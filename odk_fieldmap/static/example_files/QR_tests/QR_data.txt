@@ -1,0 +1,37 @@
+Unpacked string from Mikocheni_buildings_133.gif (from qrcode-decoder.com): eJwtj8tqwzAURL+lostQ1XG7ya6mj7ShptDalGyEkG4ixXpFuo5tgv+9MnQ5nOEwcyVHcBC5IZsrSRAvEFkfcyIKMaQNpaUMyqMX3hgQeOfjkV4K2sFEYep+P9ZV/9qWTupK/Ywvu7au0vPN2znaW/89bveN3D4VTY1fNTROtKN5KHbpHN7LAQcaoj9lZ6KP92RFDj5a1gfJEZj1EvIGy1EoBiMXaKZc4T36BE5mNOiDZtxJJsCY3vBI5hX5Fy5fHLeL4VN3XihwesFcWu0ynOc/WnNXYw==
+
+Same from zxing.org/w/decode:
+eJwtj8tqwzAURL+lostQ1XG7ya6mj7ShptDalGyEkG4ixXpFuo5tgv+9MnQ5nOEwcyVHcBC5IZsrSRAvEFkfcyIKMaQNpaUMyqMX3hgQeOfjkV4K2sFEYep+P9ZV/9qWTupK/Ywvu7au0vPN2znaW/89bveN3D4VTY1fNTROtKN5KHbpHN7LAQcaoj9lZ6KP92RFDj5a1gfJEZj1EvIGy1EoBiMXaKZc4T36BE5mNOiDZtxJJsCY3vBI5hX5Fy5fHLeL4VN3XihwesFcWu0ynOc/WnNXYw==
+
+Raw bytes:
+	
+40 12 06 54 a7 77 46 a3   87 47 17 77 a4 15 55 24
+c2 b6 c6 f7 37 45 13 15   84 73 77 96 13 66 d6 a3
+75 36 87 07 44 46 16 c4   77 94 56 b4 73 46 97 85
+87 04 67 56 f3 57 46 77   62 b3 94 d6 e5 13 56 e4
+f4 57 76 37 95 64 86 34   24 33 54 95 a7 37 25 35
+24 17 64 54 66 b6 66 37   94 94 b4 d6 15 14 e7 06
+15 54 d7 97 14 d5 83 36   86 75 16 54 f6 66 a6 b5
+63 44 b3 27 34 64 55 96   57 02 b5 03 95 a5 62 f3
+97 15 75 47 57 04 b2 f5   97 77 67 53 76 17 53 07
+65 04 e3 27 a6 e6 15 72   f3 83 96 27 66 54 e3 34
+43 45 65 45 93 16 64 e5   45 24 f7 44 b4 e3 54 b4
+86 27 04 84 e3 74 c4 15   16 36 16 f6 a3 96 c5 a3
+64 b5 03 93 25 24 64 46   a3 56 13 16 76 64 a4 55
+a6 a3 14 57 64 94 77 93   14 56 f4 26 94 d5 86 14
+b5 a6 33 45 43 33 64 24   53 56 d4 e4 f6 94 45 a7
+47 84 a4 a7 34 35 93 37   64 24 93 56 85 83 54 67
+93 56 64 84 c6 54 c3 45   64 e3 35 86 96 87 76 57
+34 66 35 77 53 07 96 e4   f6 32 f5 76 e4 e5 85 97
+73 d3 d0 ec 11 ec 11 ec   11 ec 11 ec 11 ec 11 ec
+11 ec 11 ec 11 ec 11 ec   11 ec 11 ec 11 ec 11 ec
+11 ec 11 ec 
+
+Token for app user Mikocheni_buildings_133:
+eykXJ2BuFV3ndiBhTxEKVNBsD!Gqrm$oSxHZUdHA1UNtPNeUncVxl41KsqpI3wtw
+
+https://docs.getodk.org/collect-import-export/
+
+Output of a decoded QR code from a working project
+b'{"general":{"server_url":"https://3dphotocollect.org/v1/key/eykXJ2BuFV3ndiBhTxEKVNBsD!Gqrm$oSxHZUdHA1UNtPNeUncVxl41KsqpI3wtw/projects/50","form_update_mode":"match_exactly","autosend":"wifi_and_cellular"},"project":{"name":"Mikocheni"},"admin":{}}'
+

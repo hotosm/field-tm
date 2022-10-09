@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New Project{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="title">Title</label>
+    <input name="title" id="title" value="{{ request.form['title'] }}" required>
+    <label for="description">Description</label>
+    <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
+    <p>The following two fields are used to generate empty tasks in the db with the right IDs.</p>
+    <label for="startingtask">First Task ID</label>
+    <input name="startingtask" id="startingtask">{{ request.form['startingtask'] }}</textarea>
+    <label for="lasttask">Last Task ID</label>
+    <input name="lasttask" id="lasttask">{{ request.form['lasttask'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}
