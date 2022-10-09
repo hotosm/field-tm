@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <h1>{% block title %}Pick Task for "{{ project['title'] }}"{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <!-- {% if msg %}
+    <p id="quick_view">{{msg}}</p>
+  {% endif %} -->
+
+  <div id="map"></div>
+
+  <!-- <form method="post">
+    <label for="task">Task ID</label>
+    <input name="task_id" id="task_id"
+      value="{{ request.form['task'] }}" required>
+    <input type="submit" value="Select">
+  </form> -->
+
+  <!-- <h1>Project tasks</h1>
+  {% for task in tasks %}
+    <article class="project">
+      <header>
+        <div>
+          <!-- TODO remove hardcoding -->
+          <h2>Task {{ task['task_number'] }}</h2>
+          {% if task['in_progress'] %}
+            <div class="about">by {{ task['username'] }} on {{ task['last_selected'].strftime('%Y-%m-%d') }}</div>
+          {% endif %}
+        </div>
+      </header>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %} -->
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+   crossorigin=""/>
+
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+   crossorigin=""></script>
+
+  <script>
+    function hardcodedMap() {
+
+      const map = L.map("map").setView([-6.785568, 39.261278], 13);
+      const osm = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }
+      ).addTo(map);
+
+
+
+      // area_geojson = "{{url_for('static', filename='example_files/Partial_Mikocheni/Mikocheni.geojson')}}";
+      grid_geojson = "{{url_for('static', filename='example_files/'+project['title']+'/'+project['title']+'_dumb_grid.geojson')}}";
+      // circles_geojson = "{{url_for('static', filename='example_files/Partial_Mikocheni/Mikocheni_grid_centroids.geojson')}}";
+
+      // addGeoJSONLayer(area_geojson, map)
+      grid = addGeoJSONLayer(grid_geojson, map)
+      // zoomToProject
+      // TODO: Does this work??
+      map.fitBounds(grid.getBounds());
+    }
+
+    function createPopup(feature, layer) {
+      if (feature.properties && feature.properties.id) {
+        number = feature.properties.id;
+
+        qrcode_src = "{{url_for('static', filename='example_files/'+project['title']+'/QR_codes/'+project['title']+'_buildings_42.png')}}";
+        // hacky way to combine javascript and flask logic
+        final_qrcode_src = qrcode_src.replace("42.png", ""+number+".png");
+
+        if ({{in_progress}}.includes(number)) {
+        // TODO: add check for if this user created this
+          {% if g.user['id'] %}
+            layer.setStyle({fillColor:'blue',color: 'black',weight:2,fillOpacity:0.8});
+
+            layer.bindPopup(
+              "<h1>Task "+number+"</h1>"+
+              "<p>You are responsible for this task.</p>"+
+              "<img src='"+final_qrcode_src+"' alt='' height='150px' width='150px'>"+
+              // "<a class='action' href=''>Task has been completed</a>"+
+              "<form action='{{url_for('project.release', id=project['id']) }}"+ "method='post'>"+
+                "<input style=\"display:none;\" name='tasknum' id='tasknum'"+
+                  "value='"+number+"' required>"+
+                "<input class='danger' type='submit' value='Release' onclick='return confirm(\'Are you sure?\');'>"+
+              "</form>"
+            )
+
+          {% else %}
+            layer.setStyle({fillColor:'purple',color: 'black',weight:2,fillOpacity:0.8});
+
+            layer.bindPopup("<h1>Task "+number+"</h1>")
+          {% endif %}
+        }
+        else {
+
+          layer.bindPopup(
+            "<h1>Task "+number+"</h1>"+
+            "<p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task', so that no one duplicates your work! If you are on your mobile device, select 'Download QR Code'.</p>"+
+            "<img src='"+final_qrcode_src+"' alt='' height='150px' width='150px'>"+
+            "<form method='post'>"+
+              "<input style=\"display:none;\" name='tasknum' id='tasknum'"+
+                "value='"+number+"' required>"+
+              "<label for='id_"+number+"'>Download QR Code</label>"+
+              "<input type='checkbox' id='id_"+number+"'"+ "name='select_extras' value='download'>"+
+              "<input type='submit' value='Assign me this Task'>"+
+
+            "</form>"
+          )
+        }
+      }
+    }
+
+    function addGeoJSONLayer(url, map) {
+      fetch(url)
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            layer = L.geoJSON(data, {
+              onEachFeature: createPopup
+            });
+            layer.addTo(map);
+            return layer;
+          })
+    }
+
+    hardcodedMap()
+
+  </script>
+{% endblock %}
