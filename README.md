@@ -1,7 +1,20 @@
-# field-map-odk
-Utilities to create ODK assets for field mapping
+# Field Mapping Tasking Manager (FMTM)
+## A project to provide tools for Open Mapping campaigns
+
+While we have pretty good field mapping applications, we don’t have great tools to coordinate field mapping. However, we have most of the elements needed to create a field mapping-oriented version of the HOT Tasking Manager, which allows people to select specific areas and complete tasks in a coordinated, organized fashion.
+
+It’s already possible to implement a sort of Field Mapping Tasking Manager workflow using existing tools (mostly based on ODK, particularly the new "select from map" functionality), but it’s pretty labor-intensive and tricky. We’re working on some automation to ease the pain points, which moves us closer to a fully-fledged Field Mapping Tasking Manager (FMTM).
 
 [Background and description of the project and idea are here: please have a look at this blog if you haven't yet!](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
+
+# Using OpenDataKit's Select From Map feature
+As of mid-2022, ODK incorporates a new functionality, select from map, that allows field mappers to select an object from a map, view the existing attributes, and fill out a form adding new information and attributes to that object. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
+
+![images/ODK_Select_one_from_file_map_screenshot.jpg]
+
+To prepare the appropriate map files for ODK, we are taking our inspiration from the [HOT Tasking Manager](https://tasks.hotosm.org/), which allows remote mappers to choose well-defined small "task" areas, ensuring full coverage of the project area and no unintended duplication of tasks.
+
+![images/HOT_TM_task_selection_screenshot.jpg]
 
 # Users
 ## Campaign managers
