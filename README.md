@@ -1,6 +1,8 @@
 # field-map-odk
 Utilities to create ODK assets for field mapping
 
+[Background and description of the project and idea are here: please have a look at this blog if you haven't yet!](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
+
 # Users
 ## Campaign managers
 Campaign managers select an Area of Interest (AOI) and organize field mappers to go out and collect data. They need to:
