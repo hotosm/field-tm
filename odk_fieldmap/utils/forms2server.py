@@ -1,17 +1,12 @@
 #!/bin/python3
 
-import sys, os
+import os
+import sys
 
-from odk_requests import create_project
-from odk_requests import project_id
-from odk_requests import create_form
-from odk_requests import forms
-from odk_requests import attach_to_form
-from odk_requests import publish_form
-from odk_requests import create_app_user
-from odk_requests import app_users
-from odk_requests import update_role_app_user
-from odk_requests import qr_code
+from odk_requests import (app_users, attach_to_form, create_app_user,
+                          create_form, create_project, forms, project_id,
+                          publish_form, qr_code, update_role_app_user)
+
 
 def get_formlist(indir):
     """
@@ -22,14 +17,16 @@ def get_formlist(indir):
     N.B. Operates on a subdirectory of the input directory
     named '/forms'
     """
-    formdir = os.path.join(indir, 'forms')
+    formdir = os.path.join(indir, "forms")
     filelist = os.listdir(formdir)
-    forms = [os.path.splitext(x)[0]
-             for x in filelist if
-             os.path.splitext(x)[1].lower()
-             == '.xlsx']
+    forms = [
+        os.path.splitext(x)[0]
+        for x in filelist
+        if os.path.splitext(x)[1].lower() == ".xlsx"
+    ]
     return forms
-    
+
+
 # TODO use formlist instead of traversing directory
 def formdir2project(url, aut, indir):
     """
@@ -43,20 +40,21 @@ def formdir2project(url, aut, indir):
     Project name will be the directory name.
     """
 
-    name = (os.path.basename(
-        indir.rstrip(os.path.sep)))
-    print(f'Creating a project called {name}.\n')
+    name = os.path.basename(indir.rstrip(os.path.sep))
+    print(f"Creating a project called {name}.\n")
     # TODO: first check that project does not exist
     # Create it
 
     from time import sleep
+
     sleep(2)
-    
+
     create_project(url, aut, name)
     # Need its numerical id for future operations
     pid = project_id(url, aut, name)
-    print(f'The new project ID is {pid}./n')
+    print(f"The new project ID is {pid}./n")
     return pid
+
 
 # TODO use formlist instead of traversing directory
 def push_forms(url, aut, pid, indir):
@@ -64,28 +62,27 @@ def push_forms(url, aut, pid, indir):
     Push all of the forms in the subdirectory forms
     of the input directory up to the ODK Central server.
     """
-    formdir = os.path.join(indir, 'forms')
-    
-    
+    formdir = os.path.join(indir, "forms")
+
     # Traverse the directory of xlsforms
     filelist = os.listdir(formdir)
     # keep only the files that are xlsx
     # TODO: Maybe reject all non-point input files
-    forms = [os.path.splitext(x)[0]
-             for x in filelist if
-             os.path.splitext(x)[1].lower()
-             == '.xlsx']
-    print(f'I found {len(forms)} forms to upload')
+    forms = [
+        os.path.splitext(x)[0]
+        for x in filelist
+        if os.path.splitext(x)[1].lower() == ".xlsx"
+    ]
+    print(f"I found {len(forms)} forms to upload")
     for form in forms:
-        print(f'Uploading form {form}.')
-        formpath = os.path.join(formdir,
-                                f'{form}.xlsx')
-        formfile = open(formpath, 'rb')
+        print(f"Uploading form {form}.")
+        formpath = os.path.join(formdir, f"{form}.xlsx")
+        formfile = open(formpath, "rb")
         formdata = formfile.read()
-        rf = create_form(url, aut, pid,
-                        form, formdata)
+        rf = create_form(url, aut, pid, form, formdata)
         print(rf)
-    return 'schplonk'
+    return "schplonk"
+
 
 # TODO use formlist instead of traversing the directory
 def push_geojson(url, aut, pid, indir):
@@ -98,23 +95,21 @@ def push_geojson(url, aut, pid, indir):
     # TODO loop over the forms instead of the
     # files in the geojson directory.
     # Not hugely important but more consistent.
-    gjdir = os.path.join(indir, 'geojson')
+    gjdir = os.path.join(indir, "geojson")
     filelist = os.listdir(gjdir)
-    attments = [x for x in filelist if
-                os.path.splitext(x)[1].lower()
-                == '.geojson']
+    attments = [x for x in filelist if os.path.splitext(
+        x)[1].lower() == ".geojson"]
     for attment in attments:
-        attname = (os.path.splitext
-                    (os.path.basename(attment))[0])
-        print(f'Attaching {attment}.')
-        attpath = (os.path.join(gjdir, attment))
-        attfile = open(attpath, 'rb')
+        attname = os.path.splitext(os.path.basename(attment))[0]
+        print(f"Attaching {attment}.")
+        attpath = os.path.join(gjdir, attment)
+        attfile = open(attpath, "rb")
         attdata = attfile.read()
-        
-        rg = attach_to_form(url, aut, pid,
-                            attname, attment, attdata)
-        print(rg)      
-    return 'yo'
+
+        rg = attach_to_form(url, aut, pid, attname, attment, attdata)
+        print(rg)
+    return "yo"
+
 
 def publish_forms(url, aut, pid, forms):
     """Iterate through and publish forms.
@@ -122,7 +117,8 @@ def publish_forms(url, aut, pid, forms):
     for form in forms:
         r = publish_form(url, aut, pid, form)
         print(r)
-    return 'Holy crap that worked the first try!'
+    return "Holy crap that worked the first try!"
+
 
 def create_app_users(url, aut, pid, forms):
     """
@@ -131,50 +127,51 @@ def create_app_users(url, aut, pid, forms):
     sole allocated form.
     """
     for name in forms:
-        print(f'Creating app user {name}')
+        print(f"Creating app user {name}")
         r = create_app_user(url, aut, pid, name)
         print(r)
-        
-    return 'I guess that might have worked'
+
+    return "I guess that might have worked"
+
 
 def assign_app_users_to_forms(url, aut, pid, forms):
     # First find the goddamned actorIds for the app users
     appusers_r = app_users(url, aut, pid)
     appusers = {}
     for appuser in appusers_r.json():
-        displayName = appuser['displayName']
-        appuserid = appuser['id']
+        displayName = appuser["displayName"]
+        appuserid = appuser["id"]
         appusers[displayName] = appuserid
-    print('\nShould have the app users in a dict now\n')
+    print("\nShould have the app users in a dict now\n")
     print(appusers)
     for form in forms:
         actorid = appusers[form]
-        print(f'Assigning form {form} to actor {actorid}.')
+        print(f"Assigning form {form} to actor {actorid}.")
         r = update_role_app_user(url, aut, pid, form, actorid, 2)
         print(r)
 
+
 def fetch_qr_codes(url, aut, pid, forms, indir):
-    pname = (os.path.basename(
-        indir.rstrip(os.path.sep)))
-    qrdir = os.path.join(indir, 'QR_codes')
+    pname = os.path.basename(indir.rstrip(os.path.sep))
+    qrdir = os.path.join(indir, "QR_codes")
     if not os.path.exists(qrdir):
         os.makedirs(qrdir)
     # TODO create dir if not already there
     appusers_r = app_users(url, aut, pid)
     appusertokens = {}
     for appuser in appusers_r.json():
-        displayName = appuser['displayName']
-        usertoken = appuser['token']
+        displayName = appuser["displayName"]
+        usertoken = appuser["token"]
         appusertokens[displayName] = usertoken
-    #print(appusertokens)
+    # print(appusertokens)
     for form in forms:
         token = appusertokens[form]
-        print(f'Trying to create qr code for {form} with {token}.')
+        print(f"Trying to create qr code for {form} with {token}.")
         r = qr_code(url, aut, pid, pname, form, token, qrdir)
         print(r)
-    
-        
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     """
     Accepts
     - A directory full of:
@@ -188,21 +185,20 @@ if __name__ == '__main__':
     indir = sys.argv[1]
     url = sys.argv[2]
     aut = (sys.argv[3], sys.argv[4])
-    
-    
-    print('\nHere goes nothing.\n')
+
+    print("\nHere goes nothing.\n")
     formlist = get_formlist(indir)
-    #print(f'{formlist}\n')
-    
+    # print(f'{formlist}\n')
+
     pid = formdir2project(url, aut, indir)
-    print(f'We have a project with id {pid}\n.')
-    
+    print(f"We have a project with id {pid}\n.")
+
     yabbity = push_forms(url, aut, pid, indir)
     print(yabbity)
-    
+
     blimey = push_geojson(url, aut, pid, indir)
     print(blimey)
-    
+
     publish = publish_forms(url, aut, pid, formlist)
     print(publish)
     appusers = create_app_users(url, aut, pid, formlist)
@@ -211,4 +207,3 @@ if __name__ == '__main__':
     print(ass)
 
     codies = fetch_qr_codes(url, aut, pid, formlist, indir)
-    

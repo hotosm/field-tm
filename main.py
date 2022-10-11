@@ -1,6 +1,7 @@
-from odk_fieldmap import create_app
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+from odk_fieldmap import create_app
 
 app = create_app()
 db = SQLAlchemy(app)

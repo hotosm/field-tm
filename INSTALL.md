@@ -28,9 +28,7 @@ Add debug line in code
 When this line is reached in the code then the attached tty window will 
 become interactive with ipdb.
 
-Access database (psql):
 
-    docker exec -it field-map-odk-db-1 psql -U fmtm fmtm
 
 Debugging commands
 
@@ -39,6 +37,36 @@ Debugging commands
 To get out of debugging
 
     CTRL + D
+
+## Database
+
+### Database migrations
+
+To migrate, make the changes in models.py
+Start docker services `docker compose up`
+Attach to web app container `docker compose exec web /bin/bash`
+Run migration `FLASK_APP=odk_fieldmap/__init__.py flask db migrate -m "[MIGRATION COMMENT]"`
+Upgrade db `FLASK_APP=odk_fieldmap/__init__.py flask db upgrade`
+
+### Access database (psql):
+
+Option #1:
+
+    `docker exec -it field-map-odk-db-1 psql -U fmtm fmtm`
+
+Option #2:
+
+    `docker compose exec db psql --username=fmtm --dbname=fmtm`
+
+And then connect to the database
+
+    `\c fmtm`
+
+A few commands
+
+    List tables: `/d`
+
+If you make a change, don't forget to commit the change!
 
 ## Production
 
@@ -51,10 +79,6 @@ Update the .env file with the desired settings.
 ### Start services:
 
     docker compose -f docker-compose.prod.yml up -d --build
-
-### Access database:
-
-    docker compose exec db psql --username=fmtm --dbname=fmtm
 
 ## Testing
 

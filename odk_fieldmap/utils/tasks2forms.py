@@ -1,7 +1,10 @@
 #!/bin/python3
 
-import sys, os
+import os
+import sys
+
 from openpyxl import load_workbook
+
 
 def task_areas_to_forms(indir, form_template):
     """
@@ -13,26 +16,25 @@ def task_areas_to_forms(indir, form_template):
     each task, with the appropriate references in 
     place for the Select from Map question in ODK.
     """
-    geojsondir = os.path.join(indir, 'geojson')
+    geojsondir = os.path.join(indir, "geojson")
     print(geojsondir)
     if not os.path.exists(geojsondir):
-        print('Can\'t find geojson subdirectory')
+        print("Can't find geojson subdirectory")
         # Maybe throw an exception
     filelist = os.listdir(geojsondir)
     # keep only the files that are GeoJSON
     # TODO: Maybe reject all non-point input files;
     # kind of a hassle involving a spatial lib
     # but perhaps worth it
-    aois = [x for x in filelist if
-            os.path.splitext(x)[1].lower()
-            == '.geojson']
-    outdir = os.path.join(indir, 'forms')
+    aois = [x for x in filelist if os.path.splitext(
+        x)[1].lower() == ".geojson"]
+    outdir = os.path.join(indir, "forms")
     if not os.path.exists(outdir):
-        print(f'Making directory {outdir}')
+        print(f"Making directory {outdir}")
         os.makedirs(outdir)
     for aoi in aois:
         prep_form(form_template, aoi, outdir)
-    
+
 
 def prep_form(form_template, AOIfile, outdir):
     """
@@ -40,25 +42,22 @@ def prep_form(form_template, AOIfile, outdir):
     to a specific area and GeoJSON file of features.
     Only works with OSM_Buildings_ODK_v_0-1-0.xlsx
     """
-    form_basename = os.path.splitext(
-        os.path.basename(form_template))[0]
+    form_basename = os.path.splitext(os.path.basename(form_template))[0]
     print(form_basename)
     (AOIpath, AOIext) = os.path.splitext(AOIfile)
-    AOIbasename = os.path.splitext(
-        os.path.basename(AOIfile))[0]
-    wb = load_workbook(filename = form_template)
-    surveyws = wb['survey']
-    settingws = wb['settings']
-    
-    settingws['A2'] = f'{AOIbasename}'
-    settingws['B2'] = f'{AOIbasename}'
-    surveyws['A9'] = (f'select_one_from_file '
-                      f'{AOIbasename}{AOIext}')
-    outfile = os.path.join(outdir,
-                           f'{AOIbasename}.xlsx')
-    print(f'Writing: {outfile}')
+    AOIbasename = os.path.splitext(os.path.basename(AOIfile))[0]
+    wb = load_workbook(filename=form_template)
+    surveyws = wb["survey"]
+    settingws = wb["settings"]
+
+    settingws["A2"] = f"{AOIbasename}"
+    settingws["B2"] = f"{AOIbasename}"
+    surveyws["A9"] = f"select_one_from_file " f"{AOIbasename}{AOIext}"
+    outfile = os.path.join(outdir, f"{AOIbasename}.xlsx")
+    print(f"Writing: {outfile}")
     wb.save(outfile)
-    
+
+
 if __name__ == "__main__":
     """
     If run from CLI, takes two positional arguments
@@ -71,5 +70,5 @@ if __name__ == "__main__":
     """
     indir = sys.argv[1]
     formfile = sys.argv[2]
-    print('here goes')
+    print("here goes")
     task_areas_to_forms(indir, formfile)
