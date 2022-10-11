@@ -37,3 +37,6 @@ db.sqlite3
 
 # ignore settings
 .env
+
+# project related
+odk_fieldmap/static/projects

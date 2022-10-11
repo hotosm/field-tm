@@ -1,7 +1,8 @@
 import pytest
 from flask import g, session
+
 from odk_fieldmap.db import get_db
-from odk_fieldmap.models import (User)
+from odk_fieldmap.models import User
 
 
 def test_register(client, app):
@@ -11,7 +12,9 @@ def test_register(client, app):
     )
     assert response.headers["Location"] == "http://localhost/auth/login"
     with app.app_context():
-        assert get_db().session.query(User).where(User.username == 'a').first() is not None
+        assert get_db().session.query(User).where(
+            User.username == 'a').first() is not None
+
 
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('', '', b'Username is required.'),
@@ -24,6 +27,7 @@ def test_register_validate_input(client, username, password, message):
         data={'username': username, 'password': password}
     )
     assert message in response.data
+
 
 def test_login(client, auth):
     assert client.get('/auth/login').status_code == 200
@@ -43,6 +47,7 @@ def test_login(client, auth):
 def test_login_validate_input(auth, username, password, message):
     response = auth.login(username, password)
     assert message in response.data
+
 
 def test_logout(client, auth):
     auth.login()

@@ -1,6 +1,8 @@
 #!/usr/bin/python3
-import sys, os
+import os
 import re
+import sys
+
 
 def parse_error(string, version):
     # split the error message into a list of version numbers
@@ -17,13 +19,14 @@ def parse_error(string, version):
 
     def sortbylastnum(instring):
         nums = instring.split('.')
-        last = int(nums[len(nums) -1])
+        last = int(nums[len(nums) - 1])
         return last
-    
-    sortedcandidates = sorted(filtered, key = sortbylastnum)
-    
+
+    sortedcandidates = sorted(filtered, key=sortbylastnum)
+
     with open('pygdalversion.txt', 'w') as outfile:
         outfile.write(sortedcandidates[-1])
+
 
 if __name__ == "__main__":
     parse_error(sys.argv[1], sys.argv[2])

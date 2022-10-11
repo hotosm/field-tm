@@ -1,4 +1,5 @@
 import pytest
+
 from odk_fieldmap.db import get_db
 from odk_fieldmap.models import Project
 
@@ -15,6 +16,7 @@ def test_index(client, auth):
     assert b'by test on 2022-10-05' in response.data
     assert b'test\nbody' in response.data
     assert b'href="/1/update"' in response.data
+
 
 @pytest.mark.parametrize('path', (
     '/create',
@@ -51,6 +53,7 @@ def test_exists_required(client, auth, path):
     auth.login()
     assert client.post(path).status_code == 404
 
+
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
@@ -86,6 +89,7 @@ def test_create_update_validate(client, auth, path):
     auth.login()
     response = client.post(path, data={'title': '', 'description': ''})
     assert b'Title is required.' in response.data
+
 
 def test_delete(client, auth, app):
     auth.login()

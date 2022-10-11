@@ -1,9 +1,9 @@
 import os
-from flask import Flask
-from flask import render_template
-from flask_migrate import Migrate
-from config import config
 
+from flask import Flask, render_template
+from flask_migrate import Migrate
+
+from config import config
 
 migrate = Migrate()
 
@@ -11,9 +11,7 @@ migrate = Migrate()
 def create_app(config_name=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=False)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-    )
+    app.config.from_mapping(SECRET_KEY="dev")
 
     if config_name is None:
         config_name = os.environ.get("FLASK_CONFIG", "development")
@@ -28,6 +26,7 @@ def create_app(config_name=None):
         pass
 
     from .models import db
+
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -41,16 +40,18 @@ def create_app(config_name=None):
         @app.route("/map")
         @app.route("/map/<pname>")
         def map_select_page(pname=None):
-            return render_template('map.html', pname=pname)
+            return render_template("map.html", pname=pname)
 
         db.create_all()
 
         # Register Blueprints
         from . import auth
+
         app.register_blueprint(auth.bp)
 
         from . import project
+
         app.register_blueprint(project.bp)
-        app.add_url_rule('/', endpoint='index')
+        app.add_url_rule("/", endpoint="index")
 
         return app
