@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py run -h 0.0.0.0'
+    volumes:
+      - .:/app
+    expose:
+      - 5000
+    stdin_open: true # for debugging
+    tty: true # for debugging
+    environment:
+      - FLASK_APP=odk_fieldmap/__init__.py
+      - FLASK_ENV=${FLASK_ENV}
+      - WEB_DOMAIN=${WEB_DOMAIN}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+  # alternative webproxy to nginx
+  traefik:
+    image: traefik:v2.2
+    ports:
+      - 80:80
+      - 8081:8080
+    volumes:
+      - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  postgres_data:
