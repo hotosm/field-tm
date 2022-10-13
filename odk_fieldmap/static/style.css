@@ -141,3 +141,37 @@ input[type=submit] {
   margin-top: 45px;
   color: black;
 }
+
+/* 
+This is a reference for which colors are used for task status.
+Currently being set with hardcoded strings in map.html
+
+.status {
+  border-color: #e1e0e0;
+  border-width: 1;
+  fill-opacity:0.8;
+}
+
+.status.available {
+  background-color: rgb(255, 255, 255);
+}
+
+.status.readyforvalidation {
+  background-color: rgb(173, 230, 239);
+}
+
+.status.moremappingneeded {
+  background-color: rgb(252, 236, 164);
+}
+
+.status.finished {
+  background-color: rgb(64, 172, 140);
+}
+
+.status.unavailable {
+  background-color: rgb(216, 218, 228);
+}
+
+.status.priorityareas {
+  background-color: rgb(239, 209, 209);
+} */
