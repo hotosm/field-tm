@@ -288,12 +288,19 @@ def map(id):
 def task_by_feature_id(tasks):
     task_dict = {}
     for task in tasks:
+        # status = {"value":str(task["status"].name), "label":str(task["status"].value)}
+        status = {"value":mock_status(), "label":str(task["status"].value)}
+
         task_dict[task["feature_id"]] = {
             "id": task["id"],
             "task_doer": task["task_doer"],
-            "status": str(task["status"]),
+            "status": status,
         }
     return task_dict
+
+import random
+def mock_status(): 
+    return random.choice(['available','unavailable','readyforvalidation'])
 
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))

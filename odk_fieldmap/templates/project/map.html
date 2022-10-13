@@ -71,23 +71,50 @@
       // map.fitBounds(grid.getBounds());
     }
 
+    function getStyle(statusValue) {
+      bg = 'rgb(216, 218, 228)' // set to unavailable
+      switch(statusValue) {
+        case 'available':
+          bg = 'rgb(255, 255, 255)'
+          break;
+        case 'unavailable':
+          bg = 'rgb(216, 218, 228)'
+          break;
+        case 'readyforvalidation':
+          bg = 'rgb(173, 230, 239)'
+          break;
+        default:
+          bg = 'rgb(216, 218, 228)' //set to unavailable
+          break;
+      }
+
+      return {color: '#e1e0e0',
+        weight: 1,
+        fillOpacity:0.8,
+        fillColor: bg
+      }
+    } 
+
+    first = 0
+
     function createPopup(feature, layer) {
+      //debugger
       if (feature.properties && feature.properties.id) {
         feature_id = feature.properties.id;
         task = tasks[feature_id];
+        layer.setStyle(getStyle(task.status.value))
 
         // this should be set by the same environment variable as PROJECT_FOLDER_PATH
         qrcode_src = "{{url_for('static', filename=project_path+'/QR_codes/')}}";
         // hacky way to combine javascript and flask logic
         final_qrcode_src = qrcode_src+"buildings_"+feature_id+".gif";
 
-        if (task.status != 'Available for mapping') {
+        if (task.status.value != 'Available for mapping') {
         // TODO: add check for if this user created this
         //if g.user['id'] == task['task_doer']
-          layer.setStyle({fillColor:'blue',color: 'black',weight:2,fillOpacity:0.8});
           layer.bindPopup(
             "<h1>Task "+feature_id+"</h1>"+
-            "<p>" + task.status + "</p>"+
+            "<p>" + task.status.label + " " + task.status.value + "</p>"+
             "<img src='"+final_qrcode_src+"' alt='' height='150px' width='150px'>"+
             // "<a class='action' href=''>Task has been completed</a>"+
             "<form action='{{url_for('project.release', id=project['id']) }}"+ "method='post'>"+
