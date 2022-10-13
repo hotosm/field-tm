@@ -53,22 +53,19 @@
     var grid_geojson = {{(geojson|default({}))|tojson}};
     var tasks = {{(tasks|default({}))|tojson}};
 
-    function hardcodedMap() {
-      const map = L.map("map").setView([-6.785568, 39.261278], 13);
+    function setMap() {
+      const map = L.map("map");
       const osm = L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          maxZoom: 19,
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }
       ).addTo(map);
 
+      // zoom to map
       grid = addGeoJSONLayer(map)
-
-      // zoomToProject
-      // TODO: Does this work??
-      // map.fitBounds(grid.getBounds());
+      map.fitBounds(grid.getBounds());
     }
 
     function getStyle(statusValue) {
@@ -102,14 +99,39 @@
       if (feature.properties && feature.properties.id) {
         feature_id = feature.properties.id;
         task = tasks[feature_id];
-        layer.setStyle(getStyle(task.status.value))
-
-        // this should be set by the same environment variable as PROJECT_FOLDER_PATH
         qrcode_src = "{{url_for('static', filename=project_path+'/QR_codes/')}}";
-        // hacky way to combine javascript and flask logic
         final_qrcode_src = qrcode_src+"buildings_"+feature_id+".gif";
 
-        if (task.status.value != 'Available for mapping') {
+        layer.setStyle(getStyle(task.status.value))
+
+        switch(task.status.value) {
+          case 'available':
+            layer.bindPopup(
+                `<h1>Task ${feature_id}</h1>
+                <p>${task.status.label}</p>
+                <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task', so that no one duplicates your work! If you are on your mobile device, select 'Download QR Code'.</p>
+                <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
+                <form method='post'>
+                  <input style=\"display:none;\" name='tasknum' id='tasknum'
+                    value=${feature_id} required>
+                  <label for='id_"+feature_id+"'>Download QR Code</label>
+                  <input type='checkbox' id='id_"+feature_id+"'"+ "name='select_extras' value='download'>
+                  <input type='submit' value='Assign me this Task'>
+                </form>`
+            )
+            break;
+          case 'unavailable': 
+            layer.bindPopup(
+                `<h1>Task ${feature_id}</h1>
+                <p>${task.status.label}</p>
+                <p>${task.task_doer}</p>`
+              )
+            break; 
+          default:
+            
+        }
+
+        /*  if (task.status.value != 'Available for mapping') {
         // TODO: add check for if this user created this
         //if g.user['id'] == task['task_doer']
           layer.bindPopup(
@@ -139,7 +161,7 @@
 
             "</form>"
           )
-        }
+        }  */
       }
     }
 
@@ -151,7 +173,7 @@
       return layer;
     }
 
-    hardcodedMap()
+    setMap()
 
   </script>
 {% endblock %}
