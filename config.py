@@ -15,6 +15,7 @@ class BaseConfig:
             os.path.dirname(os.path.abspath(__file__)),
             "odk_fieldmap", "static"))
     PROJECTS_UPLOAD_FOLDER_NAME = "projects"
+    QR_CODE_FOLDER_NAME = "QR_codes"
 
 
 class DevelopmentConfig(BaseConfig):
