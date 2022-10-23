@@ -21,14 +21,14 @@
   </form> -->
 
   <h1>Project tasks</h1>
-  {% for task in tasks %}
+  {% for task in tasks.values() %}
     <article class="project">
       <header>
         <div>
-          <h2>Task {{ task['feature_id'] }}</h2>
-          {% if task['status'] != 'available' %}
-            <div class="about">by {{ task['username'] }}</div>
-          {% endif %}  */}}
+          <h2>Task {{ task.id }}</h2>
+          {% if task.status.value != 'available' %}
+            <div class="about">Status: {{task.status.label}} ({{ task.task_doer }})</div>
+          {% endif %}  
         </div>
       </header>
     </article>
@@ -109,14 +109,25 @@
             layer.bindPopup(
                 `<h1>Task ${feature_id}</h1>
                 <p>${task.status.label}</p>
-                <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task', so that no one duplicates your work! If you are on your mobile device, select 'Download QR Code'.</p>
+                <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
                 <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
                 <form method='post'>
-                  <input style=\"display:none;\" name='tasknum' id='tasknum'
-                    value=${feature_id} required>
-                  <label for='id_"+feature_id+"'>Download QR Code</label>
-                  <input type='checkbox' id='id_"+feature_id+"'"+ "name='select_extras' value='download'>
-                  <input type='submit' value='Assign me this Task'>
+                  <input style=\"display:none;\" name='taskid' id='taskid'
+                    value=${task.id} required>
+                  <input style=\"display:none;\" name='newstatus' id='newstatus'
+                    value='Unavailable' required>
+                  <input style=\"display:none;\" name='qrcode' id='qrcode'
+                    value='yes' required>
+                  <input type='submit' value='Assign me this Task & Download QR Code'>
+                </form>
+                <form method='post'>
+                  <input style=\"display:none;\" name='taskid' id='taskid'
+                    value=${task.id} required>
+                  <input style=\"display:none;\" name='newstatus' id='newstatus'
+                    value="Unavailable" required>
+                  <input style=\"display:none;\" name='qrcode' id='qrcode'
+                    value='no' required>
+                  <input type='submit' value='Just assign me this Task'>
                 </form>`
             )
             break;
