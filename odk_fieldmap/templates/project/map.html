@@ -89,7 +89,6 @@
     first = 0
 
     function createPopup(feature, layer) {
-      //debugger
       if (feature.properties && feature.properties.id) {
         feature_id = feature.properties.id;
         task = tasks[feature_id];
@@ -109,8 +108,8 @@
                 <form method='post'>
                   <input style=\"display:none;\" name='taskid' id='taskid'
                     value=${task.id} required>
-                  <input style=\"display:none;\" name='qrcode_src' id='qrcode_src'
-                    value='${final_qrcode_src}' required>
+                  <input style=\"display:none;\" name='qrcode' id='qrcode'
+                    value='yes' required>
                   <input type='submit' value='Download QR Code'>
                 </form>
 
@@ -136,8 +135,8 @@
                 <form method='post'>
                   <input style=\"display:none;\" name='taskid' id='taskid'
                     value=${task.id} required>
-                  <input style=\"display:none;\" name='qrcode_src' id='qrcode_src'
-                    value='${final_qrcode_src}' required>
+                  <input style=\"display:none;\" name='qrcode' id='qrcode'
+                    value='yes' required>
                   <input type='submit' value='Download QR Code'>
                 </form>
                 `

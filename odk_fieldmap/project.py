@@ -4,10 +4,8 @@ import os
 import posixpath
 import zipfile
 from datetime import datetime
-from flask import send_file
-
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
-                   request, session, url_for)
+                   request, session, url_for, send_file)
 from werkzeug.exceptions import abort
 
 from odk_fieldmap.auth import login_required
@@ -207,32 +205,6 @@ def get_project(id, check_author=True):
 
     return project
 
-
-# most recent attempt to download: https://gist.github.com/redlotus/3138bd661ceb02abf1f6
-# def get_file_params(full_path, filename):
-#     filepath = os.path.abspath(current_app.root_path)+"/../download/"+filename
-#     if os.path.isfile(filepath):
-#         return filename,"/download/"+filename,os.path.getsize(filepath)
-#     with open(filepath, 'w') as outfile:
-#         data = load_from_mongo("ddcss","queries",\
-#             criteria = {"_id" : ObjectId(filename)}, projection = {'_id': 0})
-#         #outfile.write(json.dumps(data[0], default=json_util.default))
-#         outfile.write(dumps(data[0]))
-#     return filename, "/download/"+filename, os.path.getsize(filepath)
-#
-# def download(file_id):
-# 	(file_basename, server_path, file_size) = get_file_params(file_id)
-# 	response = make_response()
-# 	response.headers['Content-Description'] = 'File Transfer'
-# 	response.headers['Cache-Control'] = 'no-cache'
-# 	response.headers['Content-Type'] = 'application/octet-stream'
-# 	response.headers['Content-Disposition'] = 'attachment; filename=%s' % file_basename
-# 	response.headers['Content-Length'] = file_size
-# 	response.headers['X-Accel-Redirect'] = server_path # nginx: http://wiki.nginx.org/NginxXSendfile
-#
-# 	return response
-
-# todo: make this work
 def check_for_feature_id(request):
     feature_id = request.form["tasknum"]
     error = None
@@ -246,19 +218,6 @@ def check_for_feature_id(request):
             flash(error)
     return feature_id
 
-def check_for_new_status(request):
-    new_status = request.form["newstatus"]
-    error = None
-
-    #msg = "Attempted to change status to: " + new_status
-    if not new_status:
-        error = "New status cannot be blank. Please try again."
-
-        if error is not None:
-            msg = error
-            flash(error)
-    return new_status
-
 def is_valid_status_change(task, new_status):
     if task.status is TaskStatus.available:
         return (new_status == TaskStatus.unavailable)
@@ -269,24 +228,26 @@ def is_valid_status_change(task, new_status):
         return False
     return False
 
+# Get returns map of a project dispalying all tasks. 
+# Post can either include a qrcode to be downloaded, or a new status for a particular task.
 @bp.route("/<int:id>/map", methods=("GET", "POST"))
 def map(id):
     if request.method == "POST":
         user_id = session.get("user_id")
         if user_id:
             task_id = request.form["taskid"]
-            qrcode_src = request.form["qrcode_src"]
+            qrcode = request.form["qrcode"]
             error = None
 
             if not task_id:
                 error = "Task ID is required."
-            elif (qrcode_src):
+            elif (qrcode == True):
                 try:
                     project = get_project(id, False)
                     return send_file(get_qr_file(project['title'], task_id), as_attachment=True)
 
                 except Exception as e:
-                    error = f"Download failed for {qrcode_src} due to {e}"
+                    error = f"Download failed for {qrcode} due to {e}"
                     flash(error)
                     return render_map_by_project_id(id)
             
@@ -309,7 +270,7 @@ def map(id):
                         matching_task.task_doer = user_id
                         db.session.commit()
                 except:
-                    error = "Database query or update failed"
+                    error = f"Database query or update failed with error: {e}"
                         
             if error is not None:
                 flash(error)
@@ -335,7 +296,6 @@ def task_by_feature_id(tasks):
     task_dict = {}
     for task in tasks:
         status = {"value":str(task["status"].name), "label":str(task["status"].value)}
-        # status = {"value":mock_status(), "label":str(task["status"].value)}
 
         task_dict[task["feature_id"]] = {
             "id": task["id"],
@@ -344,11 +304,6 @@ def task_by_feature_id(tasks):
             "status": status,
         }
     return task_dict
-
-import random
-def mock_status(): 
-    return random.choice(['available','unavailable','readyforvalidation'])
-
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required
