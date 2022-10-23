@@ -19,7 +19,7 @@ Update the .env file with the desired settings.
 
 Open tty to container
 
-    docker attach field-map-odk-web-1
+    docker attach fmtm-web-1
 
 Add debug line in code
 
@@ -52,7 +52,7 @@ Upgrade db `FLASK_APP=odk_fieldmap/__init__.py flask db upgrade`
 
 Option #1:
 
-    `docker exec -it field-map-odk-db-1 psql -U fmtm fmtm`
+    `docker exec -it fmtm-db-1 psql -U fmtm fmtm`
 
 Option #2:
 
