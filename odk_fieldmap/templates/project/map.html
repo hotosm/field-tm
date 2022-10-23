@@ -7,18 +7,11 @@
 {% endblock %}
 
 {% block content %}
-  <!-- {% if msg %}
+  {% if msg %}
     <p id="quick_view">{{msg}}</p>
-  {% endif %} -->
+  {% endif %}
 
   <div id="map"></div>
-
-  <!-- <form method="post">
-    <label for="task">Task ID</label>
-    <input name="task_id" id="task_id"
-      value="{{ request.form['task'] }}" required>
-    <input type="submit" value="Select">
-  </form> -->
 
   <h1>Project tasks</h1>
   {% for task in tasks.values() %}
@@ -49,9 +42,10 @@
    crossorigin=""></script>
 
   <script>
-
     var grid_geojson = {{(geojson|default({}))|tojson}};
     var tasks = {{(tasks|default({}))|tojson}};
+    var project_title = '{{project['title']}}'
+    var user_id = '{{userid}}'
 
     function setMap() {
       const map = L.map("map");
@@ -111,15 +105,15 @@
                 <p>${task.status.label}</p>
                 <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
                 <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
+
                 <form method='post'>
                   <input style=\"display:none;\" name='taskid' id='taskid'
                     value=${task.id} required>
-                  <input style=\"display:none;\" name='newstatus' id='newstatus'
-                    value='Unavailable' required>
-                  <input style=\"display:none;\" name='qrcode' id='qrcode'
-                    value='yes' required>
-                  <input type='submit' value='Assign me this Task & Download QR Code'>
+                  <input style=\"display:none;\" name='qrcode_src' id='qrcode_src'
+                    value='${final_qrcode_src}' required>
+                  <input type='submit' value='Download QR Code'>
                 </form>
+
                 <form method='post'>
                   <input style=\"display:none;\" name='taskid' id='taskid'
                     value=${task.id} required>
@@ -132,47 +126,33 @@
             )
             break;
           case 'unavailable': 
-            layer.bindPopup(
+            if (user_id == task.task_doer) {
+              layer.bindPopup(
                 `<h1>Task ${feature_id}</h1>
-                <p>${task.status.label}</p>
-                <p>${task.task_doer}</p>`
+                <p>Status: ${task.status.label}</p>
+                
+                <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
+
+                <form method='post'>
+                  <input style=\"display:none;\" name='taskid' id='taskid'
+                    value=${task.id} required>
+                  <input style=\"display:none;\" name='qrcode_src' id='qrcode_src'
+                    value='${final_qrcode_src}' required>
+                  <input type='submit' value='Download QR Code'>
+                </form>
+                `
               )
+            } 
             break; 
           default:
+            layer.bindPopup(
+              `<h1>Task ${feature_id}</h1>
+              <p>${task.status.label}</p>
+              <p>${task.task_doer}</p>
+              `
+            )
             
         }
-
-        /*  if (task.status.value != 'Available for mapping') {
-        // TODO: add check for if this user created this
-        //if g.user['id'] == task['task_doer']
-          layer.bindPopup(
-            "<h1>Task "+feature_id+"</h1>"+
-            "<p>" + task.status.label + " " + task.status.value + "</p>"+
-            "<img src='"+final_qrcode_src+"' alt='' height='150px' width='150px'>"+
-            // "<a class='action' href=''>Task has been completed</a>"+
-            "<form action='{{url_for('project.release', id=project['id']) }}"+ "method='post'>"+
-              "<input style=\"display:none;\" name='tasknum' id='tasknum'"+
-                "value='"+feature_id+"' required>"+
-              "<input class='danger' type='submit' value='Release' onclick='return confirm(\'Are you sure?\');'>"+
-            "</form>"
-          )
-        //}
-      } else {
-          layer.bindPopup(
-            "<h1>Task "+feature_id+"</h1>"+
-            "<p>" + task.status + "</p>"+
-            "<p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task', so that no one duplicates your work! If you are on your mobile device, select 'Download QR Code'.</p>"+
-            "<img src='"+final_qrcode_src+"' alt='' height='150px' width='150px'>"+
-            "<form method='post'>"+
-              "<input style=\"display:none;\" name='tasknum' id='tasknum'"+
-                "value='"+feature_id+"' required>"+
-              "<label for='id_"+feature_id+"'>Download QR Code</label>"+
-              "<input type='checkbox' id='id_"+feature_id+"'"+ "name='select_extras' value='download'>"+
-              "<input type='submit' value='Assign me this Task'>"+
-
-            "</form>"
-          )
-        }  */
       }
     }
 

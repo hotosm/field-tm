@@ -4,6 +4,7 @@ import os
 import posixpath
 import zipfile
 from datetime import datetime
+from flask import send_file
 
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
                    request, session, url_for)
@@ -71,6 +72,11 @@ def create():
 
     return render_template("project/create.html")
 
+def get_qr_file(title, task_id):
+    project_folder = get_project_folder(title)
+    qr_folder_name = current_app.config["QR_CODE_FOLDER_NAME"]
+    file_name = f'buildings_{task_id}.gif'
+    return os.path.join(project_folder, qr_folder_name, file_name)
 
 def get_project_folder(title):
     static_folder_path = current_app.config["STATIC_FOLDER"]
@@ -269,22 +275,31 @@ def map(id):
         user_id = session.get("user_id")
         if user_id:
             task_id = request.form["taskid"]
-            new_status = request.form["newstatus"]
-            download_qr = request.form["qrcode"]
+            qrcode_src = request.form["qrcode_src"]
             error = None
 
             if not task_id:
                 error = "Task ID is required."
+            elif (qrcode_src):
+                try:
+                    project = get_project(id, False)
+                    return send_file(get_qr_file(project['title'], task_id), as_attachment=True)
+
+                except Exception as e:
+                    error = f"Download failed for {qrcode_src} due to {e}"
+                    flash(error)
+                    return render_map_by_project_id(id)
+            
+            new_status = request.form["newstatus"]
             if not new_status:
                 error = "New status is required."
-
+                
             if error is None:
                 try:
                     matching_task = db.session.query(Task).where(
                         Task.id == task_id
                     ).first()
 
-                    import ipdb;ipdb.set_trace()
                     if not matching_task:
                         error = "Task cannot be found."
                     elif not is_valid_status_change(matching_task, new_status):
@@ -295,26 +310,6 @@ def map(id):
                         db.session.commit()
                 except:
                     error = "Database query or update failed"
-
-                    # TODO fix this w/ postgres query
-                    # db.execute(
-                    #     'UPDATE task SET status = ?, task_doer = ?, last_selected = ?'
-                    #     ' WHERE project_id = ? AND feature_id = ?',
-                    #     (1, session.get('user_id'), datetime.now(), id, feature_id)
-                    # )
-                    # db.session.commit()
-
-                    # extra_actions = request.form.getlist('select_extras')
-                    # flash(extra_actions)
-                    # if extra_actions.contains('download'):
-                    #     new_filename = project['title']+"_task"+task_id+"_qrcode.gif"
-                    #     full_path = url_for('static', filename='example_files/Partial_Mikocheni/QR_codes/Mikocheni_buildings_198.gif')
-                    #     flash("Downloading: "+full_path)
-                    #     return send_from_directory(full_path, filename, as_attachment=True)
-                    # else:
-                    #     flash("No download requested.")
-                    # return redirect(url_for('project.index'))
-
                         
             if error is not None:
                 flash(error)
@@ -333,7 +328,7 @@ def render_map_by_project_id(id):
     path = get_relative_project_path(project["title"])
     geojson = get_geojson(project['title'])
     return render_template(
-        "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson,
+        "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson, userid=session.get("user_id")
     )
 
 def task_by_feature_id(tasks):
