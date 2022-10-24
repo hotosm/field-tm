@@ -1,8 +1,8 @@
 import pytest
 from flask import g, session
 
-from odk_fieldmap.db import get_db
-from odk_fieldmap.models import User
+from src.db import get_db
+from src.models import User
 
 
 def test_register(client, app):

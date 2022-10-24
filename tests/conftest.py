@@ -3,10 +3,10 @@ import tempfile
 
 import pytest
 
-from odk_fieldmap import create_app
-from odk_fieldmap.auth import generate_password_hash
-from odk_fieldmap.db import get_db, init_db
-from odk_fieldmap.models import Project, Task, User
+from src import create_app
+from src.auth import generate_password_hash
+from src.db import get_db, init_db
+from src.models import Project, Task, User
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
     _data_sql = f.read().decode('utf8')
