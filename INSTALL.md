@@ -28,6 +28,28 @@ Add debug line in code
 When this line is reached in the code then the attached tty window will 
 become interactive with ipdb.
 
+A few of those commands:
+    [Command CheatSheet](https://wangchuan.github.io/coding/2017/07/12/ipdb-cheat-sheet.html)
+    h(elp)
+    w(here)
+    d(own)
+    u(p)
+    b(reak): [ ([filename:]lineno | function) [, condition] ]
+    tbreak: [ ([filename:]lineno | function) [, condition] ]
+    cl(ear): [bpnumber [bpnumber ...] ]
+    disable bpnumber: [bpnumber ...]
+    enable bpnumber: [bpnumber ...]
+    ignore bpnumber count
+    condition bpnumber condition
+    s(tep)
+    n(ext)
+    unt(il)
+    r(eturn)
+    run [args ...]
+    c(ont(inue))
+    l(ist): [first [,last]]
+    a(rgs)
+    p expression
 
 
 Debugging commands
@@ -45,8 +67,8 @@ To get out of debugging
 To migrate, make the changes in models.py
 Start docker services `docker compose up`
 Attach to web app container `docker compose exec web /bin/bash`
-Run migration `FLASK_APP=odk_fieldmap/__init__.py flask db migrate -m "[MIGRATION COMMENT]"`
-Upgrade db `FLASK_APP=odk_fieldmap/__init__.py flask db upgrade`
+Run migration `FLASK_APP=src/web/__init__.py flask db migrate -m "[MIGRATION COMMENT]"`
+Upgrade db `FLASK_APP=src/web/__init__.py flask db upgrade`
 
 ### Access database (psql):
 
@@ -82,7 +104,7 @@ Update the .env file with the desired settings.
 
 ## Testing
 
-    pip install -r odk_fieldmap/requirements.txt
+    pip install -r src/web/requirements.txt
     python -m pytest
 
 ## Troubleshooting

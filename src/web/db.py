@@ -3,7 +3,7 @@ from flask import current_app, g
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from .models import db
+from src.web.models import db
 
 
 def get_db():

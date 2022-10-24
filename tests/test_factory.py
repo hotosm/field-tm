@@ -1,4 +1,4 @@
-from odk_fieldmap import create_app
+from src import create_app
 
 
 def test_config():

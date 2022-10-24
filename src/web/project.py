@@ -8,8 +8,8 @@ from flask import (Blueprint, current_app, flash, g, redirect, render_template,
                    request, session, url_for, send_file)
 from werkzeug.exceptions import abort
 
-from odk_fieldmap.auth import login_required
-from odk_fieldmap.models import Project, Task, TaskStatus, User, db
+from src.web.auth import login_required
+from src.web.models import Project, Task, TaskStatus, User, db
 
 bp = Blueprint("project", __name__)
 
@@ -241,7 +241,7 @@ def map(id):
 
             if not task_id:
                 error = "Task ID is required."
-            elif (qrcode == True):
+            elif (qrcode == 'yes'):
                 try:
                     project = get_project(id, False)
                     return send_file(get_qr_file(project['title'], task_id), as_attachment=True)

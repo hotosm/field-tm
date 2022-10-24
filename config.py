@@ -13,7 +13,7 @@ class BaseConfig:
     STATIC_FOLDER = os.environ.get(
         "PROJECTS_UPLOAD_FOLDER", os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "odk_fieldmap", "static"))
+            "src", "web", "static"))
     PROJECTS_UPLOAD_FOLDER_NAME = "projects"
     QR_CODE_FOLDER_NAME = "QR_codes"
 

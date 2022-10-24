@@ -39,4 +39,4 @@ db.sqlite3
 .env
 
 # project related
-odk_fieldmap/static/projects
+src/web/static/projects

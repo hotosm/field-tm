@@ -11,7 +11,7 @@ services:
     stdin_open: true # for debugging
     tty: true # for debugging
     environment:
-      - FLASK_APP=odk_fieldmap/__init__.py
+      - FLASK_APP=src/web/__init__.py
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
