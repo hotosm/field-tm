@@ -133,14 +133,29 @@ input[type=submit] {
   min-width: 10em;
 }
 
-#map {
-  height: 500px;
-}
-
 .highlighted-action {
   margin-top: 45px;
   color: black;
 }
+
+/* Making the map look better on mobile */
+#map {
+  height: 35rem;
+  width: 100%;
+}
+
+.fmtm-popup {
+  width: 200px;
+}
+
+.fmtm-popup-div {
+  width: 200px;
+}
+
+.fmtm-popup-div > p {
+  width: 150px;
+}
+
 
 /* 
 This is a reference for which colors are used for task status.

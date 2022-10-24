@@ -37,9 +37,13 @@
    crossorigin=""/>
 
   <!-- Make sure you put this AFTER Leaflet's CSS -->
- <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
    crossorigin=""></script>
+
+  <!-- responseive Leaflet popups -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.css" />
+  <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
 
   <script>
     var grid_geojson = {{(geojson|default({}))|tojson}};
@@ -86,9 +90,8 @@
       }
     } 
 
-    first = 0
-
     function createPopup(feature, layer) {
+      
       if (feature.properties && feature.properties.id) {
         feature_id = feature.properties.id;
         task = tasks[feature_id];
@@ -97,49 +100,59 @@
 
         layer.setStyle(getStyle(task.status.value))
 
+        var popupOptions = {
+          'maxWidth': '500',
+          'className' : 'fmtm-popup' // classname for another popup
+        }
+
+        //var popup = L.pop()
         switch(task.status.value) {
           case 'available':
             layer.bindPopup(
-                `<h1>Task ${feature_id}</h1>
-                <p>${task.status.label}</p>
-                <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
-                <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
+                `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${feature_id}</h1>
+                  <p>${task.status.label}</p>
+                  <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
+                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
 
-                <form method='post'>
-                  <input style=\"display:none;\" name='taskid' id='taskid'
-                    value=${task.id} required>
-                  <input style=\"display:none;\" name='qrcode' id='qrcode'
-                    value='yes' required>
-                  <input type='submit' value='Download QR Code'>
-                </form>
+                  <form method='post'>
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task.id} required>
+                    <input style=\"display:none;\" name='qrcode' id='qrcode'
+                      value='yes' required>
+                    <input type='submit' value='Download QR Code'>
+                  </form>
 
-                <form method='post'>
-                  <input style=\"display:none;\" name='taskid' id='taskid'
-                    value=${task.id} required>
-                  <input style=\"display:none;\" name='newstatus' id='newstatus'
-                    value="Unavailable" required>
-                  <input style=\"display:none;\" name='qrcode' id='qrcode'
-                    value='no' required>
-                  <input type='submit' value='Just assign me this Task'>
-                </form>`
+                  <form method='post'>
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task.id} required>
+                    <input style=\"display:none;\" name='newstatus' id='newstatus'
+                      value="Unavailable" required>
+                    <input style=\"display:none;\" name='qrcode' id='qrcode'
+                      value='no' required>
+                    <input type='submit' value='Just assign me this Task'>
+                  </form>
+                </div>`, popupOptions
             )
             break;
           case 'unavailable': 
             if (user_id == task.task_doer) {
               layer.bindPopup(
-                `<h1>Task ${feature_id}</h1>
-                <p>Status: ${task.status.label}</p>
-                
-                <img src='${final_qrcode_src}' alt='' height='150px' width='150px'>
+                `<div class='fmtm-popup-div'>
+                  <h1>Task ${feature_id}</h1>
+                  <p>Status: ${task.status.label}</p>
+                  
+                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
 
-                <form method='post'>
-                  <input style=\"display:none;\" name='taskid' id='taskid'
-                    value=${task.id} required>
-                    <input style=\"display:none;\" name='qrcode' id='qrcode'
-                    value='yes' required>
-                  <input type='submit' value='Download QR Code'>
-                </form>
-                `
+                  <form method='post'>
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task.id} required>
+                      <input style=\"display:none;\" name='qrcode' id='qrcode'
+                      value='yes' required>
+                    <input type='submit' value='Download QR Code'>
+                  </form>
+                </div>
+                `, popupOptions
               )
             } 
             break; 
@@ -148,10 +161,10 @@
               `<h1>Task ${feature_id}</h1>
               <p>${task.status.label}</p>
               <p>${task.task_doer}</p>
-              `
-            )
-            
+              `, popupOptions
+            )  
         }
+        //  layer.bindPopup(popup, popupOptions)  
       }
     }
 
