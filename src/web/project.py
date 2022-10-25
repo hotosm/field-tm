@@ -4,13 +4,12 @@ import os
 import posixpath
 import zipfile
 from datetime import datetime
-
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
-                   request, session, url_for)
+                   request, session, url_for, send_file)
 from werkzeug.exceptions import abort
 
-from odk_fieldmap.auth import login_required
-from odk_fieldmap.models import Project, Task, User, db
+from src.web.auth import login_required
+from src.web.models import Project, Task, TaskStatus, User, db
 
 bp = Blueprint("project", __name__)
 
@@ -71,6 +70,11 @@ def create():
 
     return render_template("project/create.html")
 
+def get_qr_file(title, task_id):
+    project_folder = get_project_folder(title)
+    qr_folder_name = current_app.config["QR_CODE_FOLDER_NAME"]
+    file_name = f'buildings_{task_id}.gif'
+    return os.path.join(project_folder, qr_folder_name, file_name)
 
 def get_project_folder(title):
     static_folder_path = current_app.config["STATIC_FOLDER"]
@@ -164,9 +168,17 @@ def get_tasks_for_project(project_id):
         .join(Project, Task.project_id == Project.id)
         .where(Project.id == project_id)
     )
-
     return tasks
 
+def get_task_by_id(project_id, task_id):
+    tasks = (
+        db.session.query(Task)
+        .join(Project, Task.project_id == Project.id)
+        .where(Project.id == id)
+        .where(Task.feature_id == task_id)
+        .first()
+    )
+    return tasks
 
 def get_tasks_for_user(user_id):
     tasks = (
@@ -193,38 +205,11 @@ def get_project(id, check_author=True):
 
     return project
 
-
-# most recent attempt to download: https://gist.github.com/redlotus/3138bd661ceb02abf1f6
-# def get_file_params(full_path, filename):
-#     filepath = os.path.abspath(current_app.root_path)+"/../download/"+filename
-#     if os.path.isfile(filepath):
-#         return filename,"/download/"+filename,os.path.getsize(filepath)
-#     with open(filepath, 'w') as outfile:
-#         data = load_from_mongo("ddcss","queries",\
-#             criteria = {"_id" : ObjectId(filename)}, projection = {'_id': 0})
-#         #outfile.write(json.dumps(data[0], default=json_util.default))
-#         outfile.write(dumps(data[0]))
-#     return filename, "/download/"+filename, os.path.getsize(filepath)
-#
-# def download(file_id):
-# 	(file_basename, server_path, file_size) = get_file_params(file_id)
-# 	response = make_response()
-# 	response.headers['Content-Description'] = 'File Transfer'
-# 	response.headers['Cache-Control'] = 'no-cache'
-# 	response.headers['Content-Type'] = 'application/octet-stream'
-# 	response.headers['Content-Disposition'] = 'attachment; filename=%s' % file_basename
-# 	response.headers['Content-Length'] = file_size
-# 	response.headers['X-Accel-Redirect'] = server_path # nginx: http://wiki.nginx.org/NginxXSendfile
-#
-# 	return response
-
-# todo: make this work
 def check_for_feature_id(request):
     feature_id = request.form["tasknum"]
     error = None
 
-    msg = "Attempted post with task number: " + feature_id
-
+    #msg = "Attempted post with task number: " + feature_id
     if not feature_id:
         error = "Task Number cannot be blank. Please select task again."
 
@@ -233,68 +218,92 @@ def check_for_feature_id(request):
             flash(error)
     return feature_id
 
+def is_valid_status_change(task, new_status):
+    if task.status is TaskStatus.available:
+        return (new_status == TaskStatus.unavailable)
+    elif task.status is TaskStatus.unavailable:
+        has_permission = session.get("user_id") == task.task_doer
+        return has_permission and (new_status == TaskStatus.available or new_status == TaskStatus.ready_for_validation)
+    elif task.status is TaskStatus.ready_for_validation:
+        return False
+    return False
 
+# Get returns map of a project dispalying all tasks. 
+# Post can either include a qrcode to be downloaded, or a new status for a particular task.
 @bp.route("/<int:id>/map", methods=("GET", "POST"))
 def map(id):
+    if request.method == "POST":
+        user_id = session.get("user_id")
+        if user_id:
+            task_id = request.form["taskid"]
+            qrcode = request.form["qrcode"]
+            error = None
+
+            if not task_id:
+                error = "Task ID is required."
+            elif (qrcode == 'yes'):
+                try:
+                    project = get_project(id, False)
+                    return send_file(get_qr_file(project['title'], task_id), as_attachment=True)
+
+                except Exception as e:
+                    error = f"Download failed for {qrcode} due to {e}"
+                    flash(error)
+                    return render_map_by_project_id(id)
+            
+            new_status = request.form["newstatus"]
+            if not new_status:
+                error = "New status is required."
+                
+            if error is None:
+                try:
+                    matching_task = db.session.query(Task).where(
+                        Task.id == task_id
+                    ).first()
+
+                    if not matching_task:
+                        error = "Task cannot be found."
+                    elif not is_valid_status_change(matching_task, new_status):
+                        error = "Status change is not valid."
+                    else:
+                        matching_task.status = new_status
+                        matching_task.task_doer = user_id
+                        db.session.commit()
+                except Exception as e:
+                    error = f"Database query or update failed with error: {e}"
+                        
+            if error is not None:
+                flash(error)
+            return render_map_by_project_id(id)
+        else:
+            return redirect(url_for("auth.login"))
+    else:
+        return render_map_by_project_id(id)
+
+def render_map_by_project_id(id):
     project = get_project(id, False)
 
     task_list = get_tasks_for_project(project["id"])
     tasks = task_by_feature_id(task_list)
 
-    if request.method == "POST":
-        if session.get("user_id"):
-
-            feature_id = check_for_feature_id(request)
-            if feature_id:
-                matching_tasks = db.session.query(Task).where(
-                    Task.project_id == id, Task.feature_id == feature_id
-                )
-                msg = matching_tasks
-
-                # TODO fix this w/ postgres query
-                # db.execute(
-                #     'UPDATE task SET status = ?, task_doer = ?, last_selected = ?'
-                #     ' WHERE project_id = ? AND feature_id = ?',
-                #     (1, session.get('user_id'), datetime.now(), id, feature_id)
-                # )
-                # db.session.commit()
-
-                # extra_actions = request.form.getlist('select_extras')
-                # flash(extra_actions)
-                # if extra_actions.contains('download'):
-                #     new_filename = project['title']+"_task"+task_id+"_qrcode.gif"
-                #     full_path = url_for('static', filename='example_files/Partial_Mikocheni/QR_codes/Mikocheni_buildings_198.gif')
-                #     flash("Downloading: "+full_path)
-                #     return send_from_directory(full_path, filename, as_attachment=True)
-                # else:
-                #     flash("No download requested.")
-                # return redirect(url_for('project.index'))
-
-            path = get_relative_project_path(project["title"])
-            geojson = get_geojson(project['title'])
-            return render_template(
-                "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson,
-            )
-        else:
-            return redirect(url_for("auth.login"))
-    else:
-        path = get_relative_project_path(project["title"])
-        geojson = get_geojson(project['title'])
-        return render_template(
-            "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson,
-        )
-
+    path = get_relative_project_path(project["title"])
+    geojson = get_geojson(project['title'])
+    return render_template(
+        "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson, userid=session.get("user_id")
+    )
 
 def task_by_feature_id(tasks):
     task_dict = {}
     for task in tasks:
+        status = {"value":str(task["status"].name), "label":str(task["status"].value)}
+
         task_dict[task["feature_id"]] = {
             "id": task["id"],
+            "feature_id": task["feature_id"],
             "task_doer": task["task_doer"],
-            "status": str(task["status"]),
+            "status": status,
         }
     return task_dict
-
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required

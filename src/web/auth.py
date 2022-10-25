@@ -5,7 +5,7 @@ from flask import (Blueprint, flash, g, redirect, render_template, request,
 from sqlalchemy import exc
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from odk_fieldmap.models import User, db
+from src.web.models import User, db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 

@@ -1,7 +1,7 @@
 import pytest
 
-from odk_fieldmap.db import get_db
-from odk_fieldmap.models import Project
+from src.db import get_db
+from src.models import Project
 
 
 def test_index(client, auth):
