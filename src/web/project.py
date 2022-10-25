@@ -269,7 +269,7 @@ def map(id):
                         matching_task.status = new_status
                         matching_task.task_doer = user_id
                         db.session.commit()
-                except:
+                except Exception as e:
                     error = f"Database query or update failed with error: {e}"
                         
             if error is not None:
