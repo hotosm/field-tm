@@ -2,8 +2,8 @@ import sqlite3
 
 import pytest
 
-from odk_fieldmap.db import get_db
-from odk_fieldmap.models import User
+from src.db import get_db
+from src.models import User
 
 # def test_get_close_db(app):
 #    with app.app_context():
@@ -19,7 +19,7 @@ from odk_fieldmap.models import User
 #    def fake_init_db():
 #        Recorder.called = True
 #
-#    monkeypatch.setattr('odk_fieldmap.db.init_db', fake_init_db)
+#    monkeypatch.setattr('src/web.db.init_db', fake_init_db)
 #    result = runner.invoke(args=['init-db'])
 #    assert 'Initialized' in result.output
 #    assert Recorder.called

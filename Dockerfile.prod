@@ -23,7 +23,7 @@ COPY . .
 ## RUN flake8 --ignore=E501,F401 .
 
 # install python dependencies
-COPY ./odk_fieldmap/requirements.txt .
+COPY ./src/web/requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 

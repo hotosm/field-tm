@@ -13,7 +13,7 @@ RUN apt update && \
     apt install -y libpq-dev gcc
 
 # install dependencies
-COPY odk_fieldmap/requirements.txt .
+COPY src/web/requirements.txt .
 RUN pip install -r requirements.txt
 
 # copy project
