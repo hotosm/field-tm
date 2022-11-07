@@ -140,6 +140,10 @@ mkdir -p ~/.docker/cli-plugins/
 curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
 sudo chmod +x ~/.docker/cli-plugins/docker-compose
 ```
+
+### Grab the FMTM code
+Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.git`. Step into the resulting directory with `cd fmtm`.
+
 #### Python stuff
 ```
 sudo apt install python3-pip
@@ -147,9 +151,7 @@ sudo apt install libpq-dev
 pip install -r src/web/requirements.txt
 ```
 
-
-### Grab the FMTM code and set it up
-Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.git`. Step into the resulting directory with `cd fmtm`.
+### Set up the environment and utilities to launch
 
 Create the env file from the example with `cp .env.example .env`. Edit that file to contain the needful (it should look like this):
 
@@ -175,11 +177,18 @@ Create a script to set some local variables and launch the FMTM. Call it `run-pr
 export WEB_DOMAIN=fieldmappingtm.org
 export METRICS_DOMAIN=fmtm-metrics.fieldmappingtm.org
 export METRICS_LOGIN=testuser:<hashed_stuff>
+
 docker compose -f docker-compose.prod.yml up -d
 ```
 
 Make it executable with `sudo chmod +x run-prod.sh`.
 
+Build it with `docker compose up --build -d`
+
+Stop it with `docker compose stop`
+
 Run it with `./run-prod.sh`.
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
+
+# TODO: set up ssl certificates. It seems we're using Traefik as the reverse proxy web server, so my existing knowledge of how to set up ssl certs with LetsEncrypt is not applicable; probably something like [this](https://doc.traefik.io/traefik/https/acme/)
