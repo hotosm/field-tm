@@ -141,9 +141,11 @@ curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-comp
 sudo chmod +x ~/.docker/cli-plugins/docker-compose
 ```
 #### Python stuff
+```
 sudo apt install python3-pip
 sudo apt install libpq-dev
 pip install -r src/web/requirements.txt
+```
 
 
 ### Grab the FMTM code and set it up
