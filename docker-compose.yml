@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   db:
-    image: postgres:14-alpine
+    image: postgis/postgis:14-3.3-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -12,9 +12,20 @@ services:
     ports:
       -  5432:5432
 
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
   api:
     build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
     volumes:
       - .:/api
     depends_on:

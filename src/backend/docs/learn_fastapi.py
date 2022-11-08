@@ -1,5 +1,5 @@
 from email.mime import image
-from fastapi import FastAPI, Query, Path, Body, Cookie, Header, Form, File, UploadFile, HTTPException, status, Depends
+from fastapi import FastAPI, Query, Path, Body, Cookie, Header, Form, File, UploadFile, HTTPException, status, Depends, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from enum import Enum
 from pydantic import BaseModel, Required, Field
@@ -528,3 +528,14 @@ class MySuperContextManager:
 async def get_db():
     with MySuperContextManager() as db:
         yield db
+
+# Send accepted response then do something the client doesn't need to wait for
+def write_notification(email: str, message=""):
+    with open("log.txt", mode="w") as email_file:
+        content = f"notification for {email}: {message}"
+        email_file.write(content)
+
+@app.post("/send-notification/{email}")
+async def send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message="some notification")
+    return {"message": "Notification sent in the background"}
