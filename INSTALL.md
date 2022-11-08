@@ -191,4 +191,5 @@ Run it with `./run-prod.sh`.
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
 
-# TODO: set up ssl certificates. It seems we're using Traefik as the reverse proxy web server, so my existing knowledge of how to set up ssl certs with LetsEncrypt is not applicable; probably something like [this](https://doc.traefik.io/traefik/https/acme/)
+# TODO: set up ssl certificates. 
+It seems we're using Traefik as the reverse proxy web server, so my existing knowledge of how to set up ssl certs with LetsEncrypt is not applicable; probably something like [this](https://doc.traefik.io/traefik/https/acme/)
