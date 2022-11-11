@@ -163,7 +163,7 @@ def fake_password_hasher(raw_password: str):
     return "supersecret" + raw_password
 
 user_id_generator = 0
-users = {int, User}
+users = {int, UserInDB}
 
 def fake_save_user(user_in: UserIn):
     hashed_password = fake_password_hasher(user_in.password)

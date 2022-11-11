@@ -3,7 +3,7 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     username: str
 
-class UserCreate(UserBase):
+class UserIn(UserBase):
     password: str
 
 class User(UserBase):
@@ -12,8 +12,15 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
-class UserOut(BaseModel):
-    pass
+class UserOut(UserBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class LoginResult(BaseModel):
+    user: UserOut
+        
 
 
 
