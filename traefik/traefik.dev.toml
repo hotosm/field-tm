@@ -2,6 +2,9 @@
 [entryPoints]
   [entryPoints.web]
     address = ":80"
+    address = ":8008"
+  [entryPoints.backend]
+    address = ":5000"
 
 # Traefik dashboard over http
 [api]

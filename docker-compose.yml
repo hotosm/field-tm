@@ -11,6 +11,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
     ports:
       -  5432:5432
+    networks:
+      - fmtm-net
 
   pgadmin:
     container_name: pgadmin
@@ -36,6 +38,8 @@ services:
       - 8000
     ports:
       - 8008:8000
+    networks:
+      - fmtm-net
     
   web:
     build: .
@@ -53,11 +57,14 @@ services:
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - API_URL=http://fmtm-api-1:8000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
     depends_on:
       - db
+    networks:
+      - fmtm-net
 
   # alternative webproxy to nginx
   traefik:
@@ -67,9 +74,17 @@ services:
     ports:
       - 80:80
       - 8081:8080
+      # - 8008:8000
+      # - 5000:5000
     volumes:
       - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - fmtm-net
 
 volumes:
   postgres_data:
+
+networks:
+  fmtm-net:
+#     external: true
