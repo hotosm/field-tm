@@ -26,7 +26,6 @@ odk2odm_venv/
 .idea/
 
 # test scripts and files
-test
 db.sqlite3
 
 # emacs
@@ -40,3 +39,4 @@ db.sqlite3
 
 # project related
 src/web/static/projects
+temp_webmaps/local_only
