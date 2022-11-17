@@ -178,9 +178,16 @@ if __name__ == "__main__":
       - GeoJSON files representing tasks
       - XLSForms corresponding to them
     - A base URL for an ODK Central server
-    - A tuple of username and password to said server
+    - A username and password to said server
     And creates an ODK Central project.
     Project name will be the directory name.
+    Directory structure must be:
+    - Project_name
+      - forms
+      - geojson
+    
+    example usage:
+    python forms2server my_project_directory https://myodkcentralserver my_odk_username my_odk_password
     """
     indir = sys.argv[1]
     url = sys.argv[2]
