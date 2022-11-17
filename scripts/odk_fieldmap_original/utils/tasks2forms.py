@@ -52,6 +52,7 @@ def prep_form(form_template, AOIfile, outdir):
 
     settingws["A2"] = f"{AOIbasename}"
     settingws["B2"] = f"{AOIbasename}"
+    settingws["C2"] = f"{AOIbasename}"
     surveyws["A9"] = f"select_one_from_file " f"{AOIbasename}{AOIext}"
     outfile = os.path.join(outdir, f"{AOIbasename}.xlsx")
     print(f"Writing: {outfile}")
