@@ -9,7 +9,7 @@ db = SQLAlchemy()
 
 class User(db.Model):
 
-    __tablename__ = "users"
+    __tablename__ = "web_users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(128), unique=True, nullable=False)
@@ -33,7 +33,7 @@ class User(db.Model):
 
 class Project(db.Model):
 
-    __tablename__ = "projects"
+    __tablename__ = "web_projects"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, unique=False, nullable=False)
@@ -66,7 +66,7 @@ class TaskStatus(str, enum.Enum):
 
 class Task(db.Model):
 
-    __tablename__ = "tasks"
+    __tablename__ = "web_tasks"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     feature_id = db.Column(db.Integer, unique=False, nullable=False)

@@ -1,17 +1,62 @@
+import os
 import functools
-
 from flask import (Blueprint, flash, g, redirect, render_template, request,
                    session, url_for)
-from sqlalchemy import exc
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from src.web.models import User, db
+# api
+import requests
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+base_url =os.getenv("API_URL")
+
+def ping(url):
+    import requests
+    try:
+        request = requests.get(url, verify=False)
+        is_up = request.status_code == 200
+        print(f'{url}, up_status={is_up}')
+        return request
+    except Exception as e:
+        print(f'Error thrown: {e}')
+        return e
+    
+class User:
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
 
 
 @bp.route("/register", methods=("GET", "POST"))
 def register():
+    if request.method == "POST":
+
+        username = request.form["username"]
+        password = request.form["password"]
+        error = None
+
+        if not username:
+            error = "Username is required."
+        elif not password:
+            error = "Password is required."
+
+        if error is None:
+            try:
+                with requests.Session() as s:
+                    response = s.post(f"{base_url}/users/", json={'username': username, 'password':password})
+                    if response.status_code == 200:
+                        return redirect(url_for("auth.login"))
+
+                    elif response.status_code == 400:
+                        error = "Username already registered."
+            except Exception as e:
+                error = f"Registration failed due to {e}"
+        flash(error)
+    return render_template("auth/register.html")
+
+
+@bp.route("/login", methods=("GET", "POST"))
+def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -24,39 +69,26 @@ def register():
 
         if error is None:
             try:
-                user = User(
-                    username=username,
-                    password=generate_password_hash(password)
-                )
-                db.session.add(user)
-                db.session.commit()
-            except exc.IntegrityError:
-                error = f"User {username} is already registered."
-            else:
-                return redirect(url_for("auth.login"))
+                with requests.Session() as s:
+                    response = s.post(f"{base_url}/login/", json={'username': username, 'password':password})
+                    if response.status_code == 200:
+                        response_dict = response.json()
 
-        flash(error)
+                        user_id = response_dict.get('id')
+                        username = response_dict.get('username')
+                        
+                        if user_id and username:
+                            session.clear()
+                            session["user_id"] = user_id
+                            session["username"] = username
+                            return redirect(url_for("index"))
+                        else:
+                            error = f"Response was successful but everything is not well. See: {response_dict}"
 
-    return render_template("auth/register.html")
-
-
-@bp.route("/login", methods=("GET", "POST"))
-def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        error = None
-        user = db.session.query(User).where(User.username == username).first()
-
-        if user is None:
-            error = "Incorrect username."
-        elif not check_password_hash(user.password, password):
-            error = "Incorrect password."
-
-        if error is None:
-            session.clear()
-            session["user_id"] = user.id
-            return redirect(url_for("index"))
+                    elif response.status_code == 400:
+                        error = "Username already registered."
+            except Exception as e:
+                error = f"Registration failed due to {e}"
 
         flash(error)
 
@@ -72,10 +104,11 @@ def logout():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get("user_id")
+
     if user_id is None:
         g.user = None
     else:
-        g.user = db.session.query(User).where(User.id == user_id).first()
+        g.user = User(user_id, session["username"])
 
 
 def login_required(view):
