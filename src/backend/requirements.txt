@@ -4,6 +4,7 @@ fastapi==0.85.1
 # anyio==3.5.0
 # idna==3.3
 pydantic==1.10.2 
+geojson-pydantic==0.4.3
 # starlette==0.20.4
 # typing-extensions==4.4.0
 # sniffio==1.2.0
@@ -18,6 +19,9 @@ uvicorn==0.19.0
 # uvloop==0.17.0 
 # watchfiles==0.18.0 
 # websockets==10.3
+
+# ----- FILE UPLOAD ----
+python-multipart==0.0.5
 
 # ----- DATABASE -----
 fastapi-sqlalchemy==0.2.1

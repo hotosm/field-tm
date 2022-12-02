@@ -4,6 +4,10 @@ from typing import List
 from ..db import db_models
 from . import user_schemas
 
+# --------------
+# ---- CRUD ----
+# --------------
+
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     db_users = db.query(db_models.DbUser).offset(skip).limit(limit).all()
     return convert_to_app_user(db_users)
@@ -18,7 +22,10 @@ def get_user_by_username(db: Session, username: str):
 
 def create_user(db: Session, user: user_schemas.UserIn):
     if user:
-        db_user = db_models.DbUser(username=user.username, password=hash_password(user.password))
+        db_user = db_models.DbUser( 
+            username=user.username, 
+            password=hash_password(user.password)
+        )
         db.add(db_user)
         db.commit()
         db.refresh(db_user) # now contains generated id etc.
@@ -26,6 +33,11 @@ def create_user(db: Session, user: user_schemas.UserIn):
         return convert_to_app_user(db_user)
 
     return Exception('No user passed in')
+
+
+# ---------------------------
+# ---- SUPPORT FUNCTIONS ----
+# ---------------------------
 
 def hash_password(password: str):
     return password
@@ -43,6 +55,12 @@ def verify_user(db: Session, questionable_user: user_schemas.UserIn):
     else:
         raise HTTPException(status_code=400, detail="Username not registered.")
 
+
+# --------------------
+# ---- CONVERTERS ----
+# --------------------
+
+# TODO: write tests for these
 def convert_to_app_user(db_user: db_models.DbUser):
     if db_user:
         app_user: user_schemas.User = db_user
@@ -58,6 +76,6 @@ def convert_to_app_users(db_users: List[db_models.DbUser]):
                 app_users.append(convert_to_app_user(user))
         return app_users
     else:
-        return None
+        return []
 
 

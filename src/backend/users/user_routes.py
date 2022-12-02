@@ -24,7 +24,7 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(database.ge
     users = user_crud.get_users(db, skip=skip, limit=limit)
     return users
 
-@router.get("/{id}]", response_model=user_schemas.UserOut)
+@router.get("/{id}", response_model=user_schemas.UserOut)
 async def get_user_by_id(id: int, db: Session = Depends(database.get_db)):
     user = user_crud.get_user(db, user_id=id)
     if user:
