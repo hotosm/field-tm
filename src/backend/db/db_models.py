@@ -365,7 +365,7 @@ class DbProject(Base):
     id_presets = Column(ARRAY(String))
     extra_id_params = Column(String)
     license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
-    project_info = relationship(DbProjectInfo, lazy="dynamic", cascade="all")
+    project_info = relationship(DbProjectInfo, cascade="all")
 
     # XFORM DETAILS
     odk_central_src = Column(String, default="") #TODO Add HOTs as default
@@ -373,14 +373,14 @@ class DbProject(Base):
     xform = relationship(DbXForm)
 
     # GEOMETRY
-    geometry = Column(Geometry("MULTIPOLYGON", srid=4326), nullable=False)
-    centroid = Column(Geometry("POINT", srid=4326), nullable=False)
+    geometry = Column(Geometry("MULTIPOLYGON", srid=4326))
+    centroid = Column(Geometry("POINT", srid=4326))
     country = Column(ARRAY(String), default=[])
     
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
     status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
-    total_tasks = Column(Integer, nullable=False)
+    total_tasks = Column(Integer)
     tasks_mapped = Column(Integer, default=0, nullable=False)
     tasks_validated = Column(Integer, default=0, nullable=False)
     tasks_bad_imagery = Column(Integer, default=0, nullable=False)
