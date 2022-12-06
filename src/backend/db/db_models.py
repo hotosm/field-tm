@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, ARRAY, String, DateTime, Boolean, ForeignKey, ForeignKeyConstraint, UniqueConstraint, Index, Unicode
+from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, LargeBinary, ARRAY, String, DateTime, Boolean, ForeignKey, ForeignKeyConstraint, UniqueConstraint, Index, Unicode
 from sqlalchemy.orm import relationship, backref #, declarative_base
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
@@ -130,12 +130,13 @@ class DbProjectInfo(Base):
     __tablename__ = "project_info"
 
     project_id = Column(Integer, ForeignKey("projects.id"), primary_key=True)
+    project_id_str = Column(String)
     locale = Column(String(10), primary_key=True)
     name = Column(String(512))
     short_description = Column(String)
     description = Column(String)
     instructions = Column(String)
-    project_id_str = Column(String)
+    
     text_searchable = Column(
         TSVECTOR
     )  # This contains searchable text and is populated by a DB Trigger
@@ -270,6 +271,16 @@ class DbTaskHistory(Base):
         {},
     )
 
+class DbQrCode(Base):
+    """QR Code"""
+
+    __tablename__ = "qr_code"
+
+    id = Column(Integer, primary_key=True)
+    filename = Column(String)
+    image = Column(LargeBinary)
+    
+
 class DbTask(Base):
     """Describes an individual mapping Task"""
 
@@ -281,13 +292,9 @@ class DbTask(Base):
         Integer, ForeignKey("projects.id"), index=True, primary_key=True
     )
     project_task_index = Column(Integer)
-    x = Column(Integer)
-    y = Column(Integer)
-    zoom = Column(Integer)
-    extra_properties = Column(Unicode)
-    # Tasks need to be split differently if created from an arbitrary grid or were clipped to the edge of the AOI
-    is_square = Column(Boolean, default=True)
-    geometry = Column(Geometry("MULTIPOLYGON", srid=4326))
+    project_task_name = Column(String)
+    geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    initial_feature_count = Column(Integer)
     task_status = Column(Enum(TaskStatus), default=TaskStatus.READY)
     locked_by = Column(
         BigInteger, ForeignKey("users.id", name="fk_users_locked"), index=True
@@ -300,11 +307,25 @@ class DbTask(Base):
     )
 
     # Mapped objects
+    qrcode_id = Column(
+        Integer, ForeignKey("qr_code.id"), index=True
+    )
+    qr_code = relationship(DbQrCode, cascade="all, delete, delete-orphan", single_parent=True)
+
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
     )
     lock_holder = relationship(DbUser, foreign_keys=[locked_by])
     mapper = relationship(DbUser, foreign_keys=[mapped_by])
+    
+    ## ---------------------------------------------- ##
+    # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
+    # x = Column(Integer)
+    # y = Column(Integer)
+    # zoom = Column(Integer)
+    # extra_properties = Column(Unicode)
+    # # Tasks need to be split differently if created from an arbitrary grid or were clipped to the edge of the AOI
+    # is_square = Column(Boolean, default=False)
 
 class DbProject(Base):
     """Describes a HOT Mapping Project"""
@@ -323,16 +344,54 @@ class DbProject(Base):
     task_creation_mode = Column(
         Enum(TaskCreationMode), default=TaskCreationMode.UPLOAD, nullable=False
     )
-    split_strategy = Column(Integer)
-    grid_meters = Column(Integer)
-    task_type = Column(Integer)
-    target_number_of_features = Column(Integer)
+    # split_strategy = Column(Integer)
+    # grid_meters = Column(Integer)
+    # task_type = Column(Integer)
+    # target_number_of_features = Column(Integer)
 
-    # PROJECT ACCESS
-    private = Column(Boolean, default=False)  # Only allowed users can validate
+    # PROJECT DETAILS
+    project_name_prefix = Column(String)
+    task_type_prefix = Column(String)
     default_locale = Column(
         String(10), default="en"
     )  # The locale that is returned if requested locale not available
+    project_info = relationship(
+        DbProjectInfo, cascade="all, delete, delete-orphan", backref="project"
+    )
+
+    # GEOMETRY
+    outline = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    
+    # PROJECT STATUS
+    last_updated = Column(DateTime, default=timestamp)
+    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
+    total_tasks = Column(Integer)
+    tasks_mapped = Column(Integer, default=0, nullable=False)
+    tasks_validated = Column(Integer, default=0, nullable=False)
+    tasks_bad_imagery = Column(Integer, default=0, nullable=False)
+
+    # TASKS
+    tasks = relationship(
+        DbTask, backref="projects", cascade="all, delete, delete-orphan", lazy="dynamic"
+    )
+
+    # XFORM DETAILS
+    odk_central_src = Column(String, default="") #TODO Add HOTs as default
+    xform_id = Column(Integer, ForeignKey("x_form.id", name="fk_xform"))
+    xform = relationship(DbXForm)
+    
+    __table_args__ = (
+       Index(
+            "idx_geometry", geometry, postgresql_using="gist"
+        ),
+        {}, 
+    )
+
+    ## ---------------------------------------------- ##
+    # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
+    # PROJECT ACCESS
+    private = Column(Boolean, default=False)  # Only allowed users can validate
     mapper_level = Column(
         Enum(MappingLevel), default=MappingLevel.INTERMEDIATE, nullable=False, index=True
     )  # Mapper level project is suitable for
@@ -351,7 +410,6 @@ class DbProject(Base):
         index=True,
     )
     organisation = relationship(DbOrganisation, backref="projects")
-
     # PROJECT DETAILS
     due_date = Column(DateTime)
     changeset_comment = Column(String)
@@ -365,40 +423,12 @@ class DbProject(Base):
     id_presets = Column(ARRAY(String))
     extra_id_params = Column(String)
     license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
-    project_info = relationship(DbProjectInfo, cascade="all")
-
-    # XFORM DETAILS
-    odk_central_src = Column(String, default="") #TODO Add HOTs as default
-    xform_id = Column(Integer, ForeignKey("x_form.id", name="fk_xform"))
-    xform = relationship(DbXForm)
-
     # GEOMETRY
-    geometry = Column(Geometry("MULTIPOLYGON", srid=4326))
     centroid = Column(Geometry("POINT", srid=4326))
     country = Column(ARRAY(String), default=[])
-    
-    # PROJECT STATUS
-    last_updated = Column(DateTime, default=timestamp)
-    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
-    total_tasks = Column(Integer)
-    tasks_mapped = Column(Integer, default=0, nullable=False)
-    tasks_validated = Column(Integer, default=0, nullable=False)
-    tasks_bad_imagery = Column(Integer, default=0, nullable=False)
-
-    # TASKS
-    tasks = relationship(
-        DbTask, backref="projects", cascade="all, delete, delete-orphan", lazy="dynamic"
-    )
-
     # FEEDBACK
     project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
 
-    __table_args__ = (
-       Index(
-            "idx_geometry", geometry, postgresql_using="gist"
-        ),
-        {}, 
-    )
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")

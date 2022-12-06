@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 from geojson_pydantic import FeatureCollection
+
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus
 

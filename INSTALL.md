@@ -76,10 +76,6 @@ Option #1:
 
     `docker exec -it fmtm-db-1 psql -U fmtm fmtm`
 
-Option #2:
-
-    `docker compose exec db psql --username=fmtm --dbname=fmtm`
-
 And then connect to the database
 
     `\c fmtm`
