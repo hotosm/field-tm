@@ -74,7 +74,8 @@ def convert_to_app_users(db_users: List[db_models.DbUser]):
         for user in db_users:
             if user:
                 app_users.append(convert_to_app_user(user))
-        return app_users
+        app_users_without_nones = [i for i in app_users if i is not None]
+        return app_users_without_nones
     else:
         return []
 

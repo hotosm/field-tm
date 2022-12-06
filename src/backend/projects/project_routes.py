@@ -40,7 +40,9 @@ async def create_project_part_1(project_info: project_schemas.BETAProjectUpload,
 @router.post("/beta/{project_id}/upload_zip")
 async def upload_beta_project(
     project_id: int, 
-    project: UploadFile, 
+    project_name_prefix: str,
+    task_type_prefix: str,
+    upload: UploadFile, 
     db: Session = Depends(database.get_db)
 ):
     # authenticate and identify user
@@ -49,7 +51,12 @@ async def upload_beta_project(
     ## - form fields
     ## - least one project info
 
-    # process file upload (zip)
+    project = project_crud.update_project_with_upload(db, project_id, project_name_prefix, task_type_prefix, upload)
+        
+    return f'{project}'
+
+
+
     ## verify grid.geojson (feature collection)
     ## make tasks for each feature in geometry
     
@@ -58,7 +65,7 @@ async def upload_beta_project(
     ## close db
 
     # return project to user
-    return f'{project_id}uploaded!!'
+    # return f'{project_id}uploaded!!'
 
 # @router.put(
 #     "/{project_id}",
