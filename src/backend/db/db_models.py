@@ -293,7 +293,8 @@ class DbTask(Base):
     )
     project_task_index = Column(Integer)
     project_task_name = Column(String)
-    geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    outline = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    geometry_geojson = Column(String)
     initial_feature_count = Column(Integer)
     task_status = Column(Enum(TaskStatus), default=TaskStatus.READY)
     locked_by = Column(
@@ -361,7 +362,7 @@ class DbProject(Base):
 
     # GEOMETRY
     outline = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
-    geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    # geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
     
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
