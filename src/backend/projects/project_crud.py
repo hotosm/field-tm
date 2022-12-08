@@ -123,7 +123,6 @@ def update_project_with_upload(
 
         # generate task outlines from file and add to project
         project_tasks_geojson, project_tasks_feature_collection = get_feature_collection(zip, task_outlines_filename, f'Could not generate FeatureCollection from {task_outlines_filename}')
-        db_project.geometry = project_tasks_geojson
 
         # generate task for each feature
         try:
@@ -141,6 +140,9 @@ def update_project_with_upload(
                 )
                 db.add(db_qr)
 
+                # save outline
+                task_outline_geojson = feature.geometry
+                
                 # extract task geojson
                 task_geojson_filename = f'{project_name_prefix}_{task_type_prefix}__{task_name}.geojson'
                 task_geojson, task_feature_collection = get_feature_collection(
@@ -155,8 +157,9 @@ def update_project_with_upload(
                     project_task_index = feature.properties['fid'],
                     project_task_name = task_name,
                     qr_code = db_qr,
-                    geometry = task_geojson,
-                    initial_feature_count = len(task_feature_collection.features)
+                    outline = task_outline_geojson, 
+                    geometry_geojson = task_geojson,
+                    initial_feature_count = len(task_feature_collection.features),
                 )
                 db.add(task)
 
