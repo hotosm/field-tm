@@ -293,7 +293,7 @@ class DbTask(Base):
     )
     project_task_index = Column(Integer)
     project_task_name = Column(String)
-    outline = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    outline = Column(Geometry("MULTIPOLYGON", srid=4326))
     geometry_geojson = Column(String)
     initial_feature_count = Column(Integer)
     task_status = Column(Enum(TaskStatus), default=TaskStatus.READY)
@@ -361,8 +361,8 @@ class DbProject(Base):
     )
 
     # GEOMETRY
-    outline = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
-    # geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromGeoJSON'))
+    outline = Column(Geometry("MULTIPOLYGON", srid=4326))
+    # geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromWkt'))
     
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
@@ -384,7 +384,7 @@ class DbProject(Base):
     
     __table_args__ = (
        Index(
-            "idx_geometry", geometry, postgresql_using="gist"
+            "idx_geometry", outline, postgresql_using="gist"
         ),
         {}, 
     )
