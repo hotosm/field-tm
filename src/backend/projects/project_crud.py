@@ -118,8 +118,8 @@ def update_project_with_upload(
         db_project.task_type_prefix = task_type_prefix
 
         # generate outline from file and add to project
-        outline_geojson, outline_fb = get_feature_collection(zip, outline_filename, f'Could not generate FeatureCollection from {outline_filename}')
-        db_project.outline = outline_geojson
+        outline_geojson, _ = get_feature_collection(zip, outline_filename, f'Could not generate FeatureCollection from {outline_filename}')
+        db_project.outline = json.ExportToWkt(outline_geojson)
 
         # generate task outlines from file and add to project
         project_tasks_geojson, project_tasks_feature_collection = get_feature_collection(zip, task_outlines_filename, f'Could not generate FeatureCollection from {task_outlines_filename}')
@@ -157,7 +157,7 @@ def update_project_with_upload(
                     project_task_index = feature.properties['fid'],
                     project_task_name = task_name,
                     qr_code = db_qr,
-                    outline = task_outline_geojson, 
+                    outline = json.ExportToWkt(task_outline_geojson), 
                     geometry_geojson = task_geojson,
                     initial_feature_count = len(task_feature_collection.features),
                 )
