@@ -4,6 +4,7 @@ from shapely.geometry import shape
 
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus
+from ..tasks import tasks_schemas
 
 class ProjectInfo(BaseModel):
     locale: str
@@ -27,6 +28,7 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     outline_json: str = None
+    project_tasks: List[tasks_schemas.Task] = None
 
     class Config:
         orm_mode = True
