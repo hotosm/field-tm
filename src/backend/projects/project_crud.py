@@ -1,5 +1,5 @@
 from fastapi import UploadFile, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 from zipfile import ZipFile
 import io
@@ -13,6 +13,7 @@ from geoalchemy2.shape import to_shape
 from ..db.postgis_utils import timestamp
 from ..db import db_models
 from ..users import user_crud
+from ..tasks import tasks_crud
 from . import project_schemas
 
 # --------------
@@ -29,10 +30,17 @@ def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100):
         db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
     return convert_to_app_projects(db_projects)
 
+def get_project_by_id_w_all_tasks(db:Session, project_id: int):
+    db_project = db\
+        .query(db_models.DbProject)\
+            .options(joinedload('tasks'))\
+                .filter(db_models.DbProject.id == project_id)\
+                    .first()
+    return convert_to_app_project(db_project)
+
 def get_project_by_id(db:Session, project_id: int):
-    db_project = db.query(db_models.DbProject).filter(db_models.DbProject.id == project_id).first()
-    return db_project
-    # return convert_to_app_project(db_project)
+    db_project = db.query(db_models.DbProject).options(joinedload('tasks')).filter(db_models.DbProject.id == project_id).order_by(db_models.DbProject.id).first()
+    return convert_to_app_project(db_project)
 
 def create_project_with_project_info(db: Session, project_metadata: project_schemas.BETAProjectUpload):
     
@@ -244,8 +252,13 @@ def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
 def convert_to_app_project(db_project: db_models.DbProject):
     if db_project:
         app_project: project_schemas.Project = db_project
-        geom_outline = to_shape(db_project.outline)
-        app_project.outline_json = json.dumps(mapping(geom_outline))
+
+        if (db_project.outline):
+            geom_outline = to_shape(db_project.outline)
+            app_project.outline_json = json.dumps(mapping(geom_outline))
+
+        app_project.project_tasks = tasks_crud.convert_to_app_tasks(db_project.tasks)
+
         return app_project
     else:
         return None

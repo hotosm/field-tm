@@ -374,7 +374,7 @@ class DbProject(Base):
 
     # TASKS
     tasks = relationship(
-        DbTask, backref="projects", cascade="all, delete, delete-orphan", lazy="dynamic"
+        DbTask, backref="projects", cascade="all, delete, delete-orphan"
     )
 
     # XFORM DETAILS
