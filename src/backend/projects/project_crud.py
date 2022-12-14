@@ -6,7 +6,8 @@ import io
 import json
 from geojson_pydantic import FeatureCollection
 import geojson
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
+from geoalchemy2.shape import to_shape
 
 
 from ..db.postgis_utils import timestamp
@@ -243,6 +244,8 @@ def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
 def convert_to_app_project(db_project: db_models.DbProject):
     if db_project:
         app_project: project_schemas.Project = db_project
+        geom_outline = to_shape(db_project.outline)
+        app_project.outline_json = json.dumps(mapping(geom_outline))
         return app_project
     else:
         return None

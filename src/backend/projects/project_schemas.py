@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Any
+from shapely.geometry import shape
 
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus
@@ -26,7 +27,7 @@ class ProjectBase(BaseModel):
     default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
-    outline: gis_schemas.FmtmPolygon = None
+    outline_json: str = None
 
     class Config:
         orm_mode = True
