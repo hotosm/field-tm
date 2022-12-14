@@ -287,13 +287,13 @@ class DbTask(Base):
     __tablename__ = "tasks"
 
     # Table has composite PK on (id and project_id)
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     project_id = Column(
         Integer, ForeignKey("projects.id"), index=True, primary_key=True
     )
     project_task_index = Column(Integer)
     project_task_name = Column(String)
-    outline = Column(Geometry("MULTIPOLYGON", srid=4326))
+    outline = Column(Geometry("POLYGON", srid=4326))
     geometry_geojson = Column(String)
     initial_feature_count = Column(Integer)
     task_status = Column(Enum(TaskStatus), default=TaskStatus.READY)
@@ -361,8 +361,8 @@ class DbProject(Base):
     )
 
     # GEOMETRY
-    outline = Column(Geometry("MULTIPOLYGON", srid=4326))
-    # geometry = Column(Geometry("MULTIPOLYGON", srid=4326, from_text='ST_GeomFromWkt'))
+    outline = Column(Geometry("POLYGON", srid=4326))
+    # geometry = Column(Geometry("POLYGON", srid=4326, from_text='ST_GeomFromWkt'))
     
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
