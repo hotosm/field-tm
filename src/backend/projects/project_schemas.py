@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List
-from geojson_pydantic import FeatureCollection
 
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus
+from ..models import gis_schemas
 
 class ProjectInfo(BaseModel):
     locale: str
@@ -26,7 +26,7 @@ class ProjectBase(BaseModel):
     default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
-    geometry: FeatureCollection = None
+    outline: gis_schemas.FmtmPolygon = None
 
     class Config:
         orm_mode = True

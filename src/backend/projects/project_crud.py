@@ -5,6 +5,9 @@ from zipfile import ZipFile
 import io
 import json
 from geojson_pydantic import FeatureCollection
+import geojson
+from shapely.geometry import shape
+
 
 from ..db.postgis_utils import timestamp
 from ..db import db_models
@@ -118,18 +121,18 @@ def update_project_with_upload(
         db_project.task_type_prefix = task_type_prefix
 
         # generate outline from file and add to project
-        outline_geojson, _ = get_feature_collection(zip, outline_filename, f'Could not generate FeatureCollection from {outline_filename}')
-        db_project.outline = json.ExportToWkt(outline_geojson)
+        outline_shape = get_outline_from_geojson_file_in_zip(zip, outline_filename, f'Could not generate Shape from {outline_filename}')
+        db_project.outline = outline_shape.wkt
 
-        # generate task outlines from file and add to project
-        project_tasks_geojson, project_tasks_feature_collection = get_feature_collection(zip, task_outlines_filename, f'Could not generate FeatureCollection from {task_outlines_filename}')
+        # get all task outlines from file
+        project_tasks_feature_collection = get_json_from_zip(zip, task_outlines_filename, f'Could not generate FeatureCollection from {task_outlines_filename}')
 
         # generate task for each feature
         try:
             task_count = 0
-            db_project.total_tasks = len(project_tasks_feature_collection.features)
-            for feature in project_tasks_feature_collection.features:
-                task_name = feature.properties['task']
+            db_project.total_tasks = len(project_tasks_feature_collection['features'])
+            for feature in project_tasks_feature_collection['features']:
+                task_name = feature['properties']['task']
 
                 # generate and save qr code in db
                 qr_filename = f'{project_name_prefix}_{task_type_prefix}__{task_name}.png'
@@ -141,11 +144,14 @@ def update_project_with_upload(
                 db.add(db_qr)
 
                 # save outline
-                task_outline_geojson = feature.geometry
+                task_outline_shape = get_shape_from_json_str(
+                    feature, 
+                    f'Could not create task outline for {task_name} using {feature}',
+                )
                 
                 # extract task geojson
                 task_geojson_filename = f'{project_name_prefix}_{task_type_prefix}__{task_name}.geojson'
-                task_geojson, task_feature_collection = get_feature_collection(
+                task_geojson = get_json_from_zip(
                     zip, 
                     TASK_GEOJSON_DIR+task_geojson_filename,  
                     f'Geojson for task {task_name} does not exist',
@@ -154,12 +160,12 @@ def update_project_with_upload(
                 # save task in db
                 task = db_models.DbTask(
                     project_id = project_id,
-                    project_task_index = feature.properties['fid'],
+                    project_task_index = feature['properties']['fid'],
                     project_task_name = task_name,
                     qr_code = db_qr,
-                    outline = json.ExportToWkt(task_outline_geojson), 
-                    geometry_geojson = task_geojson,
-                    initial_feature_count = len(task_feature_collection.features),
+                    outline = task_outline_shape.wkt, 
+                    geometry_geojson = json.dumps(task_geojson),
+                    initial_feature_count = len(task_geojson['features']),
                 )
                 db.add(task)
 
@@ -178,23 +184,41 @@ def update_project_with_upload(
 
         # Unexpected exception
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f'{task_count} tasks were created before the following error was thrown: {e}') 
+            raise HTTPException(status_code=500, detail=f'{task_count} tasks were created before the following error was thrown: {e}, on feature: {feature}') 
 
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
-def get_feature_collection(zip, filename: str, error_detail: str):
+def get_json_from_zip(zip, filename: str, error_detail: str):
     try:
         with zip.open(filename) as file:
-            data = file.read().decode("utf-8")
-            json_data = json.loads(data)
-            collection = FeatureCollection(**json_data)
-            return data, collection
+            data = file.read()
+            return json.loads(data)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f'{error_detail} ----- Error: {e}')
 
-        
+def get_outline_from_geojson_file_in_zip(zip, filename: str, error_detail: str, feature_index: int = 0):
+    try:
+        # json_dump = get_json_from_zip(zip, filename, error_detail)
+        with zip.open(filename) as file:
+            data = file.read()
+            json_dump = json.loads(data)
+            feature_collection = geojson.FeatureCollection(json_dump)
+            feature = feature_collection['features'][feature_index]
+            geom = feature['geometry']
+            shape_from_geom = shape(geom)
+            return shape_from_geom
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f'{error_detail} ----- Error: {e} ---- FeatureCollection: {feature_collection}')
+
+def get_shape_from_json_str(feature: str, error_detail: str):
+    try:
+        # json_dump = json.loads(feature)
+        geom = feature['geometry']
+        return shape(geom)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f'{error_detail} ----- Error: {e} ---- Json: {feature}')   
 
 def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
     try:
