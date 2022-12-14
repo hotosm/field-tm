@@ -4,7 +4,6 @@ from shapely.geometry import shape
 
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus
-from ..models import gis_schemas
 
 class ProjectInfo(BaseModel):
     locale: str
