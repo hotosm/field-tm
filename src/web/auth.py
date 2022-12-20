@@ -86,9 +86,9 @@ def login():
                             error = f"Response was successful but everything is not well. See: {response_dict}"
 
                     elif response.status_code == 400:
-                        error = "Username already registered."
+                        error = "Login failed."
             except Exception as e:
-                error = f"Registration failed due to {e}"
+                error = f"Login failed due to {e}"
 
         flash(error)
 

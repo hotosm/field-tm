@@ -36,8 +36,7 @@ async def create_project_part_1(project_info: project_schemas.BETAProjectUpload,
     project = project_crud.create_project_with_project_info(db, project_info)
     return project
 
-# @router.post("/beta", response_model=project_schemas.ProjectOut)
-@router.post("/beta/{project_id}/upload_zip")
+@router.post("/beta/{project_id}/upload_zip", response_model=project_schemas.ProjectOut)
 async def upload_beta_project(
     project_id: int, 
     project_name_prefix: str,
@@ -45,6 +44,8 @@ async def upload_beta_project(
     upload: UploadFile, 
     db: Session = Depends(database.get_db)
 ):
+    import logging
+    logging.info(upload)
     # authenticate and identify user
     # process metadata
     ## should include:

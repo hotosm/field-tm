@@ -9,7 +9,7 @@ from flask import (Blueprint, current_app, flash, g, redirect, render_template,
 from werkzeug.exceptions import abort
 
 from src.web.auth import login_required
-from src.web.models import Project, Task, TaskStatus, User, db
+from src.web.models import Project, Task, FrontendTaskStatus, User, db
 
 # api
 import requests
@@ -83,7 +83,6 @@ def create():
                     if response.status_code == 200:
                         session['project_in_progress'] = response.json()
                         return redirect(url_for(".upload_project_zip"))
-                        # return redirect(url_for(".upload_project_zip"), project_response=response.json(), project_id=response.json()['id'])
 
             except Exception as e:
                 if response:
@@ -92,8 +91,8 @@ def create():
                     error = f"Project Creation failed due to {e}"
             
             if (error):
+                current_app.logger.info(error)
                 flash(error)
-            return redirect(url_for("project.index"))
 
     return render_template("project/create.html")
 
@@ -102,6 +101,9 @@ def create():
 def upload_project_zip():
     current_app.logger.info("message")
     project_in_progress = session['project_in_progress']
+
+    if not project_in_progress:
+        redirect(url_for("project/index.html"))
 
     if request.method == "POST":
         project_id = request.form["project_id"]
@@ -159,7 +161,7 @@ def upload_project_zip():
             if (error):
                 flash(error)
 
-    return render_template("project/upload.html", project_data=project_in_progress, project_id=project_in_progress['id'])
+    return render_template("project/upload.html", project_id=project_in_progress['id'])
 
 def get_qr_file(title, task_id):
     project_folder = get_project_folder(title)
@@ -310,12 +312,12 @@ def check_for_feature_id(request):
     return feature_id
 
 def is_valid_status_change(task, new_status):
-    if task.status is TaskStatus.available:
-        return (new_status == TaskStatus.unavailable)
-    elif task.status is TaskStatus.unavailable:
+    if task.status is FrontendTaskStatus.available:
+        return (new_status == FrontendTaskStatus.unavailable)
+    elif task.status is FrontendTaskStatus.unavailable:
         has_permission = session.get("user_id") == task.task_doer
-        return has_permission and (new_status == TaskStatus.available or new_status == TaskStatus.ready_for_validation)
-    elif task.status is TaskStatus.ready_for_validation:
+        return has_permission and (new_status == FrontendTaskStatus.available or new_status == FrontendTaskStatus.ready_for_validation)
+    elif task.status is FrontendTaskStatus.ready_for_validation:
         return False
     return False
 

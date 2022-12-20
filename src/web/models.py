@@ -55,7 +55,7 @@ class Project(db.Model):
         return self.__dict__[field]
 
 
-class TaskStatus(str, enum.Enum):
+class FrontendTaskStatus(str, enum.Enum):
     available = "Available for mapping"
     unavailable = "Unavailable"
     ready_for_validation = "Ready for Validation"
@@ -73,8 +73,8 @@ class Task(db.Model):
     project_id = db.Column(db.Integer, unique=False, nullable=False)
     created = db.Column(db.TIMESTAMP, nullable=False,
                         server_default=db.func.now())
-    status = db.Column(Enum(TaskStatus), nullable=False,
-                       default=TaskStatus.available)
+    status = db.Column(Enum(FrontendTaskStatus), nullable=False,
+                       default=FrontendTaskStatus.available)
     task_doer = db.Column(db.Integer)
     last_selected = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
