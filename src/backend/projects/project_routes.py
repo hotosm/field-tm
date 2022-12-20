@@ -27,7 +27,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
-@router.post("beta/create_project", response_model=project_schemas.ProjectOut)
+@router.post("/beta/create_project", response_model=project_schemas.ProjectOut)
 async def create_project_part_1(project_info: project_schemas.BETAProjectUpload, db: Session = Depends(database.get_db)):
     # authenticate and identify user
     # TODO check token against user or use token instead of passing user
@@ -50,6 +50,8 @@ async def upload_beta_project(
     ## should include:
     ## - form fields
     ## - least one project info
+
+    # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
 
     project = project_crud.update_project_with_upload(db, project_id, project_name_prefix, task_type_prefix, upload)
         
