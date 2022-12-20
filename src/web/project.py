@@ -11,7 +11,11 @@ from werkzeug.exceptions import abort
 from src.web.auth import login_required
 from src.web.models import Project, Task, TaskStatus, User, db
 
+# api
+import requests
+
 bp = Blueprint("project", __name__)
+base_url =os.getenv("API_URL")
 
 grid_filename = "grid.geojson"
 
@@ -32,43 +36,130 @@ def index():
 @login_required
 def create():
     current_app.logger.info("message")
+
     if request.method == "POST":
-        title = request.form["title"]
+        locale = request.form["locale"]
+        name = request.form["name"]
+        short_description = request.form["short_description"]
         description = request.form["description"]
+        instructions = request.form["instructions"]
+        per_task_instructions = request.form['per_task_instructions']
+        
         error = None
 
-        if not title:
-            error = "Title is required."
-        else:
-            # TODO: check theres not a project with this title already
-            pass
-
-        error = save_project_file(request, "files")
+        if not locale:
+            error = "Locale is required."
+        if not name:
+            error = "Project Name is required."
+        if not short_description:
+            error = "Short description is required."
+        if not description:
+            error = "Description is required."
+        if not instructions:
+            error = "Instructions is required."
+        if not per_task_instructions:
+            error = "Per task instructions are required."
 
         if error is not None:
             flash(error)
-
         else:
-            # try:
-            user_id = g.user["id"]
-            project = Project(
-                title=title,
-                description=description,
-                author_id=user_id,
-                # TODO get rid of this in db
-                base_dir=get_relative_project_path(title),
-            )
-            db.session.add(project)
-            db.session.commit()
+            try:
+                with requests.Session() as s:
+                    response = s.post(
+                        f"{base_url}/projects/beta/create_project", 
+                        json={'author': {
+                            "username": session["username"],
+                            "id": session['user_id']
+                            },
+                            "project_info": {
+                                "locale":locale,
+                                "name":name,
+                                "short_description":short_description,
+                                "description":description,
+                                "instructions":instructions,
+                                "per_task_instructions": per_task_instructions
+                            }
+                        })
+                    if response.status_code == 200:
+                        session['project_in_progress'] = response.json()
+                        return redirect(url_for(".upload_project_zip"))
+                        # return redirect(url_for(".upload_project_zip"), project_response=response.json(), project_id=response.json()['id'])
 
-            create_tasks(title)
-            # except:
-            #     rollback_project_creation(title, error)
-            #     flash('Project creation failed.')
-
+            except Exception as e:
+                if response:
+                    error = f"Response code: {response.status_code} -- {response.json()} -- Project Creation failed due to {e}"
+                else:
+                    error = f"Project Creation failed due to {e}"
+            
+            if (error):
+                flash(error)
             return redirect(url_for("project.index"))
 
     return render_template("project/create.html")
+
+@bp.route("/upload", methods=("GET", "POST"))
+@login_required
+def upload_project_zip():
+    current_app.logger.info("message")
+    project_in_progress = session['project_in_progress']
+
+    if request.method == "POST":
+        project_id = request.form["project_id"]
+        project_name_prefix = request.form["project_name_prefix"]
+        task_type_prefix = request.form["task_type_prefix"]
+         
+        error = None
+
+        if not project_id:
+            error = "Project ID is required."
+        if not project_name_prefix:
+            error = "Project Name Prefix is required."
+        if not task_type_prefix:
+            error = "Task Type Prefix is required."
+
+        if "files" in request.files:
+            current_app.logger.info(request.files)
+            upload_files = request.files.getlist("files")
+            current_app.logger.info(upload_files)
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if not upload_files:
+                return "No selected file"
+            elif len(upload_files) > 1:
+                return "Expecting 1 file"
+
+            file = upload_files[0]
+        else:
+            error = "No file part"
+       
+        if error is not None:
+            flash(error)
+        else:
+            try:
+                with requests.Session() as s:
+                    response = s.post(
+                        f'{base_url}/projects/beta/{project_id}/upload_zip?project_name_prefix={project_name_prefix}&task_type_prefix={task_type_prefix}', 
+                        files=request.files
+                    )
+                    
+                    if response:
+                        current_app.logger.info(response.request)
+
+                        if response.status_code == 200:
+                            return render_template("project/index.html")
+                        else:
+                            error = response.json()
+
+            except Exception as e:
+                if response:
+                    error = f"Response code: {response.status_code} -- {response.json()} -- Project Creation failed due to {e}"
+                else:
+                    error = f"Project Creation failed due to {e}"
+            
+            if (error):
+                flash(error)
+
+    return render_template("project/upload.html", project_data=project_in_progress, project_id=project_in_progress['id'])
 
 def get_qr_file(title, task_id):
     project_folder = get_project_folder(title)
@@ -86,8 +177,7 @@ def get_relative_project_path(title):
     upload_folder_name = current_app.config["PROJECTS_UPLOAD_FOLDER_NAME"]
     return posixpath.join(upload_folder_name, title)
 
-
-def save_project_file(request, form_field_name):
+def get_project_file(request, form_field_name):
     if form_field_name not in request.files:
         return "No file part"
     current_app.logger.info(request.files)
@@ -108,12 +198,13 @@ def save_project_file(request, form_field_name):
         return "A project directory with this name already exists"
 
     file_like_object = file.stream._file
-    zipfile_ob = zipfile.ZipFile(file_like_object)
-    zipfile_ob.extractall(full_path)
-    zipfile_ob.close()
+    return file_like_object
+    # zipfile_ob = zipfile.ZipFile(file_like_object)
+    # zipfile_ob.extractall(full_path)
+    # zipfile_ob.close()
 
-    flash("Upload succeeded")
-    return None
+    # flash("Upload succeeded")
+    # return None
 
 
 def get_geojson(title):
