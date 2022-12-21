@@ -20,3 +20,6 @@ class Task(TaskBase):
 
 class TaskOut(TaskBase):
     pass
+
+class TaskDetails(TaskBase):
+    pass

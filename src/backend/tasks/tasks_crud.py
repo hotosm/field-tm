@@ -1,10 +1,25 @@
 from geoalchemy2.shape import to_shape
 from shapely.geometry import shape, mapping
+from sqlalchemy.orm import Session
 from typing import List
 import json
 
 from ..db import db_models
 from ..tasks import tasks_schemas
+
+# --------------
+# ---- CRUD ----
+# --------------
+
+def get_tasks(db: Session, user_id: int, task_id: int, skip: int = 0, limit: int = 1000):
+    if task_id:
+        db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).offset(skip).limit(limit).all()
+        return convert_to_app_tasks(db_task)
+    if user_id:
+        db_tasks = db.query(db_models.DbTask).filter(db_models.DbTask.author_id == user_id).offset(skip).limit(limit).all()
+    else:
+        db_tasks = db.query(db_models.DbTask).offset(skip).limit(limit).all()
+    return convert_to_app_tasks(db_tasks)
 
 # --------------------
 # ---- CONVERTERS ----

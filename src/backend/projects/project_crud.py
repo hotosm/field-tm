@@ -9,7 +9,6 @@ import geojson
 from shapely.geometry import shape, mapping
 from geoalchemy2.shape import to_shape
 
-
 from ..db.postgis_utils import timestamp
 from ..db import db_models
 from ..users import user_crud
@@ -23,17 +22,17 @@ from . import project_schemas
 QR_CODES_DIR = 'QR_codes/'
 TASK_GEOJSON_DIR = 'geojson/'
 
-def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    # TODO only get needed info from db instead of all info
-    db_projects = get_projects(db, user_id, skip, limit) 
-    return convert_to_project_summaries(db_projects)
-
 def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     if user_id:
         db_projects = db.query(db_models.DbProject).filter(db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
     else:
         db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
     return convert_to_app_projects(db_projects)
+
+def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    # TODO only get needed info from db instead of all info
+    db_projects = get_projects(db, user_id, skip, limit) 
+    return convert_to_project_summaries(db_projects)
 
 def get_project_by_id_w_all_tasks(db:Session, project_id: int):
     db_project = db\
