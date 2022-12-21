@@ -1,3 +1,21 @@
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
 import datetime
 import os
 import subprocess
@@ -5,15 +23,3 @@ import subprocess
 def timestamp():
     """ Used in SQL Alchemy models to ensure we refresh timestamp when new models initialised"""
     return datetime.datetime.utcnow()
-
-# TODO: does this work and what's the right sql query??
-def convert_geojson_to_postgis(folder, db):
-    # folder=r'path'
-    # db_connection="host=localhost dbname=hmm user=postgres password=apassword"
-
-    # QUERY FROM STACK OVERFLOW Example
-    # cmd='ogr2ogr -f "FileGDB" --config OGR_TRUNCATE YES "{0}" PG:"{1}" -sql "select geom from my table" -t_srs EPSG:3424 -nlt MULTIPOLYGON -overwrite -nln exported_table'.format(folder,db)
-   
-    # ROBS Querry
-    cmd = 'ogr2ogr -skipfailures -progress -overwrite -f PostgreSQL PG:dbname=fmtm -nlt POLYGON Naivasha.geojson -lco COLUMN_TYPES=other_tags=hstore'
-    subprocess.Popen(cmd, universal_newlines=True, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()

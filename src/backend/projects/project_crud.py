@@ -1,3 +1,21 @@
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
 from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from typing import List
@@ -216,7 +234,6 @@ def get_json_from_zip(zip, filename: str, error_detail: str):
 
 def get_outline_from_geojson_file_in_zip(zip, filename: str, error_detail: str, feature_index: int = 0):
     try:
-        # json_dump = get_json_from_zip(zip, filename, error_detail)
         with zip.open(filename) as file:
             data = file.read()
             json_dump = json.loads(data)
@@ -230,7 +247,6 @@ def get_outline_from_geojson_file_in_zip(zip, filename: str, error_detail: str, 
 
 def get_shape_from_json_str(feature: str, error_detail: str):
     try:
-        # json_dump = json.loads(feature)
         geom = feature['geometry']
         return shape(geom)
     except Exception as e:
