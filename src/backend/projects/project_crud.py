@@ -23,32 +23,10 @@ from . import project_schemas
 QR_CODES_DIR = 'QR_codes/'
 TASK_GEOJSON_DIR = 'geojson/'
 
-# todo: make a smaller one for summaries only...
-# def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-#     if user_id:
-#         # TODO get only default info
-#         # DefaultInfo = aliased(db_models.DbProjectInfo, name='info')
-#         # db_default_infos = db.query(db_models.DbProjectInfo.id)\
-#         #     .filter(DefaultInfo.project_id= )
-#         #     .with_entities(
-#         #         db_models.DbProjectInfo.name,
-#         #         db_models.DbProjectInfo.short_description
-#         #     )
-#         # TODO get org
-#         db_projects = db.query(db_models.DbProject)\
-#             .with_entities(
-#                 db_models.DbProject.id, 
-#                 db_models.DbProject.priority,
-#                 db_models.DbProject.project_info,
-#                 # TODO get org icon db_models.DbProjectInfo.org
-#              )\
-#             .filter(db_models.DbProject.author_id == user_id)\
-#             .offset(skip)\
-#             .limit(limit)\
-#             .all()
-#     else:
-#         db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
-#     return convert_to_app_projects(db_projects)
+def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    # TODO only get needed info from db instead of all info
+    db_projects = get_projects(db, user_id, skip, limit) 
+    return convert_to_project_summaries(db_projects)
 
 def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     if user_id:
@@ -90,6 +68,8 @@ def create_project_with_project_info(db: Session, project_metadata: project_sche
     db_project = db_models.DbProject(
         author = db_user,
         default_locale = project_info_1.locale,
+        country = [project_metadata.country],
+        location_str = f'{project_metadata.city}, {project_metadata.country}',
     )
     db.add(db_project)
 
@@ -298,6 +278,30 @@ def convert_to_app_projects(db_projects: List[db_models.DbProject]):
             if project:
                 app_projects.append(convert_to_app_project(project))
         app_projects_without_nones = [i for i in app_projects if i is not None]
+        return app_projects_without_nones
+    else:
+        return []
+
+def convert_to_project_summary(db_project: db_models.DbProject):
+    if db_project:
+        summary: project_schemas.ProjectSummary = db_project
+
+        if (db_project.project_info and len(db_project.project_info) > 0):
+            default_project_info = next((x for x in db_project.project_info if x.locale == db_project.default_locale), None)
+            summary.title = default_project_info.name
+            summary.description = default_project_info.short_description
+
+        return summary
+    else:
+        return None
+
+def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
+    if db_projects and len(db_projects) > 0:
+        project_summaries = []
+        for project in db_projects:
+            if project:
+                project_summaries.append(convert_to_project_summary(project))
+        app_projects_without_nones = [i for i in project_summaries if i is not None]
         return app_projects_without_nones
     else:
         return []

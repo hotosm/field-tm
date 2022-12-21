@@ -359,6 +359,7 @@ class DbProject(Base):
     project_info = relationship(
         DbProjectInfo, cascade="all, delete, delete-orphan", backref="project"
     )
+    location_str = Column(String)
 
     # GEOMETRY
     outline = Column(Geometry("POLYGON", srid=4326))

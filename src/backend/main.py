@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import logging.config
 from fastapi.logger import logger as fastapi_logger
 from os import path
@@ -45,3 +46,8 @@ def read_root():
 @api.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
+
+@api.get("/images/{image_filename}")
+def get_images(image_filename: str):
+    path = f"./src/backend/images/{image_filename}"
+    return FileResponse(path)
