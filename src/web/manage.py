@@ -13,15 +13,15 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
+from src.web.main import app, db
 from flask.cli import FlaskGroup
 
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 
-from src.web.main import app, db
 
 cli = FlaskGroup(app)
 

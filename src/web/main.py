@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy

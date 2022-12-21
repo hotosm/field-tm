@@ -13,10 +13,11 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 import os
 from pathlib import Path
+
 
 class BaseConfig:
     """Base configuration"""
@@ -26,7 +27,8 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # SQLALCHEMY_DATABASE_URI = os.environ.get(
     #     "DATABASE_URL", f"sqlite:///{BASE_DIR}/db.sqlite3")
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://fmtm:fmtm@db:5432' #TODO use environmental variables here
+    # TODO use environmental variables here
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://fmtm:fmtm@db:5432'
     STATIC_FOLDER = os.environ.get(
         "PROJECTS_UPLOAD_FOLDER", os.path.join(
             os.path.dirname(os.path.abspath(__file__)),

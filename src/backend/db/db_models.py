@@ -18,7 +18,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, LargeBinary, ARRAY, String, DateTime, Boolean, ForeignKey, ForeignKeyConstraint, UniqueConstraint, Index, Unicode
-from sqlalchemy.orm import relationship, backref #, declarative_base
+from sqlalchemy.orm import relationship, backref  # , declarative_base
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
 
@@ -26,6 +26,7 @@ from src.backend.db.postgis_utils import timestamp
 from src.backend.models.enums import TeamVisibility, OrganisationType, ProjectStatus, ProjectPriority, MappingPermission, ValidationPermission, MappingLevel, UserRole, TaskCreationMode, TaskAction, TaskStatus, ProjectSplitStrategy, TaskType
 
 from .database import Base, FmtmMetadata
+
 
 class DbUser(Base):
     """Describes the history associated with a task"""
@@ -43,7 +44,8 @@ class DbUser(Base):
     is_email_verified = Column(Boolean, default=False)
     is_expert = Column(Boolean, default=False)
 
-    mapping_level = Column(Enum(MappingLevel), default=MappingLevel.BEGINNER, nullable=False)
+    mapping_level = Column(
+        Enum(MappingLevel), default=MappingLevel.BEGINNER, nullable=False)
     tasks_mapped = Column(Integer, default=0, nullable=False)
     tasks_validated = Column(Integer, default=0, nullable=False)
     tasks_invalidated = Column(Integer, default=0, nullable=False)
@@ -59,7 +61,7 @@ class DbUser(Base):
     # teams_announcement_notifications = Column(
     #     Boolean, default=True, nullable=False
     # )
-    
+
     date_registered = Column(DateTime, default=timestamp)
     # Represents the date the user last had one of their tasks validated
     last_validation_date = Column(DateTime, default=timestamp)
@@ -76,8 +78,10 @@ organisation_managers = Table(
         "organisation_id", Integer, ForeignKey("organisations.id"), nullable=False
     ),
     Column("user_id", BigInteger, ForeignKey("users.id"), nullable=False),
-    UniqueConstraint("organisation_id", "user_id", name="organisation_user_key"),
+    UniqueConstraint("organisation_id", "user_id",
+                     name="organisation_user_key"),
 )
+
 
 class DbOrganisation(Base):
     """ Describes an Organisation """
@@ -91,7 +95,8 @@ class DbOrganisation(Base):
     logo = Column(String)  # URL of a logo
     description = Column(String)
     url = Column(String)
-    type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
+    type = Column(Enum(OrganisationType),
+                  default=OrganisationType.FREE, nullable=False)
     subscription_tier = Column(Integer)
 
     managers = relationship(
@@ -99,6 +104,7 @@ class DbOrganisation(Base):
         secondary=organisation_managers,
         backref=backref("organisations", lazy="joined"),
     )
+
 
 class DbTeam(Base):
     """ Describes a team """
@@ -121,6 +127,7 @@ class DbTeam(Base):
     )
     organisation = relationship(DbOrganisation, backref="teams")
 
+
 # Secondary table defining many-to-many join for private projects that only defined users can map on
 project_allowed_users = Table(
     "project_allowed_users",
@@ -128,6 +135,7 @@ project_allowed_users = Table(
     Column("project_id", Integer, ForeignKey("projects.id")),
     Column("user_id", BigInteger, ForeignKey("users.id")),
 )
+
 
 class DbProjectTeams(Base):
     __tablename__ = "project_teams"
@@ -142,6 +150,7 @@ class DbProjectTeams(Base):
         DbTeam, backref=backref("projects", cascade="all, delete-orphan")
     )
 
+
 class DbProjectInfo(Base):
     """ Contains all project info localized into supported languages """
 
@@ -154,7 +163,7 @@ class DbProjectInfo(Base):
     short_description = Column(String)
     description = Column(String)
     instructions = Column(String)
-    
+
     text_searchable = Column(
         TSVECTOR
     )  # This contains searchable text and is populated by a DB Trigger
@@ -165,6 +174,7 @@ class DbProjectInfo(Base):
         Index("textsearch_idx", "text_searchable"),
         {},
     )
+
 
 class DbProjectChat(Base):
     """ Contains all project info localized into supported languages """
@@ -181,6 +191,7 @@ class DbProjectChat(Base):
     # Relationships
     posted_by = relationship(DbUser, foreign_keys=[user_id])
 
+
 class DbXForm(Base):
     """Xform templates and custom uploads"""
 
@@ -188,8 +199,9 @@ class DbXForm(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     description = Column(String)
-    form_xml = Column(String) #Internal form representation
-    form_xlsx = Column(String) #Human readable representation
+    form_xml = Column(String)  # Internal form representation
+    form_xlsx = Column(String)  # Human readable representation
+
 
 class DbTaskInvalidationHistory(Base):
     """Describes the most recent history of task invalidation and subsequent validation"""
@@ -206,7 +218,7 @@ class DbTaskInvalidationHistory(Base):
     )
     invalidated_date = Column(DateTime)
     invalidation_history_id = Column(
-        Integer,ForeignKey("task_history.id", name="fk_invalidation_history")
+        Integer, ForeignKey("task_history.id", name="fk_invalidation_history")
     )
     validator_id = Column(
         BigInteger, ForeignKey("users.id", name="fk_validators")
@@ -230,6 +242,7 @@ class DbTaskInvalidationHistory(Base):
         {},
     )
 
+
 class DbTaskMappingIssue(Base):
     """Describes an issue (along with an occurrence count) with a
     task mapping that contributed to invalidation of the task"""
@@ -247,6 +260,7 @@ class DbTaskMappingIssue(Base):
     )
     count = Column(Integer, nullable=False)
 
+
 class DbMappingIssueCategory(Base):
     """ Represents a category of task mapping issues identified during validaton """
 
@@ -255,6 +269,7 @@ class DbMappingIssueCategory(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     archived = Column(Boolean, default=False, nullable=False)
+
 
 class DbTaskHistory(Base):
     """Describes the history associated with a task"""
@@ -289,6 +304,7 @@ class DbTaskHistory(Base):
         {},
     )
 
+
 class DbQrCode(Base):
     """QR Code"""
 
@@ -297,7 +313,7 @@ class DbQrCode(Base):
     id = Column(Integer, primary_key=True)
     filename = Column(String)
     image = Column(LargeBinary)
-    
+
 
 class DbTask(Base):
     """Describes an individual mapping Task"""
@@ -329,14 +345,15 @@ class DbTask(Base):
     qrcode_id = Column(
         Integer, ForeignKey("qr_code.id"), index=True
     )
-    qr_code = relationship(DbQrCode, cascade="all, delete, delete-orphan", single_parent=True)
+    qr_code = relationship(
+        DbQrCode, cascade="all, delete, delete-orphan", single_parent=True)
 
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
     )
     lock_holder = relationship(DbUser, foreign_keys=[locked_by])
     mapper = relationship(DbUser, foreign_keys=[mapped_by])
-    
+
     ## ---------------------------------------------- ##
     # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
     # x = Column(Integer)
@@ -346,6 +363,7 @@ class DbTask(Base):
     # # Tasks need to be split differently if created from an arbitrary grid or were clipped to the edge of the AOI
     # is_square = Column(Boolean, default=False)
 
+
 class DbProject(Base):
     """Describes a HOT Mapping Project"""
 
@@ -353,7 +371,7 @@ class DbProject(Base):
 
     # Columns
     id = Column(Integer, primary_key=True)
-    
+
     # PROJECT CREATION
     author_id = Column(
         BigInteger, ForeignKey("users.id", name="fk_users"), nullable=False
@@ -382,10 +400,11 @@ class DbProject(Base):
     # GEOMETRY
     outline = Column(Geometry("POLYGON", srid=4326))
     # geometry = Column(Geometry("POLYGON", srid=4326, from_text='ST_GeomFromWkt'))
-    
+
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
-    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
+    status = Column(Enum(ProjectStatus),
+                    default=ProjectStatus.DRAFT, nullable=False)
     total_tasks = Column(Integer)
     tasks_mapped = Column(Integer, default=0, nullable=False)
     tasks_validated = Column(Integer, default=0, nullable=False)
@@ -397,15 +416,15 @@ class DbProject(Base):
     )
 
     # XFORM DETAILS
-    odk_central_src = Column(String, default="") #TODO Add HOTs as default
+    odk_central_src = Column(String, default="")  # TODO Add HOTs as default
     xform_id = Column(Integer, ForeignKey("x_form.id", name="fk_xform"))
     xform = relationship(DbXForm)
-    
+
     __table_args__ = (
-       Index(
+        Index(
             "idx_geometry", outline, postgresql_using="gist"
         ),
-        {}, 
+        {},
     )
 
     ## ---------------------------------------------- ##
@@ -419,7 +438,8 @@ class DbProject(Base):
     featured = Column(
         Boolean, default=False
     )  # Only admins can set a project as featured
-    mapping_permission = Column(Enum(MappingPermission), default=MappingPermission.ANY)
+    mapping_permission = Column(
+        Enum(MappingPermission), default=MappingPermission.ANY)
     validation_permission = Column(
         Enum(ValidationPermission), default=ValidationPermission.LEVEL
     )  # Means only users with validator role can validate
@@ -460,6 +480,7 @@ user_licenses_table = Table(
     Column("user", BigInteger, ForeignKey("users.id")),
     Column("license", Integer, ForeignKey("licenses.id")),
 )
+
 
 class DbLicense(Base):
     """ Describes an individual license"""

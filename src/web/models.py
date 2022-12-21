@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 import enum
 import datetime
@@ -24,12 +24,14 @@ from sqlalchemy import Enum
 
 db = SQLAlchemy()
 
+
 class DisplayProject:
     id: int
-    author_id: int 
+    author_id: int
     created: datetime
     author_username: str
     description: str
+
 
 class User(db.Model):
 
@@ -53,6 +55,7 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
         }
+
 
 class Project(db.Model):
 

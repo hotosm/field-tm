@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 version: '3.3'
 
@@ -27,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     ports:
-      -  5432:5432
+      - 5432:5432
     networks:
       - fmtm-net
 
@@ -57,7 +57,7 @@ services:
       - 8008:8000
     networks:
       - fmtm-net
-    
+
   web:
     build: .
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
@@ -102,6 +102,6 @@ services:
 volumes:
   postgres_data:
 
+
 networks:
-  fmtm-net:
-#     external: true
+  fmtm-net: #     external: true

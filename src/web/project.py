@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 import json
 import logging
@@ -32,7 +32,7 @@ from src.web.models import DisplayProject, Project, Task, FrontendTaskStatus, Us
 import requests
 
 bp = Blueprint("project", __name__)
-base_url =os.getenv("API_URL")
+base_url = os.getenv("API_URL")
 
 grid_filename = "grid.geojson"
 
@@ -83,7 +83,7 @@ def create():
         description = request.form["description"]
         instructions = request.form["instructions"]
         per_task_instructions = request.form['per_task_instructions']
-        
+
         error = None
 
         if not locale:
@@ -105,19 +105,19 @@ def create():
             try:
                 with requests.Session() as s:
                     response = s.post(
-                        f"{base_url}/projects/beta/create_project", 
+                        f"{base_url}/projects/beta/create_project",
                         json={'author': {
                             "username": session["username"],
                             "id": session['user_id']
-                            },
+                        },
                             "project_info": {
-                                "locale":locale,
-                                "name":name,
-                                "short_description":short_description,
-                                "description":description,
-                                "instructions":instructions,
+                                "locale": locale,
+                                "name": name,
+                                "short_description": short_description,
+                                "description": description,
+                                "instructions": instructions,
                                 "per_task_instructions": per_task_instructions
-                            }
+                        }
                         })
                     if response.status_code == 200:
                         session['project_in_progress'] = response.json()
@@ -128,12 +128,13 @@ def create():
                     error = f"Response code: {response.status_code} -- {response.json()} -- Project Creation failed due to {e}"
                 else:
                     error = f"Project Creation failed due to {e}"
-            
+
             if (error):
                 current_app.logger.info(error)
                 flash(error)
 
     return render_template("project/create.html")
+
 
 @bp.route("/upload", methods=("GET", "POST"))
 @login_required
@@ -148,7 +149,7 @@ def upload_project_zip():
         project_id = request.form["project_id"]
         project_name_prefix = request.form["project_name_prefix"]
         task_type_prefix = request.form["task_type_prefix"]
-         
+
         error = None
 
         if not project_id:
@@ -172,16 +173,17 @@ def upload_project_zip():
             file = upload_files[0].read()
         else:
             error = "No file part"
-       
+
         if error is not None:
             flash(error)
         else:
             try:
                 with requests.Session() as s:
-                    current_app.logger.info(f'Attempting the post with: {file}')
-                    
+                    current_app.logger.info(
+                        f'Attempting the post with: {file}')
+
                     response = s.post(
-                        f'{base_url}/projects/beta/{project_id}/upload_zip?project_name_prefix={project_name_prefix}&task_type_prefix={task_type_prefix}', 
+                        f'{base_url}/projects/beta/{project_id}/upload_zip?project_name_prefix={project_name_prefix}&task_type_prefix={task_type_prefix}',
                         files={'file': file}
                     )
                     current_app.logger.info(f'response: {response.json()}')
@@ -198,17 +200,19 @@ def upload_project_zip():
                     error = f"Response code: {response.status_code} -- {response.json()} -- Project Creation failed due to {e}"
                 else:
                     error = f"Project Creation failed due to {e}"
-            
+
             if (error):
                 flash(error)
 
     return render_template("project/upload.html", project_id=project_in_progress['id'])
+
 
 def get_qr_file(title, task_id):
     project_folder = get_project_folder(title)
     qr_folder_name = current_app.config["QR_CODE_FOLDER_NAME"]
     file_name = f'buildings_{task_id}.gif'
     return os.path.join(project_folder, qr_folder_name, file_name)
+
 
 def get_project_folder(title):
     static_folder_path = current_app.config["STATIC_FOLDER"]
@@ -219,6 +223,7 @@ def get_project_folder(title):
 def get_relative_project_path(title):
     upload_folder_name = current_app.config["PROJECTS_UPLOAD_FOLDER_NAME"]
     return posixpath.join(upload_folder_name, title)
+
 
 def get_project_file(request, form_field_name):
     if form_field_name not in request.files:
@@ -304,6 +309,7 @@ def get_tasks_for_project(project_id):
     )
     return tasks
 
+
 def get_task_by_id(project_id, task_id):
     tasks = (
         db.session.query(Task)
@@ -313,6 +319,7 @@ def get_task_by_id(project_id, task_id):
         .first()
     )
     return tasks
+
 
 def get_tasks_for_user(user_id):
     tasks = (
@@ -339,11 +346,12 @@ def get_project(id, check_author=True):
 
     return project
 
+
 def check_for_feature_id(request):
     feature_id = request.form["tasknum"]
     error = None
 
-    #msg = "Attempted post with task number: " + feature_id
+    # msg = "Attempted post with task number: " + feature_id
     if not feature_id:
         error = "Task Number cannot be blank. Please select task again."
 
@@ -351,6 +359,7 @@ def check_for_feature_id(request):
             msg = error
             flash(error)
     return feature_id
+
 
 def is_valid_status_change(task, new_status):
     if task.status is FrontendTaskStatus.available:
@@ -362,8 +371,10 @@ def is_valid_status_change(task, new_status):
         return False
     return False
 
-# Get returns map of a project dispalying all tasks. 
+# Get returns map of a project dispalying all tasks.
 # Post can either include a qrcode to be downloaded, or a new status for a particular task.
+
+
 @bp.route("/<int:id>/map", methods=("GET", "POST"))
 def map(id):
     if request.method == "POST":
@@ -384,11 +395,11 @@ def map(id):
                     error = f"Download failed for {qrcode} due to {e}"
                     flash(error)
                     return render_map_by_project_id(id)
-            
+
             new_status = request.form["newstatus"]
             if not new_status:
                 error = "New status is required."
-                
+
             if error is None:
                 try:
                     matching_task = db.session.query(Task).where(
@@ -405,7 +416,7 @@ def map(id):
                         db.session.commit()
                 except Exception as e:
                     error = f"Database query or update failed with error: {e}"
-                        
+
             if error is not None:
                 flash(error)
             return render_map_by_project_id(id)
@@ -414,19 +425,21 @@ def map(id):
     else:
         return render_map_by_project_id(id)
 
+
 class UITask:
     status: str
-    feature_id: int 
+    feature_id: int
     name: str
     qr_code: bytes
     outline: str
     uid: int
 
+
 def render_map_by_project_id(id):
     try:
         with requests.Session() as s:
             response = s.get(f"{base_url}/projects/{id}")
-            
+
             if response.status_code == 200:
                 project = response.json()
                 project_id = project['id']
@@ -439,36 +452,38 @@ def render_map_by_project_id(id):
 
                 tasks = []
                 for task in project['project_tasks']:
-                    
+
                     ui_task = UITask()
                     ui_task.status = task['task_status']
                     ui_task.feature_id = task['project_task_index']
                     ui_task.name = task['project_task_name']
                     ui_task.outline = task['outline_json']
                     ui_task.uid = task['id']
-                    
+
                     current_app.logger.info(ui_task)
                     tasks.append(ui_task)
-                
+
                 current_app.logger.info(len(tasks))
 
                 return render_template(
-                        "project/map.html", 
-                        project_id=project_id,
-                        project_name=project_name,
-                        project_outline=project_outline, 
-                        tasks=tasks,
-                        userid=session.get("user_id")
-                    )
+                    "project/map.html",
+                    project_id=project_id,
+                    project_name=project_name,
+                    project_outline=project_outline,
+                    tasks=tasks,
+                    userid=session.get("user_id")
+                )
     except Exception as e:
         flash(e)
 
     return redirect(url_for("project.index"))
 
+
 def task_by_feature_id(tasks):
     task_dict = {}
     for task in tasks:
-        status = {"value":str(task["status"].name), "label":str(task["status"].value)}
+        status = {"value": str(task["status"].name),
+                  "label": str(task["status"].value)}
 
         task_dict[task["feature_id"]] = {
             "id": task["id"],
@@ -477,6 +492,7 @@ def task_by_feature_id(tasks):
             "status": status,
         }
     return task_dict
+
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required

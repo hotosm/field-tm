@@ -25,6 +25,7 @@ from typing import Union, List, Dict
 
 app = FastAPI()
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -34,21 +35,25 @@ async def root():
 
 items = {"foo": "The Foo Wrestlers"}
 
+
 @app.get("/items/{item_id}")
 async def read_item(item_id: str):
     if item_id not in items:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"item_id": item_id, "about": "Takes parameter with automatic type check",
-        "item": items[item_id]}
+            "item": items[item_id]}
+
 
 class AbcCode(str, Enum):
     a = "Alfa"
     b = "Bravo"
     c = "Charlie"
 
+
 @app.get("/code/{letter}")
 async def get_code(letter: AbcCode):
     return {"item_id": letter, "about": "Takes enum parameter."}
+
 
 @app.get("/files/{file_path:path}")
 async def read_file(file_path: str):
@@ -63,13 +68,16 @@ async def read_file(file_path: str):
 # example: http://127.0.0.1:8000/items/?skip=0&limit=2 IS THE SAME AS: http://127.0.0.1:8000/items/?limit=2
 # returns: [{"item_name":"Foo"},{"item_name":"Bar"}]
 
-fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+fake_items_db = [{"item_name": "Foo"}, {
+    "item_name": "Bar"}, {"item_name": "Baz"}]
+
 
 @app.get("/items/")
 async def read_item(skip: int = 0, limit: int = 10, index: int = None):
     if index:
-        return fake_items_db[index] # Note: 0 evaluates as None so can't get first index
-    return fake_items_db[skip : skip + limit]
+        # Note: 0 evaluates as None so can't get first index
+        return fake_items_db[index]
+    return fake_items_db[skip: skip + limit]
 
 # To make a query required, give no default value
 
@@ -79,6 +87,7 @@ async def read_item(skip: int = 0, limit: int = 10, index: int = None):
 # http://127.0.0.1:8000/truth?tell_me=true # or any other case variation, ex TRUE
 # http://127.0.0.1:8000/truth?tell_me=on
 # http://127.0.0.1:8000/truth?tell_me=yes
+
 
 @app.get("/truth/")
 async def is_true(tell_me: bool):
@@ -92,12 +101,14 @@ async def is_true(tell_me: bool):
 # typing List or Set can be used for list or set type validation. HttpUrl can be used for valid urls.
 # Field can be used to add validation to attributes.
 
+
 class Image(BaseModel):
-    url: str = Field(example="http://example.com/baz.jpg") # used for docs
+    url: str = Field(example="http://example.com/baz.jpg")  # used for docs
     name: str
 
+
 class Heart(BaseModel):
-    rate: int 
+    rate: int
     healthy: bool
     broken: bool = False
     loves: List[str] = []
@@ -113,7 +124,7 @@ class Heart(BaseModel):
                 "rate": "120",
                 "healthy": True,
                 "broken": True,
-                "loves": {"sloths","AI","soft things"},
+                "loves": {"sloths", "AI", "soft things"},
                 "description": "blond beauty",
                 "image": {
                     "url": "http://example.com/baz.jpg",
@@ -124,6 +135,8 @@ class Heart(BaseModel):
         }
 
 # just to show another metadata/documentation example with multiple examples
+
+
 class Lung(BaseModel):
     image: Image = Body(
         examples={
@@ -138,8 +151,8 @@ class Lung(BaseModel):
         },
     )
 
-# other built in datatypes: 
-# UUID, 
+# other built in datatypes:
+# UUID,
 # dattime.datetime, 2008-09-15T15:53:00+05:00
 # datetime.date, 2008-09-15
 # datetime.time, 14:23:55.003
@@ -151,6 +164,7 @@ class Lung(BaseModel):
 # Decimal, handled as float
 # EmailStr
 
+
 @app.post("/hearts/", response_model=Heart)
 async def create_item(heart: Heart):
     if heart.broken:
@@ -160,11 +174,14 @@ async def create_item(heart: Heart):
 # Can use in and out and response type to do validation or hide data
 # It is recommended to do it this way rather than exclude because it will be better documented that way.
 # Example:
+
+
 class UserIn(BaseModel):
     username: str
     password: str
     email: EmailStr
     full_name: Union[str, None] = None
+
 
 class UserInDB(BaseModel):
     username: str
@@ -172,20 +189,24 @@ class UserInDB(BaseModel):
     email: EmailStr
     full_name: Union[str, None] = None
 
+
 class UserOut(BaseModel):
     username: str
     email: EmailStr
     full_name: Union[str, None] = None
 
+
 def fake_password_hasher(raw_password: str):
     return "supersecret" + raw_password
+
 
 user_id_generator = 0
 users = {int, UserInDB}
 
+
 def fake_save_user(user_in: UserIn):
     hashed_password = fake_password_hasher(user_in.password)
-   
+
     # you can turn a model into a dict with .dict() and pass it into a constructor to create an instance
     user_in_db = UserInDB(**user_in.dict(), hashed_password=hashed_password)
 
@@ -195,13 +216,13 @@ def fake_save_user(user_in: UserIn):
     same_use = UserInDB(**user_in.dict())
 
     another_copy = UserInDB(
-        username = user_dict["username"],
-        password = user_dict["password"],
-        email = user_dict["email"],
-        full_name = user_dict["full_name"],
+        username=user_dict["username"],
+        password=user_dict["password"],
+        email=user_dict["email"],
+        full_name=user_dict["full_name"],
     )
 
-    #in case you have a datastring that can't be saved into the database for example, similar to json.dumps()
+    # in case you have a datastring that can't be saved into the database for example, similar to json.dumps()
     json_compatible_item_data = jsonable_encoder(user_in)
 
     print("User saved! ..not really")
@@ -209,11 +230,13 @@ def fake_save_user(user_in: UserIn):
     users_id_generator = users_id_generator+1
     return user_in_db
 
+
 @app.post("/user/", response_model=UserOut)
 async def create_user(user_in: UserIn):
     user_saved = fake_save_user(user_in)
 
     return user_saved
+
 
 @app.patch("/user/{user_id}", response_model=UserOut)
 async def update_item(user_id: str, user: UserIn):
@@ -225,21 +248,28 @@ async def update_item(user_id: str, user: UserIn):
     return updated_user
 
 # A better way to do the above with less duplicaiton and chance for error
+
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
     full_name: Union[str, None] = None
 
+
 class UserIn(UserBase):
     password: str
 
+
 class UserOut(UserBase):
     pass
+
 
 class UserInDB(UserBase):
     hashed_password: str
 
 # Notes on Union
+
+
 class BaseItem(BaseModel):
     description: str
     type: str
@@ -252,6 +282,7 @@ class CarItem(BaseItem):
 class PlaneItem(BaseItem):
     type = "plane"
     size: int
+
 
 @app.get("/items/{item_id}", response_model=Union[PlaneItem, CarItem])
 async def read_item(item_id: str):
@@ -277,22 +308,25 @@ async def read_items(q: Union[str, None] = Query(default=None, min_length=1, max
         results.update({"q": q})
     return results
 
+
 @app.get("/regex/")
 async def regex_validation(
     q: Union[str, None] = Query(
         default=None, min_length=3, max_length=50, regex="^regex$"
     )
 ):
-    return {"message": "^: starts with the following characters, doesn't have characters before. regex: has the exact value regex. $: ends there, doesn't have any more characters after fixedquery." }
-   
+    return {"message": "^: starts with the following characters, doesn't have characters before. regex: has the exact value regex. $: ends there, doesn't have any more characters after fixedquery."}
+
 # Not setting a default value, or setting the default to ... both make a value required
 # if you need a none value, use Elipses
+
 
 @app.get("/noneANDrequired/")
 async def required_and_accepts_none(q: Union[str, None] = Query(default=..., min_length=3)):
     return q
 
 # Required can also be set with Pydantic (must be imported)
+
 
 @app.get("/required/")
 async def required_w_pydantic(q: str = Query(default=Required, min_length=3)):
@@ -301,25 +335,32 @@ async def required_w_pydantic(q: str = Query(default=Required, min_length=3)):
 # Example of list (imported) of path operations: http://localhost:8000/multiple/?q=foo&q=bar
 # Unless you use query, List will be interpreted as a request body.
 # python list can also be used but there will be no type checking.
+
+
 @app.get("/multiple/")
 async def read_many(q: Union[List[str], None] = Query(default=["ho", "hum"])):
     query_items = {"q": q}
     return query_items
 
 # Same idea with dict. Json will take a string key, but Pydantic will figure it out.
+
+
 @app.post("/index-weights/")
 async def create_index_weights(weights: Dict[int, float]):
     return weights
 
 # More metadata:
 # Note that those with no default value need to go first, but it doesn't matter to fast API. Or use first parameter *
+
+
 @app.get("/metadata/{path}",
-    summary="the summary",
-    description="the description",
-    deprecated=True
-)
+         summary="the summary",
+         description="the description",
+         deprecated=True
+         )
 async def read_something_and_know_what_it_is(
-    path: int = Path(title="The ID of the item to get. Greater to or equal to 1. You can also use gt (greater than) or le (less than or equal)", ge=1),
+    path: int = Path(
+        title="The ID of the item to get. Greater to or equal to 1. You can also use gt (greater than) or le (less than or equal)", ge=1),
     q: Union[str, None] = Query(
         default=None,
         alias="item-query",
@@ -334,9 +375,10 @@ async def read_something_and_know_what_it_is(
 ):
     return "la de da da"
 
-@app.get("/route_description/", 
-    summary="showing some metadata functionality",
-    response_description="a random string",)
+
+@app.get("/route_description/",
+         summary="showing some metadata functionality",
+         response_description="a random string",)
 async def route_description():
     """
     This can be markdown and will be used as the description in the interactive docs
@@ -349,9 +391,11 @@ async def route_description():
 # If you pass two body parameters, the request will expect a dict.
 # Body can be used to make simple types expected in the body
 
+
 @app.put("/hearts/")
 async def in_love(h1: Heart, h2: Heart, importance: int = Body()):
-    results = {"item_id": item_id, "item": item, "user": user, "importance": importance}
+    results = {"item_id": item_id, "item": item,
+               "user": user, "importance": importance}
     return results
 
 # Body expected: {
@@ -366,9 +410,11 @@ async def in_love(h1: Heart, h2: Heart, importance: int = Body()):
 
 # By default one parameter will not have a key. To make it have a key, use h1: Heart = Body(embed=True)
 
+
 @app.get("/cookie/")
 async def read_items(ads_id: Union[str, None] = Cookie(default=None)):
     return {"ads_id": ads_id}
+
 
 @app.get("/items-header/{item_id}")
 async def read_item_header(item_id: str):
@@ -381,32 +427,38 @@ async def read_item_header(item_id: str):
     return {"item": items[item_id]}
 
 # Header parameters include change from - to _ for python, example: user-agent to user_agent
+
+
 @app.get("/header/")
 async def read_items(user_agent: Union[str, None] = Header(default=None)):
     return {"User-Agent": user_agent}
+
 
 @app.get("/xtoken/")
 async def read_items(x_token: Union[List[str], None] = Header(default=None)):
     return {"X-Token values": x_token}
 
 # To accept form data. You can't accept both form data and body (part of the HTTP protocol)
+
+
 @app.post("/login/")
 async def login(username: str = Form(), password: str = Form()):
     return {"username": username}
 
-# Files will be uploaded as form data, 
+# Files will be uploaded as form data,
 # File: recieving the content as bytes will store the whole contents in memory and should only be used for small files
 # UploadFile: uses a "spooled" file, which will store in memory up to a size limit and then will store in disk,
 #   allows you to access metadata
 #   has file-like asyn interface
 #   attributes: filename, content_type, file
 #   async methods: write(data), read(size), seek(offset), close() Example: contents = await myfile.read()
-# If you ware in a def path operation function, can access directly (contents = myfile.file.read()) 
+# If you ware in a def path operation function, can access directly (contents = myfile.file.read())
+
 
 @app.post("/files/")
 async def create_file(
-    file: Union[bytes, None] = File(default=None), 
-    fileb: UploadFile = File(description="A file with some extra metadata"), 
+    file: Union[bytes, None] = File(default=None),
+    fileb: UploadFile = File(description="A file with some extra metadata"),
     token: str = Form()
 ):
     return {
@@ -445,16 +497,21 @@ async def create_file(
 # 500 and above are for server errors. You almost never use them directly. When something goes wrong at some part in your application code, or server, it will automatically return one of these status codes.
 
 # To handle an exception globally:
+
+
 class UnicornException(Exception):
     def __init__(self, name: str):
         self.name = name
+
 
 @app.exception_handler(UnicornException)
 async def unicorn_exception_handler(request: Request, exc: UnicornException):
     return JSONResponse(
         status_code=418,
-        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+        content={
+            "message": f"Oops! {exc.name} did something. There goes a rainbow..."},
     )
+
 
 @app.get("/unicorns/{name}")
 async def read_unicorn(name: str):
@@ -464,10 +521,13 @@ async def read_unicorn(name: str):
 
 # Dependency injection/path operation functions example
 # Dependencies must be callable, which include Python classes with an __init__
+
+
 async def common_parameters(
     q: Union[str, None] = None, skip: int = 0, limit: int = 100
 ):
     return {"q": q, "skip": skip, "limit": limit}
+
 
 class CommonQueryParams:
     def __init__(self, q: Union[str, None] = None, skip: int = 0, limit: int = 100):
@@ -480,23 +540,28 @@ class CommonQueryParams:
 async def read_items(commons: dict = Depends(common_parameters)):
     return commons
 
+
 @app.get("/injection2/")
 async def read_items(commons: CommonQueryParams = Depends(CommonQueryParams)):
     response = {}
     if commons.q:
         response.update({"q": commons.q})
-    items = fake_items_db[commons.skip : commons.skip + commons.limit]
+    items = fake_items_db[commons.skip: commons.skip + commons.limit]
     response.update({"items": items})
     return response
 
 # Could be written but with less editor support: async def read_items(commons=Depends(CommonQueryParams))
 # commons: CommonQueryParams = Depends(CommonQueryParams) can be shortened to: commons: CommonQueryParams = Depends()
-# If a depends is used multiple times, the value will be cached. If you don't want that... 
+# If a depends is used multiple times, the value will be cached. If you don't want that...
+
+
 async def needy_dependency(fresh_value: str = Depends(get_value, use_cache=False)):
     return {"fresh_value": fresh_value}
 
-# These dependencies will be executed/solved the same way normal dependencies. 
+# These dependencies will be executed/solved the same way normal dependencies.
 # But their value (if they return any) won't be passed to your path operation function, so can be reused.
+
+
 async def verify_token(x_token: str = Header()):
     if x_token != "fake-super-secret-token":
         raise HTTPException(status_code=400, detail="X-Token header invalid")
@@ -516,10 +581,14 @@ async def read_items():
 # app = FastAPI(dependencies=[Depends(verify_token), Depends(verify_key)])
 
 # Only the code prior to and including the yield statement is executed before sending a response:
+
+
 class DBSession:
     id: id = 0
+
     def close():
         pass
+
 
 async def get_db():
     db = DBSession()
@@ -532,6 +601,8 @@ async def get_db():
 
 # Content Managers are anything that uses a with statement. Creating a dependency with yield makes it a content manger
 # So, instead of the above you could do the python way of creating a content manager with __enter__ and __exit__
+
+
 class MySuperContextManager:
     def __init__(self):
         self.db = DBSession()
@@ -548,12 +619,16 @@ async def get_db():
         yield db
 
 # Send accepted response then do something the client doesn't need to wait for
+
+
 def write_notification(email: str, message=""):
     with open("log.txt", mode="w") as email_file:
         content = f"notification for {email}: {message}"
         email_file.write(content)
 
+
 @app.post("/send-notification/{email}")
 async def send_notification(email: str, background_tasks: BackgroundTasks):
-    background_tasks.add_task(write_notification, email, message="some notification")
+    background_tasks.add_task(
+        write_notification, email, message="some notification")
     return {"message": "Notification sent in the background"}

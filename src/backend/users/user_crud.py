@@ -26,27 +26,33 @@ from . import user_schemas
 # ---- CRUD ----
 # --------------
 
+
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     db_users = db.query(db_models.DbUser).offset(skip).limit(limit).all()
     return convert_to_app_user(db_users)
 
+
 def get_user(db: Session, user_id: int):
-    db_user = db.query(db_models.DbUser).filter(db_models.DbUser.id == user_id).first()
+    db_user = db.query(db_models.DbUser).filter(
+        db_models.DbUser.id == user_id).first()
     return convert_to_app_user(db_user)
 
+
 def get_user_by_username(db: Session, username: str):
-    db_user = db.query(db_models.DbUser).filter(db_models.DbUser.username == username).first()
+    db_user = db.query(db_models.DbUser).filter(
+        db_models.DbUser.username == username).first()
     return convert_to_app_user(db_user)
+
 
 def create_user(db: Session, user: user_schemas.UserIn):
     if user:
-        db_user = db_models.DbUser( 
-            username=user.username, 
+        db_user = db_models.DbUser(
+            username=user.username,
             password=hash_password(user.password)
         )
         db.add(db_user)
         db.commit()
-        db.refresh(db_user) # now contains generated id etc.
+        db.refresh(db_user)  # now contains generated id etc.
 
         return convert_to_app_user(db_user)
 
@@ -60,8 +66,10 @@ def create_user(db: Session, user: user_schemas.UserIn):
 def hash_password(password: str):
     return password
 
+
 def unhash_password(hashed_password: str):
     return hashed_password
+
 
 def verify_user(db: Session, questionable_user: user_schemas.UserIn):
     db_user = get_user_by_username(db, questionable_user.username)
@@ -86,6 +94,7 @@ def convert_to_app_user(db_user: db_models.DbUser):
     else:
         return None
 
+
 def convert_to_app_users(db_users: List[db_models.DbUser]):
     if db_users and len(db_users) > 0:
         app_users = []
@@ -96,5 +105,3 @@ def convert_to_app_users(db_users: List[db_models.DbUser]):
         return app_users_without_nones
     else:
         return []
-
-

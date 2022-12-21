@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 import os
 
@@ -45,7 +45,7 @@ def create_app(config_name=None):
     from .models import db
 
     db.init_app(app)
-    #migrate.init_app(app, db)
+    # migrate.init_app(app, db)
 
     # shell context for flask cli
     @app.shell_context_processor

@@ -18,30 +18,31 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}New Project - Part I{% endblock %}</h1>
+<h1>{% block title %}New Project - Part I{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  <form method="post" enctype=multipart/form-data>
-    <label for="locale">Language shortcode</label>
-    <input name="locale" id="locale" value="{{ request.form['locale'] }}" required>
+<form method="post" enctype=multipart/form-data>
+  <label for="locale">Language shortcode</label>
+  <input name="locale" id="locale" value="{{ request.form['locale'] }}" required>
 
-    <label for="name">Project Name</label>
-    <input name="name" id="name" value="{{ request.form['name'] }}" required>
+  <label for="name">Project Name</label>
+  <input name="name" id="name" value="{{ request.form['name'] }}" required>
 
-    <label for="short_description">Short Description</label>
-    <input name="short_description" id="short_description">{{ request.form['short_description'] }}</textarea>
+  <label for="short_description">Short Description</label>
+  <input name="short_description" id="short_description">{{ request.form['short_description'] }}</textarea>
 
-    <label for="description">Description</label>
-    <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
+  <label for="description">Description</label>
+  <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
 
-    <label for="instructions">Instructions</label>
-    <textarea name="instructions" id="instructions">{{ request.form['instructions'] }}</textarea>
+  <label for="instructions">Instructions</label>
+  <textarea name="instructions" id="instructions">{{ request.form['instructions'] }}</textarea>
 
-    <label for="per_task_instructions">Per Task Instructions</label>
-    <textarea name="per_task_instructions" id="per_task_instructions">{{ request.form['per_task_instructions'] }}</textarea>
-    
-    <input type="submit" value="Create Project">
-  </form>
+  <label for="per_task_instructions">Per Task Instructions</label>
+  <textarea name="per_task_instructions"
+    id="per_task_instructions">{{ request.form['per_task_instructions'] }}</textarea>
+
+  <input type="submit" value="Create Project">
+</form>
 
 {% endblock %}
