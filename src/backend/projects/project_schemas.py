@@ -24,13 +24,18 @@ class BETAProjectUpload(BaseModel):
     country: str
 
 class ProjectSummary(BaseModel):
-    id: int
-    priority: ProjectPriority
-    title: str 
-    location_str: str
-    description: str 
-    num_contributors: int
-    org_icon: bytes 
+    id: int = -1
+    priority: ProjectPriority = ProjectPriority.MEDIUM
+    title: str = None
+    location_str: str = None
+    description: str = None
+    total_tasks: int = None
+    tasks_mapped: int = None
+    tasks_validated: int = None
+    tasks_bad_imagery: int = None
+
+    class Config:
+        orm_mode = True
 
 class ProjectBase(BaseModel):
     id: int
@@ -38,6 +43,7 @@ class ProjectBase(BaseModel):
     default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
+    location_str: str
     outline_json: str = None
     project_tasks: List[tasks_schemas.Task] = None
 
