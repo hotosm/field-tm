@@ -12,6 +12,12 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+# TODO
+@router.get("/summaries", response_model=List[project_schemas.ProjectSummary])
+async def read_projects(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
+    projects = project_crud.get_projects(db, user_id, skip, limit)
+    return projects
+
 @router.get("/", response_model=List[project_schemas.ProjectOut])
 async def read_projects(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
     projects = project_crud.get_projects(db, user_id, skip, limit)

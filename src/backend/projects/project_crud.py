@@ -23,6 +23,33 @@ from . import project_schemas
 QR_CODES_DIR = 'QR_codes/'
 TASK_GEOJSON_DIR = 'geojson/'
 
+# todo: make a smaller one for summaries only...
+# def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+#     if user_id:
+#         # TODO get only default info
+#         # DefaultInfo = aliased(db_models.DbProjectInfo, name='info')
+#         # db_default_infos = db.query(db_models.DbProjectInfo.id)\
+#         #     .filter(DefaultInfo.project_id= )
+#         #     .with_entities(
+#         #         db_models.DbProjectInfo.name,
+#         #         db_models.DbProjectInfo.short_description
+#         #     )
+#         # TODO get org
+#         db_projects = db.query(db_models.DbProject)\
+#             .with_entities(
+#                 db_models.DbProject.id, 
+#                 db_models.DbProject.priority,
+#                 db_models.DbProject.project_info,
+#                 # TODO get org icon db_models.DbProjectInfo.org
+#              )\
+#             .filter(db_models.DbProject.author_id == user_id)\
+#             .offset(skip)\
+#             .limit(limit)\
+#             .all()
+#     else:
+#         db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
+#     return convert_to_app_projects(db_projects)
+
 def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     if user_id:
         db_projects = db.query(db_models.DbProject).filter(db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
@@ -132,6 +159,7 @@ def update_project_with_upload(
         # generate outline from file and add to project
         outline_shape = get_outline_from_geojson_file_in_zip(zip, outline_filename, f'Could not generate Shape from {outline_filename}')
         db_project.outline = outline_shape.wkt
+        db_project.centroid = outline_shape.centroid.wkt
 
         # get all task outlines from file
         project_tasks_feature_collection = get_json_from_zip(zip, task_outlines_filename, f'Could not generate FeatureCollection from {task_outlines_filename}')
