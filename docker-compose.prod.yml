@@ -13,15 +13,15 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 version: '3.3'
 
 services:
   web:
     build:
-       context: .
-       dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: Dockerfile.prod
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:5000 manage:app'
     restart: always
     volumes:

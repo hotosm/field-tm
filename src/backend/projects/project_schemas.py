@@ -24,6 +24,7 @@ from ..users.user_schemas import User
 from ..models.enums import ProjectStatus, ProjectPriority
 from ..tasks import tasks_schemas
 
+
 class ProjectInfo(BaseModel):
     locale: str
     name: str
@@ -35,11 +36,13 @@ class ProjectInfo(BaseModel):
     class Config:
         orm_mode = True
 
+
 class BETAProjectUpload(BaseModel):
-    author: User 
+    author: User
     project_info: ProjectInfo
     city: str
     country: str
+
 
 class ProjectSummary(BaseModel):
     id: int = -1
@@ -55,9 +58,10 @@ class ProjectSummary(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ProjectBase(BaseModel):
     id: int
-    author: User 
+    author: User
     default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
@@ -68,8 +72,10 @@ class ProjectBase(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Project(ProjectBase):
     pass
+
 
 class ProjectOut(ProjectBase):
     pass

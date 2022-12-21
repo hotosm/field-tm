@@ -26,16 +26,19 @@ from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson
 from ..tasks import tasks_schemas
 
+
 # --------------
 # ---- CRUD ----
 # --------------
 
 def get_tasks(db: Session, user_id: int, task_id: int, skip: int = 0, limit: int = 1000):
     if task_id:
-        db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).offset(skip).limit(limit).first()
+        db_task = db.query(db_models.DbTask).filter(
+            db_models.DbTask.id == task_id).offset(skip).limit(limit).first()
         return convert_to_app_task(db_task)
     if user_id:
-        db_tasks = db.query(db_models.DbTask).filter(db_models.DbTask.locked_by == user_id).offset(skip).limit(limit).all()
+        db_tasks = db.query(db_models.DbTask).filter(
+            db_models.DbTask.locked_by == user_id).offset(skip).limit(limit).all()
     else:
         db_tasks = db.query(db_models.DbTask).offset(skip).limit(limit).all()
     return convert_to_app_tasks(db_tasks)
@@ -45,6 +48,7 @@ def get_tasks(db: Session, user_id: int, task_id: int, skip: int = 0, limit: int
 # --------------------
 
 # TODO: write tests for these
+
 
 def convert_to_app_task(db_task: db_models.DbTask):
     if db_task:
@@ -56,6 +60,7 @@ def convert_to_app_task(db_task: db_models.DbTask):
         return app_task
     else:
         return None
+
 
 def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
     if db_tasks and len(db_tasks) > 0:
