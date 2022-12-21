@@ -23,6 +23,7 @@ from typing import List
 import json
 
 from ..db import db_models
+from ..db.postgis_utils import geometry_to_geojson
 from ..tasks import tasks_schemas
 
 # --------------
@@ -31,10 +32,10 @@ from ..tasks import tasks_schemas
 
 def get_tasks(db: Session, user_id: int, task_id: int, skip: int = 0, limit: int = 1000):
     if task_id:
-        db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).offset(skip).limit(limit).all()
-        return convert_to_app_tasks(db_task)
+        db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).offset(skip).limit(limit).first()
+        return convert_to_app_task(db_task)
     if user_id:
-        db_tasks = db.query(db_models.DbTask).filter(db_models.DbTask.author_id == user_id).offset(skip).limit(limit).all()
+        db_tasks = db.query(db_models.DbTask).filter(db_models.DbTask.locked_by == user_id).offset(skip).limit(limit).all()
     else:
         db_tasks = db.query(db_models.DbTask).offset(skip).limit(limit).all()
     return convert_to_app_tasks(db_tasks)
@@ -50,9 +51,8 @@ def convert_to_app_task(db_task: db_models.DbTask):
         app_task: tasks_schemas.Task = db_task
 
         if (db_task.outline):
-            geom_outline = to_shape(db_task.outline)
-            app_task.outline_json = json.dumps(mapping(geom_outline))
-        
+            app_task.outline_geojson = geometry_to_geojson(db_task.outline)
+
         return app_task
     else:
         return None

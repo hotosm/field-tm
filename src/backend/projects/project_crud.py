@@ -27,7 +27,7 @@ import geojson
 from shapely.geometry import shape, mapping
 from geoalchemy2.shape import to_shape
 
-from ..db.postgis_utils import timestamp
+from ..db.postgis_utils import timestamp, geometry_to_geojson
 from ..db import db_models
 from ..users import user_crud
 from ..tasks import tasks_crud
@@ -277,8 +277,7 @@ def convert_to_app_project(db_project: db_models.DbProject):
         app_project: project_schemas.Project = db_project
 
         if (db_project.outline):
-            geom_outline = to_shape(db_project.outline)
-            app_project.outline_json = json.dumps(mapping(geom_outline))
+            app_project.outline_geojson = geometry_to_geojson(db_project.outline)
 
         app_project.project_tasks = tasks_crud.convert_to_app_tasks(db_project.tasks)
 

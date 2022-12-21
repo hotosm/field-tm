@@ -62,7 +62,7 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     location_str: str
-    outline_json: str = None
+    outline_geojson: str = None
     project_tasks: List[tasks_schemas.Task] = None
 
     class Config:

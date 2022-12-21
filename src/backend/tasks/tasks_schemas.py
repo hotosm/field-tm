@@ -25,7 +25,7 @@ class TaskBase(BaseModel):
     project_id: int
     project_task_index: int
     project_task_name: str
-    outline_json: str
+    outline_geojson: str
     initial_feature_count: int
     task_status: TaskStatus
 

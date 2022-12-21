@@ -29,8 +29,11 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.get("/", response_model=tasks_schemas.TaskDetails)
+@router.get("/", response_model=tasks_schemas.TaskOut)
 async def read_tasks(user_id: int = None, task_id: int = None, skip: int = 0, limit: int = 1000, db: Session = Depends(database.get_db)):
+    if user_id and task_id:
+        raise HTTPException(status_code=300, detail="Please provide either user_id OR task_id, not both.")
+    
     tasks = tasks_crud.get_tasks(db, user_id, task_id, skip, limit)
     if tasks:
         return tasks
