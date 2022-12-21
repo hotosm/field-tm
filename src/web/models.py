@@ -1,4 +1,5 @@
 import enum
+import datetime
 from email.policy import default
 
 from flask_sqlalchemy import SQLAlchemy
@@ -6,6 +7,12 @@ from sqlalchemy import Enum
 
 db = SQLAlchemy()
 
+class DisplayProject:
+    id: int
+    author_id: int 
+    created: datetime
+    author_username: str
+    description: str
 
 class User(db.Model):
 
@@ -29,7 +36,6 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
         }
-
 
 class Project(db.Model):
 

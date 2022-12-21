@@ -9,7 +9,7 @@ from flask import (Blueprint, current_app, flash, g, redirect, render_template,
 from werkzeug.exceptions import abort
 
 from src.web.auth import login_required
-from src.web.models import Project, Task, FrontendTaskStatus, User, db
+from src.web.models import DisplayProject, Project, Task, FrontendTaskStatus, User, db
 
 # api
 import requests
@@ -22,14 +22,36 @@ grid_filename = "grid.geojson"
 
 @bp.route("/")
 def index():
-    projects = Project.query.join(User, Project.author_id == User.id).order_by(
-        Project.created
-    )
+    try:
+        with requests.Session() as s:
+            response = s.get(f"{base_url}/projects/?skip=0&limit=100")
+            ui_projects = []
+            if response.status_code == 200:
+                api_projects = response.json()
+
+                for project in api_projects:
+                    project_info = project['project_info'][0]
+                    # ui_project = DisplayProject(
+                    #     id = project['id'],
+                    #     author_id = project['author']['id'],
+                    #     author_username = project['author']['username'],
+                    #     title=project_info['name'],
+                    #     description=project_info['short_description'],
+                    #     # location=f'{project['city']},{project['country']}',
+                    # )
+                    # ui_projects.append(ui_project)
+            return render_template("project/index.html", projects=api_projects)
+
+    except Exception as e:
+        flash(e)
+    # projects = Project.query.join(User, Project.author_id == User.id).order_by(
+    #     Project.created
+    # )
 
     if session.get("user_id"):
         tasks = get_tasks_for_user(session["user_id"])
-        return render_template("project/index.html", tasks=tasks, projects=projects)
-    return render_template("project/index.html", projects=projects)
+        return render_template("project/index.html", tasks=tasks, projects=ui_projects)
+    return render_template("project/index.html")
 
 
 @bp.route("/create", methods=("GET", "POST"))
@@ -126,11 +148,11 @@ def upload_project_zip():
             # If the user does not select a file, the browser submits an
             # empty file without a filename.
             if not upload_files:
-                return "No selected file"
+                error = "No selected file"
             elif len(upload_files) > 1:
-                return "Expecting 1 file"
+                error = "Expecting 1 file"
 
-            file = upload_files[0]
+            file = upload_files[0].read()
         else:
             error = "No file part"
        
@@ -139,11 +161,13 @@ def upload_project_zip():
         else:
             try:
                 with requests.Session() as s:
+                    current_app.logger.info(f'Attempting the post with: {file}')
+                    
                     response = s.post(
                         f'{base_url}/projects/beta/{project_id}/upload_zip?project_name_prefix={project_name_prefix}&task_type_prefix={task_type_prefix}', 
-                        files=request.files
+                        files={'file': file}
                     )
-                    
+                    current_app.logger.info(f'response: {response.json()}')
                     if response:
                         current_app.logger.info(response.request)
 
@@ -373,17 +397,56 @@ def map(id):
     else:
         return render_map_by_project_id(id)
 
+class UITask:
+    status: str
+    feature_id: int 
+    name: str
+    qr_code: bytes
+    outline: str
+    uid: int
+
 def render_map_by_project_id(id):
-    project = get_project(id, False)
+    try:
+        with requests.Session() as s:
+            response = s.get(f"{base_url}/projects/{id}")
+            
+            if response.status_code == 200:
+                project = response.json()
+                project_id = project['id']
+                project_name = project['project_info'][0]['name']
+                project_outline = project['outline_json']
 
-    task_list = get_tasks_for_project(project["id"])
-    tasks = task_by_feature_id(task_list)
+                current_app.logger.info(project_id)
+                current_app.logger.info(project_outline)
+                current_app.logger.info(project_name)
 
-    path = get_relative_project_path(project["title"])
-    geojson = get_geojson(project['title'])
-    return render_template(
-        "project/map.html", project=project, project_path=path, tasks=tasks, geojson=geojson, userid=session.get("user_id")
-    )
+                tasks = []
+                for task in project['project_tasks']:
+                    
+                    ui_task = UITask()
+                    ui_task.status = task['task_status']
+                    ui_task.feature_id = task['project_task_index']
+                    ui_task.name = task['project_task_name']
+                    ui_task.outline = task['outline_json']
+                    ui_task.uid = task['id']
+                    
+                    current_app.logger.info(ui_task)
+                    tasks.append(ui_task)
+                
+                current_app.logger.info(len(tasks))
+
+                return render_template(
+                        "project/map.html", 
+                        project_id=project_id,
+                        project_name=project_name,
+                        project_outline=project_outline, 
+                        tasks=tasks,
+                        userid=session.get("user_id")
+                    )
+    except Exception as e:
+        flash(e)
+
+    return redirect(url_for("project.index"))
 
 def task_by_feature_id(tasks):
     task_dict = {}

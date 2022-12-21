@@ -13,23 +13,6 @@
 
   <div id="map"></div>
 
-  <h1>Project tasks</h1>
-  {% for task in tasks.values() %}
-    <article class="project">
-      <header>
-        <div>
-          <h2>Task {{ task.id }}</h2>
-          {% if task.status.value != 'available' %}
-            <div class="about">Status: {{task.status.label}} ({{ task.task_doer }})</div>
-          {% endif %}  
-        </div>
-      </header>
-    </article>
-    {% if not loop.last %}
-      <hr>
-    {% endif %}
-  {% endfor %}
-
 
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
@@ -46,10 +29,12 @@
   <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
 
   <script>
-    var grid_geojson = {{(geojson|default({}))|tojson}};
-    var tasks = {{(tasks|default({}))|tojson}};
-    var project_title = '{{project['title']}}'
-    var user_id = '{{userid}}'
+   // var project_id = {{project_id}};
+   // var project_title = '{{project_name}}';
+   // var project_outline = {{project_outline}};
+   // var tasks = (tasks|default({}))|tojson;
+   // var tasks = []
+   // var user_id = '{{userid}}';
 
     function setMap() {
       const map = L.map("map");
@@ -66,16 +51,34 @@
       map.fitBounds(grid.getBounds());
     }
 
+    function addGeoJSONLayer(map) {
+      //layer = L.geoJson(project_outline);
+      //layer = L.geoJSON(project_outline, {
+        //onEachFeature: createPopup
+      //});
+      //layer.addTo(map);
+      //return layer;
+    }
+
+    //READY = 0
+    //LOCKED_FOR_MAPPING = 1
+    //MAPPED = 2
+    //LOCKED_FOR_VALIDATION = 3
+    //VALIDATED = 4
+    //INVALIDATED = 5
+    //BAD = 6  # Task cannot be mapped 
+    //SPLIT = 7  # Task has been split
+
     function getStyle(statusValue) {
       bg = 'rgb(216, 218, 228)' // set to unavailable
       switch(statusValue) {
-        case 'available':
+        case 'READY':
           bg = 'rgb(255, 255, 255)'
           break;
-        case 'unavailable':
+        case 'LOCKED_FOR_MAPPING':
           bg = 'rgb(216, 218, 228)'
           break;
-        case 'readyforvalidation':
+        case 'MAPPED':
           bg = 'rgb(173, 230, 239)'
           break;
         default:
@@ -106,18 +109,18 @@
         }
 
         //var popup = L.pop()
-        switch(task.status.value) {
-          case 'available':
+        switch(task.status) {
+          case 'READY':
             layer.bindPopup(
                 `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${feature_id}</h1>
-                  <p>${task.status.label}</p>
+                  <h1>Task ${task.name}</h1>
+                  <p>${task.status}</p>
                   <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
-                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
+                  <img src='' alt='' height='150dp' width='150dp' max-width='150dp'>
 
                   <form method='post'>
                     <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.feature_id} required>
+                      value=${task.uid} required>
                     <input style=\"display:none;\" name='qrcode' id='qrcode'
                       value='yes' required>
                     <input type='submit' value='Download QR Code'>
@@ -125,7 +128,7 @@
 
                   <form method='post'>
                     <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.id} required>
+                      value=${task.uid} required>
                     <input style=\"display:none;\" name='newstatus' id='newstatus'
                       value="Unavailable" required>
                     <input style=\"display:none;\" name='qrcode' id='qrcode'
@@ -139,10 +142,10 @@
             if (user_id == task.task_doer) {
               layer.bindPopup(
                 `<div class='fmtm-popup-div'>
-                  <h1>Task ${feature_id}</h1>
-                  <p>Status: ${task.status.label}</p>
+                  <h1>Task ${task.feature_id}</h1>
+                  <p>Status: ${task.status}</p>
                   
-                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
+                  <img src='' alt='' height='150dp' width='150dp' max-width='150dp'>
 
                   <form method='post'>
                     <input style=\"display:none;\" name='taskid' id='taskid'
@@ -158,9 +161,8 @@
             break; 
           default:
             layer.bindPopup(
-              `<h1>Task ${feature_id}</h1>
-              <p>${task.status.label}</p>
-              <p>${task.task_doer}</p>
+              `<h1>Task ${task.feature_id}</h1>
+              <p>${task.status}</p>
               `, popupOptions
             )  
         }
@@ -168,15 +170,7 @@
       }
     }
 
-    function addGeoJSONLayer(map) {
-      layer = L.geoJSON(grid_geojson, {
-        onEachFeature: createPopup
-      });
-      layer.addTo(map);
-      return layer;
-    }
-
-    setMap()
+    //setMap()
 
   </script>
 {% endblock %}
