@@ -84,21 +84,21 @@
 
     // add outline
     outline_layer = L.geoJSON(p_outline);
-    /*  outline_layer.setStyle({
+    outline_layer.setStyle({
       color: '#e0e0e0',
-      weight: 1,
+      weight: 3,
       fillOpacity: 0.5,
       fillColor: 'rgb(255, 255, 255)'
-    })  */
+    })
     outline_layer.addTo(map);
 
     // zoom to map
     map.fitBounds(outline_layer.getBounds());
 
-    // add tasks
+    return map;
   }
 
-  setMap();
+  map = setMap();
 
   /*  const READY = 0;
   const LOCKED_FOR_MAPPING = 1;
@@ -212,13 +212,13 @@
 
                 </div>`
     )
-  }
+  }*/
 
   function createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by) {
     layer = L.geoJSON(task_outline);
     layer.addTo(map);
 
-    layer.setStyle(getStyle(task.status.value))
+    /*layer.setStyle(getStyle(task.status.value))
 
     var popup = createLockedPopup(task_name, task_uid, task_status) // default popup
 
@@ -234,7 +234,7 @@
       default:
         break;
     }
-    layer.bindPopup(popup, popupOptions)
+    layer.bindPopup(popup, popupOptions) */
   }
 
   var task_uid;
@@ -245,15 +245,15 @@
 
   {% for task in tasks %}
 
-  task_uid = {{ task['id'] }};
-  task_name = '{{ task['project_task_name'] }}';
-  task_status = {{ task['task_status'] }};
-  locked_by = {{ task['locked_by_uid'] }};
-  task_outline = {{ (task['outline_geojson'] |default ({}))| tojson }};
+  task_uid = {{ task.uid }}
+  task_name = '{{ task.name }}'
+  task_status = {{ task.status }}
+  locked_by = {{ task.locked_by }}
+  task_outline = {{ (task.outline |default ({}))| tojson }};
 
-  createTaskLayer(task_layer, task_status, task_uid, task_name, locked_by);
+  createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by);
 
-  {% endfor %}  */
+  {% endfor %}
 
 </script>
 {% endblock %}

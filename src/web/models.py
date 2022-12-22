@@ -40,6 +40,7 @@ class UITask:
     qr_code: bytes
     outline: str
     uid: int
+    locked_by_uid: int
 
 
 class User(db.Model):

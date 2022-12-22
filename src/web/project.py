@@ -218,6 +218,7 @@ def render_map_by_project_id(id):
                     ui_task.name = task['project_task_name']
                     ui_task.outline = task['outline_geojson']
                     ui_task.uid = task['id']
+                    ui_task.locked_by_uid = task['locked_by_uid']
                     tasks.append(ui_task)
 
                 return render_template(
