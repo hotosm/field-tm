@@ -279,7 +279,7 @@ class DbTaskHistory(Base):
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer, ForeignKey("projects.id"), index=True)
     task_id = Column(Integer, nullable=False)
-    action = Column(String, nullable=False)
+    action = Column(Enum(TaskAction), nullable=False)
     action_text = Column(String)
     action_date = Column(DateTime, nullable=False, default=timestamp)
     user_id = Column(
