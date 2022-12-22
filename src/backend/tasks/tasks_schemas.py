@@ -17,7 +17,7 @@
 #
 
 from pydantic import BaseModel
-from geojson_pydantic import Feature
+from geojson_pydantic import Feature, Point
 
 from ..models.enums import TaskStatus
 
@@ -28,8 +28,10 @@ class TaskBase(BaseModel):
     project_task_index: int
     project_task_name: str
     outline_geojson: Feature
+    outline_centroid: Feature
     initial_feature_count: int
     task_status: TaskStatus
+    locked_by_uid: int = None
 
     class Config:
         orm_mode = True
@@ -37,7 +39,7 @@ class TaskBase(BaseModel):
 
 class Task(TaskBase):
     geometry_geojson: str
-    locked_by_uid: int = None
+
     # qr_code_binary: bytes
     pass
 

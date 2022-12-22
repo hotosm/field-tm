@@ -218,7 +218,10 @@ def render_map_by_project_id(id):
                     ui_task.name = task['project_task_name']
                     ui_task.outline = task['outline_geojson']
                     ui_task.uid = task['id']
-                    ui_task.locked_by_uid = task['locked_by_uid']
+                    ui_task.locked_by = task['locked_by_uid']
+                    ui_task.centroid = task['outline_centroid']
+                    ui_task.centroid_lat = task['outline_centroid']['geometry']['coordinates'][0]
+                    ui_task.centroid_long = task['outline_centroid']['geometry']['coordinates'][1]
                     tasks.append(ui_task)
 
                 return render_template(
@@ -228,6 +231,7 @@ def render_map_by_project_id(id):
                     project_outline=project_outline,
                     tasks=tasks,
                     userid=session.get("user_id")
+                    # userid=g.user["id"]
                 )
     except Exception as e:
         flash(e)

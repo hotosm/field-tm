@@ -20,6 +20,8 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 
 from ..db import database
+from ..models.enums import TaskStatus
+from ..users import user_schemas, user_crud
 from . import tasks_schemas, tasks_crud
 
 router = APIRouter(
@@ -41,3 +43,25 @@ async def read_tasks(user_id: int = None, task_id: int = None, skip: int = 0, li
         return tasks
     else:
         raise HTTPException(status_code=404, detail="Tasks not found")
+
+
+@router.get("/{task_id}", response_model=tasks_schemas.TaskOut)
+async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
+    task = tasks_crud.get_task(db, task_id)
+    if task:
+        return task
+    else:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+
+@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
+async def update_task_status(user: user_schemas.User, task_id: int, new_status: TaskStatus, db: Session = Depends(database.get_db)):
+    # TODO verify logged in user
+    user_id = user.id
+
+    task = tasks_crud.update_task_status(db, user_id, task_id, new_status)
+    if task:
+        return task
+    else:
+        raise HTTPException(
+            status_code=404, detail="Task status could not be updated.")

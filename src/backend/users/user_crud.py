@@ -32,9 +32,11 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return convert_to_app_user(db_users)
 
 
-def get_user(db: Session, user_id: int):
+def get_user(db: Session, user_id: int, db_obj: bool = False):
     db_user = db.query(db_models.DbUser).filter(
         db_models.DbUser.id == user_id).first()
+    if db_obj:
+        return db_user
     return convert_to_app_user(db_user)
 
 

@@ -37,7 +37,7 @@
     <div>
       <h2>Task {{ task.name }}</h2>
       <p>Status: {{ task.status }}</p>
-      <p>Outline: {{ task.outline }}</p>
+      <p>Outline: {{ task.centroid_lat }}, {{ task.centroid_long}} </p>
     </div>
   </header>
 </article>
@@ -71,6 +71,8 @@
   }  */
 
   var p_outline = {{(project_outline |default ({}))| tojson }};
+
+
 
   function setMap() {
     var map = L.map('map');
@@ -112,11 +114,17 @@
   function getStyle(statusValue) {
     bg = 'rgb(216, 218, 228)' // set to unavailable
     switch (statusValue) {
-      case READY, LOCKED_FOR_MAPPING:
+      case READY:
         bg = 'rgb(153, 204, 255)'
         break;
-      case MAPPED, LOCKED_FOR_VALIDATION:
+      case LOCKED_FOR_MAPPING:
+        bg = 'rgb(140, 146, 172)'
+        break;
+      case MAPPED:
         bg = 'rgb(255, 255, 0)'
+        break;
+      case LOCKED_FOR_VALIDATION:
+        bg = 'rgb(248, 240, 227)'
         break;
       case VALIDATED:
         bg = 'rgb(76, 153, 0)'
@@ -138,10 +146,20 @@
     return {
       color: '#404040',
       weight: 1,
-      fillOpacity: 0.8,
+      fillOpacity: 0.5,
       fillColor: bg
     }
   }
+
+  var grayLockIcon = L.icon({
+    iconUrl: "/static/gray_lock_icon.png",
+    iconSize: [10, 10], // size of the icon
+  });
+
+  var blackLockIcon = L.icon({
+    iconUrl: "/static/lock_icon.png",
+    iconSize: [10, 10], // size of the icon
+  });
 
   var popupOptions = {
     'maxWidth': '500',
@@ -155,15 +173,11 @@
                   <p>Status: READY</p>
                   
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                      <button name="lockButton" type="submit" value='Lock for Mapping'>
+                    <button name="lockButton" type="submit" value=${task_uid}>Lock for Mapping</button>
                   </form>
 
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                    <button name="detailsButton" type="submit" value='View Task Details'>
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
                   </form>
 
                 </div>`
@@ -177,21 +191,15 @@
                   <p>Status: LOCKED FOR MAPPING</p>
                   
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                      <button name="mappedButton" type="submit" value='Mark as mapped'>
+                      <button name="mappedButton" type="submit" value=${task_uid}>Mark as mapped</button>
                   </form>
 
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                    <button name="unlockButton" type="submit" value='Unlock task'>
+                    <button name="unlockButton" type="submit" value=${task_uid}>Unlock task</button>
                   </form>
 
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                    <button name="detailsButton" type="submit" value='View Task Details'>
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
                   </form>
 
                 </div>`
@@ -205,16 +213,14 @@
                   <p>Status: ${status}</p>
 
                   <form action="/" method="post">
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task_uid} required>
-                    <button name="detailsButton" type="submit" value='View Task Details'>
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</buttom>
                   </form>
 
                 </div>`
     )
   }
 
-  function createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by) {
+  function createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name) {
     layer = L.geoJSON(task_outline);
     layer.addTo(map);
 
@@ -227,9 +233,12 @@
         popup = createReadyPopup(task_name, task_uid)
         break;
       case LOCKED_FOR_MAPPING:
-        if (user_id == locked_by) {
-          popup = createLockedForMappingByMePopup(task_name, task_uid)
-        }
+        // TODO: Add check for logged in user
+        popup = createLockedForMappingByMePopup(task_name, task_uid)
+        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
+        break;
+      case LOCKED_FOR_VALIDATION:
+        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
         break;
       default:
         break;
@@ -248,10 +257,12 @@
   task_uid = {{ task.uid }}
   task_name = '{{ task.name }}'
   task_status = {{ task.status }}
-  locked_by = {{ task.locked_by }}
   task_outline = {{ (task.outline |default ({}))| tojson }};
+  task_centroid_lat = {{ task.centroid_lat }}
+  task_centroid_long = {{ task.centroid_long }}
+  task_centroid = [task_centroid_long, task_centroid_lat]
 
-  createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by);
+  createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name);
 
   {% endfor %}
 
