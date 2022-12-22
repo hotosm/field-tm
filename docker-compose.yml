@@ -60,7 +60,7 @@ services:
 
   web:
     build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
     volumes:
       - .:/app
     ports:
