@@ -20,14 +20,20 @@ import datetime
 from shapely.geometry import mapping
 from geoalchemy2.shape import to_shape
 from geoalchemy2 import Geometry
-import json
+from geojson_pydantic import Feature
+
 
 def timestamp():
     """ Used in SQL Alchemy models to ensure we refresh timestamp when new models initialised"""
     return datetime.datetime.utcnow()
 
+
 def geometry_to_geojson(geometry: Geometry, properties: str = {}):
     if (geometry):
         shape = to_shape(geometry)
-        geojson = [{'type': 'Feature', 'properties': properties, 'geometry': mapping(shape)}]
-        return json.dumps(geojson)
+        geojson = {
+            "type": "Feature",
+            "geometry": mapping(shape),
+            "properties": properties
+        }
+        return Feature(**geojson)

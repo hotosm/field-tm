@@ -55,7 +55,15 @@ def convert_to_app_task(db_task: db_models.DbTask):
         app_task: tasks_schemas.Task = db_task
 
         if (db_task.outline):
-            app_task.outline_geojson = geometry_to_geojson(db_task.outline)
+            properties = {"fid": db_task.project_task_index,
+                          "uid": db_task.id,
+                          "name": db_task.project_task_name}
+            app_task.outline_geojson = geometry_to_geojson(
+                db_task.outline,
+                properties)
+
+        if db_task.lock_holder:
+            app_task.locked_by_uid = db_task.lock_holder.id
 
         return app_task
     else:
