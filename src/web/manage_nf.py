@@ -16,11 +16,11 @@
 #
 
 
-
+import sys
+import os
 from flask.cli import FlaskGroup
 
-import os
-import sys
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 
 # must come after sys.path.append line (therefore this file is excluded from auto formatting by vscode)

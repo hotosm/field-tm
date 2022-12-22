@@ -33,6 +33,15 @@ class DisplayProject:
     description: str
 
 
+class UITask:
+    status: str
+    feature_id: int
+    name: str
+    qr_code: bytes
+    outline: str
+    uid: int
+
+
 class User(db.Model):
 
     __tablename__ = "web_users"

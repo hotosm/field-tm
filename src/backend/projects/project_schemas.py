@@ -18,7 +18,7 @@
 
 from pydantic import BaseModel
 from typing import List, Any
-from shapely.geometry import shape
+from geojson_pydantic import Feature
 
 from ..users.user_schemas import User
 from ..models.enums import ProjectStatus, ProjectPriority
@@ -66,7 +66,7 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     location_str: str
-    outline_geojson: str = None
+    outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
 
     class Config:

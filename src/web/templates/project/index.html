@@ -52,9 +52,6 @@
       <!-- TODO remove hardcoding -->
       <h1>{{ project['project_info'][0]['name'] }}</h1>
       <a class="action" href="{{ url_for('project.map', id=project['id'])}}">Select Task</a>
-      {% if g.user['id'] == project['author']['id'] %}
-      <a class="action" href="{{ url_for('project.update', id=project['id']) }}">Edit</a>
-      {% endif %}
   </header>
   <p class="description">{{ project['description'] }}</p>
 </article>

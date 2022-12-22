@@ -20,7 +20,7 @@
 {% block header %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-<h1>{% block title %}Pick Task for "{{ project['title'] }}"{% endblock %}</h1>
+<h1>{% block title %}Pick Task for "{{ project_name }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -28,8 +28,23 @@
 <p id="quick_view">{{msg}}</p>
 {% endif %}
 
-<div id="map"></div>
+<div id="map" style="width: 100%; height: 600px"></div>
 
+<h1>Project tasks</h1>
+{% for task in tasks %}
+<article class="project">
+  <header>
+    <div>
+      <h2>Task {{ task.name }}</h2>
+      <p>Status: {{ task.status }}</p>
+      <p>Outline: {{ task.outline }}</p>
+    </div>
+  </header>
+</article>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
 
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
@@ -46,15 +61,19 @@
 <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
 
 <script>
-  // var project_id = {{project_id}};
-  // var project_title = '{{project_name}}';
-  // var project_outline = {{project_outline}};
-  // var tasks = (tasks|default({}))|tojson;
-  // var tasks = []
-  // var user_id = '{{userid}}';
+  /*  var p_outline = {
+    "type": "FeatureCollection",
+    "name": "Naivasha",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+      { "type": "Feature", "properties": {}, "geometry": { "type": "Polygon", "coordinates": [[[36.441132294546918, -0.748127689869466], [36.431360797266251, -0.769253399198293], [36.427318119597118, -0.7777442799901], [36.426607095886474, -0.779552144753597], [36.427114969965508, -0.779846684444971], [36.433991584995674, -0.77968417979021], [36.433778277882475, -0.780303728752816], [36.430888474372743, -0.785839039197057], [36.428511623682851, -0.790257125758318], [36.427186072336582, -0.792232567541131], [36.426200796623256, -0.79395917398364], [36.423336386817475, -0.798925702607457], [36.422310481177838, -0.800378081010835], [36.418826464995654, -0.803374244622618], [36.417963079061288, -0.805232880606962], [36.419425756408913, -0.8059743034682], [36.422462843401547, -0.807101672217701], [36.424138827862365, -0.803770347444342], [36.427795521231431, -0.801688268080342], [36.427978355899882, -0.802744542621881], [36.429613710434381, -0.803008611214652], [36.434245522035198, -0.803008611214652], [36.440868200025839, -0.805446166649357], [36.447694027648076, -0.808076693586922], [36.450741272122293, -0.809417347587404], [36.455169934091494, -0.808401700657998], [36.460533084366126, -0.806695413244867], [36.464606234480001, -0.805903208131183], [36.463590486321934, -0.801881241334254], [36.462280171198017, -0.797554575671596], [36.461335525411016, -0.794527938301015], [36.456084107433767, -0.786098030607428], [36.454753477346685, -0.782908880358569], [36.452782925920033, -0.777404035692344], [36.451452295832958, -0.773778146997981], [36.445550799034557, -0.760254672171128], [36.443890050796099, -0.755379507470098], [36.441431940253565, -0.74818355125548], [36.441132294546918, -0.748127689869466]]] } }
+    ]
+  }  */
+
+  var p_outline = {{(project_outline |default ({}))| tojson }};
 
   function setMap() {
-    const map = L.map("map");
+    var map = L.map('map');
     const osm = L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
@@ -63,40 +82,53 @@
       }
     ).addTo(map);
 
+    // add outline
+    outline_layer = L.geoJSON(p_outline);
+    /*  outline_layer.setStyle({
+      color: '#e0e0e0',
+      weight: 1,
+      fillOpacity: 0.5,
+      fillColor: 'rgb(255, 255, 255)'
+    })  */
+    outline_layer.addTo(map);
+
     // zoom to map
-    grid = addGeoJSONLayer(map)
-    map.fitBounds(grid.getBounds());
+    map.fitBounds(outline_layer.getBounds());
+
+    // add tasks
   }
 
-  function addGeoJSONLayer(map) {
-    //layer = L.geoJson(project_outline);
-    //layer = L.geoJSON(project_outline, {
-    //onEachFeature: createPopup
-    //});
-    //layer.addTo(map);
-    //return layer;
-  }
+  setMap();
 
-  //READY = 0
-  //LOCKED_FOR_MAPPING = 1
-  //MAPPED = 2
-  //LOCKED_FOR_VALIDATION = 3
-  //VALIDATED = 4
-  //INVALIDATED = 5
-  //BAD = 6  # Task cannot be mapped 
-  //SPLIT = 7  # Task has been split
+  /*  const READY = 0;
+  const LOCKED_FOR_MAPPING = 1;
+  const MAPPED = 2;
+  const LOCKED_FOR_VALIDATION = 3;
+  const VALIDATED = 4;
+  const INVALIDATED = 5;
+  const BAD = 6;
+  const SPLIT = 7;
 
   function getStyle(statusValue) {
     bg = 'rgb(216, 218, 228)' // set to unavailable
     switch (statusValue) {
-      case 'READY':
-        bg = 'rgb(255, 255, 255)'
+      case READY, LOCKED_FOR_MAPPING:
+        bg = 'rgb(153, 204, 255)'
         break;
-      case 'LOCKED_FOR_MAPPING':
-        bg = 'rgb(216, 218, 228)'
+      case MAPPED, LOCKED_FOR_VALIDATION:
+        bg = 'rgb(255, 255, 0)'
         break;
-      case 'MAPPED':
-        bg = 'rgb(173, 230, 239)'
+      case VALIDATED:
+        bg = 'rgb(76, 153, 0)'
+        break;
+      case INVALIDATED:
+        bg = 'rgb(102, 0, 102)'
+        break;
+      case BAD:
+        bg = 'rgb(153, 0, 0)'
+        break;
+      case SPLIT:
+        bg = 'rgb(102, 51, 0)'
         break;
       default:
         bg = 'rgb(216, 218, 228)' //set to unavailable
@@ -104,91 +136,124 @@
     }
 
     return {
-      color: '#e1e0e0',
+      color: '#404040',
       weight: 1,
       fillOpacity: 0.8,
       fillColor: bg
     }
   }
 
-  function createPopup(feature, layer) {
-
-    if (feature.properties && feature.properties.id) {
-      feature_id = feature.properties.id;
-      task = tasks[feature_id];
-      qrcode_src = "{{url_for('static', filename=project_path+'/QR_codes/')}}";
-      final_qrcode_src = qrcode_src + "buildings_" + feature_id + ".gif";
-
-      layer.setStyle(getStyle(task.status.value))
-
-      var popupOptions = {
-        'maxWidth': '500',
-        'className': 'fmtm-popup' // classname for another popup
-      }
-
-      //var popup = L.pop()
-      switch (task.status) {
-        case 'READY':
-          layer.bindPopup(
-            `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${task.name}</h1>
-                  <p>${task.status}</p>
-                  <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
-                  <img src='' alt='' height='150dp' width='150dp' max-width='150dp'>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.uid} required>
-                    <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='yes' required>
-                    <input type='submit' value='Download QR Code'>
-                  </form>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.uid} required>
-                    <input style=\"display:none;\" name='newstatus' id='newstatus'
-                      value="Unavailable" required>
-                    <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='no' required>
-                    <input type='submit' value='Just assign me this Task'>
-                  </form>
-                </div>`, popupOptions
-          )
-          break;
-        case 'unavailable':
-          if (user_id == task.task_doer) {
-            layer.bindPopup(
-              `<div class='fmtm-popup-div'>
-                  <h1>Task ${task.feature_id}</h1>
-                  <p>Status: ${task.status}</p>
-                  
-                  <img src='' alt='' height='150dp' width='150dp' max-width='150dp'>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.feature_id} required>
-                      <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='yes' required>
-                    <input type='submit' value='Download QR Code'>
-                  </form>
-                </div>
-                `, popupOptions
-            )
-          }
-          break;
-        default:
-          layer.bindPopup(
-            `<h1>Task ${task.feature_id}</h1>
-              <p>${task.status}</p>
-              `, popupOptions
-          )
-      }
-      //  layer.bindPopup(popup, popupOptions)  
-    }
+  var popupOptions = {
+    'maxWidth': '500',
+    'className': 'fmtm-popup' // classname for another popup
   }
 
-    //setMap()
+  function createReadyPopup(task_name, task_uid) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: READY</p>
+                  
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                      <button name="lockButton" type="submit" value='Lock for Mapping'>
+                  </form>
+
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                    <button name="detailsButton" type="submit" value='View Task Details'>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createLockedForMappingByMePopup(task_name, task_uid) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: LOCKED FOR MAPPING</p>
+                  
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                      <button name="mappedButton" type="submit" value='Mark as mapped'>
+                  </form>
+
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                    <button name="unlockButton" type="submit" value='Unlock task'>
+                  </form>
+
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                    <button name="detailsButton" type="submit" value='View Task Details'>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createLockedPopup(task_name, task_uid, status) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: ${status}</p>
+
+                  <form action="/" method="post">
+                    <input style=\"display:none;\" name='taskid' id='taskid'
+                      value=${task_uid} required>
+                    <button name="detailsButton" type="submit" value='View Task Details'>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by) {
+    layer = L.geoJSON(task_outline);
+    layer.addTo(map);
+
+    layer.setStyle(getStyle(task.status.value))
+
+    var popup = createLockedPopup(task_name, task_uid, task_status) // default popup
+
+    switch (task_status) {
+      case READY:
+        popup = createReadyPopup(task_name, task_uid)
+        break;
+      case LOCKED_FOR_MAPPING:
+        if (user_id == locked_by) {
+          popup = createLockedForMappingByMePopup(task_name, task_uid)
+        }
+        break;
+      default:
+        break;
+    }
+    layer.bindPopup(popup, popupOptions)
+  }
+
+  var task_uid;
+  var task_name;
+  var task_status;
+  var locked_by;
+  var task_outline;
+
+  {% for task in tasks %}
+
+  task_uid = {{ task['id'] }};
+  task_name = '{{ task['project_task_name'] }}';
+  task_status = {{ task['task_status'] }};
+  locked_by = {{ task['locked_by_uid'] }};
+  task_outline = {{ (task['outline_geojson'] |default ({}))| tojson }};
+
+  createTaskLayer(task_layer, task_status, task_uid, task_name, locked_by);
+
+  {% endfor %}  */
 
 </script>
 {% endblock %}
