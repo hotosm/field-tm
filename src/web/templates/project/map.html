@@ -100,7 +100,7 @@
 
   map = setMap();
 
-  /*  const READY = 0;
+  const READY = 0;
   const LOCKED_FOR_MAPPING = 1;
   const MAPPED = 2;
   const LOCKED_FOR_VALIDATION = 3;
@@ -212,13 +212,13 @@
 
                 </div>`
     )
-  }*/
+  }
 
   function createTaskLayer(task_outline, task_status, task_uid, task_name, locked_by) {
     layer = L.geoJSON(task_outline);
     layer.addTo(map);
 
-    /*layer.setStyle(getStyle(task.status.value))
+    layer.setStyle(getStyle(task_status))
 
     var popup = createLockedPopup(task_name, task_uid, task_status) // default popup
 
@@ -234,7 +234,7 @@
       default:
         break;
     }
-    layer.bindPopup(popup, popupOptions) */
+    layer.bindPopup(popup, popupOptions)
   }
 
   var task_uid;
