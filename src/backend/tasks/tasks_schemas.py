@@ -1,4 +1,5 @@
 # Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -15,13 +16,37 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from src import create_app
+from pydantic import BaseModel
+from geojson_pydantic import Feature, Point
+
+from ..models.enums import TaskStatus
 
 
-def test_config():
-    assert not create_app().testing
-    assert create_app('testing').testing
+class TaskBase(BaseModel):
+    id: int
+    project_id: int
+    project_task_index: int
+    project_task_name: str
+    outline_geojson: Feature
+    outline_centroid: Feature
+    initial_feature_count: int
+    task_status: TaskStatus
+    locked_by_uid: int = None
 
-# def test_hello(client):
-#     response = client.get('/hello')
-#     assert response.data == b'Hello, World!'
+    class Config:
+        orm_mode = True
+
+
+class Task(TaskBase):
+    geometry_geojson: str
+
+    # qr_code_binary: bytes
+    pass
+
+
+class TaskOut(TaskBase):
+    pass
+
+
+class TaskDetails(TaskBase):
+    pass

@@ -1,26 +1,48 @@
-from enum import Enum
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
 
-class TeamVisibility(Enum):
+from enum import Enum, IntEnum
+
+
+class TeamVisibility(IntEnum, Enum):
     """ Describes the visibility associated with an Team """
 
     PUBLIC = 0
     PRIVATE = 1
 
-class OrganisationType(Enum):
+
+class OrganisationType(IntEnum, Enum):
     """ Describes an organisation's subscription type """
 
     FREE = 1
     DISCOUNTED = 2
     FULL_FEE = 3
 
-class ProjectStatus(Enum):
+
+class ProjectStatus(IntEnum, Enum):
     """ Enum to describes all possible states of a Mapping Project """
 
     ARCHIVED = 0
     PUBLISHED = 1
     DRAFT = 2
 
-class ProjectPriority(Enum):
+
+class ProjectPriority(IntEnum, Enum):
     """ Enum to describe all possible project priority levels """
 
     URGENT = 0
@@ -28,21 +50,24 @@ class ProjectPriority(Enum):
     MEDIUM = 2
     LOW = 3
 
-class UserRole(Enum):
+
+class UserRole(IntEnum, Enum):
     """ Describes the role a user can be assigned, app doesn't support multiple roles """
 
     READ_ONLY = -1
     MAPPER = 0
     ADMIN = 1
 
-class MappingLevel(Enum):
+
+class MappingLevel(IntEnum, Enum):
     """ The mapping level the mapper has achieved """
 
     BEGINNER = 1
     INTERMEDIATE = 2
     ADVANCED = 3
 
-class MappingPermission(Enum):
+
+class MappingPermission(IntEnum, Enum):
     """ Describes a set of permissions for mapping on a project """
 
     ANY = 0
@@ -51,7 +76,7 @@ class MappingPermission(Enum):
     TEAMS_LEVEL = 3
 
 
-class ValidationPermission(Enum):
+class ValidationPermission(IntEnum, Enum):
     """ Describes a set of permissions for validating on a project """
 
     ANY = 0
@@ -59,24 +84,16 @@ class ValidationPermission(Enum):
     TEAMS = 2
     TEAMS_LEVEL = 3
 
-class TaskCreationMode(Enum):
+
+class TaskCreationMode(IntEnum, Enum):
     """ Enum to describe task creation mode """
 
     GRID = 0
     ROADS = 1
     UPLOAD = 2
 
-class TaskAction(Enum):
-    """Describes the possible actions that can happen to to a task, that we'll record history for"""
 
-    LOCKED_FOR_MAPPING = 1
-    LOCKED_FOR_VALIDATION = 2
-    STATE_CHANGE = 3
-    COMMENT = 4
-    AUTO_UNLOCKED_FOR_MAPPING = 5
-    AUTO_UNLOCKED_FOR_VALIDATION = 6
-
-class TaskStatus(Enum):
+class TaskStatus(IntEnum, Enum):
     """ Enum describing available Task Statuses """
 
     READY = 0
@@ -85,15 +102,89 @@ class TaskStatus(Enum):
     LOCKED_FOR_VALIDATION = 3
     VALIDATED = 4
     INVALIDATED = 5
-    BAD = 6  # Task cannot be mapped 
+    BAD = 6  # Task cannot be mapped
     SPLIT = 7  # Task has been split
 
-class TaskType(Enum):
+
+def verify_valid_status_update(old_status: TaskStatus, new_status: TaskStatus):
+    return True
+    # match old_status:
+    #     case TaskStatus.READY:
+    #         return new_status in [TaskStatus.LOCKED_FOR_MAPPING,
+    #                               TaskStatus.BAD,
+    #                               TaskStatus.SPLIT,]
+    #     case TaskStatus.LOCKED_FOR_MAPPING:
+    #         return new_status in [TaskStatus.READY,
+    #                               TaskStatus.MAPPED,
+    #                               TaskStatus.BAD,
+    #                               TaskStatus.SPLIT,]
+    #     case TaskStatus.LOCKED_FOR_VALIDATION:
+    #         return new_status in [TaskStatus.INVALIDATED,
+    #                               TaskStatus.MAPPED]
+    #     case TaskStatus.VALIDATED:
+    #         return new_status == TaskStatus.INVALIDATED
+    #     case TaskStatus.INVALIDATED:
+    #         return new_status in [TaskStatus.MAPPED,
+    #                               TaskStatus.BAD,
+    #                               TaskStatus.SPLIT,]
+    #     case TaskStatus.BAD:
+    #         return new_status == TaskStatus.READY
+    #     case TaskStatus.SPLIT:
+    #         return new_status == TaskStatus.READY
+
+
+class TaskAction(IntEnum, Enum):
+    """Describes the possible actions that can happen to to a task, that we'll record history for"""
+
+    RELEASED_FOR_MAPPING = 0
+    LOCKED_FOR_MAPPING = 1
+    MARKED_MAPPED = 2
+    LOCKED_FOR_VALIDATION = 3
+    VALIDATED = 4
+    MARKED_INVALID = 5
+    MARKED_BAD = 6  # Task cannot be mapped
+    SPLIT_NEEDED = 7  # Task needs split
+    RECREATED = 8
+    COMMENT = 9
+
+
+def is_status_change_action(task_action):
+    return task_action in [TaskAction.RELEASED_FOR_MAPPING,
+                           TaskAction.LOCKED_FOR_MAPPING,
+                           TaskAction.MARKED_MAPPED,
+                           TaskAction.LOCKED_FOR_VALIDATION,
+                           TaskAction.VALIDATED,
+                           TaskAction.MARKED_INVALID,
+                           TaskAction.MARKED_BAD,
+                           TaskAction.SPLIT_NEEDED,]
+
+
+def get_action_for_status_change(task_status: TaskStatus):
+    return TaskAction.RELEASED_FOR_MAPPING
+    # match task_status:
+    #     case TaskStatus.READY:
+    #         return TaskAction.RELEASED_FOR_MAPPING
+    #     case TaskStatus.LOCKED_FOR_MAPPING:
+    #         return TaskAction.LOCKED_FOR_MAPPING
+    #     case TaskStatus.MAPPED:
+    #         return TaskAction.MARKED_MAPPED
+    #     case TaskStatus.LOCKED_FOR_VALIDATION:
+    #         return TaskAction.LOCKED_FOR_VALIDATION
+    #     case TaskStatus.VALIDATED:
+    #         return TaskAction.VALIDATED
+    #     case TaskStatus.BAD:
+    #         return TaskAction.MARKED_BAD
+    #     case TaskStatus.SPLIT:
+    #         return TaskAction.SPLIT_NEEDED
+
+
+class TaskType(IntEnum, Enum):
     BUILDINGS = 0
     AMENITIES = 1
     OTHER = 2
 
-class ProjectSplitStrategy(Enum):
+
+class ProjectSplitStrategy(IntEnum, Enum):
     GRID = 0
     OSM_VECTORS = 1
     OTHER = 2
