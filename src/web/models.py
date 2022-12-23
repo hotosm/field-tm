@@ -1,10 +1,49 @@
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
 import enum
+import datetime
 from email.policy import default
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum
 
 db = SQLAlchemy()
+
+
+class DisplayProject:
+    id: int
+    author_id: int
+    created: datetime
+    author_username: str
+    description: str
+
+
+class UITask:
+    status: str
+    feature_id: int
+    name: str
+    qr_code: bytes
+    outline: str
+    uid: int
+    locked_by: int
+    centroid: str
+    centroid_lat: int
+    centroid_long: int
 
 
 class User(db.Model):
@@ -55,7 +94,7 @@ class Project(db.Model):
         return self.__dict__[field]
 
 
-class TaskStatus(str, enum.Enum):
+class FrontendTaskStatus(str, enum.Enum):
     available = "Available for mapping"
     unavailable = "Unavailable"
     ready_for_validation = "Ready for Validation"
@@ -73,8 +112,8 @@ class Task(db.Model):
     project_id = db.Column(db.Integer, unique=False, nullable=False)
     created = db.Column(db.TIMESTAMP, nullable=False,
                         server_default=db.func.now())
-    status = db.Column(Enum(TaskStatus), nullable=False,
-                       default=TaskStatus.available)
+    status = db.Column(Enum(FrontendTaskStatus), nullable=False,
+                       default=FrontendTaskStatus.available)
     task_doer = db.Column(db.Integer)
     last_selected = db.Column(db.TIMESTAMP, server_default=db.func.now())
 

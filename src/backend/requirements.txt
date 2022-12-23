@@ -1,12 +1,32 @@
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
 # ----- FASTAPI -----
 fastapi==0.85.1 
 # fast api requirements
 # anyio==3.5.0
 # idna==3.3
 pydantic==1.10.2 
+geojson-pydantic==0.4.3
 # starlette==0.20.4
 # typing-extensions==4.4.0
 # sniffio==1.2.0
+
 
 uvicorn==0.19.0 
 # uvicorn[standard] requirements
@@ -19,12 +39,20 @@ uvicorn==0.19.0
 # watchfiles==0.18.0 
 # websockets==10.3
 
+# ----- LOGGING -----
+python-json-logger==2.0.4
+
+# ----- FILE UPLOAD ----
+python-multipart==0.0.5
+
 # ----- DATABASE -----
 fastapi-sqlalchemy==0.2.1
 psycopg2==2.9.3
 geoalchemy2==0.12.5
 alembic==1.8.1
 sqlmodel==0.0.8
+geojson==2.5.0
+shapely==1.8.4
 
 python-dotenv==0.21.0
 

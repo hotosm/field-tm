@@ -1,182 +1,270 @@
+<!-- Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+# -->
+
 {% extends 'base.html' %}
 
 {% block header %}
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-  <h1>{% block title %}Pick Task for "{{ project['title'] }}"{% endblock %}</h1>
+<h1>{% block title %}Pick Task for "{{ project_name }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  {% if msg %}
-    <p id="quick_view">{{msg}}</p>
-  {% endif %}
+{% if msg %}
+<p id="quick_view">{{msg}}</p>
+{% endif %}
 
-  <div id="map"></div>
+<div id="map" style="width: 100%; height: 600px"></div>
 
-  <h1>Project tasks</h1>
-  {% for task in tasks.values() %}
-    <article class="project">
-      <header>
-        <div>
-          <h2>Task {{ task.id }}</h2>
-          {% if task.status.value != 'available' %}
-            <div class="about">Status: {{task.status.label}} ({{ task.task_doer }})</div>
-          {% endif %}  
-        </div>
-      </header>
-    </article>
-    {% if not loop.last %}
-      <hr>
-    {% endif %}
+<h1>Project tasks</h1>
+{% for task in tasks %}
+<article class="project">
+  <header>
+    <div>
+      <h2>Task {{ task.name }}</h2>
+      <p>Status: {{ task.status }}</p>
+      <p>Outline: {{ task.centroid_lat }}, {{ task.centroid_long}} </p>
+    </div>
+  </header>
+</article>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+  integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+  crossorigin="" />
+
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+  integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+  crossorigin=""></script>
+
+<!-- responseive Leaflet popups -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.css" />
+<script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
+
+<script>
+  /*  var p_outline = {
+    "type": "FeatureCollection",
+    "name": "Naivasha",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+      { "type": "Feature", "properties": {}, "geometry": { "type": "Polygon", "coordinates": [[[36.441132294546918, -0.748127689869466], [36.431360797266251, -0.769253399198293], [36.427318119597118, -0.7777442799901], [36.426607095886474, -0.779552144753597], [36.427114969965508, -0.779846684444971], [36.433991584995674, -0.77968417979021], [36.433778277882475, -0.780303728752816], [36.430888474372743, -0.785839039197057], [36.428511623682851, -0.790257125758318], [36.427186072336582, -0.792232567541131], [36.426200796623256, -0.79395917398364], [36.423336386817475, -0.798925702607457], [36.422310481177838, -0.800378081010835], [36.418826464995654, -0.803374244622618], [36.417963079061288, -0.805232880606962], [36.419425756408913, -0.8059743034682], [36.422462843401547, -0.807101672217701], [36.424138827862365, -0.803770347444342], [36.427795521231431, -0.801688268080342], [36.427978355899882, -0.802744542621881], [36.429613710434381, -0.803008611214652], [36.434245522035198, -0.803008611214652], [36.440868200025839, -0.805446166649357], [36.447694027648076, -0.808076693586922], [36.450741272122293, -0.809417347587404], [36.455169934091494, -0.808401700657998], [36.460533084366126, -0.806695413244867], [36.464606234480001, -0.805903208131183], [36.463590486321934, -0.801881241334254], [36.462280171198017, -0.797554575671596], [36.461335525411016, -0.794527938301015], [36.456084107433767, -0.786098030607428], [36.454753477346685, -0.782908880358569], [36.452782925920033, -0.777404035692344], [36.451452295832958, -0.773778146997981], [36.445550799034557, -0.760254672171128], [36.443890050796099, -0.755379507470098], [36.441431940253565, -0.74818355125548], [36.441132294546918, -0.748127689869466]]] } }
+    ]
+  }  */
+
+  var p_outline = {{(project_outline |default ({}))| tojson }};
+
+
+
+  function setMap() {
+    var map = L.map('map');
+    const osm = L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }
+    ).addTo(map);
+
+    // add outline
+    outline_layer = L.geoJSON(p_outline);
+    outline_layer.setStyle({
+      color: '#e0e0e0',
+      weight: 3,
+      fillOpacity: 0.5,
+      fillColor: 'rgb(255, 255, 255)'
+    })
+    outline_layer.addTo(map);
+
+    // zoom to map
+    map.fitBounds(outline_layer.getBounds());
+
+    return map;
+  }
+
+  map = setMap();
+
+  const READY = 0;
+  const LOCKED_FOR_MAPPING = 1;
+  const MAPPED = 2;
+  const LOCKED_FOR_VALIDATION = 3;
+  const VALIDATED = 4;
+  const INVALIDATED = 5;
+  const BAD = 6;
+  const SPLIT = 7;
+
+  function getStyle(statusValue) {
+    bg = 'rgb(216, 218, 228)' // set to unavailable
+    switch (statusValue) {
+      case READY:
+        bg = 'rgb(153, 204, 255)'
+        break;
+      case LOCKED_FOR_MAPPING:
+        bg = 'rgb(140, 146, 172)'
+        break;
+      case MAPPED:
+        bg = 'rgb(255, 255, 0)'
+        break;
+      case LOCKED_FOR_VALIDATION:
+        bg = 'rgb(248, 240, 227)'
+        break;
+      case VALIDATED:
+        bg = 'rgb(76, 153, 0)'
+        break;
+      case INVALIDATED:
+        bg = 'rgb(102, 0, 102)'
+        break;
+      case BAD:
+        bg = 'rgb(153, 0, 0)'
+        break;
+      case SPLIT:
+        bg = 'rgb(102, 51, 0)'
+        break;
+      default:
+        bg = 'rgb(216, 218, 228)' //set to unavailable
+        break;
+    }
+
+    return {
+      color: '#404040',
+      weight: 1,
+      fillOpacity: 0.5,
+      fillColor: bg
+    }
+  }
+
+  var grayLockIcon = L.icon({
+    iconUrl: "/static/gray_lock_icon.png",
+    iconSize: [10, 10], // size of the icon
+  });
+
+  var blackLockIcon = L.icon({
+    iconUrl: "/static/lock_icon.png",
+    iconSize: [10, 10], // size of the icon
+  });
+
+  var popupOptions = {
+    'maxWidth': '500',
+    'className': 'fmtm-popup' // classname for another popup
+  }
+
+  function createReadyPopup(task_name, task_uid) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: READY</p>
+                  
+                  <form action="/" method="post">
+                    <button name="lockButton" type="submit" value=${task_uid}>Lock for Mapping</button>
+                  </form>
+
+                  <form action="/" method="post">
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createLockedForMappingByMePopup(task_name, task_uid) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: LOCKED FOR MAPPING</p>
+                  
+                  <form action="/" method="post">
+                      <button name="mappedButton" type="submit" value=${task_uid}>Mark as mapped</button>
+                  </form>
+
+                  <form action="/" method="post">
+                    <button name="unlockButton" type="submit" value=${task_uid}>Unlock task</button>
+                  </form>
+
+                  <form action="/" method="post">
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createLockedPopup(task_name, task_uid, status) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
+                  <h1>Task ${task_name}</h1>
+                  <p>Status: ${status}</p>
+
+                  <form action="/" method="post">
+                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</buttom>
+                  </form>
+
+                </div>`
+    )
+  }
+
+  function createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name) {
+    layer = L.geoJSON(task_outline);
+    layer.addTo(map);
+
+    layer.setStyle(getStyle(task_status))
+
+    var popup = createLockedPopup(task_name, task_uid, task_status) // default popup
+
+    switch (task_status) {
+      case READY:
+        popup = createReadyPopup(task_name, task_uid)
+        break;
+      case LOCKED_FOR_MAPPING:
+        // TODO: Add check for logged in user
+        popup = createLockedForMappingByMePopup(task_name, task_uid)
+        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
+        break;
+      case LOCKED_FOR_VALIDATION:
+        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
+        break;
+      default:
+        break;
+    }
+    layer.bindPopup(popup, popupOptions)
+  }
+
+  var task_uid;
+  var task_name;
+  var task_status;
+  var locked_by;
+  var task_outline;
+
+  {% for task in tasks %}
+
+  task_uid = {{ task.uid }}
+  task_name = '{{ task.name }}'
+  task_status = {{ task.status }}
+  task_outline = {{ (task.outline |default ({}))| tojson }};
+  task_centroid_lat = {{ task.centroid_lat }}
+  task_centroid_long = {{ task.centroid_long }}
+  task_centroid = [task_centroid_long, task_centroid_lat]
+
+  createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name);
+
   {% endfor %}
 
-
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
-   crossorigin=""/>
-
-  <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
-   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
-   crossorigin=""></script>
-
-  <!-- responseive Leaflet popups -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.css" />
-  <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
-
-  <script>
-    var grid_geojson = {{(geojson|default({}))|tojson}};
-    var tasks = {{(tasks|default({}))|tojson}};
-    var project_title = '{{project['title']}}'
-    var user_id = '{{userid}}'
-
-    function setMap() {
-      const map = L.map("map");
-      const osm = L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }
-      ).addTo(map);
-
-      // zoom to map
-      grid = addGeoJSONLayer(map)
-      map.fitBounds(grid.getBounds());
-    }
-
-    function getStyle(statusValue) {
-      bg = 'rgb(216, 218, 228)' // set to unavailable
-      switch(statusValue) {
-        case 'available':
-          bg = 'rgb(255, 255, 255)'
-          break;
-        case 'unavailable':
-          bg = 'rgb(216, 218, 228)'
-          break;
-        case 'readyforvalidation':
-          bg = 'rgb(173, 230, 239)'
-          break;
-        default:
-          bg = 'rgb(216, 218, 228)' //set to unavailable
-          break;
-      }
-
-      return {color: '#e1e0e0',
-        weight: 1,
-        fillOpacity:0.8,
-        fillColor: bg
-      }
-    } 
-
-    function createPopup(feature, layer) {
-      
-      if (feature.properties && feature.properties.id) {
-        feature_id = feature.properties.id;
-        task = tasks[feature_id];
-        qrcode_src = "{{url_for('static', filename=project_path+'/QR_codes/')}}";
-        final_qrcode_src = qrcode_src+"buildings_"+feature_id+".gif";
-
-        layer.setStyle(getStyle(task.status.value))
-
-        var popupOptions = {
-          'maxWidth': '500',
-          'className' : 'fmtm-popup' // classname for another popup
-        }
-
-        //var popup = L.pop()
-        switch(task.status.value) {
-          case 'available':
-            layer.bindPopup(
-                `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${feature_id}</h1>
-                  <p>${task.status.label}</p>
-                  <p>To start field mapping, scan the QR Code using ODK Collect and click 'Assign me this task'. If you are on your mobile device, you can download the QR Code for use in ODK.</p>
-                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.feature_id} required>
-                    <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='yes' required>
-                    <input type='submit' value='Download QR Code'>
-                  </form>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.id} required>
-                    <input style=\"display:none;\" name='newstatus' id='newstatus'
-                      value="Unavailable" required>
-                    <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='no' required>
-                    <input type='submit' value='Just assign me this Task'>
-                  </form>
-                </div>`, popupOptions
-            )
-            break;
-          case 'unavailable': 
-            if (user_id == task.task_doer) {
-              layer.bindPopup(
-                `<div class='fmtm-popup-div'>
-                  <h1>Task ${feature_id}</h1>
-                  <p>Status: ${task.status.label}</p>
-                  
-                  <img src='${final_qrcode_src}' alt='' height='150dp' width='150dp' max-width='150dp'>
-
-                  <form method='post'>
-                    <input style=\"display:none;\" name='taskid' id='taskid'
-                      value=${task.feature_id} required>
-                      <input style=\"display:none;\" name='qrcode' id='qrcode'
-                      value='yes' required>
-                    <input type='submit' value='Download QR Code'>
-                  </form>
-                </div>
-                `, popupOptions
-              )
-            } 
-            break; 
-          default:
-            layer.bindPopup(
-              `<h1>Task ${feature_id}</h1>
-              <p>${task.status.label}</p>
-              <p>${task.task_doer}</p>
-              `, popupOptions
-            )  
-        }
-        //  layer.bindPopup(popup, popupOptions)  
-      }
-    }
-
-    function addGeoJSONLayer(map) {
-      layer = L.geoJSON(grid_geojson, {
-        onEachFeature: createPopup
-      });
-      layer.addTo(map);
-      return layer;
-    }
-
-    setMap()
-
-  </script>
+</script>
 {% endblock %}

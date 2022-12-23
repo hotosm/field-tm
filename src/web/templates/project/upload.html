@@ -1,0 +1,71 @@
+<!-- Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+# -->
+
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}New Project - Part II{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<p>{{project_data}}</p>
+<form method="post" enctype=multipart/form-data>
+  <label for="project_id">Project ID</label>
+  <input name="project_id" id="project_id" value="{{project_id}}" required>
+
+  <label for="project_name_prefix">Project Name Prefix</label>
+  <input name="project_name_prefix" id="project_name_prefix" value="{{ request.form['project_name_prefix'] }}" required>
+
+  <label for="task_type_prefix">Task Type Prefix</label>
+  <input name="task_type_prefix" id="task_type_prefix">{{ request.form['task_type_prefix'] }}</textarea>
+
+  <label for="files">Project files</label>
+  <input type="file" name="files" id="files" accept="application/zip" required>
+
+  <h1>Zip requirements</h1>
+
+  <p>This upload expects a zip file that looks like: </p>
+  <ul>
+    <li>[Project Name Prefix].geojson\n (contains FeatureCollection with one Feature that outlines the project)</li>
+    <li>[Project Name Prefix]_polygons.geojson\n (contains FeatureCollection with one Feature for each task in the
+      project. Each task feature should have an geometry outlining the task, a unique identifier ('uid'), and a name
+      ('task').)</li>
+    <li>A directory called `QR_codes` that contains a QR code for each task. QR codes should be named: [Project Name
+      Prefix]_[Project Task Type]__[Task name as defined in 'task' property of task Feature in geojson].png</li>
+    <li>A directory called `geojson` that contains a geojson containing the relevent OSM data for each task. Task
+      geojson should be named: [Project Name Prefix]_[Project Task Type]__[Task name as defined in 'task' property of
+      task Feature in geojson].geojson</li>
+  </ul>
+
+  <h4> Sample [Project Name Prefix]_polygons.geojson:
+
+    <p>{</p>
+    <p> "type": "FeatureCollection",</p>
+    <p> "name": "Mikocheni_dumb_grid4326",</p>
+    <p> "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },</p>
+    <p> "features": [</p>
+    <p> { "type": "Feature", "properties": { "id": 1, "left": 4365555.9259951562, "top": -751476.61196699215, "right":
+      4365855.9259951562, "bottom": -751776.61196699215, "name": "Mikocheni_buildings_1" }, "geometry": { "type":
+      "Polygon", "coordinates": [ [ [ 39.216456119999989, -6.735064857 ], [ 39.219151065852344, -6.735064857 ], [
+      39.219151065852344, -6.73774119781377 ], [ 39.216456119999989, -6.73774119781377 ], [ 39.216456119999989,
+      -6.735064857 ] ] ] } },</p>
+    <p> ...</p>
+
+    <input type="submit" value="Save & Upload">
+</form>
+
+{% endblock %}

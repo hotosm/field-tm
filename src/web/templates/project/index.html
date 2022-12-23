@@ -1,50 +1,63 @@
+<!-- Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+# -->
+
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Projects{% endblock %}</h1>
-  {% if g.user %}
-    <a class="action" href="{{ url_for('project.create') }}">New</a>
-  {% endif %}
+<h1>{% block title %}Projects{% endblock %}</h1>
+{% if g.user %}
+<a class="action" href="{{ url_for('project.create') }}">New</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if g.user['id'] %}
-    <h1 class='highlighted-action'>My tasks</h1>
-    {% for task in tasks %}
-      <article class="project">
-        <header>
-          <div>
-            <!-- TODO remove hardcoding -->
-            <div class="about">Task {{ task['task_number'] }} was selected by {{ task['username'] }} on {{ task['last_selected'].strftime('%Y-%m-%d') }}</div>
-          </div>
-          <a class="action" href="{{ url_for('project.map', id=task['project_id'])}}">See Project</a>
-        </header>
-      </article>
-      {% if not loop.last %}
-        <hr>
-      {% endif %}
-    {% endfor %}
+{% if g.user['id'] %}
+<h1 class='highlighted-action'>My tasks</h1>
+{% for task in tasks %}
+<article class="project">
+  <header>
+    <div>
+      <!-- TODO remove hardcoding -->
+      <div class="about">Task {{ task['task_number'] }} was selected by {{ task['username'] }} on
+        {{ task['last_selected'].strftime('%Y-%m-%d') }}</div>
+    </div>
+    <a class="action" href="{{ url_for('project.map', id=task['project_id'])}}">See Project</a>
+  </header>
+</article>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
 
-    <h1 class='highlighted-action'>Open Projects</h1>
-  {% endif %}
-  {% for project in projects %}
-    <article class="project">
-      <header>
-        <div>
-          <!-- TODO remove hardcoding -->
-          <h1>{{ project['title'] }}</h1>
-	  <div class="about">by {{ g.user['username'] }} on {{ project['created'].strftime('%Y-%m-%d') }}</div>
-        </div>
-        <a class="action" href="{{ url_for('project.map', id=project['id'])}}">Select Task</a>
-        {% if g.user['id'] == project['author_id'] %}
-          <a class="action" href="{{ url_for('project.update', id=project['id']) }}">Edit</a>
-        {% endif %}
-      </header>
-      <p class="description">{{ project['description'] }}</p>
-    </article>
-    {% if not loop.last %}
-      <hr>
-    {% endif %}
-  {% endfor %}
-  <br>
+<h1 class='highlighted-action'>Open Projects</h1>
+{% endif %}
+{% for project in projects %}
+<article class="project">
+  <header>
+    <div>
+      <!-- TODO remove hardcoding -->
+      <h1>{{ project['project_info'][0]['name'] }}</h1>
+      <a class="action" href="{{ url_for('project.map', id=project['id'])}}">Select Task</a>
+  </header>
+  <p class="description">{{ project['description'] }}</p>
+</article>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
+<br>
 {% endblock %}

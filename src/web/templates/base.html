@@ -1,3 +1,20 @@
+<!-- Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+# -->
+
 <!doctype html>
 <title>{% block title %}{% endblock %} - Flaskr</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -7,12 +24,12 @@
   <h1>ODK Tasking Manager</h1>
   <ul>
     {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Register</a>
-      <li><a href="{{ url_for('auth.login') }}">Log In</a>
-    {% endif %}
+    <li><span>{{ g.user['username'] }}</span>
+    <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
+      {% else %}
+    <li><a href="{{ url_for('auth.register') }}">Register</a>
+    <li><a href="{{ url_for('auth.login') }}">Log In</a>
+      {% endif %}
   </ul>
 </nav>
 <section class="content">
@@ -20,7 +37,7 @@
     {% block header %}{% endblock %}
   </header>
   {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
+  <div class="flash">{{ message }}</div>
   {% endfor %}
   {% block content %}{% endblock %}
 </section>
