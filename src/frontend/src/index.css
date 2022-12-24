@@ -1,0 +1,28 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+.container {
+  font-size: 3rem;
+  margin: auto;
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+.dropdown {
+  width: 100%;
+}
+.dropdown-trigger {
+  width: 100%;
+}
+button {
+  width: 100%;
+}
+
+.content{
+  height: 81vh;
+  overflow: auto;
+  padding:5px
+
+}
