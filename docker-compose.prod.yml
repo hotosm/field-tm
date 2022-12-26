@@ -28,8 +28,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
     ports:
       - 5432:5432
-    networks:
-      - fmtm-net
+    # networks:
+    #   - fmtm-net
 
   pgadmin:
     container_name: pgadmin
@@ -57,8 +57,8 @@ services:
       - 8000
     ports:
       - 8008:8000
-    networks:
-      - fmtm-net
+    # networks:
+    #   - fmtm-net
 
   web:
     build:
@@ -109,6 +109,5 @@ services:
     traefik-public-certificates:
     postgres_data_prod:
 
-
-  networks:
-    fmtm-net: #     external: true
+      # networks:
+      #   fmtm-net: #     external: true
