@@ -1,5 +1,10 @@
 ## Development
 
+### For the frontend
+
+npm install
+npm run
+
 ### Config:
 
     cp .env.example .env

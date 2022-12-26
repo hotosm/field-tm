@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: '3.3'
+version: '3.4'
 
 services:
   db:
@@ -82,6 +82,17 @@ services:
       - db
     networks:
       - fmtm-net
+
+  # react-ui:
+  #   build:
+  #     context: ./my-app
+  #   ports:
+  #     - "3000:3000"
+  #   container_name: react-ui
+  #   stdin_open: true
+  #   volumes:
+  #      - ./my-app:/usr/src/app/my-app
+  #      - /usr/src/app/my-app/node_modules
 
   # alternative webproxy to nginx
   traefik:
