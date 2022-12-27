@@ -49,7 +49,7 @@ export default function ExploreProjectCard({ data, length }) {
         },
         card: {
             backgroundColor: 'white',
-            border: "1px solid lightgray",
+            border: "1px solid #ffd280",
             marginLeft: '0.2%',
             marginRight: '0.2%',
             marginTop: '1%',
