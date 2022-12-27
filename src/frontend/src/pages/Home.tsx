@@ -10,7 +10,7 @@ const Home = () => {
 
 
     const { windowSize, type } = windowDimention();
-    console.log('width:', windowSize.width, 'and heigh', windowSize.height, 'and type is :', type);
+    //console.log('width:', windowSize.width, 'and heigh', windowSize.height, 'and type is :', type);
 
     let a = '01234567891234';
     let ds = type == 'lg' ? 5 : type == 'xl' ? 7 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1
