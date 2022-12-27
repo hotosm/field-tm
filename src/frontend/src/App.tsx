@@ -9,37 +9,23 @@ import DrawerToggler from "./components/DrawerToggler";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import Home from "./pages/Home";
 import SearchableRow from "./utilities/SearchableRow";
-
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 const App = () => {
   return (
     <Router>
-      <div className="container-fluid p-0" >
-        <div className="row">
-
-          <div className="col-md-12">
-             <PrimarySearchAppBar />
-          </div>
-
-          <div className="row">
-            <SearchableRow />
-          </div>
-
-          <div className="row">
-            <Drawer />
-            <div className="col-md-12 p-2 content">
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <Routes>
-                  <Route path="/" element={
-                      <Home />
-                  } />
-
-                </Routes>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
+      <Container disableGutters={true} maxWidth={false} >
+        <Drawer />
+        <Box sx={{ bgcolor: 'whitesmoke', height: '100vh' }} >
+          <PrimarySearchAppBar />
+          <SearchableRow />
+          <Box sx={{ height: '84vh', overflow: 'auto' }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </Box>
+        </Box>
+      </Container>
     </Router>
   )
 }

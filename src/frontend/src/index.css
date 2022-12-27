@@ -13,16 +13,17 @@ body {
 .dropdown {
   width: 100%;
 }
+
 .dropdown-trigger {
   width: 100%;
 }
+
 button {
   width: 100%;
 }
 
-.content{
+.content {
   height: 81vh;
   overflow: auto;
-  padding:5px
-
+  padding: 5px
 }

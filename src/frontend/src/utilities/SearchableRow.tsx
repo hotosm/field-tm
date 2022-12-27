@@ -23,7 +23,7 @@ const SearchableRow = () => {
             backgroundColor: enviroment.sysRedColor,
             opacity: 0.8,
             marginTop: '2%',
-            marginLeft:'1%',
+            marginLeft: '1%',
             color: 'white',
             width: '99%'
         },
@@ -43,7 +43,7 @@ const SearchableRow = () => {
             // backgroundColor:enviroment.sysRedColor,
             // color:'white'
             width: '100%',
-          
+
 
         },
         outlineBtn: {
@@ -124,8 +124,7 @@ const SearchableRow = () => {
         },
     }));
     return (
-        <div>
-
+        <Box sx={{ mb: 1 }}>
             <Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
                 <OutlinedButton color={'error'} icon={<AutoAwesomeIcon />} text="Filters" style={searchableInnerStyle.outlineBtn} />
                 <DropdownUtl toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
@@ -154,11 +153,11 @@ const SearchableRow = () => {
                 </Search>
             </Box>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none' },marginTop:'2%' }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, marginTop: '2%' }}>
                 <OutlinedButton color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
                 <DropdownUtl toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
             </Box>
-        </div>
+        </Box>
     )
 }
 

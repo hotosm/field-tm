@@ -14,9 +14,9 @@ import CustomizedText from '../components/CustomizedText';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import enviroment from '../enviroment';
 
-export default function ExploreProjectCard({ maxWidth }) {
+export default function ExploreProjectCard({ data, length }) {
     const [shadow, setShadow] = React.useState('0')
-    const [shadowBox,setShadowBox] = React.useState(0)
+    const [shadowBox, setShadowBox] = React.useState(0)
     const onFocusIn = () => {
         // setShadow('2px 2px 1px 1px #ffd9cc')
         setShadowBox(3)
@@ -48,17 +48,19 @@ export default function ExploreProjectCard({ maxWidth }) {
 
         },
         card: {
-            backgroundColor: 'whitesmoke',
-            border:"1px solid lightgray",
-            marginLeft: '1%',
+            backgroundColor: 'white',
+            border: "1px solid lightgray",
+            marginLeft: '0.2%',
+            marginRight: '0.2%',
             marginTop: '1%',
+            width: `${100 / length}%`,
             cursor: 'pointer'
         }
     }
     return (
-        <Card onClick={()=>{
+        <Card onClick={() => {
             console.log('clicked')
-        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox}} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
+        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
 
             <CardContent>
                 <div >
@@ -73,7 +75,7 @@ export default function ExploreProjectCard({ maxWidth }) {
                 <div className='row'>
                     <div className='col-md-12 mt-4'>
                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                            #6566654
+                            #{data}
                         </Typography>
                     </div>
                 </div>
