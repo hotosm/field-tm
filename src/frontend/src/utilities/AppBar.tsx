@@ -16,16 +16,25 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Button from '@mui/material/Button';
 import enviroment from '../enviroment';
+import windowDimention from '../customHooks/WindowDimension';
+import DrawerComponent from './Drawer';
 
 
 
 export default function PrimarySearchAppBar() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+  const [c, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [open, setOpen] = React.useState<boolean>(false);
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const handleOpenDrawer = () => {
+    setOpen(true)
+  }
+
+  const handleOnCloseDrawer = () => {
+    setOpen(false)
+  }
+
+
   const appBarInnerStyles = {
 
     appBar: {
@@ -58,110 +67,27 @@ export default function PrimarySearchAppBar() {
     }
   }
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
 
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
 
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
+  const { windowSize, type } = windowDimention();
 
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <Button color="inherit" style={appBarInnerStyles.login}>Sign up</Button>
-      </MenuItem>
 
-      <MenuItem>
-        <Button color="inherit" style={appBarInnerStyles.login}>Login</Button>
-      </MenuItem>
-
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <Button color="inherit" style={appBarInnerStyles.login}>Profile</Button>
-      </MenuItem>
-
-      {/* <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem> */}
-      {/* <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem> */}
-    </Menu>
-  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      <DrawerComponent open={open} placement={'right'} onClose={handleOnCloseDrawer} size={type == 'xs' ? 'full' : 'xs'} />
       <AppBar position="static" style={appBarInnerStyles.appBar}>
         <Toolbar>
           <Typography
-            variant="h6"
+            variant="h4"
             noWrap
             component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
+            fontStyle={{ fontFamily: 'RoughpenBold', }}
+            sx={{
+              display: { xs: 'none', sm: 'block' }
+            }}
             style={appBarInnerStyles.logoText}
           >
             FMTM
@@ -171,13 +97,14 @@ export default function PrimarySearchAppBar() {
             variant="h6"
             noWrap
             component="div"
+            fontStyle={{ fontFamily: 'RoyalLodge' }}
             sx={{ display: { xs: 'none', sm: 'block' } }}
             style={appBarInnerStyles.pageHeading}
           >
             EXPLORE PROJECTS
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ display: { md: 'flex', xs: 'none' } }}>
             <Button color="inherit" style={appBarInnerStyles.login}>Login</Button>
             <Button color="inherit" style={appBarInnerStyles.login}>Sign up</Button>
             {/* <IconButton
@@ -193,25 +120,23 @@ export default function PrimarySearchAppBar() {
               <AccountCircle />
             </IconButton> */}
           </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Box >
 
 
             <IconButton
               size="large"
               aria-label="show more"
-              aria-controls={mobileMenuId}
               aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
+              onClick={handleOpenDrawer}
               color="inherit"
               style={appBarInnerStyles.iconButton}
             >
-              <MoreIcon />
+              <MenuIcon />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
+
     </Box>
   );
 }
