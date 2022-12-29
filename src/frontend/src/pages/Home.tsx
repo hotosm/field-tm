@@ -3,6 +3,7 @@ import ExploreProjectCard from "../utilities/Card";
 import Box from '@mui/material/Box';
 import { Container } from "@mui/material";
 import windowDimention from "../customHooks/WindowDimension";
+import BasicPagination from "../utilities/BasicPagination";
 
 
 
@@ -20,7 +21,7 @@ const Home = () => {
 
     let lgOut = new Array(rows).fill(0)
     let lgIn = new Array(ds).fill(0)
-    console.log('out', lgOut.length, 'and in ', lgIn.length);
+
 
 
 
@@ -67,7 +68,13 @@ const Home = () => {
 
                 })
 
+
+
             }
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1.5%' }}>
+                <BasicPagination count={10} color="primary" variant="outlined" />
+            </Box>
+
         </Container>
 
     )
