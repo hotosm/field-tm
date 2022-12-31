@@ -1,9 +1,16 @@
 import React from "react";
-import logo from '../images/project_icon.png';
-const CustomizedImage = () => {
+import cardImg from '../images/project_icon.png';
+import logo from '../images/hotLog.png'
+const CustomizedImage = ({ status, style }) => {
     return (
         <div>
-            <img src={logo} style={{ width: 50, height: 50 }} />
+            {
+                status == 'card' ?
+                    <img src={cardImg} style={style} />
+                    : status == 'logo' ?
+                        <img src={logo} style={style} />
+                        : null
+            }
         </div>
     )
 }

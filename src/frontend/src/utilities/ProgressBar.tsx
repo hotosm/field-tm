@@ -23,10 +23,10 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 // Inspired by the former Facebook spinners.
 
 
-export default function CustomizedProgressBar({style}) {
+export default function CustomizedProgressBar({ style }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <BorderLinearProgress style={style}  color="inherit"    variant="determinate" value={50} />
+      <BorderLinearProgress style={style} color="inherit" variant="determinate" value={50} />
     </Box>
   );
 }

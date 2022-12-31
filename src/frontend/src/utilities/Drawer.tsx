@@ -42,6 +42,7 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
       width: '100%',
       marginTop: '4%',
       borderRadius: 7,
+      fontFamily: 'BarlowMedium'
 
 
     },
@@ -51,6 +52,7 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
       width: '100%',
       marginTop: '0.7%',
       borderRadius: 7,
+      fontFamily: 'BarlowMedium'
     }
   };
 
@@ -78,7 +80,7 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
               ['Explore Projects', 'My Contributions', 'Learn', 'About', 'Support'].map((value, index) => {
                 return (
                   <ListItem id={index.toString()} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} key={index} button>
-                    <ListItemText id={`text${index}`} primary={value} />
+                    <ListItemText style={{ fontFamily: 'BarlowMedium' }} id={`text${index}`} primary={value} />
                   </ListItem>
                 )
               })

@@ -18,6 +18,7 @@ import Button from '@mui/material/Button';
 import enviroment from '../enviroment';
 import windowDimention from '../customHooks/WindowDimension';
 import DrawerComponent from './Drawer';
+import CustomizedImage from '../components/CustomizedImage';
 
 
 
@@ -48,6 +49,7 @@ export default function PrimarySearchAppBar() {
     login: {
       backgroundColor: 'white', marginRight: '10%',
       color: enviroment.sysBlackColor,
+      fontFamily: 'BarlowMedium',
       width: 100
     },
 
@@ -64,6 +66,10 @@ export default function PrimarySearchAppBar() {
     pageHeading: {
       color: enviroment.sysBlackColor,
       marginLeft: '3%'
+    },
+    logo: {
+      width: 111,
+      height: 32
     }
   }
 
@@ -80,24 +86,13 @@ export default function PrimarySearchAppBar() {
       <DrawerComponent open={open} placement={'right'} onClose={handleOnCloseDrawer} size={type == 'xs' ? 'full' : 'xs'} />
       <AppBar position="static" style={appBarInnerStyles.appBar}>
         <Toolbar>
-          <Typography
-            variant="h4"
-            noWrap
-            component="div"
-            fontStyle={{ fontFamily: 'RoughpenBold', }}
-            sx={{
-              display: { xs: 'none', sm: 'block' }
-            }}
-            style={appBarInnerStyles.logoText}
-          >
-            FMTM
-          </Typography>
-
+          <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
           <Typography
             variant="h6"
             noWrap
             component="div"
-            fontStyle={{ fontFamily: 'RoyalLodge' }}
+            fontStyle={{ fontFamily: 'BarlowMedium' }}
+            fontSize={20}
             sx={{ display: { xs: 'none', sm: 'block' } }}
             style={appBarInnerStyles.pageHeading}
           >

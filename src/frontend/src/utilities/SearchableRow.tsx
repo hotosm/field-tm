@@ -9,24 +9,29 @@ import DropdownUtl from "./Dropdown";
 import OutlinedButton from "./OutlinedButton";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import Stack from '@mui/material/Stack';
-
+import Typography from '@mui/material/Typography';
+import windowDimention from "../customHooks/WindowDimension";
 const SearchableRow = () => {
     const searchableInnerStyle: any = {
         search: {
-            backgroundColor: enviroment.sysRedColor,
+            backgroundColor: 'white',
+            border: '1px solid #000370',
             opacity: 0.8,
             marginTop: '0.7%',
             color: 'white',
-            width: '15%'
+            width: '15%',
+            fontFamily: 'BarlowMedium'
         },
         searchXs: {
-            backgroundColor: enviroment.sysRedColor,
+            backgroundColor: 'white',
+            border: '1px solid #000370',
             opacity: 0.8,
             marginTop: '2%',
             marginLeft: '1%',
             marginRight: '1%',
-            color: 'white',
-            width: '98%'
+            color: 'black',
+            width: '98%',
+            fontFamily: 'BarlowMedium'
         },
         searchableBox: {
             display: 'flex',
@@ -38,12 +43,13 @@ const SearchableRow = () => {
             display: 'flex',
             justifyContent: 'center',
             width: '15%',
+            fontFamily: 'BarlowMedium'
 
 
         },
         dropdown: {
             // backgroundColor:enviroment.sysRedColor,
-
+            fontFamily: 'BarlowMedium',
             width: '100%',
 
 
@@ -55,6 +61,7 @@ const SearchableRow = () => {
             width: '15%',
             marginTop: '0.7%',
             borderRadius: 7,
+            fontFamily: 'BarlowMedium'
 
 
         },
@@ -64,7 +71,8 @@ const SearchableRow = () => {
             width: '49%',
             marginTop: '0.7%',
             borderRadius: 7,
-            marginLeft: '1%'
+            marginLeft: '1%',
+            fontFamily: 'BarlowMedium'
 
 
         },
@@ -74,13 +82,20 @@ const SearchableRow = () => {
             justifyContent: 'center',
             width: '48%',
             marginLeft: '1%',
-            marginRight: '1%'
+            marginRight: '1%',
+            fontFamily: 'BarlowMedium'
 
 
+        },
+        pageHeading: {
+            color: enviroment.sysBlackColor,
+            marginTop: '2%',
+            marginLeft: '3%'
         },
         dropdownXs: {
             // backgroundColor:enviroment.sysRedColor,
             // color:'white'
+            fontFamily: 'BarlowMedium',
             width: '100%',
 
 
@@ -127,19 +142,35 @@ const SearchableRow = () => {
             },
         },
     }));
+    const { windowSize, type } = windowDimention();
+
+
     return (
         <Box sx={{ mb: 1 }}>
+            <Box sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
+                <Typography
+                    variant="h6"
+                    noWrap
+                    component="div"
+                    fontStyle={{ fontFamily: 'BarlowMedium' }}
+                    fontSize={20}
+
+                    style={searchableInnerStyle.pageHeading}
+                >
+                    EXPLORE PROJECTS
+                </Typography>
+            </Box>
             <Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
                 <OutlinedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="Filters" style={searchableInnerStyle.outlineBtn} />
                 <DropdownUtl names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
                 <Search style={searchableInnerStyle.search}>
                     <SearchIconWrapper>
-                        <SearchIcon />
+                        <SearchIcon style={{ color: enviroment.sysBlackColor }} />
                     </SearchIconWrapper>
                     <StyledInputBase
                         placeholder="Search…"
                         inputProps={{ 'aria-label': 'search' }}
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', color: enviroment.sysBlackColor }}
                     />
                 </Search>
             </Stack>
