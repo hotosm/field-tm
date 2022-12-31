@@ -35,7 +35,7 @@ export default function ExploreProjectCard({ data, length }) {
         },
         regularText: {
             marginTop: '7%',
-            fontFamily: 'RoyalLodge',
+            fontFamily: 'ArchivoLight',
             fontSize: 16
         },
         progressBar: {
@@ -54,7 +54,7 @@ export default function ExploreProjectCard({ data, length }) {
             borderRadius: 0,
             border: 0,
             backgroundColor: '#ffb833',
-            fontFamily: 'RoyalLodge'
+            fontFamily: 'ArchivoRegular'
 
 
         },
@@ -69,6 +69,16 @@ export default function ExploreProjectCard({ data, length }) {
             cursor: 'pointer',
             opacity: 0.9,
             position: 'relative'
+        },
+        contributors: {
+            display: 'flex',
+            flexDirection: 'row',
+
+            text: {
+                marginTop: '7%',
+                fontFamily: 'ArchivoMedium',
+                fontSize: 20
+            }
         }
     }
     return (
@@ -78,7 +88,7 @@ export default function ExploreProjectCard({ data, length }) {
 
             <CardContent>
 
-                <Typography sx={{ fontSize: 14, position: 'absolute', right: 7, top: 5, fontFamily: 'OldFive' }} color="text.secondary" gutterBottom>
+                <Typography sx={{ fontSize: 14, position: 'absolute', right: 7, top: 5, fontFamily: 'ArchivoLight' }} color="text.secondary" gutterBottom>
                     #{data}
                 </Typography>
 
@@ -87,7 +97,7 @@ export default function ExploreProjectCard({ data, length }) {
                         High
                     </Button>
                     {/* <OutlinedButton  color={'warning'} icon={<AccessAlarmIcon />} text="HIGH" style={cardInnerStyles.outlinedButton} /> */}
-                    <CustomizedImage />
+                    <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
                 </div>
 
 
@@ -96,7 +106,7 @@ export default function ExploreProjectCard({ data, length }) {
 
                 <div style={cardInnerStyles.display}>
 
-                    <CustomizedText font={'OldFive'} top={'5%'} size={22} text={'Rosso city Mapping'} weight={'bold'} />
+                    <CustomizedText font={'BarlowBold'} top={'5%'} size={20} text={'Rosso city Mapping'} weight={'bold'} />
 
                     <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                         The project aims to map the marginal lakes
@@ -104,13 +114,23 @@ export default function ExploreProjectCard({ data, length }) {
                     </Typography>
                 </div>
 
-                <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" >
-                    contributors
-                </Typography>
+                <div style={cardInnerStyles.contributors}>
+                    <Typography style={{ ...cardInnerStyles.contributors.text, color: 'black', opacity: 0.8 }} sx={{ fontSize: 20 }} color="text.secondary" >
+                        12
+                    </Typography>
+                    <Typography style={{ ...cardInnerStyles.regularText, color: 'black', opacity: 0.8, marginLeft: '1%' }} sx={{ fontSize: 14 }} color="text.secondary" >
+                        contributors
+                    </Typography>
+                </div>
 
                 <div className='row'>
                     <div className='col-md-12'>
-                        <CustomizedProgressBar style={cardInnerStyles.progressBar} />
+                        <div className="progress" style={{ marginTop: '2%', height: 8 }}>
+                            <div className="progress-bar " role="progressbar" style={{ width: '50%', backgroundColor: '#007acc' }}></div>
+                            <div className="progress-bar " role="progressbar" style={{ width: '30%', backgroundColor: '#2db92d' }} ></div>
+                            <div className="progress-bar " role="progressbar" style={{ width: '20%', backgroundColor: '#ff3333' }}></div>
+                        </div>
+                        {/* <CustomizedProgressBar style={cardInnerStyles.progressBar} /> */}
                     </div>
                 </div>
 

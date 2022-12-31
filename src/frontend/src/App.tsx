@@ -11,21 +11,26 @@ import Home from "./pages/Home";
 import SearchableRow from "./utilities/SearchableRow";
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import './fonts/Rouphen/Roughpen-8M2q2.ttf';
-import './fonts/RoyalLodge/RoyalLodge-vm7P4.otf'
-import './fonts/Bicycle/BicycleTrack-PK4RZ.otf'
-import './fonts/Raimei/RaimeiHakke-2O5ye.otf'
-import './fonts/CheesyBread/CheesyBread-DOgRW.ttf'
-import './fonts/OldFive/OldEnglishFive.ttf'
+import './fonts/Barlow/Barlow-Bold.ttf';
+import './fonts/Barlow/Barlow-Medium.ttf'
+import './fonts/Archivo/Archivo/Archivo-Regular.ttf'
+import './fonts/Archivo/Archivo/Archivo-Medium.ttf'
+import './fonts/Archivo/Archivo/Archivo-Medium.ttf'
+import './fonts/Archivo/Archivo/Archivo-Light.ttf'
+import windowDimention from "./customHooks/WindowDimension";
+
+
 
 const App = () => {
+  const { windowSize, type } = windowDimention();
+
   return (
     <Router>
       <Container disableGutters={true} maxWidth={false} >
         <Box sx={{ bgcolor: 'white', height: '100vh' }} >
           <PrimarySearchAppBar />
           <SearchableRow />
-          <Box sx={{ height: '76vh', overflow: 'auto' }}>
+          <Box sx={{ height: windowSize.width <= 599 ? '73vh' : '76vh', overflow: 'auto' }}>
             <Routes>
               <Route path="/" element={<Home />} />
             </Routes>

@@ -7,6 +7,7 @@ const DropdownUtl = ({ toolBarStyle, btnStyle, text, size, names }) => {
     const [styles, setStyles] = useState({
         backgroundColor: 'white',
         color: enviroment.sysBlackColor,
+        fontFamily: 'BarlowMedium'
     })
 
     const onMouseEnter = (event) => {
