@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Drawer } from 'rsuite';
-import FacebookOfficialIcon from '@rsuite/icons/legacy/FacebookOfficial';
 import { Box } from '@mui/system';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,32 +7,30 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import OutlinedButton from './OutlinedButton';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
 import enviroment from '../enviroment';
-const DrawerComponent = ({ open, placement, size, onClose }) => {
+import CustomizedButton from './CustomizedButton';
 
-
+const CustomDrawer = ({ open, placement, size, onClose }) => {
 
   const onMouseEnter = (event) => {
     const element: any = document.getElementById(`text${event.target.id}`);
-    element.style.color = `${enviroment.sysRedColor}`
-
-
+    element != null ? element.style.color = `${enviroment.sysRedColor}` : null
   }
+
   const onMouseLeave = (event) => {
     const element: any = document.getElementById(`text${event.target.id}`);
-    element.style.color = `${enviroment.sysBlackColor}`
+    element != null ? element.style.color = `${enviroment.sysBlackColor}` : null
+
   }
 
-  const style = {
+  const Drawerstyles = {
     list: {
       width: '100%',
       bgcolor: 'background.paper',
     },
     listItem: {
-
       border: '1px solid lightgray'
     },
     outlineBtn: {
@@ -43,8 +40,6 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
       marginTop: '4%',
       borderRadius: 7,
       fontFamily: 'BarlowMedium'
-
-
     },
     containedBtn: {
       fontSize: 14,
@@ -69,13 +64,12 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
               aria-haspopup="true"
               onClick={onClose}
               color="inherit"
-
             >
               <CloseIcon />
             </IconButton>
           </Box>
           <Divider />
-          <List sx={style.list} component="nav" aria-label="mailbox folders">
+          <List sx={Drawerstyles.list} component="nav" aria-label="mailbox folders">
             {
               ['Explore Projects', 'My Contributions', 'Learn', 'About', 'Support'].map((value, index) => {
                 return (
@@ -86,12 +80,12 @@ const DrawerComponent = ({ open, placement, size, onClose }) => {
               })
             }
           </List>
-          <OutlinedButton variant={'contained'} color={'error'} icon={<LoginIcon />} text="Sign in" style={style.containedBtn} />
-          <OutlinedButton variant={'outlined'} color={'error'} icon={<PersonIcon />} text="Sign up" style={style.outlineBtn} />
+          <CustomizedButton variant={'contained'} color={'error'} icon={<LoginIcon />} text="Sign in" style={Drawerstyles.containedBtn} />
+          <CustomizedButton variant={'outlined'} color={'error'} icon={<PersonIcon />} text="Sign up" style={Drawerstyles.outlineBtn} />
         </Box>
       </Drawer>
     </>
   );
 };
 
-export default DrawerComponent;
+export default CustomDrawer;
