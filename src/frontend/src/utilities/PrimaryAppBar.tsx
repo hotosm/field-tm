@@ -1,28 +1,19 @@
 import * as React from 'react';
-
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MoreIcon from '@mui/icons-material/MoreVert';
 import Button from '@mui/material/Button';
 import enviroment from '../enviroment';
 import windowDimention from '../customHooks/WindowDimension';
-import DrawerComponent from './Drawer';
-import CustomizedImage from '../components/CustomizedImage';
+import DrawerComponent from './CustomDrawer';
+import CustomizedImage from '../utilities/CustomizedImage';
 
 
 
-export default function PrimarySearchAppBar() {
+export default function PrimaryAppBar() {
   const [c, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState<boolean>(false);
 
@@ -102,18 +93,6 @@ export default function PrimarySearchAppBar() {
           <Box sx={{ display: { md: 'flex', xs: 'none' } }}>
             <Button color="inherit" style={appBarInnerStyles.login}>Login</Button>
             <Button color="inherit" style={appBarInnerStyles.login}>Sign up</Button>
-            {/* <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-              style={appBarInnerStyles.iconButton}
-            >
-              <AccountCircle />
-            </IconButton> */}
           </Box>
           <Box >
 
