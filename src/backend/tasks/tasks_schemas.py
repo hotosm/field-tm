@@ -18,8 +18,19 @@
 
 from pydantic import BaseModel
 from geojson_pydantic import Feature, Point
+import enum
 
 from ..models.enums import TaskStatus
+
+
+def get_task_status_strings():
+    names = [option.name for option in TaskStatus]
+    options = {names[i]: names[i] for i in range(len(names))}
+    return enum.Enum('TaskStatusOptions', options)
+
+
+# Dynamically creates String Enums for API based on Task Status options
+TaskStatusOption = get_task_status_strings()
 
 
 class TaskBase(BaseModel):
@@ -45,6 +56,7 @@ class Task(TaskBase):
 
 
 class TaskOut(TaskBase):
+    task_status_str: TaskStatusOption
     pass
 
 
