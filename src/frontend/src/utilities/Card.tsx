@@ -14,9 +14,9 @@ import CustomizedText from '../components/CustomizedText';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import enviroment from '../enviroment';
 
-export default function ExploreProjectCard({ maxWidth }) {
+export default function ExploreProjectCard({ data, length }) {
     const [shadow, setShadow] = React.useState('0')
-    const [shadowBox,setShadowBox] = React.useState(0)
+    const [shadowBox, setShadowBox] = React.useState(0)
     const onFocusIn = () => {
         // setShadow('2px 2px 1px 1px #ffd9cc')
         setShadowBox(3)
@@ -34,7 +34,9 @@ export default function ExploreProjectCard({ maxWidth }) {
             marginTop: '2%'
         },
         regularText: {
-            marginTop: '7%'
+            marginTop: '7%',
+            fontFamily: 'RoyalLodge',
+            fontSize: 16
         },
         progressBar: {
             marginTop: '10%',
@@ -45,44 +47,56 @@ export default function ExploreProjectCard({ maxWidth }) {
             width: 100,
             height: 35,
             marginTop: '5%',
+            padding: 0,
+            position: 'absolute',
+            color: `${enviroment.sysBlackColor}`,
+            right: 0,
+            borderRadius: 0,
+            border: 0,
+            backgroundColor: '#ffb833',
+            fontFamily: 'RoyalLodge'
+
 
         },
         card: {
-            backgroundColor: 'whitesmoke',
-            border:"1px solid lightgray",
-            marginLeft: '1%',
+            backgroundColor: 'white',
+            border: "1px solid #ffe4b3",
+            marginLeft: '0.2%',
+            marginRight: '0.2%',
+            padding: 0,
             marginTop: '1%',
-            cursor: 'pointer'
+            width: `${100 / length}%`,
+            cursor: 'pointer',
+            opacity: 0.9,
+            position: 'relative'
         }
     }
     return (
-        <Card onClick={()=>{
+        <Card onClick={() => {
             console.log('clicked')
-        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox}} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
+        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
 
             <CardContent>
+
+                <Typography sx={{ fontSize: 14, position: 'absolute', right: 7, top: 5, fontFamily: 'OldFive' }} color="text.secondary" gutterBottom>
+                    #{data}
+                </Typography>
+
                 <div >
-                    <div style={{ float: 'right' }}>
-                        <OutlinedButton color={'warning'} icon={<AccessAlarmIcon />} text="HIGH" style={cardInnerStyles.outlinedButton} />
-                    </div>
+                    <Button size="small" variant="contained" style={cardInnerStyles.outlinedButton} disabled>
+                        High
+                    </Button>
+                    {/* <OutlinedButton  color={'warning'} icon={<AccessAlarmIcon />} text="HIGH" style={cardInnerStyles.outlinedButton} /> */}
                     <CustomizedImage />
-
                 </div>
 
 
-                <div className='row'>
-                    <div className='col-md-12 mt-4'>
-                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                            #6566654
-                        </Typography>
-                    </div>
-                </div>
+
 
 
                 <div style={cardInnerStyles.display}>
 
-                    <CustomizedText top={'5%'} size={22} text={'Rosso city Mapping'} weight={'bold'} font={'verdana'} />
-                    <CustomizedText top={'5%'} size={18} text={'Project 2021'} weight={'bold'} font={'verdana'} />
+                    <CustomizedText font={'OldFive'} top={'5%'} size={22} text={'Rosso city Mapping'} weight={'bold'} />
 
                     <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                         The project aims to map the marginal lakes
@@ -90,6 +104,9 @@ export default function ExploreProjectCard({ maxWidth }) {
                     </Typography>
                 </div>
 
+                <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" >
+                    contributors
+                </Typography>
 
                 <div className='row'>
                     <div className='col-md-12'>
@@ -98,10 +115,7 @@ export default function ExploreProjectCard({ maxWidth }) {
                 </div>
 
 
-                <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    403 contributors
-                </Typography>
-
+                {/* 
 
                 <div className='row'>
                     <div className='col-md-12'>
@@ -110,7 +124,7 @@ export default function ExploreProjectCard({ maxWidth }) {
                         </Typography>
                     </div>
 
-                </div>
+                </div> */}
 
 
             </CardContent>

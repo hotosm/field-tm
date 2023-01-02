@@ -13,16 +13,64 @@ body {
 .dropdown {
   width: 100%;
 }
+
+.dropdown-item {
+  width: 100%;
+}
+
 .dropdown-trigger {
   width: 100%;
 }
+
 button {
   width: 100%;
 }
 
-.content{
+.content {
   height: 81vh;
   overflow: auto;
-  padding:5px
+  padding: 5px
+}
+
+@font-face {
+  font-family: "RoughpenBold";
+  src: local("RoughpenBold"),
+    url("./fonts/Rouphen/Roughpen-8M2q2.ttf") format("truetype");
+
+
+}
+
+@font-face {
+  font-family: "RoyalLodge";
+  src: local("RoyalLodge"),
+    url("./fonts/RoyalLodge/RoyalLodge-vm7P4.otf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "Bicyle";
+  src: local("Bicyle"),
+    url("./fonts/Bicycle/BicycleTrack-PK4RZ.otf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "CheesyBread";
+  src: local("CheesyBread"),
+    url("./fonts/CheesyBread/CheesyBread-DOgRW.ttf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "Raimei";
+  src: local("Raimei"),
+    url("./fonts/Raimei/RaimeiHakke-2O5ye.otf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "OldEnglish";
+  src: local("OldEnglish"),
+    url("./fonts/OldFive/OldEnglishFive.ttf") format("truetype");
 
 }

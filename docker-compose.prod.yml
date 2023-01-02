@@ -21,26 +21,26 @@ services:
   db:
     image: postgis/postgis:14-3.3-alpine
     volumes:
-      - postgres_data_prod:/var/lib/postgresql/data/
+      - postgres_data_prod1:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     ports:
-      - 5432:5432
+      - 5432
     networks:
       - fmtm-net
 
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - db
 
   api:
     build:
@@ -49,41 +49,50 @@ services:
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
     volumes:
       - .:/api
+    ports:
+      - 8000
+    networks:
+      - fmtm-net
     depends_on:
       - db
     environment:
+      - API_DOMAIN=${API_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-    expose:
-      - 8000
-    ports:
-      - 8008:8000
-    networks:
-      - fmtm-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.api.service=api"
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.prod
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
+    restart: always
     volumes:
       - .:/home/app/web
+    ports:
+      - 5000
+    networks:
+      - fmtm-net
     depends_on:
       - db
-    ports:
-      - 5000:5000
-    expose:
-      - 5000
-    restart: always
     environment:
       - FLASK_APP=src/web/__init__.py
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - API_URL=https://${API_DOMAIN}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
-      - "traefik.http.routers.flask.tls=true"
-      - "traefik.http.routers.flask.tls.certresolver=letsencrypt"
+      - "traefik.http.services.web.loadbalancer.server.port=5000"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.web.rule=Host(`${WEB_DOMAIN}`)"
+      - "traefik.http.routers.web.service=web"
 
   traefik:
     build:
@@ -93,11 +102,14 @@ services:
     ports:
       - 80:80
       - 443:443
+    networks:
+      - fmtm-net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik-public-certificates:/certificates"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=fmtm-net"
       - "traefik.http.routers.dashboard.rule=Host(`${METRICS_DOMAIN}`)"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
@@ -105,10 +117,9 @@ services:
       - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.users=${METRICS_LOGIN}"
 
-  volumes:
-    traefik-public-certificates:
-    postgres_data_prod:
+volumes:
+  traefik-public-certificates:
+  postgres_data_prod1:
 
-
-  networks:
-    fmtm-net: #     external: true
+networks:
+  fmtm-net:

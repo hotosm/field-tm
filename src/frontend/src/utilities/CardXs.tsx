@@ -45,7 +45,7 @@ export default function ExploreProjectCardXs() {
 
         },
         card: {
-            backgroundColor: 'whitesmoke',
+            backgroundColor: 'red',
             boxShadow: shadow,
             marginLeft: '1%',
             width: '100%',
