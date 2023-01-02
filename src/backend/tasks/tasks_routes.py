@@ -55,11 +55,12 @@ async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
-async def update_task_status(user: user_schemas.User, task_id: int, new_status: TaskStatus, db: Session = Depends(database.get_db)):
+async def update_task_status(user: user_schemas.User, task_id: int, new_status: tasks_schemas.TaskStatusOption, db: Session = Depends(database.get_db)):
     # TODO verify logged in user
     user_id = user.id
 
-    task = tasks_crud.update_task_status(db, user_id, task_id, new_status)
+    task = tasks_crud.update_task_status(
+        db, user_id, task_id, TaskStatus[new_status.name])
     if task:
         return task
     else:

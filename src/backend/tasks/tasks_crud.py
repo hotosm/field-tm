@@ -89,7 +89,7 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 
     else:
         raise HTTPException(
-            status_code=400, detail=f'Not a valid status update: {db_task.task_status} to {new_status}')
+            status_code=400, detail=f'Not a valid status update: {db_task.task_status.name} to {new_status.name}')
 
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
@@ -128,6 +128,7 @@ def create_task_history_for_status_change(db_task: db_models.DbTask, new_status:
 def convert_to_app_task(db_task: db_models.DbTask):
     if db_task:
         app_task: tasks_schemas.Task = db_task
+        app_task.task_status_str = tasks_schemas.TaskStatusOption[app_task.task_status.name]
 
         if (db_task.outline):
             properties = {"fid": db_task.project_task_index,
