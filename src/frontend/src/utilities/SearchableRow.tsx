@@ -23,9 +23,10 @@ const SearchableRow = () => {
             backgroundColor: enviroment.sysRedColor,
             opacity: 0.8,
             marginTop: '2%',
-            marginLeft:'1%',
+            marginLeft: '1%',
+            marginRight: '1%',
             color: 'white',
-            width: '99%'
+            width: '98%'
         },
         searchableBox: {
             display: 'flex',
@@ -38,12 +39,14 @@ const SearchableRow = () => {
             justifyContent: 'center',
             width: '15%',
 
+
         },
         dropdown: {
             // backgroundColor:enviroment.sysRedColor,
-            // color:'white'
+
             width: '100%',
-          
+
+
 
         },
         outlineBtn: {
@@ -69,8 +72,9 @@ const SearchableRow = () => {
             marginTop: '0.7%',
             display: 'flex',
             justifyContent: 'center',
-            width: '49%',
-            marginLeft: '1%'
+            width: '48%',
+            marginLeft: '1%',
+            marginRight: '1%'
 
 
         },
@@ -124,11 +128,10 @@ const SearchableRow = () => {
         },
     }));
     return (
-        <div>
-
+        <Box sx={{ mb: 1 }}>
             <Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
-                <OutlinedButton color={'error'} icon={<AutoAwesomeIcon />} text="Filters" style={searchableInnerStyle.outlineBtn} />
-                <DropdownUtl toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
+                <OutlinedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="Filters" style={searchableInnerStyle.outlineBtn} />
+                <DropdownUtl names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
                 <Search style={searchableInnerStyle.search}>
                     <SearchIconWrapper>
                         <SearchIcon />
@@ -154,11 +157,11 @@ const SearchableRow = () => {
                 </Search>
             </Box>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none' },marginTop:'2%' }}>
-                <OutlinedButton color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
-                <DropdownUtl toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, marginTop: '2%' }}>
+                <OutlinedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
+                <DropdownUtl names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
             </Box>
-        </div>
+        </Box>
     )
 }
 
