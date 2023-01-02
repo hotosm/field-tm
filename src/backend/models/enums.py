@@ -104,33 +104,32 @@ class TaskStatus(IntEnum, Enum):
     INVALIDATED = 5
     BAD = 6  # Task cannot be mapped
     SPLIT = 7  # Task has been split
+    ARCHIVED = 8  # When new replacement task has been uploaded
 
 
 def verify_valid_status_update(old_status: TaskStatus, new_status: TaskStatus):
-    return True
-    # match old_status:
-    #     case TaskStatus.READY:
-    #         return new_status in [TaskStatus.LOCKED_FOR_MAPPING,
-    #                               TaskStatus.BAD,
-    #                               TaskStatus.SPLIT,]
-    #     case TaskStatus.LOCKED_FOR_MAPPING:
-    #         return new_status in [TaskStatus.READY,
-    #                               TaskStatus.MAPPED,
-    #                               TaskStatus.BAD,
-    #                               TaskStatus.SPLIT,]
-    #     case TaskStatus.LOCKED_FOR_VALIDATION:
-    #         return new_status in [TaskStatus.INVALIDATED,
-    #                               TaskStatus.MAPPED]
-    #     case TaskStatus.VALIDATED:
-    #         return new_status == TaskStatus.INVALIDATED
-    #     case TaskStatus.INVALIDATED:
-    #         return new_status in [TaskStatus.MAPPED,
-    #                               TaskStatus.BAD,
-    #                               TaskStatus.SPLIT,]
-    #     case TaskStatus.BAD:
-    #         return new_status == TaskStatus.READY
-    #     case TaskStatus.SPLIT:
-    #         return new_status == TaskStatus.READY
+    if old_status is TaskStatus.READY:
+        return new_status in [TaskStatus.LOCKED_FOR_MAPPING,
+                              TaskStatus.BAD,
+                              TaskStatus.SPLIT,]
+    elif old_status is TaskStatus.LOCKED_FOR_MAPPING:
+        return new_status in [TaskStatus.READY,
+                              TaskStatus.MAPPED,
+                              TaskStatus.BAD,
+                              TaskStatus.SPLIT,]
+    elif old_status is TaskStatus.LOCKED_FOR_VALIDATION:
+        return new_status in [TaskStatus.INVALIDATED,
+                              TaskStatus.MAPPED]
+    elif old_status is TaskStatus.VALIDATED:
+        return new_status == TaskStatus.INVALIDATED
+    elif old_status is TaskStatus.INVALIDATED:
+        return new_status in [TaskStatus.MAPPED,
+                              TaskStatus.BAD,
+                              TaskStatus.SPLIT,]
+    elif old_status is TaskStatus.BAD:
+        return new_status == TaskStatus.ARCHIVED
+    elif old_status is TaskStatus.SPLIT:
+        return new_status == TaskStatus.ARCHIVED
 
 
 class TaskAction(IntEnum, Enum):
