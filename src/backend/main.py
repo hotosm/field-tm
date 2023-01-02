@@ -22,6 +22,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import logging.config
 from fastapi.logger import logger as fastapi_logger
+from fastapi.middleware.cors import CORSMiddleware
 from os import path
 
 from .users import user_routes
@@ -59,6 +60,19 @@ api.include_router(user_routes.router)
 api.include_router(login_route.router)
 api.include_router(project_routes.router)
 api.include_router(tasks_routes.router)
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @api.get("/")
