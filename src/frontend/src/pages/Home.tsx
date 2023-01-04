@@ -39,7 +39,7 @@ const Home = () => {
 
     useEffect(() => {
         dispatch(HomeSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`))
-        //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we render to home page
+        //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
 
     return (
