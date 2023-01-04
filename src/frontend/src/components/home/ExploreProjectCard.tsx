@@ -24,6 +24,7 @@ export default function ExploreProjectCard({ data, length }) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'left',
+            height: 170,
             marginTop: '2%'
         },
         regularText: {
@@ -78,36 +79,35 @@ export default function ExploreProjectCard({ data, length }) {
 
             <CardContent>
                 <Typography sx={{ fontSize: 14, position: 'absolute', right: 7, top: 5, fontFamily: 'ArchivoLight' }} color="text.secondary" gutterBottom>
-                    #{data}
+                    #{data.id}
                 </Typography>
 
                 <div>
                     <Button size="small" variant="contained" style={cardInnerStyles.outlinedButton} disabled>
-                        High
+                        {data.priority_str}
                     </Button>
                     <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
                 </div>
 
 
                 <div style={cardInnerStyles.display}>
-                    <CustomizedText font={'BarlowBold'} top={'5%'} size={20} text={'Rosso city Mapping'} weight={'bold'} />
-                    <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        The project aims to map the marginal lakes
-                        and floodplains on both banks
+                    <CustomizedText font={'BarlowBold'} top={'5%'} size={20} text={data.location_str} weight={'bold'} />
+                    <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14, height: 'inherit' }} color="text.secondary" gutterBottom>
+                        {data.description}
                     </Typography>
                 </div>
 
 
                 <div style={cardInnerStyles.contributors}>
                     <Typography style={{ ...cardInnerStyles.contributors.text, color: 'black', opacity: 0.8 }} sx={{ fontSize: 20 }} color="text.secondary" >
-                        12
+                        {data.num_contributors}
                     </Typography>
                     <Typography style={{ ...cardInnerStyles.regularText, color: 'black', opacity: 0.8, marginLeft: '1%' }} sx={{ fontSize: 14 }} color="text.secondary" >
                         contributors
                     </Typography>
                 </div>
 
-                <CustomizedProgressBar height={7} />
+                <CustomizedProgressBar data={data} height={7} />
 
             </CardContent>
 

@@ -159,7 +159,7 @@ const SearchablesRow = () => {
                 </Search>
             </Stack>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center' }, width: '100%', justifyContent: 'center' }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center' }, width: '100%', paddingLeft: '3%', paddingRight: '5.5%', justifyContent: 'center' }}>
                 <Search style={searchableInnerStyle.searchXs}>
                     <SearchIconWrapper>
                         <SearchIcon />
@@ -172,7 +172,7 @@ const SearchablesRow = () => {
                 </Search>
             </Box>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none' }, marginTop: '2%' }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, marginTop: '2%', paddingLeft: '3%', paddingRight: '5.5%', }}>
                 <CustomizedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
                 <CustomDropdown names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
             </Box>
