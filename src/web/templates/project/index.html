@@ -53,7 +53,7 @@
       <h1>{{ project['project_info'][0]['name'] }}</h1>
       <a class="action" href="{{ url_for('project.map', id=project['id'])}}">Select Task</a>
   </header>
-  <p class="description">{{ project['description'] }}</p>
+  <p class="description">{{ project['project_info'][0]['description'] }}</p>
 </article>
 {% if not loop.last %}
 <hr>
