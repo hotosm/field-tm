@@ -39,7 +39,6 @@ const windowDimention = () => {
         }
 
         handleResize();
-
         window.addEventListener('resize', handleResize)
 
         const cleanUp = () => {
