@@ -12,6 +12,7 @@ import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
 export default function ExploreProjectCard({ data, length }) {
     const [shadowBox, setShadowBox] = React.useState(0)
 
+
     const onFocusIn = () => {
         setShadowBox(3)
     }
@@ -53,14 +54,15 @@ export default function ExploreProjectCard({ data, length }) {
         card: {
             backgroundColor: 'white',
             border: "1px solid #ffe4b3",
-            marginLeft: '0.2%',
-            marginRight: '0.2%',
-            padding: 0,
+            marginLeft: '0.1%',
+            marginRight: '0.1%',
             marginTop: '1%',
             width: `${100 / length}%`,
             cursor: 'pointer',
             opacity: 0.9,
-            position: 'relative'
+            position: 'relative',
+
+
         },
         contributors: {
             display: 'flex',
@@ -74,7 +76,7 @@ export default function ExploreProjectCard({ data, length }) {
     }
     return (
         <Card onClick={() => {
-            console.log('clicked')
+            //  console.log('clicked')
         }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
 
             <CardContent>

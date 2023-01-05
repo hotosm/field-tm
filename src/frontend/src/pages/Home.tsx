@@ -51,7 +51,7 @@ const Home = () => {
                     totalRows.map((value, index) => {
                         //displaying rows to handle our cards
                         return (
-                            <Box key={index} sx={{ flexGrow: 1, display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
+                            <Box key={index} sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%', } }}>
                                 {/* defining rows properties */}
                                 {
                                     stateHome.homeProjectSummary.length % cardsPerRow.length == 0 ?
@@ -97,7 +97,7 @@ const Home = () => {
 
                     })
                     //IF no data loaded then we perform skeleton loading
-                    : <Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%', paddingRight: `${type == 's' ? 3 : type == 'xs' ? 3 : 0}%` } }}>
+                    : <Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
                         <ProjectCardSkeleton cardsPerRow={cardsPerRow} />
                     </Box>
 
