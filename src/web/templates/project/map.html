@@ -28,7 +28,23 @@
 <p id="quick_view">{{msg}}</p>
 {% endif %}
 
-<div id="map" style="width: 100%; height: 600px"></div>
+
+<div style="width: 100%; height: 600px">
+  <div id="map" style="float:left; width: 97%; height: 100%">
+    <!--  <div class="leaflet-bottom leaflet-left">
+      <img id="center_project" src="/static/Expand_Map.svg"
+        style="width: 3rem; height: 3rem; margin: 3rem 0rem 0rem 0rem;" />
+    </div>  -->
+  </div>
+  <div id="map-buttons" style="float:right; width: 3%; height: 100%">
+    <img id="center_project" src="/static/Expand_Map.svg" style="width: 2rem; height: 2rem; margin: 0.25rem;" />
+
+  </div>
+
+</div>
+
+
+
 
 <h1>Project tasks</h1>
 {% for task in tasks %}
@@ -71,8 +87,13 @@
   }  */
 
   var p_outline = {{(project_outline |default ({}))| tojson }};
+  var logged_in_user = {{ userid }}
+  var outline_layer
 
-
+  function centerOnMap() {
+    // zoom to map
+    map.fitBounds(outline_layer.getBounds());
+  }
 
   function setMap() {
     var map = L.map('map');
@@ -101,6 +122,10 @@
   }
 
   map = setMap();
+
+  document.getElementById("center_project").onclick = function () {
+    centerOnMap()
+  }
 
   const READY = 'READY';
   const LOCKED_FOR_MAPPING = 'LOCKED_FOR_MAPPING';
@@ -152,7 +177,7 @@
   }
 
   var grayLockIcon = L.icon({
-    iconUrl: "/static/gray_lock_icon.png",
+    iconUrl: "/static/lock_icon_gray.png",
     iconSize: [10, 10], // size of the icon
   });
 
@@ -166,79 +191,148 @@
     'className': 'fmtm-popup' // classname for another popup
   }
 
-  function createReadyPopup(task_name, task_uid, url) {
+  function createTaskDetails(task) {
+    return `<h1>Task ${task.name}</h1>
+            <p>Status: ${task.status}</p>`
+  }
+
+  function createUpdateStatusButton(task, new_status, new_status_label) {
+    return `<form action="${task.url}" method="post">
+      <button name="updateButton" type="submit" value="${new_status}">${new_status_label}</button>
+    </form>`
+  }
+
+  function createFullDetailButton(task) {
+    return `<form action="${task.url}" method="get">
+      <button name="detailsButton" type="submit" value=${task.uid}>View Task Json</button>
+    </form>`
+  }
+
+  function createReadyPopup(task) {
     return L.popup().setContent(
-      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${task_name}</h1>
-                  <p>Status: READY</p>
-                  
-                  <form action="${url}" method="post">
-                    <button name="updateButton" type="submit" value="${LOCKED_FOR_MAPPING}">Lock for Mapping</button>
-                  </form>
-
-                  <form action="${url}" method="get">
-                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
-                  </form>
-
+      `<div class='fmtm-popup-div' width: auto; maxWidth: 450; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createUpdateStatusButton(task, LOCKED_FOR_MAPPING, "Lock to Map")}
+                  ${createFullDetailButton(task)}
                 </div>`
     )
   }
 
-  function createLockedForMappingByMePopup(task_name, task_uid, url) {
+  function createLockedForMappingByMePopup(task) {
     return L.popup().setContent(
-      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${task_name}</h1>
-                  <p>Status: LOCKED FOR MAPPING</p>
-                  
-                  <form action="${url}" method="post">
-                      <button name="updateButton" type="submit" value="${MAPPED}">Mark as mapped</button>
-                  </form>
-
-                  <form action="${url}" method="post">
-                    <button name="updateButton" type="submit" value="${READY}">Unlock task</button>
-                  </form>
-
-                  <form action="${url}" method="get">
-                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</button>
-                  </form>
-
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createUpdateStatusButton(task, MAPPED, "Mark as mapped")}
+                  ${createUpdateStatusButton(task, READY, "Unlock task")}
+                  ${createFullDetailButton(task)}
                 </div>`
     )
   }
 
-  function createLockedPopup(task_name, task_uid, status, url) {
+  function createLockedPopup(task) {
     return L.popup().setContent(
-      `<div class='fmtm-popup-div' width: window.innerWidth; height: window.innerHeight>
-                  <h1>Task ${task_name}</h1>
-                  <p>Status: ${status}</p>
-
-                  <form action="${url}" method="get">
-                    <button name="detailsButton" type="submit" value=${task_uid}>View Task Details</buttom>
-                  </form>
-
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createFullDetailButton(task)}
                 </div>`
     )
   }
 
-  function createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name, url) {
-    layer = L.geoJSON(task_outline);
+  function createMappedPopup(task) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createUpdateStatusButton(task, LOCKED_FOR_VALIDATION, "Mark mapping complete")}
+                  ${createUpdateStatusButton(task, READY, "Unlock task")}
+                  ${createFullDetailButton(task)}
+                </div>`
+    )
+  }
+
+  function createLockedForValidationPopup(task) {
+    // TODO check validator
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createUpdateStatusButton(task, VALIDATED, "Fully mapped")}
+                  ${createUpdateStatusButton(task, INVALIDATED, "More mapping needed")}
+                  ${createUpdateStatusButton(task, MAPPED, "Unlock task")}
+                  ${createFullDetailButton(task)}
+                </div>`
+    )
+  }
+
+  function createValidatedPopup(task) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createFullDetailButton(task)}
+                </div>`
+    )
+  }
+
+  function createInvalidatedPopup(task) {
+    return L.popup().setContent(
+      `<div class='fmtm-popup-div' width: auto; height: window.innerHeight>
+                  ${createTaskDetails(task)}
+                  ${createUpdateStatusButton(task, LOCKED_FOR_MAPPING, "Lock to map")}
+                  ${createFullDetailButton(task)}
+                </div>`
+    )
+  }
+
+  function removeMarker(marker) {
+    if (isNaN(marker) | isNaN(map)) {
+      return
+    }
+    map.removeLayer(marker)
+  }
+
+  function addLockedMark(where, icon, popup, popupOptions) {
+    marker = L.marker(where, { icon: icon })
+    marker.addTo(map)
+    layer.bindPopup(popup, popupOptions)
+    return marker
+  }
+
+  function createTaskLayer(task) {
+    layer = L.geoJSON(task.outline);
     layer.addTo(map);
 
-    layer.setStyle(getStyle(task_status))
+    layer.setStyle(getStyle(jsTask.status))
+    task.layer = layer;
 
-    var popup = createLockedPopup(task_name, task_uid, task_status, url) // default popup
+    var popup = createLockedPopup(task) // default popup
 
-    switch (task_status) {
+    switch (task.status) {
       case READY:
-        popup = createReadyPopup(task_name, task_uid, url)
+        task.popup = createReadyPopup(task)
+        removeMarker(task.marker)
         break;
       case LOCKED_FOR_MAPPING:
-        // TODO: Add check for logged in user
-        popup = createLockedForMappingByMePopup(task_name, task_uid, url)
-        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
+        if (logged_in_user == task.locked_by) {
+          task.popup = createLockedForMappingByMePopup(task)
+          addLockedMark(task.centroid, blackLockIcon, task.popup, popupOptions)
+        } else {
+          task.popup = createLockedForMappingPopup(task)
+          addLockedMark(task.centroid, grayLockIcon, task.popup, popupOptions)
+        }
+        break;
+      case MAPPED:
+        popup = createMappedPopup(task)
+        removeMarker(task.marker)
         break;
       case LOCKED_FOR_VALIDATION:
-        L.marker(task_centroid, { icon: blackLockIcon }).addTo(map)
+        task.popup = createLockedForValidationPopup(task)
+        addLockedMark(task.centroid, grayLockIcon, task.popup, popupOptions)
+        break;
+      case VALIDATED:
+        task.popup = createValidatedPopup(task)
+        removeMarker(task.marker)
+        break;
+      case INVALIDATED:
+        task.popup = createInvalidatedPopup(task)
+        removeMarker(task.marker)
         break;
       default:
         break;
@@ -246,26 +340,58 @@
     layer.bindPopup(popup, popupOptions)
   }
 
-  var task_uid;
-  var task_name;
-  var task_status;
-  var locked_by;
-  var task_outline;
+  // Declaration
+  class MappedTask {
+    uid;
+    name;
+    task_status;
+    locked_by = NaN;
+    task_outline;
+    task_centroid;
+    layer = NaN;
+    popum = NaN;
+    marker = NaN;
+    task_url;
+
+    constructor(task_uid, name, task_status, locked_by, task_outline, task_centroid, task_action_url) {
+      this.uid = task_uid;
+      this.name = name;
+      this.status = task_status,
+        this.locked_by = locked_by,
+        this.outline = task_outline,
+        this.centroid = task_centroid,
+        this.url = task_action_url
+    }
+  }
+
+  var task_uid
+  var task_name
+  var task_status
+  var task_locked_uid
+  var task_outline
+  var task_centroid_lat
+  var task_centroid_long
+  var task_centroid
+  var task_action_url
+  var jsTask
 
   {% for task in tasks %}
 
   task_uid = {{ task.uid }}
   task_name = '{{ task.name }}'
   task_status = {{ task.status }}
-  task_action_url = {{
-    url_for('project.update_task_status', task_uid = task.uid) | tojson
-  }}
+  task_locked_uid = {{ task.locked_by }}
   task_outline = {{ (task.outline |default ({}))| tojson }};
   task_centroid_lat = {{ task.centroid_lat }}
   task_centroid_long = {{ task.centroid_long }}
   task_centroid = [task_centroid_long, task_centroid_lat]
+  task_action_url = {{
+    url_for('project.update_task_status', task_uid = task.uid) | tojson
+  }}
 
-  createTaskLayer(task_outline, task_centroid, task_status, task_uid, task_name, task_action_url);
+  jsTask = new MappedTask(task_uid, task_name, task_status, task_locked_uid, task_outline, task_centroid, task_action_url)
+
+  createTaskLayer(jsTask);
 
   {% endfor %}
 
