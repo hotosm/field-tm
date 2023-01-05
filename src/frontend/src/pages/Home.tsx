@@ -43,8 +43,7 @@ const Home = () => {
     }, [])
 
     return (
-
-        <Container disableGutters={false} maxWidth={false} >
+        <div style={{ padding: 7 }}>
             {
                 stateHome.homeProjectLoading == false ?
                     //making sure we only want to start to display data when actually have data
@@ -107,7 +106,7 @@ const Home = () => {
             </Box>
             {/*pagingation*/}
 
-        </Container>
+        </div>
 
     )
 

@@ -30,7 +30,7 @@ const SearchablesRow = () => {
             opacity: 0.8,
             margin: 0,
             color: 'black',
-            width: '93%',
+            width: '100%',
             fontFamily: 'BarlowMedium'
         },
         searchableBox: {
@@ -60,19 +60,16 @@ const SearchablesRow = () => {
         outlineBtnXs: {
             fontSize: 14,
             padding: 8,
-            width: '49%',
-            marginTop: '0.7%',
+            width: '48%',
+            margin: '2%',
             borderRadius: 7,
-            marginLeft: '1%',
             fontFamily: 'BarlowMedium'
         },
         toolbarXs: {
-            marginTop: '0.7%',
             display: 'flex',
             justifyContent: 'center',
-            width: '49%',
-            marginLeft: '1%',
-            marginRight: '1%',
+            width: '48%',
+            margin: '2%',
             fontFamily: 'BarlowMedium'
         },
         pageHeading: {
@@ -128,7 +125,8 @@ const SearchablesRow = () => {
     }));
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 7 }}>
+        <Box>
+
             <Box sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
                 <Typography
                     variant="h6"
@@ -158,26 +156,25 @@ const SearchablesRow = () => {
                 </Search>
             </Stack>
 
-            {
-                windowSize.width <= 900 && <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '0.5%', paddingRight: '3%', marginTop: '1%', justifyContent: 'center' }}>
-                    <Search style={searchableInnerStyle.searchXs}>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                            style={{ width: '100%' }}
-                        />
-                    </Search>
-                </div>
-            }
+            <Box sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center', padding: 7 } }}>
+                <Search style={searchableInnerStyle.searchXs}>
+                    <SearchIconWrapper>
+                        <SearchIcon />
+                    </SearchIconWrapper>
+                    <StyledInputBase
+                        placeholder="Search…"
+                        inputProps={{ 'aria-label': 'search' }}
+                        style={{ width: '100%' }}
+                    />
+                </Search>
+            </Box>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none' }, marginTop: '2%', paddingLeft: '3.1%', paddingRight: '5.8%', }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center' }}>
                 <CustomizedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
                 <CustomDropdown names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
             </Box>
-        </div>
+
+        </Box>
     )
 }
 
