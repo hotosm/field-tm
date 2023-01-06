@@ -52,6 +52,15 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Project not found")
 
 
+@router.post("/delete/{project_id}")
+async def read_project(project_id: int, db: Session = Depends(database.get_db)):
+    project = project_crud.delete_project_by_id(db, project_id)
+    if project:
+        return project
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
 @router.post("/beta/create_project", response_model=project_schemas.ProjectOut)
 async def create_project_part_1(project_info: project_schemas.BETAProjectUpload, db: Session = Depends(database.get_db)):
     # TODO check token against user or use token instead of passing user
