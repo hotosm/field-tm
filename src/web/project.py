@@ -179,7 +179,7 @@ def upload_project_zip():
                         if response.status_code == 200:
                             return render_template("project/index.html")
                         else:
-                            error = response.json()
+                            error = response.text
 
             except Exception as e:
                 if response:
@@ -222,7 +222,7 @@ def update_task_status(task_uid):
                     if response.status_code == 200:
                         task = response.json()
                     else:
-                        error = response
+                        error = response.text
 
             except Exception as e:
                 error = e
@@ -235,7 +235,7 @@ def update_task_status(task_uid):
                         task = response.json()
                         return f'<pre>{json.dumps(task, indent=2)}</pre>'
                     else:
-                        error = response
+                        error = response.text
 
             except Exception as e:
                 error = e
@@ -268,6 +268,7 @@ def render_map_by_project_id(id):
                     ui_task.name = task['project_task_name']
                     ui_task.outline = task['outline_geojson']
                     ui_task.uid = task['id']
+                    ui_task.qr_code = task['qr_code_in_base64']
                     if task['locked_by_uid']:
                         ui_task.locked_by = task['locked_by_uid']
                     else:

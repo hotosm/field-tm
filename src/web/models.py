@@ -32,7 +32,7 @@ class UITask:
     status: str
     feature_id: int
     name: str
-    qr_code: bytes
+    qr_code: str
     outline: str
     uid: int
     locked_by: int

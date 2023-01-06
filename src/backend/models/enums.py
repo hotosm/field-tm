@@ -122,11 +122,11 @@ def verify_valid_status_update(old_status: TaskStatus, new_status: TaskStatus):
                               TaskStatus.LOCKED_FOR_VALIDATION]
     elif old_status is TaskStatus.LOCKED_FOR_VALIDATION:
         return new_status in [TaskStatus.INVALIDATED,
-                              TaskStatus.MAPPED]
+                              TaskStatus.VALIDATED]
     elif old_status is TaskStatus.VALIDATED:
         return new_status == TaskStatus.INVALIDATED
     elif old_status is TaskStatus.INVALIDATED:
-        return new_status in [TaskStatus.MAPPED,
+        return new_status in [TaskStatus.LOCKED_FOR_MAPPING,
                               TaskStatus.BAD,
                               TaskStatus.SPLIT,]
     elif old_status is TaskStatus.BAD:

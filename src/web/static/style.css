@@ -168,7 +168,7 @@ input[type=submit] {
 /* Making the map look better on mobile */
 #map {
   float: left;
-  height: 35rem;
+  height: 30rem;
   width: 90%;
   border-top: 4px solid #D73F3F;
   border-bottom: 3px solid #D73F3F;
@@ -186,8 +186,13 @@ input[type=submit] {
   width: 7.5rem;
 }
 
-.fmtm-popup-div>p {
+.fmtm-popup-div p {
   width: 7.5rem;
+}
+
+.popup-qr {
+  width: 7.5rem;
+  height: 7.5rem;
 }
 
 button {
@@ -197,6 +202,25 @@ button {
   border-color: #D73F3F;
   border-radius: 0.25rem;
   padding: 0.25rem;
+  transition-duration: 0.4s;
+}
+
+button:hover {
+  background-color: #d11010;
+  border-color: #D73F3F;
+}
+
+.secondary {
+  background-color: rgb(246, 245, 243);
+  color: #D73F3F;
+  border-width: 1px;
+  border-color: white;
+  border-radius: 0.25rem;
+  padding: 0.15rem;
+}
+
+.secondary:hover {
+  background-color: #f6dbaf;
 }
 
 
