@@ -41,19 +41,36 @@ QR_CODES_DIR = 'QR_codes/'
 TASK_GEOJSON_DIR = 'geojson/'
 
 
-def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False):
     if user_id:
         db_projects = db.query(db_models.DbProject).filter(
             db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
     else:
         db_projects = db.query(db_models.DbProject).offset(
             skip).limit(limit).all()
+    if db_objects:
+        return db_projects
     return convert_to_app_projects(db_projects)
 
 
 def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    # TODO only get needed info from db instead of all info
-    db_projects = get_projects(db, user_id, skip, limit)
+    # TODO: Just get summaries, something like:
+    #     db_projects = db.query(db_models.DbProject).with_entities(
+    #         db_models.DbProject.id,
+    #         db_models.DbProject.priority,
+    #         db_models.DbProject.total_tasks,
+    #         db_models.DbProject.tasks_mapped,
+    #         db_models.DbProject.tasks_validated,
+    #         db_models.DbProject.tasks_bad_imagery,
+    #     ).join(db_models.DbProject.project_info) \
+    #         .with_entities(
+    #             db_models.DbProjectInfo.locale,
+    #             db_models.DbProjectInfo.name,
+    #             db_models.DbProjectInfo.short_description) \
+    #         .filter(
+    #         db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
+
+    db_projects = get_projects(db, user_id, skip, limit, True)
     return convert_to_project_summaries(db_projects)
 
 
