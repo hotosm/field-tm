@@ -1,17 +1,47 @@
 ## Development
 
-### For the frontend
-
-npm install
-npm run
-
 ### Config:
 
     cp .env.example .env
 
 Update the .env file with the desired settings.
 
-### Start Services:
+### For the react frontend
+
+From command line: 
+    `cd src/frontend`
+    `npm install`
+    `npm run`
+
+### To run locally with undockerized
+
+#### api not in docker
+
+In `docker-compose.yml` comment out `api` and `web`
+From command line start up database with `docker compose up --build`
+
+In `src/backend/database.py` switch from docker to local `SQLALCHEMY_DATABASE_URL`
+
+From command line:
+
+-   install dependencies with: `pip install -r src/backend/requirements.txt`
+-   run fast api with: `uvicorn src.backend.main:api --host 0.0.0.0:5000 --reload`
+
+#### flask frontend not in docker
+
+-   start virtual envirnment with: `python3 -m venv fmtm-env`
+    -   set it up with: `source fmtm-env/bin/activate`
+
+-   install dependencies with: `pip install -r src/web/requirements.txt`
+
+-   set env variables with: `export FLASK_APP=src/web/__init__.py`
+    -   `export WEB_DOMAIN=${WEB_DOMAIN}`
+    -   `eport API_URL=http&#x3A;//localhost:8000`
+    -   `FLASK_DEBUG=1` (auto reloading on change)
+
+-   run fast api with: `python3 src/web/manage_nf.py run`
+
+### Start Docker Services:
 
     docker compose up --build
 
@@ -19,7 +49,7 @@ Update the .env file with the desired settings.
 
     docker compose up --build -d
 
-### Debugging
+### Debugging when using docker
 
 Open tty to container
 
