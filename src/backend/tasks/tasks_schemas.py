@@ -43,6 +43,7 @@ class TaskBase(BaseModel):
     initial_feature_count: int
     task_status: TaskStatus
     locked_by_uid: int = None
+    qr_code_in_base64: bytes
 
     class Config:
         orm_mode = True

@@ -22,6 +22,7 @@ from shapely.geometry import shape, mapping
 from sqlalchemy.orm import Session
 from typing import List
 import json
+import base64
 
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
@@ -143,6 +144,10 @@ def convert_to_app_task(db_task: db_models.DbTask):
 
         if db_task.lock_holder:
             app_task.locked_by_uid = db_task.lock_holder.id
+
+        if db_task.qr_code:
+            app_task.qr_code_in_base64 = base64.b64encode(
+                db_task.qr_code.image)
 
         return app_task
     else:
