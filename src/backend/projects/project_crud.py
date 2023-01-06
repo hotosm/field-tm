@@ -89,6 +89,17 @@ def get_project_by_id(db: Session, project_id: int):
     return convert_to_app_project(db_project)
 
 
+def delete_project_by_id(db: Session, project_id: int):
+    try:
+        db_project = db.query(db_models.DbProject).filter(
+            db_models.DbProject.id == project_id).order_by(db_models.DbProject.id).first()
+        db.delete(db_project)
+        db.commit()
+    except Exception as e:
+        raise HTTPException(e)
+    return f'Project {project_id} deleted'
+
+
 def create_project_with_project_info(db: Session, project_metadata: project_schemas.BETAProjectUpload):
 
     user = project_metadata.author
