@@ -26,7 +26,7 @@ from flask import (Blueprint, current_app, flash, g, redirect, render_template,
 from werkzeug.exceptions import abort
 
 from src.web.auth import login_required
-from src.web.models import DisplayProject, UITask
+from src.web.models import DisplayProject, UITask, UITaskHistory
 
 # api
 import requests
@@ -39,14 +39,13 @@ grid_filename = "grid.geojson"
 
 @bp.route("/")
 def index():
+    session['project_id'] = None
     try:
         with requests.Session() as s:
             response = s.get(f"{base_url}/projects/?skip=0&limit=100")
             if response.status_code == 200:
                 api_projects = response.json()
-
-            session['project_id'] = None
-            return render_template("project/index.html", projects=api_projects)
+                return render_template("project/index.html", projects=api_projects)
 
     except Exception as e:
         flash(e)
@@ -270,12 +269,22 @@ def render_map_by_project_id(id):
                     ui_task.uid = task['id']
                     ui_task.qr_code = task['qr_code_in_base64']
                     if task['locked_by_uid']:
-                        ui_task.locked_by = task['locked_by_uid']
+                        ui_task.locked_by_name = task['locked_by_username']
+                        ui_task.locked_by_uid = task['locked_by_uid']
                     else:
-                        ui_task.locked_by = -1
+                        ui_task.locked_by_name = ""
+                        ui_task.locked_by_uid = -1
                     ui_task.centroid = task['outline_centroid']
                     ui_task.centroid_lat = task['outline_centroid']['geometry']['coordinates'][0]
                     ui_task.centroid_long = task['outline_centroid']['geometry']['coordinates'][1]
+                    ui_task.task_history = []
+
+                    for history in task['task_history']:
+                        task_history = UITaskHistory()
+                        task_history.date = history['action_date']
+                        task_history.action_str = history['action_text']
+                        ui_task.task_history.append(task_history)
+
                     tasks.append(ui_task)
 
                 return render_template(

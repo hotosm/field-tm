@@ -17,6 +17,10 @@ h6 {
   margin: 1rem 0;
 }
 
+h2 {
+  color: #D73F3F
+}
+
 a {
   color: #377ba8;
 }
@@ -221,6 +225,13 @@ button:hover {
 
 .secondary:hover {
   background-color: #f6dbaf;
+}
+
+.status-color-box {
+  width: 1rem;
+  height: 1rem;
+  border: 1px;
+  border-color: black;
 }
 
 
