@@ -16,6 +16,7 @@
 #
 
 import enum
+from typing import List
 import datetime
 from email.policy import default
 
@@ -28,6 +29,11 @@ class DisplayProject:
     description: str
 
 
+class UITaskHistory:
+    date: datetime
+    action_str: str
+
+
 class UITask:
     status: str
     feature_id: int
@@ -35,7 +41,9 @@ class UITask:
     qr_code: str
     outline: str
     uid: int
-    locked_by: int
+    locked_by_name: str
+    locked_by_uid: int
     centroid: str
     centroid_lat: int
     centroid_long: int
+    task_history: List[UITaskHistory]

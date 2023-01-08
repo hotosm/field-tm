@@ -77,14 +77,13 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
 def get_project_by_id_w_all_tasks(db: Session, project_id: int):
     db_project = db\
         .query(db_models.DbProject)\
-        .options(joinedload('tasks'))\
         .filter(db_models.DbProject.id == project_id)\
         .first()
     return convert_to_app_project(db_project)
 
 
 def get_project_by_id(db: Session, project_id: int):
-    db_project = db.query(db_models.DbProject).options(joinedload('tasks')).filter(
+    db_project = db.query(db_models.DbProject).filter(
         db_models.DbProject.id == project_id).order_by(db_models.DbProject.id).first()
     return convert_to_app_project(db_project)
 

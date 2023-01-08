@@ -17,7 +17,9 @@
 #
 
 from pydantic import BaseModel
+from datetime import datetime
 from geojson_pydantic import Feature, Point
+from typing import List
 import enum
 
 from ..models.enums import TaskStatus
@@ -33,6 +35,19 @@ def get_task_status_strings():
 TaskStatusOption = get_task_status_strings()
 
 
+class TaskHistoryBase(BaseModel):
+    id: int
+    action_text: str
+    action_date: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TaskHistoryOut(TaskHistoryBase):
+    pass
+
+
 class TaskBase(BaseModel):
     id: int
     project_id: int
@@ -43,7 +58,9 @@ class TaskBase(BaseModel):
     initial_feature_count: int
     task_status: TaskStatus
     locked_by_uid: int = None
+    locked_by_username: str = None
     qr_code_in_base64: bytes
+    task_history: List[TaskHistoryBase]
 
     class Config:
         orm_mode = True
