@@ -173,6 +173,7 @@
     if (locationFeatureGroup == null) {
       //navigator.geolocation.getCurrentPosition(getPosition)
       map.locate({ setView: true, maxZoom: 16 });
+      addLocationWatcherToMap()
     }
     else {
       map.fitBounds(locationFeatureGroup.getBounds())
@@ -189,16 +190,18 @@
     alert(e.message);
   }
 
-  map.on('locationerror', onLocationError);
+  //map.on('locationerror', onLocationError);
+  map.on('locationfound', onLocationFound);
 
   //L.Control.geocoder().addTo(map);
-  if (!navigator.geolocation) {
-    console.log("Your browser doesn't support geolocation feature!")
-  } else {
-    console.log("Google recommends not finding user location on page load, but as it is important for the useability of this app, we're ignoring the warning.")
-    navigator.geolocation.watchPosition(getPosition, onLocationError);
-
-  };
+  function addLocationWatcherToMap() {
+    if (!navigator.geolocation) {
+      console.log("Your browser doesn't support geolocation feature!")
+    } else {
+      console.log("Google recommends not finding user location on page load, but as it is important for the useability of this app, we're ignoring the warning.")
+      navigator.geolocation.watchPosition(getPosition, onLocationError);
+    };
+  }
   var locationFeatureGroup, locationMarker, locationCircle, lat, long, accuracy;
 
   function getPosition(position) {
@@ -230,8 +233,6 @@
     }
 
   }
-
-  map.on('locationfound', onLocationFound);
 
   const READY = 'READY';
   const LOCKED_FOR_MAPPING = 'LOCKED_FOR_MAPPING';
@@ -480,7 +481,7 @@
     layer.bindPopup(task.popup, popupOptions)
 
     if (open_task_id == task.uid) {
-]task.layer.openPopup();
+      task.layer.openPopup();
     }
   }
 
