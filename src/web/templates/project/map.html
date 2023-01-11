@@ -227,7 +227,7 @@
     if (accuracy != null) {
       locationCircle = L.circle(latlng, { radius: accuracy })
       locationFeatureGroup = L.featureGroup([locationMarker, locationCircle]).addTo(map)
-
+      locationFeatureGroup.bringToBack();
     } else {
       locationFeatureGroup = L.featureGroup([locationMarker]).addTo(map)
     }
