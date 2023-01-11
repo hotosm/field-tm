@@ -39,6 +39,7 @@ grid_filename = "grid.geojson"
 
 @bp.route("/")
 def index():
+    session["open_task_id"] = -1
     session['project_id'] = None
     try:
         with requests.Session() as s:
@@ -221,6 +222,7 @@ def update_task_status(task_uid):
                         })
                     if response.status_code == 200:
                         task = response.json()
+                        session["open_task_id"] = task_uid
                     else:
                         error = response.text
 
@@ -288,13 +290,17 @@ def render_map_by_project_id(id):
 
                     tasks.append(ui_task)
 
+                open_task_id = session["open_task_id"]
+                session["open_task_id"] = -1
+
                 return render_template(
                     "project/map.html",
                     project_id=project_id,
                     project_name=project_name,
                     project_outline=project_outline,
                     tasks=tasks,
-                    userid=session.get("user_id")
+                    userid=session.get("user_id"),
+                    open_task_id=open_task_id,
                     # userid=g.user["id"]
                 )
     except Exception as e:

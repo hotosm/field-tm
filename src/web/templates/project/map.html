@@ -129,6 +129,7 @@
 
   var p_outline = {{(project_outline |default ({}))| tojson }};
   var logged_in_user = {{ userid }}
+  var open_task_id = {{ open_task_id }}
   var outline_layer
 
   function centerOnMap() {
@@ -194,10 +195,6 @@
   if (!navigator.geolocation) {
     console.log("Your browser doesn't support geolocation feature!")
   } else {
-    /*  navigator.geolocation.getCurrentPosition(getPosition)
-    setInterval(() => {
-      navigator.geolocation.getCurrentPosition(getPosition)
-    }, 30000);  */
     console.log("Google recommends not finding user location on page load, but as it is important for the useability of this app, we're ignoring the warning.")
     navigator.geolocation.watchPosition(getPosition, onLocationError);
 
@@ -481,6 +478,10 @@
         break;
     }
     layer.bindPopup(task.popup, popupOptions)
+
+    if (open_task_id == task.uid) {
+]task.layer.openPopup();
+    }
   }
 
   function styleElements(task) {
