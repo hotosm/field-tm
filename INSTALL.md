@@ -25,7 +25,7 @@ In `src/backend/database.py` switch from docker to local `SQLALCHEMY_DATABASE_UR
 From command line:
 
 -   install dependencies with: `pip install -r src/backend/requirements.txt`
--   run fast api with: `uvicorn src.backend.main:api --host 0.0.0.0:5000 --reload`
+-   run fast api with: `uvicorn src.backend.main:api --host 0.0.0.0:5000 --reload` (you can also gry a simple: `uvicorn src.backend.main:api --reload`)
 
 #### flask frontend not in docker
 
@@ -36,7 +36,7 @@ From command line:
 
 -   set env variables with: `export FLASK_APP=src/web/__init__.py`
     -   `export WEB_DOMAIN=${WEB_DOMAIN}`
-    -   `eport API_URL=http&#x3A;//localhost:8000`
+    -   `export API_URL=http://localhost:8000`
     -   `FLASK_DEBUG=1` (auto reloading on change)
 
 -   run fast api with: `python3 src/web/manage_nf.py run`

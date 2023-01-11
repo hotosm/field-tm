@@ -193,6 +193,7 @@ def upload_project_zip():
 
 
 @bp.route("/<int:id>/map", methods=("GET", "POST"))
+@login_required
 def map(id):
     if request.method == "POST":
         pass

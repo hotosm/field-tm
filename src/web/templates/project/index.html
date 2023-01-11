@@ -54,7 +54,11 @@
       <!-- TODO remove hardcoding -->
       <h1>{{ project['project_info'][0]['name'] }}</h1>
       <p class="description">{{ project['project_info'][0]['description'] }}</p>
+      {% if g.user['id'] %}
       <a class="action" href="{{ url_for('project.map', id=project['id'])}}">Select Task</a>
+      {% else %}
+      <a class="action" href="{{ url_for('auth.login') }}">Select Task</a>
+      {% endif %}
   </header>
 </article>
 {% if not loop.last %}
