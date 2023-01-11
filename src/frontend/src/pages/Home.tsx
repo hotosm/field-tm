@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { HomeSummaryService } from "../services/HomeService";
 import enviroment from "../enviroment";
 import ProjectCardSkeleton from "../components/home/ProjectCardSkeleton";
+import SearchablesRow from "../components/home/SearchablesRow";
 
 
 const Home = () => {
@@ -44,6 +45,7 @@ const Home = () => {
 
     return (
         <div style={{ padding: 7 }}>
+            <SearchablesRow />
             {
                 stateHome.homeProjectLoading == false ?
                     //making sure we only want to start to display data when actually have data

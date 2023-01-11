@@ -9,6 +9,7 @@ import PrimaryAppBar from "./utilities/PrimaryAppBar";
 import SearchablesRow from "./components/home/SearchablesRow";
 import store from './store/Store';
 import { Provider } from "react-redux";
+import ProjectDetails from "./pages/ProjectDetails";
 
 
 
@@ -20,10 +21,10 @@ const App = () => {
       <Container disableGutters={true} maxWidth={false} >
         <Box sx={{ bgcolor: 'white', height: '100vh' }} >
           <PrimaryAppBar />
-          <SearchablesRow />
           <Box sx={{ height: windowSize.width <= 599 ? '73vh' : '76vh', overflow: 'auto' }}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/project_details" element={<ProjectDetails />} />
             </Routes>
           </Box>
         </Box>

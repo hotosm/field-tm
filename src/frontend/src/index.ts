@@ -8,6 +8,7 @@ import './fonts/Archivo/Archivo/Archivo-Light.ttf'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'rsuite/dist/rsuite.min.css'
+import 'leaflet/dist/leaflet.css';
 import("./App");
 
 
