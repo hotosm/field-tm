@@ -114,6 +114,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.css" />
 <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
 
+<!-- geocoding -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 <script>
   /*  var p_outline = {
     "type": "FeatureCollection",
@@ -166,26 +169,72 @@
   }
 
   document.getElementById("zoom_to_location").onclick = function () {
-    map.locate({ setView: true, maxZoom: 16 });
+    if (locationFeatureGroup == null) {
+      //navigator.geolocation.getCurrentPosition(getPosition)
+      map.locate({ setView: true, maxZoom: 16 });
+    }
+    else {
+      map.fitBounds(locationFeatureGroup.getBounds())
+    }
   }
 
   function onLocationFound(e) {
-    var radius = e.accuracy;
-
-    //L.marker(e.latlng).addTo(map)
-    //  .bindPopup("You are within " + radius + " meters from this point").openPopup();
-
-    L.circle(e.latlng, radius).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-
+    if (locationFeatureGroup == null) {
+      addLocationFeatureGroup(e.latlng, e.accuracy)
+    }
   }
-
-  map.on('locationfound', onLocationFound);
 
   function onLocationError(e) {
     alert(e.message);
   }
 
   map.on('locationerror', onLocationError);
+
+  //L.Control.geocoder().addTo(map);
+  if (!navigator.geolocation) {
+    console.log("Your browser doesn't support geolocation feature!")
+  } else {
+    /*  navigator.geolocation.getCurrentPosition(getPosition)
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition(getPosition)
+    }, 30000);  */
+    console.log("Google recommends not finding user location on page load, but as it is important for the useability of this app, we're ignoring the warning.")
+    navigator.geolocation.watchPosition(getPosition, onLocationError);
+
+  };
+  var locationFeatureGroup, locationMarker, locationCircle, lat, long, accuracy;
+
+  function getPosition(position) {
+    // console.log(position)
+    lat = position.coords.latitude
+    long = position.coords.longitude
+    accuracy = position.coords.accuracy
+
+    if (locationMarker) {
+      map.removeLayer(locationMarker)
+    }
+
+    if (locationCircle) {
+      map.removeLayer(locationCircle)
+    }
+
+    addLocationFeatureGroup([lat, long], accuracy)
+  }
+
+  function addLocationFeatureGroup(latlng, radius) {
+    locationMarker = L.circle(latlng, { radius: 1 })
+    locationMarker.bindPopup("You are within " + radius + " meters from this point")
+    if (accuracy != null) {
+      locationCircle = L.circle(latlng, { radius: accuracy })
+      locationFeatureGroup = L.featureGroup([locationMarker, locationCircle]).addTo(map)
+
+    } else {
+      locationFeatureGroup = L.featureGroup([locationMarker]).addTo(map)
+    }
+
+  }
+
+  map.on('locationfound', onLocationFound);
 
   const READY = 'READY';
   const LOCKED_FOR_MAPPING = 'LOCKED_FOR_MAPPING';
@@ -437,10 +486,10 @@
   function styleElements(task) {
     titles = document.getElementsByClassName(`task-${task.uid}-title`)
     if (titles.length > 0) {
-      console.log(titles)
+      //console.log(titles)
     }
     for (let i = 0; i < titles.length; i++) {
-      console.log(titles[i])
+      //console.log(titles[i])
       var color = getColor(task.status)
       if (titles[i] != null) {
         titles[i].style.borderLeft = `1rem solid ${color}`;
