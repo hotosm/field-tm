@@ -8,10 +8,12 @@ import CustomizedImage from '../../utilities/CustomizedImage';
 import CustomizedText from '../../utilities/CustomizedText';
 import enviroment from '../../enviroment';
 import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
+import { useNavigate } from "react-router-dom";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 export default function ExploreProjectCard({ data, length }) {
     const [shadowBox, setShadowBox] = React.useState(0)
-
+    const navigate = useNavigate();
 
     const onFocusIn = () => {
         setShadowBox(3)
@@ -26,11 +28,13 @@ export default function ExploreProjectCard({ data, length }) {
             flexDirection: 'column',
             justifyContent: 'left',
             height: 170,
-            marginTop: '2%'
+            marginTop: '2%',
+
         },
         regularText: {
             marginTop: '7%',
             fontFamily: 'ArchivoLight',
+            marginLeft: '2%',
             fontSize: 16
         },
         progressBar: {
@@ -70,13 +74,22 @@ export default function ExploreProjectCard({ data, length }) {
             text: {
                 marginTop: '7%',
                 fontFamily: 'ArchivoMedium',
-                fontSize: 20
+                fontSize: 20,
+                marginLeft: '2%'
+            }
+        },
+        location: {
+            display: 'flex',
+            flexDirection: 'row',
+            icon: {
+                marginTop: '7%',
+                fontSize: 22
             }
         }
     }
     return (
         <Card onClick={() => {
-            //  console.log('clicked')
+            navigate('/project_details')
         }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
 
             <CardContent>
@@ -92,13 +105,21 @@ export default function ExploreProjectCard({ data, length }) {
                 </div>
 
 
+
                 <div style={cardInnerStyles.display}>
-                    <CustomizedText font={'BarlowBold'} top={'5%'} size={20} text={data.location_str} weight={'bold'} />
+
+                    <div style={{ marginLeft: '2%', marginTop: '5%' }}>
+                        <CustomizedText font={'BarlowBold'} top={'0%'} size={20} text={data.title} weight={'bold'} />
+                    </div>
+
+                    <div style={cardInnerStyles.location}>
+                        <LocationOnIcon color='error' style={cardInnerStyles.location.icon} />
+                        <CustomizedText font={enviroment.mediumText} top={'7%'} size={16} text={data.location_str} weight={'regular'} />
+                    </div>
                     <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14, height: 'inherit' }} color="text.secondary" gutterBottom>
                         {data.description}
                     </Typography>
                 </div>
-
 
                 <div style={cardInnerStyles.contributors}>
                     <Typography style={{ ...cardInnerStyles.contributors.text, color: 'black', opacity: 0.8 }} sx={{ fontSize: 20 }} color="text.secondary" >

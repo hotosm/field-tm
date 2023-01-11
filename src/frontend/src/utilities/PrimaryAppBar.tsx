@@ -10,6 +10,7 @@ import enviroment from '../enviroment';
 import windowDimention from '../customHooks/WindowDimension';
 import DrawerComponent from './CustomDrawer';
 import CustomizedImage from '../utilities/CustomizedImage';
+import { Link } from 'react-router-dom';
 
 
 
@@ -77,7 +78,9 @@ export default function PrimaryAppBar() {
       <DrawerComponent open={open} placement={'right'} onClose={handleOnCloseDrawer} size={type == 'xs' ? 'full' : 'xs'} />
       <AppBar position="static" style={appBarInnerStyles.appBar}>
         <Toolbar>
-          <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
+          <Link to={'/'}>
+            <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
+          </Link>
           <Typography
             variant="h6"
             noWrap

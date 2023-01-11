@@ -24,12 +24,13 @@ const ProjectCardSkeleton = ({ cardsPerRow }) => {
                             <Skeleton height={25} />
                         </div>
                         <div className="col-md-12">
-                            <Skeleton style={{ marginTop: '4%' }} height={20} />
+                            <Skeleton style={{ marginTop: '7%' }} height={23} />
+                            <Skeleton style={{ marginTop: '4%' }} height={16} />
+                            <Skeleton style={{ marginTop: '5%' }} height={90} />
 
-                            <Skeleton style={{ marginTop: '4%' }} height={170} />
                         </div>
                         <div className="col-md-12 mt-2">
-                            <Skeleton style={{ marginTop: '3%' }} height={12} count={2} />
+                            <Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
                         </div>
                     </div>
                 </div>
