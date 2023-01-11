@@ -38,6 +38,7 @@
   </div>
   <div id="map-buttons" style="float:right; width: 3%; height: 100%">
     <img id="center_project" src="/static/Expand_Map.svg" style="width: 2rem; height: 2rem; margin: 0.25rem;" />
+    <img id="zoom_to_location" src="/static/GPS_Found.svg" style="width: 2rem; height: 2rem; margin: 0.25rem;" />
 
   </div>
 
@@ -163,6 +164,28 @@
   document.getElementById("center_project").onclick = function () {
     centerOnMap()
   }
+
+  document.getElementById("zoom_to_location").onclick = function () {
+    map.locate({ setView: true, maxZoom: 16 });
+  }
+
+  function onLocationFound(e) {
+    var radius = e.accuracy;
+
+    //L.marker(e.latlng).addTo(map)
+    //  .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+    L.circle(e.latlng, radius).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+  }
+
+  map.on('locationfound', onLocationFound);
+
+  function onLocationError(e) {
+    alert(e.message);
+  }
+
+  map.on('locationerror', onLocationError);
 
   const READY = 'READY';
   const LOCKED_FOR_MAPPING = 'LOCKED_FOR_MAPPING';
