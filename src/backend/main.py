@@ -25,6 +25,7 @@ from fastapi import FastAPI
 from fastapi.logger import logger as fastapi_logger
 from fastapi.responses import FileResponse
 
+from .auth import login_route
 from .auth import routers as auth_routers
 from .db.database import Base, SessionLocal, engine
 from .projects import project_routes
@@ -57,8 +58,10 @@ Base.metadata.create_all(bind=engine)
 api = FastAPI()
 
 api.include_router(user_routes.router)
+api.include_router(login_route.router)
 api.include_router(project_routes.router)
 api.include_router(tasks_routes.router)
+
 
 api.include_router(auth_routers)
 
