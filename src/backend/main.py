@@ -17,25 +17,26 @@
 #
 
 
-from typing import Union
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
 import logging.config
-from fastapi.logger import logger as fastapi_logger
 from os import path
+from typing import Union
 
-from .users import user_routes
-from .auth import login_route
+from fastapi import FastAPI
+from fastapi.logger import logger as fastapi_logger
+from fastapi.responses import FileResponse
+
+from .auth import routers as auth_routers
+from .db.database import Base, SessionLocal, engine
 from .projects import project_routes
 from .tasks import tasks_routes
-from .db.database import SessionLocal, engine, Base
+from .users import user_routes
 
 # setup loggers
-log_file_path = path.join(path.dirname(
-    path.abspath('logging.conf')), 'logging.conf')
+log_file_path = path.join(path.dirname(path.abspath("logging.conf")), "logging.conf")
 
-logging.config.fileConfig('./src/backend/logging.conf',
-                          disable_existing_loggers=False)  # main.py runs from code/
+logging.config.fileConfig(
+    "./src/backend/logging.conf", disable_existing_loggers=False
+)  # main.py runs from code/
 logger = logging.getLogger(__name__)
 
 gunicorn_error_logger = logging.getLogger("gunicorn.error")
@@ -56,9 +57,10 @@ Base.metadata.create_all(bind=engine)
 api = FastAPI()
 
 api.include_router(user_routes.router)
-api.include_router(login_route.router)
 api.include_router(project_routes.router)
 api.include_router(tasks_routes.router)
+
+api.include_router(auth_routers)
 
 
 @api.get("/")
