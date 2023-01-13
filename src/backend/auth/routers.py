@@ -18,7 +18,10 @@
 
 import json
 
+from db import database
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy.orm import Session
+from users import user_crud, user_schemas
 
 from . import AuthUser, login_required, osm_auth
 
@@ -26,6 +29,11 @@ router = APIRouter(prefix="/auth")
 
 
 @router.get("/login/")
+def login(user: user_schemas.UserIn, db: Session = Depends(database.get_db)):
+    return user_crud.verify_user(db, user)
+
+
+@router.get("/osm_login/")
 def login_url(request: Request):
     """Generate Login URL for authentication using OAuth2 Application registered with OpenStreetMap.
     Click on the download url returned to get access_token.

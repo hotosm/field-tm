@@ -16,13 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+from db import database
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from models.enums import TaskStatus
 from sqlalchemy.orm import Session
+from users import user_crud, user_schemas
 
-from ..db import database
-from ..models.enums import TaskStatus
-from ..users import user_schemas, user_crud
-from . import tasks_schemas, tasks_crud
+from . import tasks_crud, tasks_schemas
 
 router = APIRouter(
     prefix="/tasks",
@@ -33,10 +33,18 @@ router = APIRouter(
 
 
 @router.get("/", response_model=tasks_schemas.TaskOut)
-async def read_tasks(user_id: int = None, task_id: int = None, skip: int = 0, limit: int = 1000, db: Session = Depends(database.get_db)):
+async def read_tasks(
+    user_id: int = None,
+    task_id: int = None,
+    skip: int = 0,
+    limit: int = 1000,
+    db: Session = Depends(database.get_db),
+):
     if user_id and task_id:
         raise HTTPException(
-            status_code=300, detail="Please provide either user_id OR task_id, not both.")
+            status_code=300,
+            detail="Please provide either user_id OR task_id, not both.",
+        )
 
     tasks = tasks_crud.get_tasks(db, user_id, task_id, skip, limit)
     if tasks:
@@ -55,7 +63,12 @@ async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
-async def update_task_status(user: user_schemas.User, task_id: int, new_status: TaskStatus, db: Session = Depends(database.get_db)):
+async def update_task_status(
+    user: user_schemas.User,
+    task_id: int,
+    new_status: TaskStatus,
+    db: Session = Depends(database.get_db),
+):
     # TODO verify logged in user
     user_id = user.id
 
@@ -63,5 +76,4 @@ async def update_task_status(user: user_schemas.User, task_id: int, new_status: 
     if task:
         return task
     else:
-        raise HTTPException(
-            status_code=404, detail="Task status could not be updated.")
+        raise HTTPException(status_code=404, detail="Task status could not be updated.")

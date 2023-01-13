@@ -16,13 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel
-from typing import List, Any
-from geojson_pydantic import Feature
+from typing import Any, List
 
-from ..users.user_schemas import User
-from ..models.enums import ProjectStatus, ProjectPriority
-from ..tasks import tasks_schemas
+from geojson_pydantic import Feature
+from models.enums import ProjectPriority, ProjectStatus
+from pydantic import BaseModel
+from tasks import tasks_schemas
+from users.user_schemas import User
 
 
 class ProjectInfo(BaseModel):
