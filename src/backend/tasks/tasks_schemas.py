@@ -16,10 +16,9 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel
 from geojson_pydantic import Feature, Point
-
-from ..models.enums import TaskStatus
+from models.enums import TaskStatus
+from pydantic import BaseModel
 
 
 class TaskBase(BaseModel):

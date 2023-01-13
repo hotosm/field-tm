@@ -24,12 +24,12 @@ class AuthUser(BaseModel):
 
 # config plan
 osm_auth = Auth(
-    osm_url=config_env["osm_url"],
-    client_id=config_env["osm_client_id"],
-    client_secret=config_env["osm_client_secret"],
-    secret_key=config_env["osm_secret_key"],
-    login_redirect_uri=config_env["osm_login_redirect_uri"],
-    scope=config_env["osm_scope"],
+    osm_url=config_env["OSM_URL"],
+    client_id=config_env["OSM_CLIENT_ID"],
+    client_secret=config_env["OSM_CLIENT_SECRET"],
+    secret_key=config_env["OSM_SECRET_KEY"],
+    login_redirect_uri=config_env["OSM_LOGIN_REDIRECT_URI"],
+    scope=config_env["OSM_SCOPE"],
 )
 
 

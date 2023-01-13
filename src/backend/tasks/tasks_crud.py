@@ -16,36 +16,45 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import json
+from typing import List
+
+from db import db_models
+from db.postgis_utils import geometry_to_geojson, get_centroid
 from fastapi import HTTPException
 from geoalchemy2.shape import to_shape
-from shapely.geometry import shape, mapping
+from models.enums import (
+    TaskAction,
+    TaskStatus,
+    get_action_for_status_change,
+    verify_valid_status_update,
+)
+from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session
-from typing import List
-import json
-
-from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, get_centroid
-from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change, verify_valid_status_update
-from ..users import user_crud, user_schemas
-from ..tasks import tasks_schemas
-
+from tasks import tasks_schemas
+from users import user_crud, user_schemas
 
 # --------------
 # ---- CRUD ----
 # --------------
 
+
 def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 1000):
     if user_id:
-        db_tasks = db.query(db_models.DbTask).filter(
-            db_models.DbTask.locked_by == user_id).offset(skip).limit(limit).all()
+        db_tasks = (
+            db.query(db_models.DbTask)
+            .filter(db_models.DbTask.locked_by == user_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
     else:
         db_tasks = db.query(db_models.DbTask).offset(skip).limit(limit).all()
     return convert_to_app_tasks(db_tasks)
 
 
 def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(
-        db_models.DbTask.id == task_id).first()
+    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
     if db_obj:
         return db_task
     return convert_to_app_task(db_task)
@@ -53,24 +62,28 @@ def get_task(db: Session, task_id: int, db_obj: bool = False):
 
 def update_task_status(db: Session, user_id: int, task_id: int, new_status: TaskStatus):
     if not user_id:
-        raise HTTPException(
-            status_code=400, detail="User id required.")
+        raise HTTPException(status_code=400, detail="User id required.")
 
     db_user = user_crud.get_user(db, user_id, db_obj=True)
     if not db_user:
         raise HTTPException(
-            status_code=400, detail=f"User with id {user_id} does not exist.")
+            status_code=400, detail=f"User with id {user_id} does not exist."
+        )
 
     db_task = get_task(db, task_id, db_obj=True)
     if verify_valid_status_update(db_task.task_status, new_status):
         # update history prior to updating task
         update_history = create_task_history_for_status_change(
-            db_task, new_status, db_user)
+            db_task, new_status, db_user
+        )
         db.add(update_history)
 
         db_task.task_status = new_status
 
-        if new_status in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]:
+        if new_status in [
+            TaskStatus.LOCKED_FOR_MAPPING,
+            TaskStatus.LOCKED_FOR_VALIDATION,
+        ]:
             db_task.locked_by = db_user.id
         else:
             db_task.locked_by = None
@@ -89,19 +102,24 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 
     else:
         raise HTTPException(
-            status_code=400, detail=f'Not a valid status update: {db_task.task_status} to {new_status}')
+            status_code=400,
+            detail=f"Not a valid status update: {db_task.task_status} to {new_status}",
+        )
+
 
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
 
-def create_task_history_for_status_change(db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser):
+def create_task_history_for_status_change(
+    db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser
+):
     new_task_history = db_models.DbTaskHistory(
         project_id=db_task.project_id,
         task_id=db_task.id,
         action=get_action_for_status_change(new_status),
-        action_text=f'Status changed from {db_task.task_status.name} to {new_status.name}',
+        action_text=f"Status changed from {db_task.task_status.name} to {new_status.name}",
         actioned_by=db_user,
         user_id=db_user.id,
     )
@@ -118,6 +136,7 @@ def create_task_history_for_status_change(db_task: db_models.DbTask, new_status:
 
     return new_task_history
 
+
 # --------------------
 # ---- CONVERTERS ----
 # --------------------
@@ -129,16 +148,14 @@ def convert_to_app_task(db_task: db_models.DbTask):
     if db_task:
         app_task: tasks_schemas.Task = db_task
 
-        if (db_task.outline):
-            properties = {"fid": db_task.project_task_index,
-                          "uid": db_task.id,
-                          "name": db_task.project_task_name}
-            app_task.outline_geojson = geometry_to_geojson(
-                db_task.outline,
-                properties)
-            app_task.outline_centroid = get_centroid(
-                db_task.outline
-            )
+        if db_task.outline:
+            properties = {
+                "fid": db_task.project_task_index,
+                "uid": db_task.id,
+                "name": db_task.project_task_name,
+            }
+            app_task.outline_geojson = geometry_to_geojson(db_task.outline, properties)
+            app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
             app_task.locked_by_uid = db_task.lock_holder.id
