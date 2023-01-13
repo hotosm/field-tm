@@ -1,6 +1,6 @@
-client_id=
-client_secret=
-url=https://www.openstreetmap.org
-scope=read_prefs
-login_redirect_uri=http://127.0.0.1:8000/latest/auth/callback/
-secret_key=PutSomethingRandmHere
+osm_client_id=
+osm_client_secret=
+osm_url=https://www.openstreetmap.org
+osm_scope=read_prefs
+osm_login_redirect_uri=http://127.0.0.1:8000/latest/auth/callback/
+osm_secret_key=PutSomethingRandmHere
