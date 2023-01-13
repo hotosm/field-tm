@@ -1,9 +1,19 @@
+import os
 from typing import Union
 
+from dotenv import dotenv_values
 from fastapi import Header
 from osm_login_python.core import Auth
 from pydantic import BaseModel
-from src.config import config  # read from the config
+
+# Python Environment Variable setup required on System or .env file
+config_env = {
+    **dotenv_values(".env"),  # load local file development variables
+    **os.environ,  # override loaded values with system environment variables
+}
+
+# Access the variable like below
+# print(config_env["VAR_NAME"])
 
 
 class AuthUser(BaseModel):
@@ -14,12 +24,12 @@ class AuthUser(BaseModel):
 
 # config plan
 osm_auth = Auth(
-    osm_url=config.get("OAUTH", "url"),
-    client_id=config.get("OAUTH", "client_id"),
-    client_secret=config.get("OAUTH", "client_secret"),
-    secret_key=config.get("OAUTH", "secret_key"),
-    login_redirect_uri=config.get("OAUTH", "login_redirect_uri"),
-    scope=config.get("OAUTH", "scope"),
+    osm_url=config_env["osm_url"],
+    client_id=config_env["osm_client_id"],
+    client_secret=config_env["osm_client_secret"],
+    secret_key=config_env["osm_secret_key"],
+    login_redirect_uri=config_env["osm_login_redirect_uri"],
+    scope=config_env["osm_scope"],
 )
 
 
