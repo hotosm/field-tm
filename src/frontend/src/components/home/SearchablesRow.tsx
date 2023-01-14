@@ -143,7 +143,7 @@ const SearchablesRow = () => {
 
             <Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
                 <CustomizedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="Filters" style={searchableInnerStyle.outlineBtn} />
-                <CustomDropdown names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
+                <CustomDropdown color={'red'} appearance={'ghost'} names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbar} btnStyle={searchableInnerStyle.dropdown} text={"Sort By"} size={"lg"} />
                 <Search style={searchableInnerStyle.search}>
                     <SearchIconWrapper>
                         <SearchIcon style={{ color: enviroment.sysBlackColor }} />
@@ -171,7 +171,7 @@ const SearchablesRow = () => {
 
             <Box sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center' }}>
                 <CustomizedButton variant={'outlined'} color={'error'} icon={<AutoAwesomeIcon />} text="filters" style={searchableInnerStyle.outlineBtnXs} />
-                <CustomDropdown names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
+                <CustomDropdown color={'red'} appearance={'ghost'} names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} btnStyle={searchableInnerStyle.dropdownXs} text={"Sort By"} size={"lg"} />
             </Box>
 
         </Box>

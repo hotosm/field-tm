@@ -10,6 +10,7 @@ import SearchablesRow from "./components/home/SearchablesRow";
 import store from './store/Store';
 import { Provider } from "react-redux";
 import ProjectDetails from "./pages/ProjectDetails";
+import { Footer } from "rsuite";
 
 
 
@@ -21,11 +22,12 @@ const App = () => {
       <Container disableGutters={true} maxWidth={false} >
         <Box sx={{ bgcolor: 'white', height: '100vh' }} >
           <PrimaryAppBar />
-          <Box sx={{ height: windowSize.width <= 599 ? '73vh' : '76vh', overflow: 'auto' }}>
+          <Box sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto' }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/project_details" element={<ProjectDetails />} />
             </Routes>
+            {/* Footer */}
           </Box>
         </Box>
       </Container>

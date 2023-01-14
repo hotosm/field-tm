@@ -20,12 +20,9 @@ module.exports = {
     rules: [
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/,],
-        type: 'asset',
-        // loader: 'url-loader?limit=100000'
-        parser: {
-          dataUrlCondition: {
-            maxSize: 1000,
-          },
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
         },
       },
       {

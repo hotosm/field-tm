@@ -67,8 +67,6 @@ const Home = () => {
                                                 <ExploreProjectCard data={value} length={cardsPerRow.length} key={index} />
                                             )
                                         }) :
-
-
                                         //if false the we expect that there will be a reminder in our list that doesn't fit in given.
                                         //eg: list of 10 / 7 as window dimention of xl to fit our cards respectively then the reminder will be 3 which should be render in the last row
                                         index + 1 != totalRows.length ?
