@@ -13,6 +13,7 @@ export const HomeSummaryService: Function = (url: string) => {
             const fetchHomeData = await axios.get(url)
             const resp: HomeProjectCardModel = fetchHomeData.data;
 
+
             dispatch(HomeActions.SetHomeProjectSummary(resp))
             dispatch(HomeActions.HomeProjectLoading(false))
         }

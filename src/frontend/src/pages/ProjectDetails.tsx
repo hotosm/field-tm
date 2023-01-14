@@ -2,9 +2,12 @@ import React from "react";
 import { Box, Container, Divider, Stack } from '@mui/material'
 import CustomizedText from "../utilities/CustomizedText";
 import enviroment from "../enviroment";
-import LeafletMap from "../utilities/LeafletMap";
+
 import windowDimention from "../customHooks/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LeafletMap from "../components/projectDetails/LeafletMap";
+import VerticalTabs from "../components/projectDetails/BasicTabs";
+import MapDescriptionComponents from "../components/projectDetails/MapDescriptionComponents";
 
 const ProjectDetails = () => {
     const { windowSize, type } = windowDimention()
@@ -38,8 +41,13 @@ const ProjectDetails = () => {
                 <LocationOnIcon color='error' style={ProjectDetailsStyles.icon} />
                 <CustomizedText font={enviroment.mediumText} top={'1%'} size={16} text={'Testing Data'} weight={'regular'} />
             </Box>
-
-            <LeafletMap />
+            <Stack direction={'column'} spacing={1}>
+                <MapDescriptionComponents />
+                <LeafletMap />
+            </Stack>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <VerticalTabs />
+            </Box>
         </div>
     )
 }

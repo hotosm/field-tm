@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import enviroment from '../enviroment';
 
 
-const CustomDropdown = ({ toolBarStyle, btnStyle, text, size, names }) => {
+const CustomDropdown = ({ toolBarStyle, btnStyle, text, size, names, appearance, color }) => {
 
     const [styles, setStyles] = useState({
         backgroundColor: 'white',
         color: enviroment.sysBlackColor,
         fontFamily: 'BarlowMedium',
-        fontSize: 16
+        fontSize: 16,
     })
 
     const onMouseEnter = (event) => {
@@ -25,7 +25,7 @@ const CustomDropdown = ({ toolBarStyle, btnStyle, text, size, names }) => {
     }
 
     return (
-        <Dropdown style={toolBarStyle} menuStyle={btnStyle} title={text} size={size} appearance='ghost' color='red'>
+        <Dropdown style={toolBarStyle} menuStyle={btnStyle} title={text} size={size} appearance={appearance} color={color}>
             {
                 names.map((value, index) => {
                     return (

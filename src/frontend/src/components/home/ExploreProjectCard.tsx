@@ -125,7 +125,7 @@ export default function ExploreProjectCard({ data, length }) {
                     <Typography style={{ ...cardInnerStyles.contributors.text, color: 'black', opacity: 0.8 }} sx={{ fontSize: 20 }} color="text.secondary" >
                         {data.num_contributors}
                     </Typography>
-                    <Typography style={{ ...cardInnerStyles.regularText, color: 'black', opacity: 0.8, marginLeft: '1%' }} sx={{ fontSize: 14 }} color="text.secondary" >
+                    <Typography style={{ ...cardInnerStyles.regularText, marginTop: '8%', color: 'black', opacity: 0.8, marginLeft: '1%' }} sx={{ fontSize: 14 }} color="text.secondary" >
                         contributors
                     </Typography>
                 </div>
