@@ -6,8 +6,9 @@ import enviroment from "../enviroment";
 import windowDimention from "../customHooks/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LeafletMap from "../components/projectDetails/LeafletMap";
-import VerticalTabs from "../components/projectDetails/BasicTabs";
+
 import MapDescriptionComponents from "../components/projectDetails/MapDescriptionComponents";
+import BasicTabs from "../components/projectDetails/BasicTabs";
 
 const ProjectDetails = () => {
     const { windowSize, type } = windowDimention()
@@ -46,7 +47,7 @@ const ProjectDetails = () => {
                 <LeafletMap />
             </Stack>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                <VerticalTabs />
+                <BasicTabs />
             </Box>
         </div>
     )

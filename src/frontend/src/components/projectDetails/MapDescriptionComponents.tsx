@@ -3,6 +3,8 @@ import { Stack } from "@mui/system";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React, { useState } from "react";
 import ConfirmationDialogRaw from "../../utilities/ConfirmationDialogRaw";
+import CustomizedMenus from "../../utilities/CustomizedMenus";
+import enviroment from "../../enviroment";
 
 
 
@@ -18,12 +20,11 @@ const MapDescriptionComponents = () => {
     }
     return (
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-            <Stack spacing={2} direction={'row'} justifyContent={'center'} style={{ width: '100%' }}>
-                <Button id="0" onClick={handleClick} endIcon={<KeyboardArrowDownIcon />} style={{ borderRadius: 0, color: 'black' }}>Description</Button>
-                <Button id="1" onClick={handleClick} endIcon={<KeyboardArrowDownIcon />} style={{ borderRadius: 0, color: 'black' }}>Instructions</Button>
-                <Button id="2" onClick={handleClick} endIcon={<KeyboardArrowDownIcon />} style={{ borderRadius: 0, color: 'black' }}>Map Legends</Button>
-                <ConfirmationDialogRaw open={open} value={title} keepMounted={false} id={"1"} onClose={onCloseDialog} />
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 2 }}>
+            <Stack spacing={1} direction={'row'} justifyContent={'center'} style={{ width: '100%' }}>
+                <CustomizedMenus btnName={'Description'} btnProps={{ style: { backgroundColor: 'white', color: enviroment.sysBlackColor, }, sx: { boxShadow: 2 } }} element={<div>cool</div>} />
+                <CustomizedMenus btnName={'Instructions'} btnProps={{ style: { backgroundColor: 'white', color: enviroment.sysBlackColor, }, sx: { boxShadow: 2 } }} element={<div>cool</div>} />
+                <CustomizedMenus btnName={'Map Legends'} btnProps={{ style: { backgroundColor: 'white', color: enviroment.sysBlackColor, }, sx: { boxShadow: 2 } }} element={<div>cool</div>} />
             </Stack>
         </Box>
     )
