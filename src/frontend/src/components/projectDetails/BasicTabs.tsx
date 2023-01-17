@@ -57,14 +57,14 @@ export default function BasicTabs() {
     })
     const { windowSize, type } = windowDimention();
     const viewMode = type == 'xl' ? 6 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1
-
+    const variant: any = type == 's' ? 'fullWidth' : type == 'xs' ? 'fullWidth' : 'standard'
     const TabsStyles = {
         activityTab: {
-            backgroundColor: value == 0 ? 'whitesmoke' : 'white',
+
             color: value == 0 ? enviroment.sysRedColor : enviroment.sysBlackColor,
         },
         tasksTab: {
-            backgroundColor: value == 1 ? 'whitesmoke' : 'white',
+
             color: value == 1 ? enviroment.sysRedColor : enviroment.sysBlackColor
         }
     }
@@ -89,10 +89,10 @@ export default function BasicTabs() {
 
     return (
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'whitesmoke' }}>
-            <Box sx={{ borderColor: 'divider', flexDirection: 'row', justifyContent: 'center' }}>
-                <Tabs TabIndicatorProps={{ sx: { bgcolor: 'whitesmoke' } }} variant='fullWidth' value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab sx={{ mt: 0.8, mb: 1, mr: 1, boxShadow: shadow.activity }} style={TabsStyles.activityTab} label="Activities" {...a11yProps(0)} />
-                    <Tab sx={{ mt: 0.8, mb: 1, ml: 1, boxShadow: shadow.tasks }} style={TabsStyles.tasksTab} label="My Tasks" {...a11yProps(1)} />
+            <Box sx={{ borderColor: 'divider', }}>
+                <Tabs centered TabIndicatorProps={{ style: { backgroundColor: `${enviroment.sysRedColor}` } }} variant={variant} value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tab sx={{ mt: 0.8, mb: 1, mr: 1 }} style={TabsStyles.activityTab} label="Activities" {...a11yProps(0)} />
+                    <Tab sx={{ mt: 0.8, mb: 1, ml: 1 }} style={TabsStyles.tasksTab} label="My Tasks" {...a11yProps(1)} />
                 </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
@@ -218,6 +218,7 @@ export default function BasicTabs() {
                                     subtitle={{}}
                                     contentProps={{}}
                                     variant={'outlined'}
+
                                     headerStatus={false}
                                     content={<Activities />}
                                 />

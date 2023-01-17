@@ -69,10 +69,12 @@ export default function CustomizedMenus({ element, btnProps, btnName }) {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 variant="contained"
+                translate='no'
                 disableElevation
                 onClick={handleClick}
                 {...btnProps}
                 endIcon={<KeyboardArrowDownIcon />}
+
             >
                 {btnName}
             </Button>
