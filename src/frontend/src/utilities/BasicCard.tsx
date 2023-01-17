@@ -19,7 +19,9 @@ export default function BasicCard({ title, subtitle, content, variant, contentPr
                     <CustomizedText {...title} />
                     <CustomizedText {...subtitle} />
                 </Stack>}
-                {content}
+                <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
+                    {content}
+                </Box>
             </CardContent>
         </Card>
     );
