@@ -139,7 +139,6 @@ def convert_to_app_history(db_histories: List[db_models.DbTaskHistory]):
         for db_history in db_histories:
             app_history = db_history
             app_history.obj = db_history.action_text
-            # app_history: tasks_schemas.TaskHistoryBase = db_history
             app_histories.append(app_history)
         return app_histories
     return []
