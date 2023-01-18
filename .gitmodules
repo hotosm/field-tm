@@ -1,0 +1,3 @@
+[submodule "odkconvert"]
+	path = odkconvert
+	url = https://github.com/hotosm/odkconvert.git
