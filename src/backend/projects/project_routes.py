@@ -37,6 +37,11 @@ async def read_projects(user_id: int = None, skip: int = 0, limit: int = 100, db
     return projects
 
 
+@router.post("/near_me", response_model=project_schemas.ProjectSummary)
+def get_task(lat: float, long: float, user_id: int = None):
+    return "Coming..."
+
+
 @router.get("/summaries", response_model=List[project_schemas.ProjectSummary])
 async def read_project_summaries(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
     projects = project_crud.get_project_summaries(db, user_id, skip, limit)
