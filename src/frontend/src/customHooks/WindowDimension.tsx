@@ -23,14 +23,14 @@ function calculateWidthType(width) {
 }
 
 const windowDimention = () => {
+
     const [windowSize, setWindowSize] = useState({
         width: 0,
         height: 0
     })
 
-
-
     useEffect(() => {
+
         const handleResize = () => {
             setWindowSize({
                 width: window.innerWidth,
@@ -39,7 +39,6 @@ const windowDimention = () => {
         }
 
         handleResize();
-
         window.addEventListener('resize', handleResize)
 
         const cleanUp = () => {
