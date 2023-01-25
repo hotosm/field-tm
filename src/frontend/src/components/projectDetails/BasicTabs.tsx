@@ -5,7 +5,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CustomPwComponents from '../../utilities/CustomPwComponents';
-import windowDimention from '../../customHooks/WindowDimension';
+import windowDimention from '../../hooks/WindowDimension';
 import Activities from './Activities';
 import BasicCard from '../../utilities/BasicCard';
 import enviroment from '../../enviroment';
