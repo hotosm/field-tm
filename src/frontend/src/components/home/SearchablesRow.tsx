@@ -7,7 +7,7 @@ import enviroment from "../../enviroment";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import windowDimention from "../../customHooks/WindowDimension";
+import windowDimention from "../../hooks/WindowDimension";
 import CustomDropdown from "../../utilities/CustomDropdown";
 import CustomizedButton from "../../utilities/CustomizedButton";
 const SearchablesRow = () => {

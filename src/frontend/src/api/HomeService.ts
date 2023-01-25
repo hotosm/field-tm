@@ -1,7 +1,7 @@
 import react from 'react';
 import axios from 'axios';
-import { HomeActions } from '../slices/HomeSlice';
-import { HomeProjectCardModel } from '../model/home/homeModel';
+import { HomeActions } from '../store/slices/HomeSlice';
+import { HomeProjectCardModel } from '../models/home/homeModel';
 
 export const HomeSummaryService: Function = (url: string) => {
 

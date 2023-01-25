@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import enviroment from '../enviroment';
-import windowDimention from '../customHooks/WindowDimension';
+import windowDimention from '../hooks/WindowDimension';
 import DrawerComponent from './CustomDrawer';
 import CustomizedImage from '../utilities/CustomizedImage';
 import { Link } from 'react-router-dom';

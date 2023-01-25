@@ -3,7 +3,7 @@ import { Box, Container, Divider, Stack, Typography } from '@mui/material'
 import CustomizedText from "../utilities/CustomizedText";
 import enviroment from "../enviroment";
 
-import windowDimention from "../customHooks/WindowDimension";
+import windowDimention from "../hooks/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LeafletMap from "../components/projectDetails/LeafletMap";
 
