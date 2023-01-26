@@ -34,7 +34,6 @@ wheels/
 .installed.cfg
 *.egg
 venv/
-odkconvert
 
 __pycache__
 credentials.txt
