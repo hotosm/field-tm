@@ -29,7 +29,6 @@ base_url = os.getenv("API_URL")
 
 
 def ping(url):
-    import requests
     try:
         request = requests.get(url, verify=False)
         is_up = request.status_code == 200

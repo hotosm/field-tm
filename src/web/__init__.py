@@ -18,11 +18,8 @@
 import os
 
 from flask import Flask, render_template
-# from flask_migrate import Migrate
 
 from config import config
-
-# migrate = Migrate()
 
 
 def create_app(config_name=None):
@@ -42,15 +39,10 @@ def create_app(config_name=None):
     except OSError:
         pass
 
-    from .models import db
-
-    db.init_app(app)
-    # migrate.init_app(app, db)
-
     # shell context for flask cli
     @app.shell_context_processor
     def ctx():
-        return {"app": app, "db": db}
+        return {"app": app}
 
     with app.app_context():
         # Include our Routes
@@ -58,8 +50,6 @@ def create_app(config_name=None):
         @app.route("/map/<pname>")
         def map_select_page(pname=None):
             return render_template("map.html", pname=pname)
-
-        db.create_all()
 
         # Register Blueprints
         from . import auth

@@ -26,7 +26,7 @@ from flask import (Blueprint, current_app, flash, g, redirect, render_template,
 from werkzeug.exceptions import abort
 
 from src.web.auth import login_required
-from src.web.models import DisplayProject, Project, UITask, Task, FrontendTaskStatus, User, db
+from src.web.models import DisplayProject, UITask, UITaskHistory
 
 # api
 import requests
@@ -39,12 +39,14 @@ grid_filename = "grid.geojson"
 
 @bp.route("/")
 def index():
+    session["open_task_id"] = -1
+    session['project_id'] = None
     try:
         with requests.Session() as s:
             response = s.get(f"{base_url}/projects/?skip=0&limit=100")
             if response.status_code == 200:
                 api_projects = response.json()
-            return render_template("project/index.html", projects=api_projects)
+                return render_template("project/index.html", projects=api_projects)
 
     except Exception as e:
         flash(e)
@@ -177,7 +179,7 @@ def upload_project_zip():
                         if response.status_code == 200:
                             return render_template("project/index.html")
                         else:
-                            error = response.json()
+                            error = response.text
 
             except Exception as e:
                 if response:
@@ -192,11 +194,59 @@ def upload_project_zip():
 
 
 @bp.route("/<int:id>/map", methods=("GET", "POST"))
+@login_required
 def map(id):
     if request.method == "POST":
         pass
     else:
         return render_map_by_project_id(id)
+
+
+@bp.route("/<int:task_uid>/update_task_status", methods=("GET", "POST"))
+def update_task_status(task_uid):
+    project = session['project_id']
+
+    if project:
+        error = None
+        task = None
+
+        if request.method == "POST":
+            new_status = request.form["updateButton"]
+            try:
+                with requests.Session() as s:
+                    response = s.post(
+                        f"{base_url}/tasks/{task_uid}/new_status/{new_status}",
+                        json={
+                            "username": session["username"],
+                            "id": session['user_id']
+                        })
+                    if response.status_code == 200:
+                        task = response.json()
+                        session["open_task_id"] = task_uid
+                    else:
+                        error = response.text
+
+            except Exception as e:
+                error = e
+        else:
+            try:
+                with requests.Session() as s:
+                    response = s.get(
+                        f"{base_url}/tasks/{task_uid}")
+                    if response.status_code == 200:
+                        task = response.json()
+                        return f'<pre>{json.dumps(task, indent=2)}</pre>'
+                    else:
+                        error = response.text
+
+            except Exception as e:
+                error = e
+        # TODO This hardcoding is a horrible idea
+        if error:
+            flash(error)
+        return redirect(url_for(".map", id=project))
+    else:
+        return render_template("project/index.html")
 
 
 def render_map_by_project_id(id):
@@ -206,6 +256,8 @@ def render_map_by_project_id(id):
 
             if response.status_code == 200:
                 project = response.json()
+                session['project_id'] = project['id']
+
                 project_id = project['id']
                 project_name = project['project_info'][0]['name']
                 project_outline = project['outline_geojson']
@@ -213,16 +265,33 @@ def render_map_by_project_id(id):
                 tasks = []
                 for task in project['project_tasks']:
                     ui_task = UITask()
-                    ui_task.status = task['task_status']
+                    ui_task.status = task['task_status_str']
                     ui_task.feature_id = task['project_task_index']
                     ui_task.name = task['project_task_name']
                     ui_task.outline = task['outline_geojson']
                     ui_task.uid = task['id']
-                    ui_task.locked_by = task['locked_by_uid']
+                    ui_task.qr_code = task['qr_code_in_base64']
+                    if task['locked_by_uid']:
+                        ui_task.locked_by_name = task['locked_by_username']
+                        ui_task.locked_by_uid = task['locked_by_uid']
+                    else:
+                        ui_task.locked_by_name = ""
+                        ui_task.locked_by_uid = -1
                     ui_task.centroid = task['outline_centroid']
                     ui_task.centroid_lat = task['outline_centroid']['geometry']['coordinates'][0]
                     ui_task.centroid_long = task['outline_centroid']['geometry']['coordinates'][1]
+                    ui_task.task_history = []
+
+                    for history in task['task_history']:
+                        task_history = UITaskHistory()
+                        task_history.date = history['action_date']
+                        task_history.action_str = history['action_text']
+                        ui_task.task_history.append(task_history)
+
                     tasks.append(ui_task)
+
+                open_task_id = session["open_task_id"]
+                session["open_task_id"] = -1
 
                 return render_template(
                     "project/map.html",
@@ -230,7 +299,8 @@ def render_map_by_project_id(id):
                     project_name=project_name,
                     project_outline=project_outline,
                     tasks=tasks,
-                    userid=session.get("user_id")
+                    userid=session.get("user_id"),
+                    open_task_id=open_task_id,
                     # userid=g.user["id"]
                 )
     except Exception as e:

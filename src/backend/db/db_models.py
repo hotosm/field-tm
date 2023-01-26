@@ -18,7 +18,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, LargeBinary, ARRAY, String, DateTime, Boolean, ForeignKey, ForeignKeyConstraint, UniqueConstraint, Index, Unicode
-from sqlalchemy.orm import relationship, backref  # , declarative_base
+from sqlalchemy.orm import relationship, backref, object_session  # , declarative_base
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
 
@@ -406,14 +406,26 @@ class DbProject(Base):
     status = Column(Enum(ProjectStatus),
                     default=ProjectStatus.DRAFT, nullable=False)
     total_tasks = Column(Integer)
-    tasks_mapped = Column(Integer, default=0, nullable=False)
-    tasks_validated = Column(Integer, default=0, nullable=False)
-    tasks_bad_imagery = Column(Integer, default=0, nullable=False)
+    # tasks_mapped = Column(Integer, default=0, nullable=False)
+    # tasks_validated = Column(Integer, default=0, nullable=False)
+    # tasks_bad_imagery = Column(Integer, default=0, nullable=False)
 
     # TASKS
     tasks = relationship(
         DbTask, backref="projects", cascade="all, delete, delete-orphan"
     )
+
+    @property
+    def tasks_mapped(self):
+        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.MAPPED).with_parent(self).count()
+
+    @property
+    def tasks_validated(self):
+        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.VALIDATED).with_parent(self).count()
+
+    @property
+    def tasks_bad(self):
+        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.BAD).with_parent(self).count()
 
     # XFORM DETAILS
     odk_central_src = Column(String, default="")  # TODO Add HOTs as default

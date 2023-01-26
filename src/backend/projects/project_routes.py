@@ -37,6 +37,11 @@ async def read_projects(user_id: int = None, skip: int = 0, limit: int = 100, db
     return projects
 
 
+@router.post("/near_me", response_model=project_schemas.ProjectSummary)
+def get_task(lat: float, long: float, user_id: int = None):
+    return "Coming..."
+
+
 @router.get("/summaries", response_model=List[project_schemas.ProjectSummary])
 async def read_project_summaries(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
     projects = project_crud.get_project_summaries(db, user_id, skip, limit)
@@ -46,6 +51,15 @@ async def read_project_summaries(user_id: int = None, skip: int = 0, limit: int 
 @router.get("/{project_id}", response_model=project_schemas.ProjectOut)
 async def read_project(project_id: int, db: Session = Depends(database.get_db)):
     project = project_crud.get_project_by_id(db, project_id)
+    if project:
+        return project
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
+@router.post("/delete/{project_id}")
+async def read_project(project_id: int, db: Session = Depends(database.get_db)):
+    project = project_crud.delete_project_by_id(db, project_id)
     if project:
         return project
     else:
