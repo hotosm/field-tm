@@ -17,6 +17,18 @@
 
 #!/bin/python3
 
+"""
+    Accepts
+    - A directory with subdirectories full of:
+      - GeoJSON files representing tasks
+      - XLSForms corresponding to them
+    - A base URL for an ODK Central server
+    - A tuple of username and password to said server
+    And creates an ODK Central project.
+    Project name will be the directory name.
+
+"""
+
 import os
 import sys
 
@@ -190,14 +202,7 @@ def fetch_qr_codes(url, aut, pid, forms, indir):
 
 if __name__ == "__main__":
     """
-    Accepts
-    - A directory full of:
-      - GeoJSON files representing tasks
-      - XLSForms corresponding to them
-    - A base URL for an ODK Central server
-    - A tuple of username and password to said server
-    And creates an ODK Central project.
-    Project name will be the directory name.
+
     """
     indir = sys.argv[1]
     url = sys.argv[2]
