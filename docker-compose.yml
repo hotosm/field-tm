@@ -74,8 +74,8 @@ services:
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - API_URL=http://localhost:8000
-      # - API_URL=http://fmtm-api-1:8000
+      # - API_URL=http://localhost:8000
+      - API_URL=http://fmtm-api-1:8000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
