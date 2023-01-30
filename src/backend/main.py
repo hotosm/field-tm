@@ -29,6 +29,8 @@ from .users import user_routes
 from .auth import login_route
 from .projects import project_routes
 from .tasks import tasks_routes
+from .debug import debug_routes
+from .central import central_routes
 from .db.database import SessionLocal, engine, Base
 
 # setup loggers
@@ -60,6 +62,8 @@ api.include_router(user_routes.router)
 api.include_router(login_route.router)
 api.include_router(project_routes.router)
 api.include_router(tasks_routes.router)
+api.include_router(debug_routes.router)
+api.include_router(central_routes.router)
 
 origins = [
     "http://localhost",
