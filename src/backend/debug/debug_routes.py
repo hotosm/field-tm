@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -31,6 +31,13 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+#
+# These are temporary debugging endpoints so it's possible to
+# call directly into the backend support code. As that code is
+# more developed, then these will be called by other endpoints,
+# and not directly.
+#
+
 @router.get("/", response_model=debug_schemas.DebugOut)
 async def debug():
     return {"message": "Hello World!"}
@@ -58,5 +65,23 @@ def make_basemap():
 def make_task_polygons():
     """Make a multipolygon containing all the task boundaries"""
     logger.info("/debug/polygonize is Unimplemented!")
-    return {"message": "Hello World from /debug/basemap"}
+    return {"message": "Hello World from /debug/polygonize"}
+
+@router.get("/makecsv")
+def do_odk2csv():
+    """Convert the submissions data into a CSV file"""
+    logger.info("/debug/do_odk2csv is Unimplemented!")
+    return {"message": "Hello World from /debug/makecsv"}
+
+@router.get("/makeosm")
+def do_csv2osm():
+    """Convert the submissions data into a CSV file"""
+    logger.info("/debug/do_csv2osm is Unimplemented!")
+    return {"message": "Hello World from /debug/makeosm"}
+
+@router.get("/makexform")
+def make_xform():
+    """Convert the submissions data into a CSV file"""
+    logger.info("/debug/do_csv2osm is Unimplemented!")
+    return {"message": "Hello World from /debug/majexform"}
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -30,7 +30,6 @@ class DebugBase(BaseModel):
 
 class Debug(DebugBase):
     geometry_geojson: str
-
     # qr_code_binary: bytes
     pass
 
