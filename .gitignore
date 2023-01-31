@@ -54,7 +54,14 @@ db.sqlite3
 # ignore settings
 .env
 
+# ignore python environments
+venv
+fmtm-env
+
 # project related
 src/web/static/projects
 temp_webmaps/local_only
 temp_webmaps/Naivasha
+
+# node
+src/frontend/node_modules

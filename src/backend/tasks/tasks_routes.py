@@ -53,6 +53,11 @@ async def read_tasks(
         raise HTTPException(status_code=404, detail="Tasks not found")
 
 
+@router.post("/near_me", response_model=tasks_schemas.TaskOut)
+def get_task(lat: float, long: float, project_id: int = None, user_id: int = None):
+    return "Coming..."
+
+
 @router.get("/{task_id}", response_model=tasks_schemas.TaskOut)
 async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
     task = tasks_crud.get_task(db, task_id)
@@ -63,16 +68,12 @@ async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
-async def update_task_status(
-    user: user_schemas.User,
-    task_id: int,
-    new_status: TaskStatus,
-    db: Session = Depends(database.get_db),
-):
+async def update_task_status(user: user_schemas.User, task_id: int, new_status: tasks_schemas.TaskStatusOption, db: Session = Depends(database.get_db)):
     # TODO verify logged in user
     user_id = user.id
 
-    task = tasks_crud.update_task_status(db, user_id, task_id, new_status)
+    task = tasks_crud.update_task_status(
+        db, user_id, task_id, TaskStatus[new_status.name])
     if task:
         return task
     else:

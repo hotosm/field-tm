@@ -1,0 +1,71 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+.container {
+  font-size: 3rem;
+  margin: auto;
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+.dropdown {
+  width: 100%;
+}
+
+.dropdown-item {
+  width: 100%;
+}
+
+.dropdown-trigger {
+  width: 100%;
+}
+
+button {
+  width: 100%;
+}
+
+.leaflet-container {
+  width: '100%';
+  height: 100vh;
+}
+
+.content {
+  height: 81vh;
+  overflow: auto;
+  padding: 5px
+}
+
+@font-face {
+  font-family: "BarlowBold";
+  src: local("BarlowBold"),
+    url("./fonts/Barlow/Barlow-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "BarlowMedium";
+  src: local("BarlowMedium"),
+    url("./fonts/Barlow/Barlow-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "ArchivoRegular";
+  src: local("ArchivoRegular"),
+    url("./fonts/Archivo/Archivo/Archivo-Regular.ttf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "ArchivoMedium";
+  src: local("ArchivoMedium"),
+    url("./fonts/Archivo/Archivo/Archivo-Medium.ttf") format("truetype");
+
+}
+
+@font-face {
+  font-family: "ArchivoLight";
+  src: local("ArchivoLight"),
+    url("./fonts/Archivo/Archivo/Archivo-Light.ttf") format("truetype");
+
+}
