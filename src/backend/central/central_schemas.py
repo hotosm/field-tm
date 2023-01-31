@@ -23,22 +23,22 @@ from typing import List
 import enum
 import logging.config
 from fastapi.logger import logger as logger
+from enum import Enum
 
 
 class CentralBase(BaseModel):
-    pass
+    central_url: str
 
 class Central(CentralBase):
     geometry_geojson: str
     # qr_code_binary: bytes
-    pass
-
 
 class CentralOut(CentralBase):
     logger.debug("Hello World!")
-    pass
 
+class CentralFileType(BaseModel):
+    filetype: Enum('FileType', ['xform', 'extract', 'zip', 'xlsform', 'all'])
+    logger.debug("Hello World!")
 
 class CentralDetails(CentralBase):
     logger.debug("Hello World!")
-    pass
