@@ -17,6 +17,7 @@
 #
 
 from fastapi import HTTPException
+from fastapi.logger import logger as logger
 from geoalchemy2.shape import to_shape
 from shapely.geometry import shape, mapping
 from sqlalchemy.orm import Session
@@ -32,5 +33,21 @@ from ..tasks import tasks_schemas
 from ..central import central_schemas
 from pyodk.client import Client
 import csv
+from fastapi.responses import FileResponse
 
 
+class OdkCentral(object):
+    """Test class for fastapi"""
+    def __init__(self):
+        pass
+
+    def exists(self):
+        return "Yes I exists!"
+
+#odk = OdkCentral()
+
+def does_central_exist():
+    # xxx = odk.exists()
+    xxx = "Yes, Central exists"
+    logger.debug("Yes, Central exists")
+    return xxx

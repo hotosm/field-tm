@@ -22,7 +22,9 @@ import logging.config
 from fastapi.logger import logger as logger
 from ..db import database
 from ..models.enums import TaskStatus
-from ..debug import debug_schemas, debug_crud
+from ..central import central_schemas, central_crud
+from fastapi.responses import FileResponse
+
 
 router = APIRouter(
     prefix="/central",
@@ -31,38 +33,43 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.get("/", response_model=debug_schemas.DebugOut)
+@router.get("/", response_model=central_schemas.CentralOut)
 async def central():
     return {"message": "Hello World!"}
     #raise HTTPException(status_code=404, detail="Tasks not found")
 
 @router.get("/appuser")
-def create_appuser():
+async def create_appuser(name):
     """Create an appuser in Central"""
-    logger.info("/central/submissions is Unimplemented!")
-    return {"message": "Hello World from /debug/submisisons"}
+    logger.info("/central/appuser is Unimplemented!")
+    return {"message": "Hello World from /central/appuser"}
 
 @router.get("/project")
-def create_project():
+async def create_project(name: str, boundary: str):
     """Create a project in Central"""
-    logger.info("/central/submissions is Unimplemented!")
-    return {"message": "Hello World from /debug/submisisons"}
+    logger.info("/central/project is Unimplemented!")
+    # TODO: Return project_id instead of debug
+    return {"message": "Hello World from /central/project"}
 
 @router.get("/submissions")
-def download_submissions():
+async def download_submissions(project_id: int, xform_id: str):
     """Download the submissions data from Central"""
     logger.info("/central/submissions is Unimplemented!")
-    return {"message": "Hello World from /debug/submisisons"}
+    return {"message": "Hello World from /central/submisisons"}
 
 @router.get("/upload")
-def upload_project_files():
+async def upload_project_files(project_id: int, filespec: str):
     """Upload the XForm and data files to Central"""
-    logger.info("/central/submissions is Unimplemented!")
+    logger.warning("/central/upload is Unimplemented!")
     return {"message": "Hello World from /central/upload"}
 
 @router.get("/download")
-def download_project_files():
-    """Download the project data files from Central"""
-    logger.info("/central/submissions is Unimplemented!")
-    return {"message": "Hello World from /central/upload"}
+async def download_project_files(project_id: int, type: central_schemas.CentralFileType):
+    """Download the project data files from Central. The filespec is
+    a string that can contain multiple filenames separeted by a comma.
+    """
+    # FileResponse("README.md")
+    #xxx = central_crud.does_central_exist()
+    logger.warning("/central/download is Unimplemented!")
+    return {"message": "Hello World from /central/download"}
 
