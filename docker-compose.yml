@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: '3.3'
+version: '3.4'
 
 services:
   db:
@@ -31,16 +31,16 @@ services:
     networks:
       - fmtm-net
 
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - db
 
   api:
     build: .
@@ -74,6 +74,7 @@ services:
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      # - API_URL=http://localhost:8000
       - API_URL=http://fmtm-api-1:8000
     labels:
       - "traefik.enable=true"
@@ -82,6 +83,17 @@ services:
       - db
     networks:
       - fmtm-net
+
+  # react-ui:
+  #   build:
+  #     context: ./my-app
+  #   ports:
+  #     - "3000:3000"
+  #   container_name: react-ui
+  #   stdin_open: true
+  #   volumes:
+  #      - ./my-app:/usr/src/app/my-app
+  #      - /usr/src/app/my-app/node_modules
 
   # alternative webproxy to nginx
   traefik:

@@ -47,13 +47,15 @@ class BETAProjectUpload(BaseModel):
 class ProjectSummary(BaseModel):
     id: int = -1
     priority: ProjectPriority = ProjectPriority.MEDIUM
+    priority_str: str = priority.name
     title: str = None
     location_str: str = None
     description: str = None
+    num_contributors: int = None
     total_tasks: int = None
     tasks_mapped: int = None
     tasks_validated: int = None
-    tasks_bad_imagery: int = None
+    tasks_bad: int = None
 
     class Config:
         orm_mode = True

@@ -23,15 +23,15 @@
 FROM python:3.9.5-slim as builder
 
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends libpq-dev gcc
+# install postgresql package requirements
+RUN apt update && \
+    apt install -y libpq-dev gcc
 
 # lint
 RUN pip install --upgrade pip
@@ -39,9 +39,14 @@ RUN pip install --upgrade pip
 COPY . .
 ## RUN flake8 --ignore=E501,F401 .
 
-# install python dependencies
-COPY ./src/web/requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+# install frontend dependencies
+COPY src/web/requirements.txt /usr/src/app/frontend_requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r /usr/src/app/frontend_requirements.txt
+
+# install backend dependencies
+COPY src/backend/requirements.txt /usr/src/app/backend_requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r /usr/src/app/backend_requirements.txt
+
 
 
 #########
@@ -61,17 +66,21 @@ RUN addgroup --system app && adduser --system --group app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+WORKDIR $HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat
+# install postgresql package requirements
+RUN apt update && \
+    apt install -y libpq-dev gcc
+RUN apt-get install libpq5 -y
 COPY --from=builder /usr/src/app/wheels /wheels
-COPY --from=builder /usr/src/app/requirements.txt .
+COPY --from=builder /usr/src/app/frontend_requirements.txt .
+COPY --from=builder /usr/src/app/backend_requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
 # copy project
-COPY . $APP_HOME
+COPY . $HOME
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
