@@ -22,7 +22,7 @@ from sqlalchemy.orm import sessionmaker
 
 from . import config_env
 
-SQLALCHEMY_DATABASE_URL = config_env["DB_URL"]
+SQLALCHEMY_DATABASE_URL = config_env["DATABASE_URL"]
 # When running docker db locally
 # SQLALCHEMY_DATABASE_URL = 'postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm'
 # The url is formatted like: 'postgresql://{db_username}:{db_password}@{host_server}:{db_server_port}/{database_name}
