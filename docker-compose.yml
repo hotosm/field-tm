@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: '3.4'
+version: "3.4"
 
 services:
   db:
@@ -44,9 +44,9 @@ services:
 
   api:
     build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn main:api --host 0.0.0.0 --reload'
     volumes:
-      - .:/api
+      - ./src/backend:/app
     depends_on:
       - db
     environment:
@@ -113,7 +113,6 @@ services:
 
 volumes:
   postgres_data:
-
 
 networks:
   fmtm-net: #     external: true
