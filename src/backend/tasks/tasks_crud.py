@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import base64
 import json
 from typing import List
 
@@ -31,17 +32,8 @@ from models.enums import (
 )
 from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session
-
-from typing import List
-import json
-import base64
-
-from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, get_centroid
-from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change, verify_valid_status_update
-from ..users import user_crud, user_schemas
-from ..tasks import tasks_schemas
-
+from tasks import tasks_schemas
+from users import user_crud, user_schemas
 
 # --------------
 # ---- CRUD ----
@@ -82,22 +74,28 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
     db_task = get_task(db, task_id, db_obj=True)
 
     if db_task:
-        if (db_task.task_status in [TaskStatus.LOCKED_FOR_MAPPING,
-                                    TaskStatus.LOCKED_FOR_VALIDATION]) and user_id is not db_task.locked_by:
+        if (
+            db_task.task_status
+            in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]
+        ) and user_id is not db_task.locked_by:
             raise HTTPException(
-                status_code=401, detail=f"User {user_id} with username {db_user.username} has not locked this task."
+                status_code=401,
+                detail=f"User {user_id} with username {db_user.username} has not locked this task.",
             )
 
         if verify_valid_status_update(db_task.task_status, new_status):
             # update history prior to updating task
             update_history = create_task_history_for_status_change(
-                db_task, new_status, db_user)
+                db_task, new_status, db_user
+            )
             db.add(update_history)
-
 
             db_task.task_status = new_status
 
-            if new_status in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]:
+            if new_status in [
+                TaskStatus.LOCKED_FOR_MAPPING,
+                TaskStatus.LOCKED_FOR_VALIDATION,
+            ]:
                 db_task.locked_by = db_user.id
             else:
                 db_task.locked_by = None
@@ -116,8 +114,10 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 
     else:
         raise HTTPException(
+            status_code=400,
+            detail=f"Not a valid status update: {db_task.task_status.name} to {new_status.name}",
+        )
 
-            status_code=400, detail=f'Not a valid status update: {db_task.task_status.name} to {new_status.name}')
 
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
@@ -131,8 +131,7 @@ def create_task_history_for_status_change(
         project_id=db_task.project_id,
         task_id=db_task.id,
         action=get_action_for_status_change(new_status),
-
-        action_text=f'Status changed from {db_task.task_status.name} to {new_status.name} by: {db_user.username}',
+        action_text=f"Status changed from {db_task.task_status.name} to {new_status.name} by: {db_user.username}",
         actioned_by=db_user,
         user_id=db_user.id,
     )
@@ -171,7 +170,9 @@ def convert_to_app_history(db_histories: List[db_models.DbTaskHistory]):
 def convert_to_app_task(db_task: db_models.DbTask):
     if db_task:
         app_task: tasks_schemas.Task = db_task
-        app_task.task_status_str = tasks_schemas.TaskStatusOption[app_task.task_status.name]
+        app_task.task_status_str = tasks_schemas.TaskStatusOption[
+            app_task.task_status.name
+        ]
 
         if db_task.outline:
             properties = {
@@ -187,12 +188,10 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.locked_by_username = db_task.lock_holder.username
 
         if db_task.qr_code:
-            app_task.qr_code_in_base64 = base64.b64encode(
-                db_task.qr_code.image)
+            app_task.qr_code_in_base64 = base64.b64encode(db_task.qr_code.image)
 
         if db_task.task_history:
-            app_task.task_history = convert_to_app_history(
-                db_task.task_history)
+            app_task.task_history = convert_to_app_history(db_task.task_history)
 
         return app_task
     else:

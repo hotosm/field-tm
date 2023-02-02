@@ -1,0 +1,7 @@
+OSM_CLIENT_ID=
+OSM_CLIENT_SECRET=
+OSM_URL=https://www.openstreetmap.org
+OSM_SCOPE=read_prefs
+OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
+OSM_SECRET_KEY=
+DB_URL=postgresql://{db_username}:{db_password}@{host_server}:{db_server_port}/{database_name}

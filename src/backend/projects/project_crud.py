@@ -29,14 +29,9 @@ from geoalchemy2.shape import to_shape
 from geojson_pydantic import FeatureCollection
 from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session, joinedload
-from tasks import tasks_crud
+from tasks import tasks_crud, tasks_schemas
 from users import user_crud
 
-
-from ..db.postgis_utils import timestamp, geometry_to_geojson
-from ..db import db_models
-from ..users import user_crud
-from ..tasks import tasks_crud, tasks_schemas
 from . import project_schemas
 
 # --------------
@@ -47,7 +42,9 @@ QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
 
 
-def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False):
+def get_projects(
+    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
+):
     if user_id:
         db_projects = (
             db.query(db_models.DbProject)
@@ -58,8 +55,7 @@ def get_projects(db: Session, user_id: int, skip: int = 0, limit: int = 100, db_
         )
     else:
 
-        db_projects = db.query(db_models.DbProject).offset(
-            skip).limit(limit).all()
+        db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
@@ -88,34 +84,44 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
 
 def get_project_by_id_w_all_tasks(db: Session, project_id: int):
 
-    db_project = db\
-        .query(db_models.DbProject)\
-        .filter(db_models.DbProject.id == project_id)\
+    db_project = (
+        db.query(db_models.DbProject)
+        .filter(db_models.DbProject.id == project_id)
         .first()
     )
+
     return convert_to_app_project(db_project)
 
 
 def get_project_by_id(db: Session, project_id: int):
 
-=======
-    db_project = db.query(db_models.DbProject).filter(
-        db_models.DbProject.id == project_id).order_by(db_models.DbProject.id).first()
+    db_project = (
+        db.query(db_models.DbProject)
+        .filter(db_models.DbProject.id == project_id)
+        .order_by(db_models.DbProject.id)
+        .first()
+    )
     return convert_to_app_project(db_project)
 
 
 def delete_project_by_id(db: Session, project_id: int):
     try:
-        db_project = db.query(db_models.DbProject).filter(
-            db_models.DbProject.id == project_id).order_by(db_models.DbProject.id).first()
+        db_project = (
+            db.query(db_models.DbProject)
+            .filter(db_models.DbProject.id == project_id)
+            .order_by(db_models.DbProject.id)
+            .first()
+        )
         db.delete(db_project)
         db.commit()
     except Exception as e:
         raise HTTPException(e)
-    return f'Project {project_id} deleted'
+    return f"Project {project_id} deleted"
 
 
-def create_project_with_project_info(db: Session, project_metadata: project_schemas.BETAProjectUpload):
+def create_project_with_project_info(
+    db: Session, project_metadata: project_schemas.BETAProjectUpload
+):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
 
@@ -417,8 +423,9 @@ def convert_to_project_summary(db_project: db_models.DbProject):
             summary.title = default_project_info.name
             summary.description = default_project_info.short_description
 
-        summary.num_contributors = db_project.tasks_mapped + \
-            db_project.tasks_validated  # TODO: get real number of contributors
+        summary.num_contributors = (
+            db_project.tasks_mapped + db_project.tasks_validated
+        )  # TODO: get real number of contributors
 
         return summary
     else:
