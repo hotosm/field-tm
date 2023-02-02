@@ -20,9 +20,9 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 import logging.config
 from fastapi.logger import logger as logger
-from ..db import database
-from ..models.enums import TaskStatus
-from ..central import central_schemas, central_crud
+from db import database
+from models.enums import TaskStatus
+from central import central_schemas, central_crud
 from fastapi.responses import FileResponse
 
 
