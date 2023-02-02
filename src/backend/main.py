@@ -40,8 +40,6 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 from fastapi.middleware.cors import CORSMiddleware
 from os import path
 
-
-
 # setup loggers
 log_file_path = path.join(path.dirname(path.abspath("logging.conf")), "logging.conf")
 
@@ -70,6 +68,8 @@ api = FastAPI()
 api.include_router(user_routes.router)
 api.include_router(project_routes.router)
 api.include_router(tasks_routes.router)
+api.include_router(debug_routes.router)
+api.include_router(central_routes.router)
 
 origins = [
     "http://localhost",

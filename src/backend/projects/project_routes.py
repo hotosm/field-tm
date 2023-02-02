@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -69,7 +69,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.post("/delete/{project_id}")
-async def read_project(project_id: int, db: Session = Depends(database.get_db)):
+async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     project = project_crud.delete_project_by_id(db, project_id)
     if project:
         return project
