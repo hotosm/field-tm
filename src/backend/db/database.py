@@ -16,12 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# TODO don't hardcode this
-SQLALCHEMY_DATABASE_URL = 'postgresql+psycopg2://fmtm:fmtm@db:5432'
+from . import config_env
+
+SQLALCHEMY_DATABASE_URL = config_env["DATABASE_URL"]
 # When running docker db locally
 # SQLALCHEMY_DATABASE_URL = 'postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm'
 # The url is formatted like: 'postgresql://{db_username}:{db_password}@{host_server}:{db_server_port}/{database_name}
