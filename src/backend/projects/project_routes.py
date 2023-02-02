@@ -16,12 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
-from sqlalchemy.orm import Session
 from typing import List
 
-from ..db import database
-from . import project_schemas, project_crud
+from db import database
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from sqlalchemy.orm import Session
+
+from . import project_crud, project_schemas
 
 router = APIRouter(
     prefix="/projects",
@@ -32,7 +33,12 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[project_schemas.ProjectOut])
-async def read_projects(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
+async def read_projects(
+    user_id: int = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(database.get_db),
+):
     projects = project_crud.get_projects(db, user_id, skip, limit)
     return projects
 
@@ -43,7 +49,12 @@ def get_task(lat: float, long: float, user_id: int = None):
 
 
 @router.get("/summaries", response_model=List[project_schemas.ProjectSummary])
-async def read_project_summaries(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
+async def read_project_summaries(
+    user_id: int = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(database.get_db),
+):
     projects = project_crud.get_project_summaries(db, user_id, skip, limit)
     return projects
 
@@ -67,7 +78,10 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.post("/beta/create_project", response_model=project_schemas.ProjectOut)
-async def create_project_part_1(project_info: project_schemas.BETAProjectUpload, db: Session = Depends(database.get_db)):
+async def create_project_part_1(
+    project_info: project_schemas.BETAProjectUpload,
+    db: Session = Depends(database.get_db),
+):
     # TODO check token against user or use token instead of passing user
     project = project_crud.create_project_with_project_info(db, project_info)
     return project
@@ -79,9 +93,10 @@ async def upload_beta_project(
     project_name_prefix: str,
     task_type_prefix: str,
     upload: UploadFile,
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
 ):
     # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
     project = project_crud.update_project_with_upload(
-        db, project_id, project_name_prefix, task_type_prefix, upload)
-    return f'{project}'
+        db, project_id, project_name_prefix, task_type_prefix, upload
+    )
+    return f"{project}"
