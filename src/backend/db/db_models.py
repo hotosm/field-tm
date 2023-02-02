@@ -21,11 +21,45 @@ from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, LargeBina
 from sqlalchemy.orm import relationship, backref, object_session  # , declarative_base
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
-
-from src.backend.db.postgis_utils import timestamp
-from src.backend.models.enums import TeamVisibility, OrganisationType, ProjectStatus, ProjectPriority, MappingPermission, ValidationPermission, MappingLevel, UserRole, TaskCreationMode, TaskAction, TaskStatus, ProjectSplitStrategy, TaskType
+from models.enums import (
+    MappingLevel,
+    MappingPermission,
+    OrganisationType,
+    ProjectPriority,
+    ProjectSplitStrategy,
+    ProjectStatus,
+    TaskAction,
+    TaskCreationMode,
+    TaskStatus,
+    TaskType,
+    TeamVisibility,
+    UserRole,
+    ValidationPermission,
+)
+from sqlalchemy import (
+    ARRAY,
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Index,
+    Integer,
+    LargeBinary,
+    String,
+    Table,
+    Unicode,
+    UniqueConstraint,
+    desc,
+)
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref, relationship  # , declarative_base
 
 from .database import Base, FmtmMetadata
+from .postgis_utils import timestamp
 
 
 class DbUser(Base):
@@ -45,7 +79,8 @@ class DbUser(Base):
     is_expert = Column(Boolean, default=False)
 
     mapping_level = Column(
-        Enum(MappingLevel), default=MappingLevel.BEGINNER, nullable=False)
+        Enum(MappingLevel), default=MappingLevel.BEGINNER, nullable=False
+    )
     tasks_mapped = Column(Integer, default=0, nullable=False)
     tasks_validated = Column(Integer, default=0, nullable=False)
     tasks_invalidated = Column(Integer, default=0, nullable=False)
@@ -74,17 +109,14 @@ class DbUser(Base):
 organisation_managers = Table(
     "organisation_managers",
     FmtmMetadata,
-    Column(
-        "organisation_id", Integer, ForeignKey("organisations.id"), nullable=False
-    ),
+    Column("organisation_id", Integer, ForeignKey("organisations.id"), nullable=False),
     Column("user_id", BigInteger, ForeignKey("users.id"), nullable=False),
-    UniqueConstraint("organisation_id", "user_id",
-                     name="organisation_user_key"),
+    UniqueConstraint("organisation_id", "user_id", name="organisation_user_key"),
 )
 
 
 class DbOrganisation(Base):
-    """ Describes an Organisation """
+    """Describes an Organisation"""
 
     __tablename__ = "organisations"
 
@@ -95,8 +127,7 @@ class DbOrganisation(Base):
     logo = Column(String)  # URL of a logo
     description = Column(String)
     url = Column(String)
-    type = Column(Enum(OrganisationType),
-                  default=OrganisationType.FREE, nullable=False)
+    type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
     subscription_tier = Column(Integer)
 
     managers = relationship(
@@ -107,7 +138,7 @@ class DbOrganisation(Base):
 
 
 class DbTeam(Base):
-    """ Describes a team """
+    """Describes a team"""
 
     __tablename__ = "teams"
 
@@ -152,7 +183,7 @@ class DbProjectTeams(Base):
 
 
 class DbProjectInfo(Base):
-    """ Contains all project info localized into supported languages """
+    """Contains all project info localized into supported languages"""
 
     __tablename__ = "project_info"
 
@@ -177,13 +208,11 @@ class DbProjectInfo(Base):
 
 
 class DbProjectChat(Base):
-    """ Contains all project info localized into supported languages """
+    """Contains all project info localized into supported languages"""
 
     __tablename__ = "project_chat"
     id = Column(BigInteger, primary_key=True)
-    project_id = Column(
-        Integer, ForeignKey("projects.id"), index=True, nullable=False
-    )
+    project_id = Column(Integer, ForeignKey("projects.id"), index=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     time_stamp = Column(DateTime, nullable=False, default=timestamp)
     message = Column(String, nullable=False)
@@ -213,16 +242,12 @@ class DbTaskInvalidationHistory(Base):
     is_closed = Column(Boolean, default=False)
     mapper_id = Column(BigInteger, ForeignKey("users.id", name="fk_mappers"))
     mapped_date = Column(DateTime)
-    invalidator_id = Column(
-        BigInteger, ForeignKey("users.id", name="fk_invalidators")
-    )
+    invalidator_id = Column(BigInteger, ForeignKey("users.id", name="fk_invalidators"))
     invalidated_date = Column(DateTime)
     invalidation_history_id = Column(
         Integer, ForeignKey("task_history.id", name="fk_invalidation_history")
     )
-    validator_id = Column(
-        BigInteger, ForeignKey("users.id", name="fk_validators")
-    )
+    validator_id = Column(BigInteger, ForeignKey("users.id", name="fk_validators"))
     validated_date = Column(DateTime)
     updated_date = Column(DateTime, default=timestamp)
 
@@ -236,9 +261,7 @@ class DbTaskInvalidationHistory(Base):
             "invalidator_id",
             "is_closed",
         ),
-        Index(
-            "idx_task_validation_mapper_status_composite", "mapper_id", "is_closed"
-        ),
+        Index("idx_task_validation_mapper_status_composite", "mapper_id", "is_closed"),
         {},
     )
 
@@ -262,7 +285,7 @@ class DbTaskMappingIssue(Base):
 
 
 class DbMappingIssueCategory(Base):
-    """ Represents a category of task mapping issues identified during validaton """
+    """Represents a category of task mapping issues identified during validaton"""
 
     __tablename__ = "mapping_issue_categories"
     id = Column(Integer, primary_key=True)
@@ -342,11 +365,10 @@ class DbTask(Base):
     )
 
     # Mapped objects
-    qrcode_id = Column(
-        Integer, ForeignKey("qr_code.id"), index=True
-    )
+    qrcode_id = Column(Integer, ForeignKey("qr_code.id"), index=True)
     qr_code = relationship(
-        DbQrCode, cascade="all, delete, delete-orphan", single_parent=True)
+        DbQrCode, cascade="all, delete, delete-orphan", single_parent=True
+    )
 
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
@@ -403,8 +425,7 @@ class DbProject(Base):
 
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
-    status = Column(Enum(ProjectStatus),
-                    default=ProjectStatus.DRAFT, nullable=False)
+    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
     total_tasks = Column(Integer)
     # tasks_mapped = Column(Integer, default=0, nullable=False)
     # tasks_validated = Column(Integer, default=0, nullable=False)
@@ -433,9 +454,7 @@ class DbProject(Base):
     xform = relationship(DbXForm)
 
     __table_args__ = (
-        Index(
-            "idx_geometry", outline, postgresql_using="gist"
-        ),
+        Index("idx_geometry", outline, postgresql_using="gist"),
         {},
     )
 
@@ -444,14 +463,16 @@ class DbProject(Base):
     # PROJECT ACCESS
     private = Column(Boolean, default=False)  # Only allowed users can validate
     mapper_level = Column(
-        Enum(MappingLevel), default=MappingLevel.INTERMEDIATE, nullable=False, index=True
+        Enum(MappingLevel),
+        default=MappingLevel.INTERMEDIATE,
+        nullable=False,
+        index=True,
     )  # Mapper level project is suitable for
     priority = Column(Enum(ProjectPriority), default=ProjectPriority.MEDIUM)
     featured = Column(
         Boolean, default=False
     )  # Only admins can set a project as featured
-    mapping_permission = Column(
-        Enum(MappingPermission), default=MappingPermission.ANY)
+    mapping_permission = Column(Enum(MappingPermission), default=MappingPermission.ANY)
     validation_permission = Column(
         Enum(ValidationPermission), default=ValidationPermission.LEVEL
     )  # Means only users with validator role can validate
@@ -495,7 +516,7 @@ user_licenses_table = Table(
 
 
 class DbLicense(Base):
-    """ Describes an individual license"""
+    """Describes an individual license"""
 
     __tablename__ = "licenses"
 

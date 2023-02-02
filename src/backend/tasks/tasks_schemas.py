@@ -16,19 +16,20 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel
-from datetime import datetime
-from geojson_pydantic import Feature, Point
-from typing import List
-import enum
 
-from ..models.enums import TaskStatus
+import enum
+from datetime import datetime
+from typing import List
+
+from geojson_pydantic import Feature, Point
+from models.enums import TaskStatus
+from pydantic import BaseModel
 
 
 def get_task_status_strings():
     names = [option.name for option in TaskStatus]
     options = {names[i]: names[i] for i in range(len(names))}
-    return enum.Enum('TaskStatusOptions', options)
+    return enum.Enum("TaskStatusOptions", options)
 
 
 # Dynamically creates String Enums for API based on Task Status options
