@@ -24,8 +24,8 @@ In `src/backend/database.py` switch from docker to local `SQLALCHEMY_DATABASE_UR
 
 From command line:
 
--   install dependencies with: `pip install -r src/backend/requirements.txt`
--   run fast api with: `uvicorn src.backend.main:api --host 0.0.0.0:5000 --reload` (you can also gry a simple: `uvicorn src.backend.main:api --reload`)
+-   Navigate to ```src/backend/
+-   Follow ```Readme.md```
 
 #### flask frontend not in docker
 
