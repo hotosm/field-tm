@@ -31,6 +31,8 @@ from fastapi.responses import FileResponse
 from projects import project_routes
 from tasks import tasks_routes
 from users import user_routes
+from central import central_routes
+from debug import debug_routes
 
 # from .auth import login_route
 
