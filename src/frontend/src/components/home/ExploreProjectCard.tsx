@@ -12,7 +12,7 @@ import { Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 //Explore Project Card Model to be renderd in home view
-export default function ExploreProjectCard({ data, length }) {
+export default function ExploreProjectCard({ data }) {
 
     const [shadowBox, setShadowBox] = React.useState(0)
     const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
@@ -34,20 +34,17 @@ export default function ExploreProjectCard({ data, length }) {
             width: 100,
             height: 35,
             marginTop: '5%',
-            padding: 0,
             position: 'absolute',
             fontFamily: defaultTheme.typography.h3.fontFamily,
             right: 0,
             borderRadius: 0,
-            border: 0,
-            shadowBox: 0,
         },
         card: {
             border: `1px solid ${defaultTheme.palette.warning['main']}`,
             marginLeft: '0.1%',
             marginRight: '0.1%',
             marginTop: '0.7%',
-            width: `${100 / length}%`,
+            width: `${100}%`,
             cursor: 'pointer',
             opacity: 0.9,
             position: 'relative',
@@ -98,14 +95,15 @@ export default function ExploreProjectCard({ data, length }) {
 
                 {/*Project Info and description*/}
                 <Stack direction={'column'} height={170} mt={'2%'} justifyContent={'left'}>
-                    <div style={{ marginLeft: '2%', marginTop: '5%' }}>
-                        <Typography
-                            variant='subtitle1'
-                            color="info"
-                            gutterBottom>
-                            {data.title}
-                        </Typography>
-                    </div>
+
+                    <Typography
+                        ml={'2%'}
+                        mt={'5%'}
+                        variant='subtitle1'
+                        color="info"
+                        gutterBottom>
+                        {data.title}
+                    </Typography>
 
                     <Stack direction={'row'}>
                         <LocationOnIcon
@@ -120,7 +118,6 @@ export default function ExploreProjectCard({ data, length }) {
                             {data.location_str}
                         </Typography>
                     </Stack>
-
 
                     <Typography
                         mt={'7%'}

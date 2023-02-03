@@ -42,7 +42,6 @@ const CustomSwiper = ({ listOfData, switchMode, screenType }) => {
                         <SwiperSlide key={i}>
                             <CustomSwiperSwitcher
                                 data={item}
-                                key={i}
                                 mode={switchMode}
                                 selected={listOfData[0]}
                             />

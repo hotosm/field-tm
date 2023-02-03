@@ -51,7 +51,6 @@ export default function PrimaryAppBar() {
     },
     btnLogin: {
       fontSize: defaultTheme.typography.h3.fontSize,
-      color: defaultTheme.palette.text.secondary
     }
   }
   const { type } = windowDimention();
@@ -90,8 +89,8 @@ export default function PrimaryAppBar() {
               onClick={handleLightToggle}
               color="inherit"
             >
-              {brightness != true ? <DarkModeIcon /> :
-                <LightModeIcon />
+              {brightness != true ? <LightModeIcon /> :
+                <DarkModeIcon />
               }
             </IconButton>
           </Box>
@@ -100,14 +99,14 @@ export default function PrimaryAppBar() {
             <Button
               className='btnLogin'
               style={appBarInnerStyles.btnLogin}
-              color="primary" >
+              color="info" >
               Login
             </Button>
 
             <Button
               className='btnSignUp'
               style={appBarInnerStyles.btnLogin}
-              color="primary" >
+              color="info" >
               Sign up
             </Button>
           </Box>

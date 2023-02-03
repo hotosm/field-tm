@@ -8,12 +8,14 @@ import BasicTabs from "../utilities/BasicTabs";
 import MapLegends from "../components/projectDetails/MapLegends";
 import ActivitiesPanel from "../components/projectDetails/ActivitiesPanel";
 import TasksComponent from "../components/projectDetails/TasksPanel";
-import defaultTheme from "../themes/defaultTheme";
+import { useSelector } from "react-redux";
+
 
 const ProjectDetails = () => {
 
     const { type } = windowDimention();
     const viewMode = type == 'xl' ? 6 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1
+    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
     const ProjectDetailsStyles = {
         text: {
             marginLeft: '2%'
@@ -29,7 +31,7 @@ const ProjectDetails = () => {
     ]
 
     const panelData: any = [
-        { label: 'Activities', element: <ActivitiesPanel viewMode={viewMode} /> },
+        { label: 'Activities', element: <ActivitiesPanel /> },
         { label: 'My Tasks', element: <TasksComponent type={type} /> }
     ]
 
