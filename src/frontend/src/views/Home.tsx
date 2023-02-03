@@ -15,8 +15,7 @@ import SearchablesRow from "../components/home/HomePageFilters";
 const Home = () => {
 
 
-    const { windowSize, type } = windowDimention();
-
+    const { type } = windowDimention();
     //get window dimension
 
     const dispatch = useDispatch()

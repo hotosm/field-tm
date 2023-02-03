@@ -22,7 +22,7 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
 
   const onMouseLeave = (event) => {
     const element: any = document.getElementById(`text${event.target.id}`);
-    element != null ? element.style.color = `${defaultTheme.palette.primary['main']}` : null
+    element != null ? element.style.color = `${defaultTheme.palette.info['main']}` : null
 
   }
 
@@ -60,7 +60,6 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
           <Box sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
-
             <IconButton
               size="large"
               aria-label="show more"
@@ -84,10 +83,6 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
                     key={index}
                   >
                     <ListItemText
-                      style={{
-                        fontFamily: defaultTheme.typography.subtitle2.fontFamily,
-                        fontSize: defaultTheme.typography.htmlFontSize
-                      }}
                       id={`text${index}`}
                       primary={value}
 
