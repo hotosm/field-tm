@@ -6,18 +6,21 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
-import enviroment from '../enviroment';
 import windowDimention from '../hooks/WindowDimension';
 import DrawerComponent from './CustomDrawer';
 import CustomizedImage from '../utilities/CustomizedImage';
 import { Link } from 'react-router-dom';
-
-
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import { useDispatch, useSelector } from 'react-redux';
+import { ThemeActions } from '../store/slices/ThemeSlice';
 
 export default function PrimaryAppBar() {
-  const [c, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [open, setOpen] = React.useState<boolean>(false);
 
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [brightness, setBrightness] = React.useState<boolean>(true)
+  const dispatch = useDispatch();
+  const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme);
 
   const handleOpenDrawer = () => {
     setOpen(true)
@@ -27,86 +30,94 @@ export default function PrimaryAppBar() {
     setOpen(false)
   }
 
+  const handleLightToggle = () => {
+    setBrightness(!brightness)
+
+    const newTheme = {
+      ...defaultTheme,
+      palette: {
+        ...defaultTheme.palette,
+        mode: !brightness == true ? 'light' : 'dark'
+      }
+    }
+    console.log({ ...defaultTheme, mode: 'dark' })
+    dispatch(ThemeActions.UpdateBrightness(newTheme))
+  }
 
   const appBarInnerStyles = {
-
-    appBar: {
-      backgroundColor: 'white'
-    },
-
-    menu: {
-      backgroundColor: 'black'
-    },
-
-    login: {
-      backgroundColor: 'white', marginRight: '10%',
-      color: enviroment.sysBlackColor,
-      fontFamily: 'BarlowMedium',
-      width: 100
-    },
-
-    logoText: {
-      color: enviroment.sysRedColor
-    },
-
-
-
-    iconButton: {
-      backgroundColor: 'white',
-      color: enviroment.sysBlackColor
-    },
-    pageHeading: {
-      color: enviroment.sysBlackColor,
-      marginLeft: '3%'
-    },
     logo: {
       width: 111,
       height: 32
+    },
+    btnLogin: {
+      fontSize: defaultTheme.typography.h3.fontSize,
+      color: defaultTheme.palette.text.secondary
     }
   }
-
-
-
-
-
-  const { windowSize, type } = windowDimention();
-
-
+  const { type } = windowDimention();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <DrawerComponent open={open} placement={'right'} onClose={handleOnCloseDrawer} size={type == 'xs' ? 'full' : 'xs'} />
-      <AppBar position="static" style={appBarInnerStyles.appBar}>
+      <DrawerComponent
+        open={open}
+        placement={'right'}
+        onClose={handleOnCloseDrawer}
+        size={type == 'xs' ? 'full' : 'xs'}
+      />
+      <AppBar position="static">
         <Toolbar>
+
           <Link to={'/'}>
             <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
           </Link>
           <Typography
-            variant="h6"
+            variant="subtitle2"
+            color={'info'}
             noWrap
-            component="div"
-            fontStyle={{ fontFamily: 'BarlowMedium' }}
-            fontSize={20}
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-            style={appBarInnerStyles.pageHeading}
+            sx={{ display: { xs: 'none', sm: 'block', } }}
+            ml={'3%'}
           >
             EXPLORE PROJECTS
           </Typography>
+
+
           <Box sx={{ flexGrow: 1 }} />
+          <Box >
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-haspopup="true"
+              onClick={handleLightToggle}
+              color="inherit"
+            >
+              {brightness != true ? <DarkModeIcon /> :
+                <LightModeIcon />
+              }
+            </IconButton>
+          </Box>
+
           <Box sx={{ display: { md: 'flex', xs: 'none' } }}>
-            <Button color="inherit" style={appBarInnerStyles.login}>Login</Button>
-            <Button color="inherit" style={appBarInnerStyles.login}>Sign up</Button>
+            <Button
+              className='btnLogin'
+              style={appBarInnerStyles.btnLogin}
+              color="primary" >
+              Login
+            </Button>
+
+            <Button
+              className='btnSignUp'
+              style={appBarInnerStyles.btnLogin}
+              color="primary" >
+              Sign up
+            </Button>
           </Box>
           <Box >
-
-
             <IconButton
               size="large"
               aria-label="show more"
               aria-haspopup="true"
               onClick={handleOpenDrawer}
               color="inherit"
-              style={appBarInnerStyles.iconButton}
             >
               <MenuIcon />
             </IconButton>

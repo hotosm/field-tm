@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
+import '../styles/home.css'
 import ExploreProjectCard from "../components/home/ExploreProjectCard";
 import Box from '@mui/material/Box';
-import { Container, TableRow } from "@mui/material";
+import { Container, Grid, Pagination, TableRow } from "@mui/material";
 import windowDimention from "../hooks/WindowDimension";
 import BasicPagination from "../utilities/BasicPagination";
 import { useDispatch, useSelector } from 'react-redux';
 import { HomeSummaryService } from "../api/HomeService";
 import enviroment from "../enviroment";
 import ProjectCardSkeleton from "../components/home/ProjectCardSkeleton";
-import SearchablesRow from "../components/home/SearchablesRow";
+import SearchablesRow from "../components/home/HomePageFilters";
 
 
 const Home = () => {
@@ -62,7 +63,7 @@ const Home = () => {
                                             //displaying cards on every give row
 
                                             let value = projectSummaryData.shift()
-                                            //manipulating the new project array, capture current last index value, displaying it then remove it from the array 
+                                            //manipulating the new project array, capture current last index value, displaying it then remove it from the array
                                             return (
                                                 <ExploreProjectCard data={value} length={cardsPerRow.length} key={index} />
                                             )
@@ -95,17 +96,15 @@ const Home = () => {
                         )
 
                     })
-                    //IF no data loaded then we perform skeleton loading
                     : <Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
                         <ProjectCardSkeleton cardsPerRow={cardsPerRow} />
                     </Box>
 
             }
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
-                <BasicPagination count={10} color="primary" variant="outlined" />
+                <Pagination color="standard" count={10} variant="outlined" />
             </Box>
             {/*pagingation*/}
-
         </div>
 
     )

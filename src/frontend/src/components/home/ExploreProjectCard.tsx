@@ -5,82 +5,55 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CustomizedImage from '../../utilities/CustomizedImage';
-import CustomizedText from '../../utilities/CustomizedText';
-import enviroment from '../../enviroment';
 import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
 import { useNavigate } from "react-router-dom";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { Stack } from '@mui/material';
+import { useSelector } from 'react-redux';
 
+//Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data, length }) {
+
     const [shadowBox, setShadowBox] = React.useState(0)
+    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    //use navigate hook for from react router dom for rounting purpose
     const navigate = useNavigate();
 
-    const onFocusIn = () => {
+    //on mounse enter an Element set shadow to 3
+    const onHoverIn = () => {
         setShadowBox(3)
     }
-
-    const onFocusOut = () => {
+    //on mounse enter an Element set shadow to default
+    const onHoverOut = () => {
         setShadowBox(0)
     }
+
+    //Inline styles mainly for overidding css
     const cardInnerStyles: any = {
-        display: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'left',
-            height: 170,
-            marginTop: '2%',
-
-        },
-        regularText: {
-            marginTop: '7%',
-            fontFamily: 'ArchivoLight',
-            marginLeft: '2%',
-            fontSize: 16
-        },
-        progressBar: {
-            marginTop: '10%',
-
-        },
         outlinedButton: {
-            fontSize: 14,
             width: 100,
             height: 35,
             marginTop: '5%',
             padding: 0,
             position: 'absolute',
-            color: `${enviroment.sysBlackColor}`,
+            fontFamily: defaultTheme.typography.h3.fontFamily,
             right: 0,
             borderRadius: 0,
             border: 0,
-            backgroundColor: '#ffb833',
-            fontFamily: 'ArchivoRegular'
+            shadowBox: 0,
         },
         card: {
-            backgroundColor: 'white',
-            border: "1px solid #ffe4b3",
+            border: `1px solid ${defaultTheme.palette.warning['main']}`,
             marginLeft: '0.1%',
             marginRight: '0.1%',
-            marginTop: '1%',
+            marginTop: '0.7%',
             width: `${100 / length}%`,
             cursor: 'pointer',
             opacity: 0.9,
             position: 'relative',
-
-
         },
-        contributors: {
-            display: 'flex',
-            flexDirection: 'row',
-            text: {
-                marginTop: '7%',
-                fontFamily: 'ArchivoMedium',
-                fontSize: 20,
-                marginLeft: '2%'
-            }
-        },
+
         location: {
-            display: 'flex',
-            flexDirection: 'row',
             icon: {
                 marginTop: '7%',
                 fontSize: 22
@@ -90,48 +63,108 @@ export default function ExploreProjectCard({ data, length }) {
     return (
         <Card onClick={() => {
             navigate('/project_details')
-        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onFocusIn} onMouseLeave={onFocusOut}>
+        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onHoverIn} onMouseLeave={onHoverOut}>
 
             <CardContent>
-                <Typography sx={{ fontSize: 14, position: 'absolute', right: 7, top: 5, fontFamily: 'ArchivoLight' }} color="text.secondary" gutterBottom>
+
+                {/*Id Number*/}
+                <Typography
+                    variant='h4'
+                    position={'absolute'}
+                    right={7}
+                    top={5}
+                    color="info"
+                    gutterBottom>
                     #{data.id}
                 </Typography>
+                {/* <======End======> */}
 
+                {/*Priority Button and Image*/}
                 <div>
-                    <Button size="small" variant="contained" style={cardInnerStyles.outlinedButton} disabled>
+                    <Button
+                        size="small"
+                        variant="contained"
+                        style={cardInnerStyles.outlinedButton}
+                        color="warning"
+                    >
                         {data.priority_str}
                     </Button>
-                    <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
+                    <CustomizedImage
+                        status={'card'}
+                        style={{ width: 50, height: 50 }}
+                    />
                 </div>
+                {/* <======End======> */}
 
-
-
-                <div style={cardInnerStyles.display}>
-
+                {/*Project Info and description*/}
+                <Stack direction={'column'} height={170} mt={'2%'} justifyContent={'left'}>
                     <div style={{ marginLeft: '2%', marginTop: '5%' }}>
-                        <CustomizedText font={'BarlowBold'} top={'0%'} size={20} text={data.title} weight={'bold'} />
+                        <Typography
+                            variant='subtitle1'
+                            color="info"
+                            gutterBottom>
+                            {data.title}
+                        </Typography>
                     </div>
 
-                    <div style={cardInnerStyles.location}>
-                        <LocationOnIcon color='error' style={cardInnerStyles.location.icon} />
-                        <CustomizedText font={enviroment.mediumText} top={'7%'} size={16} text={data.location_str} weight={'regular'} />
-                    </div>
-                    <Typography style={cardInnerStyles.regularText} sx={{ fontSize: 14, height: 'inherit' }} color="text.secondary" gutterBottom>
+                    <Stack direction={'row'}>
+                        <LocationOnIcon
+                            color='error'
+                            style={cardInnerStyles.location.icon}
+                        />
+                        <Typography
+                            mt={'7%'}
+                            variant='h2'
+                            color="info"
+                            gutterBottom>
+                            {data.location_str}
+                        </Typography>
+                    </Stack>
+
+
+                    <Typography
+                        mt={'7%'}
+                        ml={'2%'}
+                        variant="h4"
+                        color="info"
+                        gutterBottom
+                    >
                         {data.description}
                     </Typography>
-                </div>
 
-                <div style={cardInnerStyles.contributors}>
-                    <Typography style={{ ...cardInnerStyles.contributors.text, color: 'black', opacity: 0.8 }} sx={{ fontSize: 20 }} color="text.secondary" >
+                </Stack>
+                {/* <======End======> */}
+
+
+                {/* Contributors */}
+                <Stack direction={'row'}>
+                    <Typography
+                        mt={'7%'}
+                        ml={'2%'}
+                        variant={'h2'}
+                        fontSize={defaultTheme.typography.subtitle1.fontSize}
+                        fontWeight={'bold'}
+                        color="info"
+                    >
                         {data.num_contributors}
                     </Typography>
-                    <Typography style={{ ...cardInnerStyles.regularText, marginTop: '8%', color: 'black', opacity: 0.8, marginLeft: '1%' }} sx={{ fontSize: 14 }} color="text.secondary" >
+
+                    <Typography
+                        mt={'8%'}
+                        ml={'2%'}
+                        variant={'h4'}
+                        fontSize={defaultTheme.typography.htmlFontSize}
+                        color="info"
+                    >
                         contributors
                     </Typography>
-                </div>
+                </Stack>
+                {/* <======End======> */}
 
+
+                {/* Contribution Progress Bar */}
                 <CustomizedProgressBar data={data} height={7} />
-
+                {/* <======End======> */}
             </CardContent>
 
         </Card>

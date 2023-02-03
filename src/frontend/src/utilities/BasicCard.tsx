@@ -1,23 +1,19 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import CustomizedText from './CustomizedText';
 import { Stack } from '@mui/material';
 
 
 
-export default function BasicCard({ title, subtitle, content, variant, contentProps, headerStatus, width }) {
+export default function BasicCard({ title, subtitle, content, variant, contentProps, headerStatus }) {
 
     return (
-        <Card sx={{ width: width }} variant={variant}>
+        <Card sx={{ width: '100%' }} variant={variant}>
             <CardContent {...contentProps}>
                 {headerStatus && <Stack direction={'column'} spacing={1}>
-                    <CustomizedText {...title} />
-                    <CustomizedText {...subtitle} />
+                    {/* <CustomizedText {...title} />
+                    <CustomizedText {...subtitle} /> */}
                 </Stack>}
                 <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
                     {content}
