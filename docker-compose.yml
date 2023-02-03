@@ -44,7 +44,7 @@ services:
 
   api:
     build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn main:api --host 0.0.0.0 --reload'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
     volumes:
       - ./src/backend:/app
     depends_on:
@@ -113,6 +113,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   fmtm-net: #     external: true
