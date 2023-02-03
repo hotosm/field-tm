@@ -36,6 +36,8 @@ export default function ExploreProjectCard({ data }) {
             marginTop: '5%',
             position: 'absolute',
             fontFamily: defaultTheme.typography.h3.fontFamily,
+            backgroundColor: defaultTheme.palette.warning['main'],
+            color: defaultTheme.palette.warning['contrastText'],
             right: 0,
             borderRadius: 0,
         },
@@ -70,7 +72,6 @@ export default function ExploreProjectCard({ data }) {
                     position={'absolute'}
                     right={7}
                     top={5}
-                    color="info"
                     gutterBottom>
                     #{data.id}
                 </Typography>
@@ -83,6 +84,7 @@ export default function ExploreProjectCard({ data }) {
                         variant="contained"
                         style={cardInnerStyles.outlinedButton}
                         color="warning"
+                        disabled
                     >
                         {data.priority_str}
                     </Button>
