@@ -17,12 +17,12 @@
 #
 
 from typing import Any, List
-
 from geojson_pydantic import Feature
-from models.enums import ProjectPriority, ProjectStatus
 from pydantic import BaseModel
-from tasks import tasks_schemas
-from users.user_schemas import User
+
+from ..models.enums import ProjectPriority, ProjectStatus
+from ..tasks import tasks_schemas
+from ..users.user_schemas import User
 
 
 class ProjectInfo(BaseModel):

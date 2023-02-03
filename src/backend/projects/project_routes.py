@@ -17,11 +17,10 @@
 #
 
 from typing import List
-
-from db import database
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
+from ..db import database
 from . import project_crud, project_schemas
 
 router = APIRouter(
