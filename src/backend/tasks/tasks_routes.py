@@ -16,13 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from db import database
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from models.enums import TaskStatus
 from sqlalchemy.orm import Session
-from users import user_crud, user_schemas
 
+from ..db import database
+from ..users import user_crud, user_schemas
 from . import tasks_crud, tasks_schemas
+from ..models.enums import TaskStatus
 
 router = APIRouter(
     prefix="/tasks",
@@ -77,4 +77,5 @@ async def update_task_status(user: user_schemas.User, task_id: int, new_status: 
     if task:
         return task
     else:
-        raise HTTPException(status_code=404, detail="Task status could not be updated.")
+        raise HTTPException(
+            status_code=404, detail="Task status could not be updated.")
