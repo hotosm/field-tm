@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import defaultTheme from "../../themes/defaultTheme";
 
 const ThemeSlice = createSlice({
     name: 'theme',
@@ -44,7 +43,7 @@ const ThemeSlice = createSlice({
             },
             typography: {
                 //default
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: 'ArchivoMedium',
 
 
