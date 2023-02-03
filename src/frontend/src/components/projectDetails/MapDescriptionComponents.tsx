@@ -1,27 +1,22 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { Stack } from "@mui/system";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import React, { useState } from "react";
-import ConfirmationDialogRaw from "../../utilities/ConfirmationDialogRaw";
+import React from "react";
+import { useSelector } from "react-redux";
 import CustomizedMenus from "../../utilities/CustomizedMenus";
-import enviroment from "../../enviroment";
-
 
 
 const MapDescriptionComponents = ({ details, type }) => {
-    const [open, setOpen] = useState(false)
-    const [title, setTitle] = useState("")
-    const onCloseDialog = () => {
-        setOpen(false)
-    }
-    const handleClick = (event: any) => {
-        setTitle(event.target.id)
-        setOpen(true)
-    }
+    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
     return (
 
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 2 }}>
-            <Stack spacing={type == 's' ? 1 : type == 'xs' ? 1 : 3} direction={'row'} justifyContent={'center'} style={{ width: '100%' }}>
+            <Stack
+                width={'100%'}
+                p={2}
+                spacing={type == 's' ? 1 : type == 'xs' ? 1 : 3}
+                direction={type == 's' ? 'column' : type == 'xs' ? 'column' : 'row'}
+                justifyContent={'center'}
+            >
                 {
                     details.map((data, index) => {
                         return (
@@ -30,11 +25,13 @@ const MapDescriptionComponents = ({ details, type }) => {
                                 btnName={data.value}
                                 btnProps={{
                                     style: {
+                                        //overidding style
                                         backgroundColor: 'white',
-                                        color: enviroment.sysBlackColor,
-                                        fontFamily: enviroment.mediumText,
-                                        fontSize: type == 's' ? 14 : type == 'xs' ? 14 : 16
+                                        fontFamily: defaultTheme.typography.h1.fontFamily,
+                                        fontSize: 16
+
                                     },
+                                    color: 'primary',
                                     sx: { boxShadow: 2 }
                                 }}
                                 element={data.element}
