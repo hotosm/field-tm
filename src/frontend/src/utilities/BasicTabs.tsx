@@ -69,9 +69,10 @@ export default function BasicTabs({ listOfData }) {
                     aria-label="basic tabs example"
                 >
                     {
-                        listOfData.map((item) => {
+                        listOfData.map((item, index) => {
                             return (
                                 <Tab
+                                    key={index}
                                     sx={{ mt: 0.8, mb: 1, mr: 1 }}
                                     style={{
                                         fontFamily: defaultTheme.typography.h1.fontFamily,
@@ -88,7 +89,7 @@ export default function BasicTabs({ listOfData }) {
             {
                 listOfData.map((item, index) => {
                     return (
-                        <TabPanel value={value} index={index}>
+                        <TabPanel value={value} key={index} index={index}>
                             {
                                 item.element
                             }

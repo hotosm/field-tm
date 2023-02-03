@@ -2,21 +2,7 @@ import { Stack } from "@mui/material";
 import React from "react";
 import { TileLayer, Polygon, Circle, MapContainer, Marker, Popup } from 'react-leaflet';
 const LeafletMap = () => {
-    const MapStyles = {
-        toolbar: {
-            marginTop: '0.7%',
-            display: 'flex',
-            justifyContent: 'center',
-            width: '15%',
-            fontFamily: 'BarlowMedium',
 
-        },
-        dropdown: {
-            fontFamily: 'BarlowMedium',
-            width: '100%',
-            color: 'black'
-        },
-    }
     const position: any = [51.505, -0.09]
 
     return (

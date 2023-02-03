@@ -6,7 +6,6 @@ import windowDimention from "../hooks/WindowDimension";
 import PrimaryAppBar from "../utilities/PrimaryAppBar";
 import { Outlet } from "react-router-dom";
 import { ThemeProvider, CssBaseline, Paper, createTheme } from "@mui/material";
-import hotTheme from "../themes/defaultTheme";
 import { useSelector } from "react-redux";
 
 const MainView = () => {
