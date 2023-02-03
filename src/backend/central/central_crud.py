@@ -31,20 +31,22 @@ from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change,
 from ..users import user_crud, user_schemas
 from ..tasks import tasks_schemas
 from ..central import central_schemas
-from pyodk.client import Client
+# from pyodk.client import Client
 import csv
 from fastapi.responses import FileResponse
 
 
 class OdkCentral(object):
     """Test class for fastapi"""
+
     def __init__(self):
         pass
 
     def exists(self):
         return "Yes I exists!"
 
-#odk = OdkCentral()
+# odk = OdkCentral()
+
 
 def does_central_exist():
     # xxx = odk.exists()
