@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: "3.4"
+version: "3.5"
 
 services:
   db:
@@ -31,17 +31,6 @@ services:
     networks:
       - fmtm-net
 
-  # pgadmin:
-  #   container_name: pgadmin
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
-  #     - PGADMIN_DEFAULT_PASSWORD=admin
-  #   ports:
-  #     - "5050:80"
-  #   depends_on:
-  #     - db
-
   api:
     build: .
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
@@ -54,7 +43,7 @@ services:
     expose:
       - 8000
     ports:
-      - 8008:8000
+      - 8000:8000
     networks:
       - fmtm-net
 
@@ -74,7 +63,6 @@ services:
       - FLASK_ENV=${FLASK_ENV}
       - WEB_DOMAIN=${WEB_DOMAIN}
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      # - API_URL=http://localhost:8000
       - API_URL=http://fmtm-api-1:8000
     labels:
       - "traefik.enable=true"
@@ -103,8 +91,6 @@ services:
     ports:
       - 80:80
       - 8081:8080
-      # - 8008:8000
-      # - 5000:5000
     volumes:
       - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
