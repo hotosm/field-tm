@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: "3.5"
+version: "3.4"
 
 services:
   db:
@@ -31,58 +31,6 @@ services:
     networks:
       - fmtm-net
 
-  api:
-    build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
-    volumes:
-      - ./src/backend:/app
-    depends_on:
-      - db
-    environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-    expose:
-      - 8000
-    ports:
-      - 8000:8000
-    networks:
-      - fmtm-net
-
-  web:
-    build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
-    volumes:
-      - .:/app
-    ports:
-      - 5000:5000
-    expose:
-      - 5000
-    stdin_open: true # for debugging
-    tty: true # for debugging
-    environment:
-      - FLASK_APP=src/web/__init__.py
-      - FLASK_ENV=${FLASK_ENV}
-      - WEB_DOMAIN=${WEB_DOMAIN}
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - API_URL=http://fmtm-api-1:8000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
-    depends_on:
-      - db
-    networks:
-      - fmtm-net
-
-  # react-ui:
-  #   build:
-  #     context: ./my-app
-  #   ports:
-  #     - "3000:3000"
-  #   container_name: react-ui
-  #   stdin_open: true
-  #   volumes:
-  #      - ./my-app:/usr/src/app/my-app
-  #      - /usr/src/app/my-app/node_modules
-
   # alternative webproxy to nginx
   traefik:
     image: traefik:v2.2
@@ -91,6 +39,8 @@ services:
     ports:
       - 80:80
       - 8081:8080
+      # - 8008:8000
+      # - 5000:5000
     volumes:
       - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"

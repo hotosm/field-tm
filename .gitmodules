@@ -1,3 +1,6 @@
 [submodule "odkconvert"]
 	path = odkconvert
 	url = https://github.com/hotosm/odkconvert.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/hotosm/fmtm.wiki.git
