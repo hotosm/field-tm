@@ -20,10 +20,10 @@
 import enum
 from datetime import datetime
 from typing import List
-
 from geojson_pydantic import Feature, Point
-from models.enums import TaskStatus
 from pydantic import BaseModel
+
+from ..models.enums import TaskStatus
 
 
 def get_task_status_strings():

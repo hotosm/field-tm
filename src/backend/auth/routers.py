@@ -18,10 +18,12 @@
 
 import json
 
-from db import database
+
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
-from users import user_crud, user_schemas
+
+from ..db import database
+from ..users import user_crud, user_schemas
 
 from . import AuthUser, login_required, osm_auth
 

@@ -20,9 +20,9 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 import logging.config
 from fastapi.logger import logger as logger
-from db import database
-from models.enums import TaskStatus
-from debug import debug_schemas, debug_crud
+from ..db import database
+from ..models.enums import TaskStatus
+from ..debug import debug_schemas, debug_crud
 
 router = APIRouter(
     prefix="/debug",
