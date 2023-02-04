@@ -1,0 +1,68 @@
+name,label,category
+waste_transfer_station,Transfer Station,waste
+waste_dump_site,Dump Site,waste
+waste_disposal,Waste Disposal,waste
+waste_basket,Waste Basket,waste
+recycling,Recycling,waste
+landfill,Landfill,waste
+toilets,Toilets,wasteX
+
+drinking_water,Drinking Water,waterpoint
+water_point,Water Point,waterpoint
+
+fire_station,Fire Station,emergency
+police,Police Station,emergency
+rescue_station,Rescue Station,emergency
+
+clinic,Clinic,medical
+doctors,Doctors,medical
+hospital,Hospital,medical
+dentist,Dentust,medical
+pharmacy,Pharmacy,medical
+veterinary,Veterinary,medical
+band_hatch,Baby Hatch,medical
+vending,Vending Machine,medicalX
+
+music_school,Music School,education
+language_school,Language School,education
+childcare,Childcare,education
+prep_school,Prep School,education
+school,School,education
+university,University,education
+college,College,education
+kindergarten,Kindergarten,education
+
+social_facility,Social Facility,social
+social_centre,Social Centre,social
+community_centre,Community Centre,social
+
+ferry_terminal,Ferry Terminal,transport
+
+post_office,Post Office,civic
+studio,Studio,civic
+townhall,Town hall,civic
+
+atm,ATM,money
+bank,Bank,money
+money_transfer,Money Transfer,money
+bureau_de_change,Bureau de Change,money
+mobile_money_agent,Mobile Money Agent,money
+
+place_of_worship,Place of Worship,religion
+church,Church,religion
+mosque,Mosque,religion
+temple,Temple,religion
+shrine,Shrine,religion
+cathedral,Cathedral,religion
+chapel,Chapel,religion
+
+courthouse,Courthouse,civicX
+embassy,Embassy,civicX
+post_office,,civicX
+fuel,Fuel,X
+library,Library,civicX
+marketplace,Marketplace,X
+parking,Parking,X
+
+
+

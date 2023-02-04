@@ -1,0 +1,185 @@
+# This section corrently isn't being used yet, but will be used to
+# test for tag completeness for some features.
+validate:
+  - highway:
+      - smoothness
+      - surface
+      - tracktype
+      - smoothness
+  - leisure:
+      - firepit
+      - picnic_table
+
+# This section is for simple tag translation. Sometimes the value from
+# the choices sheet of the XLSXForm is very close, but not an exact
+# match to an approved OSM tags. Many XLSXForms that used OMK tried
+# hard to use the (almost) same value as the official OSM one. This
+# makes it easier to deal with older forms without having to edit the
+# raw data.
+
+# ODK allows a colon in a selection name, but does not for the
+# variable name that later gets used as a tag. When using existing OSM
+# data we need to handle converting the tag name back to the colon
+# version for OSM.
+convert:
+   # From the Saint Lucia XForm
+  - _record_your_current_location_altitude: ele
+  - Record_your_current_location-Longitude: lon
+  - Record_your_current_location-Latitide: lat
+  # Other forms
+  - latitude: lat
+  - longitude: lon
+  - altitude: ele
+  - submitterid: uid
+  - submittername: user
+  - submissiondate: timestamp
+  - comment: note
+  - view: viewpoint
+  - cell: cellular
+  - Monday: Mo
+  - Tuesday: Tu
+  - Wednesday: We
+  - Thursday: Th
+  - Friday: Fr
+  - Saturday: Sa
+  - Sunday: Su
+  - waterpoint_name: name
+  - cemetery_name: name
+  - waterpoint_type: man_made
+  - faucet: valve=yes
+  - well: well=yes
+  - borehole: borehole=yes
+  - drinkable_water: amenity=drinking_water
+  - drinking_water: menity=drinking_water
+  - irrigation: irrigation=yes
+  - livestock: drinking_water=no
+  - waterpoint_code: ref
+  - pump_type: pump
+  - waterpoint_access: access
+  - fee: fee=yes
+  - power_type: power_source
+  - provider: operator:type
+  - operator_type: operator:type
+  - cemetery_services:
+      - cemetery: amenity=grave_yard
+      - cremation: amenity=crematorium
+  - xid: id
+  - food: amenity
+  - brewery: craft=brewery
+  - housing: building
+  - xlocation: geometry
+  - bldmat: building:material
+  - building_material: building:material
+  - roofmat: roof:material
+  - roof:material: roof:material
+  - building_floor: building:floor
+  - building_prefab: building:prefabricated
+  - building_levels: building:levels
+  - levels_underground: building:levels:underground
+  - emergency:
+      - fire_station: amenity=fire_station
+      - police: amenity=police
+      - hospital: amenity=hospital
+      - clinic: amenity=clinic
+      - toilets: amenity=toilets
+  - amenity:
+      - coffee: amenity=cafe,cuisine=coffee_shop
+
+# All of the data that goes in a different non-OSM file
+private:
+  - income
+  - age
+  - gender
+  - education
+  - waterpoint_type_other
+  - waterpoint_provider
+  - waterpoint_provider_other
+  - waterpoint_capacity
+  - waterpoint_quantity
+  - waterpoint_access
+  - waterpoint_access_other
+  - waterpoint_elevation
+  - waterpoint_mgmt
+  - fee_cost
+  - end_time
+  - locality
+  - municipality
+  - town
+  - place
+  - district
+  - elev
+  - area
+  - geological_site
+  - lateral_material
+  - lateral_system
+  - access_roof
+  
+# All of these tags are in the CSV file, and can be ignored
+ignore:
+  - attachmentsexpected
+  - attachmentspresent
+  - reviewstate
+  - edits
+  - gps_type
+  - accuracy
+  - deviceid
+  - key
+  - start
+  - end
+  - today
+  - status
+  - instanceid
+  - audio
+  - image
+  - phonenumber
+  - detail
+  - what_are_you_mapping
+  - highway_type
+  - waterpoint_img
+  - warmup
+  - enum_name
+  - username
+  - model
+  - email
+  - category
+  - existing
+  - formversion
+
+multiple:
+  - healthcare
+  - amenity_type
+  - specialty
+
+# This section matches values to the correct keyword. Often a multiple
+# selection in the XLSXForm survey sheet may have values that don't
+# all share the same keyword. This corrects that.
+tags:
+  - leisure:
+    - firepit
+    - picnic_table
+    - fishing
+    - park
+    - resort
+  - tourism:
+    - picnic_table
+    - caravans
+    - camp_site
+    - camp_pitch
+    - viewpoint
+  - bear box: yes
+  - barbeque_grill: yes
+  - power_supply: yes
+  - path:
+    - sac_scale
+    - mtb:scale
+    - mtb:scale:imba
+  - internet_access:
+    - wlan
+    - cellular
+    - internet
+    
+  - toilets:disposal:
+      - flush
+      - urinal
+      - squat
+      - seated

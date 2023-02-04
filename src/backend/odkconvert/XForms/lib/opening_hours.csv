@@ -1,0 +1,9 @@
+name,label,category
+24/7,24/7
+mo-sa_08:00-18:00,Mo-Sa 08:00-18:00,open
+mo-sa_09:00-17:00,Mo-Sa 09:00-17:00,open
+mo-sa_09:00-18:00,Mo-Sa 09:00-18:00,open
+mo-fr_09:00-17:00,Mo-Fr 09:00-17:00,open
+mo-su_09:00-21:00,Mo-Su 09:00-21:00,open
+mo-fr_08:00-18:00;Sa-Su 08:00-15:00,Mo-Fr 08:00-18:00; Sa-Su 08:00-15:00,open
+by_appointment,By Appointment Only,open

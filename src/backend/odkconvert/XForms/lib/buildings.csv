@@ -1,0 +1,13 @@
+name,label,category
+residential,Residential Building (people live here),building
+commercial,Commercial Building,building
+commercial;residential,Mixed Use Building,building
+apartment,Apaertment Building,building
+industrial,Industrial Building,building
+public,Public Building,building
+construction,Under Construction,building
+mosque,Mosque,building
+church,Church,building
+Office,Office Building,building
+supermarket,Supermarket,building
+toilet,Public Toilet,buildingX

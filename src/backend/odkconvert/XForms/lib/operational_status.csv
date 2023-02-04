@@ -1,0 +1,5 @@
+name,label,category
+operational,Operational,status
+needs_maintenance,Needs Maintenance,status
+closed,Closed,status
+under_construction,Under Construction,status
