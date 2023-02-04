@@ -20,20 +20,21 @@ import base64
 import json
 from typing import List
 
-from db import db_models
-from db.postgis_utils import geometry_to_geojson, get_centroid
 from fastapi import HTTPException
 from geoalchemy2.shape import to_shape
-from models.enums import (
+from shapely.geometry import mapping, shape
+from sqlalchemy.orm import Session
+
+from ..db import db_models
+from ..db.postgis_utils import geometry_to_geojson, get_centroid
+from ..tasks import tasks_schemas
+from ..users import user_crud, user_schemas
+from ..models.enums import (
     TaskAction,
     TaskStatus,
     get_action_for_status_change,
     verify_valid_status_update,
 )
-from shapely.geometry import mapping, shape
-from sqlalchemy.orm import Session
-from tasks import tasks_schemas
-from users import user_crud, user_schemas
 
 # --------------
 # ---- CRUD ----
@@ -55,7 +56,8 @@ def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 1000):
 
 
 def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
+    db_task = db.query(db_models.DbTask).filter(
+        db_models.DbTask.id == task_id).first()
     if db_obj:
         return db_task
     return convert_to_app_task(db_task)
@@ -199,7 +201,8 @@ def convert_to_app_task(db_task: db_models.DbTask):
                 "uid": db_task.id,
                 "name": db_task.project_task_name,
             }
-            app_task.outline_geojson = geometry_to_geojson(db_task.outline, properties)
+            app_task.outline_geojson = geometry_to_geojson(
+                db_task.outline, properties)
             app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
@@ -207,10 +210,12 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.locked_by_username = db_task.lock_holder.username
 
         if db_task.qr_code:
-            app_task.qr_code_in_base64 = base64.b64encode(db_task.qr_code.image)
+            app_task.qr_code_in_base64 = base64.b64encode(
+                db_task.qr_code.image)
 
         if db_task.task_history:
-            app_task.task_history = convert_to_app_history(db_task.task_history)
+            app_task.task_history = convert_to_app_history(
+                db_task.task_history)
 
         return app_task
     else:

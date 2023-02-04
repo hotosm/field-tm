@@ -1,5 +1,4 @@
 # Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
-#
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -16,37 +15,41 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# ----- FASTAPI -----
-fastapi==0.85.1 
-pydantic==1.10.2
-geojson-pydantic==0.4.3
-uvicorn==0.19.0 
+version: "3.4"
 
-# ----- DATABASE -----
-fastapi-sqlalchemy==0.2.1
-psycopg2==2.9.3
-# psycopg2-binary==2.9.3
-geoalchemy2==0.12.5
-alembic==1.8.1
-sqlmodel==0.0.8
-geojson==2.5.0
-shapely==1.8.4
-python-dotenv==0.21.0
+services:
+  db:
+    image: postgis/postgis:14-3.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - 5432:5432
+    networks:
+      - fmtm-net
 
-# ----OSM LOGIN -----
-osm-login-python==0.0.2
+  # alternative webproxy to nginx
+  traefik:
+    image: traefik:v2.2
+    expose:
+      - 5432
+    ports:
+      - 80:80
+      - 8081:8080
+      # - 8008:8000
+      # - 5000:5000
+    volumes:
+      - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - fmtm-net
 
-# ---- ODK ----
-# pyodk==0.1.0
+volumes:
+  postgres_data:
 
-# ----- FILE UPLOAD ----
-python-multipart==0.0.5
 
-# ----- LOGGING -----
-python-json-logger==2.0.4
-
-# ----- DEVELOPMENT -----
-ipdb
-black
-isort
-
+networks:
+  fmtm-net: #     external: true

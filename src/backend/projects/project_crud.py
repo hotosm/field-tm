@@ -16,21 +16,22 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+
+import geojson
 import io
 import json
 from typing import List
 from zipfile import ZipFile
-
-import geojson
-from db import db_models
-from db.postgis_utils import geometry_to_geojson, timestamp
 from fastapi import HTTPException, UploadFile
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import FeatureCollection
 from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session, joinedload
-from tasks import tasks_crud, tasks_schemas
-from users import user_crud
+
+from ..db.postgis_utils import geometry_to_geojson, timestamp
+from ..db import db_models
+from ..tasks import tasks_crud, tasks_schemas
+from ..users import user_crud
 
 from . import project_schemas
 
@@ -55,7 +56,8 @@ def get_projects(
         )
     else:
 
-        db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
+        db_projects = db.query(db_models.DbProject).offset(
+            skip).limit(limit).all()
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
@@ -248,7 +250,8 @@ def update_project_with_upload(
         # generate task for each feature
         try:
             task_count = 0
-            db_project.total_tasks = len(project_tasks_feature_collection["features"])
+            db_project.total_tasks = len(
+                project_tasks_feature_collection["features"])
             for feature in project_tasks_feature_collection["features"]:
                 task_name = feature["properties"]["task"]
 
@@ -324,7 +327,8 @@ def get_json_from_zip(zip, filename: str, error_detail: str):
             data = file.read()
             return json.loads(data)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"{error_detail} ----- Error: {e}")
+        raise HTTPException(
+            status_code=400, detail=f"{error_detail} ----- Error: {e}")
 
 
 def get_outline_from_geojson_file_in_zip(
@@ -371,7 +375,8 @@ def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
                     status_code=400, detail=f"{qr_filename} is an empty file"
                 )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"{error_detail} ----- Error: {e}")
+        raise HTTPException(
+            status_code=400, detail=f"{error_detail} ----- Error: {e}")
 
 
 # --------------------
@@ -386,9 +391,11 @@ def convert_to_app_project(db_project: db_models.DbProject):
         app_project: project_schemas.Project = db_project
 
         if db_project.outline:
-            app_project.outline_geojson = geometry_to_geojson(db_project.outline)
+            app_project.outline_geojson = geometry_to_geojson(
+                db_project.outline)
 
-        app_project.project_tasks = tasks_crud.convert_to_app_tasks(db_project.tasks)
+        app_project.project_tasks = tasks_crud.convert_to_app_tasks(
+            db_project.tasks)
 
         return app_project
     else:
@@ -438,7 +445,8 @@ def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
         for project in db_projects:
             if project:
                 project_summaries.append(convert_to_project_summary(project))
-        app_projects_without_nones = [i for i in project_summaries if i is not None]
+        app_projects_without_nones = [
+            i for i in project_summaries if i is not None]
         return app_projects_without_nones
     else:
         return []

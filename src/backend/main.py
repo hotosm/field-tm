@@ -17,36 +17,33 @@
 #
 
 
+from fastapi.middleware.cors import CORSMiddleware
 import logging.config
 import os
 from os import path
 from typing import Union
 
-from auth import routers as auth_routers
-from db.database import Base, SessionLocal, engine
 from fastapi import FastAPI
 from fastapi.logger import logger as fastapi_logger
-
 from fastapi.responses import FileResponse
-from projects import project_routes
-from tasks import tasks_routes
-from users import user_routes
-from central import central_routes
-from debug import debug_routes
 
-# from .auth import login_route
+from .auth import routers as auth_routers
+from .db.database import Base, SessionLocal, engine
+from .projects import project_routes
+from .tasks import tasks_routes
+from .users import user_routes
+from .debug import debug_routes
+from .central import central_routes
 
-
+# setup env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-from fastapi.middleware.cors import CORSMiddleware
-from os import path
-
 # setup loggers
-log_file_path = path.join(path.dirname(path.abspath("logging.conf")), "logging.conf")
+log_file_path = path.join(os.path.dirname(
+    os.path.abspath(__file__)), "logging.conf")
 
 logging.config.fileConfig(
-    os.path.join(os.getcwd(), "logging.conf"), disable_existing_loggers=False
+    log_file_path, disable_existing_loggers=False
 )  # main.py runs from code/
 logger = logging.getLogger(__name__)
 

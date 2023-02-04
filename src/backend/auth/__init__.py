@@ -1,19 +1,11 @@
 import os
 from typing import Union
 
-from dotenv import dotenv_values
 from fastapi import Header
 from osm_login_python.core import Auth
 from pydantic import BaseModel
 
-# Python Environment Variable setup required on System or .env file
-config_env = {
-    **dotenv_values(".env"),  # load local file development variables
-    **os.environ,  # override loaded values with system environment variables
-}
-
-# Access the variable like below
-# print(config_env["VAR_NAME"])
+from ..env_utils import config_env
 
 
 class AuthUser(BaseModel):
