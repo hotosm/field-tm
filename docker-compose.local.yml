@@ -1,0 +1,119 @@
+# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+version: "3.4"
+
+services:
+  db:
+    image: postgis/postgis:14-3.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - 5432:5432
+    networks:
+      - fmtm-net
+
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - db
+
+  # api:
+  #   build: .
+  #   command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
+  #   volumes:
+  #     - ./src/backend:/app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+  #   expose:
+  #     - 8000
+  #   ports:
+  #     - 8008:8000
+  #   networks:
+  #     - fmtm-net
+
+  # web:
+  #   build: .
+  #   command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - 5000:5000
+  #   expose:
+  #     - 5000
+  #   stdin_open: true # for debugging
+  #   tty: true # for debugging
+  #   environment:
+  #     - FLASK_APP=src/web/__init__.py
+  #     - FLASK_ENV=${FLASK_ENV}
+  #     - WEB_DOMAIN=${WEB_DOMAIN}
+  #     - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+  #     # - API_URL=http://localhost:8000
+  #     - API_URL=http://fmtm-api-1:8000
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - fmtm-net
+
+  # react-ui:
+  #   build:
+  #     context: ./my-app
+  #   ports:
+  #     - "3000:3000"
+  #   container_name: react-ui
+  #   stdin_open: true
+  #   volumes:
+  #      - ./my-app:/usr/src/app/my-app
+  #      - /usr/src/app/my-app/node_modules
+
+  # alternative webproxy to nginx
+  traefik:
+    image: traefik:v2.2
+    expose:
+      - 5432
+    ports:
+      - 80:80
+      - 8081:8080
+      # - 8008:8000
+      # - 5000:5000
+    volumes:
+      - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - fmtm-net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  fmtm-net: #     external: true

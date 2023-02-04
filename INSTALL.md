@@ -6,28 +6,26 @@
 
 Update the .env file with the desired settings.
 
-### For the react frontend
+### To run locally (for quicker development)
 
-From command line: 
-    `cd src/frontend`
-    `npm install`
-    `npm run`
+#### db in docker
 
-### To run locally with undockerized
+From command line start up database with `docker-compose -f docker-compose.local.yml up --build`
+
+This docker-compose file only includes the db, so the db is running on docker, meaning you won't have to manually install postgresql on your machine. 
 
 #### api not in docker
 
-In `docker-compose.yml` comment out `api` and `web`
-From command line start up database with `docker compose up --build`
-
-In `src/backend/database.py` switch from docker to local `SQLALCHEMY_DATABASE_URL`
-
 From command line:
 
--   Navigate to ```src/backend/
--   Follow ```Readme.md```
+-   start virtual envirnment with: `python3 -m venv fmtm-env`
+    -   set it up with: `source fmtm-env/bin/activate`
+-   install dependencies with: `pip install -r src/backend/requirements.txt`
+-   run fast api with: `uvicorn src.backend.main:api --reload`
 
 #### flask frontend not in docker
+
+From command line:
 
 -   start virtual envirnment with: `python3 -m venv fmtm-env`
     -   set it up with: `source fmtm-env/bin/activate`
@@ -41,7 +39,14 @@ From command line:
 
 -   run fast api with: `python3 src/web/manage_nf.py run`
 
-### Start Docker Services:
+### For the react frontend
+
+From command line: 
+    `cd src/frontend`
+    `npm install`
+    `npm run`
+
+### Start Via Docker (fastest way to get up and running):
 
     docker compose up --build
 
