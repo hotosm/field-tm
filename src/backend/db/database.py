@@ -20,13 +20,13 @@ from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from . import config_env
+from ..env_utils import is_docker, config_env
 
-SQLALCHEMY_DATABASE_URL = config_env["DATABASE_URL"]
-# When running docker db locally
-# SQLALCHEMY_DATABASE_URL = 'postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm'
-# The url is formatted like: 'postgresql://{db_username}:{db_password}@{host_server}:{db_server_port}/{database_name}
 
+if is_docker():
+    SQLALCHEMY_DATABASE_URL = config_env["DB_URL"]
+else:
+    SQLALCHEMY_DATABASE_URL = config_env["LOCAL_DB_URL"]
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -35,9 +35,8 @@ from .users import user_routes
 from .debug import debug_routes
 from .central import central_routes
 
-
+# setup env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
 
 # setup loggers
 log_file_path = path.join(os.path.dirname(
