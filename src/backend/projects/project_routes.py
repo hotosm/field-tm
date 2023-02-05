@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from ..db import database
+from ..central import central_crud
 from . import project_crud, project_schemas
 
 router = APIRouter(
@@ -69,6 +70,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.post("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
+    odkproject = central_crud.delete_odk_project(project_id)
     project = project_crud.delete_project_by_id(db, project_id)
     if project:
         return project
@@ -77,10 +79,13 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
 
 
 @router.post("/beta/create_project", response_model=project_schemas.ProjectOut)
-async def create_project_part_1(
+async def create_project(
     project_info: project_schemas.BETAProjectUpload,
     db: Session = Depends(database.get_db),
 ):
+    odkproject = central_crud.create_odk_project(project_info.project_info.name)
+    # Use the ID we get from Central, as it's needed for many queries
+    project_info.project_info.id = odkproject['id']
     # TODO check token against user or use token instead of passing user
     project = project_crud.create_project_with_project_info(db, project_info)
     return project
