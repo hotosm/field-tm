@@ -50,17 +50,20 @@ pw = config_env["ODK_CENTRAL_PASSWD"]
 project.authenticate(url, user, pw)
 
 def create_odk_project(name):
+    """Create a project on a remote ODK Server"""
     result = project.createProject(name)
     project.id = result['id']
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
 
 def delete_odk_project(project_id: int):
+    """Delete a project from a remote ODK Server"""
     result = project.deleteProject(project_id)
     logger.info(f"Project {project_id} has been from the ODK Central server.")
     return result
 
 def create_app_user(project_id: int, name: str):
+    """Create an app-user on a remote ODK Server"""
     project.listAppUsers(project_id)
     user = project.findAppUser(name)
     if not user:
@@ -69,4 +72,29 @@ def create_app_user(project_id: int, name: str):
     return result
 
 def delete_app_user(project_id: int, name: str):
-    epdb.st()
+    """Delete an app-user from a remote ODK Server"""
+    logger.error("delete_app_user is unimplemented!")
+    return None
+
+def create_odk_xform(project_id: int, xform: str):
+    """Create an XForm on a remote ODK Central server."""
+    logger.error("create_odk_xform is unimplemented!")
+    # FIXME: make sure it's a valid project id
+    return None
+
+def delete_odk_xform(project_id: int, xform_id: str):
+    """Delete an XForm from a remote ODK Central server."""
+    logger.error("delete_odk_xform is unimplemented!")
+    # FIXME: make sure it's a valid project id
+    return None
+
+def download_submissions(project_id: int, xform_id: str):
+    """Download submissions from a remote ODK server"""
+    logger.error("download_submissions is unimplemented!")
+    # FIXME: should filter by timestamps or status value
+    return None
+
+def update_xform(filespec: str):
+    """Update the version in an XForm so it's unique"""
+    logger.error("update_xform is unimplemented!")
+    return None
