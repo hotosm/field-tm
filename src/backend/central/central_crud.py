@@ -39,7 +39,6 @@ from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
 from ..env_utils import is_docker, config_env
 
-# FIXME: I am not sure this is thread-safe
 project = OdkProject()
 project.listProjects()
 xform = OdkForm()
@@ -59,7 +58,7 @@ def create_odk_project(name):
 def delete_odk_project(project_id: int):
     """Delete a project from a remote ODK Server"""
     result = project.deleteProject(project_id)
-    logger.info(f"Project {project_id} has been from the ODK Central server.")
+    logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
     return result
 
 def create_app_user(project_id: int, name: str):
@@ -67,7 +66,7 @@ def create_app_user(project_id: int, name: str):
     project.listAppUsers(project_id)
     user = project.findAppUser(name)
     if not user:
-        appuser = OdkAppUser()
+        appuser = OdkAppUser(name=name)
         result = appuser.create(user)
     return result
 
@@ -98,3 +97,8 @@ def update_xform(filespec: str):
     """Update the version in an XForm so it's unique"""
     logger.error("update_xform is unimplemented!")
     return None
+
+def create_QRCode(project_id=None, token=None, name=None):
+    """Create the QR Code for an app-user"""
+    appuser = OdkAppUser()
+    return appuser.createQRCode(project_id, token, name)
