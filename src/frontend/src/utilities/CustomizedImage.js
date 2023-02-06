@@ -1,17 +1,20 @@
 import React from "react";
-import cardImg from '../images/project_icon.png';
-import logo from '../images/hotLog.png'
+import cardImg from '../assets/images/project_icon.png';
+import logo from '../assets/images/hotLog.png'
+
+const Switcher = ({ status, style }) => {
+    switch (status) {
+        case 'card':
+            return <img src={cardImg} style={style} />
+        case 'logo':
+            return <img src={logo} style={style} />
+
+    }
+}
+
 const CustomizedImage = ({ status, style }) => {
     return (
-        <div>
-            {
-                status == 'card' ?
-                    <img src={cardImg} style={style} />
-                    : status == 'logo' ?
-                        <img src={logo} style={style} />
-                        : null
-            }
-        </div>
+        <Switcher status={status} style={style} />
     )
 }
 
