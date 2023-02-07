@@ -19,6 +19,9 @@
 from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
+from pathlib import Path
+import json
+import epdb
 
 from ..db import database
 from ..central import central_crud
@@ -94,16 +97,37 @@ async def create_project(
     return project
 
 
-@router.post("/beta/{project_id}/upload_zip", response_model=project_schemas.ProjectOut)
-async def upload_beta_project(
+@router.post("/beta/{project_id}/upload", response_model=project_schemas.ProjectOut)
+async def upload_project_boundary(
     project_id: int,
     project_name_prefix: str,
     task_type_prefix: str,
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
+    """This uploads the projecy boundzry polygon to an existing project"""
     # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
-    project = project_crud.update_project_with_upload(
+    project = project_crud.update_project_with_zip(
         db, project_id, project_name_prefix, task_type_prefix, upload
     )
     return f"{project}"
+
+@router.post("/{project_id}/upload")
+async def upload_project_boundary(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+):
+    # read entire file
+    content = await upload.read()
+    #epdb.st()
+    boundary = json.loads(content)
+
+    result = project_crud.update_project_boundary(db, project_id, boundary)
+    if not result:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+        return f"No project with id {project_id}"
+
+    return {f"Message": f"{project_id}"}
