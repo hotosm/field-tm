@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -22,11 +22,14 @@ import io
 import json
 from typing import List
 from zipfile import ZipFile
+import epdb
 from fastapi import HTTPException, UploadFile
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import FeatureCollection
 from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session, joinedload
+import shapely.wkb as wkblib
+from fastapi.logger import logger as logger
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..db import db_models
@@ -168,8 +171,30 @@ def create_project_with_project_info(
 
     return convert_to_app_project(db_project)
 
+def update_project_boundary(
+        db: Session,
+        project_id: int,
+        boundary: str,
+):
+    outline = shape(boundary['features'][0]['geometry'])
 
-def update_project_with_upload(
+    # verify project exists in db
+    db_project = get_project_by_id(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    db_project.outline = outline.wkt
+    db_project.centroid = outline.centroid.wkt
+
+    db.commit()
+    db.refresh(db_project)
+    logger.debug("Added project boundary!")
+
+    return True
+
+
+def update_project_with_zip(
     db: Session,
     project_id: int,
     project_name_prefix: str,
@@ -314,7 +339,6 @@ def update_project_with_upload(
                 status_code=500,
                 detail=f"{task_count} tasks were created before the following error was thrown: {e}, on feature: {feature}",
             )
-
 
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
