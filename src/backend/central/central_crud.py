@@ -26,6 +26,7 @@ import json
 import base64
 import epdb
 from fastapi.responses import FileResponse
+from fastapi import HTTPException, UploadFile
 
 from ..env_utils import is_docker, config_env
 from ..db import db_models
@@ -102,3 +103,11 @@ def create_QRCode(project_id=None, token=None, name=None):
     """Create the QR Code for an app-user"""
     appuser = OdkAppUser()
     return appuser.createQRCode(project_id, token, name)
+
+def upload_media(project_id: int, xform_id: str, filespec: str):
+    """Upload a data file to Central"""
+    xform.uploadMedia(project_id, xform_id, filespec)
+
+def download_media(project_id: int, xform_id: str, filespec: str):
+    """Upload a data file to Central"""
+    xform.getMedia(project_id, xform_id, filename)
