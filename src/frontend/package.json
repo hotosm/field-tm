@@ -55,6 +55,7 @@
     "react-router-dom": "^6.6.0",
     "react-swipeable-views": "^0.14.0",
     "redux": "^4.2.0",
-    "rsuite": "^5.23.3"
+    "rsuite": "^5.23.3",
+    "swiper": "^8.4.7"
   }
 }

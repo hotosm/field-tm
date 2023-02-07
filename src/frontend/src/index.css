@@ -10,6 +10,13 @@ body {
   margin-top: 20px;
 }
 
+
+
+.btnLogin,
+btnSignUp {
+  width: 100px;
+}
+
 .dropdown {
   width: 100%;
 }
@@ -40,32 +47,44 @@ button {
 @font-face {
   font-family: "BarlowBold";
   src: local("BarlowBold"),
-    url("./fonts/Barlow/Barlow-Bold.ttf") format("truetype");
+    url("./assets/fonts/Barlow/Barlow-Bold.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "BarlowMedium";
   src: local("BarlowMedium"),
-    url("./fonts/Barlow/Barlow-Medium.ttf") format("truetype");
+    url("./assets/fonts/Barlow/Barlow-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "ArchivoBold";
+  src: local("ArchivoBold"),
+    url("./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "ArchivoRegular";
   src: local("ArchivoRegular"),
-    url("./fonts/Archivo/Archivo/Archivo-Regular.ttf") format("truetype");
-
+    url("./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "ArchivoMedium";
   src: local("ArchivoMedium"),
-    url("./fonts/Archivo/Archivo/Archivo-Medium.ttf") format("truetype");
+    url("./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf") format("truetype");
 
 }
 
 @font-face {
   font-family: "ArchivoLight";
   src: local("ArchivoLight"),
-    url("./fonts/Archivo/Archivo/Archivo-Light.ttf") format("truetype");
+    url("./assets/fonts/Archivo/Archivo/Archivo-Light.ttf") format("truetype");
 
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #44546a !important;
+  fill: #44546a !important;
+  stroke: #44546a !important;
 }
