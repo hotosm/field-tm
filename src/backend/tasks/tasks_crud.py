@@ -158,7 +158,7 @@ def create_QRCode(self, project_id=None, token=None, name=None):
     settings = {"general":
                 {"server_url":f'{base}key/{token}/projects/{project_id}',
                  "form_update_mode":"manual",
-                 "basemap_source": "OpenStreetMap",
+                 "basemap_source": "MapBox",
                  "autosend":"wifi_and_cellular"},
                 "project":{"name":f'{name}'},
                 "admin":{}
