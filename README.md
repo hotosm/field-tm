@@ -8,6 +8,9 @@ It’s already possible to implement a sort of Field Mapping Tasking Manager wor
 
 [Background and description of the project and idea are here: please have a look at this blog if you haven't yet!](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
 
+[Overview, timeline & relevant links for the Field Mapping Tasking Manager (FMTM)](https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0) 
+
+
 # How to contribute
 👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
 
