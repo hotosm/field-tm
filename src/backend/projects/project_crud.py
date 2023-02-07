@@ -320,6 +320,41 @@ def update_project_with_upload(
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
+def create_task_grid(projectid: int, error_detail: str):
+    try:
+        #file = open("test_boundary.geojson", 'r')
+        #coords = geojson.load(file)
+        # Query DB for project AOI
+        boundary = shape(coords['features'][0]['geometry'])
+
+        minx, miny, maxx, maxy = boundary.bounds
+        delta = 0.005
+        nx = int((maxx - minx)/delta)
+        ny = int((maxy - miny)/delta)
+        gx, gy = np.linspace(minx,maxx,nx), np.linspace(miny,maxy,ny)
+        grid = list()
+        json = open("tmp.geojson", 'w')
+        id = 0
+        for i in range(len(gx)-1):
+            for j in range(len(gy)-1):
+                poly = shapely.geometry.Polygon([
+                    [gx[i],gy[j]],
+                    [gx[i],gy[j+1]],
+                    [gx[i+1],gy[j+1]],
+                    [gx[i+1],gy[j]],
+                    [gx[i],gy[j]],
+                ])
+                # FIXME: this should clip the features that intersect with the
+                # boundary.
+                if boundary.contains(poly):
+                    feature = Feature(geometry=poly, properties={'id': str(id)})
+                    id += 1
+                    grid.append(feature)
+        collection = FeatureCollection(grid)
+        out = dumps(collection, json)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f'{error_detail} ----- Error: {e} ---- Json: {feature}')
 
 def get_json_from_zip(zip, filename: str, error_detail: str):
     try:
