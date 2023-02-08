@@ -1,6 +1,6 @@
 #!/bin/python3
 
-# Copyright (c) 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 #
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -52,27 +52,29 @@ class OdkCentral(object):
             "form_update_mode": "match_exactly",
             "autosend": "wifi_and_cellular",
         }
-        # If their is a config file with authentication setting, use that
-        # so we don't have to supply this all the time.
-        home = os.getenv("HOME")
-        config = ".odkcentral"
-        filespec = home + "/" + config
-        if os.path.exists(filespec):
-            file = open(filespec, "r")
-            for line in file:
-                # Support embedded comments
-                if line[0] == "#":
-                    continue
-                # Read the config file for authentication settings
-                tmp = line.split("=")
-                if tmp[0] == "url":
-                    self.url = tmp[1].strip ('\n')
-                if tmp[0] == "user":
-                    self.user = tmp[1].strip ('\n')
-                if tmp[0] == "passwd":
-                    self.passwd = tmp[1].strip ('\n')
-        else:
-            logging.warning("You can put authentication settings in %s" % filespec)
+        # If there is a config file with authentication setting, use that
+        # so we don't have to supply this all the time. This is only used
+        # when odk_client is used, and no parameters are passed in.
+        if not self.url:
+            home = os.getenv("HOME")
+            config = ".odkcentral"
+            filespec = home + "/" + config
+            if os.path.exists(filespec):
+                file = open(filespec, "r")
+                for line in file:
+                    # Support embedded comments
+                    if line[0] == "#":
+                        continue
+                    # Read the config file for authentication settings
+                    tmp = line.split("=")
+                    if tmp[0] == "url":
+                        self.url = tmp[1].strip ('\n')
+                    if tmp[0] == "user":
+                        self.user = tmp[1].strip ('\n')
+                    if tmp[0] == "passwd":
+                        self.passwd = tmp[1].strip ('\n')
+            else:
+                logging.warning("You can put authentication settings in %s" % filespec)
         # Base URL for the REST API
         self.version = "v1"
         self.base = self.url + "/" + self.version + "/"
@@ -105,17 +107,60 @@ class OdkCentral(object):
         """Fetch a list of projects from an ODK Central server, and
         store it as an indexed list."""
         logging.info("Getting a list of projects from %s" % self.url)
-        url = self.base + "projects"
+        url = f'{self.base}projects'
         result = self.session.get(url, auth=self.auth)
         projects = result.json()
         for project in projects:
             self.projects[project['id']] = project
         return projects
 
-    def createProject(name=None):
-        """Create a new project on an ODK Central server"""
-        url = f'{self.base}/v1/projects'
-        result = self.session.post(url, auth=self.auth, json={'name': name})
+    def createProject(self, name=None):
+        """Create a new project on an ODK Central server if it doesn't
+        already exist"""
+        exists = self.findProject(name)
+        if exists:
+            logging.debug(f"Project \"{name}\" already exists.")
+            return exists
+        else:
+            url = f'{self.base}projects'
+            result = self.session.post(url, auth=self.auth, json={'name': name})
+            # update the internal list of projects
+            self.listProjects()
+        return self.findProject(name)
+
+    def deleteProject(self, project_id: int):
+        """Delete a project on an ODK Central server"""
+        url = f'{self.base}projects/{project_id}'
+        result = self.session.delete(url, auth=self.auth)
+        # update the internal list of projects
+        self.listProjects()
+        return self.findProject(project_id)
+
+    def findProject(self, project_id=None, name=None):
+        """Get the project data from Central"""
+        if self.projects:
+            if name:
+                for key, value in self.projects.items():
+                    if name == value['name']:
+                        return value
+            if project_id:
+                for key, value in self.projects.items():
+                    if project_id == value['id']:
+                        return value
+        return None
+
+    def findAppUser(self, user_id=None, name=None):
+        """Get the data for an app user"""
+        if self.appusers:
+            if name:
+                for key, value in self.appusers.items():
+                    if name == value['name']:
+                        return value
+            if project_id:
+                for key, value in self.appusers.items():
+                    if user_id == value['id']:
+                        return value
+        return None
 
     def listUsers(self):
         """Fetch a list of users on the ODK Central server"""
@@ -131,6 +176,7 @@ class OdkCentral(object):
         # print("User: %s" % self.user)
         # print("Passwd: %s" % self.passwd)
         print("REST URL: %s" % self.base)
+
         print("There are %d projects on this server" % len(self.projects))
         for id, data in self.projects.items():
             print("\t %s: %s" % (id, data['name']))
@@ -150,6 +196,7 @@ class OdkProject(OdkCentral):
         self.submissions = None
         self.data = None
         self.appusers = None
+        self.id = None
 
     def getData(self, keyword):
         return self.data[keyword]
@@ -162,7 +209,7 @@ class OdkProject(OdkCentral):
         return self.forms
 
     def listAppUsers(self, projectId=None):
-        """Fetch a list of app users for a project on an ODK Central server."""
+        """Fetch a list of app users for a project from an ODK Central server."""
         url = f'{self.base}projects/{projectId}/app-users'
         result = self.session.get(url, auth=self.auth)
         self.appusers = result.json()
@@ -184,11 +231,12 @@ class OdkProject(OdkCentral):
     def dump(self):
         """Dump internal data structures, for debugging purposes only"""
         super().dump()
-        print("There are %d forms in this project" % len(self.forms))
+        if self.forms:
+            print("There are %d forms in this project" % len(self.forms))
+            for data in self.forms:
+                print("\t %s(%s): %s" % (data['xmlFormId'], data['version'], data['name']))
         if self.data:
             print("Project ID: %s" % self.data['id'])
-        for data in self.forms:
-            print("\t %s(%s): %s" % (data['xmlFormId'], data['version'], data['name']))
         print("There are %d submissions in this project" % len(self.submissions))
         for data in self.submissions:
             print("\t%s: %s" % (data['instanceId'], data['createdAt']))
@@ -416,12 +464,12 @@ class OdkAppUser(OdkCentral):
         result = self.session.post(url, auth=self.auth)
         return result
 
-    def getQRCode(self, projectId=None, token=None, name=None):
+    def createQRCode(self, project_id=None, token=None, name=None):
         """Get the QR Code for an app-user"""
-        url = f'{self.base}key/{token}/projects/{projectId}'
-        logging.info("Generating QR Code for app-user \"%s\" for project %s" % (name, projectId))
+        url = f'{self.base}key/{token}/projects/{project_id}'
+        logging.info("Generating QR Code for app-user \"%s\" for project %s" % (name, project_id))
         self.settings = {"general":
-                    {"server_url":f'{self.base}key/{token}/projects/{projectId}',
+                    {"server_url":f'{self.base}key/{token}/projects/{project_id}',
                      "form_update_mode":"manual",
                      "basemap_source": "OpenStreetMap",
                      "autosend":"wifi_and_cellular"},
@@ -430,7 +478,8 @@ class OdkAppUser(OdkCentral):
                     }
         qr_data = (b64encode(zlib.compress(json.dumps(self.settings).encode("utf-8"))))
         self.qrcode = segno.make(qr_data, micro=False)
-        self.qrcode.save(f'{name}.png', scale=5)
+        # self.qrcode.save(f'{name}.png', scale=5)
+        return qr_data
 
 # This following code is only for debugging purposes, since this is easier
 # to use a debugger with instead of pytest.
