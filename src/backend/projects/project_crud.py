@@ -29,6 +29,7 @@ from geoalchemy2.shape import to_shape
 import geoalchemy2
 import numpy as np
 from pyxform.xls2xform import get_xml_path, xls2xform_convert
+import xmltodict
 
 
 from geojson_pydantic import FeatureCollection, Feature
@@ -420,12 +421,41 @@ def read_xlsforms(
         if os.path.getsize(outfile) <= 0:
             logger.warning(f"{outfile} is empty!")
             continue
-        xls = open(outfile, "rb")
+        xls = open(outfile, "r")
         data = xls.read()
         xls.close()
+
+        try:
+            xml = xmltodict.parse(str(data))
+        except Exception as e:
+            continue
+        # First change the osm data extract file
+        index = 0
+        for inst in xml['h:html']['h:head']['model']['instance']:
+            try:
+                if '@src' in inst:
+                    xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
+                if 'data' in inst:
+                    if 'data' == inst:
+                        xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
+                    else:
+                        xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
+            except Exception as e:
+                continue
+            index += 1
+        xml['h:html']['h:head']['h:title'] = "FIXME title"
+
+        # write the updated XML file
+        outxml = open(outfile, "w")
+        newxml = xmltodict.unparse(xml)
+        outxml.write(newxml)
+        outxml.close()
+
+        # insert the new version
         ins = insert(forms).values(title=name, xml=data)
-        sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=data))
+        sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
         result = db.execute(sql)
+
         db.commit()
 
     return xlsforms
