@@ -19,15 +19,23 @@
 
 import geojson
 import io
-import json
+import os
+from json import loads, dumps, dump
 from typing import List
 from zipfile import ZipFile
 import epdb
 from fastapi import HTTPException, UploadFile
 from geoalchemy2.shape import to_shape
-from geojson_pydantic import FeatureCollection
-from shapely.geometry import mapping, shape
+import geoalchemy2
+import numpy as np
+
+from geojson_pydantic import FeatureCollection, Feature
+from shapely.geometry import mapping, shape, Polygon
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import select, table, column, Enum, insert, delete, update, inspect, Table
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.sql import text
+import sqlalchemy
 import shapely.wkb as wkblib
 from fastapi.logger import logger as logger
 
@@ -35,6 +43,7 @@ from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..db import db_models
 from ..tasks import tasks_crud, tasks_schemas
 from ..users import user_crud
+from ..central import central_crud
 
 from . import project_schemas
 
@@ -117,15 +126,17 @@ def delete_project_by_id(db: Session, project_id: int):
             .order_by(db_models.DbProject.id)
             .first()
         )
-        db.delete(db_project)
-        db.commit()
+        if db_project:
+            db.delete(db_project)
+            db.commit()
     except Exception as e:
         raise HTTPException(e)
     return f"Project {project_id} deleted"
 
 
 def create_project_with_project_info(
-    db: Session, project_metadata: project_schemas.BETAProjectUpload
+        db: Session, project_metadata: project_schemas.BETAProjectUpload,
+        project_id
 ):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
@@ -147,6 +158,7 @@ def create_project_with_project_info(
     # create new project
     db_project = db_models.DbProject(
         author=db_user,
+        odkid=project_id,
         default_locale=project_info_1.locale,
         country=[project_metadata.country],
         location_str=f"{project_metadata.city}, {project_metadata.country}",
@@ -171,6 +183,7 @@ def create_project_with_project_info(
 
     return convert_to_app_project(db_project)
 
+
 def update_project_boundary(
         db: Session,
         project_id: int,
@@ -191,6 +204,25 @@ def update_project_boundary(
     db.refresh(db_project)
     logger.debug("Added project boundary!")
 
+    result = create_task_grid(db, project_id=project_id)
+    tasks = eval(result)
+    for poly in tasks['features']:
+        logger.debug(poly)
+        task_name='fixme'
+        db_task = db_models.DbTask(
+            project_id=project_id,
+            project_task_name=task_name,
+            outline=wkblib.dumps(shape(poly['geometry']), hex=True),
+            # qr_code=db_qr,
+            # project_task_index=feature["properties"]["fid"],
+            project_task_index=1,
+            #geometry_geojson=geojson.dumps(task_geojson),
+            #initial_feature_count=len(task_geojson["features"]),
+        )
+        db.add(db_task)
+        db.commit()
+
+        # FIXME: write to tasks table
     return True
 
 
@@ -330,8 +362,8 @@ def update_project_with_zip(
             return db_project
 
         # Exception was raised by app logic and has an error message, just pass it along
-        except HTTPException as http_e:
-            raise http_e
+        except HTTPException as e:
+            raise e
 
         # Unexpected exception
         except Exception as e:
@@ -344,24 +376,111 @@ def update_project_with_zip(
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
-def create_task_grid(projectid: int, error_detail: str):
-    try:
-        #file = open("test_boundary.geojson", 'r')
-        #coords = geojson.load(file)
-        # Query DB for project AOI
-        boundary = shape(coords['features'][0]['geometry'])
+def read_xlsforms(
+    db: Session,
+    directory: str,
+):
+    """Read the list of XLSForms from the disk"""
+    xlsforms = list()
+    for xls in os.listdir(directory):
+        if xls.endswith(".xls"):
+            xlsforms.append(xls)
+    logger.info(xls)
+    insp = inspect(db_models.DbXForm)
+    forms = table('xlsforms', column('title'), column('xls'), column('id'))
+    # x = Table('xlsforms', MetaData())
+    # x.primary_key.columns.values()
 
+
+    for xlsform in xlsforms:
+        xls = open(f"{directory}/{xlsform}", "rb")
+        name = xlsform.split('.')[0]
+        data = xls.read()
+        logger.info(xlsform)
+        ins = insert(forms).values(title=name, xls=data)
+        sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xls=data))
+        result = db.execute(sql)
+        db.commit()
+
+    return xlsforms
+
+def generate_appuser_files(
+        db: Session,
+        grid: dict,
+        project_id: int,
+        category: str
+):
+    """Generate the files for each appuser, the qrcode, the new XForm,
+    and the OSM data extract.
+    """
+    # xlsforms = read_xlsforms("src/backend/odkconvert/XForms")
+    project = table('projects', column('project_name_prefix'), column('id'))
+    where = f"id={project_id}"
+    sql = select(project).where(text(where))
+    logger.info(str(sql))
+    result = db.execute(sql)
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+    one = result.fetchone()
+    if one:
+        prefix = one.project_name_prefix
+        for task in grid['features']:
+            id = task['properties']['id']
+            name = f"{prefix}_{id}"
+            appuser = central_crud.create_appuser(project_id, name)
+            if not appuser:
+                logger.error(f"Couldn't create appuser for project {project_id}")
+                return None
+            qrcode = create_qrcode(db, project_id, appuser.json()['token'], name)
+            # xform = central_crud.update_xform(name, project_id)
+            # create_data_extract(task['geometry'])
+
+def create_qrcode(
+        db: Session,
+        project_id: int,
+        token: str,
+        project_name: str,
+):
+    """Make a QR code for an app_user"""
+    qrcode = central_crud.create_QRCode(project_id, token, project_name)
+    qrdb = db_models.DbQrCode(image=qrcode, )
+    db.add(qrdb)
+    db.commit()
+    codes = table('qr_code', column('id'))
+    sql = select(sqlalchemy.func.count(codes.c.id))
+    result = db.execute(sql)
+    rows = result.fetchone()[0]
+    return {"data": qrcode, "id": rows + 1}
+
+def create_task_grid(
+        db: Session,
+        project_id: int
+):
+    try:
+        # Query DB for project AOI
+        projects = table('projects', column('outline'), column('id'))
+        where = f"projects.id={project_id}"
+        sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(text(where))
+        result = db.execute(sql)
+        # There should only be one match
+        if result.rowcount != 1:
+            logger.warning(str(sql))
+            return False
+        data = result.fetchall()
+        boundary = shape(loads(data[0][0]))
         minx, miny, maxx, maxy = boundary.bounds
         delta = 0.005
         nx = int((maxx - minx)/delta)
         ny = int((maxy - miny)/delta)
         gx, gy = np.linspace(minx,maxx,nx), np.linspace(miny,maxy,ny)
         grid = list()
-        json = open("tmp.geojson", 'w')
+
         id = 0
         for i in range(len(gx)-1):
             for j in range(len(gy)-1):
-                poly = shapely.geometry.Polygon([
+                poly = Polygon([
                     [gx[i],gy[j]],
                     [gx[i],gy[j+1]],
                     [gx[i+1],gy[j+1]],
@@ -371,14 +490,17 @@ def create_task_grid(projectid: int, error_detail: str):
                 # FIXME: this should clip the features that intersect with the
                 # boundary.
                 if boundary.contains(poly):
-                    feature = Feature(geometry=poly, properties={'id': str(id)})
+                    feature = geojson.Feature(geometry=poly, properties={'id': str(id)})
                     id += 1
                     grid.append(feature)
-        collection = FeatureCollection(grid)
-        out = dumps(collection, json)
+        collection = geojson.FeatureCollection(grid)
+        # jsonout = open("tmp.geojson", 'w')
+        # out = dump(collection, jsonout)
+        out = dumps(collection)
     except Exception as e:
-        raise HTTPException(
-            status_code=400, detail=f'{error_detail} ----- Error: {e} ---- Json: {feature}')
+        logger.error(e)
+
+    return out
 
 def get_json_from_zip(zip, filename: str, error_detail: str):
     try:

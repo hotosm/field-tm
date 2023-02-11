@@ -63,6 +63,7 @@ class ProjectSummary(BaseModel):
 
 class ProjectBase(BaseModel):
     id: int
+    odkid: int
     author: User
     default_locale: str
     project_info: List[ProjectInfo]
@@ -73,10 +74,6 @@ class ProjectBase(BaseModel):
 
     class Config:
         orm_mode = True
-
-
-class Project(ProjectBase):
-    pass
 
 
 class ProjectOut(ProjectBase):
