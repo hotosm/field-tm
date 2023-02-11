@@ -28,6 +28,8 @@ from fastapi import HTTPException, UploadFile
 from geoalchemy2.shape import to_shape
 import geoalchemy2
 import numpy as np
+from pyxform.xls2xform import get_xml_path, xls2xform_convert
+
 
 from geojson_pydantic import FeatureCollection, Feature
 from shapely.geometry import mapping, shape, Polygon
@@ -189,6 +191,7 @@ def update_project_boundary(
         project_id: int,
         boundary: str,
 ):
+    """Update the boundary polyon on the database"""
     outline = shape(boundary['features'][0]['geometry'])
 
     # verify project exists in db
@@ -387,18 +390,41 @@ def read_xlsforms(
             xlsforms.append(xls)
     logger.info(xls)
     insp = inspect(db_models.DbXForm)
-    forms = table('xlsforms', column('title'), column('xls'), column('id'))
+    forms = table('xlsforms', column('title'), column('xls'), column('xml'), column('id'))
     # x = Table('xlsforms', MetaData())
     # x.primary_key.columns.values()
 
 
     for xlsform in xlsforms:
-        xls = open(f"{directory}/{xlsform}", "rb")
+        infile = f"{directory}/{xlsform}"
+        if os.path.getsize(infile) <= 0:
+            logger.warning(f"{infile} is empty!")
+            continue
+        xls = open(infile, "rb")
         name = xlsform.split('.')[0]
         data = xls.read()
-        logger.info(xlsform)
+        xls.close()
+        # logger.info(xlsform)
         ins = insert(forms).values(title=name, xls=data)
         sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xls=data))
+        result = db.execute(sql)
+        db.commit()
+
+        # FIXME: make xform. This will probasbly happen someplace else soon,
+        # but Iwanted to see if the conversion worked.
+        outfile = f"/tmp/{name}.xml"
+        try:
+            xls2xform_convert(xlsform_path=infile, xform_path=outfile)
+        except Exception as e:
+            continue
+        if os.path.getsize(outfile) <= 0:
+            logger.warning(f"{outfile} is empty!")
+            continue
+        xls = open(outfile, "rb")
+        data = xls.read()
+        xls.close()
+        ins = insert(forms).values(title=name, xml=data)
+        sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=data))
         result = db.execute(sql)
         db.commit()
 
