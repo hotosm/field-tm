@@ -41,18 +41,18 @@ from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 from ..env_utils import is_docker, config_env
 
 project = OdkProject()
-project.listProjects()
 xform = OdkForm()
 
 url = config_env["ODK_CENTRAL_URL"]
 user = config_env["ODK_CENTRAL_USER"]
 pw = config_env["ODK_CENTRAL_PASSWD"]
 project.authenticate(url, user, pw)
+project.listProjects()
 
 def create_odk_project(name):
     """Create a project on a remote ODK Server"""
     result = project.createProject(name)
-    project.id = result['id']
+    project.id = result
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
 
@@ -62,19 +62,21 @@ def delete_odk_project(project_id: int):
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
     return result
 
-def create_app_user(project_id: int, name: str):
+def create_appuser(project_id: int, name: str):
     """Create an app-user on a remote ODK Server"""
-    project.listAppUsers(project_id)
-    user = project.findAppUser(name)
-    if not user:
-        appuser = OdkAppUser(name=name)
-        result = appuser.create(user)
+    #project.listAppUsers(project_id)
+    # user = project.findAppUser(name=name)
+    # user = False
+    # if not user:
+    appuser = OdkAppUser()
+    result = appuser.create(project_id, name)
     return result
 
 def delete_app_user(project_id: int, name: str):
     """Delete an app-user from a remote ODK Server"""
-    logger.error("delete_app_user is unimplemented!")
-    return None
+    appuser = OdkAppUser()
+    result = appuser.delete(project_id, name)
+    return result
 
 def create_odk_xform(project_id: int, xform: str):
     """Create an XForm on a remote ODK Central server."""
