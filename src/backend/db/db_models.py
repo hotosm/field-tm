@@ -400,6 +400,7 @@ class DbProject(Base):
 
     # Columns
     id = Column(Integer, primary_key=True)
+    odkid = Column(Integer)
 
     # PROJECT CREATION
     author_id = Column(
