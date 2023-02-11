@@ -98,7 +98,6 @@ async def create_project(
     # TODO check token against user or use token instead of passing user
     project = project_crud.create_project_with_project_info(db, project_info, odkproject['id'])
     # FIXME: This should only be done once when starting, instead of for each project
-    epdb.st()
     xlsforms = project_crud.read_xlsforms(db, config_env['XLSFORMS_LIBRARY'])
 
     if project:
@@ -146,11 +145,11 @@ async def upload_project_boundary(
     # FIXME: fix return value
     return {f"Message": f"{project_id}"}
 
-@router.post("/readXLSForms")
-async def read_xlsforms_directory(
-    directory: str,
-    db: Session = Depends(database.get_db),
-):
-    """Read XLSForms from the disk"""
-    xlsforms = project_crud.read_xlsforms(db, directory)
-    return {"message": "Hello World from /debug/read_xlsforms"}
+# @router.post("/readXLSForms")
+# async def read_xlsforms_directory(
+#     directory: str,
+#     db: Session = Depends(database.get_db),
+# ):
+#     """Read XLSForms from the disk"""
+#     xlsforms = project_crud.read_xlsforms(db, directory)
+#     return {"message": "Hello World from /debug/read_xlsforms"}
