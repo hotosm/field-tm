@@ -38,6 +38,7 @@ osm-login-python==0.0.2
 
 # ---- ODK ----
 # pyodk==0.1.0
+qrcode==7.3.1
 
 # ----- FILE UPLOAD ----
 python-multipart==0.0.5
@@ -47,6 +48,7 @@ python-json-logger==2.0.4
 
 # ----- DEVELOPMENT -----
 ipdb
+epdb
 black
 isort
 
