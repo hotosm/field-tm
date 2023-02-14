@@ -12,7 +12,7 @@ It’s already possible to implement a sort of Field Mapping Tasking Manager wor
 
 
 # How to contribute
-👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
+👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/wiki/Home/90b86d34ddd42f0eafd03ea7e6d443eb37db2df6) for more details! Reach out to us if any questions! 👍🎉
 
 # Using OpenDataKit's Select From Map feature
 As of mid-2022, ODK incorporates a new functionality, select from map, that allows field mappers to select an object from a map, view the existing attributes, and fill out a form adding new information and attributes to that object. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
