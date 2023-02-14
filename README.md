@@ -9,7 +9,7 @@ It’s already possible to implement a sort of Field Mapping Tasking Manager wor
 Background and description of the project and idea are here: please have a look at this [blog](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/) if you haven't yet! [Overview, timeline & relevant links](https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0) 
  for the Field Mapping Tasking Manager (FMTM)
  
- ## Field Mapping Tasking Manager (FMTM) Emergency Response
+ ## [side project] Field Mapping Tasking Manager (FMTM) Emergency Response
 Field mapping, especially for damage assessments, is limited by coordination of all the response actors in the affected areas. Yer Çizenler, and OSM community in Turkey, has reported that there is a huge coordination challenge for mapping impacted areas. It is nearly impossible to know what has already been mapped, and duplications and gaps in mapping pose a challenge to building an effective understanding of the impact.
  
 In the wake of the 2010 Haiti earthquake, seeing a similar coordination challenge with mapping affected areas, OSM volunteers developed the Tasking Manager, which allowed mapping volunteers around the world to support building an open-source map of areas without map data. Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource for volunteers to contribute to the development of OSM.
