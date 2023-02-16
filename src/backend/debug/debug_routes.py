@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session
 import logging.config
 from fastapi.logger import logger as logger
 import os
+from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
 
 from ..db import database
 from ..models.enums import TaskStatus
@@ -78,10 +79,3 @@ def do_csv2osm():
     """Convert the submissions data into a CSV file"""
     logger.info("/debug/do_csv2osm is Unimplemented!")
     return {"message": "Hello World from /debug/makeosm"}
-
-@router.get("/makexform")
-def make_xform():
-    """Convert the submissions data into a CSV file"""
-    logger.info("/debug/do_csv2osm is Unimplemented!")
-    return {"message": "Hello World from /debug/majexform"}
-
