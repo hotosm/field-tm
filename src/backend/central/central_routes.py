@@ -78,9 +78,12 @@ async def upload_project_files(project_id: int, filespec: str):
     return {"message": "Hello World from /central/upload"}
 
 @router.get("/download")
-async def download_project_files(project_id: int, type: central_schemas.CentralFileType):
+async def download_project_files(
+        project_id: int,
+        type: central_schemas.CentralFileType
+):
     """Download the project data files from Central. The filespec is
-    a string that can contain multiple filenames separeted by a comma.
+    a string that can contain multiple filenames separated by a comma.
     """
     # FileResponse("README.md")
     #xxx = central_crud.does_central_exist()
