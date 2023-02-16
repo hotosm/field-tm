@@ -21,12 +21,20 @@ from fastapi.logger import logger as logger
 from geoalchemy2.shape import to_shape
 from shapely.geometry import shape, mapping
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select, table, column, Enum, insert, delete, update, inspect
+
 from typing import List
 import json
 import base64
 import epdb
+import os
 from fastapi.responses import FileResponse
 from fastapi import HTTPException, UploadFile
+from pyxform.xls2xform import get_xml_path, xls2xform_convert
+import xmltodict
+from sqlalchemy.dialects.postgresql import insert
+
 
 from ..env_utils import is_docker, config_env
 from ..db import db_models
@@ -36,9 +44,6 @@ from ..users import user_crud, user_schemas
 from ..tasks import tasks_schemas
 from ..central import central_schemas
 from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
-
-
-from ..env_utils import is_docker, config_env
 
 project = OdkProject()
 xform = OdkForm()
@@ -78,30 +83,92 @@ def delete_app_user(project_id: int, name: str):
     result = appuser.delete(project_id, name)
     return result
 
-def create_odk_xform(project_id: int, xform: str):
+def create_odk_xform(project_id: int,
+                     xform: str
+):
     """Create an XForm on a remote ODK Central server."""
     logger.error("create_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return None
 
-def delete_odk_xform(project_id: int, xform_id: str):
+def delete_odk_xform(
+    project_id: int,
+    xform_id: str
+):
     """Delete an XForm from a remote ODK Central server."""
     logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return None
 
-def download_submissions(project_id: int, xform_id: str):
+def download_submissions(
+    project_id: int,
+    xform_id: str
+):
     """Download submissions from a remote ODK server"""
     logger.error("download_submissions is unimplemented!")
     # FIXME: should filter by timestamps or status value
     return None
 
-def update_xform(filespec: str):
-    """Update the version in an XForm so it's unique"""
-    logger.error("update_xform is unimplemented!")
-    return None
 
-def create_QRCode(project_id=None, token=None, name=None):
+def generate_updated_xform(
+        db: Session,
+        task_id: dict,
+        xlsform: str,
+        xform: str,
+):
+    """Update the version in an XForm so it's unique"""
+    name = xlsform.split('.')[0]
+    base = os.path.basename(name)
+    outfile = xform
+    try:
+        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=True)
+    except Exception as e:
+        logger.error(f"Couldn't convert {xlsform} to an XForm!")
+        return None
+    if os.path.getsize(outfile) <= 0:
+        logger.warning(f"{outfile} is empty!")
+        return None
+    xls = open(outfile, "r")
+    data = xls.read()
+    xls.close()
+
+    xml = xmltodict.parse(str(data))
+    # First change the osm data extract file
+    index = 0
+    for inst in xml['h:html']['h:head']['model']['instance']:
+        try:
+            if '@src' in inst:
+                xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
+            if 'data' in inst:
+                if 'data' == inst:
+                    xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
+                else:
+                    xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
+        except Exception as e:
+            continue
+        index += 1
+    xml['h:html']['h:head']['h:title'] = "FIXME title"
+
+    # write the updated XML file
+    outxml = open(outfile, "w")
+    newxml = xmltodict.unparse(xml)
+    outxml.write(newxml)
+    outxml.close()
+
+    # insert the new version
+    forms = table('xlsforms', column('title'), column('xls'), column('xml'), column('id'))
+    ins = insert(forms).values(title=name, xml=data)
+    sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
+    result = db.execute(sql)
+    db.commit()
+
+    return outfile
+
+def create_QRCode(
+    project_id=None,
+    token=None,
+    name=None
+):
     """Create the QR Code for an app-user"""
     appuser = OdkAppUser()
     return appuser.createQRCode(project_id, token, name)
