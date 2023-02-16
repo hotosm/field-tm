@@ -47,6 +47,9 @@ from ..db import db_models
 from ..tasks import tasks_crud, tasks_schemas
 from ..users import user_crud
 from ..central import central_crud
+from ..models.enums import DataCategory
+from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
+from ..env_utils import is_docker, config_env
 
 from . import project_schemas
 
@@ -59,7 +62,11 @@ TASK_GEOJSON_DIR = "geojson/"
 
 
 def get_projects(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    db_objects: bool = False
 ):
     if user_id:
         db_projects = (
@@ -78,7 +85,12 @@ def get_projects(
     return convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+def get_project_summaries(
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100
+):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
     #         db_models.DbProject.id,
@@ -99,8 +111,10 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
     return convert_to_project_summaries(db_projects)
 
 
-def get_project_by_id_w_all_tasks(db: Session, project_id: int):
-
+def get_project_by_id_w_all_tasks(
+    db: Session,
+    project_id: int
+):
     db_project = (
         db.query(db_models.DbProject)
         .filter(db_models.DbProject.id == project_id)
@@ -110,7 +124,10 @@ def get_project_by_id_w_all_tasks(db: Session, project_id: int):
     return convert_to_app_project(db_project)
 
 
-def get_project_by_id(db: Session, project_id: int):
+def get_project_by_id(
+    db: Session,
+    project_id: int
+):
 
     db_project = (
         db.query(db_models.DbProject)
@@ -121,7 +138,10 @@ def get_project_by_id(db: Session, project_id: int):
     return convert_to_app_project(db_project)
 
 
-def delete_project_by_id(db: Session, project_id: int):
+def delete_project_by_id(
+    db: Session,
+    project_id: int
+):
     try:
         db_project = (
             db.query(db_models.DbProject)
@@ -411,66 +431,65 @@ def read_xlsforms(
         result = db.execute(sql)
         db.commit()
 
-        # FIXME: make xform. This will probasbly happen someplace else soon,
-        # but Iwanted to see if the conversion worked.
-        outfile = f"/tmp/{name}.xml"
-        try:
-            xls2xform_convert(xlsform_path=infile, xform_path=outfile)
-        except Exception as e:
-            continue
-        if os.path.getsize(outfile) <= 0:
-            logger.warning(f"{outfile} is empty!")
-            continue
-        xls = open(outfile, "r")
-        data = xls.read()
-        xls.close()
+        # outfile = central_crud.generate_updated_xform(db, task_id, infile)
+        # # FIXME: make xform. This will probably happen someplace else soon,
+        # # but I wanted to see if the conversion worked.
+        # outfile = f"/tmp/{name}.xml"
+        # try:
+        #     xls2xform_convert(xlsform_path=infile, xform_path=outfile)
+        # except Exception as e:
+        #     continue
+        # if os.path.getsize(outfile) <= 0:
+        #     logger.warning(f"{outfile} is empty!")
+        #     continue
+        # xls = open(outfile, "r")
+        # data = xls.read()
+        # xls.close()
 
-        try:
-            xml = xmltodict.parse(str(data))
-        except Exception as e:
-            continue
-        # First change the osm data extract file
-        index = 0
-        for inst in xml['h:html']['h:head']['model']['instance']:
-            try:
-                if '@src' in inst:
-                    xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
-                if 'data' in inst:
-                    if 'data' == inst:
-                        xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
-                    else:
-                        xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
-            except Exception as e:
-                continue
-            index += 1
-        xml['h:html']['h:head']['h:title'] = "FIXME title"
+        # try:
+        #     xml = xmltodict.parse(str(data))
+        # except Exception as e:
+        #     continue
+        # # First change the osm data extract file
+        # index = 0
+        # for inst in xml['h:html']['h:head']['model']['instance']:
+        #     try:
+        #         if '@src' in inst:
+        #             xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
+        #         if 'data' in inst:
+        #             if 'data' == inst:
+        #                 xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
+        #             else:
+        #                 xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
+        #     except Exception as e:
+        #         continue
+        #     index += 1
+        # xml['h:html']['h:head']['h:title'] = "FIXME title"
 
-        # write the updated XML file
-        outxml = open(outfile, "w")
-        newxml = xmltodict.unparse(xml)
-        outxml.write(newxml)
-        outxml.close()
+        # # write the updated XML file
+        # outxml = open(outfile, "w")
+        # newxml = xmltodict.unparse(xml)
+        # outxml.write(newxml)
+        # outxml.close()
 
-        # insert the new version
-        ins = insert(forms).values(title=name, xml=data)
-        sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
-        result = db.execute(sql)
+        # # insert the new version
+        # ins = insert(forms).values(title=name, xml=data)
+        # sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
+        # result = db.execute(sql)
 
-        db.commit()
+        # db.commit()
 
     return xlsforms
 
 def generate_appuser_files(
-        db: Session,
-        grid: dict,
-        project_id: int,
-        category: str
+    db: Session,
+    dbname: str,
+    project_id: int,
 ):
     """Generate the files for each appuser, the qrcode, the new XForm,
     and the OSM data extract.
     """
-    # xlsforms = read_xlsforms("src/backend/odkconvert/XForms")
-    project = table('projects', column('project_name_prefix'), column('id'))
+    project = table('projects', column('project_name_prefix'), column('xform_title'), column('id'))
     where = f"id={project_id}"
     sql = select(project).where(text(where))
     logger.info(str(sql))
@@ -479,19 +498,28 @@ def generate_appuser_files(
     if result.rowcount != 1:
         logger.warning(str(sql))
         return False
-    one = result.fetchone()
+    one = result.first()
     if one:
         prefix = one.project_name_prefix
-        for task in grid['features']:
-            id = task['properties']['id']
-            name = f"{prefix}_{id}"
+        task = table('tasks', column('outline'), column('id'))
+        where = f"project_id={project_id}"
+        sql = select(task.c.id, geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label('outline')).where(text(where))
+        result = db.execute(sql)
+        for poly in result.fetchall():
+            # poly = result.first()
+            name = f"{prefix}_{poly.id}"
             appuser = central_crud.create_appuser(project_id, name)
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
-            qrcode = create_qrcode(db, project_id, appuser.json()['token'], name)
-            # xform = central_crud.update_xform(name, project_id)
-            # create_data_extract(task['geometry'])
+            qrcode = create_qrcode(db, project_id, appuser.json()['token'], prefix)
+            xlsform = f'{config_env["XLSFORMS_LIBRARY"]}/{one.xform_title}.xls'
+            xform = f'/tmp/{prefix}_{one.xform_title}_{poly.id}.xml'
+            result = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+            outfile = f"/tmp/{prefix}_{one.xform_title}_{poly.id}.geojson"
+            pg = PostgresClient('localhost', dbname, outfile)
+            outline = eval(poly.outline)
+            pg.getFeature(outline, outfile, one.xform_title)
 
 def create_qrcode(
         db: Session,
