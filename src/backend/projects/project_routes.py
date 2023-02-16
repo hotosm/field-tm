@@ -19,11 +19,13 @@
 from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.logger import logger as logger
+from fastapi.logger import logger as logging
 from sqlalchemy.orm import Session
 from pathlib import Path
 import json
 import epdb
 import os
+from ..models.enums import DataCategory
 
 from ..env_utils import is_docker, config_env
 from ..db import database
@@ -140,16 +142,19 @@ async def upload_project_boundary(
 
     # Use the ID we get from Central, as it's needed for many queries
     grid = eval(project_crud.create_task_grid(db, project_id))
-    result = project_crud.generate_appuser_files(db, grid, project_id)
+    # type = DataCategory()
+    # result = project_crud.generate_appuser_files(db, grid, project_id)
 
     # FIXME: fix return value
     return {f"Message": f"{project_id}"}
 
-# @router.post("/readXLSForms")
-# async def read_xlsforms_directory(
-#     directory: str,
-#     db: Session = Depends(database.get_db),
-# ):
-#     """Read XLSForms from the disk"""
-#     xlsforms = project_crud.read_xlsforms(db, directory)
-#     return {"message": "Hello World from /debug/read_xlsforms"}
+@router.post("/{project_id}/generate")
+async def generate_files(
+    project_id: int,
+    dbname: str,
+    db: Session = Depends(database.get_db),
+):
+    result = project_crud.generate_appuser_files(db, dbname, project_id)
+
+    # FIXME: fix return value
+    return {f"Message": f"{project_id}"}
