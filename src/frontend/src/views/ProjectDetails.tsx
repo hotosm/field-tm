@@ -1,28 +1,41 @@
 import React from "react";
 import { Box, Container, Divider, Stack, Typography } from '@mui/material'
-import CustomizedText from "../utilities/CustomizedText";
-import enviroment from "../enviroment";
-
-import windowDimention from "../customHooks/WindowDimension";
+import windowDimention from "../hooks/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LeafletMap from "../components/projectDetails/LeafletMap";
-
 import MapDescriptionComponents from "../components/projectDetails/MapDescriptionComponents";
-import BasicTabs from "../components/projectDetails/BasicTabs";
+import BasicTabs from "../utilities/BasicTabs";
 import MapLegends from "../components/projectDetails/MapLegends";
+import ActivitiesPanel from "../components/projectDetails/ActivitiesPanel";
+import TasksComponent from "../components/projectDetails/TasksPanel";
+import { useSelector } from "react-redux";
+
 
 const ProjectDetails = () => {
-    const { type } = windowDimention()
+
+    const { type } = windowDimention();
+    const viewMode = type == 'xl' ? 6 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1
+    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
     const ProjectDetailsStyles = {
         text: {
             marginLeft: '2%'
         },
         icon: {
-            marginTop: '1%',
+            marginTop: '0.5%',
             fontSize: 22
         }
     }
-    const MapDetails: any = [{ value: 'lock', color: 'blue', status: 'none' }, { value: 'opened', color: 'green', status: 'lock' }]
+    const MapDetails: any = [
+        { value: 'lock', color: 'blue', status: 'none' },
+        { value: 'opened', color: 'green', status: 'lock' }
+    ]
+
+    const panelData: any = [
+        { label: 'Activities', element: <ActivitiesPanel /> },
+        { label: 'My Tasks', element: <TasksComponent type={type} /> }
+    ]
+
+    //mock data
     const descriptionData: any = [
         {
             value: 'Descriptions', element: <Typography align="center" >
@@ -89,31 +102,61 @@ const ProjectDetails = () => {
     ]
 
     return (
-        <div>
+        <Stack spacing={2}>
+
             <Stack direction="column"
-                spacing={0}
                 justifyContent="center"
                 alignItems={"center"}
             >
-                <Stack direction={'row'} p={2} spacing={2} divider={<Divider sx={{ backgroundColor: enviroment.sysBlackColor }} orientation="vertical" flexItem />}>
-                    <CustomizedText font={enviroment.regularText} top={'1.8%'} size={16} text={'Testing Data'} weight={'regular'} />
-                    <CustomizedText font={enviroment.regularText} top={'1.8%'} size={16} text={'Testing Data'} weight={'regular'} />
+                <Stack
+                    direction={'row'}
+                    p={2}
+                    spacing={2}
+                    divider={
+                        <Divider
+                            sx={{ backgroundColor: defaultTheme.palette.grey['main'] }}
+                            orientation="vertical"
+                            flexItem
+                        />}
+                >
+                    <Typography
+                        variant="h4"
+                        fontSize={defaultTheme.typography.fontSize}
+                        top={'1.8%'}
+                    >
+                        Testing Data
+                    </Typography>
+
+                    <Typography
+                        variant="h4"
+                        fontSize={defaultTheme.typography.fontSize}
+                        top={'1.8%'}
+                    >
+                        Testing Data
+                    </Typography>
+
                 </Stack>
-                <CustomizedText font={enviroment.headerText} top={'0%'} size={20} text={'OpenStreetMap Bangladesh-Earthquake'} weight={'regular'} />
+
             </Stack>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }} mb={'1%'}>
+            <Stack direction={'row'} justifyContent={'center'}>
                 <LocationOnIcon color='error' style={ProjectDetailsStyles.icon} />
-                <CustomizedText font={enviroment.mediumText} top={'1%'} size={16} text={'Testing Data'} weight={'regular'} />
-            </Box>
+                <Typography
+                    variant="caption"
+                >
+                    Testing Data
+                </Typography>
+            </Stack>
+
             <Stack direction={'column'} spacing={1}>
                 <MapDescriptionComponents details={descriptionData} type={type} />
                 <LeafletMap />
             </Stack>
+
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                <BasicTabs />
+                <BasicTabs listOfData={panelData} />
             </Box>
-        </div>
+        </Stack>
     )
 }
 

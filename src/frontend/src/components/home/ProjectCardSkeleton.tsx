@@ -1,8 +1,8 @@
 import React from "react";
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import Skeleton from 'react-loading-skeleton'
 
+// Skeleton card main purpose is to perfom loading in case of any delay in retrieving project
 const ProjectCardSkeleton = ({ cardsPerRow }) => {
-
 
     return (
 
@@ -12,7 +12,11 @@ const ProjectCardSkeleton = ({ cardsPerRow }) => {
 
                     <div className="row mt-2">
                         <div className="col-md-12">
-                            <Skeleton style={{ marginTop: '3%', float: 'right', width: 69 }} count={1} />
+                            <Skeleton
+                                width={69}
+                                style={{ marginTop: '3%', float: 'right' }}
+                                count={1}
+                            />
                         </div>
                         <div className="col-md-4 mt-1">
                             <Skeleton height={25} />
