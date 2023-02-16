@@ -1,15 +1,28 @@
 ![](images/hot_logo.png)
 # Field Mapping Tasking Manager (FMTM)
-## A project to provide tools for Open Mapping campaigns
+A project to provide tools for Open Mapping campaigns
 
 While we have pretty good field mapping applications, we don’t have great tools to coordinate field mapping. However, we have most of the elements needed to create a field mapping-oriented version of the HOT Tasking Manager, which allows people to select specific areas and complete tasks in a coordinated, organized fashion.
 
 It’s already possible to implement a sort of Field Mapping Tasking Manager workflow using existing tools (mostly based on ODK, particularly the new "select from map" functionality), but it’s pretty labor-intensive and tricky. We’re working on some automation to ease the pain points, which moves us closer to a fully-fledged Field Mapping Tasking Manager (FMTM).
 
-[Background and description of the project and idea are here: please have a look at this blog if you haven't yet!](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
+Background and description of the project and idea are here: please have a look at this [blog](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/) if you haven't yet! [Overview, timeline & relevant links](https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0) 
+ for the Field Mapping Tasking Manager (FMTM)
+ 
+ ## [side project] FMTM Turkey Earthquake Response Support 
+Field mapping, especially for damage assessments, is limited by coordination of all the response actors in the affected areas. Yer Çizenler, and OSM community in Turkey, has reported that there is a huge coordination challenge for mapping impacted areas. It is nearly impossible to know what has already been mapped, and duplications and gaps in mapping pose a challenge to building an effective understanding of the impact.
+ 
+In the wake of the 2010 Haiti earthquake, seeing a similar coordination challenge with mapping affected areas, OSM volunteers developed the Tasking Manager, which allowed mapping volunteers around the world to support building an open-source map of areas without map data. Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource for volunteers to contribute to the development of OSM.
+
+HOT is already in the early stages of developing the Field Mapping Tasking Manager (FMTM), but we now need to accelerate this effort and provide a working version for use as soon as possible to the OSM Turkey community and on-the-ground data collectors. We are asking for your developer conttributions: calling for 4 developers to work with us on this for 2 weeks See [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more detail.
+ 
 
 # How to contribute
-👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
+👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers.  We have a specific request for volunteer developers at the moment!
+![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
+Please take a look at our [Wiki pages](https://github.com/hotosm/fmtm/wiki/Home/90b86d34ddd42f0eafd03ea7e6d443eb37db2df6)  and [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more details! Reach out to us if any questions! 👍🎉
+
+
 
 # Using OpenDataKit's Select From Map feature
 As of mid-2022, ODK incorporates a new functionality, select from map, that allows field mappers to select an object from a map, view the existing attributes, and fill out a form adding new information and attributes to that object. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
