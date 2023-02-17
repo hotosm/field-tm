@@ -60,7 +60,7 @@ parser.add_argument("-v", "--verbose", action="store_true", help="verbose output
 parser.add_argument("-s", "--server", choices=['projects', 'users'],
                     help="project operations")
 # This is for project specific requests
-parser.add_argument("-p", "--project", choices=['forms', 'app-users', 'assignments'],
+parser.add_argument("-p", "--project", choices=['forms', 'app-users', 'assignments', 'delete'],
                     help="project operations")
 parser.add_argument('-i', '--id', type=int, help = 'Project ID nunmber')
 parser.add_argument("-f", "--form", help="XForm name")
@@ -147,6 +147,9 @@ elif args.project:
         ordered = sorted(users, key=lambda item: item.get('id'))
         for user in ordered:
             print("\t%r: %s (%s)" % (user['id'], user['displayName'], user['token']))
+    if args.project == "delete":
+        project.deleteProject(args.id)
+        # logging.info("There are %d app users on this ODK Central server" %)
     if args.project == "assignments":
         assign = project.listAssignments(args.id)
         logging.info("There are %d assignments  on this ODK Central server" % len(assign))

@@ -127,12 +127,12 @@ class OdkCentral(object):
             result = self.session.post(url, auth=self.auth, json={'name': name}, verify=self.verify)
             # update the internal list of projects
             self.listProjects()
-        return self.findProject(name)
+        return result.json()
 
     def deleteProject(self, project_id: int):
         """Delete a project on an ODK Central server"""
         url = f'{self.base}projects/{project_id}'
-        result = self.session.delete(url, auth=self.auth)
+        result = self.session.delete(url, auth=self.auth, verify=self.verify)
         # update the internal list of projects
         self.listProjects()
         return self.findProject(project_id)
@@ -405,7 +405,7 @@ class OdkForm(OdkCentral):
         else:
             url = f'{self.base}projects/{projectId}/forms/{xmlFormId}'
         print(url)
-        result = self.session.delete(url, auth=self.auth)
+        result = self.session.delete(url, auth=self.auth, verify=self.verify)
         return result
 
     def publishForm(self, projectId=None, xmlFormId=None):
