@@ -39,6 +39,9 @@ osm-login-python==0.0.2
 # ---- ODK ----
 # pyodk==0.1.0
 qrcode==7.3.1
+pyxform==1.12.0
+xmltodict==0.13.0
+
 
 # ----- FILE UPLOAD ----
 python-multipart==0.0.5
