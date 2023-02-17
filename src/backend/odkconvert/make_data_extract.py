@@ -31,7 +31,7 @@ from geojson import Point, Polygon, Feature, FeatureCollection, dump
 import geojson
 from OSMPythonTools.overpass import Overpass
 from OSMPythonTools.api import Api
-from yamlfile import YamlFile
+# from yamlfile import YamlFile
 import psycopg2
 from shapely.geometry import shape
 
@@ -100,10 +100,13 @@ class PostgresClient(object):
             tables = ("ways_view")
             filter = "tags->>'landuse' IS NOT NULL"
 
-        clip = open(boundary, 'r')
-        data = geojson.load(clip)
-        feature = data['features'][0]
-        geom = feature['geometry']
+        if type(boundary) != dict:
+            clip = open(boundary, 'r')
+            geom = geojson.load(clip)
+            feature = data['features'][0]
+            geom = feature['geometry']
+        else:
+            geom = boundary
         wkt = shape(geom)
         sql = f"DROP VIEW IF EXISTS ways_view;CREATE TEMP VIEW ways_view AS SELECT * FROM ways_poly WHERE ST_CONTAINS(ST_GeomFromEWKT(\'SRID=4326;{wkt.wkt}\'), geom)"
         self.dbcursor.execute(sql)
@@ -284,21 +287,21 @@ if __name__ == '__main__':
     else:
         outfile = args.geojson
 
-if args.postgres:
-    logging.info("Using a Postgres database for the data source")
-    pg = PostgresClient(args.dbhost, args.dbname, outfile)
-    pg.getFeature(args.boundary, args.geojson, args.category)
-    #pg.cleanup(outfile)
-elif args.overpass:
-    logging.info("Using Overpass Turbo for the data source")
-    op = OverpassClient(outfile)
-    op.getFeature(args.boundary, args.geojson, args.category)
-elif args.infile:
-    f = FileClient(args.infile)
-    f.getFeature(args.boundary, args.geojson, args.category)
-    logging.info("Using file %s for the data source" % args.infile)
-else:
-    logging.error("You need to supply either --overpass or --postgres")
+    if args.postgres:
+        logging.info("Using a Postgres database for the data source")
+        pg = PostgresClient(args.dbhost, args.dbname, outfile)
+        pg.getFeature(args.boundary, args.geojson, args.category)
+        #pg.cleanup(outfile)
+    elif args.overpass:
+        logging.info("Using Overpass Turbo for the data source")
+        op = OverpassClient(outfile)
+        op.getFeature(args.boundary, args.geojson, args.category)
+    elif args.infile:
+        f = FileClient(args.infile)
+        f.getFeature(args.boundary, args.geojson, args.category)
+        logging.info("Using file %s for the data source" % args.infile)
+    else:
+        logging.error("You need to supply either --overpass or --postgres")
 
-logging.info("Wrote output data file to: %s" % outfile)
+        logging.info("Wrote output data file to: %s" % outfile)
 
