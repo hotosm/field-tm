@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -16,8 +16,23 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 
+
+class category(StrEnum, Enum):
+    """The category of data to look for"""
+    "buildings"
+    "waterpoints"
+    "waste"
+    "healthcare"
+    "education"
+    "cemeteries"
+    "landuse"
+    "toilets"
+    "transportation"
+    "religious"
+    "place"
+    "natural"
 
 class TeamVisibility(IntEnum, Enum):
     """ Describes the visibility associated with an Team """

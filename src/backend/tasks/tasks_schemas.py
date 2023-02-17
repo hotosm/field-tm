@@ -70,7 +70,6 @@ class TaskBase(BaseModel):
 class Task(TaskBase):
     geometry_geojson: str
     task_status_str: TaskStatusOption
-
     # qr_code_binary: bytes
     pass
 
