@@ -228,12 +228,14 @@ class DbProjectChat(Base):
 class DbXForm(Base):
     """Xform templates and custom uploads"""
 
-    __tablename__ = "x_form"
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
+    __tablename__ = "xlsforms"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    # The XLSForm name is the only unique thing we can use for a key
+    # so on conflict update works. Otherwise we get multiple entries.
+    title = Column(String, unique=True)
     description = Column(String)
-    form_xml = Column(String)  # Internal form representation
-    form_xlsx = Column(String)  # Human readable representation
+    xml = Column(String)  # Internal form representation
+    xls = Column(LargeBinary)  # Human readable representation
 
 
 class DbTaskInvalidationHistory(Base):
@@ -400,6 +402,7 @@ class DbProject(Base):
 
     # Columns
     id = Column(Integer, primary_key=True)
+    odkid = Column(Integer)
 
     # PROJECT CREATION
     author_id = Column(
@@ -458,7 +461,7 @@ class DbProject(Base):
 
     # XFORM DETAILS
     odk_central_src = Column(String, default="")  # TODO Add HOTs as default
-    xform_id = Column(Integer, ForeignKey("x_form.id", name="fk_xform"))
+    xform_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
     xform = relationship(DbXForm)
 
     __table_args__ = (

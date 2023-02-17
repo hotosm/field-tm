@@ -20,10 +20,12 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 import logging.config
 import json
+import epdb
 from os import getenv
 from fastapi.logger import logger as logger
 from fastapi.responses import FileResponse
 
+from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas, user_crud
@@ -50,31 +52,18 @@ router = APIRouter(
 )
 
 @router.get("/appuser")
-async def create_appuser(name):
+async def create_appuser(
+        project_id: int,
+        name: str,
+        token: str,
+        db: Session = Depends(database.get_db),
+):
     """Create an appuser in Central"""
-    logger.info("/central/appuser is Unimplemented!")
-    return {"message": "Hello World from /central/appuser"}
-
-# @router.get("/project")
-# async def create_project(name: str, boundary: str):
-#     """Create a project in Central"""
-#     project.listProjects()
-#     result = project.createProject(name)
-#     logger.info(f"Project {name} has been created on the ODK Central server.")
-#     import epdb; epdb.st()
-#     user = user_schemas.User(author='', city='', country='', username='', id=0)
-#     info = project_schemas.ProjectInfo(name=result['name'],
-#                                              locale=getenv('LANG'),
-#                                              id=result['id'],
-#                                              short_description='',
-#                                              description='',
-#                                              instructions='',
-#                                              per_task_instructions='',
-#                                              )
-#     project = project_crud.create_project_with_project_info(db, project_info)
-
-#     data = json.dumps(result)
-#     return {"message": f"Project {name} created", "data": {data}}
+    appuser = central_crud.create_appuser(project_id, name=name)
+    qrcode = project_crud.create_qrcode(db, project_id, appuser.json()['token'], name)
+    epdb.st()
+    #tasks = tasks_crud.update_qrcode(db, task_id, qrcode['id'])
+    return {"message": "Unimplemented"}
 
 @router.get("/submissions")
 async def download_submissions(project_id: int, xform_id: str):
@@ -89,9 +78,12 @@ async def upload_project_files(project_id: int, filespec: str):
     return {"message": "Hello World from /central/upload"}
 
 @router.get("/download")
-async def download_project_files(project_id: int, type: central_schemas.CentralFileType):
+async def download_project_files(
+        project_id: int,
+        type: central_schemas.CentralFileType
+):
     """Download the project data files from Central. The filespec is
-    a string that can contain multiple filenames separeted by a comma.
+    a string that can contain multiple filenames separated by a comma.
     """
     # FileResponse("README.md")
     #xxx = central_crud.does_central_exist()

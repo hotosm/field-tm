@@ -24,6 +24,9 @@ from fastapi import HTTPException
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session
+from sqlalchemy import select, table, column
+from sqlalchemy.sql import text
+from fastapi.logger import logger as logger
 
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
@@ -125,9 +128,29 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
+def update_qrcode(
+        db: Session,
+        task_id: int,
+        qr_id: int,
+        project_id: int,
+):
+    task = table('tasks', column('qrcode_id'), column('id'))
+    where = f"task.c.id={task_id}"
+    value = {'qrcode_id': qr_id}
+    sql = select(geoalchemy2.functions.update(task.c.qrcode_id).where(text(where)).values(text(value)))
+    logger.info(str(sql))
+    result = db.execute(sql)
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+
+    logger.info("/tasks/update_qr is partially implemented!")
 
 def create_task_history_for_status_change(
-    db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser
+        db_task: db_models.DbTask,
+        new_status: TaskStatus,
+        db_user: db_models.DbUser
 ):
     new_task_history = db_models.DbTaskHistory(
         project_id=db_task.project_id,
@@ -149,26 +172,6 @@ def create_task_history_for_status_change(
     # if new_status == TaskStatus.BAD:
 
     return new_task_history
-
-def create_QRCode(self, project_id=None, token=None, name=None):
-    """Get the QR Code for an app-user"""
-    base = "fixme"
-    url = f'{base}key/{token}/projects/{project_id}'
-    logger.info(f"Generating QR Code for app-user \"{name}\" for project {project_id}")
-    settings = {"general":
-                {"server_url":f'{base}key/{token}/projects/{project_id}',
-                 "form_update_mode":"manual",
-                 "basemap_source": "MapBox",
-                 "autosend":"wifi_and_cellular"},
-                "project":{"name":f'{name}'},
-                "admin":{}
-                }
-    qr_data = (base64.b64encode(zlib.compress(json.dumps(settings).encode("utf-8"))))
-    qrcode = segno.make(qr_data, micro=False)
-    qrcode.save(f'{name}.png', scale=5)
-    logger.info(f"Generated {name}.png QR-code")
-    # image = qrcode.make_image(fill_color="black", back_color="white")
-    return central_schemas.QRCode(name=f"{name}.png", image=qr_data, content_type="image/png")
 
 # --------------------
 # ---- CONVERTERS ----

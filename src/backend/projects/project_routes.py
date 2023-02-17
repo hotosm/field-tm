@@ -18,8 +18,16 @@
 
 from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi.logger import logger as logger
+from fastapi.logger import logger as logging
 from sqlalchemy.orm import Session
+from pathlib import Path
+import json
+import epdb
+import os
+from ..models.enums import DataCategory
 
+from ..env_utils import is_docker, config_env
 from ..db import database
 from ..central import central_crud
 from . import project_crud, project_schemas
@@ -71,8 +79,10 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 @router.post("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database"""
-    # FIXME: should check for errors
+    # FIXME: should check for error
     odkproject = central_crud.delete_odk_project(project_id)
+    # if not odkproject:
+    #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
     project = project_crud.delete_project_by_id(db, project_id)
     if project:
         return project
@@ -87,23 +97,64 @@ async def create_project(
 ):
     """Create a project in ODK Central and the local database"""
     odkproject = central_crud.create_odk_project(project_info.project_info.name)
-    # Use the ID we get from Central, as it's needed for many queries
-    project_info.project_info.id = odkproject['id']
     # TODO check token against user or use token instead of passing user
-    project = project_crud.create_project_with_project_info(db, project_info)
-    return project
+    project = project_crud.create_project_with_project_info(db, project_info, odkproject['id'])
+    # FIXME: This should only be done once when starting, instead of for each project
+    xlsforms = project_crud.read_xlsforms(db, config_env['XLSFORMS_LIBRARY'])
+
+    if project:
+        return project
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/{project_id}/upload_zip", response_model=project_schemas.ProjectOut)
-async def upload_beta_project(
+@router.post("/beta/{project_id}/upload", response_model=project_schemas.ProjectOut)
+async def upload_project_boundary_with_zip(
     project_id: int,
     project_name_prefix: str,
     task_type_prefix: str,
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
+    """This uploads the projecy boundary polygon to an existing project"""
     # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
-    project = project_crud.update_project_with_upload(
+    project = project_crud.update_project_with_zip(
         db, project_id, project_name_prefix, task_type_prefix, upload
     )
     return f"{project}"
+
+@router.post("/{project_id}/upload")
+async def upload_project_boundary(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+):
+    # read entire file
+    content = await upload.read()
+    boundary = json.loads(content)
+
+    result = project_crud.update_project_boundary(db, project_id, boundary)
+    if not result:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+        return f"No project with id {project_id}"
+
+    # Use the ID we get from Central, as it's needed for many queries
+    grid = eval(project_crud.create_task_grid(db, project_id))
+    # type = DataCategory()
+    # result = project_crud.generate_appuser_files(db, grid, project_id)
+
+    # FIXME: fix return value
+    return {f"Message": f"{project_id}"}
+
+@router.post("/{project_id}/generate")
+async def generate_files(
+    project_id: int,
+    dbname: str,
+    db: Session = Depends(database.get_db),
+):
+    result = project_crud.generate_appuser_files(db, dbname, project_id)
+
+    # FIXME: fix return value
+    return {f"Message": f"{project_id}"}
