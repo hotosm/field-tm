@@ -25,7 +25,6 @@ import sys
 import re
 import epdb
 from sys import argv
-from osgeo import ogr, gdal
 import json
 from geojson import Point, Polygon, Feature, FeatureCollection, dump
 import geojson
@@ -46,9 +45,9 @@ class PostgresClient(object):
         # OutputFile.__init__( self, output)
         logging.info("Opening database connection to: %s" % dbhost)
         connect = "PG: dbname=" + dbname
-        if dbhost:
-            connect += " host=" + dbhost
-        self.pg = ogr.Open(connect)
+        # if dbhost:
+        #     connect += " host=" + dbhost
+        # self.pg = ogr.Open(connect)
         self.boundary = None
         if dbhost is None or dbhost == 'localhost':
             connect = f"dbname={dbname}"
@@ -103,7 +102,7 @@ class PostgresClient(object):
         if type(boundary) != dict:
             clip = open(boundary, 'r')
             geom = geojson.load(clip)
-            feature = data['features'][0]
+            feature = geom['features'][0]
             geom = feature['geometry']
         else:
             geom = boundary
