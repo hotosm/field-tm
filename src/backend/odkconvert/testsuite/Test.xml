@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:odk="http://www.opendatakit.org/xforms" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Test</h:title>
+    <model odk:xforms-version="1.0.0">
+      <itext>
+        <translation lang="English(en)">
+          <text id="/data/group1:label">
+            <value>New Group 1</value>
+          </text>
+          <text id="/data/group1/onename:label">
+            <value>One label</value>
+          </text>
+          <text id="/data/group1/onename/one1:label">
+            <value>One 1</value>
+          </text>
+          <text id="/data/group1/onename/one2:label">
+            <value>One 2</value>
+          </text>
+          <text id="/data/group1/onename/one3:label">
+            <value>One 3</value>
+          </text>
+          <text id="/data/group1/multiname:label">
+            <value>Multi label</value>
+          </text>
+          <text id="/data/group1/multiname/multi1:label">
+            <value>Multi 1</value>
+          </text>
+          <text id="/data/group1/multiname/multi2:label">
+            <value>Multi 2</value>
+          </text>
+          <text id="/data/group1/multiname/mutli3:label">
+            <value>Multi 3</value>
+          </text>
+          <text id="/data/group1/levels:label">
+            <value>Number of floors</value>
+          </text>
+          <text id="/data/group2:label">
+            <value>New Group 2</value>
+          </text>
+          <text id="/data/group2/name:label">
+            <value>Name of building (if present)</value>
+          </text>
+          <text id="/data/group2/age:label">
+            <value>Age of building</value>
+          </text>
+          <text id="/data/group3:label">
+            <value>New Group 3</value>
+          </text>
+          <text id="/data/group3/highway_point:label">
+            <value>Please take a GPS point at the feature location.</value>
+          </text>
+          <text id="/data/group3/highway_point:hint">
+            <value>Where are we ?</value>
+          </text>
+          <text id="/data/group3/track:label">
+            <value>Please record a GPS tracks while you are walking or driving</value>
+          </text>
+          <text id="/data/group3/comment:label">
+            <value>Any other comments about this feature</value>
+          </text>
+          <text id="/data/group3/audio:label">
+            <value>Audio Note</value>
+          </text>
+          <text id="/data/group3/image:label">
+            <value>Take A Picture</value>
+          </text>
+        </translation>
+      </itext>
+      <instance>
+        <data id="2021-10-24 16:28:42">
+          <start/>
+          <end/>
+          <today/>
+          <phonenumber/>
+          <deviceid/>
+          <group1>
+            <onename/>
+            <multiname/>
+            <levels>1</levels>
+          </group1>
+          <group2>
+            <name/>
+            <age/>
+          </group2>
+          <group3>
+            <highway_point/>
+            <track/>
+            <comment/>
+            <audio/>
+            <image/>
+          </group3>
+          <meta>
+            <instanceID/>
+          </meta>
+        </data>
+      </instance>
+      <bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/data/start" type="dateTime"/>
+      <bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/data/end" type="dateTime"/>
+      <bind jr:preload="date" jr:preloadParams="today" nodeset="/data/today" type="date"/>
+      <bind jr:preload="property" jr:preloadParams="phonenumber" nodeset="/data/phonenumber" type="string"/>
+      <bind jr:preload="property" jr:preloadParams="deviceid" nodeset="/data/deviceid" type="string"/>
+      <bind nodeset="/data/group1/onename" type="string"/>
+      <bind nodeset="/data/group1/multiname" type="string"/>
+      <bind nodeset="/data/group1/levels" type="int"/>
+      <bind nodeset="/data/group2/name" type="string"/>
+      <bind nodeset="/data/group2/age" type="int"/>
+      <bind nodeset="/data/group3/highway_point" type="geopoint"/>
+      <bind nodeset="/data/group3/track" type="geotrace"/>
+      <bind nodeset="/data/group3/comment" type="string"/>
+      <bind nodeset="/data/group3/audio" type="binary"/>
+      <bind nodeset="/data/group3/image" orx:max-pixels="1000" type="binary"/>
+      <bind jr:preload="uid" nodeset="/data/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group appearance="field-list" ref="/data/group1">
+      <label ref="jr:itext('/data/group1:label')"/>
+      <select1 appearance="minimal" ref="/data/group1/onename">
+        <label ref="jr:itext('/data/group1/onename:label')"/>
+        <item>
+          <label ref="jr:itext('/data/group1/onename/one1:label')"/>
+          <value>one1</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group1/onename/one2:label')"/>
+          <value>one2</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group1/onename/one3:label')"/>
+          <value>one3</value>
+        </item>
+      </select1>
+      <select ref="/data/group1/multiname">
+        <label ref="jr:itext('/data/group1/multiname:label')"/>
+        <item>
+          <label ref="jr:itext('/data/group1/multiname/multi1:label')"/>
+          <value>multi1</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group1/multiname/multi2:label')"/>
+          <value>multi2</value>
+        </item>
+        <item>
+          <label ref="jr:itext('/data/group1/multiname/mutli3:label')"/>
+          <value>mutli3</value>
+        </item>
+      </select>
+      <range appearance="minimal" end="17" ref="/data/group1/levels" start="0" step="1">
+        <label ref="jr:itext('/data/group1/levels:label')"/>
+      </range>
+    </group>
+    <group appearance="field-list" ref="/data/group2">
+      <label ref="jr:itext('/data/group2:label')"/>
+      <input appearance="minimal" ref="/data/group2/name">
+        <label ref="jr:itext('/data/group2/name:label')"/>
+      </input>
+      <input appearance="minimal" ref="/data/group2/age">
+        <label ref="jr:itext('/data/group2/age:label')"/>
+      </input>
+    </group>
+    <group appearance="field-list" ref="/data/group3">
+      <label ref="jr:itext('/data/group3:label')"/>
+      <input appearance="Placement-map" ref="/data/group3/highway_point">
+        <label ref="jr:itext('/data/group3/highway_point:label')"/>
+        <hint ref="jr:itext('/data/group3/highway_point:hint')"/>
+      </input>
+      <input appearance="Placement-map" ref="/data/group3/track">
+        <label ref="jr:itext('/data/group3/track:label')"/>
+      </input>
+      <input appearance="minimal" ref="/data/group3/comment">
+        <label ref="jr:itext('/data/group3/comment:label')"/>
+      </input>
+      <upload appearance="minimal" mediatype="audio/*" ref="/data/group3/audio">
+        <label ref="jr:itext('/data/group3/audio:label')"/>
+      </upload>
+      <upload appearance="minimal" mediatype="image/*" ref="/data/group3/image">
+        <label ref="jr:itext('/data/group3/image:label')"/>
+      </upload>
+    </group>
+  </h:body>
+</h:html>

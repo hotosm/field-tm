@@ -1,0 +1,36 @@
+# Thease are header fields, and not in any group
+start:
+end:
+
+# ThIs is of the groups
+groups:
+  - group1
+  - group2
+  - group
+
+# These are the values for each group
+group1:
+  - onename:
+      - One 1
+      - One 2
+      - One 3
+  - multiname:
+      - Multi 1
+      - Multi 2
+      - Multi 3
+group2:
+  - name
+  - age
+group3:
+  - highway_point
+  - track
+  - comment
+
+# This modifies the value to be an legit OSM value
+one1: First select entry
+one2: Second  select entry
+one3: Third  select entry
+
+multi1: First multi entry
+multi2: Second multi entry
+multi3: Third multi entry
