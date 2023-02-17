@@ -58,7 +58,7 @@ project.listProjects()
 def create_odk_project(name):
     """Create a project on a remote ODK Server"""
     result = project.createProject(name)
-    project.id = result
+    project.id = result['id']
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
 
