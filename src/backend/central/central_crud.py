@@ -45,13 +45,14 @@ from ..tasks import tasks_schemas
 from ..central import central_schemas
 from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
-project = OdkProject()
-xform = OdkForm()
-
 url = config_env["ODK_CENTRAL_URL"]
 user = config_env["ODK_CENTRAL_USER"]
 pw = config_env["ODK_CENTRAL_PASSWD"]
-project.authenticate(url, user, pw)
+
+project = OdkProject(url, user, pw)
+xform = OdkForm(url, user, pw)
+appuser = OdkAppUser(url, user, pw)
+# project.authenticate()
 project.listProjects()
 
 def create_odk_project(name):
@@ -73,7 +74,6 @@ def create_appuser(project_id: int, name: str):
     # user = project.findAppUser(name=name)
     # user = False
     # if not user:
-    appuser = OdkAppUser()
     result = appuser.create(project_id, name)
     return result
 
