@@ -206,6 +206,20 @@ def create_project_with_project_info(
     return convert_to_app_project(db_project)
 
 
+def upload_xlsform(
+        db: Session,
+        project_id: int,
+        xlsform: str,
+        name: str,
+):
+    forms = table('xlsforms', column('title'), column('xls'), column('xml'), column('id'))
+    ins = insert(forms).values(title=name, xls=xlsform)
+    sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xls=xlsform))
+    result = db.execute(sql)
+    db.commit()
+
+    return True
+
 def update_project_boundary(
         db: Session,
         project_id: int,

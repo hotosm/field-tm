@@ -122,6 +122,20 @@ async def upload_project_boundary_with_zip(
     )
     return f"{project}"
 
+@router.post("/{project_id}/upload_xlsform")
+async def upload_custom_xls(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+):
+    # read entire file
+    content = await upload.read()
+    category = upload.filename.split(".")[0]
+    result = project_crud.upload_xlsform(db, project_id, content, category)
+
+    # FIXME: fix return value
+    return {f"Message": f"{project_id}"}
+
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
     project_id: int,
