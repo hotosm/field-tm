@@ -16,23 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from enum import Enum, IntEnum, StrEnum
-
-
-class category(StrEnum, Enum):
-    """The category of data to look for"""
-    "buildings"
-    "waterpoints"
-    "waste"
-    "healthcare"
-    "education"
-    "cemeteries"
-    "landuse"
-    "toilets"
-    "transportation"
-    "religious"
-    "place"
-    "natural"
+from enum import Enum, IntEnum
 
 class TeamVisibility(IntEnum, Enum):
     """ Describes the visibility associated with an Team """

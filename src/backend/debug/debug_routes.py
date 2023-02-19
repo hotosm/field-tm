@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 import logging.config
 from fastapi.logger import logger as logger
 import os
-from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
+# from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
 
 from ..db import database
 from ..models.enums import TaskStatus
