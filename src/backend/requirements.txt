@@ -32,6 +32,7 @@ sqlmodel==0.0.8
 geojson==2.5.0
 shapely==1.8.4
 python-dotenv==0.21.0
+OSMPythonTools==0.3.5
 
 # ----OSM LOGIN -----
 osm-login-python==0.0.2
@@ -39,6 +40,8 @@ osm-login-python==0.0.2
 # ---- ODK ----
 # pyodk==0.1.0
 qrcode==7.3.1
+pyxform==1.12.0
+xmltodict==0.13.0
 
 # ----- FILE UPLOAD ----
 python-multipart==0.0.5
