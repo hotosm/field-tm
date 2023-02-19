@@ -407,7 +407,7 @@ def read_xlsforms(
     """Read the list of XLSForms from the disk"""
     xlsforms = list()
     for xls in os.listdir(directory):
-        if xls.endswith(".xls"):
+        if xls.endswith(".xls") or xls.endswith(".xlsx"):
             xlsforms.append(xls)
     logger.info(xls)
     insp = inspect(db_models.DbXForm)
