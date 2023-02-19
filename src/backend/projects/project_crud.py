@@ -430,54 +430,6 @@ def read_xlsforms(
         result = db.execute(sql)
         db.commit()
 
-        # outfile = central_crud.generate_updated_xform(db, task_id, infile)
-        # # FIXME: make xform. This will probably happen someplace else soon,
-        # # but I wanted to see if the conversion worked.
-        # outfile = f"/tmp/{name}.xml"
-        # try:
-        #     xls2xform_convert(xlsform_path=infile, xform_path=outfile)
-        # except Exception as e:
-        #     continue
-        # if os.path.getsize(outfile) <= 0:
-        #     logger.warning(f"{outfile} is empty!")
-        #     continue
-        # xls = open(outfile, "r")
-        # data = xls.read()
-        # xls.close()
-
-        # try:
-        #     xml = xmltodict.parse(str(data))
-        # except Exception as e:
-        #     continue
-        # # First change the osm data extract file
-        # index = 0
-        # for inst in xml['h:html']['h:head']['model']['instance']:
-        #     try:
-        #         if '@src' in inst:
-        #             xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
-        #         if 'data' in inst:
-        #             if 'data' == inst:
-        #                 xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
-        #             else:
-        #                 xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
-        #     except Exception as e:
-        #         continue
-        #     index += 1
-        # xml['h:html']['h:head']['h:title'] = "FIXME title"
-
-        # # write the updated XML file
-        # outxml = open(outfile, "w")
-        # newxml = xmltodict.unparse(xml)
-        # outxml.write(newxml)
-        # outxml.close()
-
-        # # insert the new version
-        # ins = insert(forms).values(title=name, xml=data)
-        # sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
-        # result = db.execute(sql)
-
-        # db.commit()
-
     return xlsforms
 
 def generate_appuser_files(
@@ -536,6 +488,39 @@ def create_qrcode(
     result = db.execute(sql)
     rows = result.fetchone()[0]
     return {"data": qrcode, "id": rows + 1}
+
+def download_geometry(
+        db: Session,
+        project_id: int,
+        download_type: bool,
+):
+    """Download the project or task boundaries from the database"""
+    data = list()
+    if not download_type:
+        projects = table('projects', column('outline'), column('id'))
+        where = f"projects.id={project_id}"
+        sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(text(where))
+        result = db.execute(sql)
+        # There should only be one match
+        if result.rowcount != 1:
+            logger.warning(str(sql))
+            return False
+        row = eval(result.first()[0])
+        row['id'] = project_id
+        data.append(row)
+    else:
+        task = table('tasks', column('outline'), column('project_id'), column('id'))
+        where = f"project_id={project_id}"
+        sql = select(task.c.id, geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label('outline')).where(text(where))
+        result = db.execute(sql)
+        for item in result.fetchall():
+            poly = eval(item.outline)
+            poly['id'] = item.id
+            data.append(poly)
+    collection = geojson.FeatureCollection(data)
+    out = dumps(collection)
+
+    return {"filespec": out }
 
 def create_task_grid(
         db: Session,

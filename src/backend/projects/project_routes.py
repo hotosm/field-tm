@@ -19,7 +19,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from fastapi.logger import logger as logging
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from pathlib import Path
 import json
@@ -146,6 +146,26 @@ async def upload_project_boundary(
 
     # FIXME: fix return value
     return {f"Message": f"{project_id}"}
+
+@router.post("/{project_id}/download")
+async def download_project_boundary(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Download the boundary polygon for this project"""
+    out = project_crud.download_geometry(db, project_id, False)
+    # FIXME: fix return value
+    return {f"Message": out}
+
+@router.post("/{project_id}/download_tasks")
+async def download_task_boundaries(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Download the task boundary polygons for this project"""
+    out = project_crud.download_geometry(db, project_id, True)
+    # FIXME: fix return value
+    return {f"Message": out}
 
 @router.post("/{project_id}/generate")
 async def generate_files(
