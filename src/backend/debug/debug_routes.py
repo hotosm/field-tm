@@ -50,23 +50,11 @@ async def debug():
     return {"message": "Hello World!"}
     #raise HTTPException(status_code=404, detail="Tasks not found")
 
-@router.get("/makedata")
-def make_data_extract():
-    """Extract data from OSM"""
-    logger.info("/debug/makedata is Unimplemented!")
-    return {"message": "Hello World from /debug/makedata"}
-
 @router.get("/basemap")
 def make_basemap():
     """Make a basemap of satellite imagery"""
     logger.info("/debug/basemap Unimplemented!")
     return {"message": "Hello World from /debug/basemap"}
-
-@router.get("/polygonize")
-def make_task_polygons():
-    """Make a multipolygon containing all the task boundaries"""
-    logger.info("/debug/polygonize is Unimplemented!")
-    return {"message": "Hello World from /debug/polygonize"}
 
 @router.get("/makecsv")
 def do_odk2csv():
