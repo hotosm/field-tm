@@ -10,16 +10,18 @@ const ThemeSlice = createSlice({
                 primary: {
                     main: '#ffffff',
                     contrastText: '#44546a',
+                    lightblue: '#99e6ff'
                 },
                 error: {
                     //hot red
                     main: '#d73f3e',
+                    purple: '#ff3399'
                 },
                 success: {
                     //hot blue
+                    //green in regular
                     main: '#459ca0',
                     contrastText: '#2C3038',
-
                 },
                 warning: {
                     //hot yellow
@@ -40,14 +42,34 @@ const ThemeSlice = createSlice({
                 text: {
                     secondary: '#2C3038',
                 },
+                mapFeatureColors: {
+                    //blue
+                    ready: '#66e5ff',
+                    ready_rgb: 'rgb(102, 229, 255,0.2)',
+                    locked_for_mapping: '#66afff',
+                    locked_for_mapping_rgb: 'rgb(102, 175, 255,0.1)',
+                    mapped: '#202395',
+                    mapped_rgb: 'rgb(32, 35, 149,0.1)',
+                    locked_for_validation: '#7049de',
+                    locked_for_validation_rgb: 'rgb(112, 73, 222,0.1)',
+                    //green
+                    validated: '#006600',
+                    validated_rgb: 'rgb(0, 102, 0,0.1)',
+                    //yellow
+                    invalidated: '#ffff00',
+                    invalidated_rgb: 'rgb(255, 255, 0,0.1)',
+                    //brown
+                    bad: '#dfcaca',
+                    bad_rgb: 'rgb(223, 202, 202,0.1)',
+                    split: '#dfcaca',
+                    split_rgb: 'rgb(223, 202, 202,0.1)'
+                }
 
             },
             typography: {
                 //default
                 fontSize: 16,
                 fontFamily: 'ArchivoMedium',
-
-
                 //custom
                 htmlFontSize: 18,
 

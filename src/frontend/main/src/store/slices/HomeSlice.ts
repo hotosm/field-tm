@@ -5,7 +5,8 @@ const HomeSlice = createSlice({
     name: 'home',
     initialState: {
         homeProjectSummary: [],
-        homeProjectLoading: true
+        homeProjectLoading: true,
+        projectId: null,
     },
     reducers: {
         SetHomeProjectSummary(state, action) {
@@ -13,6 +14,9 @@ const HomeSlice = createSlice({
         },
         HomeProjectLoading(state, action) {
             state.homeProjectLoading = action.payload
+        },
+        SetProjectId(state, action) {
+            state.projectId = action.payload
         }
     }
 })

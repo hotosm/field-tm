@@ -7,7 +7,7 @@ import windowDimention from "../hooks/WindowDimension";
 import BasicPagination from "../utilities/BasicPagination";
 import { useDispatch, useSelector } from 'react-redux';
 import { HomeSummaryService } from "../api/HomeService";
-import enviroment from "../enviroment";
+import enviroment from "../environment";
 import ProjectCardSkeleton from "../components/home/ProjectCardSkeleton";
 import SearchablesRow from "../components/home/HomePageFilters";
 

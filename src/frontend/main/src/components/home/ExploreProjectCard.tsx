@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
+import environment from '../../environment';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
@@ -61,7 +62,7 @@ export default function ExploreProjectCard({ data }) {
     }
     return (
         <Card onClick={() => {
-            navigate('/project_details')
+            navigate(`/project_details/${environment.encode(`${data.id}`)}`)
         }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onHoverIn} onMouseLeave={onHoverOut}>
 
             <CardContent>

@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { RouterProvider, Outlet } from 'react-router-dom'
-import { ThemeProvider } from '@mui/material/styles';
+import { RouterProvider } from 'react-router-dom'
 import store from './store/Store';
 import { Provider } from "react-redux";
 import routes from "./routes";
