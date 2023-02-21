@@ -67,8 +67,8 @@ services:
       target: debug
     container_name: fmtm_ui
     volumes:
-       - ./src/frontend/main:/app
-       - /app/node_modules/
+      - ./src/frontend/main:/app
+      - /app/node_modules/
     ports:
       - "8080:8080"
     networks:
@@ -105,8 +105,7 @@ services:
     restart: unless-stopped
 
   pyxform:
-    image: 'ghcr.io/getodk/pyxform-http:v1.10.1.1'
+    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
     networks:
       - fmtm-dev
     restart: always
-
