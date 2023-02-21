@@ -43,6 +43,9 @@ odk2odm_venv/
 # PyCharm
 .idea/
 
+# VSCode
+.vscode
+
 # test scripts and files
 db.sqlite3
 
