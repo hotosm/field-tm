@@ -16,34 +16,19 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import HTTPException
 from fastapi.logger import logger as logger
-from geoalchemy2.shape import to_shape
-from shapely.geometry import shape, mapping
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import select, table, column, Enum, insert, delete, update, inspect
+from sqlalchemy import table, column, insert
 
-from typing import List
-import json
-import base64
-import epdb
 import os
-from fastapi.responses import FileResponse
-from fastapi import HTTPException, UploadFile
-from pyxform.xls2xform import get_xml_path, xls2xform_convert
+from pyxform.xls2xform import xls2xform_convert
 import xmltodict
 from sqlalchemy.dialects.postgresql import insert
 
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
-from ..env_utils import is_docker, config_env
-from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, get_centroid
-from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change, verify_valid_status_update
-from ..users import user_crud, user_schemas
-from ..tasks import tasks_schemas
-from ..central import central_schemas
+from ..env_utils import config_env
 
 url = config_env["ODK_CENTRAL_URL"]
 user = config_env["ODK_CENTRAL_USER"]
@@ -55,12 +40,14 @@ appuser = OdkAppUser(url, user, pw)
 # project.authenticate()
 project.listProjects()
 
+
 def create_odk_project(name):
     """Create a project on a remote ODK Server"""
     result = project.createProject(name)
-    project.id = result['id']
+    project.id = result["id"]
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
+
 
 def delete_odk_project(project_id: int):
     """Delete a project from a remote ODK Server"""
@@ -68,14 +55,16 @@ def delete_odk_project(project_id: int):
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
     return result
 
+
 def create_appuser(project_id: int, name: str):
     """Create an app-user on a remote ODK Server"""
-    #project.listAppUsers(project_id)
+    # project.listAppUsers(project_id)
     # user = project.findAppUser(name=name)
     # user = False
     # if not user:
     result = appuser.create(project_id, name)
     return result
+
 
 def delete_app_user(project_id: int, name: str):
     """Delete an app-user from a remote ODK Server"""
@@ -83,27 +72,22 @@ def delete_app_user(project_id: int, name: str):
     result = appuser.delete(project_id, name)
     return result
 
-def create_odk_xform(project_id: int,
-                     xform: str
-):
+
+def create_odk_xform(project_id: int, xform: str):
     """Create an XForm on a remote ODK Central server."""
     logger.error("create_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return None
 
-def delete_odk_xform(
-    project_id: int,
-    xform_id: str
-):
+
+def delete_odk_xform(project_id: int, xform_id: str):
     """Delete an XForm from a remote ODK Central server."""
     logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return None
 
-def download_submissions(
-    project_id: int,
-    xform_id: str
-):
+
+def download_submissions(project_id: int, xform_id: str):
     """Download submissions from a remote ODK server"""
     logger.error("download_submissions is unimplemented!")
     # FIXME: should filter by timestamps or status value
@@ -111,18 +95,18 @@ def download_submissions(
 
 
 def generate_updated_xform(
-        db: Session,
-        task_id: dict,
-        xlsform: str,
-        xform: str,
+    db: Session,
+    task_id: dict,
+    xlsform: str,
+    xform: str,
 ):
     """Update the version in an XForm so it's unique"""
-    name = xlsform.split('.')[0]
-    base = os.path.basename(name)
+    name = xlsform.split(".")[0]
+    os.path.basename(name)
     outfile = xform
     try:
         xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=True)
-    except Exception as e:
+    except Exception:
         logger.error(f"Couldn't convert {xlsform} to an XForm!")
         return None
     if os.path.getsize(outfile) <= 0:
@@ -135,19 +119,25 @@ def generate_updated_xform(
     xml = xmltodict.parse(str(data))
     # First change the osm data extract file
     index = 0
-    for inst in xml['h:html']['h:head']['model']['instance']:
+    for inst in xml["h:html"]["h:head"]["model"]["instance"]:
         try:
-            if '@src' in inst:
-                xml['h:html']['h:head']['model']['instance'][index]['@src'] = "FIXME.geojson"
-            if 'data' in inst:
-                if 'data' == inst:
-                    xml['h:html']['h:head']['model']['instance']['data']['@id'] = "FIXME XFORM"
+            if "@src" in inst:
+                xml["h:html"]["h:head"]["model"]["instance"][index][
+                    "@src"
+                ] = "FIXME.geojson"
+            if "data" in inst:
+                if "data" == inst:
+                    xml["h:html"]["h:head"]["model"]["instance"]["data"][
+                        "@id"
+                    ] = "FIXME XFORM"
                 else:
-                    xml['h:html']['h:head']['model']['instance'][0]['data']['@id'] = "FIXME XFORM"
-        except Exception as e:
+                    xml["h:html"]["h:head"]["model"]["instance"][0]["data"][
+                        "@id"
+                    ] = "FIXME XFORM"
+        except Exception:
             continue
         index += 1
-    xml['h:html']['h:head']['h:title'] = "FIXME title"
+    xml["h:html"]["h:head"]["h:title"] = "FIXME title"
 
     # write the updated XML file
     outxml = open(outfile, "w")
@@ -156,26 +146,29 @@ def generate_updated_xform(
     outxml.close()
 
     # insert the new version
-    forms = table('xlsforms', column('title'), column('xls'), column('xml'), column('id'))
+    forms = table(
+        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+    )
     ins = insert(forms).values(title=name, xml=data)
-    sql = ins.on_conflict_do_update(constraint='xlsforms_title_key', set_=dict(title=name, xml=newxml))
-    result = db.execute(sql)
+    sql = ins.on_conflict_do_update(
+        constraint="xlsforms_title_key", set_=dict(title=name, xml=newxml)
+    )
+    db.execute(sql)
     db.commit()
 
     return outfile
 
-def create_QRCode(
-    project_id=None,
-    token=None,
-    name=None
-):
+
+def create_QRCode(project_id=None, token=None, name=None):
     """Create the QR Code for an app-user"""
     appuser = OdkAppUser()
     return appuser.createQRCode(project_id, token, name)
 
+
 def upload_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central"""
     xform.uploadMedia(project_id, xform_id, filespec)
+
 
 def download_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central"""

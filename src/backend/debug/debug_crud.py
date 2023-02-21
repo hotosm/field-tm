@@ -16,18 +16,4 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import HTTPException
-from geoalchemy2.shape import to_shape
-from shapely.geometry import shape, mapping
-from sqlalchemy.orm import Session
-from typing import List
-import json
-import base64
-
-from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, get_centroid
-from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change, verify_valid_status_update
-from ..users import user_crud, user_schemas
-from ..tasks import tasks_schemas
-
 
