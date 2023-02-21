@@ -35,6 +35,7 @@ from pyxform.xls2xform import get_xml_path, xls2xform_convert
 import xmltodict
 from sqlalchemy.dialects.postgresql import insert
 
+from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
 from ..env_utils import is_docker, config_env
 from ..db import db_models
@@ -43,7 +44,6 @@ from ..models.enums import TaskStatus, TaskAction, get_action_for_status_change,
 from ..users import user_crud, user_schemas
 from ..tasks import tasks_schemas
 from ..central import central_schemas
-from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
 url = config_env["ODK_CENTRAL_URL"]
 user = config_env["ODK_CENTRAL_USER"]
