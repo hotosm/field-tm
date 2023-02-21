@@ -43,7 +43,7 @@ services:
   api:
     build:
       context: src/backend
-      target: prod
+      # target: debug
     container_name: fmtm_api
     volumes:
       - ./src/backend:/app/backend
@@ -64,13 +64,13 @@ services:
   ui:
     build:
       context: src/frontend
-      target: prod
+      target: debug
     container_name: fmtm_ui
     volumes:
-       - ./src/frontend:/app
+       - ./src/frontend/main:/app
        - /app/node_modules/
     ports:
-      - "3000:3000"
+      - "8080:8080"
     networks:
       - fmtm-dev
     restart: unless-stopped
