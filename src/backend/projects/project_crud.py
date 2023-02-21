@@ -383,7 +383,7 @@ def update_project_with_zip(
                     project_task_name=task_name,
                     qr_code=db_qr,
                     outline=task_outline_shape.wkt,
-                    geometry_geojson=json.dumps(task_geojson),
+                    # geometry_geojson=json.dumps(task_geojson),
                     initial_feature_count=len(task_geojson["features"]),
                 )
                 db.add(task)
