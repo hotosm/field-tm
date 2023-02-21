@@ -52,11 +52,6 @@ RUN set -ex \
         "libgeos-dev" \
         # libgdal-dev \
         "git" \
-    && echo "deb http://deb.debian.org/debian bookworm main" >> /etc/apt/sources.list \
-    # workaround until debian bookworm release (20-02-2023 currently soft freeze)
-    && apt-get update && apt-get install \
-    -y --no-install-recommends -t bookworm \
-        "libgdal-dev" \
     && rm -rf /var/lib/apt/lists/*
 COPY ./requirements.txt /opt/python/
 RUN pip install --user --no-warn-script-location \
@@ -84,11 +79,7 @@ RUN set -ex \
         "libspatialindex-c6" \
         "libproj19" \
         "libgeos-c1v5" \
-    && echo "deb http://deb.debian.org/debian bookworm main" >> /etc/apt/sources.list \
-    # workaround until debian bookworm release (20-02-2023 currently soft freeze)
-    && apt-get update && apt-get install \
-    -y --no-install-recommends -t bookworm \
-        "libgdal32" \
+        # "libgdal32" \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=build \
     /root/.local \
