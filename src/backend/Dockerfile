@@ -61,8 +61,6 @@ RUN set -ex \
 COPY ./requirements.txt /opt/python/
 RUN pip install --user --no-warn-script-location \
     --no-cache-dir -r /opt/python/requirements.txt
-RUN pip install --user --no-warn-script-location \
-    --no-cache-dir git+https://github.com/spwoodcock/odkconvert@feature/create_xform_index
 
 
 
@@ -86,7 +84,6 @@ RUN set -ex \
         "libspatialindex-c6" \
         "libproj19" \
         "libgeos-c1v5" \
-        # libgdal28 \
     && echo "deb http://deb.debian.org/debian bookworm main" >> /etc/apt/sources.list \
     # workaround until debian bookworm release (20-02-2023 currently soft freeze)
     && apt-get update && apt-get install \
