@@ -23,11 +23,6 @@ ARG ODK_CENTRAL_VERSION=v2023.1.0
 RUN git clone --depth 1 --branch ${ODK_CENTRAL_VERSION} \
     "https://github.com/getodk/central.git" \
     && cd central && git submodule update --init
-RUN tmp=$(mktemp) \
-    && jq '.default.database.host = "central-db"' \
-    central/files/service/config.json.template > \
-    "$tmp" && mv "$tmp" central/files/service/config.json.template
-
 
 
 
@@ -38,7 +33,7 @@ WORKDIR /usr/odk
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODENAME=\K\w+' /etc/os-release)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list; \
     curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg; \
     apt-get update; \
-    apt-get install -y cron gettext postgresql-client-9.6
+    apt-get install -y cron gettext postgresql-client-9.6 jq
 
 COPY --from=repo central/files/service/crontab /etc/cron.d/odk
 
@@ -60,5 +55,21 @@ RUN mkdir /etc/secrets sentry-versions \
     && echo '1' > sentry-versions/server \
     && echo '1' > sentry-versions/central \
     && echo '1' > sentry-versions/client
+
+# Substitute central db vars
+RUN printf '#!/bin/bash\n\
+set -eo pipefail\n\
+tmp=$(mktemp)\n\
+echo "Setting database credentials in /usr/share/odk/config.json.template"\n\
+jq --arg host "${CENTRAL_DB_HOST}" --arg user "${CENTRAL_DB_USER}" \
+--arg pass "${CENTRAL_DB_PASSWORD}" --arg db "${CENTRAL_DB_NAME}" \
+'"'"'.default.database.host = $host | .default.database.user = $user | .default.database.password = $pass | .default.database.database = $db'"'"' \
+/usr/share/odk/config.json.template > \
+"$tmp" && mv "$tmp" /usr/share/odk/config.json.template\n\
+echo "Credentials set"\n\
+exec ./start-odk.sh' \
+>> ./sub-db-vars.sh \
+&& chmod +x ./sub-db-vars.sh
+ENTRYPOINT ["./wait-for-it.sh", "central-db:5432", "--", "./sub-db-vars.sh"]
 
 EXPOSE 8383
