@@ -17,12 +17,9 @@
 #
 
 # import base64
-import json
 from typing import List
 
 from fastapi import HTTPException
-from geoalchemy2.shape import to_shape
-from shapely.geometry import mapping, shape
 from sqlalchemy.orm import Session
 from sqlalchemy import select, table, column
 from sqlalchemy.sql import text
@@ -31,9 +28,8 @@ from fastapi.logger import logger as logger
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
 from ..tasks import tasks_schemas
-from ..users import user_crud, user_schemas
+from ..users import user_crud
 from ..models.enums import (
-    TaskAction,
     TaskStatus,
     get_action_for_status_change,
     verify_valid_status_update,
@@ -59,8 +55,7 @@ def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 1000):
 
 
 def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(
-        db_models.DbTask.id == task_id).first()
+    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
     if db_obj:
         return db_task
     return convert_to_app_task(db_task)
@@ -128,16 +123,21 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
 
+
 def update_qrcode(
-        db: Session,
-        task_id: int,
-        qr_id: int,
-        project_id: int,
+    db: Session,
+    task_id: int,
+    qr_id: int,
+    project_id: int,
 ):
-    task = table('tasks', column('qrcode_id'), column('id'))
+    task = table("tasks", column("qrcode_id"), column("id"))
     where = f"task.c.id={task_id}"
-    value = {'qrcode_id': qr_id}
-    sql = select(geoalchemy2.functions.update(task.c.qrcode_id).where(text(where)).values(text(value)))
+    value = {"qrcode_id": qr_id}
+    sql = select(
+        geoalchemy2.functions.update(task.c.qrcode_id)
+        .where(text(where))
+        .values(text(value))
+    )
     logger.info(str(sql))
     result = db.execute(sql)
     # There should only be one match
@@ -147,10 +147,9 @@ def update_qrcode(
 
     logger.info("/tasks/update_qr is partially implemented!")
 
+
 def create_task_history_for_status_change(
-        db_task: db_models.DbTask,
-        new_status: TaskStatus,
-        db_user: db_models.DbUser
+    db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser
 ):
     new_task_history = db_models.DbTaskHistory(
         project_id=db_task.project_id,
@@ -172,6 +171,7 @@ def create_task_history_for_status_change(
     # if new_status == TaskStatus.BAD:
 
     return new_task_history
+
 
 # --------------------
 # ---- CONVERTERS ----
@@ -204,8 +204,7 @@ def convert_to_app_task(db_task: db_models.DbTask):
                 "uid": db_task.id,
                 "name": db_task.project_task_name,
             }
-            app_task.outline_geojson = geometry_to_geojson(
-                db_task.outline, properties)
+            app_task.outline_geojson = geometry_to_geojson(db_task.outline, properties)
             app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
@@ -217,8 +216,7 @@ def convert_to_app_task(db_task: db_models.DbTask):
         #         db_task.qr_code.image)
 
         if db_task.task_history:
-            app_task.task_history = convert_to_app_history(
-                db_task.task_history)
+            app_task.task_history = convert_to_app_history(db_task.task_history)
 
         return app_task
     else:

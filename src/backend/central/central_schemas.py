@@ -17,11 +17,6 @@
 #
 
 from pydantic import BaseModel
-from datetime import datetime
-from geojson_pydantic import Feature, Point
-from typing import List
-import enum
-import logging.config
 from fastapi.logger import logger as logger
 from enum import Enum
 
@@ -29,16 +24,20 @@ from enum import Enum
 class CentralBase(BaseModel):
     central_url: str
 
+
 class Central(CentralBase):
     geometry_geojson: str
     # qr_code_binary: bytes
 
+
 class CentralOut(CentralBase):
     logger.debug("Hello World!")
 
+
 class CentralFileType(BaseModel):
-    filetype: Enum('FileType', ['xform', 'extract', 'zip', 'xlsform', 'all'])
+    filetype: Enum("FileType", ["xform", "extract", "zip", "xlsform", "all"])
     logger.debug("Hello World!")
+
 
 class CentralDetails(CentralBase):
     logger.debug("Hello World!")

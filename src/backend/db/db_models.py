@@ -16,8 +16,23 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import desc, Enum, Table, Column, Integer, BigInteger, LargeBinary, ARRAY, String, DateTime, Boolean, ForeignKey, ForeignKeyConstraint, UniqueConstraint, Index, Unicode
+from sqlalchemy import (
+    desc,
+    Enum,
+    Table,
+    Column,
+    Integer,
+    BigInteger,
+    LargeBinary,
+    ARRAY,
+    String,
+    DateTime,
+    Boolean,
+    ForeignKey,
+    ForeignKeyConstraint,
+    UniqueConstraint,
+    Index,
+)
 from sqlalchemy.orm import relationship, backref, object_session  # , declarative_base
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
@@ -35,12 +50,10 @@ from sqlalchemy import (
     LargeBinary,
     String,
     Table,
-    Unicode,
     UniqueConstraint,
     desc,
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship  # , declarative_base
 
 from ..models.enums import (
@@ -48,12 +61,10 @@ from ..models.enums import (
     MappingPermission,
     OrganisationType,
     ProjectPriority,
-    ProjectSplitStrategy,
     ProjectStatus,
     TaskAction,
     TaskCreationMode,
     TaskStatus,
-    TaskType,
     TeamVisibility,
     UserRole,
     ValidationPermission,
@@ -109,11 +120,9 @@ class DbUser(Base):
 organisation_managers = Table(
     "organisation_managers",
     FmtmMetadata,
-    Column("organisation_id", Integer, ForeignKey(
-        "organisations.id"), nullable=False),
+    Column("organisation_id", Integer, ForeignKey("organisations.id"), nullable=False),
     Column("user_id", BigInteger, ForeignKey("users.id"), nullable=False),
-    UniqueConstraint("organisation_id", "user_id",
-                     name="organisation_user_key"),
+    UniqueConstraint("organisation_id", "user_id", name="organisation_user_key"),
 )
 
 
@@ -129,8 +138,7 @@ class DbOrganisation(Base):
     logo = Column(String)  # URL of a logo
     description = Column(String)
     url = Column(String)
-    type = Column(Enum(OrganisationType),
-                  default=OrganisationType.FREE, nullable=False)
+    type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
     subscription_tier = Column(Integer)
 
     managers = relationship(
@@ -215,8 +223,7 @@ class DbProjectChat(Base):
 
     __tablename__ = "project_chat"
     id = Column(BigInteger, primary_key=True)
-    project_id = Column(Integer, ForeignKey(
-        "projects.id"), index=True, nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), index=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     time_stamp = Column(DateTime, nullable=False, default=timestamp)
     message = Column(String, nullable=False)
@@ -248,14 +255,12 @@ class DbTaskInvalidationHistory(Base):
     is_closed = Column(Boolean, default=False)
     mapper_id = Column(BigInteger, ForeignKey("users.id", name="fk_mappers"))
     mapped_date = Column(DateTime)
-    invalidator_id = Column(BigInteger, ForeignKey(
-        "users.id", name="fk_invalidators"))
+    invalidator_id = Column(BigInteger, ForeignKey("users.id", name="fk_invalidators"))
     invalidated_date = Column(DateTime)
     invalidation_history_id = Column(
         Integer, ForeignKey("task_history.id", name="fk_invalidation_history")
     )
-    validator_id = Column(BigInteger, ForeignKey(
-        "users.id", name="fk_validators"))
+    validator_id = Column(BigInteger, ForeignKey("users.id", name="fk_validators"))
     validated_date = Column(DateTime)
     updated_date = Column(DateTime, default=timestamp)
 
@@ -269,8 +274,7 @@ class DbTaskInvalidationHistory(Base):
             "invalidator_id",
             "is_closed",
         ),
-        Index("idx_task_validation_mapper_status_composite",
-              "mapper_id", "is_closed"),
+        Index("idx_task_validation_mapper_status_composite", "mapper_id", "is_closed"),
         {},
     )
 
@@ -435,8 +439,7 @@ class DbProject(Base):
 
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
-    status = Column(Enum(ProjectStatus),
-                    default=ProjectStatus.DRAFT, nullable=False)
+    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
     total_tasks = Column(Integer)
     # tasks_mapped = Column(Integer, default=0, nullable=False)
     # tasks_validated = Column(Integer, default=0, nullable=False)
@@ -449,15 +452,33 @@ class DbProject(Base):
 
     @property
     def tasks_mapped(self):
-        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.MAPPED).with_parent(self).count()
+        return (
+            object_session(self)
+            .query(DbTask)
+            .filter(DbTask.task_status == TaskStatus.MAPPED)
+            .with_parent(self)
+            .count()
+        )
 
     @property
     def tasks_validated(self):
-        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.VALIDATED).with_parent(self).count()
+        return (
+            object_session(self)
+            .query(DbTask)
+            .filter(DbTask.task_status == TaskStatus.VALIDATED)
+            .with_parent(self)
+            .count()
+        )
 
     @property
     def tasks_bad(self):
-        return object_session(self).query(DbTask).filter(DbTask.task_status == TaskStatus.BAD).with_parent(self).count()
+        return (
+            object_session(self)
+            .query(DbTask)
+            .filter(DbTask.task_status == TaskStatus.BAD)
+            .with_parent(self)
+            .count()
+        )
 
     # XFORM DETAILS
     odk_central_src = Column(String, default="")  # TODO Add HOTs as default
@@ -483,8 +504,7 @@ class DbProject(Base):
     featured = Column(
         Boolean, default=False
     )  # Only admins can set a project as featured
-    mapping_permission = Column(
-        Enum(MappingPermission), default=MappingPermission.ANY)
+    mapping_permission = Column(Enum(MappingPermission), default=MappingPermission.ANY)
     validation_permission = Column(
         Enum(ValidationPermission), default=ValidationPermission.LEVEL
     )  # Means only users with validator role can validate

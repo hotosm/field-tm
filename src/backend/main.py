@@ -28,7 +28,7 @@ from fastapi.logger import logger as fastapi_logger
 from fastapi.responses import FileResponse
 
 from .auth import routers as auth_routers
-from .db.database import Base, SessionLocal, engine
+from .db.database import Base, engine
 from .projects import project_routes
 from .tasks import tasks_routes
 from .users import user_routes
@@ -39,8 +39,7 @@ from .central import central_routes
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # setup loggers
-log_file_path = path.join(os.path.dirname(
-    os.path.abspath(__file__)), "logging.conf")
+log_file_path = path.join(os.path.dirname(os.path.abspath(__file__)), "logging.conf")
 
 logging.config.fileConfig(
     log_file_path, disable_existing_loggers=False

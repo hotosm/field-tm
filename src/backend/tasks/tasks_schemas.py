@@ -20,7 +20,7 @@
 import enum
 from datetime import datetime
 from typing import List
-from geojson_pydantic import Feature, Point
+from geojson_pydantic import Feature
 from pydantic import BaseModel
 
 from ..models.enums import TaskStatus
