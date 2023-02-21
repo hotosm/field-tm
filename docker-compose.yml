@@ -15,91 +15,97 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: "3.5"
+version: "3"
+
+volumes:
+  fmtm_db_data:
+  central_db_data:
+
+networks:
+  fmtm-dev:
 
 services:
-  db:
+  fmtm-db:
     image: postgis/postgis:14-3.3-alpine
+    container_name: fmtm_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - fmtm_db_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
-      - fmtm-net
+      - fmtm-dev
+    restart: unless-stopped
 
   api:
-    build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
+    build:
+      context: src/backend
+      target: prod
+    container_name: fmtm_api
     volumes:
-      - ./src/backend:/app
+      - ./src/backend:/app/backend
+      # - ../odkconvert/odkconvert:/home/appuser/.local/lib/python3.9/site-packages/odkconvert
     depends_on:
-      - db
+      - fmtm-db
+      - central
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-    expose:
-      - 8000
+      - DB_URL=postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@fmtm-db:5432/${DB_NAME}
     ports:
-      - 8000:8000
+      - "8000:8000"
     networks:
-      - fmtm-net
+      - fmtm-dev
+    restart: unless-stopped
 
-  web:
-    build: .
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
+  ui:
+    build:
+      context: src/frontend
+      target: prod
+    container_name: fmtm_ui
     volumes:
-      - .:/app
+       - ./src/frontend:/app
+       - /app/node_modules/
     ports:
-      - 5000:5000
-    expose:
-      - 5000
-    stdin_open: true # for debugging
-    tty: true # for debugging
+      - "3000:3000"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  central-db:
+    image: postgis/postgis:14-3.3-alpine
+    container_name: central_db
+    volumes:
+      - central_db_data:/var/lib/postgresql/data/
     environment:
-      - FLASK_APP=src/web/__init__.py
-      - FLASK_ENV=${FLASK_ENV}
-      - WEB_DOMAIN=${WEB_DOMAIN}
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - API_URL=http://fmtm-api-1:8000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.flask.rule=Host(`${WEB_DOMAIN}`)"
+      - POSTGRES_USER=odk
+      - POSTGRES_PASSWORD=odk
+      - POSTGRES_DB=odk
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  central:
+    build:
+      context: .
+      dockerfile: central.dockerfile
+    container_name: central_api
     depends_on:
-      - db
-    networks:
-      - fmtm-net
-
-  # react-ui:
-  #   build:
-  #     context: ./my-app
-  #   ports:
-  #     - "3000:3000"
-  #   container_name: react-ui
-  #   stdin_open: true
-  #   volumes:
-  #      - ./my-app:/usr/src/app/my-app
-  #      - /usr/src/app/my-app/node_modules
-
-  # alternative webproxy to nginx
-  traefik:
-    image: traefik:v2.2
-    expose:
-      - 5432
+      - central-db
+      - pyxform
+    command: [ "./wait-for-it.sh", "central-db:5432", "--", "./start-odk.sh" ]
     ports:
-      - 80:80
-      - 8081:8080
-    volumes:
-      - "./traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "8383:8383"
     networks:
-      - fmtm-net
+      - fmtm-dev
+    restart: unless-stopped
 
-volumes:
-  postgres_data:
+  pyxform:
+    image: 'ghcr.io/getodk/pyxform-http:v1.10.1.1'
+    networks:
+      - fmtm-dev
+    restart: always
 
-
-networks:
-  fmtm-net: #     external: true
