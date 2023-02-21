@@ -26,7 +26,9 @@ import json
 import epdb
 import os
 
-from ..env_utils import is_docker, config_env
+from odkconvert.xlsforms import xlsforms_path
+
+from ..env_utils import is_docker
 from ..db import database
 from ..central import central_crud
 from . import project_crud, project_schemas
@@ -99,7 +101,7 @@ async def create_project(
     # TODO check token against user or use token instead of passing user
     project = project_crud.create_project_with_project_info(db, project_info, odkproject['id'])
     # FIXME: This should only be done once when starting, instead of for each project
-    xlsforms = project_crud.read_xlsforms(db, config_env['XLSFORMS_LIBRARY'])
+    xlsforms = project_crud.read_xlsforms(db, xlsforms_path)
 
     if project:
         return project

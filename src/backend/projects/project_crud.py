@@ -42,13 +42,16 @@ import sqlalchemy
 import shapely.wkb as wkblib
 from fastapi.logger import logger as logger
 
+from odkconvert.make_data_extract import PostgresClient, OverpassClient
+from odkconvert.xlsforms import xlsforms_path
+
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..db import db_models
 from ..tasks import tasks_crud, tasks_schemas
 from ..users import user_crud
 from ..central import central_crud
 # from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
-from ..env_utils import is_docker, config_env
+from ..env_utils import is_docker
 
 from . import project_schemas
 
@@ -478,7 +481,7 @@ def generate_appuser_files(
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
             qrcode = create_qrcode(db, project_id, appuser.json()['token'], prefix)
-            xlsform = f'{config_env["XLSFORMS_LIBRARY"]}/{one.xform_title}.xls'
+            xlsform = f'{xlsforms_path}/{one.xform_title}.xls'
             xform = f'/tmp/{prefix}_{one.xform_title}_{poly.id}.xml'
             result = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
             # outfile = f"/tmp/{prefix}_{one.xform_title}_{poly.id}.geojson"

@@ -25,7 +25,8 @@ from os import getenv
 from fastapi.logger import logger as logger
 from fastapi.responses import FileResponse
 
-from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
+from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
+
 from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas, user_crud
@@ -34,7 +35,7 @@ from ..projects import project_schemas, project_crud
 from ..env_utils import is_docker, config_env
 
 # # FIXME: I am not sure this is thread-safe
-# from ..odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
+# from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 # project = OdkProject()
 # xform = OdkForm()
 # appuser = OdkAppUser()
