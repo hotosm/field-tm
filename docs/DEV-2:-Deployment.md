@@ -1,6 +1,6 @@
 # Deployment for Development
 
-FMTM is Dockerized, but it is often faster to develop on your local machine outside of Docker. Therefore, instructions are given to run FMTM using docker, and in a mostly de-dockerized version. 
+FMTM is Dockerized, but it is often faster to develop on your local machine outside of Docker. Therefore, instructions are given to run FMTM using docker, and in a mostly de-dockerized version.
 
 > NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Development]() wiki page.
 
@@ -8,7 +8,7 @@ Now let's get started!
 
 ## 1. Fastest way to get up and running (Docker)
 
-The easiest way to get up and running is by using the FMTM Docker deployment. Docker creates a virtual environment, isolated from your computer's environment, installs all necessary dependencies, and creates a container for each the database, api, and frontend. These containers talk to each other via the URLs defined in the docker-compose file and your env file. 
+The easiest way to get up and running is by using the FMTM Docker deployment. Docker creates a virtual environment, isolated from your computer's environment, installs all necessary dependencies, and creates a container for each the database, api, and frontend. These containers talk to each other via the URLs defined in the docker-compose file and your env file.
 
 **To start FMTM via Docker:**
 
@@ -17,13 +17,12 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 3. From the command line run: `docker compose up --build`
 
 4. Check the command line for errors! If everything goes well you should now be able to **navigate to the project in your browser:**
-    - **Demo frontend (_Deprecated_):** http://127.0.0.1:5000
-    - **API:** http://127.0.0.1:8000/docs
+   - **Demo frontend (_Deprecated_):** <http://127.0.0.1:5000>
+   - **API:** <http://127.0.0.1:8000/docs>
 
-> Note: If those links don't work, check the console log for the correct URLs. 
+> Note: If those links don't work, check the console log for the correct URLs.
 
 > Note: If you want to put Docker in the background, use the following command: `docker compose up --build -d`
-
 
 ## 2. Start FMTM locally (outside of Docker for quicker development)
 
@@ -39,23 +38,23 @@ Running the database in Docker means postgres/postgis does not need to be instal
 2. From the command line, navigate into the top level directory of the FMTM project.
 3. From command line, start up database with `docker-compose -f docker-compose.local.yml up --build`
 
-The `docker-compose.local.yml` file only includes the database container (`db`), so only the database runs on docker. 
+The `docker-compose.local.yml` file only includes the database container (`db`), so only the database runs on docker.
 
 #### Option 2: Run the database locally
 
-For advanced users, it is also possible to run a postgresql/postgis database locally, however you will need to set it up yourself, and may need to modify the `LOCAL_DEV_URL` environmental variable found in your `.env` file. 
+For advanced users, it is also possible to run a postgresql/postgis database locally, however you will need to set it up yourself, and may need to modify the `LOCAL_DEV_URL` environmental variable found in your `.env` file.
 
 ### 2B. Starting the API (not in docker)
 
 After starting the database, from the command line:
 
 1. Navigate into the top level directory of the FMTM project.
-2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer python environment is kept clean. 
+2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer python environment is kept clean.
 3. Start the FMTM virtual environment with: `source fmtm-env/bin/activate`
 4. Install backend dependencies with: `pip install -r src/backend/requirements.txt`
 5. Run the Fast API backend with: `uvicorn src.backend.main:api --reload`
 
-The API should now be accessible at: http://127.0.0.1:8000/docs
+The API should now be accessible at: <http://127.0.0.1:8000/docs>
 
 ### 2C. Starting the Demo Frontend (not in docker)
 
@@ -64,20 +63,21 @@ The demo frontend (found in `src/web`) is deprecated and will be replaced with `
 To run the demo frontend, from the command line:
 
 1. Navigate into the top level directory of the FMTM project.
-2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer python environment is kept clean. 
+2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer python environment is kept clean.
 3. Start the FMTM virtual environment with: `source fmtm-env/bin/activate`
 4. Install frontend dependencies with: `pip install -r src/web/requirements.txt`
-5. Set env variables with: 
-    ```
-    export FLASK_APP=src/web/__init__.py
-    export WEB_DOMAIN=${WEB_DOMAIN}
-    export API_URL=http://localhost:8000
-    FLASK_DEBUG=1 #auto reloading on change
-    ```
+5. Set env variables with:
+
+   ```
+   export FLASK_APP=src/web/__init__.py
+   export WEB_DOMAIN=${WEB_DOMAIN}
+   export API_URL=http://localhost:8000
+   FLASK_DEBUG=1 #auto reloading on change
+   ```
 
 6. Run the demo frontend (a flask app) with: `python3 src/web/manage_nf.py run`
 
-The Demo frontend should now be accessible at: http://127.0.0.1:5000
+The Demo frontend should now be accessible at: <http://127.0.0.1:5000>
 
 ### 2D. Starting the react frontend (WIP - will replace Demo Frontend)
 
@@ -87,7 +87,7 @@ To run the react frontend, from the command line:
 2. Install dependencies: `npm install`
 3. Run the project: `npm run`
 
-The React frontend should now be accessible at: 
+The React frontend should now be accessible at:
 
 # Deployment for Production
 
@@ -97,9 +97,9 @@ The following instructions are needed set up FMTM for production on your own clo
 
 ### Set up a server and domain name
 
--   Get a cloud server (tested with Ubuntu 22.04).
--   Set up a domain name, point the DNS to your cloud server.
--   SSH into your server. Set up a user with sudo called fmtm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04) is a good guide for basic server setup including creation of a user.
+- Get a cloud server (tested with Ubuntu 22.04).
+- Set up a domain name, point the DNS to your cloud server.
+- SSH into your server. Set up a user with sudo called fmtm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04) is a good guide for basic server setup including creation of a user.
 
 ### Install some stuff it'll need
 

@@ -3,7 +3,7 @@
 ## Workflow
 
 We operate the "Fork & Pull" model explained at [About Pull
-Requests](https://help.github.com/articles/about-pull-requests/) 
+Requests](https://help.github.com/articles/about-pull-requests/)
 
 You should fork the project into your own repo, create a topic branch
 there and then make one or more pull requests back to the repository.
@@ -20,14 +20,14 @@ complications with other developers. The old free software joke is
 "patches are better than bug reports" is how we contribute to the
 community of people involved with this project.
 
-# If you are reporting a problem:
+# If you are reporting a problem
 
-* Describe exactly what you were trying to achieve, what you did, what you
+- Describe exactly what you were trying to achieve, what you did, what you
   expected to happen and what did happen instead. Include relevant information
   about the platform, OS version etc. you are using. Include shell commands you
   typed in, log files, errors messages etc.
 
-* Please open a separate issue for each problem, question, or comment you have.
+- Please open a separate issue for each problem, question, or comment you have.
   Do not re-use existing issues for other topics, even if they are similar. This
   keeps issues small and manageable and makes it much easier to follow through
   and make sure each problem is taken care of.
@@ -35,7 +35,7 @@ community of people involved with this project.
 ## Documentation
 
 Project documentation should be in [Markdown
-format](https://www.markdownguide.org/), and in a *docs*
+format](https://www.markdownguide.org/), and in a _docs_
 subdirectory. While it is possible to use HTML in Markdown documents
 for tables and images, it is prefered to use the Markdown style as
 it's much easier to read.
