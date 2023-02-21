@@ -15,12 +15,8 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import sqlite3
 
-import pytest
 
-from src.db import get_db
-from src.models import User
 
 # def test_get_close_db(app):
 #    with app.app_context():

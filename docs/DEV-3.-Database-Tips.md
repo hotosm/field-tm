@@ -1,4 +1,4 @@
-# Access the database (psql):
+# Access the database (psql)
 
 Option #1 (when running the database in Docker):
 
@@ -30,12 +30,12 @@ And then connect to the database
 
 If you make a change, don't forget to commit the change!
 
-# Migrations 
-We haven't yet implemented migrations. 
+# Migrations
+
+We haven't yet implemented migrations.
 
 If you need to drop all tables, connect to fmtm and...
 
-    
     drop table mapping_issue_categories cascade;
     drop table organisation_managers cascade;
     drop table organisations  cascade;
@@ -52,4 +52,3 @@ If you need to drop all tables, connect to fmtm and...
     drop table user_licenses cascade;
     drop table users cascade;
     drop table x_form cascade;
-    

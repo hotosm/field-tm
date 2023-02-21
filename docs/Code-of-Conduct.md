@@ -1,6 +1,6 @@
 # Code of conduct
 
-(The latest version can be found at https://www.hotosm.org/code-of-conduct)
+(The latest version can be found at <https://www.hotosm.org/code-of-conduct>)
 
 Welcome to Humanitarian OpenStreetMap Team. HOT is committed to providing a welcoming and safe environment for people of all races, gender identities, gender expressions, sexual orientations, physical abilities, physical appearances, socio-economic backgrounds, nationalities, ages, religions, and beliefs.
 
@@ -45,7 +45,6 @@ The HOT community principles are:
 **Assume all communications are positive.** Always remain polite, and assume good faith. It is surprisingly easy to misunderstand each other, be it online or in person, particularly in such a culturally diverse setting as ours. Misunderstandings are particularly easy to arise when we are in a rush, or otherwise distracted. Please ask clarifying questions before assuming that a communication was inappropriate.
 
 **When we disagree, try to understand why.** Disagreements, both social and technical, happen easily and often. It is important that we resolve such disagreements and differing views constructively. At times it can be hard to appreciate a viewpoint that contradicts your own perceptions. Instead of pushing back, try to understand where the other person is coming from, and don’t be afraid to ask questions. You can be most helpful if your own replies serve to clarify, rather than to escalate an issue. Also don’t forget that it can be easy to make mistakes, and allow for the possibility that the mistake may have been yours. When this happens it is better to resolve the issue together, and to learn from the experience together, than to place blame.
-
 
 Original text courtesy of the [Speak Up! project](http://web.archive.org/web/20141109123859/http://speakup.io/coc.html).
 

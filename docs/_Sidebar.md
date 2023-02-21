@@ -6,7 +6,7 @@
 
 [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution)
 
-## For Developers:
+## For Developers
 
 [1. Getting Started](https://github.com/hotosm/fmtm/wiki/DEV-1.-Getting-Started)
 

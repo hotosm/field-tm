@@ -16,19 +16,13 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
-from sqlalchemy.orm import Session
-import logging.config
+from fastapi import APIRouter, Depends
 from fastapi.logger import logger as logger
-import os
+
 # from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
 
 from ..db import database
-from ..models.enums import TaskStatus
-from ..debug import debug_schemas, debug_crud
-from ..tasks import tasks_schemas, tasks_crud
-from ..central import central_schemas, central_crud
-from ..db import db_models
+from ..debug import debug_schemas
 
 
 router = APIRouter(
@@ -45,10 +39,12 @@ router = APIRouter(
 # and not directly.
 #
 
+
 @router.get("/", response_model=debug_schemas.DebugOut)
 async def debug():
     return {"message": "Hello World!"}
-    #raise HTTPException(status_code=404, detail="Tasks not found")
+    # raise HTTPException(status_code=404, detail="Tasks not found")
+
 
 @router.get("/basemap")
 def make_basemap():
@@ -56,11 +52,13 @@ def make_basemap():
     logger.info("/debug/basemap Unimplemented!")
     return {"message": "Hello World from /debug/basemap"}
 
+
 @router.get("/makecsv")
 def do_odk2csv():
     """Convert the submissions data into a CSV file"""
     logger.info("/debug/do_odk2csv is Unimplemented!")
     return {"message": "Hello World from /debug/makecsv"}
+
 
 @router.get("/makeosm")
 def do_csv2osm():
