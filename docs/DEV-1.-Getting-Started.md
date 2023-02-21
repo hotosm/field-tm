@@ -3,9 +3,6 @@
 The FMTM codebase consists of:
 - An API backend in FastAPI (code in: `src/backend`)
 - A frontend website (soon to be a PWA) in react (code in: `src/frontend`)
-- A demo frontend that was used for initial presentations and basic user testing (code in: `src/web`)
-
-> NOTE: demo is deprecated and will be removed when feature parity is reached in the react frontend.
 
 ![FMTM Dataflow Diagram](https://github.com/hotosm/fmtm/blob/main/docs/dataflow.dia)
 
@@ -39,46 +36,30 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this 
 
+    ODK_CENTRAL_URL=`<external_url_or_local_instance_url>`
+    ODK_CENTRAL_USER=`<any_valid_email_address>`
+    ODK_CENTRAL_PASSWD=`<password_of_central_user>`
     API_URL=http://127.0.0.1:8000
-    DB_HOST=db
+    DB_HOST=fmtm-db
     DB_USER=fmtm
     DB_PASSWORD=fmtm
     DB_NAME=fmtm
-    OSM_CLIENT_ID=
-    OSM_CLIENT_SECRET=
+    OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
+    OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
     OSM_SCOPE=read_prefs
     OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
     OSM_SECRET_KEY=`<random_key_for_development>`
-    ODK_CENTRAL_URL=`<external_url_or_local_instance_url>`
 
-### Setup ODK Central (optional)
+### Setup ODK Central User
 
-The FMTM uses ODK Central to store ODK data. 
+The FMTM uses ODK Central to store ODK data.
 
-1. Clone the project: https://github.com/getodk/central
-
-2. Create a `.env` file from `.env.template`.
-
-    DOMAIN=localhost
-    SYSADMIN_EMAIL=`<YOUR_EMAIL_ADDRESS>`
-    SSL_TYPE=upstream
-    HTTP_PORT=8442
-    HTTPS_PORT=8443
-
-`SSL_TYPE=upstream` is essential to run Central insecurely (http).
-
-3. Deploy using docker-compose (see ODK central docs for full details):
-
-```bash
-docker-compose up -d
-```
-
-4. Add an admin user, from the ODK central repo:
-`docker compose exec service odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
-`docker-compose exec service odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
-
-ODK central should be accessible at: `http://127.0.0.1:8442`
+- By default the docker setup includes a Central server.
+- Alternatively, you may use an external Central server and user.
+- Add an admin user, with the user (email) and password you included in `.env`:
+`docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
+`docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
 
 ## Verify Setup
 
