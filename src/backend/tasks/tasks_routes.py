@@ -16,12 +16,11 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select, table, column
 
 from ..db import database
-from ..users import user_crud, user_schemas
+from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
 from ..models.enums import TaskStatus
 
@@ -60,30 +59,28 @@ def get_task(lat: float, long: float, project_id: int = None, user_id: int = Non
 
 
 @router.get("/{task_id}", response_model=tasks_schemas.TaskOut)
-async def read_tasks(
-        task_id: int,
-        db: Session = Depends(database.get_db)
-):
+async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
     task = tasks_crud.get_task(db, task_id)
     if task:
         return task
     else:
         raise HTTPException(status_code=404, detail="Task not found")
 
+
 @router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
 async def update_task_status(
-        user: user_schemas.User,
-        task_id: int,
-        new_status: tasks_schemas.TaskStatusOption,
-        db: Session = Depends(database.get_db)
+    user: user_schemas.User,
+    task_id: int,
+    new_status: tasks_schemas.TaskStatusOption,
+    db: Session = Depends(database.get_db),
 ):
     # TODO verify logged in user
     user_id = user.id
 
     task = tasks_crud.update_task_status(
-        db, user_id, task_id, TaskStatus[new_status.name])
+        db, user_id, task_id, TaskStatus[new_status.name]
+    )
     if task:
         return task
     else:
-        raise HTTPException(
-            status_code=404, detail="Task status could not be updated.")
+        raise HTTPException(status_code=404, detail="Task status could not be updated.")

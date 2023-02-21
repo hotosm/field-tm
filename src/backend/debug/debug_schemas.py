@@ -17,16 +17,12 @@
 #
 
 from pydantic import BaseModel
-from datetime import datetime
-from geojson_pydantic import Feature, Point
-from typing import List
-import enum
-import logging.config
 from fastapi.logger import logger as logger
 
 
 class DebugBase(BaseModel):
     pass
+
 
 class Debug(DebugBase):
     geometry_geojson: str

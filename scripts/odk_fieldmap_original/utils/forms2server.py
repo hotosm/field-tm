@@ -13,21 +13,29 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
 import os
 import sys
 
-from odk_requests import (app_users, attach_to_form, create_app_user,
-                          create_form, create_project, forms, project_id,
-                          publish_form, qr_code, update_role_app_user)
+from odk_requests import (
+    app_users,
+    attach_to_form,
+    create_app_user,
+    create_form,
+    create_project,
+    project_id,
+    publish_form,
+    qr_code,
+    update_role_app_user,
+)
 
 
 def get_formlist(indir):
     """
-    Converts a directory full of xlsform files into 
+    Converts a directory full of xlsform files into
     a list of form names without the file extension.
     i.e. Dakar_buildings_213.xlsx =-> Dakar_buildings_213
 
@@ -106,7 +114,7 @@ def push_geojson(url, aut, pid, indir):
     """
     Push all of the geojson attachments to their
     corresponsing forms on the ODK Central server.
-    The geojson files are expected to be in the 
+    The geojson files are expected to be in the
     geojson subdirectory of the input directory.
     """
     # TODO loop over the forms instead of the
@@ -114,8 +122,7 @@ def push_geojson(url, aut, pid, indir):
     # Not hugely important but more consistent.
     gjdir = os.path.join(indir, "geojson")
     filelist = os.listdir(gjdir)
-    attments = [x for x in filelist if os.path.splitext(
-        x)[1].lower() == ".geojson"]
+    attments = [x for x in filelist if os.path.splitext(x)[1].lower() == ".geojson"]
     for attment in attments:
         attname = os.path.splitext(os.path.basename(attment))[0]
         print(f"Attaching {attment}.")
@@ -129,8 +136,7 @@ def push_geojson(url, aut, pid, indir):
 
 
 def publish_forms(url, aut, pid, forms):
-    """Iterate through and publish forms.
-    """
+    """Iterate through and publish forms."""
     for form in forms:
         r = publish_form(url, aut, pid, form)
         print(r)
@@ -202,7 +208,7 @@ if __name__ == "__main__":
     - Project_name
       - forms
       - geojson
-    
+
     example usage:
     python forms2server my_project_directory https://myodkcentralserver my_odk_username my_odk_password
     """

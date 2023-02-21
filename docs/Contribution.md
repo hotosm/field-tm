@@ -7,7 +7,6 @@ You can see an overview of the project and the process we have gone through in d
 
 There are many ways to contribute to the Field Mapping Tasking Manager (FMTM):
 
-
 ## Testing
 
 As we are in the process of building the prototype, we would really welcome your input in testing and sharing your feedback. If you are alos interested in coordinating field testing session, do reach out!
@@ -18,11 +17,11 @@ Create pull requests (PRs) for changes that you think are needed. We would reall
 
 If we are specifically looking for input from developers with Python skills and familiarity with Fast API.
 
-## Report bugs and suggest improvements:
+## Report bugs and suggest improvements
 
 The [issue queue](https://github.com/hotosm/fmtm/issues)) is the best way to get started. There are issue templates for BUGs and FEATURES that you can use, or you can create your own. Once you have submitted an issue, it will be assigned one label out of the following [label categories](https://github.com/hotosm/fmtm/labels). If you are wondering where to start, you can filter by GoodFirstIssue label.
 
+## Thank you
 
-## Thank you!
 Thank you very much in advance for your contributions!! Please ensure you refer to our Code of Conduct.
 If you've read the guidelines, but you are still not sure how to contribute on Github, please reach out to us via our Slack #geospatial-tech-and-innovation.

@@ -17,18 +17,13 @@
 #
 
 from typing import List
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from pathlib import Path
 import json
-import epdb
-import os
 
 from odkconvert.xlsforms import xlsforms_path
 
-from ..env_utils import is_docker
 from ..db import database
 from ..central import central_crud
 from . import project_crud, project_schemas
@@ -43,10 +38,10 @@ router = APIRouter(
 
 @router.get("/", response_model=List[project_schemas.ProjectOut])
 async def read_projects(
-        user_id: int = None,
-        skip: int = 0,
-        limit: int = 100,
-        db: Session = Depends(database.get_db),
+    user_id: int = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(database.get_db),
 ):
     projects = project_crud.get_projects(db, user_id, skip, limit)
     return projects
@@ -81,7 +76,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database"""
     # FIXME: should check for error
-    odkproject = central_crud.delete_odk_project(project_id)
+    central_crud.delete_odk_project(project_id)
     # if not odkproject:
     #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
     project = project_crud.delete_project_by_id(db, project_id)
@@ -99,9 +94,11 @@ async def create_project(
     """Create a project in ODK Central and the local database"""
     odkproject = central_crud.create_odk_project(project_info.project_info.name)
     # TODO check token against user or use token instead of passing user
-    project = project_crud.create_project_with_project_info(db, project_info, odkproject['id'])
+    project = project_crud.create_project_with_project_info(
+        db, project_info, odkproject["id"]
+    )
     # FIXME: This should only be done once when starting, instead of for each project
-    xlsforms = project_crud.read_xlsforms(db, xlsforms_path)
+    project_crud.read_xlsforms(db, xlsforms_path)
 
     if project:
         return project
@@ -124,6 +121,7 @@ async def upload_project_boundary_with_zip(
     )
     return f"{project}"
 
+
 @router.post("/{project_id}/upload_xlsform")
 async def upload_custom_xls(
     project_id: int,
@@ -133,10 +131,11 @@ async def upload_custom_xls(
     # read entire file
     content = await upload.read()
     category = upload.filename.split(".")[0]
-    result = project_crud.upload_xlsform(db, project_id, content, category)
+    project_crud.upload_xlsform(db, project_id, content, category)
 
     # FIXME: fix return value
-    return {f"Message": f"{project_id}"}
+    return {"Message": f"{project_id}"}
+
 
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
@@ -156,12 +155,13 @@ async def upload_project_boundary(
         return f"No project with id {project_id}"
 
     # Use the ID we get from Central, as it's needed for many queries
-    grid = eval(project_crud.create_task_grid(db, project_id))
+    eval(project_crud.create_task_grid(db, project_id))
     # type = DataCategory()
     # result = project_crud.generate_appuser_files(db, grid, project_id)
 
     # FIXME: fix return value
-    return {f"Message": f"{project_id}"}
+    return {"Message": f"{project_id}"}
+
 
 @router.post("/{project_id}/download")
 async def download_project_boundary(
@@ -171,7 +171,8 @@ async def download_project_boundary(
     """Download the boundary polygon for this project"""
     out = project_crud.download_geometry(db, project_id, False)
     # FIXME: fix return value
-    return {f"Message": out}
+    return {"Message": out}
+
 
 @router.post("/{project_id}/download_tasks")
 async def download_task_boundaries(
@@ -181,7 +182,8 @@ async def download_task_boundaries(
     """Download the task boundary polygons for this project"""
     out = project_crud.download_geometry(db, project_id, True)
     # FIXME: fix return value
-    return {f"Message": out}
+    return {"Message": out}
+
 
 @router.post("/{project_id}/generate")
 async def generate_files(
@@ -189,7 +191,7 @@ async def generate_files(
     dbname: str,
     db: Session = Depends(database.get_db),
 ):
-    result = project_crud.generate_appuser_files(db, dbname, project_id)
+    project_crud.generate_appuser_files(db, dbname, project_id)
 
     # FIXME: fix return value
-    return {f"Message": f"{project_id}"}
+    return {"Message": f"{project_id}"}
