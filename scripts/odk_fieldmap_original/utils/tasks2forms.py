@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
@@ -28,9 +28,9 @@ def task_areas_to_forms(indir, form_template):
     Accepts a project directory, with a subdirectory
     called /geojson full of GeoJSON point files,
     each representing an individual task (e.g. a batch
-    of buildings or amenities to be visited for data 
+    of buildings or amenities to be visited for data
     collection) and returns a set of xlsforms, one for
-    each task, with the appropriate references in 
+    each task, with the appropriate references in
     place for the Select from Map question in ODK.
     """
     geojsondir = os.path.join(indir, "geojson")
@@ -43,8 +43,7 @@ def task_areas_to_forms(indir, form_template):
     # TODO: Maybe reject all non-point input files;
     # kind of a hassle involving a spatial lib
     # but perhaps worth it
-    aois = [x for x in filelist if os.path.splitext(
-        x)[1].lower() == ".geojson"]
+    aois = [x for x in filelist if os.path.splitext(x)[1].lower() == ".geojson"]
     outdir = os.path.join(indir, "forms")
     if not os.path.exists(outdir):
         print(f"Making directory {outdir}")
@@ -83,7 +82,7 @@ if __name__ == "__main__":
        files representing tasks
     2) A ODK-compatible xlsform template
     It then creates a subdirectory called 'forms'
-    and populates it with xlsforms specifically 
+    and populates it with xlsforms specifically
     referencing the individual GeoJSON files.
     """
     indir = sys.argv[1]
