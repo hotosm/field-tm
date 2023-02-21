@@ -31,9 +31,9 @@ services:
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${FMTM_DB_USER}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
+      - POSTGRES_DB=${FMTM_DB_NAME}
     ports:
       - "5432:5432"
     networks:
@@ -54,7 +54,7 @@ services:
     env_file:
       - .env
     environment:
-      - DB_URL=postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@fmtm-db:5432/${DB_NAME}
+      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}:5432/${FMTM_DB_NAME}
     ports:
       - "8000:8000"
     networks:
@@ -81,9 +81,9 @@ services:
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=odk
-      - POSTGRES_PASSWORD=odk
-      - POSTGRES_DB=odk
+      - POSTGRES_USER=${CENTRAL_DB_USER}
+      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD}
+      - POSTGRES_DB=${CENTRAL_DB_NAME}
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -96,7 +96,8 @@ services:
     depends_on:
       - central-db
       - pyxform
-    command: [ "./wait-for-it.sh", "central-db:5432", "--", "./start-odk.sh" ]
+    env_file:
+      - .env
     ports:
       - "8383:8383"
     networks:

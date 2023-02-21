@@ -87,10 +87,10 @@ COPY --from=build \
 WORKDIR /app
 COPY . /app/backend
 # ENTRYPOINT bash script to check db is ready
-ARG DB_HOST
+ARG FMTM_DB_HOST
 RUN printf '#!/bin/bash\n\
     set -eo pipefail\n\
-    while !</dev/tcp/${DB_HOST}/5432; do sleep 1; done;\n\
+    while !</dev/tcp/${FMTM_DB_HOST}/5432; do sleep 1; done;\n\
     exec "$@"'\
     >> /docker-entrypoint.sh \
     && chmod +x /docker-entrypoint.sh
