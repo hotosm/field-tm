@@ -56,30 +56,7 @@ After starting the database, from the command line:
 
 The API should now be accessible at: <http://127.0.0.1:8000/docs>
 
-### 2C. Starting the Demo Frontend (not in docker)
-
-The demo frontend (found in `src/web`) is deprecated and will be replaced with `src/frontend` when feature parity is reached. However, as it is currently still useful, we are including it in this documentation
-
-To run the demo frontend, from the command line:
-
-1. Navigate into the top level directory of the FMTM project.
-2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer python environment is kept clean.
-3. Start the FMTM virtual environment with: `source fmtm-env/bin/activate`
-4. Install frontend dependencies with: `pip install -r src/web/requirements.txt`
-5. Set env variables with:
-
-   ```
-   export FLASK_APP=src/web/__init__.py
-   export WEB_DOMAIN=${WEB_DOMAIN}
-   export API_URL=http://localhost:8000
-   FLASK_DEBUG=1 #auto reloading on change
-   ```
-
-6. Run the demo frontend (a flask app) with: `python3 src/web/manage_nf.py run`
-
-The Demo frontend should now be accessible at: <http://127.0.0.1:5000>
-
-### 2D. Starting the react frontend (WIP - will replace Demo Frontend)
+### 2C. Starting the react frontend
 
 To run the react frontend, from the command line:
 
