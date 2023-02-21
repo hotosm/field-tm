@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import base64
+# import base64
 import json
 from typing import List
 
@@ -212,9 +212,9 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.locked_by_uid = db_task.lock_holder.id
             app_task.locked_by_username = db_task.lock_holder.username
 
-        if db_task.qr_code:
-            app_task.qr_code_in_base64 = base64.b64encode(
-                db_task.qr_code.image)
+        # if db_task.qr_code:
+        #     app_task.qr_code_in_base64 = base64.b64encode(
+        #         db_task.qr_code.image)
 
         if db_task.task_history:
             app_task.task_history = convert_to_app_history(
