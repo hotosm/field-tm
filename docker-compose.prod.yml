@@ -46,7 +46,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.backend.main:api --host 0.0.0.0 --reload'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn main:api --host 0.0.0.0 --reload'
     volumes:
       - .:/api
     ports:
@@ -65,34 +65,6 @@ services:
       - "traefik.http.routers.api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.api.service=api"
-
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python src/web/manage_nf.py run -h 0.0.0.0' # tail -F anything;' # python src/web/manage.py run -h 0.0.0.0'
-    restart: always
-    volumes:
-      - .:/home/app/web
-    ports:
-      - 5000
-    networks:
-      - fmtm-net
-    depends_on:
-      - db
-    environment:
-      - FLASK_APP=src/web/__init__.py
-      - FLASK_ENV=${FLASK_ENV}
-      - WEB_DOMAIN=${WEB_DOMAIN}
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-      - API_URL=https://${API_DOMAIN}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.web.loadbalancer.server.port=5000"
-      - "traefik.http.routers.web.tls=true"
-      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.web.rule=Host(`${WEB_DOMAIN}`)"
-      - "traefik.http.routers.web.service=web"
 
   traefik:
     build:

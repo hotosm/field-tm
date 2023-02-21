@@ -16,7 +16,16 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from enum import Enum, IntEnum
+from enum import Enum
+
+
+class StrEnum(str, Enum):
+    pass
+
+
+class IntEnum(int, Enum):
+    pass
+
 
 class TeamVisibility(IntEnum, Enum):
     """ Describes the visibility associated with an Team """

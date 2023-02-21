@@ -20,13 +20,10 @@ from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from ..env_utils import is_docker, config_env
+from ..env_utils import config_env
 
 
-if is_docker():
-    SQLALCHEMY_DATABASE_URL = config_env["DB_URL"]
-else:
-    SQLALCHEMY_DATABASE_URL = config_env["LOCAL_DB_URL"]
+SQLALCHEMY_DATABASE_URL = config_env["DB_URL"]
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
