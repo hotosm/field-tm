@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Container, Divider, Stack, Typography } from '@mui/material'
 import windowDimention from "../hooks/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -8,10 +8,20 @@ import BasicTabs from "../utilities/BasicTabs";
 import MapLegends from "../components/projectDetails/MapLegends";
 import ActivitiesPanel from "../components/projectDetails/ActivitiesPanel";
 import TasksComponent from "../components/projectDetails/TasksPanel";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
+
+import environment from "../environment";
+import { useParams } from "react-router-dom";
+import { HomeActions } from "../store/slices/HomeSlice";
 
 const ProjectDetails = () => {
+    const dispatch = useDispatch();
+    const params = useParams();
+    // console.log(environment.decode(params.id),'check')
+    useEffect(() => {
+        dispatch(HomeActions.SetProjectId(params.id))
+    }, [])
 
     const { type } = windowDimention();
     const viewMode = type == 'xl' ? 6 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1

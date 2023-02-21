@@ -50,8 +50,15 @@ module.exports = {
     new ModuleFederationPlugin({
       name: "fmtm",
       filename: "remoteEntry.js",
-      remotes: {},
-      exposes: {},
+      remotes: {
+        map: "fmtm_openlayer_map@http://localhost:7000/remoteEntry.js"
+      },
+      exposes: {
+        "./HomeSlice": "./src/store/slices/HomeSlice.ts",
+        "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
+        "./BasicDialog": "./src/utilities/BasicDialog.tsx",
+        "./environment": "./src/environment.ts"
+      },
       shared: {
         ...deps,
         react: {
