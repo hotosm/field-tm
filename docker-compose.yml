@@ -31,9 +31,9 @@ services:
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
-      - POSTGRES_DB=${FMTM_DB_NAME}
+      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
     ports:
       - "5432:5432"
     networks:
@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
 
   api:
+    image: "ghcr.io/hotosm/fmtm-backend:0.1.0"
     build:
       context: src/backend
       # target: debug
@@ -54,14 +55,16 @@ services:
     env_file:
       - .env
     environment:
-      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}:5432/${FMTM_DB_NAME}
+      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}:5432/${FMTM_DB_NAME:-fmtm}
     ports:
       - "8000:8000"
+      # - "5678:5678"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
   ui:
+    image: "ghcr.io/hotosm/fmtm-frontend:1.0.0"
     build:
       context: src/frontend
       target: debug
@@ -81,14 +84,17 @@ services:
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD}
-      - POSTGRES_DB=${CENTRAL_DB_NAME}
+      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
+      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
+    ports:
+      - "5433:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
   central:
+    image: "ghcr.io/hotosm/fmtm-central:0.1.0"
     build:
       context: .
       dockerfile: central.dockerfile

@@ -40,15 +40,7 @@ Your env should look like this
     ODK_CENTRAL_URL=`<external_url_or_local_instance_url>`
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
-    CENTRAL_DB_HOST=central-db
-    CENTRAL_DB_USER=odk
-    CENTRAL_DB_PASSWORD=odk
-    CENTRAL_DB_NAME=odk
     API_URL=http://127.0.0.1:8000
-    FMTM_DB_HOST=fmtm-db
-    FMTM_DB_USER=fmtm
-    FMTM_DB_PASSWORD=fmtm
-    FMTM_DB_NAME=fmtm
     OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
     OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
@@ -102,3 +94,40 @@ Don't forget to review [Contribution](https://github.com/hotosm/fmtm/wiki/Contri
 ### Implement authorization on an endpoints
 
 To add authentication to an endpoint, import `login_required` from `auth` module , you can use it as decorator or use fastapi `Depends(login_required)` on endpoints.
+
+## Backend Debugging
+
+1. Uncomment in docker-compose.yml:
+```
+target: debug
+ports:
+  - "5678:5678"
+```
+2. Re-build the docker image `docker compose build api`
+3. Start the docker container `docker compose up -d api` (the api startup will be halted until you connect a debugger)
+4. Set a debugger config in your IDE (e.g. VSCode) and start the debugger
+5. The API server will start up & any set breakpoints will trigger
+
+Example launch.json config for vscode:
+```
+{
+  "configurations": [
+    {
+      "name": "Remote - Server Debug",
+      "type": "python",
+      "request": "attach",
+      "host": "localhost",
+      "port": 5678,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/backend",
+          "remoteRoot": "/app/backend"
+        }
+      ],
+      "justMyCode": false
+    }
+  ]
+}
+```
+
+Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.

@@ -61,7 +61,9 @@ else:
 
 Base.metadata.create_all(bind=engine)
 
-api = FastAPI()
+api = FastAPI(
+    root_path=os.getenv("API_PREFIX", default="/")
+)
 
 api.include_router(user_routes.router)
 api.include_router(project_routes.router)
