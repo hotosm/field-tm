@@ -103,6 +103,8 @@ services:
     container_name: fmtm_ui
     networks:
       - fmtm-prod
+    environment:
+      - API_URL=${API_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"

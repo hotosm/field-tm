@@ -72,6 +72,8 @@ services:
     volumes:
       - ./src/frontend/main:/app
       - /app/node_modules/
+    environment:
+      - API_URL=${API_URL}
     ports:
       - "8080:8080"
     networks:
