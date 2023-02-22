@@ -33,5 +33,4 @@ jobs:
           pip install -r src/backend/requirements-dev.txt
       - name: Run pytest
         run: |
-          cd src/backend
           pytest
