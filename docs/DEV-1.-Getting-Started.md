@@ -25,7 +25,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 <img width="716" alt="image" src="https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png">
 
-3. Rightnow read user preferences permission is enough later on fmtm may need permission for modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
+3. Right now read user preferences permission is enough later on fmtm may need permission for modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
 
 4. Now Copy your Client ID , Client Secret and put it to `.env`
 
@@ -37,7 +37,7 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this
 
-    ODK_CENTRAL_URL=`<external_url_or_local_instance_url>`
+    ODK_CENTRAL_URL=http://central:8383
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
     CENTRAL_DB_HOST=central-db
@@ -55,16 +55,6 @@ Your env should look like this
     OSM_SCOPE=read_prefs
     OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
     OSM_SECRET_KEY=`<random_key_for_development>`
-
-### Setup ODK Central User
-
-The FMTM uses ODK Central to store ODK data.
-
-- By default the docker setup includes a Central server.
-- Alternatively, you may use an external Central server and user.
-- Add an admin user, with the user (email) and password you included in `.env`:
-  `docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
-  `docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
 
 ## Verify Setup
 
