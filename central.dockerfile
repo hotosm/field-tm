@@ -61,8 +61,8 @@ RUN printf '#!/bin/bash\n\
 set -eo pipefail\n\
 tmp=$(mktemp)\n\
 echo "Setting database credentials in /usr/share/odk/config.json.template"\n\
-jq --arg host "${CENTRAL_DB_HOST}" --arg user "${CENTRAL_DB_USER}" \
---arg pass "${CENTRAL_DB_PASSWORD}" --arg db "${CENTRAL_DB_NAME}" \
+jq --arg host "${CENTRAL_DB_HOST:-central-db}" --arg user "${CENTRAL_DB_USER:-odk}" \
+--arg pass "${CENTRAL_DB_PASSWORD:-odk}" --arg db "${CENTRAL_DB_NAME:-odk}" \
 '"'"'.default.database.host = $host | .default.database.user = $user | .default.database.password = $pass | .default.database.database = $db'"'"' \
 /usr/share/odk/config.json.template > \
 "$tmp" && mv "$tmp" /usr/share/odk/config.json.template\n\
@@ -70,6 +70,6 @@ echo "Credentials set"\n\
 exec ./start-odk.sh' \
 >> ./sub-db-vars.sh \
 && chmod +x ./sub-db-vars.sh
-ENTRYPOINT ["./wait-for-it.sh", "central-db:5432", "--", "./sub-db-vars.sh"]
+ENTRYPOINT ["./wait-for-it.sh", "${CENTRAL_DB_HOST:-central-db}:5432", "--", "./sub-db-vars.sh"]
 
 EXPOSE 8383
