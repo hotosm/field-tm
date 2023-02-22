@@ -15,3 +15,5 @@
 [3. Database Tips](https://github.com/hotosm/fmtm/wiki/DEV-3.-Database-Tips)
 
 [4. Docker Tips](https://github.com/hotosm/fmtm/wiki/DEV-4.-Docker-Tips)
+
+[5. Production Deployment](https://github.com/hotosm/fmtm/wiki/DEV-5.-Production-Deployment)

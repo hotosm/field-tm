@@ -8,7 +8,7 @@ When `docker-compose` is ran:
   - the `execute` command of each container is run
   - the container is deployed at the given `port`
 
-Note: this Docker deployment automatically sets up a traefik server with ssh.
+> Note: this Docker deployment automatically sets up a traefik server with ssh.
 
 # When updating docker
 
