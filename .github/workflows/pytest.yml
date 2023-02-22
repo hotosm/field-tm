@@ -6,6 +6,18 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
+  ODK_CENTRAL_URL: http://localhost:8383
+  ODK_CENTRAL_USER: odk
+  ODK_CENTRAL_PASSWD: odk
+  OSM_CLIENT_ID: test
+  OSM_CLIENT_SECRET: test
+  OSM_URL: https://www.openstreetmap.org
+  OSM_SCOPE: read_prefs
+  OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
+  OSM_SECRET_KEY: test
+
 permissions:
   contents: read
 
