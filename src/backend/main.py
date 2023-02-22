@@ -62,32 +62,37 @@ else:
 
 Base.metadata.create_all(bind=engine)
 
-api = FastAPI(
-    root_path=os.getenv("API_PREFIX", default="/")
-)
 
-api.include_router(user_routes.router)
-api.include_router(project_routes.router)
-api.include_router(tasks_routes.router)
-api.include_router(debug_routes.router)
-api.include_router(central_routes.router)
+def get_application() -> FastAPI:
 
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:8081"
-]
+    application = FastAPI(root_path=os.getenv("API_PREFIX", default="/"))
 
-api.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    application.include_router(user_routes.router)
+    application.include_router(project_routes.router)
+    application.include_router(tasks_routes.router)
+    application.include_router(debug_routes.router)
+    application.include_router(central_routes.router)
+
+    origins = [
+        "http://localhost",
+        "http://localhost:8080",
+        "http://localhost:8081"
+    ]
+
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    application.include_router(auth_routers.router)
+
+    return application
 
 
-api.include_router(auth_routers.router)
+api = get_application()
 
 
 @api.get("/")
