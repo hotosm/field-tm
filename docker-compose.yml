@@ -26,7 +26,7 @@ networks:
 
 services:
   fmtm-db:
-    image: postgis/postgis:14-3.3-alpine
+    image: "postgis/postgis:14-3.3-alpine"
     container_name: fmtm_db
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   api:
-    image: "ghcr.io/hotosm/fmtm-backend:0.1.0"
+    image: "quay.io/hotosm/fmtm:latest"
     build:
       context: src/backend
       # target: debug
@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
 
   ui:
-    image: "ghcr.io/hotosm/fmtm-frontend:1.0.0"
+    image: "quay.io/hotosm/fmtm-frontend:latest"
     build:
       context: src/frontend
       target: debug
@@ -79,7 +79,7 @@ services:
     restart: unless-stopped
 
   central-db:
-    image: postgis/postgis:14-3.3-alpine
+    image: "postgis/postgis:14-3.3-alpine"
     container_name: central_db
     volumes:
       - central_db_data:/var/lib/postgresql/data/
@@ -94,7 +94,7 @@ services:
     restart: unless-stopped
 
   central:
-    image: "ghcr.io/hotosm/fmtm-central:0.1.0"
+    image: "quay.io/hotosm/fmtm-root:latest"
     build:
       context: .
       dockerfile: central.dockerfile
