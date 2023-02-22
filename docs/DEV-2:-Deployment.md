@@ -1,30 +1,40 @@
 # Deployment for Development
 
-FMTM is Dockerized, but it is often faster to develop on your local machine outside of Docker. Therefore, instructions are given to run FMTM using docker, and in a mostly de-dockerized version.
+The recommended way to run FMTM is with Docker. You can also develop on your local machine outside of Docker, see below.
 
 > NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Development]() wiki page.
 
 Now let's get started!
 
-## 1. Fastest way to get up and running (Docker)
+## 1. Start FMTM with Docker
 
 The easiest way to get up and running is by using the FMTM Docker deployment. Docker creates a virtual environment, isolated from your computer's environment, installs all necessary dependencies, and creates a container for each the database, api, and frontend. These containers talk to each other via the URLs defined in the docker-compose file and your env file.
 
-**To start FMTM via Docker:**
+### 1A: Starting the Containers
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and insure that it is running on your local machine.
 2. From the command line: navigate into the top level directory of the FMTM project.
-3. From the command line run: `docker compose up --build`
+3. From the command line run: `docker compose build`
+4. Once everything is built, from the command line run: `docker compose up -d`
 
-4. Check the command line for errors! If everything goes well you should now be able to **navigate to the project in your browser:**
-   - **Demo frontend (_Deprecated_):** <http://127.0.0.1:5000>
+5. If everything goes well you should now be able to **navigate to the project in your browser:**
+   - **Frontend:** <http://127.0.0.1:8080>
    - **API:** <http://127.0.0.1:8000/docs>
 
-> Note: If those links don't work, check the console log for the correct URLs.
+> Note: If those links don't work, check the logs with `docker log fmtm_api`.
 
-> Note: If you want to put Docker in the background, use the following command: `docker compose up --build -d`
+### 1B: Setup ODK Central User
 
-## 2. Start FMTM locally (outside of Docker for quicker development)
+The FMTM uses ODK Central to store ODK data.
+
+- By default the docker setup includes a Central server.
+- Add an admin user, with the user (email) and password you included in `.env`:
+  `docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
+  `docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
+
+> Note: Alternatively, you may use an external Central server and user.
+
+## 2. Start FMTM locally
 
 To run FMTM locally, you will need to start the database, the api, and the frontend separately, one by one. It is important to do this in the proper order.
 
@@ -60,91 +70,8 @@ The API should now be accessible at: <http://127.0.0.1:8000/docs>
 
 To run the react frontend, from the command line:
 
-1. Navigate into the react frontend directory: `cd src/frontend`
+1. Navigate into the react frontend directory: `cd src/frontend/main`
 2. Install dependencies: `npm install`
-3. Run the project: `npm run`
+3. Run the project: `npm run start:live`
 
-The React frontend should now be accessible at:
-
-# Deployment for Production
-
-The following instructions are needed set up FMTM for production on your own cloud server.
-
-## Set up the FMTM on a cloud server
-
-### Set up a server and domain name
-
-- Get a cloud server (tested with Ubuntu 22.04).
-- Set up a domain name, point the DNS to your cloud server.
-- SSH into your server. Set up a user with sudo called fmtm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04) is a good guide for basic server setup including creation of a user.
-
-### Install some stuff it'll need
-
-#### Docker
-
-Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) is a good tutorial for that; do step 1 and 2. At time of writing that consisted of:
-
-    sudo apt update
-    sudo apt install apt-transport-https ca-certificates curl software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt update
-    sudo apt install docker-ce
-    sudo usermod -aG docker ${USER}
-    su - ${USER}
-
-Now install Docker Compose (as per [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At time of writing (the latest version of Docker Compose may change, so the version number might be out of date, but the rest shouldn't change) this consisted of:
-
-    mkdir -p ~/.docker/cli-plugins/
-    curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-    sudo chmod +x ~/.docker/cli-plugins/docker-compose
-
-### Grab the FMTM code
-
-Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.git`. Step into the resulting directory with `cd fmtm`.
-
-#### Python stuff
-
-    sudo apt install python3-pip
-    sudo apt install libpq-dev
-    pip install -r src/web/requirements.txt
-
-### Set up the environment and utilities to launch
-
-Create the env file from the example with `cp .env.example .env`. Edit that file to contain the needful (it should look like this):
-
-    # copy to .env and set variables
-    FLASK_ENV=development
-    WEB_DOMAIN=<domain name>
-    METRICS_DOMAIN=fmtm-metrics.<domain name>
-
-    # To generate login:
-    # echo $(htpasswd -nb testuser password) | sed -e s/\\$/\\$\\$/g
-    METRICS_LOGIN=
-
-    DB_USER=fmtm
-    DB_PASSWORD=fmtm
-    DB_NAME=fmtm
-
-Create a script to set some local variables and launch the FMTM. Call it `run-prod.sh`. It should contain:
-
-    #!/bin/bash
-
-    export WEB_DOMAIN=fieldmappingtm.org
-    export METRICS_DOMAIN=fmtm-metrics.fieldmappingtm.org
-    export METRICS_LOGIN=testuser:<hashed_stuff>
-
-    docker compose -f docker-compose.prod.yml up -d
-
-Make it executable with `sudo chmod +x run-prod.sh`.
-
-Build it with `docker compose up --build -d`
-
-Stop it with `docker compose stop`
-
-Run it with `./run-prod.sh`.
-
-With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
-
-> TODO: set up ssl certificates.
-> It seems we're using Traefik as the reverse proxy web server, so my existing knowledge of how to set up ssl certs with LetsEncrypt is not applicable; probably something like [this](https://doc.traefik.io/traefik/https/acme/)
+The React frontend should now be accessible at: <http://127.0.0.1:8080>
