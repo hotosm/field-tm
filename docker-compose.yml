@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
 
   api:
+    image: "ghcr.io/hotosm/fmtm-backend:0.1.0"
     build:
       context: src/backend
       # target: debug
@@ -63,6 +64,7 @@ services:
     restart: unless-stopped
 
   ui:
+    image: "ghcr.io/hotosm/fmtm-frontend:1.0.0"
     build:
       context: src/frontend
       target: debug
@@ -85,11 +87,14 @@ services:
       - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
       - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
       - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
+    ports:
+      - "5433:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
   central:
+    image: "ghcr.io/hotosm/fmtm-central:0.1.0"
     build:
       context: .
       dockerfile: central.dockerfile
