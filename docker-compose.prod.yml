@@ -15,83 +15,121 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: "3.4"
+version: "3"
+
+volumes:
+  fmtm_db_data:
+  central_db_data:
+  traefik-public-certificates:
+
+networks:
+  fmtm-prod:
 
 services:
-  db:
-    image: postgis/postgis:14-3.3-alpine
-    volumes:
-      - postgres_data_prod1:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-    ports:
-      - 5432
-    networks:
-      - fmtm-net
-
-  # pgadmin:
-  #   container_name: pgadmin
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     - PGADMIN_DEFAULT_EMAIL=pgadmin4@hotosm.org
-  #     - PGADMIN_DEFAULT_PASSWORD=admin
-  #   ports:
-  #     - "5050:80"
-  #   depends_on:
-  #     - db
-
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn main:api --host 0.0.0.0 --reload'
-    volumes:
-      - .:/api
-    ports:
-      - 8000
-    networks:
-      - fmtm-net
-    depends_on:
-      - db
-    environment:
-      - API_DOMAIN=${API_DOMAIN}
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.api.loadbalancer.server.port=8000"
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`)"
-      - "traefik.http.routers.api.service=api"
-
   traefik:
     build:
-      context: ./traefik
+      context: traefik
       dockerfile: Dockerfile.traefik
     restart: always
     ports:
       - 80:80
       - 443:443
     networks:
-      - fmtm-net
+      - fmtm-prod
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik-public-certificates:/certificates"
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=fmtm-net"
-      - "traefik.http.routers.dashboard.rule=Host(`${METRICS_DOMAIN}`)"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${METRICS_LOGIN}"
+      - "traefik.docker.network=fmtm-prod"
+      - "traefik.api.dashboard=false"
 
-volumes:
-  traefik-public-certificates:
-  postgres_data_prod1:
+  fmtm-db:
+    image: postgis/postgis:14-3.3-alpine
+    container_name: fmtm_db
+    volumes:
+      - fmtm_db_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+    ports:
+      - "5432:5432"
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
 
-networks:
-  fmtm-net:
+  api:
+    build:
+      context: src/backend
+      target: prod
+    container_name: fmtm_api
+    depends_on:
+      - fmtm-db
+      - central
+    env_file:
+      - .env
+    environment:
+      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}:5432/${FMTM_DB_NAME:-fmtm}
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`) && PathPrefix(`/api{regex:$$|/.*}`)"
+      - "traefik.http.routers.api.service=api"
+
+  ui:
+    build:
+      context: src/frontend
+      target: prod
+    container_name: fmtm_ui
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.ui.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ui.tls=true"
+      - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ui.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.ui.service=ui"
+
+  central-db:
+    image: postgis/postgis:14-3.3-alpine
+    container_name: central_db
+    volumes:
+      - central_db_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
+      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
+
+  central:
+    image: "ghcr.io/hotosm/fmtm-central:0.1.0"
+    build:
+      context: .
+      dockerfile: central.dockerfile
+    container_name: central_api
+    depends_on:
+      - central-db
+      - pyxform
+    env_file:
+      - .env
+    ports:
+      - "8383:8383"
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
+
+  pyxform:
+    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
+    networks:
+      - fmtm-prod
+    restart: always
