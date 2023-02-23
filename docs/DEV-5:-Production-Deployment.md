@@ -40,7 +40,7 @@ Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.g
 Create the env file from the example with `cp .env.example .env`. Edit that file to contain the needful (it should look like this):
 
     # ODK Central
-    ODK_CENTRAL_URL=http://central:8383
+    ODK_CENTRAL_URL=https://central
     ODK_CENTRAL_USER=`<CHANGEME>`
     ODK_CENTRAL_PASSWD=`<CHANGEME>`
 
