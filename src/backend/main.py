@@ -39,8 +39,7 @@ from .central import central_routes
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # setup loggers
-log_file_path = path.join(os.path.dirname(
-    os.path.abspath(__file__)), "logging.conf")
+log_file_path = path.join(os.path.dirname(os.path.abspath(__file__)), "logging.conf")
 
 logging.config.fileConfig(
     log_file_path, disable_existing_loggers=False
@@ -76,7 +75,8 @@ def get_application() -> FastAPI:
     origins = [
         "http://localhost",
         "http://localhost:8080",
-        "http://localhost:8081"
+        "http://localhost:8081",
+        "https://fmtm.hotosm.org",
     ]
 
     application.add_middleware(
