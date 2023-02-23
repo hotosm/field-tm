@@ -46,6 +46,10 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
 
     # FMTM
     API_URL=http://127.0.0.1:8000
+    FRONTEND_SCHEME=http
+    FRONTEND_DOMAIN=localhost
+    API_DOMAIN=localhost
+    # API_PREFIX=/api
 
     # OSM
     OSM_CLIENT_ID=`<CHANGEME>`
@@ -65,10 +69,6 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     FMTM_DB_USER=fmtm
     FMTM_DB_PASSWORD=`<CHANGEME>`
     FMTM_DB_NAME=fmtm
-
-    # Production only
-    FRONTEND_DOMAIN=`<CHANGEME>`
-    API_DOMAIN=`<CHANGEME>`
 
 > Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
 
