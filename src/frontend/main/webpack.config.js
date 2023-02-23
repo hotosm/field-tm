@@ -81,6 +81,7 @@ module.exports = {
       template: "./src/index.html",
     }),
     new EnvironmentPlugin([
+      "API_URL",
       "FRONTEND_SCHEME",
       "FRONTEND_DOMAIN",
       "MAIN_PORT",
