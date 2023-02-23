@@ -1,7 +1,7 @@
 import { Box, Grid, Paper } from "@mui/material";
 import React from "react";
 import { experimentalStyled as styled } from '@mui/material/styles';
-import BasicCard from "../../utilities/BasicCard";
+import BasicCard from "fmtm/BasicCard";
 import Activities from "./Activities";
 
 const Item = styled(Paper)(({ theme }) => ({

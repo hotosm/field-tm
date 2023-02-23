@@ -1,31 +1,39 @@
 import React, { useEffect } from "react";
-import { Box, Container, Divider, Stack, Typography } from '@mui/material'
-import windowDimention from "../hooks/WindowDimension";
+import "../../node_modules/ol/ol.css";
+import '../styles/home.css'
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
+import WindowDimension from "fmtm/WindowDimension";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import LeafletMap from "../components/projectDetails/LeafletMap";
-import MapDescriptionComponents from "../components/projectDetails/MapDescriptionComponents";
-import BasicTabs from "../utilities/BasicTabs";
-import MapLegends from "../components/projectDetails/MapLegends";
-import ActivitiesPanel from "../components/projectDetails/ActivitiesPanel";
-import TasksComponent from "../components/projectDetails/TasksPanel";
+import MapDescriptionComponents from "../components/MapDescriptionComponents";
+import MapLegends from "../components/MapLegends";
+import ActivitiesPanel from "../components/ActivitiesPanel";
 import { useDispatch, useSelector } from "react-redux";
-
-
-import environment from "../environment";
 import { useParams } from "react-router-dom";
-import { HomeActions } from "../store/slices/HomeSlice";
+import TasksComponent from "../components/TasksComponent";
+import OpenLayersMap from "../components/OpenLayersMap";
+import BasicTabs from "fmtm/BasicTabs";
+import environment from "fmtm/environment";
+import { ProjectById } from "../api/Project";
+import { ProjectActions } from "../store/slices/ProjectSlice";
 
-const ProjectDetails = () => {
+const Home = () => {
     const dispatch = useDispatch();
     const params = useParams();
-    // console.log(environment.decode(params.id),'check')
-    useEffect(() => {
-        dispatch(HomeActions.SetProjectId(params.id))
-    }, [])
+    const defaultTheme = useSelector(state => state.theme.hotTheme)
+    const state = useSelector(state => state.project.projectData)
+    const encodedId = params.id
 
-    const { type } = windowDimention();
-    const viewMode = type == 'xl' ? 6 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    useEffect(() => {
+        if (environment.decode(encodedId) != state.id) {
+            dispatch(ProjectById(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`))
+        }else{
+            console.log('i was not opened')
+        }
+    }, [params.id])
+
+
+    const { type } = WindowDimension();
+
     const ProjectDetailsStyles = {
         text: {
             marginLeft: '2%'
@@ -35,18 +43,18 @@ const ProjectDetails = () => {
             fontSize: 22
         }
     }
-    const MapDetails: any = [
+    const MapDetails = [
         { value: 'lock', color: 'blue', status: 'none' },
         { value: 'opened', color: 'green', status: 'lock' }
     ]
 
-    const panelData: any = [
+    const panelData = [
         { label: 'Activities', element: <ActivitiesPanel /> },
         { label: 'My Tasks', element: <TasksComponent type={type} /> }
     ]
 
     //mock data
-    const descriptionData: any = [
+    const descriptionData = [
         {
             value: 'Descriptions', element: <Typography align="center" >
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
@@ -160,7 +168,7 @@ const ProjectDetails = () => {
 
             <Stack direction={'column'} spacing={1}>
                 <MapDescriptionComponents details={descriptionData} type={type} />
-                <LeafletMap />
+                <OpenLayersMap />
             </Stack>
 
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -170,4 +178,4 @@ const ProjectDetails = () => {
     )
 }
 
-export default ProjectDetails;
+export default Home;

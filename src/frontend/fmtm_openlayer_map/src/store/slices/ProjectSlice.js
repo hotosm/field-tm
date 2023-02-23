@@ -6,7 +6,8 @@ const ProjectSlice = createSlice({
     initialState: {
         projectLoading: true,
         projectData:{},
-        dialogStatus:false
+        dialogStatus:false,
+        map:null
     },
     reducers: {
         SetProject(state, action) {
@@ -17,8 +18,10 @@ const ProjectSlice = createSlice({
         },
         SetDialogStatus(state,action){
             state.dialogStatus = action.payload
+        },
+        SetMap(state,action){
+            state.map = action.payload
         }
-
     }
 })
 

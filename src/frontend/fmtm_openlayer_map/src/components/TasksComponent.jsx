@@ -5,8 +5,8 @@ import { Stack, TextField } from '@mui/material';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import DescriptionIcon from '@mui/icons-material/Description';
-import CustomSwiper from '../../utilities/CustomSwiper';
-import BasicCard from "../../utilities/BasicCard";
+import CustomSwiper from 'fmtm/CustomSwiper';
+import BasicCard from "fmtm/BasicCard";
 import Activities from "./Activities";
 
 const TasksComponent = ({ type }) => {

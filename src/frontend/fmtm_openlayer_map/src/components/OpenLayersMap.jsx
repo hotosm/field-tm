@@ -1,13 +1,10 @@
 import { Stack } from "@mui/material";
 import React from "react";
-import { TileLayer, Polygon, Circle, MapContainer, Marker, Popup } from 'react-leaflet';
-import Map from 'map/Map';
 import { useSelector } from "react-redux";
-const LeafletMap = () => {
+import MainMap from "../views/MainMap";
 
+const OpenLayersMap = () => {
     const defaultTheme = useSelector(state => state.theme.hotTheme)
-    const position = [51.505, -0.09]
-
     return (
         <Stack spacing={1} direction={'column'}>
             <Stack
@@ -16,10 +13,10 @@ const LeafletMap = () => {
                 height={608}
             
             >
-                <Map />
+                <MainMap />
             </Stack>
         </Stack>
     )
 }
 
-export default LeafletMap;
+export default OpenLayersMap;

@@ -1,28 +1,39 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import homeSlice from 'fmtm/HomeSlice';
 import themeSlice from 'fmtm/ThemeSlice';
-import MapTasksSlice from "./slices/MapTasksSlice";
 import ProjectSlice from "./slices/ProjectSlice";
-import storage from 'redux-persist/lib/storage';
-import { persistReducer, persistStore } from 'redux-persist';
-import thunk from "redux-thunk";
+import {
+    persistStore,
+    persistReducer,
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+} from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 
-const persistConfig = {
-    key: 'root',
-    storage,
-}
 
 const reducers = combineReducers({
-    project: ProjectSlice.reducer,
+    project: persistReducer(
+        {
+            key: 'project',
+            storage
+        },
+        ProjectSlice.reducer
+    ),
     theme: themeSlice.reducer,
-    home: homeSlice.reducer,
-    maptasks: MapTasksSlice.reducer
-});
-
-const persistedReducer = persistReducer(persistConfig, reducers)
-export const store = configureStore({
-    reducer: persistedReducer,
-    middleware: [thunk]
 })
+
+export const store = configureStore({
+    reducer: reducers,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }),
+})
+
 
 export const persistor = persistStore(store)

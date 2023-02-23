@@ -51,13 +51,18 @@ module.exports = {
       name: "fmtm",
       filename: "remoteEntry.js",
       remotes: {
-        map: "fmtm_openlayer_map@http://localhost:7000/remoteEntry.js"
+        map: "fmtm_openlayer_map@http://localhost:8081/remoteEntry.js"
       },
       exposes: {
-        "./HomeSlice": "./src/store/slices/HomeSlice.ts",
         "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
         "./BasicDialog": "./src/utilities/BasicDialog.tsx",
-        "./environment": "./src/environment.ts"
+        "./BasicCard": "./src/utilities/BasicCard.tsx",
+        "./BasicTabs": "./src/utilities/BasicTabs.tsx",
+        "./CustomSwiper": "./src/utilities/CustomSwiper.tsx",
+        "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
+        "./PrimaryAppBar":"./src/utilities/PrimaryAppBar.tsx",
+        "./environment": "./src/environment.ts",
+        "./WindowDimension":"./src/hooks/WindowDimension.tsx"
       },
       shared: {
         ...deps,
