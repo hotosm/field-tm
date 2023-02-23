@@ -41,6 +41,8 @@ Your env should look like this
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
     API_URL=http://127.0.0.1:8000
+    FRONTEND_SCHEME=http
+    FRONTEND_DOMAIN=localhost
     OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
     OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
