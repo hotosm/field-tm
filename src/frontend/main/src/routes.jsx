@@ -4,9 +4,7 @@ import {
 } from "react-router-dom";
 import Home from './views/Home';
 import MainView from './views/MainView';
-import ProjectDetails from "./views/ProjectDetails";
-
-
+import ProjectDetails from "map/ProjectDetails";
 
 
 const routes = createBrowserRouter(

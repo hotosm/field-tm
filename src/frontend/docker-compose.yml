@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  main:
+    build: 
+         context: ./main
+         dockerfile: Dockerfile
+    image: main_frontend:latest
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - fmtm_openlayer_map
+    networks:
+      -  fmtm-network
+
+  fmtm_openlayer_map:
+    build: 
+         context: ./fmtm_openlayer_map
+         dockerfile: Dockerfile
+    image: fmtm_openlayer_map_frontend:latest
+    ports:
+      - "8081:80"
+    restart: always
+    networks:
+      - fmtm-network
+
+networks:
+  fmtm-network:
+    driver: bridge

@@ -44,25 +44,26 @@ const ThemeSlice = createSlice({
                 },
                 mapFeatureColors: {
                     //blue
-                    ready: '#66e5ff',
-                    ready_rgb: 'rgb(102, 229, 255,0.2)',
-                    locked_for_mapping: '#66afff',
-                    locked_for_mapping_rgb: 'rgb(102, 175, 255,0.1)',
-                    mapped: '#202395',
-                    mapped_rgb: 'rgb(32, 35, 149,0.1)',
-                    locked_for_validation: '#7049de',
-                    locked_for_validation_rgb: 'rgb(112, 73, 222,0.1)',
+                    ready: '#008099',
+                    ready_rgb: 'rgb(0, 128, 153,0.1)',
+                    locked_for_mapping: '#0063cc',
+                    locked_for_mapping_rgb: 'rgb(0, 99, 204,0.1)',
+                    mapped: '#161969',
+                    mapped_rgb: 'rgb(22, 25, 105,0.1)',
+                    locked_for_validation: '#3d1c97',
+                    locked_for_validation_rgb: 'rgb(61, 28, 151,0.1)',
                     //green
                     validated: '#006600',
                     validated_rgb: 'rgb(0, 102, 0,0.1)',
                     //yellow
-                    invalidated: '#ffff00',
-                    invalidated_rgb: 'rgb(255, 255, 0,0.1)',
+                    // invalidated: '#ffff00',
+                    invalidated:'#ffcc00',
+                    invalidated_rgb: 'rgb(255, 204, 0,0.1)',
                     //brown
-                    bad: '#dfcaca',
-                    bad_rgb: 'rgb(223, 202, 202,0.1)',
-                    split: '#dfcaca',
-                    split_rgb: 'rgb(223, 202, 202,0.1)'
+                    bad: '#704343',
+                    bad_rgb: 'rgb(112, 67, 67,0.1)',
+                    split: '#704343',
+                    split_rgb: 'rgb(112, 67, 67,0.1)'
                 }
 
             },
