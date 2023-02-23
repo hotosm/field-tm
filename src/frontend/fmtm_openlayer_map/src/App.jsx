@@ -2,34 +2,23 @@
 import React, { useEffect, useState } from "react";
 import './index.css'
 import ReactDOM from "react-dom";
-import "../node_modules/ol/ol.css";
+
+import 'rsuite/dist/rsuite.min.css';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import { persistor, store } from "./store/store";
-import MainView from "./views/MainView";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { PersistGate } from 'redux-persist/integration/react';
-import environment from "fmtm/environment";
-import { ProjectById } from "./api/Project";
+import routes from "./routes";
+import { RouterProvider } from "react-router-dom";
 
 
-export default function App() {
 
-  const stateHome = useSelector(state => state.home)
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (stateHome.projectId != null) {
-      dispatch(ProjectById(`${environment.baseApiUrl}/projects/${environment.decode(stateHome.projectId)}`))
-    }
-  }, [stateHome.projectId])
-  
-  return (
-    <MainView />
-  )
-}
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <App />
+      <RouterProvider router={routes} />
     </PersistGate>
   </Provider>
   ,

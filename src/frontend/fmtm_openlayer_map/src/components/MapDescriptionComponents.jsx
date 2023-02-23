@@ -2,11 +2,11 @@ import { Box } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import { useSelector } from "react-redux";
-import CustomizedMenus from "../../utilities/CustomizedMenus";
+import CustomizedMenus from "fmtm/CustomizedMenus";
 
 
 const MapDescriptionComponents = ({ details, type }) => {
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme = useSelector(state => state.theme.hotTheme)
     return (
 
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 2 }}>

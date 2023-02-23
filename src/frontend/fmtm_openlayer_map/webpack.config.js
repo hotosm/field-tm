@@ -4,7 +4,7 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const deps = require("./package.json").dependencies;
 module.exports = {
   output: {
-    publicPath: "http://localhost:7000/",
+    publicPath: "http://localhost:8081/",
   },
 
   resolve: {
@@ -12,7 +12,7 @@ module.exports = {
   },
 
   devServer: {
-    port: 7000,
+    port: 8081,
     historyApiFallback: true,
   },
 
@@ -55,7 +55,9 @@ module.exports = {
       },
       exposes: {
         './Map': './src/App.jsx',
-        './Project':'./src/store/slices/ProjectSlice.js'
+        './Project':'./src/store/slices/ProjectSlice.js',
+        './ProjectDetails':'./src/views/Home.jsx',
+        './Persistor':'./src/store/store.js'
       },
       shared: {
         ...deps,
