@@ -5,7 +5,7 @@ LABEL fmtm.hotosm.org.app-version="${APP_VERSION}" \
     fmtm.hotosm.org.maintainer="${MAINTAINER}" \
     fmtm.hotosm.org.api-port="3000"
 WORKDIR /app
-COPY main/package*.json ./
+COPY fmtm_openlayer_map/package*.json ./
 RUN npm install
 
 
@@ -16,7 +16,7 @@ ENTRYPOINT ["npm", "run", "start:live"]
 
 FROM base AS builder
 ENV NODE_ENV production
-COPY ./main .
+COPY ./fmtm_openlayer_map .
 RUN npm run build
 
 
