@@ -67,8 +67,10 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     FMTM_DB_NAME=fmtm
 
     # Production only
+    FRONTEND_DOMAIN=`<CHANGEME>`
     API_DOMAIN=`<CHANGEME>`
-    API_PREFIX=/api
+
+> Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
 
 Run the production docker-compose config:
 `docker compose -f docker-compose.prod.yml up --build -d`

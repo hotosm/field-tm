@@ -28,9 +28,10 @@ networks:
 services:
   traefik:
     image: "docker.io/traefik:v2.9"
+    container_name: fmtm_proxy
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik-public-certificates:/certificates"
+      - "traefik-public-certificates:/certificates"
     ports:
       - 80:80
       - 443:443
@@ -92,7 +93,7 @@ services:
       - "traefik.http.services.api.loadbalancer.server.port=8000"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`) && PathPrefix(`/api{regex:$$|/.*}`)"
+      - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.api.service=api"
 
   ui:
@@ -111,7 +112,7 @@ services:
       - "traefik.http.services.ui.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui.tls=true"
       - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.ui.rule=Host(`${FRONTEND_DOMAIN}`)"
       - "traefik.http.routers.ui.service=ui"
 
   central-db:
@@ -146,6 +147,7 @@ services:
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
+    container_name: central_pyxform
     networks:
       - fmtm-prod
     restart: always
