@@ -19,12 +19,11 @@
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import table, column, insert
+from sqlalchemy import table, column
 
 import os
 from pyxform.xls2xform import xls2xform_convert
 import xmltodict
-from sqlalchemy.dialects.postgresql import insert
 
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
@@ -38,7 +37,11 @@ project = OdkProject(url, user, pw)
 xform = OdkForm(url, user, pw)
 appuser = OdkAppUser(url, user, pw)
 # project.authenticate()
-project.listProjects()
+
+
+def list_odk_projects():
+    """List all projects on a remote ODK Server"""
+    return project.listProjects()
 
 
 def create_odk_project(name):
@@ -172,4 +175,5 @@ def upload_media(project_id: int, xform_id: str, filespec: str):
 
 def download_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central"""
+    filename = "test"
     xform.getMedia(project_id, xform_id, filename)
