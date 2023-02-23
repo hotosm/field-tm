@@ -1,11 +1,20 @@
 FROM docker.io/node:18 AS base
 ARG APP_VERSION=1.0.0
+ARG APP_NAME
 ARG MAINTAINER=admin@hotosm.org
-LABEL fmtm.hotosm.org.app-version="${APP_VERSION}" \
+ARG FRONTEND_SCHEME
+ENV FRONTEND_SCHEME ${FRONTEND_SCHEME}
+ARG FRONTEND_DOMAIN
+ENV FRONTEND_DOMAIN ${FRONTEND_DOMAIN}
+ENV MAIN_PORT=8080
+ENV FMTM_OPENLAYER_MAP_PORT=8081
+LABEL fmtm.hotosm.org.app-name="${APP_NAME}" \
+    fmtm.hotosm.org.app-version="${APP_VERSION}" \
     fmtm.hotosm.org.maintainer="${MAINTAINER}" \
-    fmtm.hotosm.org.api-port="3000"
+    fmtm.hotosm.org.main-port="${MAIN_PORT}" \
+    fmtm.hotosm.org.fmtm_openlayer_map-port="${FMTM_OPENLAYER_MAP_PORT}"
 WORKDIR /app
-COPY main/package*.json ./
+COPY ./${APP_NAME}/package*.json ./
 RUN npm install
 
 
@@ -16,7 +25,7 @@ ENTRYPOINT ["npm", "run", "start:live"]
 
 FROM base AS builder
 ENV NODE_ENV production
-COPY ./main .
+COPY ./${APP_NAME} .
 RUN npm run build
 
 
