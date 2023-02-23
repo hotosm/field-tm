@@ -19,7 +19,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from fastapi.logger import logger as logger
-
+from fastapi.responses import JSONResponse
 
 from ..db import database
 from ..central import central_schemas, central_crud
@@ -42,6 +42,15 @@ router = APIRouter(
     dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router.get("/projects")
+async def list_projects():
+    """List projects in Central"""
+    projects = central_crud.list_odk_projects()
+    if projects is None:
+        return {"message": "No projects found"}
+    return JSONResponse(content={"projects": projects})
 
 
 @router.get("/appuser")
