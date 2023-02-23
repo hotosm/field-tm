@@ -39,7 +39,8 @@ from .central import central_routes
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 # setup loggers
-log_file_path = path.join(os.path.dirname(os.path.abspath(__file__)), "logging.conf")
+log_file_path = path.join(os.path.dirname(
+    os.path.abspath(__file__)), "logging.conf")
 
 logging.config.fileConfig(
     log_file_path, disable_existing_loggers=False
@@ -74,6 +75,7 @@ api.include_router(central_routes.router)
 origins = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:8081"
 ]
 
 api.add_middleware(
