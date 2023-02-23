@@ -96,24 +96,55 @@ services:
       - "traefik.http.routers.api.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.api.service=api"
 
-  ui:
-    image: "quay.io/hotosm/fmtm-frontend:latest"
+  ui-main:
+    image: "quay.io/hotosm/fmtm-main:latest"
     build:
       context: src/frontend
       target: prod
-    container_name: fmtm_ui
+      args:
+        FRONTEND_SCHEME: ${FRONTEND_SCHEME}
+        FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
+        APP_NAME: main
+    container_name: fmtm_main
     networks:
       - fmtm-prod
     environment:
       - API_URL=${API_URL}
+    ports:
+      - "8080:8080"
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.ui.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui.tls=true"
-      - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui.rule=Host(`${FRONTEND_DOMAIN}`)"
-      - "traefik.http.routers.ui.service=ui"
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.services.ui.loadbalancer.server.port=8080"
+    #   - "traefik.http.routers.ui.tls=true"
+    #   - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
+    #   - "traefik.http.routers.ui.rule=Host(`${FRONTEND_DOMAIN}`)"
+    #   - "traefik.http.routers.ui.service=ui"
+
+  ui-openlayers:
+    image: "quay.io/hotosm/fmtm-fmtm_openlayer_map:latest"
+    build:
+      context: src/frontend
+      target: prod
+      args:
+        FRONTEND_SCHEME: ${FRONTEND_SCHEME}
+        FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
+        APP_NAME: fmtm_openlayer_map
+    container_name: fmtm_fmtm_openlayer_map
+    networks:
+      - fmtm-prod
+    environment:
+      - API_URL=${API_URL}
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.services.ui.loadbalancer.server.port=8081"
+    #   - "traefik.http.routers.ui.tls=true"
+    #   - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
+    #   - "traefik.http.routers.ui.rule=Host(`${FRONTEND_DOMAIN}` && PathPrefix(`/maps{regex:$$|/.*}`)"
+    #   - "traefik.http.routers.ui.service=ui"
 
   central-db:
     image: postgis/postgis:14-3.3-alpine
@@ -139,8 +170,17 @@ services:
       - pyxform
     env_file:
       - .env
-    ports:
-      - "8383:8383"
+    networks:
+      - fmtm-prod
+    restart: unless-stopped
+
+  central-proxy:
+    image: "quay.io/hotosm/fmtm-central-proxy:latest"
+    build:
+      context: central_proxy
+    container_name: central_proxy
+    depends_on:
+      - central
     networks:
       - fmtm-prod
     restart: unless-stopped
