@@ -16,15 +16,15 @@
 #
 """Configure PyTest for FastAPI."""
 
-import pytest
+# import pytest
 
-from fastapi import FastAPI
+# from fastapi import FastAPI
 
-# from fastapi.testclient import TestClient
+# # from fastapi.testclient import TestClient
 
-from backend.main import get_application
+# from backend.main import get_application
 
 
-@pytest.fixture
-def app() -> FastAPI:
-    return get_application()
+# @pytest.fixture
+# def app() -> FastAPI:
+#     return get_application()
