@@ -49,7 +49,7 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=fmtm-prod"
+      - "traefik.docker.network=fmtm_fmtm-prod"
       - "traefik.api.dashboard=false"
       - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
