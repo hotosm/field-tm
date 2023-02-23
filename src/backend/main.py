@@ -77,6 +77,8 @@ def get_application() -> FastAPI:
         "http://localhost:8080",
         "http://localhost:8081",
         "https://fmtm.hotosm.org",
+        "https://fmtm.hotosm.org:8080",
+        "https://fmtm.hotosm.org:8081",
     ]
 
     application.add_middleware(
