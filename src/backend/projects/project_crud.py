@@ -20,6 +20,7 @@
 import geojson
 import io
 import os
+import json
 from json import loads, dumps
 from typing import List
 from zipfile import ZipFile
@@ -368,7 +369,7 @@ def update_project_with_zip(
                     project_id=project_id,
                     project_task_index=feature["properties"]["fid"],
                     project_task_name=task_name,
-                    qr_code=db_qr,
+                    # qr_code=db_qr,
                     outline=task_outline_shape.wkt,
                     # geometry_geojson=json.dumps(task_geojson),
                     initial_feature_count=len(task_geojson["features"]),
@@ -618,7 +619,7 @@ def get_outline_from_geojson_file_in_zip(
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail=f"{error_detail} ----- Error: {e} ---- FeatureCollection: {feature_collection}",
+            detail=f"{error_detail} ----- Error: {e} ----",
         )
 
 
