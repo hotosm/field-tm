@@ -102,6 +102,7 @@ services:
       context: src/frontend
       target: prod
       args:
+        API_URL: ${API_URL}
         FRONTEND_SCHEME: ${FRONTEND_SCHEME}
         FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
         APP_NAME: main
@@ -127,6 +128,7 @@ services:
       context: src/frontend
       target: prod
       args:
+        API_URL: ${API_URL}
         FRONTEND_SCHEME: ${FRONTEND_SCHEME}
         FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
         APP_NAME: fmtm_openlayer_map
