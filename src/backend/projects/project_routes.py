@@ -106,7 +106,7 @@ async def create_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/{project_id}/upload", response_model=project_schemas.ProjectOut)
+@router.post("/beta/{project_id}/upload")
 async def upload_project_boundary_with_zip(
     project_id: int,
     project_name_prefix: str,
