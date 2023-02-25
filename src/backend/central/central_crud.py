@@ -22,10 +22,14 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import table, column
 
 import os
+import csv
 from pyxform.xls2xform import xls2xform_convert
 import xmltodict
+import pathlib
 
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
+from odkconvert.CSVDump import CSVDump
+import odkconvert
 
 from ..env_utils import config_env
 
@@ -90,9 +94,25 @@ def delete_odk_xform(project_id: int, xform_id: str):
     return None
 
 
+def list_submissions(project_id: int):
+    """List submissions from a remote ODK server"""
+    submissions = list()
+    for user in project.listAppUsers(project_id):
+        for subm in xform.listSubmissions(project_id, user['displayName']):
+            submissions.append(subm)
+
+    return submissions
+
 def download_submissions(project_id: int, xform_id: str):
     """Download submissions from a remote ODK server"""
-    logger.error("download_submissions is unimplemented!")
+    #for submission in list_submissions(project_id):
+    for metadata in xform.getSubmissions(project_id, xform_id, True):
+        #top = pathlib.Path(odkconvert.__file__).resolve().parent
+        #csvin = CSVDump(str(top.absolute()) + "/xforms.yaml")
+        #csv.createOSM()
+        #csv.createGeoJson()
+        logger.info(metadata)
+
     # FIXME: should filter by timestamps or status value
     return None
 
@@ -177,3 +197,31 @@ def download_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central"""
     filename = "test"
     xform.getMedia(project_id, xform_id, filename)
+
+def convert_csv(infile):
+    """Convert ODK CSV to OSM XML and GeoJson"""
+    logger.debug("Parsing csv file %r" % infile)
+    # The yaml file is in the package files for odkconvert
+    top = pathlib.Path(odkconvert.__file__).resolve().parent
+    csvin = CSVDump(str(top.absolute()) + "/xforms.yaml")
+    osmoutfile = str(infile.replace(".csv", ".osm"))
+    csvin.createOSM(osmoutfile)
+
+    jsonoutfile = infile.replace(".csv", ".geojson")
+    csvin.createGeoJson(jsonoutfile)
+
+    entry = csvin.parse(infile)
+    # This OSM XML file only has OSM appropriate tags and values
+    feature = csvin.createEntry(entry)
+    # Sometimes bad entries, usually from debugging XForm design, sneak in
+    if len(feature) > 0:
+        if 'lat' not in feature['attrs']:
+            logger.warning("Bad record! %r" % feature)
+        else:
+            csvin.writeOSM(feature)
+            # This GeoJson file has all the data values
+            csvin.writeGeoJson(feature)
+        print("TAGS: %r" % feature['tags'])
+
+    csvin.finishOSM()
+    csvin.finishGeoJson()

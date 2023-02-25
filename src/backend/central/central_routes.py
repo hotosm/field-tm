@@ -25,17 +25,6 @@ from ..db import database
 from ..central import central_schemas, central_crud
 from ..projects import project_crud
 
-# # FIXME: I am not sure this is thread-safe
-# from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
-# project = OdkProject()
-# xform = OdkForm()
-# appuser = OdkAppUser()
-
-# url = config_env["ODK_CENTRAL_URL"]
-# user = config_env["ODK_CENTRAL_USER"]
-# pw = config_env["ODK_CENTRAL_PASSWD"]
-# project.authenticate(url, user, pw)
-
 router = APIRouter(
     prefix="/central",
     tags=["central"],
@@ -67,12 +56,28 @@ async def create_appuser(
     return {"message": "Unimplemented"}
 
 
-@router.get("/submissions")
+# @router.get("/list_submissions")
+# async def list_submissions(project_id: int):
+#     """List the submissions data from Central"""
+#     submissions = central_crud.list_submissions(project_id)
+#     logger.info("/central/list_submissions is Unimplemented!")
+#     return {"data": submissions}
+
+
+@router.get("/download_submissions")
 async def download_submissions(project_id: int, xform_id: str):
     """Download the submissions data from Central"""
-    logger.info("/central/submissions is Unimplemented!")
-    return {"message": "Hello World from /central/submisisons"}
+    data = central_crud.download_submissions(project_id, xform_id)
+    logger.info("/central/download_submissions is Unimplemented!")
+    return {"data": data}
 
+@router.get("/makeosm")
+def do_csv2osm(
+        filespec: str):
+    """Convert the submissions data into a CSV file"""
+    result = central_crud.convert_csv(filespec)
+    logger.info("/debug/do_csv2osm is Unimplemented!")
+    return {"message": result}
 
 @router.get("/upload")
 async def upload_project_files(project_id: int, filespec: str):
