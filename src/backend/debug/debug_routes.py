@@ -59,9 +59,3 @@ def do_odk2csv():
     logger.info("/debug/do_odk2csv is Unimplemented!")
     return {"message": "Hello World from /debug/makecsv"}
 
-
-@router.get("/makeosm")
-def do_csv2osm():
-    """Convert the submissions data into a CSV file"""
-    logger.info("/debug/do_csv2osm is Unimplemented!")
-    return {"message": "Hello World from /debug/makeosm"}
