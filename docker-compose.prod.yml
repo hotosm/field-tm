@@ -83,8 +83,6 @@ services:
       - central-proxy
     env_file:
       - .env
-    environment:
-      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}:5432/${FMTM_DB_NAME:-fmtm}
     networks:
       - fmtm-prod
     restart: unless-stopped

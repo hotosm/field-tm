@@ -48,16 +48,14 @@ services:
     container_name: fmtm_api
     volumes:
       - ./src/backend:/app/backend
-      # - ../odkconvert/odkconvert:/home/appuser/.local/lib/python3.9/site-packages/odkconvert
+      - ../odkconvert/odkconvert:/home/appuser/.local/lib/python3.9/site-packages/odkconvert
     depends_on:
       - fmtm-db
       - central-proxy
     env_file:
       - .env
-    environment:
-      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}:5432/${FMTM_DB_NAME:-fmtm}
     ports:
-      - "8000:8000"
+      - "7050:8000"
       # - "5678:5678"
     networks:
       - fmtm-dev
