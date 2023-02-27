@@ -51,7 +51,7 @@ services:
       # - ../odkconvert/odkconvert:/home/appuser/.local/lib/python3.9/site-packages/odkconvert
     depends_on:
       - fmtm-db
-      - central
+      - central-proxy
     env_file:
       - .env
     environment:
