@@ -17,16 +17,19 @@
 #
 
 
-from fastapi.middleware.cors import CORSMiddleware
-import logging.config
 import os
-from os import path
+import sys
+import logging
+
 from typing import Union
 
 from fastapi import FastAPI
 from fastapi.logger import logger as fastapi_logger
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
+from .__version__ import __version__
+from .config import settings
 from .auth import routers as auth_routers
 from .db.database import Base, engine
 from .projects import project_routes
@@ -35,16 +38,19 @@ from .users import user_routes
 from .debug import debug_routes
 from .central import central_routes
 
-# setup env variables
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+# Env variables
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
 
-# setup loggers
-log_file_path = path.join(os.path.dirname(os.path.abspath(__file__)), "logging.conf")
-
-logging.config.fileConfig(
-    log_file_path, disable_existing_loggers=False
-)  # main.py runs from code/
-logger = logging.getLogger(__name__)
+# Logging
+logging.basicConfig(
+    level=settings.LOG_LEVEL,
+    format=(
+        "%(asctime)s.%(msecs)03d [%(levelname)s] "
+        "%(name)s | %(funcName)s:%(lineno)d | %(message)s"
+    ),
+    datefmt="%y-%m-%d %H:%M:%S",
+    stream=sys.stdout,
+)
 
 gunicorn_error_logger = logging.getLogger("gunicorn.error")
 gunicorn_logger = logging.getLogger("gunicorn")
@@ -53,48 +59,55 @@ uvicorn_access_logger.handlers = gunicorn_error_logger.handlers
 
 fastapi_logger.handlers = gunicorn_error_logger.handlers
 
-if __name__ != "__main__":
-    fastapi_logger.setLevel(gunicorn_logger.level)
-else:
-    fastapi_logger.setLevel(logging.DEBUG)
-
-
-Base.metadata.create_all(bind=engine)
+logger = logging.getLogger(__name__)
 
 
 def get_application() -> FastAPI:
 
-    application = FastAPI(root_path=os.getenv("API_PREFIX", default="/"))
+    _app = FastAPI(
+        title=settings.APP_NAME,
+        description="HOTOSM Field Tasking Manager",
+        version=__version__,
+        license_info={
+            "name": "GPL-3.0-only",
+            "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE",
+        },
+        debug=settings.DEBUG,
+    )
 
-    application.include_router(user_routes.router)
-    application.include_router(project_routes.router)
-    application.include_router(tasks_routes.router)
-    application.include_router(debug_routes.router)
-    application.include_router(central_routes.router)
-
-    origins = [
-        "http://localhost",
-        "http://localhost:8080",
-        "http://localhost:8081",
-        "https://fmtm.hotosm.org",
-        "https://fmtm.hotosm.org:8080",
-        "https://fmtm.hotosm.org:8081",
-    ]
-
-    application.add_middleware(
+    _app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=settings.BACKEND_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    application.include_router(auth_routers.router)
+    _app.include_router(user_routes.router)
+    _app.include_router(project_routes.router)
+    _app.include_router(tasks_routes.router)
+    _app.include_router(debug_routes.router)
+    _app.include_router(central_routes.router)
+    _app.include_router(auth_routers.router)
 
-    return application
+    return _app
 
 
 api = get_application()
+
+
+@api.on_event("startup")
+async def startup_event():
+    """Commands to run on server startup."""
+    logger.debug("Starting up FastAPI server.")
+    logger.debug("Connecting to DB with SQLAlchemy")
+    Base.metadata.create_all(bind=engine)
+
+
+@api.on_event("shutdown")
+async def shutdown_event():
+    """Commands to run on server shutdown."""
+    logger.debug("Shutting down FastAPI server.")
 
 
 @api.get("/")

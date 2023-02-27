@@ -80,11 +80,9 @@ services:
     container_name: fmtm_api
     depends_on:
       - fmtm-db
-      - central
+      - central-proxy
     env_file:
       - .env
-    environment:
-      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}:5432/${FMTM_DB_NAME:-fmtm}
     networks:
       - fmtm-prod
     restart: unless-stopped
@@ -102,6 +100,7 @@ services:
       context: src/frontend
       target: prod
       args:
+        API_URL: ${API_URL}
         FRONTEND_SCHEME: ${FRONTEND_SCHEME}
         FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
         APP_NAME: main
@@ -127,6 +126,7 @@ services:
       context: src/frontend
       target: prod
       args:
+        API_URL: ${API_URL}
         FRONTEND_SCHEME: ${FRONTEND_SCHEME}
         FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
         APP_NAME: fmtm_openlayer_map
