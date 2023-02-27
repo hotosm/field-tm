@@ -80,7 +80,7 @@ services:
     container_name: fmtm_api
     depends_on:
       - fmtm-db
-      - central
+      - central-proxy
     env_file:
       - .env
     environment:
