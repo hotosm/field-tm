@@ -66,6 +66,7 @@ def create_appuser(project_id: int, name: str):
     # user = False
     # if not user:
     result = appuser.create(project_id, name)
+    logger.info(f"Created app user: {result.json()}")
     return result
 
 
