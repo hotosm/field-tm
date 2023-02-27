@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import logging
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
@@ -28,6 +29,8 @@ import xmltodict
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
 from ..env_utils import config_env
+
+logger = logging.getLogger(__name__)
 
 url = config_env["ODK_CENTRAL_URL"]
 user = config_env["ODK_CENTRAL_USER"]
@@ -61,12 +64,16 @@ def delete_odk_project(project_id: int):
 
 def create_appuser(project_id: int, name: str):
     """Create an app-user on a remote ODK Server"""
-    # project.listAppUsers(project_id)
-    # user = project.findAppUser(name=name)
-    # user = False
-    # if not user:
-    result = appuser.create(project_id, name)
-    return result
+    logger.debug(f"Listing appusers for project {project_id}")
+    project.listAppUsers(project_id)
+
+    user = project.findAppUser(name=name)
+    if user:
+        logger.debug(f"User already exists with name {name} for project {project_id}")
+        return user
+
+    logger.debug(f"Creating user with name {name} for project {project_id}")
+    return appuser.create(project_id, name)
 
 
 def delete_app_user(project_id: int, name: str):
