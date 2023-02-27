@@ -31,9 +31,9 @@ from ..projects import project_crud
 # xform = OdkForm()
 # appuser = OdkAppUser()
 
-# url = config_env["ODK_CENTRAL_URL"]
-# user = config_env["ODK_CENTRAL_USER"]
-# pw = config_env["ODK_CENTRAL_PASSWD"]
+# url = settings.ODK_CENTRAL_URL
+# user = settings.ODK_CENTRAL_USER
+# pw = settings.ODK_CENTRAL_PASSWD
 # project.authenticate(url, user, pw)
 
 router = APIRouter(

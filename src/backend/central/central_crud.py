@@ -27,11 +27,11 @@ import xmltodict
 
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
-from ..env_utils import config_env
+from ..config import settings
 
-url = config_env["ODK_CENTRAL_URL"]
-user = config_env["ODK_CENTRAL_USER"]
-pw = config_env["ODK_CENTRAL_PASSWD"]
+url = settings.ODK_CENTRAL_URL
+user = settings.ODK_CENTRAL_USER
+pw = settings.ODK_CENTRAL_PASSWD
 
 project = OdkProject(url, user, pw)
 xform = OdkForm(url, user, pw)
