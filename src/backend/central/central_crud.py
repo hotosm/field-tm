@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import logging
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert

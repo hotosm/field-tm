@@ -91,10 +91,12 @@ To add authentication to an endpoint, import `login_required` from `auth` module
 
 1. Uncomment in docker-compose.yml:
 
-```
-target: debug
-ports:
-  - "5678:5678"
+```yaml
+services:
+  api:
+    target: debug
+    ports:
+      - "5678:5678"
 ```
 
 2. Re-build the docker image `docker compose build api`
@@ -125,4 +127,4 @@ Example launch.json config for vscode:
 }
 ```
 
-Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
