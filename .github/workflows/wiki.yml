@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  USER_TOKEN: ${{ secrets.WIKI_DEPLOY_TOKEN }}
   USER_NAME: svcfmtm
   USER_EMAIL: fmtm@hotosm.org
   ORG: ${{ github.event.repository.owner.name }}
