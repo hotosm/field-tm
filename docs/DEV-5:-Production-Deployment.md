@@ -40,7 +40,7 @@ Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.g
 Create the env file from the example with `cp .env.example .env`. Edit that file to contain the needful (it should look like this):
 
     # ODK Central
-    ODK_CENTRAL_URL=https://central
+    ODK_CENTRAL_URL=https://central-proxy
     ODK_CENTRAL_USER=`<CHANGEME>`
     ODK_CENTRAL_PASSWD=`<CHANGEME>`
 
@@ -76,3 +76,5 @@ Run the production docker-compose config:
 `docker compose -f docker-compose.prod.yml up --build -d`
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
+
+> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2:-Deployment).
