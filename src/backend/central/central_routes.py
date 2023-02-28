@@ -18,6 +18,16 @@
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
+from sqlalchemy import (
+    select,
+    table,
+    column,
+    insert,
+    inspect,
+)
+
+import sqlalchemy
 from fastapi.logger import logger as logger
 from fastapi.responses import JSONResponse
 
@@ -65,35 +75,58 @@ async def create_appuser(
 
 
 @router.get("/download_submissions")
-async def download_submissions(project_id: int, xform_id: str):
-    """Download the submissions data from Central"""
-    data = central_crud.download_submissions(project_id, xform_id)
-    logger.info("/central/download_submissions is Unimplemented!")
-    return {"data": data}
-
-@router.get("/makeosm")
-def do_csv2osm(
-        filespec: str):
-    """Convert the submissions data into a CSV file"""
-    result = central_crud.convert_csv(filespec)
-    logger.info("/debug/do_csv2osm is Unimplemented!")
-    return {"message": result}
-
-@router.get("/upload")
-async def upload_project_files(project_id: int, filespec: str):
-    """Upload the XForm and data files to Central"""
-    logger.warning("/central/upload is Unimplemented!")
-    return {"message": "Hello World from /central/upload"}
-
-
-@router.get("/download")
-async def download_project_files(
-    project_id: int, type: central_schemas.CentralFileType
+async def download_submissions(
+    project_id: int,
+    db: Session = Depends(database.get_db),
 ):
-    """Download the project data files from Central. The filespec is
-    a string that can contain multiple filenames separated by a comma.
-    """
-    # FileResponse("README.md")
-    # xxx = central_crud.does_central_exist()
-    logger.warning("/central/download is Unimplemented!")
-    return {"message": "Hello World from /central/download"}
+    """Download the submissions data from Central"""
+    project = table(
+        "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+    )
+    where = f"id={project_id}"
+    sql = select(project).where(text(where))
+    result = db.execute(sql)
+    first = result.first()
+    if not first:
+        return {"error": "No such project!"}
+    # FIXME: this should be configurable
+    tmp = "/tmp"
+    filespec = f"{tmp}/{first.project_name_prefix}_{first.xform_title}"
+
+    xforms = central_crud.list_odk_xforms(first.odkid)
+    submissions = list()
+    for xform in xforms:
+        data = central_crud.download_submissions(first.odkid, xform['xmlFormId'])
+        # An empty submissions only has the CSV headers
+        # headers = data[0]
+        if len(submissions) == 0:
+            submissions.append(data[0])
+        if len(data) >= 2:
+            for entry in range(1, len(data)):
+                submissions.append(data[entry])
+
+    result = central_crud.convert_csv(filespec, submissions)
+    return {"data": result}
+
+# @router.get("/upload")
+# async def upload_project_files(
+#         project_id: int,
+#         filespec: str
+# ):
+#     """Upload the XForm and data files to Central"""
+#     logger.warning("/central/upload is Unimplemented!")
+#     return {"message": "Hello World from /central/upload"}
+
+
+# @router.get("/download")
+# async def download_project_files(
+#     project_id: int,
+#     type: central_schemas.CentralFileType
+# ):
+#     """Download the project data files from Central. The filespec is
+#     a string that can contain multiple filenames separated by a comma.
+#     """
+#     # FileResponse("README.md")
+#     # xxx = central_crud.does_central_exist()
+#     logger.warning("/central/download is Unimplemented!")
+#     return {"message": "Hello World from /central/download"}

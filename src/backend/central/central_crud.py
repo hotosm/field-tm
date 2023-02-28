@@ -48,7 +48,9 @@ def list_odk_projects():
     return project.listProjects()
 
 
-def create_odk_project(name):
+def create_odk_project(
+    name: str
+):
     """Create a project on a remote ODK Server"""
     result = project.createProject(name)
     project.id = result["id"]
@@ -56,14 +58,19 @@ def create_odk_project(name):
     return result
 
 
-def delete_odk_project(project_id: int):
+def delete_odk_project(
+    project_id: int
+):
     """Delete a project from a remote ODK Server"""
     result = project.deleteProject(project_id)
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
     return result
 
 
-def create_appuser(project_id: int, name: str):
+def create_appuser(
+    project_id: int,
+    name: str
+):
     """Create an app-user on a remote ODK Server"""
     # project.listAppUsers(project_id)
     # user = project.findAppUser(name=name)
@@ -80,21 +87,28 @@ def delete_app_user(project_id: int, name: str):
     return result
 
 
-def create_odk_xform(project_id: int, xform: str):
+def create_odk_xform(
+    project_id: int,
+    xform: str
+):
     """Create an XForm on a remote ODK Central server."""
     logger.error("create_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return None
 
 
-def delete_odk_xform(project_id: int, xform_id: str):
-    """Delete an XForm from a remote ODK Central server."""
-    logger.error("delete_odk_xform is unimplemented!")
+def list_odk_xforms(
+    project_id: int
+):
+    """List all XForms in an ODK Central project."""
+    xforms = project.listForms(project_id)
     # FIXME: make sure it's a valid project id
-    return None
+    return xforms
 
 
-def list_submissions(project_id: int):
+def list_submissions(
+    project_id: int
+):
     """List submissions from a remote ODK server"""
     submissions = list()
     for user in project.listAppUsers(project_id):
@@ -103,18 +117,15 @@ def list_submissions(project_id: int):
 
     return submissions
 
-def download_submissions(project_id: int, xform_id: str):
+def download_submissions(
+    project_id: int,
+    xform_id: str
+):
     """Download submissions from a remote ODK server"""
-    #for submission in list_submissions(project_id):
-    for metadata in xform.getSubmissions(project_id, xform_id, True):
-        #top = pathlib.Path(odkconvert.__file__).resolve().parent
-        #csvin = CSVDump(str(top.absolute()) + "/xforms.yaml")
-        #csv.createOSM()
-        #csv.createGeoJson()
-        logger.info(metadata)
-
-    # FIXME: should filter by timestamps or status value
-    return None
+    # FIXME: should probably filter by timestamps or status value
+    data = xform.getSubmissions(project_id, xform_id, True)
+    fixed = str(data, 'utf-8')
+    return fixed.splitlines()
 
 
 def generate_updated_xform(
@@ -182,46 +193,72 @@ def generate_updated_xform(
     return outfile
 
 
-def create_QRCode(project_id=None, token=None, name=None):
+def create_QRCode(
+    project_id: int,
+    token: str,
+    name: str,
+):
     """Create the QR Code for an app-user"""
     appuser = OdkAppUser()
     return appuser.createQRCode(project_id, token, name)
 
 
-def upload_media(project_id: int, xform_id: str, filespec: str):
+def upload_media(
+    project_id: int,
+    xform_id: str,
+    filespec: str
+):
     """Upload a data file to Central"""
     xform.uploadMedia(project_id, xform_id, filespec)
 
 
-def download_media(project_id: int, xform_id: str, filespec: str):
+def download_media(
+    project_id: int,
+    xform_id: str,
+    filespec: str
+):
     """Upload a data file to Central"""
     filename = "test"
     xform.getMedia(project_id, xform_id, filename)
 
-def convert_csv(infile):
+def convert_csv(
+    filespec: str,
+    data: bytes,
+):
     """Convert ODK CSV to OSM XML and GeoJson"""
-    logger.debug("Parsing csv file %r" % infile)
-    # The yaml file is in the package files for odkconvert
-    top = pathlib.Path(odkconvert.__file__).resolve().parent
-    csvin = CSVDump(str(top.absolute()) + "/xforms.yaml")
-    osmoutfile = str(infile.replace(".csv", ".osm"))
+    parent = pathlib.Path(odkconvert.__file__).resolve().parent
+    csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
+
+    osmoutfile = f"{filespec}.osm"
     csvin.createOSM(osmoutfile)
 
-    jsonoutfile = infile.replace(".csv", ".geojson")
+    jsonoutfile = f"{filespec}.geojson"
     csvin.createGeoJson(jsonoutfile)
 
-    entry = csvin.parse(infile)
-    # This OSM XML file only has OSM appropriate tags and values
-    feature = csvin.createEntry(entry)
-    # Sometimes bad entries, usually from debugging XForm design, sneak in
-    if len(feature) > 0:
-        if 'lat' not in feature['attrs']:
-            logger.warning("Bad record! %r" % feature)
-        else:
-            csvin.writeOSM(feature)
-            # This GeoJson file has all the data values
-            csvin.writeGeoJson(feature)
-        print("TAGS: %r" % feature['tags'])
+    if len(data) == 0:
+        logger.debug("Parsing csv file %r" % filespec)
+        # The yaml file is in the package files for odkconvert
+        data = csvin.parse(filespec)
+    else:
+        csvdata = csvin.parse(filespec, data)
+        for entry in csvdata:
+            logger.debug(f"Parsing csv data {entry}")
+            if len(data) <= 1:
+                continue
+            feature = csvin.createEntry(entry)
+            # Sometimes bad entries, usually from debugging XForm design, sneak in
+            if len(feature) > 0:
+                if 'tags' not in feature:
+                    logger.warning("Bad record! %r" % feature)
+                else:
+                    if 'lat' not in feature['attrs']:
+                        import epdb; epdb.st()
+                    csvin.writeOSM(feature)
+                    # This GeoJson file has all the data values
+                    csvin.writeGeoJson(feature)
+                    pass
 
     csvin.finishOSM()
     csvin.finishGeoJson()
+
+    return True

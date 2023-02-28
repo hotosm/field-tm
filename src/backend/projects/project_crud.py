@@ -64,7 +64,11 @@ TASK_GEOJSON_DIR = "geojson/"
 
 
 def get_projects(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    db_objects: bool = False
 ):
     if user_id:
         db_projects = (
@@ -82,7 +86,12 @@ def get_projects(
     return convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+def get_project_summaries(
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100
+):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
     #         db_models.DbProject.id,
