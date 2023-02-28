@@ -106,7 +106,7 @@ async def create_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/{project_id}/upload")
+@router.post("/beta/{project_id}/upload", response_model=project_schemas.ProjectOut)
 async def upload_project_boundary_with_zip(
     project_id: int,
     project_name_prefix: str,
@@ -114,12 +114,25 @@ async def upload_project_boundary_with_zip(
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
-    """This uploads the projecy boundary polygon to an existing project"""
+    """
+    Upload a ZIP with task geojson polygons and QR codes for an existing project.
+
+    {PROJECT_NAME}/\n
+    ├─ {PROJECT_NAME}.geojson\n
+    ├─ {PROJECT_NAME}_polygons.geojson\n
+    ├─ geojson/\n
+    │  ├─ {PROJECT_NAME}_TASK_TYPE__{TASK_NUM}.geojson\n
+    ├─ QR_codes/\n
+    │  ├─ {PROJECT_NAME}_{TASK_TYPE}__{TASK_NUM}.png\n
+    """
     # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
     project = project_crud.update_project_with_zip(
         db, project_id, project_name_prefix, task_type_prefix, upload
     )
-    return f"{project}"
+    if project:
+        return project
+
+    return {"Message": "Uploading project ZIP failed"}
 
 
 @router.post("/{project_id}/upload_xlsform")

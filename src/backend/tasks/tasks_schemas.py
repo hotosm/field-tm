@@ -60,7 +60,6 @@ class TaskBase(BaseModel):
     task_status: TaskStatus
     locked_by_uid: int = None
     locked_by_username: str = None
-    # qr_code_in_base64: bytes
     task_history: List[TaskHistoryBase]
 
     class Config:
@@ -69,8 +68,8 @@ class TaskBase(BaseModel):
 
 class Task(TaskBase):
     # geometry_geojson: str
+    qr_code_base64: str
     task_status_str: TaskStatusOption
-    # qr_code_binary: bytes
     pass
 
 
