@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# import base64
+import base64
 from typing import List
 
 from fastapi import HTTPException
@@ -130,11 +130,11 @@ def update_qrcode(
     qr_id: int,
     project_id: int,
 ):
-    task = table("tasks", column("qrcode_id"), column("id"))
+    task = table("tasks", column("qr_code_id"), column("id"))
     where = f"task.c.id={task_id}"
-    value = {"qrcode_id": qr_id}
+    value = {"qr_code_id": qr_id}
     sql = select(
-        geoalchemy2.functions.update(task.c.qrcode_id)
+        geoalchemy2.functions.update(task.c.qr_code_id)
         .where(text(where))
         .values(text(value))
     )
@@ -211,9 +211,14 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.locked_by_uid = db_task.lock_holder.id
             app_task.locked_by_username = db_task.lock_holder.username
 
-        # if db_task.qr_code:
-        #     app_task.qr_code_in_base64 = base64.b64encode(
-        #         db_task.qr_code.image)
+        if db_task.qr_code:
+            logger.debug(
+                f"QR code found for task ID {db_task.id}. Converting to base64"
+            )
+            app_task.qr_code_base64 = base64.b64encode(db_task.qr_code.image)
+        else:
+            logger.warning(f"No QR code found for task ID {db_task.id}")
+            app_task.qr_code_base64 = ""
 
         if db_task.task_history:
             app_task.task_history = convert_to_app_history(db_task.task_history)
