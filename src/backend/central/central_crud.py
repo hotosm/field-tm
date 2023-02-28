@@ -28,13 +28,11 @@ import xmltodict
 
 from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 
-from ..env_utils import config_env
+from ..config import settings
 
-logger = logging.getLogger(__name__)
-
-url = config_env["ODK_CENTRAL_URL"]
-user = config_env["ODK_CENTRAL_USER"]
-pw = config_env["ODK_CENTRAL_PASSWD"]
+url = settings.ODK_CENTRAL_URL
+user = settings.ODK_CENTRAL_USER
+pw = settings.ODK_CENTRAL_PASSWD
 
 project = OdkProject(url, user, pw)
 xform = OdkForm(url, user, pw)
@@ -64,16 +62,13 @@ def delete_odk_project(project_id: int):
 
 def create_appuser(project_id: int, name: str):
     """Create an app-user on a remote ODK Server"""
-    logger.debug(f"Listing appusers for project {project_id}")
-    project.listAppUsers(project_id)
-
-    user = project.findAppUser(name=name)
-    if user:
-        logger.debug(f"User already exists with name {name} for project {project_id}")
-        return user
-
-    logger.debug(f"Creating user with name {name} for project {project_id}")
-    return appuser.create(project_id, name)
+    # project.listAppUsers(project_id)
+    # user = project.findAppUser(name=name)
+    # user = False
+    # if not user:
+    result = appuser.create(project_id, name)
+    logger.info(f"Created app user: {result.json()}")
+    return result
 
 
 def delete_app_user(project_id: int, name: str):
