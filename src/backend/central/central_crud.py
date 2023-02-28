@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import logging
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
@@ -31,11 +32,11 @@ from odkconvert.OdkCentral import OdkProject, OdkAppUser, OdkForm
 from odkconvert.CSVDump import CSVDump
 import odkconvert
 
-from ..env_utils import config_env
+from ..config import settings
 
-url = config_env["ODK_CENTRAL_URL"]
-user = config_env["ODK_CENTRAL_USER"]
-pw = config_env["ODK_CENTRAL_PASSWD"]
+url = settings.ODK_CENTRAL_URL
+user = settings.ODK_CENTRAL_USER
+pw = settings.ODK_CENTRAL_PASSWD
 
 project = OdkProject(url, user, pw)
 xform = OdkForm(url, user, pw)
@@ -77,6 +78,7 @@ def create_appuser(
     # user = False
     # if not user:
     result = appuser.create(project_id, name)
+    logger.info(f"Created app user: {result.json()}")
     return result
 
 

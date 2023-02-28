@@ -37,10 +37,12 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this
 
-    ODK_CENTRAL_URL=http://central:8383
+    ODK_CENTRAL_URL=https://central-proxy
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
     API_URL=http://127.0.0.1:8000
+    FRONTEND_SCHEME=http
+    FRONTEND_DOMAIN=localhost
     OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
     OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
@@ -88,17 +90,22 @@ To add authentication to an endpoint, import `login_required` from `auth` module
 ## Backend Debugging
 
 1. Uncomment in docker-compose.yml:
+
+```yaml
+services:
+  api:
+    target: debug
+    ports:
+      - "5678:5678"
 ```
-target: debug
-ports:
-  - "5678:5678"
-```
+
 2. Re-build the docker image `docker compose build api`
 3. Start the docker container `docker compose up -d api` (the api startup will be halted until you connect a debugger)
 4. Set a debugger config in your IDE (e.g. VSCode) and start the debugger
 5. The API server will start up & any set breakpoints will trigger
 
 Example launch.json config for vscode:
+
 ```
 {
   "configurations": [
@@ -120,4 +127,4 @@ Example launch.json config for vscode:
 }
 ```
 
-Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.

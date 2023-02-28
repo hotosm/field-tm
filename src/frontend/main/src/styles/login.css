@@ -1,0 +1,21 @@
+button {
+    border-radius: 5px;
+    background: #54af29;
+    border-color: #2c7505;
+    color: #fff;
+    width: 145px;
+    margin: 0 10px;
+    font-size: 25px;
+    text-shadow: 1px 1px -1px #2c7505;
+    padding: 10px;
+  }
+
+  button.done { background: #2c7505; }
+  button:hover { background: #2c7505; }
+
+  #buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    margin-top: 20px;
+  }
