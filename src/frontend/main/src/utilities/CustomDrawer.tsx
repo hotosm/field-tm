@@ -97,6 +97,7 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
             color="error"
             startIcon={<LoginIcon />}
             style={Drawerstyles.containedBtn}
+            href="/login"
           >
             Sign in
           </Button>
@@ -105,6 +106,7 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
             color="error"
             startIcon={<PersonIcon />}
             style={Drawerstyles.outlineBtn}
+            href="/signup"
           >
             Sign up
           </Button>

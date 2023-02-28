@@ -56,14 +56,12 @@ async def list_projects():
 async def create_appuser(
     project_id: int,
     name: str,
-    token: str,
     db: Session = Depends(database.get_db),
 ):
     """Create an appuser in Central"""
     appuser = central_crud.create_appuser(project_id, name=name)
-    project_crud.create_qrcode(db, project_id, appuser.json()["token"], name)
     # tasks = tasks_crud.update_qrcode(db, task_id, qrcode['id'])
-    return {"message": "Unimplemented"}
+    return project_crud.create_qrcode(db, project_id, appuser.get("token"), name)
 
 
 # @router.get("/list_submissions")
