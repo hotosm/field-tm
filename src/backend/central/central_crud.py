@@ -16,7 +16,6 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import logging
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
@@ -48,7 +47,8 @@ def list_odk_projects():
 def create_odk_project(name):
     """Create a project on a remote ODK Server"""
     result = project.createProject(name)
-    project.id = result["id"]
+    logger.debug(f"create_odk_project return from ODKCentral: {result}")
+    project.id = result.get("id")
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
 

@@ -378,10 +378,10 @@ class DbTask(Base):
     )
 
     # Mapped objects
-    # qrcode_id = Column(Integer, ForeignKey("qr_code.id"), index=True)
-    # qr_code = relationship(
-    #     DbQrCode, cascade="all, delete, delete-orphan", single_parent=True
-    # )
+    qr_code_id = Column(Integer, ForeignKey("qr_code.id"), index=True)
+    qr_code = relationship(
+        DbQrCode, cascade="all, delete, delete-orphan", single_parent=True
+    )
 
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)

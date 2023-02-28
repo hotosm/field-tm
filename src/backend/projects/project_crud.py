@@ -240,6 +240,7 @@ def update_project_boundary(
             project_task_name=task_name,
             outline=wkblib.dumps(shape(poly["geometry"]), hex=True),
             # qr_code=db_qr,
+            # qr_code_id=db_qr.id,
             # project_task_index=feature["properties"]["fid"],
             project_task_index=1,
             # geometry_geojson=geojson.dumps(task_geojson),
@@ -262,7 +263,11 @@ def update_project_with_zip(
     # TODO: ensure that logged in user is user who created this project, return 403 (forbidden) if not authorized
 
     # ensure file upload is zip
-    if uploaded_zip.content_type not in ["application/zip"]:
+    if uploaded_zip.content_type not in [
+        "application/zip",
+        "application/zip-compressed",
+        "application/x-zip-compressed",
+    ]:
         raise HTTPException(
             status_code=415,
             detail=f"File must be a zip. Uploaded file was {uploaded_zip.content_type}",
@@ -364,12 +369,15 @@ def update_project_with_zip(
                     f"Geojson for task {task_name} does not exist",
                 )
 
+                # generate qr code id first
+                db.flush()
                 # save task in db
                 task = db_models.DbTask(
                     project_id=project_id,
                     project_task_index=feature["properties"]["fid"],
                     project_task_name=task_name,
-                    # qr_code=db_qr,
+                    qr_code=db_qr,
+                    qr_code_id=db_qr.id,
                     outline=task_outline_shape.wkt,
                     # geometry_geojson=json.dumps(task_geojson),
                     initial_feature_count=len(task_geojson["features"]),
