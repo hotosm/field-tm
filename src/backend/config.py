@@ -6,7 +6,6 @@ from typing import Any, Optional, Union
 
 from pydantic import AnyUrl, BaseSettings, PostgresDsn, validator
 
-
 logger = logging.getLogger(__name__)
 
 
