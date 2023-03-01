@@ -19,7 +19,29 @@ repos:
     rev: "v0.0.248"
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args:
+          [
+            --select,
+            "I",
+            --select,
+            "E",
+            --select,
+            "W",
+            --select,
+            "D",
+            --select,
+            "B",
+            --select,
+            "F",
+            --select,
+            "N",
+            --select,
+            "Q",
+            --fix,
+            --exit-non-zero-on-fix,
+            --target-version,
+            py39,
+          ]
 
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pre-commit/mirrors-prettier

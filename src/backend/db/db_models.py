@@ -16,25 +16,6 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from sqlalchemy import (
-    desc,
-    Enum,
-    Table,
-    Column,
-    Integer,
-    BigInteger,
-    LargeBinary,
-    ARRAY,
-    String,
-    DateTime,
-    Boolean,
-    ForeignKey,
-    ForeignKeyConstraint,
-    UniqueConstraint,
-    Index,
-)
-from sqlalchemy.orm import relationship, backref, object_session  # , declarative_base
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from geoalchemy2 import Geometry
 from sqlalchemy import (
     ARRAY,
@@ -54,7 +35,11 @@ from sqlalchemy import (
     desc,
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.orm import backref, relationship  # , declarative_base
+from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
+    backref,
+    object_session,
+    relationship,
+)
 
 from ..models.enums import (
     MappingLevel,
@@ -74,7 +59,7 @@ from .postgis_utils import timestamp
 
 
 class DbUser(Base):
-    """Describes the history associated with a task"""
+    """Describes the history associated with a task."""
 
     __tablename__ = "users"
 
@@ -127,7 +112,7 @@ organisation_managers = Table(
 
 
 class DbOrganisation(Base):
-    """Describes an Organisation"""
+    """Describes an Organisation."""
 
     __tablename__ = "organisations"
 
@@ -149,7 +134,7 @@ class DbOrganisation(Base):
 
 
 class DbTeam(Base):
-    """Describes a team"""
+    """Describes a team."""
 
     __tablename__ = "teams"
 
@@ -194,7 +179,7 @@ class DbProjectTeams(Base):
 
 
 class DbProjectInfo(Base):
-    """Contains all project info localized into supported languages"""
+    """Contains all project info localized into supported languages."""
 
     __tablename__ = "project_info"
 
@@ -219,7 +204,7 @@ class DbProjectInfo(Base):
 
 
 class DbProjectChat(Base):
-    """Contains all project info localized into supported languages"""
+    """Contains all project info localized into supported languages."""
 
     __tablename__ = "project_chat"
     id = Column(BigInteger, primary_key=True)
@@ -233,7 +218,7 @@ class DbProjectChat(Base):
 
 
 class DbXForm(Base):
-    """Xform templates and custom uploads"""
+    """Xform templates and custom uploads."""
 
     __tablename__ = "xlsforms"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -246,7 +231,7 @@ class DbXForm(Base):
 
 
 class DbTaskInvalidationHistory(Base):
-    """Describes the most recent history of task invalidation and subsequent validation"""
+    """Describes the most recent history of task invalidation and subsequent validation."""
 
     __tablename__ = "task_invalidation_history"
     id = Column(Integer, primary_key=True)
@@ -281,7 +266,9 @@ class DbTaskInvalidationHistory(Base):
 
 class DbTaskMappingIssue(Base):
     """Describes an issue (along with an occurrence count) with a
-    task mapping that contributed to invalidation of the task"""
+    task mapping that contributed to invalidation of the task
+    .
+    """
 
     __tablename__ = "task_mapping_issues"
     id = Column(Integer, primary_key=True)
@@ -298,7 +285,7 @@ class DbTaskMappingIssue(Base):
 
 
 class DbMappingIssueCategory(Base):
-    """Represents a category of task mapping issues identified during validaton"""
+    """Represents a category of task mapping issues identified during validaton."""
 
     __tablename__ = "mapping_issue_categories"
     id = Column(Integer, primary_key=True)
@@ -308,7 +295,7 @@ class DbMappingIssueCategory(Base):
 
 
 class DbTaskHistory(Base):
-    """Describes the history associated with a task"""
+    """Describes the history associated with a task."""
 
     __tablename__ = "task_history"
 
@@ -342,7 +329,7 @@ class DbTaskHistory(Base):
 
 
 class DbQrCode(Base):
-    """QR Code"""
+    """QR Code."""
 
     __tablename__ = "qr_code"
 
@@ -352,7 +339,7 @@ class DbQrCode(Base):
 
 
 class DbTask(Base):
-    """Describes an individual mapping Task"""
+    """Describes an individual mapping Task."""
 
     __tablename__ = "tasks"
 
@@ -400,7 +387,7 @@ class DbTask(Base):
 
 
 class DbProject(Base):
-    """Describes a HOT Mapping Project"""
+    """Describes a HOT Mapping Project."""
 
     __tablename__ = "projects"
 
@@ -548,7 +535,7 @@ user_licenses_table = Table(
 
 
 class DbLicense(Base):
-    """Describes an individual license"""
+    """Describes an individual license."""
 
     __tablename__ = "licenses"
 

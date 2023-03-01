@@ -103,7 +103,6 @@ services:
     image: "quay.io/hotosm/fmtm-mf-main:latest"
     build:
       context: src/frontend/main
-      dockerfile: prod.dockerfile
     container_name: fmtm_main
     depends_on:
       - api
@@ -130,7 +129,6 @@ services:
     image: "quay.io/hotosm/fmtm-mf-map:latest"
     build:
       context: src/frontend/fmtm_openlayer_map
-      dockerfile: prod.dockerfile
     container_name: fmtm_map
     depends_on:
       - api

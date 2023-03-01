@@ -16,16 +16,16 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import json
 from typing import List
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from sqlalchemy.orm import Session
-import json
-
 from odkconvert.xlsforms import xlsforms_path
+from sqlalchemy.orm import Session
 
-from ..db import database
 from ..central import central_crud
+from ..db import database
 from . import project_crud, project_schemas
 
 router = APIRouter(
@@ -74,7 +74,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.post("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
-    """Delete a project from ODK Central and the local database"""
+    """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
     central_crud.delete_odk_project(project_id)
     # if not odkproject:
@@ -91,7 +91,7 @@ async def create_project(
     project_info: project_schemas.BETAProjectUpload,
     db: Session = Depends(database.get_db),
 ):
-    """Create a project in ODK Central and the local database"""
+    """Create a project in ODK Central and the local database."""
     odkproject = central_crud.create_odk_project(project_info.project_info.name)
     # TODO check token against user or use token instead of passing user
     project = project_crud.create_project_with_project_info(
@@ -114,8 +114,7 @@ async def upload_project_boundary_with_zip(
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
-    """
-    Upload a ZIP with task geojson polygons and QR codes for an existing project.
+    """Upload a ZIP with task geojson polygons and QR codes for an existing project.
 
     {PROJECT_NAME}/\n
     ├─ {PROJECT_NAME}.geojson\n
@@ -181,7 +180,7 @@ async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """Download the boundary polygon for this project"""
+    """Download the boundary polygon for this project."""
     out = project_crud.download_geometry(db, project_id, False)
     # FIXME: fix return value
     return {"Message": out}
@@ -192,7 +191,7 @@ async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """Download the task boundary polygons for this project"""
+    """Download the task boundary polygons for this project."""
     out = project_crud.download_geometry(db, project_id, True)
     # FIXME: fix return value
     return {"Message": out}
