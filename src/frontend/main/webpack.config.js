@@ -13,8 +13,10 @@ module.exports = {
   },
 
   devServer: {
+    host: "0.0.0.0",
     port: `${new URL(process.env.FRONTEND_MAIN_URL).port}`,
     historyApiFallback: true,
+    allowedHosts: [`${process.env.FRONTEND_MAIN_URL}`],
   },
   devtool: "source-map",
   module: {
