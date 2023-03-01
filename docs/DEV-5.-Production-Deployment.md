@@ -76,4 +76,4 @@ Run the production docker-compose config:
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
 
-> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2:-Deployment).
+> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2.-Deployment).

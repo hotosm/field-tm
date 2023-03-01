@@ -94,7 +94,9 @@ services:
       - "traefik.http.services.api.loadbalancer.server.port=8000"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.api.rule=Host(`${API_URL#https://}`)"
+      # The Go regex below requires escaping or changing, is this possible?
+      # - "traefik.http.routers.api.rule=HostRegexp(`${API_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
+      - "traefik.http.routers.api.rule=HostRegexp(`fmtm-api.hotosm.org`)"
       - "traefik.http.routers.api.service=api"
 
   ui-main:
@@ -114,17 +116,20 @@ services:
     networks:
       - fmtm-prod
     environment:
+      - BROTLI=true
       - API_URL=${API_URL}
       - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.ui.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui.tls=true"
-      - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui.rule=Host(`${FRONTEND_MAIN_URL#https://}`)"
-      - "traefik.http.routers.ui.service=ui"
+      - "traefik.http.services.ui-main.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ui-main.tls=true"
+      - "traefik.http.routers.ui-main.tls.certresolver=letsencrypt"
+      # The Go regex below requires escaping or changing, is this possible?
+      # - "traefik.http.routers.api.rule=HostRegexp(`${FRONTEND_MAIN_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
+      - "traefik.http.routers.api.rule=HostRegexp(`fmtm.hotosm.org`)"
+      - "traefik.http.routers.ui-main.service=ui-main"
 
   ui-map:
     image: "quay.io/hotosm/fmtm-fmtm_openlayer_map:latest"
@@ -143,17 +148,20 @@ services:
     networks:
       - fmtm-prod
     environment:
+      - BROTLI=true
       - API_URL=${API_URL}
       - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.ui.loadbalancer.server.port=8081"
-      - "traefik.http.routers.ui.tls=true"
-      - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui.rule=Host(`${FRONTEND_MAP_URL#https://}`)"
-      - "traefik.http.routers.ui.service=ui"
+      - "traefik.http.services.ui-map.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ui-map.tls=true"
+      - "traefik.http.routers.ui-map.tls.certresolver=letsencrypt"
+      # The Go regex below requires escaping or changing, is this possible?
+      # - "traefik.http.routers.api.rule=HostRegexp(`${FRONTEND_MAP_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
+      - "traefik.http.routers.api.rule=HostRegexp(`map.fmtm.hotosm.org`)"
+      - "traefik.http.routers.ui-map.service=ui-map"
 
   central-db:
     image: postgis/postgis:14-3.3-alpine
