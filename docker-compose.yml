@@ -133,8 +133,7 @@ services:
   central:
     image: "quay.io/hotosm/fmtm-root:latest"
     build:
-      context: .
-      dockerfile: central.dockerfile
+      context: odkcentral/api
     container_name: central_api
     depends_on:
       - central-db
@@ -150,7 +149,7 @@ services:
   central-proxy:
     image: "quay.io/hotosm/fmtm-central-proxy:latest"
     build:
-      context: central_proxy
+      context: odkcentral/proxy
     container_name: central_proxy
     depends_on:
       - central
