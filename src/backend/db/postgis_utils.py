@@ -17,14 +17,15 @@
 #
 
 import datetime
-from shapely.geometry import mapping
-from geoalchemy2.shape import to_shape
+
 from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
 from geojson_pydantic import Feature
+from shapely.geometry import mapping
 
 
 def timestamp():
-    """Used in SQL Alchemy models to ensure we refresh timestamp when new models initialised"""
+    """Used in SQL Alchemy models to ensure we refresh timestamp when new models initialised."""
     return datetime.datetime.utcnow()
 
 

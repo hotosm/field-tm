@@ -17,43 +17,40 @@
 #
 
 
-import geojson
 import io
-import os
 import json
-from json import loads, dumps
+import os
+from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
-from fastapi import HTTPException, UploadFile
+
 import geoalchemy2
+import geojson
 import numpy as np
-
-
-from shapely.geometry import shape, Polygon
-from sqlalchemy.orm import Session
+import shapely.wkb as wkblib
+import sqlalchemy
+from fastapi import HTTPException, UploadFile
+from fastapi.logger import logger as logger
+from odkconvert.xlsforms import xlsforms_path
+from shapely.geometry import Polygon, shape
 from sqlalchemy import (
-    select,
-    table,
     column,
     insert,
     inspect,
+    select,
+    table,
 )
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-import sqlalchemy
-import shapely.wkb as wkblib
-from fastapi.logger import logger as logger
 
-from odkconvert.xlsforms import xlsforms_path
-
-from ..db.postgis_utils import geometry_to_geojson, timestamp
+from ..central import central_crud
 from ..db import db_models
+from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
-from ..central import central_crud
 
 # from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
-
 from . import project_schemas
 
 # --------------
@@ -65,11 +62,7 @@ TASK_GEOJSON_DIR = "geojson/"
 
 
 def get_projects(
-    db: Session,
-    user_id: int,
-    skip: int = 0,
-    limit: int = 100,
-    db_objects: bool = False
+    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
 ):
     if user_id:
         db_projects = (
@@ -87,12 +80,7 @@ def get_projects(
     return convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(
-    db: Session,
-    user_id: int,
-    skip: int = 0,
-    limit: int = 100
-):
+def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
     #         db_models.DbProject.id,
@@ -223,7 +211,7 @@ def update_project_boundary(
     project_id: int,
     boundary: str,
 ):
-    """Update the boundary polyon on the database"""
+    """Update the boundary polyon on the database."""
     outline = shape(boundary["features"][0]["geometry"])
 
     # verify project exists in db
@@ -424,7 +412,7 @@ def read_xlsforms(
     db: Session,
     directory: str,
 ):
-    """Read the list of XLSForms from the disk"""
+    """Read the list of XLSForms from the disk."""
     xlsforms = list()
     for xls in os.listdir(directory):
         if xls.endswith(".xls") or xls.endswith(".xlsx"):
@@ -509,7 +497,7 @@ def create_qrcode(
     token: str,
     project_name: str,
 ):
-    """Make a QR code for an app_user"""
+    """Make a QR code for an app_user."""
     qrcode = central_crud.create_QRCode(project_id, token, project_name)
     qrdb = db_models.DbQrCode(
         image=qrcode,
@@ -528,7 +516,7 @@ def download_geometry(
     project_id: int,
     download_type: bool,
 ):
-    """Download the project or task boundaries from the database"""
+    """Download the project or task boundaries from the database."""
     data = list()
     if not download_type:
         projects = table("projects", column("outline"), column("id"))

@@ -17,26 +17,25 @@
 #
 
 
+import logging
 import os
 import sys
-import logging
-
 from typing import Union
 
 from fastapi import FastAPI
 from fastapi.logger import logger as fastapi_logger
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from .__version__ import __version__
-from .config import settings
 from .auth import routers as auth_routers
+from .central import central_routes
+from .config import settings
 from .db.database import Base, engine
+from .debug import debug_routes
 from .projects import project_routes
 from .tasks import tasks_routes
 from .users import user_routes
-from .debug import debug_routes
-from .central import central_routes
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT

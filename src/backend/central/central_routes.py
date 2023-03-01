@@ -17,22 +17,18 @@
 #
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
-from sqlalchemy import (
-    select,
-    table,
-    column,
-    insert,
-    inspect,
-)
-
-import sqlalchemy
 from fastapi.logger import logger as logger
 from fastapi.responses import JSONResponse
+from sqlalchemy import (
+    column,
+    select,
+    table,
+)
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
+from ..central import central_crud
 from ..db import database
-from ..central import central_schemas, central_crud
 from ..projects import project_crud
 
 router = APIRouter(
@@ -45,7 +41,7 @@ router = APIRouter(
 
 @router.get("/projects")
 async def list_projects():
-    """List projects in Central"""
+    """List projects in Central."""
     projects = central_crud.list_odk_projects()
     if projects is None:
         return {"message": "No projects found"}
@@ -58,7 +54,7 @@ async def create_appuser(
     name: str,
     db: Session = Depends(database.get_db),
 ):
-    """Create an appuser in Central"""
+    """Create an appuser in Central."""
     appuser = central_crud.create_appuser(project_id, name=name)
     # tasks = tasks_crud.update_qrcode(db, task_id, qrcode['id'])
     return project_crud.create_qrcode(db, project_id, appuser.get("token"), name)
@@ -77,7 +73,7 @@ async def download_submissions(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """Download the submissions data from Central"""
+    """Download the submissions data from Central."""
     project = table(
         "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
     )
@@ -94,7 +90,7 @@ async def download_submissions(
     xforms = central_crud.list_odk_xforms(first.odkid)
     submissions = list()
     for xform in xforms:
-        data = central_crud.download_submissions(first.odkid, xform['xmlFormId'])
+        data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
         # An empty submissions only has the CSV headers
         # headers = data[0]
         if len(submissions) == 0:

@@ -20,9 +20,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import database
+from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
-from ..models.enums import TaskStatus
 
 router = APIRouter(
     prefix="/tasks",

@@ -28,14 +28,14 @@ class IntEnum(int, Enum):
 
 
 class TeamVisibility(IntEnum, Enum):
-    """Describes the visibility associated with an Team"""
+    """Describes the visibility associated with an Team."""
 
     PUBLIC = 0
     PRIVATE = 1
 
 
 class OrganisationType(IntEnum, Enum):
-    """Describes an organisation's subscription type"""
+    """Describes an organisation's subscription type."""
 
     FREE = 1
     DISCOUNTED = 2
@@ -43,7 +43,7 @@ class OrganisationType(IntEnum, Enum):
 
 
 class ProjectStatus(IntEnum, Enum):
-    """Enum to describes all possible states of a Mapping Project"""
+    """Enum to describes all possible states of a Mapping Project."""
 
     ARCHIVED = 0
     PUBLISHED = 1
@@ -51,7 +51,7 @@ class ProjectStatus(IntEnum, Enum):
 
 
 class ProjectPriority(IntEnum, Enum):
-    """Enum to describe all possible project priority levels"""
+    """Enum to describe all possible project priority levels."""
 
     URGENT = 0
     HIGH = 1
@@ -60,7 +60,7 @@ class ProjectPriority(IntEnum, Enum):
 
 
 class UserRole(IntEnum, Enum):
-    """Describes the role a user can be assigned, app doesn't support multiple roles"""
+    """Describes the role a user can be assigned, app doesn't support multiple roles."""
 
     READ_ONLY = -1
     MAPPER = 0
@@ -68,7 +68,7 @@ class UserRole(IntEnum, Enum):
 
 
 class MappingLevel(IntEnum, Enum):
-    """The mapping level the mapper has achieved"""
+    """The mapping level the mapper has achieved."""
 
     BEGINNER = 1
     INTERMEDIATE = 2
@@ -76,7 +76,7 @@ class MappingLevel(IntEnum, Enum):
 
 
 class MappingPermission(IntEnum, Enum):
-    """Describes a set of permissions for mapping on a project"""
+    """Describes a set of permissions for mapping on a project."""
 
     ANY = 0
     LEVEL = 1
@@ -85,7 +85,7 @@ class MappingPermission(IntEnum, Enum):
 
 
 class ValidationPermission(IntEnum, Enum):
-    """Describes a set of permissions for validating on a project"""
+    """Describes a set of permissions for validating on a project."""
 
     ANY = 0
     LEVEL = 1
@@ -94,7 +94,7 @@ class ValidationPermission(IntEnum, Enum):
 
 
 class TaskCreationMode(IntEnum, Enum):
-    """Enum to describe task creation mode"""
+    """Enum to describe task creation mode."""
 
     GRID = 0
     ROADS = 1
@@ -102,7 +102,7 @@ class TaskCreationMode(IntEnum, Enum):
 
 
 class TaskStatus(IntEnum, Enum):
-    """Enum describing available Task Statuses"""
+    """Enum describing available Task Statuses."""
 
     READY = 0
     LOCKED_FOR_MAPPING = 1
@@ -151,7 +151,7 @@ def verify_valid_status_update(old_status: TaskStatus, new_status: TaskStatus):
 
 
 class TaskAction(IntEnum, Enum):
-    """Describes the possible actions that can happen to to a task, that we'll record history for"""
+    """Describes the possible actions that can happen to to a task, that we'll record history for."""
 
     RELEASED_FOR_MAPPING = 0
     LOCKED_FOR_MAPPING = 1

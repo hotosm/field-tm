@@ -16,9 +16,10 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel
-from fastapi.logger import logger as logger
 from enum import Enum
+
+from fastapi.logger import logger as logger
+from pydantic import BaseModel
 
 
 class CentralBase(BaseModel):
