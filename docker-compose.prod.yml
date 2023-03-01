@@ -100,13 +100,8 @@ services:
   ui-main:
     image: "quay.io/hotosm/fmtm-mf-main:latest"
     build:
-      context: src/frontend
-      target: prod
-      args:
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: main
+      context: src/frontend/main
+      dockerfile: prod.dockerfile
     container_name: fmtm_main
     depends_on:
       - api
@@ -129,13 +124,8 @@ services:
   ui-map:
     image: "quay.io/hotosm/fmtm-mf-map:latest"
     build:
-      context: src/frontend
-      target: prod
-      args:
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: fmtm_openlayer_map
+      context: src/frontend/fmtm_openlayer_map
+      dockerfile: prod.dockerfile
     container_name: fmtm_map
     depends_on:
       - api
