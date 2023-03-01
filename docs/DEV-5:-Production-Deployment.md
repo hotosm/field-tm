@@ -49,7 +49,6 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     FRONTEND_MAIN_URL=https://fmtm.hotosm.org
     FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
     # API_PREFIX=/api
-    BACKEND_CORS_ORIGINS=https://fmtm.hotosm.org,https://map.fmtm.hotosm.org
 
     # OSM
     OSM_CLIENT_ID=`<CHANGEME>`
