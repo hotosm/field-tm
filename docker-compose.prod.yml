@@ -170,7 +170,6 @@ services:
     image: "quay.io/hotosm/odkcentral-api:latest"
     build:
       context: odkcentral/api
-      dockerfile: central.dockerfile
     container_name: central_api
     depends_on:
       - central-db
