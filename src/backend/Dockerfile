@@ -70,7 +70,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
     CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-COPY --from=quay.io/hotosm/fmtm-central-proxy:latest \
+COPY --from=quay.io/hotosm/odkcentral-proxy:latest \
     /etc/nginx/central-cert.pem /usr/local/share/ca-certificates/central.crt
 RUN set -ex \
     && apt-get update \

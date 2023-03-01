@@ -73,7 +73,7 @@ services:
     restart: unless-stopped
 
   api:
-    image: "quay.io/hotosm/fmtm:latest"
+    image: "quay.io/hotosm/fmtm-backend:latest"
     build:
       context: src/backend
       target: prod
@@ -98,7 +98,7 @@ services:
       - "traefik.http.routers.api.service=api"
 
   ui-main:
-    image: "quay.io/hotosm/fmtm-main:latest"
+    image: "quay.io/hotosm/fmtm-mf-main:latest"
     build:
       context: src/frontend
       target: prod
@@ -127,7 +127,7 @@ services:
       - "traefik.http.routers.ui.service=ui"
 
   ui-map:
-    image: "quay.io/hotosm/fmtm-fmtm_openlayer_map:latest"
+    image: "quay.io/hotosm/fmtm-mf-map:latest"
     build:
       context: src/frontend
       target: prod
@@ -169,7 +169,7 @@ services:
     restart: unless-stopped
 
   central:
-    image: "quay.io/hotosm/fmtm-root:latest"
+    image: "quay.io/hotosm/odkcentral-api:latest"
     build:
       context: odkcentral/api
       dockerfile: central.dockerfile
@@ -184,7 +184,7 @@ services:
     restart: unless-stopped
 
   central-proxy:
-    image: "quay.io/hotosm/fmtm-central-proxy:latest"
+    image: "quay.io/hotosm/odkcentral-proxy:latest"
     build:
       context: odkcentral/proxy
     container_name: central_proxy
