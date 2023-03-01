@@ -67,36 +67,46 @@ services:
       context: src/frontend
       target: debug
       args:
-        FRONTEND_SCHEME: ${FRONTEND_SCHEME}
-        FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
         APP_NAME: main
     container_name: fmtm_main
+    depends_on:
+      - api
     volumes:
       - ./src/frontend/main:/app
       - /app/node_modules/
     environment:
       - API_URL=${API_URL}
+      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
     ports:
       - "8080:8080"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
-  ui-openlayers:
+  ui-map:
     image: "quay.io/hotosm/fmtm-fmtm_openlayer_map:latest"
     build:
       context: src/frontend
       target: debug
       args:
-        FRONTEND_SCHEME: ${FRONTEND_SCHEME}
-        FRONTEND_DOMAIN: ${FRONTEND_DOMAIN}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
         APP_NAME: fmtm_openlayer_map
-    container_name: fmtm_fmtm_openlayer_map
+    container_name: fmtm_map
+    depends_on:
+      - api
     volumes:
       - ./src/frontend/fmtm_openlayer_map:/app
       - /app/node_modules/
     environment:
       - API_URL=${API_URL}
+      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
     ports:
       - "8081:8081"
     networks:
