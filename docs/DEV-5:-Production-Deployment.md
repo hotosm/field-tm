@@ -45,18 +45,18 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     ODK_CENTRAL_PASSWD=`<CHANGEME>`
 
     # FMTM
-    API_URL=http://127.0.0.1:8000
-    FRONTEND_SCHEME=http
-    FRONTEND_DOMAIN=localhost
-    API_DOMAIN=localhost
+    API_URL=https://fmtm-api.hotosm.org
+    FRONTEND_MAIN_URL=https://fmtm.hotosm.org
+    FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
     # API_PREFIX=/api
+    BACKEND_CORS_ORIGINS=https://fmtm.hotosm.org,https://map.fmtm.hotosm.org
 
     # OSM
     OSM_CLIENT_ID=`<CHANGEME>`
     OSM_CLIENT_SECRET=`<CHANGEME>`
     OSM_URL=https://www.openstreetmap.org
     OSM_SCOPE=read_prefs
-    OSM_LOGIN_REDIRECT_URI=`<YOUR_API_DOMAIN>`/auth/callback/
+    OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
     OSM_SECRET_KEY=`<CHANGEME>`
 
     # Database (optional)
