@@ -54,7 +54,7 @@ Your env should look like this
 
 ### Check Deployment
 
-For details for how to run this project locally for development, please look at: [DEV 2. Deployment](https://github.com/hotosm/fmtm/wiki/DEV-2:-Deployment)
+For details for how to run this project locally for development, please look at: [DEV 2. Deployment](https://github.com/hotosm/fmtm/wiki/DEV-2.-Deployment)
 
 ### Check Authentication
 
