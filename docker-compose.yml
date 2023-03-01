@@ -64,15 +64,15 @@ services:
     restart: unless-stopped
 
   ui-main:
-    image: "quay.io/hotosm/fmtm-mf-main:latest"
+    image: "quay.io/hotosm/fmtm-mf-main:debug"
     build:
       context: src/frontend
-      target: debug
+      dockerfile: debug.dockerfile
       args:
+        APP_NAME: main
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: main
     container_name: fmtm_main
     depends_on:
       - api
@@ -90,15 +90,15 @@ services:
     restart: unless-stopped
 
   ui-map:
-    image: "quay.io/hotosm/fmtm-mf-map:latest"
+    image: "quay.io/hotosm/fmtm-mf-map:debug"
     build:
       context: src/frontend
-      target: debug
+      dockerfile: debug.dockerfile
       args:
+        APP_NAME: fmtm_openlayer_map
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: fmtm_openlayer_map
     container_name: fmtm_map
     depends_on:
       - api
