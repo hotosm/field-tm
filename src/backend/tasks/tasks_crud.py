@@ -20,20 +20,20 @@ import base64
 from typing import List
 
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import select, table, column
-from sqlalchemy.sql import text
 from fastapi.logger import logger as logger
+from sqlalchemy import column, select, table
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
-from ..tasks import tasks_schemas
-from ..users import user_crud
 from ..models.enums import (
     TaskStatus,
     get_action_for_status_change,
     verify_valid_status_update,
 )
+from ..tasks import tasks_schemas
+from ..users import user_crud
 
 # --------------
 # ---- CRUD ----
