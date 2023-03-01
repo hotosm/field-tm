@@ -1,5 +1,13 @@
 ![](images/hot_logo.png)
 
+**Workflows**
+
+[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml)
+
+**Builds**
+
+**Backend** [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/fmtm-backend) **ODKCentral-API** [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api) **ODKCentral-Proxy** [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy) **Frontend Main** [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main) **Frontend Map** [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map)
+
 # Field Mapping Tasking Manager (FMTM)
 
 A project to provide tools for Open Mapping campaigns

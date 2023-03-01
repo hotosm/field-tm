@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   api:
-    image: "quay.io/hotosm/fmtm:latest"
+    image: "quay.io/hotosm/fmtm-backend:latest"
     build:
       context: src/backend
       # target: debug
@@ -64,15 +64,15 @@ services:
     restart: unless-stopped
 
   ui-main:
-    image: "quay.io/hotosm/fmtm-main:latest"
+    image: "quay.io/hotosm/fmtm-mf-main:debug"
     build:
       context: src/frontend
-      target: debug
+      dockerfile: debug.dockerfile
       args:
+        APP_NAME: main
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: main
     container_name: fmtm_main
     depends_on:
       - api
@@ -90,15 +90,15 @@ services:
     restart: unless-stopped
 
   ui-map:
-    image: "quay.io/hotosm/fmtm-fmtm_openlayer_map:latest"
+    image: "quay.io/hotosm/fmtm-mf-map:debug"
     build:
       context: src/frontend
-      target: debug
+      dockerfile: debug.dockerfile
       args:
+        APP_NAME: fmtm_openlayer_map
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
-        APP_NAME: fmtm_openlayer_map
     container_name: fmtm_map
     depends_on:
       - api
@@ -131,10 +131,9 @@ services:
     restart: unless-stopped
 
   central:
-    image: "quay.io/hotosm/fmtm-root:latest"
+    image: "quay.io/hotosm/odkcentral-api:latest"
     build:
-      context: .
-      dockerfile: central.dockerfile
+      context: odkcentral/api
     container_name: central_api
     depends_on:
       - central-db
@@ -148,9 +147,9 @@ services:
     restart: unless-stopped
 
   central-proxy:
-    image: "quay.io/hotosm/fmtm-central-proxy:latest"
+    image: "quay.io/hotosm/odkcentral-proxy:latest"
     build:
-      context: central_proxy
+      context: odkcentral/proxy
     container_name: central_proxy
     depends_on:
       - central
