@@ -5,7 +5,7 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const deps = require("./package.json").dependencies;
 module.exports = {
   output: {
-    publicPath: `${process.env.FRONTEND_SCHEME}://${process.env.FRONTEND_DOMAIN}:${process.env.MAIN_PORT}/`,
+    publicPath: `${process.env.FRONTEND_MAIN_URL}/`,
   },
 
   resolve: {
@@ -13,7 +13,7 @@ module.exports = {
   },
 
   devServer: {
-    port: process.env.MAIN_PORT,
+    port: `${new URL(process.env.FRONTEND_MAIN_URL).port}`,
     historyApiFallback: true,
   },
   devtool: "source-map",
@@ -52,7 +52,7 @@ module.exports = {
       name: "fmtm",
       filename: "remoteEntry.js",
       remotes: {
-        map: `fmtm_openlayer_map@${process.env.FRONTEND_SCHEME}://${process.env.FRONTEND_DOMAIN}:${process.env.FMTM_OPENLAYER_MAP_PORT}/remoteEntry.js`,
+        map: `fmtm_openlayer_map@${process.env.FRONTEND_MAP_URL}/remoteEntry.js`,
       },
       exposes: {
         "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
@@ -80,12 +80,6 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "./src/index.html",
     }),
-    new EnvironmentPlugin([
-      "API_URL",
-      "FRONTEND_SCHEME",
-      "FRONTEND_DOMAIN",
-      "MAIN_PORT",
-      "FMTM_OPENLAYER_MAP_PORT",
-    ]),
+    new EnvironmentPlugin(["API_URL", "FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
   ],
 };

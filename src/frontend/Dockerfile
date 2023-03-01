@@ -4,17 +4,15 @@ ARG APP_NAME
 ARG MAINTAINER=admin@hotosm.org
 ARG API_URL
 ENV API_URL=${API_URL}
-ARG FRONTEND_SCHEME
-ENV FRONTEND_SCHEME=${FRONTEND_SCHEME}
-ARG FRONTEND_DOMAIN
-ENV FRONTEND_DOMAIN=${FRONTEND_DOMAIN}
-ENV MAIN_PORT=8080
-ENV FMTM_OPENLAYER_MAP_PORT=8081
+ARG FRONTEND_MAIN_URL
+ENV FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+ARG FRONTEND_MAP_URL
+ENV FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
 LABEL fmtm.hotosm.org.app-name="${APP_NAME}" \
     fmtm.hotosm.org.app-version="${APP_VERSION}" \
     fmtm.hotosm.org.maintainer="${MAINTAINER}" \
-    fmtm.hotosm.org.main-port="${MAIN_PORT}" \
-    fmtm.hotosm.org.fmtm_openlayer_map-port="${FMTM_OPENLAYER_MAP_PORT}"
+    fmtm.hotosm.org.main-url="${FRONTEND_MAIN_URL}" \
+    fmtm.hotosm.org.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
 WORKDIR /app
 COPY ./${APP_NAME}/package*.json ./
 RUN npm install
