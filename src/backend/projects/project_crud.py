@@ -44,6 +44,7 @@ import shapely.wkb as wkblib
 from fastapi.logger import logger as logger
 
 from odkconvert.xlsforms import xlsforms_path
+from odkconvert.make_data_extract import PostgresClient, OverpassClient
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..db import db_models
@@ -51,7 +52,6 @@ from ..tasks import tasks_crud
 from ..users import user_crud
 from ..central import central_crud
 
-# from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
 
 from . import project_schemas
 
@@ -164,6 +164,7 @@ def create_project_with_project_info(
     db_project = db_models.DbProject(
         author=db_user,
         odkid=project_id,
+        project_name_prefix=project_info_1.name,
         default_locale=project_info_1.locale,
         country=[project_metadata.country],
         location_str=f"{project_metadata.city}, {project_metadata.country}",
@@ -233,7 +234,7 @@ def update_project_boundary(
     tasks = eval(result)
     for poly in tasks["features"]:
         logger.debug(poly)
-        task_name = "fixme"
+        task_name = str(poly['properties']['id'])
         db_task = db_models.DbTask(
             project_id=project_id,
             project_task_name=task_name,
@@ -442,13 +443,14 @@ def read_xlsforms(
 def generate_appuser_files(
     db: Session,
     dbname: str,
+    category: str,
     project_id: int,
 ):
     """Generate the files for each appuser, the qrcode, the new XForm,
     and the OSM data extract.
     """
     project = table(
-        "projects", column("project_name_prefix"), column("xform_title"), column("id")
+        "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
     )
     where = f"id={project_id}"
     sql = select(project).where(text(where))
@@ -461,6 +463,10 @@ def generate_appuser_files(
     one = result.first()
     if one:
         prefix = one.project_name_prefix
+        if not one.xform_title:
+            xform_title = category
+        else:
+            xform_title = one.xform_title
         task = table("tasks", column("outline"), column("id"))
         where = f"project_id={project_id}"
         sql = select(
@@ -470,19 +476,22 @@ def generate_appuser_files(
         result = db.execute(sql)
         for poly in result.fetchall():
             # poly = result.first()
-            name = f"{prefix}_{poly.id}"
+            name = f"{prefix}_{category}_{poly.id}"
             appuser = central_crud.create_appuser(project_id, name)
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
-            create_qrcode(db, project_id, appuser.json()["token"], prefix)
-            xlsform = f"{xlsforms_path}/{one.xform_title}.xls"
-            xform = f"/tmp/{prefix}_{one.xform_title}_{poly.id}.xml"
-            result = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
-            # outfile = f"/tmp/{prefix}_{one.xform_title}_{poly.id}.geojson"
-            # pg = PostgresClient('localhost', dbname, outfile)
-            # outline = eval(poly.outline)
-            # pg.getFeature(outline, outfile, one.xform_title)
+
+            create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
+            xlsform = f"{xlsforms_path}/{xform_title}.xls"
+            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
+            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
+            pg = PostgresClient('localhost', dbname, outfile)
+            outline = eval(poly.outline)
+            pg.getFeature(outline, outfile, xform_title)
+            outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+            # import epdb; epdb.st()
+            result = central_crud.create_odk_xform(project_id, poly.id, outfile)
 
 
 def create_qrcode(
@@ -618,7 +627,7 @@ def get_outline_from_geojson_file_in_zip(
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail=f"{error_detail} ----- Error: {e} ---- FeatureCollection: {feature_collection}",
+            detail=f"{error_detail} ----- Error: {e} ----",
         )
 
 
