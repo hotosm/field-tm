@@ -69,7 +69,7 @@ def prep_form(form_template, AOIfile, outdir):
     """
     Creates a modified copy of an ODK xlsform to refer
     to a specific area and GeoJSON file of features.
-    Only works with OSM_Buildings_ODK_v_0-1-0.xlsx
+    Only works with forms built with this script in mind
     """
     form_basename = os.path.splitext(os.path.basename(form_template))[0]
     print(form_basename)
@@ -79,17 +79,17 @@ def prep_form(form_template, AOIfile, outdir):
     surveyws = wb["survey"]
     settingws = wb["settings"]
 
+    # Make the form title the task name
     settingws["A2"] = f"{AOIbasename}"
     settingws["B2"] = f"{AOIbasename}"
     settingws["C2"] = f"{AOIbasename}"
-    # TODO search for select_one_from_file instead of hard-coding row 15
-    # surveyws["A15"] = f"select_one_from_file " + f"{AOIbasename}{AOIext}"
 
     # Replace path to root of GeoJSON with the appropriate filename
     for row in surveyws.iter_rows():
         for cell in row:
             s = cell.value
             if s != None:
+                # check for cells referencing the geojson file
                 if "instance('buildings" in s:
                     cell.value = s.replace('buildings', f'{AOIbasename}')
                 if "select_one_from_file" in s:
