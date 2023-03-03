@@ -13,9 +13,21 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-#
+# 
 
 #!/bin/python3
+
+"""
+    If run from CLI, takes two positional arguments:
+
+    1) An input directory containing a subdirectory 
+       full of individual GeoJSON files representing tasks
+    2) A ODK-compatible xlsform template
+
+    It then creates a subdirectory called 'forms'
+    and populates it with xlsforms specifically 
+    referencing the individual GeoJSON files.
+"""
 
 import os
 import sys
@@ -28,9 +40,9 @@ def task_areas_to_forms(indir, form_template):
     Accepts a project directory, with a subdirectory
     called /geojson full of GeoJSON point files,
     each representing an individual task (e.g. a batch
-    of buildings or amenities to be visited for data
+    of buildings or amenities to be visited for data 
     collection) and returns a set of xlsforms, one for
-    each task, with the appropriate references in
+    each task, with the appropriate references in 
     place for the Select from Map question in ODK.
     """
     geojsondir = os.path.join(indir, "geojson")
@@ -43,7 +55,8 @@ def task_areas_to_forms(indir, form_template):
     # TODO: Maybe reject all non-point input files;
     # kind of a hassle involving a spatial lib
     # but perhaps worth it
-    aois = [x for x in filelist if os.path.splitext(x)[1].lower() == ".geojson"]
+    aois = [x for x in filelist if os.path.splitext(
+        x)[1].lower() == ".geojson"]
     outdir = os.path.join(indir, "forms")
     if not os.path.exists(outdir):
         print(f"Making directory {outdir}")
@@ -69,7 +82,23 @@ def prep_form(form_template, AOIfile, outdir):
     settingws["A2"] = f"{AOIbasename}"
     settingws["B2"] = f"{AOIbasename}"
     settingws["C2"] = f"{AOIbasename}"
-    surveyws["A9"] = f"select_one_from_file " f"{AOIbasename}{AOIext}"
+    # TODO search for select_one_from_file instead of hard-coding row 15
+    # surveyws["A15"] = f"select_one_from_file " + f"{AOIbasename}{AOIext}"
+
+    # Replace path to root of GeoJSON with the appropriate filename
+    for row in surveyws.iter_rows():
+        for cell in row:
+            s = cell.value
+            if s != None:
+                if "instance('buildings" in s:
+                    cell.value = s.replace('buildings', f'{AOIbasename}')
+                if "select_one_from_file" in s:
+                    cell.value = (f"select_one_from_file " +
+                                  f"{AOIbasename}{AOIext}")
+                    
+
+
+    # Write the individual XLSForm 
     outfile = os.path.join(outdir, f"{AOIbasename}.xlsx")
     print(f"Writing: {outfile}")
     wb.save(outfile)
@@ -77,13 +106,6 @@ def prep_form(form_template, AOIfile, outdir):
 
 if __name__ == "__main__":
     """
-    If run from CLI, takes two positional arguments
-    1) An input directory full of individual GeoJSON
-       files representing tasks
-    2) A ODK-compatible xlsform template
-    It then creates a subdirectory called 'forms'
-    and populates it with xlsforms specifically
-    referencing the individual GeoJSON files.
     """
     indir = sys.argv[1]
     formfile = sys.argv[2]
