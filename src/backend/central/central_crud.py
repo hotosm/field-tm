@@ -54,11 +54,15 @@ def create_odk_project(name: str):
     logger.info(f"Project {name} has been created on the ODK Central server.")
     return result
 
-
 def delete_odk_project(project_id: int):
-    """Delete a project from a remote ODK Server."""
+    """Delete a project from a remote ODK Server"""
+    # FIXME: when a project is deleted from Central, we have to update the
+    # odkid in the projects table
+
     result = project.deleteProject(project_id)
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
+    projects = project.listProjects()
+
     return result
 
 
@@ -80,13 +84,27 @@ def delete_app_user(project_id: int, name: str):
     return result
 
 
-def create_odk_xform(project_id: int, xform: str):
+def create_odk_xform(project_id: int, xform_id: str, filespec: str):
     """Create an XForm on a remote ODK Central server."""
-    logger.error("create_odk_xform is unimplemented!")
+    title = os.path.basename(os.path.splitext(filespec)[0])
+    result = xform.createForm(project_id, title, filespec, False)
+    if result != 200 and result != 409:
+        return result
+    data = f"/tmp/{title}.geojson"
+    # This modifies an existing published XForm to be in draft mode.
+    # An XForm must be in draft mode to upload an attachment.
+    result = xform.uploadMedia(project_id, title, data)
+    #if result == 200:
+    result = xform.publishForm(project_id, title)
+    return result
+
+
+def delete_odk_xform(project_id: int, xform_id: str):
+    """Delete an XForm from a remote ODK Central server."""
+    result = xform.deleteForm(project_id, xform_id, filespec, True)
+    logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
-    return None
-
-
+    return result
 def list_odk_xforms(project_id: int):
     """List all XForms in an ODK Central project."""
     xforms = project.listForms(project_id)
@@ -111,16 +129,15 @@ def download_submissions(project_id: int, xform_id: str):
     fixed = str(data, "utf-8")
     return fixed.splitlines()
 
-
 def generate_updated_xform(
     db: Session,
     task_id: dict,
     xlsform: str,
     xform: str,
 ):
-    """Update the version in an XForm so it's unique."""
-    name = xlsform.split(".")[0]
-    os.path.basename(name)
+    """Update the version in an XForm so it's unique"""
+    name =  os.path.basename(xform).replace(".xml", "")
+
     outfile = xform
     try:
         xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=True)
@@ -130,32 +147,37 @@ def generate_updated_xform(
     if os.path.getsize(outfile) <= 0:
         logger.warning(f"{outfile} is empty!")
         return None
+
     xls = open(outfile, "r")
     data = xls.read()
     xls.close()
 
+    tmp = name.split('_')
+    project = tmp[0]
+    category = tmp[1]
+    id = tmp[2].split('.')[0]
+    extract = f"jr://file/{name}.geojson"
     xml = xmltodict.parse(str(data))
     # First change the osm data extract file
     index = 0
     for inst in xml["h:html"]["h:head"]["model"]["instance"]:
         try:
             if "@src" in inst:
-                xml["h:html"]["h:head"]["model"]["instance"][index][
-                    "@src"
-                ] = "FIXME.geojson"
+                if xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split('.')[1] == "geojson":
+                    xml["h:html"]["h:head"]["model"]["instance"][index]["@src"] = extract
             if "data" in inst:
                 if "data" == inst:
                     xml["h:html"]["h:head"]["model"]["instance"]["data"][
                         "@id"
-                    ] = "FIXME XFORM"
+                    ] = xform
                 else:
                     xml["h:html"]["h:head"]["model"]["instance"][0]["data"][
                         "@id"
-                    ] = "FIXME XFORM"
+                    ] = id
         except Exception:
             continue
         index += 1
-    xml["h:html"]["h:head"]["h:title"] = "FIXME title"
+    xml["h:html"]["h:head"]["h:title"] = name
 
     # write the updated XML file
     outxml = open(outfile, "w")
@@ -185,7 +207,6 @@ def create_QRCode(
     """Create the QR Code for an app-user."""
     appuser = OdkAppUser()
     return appuser.createQRCode(project_id, token, name)
-
 
 def upload_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central."""
