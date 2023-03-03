@@ -94,6 +94,7 @@ async def create_project(
     """Create a project in ODK Central and the local database."""
     odkproject = central_crud.create_odk_project(project_info.project_info.name)
     # TODO check token against user or use token instead of passing user
+    # project_info.project_name_prefix = project_info.project_info.name
     project = project_crud.create_project_with_project_info(
         db, project_info, odkproject["id"]
     )
@@ -106,7 +107,7 @@ async def create_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/{project_id}/upload", response_model=project_schemas.ProjectOut)
+@router.post("/beta/{project_id}/upload")
 async def upload_project_boundary_with_zip(
     project_id: int,
     project_name_prefix: str,
@@ -201,9 +202,10 @@ async def download_task_boundaries(
 async def generate_files(
     project_id: int,
     dbname: str,
+    category: str,
     db: Session = Depends(database.get_db),
 ):
-    project_crud.generate_appuser_files(db, dbname, project_id)
+    project_crud.generate_appuser_files(db, dbname, category, project_id)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
