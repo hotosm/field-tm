@@ -26,14 +26,14 @@ networks:
 
 services:
   fmtm-db:
-    image: postgis/postgis:14-3.3-alpine
+    image: "postgis/postgis:14-3.3-alpine"
     container_name: fmtm_db
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
-      - POSTGRES_DB=${FMTM_DB_NAME}
+      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
     ports:
       - "5432:5432"
     networks:
@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
 
   api:
+    image: "quay.io/hotosm/fmtm-backend:latest"
     build:
       context: src/backend
       # target: debug
@@ -50,48 +51,89 @@ services:
       # - ../odkconvert/odkconvert:/home/appuser/.local/lib/python3.9/site-packages/odkconvert
     depends_on:
       - fmtm-db
-      - central
+      - central-proxy
     env_file:
       - .env
     environment:
-      - DB_URL=postgresql+psycopg2://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}:5432/${FMTM_DB_NAME}
+      - BACKEND_CORS_ORIGINS=${FRONTEND_MAIN_URL},${FRONTEND_MAP_URL}
     ports:
       - "8000:8000"
+      # - "5678:5678"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
-  ui:
+  ui-main:
+    image: "quay.io/hotosm/fmtm-mf-main:debug"
     build:
       context: src/frontend
-      target: debug
-    container_name: fmtm_ui
+      dockerfile: debug.dockerfile
+      args:
+        APP_NAME: main
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+    container_name: fmtm_main
+    depends_on:
+      - api
     volumes:
       - ./src/frontend/main:/app
       - /app/node_modules/
+    environment:
+      - API_URL=${API_URL}
+      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
     ports:
       - "8080:8080"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
+  ui-map:
+    image: "quay.io/hotosm/fmtm-mf-map:debug"
+    build:
+      context: src/frontend
+      dockerfile: debug.dockerfile
+      args:
+        APP_NAME: fmtm_openlayer_map
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+    container_name: fmtm_map
+    depends_on:
+      - api
+    volumes:
+      - ./src/frontend/fmtm_openlayer_map:/app
+      - /app/node_modules/
+    environment:
+      - API_URL=${API_URL}
+      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+    ports:
+      - "8081:8081"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
   central-db:
-    image: postgis/postgis:14-3.3-alpine
+    image: "postgis/postgis:14-3.3-alpine"
     container_name: central_db
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD}
-      - POSTGRES_DB=${CENTRAL_DB_NAME}
+      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
+      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
+    ports:
+      - "5433:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
   central:
+    image: "quay.io/hotosm/odkcentral-api:latest"
     build:
-      context: .
-      dockerfile: central.dockerfile
+      context: odkcentral/api
     container_name: central_api
     depends_on:
       - central-db
@@ -100,6 +142,17 @@ services:
       - .env
     ports:
       - "8383:8383"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  central-proxy:
+    image: "quay.io/hotosm/odkcentral-proxy:latest"
+    build:
+      context: odkcentral/proxy
+    container_name: central_proxy
+    depends_on:
+      - central
     networks:
       - fmtm-dev
     restart: unless-stopped

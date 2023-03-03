@@ -20,10 +20,8 @@ from fastapi import APIRouter, Depends
 from fastapi.logger import logger as logger
 
 # from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
-
 from ..db import database
 from ..debug import debug_schemas
-
 
 router = APIRouter(
     prefix="/debug",
@@ -48,20 +46,13 @@ async def debug():
 
 @router.get("/basemap")
 def make_basemap():
-    """Make a basemap of satellite imagery"""
+    """Make a basemap of satellite imagery."""
     logger.info("/debug/basemap Unimplemented!")
     return {"message": "Hello World from /debug/basemap"}
 
 
 @router.get("/makecsv")
 def do_odk2csv():
-    """Convert the submissions data into a CSV file"""
+    """Convert the submissions data into a CSV file."""
     logger.info("/debug/do_odk2csv is Unimplemented!")
     return {"message": "Hello World from /debug/makecsv"}
-
-
-@router.get("/makeosm")
-def do_csv2osm():
-    """Convert the submissions data into a CSV file"""
-    logger.info("/debug/do_csv2osm is Unimplemented!")
-    return {"message": "Hello World from /debug/makeosm"}

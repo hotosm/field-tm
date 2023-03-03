@@ -1,10 +1,11 @@
+const { EnvironmentPlugin } = require("webpack");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 const deps = require("./package.json").dependencies;
 module.exports = {
   output: {
-    publicPath: "http://localhost:7000/",
+    publicPath: `${process.env.FRONTEND_MAP_URL}/`,
   },
 
   resolve: {
@@ -12,17 +13,19 @@ module.exports = {
   },
 
   devServer: {
-    port: 7000,
+    host: "0.0.0.0",
+    port: `${new URL(process.env.FRONTEND_MAP_URL).port}`,
     historyApiFallback: true,
+    allowedHosts: [`${process.env.FRONTEND_MAP_URL}`],
   },
 
   module: {
     rules: [
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/,],
-        loader: 'file-loader',
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/],
+        loader: "file-loader",
         options: {
-          name: '[name].[ext]',
+          name: "[name].[ext]",
         },
       },
       {
@@ -51,11 +54,13 @@ module.exports = {
       name: "fmtm_openlayer_map",
       filename: "remoteEntry.js",
       remotes: {
-        fmtm:"fmtm@http://localhost:8080/remoteEntry.js"
+        fmtm: `fmtm@${process.env.FRONTEND_MAIN_URL}/remoteEntry.js`,
       },
       exposes: {
-        './Map': './src/App.jsx',
-        './Project':'./src/store/slices/ProjectSlice.js'
+        "./Map": "./src/App.jsx",
+        "./Project": "./src/store/slices/ProjectSlice.js",
+        "./ProjectDetails": "./src/views/Home.jsx",
+        "./Persistor": "./src/store/store.js",
       },
       shared: {
         ...deps,
@@ -72,5 +77,6 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "./src/index.html",
     }),
+    new EnvironmentPlugin(["FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
   ],
 };

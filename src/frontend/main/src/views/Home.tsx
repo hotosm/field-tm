@@ -13,7 +13,8 @@ import SearchablesRow from "../components/home/HomePageFilters";
 
 
 const Home = () => {
-
+    // const state:any = useSelector<any>(state=>state.project.projectData)
+    // console.log('state main :',state)
 
     const { type } = windowDimention();
     //get window dimension

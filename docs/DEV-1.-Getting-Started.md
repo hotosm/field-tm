@@ -25,7 +25,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 <img width="716" alt="image" src="https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png">
 
-3. Rightnow read user preferences permission is enough later on fmtm may need permission for modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
+3. Right now read user preferences permission is enough later on fmtm may need permission for modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
 
 4. Now Copy your Client ID , Client Secret and put it to `.env`
 
@@ -37,18 +37,12 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this
 
-    ODK_CENTRAL_URL=`<external_url_or_local_instance_url>`
+    ODK_CENTRAL_URL=https://central-proxy
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
-    CENTRAL_DB_HOST=central-db
-    CENTRAL_DB_USER=odk
-    CENTRAL_DB_PASSWORD=odk
-    CENTRAL_DB_NAME=odk
     API_URL=http://127.0.0.1:8000
-    FMTM_DB_HOST=fmtm-db
-    FMTM_DB_USER=fmtm
-    FMTM_DB_PASSWORD=fmtm
-    FMTM_DB_NAME=fmtm
+    FRONTEND_MAIN_URL=http://localhost:8080
+    FRONTEND_MAP_URL=http://localhost:8081
     OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
     OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
@@ -56,21 +50,11 @@ Your env should look like this
     OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
     OSM_SECRET_KEY=`<random_key_for_development>`
 
-### Setup ODK Central User
-
-The FMTM uses ODK Central to store ODK data.
-
-- By default the docker setup includes a Central server.
-- Alternatively, you may use an external Central server and user.
-- Add an admin user, with the user (email) and password you included in `.env`:
-  `docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
-  `docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
-
 ## Verify Setup
 
 ### Check Deployment
 
-For details for how to run this project locally for development, please look at: [DEV 2. Deployment](https://github.com/hotosm/fmtm/wiki/DEV-2:-Deployment)
+For details for how to run this project locally for development, please look at: [DEV 2. Deployment](https://github.com/hotosm/fmtm/wiki/DEV-2.-Deployment)
 
 ### Check Authentication
 
@@ -102,3 +86,45 @@ Don't forget to review [Contribution](https://github.com/hotosm/fmtm/wiki/Contri
 ### Implement authorization on an endpoints
 
 To add authentication to an endpoint, import `login_required` from `auth` module , you can use it as decorator or use fastapi `Depends(login_required)` on endpoints.
+
+## Backend Debugging
+
+1. Uncomment in docker-compose.yml:
+
+```yaml
+services:
+  api:
+    target: debug
+    ports:
+      - "5678:5678"
+```
+
+2. Re-build the docker image `docker compose build api`
+3. Start the docker container `docker compose up -d api` (the api startup will be halted until you connect a debugger)
+4. Set a debugger config in your IDE (e.g. VSCode) and start the debugger
+5. The API server will start up & any set breakpoints will trigger
+
+Example launch.json config for vscode:
+
+```
+{
+  "configurations": [
+    {
+      "name": "Remote - Server Debug",
+      "type": "python",
+      "request": "attach",
+      "host": "localhost",
+      "port": 5678,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/backend",
+          "remoteRoot": "/app/backend"
+        }
+      ],
+      "justMyCode": false
+    }
+  ]
+}
+```
+
+> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
