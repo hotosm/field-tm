@@ -1,10 +1,11 @@
+const { EnvironmentPlugin } = require("webpack");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 const deps = require("./package.json").dependencies;
 module.exports = {
   output: {
-    publicPath: "http://localhost:8080/",
+    publicPath: `${process.env.FRONTEND_MAIN_URL}/`,
   },
 
   resolve: {
@@ -12,17 +13,19 @@ module.exports = {
   },
 
   devServer: {
-    port: 8080,
+    host: "0.0.0.0",
+    port: `${new URL(process.env.FRONTEND_MAIN_URL).port}`,
     historyApiFallback: true,
+    allowedHosts: [`${process.env.FRONTEND_MAIN_URL}`],
   },
   devtool: "source-map",
   module: {
     rules: [
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/,],
-        loader: 'file-loader',
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/],
+        loader: "file-loader",
         options: {
-          name: '[name].[ext]',
+          name: "[name].[ext]",
         },
       },
       {
@@ -51,13 +54,18 @@ module.exports = {
       name: "fmtm",
       filename: "remoteEntry.js",
       remotes: {
-        map: "fmtm_openlayer_map@http://localhost:7000/remoteEntry.js"
+        map: `fmtm_openlayer_map@${process.env.FRONTEND_MAP_URL}/remoteEntry.js`,
       },
       exposes: {
-        "./HomeSlice": "./src/store/slices/HomeSlice.ts",
         "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
         "./BasicDialog": "./src/utilities/BasicDialog.tsx",
-        "./environment": "./src/environment.ts"
+        "./BasicCard": "./src/utilities/BasicCard.tsx",
+        "./BasicTabs": "./src/utilities/BasicTabs.tsx",
+        "./CustomSwiper": "./src/utilities/CustomSwiper.tsx",
+        "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
+        "./PrimaryAppBar": "./src/utilities/PrimaryAppBar.tsx",
+        "./environment": "./src/environment.ts",
+        "./WindowDimension": "./src/hooks/WindowDimension.tsx",
       },
       shared: {
         ...deps,
@@ -74,5 +82,6 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "./src/index.html",
     }),
+    new EnvironmentPlugin(["API_URL", "FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
   ],
 };

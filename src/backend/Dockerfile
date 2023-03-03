@@ -65,11 +65,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONFAULTHANDLER=1 \
     PATH="/home/appuser/.local/bin:$PATH" \
-    PYTHON_LIB="/home/appuser/.local/lib/python$PYTHON_IMG_TAG/site-packages"
+    PYTHON_LIB="/home/appuser/.local/lib/python$PYTHON_IMG_TAG/site-packages" \
+    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+
+COPY --from=quay.io/hotosm/odkcentral-proxy:latest \
+    /etc/nginx/central-cert.pem /usr/local/share/ca-certificates/central.crt
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
     -y --no-install-recommends \
+        "ca-certificates" \
         "nano" \
         "curl" \
         "libpcre3" \
@@ -80,7 +87,8 @@ RUN set -ex \
         "libproj19" \
         "libgeos-c1v5" \
         # "libgdal32" \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
 COPY --from=build \
     /root/.local \
     /home/appuser/.local
@@ -90,7 +98,7 @@ COPY . /app/backend
 ARG FMTM_DB_HOST
 RUN printf '#!/bin/bash\n\
     set -eo pipefail\n\
-    while !</dev/tcp/${FMTM_DB_HOST}/5432; do sleep 1; done;\n\
+    while !</dev/tcp/${FMTM_DB_HOST:-fmtm-db}/5432; do sleep 1; done;\n\
     exec "$@"'\
     >> /docker-entrypoint.sh \
     && chmod +x /docker-entrypoint.sh

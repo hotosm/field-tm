@@ -16,16 +16,16 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import json
 from typing import List
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from sqlalchemy.orm import Session
-import json
-
 from odkconvert.xlsforms import xlsforms_path
+from sqlalchemy.orm import Session
 
-from ..db import database
 from ..central import central_crud
+from ..db import database
 from . import project_crud, project_schemas
 
 router = APIRouter(
@@ -74,7 +74,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.post("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
-    """Delete a project from ODK Central and the local database"""
+    """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
     central_crud.delete_odk_project(project_id)
     # if not odkproject:
@@ -91,7 +91,7 @@ async def create_project(
     project_info: project_schemas.BETAProjectUpload,
     db: Session = Depends(database.get_db),
 ):
-    """Create a project in ODK Central and the local database"""
+    """Create a project in ODK Central and the local database."""
     odkproject = central_crud.create_odk_project(project_info.project_info.name)
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
@@ -115,12 +115,24 @@ async def upload_project_boundary_with_zip(
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
-    """This uploads the projecy boundary polygon to an existing project"""
+    """Upload a ZIP with task geojson polygons and QR codes for an existing project.
+
+    {PROJECT_NAME}/\n
+    ├─ {PROJECT_NAME}.geojson\n
+    ├─ {PROJECT_NAME}_polygons.geojson\n
+    ├─ geojson/\n
+    │  ├─ {PROJECT_NAME}_TASK_TYPE__{TASK_NUM}.geojson\n
+    ├─ QR_codes/\n
+    │  ├─ {PROJECT_NAME}_{TASK_TYPE}__{TASK_NUM}.png\n
+    """
     # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
     project = project_crud.update_project_with_zip(
         db, project_id, project_name_prefix, task_type_prefix, upload
     )
-    return f"{project}"
+    if project:
+        return project
+
+    return {"Message": "Uploading project ZIP failed"}
 
 
 @router.post("/{project_id}/upload_xlsform")
@@ -169,7 +181,7 @@ async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """Download the boundary polygon for this project"""
+    """Download the boundary polygon for this project."""
     out = project_crud.download_geometry(db, project_id, False)
     # FIXME: fix return value
     return {"Message": out}
@@ -180,7 +192,7 @@ async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """Download the task boundary polygons for this project"""
+    """Download the task boundary polygons for this project."""
     out = project_crud.download_geometry(db, project_id, True)
     # FIXME: fix return value
     return {"Message": out}

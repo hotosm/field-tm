@@ -1,0 +1,43 @@
+name: Publish Docs to Wiki
+
+on:
+  push:
+    paths:
+      - docs/**
+    branches: [main]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+env:
+  USER_TOKEN: ${{ secrets.WIKI_DEPLOY_TOKEN }}
+  USER_NAME: svcfmtm
+  USER_EMAIL: fmtm@hotosm.org
+  ORG: ${{ github.event.repository.owner.name }}
+  REPO_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  publish_docs_to_wiki:
+    # rclone syncs /docs dir to fmtm.wiki repo
+    name: Publish Docs to Wiki
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Pull content from wiki
+        run: |
+          mkdir tmp_wiki
+          cd tmp_wiki
+          git init
+          git config user.name $USER_NAME
+          git config user.email $USER_EMAIL
+          git pull https://$USER_TOKEN@github.com/$ORG/$REPO_NAME.wiki.git
+
+      - name: Push content to wiki
+        run: |
+          apt update && apt install -y rsync
+          rsync -av --delete docs/ tmp_wiki/ --exclude .git
+          cd tmp_wiki
+          git add .
+          git commit -m "docs: automated wiki update on push"
+          git push -f --set-upstream https://$USER_TOKEN@github.com/$ORG/$REPO_NAME.wiki.git master

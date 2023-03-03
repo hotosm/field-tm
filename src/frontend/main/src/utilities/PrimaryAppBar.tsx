@@ -9,11 +9,12 @@ import Button from '@mui/material/Button';
 import windowDimention from '../hooks/WindowDimension';
 import DrawerComponent from './CustomDrawer';
 import CustomizedImage from '../utilities/CustomizedImage';
-import { Link } from 'react-router-dom';
+import { Link, RouterProvider } from 'react-router-dom';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import { useDispatch, useSelector } from 'react-redux';
 import { ThemeActions } from '../store/slices/ThemeSlice';
+
 
 export default function PrimaryAppBar() {
 
@@ -25,6 +26,9 @@ export default function PrimaryAppBar() {
   const handleOpenDrawer = () => {
     setOpen(true)
   }
+
+
+
 
   const handleOnCloseDrawer = () => {
     setOpen(false)
@@ -99,14 +103,16 @@ export default function PrimaryAppBar() {
             <Button
               className='btnLogin'
               style={appBarInnerStyles.btnLogin}
-              color="info" >
+              color="info"
+              href="/login" >
               Login
             </Button>
 
             <Button
               className='btnSignUp'
               style={appBarInnerStyles.btnLogin}
-              color="info" >
+              color="info" 
+              href="/signup">
               Sign up
             </Button>
           </Box>

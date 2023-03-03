@@ -18,13 +18,11 @@
 
 import json
 
-
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from ..db import database
 from ..users import user_crud, user_schemas
-
 from . import AuthUser, login_required, osm_auth
 
 router = APIRouter(prefix="/auth")
@@ -42,7 +40,8 @@ def login_url(request: Request):
 
     Parameters: None
 
-    Returns:
+    Returns
+    -------
     - login_url (string) - URL to authorize user to the application via. Openstreetmap
         OAuth2 with client_id, redirect_uri, and permission scope as query_string parameters
     """
@@ -52,14 +51,15 @@ def login_url(request: Request):
 
 @router.get("/callback/")
 def callback(request: Request):
-    """Performs token exchange between OpenStreetMap and Export tool API
+    """Performs token exchange between OpenStreetMap and Export tool API.
 
     Core will use Oauth secret key from configuration while deserializing token,
     provides access token that can be used for authorized endpoints.
 
     Parameters: None
 
-    Returns:
+    Returns
+    -------
     - access_token (string)
     """
     access_token = osm_auth.callback(str(request.url))

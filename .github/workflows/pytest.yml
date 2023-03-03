@@ -1,0 +1,48 @@
+name: pytest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
+  ODK_CENTRAL_URL: http://localhost:8383
+  ODK_CENTRAL_USER: odk
+  ODK_CENTRAL_PASSWD: odk
+  OSM_CLIENT_ID: test
+  OSM_CLIENT_SECRET: test
+  OSM_URL: https://www.openstreetmap.org
+  OSM_SCOPE: read_prefs
+  OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
+  OSM_SECRET_KEY: test
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.*') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/backend/requirements.txt
+          pip install -r src/backend/requirements-dev.txt
+      - name: Run pytest
+        run: |
+          pytest
