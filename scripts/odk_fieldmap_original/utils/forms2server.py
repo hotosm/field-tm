@@ -32,9 +32,18 @@
 import os
 import sys
 
-from odk_requests import (app_users, attach_to_form, create_app_user,
-                          create_form, create_project, forms, project_id,
-                          publish_form, qr_code, update_role_app_user)
+from odk_requests import (
+    app_users,
+    attach_to_form,
+    create_app_user,
+    create_form,
+    forms,
+    create_project,
+    project_id,
+    publish_form,
+    qr_code,
+    update_role_app_user,
+)
 
 
 def get_formlist(indir):
