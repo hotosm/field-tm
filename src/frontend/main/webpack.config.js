@@ -58,14 +58,16 @@ module.exports = {
       },
       exposes: {
         "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
-        "./BasicDialog": "./src/utilities/BasicDialog.tsx",
+        "./HomeSlice": "./src/store/slices/HomeSlice.ts",
         "./BasicCard": "./src/utilities/BasicCard.tsx",
         "./BasicTabs": "./src/utilities/BasicTabs.tsx",
         "./CustomSwiper": "./src/utilities/CustomSwiper.tsx",
         "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
+        "./CustomizedSnackbar": "./src/utilities/CustomizedSnackbar.jsx",
         "./PrimaryAppBar": "./src/utilities/PrimaryAppBar.tsx",
         "./environment": "./src/environment.ts",
         "./WindowDimension": "./src/hooks/WindowDimension.tsx",
+        "./OnScroll": "./src/hooks/OnScroll.tsx",
       },
       shared: {
         ...deps,

@@ -28,7 +28,7 @@ const Home = () => {
     let cardsPerRow: any = new Array(type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1).fill(0);
     //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
-
+    const theme: any = useSelector<any>(state => state.theme.hotTheme)
     useEffect(() => {
         dispatch(HomeSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
@@ -47,7 +47,7 @@ const Home = () => {
                         ))}
                     </Grid>
                     : <Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
-                        <ProjectCardSkeleton cardsPerRow={cardsPerRow} />
+                        <ProjectCardSkeleton defaultTheme={theme} cardsPerRow={cardsPerRow} />
                     </Box>
 
             }
