@@ -7,10 +7,10 @@ import { Box, Stack } from '@mui/material';
 import { Navigation, Pagination } from "swiper";
 import CustomSwiperSwitcher from './CustomSwiperSwtcher';
 
-const CustomSwiper = ({ listOfData, switchMode, screenType }) => {
+const CustomSwiper = ({ listOfData, switchMode, screenType, onClick, selected, loading }) => {
 
     return (
-        <Stack className="App" p={3}>
+        <Stack className="App" >
             <Box marginTop={4}>
                 <Swiper
                     navigation={true}
@@ -38,15 +38,21 @@ const CustomSwiper = ({ listOfData, switchMode, screenType }) => {
                         paddingTop: 38
                     }}
                 >
-                    {listOfData.map((item, i) => (
-                        <SwiperSlide key={i}>
-                            <CustomSwiperSwitcher
-                                data={item}
-                                mode={switchMode}
-                                selected={listOfData[0]}
-                            />
-                        </SwiperSlide>
-                    ))}
+                    {listOfData.map((item, i) => {
+                        return (
+                            <SwiperSlide key={i}>
+                                <CustomSwiperSwitcher
+                                    index={i}
+                                    key={i}
+                                    data={item}
+                                    mode={switchMode}
+                                    selected={selected}
+                                    onClick={onClick}
+                                    loading={loading}
+                                />
+                            </SwiperSlide>
+                        )
+                    })}
                 </Swiper>
             </Box>
         </Stack>

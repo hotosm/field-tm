@@ -9,13 +9,16 @@ import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
 import { useNavigate } from "react-router-dom";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Stack } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import environment from '../../environment';
+import { HomeActions } from '../../store/slices/HomeSlice';
+import { HomeProjectCardModel } from '../../models/home/homeModel';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
 
     const [shadowBox, setShadowBox] = React.useState(0)
+    const dispatch = useDispatch();
     const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
     //use navigate hook for from react router dom for rounting purpose
     const navigate = useNavigate();
@@ -62,11 +65,17 @@ export default function ExploreProjectCard({ data }) {
     }
     return (
         <Card onClick={() => {
-            navigate(`/project_details/${environment.encode(`${data.id}`)}`)
-        }} style={cardInnerStyles.card} sx={{ boxShadow: shadowBox }} onMouseEnter={onHoverIn} onMouseLeave={onHoverOut}>
+            const project: HomeProjectCardModel = data;
+            dispatch(HomeActions.SetSelectedProject(project))
+            navigate(`/project_details/${environment.encode(data.id)}`)
+        }}
+            style={cardInnerStyles.card}
+            sx={{ boxShadow: shadowBox }}
+            onMouseEnter={onHoverIn}
+            onMouseLeave={onHoverOut}
+        >
 
             <CardContent>
-
                 {/*Id Number*/}
                 <Typography
                     variant='h4'

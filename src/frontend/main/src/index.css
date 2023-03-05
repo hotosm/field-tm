@@ -10,8 +10,6 @@ body {
   margin-top: 20px;
 }
 
-
-
 .btnLogin,
 btnSignUp {
   width: 100px;
@@ -88,5 +86,3 @@ button {
   fill: #44546a !important;
   stroke: #44546a !important;
 }
-
-

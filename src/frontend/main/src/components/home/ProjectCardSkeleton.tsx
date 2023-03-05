@@ -1,8 +1,8 @@
 import React from "react";
-import Skeleton from 'react-loading-skeleton'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 
 // Skeleton card main purpose is to perfom loading in case of any delay in retrieving project
-const ProjectCardSkeleton = ({ cardsPerRow }) => {
+const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
 
     return (
 
@@ -12,29 +12,56 @@ const ProjectCardSkeleton = ({ cardsPerRow }) => {
 
                     <div className="row mt-2">
                         <div className="col-md-12">
-                            <Skeleton
-                                width={69}
-                                style={{ marginTop: '3%', float: 'right' }}
-                                count={1}
-                            />
+
+
+                            <SkeletonTheme
+                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                            >
+                                <Skeleton
+                                    width={69}
+                                    style={{ marginTop: '3%', float: 'right' }}
+                                    count={1}
+                                />
+                            </SkeletonTheme>
                         </div>
                         <div className="col-md-4 mt-1">
-                            <Skeleton height={25} />
+                            <SkeletonTheme
+                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                            >
+                                <Skeleton height={25} />
+                            </SkeletonTheme>
                         </div>
                         <div className="col-md-4">
 
                         </div>
                         <div className="col-md-4 mt-1">
-                            <Skeleton height={25} />
+                            <SkeletonTheme
+                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                            >
+                                <Skeleton height={25} />
+                            </SkeletonTheme>
                         </div>
                         <div className="col-md-12">
-                            <Skeleton style={{ marginTop: '7%' }} height={23} />
-                            <Skeleton style={{ marginTop: '4%' }} height={16} />
-                            <Skeleton style={{ marginTop: '5%' }} height={90} />
+                            <SkeletonTheme
+                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                            >
+                                <Skeleton style={{ marginTop: '7%' }} height={23} />
+                                <Skeleton style={{ marginTop: '4%' }} height={16} />
+                                <Skeleton style={{ marginTop: '5%' }} height={90} />
+                            </SkeletonTheme>
 
                         </div>
                         <div className="col-md-12 mt-2">
-                            <Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
+                            <SkeletonTheme
+                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                            >
+                                <Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
+                            </SkeletonTheme>
                         </div>
                     </div>
                 </div>
