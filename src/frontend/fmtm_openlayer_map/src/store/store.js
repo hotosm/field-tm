@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import themeSlice from 'fmtm/ThemeSlice';
+import homeSlice from 'fmtm/HomeSlice';
 import ProjectSlice from "./slices/ProjectSlice";
 import {
     persistStore,
@@ -13,7 +14,6 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
-
 const reducers = combineReducers({
     project: persistReducer(
         {
@@ -23,6 +23,7 @@ const reducers = combineReducers({
         ProjectSlice.reducer
     ),
     theme: themeSlice.reducer,
+    home: homeSlice.reducer
 })
 
 export const store = configureStore({

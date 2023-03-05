@@ -5,18 +5,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import ProjectTaskStatus from '../api/ProjectTaskStatus';
 import MapStyles from '../hooks/MapStyles';
 import { ProjectActions } from '../store/slices/ProjectSlice';
+import { useParams } from 'react-router-dom';
 
-export default function Dialog({ taskId, feature }) {
-    const projectData = useSelector(state => state.project.projectData)
+export default function Dialog({ taskId, feature, map, view }) {
+    const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
+    const projectData = useSelector(state => state.project.projectTaskBoundries)
     const geojsonStyles = MapStyles()
     const dispatch = useDispatch();
+    const params = useParams();
+    const currentProjectId = environment.decode(params.id)
 
-    const tasksStatus = ['READY', 'LOCKED FOR MAPPING', 'LOCKED FOR VALIDATION',
-        'VALIDATE', 'INVALIDATED', 'BAD', 'SPLIT', 'ARCHIVED']
+    const index = environment.tasksStatus.findIndex(data => data.key == featureStatus)
+    const tasksStatusList = feature.id_ != undefined ? environment.tasksStatus[index]['value'] : []
+    const tasksList = environment.tasksStatus.map((status) => {
+        return status.key
+    })
 
     const handleOnClick = (event) => {
-        const value = event.target.id;
-        const status = value.replaceAll(' ', '_')
+
+        const status = event.target.id;
         const body = {
             username: 'mohamed',
             id: 1
@@ -25,26 +32,36 @@ export default function Dialog({ taskId, feature }) {
         dispatch(ProjectActions.SetDialogStatus(false))
         dispatch(
             ProjectTaskStatus(`${environment.baseApiUrl}/tasks/${taskId}/new_status/${status}`,
-                geoStyle, projectData, feature, body)
+                geoStyle, projectData, currentProjectId, feature, map, view, taskId, body)
         )
-
     }
 
     return (
-        <Stack direction={'column'} spacing={2}>
+        <Stack direction={'column'} p={3} spacing={2}>
             {
-                tasksStatus.map((data, index) => {
+                tasksList.map((data, index) => {
                     return (
-                        <Button
-                            id={data}
-                            key={index}
-                            variant="contained"
-                            color='error'
-                            onClick={handleOnClick}
-                            disabled={false}
-                        >
-                            {data}
-                        </Button>
+                        tasksStatusList.indexOf(data) != -1 ?
+                            <Button
+                                id={data}
+                                key={index}
+                                variant="contained"
+                                color='error'
+                                onClick={handleOnClick}
+                                disabled={false}
+                            >
+                                {data.replaceAll('_', ' ')}
+                            </Button> :
+                            <Button
+                                id={data}
+                                key={index}
+                                variant="contained"
+                                color='error'
+                                onClick={handleOnClick}
+                                disabled={true}
+                            >
+                                {data.replaceAll('_', ' ')}
+                            </Button>
                     )
                 })
             }

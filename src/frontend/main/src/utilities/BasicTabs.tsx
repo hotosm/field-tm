@@ -61,7 +61,7 @@ export default function BasicTabs({ listOfData }) {
                     centered
                     textColor='inherit'
                     TabIndicatorProps={{
-                        style: { backgroundColor: `${defaultTheme.palette.error['main']}` }
+                        style: { backgroundColor: `${defaultTheme.palette.error['main']}`, }
                     }}
                     variant={variant}
                     value={value}
@@ -76,7 +76,7 @@ export default function BasicTabs({ listOfData }) {
                                     sx={{ mt: 0.8, mb: 1, mr: 1 }}
                                     style={{
                                         fontFamily: defaultTheme.typography.h1.fontFamily,
-                                        fontSize: defaultTheme.typography.htmlFontSize
+                                        fontSize: defaultTheme.typography.fontSize
                                     }}
                                     label={item.label
                                     } {...a11yProps(0)}

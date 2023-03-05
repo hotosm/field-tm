@@ -57,7 +57,6 @@ export default function CustomizedMenus({ element, btnProps, btnName }) {
                 onClick={handleClick}
                 {...btnProps}
                 endIcon={<KeyboardArrowDownIcon />}
-
             >
                 {btnName}
             </Button>

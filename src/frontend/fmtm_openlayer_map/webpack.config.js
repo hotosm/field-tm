@@ -7,7 +7,7 @@ module.exports = {
   output: {
     publicPath: `${process.env.FRONTEND_SCHEME}://${process.env.FRONTEND_DOMAIN}:${process.env.FMTM_OPENLAYER_MAP_PORT}/`,
   },
-
+  devtool: "source-map",
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
@@ -35,7 +35,7 @@ module.exports = {
       },
       {
         test: /\.(css|s[ac]ss)$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
       },
       {
         test: /\.(ts|tsx|js|jsx)$/,
@@ -55,10 +55,8 @@ module.exports = {
         fmtm: `fmtm@${process.env.FRONTEND_SCHEME}://${process.env.FRONTEND_DOMAIN}:${process.env.MAIN_PORT}/remoteEntry.js`,
       },
       exposes: {
-        "./Map": "./src/App.jsx",
         "./Project": "./src/store/slices/ProjectSlice.js",
         "./ProjectDetails": "./src/views/Home.jsx",
-        "./Persistor": "./src/store/store.js",
       },
       shared: {
         ...deps,

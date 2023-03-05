@@ -2,19 +2,24 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 // import Swiper core and required modules
 
-import React from 'react';
-import { Box, Stack } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Stack } from '@mui/material';
 import { Navigation, Pagination } from "swiper";
-import CustomSwiperSwitcher from './CustomSwiperSwtcher';
 
-const CustomSwiper = ({ listOfData, switchMode, screenType, onClick, selected, loading }) => {
+
+const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected, loading }) => {
+    const [list, setListOfData] = useState([])
+    useEffect(() => {
+        setListOfData(listOfData)
+    }, [])
+
 
     return (
         <Stack className="App" >
             <Box marginTop={4}>
                 <Swiper
                     navigation={true}
-                    modules={[Pagination, Navigation]}
+                    modules={[Navigation]}
                     slidesPerView={
                         screenType == 'sm' ? 4 :
                             screenType == 's' ? 2 :
@@ -27,7 +32,7 @@ const CustomSwiper = ({ listOfData, switchMode, screenType, onClick, selected, l
                                 screenType == 'xs' ? 2 : 6
                     }
                     loop={true}
-                    loopFillGroupWithBlank={true}
+
                     pagination={{
                         clickable: true,
                     }}
@@ -38,18 +43,23 @@ const CustomSwiper = ({ listOfData, switchMode, screenType, onClick, selected, l
                         paddingTop: 38
                     }}
                 >
-                    {listOfData.map((item, i) => {
+                    {list.map((item, index) => {
                         return (
-                            <SwiperSlide key={i}>
-                                <CustomSwiperSwitcher
-                                    index={i}
-                                    key={i}
-                                    data={item}
-                                    mode={switchMode}
-                                    selected={selected}
+                            <SwiperSlide key={index}>
+                                <Button
+                                    key={index}
+                                    color="error"
+                                    id={item.id}
+                                    disabled={loading}
+                                    style={{
+                                        fontSize: defaultTheme.typography.htmlFontSize,
+                                        fontFamily: defaultTheme.typography.h3.fontFamily,
+                                    }}
                                     onClick={onClick}
-                                    loading={loading}
-                                />
+                                    variant={selected == item.id ? 'contained' : 'outlined'}
+                                >
+                                    {`Task #${item.id}`}
+                                </Button>
                             </SwiperSlide>
                         )
                     })}
