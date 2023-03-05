@@ -5,22 +5,35 @@ const ProjectSlice = createSlice({
     name: 'project',
     initialState: {
         projectLoading: true,
-        projectData:{},
-        dialogStatus:false,
-        map:null
+        projectTaskBoundries: [],
+        newProjectTrigger: false,
+        dialogStatus: false,
+        projectInfo: {},
+        snackbar: {
+            open: false,
+            message: '',
+            variant: 'info',
+            duration: 0
+        },
     },
     reducers: {
-        SetProject(state, action) {
-            state.projectData = action.payload
+        SetProjectTaskBoundries(state, action) {
+            state.projectTaskBoundries = action.payload
         },
         SetProjectLoading(state, action) {
             state.projectLoading = action.payload
         },
-        SetDialogStatus(state,action){
+        SetDialogStatus(state, action) {
             state.dialogStatus = action.payload
         },
-        SetMap(state,action){
-            state.map = action.payload
+        SetProjectInfo(state, action) {
+            state.projectInfo = action.payload
+        },
+        SetSnackBar(state, action) {
+            state.snackbar = action.payload
+        },
+        SetNewProjectTrigger(state, action) {
+            state.newProjectTrigger = !state.newProjectTrigger
         }
     }
 })

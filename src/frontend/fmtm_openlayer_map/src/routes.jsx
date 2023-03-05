@@ -15,10 +15,6 @@ const routes = createBrowserRouter(
                     path: "/:id",
                     element: <Home />,
                 },
-                // {
-                //     path: '/project_details/:id',
-                //     element: <ProjectDetails />,
-                // },
             ],
         },
     ]

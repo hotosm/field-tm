@@ -1,24 +1,48 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import React from "react";
 import { useSelector } from "react-redux";
 import CustomizedMenus from "fmtm/CustomizedMenus";
+import MapLegends from "./MapLegends";
 
 
-const MapDescriptionComponents = ({ details, type }) => {
-    const defaultTheme = useSelector(state => state.theme.hotTheme)
+const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
+
+    const descriptionData = [
+        {
+            value: 'Descriptions', element: <Typography align="center" >
+                {state.projectInfo.description}
+            </Typography>
+        },
+        {
+            value: 'Instructions', element: <Typography align="center" >
+                {state.projectInfo.location_str}
+            </Typography>
+        },
+        {
+            value: 'Legends',
+            element:
+                <MapLegends
+                    direction={'column'}
+                    defaultTheme={defaultTheme}
+                    spacing={1}
+                    iconBtnProps={{ disabled: true }}
+                    valueStatus
+                />
+        }
+    ]
     return (
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 1 }}>
             <Stack
                 width={'100%'}
-                p={2}
+                p={1}
                 spacing={type == 's' ? 1 : type == 'xs' ? 1 : 3}
                 direction={type == 's' ? 'column' : type == 'xs' ? 'column' : 'row'}
                 justifyContent={'center'}
             >
                 {
-                    details.map((data, index) => {
+                    descriptionData.map((data, index) => {
                         return (
                             <CustomizedMenus
                                 key={index}
