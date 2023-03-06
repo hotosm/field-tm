@@ -27,7 +27,7 @@ networks:
 
 services:
   traefik:
-    image: "docker.io/traefik:v2.9"
+    image: "docker.io/traefik:v2.8"
     container_name: fmtm_proxy
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
