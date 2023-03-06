@@ -75,6 +75,7 @@ class Task(TaskBase):
 
 
 class TaskOut(TaskBase):
+    task_status_str: TaskStatusOption
     pass
 
 
