@@ -27,7 +27,7 @@ Field mapping, especially for damage assessments, is limited by coordination of 
 
 In the wake of the 2010 Haiti earthquake, seeing a similar coordination challenge with mapping affected areas, OSM volunteers developed the Tasking Manager, which allowed mapping volunteers around the world to support building an open-source map of areas without map data. Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource for volunteers to contribute to the development of OSM.
 
-HOT is already in the early stages of developing the Field Mapping Tasking Manager (FMTM), but we now need to accelerate this effort and provide a working version for use as soon as possible to the OSM Turkey community and on-the-ground data collectors. We are asking for your developer conttributions: calling for 4 developers to work with us on this for 2 weeks See [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more detail.
+HOT is already in the early stages of developing the Field Mapping Tasking Manager (FMTM), but we now need to accelerate this effort and provide a working version for use as soon as possible to the OSM Turkey community and on-the-ground data collectors. We are asking for your developer contributions: calling for 4 developers to work with us on this for 2 weeks See [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more detail.
 
 # How to contribute
 
