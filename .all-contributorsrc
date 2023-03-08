@@ -1,5 +1,5 @@
 {
-  "projectName": "FMTM",
+  "projectName": "fmtm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -9,7 +9,21 @@
   "imageSize": 100,
   "commit": true,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "robsavoye",
+      "name": "Rob Savoye",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71342768?v=4",
+      "profile": "https://www.hotosm.org",
+      "contributions": [
+        "maintenance",
+        "mentoring",
+        "code",
+        "review",
+        "ideas"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "linkToUsage": true
 }
