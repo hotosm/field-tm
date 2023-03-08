@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/usr/bin/python3
 """
@@ -27,7 +27,7 @@ from osgeo import ogr
 
 
 def get_ogr_driver(extension):
-    """Load a driver from GDAL for the input file. 
+    """Load a driver from GDAL for the input file.
        Only GeoJSON guaranteed to work.
     """
     driver = None
