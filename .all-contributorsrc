@@ -1,5 +1,5 @@
 {
-  "projectName": "FMTM",
+  "projectName": "fmtm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -9,7 +9,20 @@
   "imageSize": 100,
   "commit": true,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "ivangayton",
+      "name": "Ivan Gayton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5991943?v=4",
+      "profile": "http://ivangayton.net",
+      "contributions": [
+        "projectManagement",
+        "code",
+        "review",
+        "ideas"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "linkToUsage": true
 }
