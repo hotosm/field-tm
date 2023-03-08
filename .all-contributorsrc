@@ -1,5 +1,5 @@
 {
-  "projectName": "FMTM",
+  "projectName": "fmtm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -9,7 +9,17 @@
   "imageSize": 100,
   "commit": true,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "biomassives",
+      "name": "G. Willson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
+      "profile": "https://www.scdhub.org",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "linkToUsage": true
 }
