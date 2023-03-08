@@ -1,5 +1,5 @@
 {
-  "projectName": "FMTM",
+  "projectName": "fmtm",
   "projectOwner": "hotosm",
   "repoType": "github",
   "repoHost": "https://github.com",
@@ -9,7 +9,20 @@
   "imageSize": 100,
   "commit": true,
   "commitConvention": "angular",
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "krtonga",
+      "name": "krtonga",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7307817?v=4",
+      "profile": "https://github.com/krtonga",
+      "contributions": [
+        "code",
+        "doc",
+        "tool",
+        "ideas"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "linkToUsage": true
 }
