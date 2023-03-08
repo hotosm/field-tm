@@ -1,5 +1,7 @@
 ![](images/hot_logo.png)
 
+[![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-)
+
 **Workflows**
 
 [![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml)
@@ -25,7 +27,7 @@ Field mapping, especially for damage assessments, is limited by coordination of 
 
 In the wake of the 2010 Haiti earthquake, seeing a similar coordination challenge with mapping affected areas, OSM volunteers developed the Tasking Manager, which allowed mapping volunteers around the world to support building an open-source map of areas without map data. Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource for volunteers to contribute to the development of OSM.
 
-HOT is already in the early stages of developing the Field Mapping Tasking Manager (FMTM), but we now need to accelerate this effort and provide a working version for use as soon as possible to the OSM Turkey community and on-the-ground data collectors. We are asking for your developer conttributions: calling for 4 developers to work with us on this for 2 weeks See [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more detail.
+HOT is already in the early stages of developing the Field Mapping Tasking Manager (FMTM), but we now need to accelerate this effort and provide a working version for use as soon as possible to the OSM Turkey community and on-the-ground data collectors. We are asking for your developer contributions: calling for 4 developers to work with us on this for 2 weeks See [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more detail.
 
 # How to contribute
 
@@ -50,9 +52,9 @@ To prepare the appropriate map files for ODK, we are taking our inspiration from
 Campaign managers select an Area of Interest (AOI) and organize field mappers to go out and collect data. They need to:
 
 - Select an AOI polygon by creating a GeoJSON or by tracing a polygon in a Web map
-- Choose a task division scheme (number of features or area per task, and possibly variations on what features to use as the preffered splitting lines)
+- Choose a task division scheme (number of features or area per task, and possibly variations on what features to use as the preferred splitting lines)
 - Provide specific instructions and guidance for field mappers on the project.
-- Provide a URL to a mobile-friendly Web page where field mappers can, from their mobile phone, select an task that is not already "checked out" (or possibly simply allocate areas to the field mappers).
+- Provide a URL to a mobile-friendly Web page where field mappers can, from their mobile phone, select a task that is not already "checked out" (or possibly simply allocate areas to the field mappers).
 - See the status of tasks (open, "checked out", completed but not validated, requires rework, validated, etc) in the Web browser on their computer
 
 ## Field mappers
@@ -123,3 +125,16 @@ A back end that converts the project parameters entered by the Campaign Manager 
 ### Field Mapper Web Interface (with mobile-friendly map view)
 
 - Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
+
+## Contributors ✨
+
+Thanks goes to these wonderful people:
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
