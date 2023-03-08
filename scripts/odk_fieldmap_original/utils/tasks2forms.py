@@ -13,19 +13,19 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
 """
     If run from CLI, takes two positional arguments:
 
-    1) An input directory containing a subdirectory 
+    1) An input directory containing a subdirectory
        full of individual GeoJSON files representing tasks
     2) A ODK-compatible xlsform template
 
     It then creates a subdirectory called 'forms'
-    and populates it with xlsforms specifically 
+    and populates it with xlsforms specifically
     referencing the individual GeoJSON files.
 """
 
@@ -40,9 +40,9 @@ def task_areas_to_forms(indir, form_template):
     Accepts a project directory, with a subdirectory
     called /geojson full of GeoJSON point files,
     each representing an individual task (e.g. a batch
-    of buildings or amenities to be visited for data 
+    of buildings or amenities to be visited for data
     collection) and returns a set of xlsforms, one for
-    each task, with the appropriate references in 
+    each task, with the appropriate references in
     place for the Select from Map question in ODK.
     """
     geojsondir = os.path.join(indir, "geojson")
@@ -95,10 +95,10 @@ def prep_form(form_template, AOIfile, outdir):
                 if "select_one_from_file" in s:
                     cell.value = (f"select_one_from_file " +
                                   f"{AOIbasename}{AOIext}")
-                    
 
 
-    # Write the individual XLSForm 
+
+    # Write the individual XLSForm
     outfile = os.path.join(outdir, f"{AOIbasename}.xlsx")
     print(f"Writing: {outfile}")
     wb.save(outfile)
