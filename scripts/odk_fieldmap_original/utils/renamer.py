@@ -13,14 +13,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
 """
     Accepts
     - A directory with forms or QR codes for an FMTM project
-    
+
     Renames all of the files with the schema needed by the FMTM uploader.
 """
 import os
@@ -38,12 +38,11 @@ if __name__ == "__main__":
     """
     Renames a directory full of files to match FMTM format
     """
-    
+
     indir = sys.argv[1]
     basename = sys.argv[2]
     formtype = sys.argv[3]
-    
+
     print("\nHere goes nothing.\n")
     r = rename(indir, basename, formtype)
     print(r)
-    
