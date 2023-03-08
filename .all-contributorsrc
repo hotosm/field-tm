@@ -45,12 +45,14 @@
       ]
     },
     {
-      "login": "biomassives",
-      "name": "G. Willson",
-      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
-      "profile": "https://www.scdhub.org",
+      "login": "spwoodcock",
+      "name": "Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78538841?v=4",
+      "profile": "https://github.com/spwoodcock",
       "contributions": [
-        "code"
+        "code",
+        "review",
+        "infra",
       ]
     },
     {
@@ -62,6 +64,15 @@
         "doc",
         "eventOrganizing",
         "ideas"
+      ]
+    }
+    {
+      "login": "biomassives",
+      "name": "G. Willson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
+      "profile": "https://www.scdhub.org",
+      "contributions": [
+        "code"
       ]
     }
   ],
