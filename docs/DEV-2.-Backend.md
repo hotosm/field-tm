@@ -27,7 +27,7 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 The FMTM uses ODK Central to store ODK data.
 
-- By default the docker setup includes a Central server.
+- By default, the docker setup includes a Central server.
 - Add an admin user, with the user (email) and password you included in `.env`:
   `docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
   `docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
