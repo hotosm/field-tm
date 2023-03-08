@@ -7,14 +7,8 @@ const ProjectSlice = createSlice({
         projectLoading: true,
         projectTaskBoundries: [],
         newProjectTrigger: false,
-        dialogStatus: false,
         projectInfo: {},
-        snackbar: {
-            open: false,
-            message: '',
-            variant: 'info',
-            duration: 0
-        },
+
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
@@ -23,14 +17,8 @@ const ProjectSlice = createSlice({
         SetProjectLoading(state, action) {
             state.projectLoading = action.payload
         },
-        SetDialogStatus(state, action) {
-            state.dialogStatus = action.payload
-        },
         SetProjectInfo(state, action) {
             state.projectInfo = action.payload
-        },
-        SetSnackBar(state, action) {
-            state.snackbar = action.payload
         },
         SetNewProjectTrigger(state, action) {
             state.newProjectTrigger = !state.newProjectTrigger

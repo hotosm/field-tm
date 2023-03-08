@@ -22,7 +22,7 @@ export default function BasicDialog({ open, actions, title, onClose }) {
                 </IconButton>
             </Stack>
             {title != undefined ?
-                <Stack p={1} direction={'row'} justifyContent={'center'}>
+                <Stack p={1} direction={'row'} pl={3} >
                     <Typography
                         variant='h2'
                         mt={'3%'}

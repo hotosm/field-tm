@@ -8,9 +8,13 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import GridViewIcon from '@mui/icons-material/GridView';
 import AddIcon from '@mui/icons-material/Add';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import RemoveIcon from '@mui/icons-material/Remove';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import '../styles/home.scss'
 import { ProjectActions } from "../store/slices/ProjectSlice";
+import { HomeActions }  from 'fmtm/HomeSlice';
 
 
 
@@ -26,7 +30,8 @@ const OpenLayersMap = (
         mainView,
         featuresLayer,
         mapElement,
-        environment
+        environment,
+        mapDivPostion
     }) => {
 
     function elastic(t) {
@@ -48,9 +53,9 @@ const OpenLayersMap = (
 
                     <BasicDialog
                         open={stateDialog}
-                        title={`#${taskId}`}
+                        title={`Task #${taskId}`}
                         onClose={() => {
-                            dispatch(ProjectActions.SetDialogStatus(false))
+                            dispatch(HomeActions.SetDialogStatus(false))
                         }}
                         actions={<DialogActions map={map} view={mainView} feature={featuresLayer} taskId={taskId}
                         />}
@@ -65,6 +70,23 @@ const OpenLayersMap = (
                         zIndex={1}
                         top={top}
                     >
+
+                        <IconButtonCard
+                            style={{ backgroundColor: 'white', right: 0 }}
+                            element={
+                                <IconButton onClick={() => {
+                                    const main = document.getElementsByClassName('mainview')[0]
+                                    main.scrollTo({
+                                        top: mapDivPostion
+                                    });
+                                }}
+                                    color="info" aria-label="share qrcode"
+                                >
+                                    <KeyboardDoubleArrowUpIcon color="info" sx={{ fontSize: 30 }} />
+                                </IconButton>
+                            }
+                        />
+
                         <IconButtonCard
                             style={{ backgroundColor: 'white', right: 0 }}
                             element={
@@ -93,6 +115,7 @@ const OpenLayersMap = (
                             }
                         />
 
+
                         <IconButtonCard
                             style={{ backgroundColor: 'white', right: 0 }}
                             element={
@@ -104,10 +127,10 @@ const OpenLayersMap = (
                                     //     setFullView(true)
                                     //     mapElement.current.style.position = 'absolute';
                                     // }
-                                    dispatch(ProjectActions.SetSnackBar({
+                                    dispatch(HomeActions.SetSnackBar({
                                         open: true,
                                         message: `No action yet`,
-                                        variant: 'info',
+                                        variant: 'warning',
                                         duration: 6000
                                     }))
                                 }}
@@ -156,6 +179,33 @@ const OpenLayersMap = (
                                     color="info" aria-label="share qrcode"
                                 >
                                     <GridViewIcon color="info" sx={{ fontSize: 30 }} />
+                                </IconButton>
+                            }
+                        />
+
+                        <IconButtonCard
+                            style={{ backgroundColor: 'white', right: 0 }}
+                            element={
+                                <IconButton onClick={() => {
+                                    const main = document.getElementsByClassName('mainview')[0]
+                                    const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
+                                    let taskHistories = [];
+                                    state.projectTaskBoundries[index].taskBoundries.forEach((task) => {
+                                        taskHistories = taskHistories.concat(task.task_history.map(history => {
+                                            return { ...history, taskId: task.id, status: task.task_status_str }
+                                        }))
+                                    })
+
+                                    if (taskHistories.length > 1) {
+                                        main.scrollTo(0,document.getElementsByClassName('mainview')[0].scrollHeight/6);
+                                    } else {
+                                        main.scrollTo(0,document.getElementsByClassName('mainview')[0].scrollHeight);
+                                    }
+                                   
+                                }}
+                                    color="info" aria-label="share qrcode"
+                                >
+                                    <KeyboardDoubleArrowDownIcon color="info" sx={{ fontSize: 30 }} />
                                 </IconButton>
                             }
                         />

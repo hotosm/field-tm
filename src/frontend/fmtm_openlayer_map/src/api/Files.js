@@ -30,8 +30,8 @@ export const ProjectFilesById = (url, taskId, selectedTask) => {
             setLoading(false)
             setQrcode('')
             if (source) {
-                console.log('canceled');
-                source.cancel("Landing Component got unmounted");
+                // console.log('canceled');
+                source.cancel("component unmounted");
             }
         }
 

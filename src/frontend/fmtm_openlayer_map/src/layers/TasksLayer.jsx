@@ -22,7 +22,7 @@ const TasksLayer = (map, view) => {
             if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
 
                 const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
-
+      
                 const styleFunction = function (feature) {
                     let id = feature.getId().toString().replace("_", ",");
                     geojsonStyles[id.split(',')[1]]

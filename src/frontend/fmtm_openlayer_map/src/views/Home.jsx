@@ -25,6 +25,7 @@ import TasksLayer from "../layers/TasksLayer";
 import { easeIn, easeOut } from 'ol/easing';
 import Map from 'ol/Map'
 import View from 'ol/View'
+import { HomeActions }  from 'fmtm/HomeSlice';
 const Home = () => {
 
     const dispatch = useDispatch();
@@ -32,7 +33,8 @@ const Home = () => {
     const defaultTheme = useSelector(state => state.theme.hotTheme)
     const state = useSelector(state => state.project)
     const projectInfo = useSelector(state => state.home.selectedProject)
-    const stateDialog = useSelector(state => state.project.dialogStatus)
+    const stateDialog = useSelector(state => state.home.dialogStatus)
+    const stateSnackBar= useSelector(state => state.home.snackbar)
     const [taskId, setTaskId] = useState()
     const mapElement = useRef();
     const [map, setMap] = useState()
@@ -71,10 +73,10 @@ const Home = () => {
         if (reason === 'clickaway') {
             return;
         }
-        dispatch(ProjectActions.SetSnackBar({
+        dispatch(HomeActions.SetSnackBar({
             open: false,
-            message: state.snackbar.message,
-            variant: state.snackbar.variant,
+            message: stateSnackBar.message,
+            variant: stateSnackBar.variant,
             duration: 0
         }))
     };
@@ -131,7 +133,7 @@ const Home = () => {
                 if (environment.tasksStatus.findIndex(data => data.key == status) != -1) {
                     setFeaturesLayer(feature)
                     setTaskId(feature.getId().split('_')[0])
-                    dispatch(ProjectActions.SetDialogStatus(true))
+                    dispatch(HomeActions.SetDialogStatus(true))
                 }
             });
         });
@@ -163,10 +165,10 @@ const Home = () => {
 
             {/* Home snackbar */}
             <CustomizedSnackbar
-                duration={state.snackbar.duration}
-                open={state.snackbar.open}
-                variant={state.snackbar.variant}
-                message={state.snackbar.message}
+                duration={stateSnackBar.duration}
+                open={stateSnackBar.open}
+                variant={stateSnackBar.variant}
+                message={stateSnackBar.message}
                 handleClose={handleClose}
             />
 
@@ -264,6 +266,7 @@ const Home = () => {
                     mainView={mainView}
                     mapElement={mapElement}
                     environment={environment}
+                    mapDivPostion={y}
                 />
             </Stack>
 

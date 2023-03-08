@@ -38,11 +38,11 @@ const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, pa
                     <IconButtonCard
                         element={
                             <IconButton onClick={async () => {
+                                
                                 const main = document.getElementsByClassName('mainview')[0]
                                 await main.scrollTo({
                                     top: mapDivPostion
                                 });
-
 
                                 const centroid = state.projectTaskBoundries[index].
                                     taskBoundries.filter((task) => {

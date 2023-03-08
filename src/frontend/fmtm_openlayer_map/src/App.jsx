@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import './index.css'
 import ReactDOM from "react-dom";
 
-import 'rsuite/dist/rsuite.min.css';
+
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

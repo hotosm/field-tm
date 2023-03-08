@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ProjectActions } from "../store/slices/ProjectSlice";
-import environment from "fmtm/environment";
 import { easeIn, easeOut } from 'ol/easing';
+import { HomeActions }  from 'fmtm/HomeSlice';
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
 
     return async (dispatch) => {
@@ -10,18 +10,14 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         const updateTask = async (url, existingData, body) => {
 
             try {
-
+                dispatch(HomeActions.SetDialogStatus(false))
                 map.getTargetElement().classList.add('spinner');
 
                 const response = await axios.post(url, body);
                 const findIndexForUpdation = existingData[index].taskBoundries.findIndex(obj => obj.id == response.data.id)
 
                 let project_tasks = [...existingData[index].taskBoundries]
-                project_tasks[findIndexForUpdation] = {
-                    ...response.data, task_status_str: environment.tasksStatus.filter((val) => {
-                        return val.status == response.data.task_status
-                    })[0]['key']
-                }
+                project_tasks[findIndexForUpdation] = {...response.data}
 
                 let updatedProject = [...existingData]
                 const finalProjectOBJ = { id: updatedProject[index].id, taskBoundries: project_tasks }
@@ -29,7 +25,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
 
                 dispatch(ProjectActions.SetProjectTaskBoundries(updatedProject))
 
-                dispatch(ProjectActions.SetSnackBar({
+                dispatch(HomeActions.SetSnackBar({
                     open: true,
                     message: `Task #${response.data.id} updated successful`,
                     variant: 'success',
@@ -38,10 +34,10 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
 
 
             } catch (error) {
-                dispatch(ProjectActions.SetSnackBar({
+                dispatch(HomeActions.SetSnackBar({
                     open: true,
-                    message: `Failed to update Task #${response.data.id}`,
-                    variant: 'success',
+                    message: `Failed to update Task #${taskId}`,
+                    variant: 'error',
                     duration: 6000
                 }))
             }
