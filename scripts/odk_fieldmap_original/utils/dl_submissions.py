@@ -40,6 +40,7 @@
 
 import os
 import sys
+import argparse
 
 from io import BytesIO, StringIO
 from zipfile import ZipFile as zf
@@ -51,6 +52,9 @@ def project_forms(url, aut, pid):
     """Returns a list of all forms in an ODK project"""
     formsr = forms(url, aut, pid)
     formsl = formsr.json()
+    # TODO this returns happily with wrong credentials,
+    # thinking that the error message actually constitutes
+    # data about 2 forms. Should fail noisily. 
     print(f'There are {len(formsl)} forms in project {pid}.')
     return formsl
 
@@ -126,6 +130,9 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
 
             # If it is a csv, open it and see if it is more than one line
             # This might go wrong if something is encoded in other than UTF-8
+            #
+            # TODO: identify and collate repeats separate from the parent
+            # submission.
             if os.path.splitext(sub_name)[1] == '.csv':
                 subs_stringio = StringIO(subs_bytes.decode())
                 subs_list = list(csv.reader(subs_stringio))
@@ -153,16 +160,53 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
 
 if __name__ == "__main__":
     """Downloads all of the submissions from a given ODK Central project"""
-    # TODO Add Argparse and make the expand_geopoint function a parameter
-    # that accepts and arbitrary column name to expand
-    url = sys.argv[1]
-    aut = (sys.argv[2], sys.argv[3])
-    pid = sys.argv[4]
-    outdir = sys.argv[5]
-    collate = True
-    expand_geopoint = 'all-xlocation'
 
-    formsl = project_forms(url, aut, pid)
-    subs = project_submissions_unzipped(url, aut, pid, formsl, outdir,
-                                        collate, expand_geopoint)
-    
+    p = argparse.ArgumentParser()
+
+    # Positional args
+    p.add_argument('url', help="ODK Central Server URL")
+    p.add_argument('username', help="ODK Central username")
+    p.add_argument('password', help="ODK Central password")
+    p.add_argument('pid', help="ODK Central project id number")
+    p.add_argument('outdir', help="Output directory to write submissions")
+
+    # Optional args
+    p.add_argument('-gc', '--geopoint_column', default='all-xlocation', help=
+                   'The name of the column in the submissions containing '
+                   'single-point geometry in Javarosa form for expansion')
+
+    # Flag args
+    p.add_argument('-c', '--collate', action="store_true", help=
+                   "Attempt to collate the CSV from all submissions "
+                   "into a single CSV file")
+    p.add_argument('-z', '--zipped', action="store_true", help=
+                   "Don't bother trying to extract and/or collate csv "
+                   "submissions, just get the zip files")
+    p.add_argument('-x', '--expand_geopoint', action="store_true", help=
+                   "Convert a the column given by -gc, containing a Javarosa "
+                   "geopoint string, into four columns: "
+                   "lat, lon, elevation, accuracy")
+
+    a = p.parse_args()
+
+    print(a)
+#    formsl = project_forms(a.url, (a.username, a.password), a.pid)
+#    
+#    if a.zipped:
+#        subs = project_submissions_zipped(a.url,
+#                                          (a.username, a.password),
+#                                          a.pid,
+#                                          formsl,
+#                                          a.outdir
+#                                          )
+#    else:
+#        subs = project_submissions_unzipped(a.url,
+#                                            (a.username, a.password),
+#                                            a.pid,
+#                                            formsl,
+#                                            a.outdir,
+#                                            a.collate,
+#                                            a.expand_geopoint
+#                                            )
+#    
+#
