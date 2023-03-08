@@ -7,15 +7,59 @@ The FMTM codebase consists of:
 
 <img src="https://github.com/hotosm/fmtm/blob/main/images/dataflow.png?raw=true"  width=800 height= 800>
 
-# To Start working on this project
+## Prerequisites for Contribution
 
-## Get project code
+### 1. Review documentation
 
-1. Clone the project `git clone https://github.com/hotosm/fmtm.git`
+Don't forget to review the [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution) guidelines and our [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct) before contributing!
+Here are the steps to contribute to the frontend of Field Mapping Tasking Manager:
 
-## Setup your local environment
+### 2. Fork the repository
 
-### Setup OSM OAUTH 2.0
+Forking creates a copy of the repository in your own GitHub account.
+Go to the [Field Mapping Tasking Manager repository](https://github.com/hotosm/fmtm) and click the "Fork" button in the top right corner of the page.
+
+### 3. Clone the forked repository
+
+Clone the forked repository to your local machine using the following command:
+
+`git clone https://github.com/<your-username>/tasking-manager.git`
+
+Make sure to replace <your-username> with your GitHub username.
+
+### 4. Create a new branch
+
+Create a new branch for your changes using the following command:
+
+`git checkout -b branch-name`
+
+Make sure to give your branch a descriptive name that reflects the changes you'll be making.
+
+### 5. Make changes
+
+Make your changes to the codebase.
+
+### 6. Commit and push
+
+Once you've made and tested your changes, commit them to your local branch using the following command:
+
+`git commit -m "Add feature"`
+
+Make sure to write a descriptive commit message that explains the changes you've made. Then, push your changes to your forked repository using the following command:
+
+`git push origin branch-name`
+
+### 6. Submit a pull request
+
+Go to your forked repository on GitHub and click the "New pull request" button. Select the branch that contains your changes, then click "Create pull request". This will open a new pull request in the Field Mapping Tasking Manager repository, where you can describe your changes and request that they be merged into the main codebase.
+
+That's it! You've now contributed to the frontend of the Field Mapping Tasking Manager.
+
+## Development: Setup Your Local Environment
+
+These steps are essential to run and test your code!
+
+### 1. Setup OSM OAUTH 2.0
 
 The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your FMTM project, you will need to create keys for OSM.
 
@@ -29,7 +73,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 4. Now Copy your Client ID , Client Secret and put it to `.env`
 
-### Create an `.env` File
+### 2. Create an `.env` File
 
 Environmental variables are used throughout this project. To get started, create `.env` file in the top level dir, Sample is `.env.example`
 
@@ -80,51 +124,3 @@ Once you have deployed, you will need to check that you can properly authenticat
 # Start Developing
 
 Don't forget to review [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution) guidelines and our [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct) before contributing!
-
-## Backend Tips
-
-### Implement authorization on an endpoints
-
-To add authentication to an endpoint, import `login_required` from `auth` module, you can use it as a decorator or use fastapi `Depends(login_required)` on endpoints.
-
-## Backend Debugging
-
-1. Uncomment in docker-compose.yml:
-
-```yaml
-services:
-  api:
-    target: debug
-    ports:
-      - "5678:5678"
-```
-
-2. Re-build the docker image `docker compose build api`
-3. Start the docker container `docker compose up -d api` (the api startup will be halted until you connect a debugger)
-4. Set a debugger config in your IDE (e.g. VSCode) and start the debugger
-5. The API server will start up & any set breakpoints will trigger
-
-Example launch.json config for vscode:
-
-```
-{
-  "configurations": [
-    {
-      "name": "Remote - Server Debug",
-      "type": "python",
-      "request": "attach",
-      "host": "localhost",
-      "port": 5678,
-      "pathMappings": [
-        {
-          "localRoot": "${workspaceFolder}/src/backend",
-          "remoteRoot": "/app/backend"
-        }
-      ],
-      "justMyCode": false
-    }
-  ]
-}
-```
-
-> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
