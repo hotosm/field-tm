@@ -12,14 +12,14 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 ### 1A: Starting the Containers
 
-1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and insure that it is running on your local machine.
+1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
 3. From the command line run: `docker compose build`
 4. Once everything is built, from the command line run: `docker compose up -d`
 
 5. If everything goes well you should now be able to **navigate to the project in your browser:**
-   - **Frontend:** <http://127.0.0.1:8080>
    - **API:** <http://127.0.0.1:8000/docs>
+   - **Frontend:** <http://127.0.0.1:8080>
 
 > Note: If those links don't work, check the logs with `docker log fmtm_api`.
 
@@ -34,7 +34,15 @@ The FMTM uses ODK Central to store ODK data.
 
 > Note: Alternatively, you may use an external Central server and user.
 
-## 2. Start FMTM locally
+### 1C: Import Test Data
+
+Some test data is available to get started quickly.
+
+- Navigate to the `import-test-data` endpoint in the API docs page:
+  <http://localhost:8000/docs#/debug/import_test_data_debug_import_test_data_get>
+- Click `Try it out`, then `execute`.
+
+## 2. Start FMTM locally (OUTDATED)
 
 To run FMTM locally, you will need to start the database, the api, and the frontend separately, one by one. It is important to do this in the proper order.
 
@@ -44,9 +52,9 @@ To run FMTM locally, you will need to start the database, the api, and the front
 
 Running the database in Docker means postgres/postgis does not need to be installed and ran on your local machine, and you can use the same database no matter your method of deployment.
 
-1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and insure that it is running on your local machine.
-2. From the command line, navigate to the top level directory of the FMTM project.
-3. From command line, start up the database with `docker-compose -f docker-compose.local.yml up --build`
+1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
+2. From the command line, navigate into the top level directory of the FMTM project.
+3. From command line, start up database with `docker-compose -f docker-compose.local.yml up --build`
 
 The `docker-compose.local.yml` file only includes the database container (`db`), so only the database runs on docker.
 
@@ -65,13 +73,3 @@ After starting the database, from the command line:
 5. Run the Fast API backend with: `uvicorn src.backend.main:api --reload`
 
 The API should now be accessible at: <http://127.0.0.1:8000/docs>
-
-### 2C. Starting the react frontend
-
-To run the react frontend, from the command line:
-
-1. Navigate into the react frontend directory: `cd src/frontend/main`
-2. Install dependencies: `npm install`
-3. Run the project: `npm run start:live`
-
-The React frontend should now be accessible at: <http://127.0.0.1:8080>
