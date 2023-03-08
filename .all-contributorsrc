@@ -11,6 +11,18 @@
   "commitConvention": "angular",
   "contributors": [
     {
+      "login": "ivangayton",
+      "name": "Ivan Gayton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5991943?v=4",
+      "profile": "http://ivangayton.net",
+      "contributions": [
+        "projectManagement",
+        "code",
+        "review",
+        "ideas"
+      ]
+    },
+    {
       "login": "robsavoye",
       "name": "Rob Savoye",
       "avatar_url": "https://avatars.githubusercontent.com/u/71342768?v=4",
@@ -18,11 +30,7 @@
       "contributions": [
         "maintenance",
         "mentoring",
-        "code",
-        "review",
-        "ideas"
-      ]
-    }
+    },
   ],
   "contributorsPerLine": 7,
   "linkToUsage": true
