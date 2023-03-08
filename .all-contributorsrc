@@ -45,15 +45,6 @@
       ]
     },
     {
-      "login": "biomassives",
-      "name": "G. Willson",
-      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
-      "profile": "https://www.scdhub.org",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
       "login": "spwoodcock",
       "name": "Sam",
       "avatar_url": "https://avatars.githubusercontent.com/u/78538841?v=4",
@@ -62,7 +53,26 @@
         "code",
         "review",
         "infra",
+      ]
+    },
+    {
+      "login": "petya-kangalova",
+      "name": "Petya ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/98902727?v=4",
+      "profile": "https://www.hotosm.org/people/petya-kangalova/",
+      "contributions": [
+        "doc",
+        "eventOrganizing",
         "ideas"
+      ]
+    }
+    {
+      "login": "biomassives",
+      "name": "G. Willson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
+      "profile": "https://www.scdhub.org",
+      "contributions": [
+        "code"
       ]
     }
   ],
