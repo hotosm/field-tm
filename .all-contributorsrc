@@ -21,6 +21,15 @@
         "review",
         "ideas"
       ]
+    },
+    {
+      "login": "Mudi-business",
+      "name": "Mohamed Bakari Mohamed",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52991565?v=4",
+      "profile": "http://zanrevenue.org",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
