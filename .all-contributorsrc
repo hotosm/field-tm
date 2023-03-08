@@ -1,37 +1,59 @@
 {
-  "projectName": "fmtm",
-  "projectOwner": "hotosm",
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "files": [
-    "README.md"
-  ],
-  "imageSize": 100,
-  "commit": true,
-  "commitConvention": "angular",
-  "contributors": [
-    {
-      "login": "ivangayton",
-      "name": "Ivan Gayton",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5991943?v=4",
-      "profile": "http://ivangayton.net",
-      "contributions": [
-        "projectManagement",
-        "code",
-        "review",
-        "ideas"
-      ]
-    },
-    {
-      "login": "Mudi-business",
-      "name": "Mohamed Bakari Mohamed",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52991565?v=4",
-      "profile": "http://zanrevenue.org",
-      "contributions": [
-        "code"
-      ]
-    }
-  ],
-  "contributorsPerLine": 7,
-  "linkToUsage": true
+   "projectName":"fmtm",
+   "projectOwner":"hotosm",
+   "repoType":"github",
+   "repoHost":"https://github.com",
+   "files":[
+      "README.md"
+   ],
+   "imageSize":100,
+   "commit":true,
+   "commitConvention":"angular",
+   "contributors":[
+      {
+         "login":"ivangayton",
+         "name":"Ivan Gayton",
+         "avatar_url":"https://avatars.githubusercontent.com/u/5991943?v=4",
+         "profile":"http://ivangayton.net",
+         "contributions":[
+            "projectManagement",
+            "code",
+            "review",
+            "ideas"
+         ]
+      },
+      {
+         "login":"robsavoye",
+         "name":"Rob Savoye",
+         "avatar_url":"https://avatars.githubusercontent.com/u/71342768?v=4",
+         "profile":"https://www.hotosm.org",
+         "contributions":[
+            "maintenance",
+            "mentoring"
+         ]
+      },
+      {
+         "login":"krtonga",
+         "name":"krtonga",
+         "avatar_url":"https://avatars.githubusercontent.com/u/7307817?v=4",
+         "profile":"https://github.com/krtonga",
+         "contributions":[
+            "code",
+            "doc",
+            "tool",
+            "ideas"
+         ]
+      },
+      {
+         "login":"biomassives",
+         "name":"G. Willson",
+         "avatar_url":"https://avatars.githubusercontent.com/u/4379874?v=4",
+         "profile":"https://www.scdhub.org",
+         "contributions":[
+            "code"
+         ]
+      }
+   ],
+   "contributorsPerLine":7,
+   "linkToUsage":true
 }
