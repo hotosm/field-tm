@@ -7,6 +7,13 @@ const HomeSlice = createSlice({
         homeProjectSummary: [],
         homeProjectLoading: true,
         selectedProject: {},
+        dialogStatus: false,
+        snackbar: {
+            open: false,
+            message: '',
+            variant: 'info',
+            duration: 0
+        },
 
     },
     reducers: {
@@ -18,6 +25,12 @@ const HomeSlice = createSlice({
         },
         SetSelectedProject(state, action) {
             state.selectedProject = action.payload
+        },
+        SetDialogStatus(state, action) {
+            state.dialogStatus = action.payload
+        },
+        SetSnackBar(state, action) {
+            state.snackbar = action.payload
         },
     }
 })
