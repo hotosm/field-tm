@@ -5,7 +5,7 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "build:start": "cd dist && PORT=8080 npx serve",
-    "start": "env-cmd -f .env.dev webpack serve --open --mode development",
+    "start": "webpack serve --open --mode development",
     "start:live": "webpack serve --open --mode development --live-reload --hot"
   },
   "license": "MIT",
@@ -42,16 +42,20 @@
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",
     "axios": "^1.2.2",
-    "env-cmd": "^10.1.0",
+    "bootstrap": "^5.2.3",
     "install": "^0.13.0",
+    "leaflet": "^1.9.3",
     "react": "^17.0.2",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^17.0.2",
+    "react-leaflet": "^4.2.0",
     "react-loading-skeleton": "^3.1.0",
+    "react-qr-code": "^2.0.11",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.6.0",
+    "react-swipeable-views": "^0.14.0",
     "redux": "^4.2.0",
-    "redux-persist": "^6.0.0",
     "rsuite": "^5.23.3",
-    "swiper": "^9.1.0"
+    "swiper": "^8.4.7"
   }
 }
