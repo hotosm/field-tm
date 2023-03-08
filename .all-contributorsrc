@@ -7,6 +7,7 @@
     "README.md"
   ],
   "imageSize": 100,
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/HOTOSM-Thanks%20for%20contributing!-red/github/all-contributors/hotosm/FMTM?color=red&style=flat-square)](#contributors)",
   "commit": true,
   "commitConvention": "angular",
   "contributors": [
