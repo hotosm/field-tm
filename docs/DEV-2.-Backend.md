@@ -6,7 +6,7 @@ The recommended way to run FMTM is with Docker. You can also develop on your loc
 
 Now let's get started!
 
-## 1. Start FMTM with Docker
+## 1. Start the API with Docker
 
 The easiest way to get up and running is by using the FMTM Docker deployment. Docker creates a virtual environment, isolated from your computer's environment, installs all necessary dependencies, and creates a container for each the database, the api, and the frontend. These containers talk to each other via the URLs defined in the docker-compose file and your env file.
 
@@ -14,14 +14,12 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
-3. From the command line run: `docker compose build`
-4. Once everything is built, from the command line run: `docker compose up -d`
+3. From the command line run: `docker compose pull`.
+   This will pull the latest container builds from **main** branch.
+4. Once everything is pulled, from the command line run: `docker compose up -d api`
+5. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
-5. If everything goes well you should now be able to **navigate to the project in your browser:**
-   - **API:** <http://127.0.0.1:8000/docs>
-   - **Frontend:** <http://127.0.0.1:8080>
-
-> Note: If those links don't work, check the logs with `docker log fmtm_api`.
+> Note: If those link doesn't work, check the logs with `docker log fmtm_api`.
 
 ### 1B: Setup ODK Central User
 
@@ -42,7 +40,7 @@ Some test data is available to get started quickly.
   <http://localhost:8000/docs#/debug/import_test_data_debug_import_test_data_get>
 - Click `Try it out`, then `execute`.
 
-## 2. Start FMTM locally (OUTDATED)
+## 2. Start the API locally (OUTDATED)
 
 To run FMTM locally, you will need to start the database, the api, and the frontend separately, one by one. It is important to do this in the proper order.
 
@@ -73,3 +71,51 @@ After starting the database, from the command line:
 5. Run the Fast API backend with: `uvicorn src.backend.main:api --reload`
 
 The API should now be accessible at: <http://127.0.0.1:8000/docs>
+
+## Backend Tips
+
+### Implement authorization on an endpoints
+
+To add authentication to an endpoint, import `login_required` from `auth` module, you can use it as a decorator or use fastapi `Depends(login_required)` on endpoints.
+
+## Backend Debugging
+
+1. Uncomment in docker-compose.yml:
+
+```yaml
+services:
+  api:
+    target: debug
+    ports:
+      - "5678:5678"
+```
+
+2. Re-build the docker image `docker compose build api`
+3. Start the docker container `docker compose up -d api` (the api startup will be halted until you connect a debugger)
+4. Set a debugger config in your IDE (e.g. VSCode) and start the debugger
+5. The API server will start up & any set breakpoints will trigger
+
+Example launch.json config for vscode:
+
+```
+{
+  "configurations": [
+    {
+      "name": "Remote - Server Debug",
+      "type": "python",
+      "request": "attach",
+      "host": "localhost",
+      "port": 5678,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/backend",
+          "remoteRoot": "/app/backend"
+        }
+      ],
+      "justMyCode": false
+    }
+  ]
+}
+```
+
+> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
