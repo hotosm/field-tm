@@ -111,7 +111,7 @@ export default function PrimaryAppBar() {
             <Button
               className='btnSignUp'
               style={appBarInnerStyles.btnLogin}
-              color="info" 
+              color="info"
               href="/signup">
               Sign up
             </Button>

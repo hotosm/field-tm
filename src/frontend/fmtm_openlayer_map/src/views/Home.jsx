@@ -79,7 +79,7 @@ const Home = () => {
         }))
     };
 
-    //Fetch project for the first time 
+    //Fetch project for the first time
     useEffect(() => {
         if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(encodedId)) == -1) {
             dispatch(
