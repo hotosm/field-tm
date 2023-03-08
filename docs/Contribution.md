@@ -20,7 +20,7 @@ If we are specifically looking for input from developers with Python skills and 
 
 ## Report bugs and suggest improvements
 
-The [issue queue](https://github.com/hotosm/fmtm/issues)) is the best way to get started. There are issue templates for BUGs and FEATURES that you can use, or you can create your own. Once you have submitted an issue, it will be assigned one label out of the following [label categories](https://github.com/hotosm/fmtm/labels). If you are wondering where to start, you can filter by the GoodFirstIssue label.
+The [issue queue](https://github.com/hotosm/fmtm/issues) is the best way to get started. There are issue templates for BUGs and FEATURES that you can use, or you can create your own. Once you have submitted an issue, it will be assigned one label out of the following [label categories](https://github.com/hotosm/fmtm/labels). If you are wondering where to start, you can filter by the GoodFirstIssue label.
 
 ## Thank you
 
