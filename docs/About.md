@@ -12,7 +12,7 @@ It’s already possible to implement a sort of Field Mapping Tasking Manager wor
 
 # How to contribute
 
-👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
+👍🎉We are actively looking for contributors to this project- from design, user testing, and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
 
 # Using OpenDataKit's Select From Map feature
 
@@ -31,10 +31,10 @@ To prepare the appropriate map files for ODK, we are taking our inspiration from
 Campaign managers select an Area of Interest (AOI) and organize field mappers to go out and collect data. They need to:
 
 - Select an AOI polygon by creating a GeoJSON or by tracing a polygon in a Web map
-- Choose a task division scheme (number of features or area per task, and possibly variations on what features to use as the preffered splitting lines)
+- Choose a task division scheme (number of features or area per task, and possible variations on what features to use as the preferred splitting lines)
 - Provide specific instructions and guidance for field mappers on the project.
-- Provide a URL to a mobile-friendly Web page where field mappers can, from their mobile phone, select an task that is not already "checked out" (or possibly simply allocate areas to the field mappers).
-- See the status of tasks (open, "checked out", completed but not validated, requires rework, validated, etc) in the Web browser on their computer
+- Provide a URL to a mobile-friendly Web page where field mappers can, from their mobile phone, select a task that is not already "checked out" (or possibly simply allocate areas to the field mappers).
+- See the status of tasks (open, "checked out", completed but not validated, requires to rework, validated, etc) in the Web browser on their computer
 
 ## Field mappers
 
@@ -47,7 +47,7 @@ Field mappers select (or are allocated) individual tasks within a project AOI an
 
 Validators review the data collected by field mappers and assess its quality. If the data is good, the validators merge the portion of the data that belongs in OpenStreetMap to OSM. If it requires more work, the validators either fix it themselves (for minor stuff like spelling or capitalization mistakes that don't seem to be systematic) or inform the field mappers that they need to fix it. They need to:
 
-- Access completed data sets of "submissions" as Comma Separated Values and/or OSM XML so that they can review it.
+- Access completed data sets of "submissions" as Comma Separated Values and/or OSM XML so that they can review them.
 - Mark areas as validated or requiring rework
 - Communicate with field mappers if rework is necessary
 - Merge good-quality data into OSM (probably from JOSM).
@@ -65,7 +65,7 @@ The ODK Collect app connects to a back-end server (in this case ODK Central), wh
 
 ## ODK Central server
 
-An ODK Central server which functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
+An ODK Central server that functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
 
 [Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (it's very similar on AWS or whatever)
 
