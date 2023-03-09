@@ -99,17 +99,35 @@ def expand_geopoints(csv, geopoint_column_name):
 
     return newcsv
     
+def javarosa2wkt(jrstring):
+    """Takes a Javarosa geo string and converts it into Well-Known-Text.
+    Assumes that the string consists of the usual space-delimited 
+    lat, lon, elevation, accuracy elements for each node, and nodes are
+    semicolon-delimited (as is the case with ODK geowidget output). 
+    If there's only one node, it creates a WKT point. If more than one,
+    and the last isn't identical to the first, it creates a polyline.
+    If more than two, and the last is identical to the first, it creates
+    a polygon. In any other cases it should return an error."""
+    
     
 
 def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                                  collate, expand_geopoint):
     """Downloads and unzips all of the submissions from a given ODK project"""
     if collate:
-        collated_outfilepath = os.path.join(outdir, f'_project_{pid}.csv')
+        collated_outfilepath = os.path.join(outdir, f'project_{pid}_submissions'
+                                            '_collated.csv')
         c_outfile = open(collated_outfilepath, 'w')
         cw = csv.writer(c_outfile)
-        firstline = True
-    for form in formsl:
+
+        # create a single file to dump all repeat data lines
+        # TODO multiple collated files for multiple repeats
+        c_repeatfilepath = os.path.join(outdir, f'project_{pid}_repeats'
+                                        '_collated.csv')
+        c_repeatfile = open(c_repeatfilepath, 'w')
+        cr = csv.writer(c_repeatfile)
+        
+    for fidx, form in enumerate(formsl):
         form_id = form['xmlFormId']
         print(f'Checking submissions from {form_id}.')
         subs_zip = csv_submissions(url, aut, pid, form_id)
@@ -117,9 +135,12 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
         subs_bytes.seek(0)
         subs_unzipped = zf(subs_bytes)
         sub_namelist = subs_unzipped.namelist()
-        print(f'Files in submissions from {form_id}:')
+        subcount = len(sub_namelist)
+        print(f'There are {subcount} files in submissions from {form_id}:')
         print(sub_namelist)
-        for sub_name in sub_namelist:
+
+        # Now save the rest of the files
+        for idx, sub_name in enumerate(sub_namelist):
             subs_bytes = subs_unzipped.read(sub_name)
             outfilename = os.path.join(outdir, sub_name)
             
@@ -130,16 +151,13 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
 
             # If it is a csv, open it and see if it is more than one line
             # This might go wrong if something is encoded in other than UTF-8
-            #
-            # TODO: identify and collate repeats separate from the parent
-            # submission.
             if os.path.splitext(sub_name)[1] == '.csv':
                 subs_stringio = StringIO(subs_bytes.decode())
                 subs_list = list(csv.reader(subs_stringio))
                 # Check if there are CSV lines after the headers
-                subs_num = len(subs_list)
-                print(f'{sub_name} has {subs_num - 1} submissions')
-                if subs_num > 1:
+                subs_len = len(subs_list)
+                print(f'{sub_name} has {subs_len - 1} submissions')
+                if subs_len > 1:
                     subs_to_write = subs_list
                     if expand_geopoint:
                         subs_to_write = expand_geopoints(subs_list,
@@ -148,12 +166,19 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                         w = csv.writer(outfile)
                         w.writerows(subs_to_write)
                     if collate:
-                        if firstline:
-                            cw.writerows(subs_to_write)
-                            firstline = False
+                        if not idx:                            
+                            if not fidx:
+                                # First form. Include header
+                                cw.writerows(subs_to_write)
+                            else:
+                                # Not first form. Skip first row (header)
+                                cw.writerows(subs_to_write[1:])
                         else:
-                            cw.writerows(subs_to_write[1:])
-
+                            # Include header because it's a repeat
+                            # TODO actually create a separate collated
+                            # CSV output for each repeat in the survey
+                            cr.writerows(subs_to_write)
+    
             else:
                 with open(outfilename, 'wb') as outfile:
                     outfile.write(subs_bytes)
@@ -189,24 +214,23 @@ if __name__ == "__main__":
 
     a = p.parse_args()
 
-    print(a)
-#    formsl = project_forms(a.url, (a.username, a.password), a.pid)
-#    
-#    if a.zipped:
-#        subs = project_submissions_zipped(a.url,
-#                                          (a.username, a.password),
-#                                          a.pid,
-#                                          formsl,
-#                                          a.outdir
-#                                          )
-#    else:
-#        subs = project_submissions_unzipped(a.url,
-#                                            (a.username, a.password),
-#                                            a.pid,
-#                                            formsl,
-#                                            a.outdir,
-#                                            a.collate,
-#                                            a.expand_geopoint
-#                                            )
-#    
-#
+    formsl = project_forms(a.url, (a.username, a.password), a.pid)
+    
+    if a.zipped:
+        subs = project_submissions_zipped(a.url,
+                                          (a.username, a.password),
+                                          a.pid,
+                                          formsl,
+                                          a.outdir
+                                          )
+    else:
+        subs = project_submissions_unzipped(a.url,
+                                            (a.username, a.password),
+                                            a.pid,
+                                            formsl,
+                                            a.outdir,
+                                            a.collate,
+                                            a.expand_geopoint
+                                            )
+    
+
