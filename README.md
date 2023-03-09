@@ -126,6 +126,82 @@ A back end that converts the project parameters entered by the Campaign Manager 
 
 - Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
 
+## Frequently Asked Questions
+### For Users
+Q: What is the Field Mapping Tasking Manager (FMTM) Web App?
+
+A: The FMTM Web App is an online platform that allows users to view and contribute to collaborative mapping projects related to humanitarian and development work.
+
+Q: Do I need to create an account to use the FMTM Web App?
+
+A: No, you can use the FMTM Web App without creating an account, but creating an account allows you to contribute to mapping projects and access additional features.
+
+Q: How do I browse and select mapping projects on the FMTM Web App?
+
+A: You can browse and select mapping projects on the FMTM Web App by clicking on the "Projects" tab and selecting a project of interest. You can view project details, tasks, and mapping data on the project page.
+
+Q: How do I contribute to a mapping project on the FMTM Web App?
+
+A: To contribute to a mapping project on the FMTM Web App, you can create an account, select a project of interest, and choose a task to work on. You can then use the mapping tools provided to complete the task.
+
+Q: Can I work on multiple mapping tasks at the same time on the FMTM Web App?
+
+A: Yes, you can work on multiple mapping tasks at the same time on the FMTM Web App, as long as you can commit the necessary time and effort to each task.
+
+Q: How do I know if my mapping work on the FMTM Web App is accurate?
+
+A: The FMTM Web App has a validation process where other contributors review and validate the mapping work. This helps to ensure the accuracy of the mapping data.
+
+Q: Can I provide feedback on a mapping project on the FMTM Web App?
+
+A: Yes, you can provide feedback on a mapping project on the FMTM Web App by leaving a comment on the project page or contacting the project manager.
+
+Q: How do I download mapping data from a project on the FMTM Web App?
+
+A: To download mapping data from a project on the FMTM Web App, you can select the project of interest and click on the "Export" button on the project page.
+
+Q: Can I use the mapping data from the FMTM Web App for my own research or projects?
+
+A: The mapping data on the FMTM Web App is generally open and available for use, but it is important to check the specific project requirements and licenses before using the data for your own research or projects.
+
+### For Contributors
+
+Q: What is the Field Mapping Tasking Manager (FMTM)?
+
+A: The Field Mapping Tasking Manager (FMTM) is an online platform that allows contributors to participate in mapping projects related to humanitarian and development work.
+
+Q: How can I become a contributor to the FMTM?
+
+A: To become a contributor to the FMTM, you can create an account on the platform and join a mapping project.
+
+Q: What are the benefits of contributing to the FMTM?
+
+A: Contributing to the FMTM allows you to help with important humanitarian and development work, while also developing your mapping skills and knowledge.
+
+Q: Do I need to have prior mapping experience to contribute to the FMTM?
+
+A: No, prior mapping experience is not required to contribute to the FMTM. The platform provides training and resources to help new contributors get started.
+
+Q: How do I know which mapping project to join?
+
+A: The FMTM provides information about each project, including the location, the organization sponsoring the project, and the mapping goals. Review the project information and choose a project that interests you.
+
+Q: Can I work on multiple mapping projects at the same time?
+
+A: Yes, you can work on multiple mapping projects at the same time. However, it is important to ensure that you can commit the necessary time and effort to each project.
+
+Q: How do I get feedback on my mapping work?
+
+A: The FMTM provides a validation process where other contributors review and provide feedback on mapping work. You can also contact project managers or experienced contributors for additional feedback.
+
+Q: How can I improve my mapping skills?
+
+A: The FMTM provides training and resources to help you improve your mapping skills. You can also join mapping communities and forums to connect with other contributors and learn from their experiences.
+
+Q: Can I use the mapping data for my own research or projects?
+
+A: The mapping data on the FMTM is generally open and available for use, but it is important to check the specific project requirements and licenses before using the data for your own research or projects.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people:
