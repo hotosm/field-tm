@@ -73,15 +73,15 @@ export default function BasicTabs({ listOfData }) {
                             return (
                                 <Tab
                                     key={index}
-                             
+
                                     sx={{
                                         fontFamily: defaultTheme.typography.h1.fontFamily,
                                         fontSize: defaultTheme.typography.fontSize,
                                         mt: 0.8, mb: 1,
                                         mr: 1,
-                                        '&:hover':{
-                                            backgroundColor:defaultTheme.palette.mapFeatureColors['bad_rgb']
-                                        } 
+                                        '&:hover': {
+                                            backgroundColor: defaultTheme.palette.mapFeatureColors['info_rgb']
+                                        }
                                     }}
                                     label={item.label
                                     } {...a11yProps(0)}

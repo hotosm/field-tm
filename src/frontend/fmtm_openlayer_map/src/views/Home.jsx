@@ -25,7 +25,7 @@ import TasksLayer from "../layers/TasksLayer";
 import { easeIn, easeOut } from 'ol/easing';
 import Map from 'ol/Map'
 import View from 'ol/View'
-import { HomeActions }  from 'fmtm/HomeSlice';
+import { HomeActions } from 'fmtm/HomeSlice';
 const Home = () => {
 
     const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const Home = () => {
     const state = useSelector(state => state.project)
     const projectInfo = useSelector(state => state.home.selectedProject)
     const stateDialog = useSelector(state => state.home.dialogStatus)
-    const stateSnackBar= useSelector(state => state.home.snackbar)
+    const stateSnackBar = useSelector(state => state.home.snackbar)
     const [taskId, setTaskId] = useState()
     const mapElement = useRef();
     const [map, setMap] = useState()
@@ -108,7 +108,7 @@ const Home = () => {
         const view = new View({
             projection: 'EPSG:4326',
             center: [0, 0],
-            zoom: 3,
+            zoom: 4,
         });
 
         const initialMap = new Map({
@@ -156,7 +156,7 @@ const Home = () => {
         }
     }, [map, y])
 
-    TasksLayer(map, mainView)
+    TasksLayer(map, mainView, featuresLayer)
 
 
 

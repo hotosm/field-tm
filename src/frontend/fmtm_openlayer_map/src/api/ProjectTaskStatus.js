@@ -1,7 +1,9 @@
 import axios from "axios";
 import { ProjectActions } from "../store/slices/ProjectSlice";
 import { easeIn, easeOut } from 'ol/easing';
-import { HomeActions }  from 'fmtm/HomeSlice';
+import { HomeActions } from 'fmtm/HomeSlice';
+import Style from "ol/style/Style";
+import Icon from "ol/style/Icon";
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
 
     return async (dispatch) => {
@@ -17,7 +19,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
                 const findIndexForUpdation = existingData[index].taskBoundries.findIndex(obj => obj.id == response.data.id)
 
                 let project_tasks = [...existingData[index].taskBoundries]
-                project_tasks[findIndexForUpdation] = {...response.data}
+                project_tasks[findIndexForUpdation] = { ...response.data }
 
                 let updatedProject = [...existingData]
                 const finalProjectOBJ = { id: updatedProject[index].id, taskBoundries: project_tasks }
@@ -44,7 +46,6 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
 
         }
         await updateTask(url, existingData, body)
-
         const centroid = await existingData[index].
             taskBoundries.filter((task) => {
                 return task.id == taskId

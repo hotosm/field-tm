@@ -8,12 +8,19 @@ import MapStyles from '../hooks/MapStyles';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import environment from "fmtm/environment";
+import Feature from 'ol/Feature';
+import Style from 'ol/style/Style';
+import { Point } from 'ol/geom';
+import Icon from 'ol/style/Icon';
+import { Projection } from 'ol/proj';
+import ImageLayer from 'ol/layer/Image';
+import Static from 'ol/source/ImageStatic';
 
 
-const TasksLayer = (map, view) => {
+const TasksLayer = (map, view, feature) => {
     const params = useParams();
     const state = useSelector(state => state.project)
-    const geojsonStyles = MapStyles();
+    const geojsonStyles = MapStyles(feature);
 
     useEffect(() => {
 
@@ -22,7 +29,7 @@ const TasksLayer = (map, view) => {
             if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
 
                 const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
-      
+
                 const styleFunction = function (feature) {
                     let id = feature.getId().toString().replace("_", ",");
                     geojsonStyles[id.split(',')[1]]
@@ -42,6 +49,7 @@ const TasksLayer = (map, view) => {
 
                 const vectorSource = new VectorSource({
                     features: new GeoJSON().readFeatures(geojsonObject),
+
                 });
 
                 const vectorLayer = new VectorLayer({
@@ -57,7 +65,7 @@ const TasksLayer = (map, view) => {
                 map.getView().setCenter(centroid)
 
                 setTimeout(() => {
-                    view.animate({ zoom: 13, easing: easeOut, duration: 2000, });
+                    view.animate({ zoom: 15, easing: easeOut, duration: 2000, });
                 }, 500);
 
                 map.addLayer(vectorLayer)
@@ -68,6 +76,17 @@ const TasksLayer = (map, view) => {
         }
 
     }, [state.newProjectTrigger, map])
+
+    // useEffect(() => {
+
+    //     if (state.projectTaskBoundries.length != 0 && map != undefined) {
+    //         if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
+    //         }
+    //     }
+    // }, [map])
+
+
+
 
 }
 

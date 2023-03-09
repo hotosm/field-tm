@@ -16,7 +16,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { ShareSocial } from 'react-share-social'
 import BasicDialog from "../utilities/BasicDialog";
 import CustomSwiper from "../utilities/CustomSwiper";
-import { ProjectActions } from "../store/slices/ProjectSlice";
+import { HomeActions } from 'fmtm/HomeSlice';
 
 
 const TasksComponent = ({ type, state, defaultTheme }) => {
@@ -247,10 +247,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         startIcon={<VerifiedIcon />}
                                         disabled={loading}
                                         onClick={() => {
-                                            dispatch(ProjectActions.SetSnackBar({
+                                            dispatch(HomeActions.SetSnackBar({
                                                 open: true,
                                                 message: `No action yet`,
-                                                variant: 'info',
+                                                variant: 'warning',
                                                 duration: 6000
                                             }))
                                         }}
@@ -275,10 +275,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         startIcon={<LockOpenIcon />}
                                         disabled={loading}
                                         onClick={() => {
-                                            dispatch(ProjectActions.SetSnackBar({
+                                            dispatch(HomeActions.SetSnackBar({
                                                 open: true,
                                                 message: `No action yet`,
-                                                variant: 'info',
+                                                variant: 'warning',
                                                 duration: 6000
                                             }))
                                         }}
