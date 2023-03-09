@@ -35,7 +35,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     const socialStyles = {
         copyContainer: {
             border: `1px solid ${defaultTheme.palette.info['main']}`,
-            background: defaultTheme.palette.info['main']
+            background: defaultTheme.palette.info['info'],
+            color: defaultTheme.palette.info['main']
         },
         title: {
             color: defaultTheme.palette.info['main'],
@@ -72,7 +73,6 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     .map((skeleton, index) => {
                                         return (
                                             <SkeletonTheme
-
                                                 key={index}
                                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}

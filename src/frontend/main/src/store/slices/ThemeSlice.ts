@@ -39,6 +39,7 @@ const ThemeSlice = createSlice({
                     //hot dark
                     main: '#44546a',
                     contrastText: '#2C3038',
+                    info_rgb: 'rgb(44,48,56,0.2)'
 
                 },
                 text: {

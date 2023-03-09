@@ -31,7 +31,7 @@ const OpenLayersMap = (
         featuresLayer,
         mapElement,
         environment,
-        mapDivPostion
+        mapDivPostion,
     }) => {
 
     function elastic(t) {
@@ -204,6 +204,8 @@ const OpenLayersMap = (
                                             });
                                         }
                                     }
+
+                                    map.getTargetElement().classList.remove('spinner');
 
                                 }}
                                     color="info" aria-label="share qrcode"
