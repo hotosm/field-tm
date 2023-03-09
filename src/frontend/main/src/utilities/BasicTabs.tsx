@@ -80,7 +80,7 @@ export default function BasicTabs({ listOfData }) {
                                         mt: 0.8, mb: 1,
                                         mr: 1,
                                         '&:hover': {
-                                            backgroundColor: defaultTheme.palette.mapFeatureColors['info_rgb']
+                                            backgroundColor: defaultTheme.palette.primary['primary_rgb']
                                         }
                                     }}
                                     label={item.label
