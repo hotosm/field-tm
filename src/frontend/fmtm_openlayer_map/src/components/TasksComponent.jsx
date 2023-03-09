@@ -74,8 +74,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                             <SkeletonTheme
 
                                                 key={index}
-                                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
                                                 <Skeleton key={skeleton + index} width={200} height={30} />
                                             </SkeletonTheme>
@@ -148,8 +148,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     loading ?
                                         <Stack>
                                             <SkeletonTheme
-                                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
                                                 <Skeleton width={300} count={12} />
                                             </SkeletonTheme>
@@ -235,8 +235,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                 loading ?
 
                                     <SkeletonTheme
-                                        baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                        highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                        baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                        highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
                                         <Skeleton width={'100%'} height={30} />
                                     </SkeletonTheme>
@@ -263,8 +263,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                 loading ?
 
                                     <SkeletonTheme
-                                        baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                        highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                        baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                        highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
                                         <Skeleton width={'100%'} height={30} />
                                     </SkeletonTheme>

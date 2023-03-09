@@ -74,7 +74,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -95,7 +95,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -114,7 +114,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -134,7 +134,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -164,7 +164,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -182,7 +182,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
@@ -216,7 +216,7 @@ const OpenLayersMap = (
                         <IconButtonCard
                             style={{
                                 backgroundColor:
-                                    defaultTheme.palette.mapFeatureColors['info_rgb'],
+                                    defaultTheme.palette.primary['primary_rgb'],
                                 right: 0
                             }}
                             radius={0}
