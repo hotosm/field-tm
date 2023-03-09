@@ -1,6 +1,5 @@
-import { Stack } from '@mui/system'
+import { Stack } from '@mui/material'
 import React from 'react'
-
 export default function IconButtonCard({ element, style, radius }) {
     return (
 
