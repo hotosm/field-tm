@@ -128,9 +128,9 @@ A back end that converts the project parameters entered by the Campaign Manager 
 
 ## Frequently Asked Questions
 ### For Users
-Q: What is the Field Mapping Tasking Manager (FMTM) Web App?
+Q: What is FMTM?
 
-A: The FMTM Web App is an online platform that allows users to view and contribute to collaborative mapping projects related to humanitarian and development work.
+A: FMTM stands for Field Monitoring Task Manager. It is a web-based application that facilitates remote monitoring of field activities for humanitarian organizations.
 
 Q: Do I need to create an account to use the FMTM Web App?
 
@@ -173,6 +173,40 @@ A: The Field Mapping Tasking Manager (FMTM) is an online platform that allows co
 Q: How can I become a contributor to the FMTM?
 
 A: To become a contributor to the FMTM, you can create an account on the platform and join a mapping project.
+
+Q: Who can contribute to FMTM?
+
+A: Anyone can contribute to FMTM. It is an open-source project, and contributions from developers, designers, and other contributors are always welcome.
+
+Q: What kind of contributions can I make to FMTM?
+
+A: There are several ways you can contribute to FMTM, including:
+
+Development: If you have experience in web development, you can contribute by fixing bugs, adding new features, or improving the existing codebase.
+
+Design: If you are a designer, you can contribute by improving the user interface, creating new design assets, or providing feedback on the existing design.
+
+Documentation: If you have experience in technical writing, you can contribute by writing documentation, tutorials, or other educational materials.
+
+Testing: If you have experience in software testing, you can contribute by testing the application and reporting bugs or suggesting improvements.
+
+Translation: If you are fluent in a language other than English, you can contribute by translating the application or its documentation into your language.
+
+Q: What technologies are used in FMTM?
+
+A: FMTM is built using several technologies, including Django, Postgres, Redis, Celery, and Vue.js. The codebase is written in Python, HTML, CSS, and JavaScript.
+
+Q: How do I set up FMTM locally?
+
+A: To set up FMTM locally, you need to have Python, Postgres, Redis, and Node.js installed on your system. You can follow the instructions in the README file of the FMTM repository to set up the project.
+
+Q: How can I report a bug or suggest a new feature for FMTM?
+
+A: You can report bugs or suggest new features by opening an issue on the FMTM repository on GitHub. Be sure to provide as much detail as possible, including steps to reproduce the bug, screenshots, or mockups for new features.
+
+Q: How can I contribute to FMTM if I'm new to open source or web development?
+
+A: FMTM welcomes contributions from developers of all levels of experience, including those who are new to open source or web development. You can start by exploring the project's codebase and documentation, asking questions in the community, and contributing to issues labeled as "good first issue." Additionally, you can join the FMTM community on Slack to connect with other contributors and get help with your contributions.
 
 Q: What are the benefits of contributing to the FMTM?
 
