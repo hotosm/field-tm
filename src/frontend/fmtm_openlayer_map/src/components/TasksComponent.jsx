@@ -25,7 +25,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     const params = useParams();
     const index = state.findIndex(project => project.id == environment.decode(params.id));
     const [selectedTask, SetSelectedTask] = useState(0)
-    const validatedSelectedTask = selectedTask == 0 ? state != undefined ? state[index].taskBoundries[0].id : null : selectedTask;
+    const validatedSelectedTask = selectedTask == 0 ? state.length != 0 ? state[index].taskBoundries[0].id : null : selectedTask;
     const dispatch = useDispatch();
     const { loading, qrcode } = ProjectFilesById(
         `${environment.baseApiUrl}/projects/${environment.decode(params.id)}`,
