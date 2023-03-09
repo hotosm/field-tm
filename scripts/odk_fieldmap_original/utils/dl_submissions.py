@@ -99,7 +99,7 @@ def expand_geopoints(csv, geopoint_column_name):
 
     return newcsv
  
-def javarosa2wkt(jrstring):
+def odk_geo2wkt(jrstring, node_delimiter = ';', delimiter = ' '):
     """Takes a Javarosa geo string and converts it into Well-Known-Text.
     Assumes that the string consists of the usual space-delimited 
     lat, lon, elevation, accuracy elements for each node, and nodes are
@@ -108,6 +108,37 @@ def javarosa2wkt(jrstring):
     and the last isn't identical to the first, it creates a polyline.
     If more than two, and the last is identical to the first, it creates
     a polygon. In any other cases it should return an error."""
+    nodes = [x.strip() for x in jrstring.split(node_delimiter)]
+    wkt_feature_type = ''
+    end_paren = ')'
+    if len(nodes) == 0:
+        print("There's nothing in there.")
+        return None
+    elif len(nodes) == 1:
+        wkt_feature_type = 'POINT ('
+    elif len(nodes) == 2:
+        wkt_feature_type = 'LINESTRING ('
+    elif len(nodes) >= 3:
+        if nodes[0] == nodes[-1]:
+            wkt_feature_type = 'POLYGON (('
+            end_paren = '))'
+        else:
+            wkt_feature_type = 'LINESTRING ('
+
+    
+    try:
+        positions = []
+        for node in nodes:
+            coords = node.split(delimiter)
+            lat = float(coords[0])
+            lon = float(coords[1])
+            positions.append(f'{lon} {lat}')
+        positions_string = ','.join(positions)
+        return (f'{wkt_feature_type}{positions_string}{end_paren}')
+    except Exception as e:
+        return None
+        
+        
 
 def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                                  collate, expand_geopoint):
@@ -196,7 +227,7 @@ if __name__ == "__main__":
     # Optional args
     p.add_argument('-gc', '--geopoint_column', default='all-xlocation', help=
                    'The name of the column in the submissions containing '
-                   'single-point geometry in Javarosa form for expansion')
+                   'geometry in Javarosa form for expansion or conversion')
 
     # Flag args
     p.add_argument('-c', '--collate', action="store_true", help=
