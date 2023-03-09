@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
@@ -26,12 +26,12 @@
 
     And downloads all of the submissions from that server as CSV
 
-    TODO (KNOWN BUGS): 
+    TODO (KNOWN BUGS):
     - For now it expects a project with multiple form, but all basically
       identical (a single ODK survey with different GeoJSON forms).
-      If it gets a project with multiple forms, the collated CSV will 
+      If it gets a project with multiple forms, the collated CSV will
       be fucked up.
-    - The geopoint column to be expanded is hard-coded to all-xlocation. 
+    - The geopoint column to be expanded is hard-coded to all-xlocation.
       That only works for forms following Rob Savoye's current template.
       This needs to be a command line argument.
     - Both the geopoint expansion and creation of collated CSV are hardcoded
@@ -64,15 +64,15 @@ def project_submissions_zipped(url, aut, pid, formsl, outdir):
         form_id = form['xmlFormId']
         print(f'Checking submissions from {form_id}.')
         subs_zip = csv_submissions(url, aut, pid, form_id)
-        
+
         outfilename = os.path.join(outdir, f'{form_id}.csv.zip')
         outfile = open(outfilename, 'wb')
         outfile.write(subs_zip.content)
 
 def expand_geopoints(csv, geopoint_column_name):
     """
-    Accepts a list representing a set of CSV ODK submissions and expands 
-    a geopoint column to include lon, lat, ele, acc columns for easy 
+    Accepts a list representing a set of CSV ODK submissions and expands
+    a geopoint column to include lon, lat, ele, acc columns for easy
     import into QGIS or direct conversion to GeoJSON or similar.
     """
     newcsv = []
@@ -92,13 +92,13 @@ def expand_geopoints(csv, geopoint_column_name):
                 newrow.extend(split_geopoint)
                 newrow.extend(row[column_num + 1:])
             newcsv.append(newrow)
-            
+
     except Exception as e:
         print("Is that the right geopoint column name?")
         print(e)
 
     return newcsv
-    
+ 
 def javarosa2wkt(jrstring):
     """Takes a Javarosa geo string and converts it into Well-Known-Text.
     Assumes that the string consists of the usual space-delimited 
@@ -108,8 +108,6 @@ def javarosa2wkt(jrstring):
     and the last isn't identical to the first, it creates a polyline.
     If more than two, and the last is identical to the first, it creates
     a polygon. In any other cases it should return an error."""
-    
-    
 
 def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                                  collate, expand_geopoint):
@@ -143,7 +141,7 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
         for idx, sub_name in enumerate(sub_namelist):
             subs_bytes = subs_unzipped.read(sub_name)
             outfilename = os.path.join(outdir, sub_name)
-            
+
             # Some attachments need a subdirectory
             suboutdir = os.path.split(outfilename)[0]
             if not os.path.exists(suboutdir):
@@ -233,4 +231,3 @@ if __name__ == "__main__":
                                             a.expand_geopoint
                                             )
     
-
