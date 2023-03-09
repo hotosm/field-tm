@@ -59,7 +59,6 @@ module.exports = {
       exposes: {
         "./Project": "./src/store/slices/ProjectSlice.js",
         "./ProjectDetails": "./src/views/Home.jsx",
-        "./Mui": "@mui/material"
       },
       shared: {
         ...deps,
