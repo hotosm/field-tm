@@ -151,7 +151,7 @@ const OpenLayersMap = (
                                         open: true,
                                         message: `No action yet`,
                                         variant: 'warning',
-                                        duration: 6000
+                                        duration: 3000
                                     }))
                                 }}
                                     color="info" aria-label="share qrcode"
