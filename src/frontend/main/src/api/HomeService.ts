@@ -39,5 +39,3 @@ export const HomeSummaryService: Function = (url: string) => {
     }
 
 }
-
-

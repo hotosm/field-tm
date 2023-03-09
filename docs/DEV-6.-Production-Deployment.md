@@ -1,20 +1,20 @@
 # Deployment for Production
 
-The following instructions are needed set up FMTM for production on your own cloud server.
+The following instructions are needed to set up FMTM for production on your own cloud server.
 
 ## Set up the FMTM on a cloud server
 
 ### Set up a server and domain name
 
 - Get a cloud server (tested with Ubuntu 22.04).
-- Set up a domain name, point the DNS to your cloud server.
+- Set up a domain name, and point the DNS to your cloud server.
 - SSH into your server. Set up a user with sudo called fmtm. [this](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04) is a good guide for basic server setup including creation of a user.
 
 ### Install some stuff it'll need
 
 #### Docker
 
-Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) is a good tutorial for that; do step 1 and 2. At time of writing that consisted of:
+Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) is a good tutorial for that; do steps 1 and 2. At the time of writing that consisted of:
 
     sudo apt update
     sudo apt install apt-transport-https ca-certificates curl software-properties-common
@@ -25,7 +25,7 @@ Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-i
     sudo usermod -aG docker ${USER}
     su - ${USER}
 
-Now install Docker Compose (as per [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At time of writing (the latest version of Docker Compose may change, so the version number might be out of date, but the rest shouldn't change) this consisted of:
+Now install Docker Compose (as per [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At the time of writing (the latest version of Docker Compose may change, so the version number might be out of date, but the rest shouldn't change) this consisted of:
 
     mkdir -p ~/.docker/cli-plugins/
     curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
@@ -76,4 +76,4 @@ Run the production docker-compose config:
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
 
-> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2.-Deployment).
+> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend).

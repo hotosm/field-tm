@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/usr/bin/python3
 """
@@ -140,8 +140,8 @@ def csv_submissions(base_url, aut, pid, formId):
 
 def odata_submissions(base_url, aut, pid, formId):
     """
-    Fetch the submissions using the odata api. 
-    use submissions.json()['value'] to get a list of dicts, wherein 
+    Fetch the submissions using the odata api.
+    use submissions.json()['value'] to get a list of dicts, wherein
     each dict is a single submission with the form question names as keys.
     """
     url = f"{base_url}/v1/projects/{pid}/forms/{formId}.svc/Submissions"
@@ -202,8 +202,8 @@ def create_app_user(base_url, aut, pid, app_user_name="Surveyor"):
     """
     Create a new project on an ODK Central server
 
-    Atm. you can create multiple app users with the same name, 
-    this should probably be illegal? 
+    Atm. you can create multiple app users with the same name,
+    this should probably be illegal?
     """
     url = f"{base_url}/v1/projects/{pid}/app-users"
     return requests.post(url, auth=aut, json={"displayName": app_user_name})
@@ -250,7 +250,7 @@ def publish_form(base_url, aut, pid, fid):
 
 def qr_code(base_url, aut, pid, pname, form, token, outdir):
     """
-    Based on the info at 
+    Based on the info at
     https://docs.getodk.org/collect-import-export/
     """
     settings = {
