@@ -10,7 +10,8 @@ const ThemeSlice = createSlice({
                 primary: {
                     main: '#ffffff',
                     contrastText: '#44546a',
-                    lightblue: '#99e6ff'
+                    lightblue: '#99e6ff',
+                    primary_rgb: 'rgb(255, 255, 255,0.8)'
                 },
                 error: {
                     //hot red
@@ -38,9 +39,13 @@ const ThemeSlice = createSlice({
                     //hot dark
                     main: '#44546a',
                     contrastText: '#2C3038',
+
                 },
                 text: {
                     secondary: '#2C3038',
+                },
+                loading: {
+                    skeleton_rgb: 'rgb(112, 67, 67,0.1)'
                 },
                 mapFeatureColors: {
                     //blue
@@ -64,7 +69,6 @@ const ThemeSlice = createSlice({
                     bad_rgb: 'rgb(112, 67, 67,0.4)',
                     split: '#704343',
                     split_rgb: 'rgb(112, 67, 67,0.4)',
-                    info_rgb: 'rgb(255, 255, 255,0.8)'
                 }
 
             },

@@ -15,8 +15,8 @@ const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
 
 
                             <SkeletonTheme
-                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
                                 <Skeleton
                                     width={69}
@@ -27,8 +27,8 @@ const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
                         </div>
                         <div className="col-md-4 mt-1">
                             <SkeletonTheme
-                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
                                 <Skeleton height={25} />
                             </SkeletonTheme>
@@ -38,16 +38,16 @@ const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
                         </div>
                         <div className="col-md-4 mt-1">
                             <SkeletonTheme
-                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
                                 <Skeleton height={25} />
                             </SkeletonTheme>
                         </div>
                         <div className="col-md-12">
                             <SkeletonTheme
-                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
                                 <Skeleton style={{ marginTop: '7%' }} height={23} />
                                 <Skeleton style={{ marginTop: '4%' }} height={16} />
@@ -57,8 +57,8 @@ const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
                         </div>
                         <div className="col-md-12 mt-2">
                             <SkeletonTheme
-                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
                                 <Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
                             </SkeletonTheme>
