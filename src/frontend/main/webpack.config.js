@@ -23,9 +23,11 @@ module.exports = {
     rules: [
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/],
-        loader: "file-loader",
-        options: {
-          name: "[name].[ext]",
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 1000,
+          },
         },
       },
       {
@@ -67,6 +69,8 @@ module.exports = {
         "./environment": "./src/environment.ts",
         "./WindowDimension": "./src/hooks/WindowDimension.tsx",
         "./OnScroll": "./src/hooks/OnScroll.tsx",
+        "./CoreModules": "./src/shared/CoreModules.js",
+        "./AssetModules": "./src/shared/AssetModules.js"
       },
       shared: {
         ...deps,

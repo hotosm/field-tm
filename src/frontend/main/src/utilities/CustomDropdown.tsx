@@ -1,13 +1,10 @@
-import { Dropdown, ButtonToolbar } from 'rsuite';
+import { Dropdown } from 'rsuite';
 import React, { useState } from 'react';
-import enviroment from '../enviroment';
 import '../styles/home.css'
-import { useSelector } from 'react-redux';
-
-
+import CoreModules from '../shared/CoreModules';
 
 const CustomDropdown = ({ toolBarStyle, text, size, names, appearance, color }) => {
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     const [styles, setStyles] = useState({
         backgroundColor: 'white',
         color: defaultTheme.palette.info['main'],

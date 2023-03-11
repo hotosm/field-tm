@@ -1,11 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
 import windowDimention from '../hooks/WindowDimension';
-import { useSelector } from 'react-redux';
-
+import CoreModules from '../shared/CoreModules';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -18,9 +14,9 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <CoreModules.Box sx={{ p: 3 }}>
                     {children}
-                </Box>
+                </CoreModules.Box>
             )}
         </div>
     );
@@ -40,7 +36,7 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs({ listOfData }) {
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     const [value, setValue] = React.useState(0);
     const { type } = windowDimention();
     const variant: any = type == 's' ? 'fullWidth' : type == 'xs' ? 'fullWidth' : 'standard'
@@ -50,14 +46,14 @@ export default function BasicTabs({ listOfData }) {
     };
 
     return (
-        <Box sx={{
+        <CoreModules.Box sx={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'
         }}>
-            <Box sx={{ borderColor: 'divider' }}>
-                <Tabs
+            <CoreModules.Box sx={{ borderColor: 'divider' }}>
+                <CoreModules.Tabs
                     centered
                     textColor='inherit'
                     TabIndicatorProps={{
@@ -71,7 +67,7 @@ export default function BasicTabs({ listOfData }) {
                     {
                         listOfData.map((item, index) => {
                             return (
-                                <Tab
+                                <CoreModules.Tab
                                     key={index}
 
                                     sx={{
@@ -89,8 +85,8 @@ export default function BasicTabs({ listOfData }) {
                             )
                         })
                     }
-                </Tabs>
-            </Box>
+                </CoreModules.Tabs>
+            </CoreModules.Box>
             {
                 listOfData.map((item, index) => {
                     return (
@@ -102,7 +98,7 @@ export default function BasicTabs({ listOfData }) {
                     )
                 })
             }
-        </Box>
+        </CoreModules.Box>
     );
 }
 

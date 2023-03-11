@@ -1,28 +1,22 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { Box, IconButton, Stack } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import CoreModules from '../shared/CoreModules';
+import AssetModules from '../shared/AssetModules';
+
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
         children: React.ReactElement<any, any>;
     },
     ref: React.Ref<unknown>,
 ) {
-    return <Slide direction="up" ref={ref} {...props} />;
+    return <CoreModules.Slide direction="up" ref={ref} {...props} />;
 });
 
 export default function BasicDialog({ open, onClose, title, iconCloseMode, actionsButton, element }) {
 
     return (
-        <Stack>
-            <Dialog
+        <CoreModules.Stack>
+            <CoreModules.Dialog
                 fullWidth
                 open={open}
                 TransitionComponent={Transition}
@@ -30,10 +24,10 @@ export default function BasicDialog({ open, onClose, title, iconCloseMode, actio
                 onClose={onClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <Box>
+                <CoreModules.Box>
                     {
                         iconCloseMode &&
-                        <Stack
+                        <CoreModules.Stack
                             style={{ float: 'right' }}
                             mt={'2%'}
                             mr={'1%'}
@@ -42,22 +36,22 @@ export default function BasicDialog({ open, onClose, title, iconCloseMode, actio
                             width={40}
 
                         >
-                            <IconButton onClick={onClose}>
-                                <CloseIcon color='info' />
-                            </IconButton>
-                        </Stack>
+                            <CoreModules.IconButton onClick={onClose}>
+                                <AssetModules.CloseIcon color='info' />
+                            </CoreModules.IconButton>
+                        </CoreModules.Stack>
                     }
-                    <DialogTitle variant='h2'>{title}</DialogTitle>
-                </Box>
-                <DialogContent>
+                    <CoreModules.DialogTitle variant='h2'>{title}</CoreModules.DialogTitle>
+                </CoreModules.Box>
+                <CoreModules.DialogContent>
                     {element}
-                </DialogContent>
-                <DialogActions>
+                </CoreModules.DialogContent>
+                <CoreModules.DialogActions>
                     {
                         iconCloseMode != true && actionsButton
                     }
-                </DialogActions>
-            </Dialog>
-        </Stack>
+                </CoreModules.DialogActions>
+            </CoreModules.Dialog>
+        </CoreModules.Stack>
     );
 }
