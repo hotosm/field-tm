@@ -32,15 +32,18 @@ import {
     createTheme,
     Container
 } from "@mui/material";
-import axios from 'axios'
+import axios from 'axios';
+import { PersistGate } from "redux-persist/integration/react";
 import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import { useNavigate, useParams, Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
 export default {
+    Provider,
+    PersistGate,
     RouterProvider,
     createBrowserRouter,
     Card,

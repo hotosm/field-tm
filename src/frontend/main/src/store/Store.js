@@ -1,6 +1,6 @@
 import HomeSlice from "./slices/HomeSlice";
 import ThemeSlice from "./slices/ThemeSlice";
-import projectSlice from 'map/Project';
+// import projectSlice from 'map/Project';
 import CoreModules from '../shared/CoreModules';
 import {
     persistStore,
@@ -13,6 +13,7 @@ import {
     REGISTER,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage';
+import ProjectSlice from "./slices/ProjectSlice";
 
 const reducers = CoreModules.combineReducers({
     project: persistReducer(
@@ -20,7 +21,7 @@ const reducers = CoreModules.combineReducers({
             key: 'project',
             storage
         },
-        projectSlice.reducer
+        ProjectSlice.reducer
     ),
     //you can persist your auth reducer here similar to project reducer
     home: HomeSlice.reducer,

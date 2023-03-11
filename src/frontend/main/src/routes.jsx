@@ -8,9 +8,11 @@ import Create from './views/Create';
 import Tabbed from './views/Tabbed';
 import Forgot from './views/Forgot';
 import MainView from './views/MainView';
-import ProjectDetails from "map/ProjectDetails";
+import { Suspense } from 'react';
+// import ProjectDetails from "map/ProjectDetails";
 
 
+const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const routes = createBrowserRouter(
     [
         {
@@ -38,7 +40,11 @@ const routes = createBrowserRouter(
                 },
                 {
                     path: '/project_details/:id',
-                    element: <ProjectDetails />,
+                    element: <Suspense fallback={<div></div>}>
+                        <ProjectDetails />
+                    </Suspense>
+
+                    ,
                 },
             ],
         },
