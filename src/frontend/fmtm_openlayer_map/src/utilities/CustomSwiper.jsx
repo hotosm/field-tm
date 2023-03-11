@@ -1,10 +1,7 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
 
 // import Swiper core and required modules
-
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Stack } from '@mui/material';
-import { Navigation, Pagination } from "swiper";
+import CoreModules from 'fmtm/CoreModules';
 
 
 const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected, loading }) => {
@@ -15,11 +12,11 @@ const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected,
 
 
     return (
-        <Stack className="App" >
-            <Box marginTop={4}>
-                <Swiper
+        <CoreModules.Stack className="App" >
+            <CoreModules.Box marginTop={4}>
+                <CoreModules.Swiper
                     navigation={true}
-                    modules={[Navigation]}
+                    modules={[CoreModules.SwiperNavigation]}
                     slidesPerView={
                         screenType == 'sm' ? 4 :
                             screenType == 's' ? 2 :
@@ -45,8 +42,8 @@ const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected,
                 >
                     {list.map((item, index) => {
                         return (
-                            <SwiperSlide key={index}>
-                                <Button
+                            <CoreModules.SwiperSlide key={index}>
+                                <CoreModules.Button
                                     key={index}
                                     color="error"
                                     id={item.id}
@@ -59,13 +56,13 @@ const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected,
                                     variant={selected == item.id ? 'contained' : 'outlined'}
                                 >
                                     {`Task #${item.id}`}
-                                </Button>
-                            </SwiperSlide>
+                                </CoreModules.Button>
+                            </CoreModules.SwiperSlide>
                         )
                     })}
-                </Swiper>
-            </Box>
-        </Stack>
+                </CoreModules.Swiper>
+            </CoreModules.Box>
+        </CoreModules.Stack>
     )
 }
 

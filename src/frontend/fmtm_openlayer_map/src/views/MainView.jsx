@@ -1,31 +1,29 @@
 import React from "react";
 import { useSelector } from 'react-redux'
-import { Box, Container, createTheme, CssBaseline, Paper, ThemeProvider } from "@mui/material";
-import { Outlet } from "react-router-dom";
 import PrimaryAppBar from 'fmtm/PrimaryAppBar'
 import WindowDimension from "fmtm/WindowDimension";
-
+import CoreModules from 'fmtm/CoreModules';
 export default function MainView() {
 
     const { windowSize } = WindowDimension();
     const getTheme = useSelector(state => state.theme.hotTheme)
-    const theme = createTheme(getTheme)
+    const theme = CoreModules.createTheme(getTheme)
 
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Paper>
-                <Container disableGutters={true} maxWidth={false}>
+        <CoreModules.ThemeProvider theme={theme}>
+            <CoreModules.CssBaseline />
+            <CoreModules.Paper>
+                <CoreModules.Container disableGutters={true} maxWidth={false}>
 
-                    <Box sx={{ height: '100vh' }} >
+                    <CoreModules.Box sx={{ height: '100vh' }} >
                         <PrimaryAppBar />
-                        <Box sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh' }}>
-                            <Outlet />
+                        <CoreModules.Box sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh' }}>
+                            <CoreModules.Outlet />
                             {/* Footer */}
-                        </Box>
-                    </Box>
-                </Container>
-            </Paper>
-        </ThemeProvider>
+                        </CoreModules.Box>
+                    </CoreModules.Box>
+                </CoreModules.Container>
+            </CoreModules.Paper>
+        </CoreModules.ThemeProvider>
     )
 }

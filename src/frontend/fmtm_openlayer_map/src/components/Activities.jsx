@@ -1,44 +1,40 @@
-import { Divider, IconButton, Stack, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import RectangleIcon from '@mui/icons-material/Rectangle';
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
-import LinkIcon from '@mui/icons-material/Link';
+import React from "react";
 import IconButtonCard from "../utilities/IconButtonCard";
-import { useSelector } from "react-redux";
 import environment from 'fmtm/environment';
 import { easeIn, easeOut } from 'ol/easing';
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
 //Activity Model to be display in Activities panel
 const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, params }) => {
 
     const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
 
     return (
-        <Stack minWidth={100} direction={'column'} spacing={1}>
+        <CoreModules.Stack minWidth={100} direction={'column'} spacing={1}>
 
-            <Stack direction={'row'} spacing={2}>
-                <Typography
+            <CoreModules.Stack direction={'row'} spacing={2}>
+                <CoreModules.Typography
                     variant="h2"
                 >
                     {`Task #${history.taskId}`}
-                </Typography>
-                <RectangleIcon style={{ color: `${defaultTheme.palette.mapFeatureColors[history.status.toLowerCase()]}` }} />
-            </Stack>
+                </CoreModules.Typography>
+                <AssetModules.RectangleIcon style={{ color: `${defaultTheme.palette.mapFeatureColors[history.status.toLowerCase()]}` }} />
+            </CoreModules.Stack>
 
-            <Divider color="lightgray" />
+            <CoreModules.Divider color="lightgray" />
 
-            <Stack minHeight={120} direction={'column'} spacing={2}>
-                <Typography
+            <CoreModules.Stack minHeight={120} direction={'column'} spacing={2}>
+                <CoreModules.Typography
                     variant="h2"
                     style={{ wordWrap: "break-word" }}
                 >
                     {history.action_text}
-                </Typography>
-                <Stack direction={'row-reverse'}>
+                </CoreModules.Typography>
+                <CoreModules.Stack direction={'row-reverse'}>
                     <IconButtonCard
                         element={
-                            <IconButton onClick={async () => {
-                                
+                            <CoreModules.IconButton onClick={async () => {
+
                                 const main = document.getElementsByClassName('mainview')[0]
                                 await main.scrollTo({
                                     top: mapDivPostion
@@ -59,25 +55,25 @@ const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, pa
                             }}
                                 color="info" aria-label="share qrcode"
                             >
-                                <LinkIcon color="info" sx={{ fontSize: 30 }} />
-                            </IconButton>
+                                <AssetModules.LinkIcon color="info" sx={{ fontSize: 30 }} />
+                            </CoreModules.IconButton>
                         }
                     />
-                </Stack>
-            </Stack>
+                </CoreModules.Stack>
+            </CoreModules.Stack>
 
-            <Divider color="lightgray" />
+            <CoreModules.Divider color="lightgray" />
 
-            <Stack direction={'row'} spacing={2}>
-                <AccessTimeFilledIcon />
-                <Typography
+            <CoreModules.Stack direction={'row'} spacing={2}>
+                <AssetModules.AccessTimeFilledIcon />
+                <CoreModules.Typography
                     variant="h2"
                 >
                     {history.action_date}
-                </Typography>
-            </Stack>
+                </CoreModules.Typography>
+            </CoreModules.Stack>
 
-        </Stack >
+        </CoreModules.Stack >
     )
 }
 export default Activities;

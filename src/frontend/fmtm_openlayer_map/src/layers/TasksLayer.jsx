@@ -1,24 +1,16 @@
 import { Vector as VectorLayer } from 'ol/layer.js';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source.js';
-import { easeIn, easeOut } from 'ol/easing';
-import { useEffect, useRef } from 'react';
+import { easeOut } from 'ol/easing';
+import { useEffect } from 'react';
 import { geojsonObjectModel } from '../models/geojsonObjectModel';
 import MapStyles from '../hooks/MapStyles';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import environment from "fmtm/environment";
-import Feature from 'ol/Feature';
-import Style from 'ol/style/Style';
-import { Point } from 'ol/geom';
-import Icon from 'ol/style/Icon';
-import { Projection } from 'ol/proj';
-import ImageLayer from 'ol/layer/Image';
-import Static from 'ol/source/ImageStatic';
-
+import CoreModules from 'fmtm/CoreModules';
 
 const TasksLayer = (map, view, feature) => {
-    const params = useParams();
+    const params = CoreModules.useParams();
     const state = useSelector(state => state.project)
     const geojsonStyles = MapStyles(feature);
 

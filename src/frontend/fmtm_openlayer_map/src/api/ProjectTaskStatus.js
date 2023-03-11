@@ -1,9 +1,7 @@
-import axios from "axios";
 import { ProjectActions } from "../store/slices/ProjectSlice";
 import { easeIn, easeOut } from 'ol/easing';
 import { HomeActions } from 'fmtm/HomeSlice';
-import Style from "ol/style/Style";
-import Icon from "ol/style/Icon";
+import CoreModules from 'fmtm/CoreModules';
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
 
     return async (dispatch) => {
@@ -15,7 +13,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
                 dispatch(HomeActions.SetDialogStatus(false))
                 map.getTargetElement().classList.add('spinner');
 
-                const response = await axios.post(url, body);
+                const response = await CoreModules.axios.post(url, body);
                 const findIndexForUpdation = existingData[index].taskBoundries.findIndex(obj => obj.id == response.data.id)
 
                 let project_tasks = [...existingData[index].taskBoundries]

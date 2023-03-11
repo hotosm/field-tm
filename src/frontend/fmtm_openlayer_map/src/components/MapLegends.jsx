@@ -1,8 +1,6 @@
-import { Box, IconButton, Typography } from "@mui/material";
-import { Stack } from "@mui/system";
 import React from "react";
-import LockIcon from '@mui/icons-material/Lock';
-
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
 
 const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatus }) => {
 
@@ -44,26 +42,26 @@ const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatu
         }
     ]
     return (
-        <Stack direction={direction} spacing={spacing}>
+        <CoreModules.Stack direction={direction} spacing={spacing}>
             {
                 MapDetails.map((data, index) => {
                     return (
-                        <Stack key={index} direction={'row'} spacing={1} p={1}>
-                            <IconButton style={{ backgroundColor: data.color, borderRadius: 0 }} {...iconBtnProps} color="primary" component="label">
-                                <LockIcon style={{ color: data.status == 'none' ? data.color : 'white' }} />
-                            </IconButton>
+                        <CoreModules.Stack key={index} direction={'row'} spacing={1} p={1}>
+                            <CoreModules.IconButton style={{ backgroundColor: data.color, borderRadius: 0 }} {...iconBtnProps} color="primary" component="label">
+                                <AssetModules.LockIcon style={{ color: data.status == 'none' ? data.color : 'white' }} />
+                            </CoreModules.IconButton>
                             {
-                                valueStatus && <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                    <Typography>
+                                valueStatus && <CoreModules.Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                    <CoreModules.Typography>
                                         {data.value}
-                                    </Typography>
-                                </Box>
+                                    </CoreModules.Typography>
+                                </CoreModules.Box>
                             }
-                        </Stack>
+                        </CoreModules.Stack>
                     )
                 })
             }
-        </Stack>
+        </CoreModules.Stack>
     )
 }
 

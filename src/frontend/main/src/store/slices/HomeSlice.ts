@@ -1,7 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
-import React from "react";
 
-const HomeSlice = createSlice({
+import CoreModules from "../../shared/CoreModules";
+const HomeSlice = CoreModules.createSlice({
     name: 'home',
     initialState: {
         homeProjectSummary: [],
@@ -14,7 +13,6 @@ const HomeSlice = createSlice({
             variant: 'info',
             duration: 0
         },
-
     },
     reducers: {
         SetHomeProjectSummary(state, action) {

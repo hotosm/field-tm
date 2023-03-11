@@ -1,27 +1,16 @@
-import { Box, Grid, Pagination, Paper, Stack, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { experimentalStyled as styled } from '@mui/material/styles';
+import React, { useEffect, useState } from "react";
 import BasicCard from "fmtm/BasicCard";
 import Activities from "./Activities";
 import environment from "fmtm/environment";
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
-import { alpha } from '@mui/material/styles';
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
 
-// const Item = styled(Paper)(({ theme }) => ({
-//     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-//     ...theme.typography.body2,
-//     padding: theme.spacing(2),
-//     textAlign: 'center',
-//     color: theme.palette.text.secondary,
-// }));
-
-const Search = styled('div')(({ theme }) => ({
+const Search = AssetModules.styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    backgroundColor: AssetModules.alpha(theme.palette.common.white, 0.15),
     '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
+        backgroundColor: AssetModules.alpha(theme.palette.common.white, 0.25),
     },
     marginRight: theme.spacing(2),
     marginLeft: 0,
@@ -34,7 +23,7 @@ const Search = styled('div')(({ theme }) => ({
     },
 }));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+const SearchIconWrapper = AssetModules.styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
     position: 'absolute',
@@ -44,7 +33,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     justifyContent: 'center',
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = AssetModules.styled(CoreModules.InputBase)(({ theme }) => ({
     color: 'primary',
     '& .MuiInputBase-input': {
         padding: theme.spacing(1, 1, 1, 0),
@@ -130,18 +119,18 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
     }, [taskDisplay, searchText])
 
     return (
-        <Stack spacing={2}>
-            <Typography
+        <CoreModules.Stack spacing={2}>
+            <CoreModules.Typography
                 variant="h1"
                 fontSize={defaultTheme.typography.htmlFontSize}
                 color={defaultTheme.palette.info['main']}
             >
                 {`Total Activities ${allActivities}`}
-            </Typography>
+            </CoreModules.Typography>
 
             <Search id="searchActivities">
                 <SearchIconWrapper>
-                    <SearchIcon color="info" />
+                    <AssetModules.SearchIcon color="info" />
                 </SearchIconWrapper>
                 <StyledInputBase
                     placeholder="Search by Task Id and username…"
@@ -151,10 +140,10 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
                 />
             </Search>
 
-            <Grid container item columns={{ xs: 2, sm: 3, md: 7 }}>
-                <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
+            <CoreModules.Grid container item columns={{ xs: 2, sm: 3, md: 7 }}>
+                <CoreModules.Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
                     {taskHistories.map((history, index) => (
-                        <Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
+                        <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
                             <BasicCard
                                 key={index}
                                 title={{}}
@@ -173,15 +162,15 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
                                         params={params}
                                     />}
                             />
-                        </Grid>
+                        </CoreModules.Grid>
                     ))}
-                </Grid>
-            </Grid>
+                </CoreModules.Grid>
+            </CoreModules.Grid>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
-                <Pagination onChange={handleChange} color="standard" count={paginationSize} variant="outlined" />
-            </Box>
-        </Stack>
+            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+                <CoreModules.Pagination onChange={handleChange} color="standard" count={paginationSize} variant="outlined" />
+            </CoreModules.Box>
+        </CoreModules.Stack>
     )
 }
 

@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
-import React from "react";
 
-const LoginSlice = createSlice({
+import CoreModules from "../../shared/CoreModules";
+
+const LoginSlice = CoreModules.createSlice({
     name: 'login',
     initialState: {
         loginProjectSummary: [],

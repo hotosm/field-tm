@@ -1,23 +1,22 @@
-import { Box, Typography } from "@mui/material";
-import { Stack } from "@mui/system";
 import React from "react";
-import { useSelector } from "react-redux";
 import CustomizedMenus from "fmtm/CustomizedMenus";
 import MapLegends from "./MapLegends";
-
+import CoreModules from 'fmtm/CoreModules';
 
 const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
 
     const descriptionData = [
         {
-            value: 'Descriptions', element: <Typography align="center" >
-                {state.projectInfo.description}
-            </Typography>
+            value: 'Descriptions', element:
+                <CoreModules.Typography align="center" >
+                    {state.projectInfo.description}
+                </CoreModules.Typography>
         },
         {
-            value: 'Instructions', element: <Typography align="center" >
-                {state.projectInfo.location_str}
-            </Typography>
+            value: 'Instructions', element:
+                <CoreModules.Typography align="center" >
+                    {state.projectInfo.location_str}
+                </CoreModules.Typography>
         },
         {
             value: 'Legends',
@@ -33,8 +32,8 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
     ]
     return (
 
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 1 }}>
-            <Stack
+        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 1 }}>
+            <CoreModules.Stack
                 width={'100%'}
                 p={1}
                 spacing={type == 's' ? 1 : type == 'xs' ? 1 : 3}
@@ -63,8 +62,8 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
                         )
                     })
                 }
-            </Stack>
-        </Box>
+            </CoreModules.Stack>
+        </CoreModules.Box>
     )
 }
 

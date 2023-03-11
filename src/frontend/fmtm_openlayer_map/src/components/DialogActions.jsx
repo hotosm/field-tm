@@ -1,18 +1,16 @@
-import { Button, Stack, Typography } from '@mui/material'
 import React from 'react'
 import environment from "fmtm/environment";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';//actions
 import ProjectTaskStatus from '../api/ProjectTaskStatus';
 import MapStyles from '../hooks/MapStyles';
-import { useParams } from 'react-router-dom';
+import CoreModules from 'fmtm/CoreModules';
 
 export default function Dialog({ taskId, feature, map, view }) {
-    const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
-
+    // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
     const projectData = useSelector(state => state.project.projectTaskBoundries)
     const geojsonStyles = MapStyles()
     const dispatch = useDispatch();
-    const params = useParams();
+    const params = CoreModules.useParams();
     const currentProjectId = environment.decode(params.id)
     const projectIndex = projectData.findIndex(project => project.id == currentProjectId)
     const currentStatus = {
@@ -44,20 +42,20 @@ export default function Dialog({ taskId, feature, map, view }) {
     }
 
     return (
-        <Stack direction={'column'} spacing={2}>
-            <Stack direction={'row'} pl={1} >
-                <Typography
+        <CoreModules.Stack direction={'column'} spacing={2}>
+            <CoreModules.Stack direction={'row'} pl={1} >
+                <CoreModules.Typography
                     variant='h3'
                 >
                     {`STATUS : ${tasksStatus.replaceAll('_', ' ')}`}
-                </Typography>
-            </Stack>
+                </CoreModules.Typography>
+            </CoreModules.Stack>
 
             {
                 tasksList.map((data, index) => {
                     return (
                         tasksStatusList.indexOf(data) != -1 ?
-                            <Button
+                            <CoreModules.Button
                                 id={data}
                                 key={index}
                                 variant="contained"
@@ -66,8 +64,8 @@ export default function Dialog({ taskId, feature, map, view }) {
                                 disabled={false}
                             >
                                 {data.replaceAll('_', ' ')}
-                            </Button> :
-                            <Button
+                            </CoreModules.Button> :
+                            <CoreModules.Button
                                 id={data}
                                 key={index}
                                 variant="contained"
@@ -76,10 +74,10 @@ export default function Dialog({ taskId, feature, map, view }) {
                                 disabled={true}
                             >
                                 {data.replaceAll('_', ' ')}
-                            </Button>
+                            </CoreModules.Button>
                     )
                 })
             }
-        </Stack>
+        </CoreModules.Stack>
     )
 }

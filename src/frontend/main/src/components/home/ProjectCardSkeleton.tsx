@@ -1,6 +1,5 @@
 import React from "react";
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-
+import CoreModules from '../../shared/CoreModules';
 // Skeleton card main purpose is to perfom loading in case of any delay in retrieving project
 const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
 
@@ -14,54 +13,54 @@ const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
                         <div className="col-md-12">
 
 
-                            <SkeletonTheme
+                            <CoreModules.SkeletonTheme
                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
-                                <Skeleton
+                                <CoreModules.Skeleton
                                     width={69}
                                     style={{ marginTop: '3%', float: 'right' }}
                                     count={1}
                                 />
-                            </SkeletonTheme>
+                            </CoreModules.SkeletonTheme>
                         </div>
                         <div className="col-md-4 mt-1">
-                            <SkeletonTheme
+                            <CoreModules.SkeletonTheme
                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
-                                <Skeleton height={25} />
-                            </SkeletonTheme>
+                                <CoreModules.Skeleton height={25} />
+                            </CoreModules.SkeletonTheme>
                         </div>
                         <div className="col-md-4">
 
                         </div>
                         <div className="col-md-4 mt-1">
-                            <SkeletonTheme
+                            <CoreModules.SkeletonTheme
                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
-                                <Skeleton height={25} />
-                            </SkeletonTheme>
+                                <CoreModules.Skeleton height={25} />
+                            </CoreModules.SkeletonTheme>
                         </div>
                         <div className="col-md-12">
-                            <SkeletonTheme
+                            <CoreModules.SkeletonTheme
                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
-                                <Skeleton style={{ marginTop: '7%' }} height={23} />
-                                <Skeleton style={{ marginTop: '4%' }} height={16} />
-                                <Skeleton style={{ marginTop: '5%' }} height={90} />
-                            </SkeletonTheme>
+                                <CoreModules.Skeleton style={{ marginTop: '7%' }} height={23} />
+                                <CoreModules.Skeleton style={{ marginTop: '4%' }} height={16} />
+                                <CoreModules.Skeleton style={{ marginTop: '5%' }} height={90} />
+                            </CoreModules.SkeletonTheme>
 
                         </div>
                         <div className="col-md-12 mt-2">
-                            <SkeletonTheme
+                            <CoreModules.SkeletonTheme
                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                             >
-                                <Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
-                            </SkeletonTheme>
+                                <CoreModules.Skeleton style={{ marginTop: '1%' }} height={12} count={2} />
+                            </CoreModules.SkeletonTheme>
                         </div>
                     </div>
                 </div>
