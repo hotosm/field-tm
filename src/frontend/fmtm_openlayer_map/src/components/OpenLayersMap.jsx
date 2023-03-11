@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import IconButtonCard from "../utilities/IconButtonCard";
 import BasicDialog from "../utilities/BasicDialog";
 import DialogActions from "../components/DialogActions";
@@ -31,7 +30,7 @@ const OpenLayersMap = (
             Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1
         );
     }
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const [fullView, setFullView] = useState(false)
     return (
         <CoreModules.Stack spacing={1} direction={'column'}>

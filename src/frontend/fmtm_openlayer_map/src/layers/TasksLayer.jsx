@@ -5,13 +5,12 @@ import { easeOut } from 'ol/easing';
 import { useEffect } from 'react';
 import { geojsonObjectModel } from '../models/geojsonObjectModel';
 import MapStyles from '../hooks/MapStyles';
-import { useSelector } from 'react-redux';
 import environment from "fmtm/environment";
 import CoreModules from 'fmtm/CoreModules';
 
 const TasksLayer = (map, view, feature) => {
     const params = CoreModules.useParams();
-    const state = useSelector(state => state.project)
+    const state = CoreModules.useSelector(state => state.project)
     const geojsonStyles = MapStyles(feature);
 
     useEffect(() => {

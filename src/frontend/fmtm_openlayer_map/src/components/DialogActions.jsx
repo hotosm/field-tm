@@ -1,15 +1,14 @@
 import React from 'react'
 import environment from "fmtm/environment";
-import { useDispatch, useSelector } from 'react-redux';//actions
 import ProjectTaskStatus from '../api/ProjectTaskStatus';
 import MapStyles from '../hooks/MapStyles';
 import CoreModules from 'fmtm/CoreModules';
 
 export default function Dialog({ taskId, feature, map, view }) {
     // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
-    const projectData = useSelector(state => state.project.projectTaskBoundries)
+    const projectData = CoreModules.useSelector(state => state.project.projectTaskBoundries)
     const geojsonStyles = MapStyles()
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const params = CoreModules.useParams();
     const currentProjectId = environment.decode(params.id)
     const projectIndex = projectData.findIndex(project => project.id == currentProjectId)

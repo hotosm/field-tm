@@ -57,7 +57,6 @@ module.exports = {
         fmtm: `fmtm@${process.env.FRONTEND_MAIN_URL}/remoteEntry.js`,
       },
       exposes: {
-        "./Project": "./src/store/slices/ProjectSlice.js",
         "./ProjectDetails": "./src/views/Home.jsx",
       },
       shared: {

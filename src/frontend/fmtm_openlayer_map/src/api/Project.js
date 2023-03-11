@@ -1,4 +1,4 @@
-import { ProjectActions } from "../store/slices/ProjectSlice"
+import { ProjectActions } from "fmtm/ProjectSlice"
 import CoreModules from 'fmtm/CoreModules';
 export const ProjectById = (url, existingProjectList) => {
 

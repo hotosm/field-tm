@@ -1,4 +1,4 @@
-import { ProjectActions } from "../store/slices/ProjectSlice";
+import { ProjectActions } from "fmtm/ProjectSlice";
 import { easeIn, easeOut } from 'ol/easing';
 import { HomeActions } from 'fmtm/HomeSlice';
 import CoreModules from 'fmtm/CoreModules';

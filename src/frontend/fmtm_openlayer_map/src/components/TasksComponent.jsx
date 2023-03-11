@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import BasicCard from "fmtm/BasicCard";
 // import Activities from "./Activities";
 import environment from "fmtm/environment";
-import { useDispatch } from 'react-redux';
 import { ProjectFilesById } from "../api/Files";
 import { ShareSocial } from 'react-share-social'
 import BasicDialog from "../utilities/BasicDialog";
@@ -19,7 +18,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     const index = state.findIndex(project => project.id == environment.decode(params.id));
     const [selectedTask, SetSelectedTask] = useState(0)
     const validatedSelectedTask = selectedTask == 0 ? state.length != 0 ? state[index].taskBoundries[0].id : null : selectedTask;
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const { loading, qrcode } = ProjectFilesById(
         `${environment.baseApiUrl}/projects/${environment.decode(params.id)}`,
         validatedSelectedTask,

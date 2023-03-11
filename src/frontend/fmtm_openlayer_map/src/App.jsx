@@ -1,18 +1,15 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import './index.css'
 import ReactDOM from "react-dom";
-import { persistor, store } from "./store/store";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { PersistGate } from 'redux-persist/integration/react';
+import { store } from "fmtm/Store";
 import routes from "./routes";
+import CoreModules from 'fmtm/CoreModules'
 
 ReactDOM.render(
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <CoreModules.RouterProvider router={routes} />
-    </PersistGate>
-  </Provider>
+  <CoreModules.Provider store={store}>
+    <CoreModules.RouterProvider router={routes} />
+  </CoreModules.Provider>
   ,
   document.getElementById("app")
 );

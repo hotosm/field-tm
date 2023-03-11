@@ -61,6 +61,8 @@ module.exports = {
       exposes: {
         "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
         "./HomeSlice": "./src/store/slices/HomeSlice.ts",
+        "./ProjectSlice": "./src/store/slices/ProjectSlice.ts",
+        "./Store": "./src/store/Store.js",
         "./BasicCard": "./src/utilities/BasicCard.tsx",
         "./BasicTabs": "./src/utilities/BasicTabs.tsx",
         "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",

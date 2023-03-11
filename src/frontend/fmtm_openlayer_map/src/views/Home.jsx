@@ -4,13 +4,12 @@ import '../styles/home.scss'
 import WindowDimension from "fmtm/WindowDimension";
 import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
-import { useDispatch, useSelector } from "react-redux";
 import TasksComponent from "../components/TasksComponent";
 import OpenLayersMap from "../components/OpenLayersMap";
 import BasicTabs from "fmtm/BasicTabs";
 import environment from "fmtm/environment";
 import { ProjectById } from "../api/Project";
-import { ProjectActions } from "../store/slices/ProjectSlice";
+import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from 'fmtm/CustomizedSnackbar'
 import { defaults } from "ol/control/defaults";
 import OnScroll from 'fmtm/OnScroll';
@@ -27,13 +26,13 @@ import AssetModules from 'fmtm/AssetModules';
 
 const Home = () => {
 
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const params = CoreModules.useParams();
-    const defaultTheme = useSelector(state => state.theme.hotTheme)
-    const state = useSelector(state => state.project)
-    const projectInfo = useSelector(state => state.home.selectedProject)
-    const stateDialog = useSelector(state => state.home.dialogStatus)
-    const stateSnackBar = useSelector(state => state.home.snackbar)
+    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const state = CoreModules.useSelector(state => state.project)
+    const projectInfo = CoreModules.useSelector(state => state.home.selectedProject)
+    const stateDialog = CoreModules.useSelector(state => state.home.dialogStatus)
+    const stateSnackBar = CoreModules.useSelector(state => state.home.snackbar)
     const [taskId, setTaskId] = useState()
     const mapElement = useRef();
     const [map, setMap] = useState()
