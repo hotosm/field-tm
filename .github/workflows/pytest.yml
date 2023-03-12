@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
 
 env:
   DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
