@@ -2,7 +2,7 @@
 
 The recommended way to run FMTM is with Docker. You can also develop on your local machine outside of Docker, see below.
 
-> NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Development](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md) wiki page.
+> NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md) wiki page.
 
 Now let's get started!
 
