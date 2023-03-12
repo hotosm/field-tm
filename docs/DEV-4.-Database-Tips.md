@@ -10,11 +10,11 @@ And then connect to the database
 
 ## A few helpful psql commands
 
-    Switch connection to new database: `\c dbname`
+    Switch connection to the new database: `\c dbname`
     List databases: `\l`
     List all schemes of currently connected database: `\dn`
     List functions of current database: `\df`
-    List views in current datbase: `\dv`
+    List views in current database: `\dv`
     List users and roles: `\du`
 
     List tables: `\dt`

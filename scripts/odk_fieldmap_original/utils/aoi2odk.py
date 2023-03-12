@@ -65,7 +65,7 @@ def aoi2project(AOIfile):
     Takes a GeoJSON file with an aoi polygon, creates
     - A GeoJSON of all the OSM building polygons in it
     - A GeoJSON of the centroids thereof
-    - 
+    -
     """
     (AOIpath, ext) = os.path.splitext(AOIfile)
     buildings = get_buildings(AOIfile)

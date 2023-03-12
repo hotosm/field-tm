@@ -105,4 +105,3 @@ export default function BasicTabs({ listOfData }) {
         </Box>
     );
 }
-
