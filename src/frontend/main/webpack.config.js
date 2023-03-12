@@ -161,7 +161,7 @@ module.exports = function (webpackEnv) {
       }),
       new HtmlWebPackPlugin({
         template: "./src/index.html",
-        favicon: './src/assets/images/hotLog.png',
+        favicon: './src/assets/images/favicon.png',
       }),
       new EnvironmentPlugin(["API_URL", "FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
     ],
