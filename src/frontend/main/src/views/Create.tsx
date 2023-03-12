@@ -33,7 +33,7 @@ const Create = () => {
     const stateHome = useSelector((state: any) => state.home);
     //we use use selector from redux to get all state of home from home slice
 
- 
+
 
     useEffect(() => {
         dispatch(LoginSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`))
@@ -41,10 +41,10 @@ const Create = () => {
     }, [])
 
     return (
-        <div style={{ padding: 7 }}> 
-          
+        <div style={{ padding: 7 }}>
+
             <div id="buttons">
-            
+
 
 
 
@@ -71,7 +71,7 @@ const Create = () => {
                         autoComplete="email"
                         autoFocus
                         />
-            
+
                 <TextField
                         margin="normal"
                         fullWidth
@@ -83,27 +83,18 @@ const Create = () => {
                         />
 
       <a href ="/recoveraccess">forgot passord</a>
- 
+
 
     </FormControl>
-  
+
 
     <button id="signup" >Sign Up</button>
 
 
             </div>
-            
+
         </div>
-
-
-
-
-    )    
+    )
 }
-
-
-
-
-
 
 export default Create;

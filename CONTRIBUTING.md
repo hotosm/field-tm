@@ -56,7 +56,7 @@ standalone test cases.
 Code follows a [CamelCase](https://en.wikipedia.org/wiki/Camel_case)
 style. Classes use an Upper Case for the first word, method use a
 lower case for the first word. Variable names are all lower case with
-an underbar as a word seperator. Properly naming everything makes it
+an underbar as a word separator. Properly naming everything makes it
 much easier to read the code and get an idea of what it is doing. This
 enables people new to this project to contribute easier.
 

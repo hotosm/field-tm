@@ -1,4 +1,5 @@
 # Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+#
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -15,34 +16,8 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-#!/bin/python3
+"""Test data for debugging the API and test cases."""
 
-"""
-    Accepts
-    - A directory with forms or QR codes for an FMTM project
-
-    Renames all of the files with the schema needed by the FMTM uploader.
-"""
 import os
-import sys
 
-def rename(indir, basename, formtype = 'buildings'):
-    filelist = os.listdir(indir)
-    for f in filelist:
-        old = os.path.join(indir, f)
-        new = os.path.join(indir, f.replace(f'{basename}',
-                                            f'{basename}_{formtype}_'))
-        os.rename(old, new)
-
-if __name__ == "__main__":
-    """
-    Renames a directory full of files to match FMTM format
-    """
-
-    indir = sys.argv[1]
-    basename = sys.argv[2]
-    formtype = sys.argv[3]
-
-    print("\nHere goes nothing.\n")
-    r = rename(indir, basename, formtype)
-    print(r)
+test_data_path = os.path.dirname(os.path.abspath(__file__))

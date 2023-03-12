@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import '../styles/login.css' 
+import '../styles/login.css'
 import windowDimention from "../hooks/WindowDimension";
 import { useDispatch, useSelector } from 'react-redux';
 import FormControl from '@mui/material/FormControl';
@@ -33,14 +33,14 @@ const Login = () => {
     const stateHome = useSelector((state: any) => state.home);
     //we use use selector from redux to get all state of home from home slice
 
- 
+
 
 
     return (
-        <div style={{ padding: 7 }}> 
-          
+        <div style={{ padding: 7 }}>
+
             <div id="buttons">
-            
+
 
 
 
@@ -74,24 +74,20 @@ const Login = () => {
          </p>
 
     </FormControl>
-  
+
 
     <button id="signup" className="warning">Login</button>
 
 
             </div>
-            
+
         </div>
 
 
 
 
-    )    
+    )
 }
-
-
-
-
 
 
 export default Login;
