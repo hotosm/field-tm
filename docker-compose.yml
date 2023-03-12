@@ -54,8 +54,6 @@ services:
       - central-proxy
     env_file:
       - .env
-    environment:
-      - BACKEND_CORS_ORIGINS=${FRONTEND_MAIN_URL},${FRONTEND_MAP_URL}
     ports:
       - "8000:8000"
       # - "5678:5678"

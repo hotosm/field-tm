@@ -16,18 +16,29 @@ class Settings(BaseSettings):
     DEBUG: str = False
     LOG_LEVEL: str = "DEBUG"
 
-    BACKEND_CORS_ORIGINS: Union[str, list[AnyUrl]] = [
-        "http://localhost:8080",
-        "http://localhost:8081",
-    ]
+    FRONTEND_MAIN_URL: Optional[str]
+    FRONTEND_MAP_URL: Optional[str]
+
+    BACKEND_CORS_ORIGINS: Union[str, list[AnyUrl]]
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, val: Union[str, list[AnyUrl]]) -> list[str]:
+    def assemble_cors_origins(
+        self, val: Union[str, list[AnyUrl]], values: dict
+    ) -> list[str]:
         """Build and validate CORS origins list."""
+        default_origins = [
+            values.get("FRONTEND_MAIN_URL"),
+            values.get("FRONTEND_MAP_URL"),
+        ]
+
         if isinstance(val, str):
-            return [i.strip() for i in val.split(",")]
+            default_origins += [i.strip() for i in val.split(",")]
+            return default_origins
+
         elif isinstance(val, list):
-            return val
+            default_origins += val
+            return default_origins
+
         raise ValueError(f"Not a valid CORS origin list: {val}")
 
     API_PREFIX: Optional[str] = "/"
@@ -39,7 +50,7 @@ class Settings(BaseSettings):
     DB_URL: Optional[PostgresDsn]
 
     @validator("DB_URL", pre=True)
-    def assemble_db_connection(cls, v: str, values: dict[str, Any]) -> Any:
+    def assemble_db_connection(self, v: str, values: dict[str, Any]) -> Any:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):
             return v
@@ -78,6 +89,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings():
+    """Cache settings, for calling in multiple modules."""
     _settings = Settings()
     logger.info(f"Loaded settings: {_settings.dict()}")
     return _settings
