@@ -3,9 +3,9 @@ ARG MAINTAINER=admin@hotosm.org
 
 ARG API_URL=https://fmtm-api.hotosm.org
 ENV API_URL=${API_URL}
-ARG FRONTEND_MAIN_URL=https://localhost:8000
+ARG FRONTEND_MAIN_URL=https://fmtm.hotosm.org
 ENV FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-ARG FRONTEND_MAP_URL=https://localhost:8001
+ARG FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
 ENV FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
 
 LABEL fmtm.hotosm.org.maintainer="${MAINTAINER}" \
