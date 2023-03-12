@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(
-        self, val: Union[str, list[AnyUrl]], values: dict
+        cls, val: Union[str, list[AnyUrl]], values: dict
     ) -> list[str]:
         """Build and validate CORS origins list."""
         default_origins = [
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     DB_URL: Optional[PostgresDsn]
 
     @validator("DB_URL", pre=True)
-    def assemble_db_connection(self, v: str, values: dict[str, Any]) -> Any:
+    def assemble_db_connection(cls, v: str, values: dict[str, Any]) -> Any:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):
             return v
