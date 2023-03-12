@@ -96,8 +96,8 @@ services:
       # The Go regex below requires escaping or changing, is this possible?
       # - "traefik.http.routers.api.rule=HostRegexp(`${API_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
       - "traefik.http.routers.api.rule=Host(`fmtm-api.hotosm.org`)"
-      - "traefik.http.services.api.loadbalancer.server.port=8000"
-      - "traefik.http.routers.api.service=api"
+      - "traefik.http.services.api-svc.loadbalancer.server.port=8000"
+      - "traefik.http.routers.api.service=api-svc"
 
   ui-main:
     image: "quay.io/hotosm/fmtm-mf-main:latest"
@@ -119,8 +119,8 @@ services:
       # The Go regex below requires escaping or changing, is this possible?
       # - "traefik.http.routers.ui-main.rule=HostRegexp(`${FRONTEND_MAIN_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
       - "traefik.http.routers.ui-main.rule=Host(`fmtm.hotosm.org`)"
-      - "traefik.http.services.ui-main.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui-main.service=ui-main"
+      - "traefik.http.services.ui-main-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ui-main.service=ui-main-svc"
 
   ui-map:
     image: "quay.io/hotosm/fmtm-mf-map:latest"
@@ -142,8 +142,8 @@ services:
       # The Go regex below requires escaping or changing, is this possible?
       # - "traefik.http.routers.ui-map.rule=HostRegexp(`${FRONTEND_MAP_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
       - "traefik.http.routers.ui-map.rule=Host(`map.fmtm.hotosm.org`)"
-      - "traefik.http.services.ui-map.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui-map.service=ui-map"
+      - "traefik.http.services.ui-map-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ui-map.service=ui-map-svc"
 
   central-db:
     image: postgis/postgis:14-3.3-alpine
