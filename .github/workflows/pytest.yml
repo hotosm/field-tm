@@ -3,6 +3,7 @@ name: pytest
 on:
   push:
     branches: [main]
+  # Run tests on PR, prior to merge
   pull_request:
     branches: [main]
   # Allow manual trigger (workflow_dispatch)
