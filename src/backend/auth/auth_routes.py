@@ -16,9 +16,9 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import json
-
 from fastapi import APIRouter, Depends, Request
+from fastapi.logger import logger as log
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ..db import database
@@ -28,18 +28,17 @@ from .osm import AuthUser, init_osm_auth, login_required
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
-    dependencies=[Depends(init_osm_auth)],
     responses={404: {"description": "Not found"}},
 )
 
 
 @router.get("/login/")
 def login(user: user_schemas.UserIn, db: Session = Depends(database.get_db)):
-    return user_crud.verify_user(db, user)
+    return JSONResponse(content=user_crud.verify_user(db, user), status_code=200)
 
 
 @router.get("/osm_login/")
-def login_url(request: Request):
+def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
     """Generate Login URL for authentication using OAuth2 Application registered with OpenStreetMap.
     Click on the download url returned to get access_token.
 
@@ -51,11 +50,12 @@ def login_url(request: Request):
         OAuth2 with client_id, redirect_uri, and permission scope as query_string parameters
     """
     login_url = osm_auth.login()
-    return json.loads(login_url)
+    log.debug(f"Login URL returned: {login_url}")
+    return JSONResponse(content=login_url, status_code=200)
 
 
 @router.get("/callback/")
-def callback(request: Request):
+def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     """Performs token exchange between OpenStreetMap and Export tool API.
 
     Core will use Oauth secret key from configuration while deserializing token,
@@ -68,8 +68,8 @@ def callback(request: Request):
     - access_token (string)
     """
     access_token = osm_auth.callback(str(request.url))
-
-    return json.loads(access_token)
+    log.debug(f"Access token returned: {access_token}")
+    return JSONResponse(content=access_token, status_code=200)
 
 
 @router.get("/me/", response_model=AuthUser)
