@@ -28,16 +28,16 @@ const Forgot = () => {
     const stateLogin = useSelector((state: any) => state.login);
     //we use use selector from redux to get all state of token from login slice
 
- 
+
 
 
 
     return (
-        <div style={{ padding: 7 }}> 
-          
+        <div style={{ padding: 7 }}>
+
             <div id="buttons">
-            
- 
+
+
                 <FormControl>
 
                 <TextField
@@ -61,7 +61,7 @@ const Forgot = () => {
                         autoComplete="requested username"
                         autoFocus
                         />
-                
+
                 <TextField
                         margin="normal"
                         required
@@ -77,17 +77,17 @@ const Forgot = () => {
 
 
                 </FormControl>
-            
+
 
                 <button id="submit">Send a link</button>
 
 
             </div>
-            
+
         </div>
 
 
-    )    
+    )
 }
 
 

@@ -26,14 +26,16 @@ from fastapi import FastAPI
 from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from odkconvert.xlsforms import xlsforms_path
 
 from .__version__ import __version__
 from .auth import routers as auth_routers
 from .central import central_routes
 from .config import settings
-from .db.database import Base, engine
+from .db.database import Base, engine, get_db
 from .debug import debug_routes
 from .projects import project_routes
+from .projects.project_crud import read_xlsforms
 from .tasks import tasks_routes
 from .users import user_routes
 
@@ -85,9 +87,11 @@ def get_application() -> FastAPI:
     _app.include_router(user_routes.router)
     _app.include_router(project_routes.router)
     _app.include_router(tasks_routes.router)
-    _app.include_router(debug_routes.router)
     _app.include_router(central_routes.router)
     _app.include_router(auth_routers.router)
+
+    if settings.DEBUG:
+        _app.include_router(debug_routes.router)
 
     return _app
 
@@ -101,6 +105,9 @@ async def startup_event():
     logger.debug("Starting up FastAPI server.")
     logger.debug("Connecting to DB with SQLAlchemy")
     Base.metadata.create_all(bind=engine)
+
+    # Read in XLSForms
+    read_xlsforms(next(get_db()), xlsforms_path)
 
 
 @api.on_event("shutdown")
