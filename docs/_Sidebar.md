@@ -6,6 +6,8 @@
 
 [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution)
 
+[FAQ](https://github.com/hotosm/fmtm/wiki/FAQ)
+
 ## For Developers
 
 [1. Getting Started](https://github.com/hotosm/fmtm/wiki/DEV-1.-Getting-Started)
