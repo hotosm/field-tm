@@ -21,7 +21,6 @@ from typing import List
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from odkconvert.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
 
 from ..central import central_crud
@@ -98,8 +97,6 @@ async def create_project(
     project = project_crud.create_project_with_project_info(
         db, project_info, odkproject["id"]
     )
-    # FIXME: This should only be done once when starting, instead of for each project
-    project_crud.read_xlsforms(db, xlsforms_path)
 
     if project:
         return project

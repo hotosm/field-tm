@@ -101,4 +101,3 @@ export default function BasicTabs({ listOfData }) {
         </CoreModules.Box>
     );
 }
-

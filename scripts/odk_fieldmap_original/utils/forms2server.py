@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/python3
 
@@ -48,7 +48,7 @@ from odk_requests import (
 
 def get_formlist(indir):
     """
-    Converts a directory full of xlsform files into 
+    Converts a directory full of xlsform files into
     a list of form names without the file extension.
     i.e. Dakar_buildings_213.xlsx =-> Dakar_buildings_213
 
@@ -127,7 +127,7 @@ def push_geojson(url, aut, pid, indir):
     """
     Push all of the geojson attachments to their
     corresponsing forms on the ODK Central server.
-    The geojson files are expected to be in the 
+    The geojson files are expected to be in the
     geojson subdirectory of the input directory.
     """
     # TODO loop over the forms instead of the
