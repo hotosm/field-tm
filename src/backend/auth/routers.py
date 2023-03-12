@@ -23,9 +23,14 @@ from sqlalchemy.orm import Session
 
 from ..db import database
 from ..users import user_crud, user_schemas
-from . import AuthUser, login_required, osm_auth
+from .osm import AuthUser, init_osm_auth, login_required
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+    dependencies=[Depends(init_osm_auth)],
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.get("/login/")
