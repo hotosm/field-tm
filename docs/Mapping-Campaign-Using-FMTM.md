@@ -44,7 +44,7 @@ Alternatively, you can also select one from the map or the task and choose “Ma
 12.When finished mapping, save your edits and select the button Submit task.
 After this, you can go back to step 7 and select a new task for mapping.
 
-- A step by step procedure on how to begin mapping can be found [here][https://learnosm.org/en/beginner/]
+- A step by step procedure on how to begin mapping can be found [here](https://learnosm.org/en/beginner/)
 
 A short guide for beginners on how to begin mapping.
 
