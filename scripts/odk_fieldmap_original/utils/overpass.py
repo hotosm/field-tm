@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/usr/bin/python3
 
@@ -28,7 +28,7 @@ import requests
 
 
 def query(query_string, overpass_url):
-    """Accept a query in Overpass API query language, 
+    """Accept a query in Overpass API query language,
     return a dict from json of the data from an Overpass server,
     which can be dumped as a json file or used as a dict.
     """
@@ -74,7 +74,7 @@ def osm_json_to_geojson(infile):
 
 
 def centroid_and_merge_to_points(geojson_in, geojson_out):
-    """Accept a GeoJSON file containing polygons and points, 
+    """Accept a GeoJSON file containing polygons and points,
     return a GeoJSON containing only points with centroids for polygons.
     Lines are ignored.
     """

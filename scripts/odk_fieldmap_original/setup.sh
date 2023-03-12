@@ -13,7 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
 
 #!/bin/bash
 
@@ -60,7 +60,7 @@ echo installing GDAL
 sudo apt install -y gdal-bin libgdal-dev >> logs/setup.log 2>> logs/error.log
 echo setting up python hooks for GDAL, pygdal.
 echo Doing so via a horrible hack using a Python script to extract the latest
-echo version of pygdal compatible with the specific GDAL installed. 
+echo version of pygdal compatible with the specific GDAL installed.
 gdalversion=$(gdal-config --version)
 echo $gdalversion
 GDALERROR=$((pip install pygdal==$gdalversion) 2>&1)
@@ -74,7 +74,7 @@ rm pygdalversion.txt
 
 echo installing nodejs and npm
 sudo apt install -y nodejs npm >> logs/setup.log 2>> logs/error.log
-echo installing osmtogeojson 
+echo installing osmtogeojson
 sudo npm install -g osmtogeojson >> logs/setup.log 2>> logs/error.log
 
 
