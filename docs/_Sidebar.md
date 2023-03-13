@@ -21,3 +21,7 @@
 [5. Docker Tips](https://github.com/hotosm/fmtm/wiki/DEV-5.-Docker-Tips)
 
 [6. Production Deployment](https://github.com/hotosm/fmtm/wiki/DEV-6.-Production-Deployment)
+
+## For Volunteers
+
+[How to use fmtm to create a mapping campaign](https://github.com/hotosm/fmtm/wiki/Mapping-Campaign-Using-FMTM.md)
