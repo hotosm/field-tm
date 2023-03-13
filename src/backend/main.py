@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -29,7 +29,7 @@ from fastapi.responses import FileResponse
 from odkconvert.xlsforms import xlsforms_path
 
 from .__version__ import __version__
-from .auth import routers as auth_routers
+from .auth import auth_routes
 from .central import central_routes
 from .config import settings
 from .db.database import Base, engine, get_db
@@ -88,7 +88,7 @@ def get_application() -> FastAPI:
     _app.include_router(project_routes.router)
     _app.include_router(tasks_routes.router)
     _app.include_router(central_routes.router)
-    _app.include_router(auth_routers.router)
+    _app.include_router(auth_routes.router)
 
     if settings.DEBUG:
         _app.include_router(debug_routes.router)
