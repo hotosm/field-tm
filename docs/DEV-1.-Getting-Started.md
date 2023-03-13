@@ -83,20 +83,20 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this
 
-\### ODK Central ###
+\ ### ODK Central ###
 ODK_CENTRAL_URL=https://central-proxy
 ODK_CENTRAL_USER=
 ODK_CENTRAL_PASSWD=
 
-\### FMTM ###
-\# DEBUG=True
-\# LOG_LEVEL=DEBUG
+\ ### FMTM ###
+\ # DEBUG=True
+\ # LOG_LEVEL=DEBUG
 API_URL=http://127.0.0.1:8000
 FRONTEND_MAIN_URL=http://localhost:8080
 FRONTEND_MAP_URL=http://localhost:8081
-\# API_PREFIX=/api
+\ # API_PREFIX=/api
 
-\### OSM ###
+\ ### OSM ###
 OSM_CLIENT_ID=
 OSM_CLIENT_SECRET=
 OSM_URL=https://www.openstreetmap.org
@@ -104,7 +104,7 @@ OSM_SCOPE=read_prefs
 OSM_LOGIN_REDIRECT_URL=http://127.0.0.1:8000/auth/callback/
 OSM_SECRET_KEY=
 
-\### Database (optional) ###
+\ ### Database (optional) ###
 CENTRAL_DB_HOST=central-db
 CENTRAL_DB_USER=odk
 CENTRAL_DB_PASSWORD=odk
