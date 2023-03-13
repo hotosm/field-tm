@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -17,22 +17,22 @@
 
 #!/bin/python3
 
-"""
-    Accepts
-    - A directory with forms or QR codes for an FMTM project
+"""Accepts
+- A directory with forms or QR codes for an FMTM project.
 
-    Renames all of the files with the schema needed by the FMTM uploader.
+Renames all of the files with the schema needed by the FMTM uploader.
 """
 import os
 import sys
 
-def rename(indir, basename, formtype = 'buildings'):
+
+def rename(indir, basename, formtype="buildings"):
     filelist = os.listdir(indir)
     for f in filelist:
         old = os.path.join(indir, f)
-        new = os.path.join(indir, f.replace(f'{basename}',
-                                            f'{basename}_{formtype}_'))
+        new = os.path.join(indir, f.replace(f"{basename}", f"{basename}_{formtype}_"))
         os.rename(old, new)
+
 
 if __name__ == "__main__":
     """

@@ -2,7 +2,7 @@
 
 The recommended way to run FMTM is with Docker. You can also develop on your local machine outside of Docker, see below.
 
-> NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Development]() wiki page.
+> NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md) wiki page.
 
 Now let's get started!
 
@@ -37,7 +37,7 @@ The FMTM uses ODK Central to store ODK data.
 Some test data is available to get started quickly.
 
 - Navigate to the `import-test-data` endpoint in the API docs page:
-  <http://localhost:8000/docs#/debug/import_test_data_debug_import_test_data_get>
+  <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
 - Click `Try it out`, then `execute`.
 
 ## 2. Start the API locally (OUTDATED)
@@ -118,4 +118,4 @@ Example launch.json config for vscode:
 }
 ```
 
-> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+> Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.

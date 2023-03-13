@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -17,61 +17,60 @@
 
 #!/bin/python3
 
+"""Accepts:
+- A base URL for an ODK Central server
+- A tuple of username and password to said server
+- An ID number for a project on the server
+- An output directory where the results will be placed.
+
+And downloads all of the submissions from that server as CSV
+
+TODO (KNOWN BUGS):
+- For now it expects a project with multiple form, but all basically
+identical (a single ODK survey with different GeoJSON forms).
+If it gets a project with multiple forms, the collated CSV will
+be fucked up.
+- The geopoint column to be expanded is hard-coded to all-xlocation.
+That only works for forms following Rob Savoye's current template.
+This needs to be a command line argument.
+- Both the geopoint expansion and creation of collated CSV are hardcoded
+to yes; not a big deal but should be flags.
 """
-    Accepts:
-    - A base URL for an ODK Central server
-    - A tuple of username and password to said server
-    - An ID number for a project on the server
-    - An output directory where the results will be placed
 
-    And downloads all of the submissions from that server as CSV
-
-    TODO (KNOWN BUGS):
-    - For now it expects a project with multiple form, but all basically
-      identical (a single ODK survey with different GeoJSON forms).
-      If it gets a project with multiple forms, the collated CSV will
-      be fucked up.
-    - The geopoint column to be expanded is hard-coded to all-xlocation.
-      That only works for forms following Rob Savoye's current template.
-      This needs to be a command line argument.
-    - Both the geopoint expansion and creation of collated CSV are hardcoded
-      to yes; not a big deal but should be flags.
-"""
-
-import os
-import sys
 import argparse
-
+import csv
+import os
 from io import BytesIO, StringIO
 from zipfile import ZipFile as zf
-import csv
 
-from odk_requests import (forms, submissions, csv_submissions)
+from odk_requests import csv_submissions, forms
+
 
 def project_forms(url, aut, pid):
-    """Returns a list of all forms in an ODK project"""
+    """Returns a list of all forms in an ODK project."""
     formsr = forms(url, aut, pid)
     formsl = formsr.json()
     # TODO this returns happily with wrong credentials,
     # thinking that the error message actually constitutes
-    # data about 2 forms. Should fail noisily. 
-    print(f'There are {len(formsl)} forms in project {pid}.')
+    # data about 2 forms. Should fail noisily.
+    print(f"There are {len(formsl)} forms in project {pid}.")
     return formsl
 
+
 def project_submissions_zipped(url, aut, pid, formsl, outdir):
-    """Downloads all of the submissions frm a given ODK Central project"""
+    """Downloads all of the submissions frm a given ODK Central project."""
     for form in formsl:
-        form_id = form['xmlFormId']
-        print(f'Checking submissions from {form_id}.')
+        form_id = form["xmlFormId"]
+        print(f"Checking submissions from {form_id}.")
         subs_zip = csv_submissions(url, aut, pid, form_id)
 
-        outfilename = os.path.join(outdir, f'{form_id}.csv.zip')
-        outfile = open(outfilename, 'wb')
+        outfilename = os.path.join(outdir, f"{form_id}.csv.zip")
+        outfile = open(outfilename, "wb")
         outfile.write(subs_zip.content)
 
+
 def expand_geopoints(csv, geopoint_column_name):
-    """
-    Accepts a list representing a set of CSV ODK submissions and expands
+    """Accepts a list representing a set of CSV ODK submissions and expands
     a geopoint column to include lon, lat, ele, acc columns for easy
     import into QGIS or direct conversion to GeoJSON or similar.
     """
@@ -79,18 +78,18 @@ def expand_geopoints(csv, geopoint_column_name):
     try:
         header_row = csv[0]
         column_num = header_row.index(geopoint_column_name)
-        print(f'I found {geopoint_column_name} at index {column_num}')
-        newheaderrow = header_row[:column_num + 1]
-        newheaderrow.extend(['lat', 'lon', 'ele', 'acc'])
-        newheaderrow.extend(header_row[column_num + 1:])
+        print(f"I found {geopoint_column_name} at index {column_num}")
+        newheaderrow = header_row[: column_num + 1]
+        newheaderrow.extend(["lat", "lon", "ele", "acc"])
+        newheaderrow.extend(header_row[column_num + 1 :])
         newcsv.append(newheaderrow)
         for row in csv[1:]:
             split_geopoint = row[column_num].split()
             print(split_geopoint)
             if len(split_geopoint) == 4:
-                newrow = row[:column_num + 1]
+                newrow = row[: column_num + 1]
                 newrow.extend(split_geopoint)
-                newrow.extend(row[column_num + 1:])
+                newrow.extend(row[column_num + 1 :])
             newcsv.append(newrow)
 
     except Exception as e:
@@ -140,10 +139,12 @@ def odk_geo2wkt(jrstring, node_delimiter = ';', delimiter = ' '):
         
         
 
-def project_submissions_unzipped(url, aut, pid, formsl, outdir,
-                                 collate, expand_geopoint):
-    """Downloads and unzips all of the submissions from a given ODK project"""
+def project_submissions_unzipped(
+    url, aut, pid, formsl, outdir, collate, expand_geopoint
+):
+    """Downloads and unzips all of the submissions from a given ODK project."""
     if collate:
+
         collated_outfilepath = os.path.join(outdir, f'project_{pid}_submissions'
                                             '_collated.csv')
         c_outfile = open(collated_outfilepath, 'w')
@@ -164,6 +165,7 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
         subs_bytes.seek(0)
         subs_unzipped = zf(subs_bytes)
         sub_namelist = subs_unzipped.namelist()
+
         subcount = len(sub_namelist)
         print(f'There are {subcount} files in submissions from {form_id}:')
         print(sub_namelist)
@@ -180,6 +182,7 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
 
             # If it is a csv, open it and see if it is more than one line
             # This might go wrong if something is encoded in other than UTF-8
+
             if os.path.splitext(sub_name)[1] == '.csv':
                 subs_stringio = StringIO(subs_bytes.decode())
                 subs_list = list(csv.reader(subs_stringio))
@@ -189,9 +192,8 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                 if subs_len > 1:
                     subs_to_write = subs_list
                     if expand_geopoint:
-                        subs_to_write = expand_geopoints(subs_list,
-                                                         expand_geopoint)
-                    with open(outfilename, 'w') as outfile:
+                        subs_to_write = expand_geopoints(subs_list, expand_geopoint)
+                    with open(outfilename, "w") as outfile:
                         w = csv.writer(outfile)
                         w.writerows(subs_to_write)
                     if collate:
@@ -209,8 +211,9 @@ def project_submissions_unzipped(url, aut, pid, formsl, outdir,
                             cr.writerows(subs_to_write)
     
             else:
-                with open(outfilename, 'wb') as outfile:
+                with open(outfilename, "wb") as outfile:
                     outfile.write(subs_bytes)
+
 
 if __name__ == "__main__":
     """Downloads all of the submissions from a given ODK Central project"""
@@ -218,28 +221,41 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
 
     # Positional args
-    p.add_argument('url', help="ODK Central Server URL")
-    p.add_argument('username', help="ODK Central username")
-    p.add_argument('password', help="ODK Central password")
-    p.add_argument('pid', help="ODK Central project id number")
-    p.add_argument('outdir', help="Output directory to write submissions")
+    p.add_argument("url", help="ODK Central Server URL")
+    p.add_argument("username", help="ODK Central username")
+    p.add_argument("password", help="ODK Central password")
+    p.add_argument("pid", help="ODK Central project id number")
+    p.add_argument("outdir", help="Output directory to write submissions")
 
     # Optional args
+
     p.add_argument('-gc', '--geopoint_column', default='all-xlocation', help=
                    'The name of the column in the submissions containing '
                    'geometry in Javarosa form for expansion or conversion')
 
     # Flag args
-    p.add_argument('-c', '--collate', action="store_true", help=
-                   "Attempt to collate the CSV from all submissions "
-                   "into a single CSV file")
-    p.add_argument('-z', '--zipped', action="store_true", help=
-                   "Don't bother trying to extract and/or collate csv "
-                   "submissions, just get the zip files")
-    p.add_argument('-x', '--expand_geopoint', action="store_true", help=
-                   "Convert a the column given by -gc, containing a Javarosa "
-                   "geopoint string, into four columns: "
-                   "lat, lon, elevation, accuracy")
+    p.add_argument(
+        "-c",
+        "--collate",
+        action="store_true",
+        help="Attempt to collate the CSV from all submissions "
+        "into a single CSV file",
+    )
+    p.add_argument(
+        "-z",
+        "--zipped",
+        action="store_true",
+        help="Don't bother trying to extract and/or collate csv "
+        "submissions, just get the zip files",
+    )
+    p.add_argument(
+        "-x",
+        "--expand_geopoint",
+        action="store_true",
+        help="Convert a the column given by -gc, containing a Javarosa "
+        "geopoint string, into four columns: "
+        "lat, lon, elevation, accuracy",
+    )
 
     a = p.parse_args()
 

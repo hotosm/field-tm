@@ -23,7 +23,7 @@ Go to the [Field Mapping Tasking Manager repository](https://github.com/hotosm/f
 
 Clone the forked repository to your local machine using the following command:
 
-`git clone https://github.com/<your-username>/tasking-manager.git`
+`git clone https://github.com/<your-username>/fmtm.git`
 
 Make sure to replace <your-username> with your GitHub username.
 
@@ -66,6 +66,8 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 1. Login to OSM, Click on My Settings and register your local fmtm backend app to Oauth2applications
 
 2. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
+
+> Note: `127.0.0.1` is required instead of `localhost` due to OSM restrictions.
 
 <img width="716" alt="image" src="https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png">
 
