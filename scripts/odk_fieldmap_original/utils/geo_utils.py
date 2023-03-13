@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -16,10 +16,7 @@
 #
 
 #!/usr/bin/python3
-"""
-Various utilities for using GDAL in python
-"""
-import os
+"""Various utilities for using GDAL in python."""
 import subprocess
 import sys
 
@@ -28,7 +25,7 @@ from osgeo import ogr
 
 def get_ogr_driver(extension):
     """Load a driver from GDAL for the input file.
-       Only GeoJSON guaranteed to work.
+    Only GeoJSON guaranteed to work.
     """
     driver = None
     if extension.lower() == ".shp":
@@ -60,8 +57,7 @@ def get_extent(infile, extension):
 
 
 def get_extent_bbox(infile, extension):
-    """
-    Returns a string in the format of a bbox that
+    """Returns a string in the format of a bbox that
     works with an Overpass query.
     """
     try:
@@ -78,13 +74,12 @@ def get_extent_bbox(infile, extension):
 
 
 def make_centroids(infile):
-    """
-    Expects a GeoJSON file of polygons
+    """Expects a GeoJSON file of polygons
     Creates a GeoJSON file of centroids.
     Retains all fields from the original polygon file.
     """
     p = subprocess.run(
-        ["ogr2ogr", "-f", "PostgreSQL", f"dbname=fmtm user=fmtm", infile],
+        ["ogr2ogr", "-f", "PostgreSQL", "dbname=fmtm user=fmtm", infile],
         capture_output=True,
         encoding="utf-8",
     )
@@ -153,7 +148,7 @@ def get_geomcollection(infile, extension):
 
         # using a horrible range iterator to work around an apparent bug in OGR
         # (layer won't iterate in some versions of OGR)
-        for i in range(featurecount):
+        for _i in range(featurecount):
             feature = layer.GetNextFeature()
             geomcollection.AddGeometry(feature.GetGeometryRef())
         return geomcollection

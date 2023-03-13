@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ import argparse
 import json
 import os
 import subprocess
-import sys
 from datetime import datetime
 
 import requests
@@ -32,7 +31,6 @@ def query(query_string, overpass_url):
     return a dict from json of the data from an Overpass server,
     which can be dumped as a json file or used as a dict.
     """
-
     try:
         response = requests.get(overpass_url, params={"data": query_string})
     except:
@@ -56,7 +54,7 @@ def osm_json_to_geojson(infile):
     """Accept a raw JSON file of data from an Overpass API query.
     Return a GeoJSON string of the same data, after converting all polygons
     to points. USING THE NODE MODULE FROM OVERPASS, WHICH MUST BE INSTALLED
-    USING sudo npm install -g osmtogeojson
+    USING sudo npm install -g osmtogeojson.
     """
     try:
         print(f"Trying to turn {infile} into geojson")
