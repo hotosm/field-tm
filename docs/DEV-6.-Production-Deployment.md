@@ -55,7 +55,7 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     OSM_CLIENT_SECRET=`<CHANGEME>`
     OSM_URL=https://www.openstreetmap.org
     OSM_SCOPE=read_prefs
-    OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
+    OSM_LOGIN_REDIRECT_URL=`<YOUR_API_URL>`/auth/callback/
     OSM_SECRET_KEY=`<CHANGEME>`
 
     # Database (optional)
