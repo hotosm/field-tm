@@ -37,7 +37,7 @@ The FMTM uses ODK Central to store ODK data.
 Some test data is available to get started quickly.
 
 - Navigate to the `import-test-data` endpoint in the API docs page:
-  <http://localhost:8000/docs#/debug/import_test_data_debug_import_test_data_get>
+  <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
 - Click `Try it out`, then `execute`.
 
 ## 2. Start the API locally (OUTDATED)
@@ -118,4 +118,4 @@ Example launch.json config for vscode:
 }
 ```
 
-> Note: Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+> Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
