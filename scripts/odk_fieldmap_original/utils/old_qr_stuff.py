@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -36,8 +36,6 @@ def generate_qr_data_dict(base_url, aut, pid, admin={}, general=general):
     url = f"{base_url}/v1/projects/{pid}/app-users"
     app_users = requests.get(url, auth=aut).json()
     qr_data_dict = {}
-    false = False
-    true = True
     for app_user in app_users:
         token = app_user["token"]
         app_user_id = app_user["id"]
@@ -60,7 +58,7 @@ def generate_qr_data_dict(base_url, aut, pid, admin={}, general=general):
 
 
 def give_access_app_users(base_url, aut, pid, roleId=2):
-    """Give all the app-users in the project access to all the forms in that project"""
+    """Give all the app-users in the project access to all the forms in that project."""
     url = f"{base_url}/v1/projects/{pid}/forms"
     forms = requests.get(url, auth=aut).json()
 

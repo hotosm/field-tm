@@ -1,0 +1,33 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [main]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Environment to .env
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
+        run: echo "${{ secrets.DOTENV }}" > .env
+
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.FMTM_HOTOSM_ORG_PRIV_KEY }}
+
+      - name: Disable Host key verification
+        # Hack to prevent "Host key verification failed". Should be replaced with a ssh-keyscan based solution
+        run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Deploy
+        run: docker compose --file docker-compose.prod.yml up --build --detach
+        env:
+          DOCKER_HOST: "ssh://svcfmtm@fmtm.hotosm.org"

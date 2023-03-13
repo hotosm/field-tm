@@ -41,6 +41,8 @@ repos:
             --exit-non-zero-on-fix,
             --target-version,
             py39,
+            --ignore,
+            "N805",
           ]
 
   # Autoformat: YAML, JSON, Markdown, etc.
