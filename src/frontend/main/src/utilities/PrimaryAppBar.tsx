@@ -44,7 +44,7 @@ export default function PrimaryAppBar() {
         mode: !brightness == true ? 'light' : 'dark'
       }
     }
-    console.log({ ...defaultTheme, mode: 'dark' })
+
     dispatch(ThemeActions.UpdateBrightness(newTheme))
   }
 
