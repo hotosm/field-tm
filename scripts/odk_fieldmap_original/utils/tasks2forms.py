@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -17,16 +17,15 @@
 
 #!/bin/python3
 
-"""
-    If run from CLI, takes two positional arguments:
+"""If run from CLI, takes two positional arguments:
 
-    1) An input directory containing a subdirectory
-       full of individual GeoJSON files representing tasks
-    2) A ODK-compatible xlsform template
+1) An input directory containing a subdirectory
+full of individual GeoJSON files representing tasks
+2) A ODK-compatible xlsform template
 
-    It then creates a subdirectory called 'forms'
-    and populates it with xlsforms specifically
-    referencing the individual GeoJSON files.
+It then creates a subdirectory called 'forms'
+and populates it with xlsforms specifically
+referencing the individual GeoJSON files.
 """
 
 import os
@@ -36,8 +35,7 @@ from openpyxl import load_workbook
 
 
 def task_areas_to_forms(indir, form_template):
-    """
-    Accepts a project directory, with a subdirectory
+    """Accepts a project directory, with a subdirectory
     called /geojson full of GeoJSON point files,
     each representing an individual task (e.g. a batch
     of buildings or amenities to be visited for data
@@ -55,8 +53,7 @@ def task_areas_to_forms(indir, form_template):
     # TODO: Maybe reject all non-point input files;
     # kind of a hassle involving a spatial lib
     # but perhaps worth it
-    aois = [x for x in filelist if os.path.splitext(
-        x)[1].lower() == ".geojson"]
+    aois = [x for x in filelist if os.path.splitext(x)[1].lower() == ".geojson"]
     outdir = os.path.join(indir, "forms")
     if not os.path.exists(outdir):
         print(f"Making directory {outdir}")
@@ -66,10 +63,9 @@ def task_areas_to_forms(indir, form_template):
 
 
 def prep_form(form_template, AOIfile, outdir):
-    """
-    Creates a modified copy of an ODK xlsform to refer
+    """Creates a modified copy of an ODK xlsform to refer
     to a specific area and GeoJSON file of features.
-    Only works with forms built with this script in mind
+    Only works with forms built with this script in mind.
     """
     form_basename = os.path.splitext(os.path.basename(form_template))[0]
     print(form_basename)
@@ -88,15 +84,12 @@ def prep_form(form_template, AOIfile, outdir):
     for row in surveyws.iter_rows():
         for cell in row:
             s = cell.value
-            if s != None:
+            if s is not None:
                 # check for cells referencing the geojson file
                 if "instance('buildings" in s:
-                    cell.value = s.replace('buildings', f'{AOIbasename}')
+                    cell.value = s.replace("buildings", f"{AOIbasename}")
                 if "select_one_from_file" in s:
-                    cell.value = (f"select_one_from_file " +
-                                  f"{AOIbasename}{AOIext}")
-
-
+                    cell.value = "select_one_from_file " + f"{AOIbasename}{AOIext}"
 
     # Write the individual XLSForm
     outfile = os.path.join(outdir, f"{AOIbasename}.xlsx")
@@ -105,8 +98,7 @@ def prep_form(form_template, AOIfile, outdir):
 
 
 if __name__ == "__main__":
-    """
-    """
+    """ """
     indir = sys.argv[1]
     formfile = sys.argv[2]
     print("here goes")

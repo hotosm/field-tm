@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -17,15 +17,14 @@
 
 #!/bin/python3
 
-"""
-    Accepts
-    - A directory with subdirectories full of:
-      - GeoJSON files representing tasks
-      - XLSForms corresponding to them
-    - A base URL for an ODK Central server
-    - A tuple of username and password to said server
-    And creates an ODK Central project.
-    Project name will be the directory name.
+"""Accepts
+- A directory with subdirectories full of:
+- GeoJSON files representing tasks
+- XLSForms corresponding to them
+- A base URL for an ODK Central server
+- A tuple of username and password to said server
+And creates an ODK Central project.
+Project name will be the directory name.
 
 """
 
@@ -37,7 +36,6 @@ from odk_requests import (
     attach_to_form,
     create_app_user,
     create_form,
-    forms,
     create_project,
     project_id,
     publish_form,
@@ -47,10 +45,9 @@ from odk_requests import (
 
 
 def get_formlist(indir):
-    """
-    Converts a directory full of xlsform files into
+    """Converts a directory full of xlsform files into
     a list of form names without the file extension.
-    i.e. Dakar_buildings_213.xlsx =-> Dakar_buildings_213
+    i.e. Dakar_buildings_213.xlsx =-> Dakar_buildings_213.
 
     N.B. Operates on a subdirectory of the input directory
     named '/forms'
@@ -67,8 +64,7 @@ def get_formlist(indir):
 
 # TODO use formlist instead of traversing directory
 def formdir2project(url, aut, indir):
-    """
-    Accepts
+    """Accepts
     - A directory full of:
       - GeoJSON files representing tasks
       - XLSForms corresponding to them
@@ -77,7 +73,6 @@ def formdir2project(url, aut, indir):
     And creates an ODK Central project.
     Project name will be the directory name.
     """
-
     name = os.path.basename(indir.rstrip(os.path.sep))
     print(f"Creating a project called {name}.\n")
     # TODO: first check that project does not exist
@@ -96,8 +91,7 @@ def formdir2project(url, aut, indir):
 
 # TODO use formlist instead of traversing directory
 def push_forms(url, aut, pid, indir):
-    """
-    Push all of the forms in the subdirectory forms
+    """Push all of the forms in the subdirectory forms
     of the input directory up to the ODK Central server.
     """
     formdir = os.path.join(indir, "forms")
@@ -124,8 +118,7 @@ def push_forms(url, aut, pid, indir):
 
 # TODO use formlist instead of traversing the directory
 def push_geojson(url, aut, pid, indir):
-    """
-    Push all of the geojson attachments to their
+    """Push all of the geojson attachments to their
     corresponsing forms on the ODK Central server.
     The geojson files are expected to be in the
     geojson subdirectory of the input directory.
@@ -135,8 +128,7 @@ def push_geojson(url, aut, pid, indir):
     # Not hugely important but more consistent.
     gjdir = os.path.join(indir, "geojson")
     filelist = os.listdir(gjdir)
-    attments = [x for x in filelist if os.path.splitext(
-        x)[1].lower() == ".geojson"]
+    attments = [x for x in filelist if os.path.splitext(x)[1].lower() == ".geojson"]
     for attment in attments:
         attname = os.path.splitext(os.path.basename(attment))[0]
         print(f"Attaching {attment}.")
@@ -150,8 +142,7 @@ def push_geojson(url, aut, pid, indir):
 
 
 def publish_forms(url, aut, pid, forms):
-    """Iterate through and publish forms.
-    """
+    """Iterate through and publish forms."""
     for form in forms:
         r = publish_form(url, aut, pid, form)
         print(r)
@@ -159,8 +150,7 @@ def publish_forms(url, aut, pid, forms):
 
 
 def create_app_users(url, aut, pid, forms):
-    """
-    Create app users with access to the appropriate
+    """Create app users with access to the appropriate
     forms. Each app users will share a name with their
     sole allocated form.
     """
@@ -210,9 +200,7 @@ def fetch_qr_codes(url, aut, pid, forms, indir):
 
 
 if __name__ == "__main__":
-    """
-
-    """
+    """ """
     indir = sys.argv[1]
     url = sys.argv[2]
     aut = (sys.argv[3], sys.argv[4])
