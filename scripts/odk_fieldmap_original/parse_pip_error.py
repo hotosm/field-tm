@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -16,32 +16,31 @@
 #
 
 #!/usr/bin/python3
-import os
 import re
 import sys
 
 
 def parse_error(string, version):
     # split the error message into a list of version numbers
-    possibles = string.split(',')
+    possibles = string.split(",")
 
     # Clean the strings in the list
     possibles = [text.strip() for text in possibles]
 
     # Find those beginning with the correct first three numbers
-    regex = re.compile('^' + version)
+    regex = re.compile("^" + version)
     filtered = list(filter(regex.search, possibles))
     print(filtered)
-    print('\n')
+    print("\n")
 
     def sortbylastnum(instring):
-        nums = instring.split('.')
+        nums = instring.split(".")
         last = int(nums[len(nums) - 1])
         return last
 
     sortedcandidates = sorted(filtered, key=sortbylastnum)
 
-    with open('pygdalversion.txt', 'w') as outfile:
+    with open("pygdalversion.txt", "w") as outfile:
         outfile.write(sortedcandidates[-1])
 
 

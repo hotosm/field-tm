@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -14,6 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+
 FROM docker.io/bitnami/git:2 as repo
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

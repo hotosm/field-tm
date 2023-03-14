@@ -57,6 +57,7 @@ module.exports = (webpackEnv) => {
           use: {
             loader: "babel-loader",
           },
+
         },
       ],
     },
