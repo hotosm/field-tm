@@ -9,9 +9,9 @@ ARG FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
 ENV FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
 
 LABEL fmtm.hotosm.org.maintainer="${MAINTAINER}" \
-      fmtm.hotosm.org.api-url="${API_URL}" \
-      fmtm.hotosm.org.main-url="${FRONTEND_MAIN_URL}" \
-      fmtm.hotosm.org.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
+    fmtm.hotosm.org.api-url="${API_URL}" \
+    fmtm.hotosm.org.main-url="${FRONTEND_MAIN_URL}" \
+    fmtm.hotosm.org.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
 
 WORKDIR /app
 COPY ./package*.json ./

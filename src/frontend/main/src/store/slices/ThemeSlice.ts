@@ -10,7 +10,8 @@ const ThemeSlice = createSlice({
                 primary: {
                     main: '#ffffff',
                     contrastText: '#44546a',
-                    lightblue: '#99e6ff'
+                    lightblue: '#99e6ff',
+                    primary_rgb: 'rgb(255, 255, 255,0.8)'
                 },
                 error: {
                     //hot red
@@ -38,32 +39,37 @@ const ThemeSlice = createSlice({
                     //hot dark
                     main: '#44546a',
                     contrastText: '#2C3038',
+                    info_rgb: 'rgb(44,48,56,0.2)'
+
                 },
                 text: {
                     secondary: '#2C3038',
                 },
+                loading: {
+                    skeleton_rgb: 'rgb(112, 67, 67,0.1)'
+                },
                 mapFeatureColors: {
                     //blue
                     ready: '#008099',
-                    ready_rgb: 'rgb(0, 128, 153,0.1)',
+                    ready_rgb: 'rgb(0, 128, 153,0.4)',
                     locked_for_mapping: '#0063cc',
-                    locked_for_mapping_rgb: 'rgb(0, 99, 204,0.1)',
+                    locked_for_mapping_rgb: 'rgb(0, 99, 204,0.4)',
                     mapped: '#161969',
-                    mapped_rgb: 'rgb(22, 25, 105,0.1)',
+                    mapped_rgb: 'rgb(22, 25, 105,0.4)',
                     locked_for_validation: '#3d1c97',
-                    locked_for_validation_rgb: 'rgb(61, 28, 151,0.1)',
+                    locked_for_validation_rgb: 'rgb(61, 28, 151,0.4)',
                     //green
                     validated: '#006600',
-                    validated_rgb: 'rgb(0, 102, 0,0.1)',
+                    validated_rgb: 'rgb(0, 102, 0,0.4)',
                     //yellow
                     // invalidated: '#ffff00',
-                    invalidated:'#ffcc00',
-                    invalidated_rgb: 'rgb(255, 204, 0,0.1)',
+                    invalidated: '#ffcc00',
+                    invalidated_rgb: 'rgb(255, 204, 0,0.4)',
                     //brown
                     bad: '#704343',
-                    bad_rgb: 'rgb(112, 67, 67,0.1)',
+                    bad_rgb: 'rgb(112, 67, 67,0.4)',
                     split: '#704343',
-                    split_rgb: 'rgb(112, 67, 67,0.1)'
+                    split_rgb: 'rgb(112, 67, 67,0.4)',
                 }
 
             },

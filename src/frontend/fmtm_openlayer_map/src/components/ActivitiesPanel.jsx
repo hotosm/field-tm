@@ -139,7 +139,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
                 {`Total Activities ${allActivities}`}
             </Typography>
 
-            <Search id="search">
+            <Search id="searchActivities">
                 <SearchIconWrapper>
                     <SearchIcon color="info" />
                 </SearchIconWrapper>

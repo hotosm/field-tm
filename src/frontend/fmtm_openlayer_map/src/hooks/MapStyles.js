@@ -8,7 +8,7 @@ export default function MapStyles() {
 
 
     const mapTheme = useSelector(state => state.theme.hotTheme)
-    const [style,setStyle] = useState({})
+    const [style, setStyle] = useState({})
 
     useEffect(() => {
 

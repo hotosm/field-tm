@@ -16,7 +16,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { ShareSocial } from 'react-share-social'
 import BasicDialog from "../utilities/BasicDialog";
 import CustomSwiper from "../utilities/CustomSwiper";
-import { ProjectActions } from "../store/slices/ProjectSlice";
+import { HomeActions } from 'fmtm/HomeSlice';
 
 
 const TasksComponent = ({ type, state, defaultTheme }) => {
@@ -25,7 +25,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     const params = useParams();
     const index = state.findIndex(project => project.id == environment.decode(params.id));
     const [selectedTask, SetSelectedTask] = useState(0)
-    const validatedSelectedTask = selectedTask == 0 ? state[index].taskBoundries[0].id : selectedTask;
+    const validatedSelectedTask = selectedTask == 0 ? state.length != 0 ? state[index].taskBoundries[0].id : null : selectedTask;
     const dispatch = useDispatch();
     const { loading, qrcode } = ProjectFilesById(
         `${environment.baseApiUrl}/projects/${environment.decode(params.id)}`,
@@ -35,7 +35,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     const socialStyles = {
         copyContainer: {
             border: `1px solid ${defaultTheme.palette.info['main']}`,
-            background: defaultTheme.palette.info['main']
+            background: defaultTheme.palette.info['info'],
+            color: defaultTheme.palette.info['main']
         },
         title: {
             color: defaultTheme.palette.info['main'],
@@ -72,10 +73,9 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     .map((skeleton, index) => {
                                         return (
                                             <SkeletonTheme
-
                                                 key={index}
-                                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
                                                 <Skeleton key={skeleton + index} width={200} height={30} />
                                             </SkeletonTheme>
@@ -148,8 +148,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     loading ?
                                         <Stack>
                                             <SkeletonTheme
-                                                baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                                highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                                baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                                highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
                                                 <Skeleton width={300} count={12} />
                                             </SkeletonTheme>
@@ -235,8 +235,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                 loading ?
 
                                     <SkeletonTheme
-                                        baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                        highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                        baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                        highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
                                         <Skeleton width={'100%'} height={30} />
                                     </SkeletonTheme>
@@ -247,10 +247,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         startIcon={<VerifiedIcon />}
                                         disabled={loading}
                                         onClick={() => {
-                                            dispatch(ProjectActions.SetSnackBar({
+                                            dispatch(HomeActions.SetSnackBar({
                                                 open: true,
                                                 message: `No action yet`,
-                                                variant: 'info',
+                                                variant: 'warning',
                                                 duration: 6000
                                             }))
                                         }}
@@ -263,8 +263,8 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                 loading ?
 
                                     <SkeletonTheme
-                                        baseColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
-                                        highlightColor={defaultTheme.palette.mapFeatureColors['bad_rgb']}
+                                        baseColor={defaultTheme.palette.loading['skeleton_rgb']}
+                                        highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
                                         <Skeleton width={'100%'} height={30} />
                                     </SkeletonTheme>
@@ -275,10 +275,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         startIcon={<LockOpenIcon />}
                                         disabled={loading}
                                         onClick={() => {
-                                            dispatch(ProjectActions.SetSnackBar({
+                                            dispatch(HomeActions.SetSnackBar({
                                                 open: true,
                                                 message: `No action yet`,
-                                                variant: 'info',
+                                                variant: 'warning',
                                                 duration: 6000
                                             }))
                                         }}

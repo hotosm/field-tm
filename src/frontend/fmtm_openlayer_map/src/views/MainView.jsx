@@ -9,7 +9,6 @@ export default function MainView() {
 
     const { windowSize } = WindowDimension();
     const getTheme = useSelector(state => state.theme.hotTheme)
-    const state = useSelector(state => state.project.snackbar)
     const theme = createTheme(getTheme)
 
     return (

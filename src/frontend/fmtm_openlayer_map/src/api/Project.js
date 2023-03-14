@@ -8,7 +8,7 @@ export const ProjectById = (url, existingProjectList) => {
         const fetchProjectById = async (url, existingProjectList) => {
 
             try {
-                console.log('loading :')
+                // console.log('loading :')
                 const project = await axios.get(url)
                 const resp = project.data;
 
