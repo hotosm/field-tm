@@ -1,9 +1,9 @@
-import { Stack } from '@mui/material'
 import React from 'react'
+import CoreModules from 'fmtm/CoreModules';
 export default function IconButtonCard({ element, style, radius }) {
     return (
 
-        <Stack
+        <CoreModules.Stack
             style={style}
             width={50}
             height={50}
@@ -12,6 +12,6 @@ export default function IconButtonCard({ element, style, radius }) {
             justifyContent={'center'}
         >
             {element}
-        </Stack>
+        </CoreModules.Stack>
     )
 }

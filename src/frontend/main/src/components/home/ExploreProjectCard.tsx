@@ -1,27 +1,19 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import CustomizedImage from '../../utilities/CustomizedImage';
 import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
-import { useNavigate } from "react-router-dom";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { Stack } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
 import environment from '../../environment';
 import { HomeActions } from '../../store/slices/HomeSlice';
 import { HomeProjectCardModel } from '../../models/home/homeModel';
+import CoreModules from '../../shared/CoreModules';
+import AssetModules from '../../shared/AssetModules';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
-
     const [shadowBox, setShadowBox] = React.useState(0)
-    const dispatch = useDispatch();
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    const dispatch = CoreModules.useDispatch();
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     //use navigate hook for from react router dom for rounting purpose
-    const navigate = useNavigate();
+    const navigate = CoreModules.useNavigate();
 
     //on mounse enter an Element set shadow to 3
     const onHoverIn = () => {
@@ -64,7 +56,7 @@ export default function ExploreProjectCard({ data }) {
         }
     }
     return (
-        <Card onClick={() => {
+        <CoreModules.Card onClick={() => {
             const project: HomeProjectCardModel = data;
             dispatch(HomeActions.SetSelectedProject(project))
             navigate(`/project_details/${environment.encode(data.id)}`)
@@ -75,21 +67,21 @@ export default function ExploreProjectCard({ data }) {
             onMouseLeave={onHoverOut}
         >
 
-            <CardContent>
+            <CoreModules.CardContent>
                 {/*Id Number*/}
-                <Typography
+                <CoreModules.Typography
                     variant='h4'
                     position={'absolute'}
                     right={7}
                     top={5}
                     gutterBottom>
                     #{data.id}
-                </Typography>
+                </CoreModules.Typography>
                 {/* <======End======> */}
 
                 {/*Priority Button and Image*/}
                 <div>
-                    <Button
+                    <CoreModules.Button
                         size="small"
                         variant="contained"
                         style={cardInnerStyles.outlinedButton}
@@ -97,7 +89,7 @@ export default function ExploreProjectCard({ data }) {
                         disabled
                     >
                         {data.priority_str}
-                    </Button>
+                    </CoreModules.Button>
                     <CustomizedImage
                         status={'card'}
                         style={{ width: 50, height: 50 }}
@@ -106,32 +98,32 @@ export default function ExploreProjectCard({ data }) {
                 {/* <======End======> */}
 
                 {/*Project Info and description*/}
-                <Stack direction={'column'} height={170} mt={'2%'} justifyContent={'left'}>
+                <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
 
-                    <Typography
+                    <CoreModules.Typography
                         ml={'2%'}
                         mt={'5%'}
                         variant='subtitle1'
                         color="info"
                         gutterBottom>
                         {data.title}
-                    </Typography>
+                    </CoreModules.Typography>
 
-                    <Stack direction={'row'}>
-                        <LocationOnIcon
+                    <CoreModules.Stack direction={'row'}>
+                        <AssetModules.LocationOn
                             color='error'
                             style={cardInnerStyles.location.icon}
                         />
-                        <Typography
+                        <CoreModules.Typography
                             mt={'7%'}
                             variant='h2'
                             color="info"
                             gutterBottom>
                             {data.location_str}
-                        </Typography>
-                    </Stack>
+                        </CoreModules.Typography>
+                    </CoreModules.Stack>
 
-                    <Typography
+                    <CoreModules.Typography
                         mt={'7%'}
                         ml={'2%'}
                         variant="h4"
@@ -139,15 +131,15 @@ export default function ExploreProjectCard({ data }) {
                         gutterBottom
                     >
                         {data.description}
-                    </Typography>
+                    </CoreModules.Typography>
 
-                </Stack>
+                </CoreModules.Stack>
                 {/* <======End======> */}
 
 
                 {/* Contributors */}
-                <Stack direction={'row'}>
-                    <Typography
+                <CoreModules.Stack direction={'row'}>
+                    <CoreModules.Typography
                         mt={'7%'}
                         ml={'2%'}
                         variant={'h2'}
@@ -156,9 +148,9 @@ export default function ExploreProjectCard({ data }) {
                         color="info"
                     >
                         {data.num_contributors}
-                    </Typography>
+                    </CoreModules.Typography>
 
-                    <Typography
+                    <CoreModules.Typography
                         mt={'8%'}
                         ml={'2%'}
                         variant={'h4'}
@@ -166,16 +158,16 @@ export default function ExploreProjectCard({ data }) {
                         color="info"
                     >
                         contributors
-                    </Typography>
-                </Stack>
+                    </CoreModules.Typography>
+                </CoreModules.Stack>
                 {/* <======End======> */}
 
 
                 {/* Contribution Progress Bar */}
                 <CustomizedProgressBar data={data} height={7} />
                 {/* <======End======> */}
-            </CardContent>
+            </CoreModules.CardContent>
 
-        </Card>
+        </CoreModules.Card>
     );
 }

@@ -1,32 +1,24 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import { Stack, TextField } from '@mui/material';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
-import DescriptionIcon from '@mui/icons-material/Description';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+
+import React, { useState } from "react";
 import BasicCard from "fmtm/BasicCard";
-import Activities from "./Activities";
-import { useParams } from "react-router-dom";
+// import Activities from "./Activities";
 import environment from "fmtm/environment";
-import { useDispatch, useSelector } from 'react-redux';
 import { ProjectFilesById } from "../api/Files";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import ShareIcon from '@mui/icons-material/Share';
 import { ShareSocial } from 'react-share-social'
 import BasicDialog from "../utilities/BasicDialog";
 import CustomSwiper from "../utilities/CustomSwiper";
 import { HomeActions } from 'fmtm/HomeSlice';
-
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
 
 const TasksComponent = ({ type, state, defaultTheme }) => {
 
     const [open, setOpen] = useState(false)
-    const params = useParams();
+    const params = CoreModules.useParams();
     const index = state.findIndex(project => project.id == environment.decode(params.id));
     const [selectedTask, SetSelectedTask] = useState(0)
     const validatedSelectedTask = selectedTask == 0 ? state.length != 0 ? state[index].taskBoundries[0].id : null : selectedTask;
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const { loading, qrcode } = ProjectFilesById(
         `${environment.baseApiUrl}/projects/${environment.decode(params.id)}`,
         validatedSelectedTask,
@@ -45,10 +37,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     }
 
     return (
-        <Box>
+        <CoreModules.Box>
 
 
-            <Stack>
+            <CoreModules.Stack>
                 {
                     loading != true ?
                         <CustomSwiper
@@ -63,7 +55,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                             loading={loading}
                         />
                         :
-                        <Stack direction={'row'} justifyContent={'center'} spacing={1}>
+                        <CoreModules.Stack direction={'row'} justifyContent={'center'} spacing={1}>
                             {
                                 Array.from(Array(
                                     type == 'sm' ? 4 :
@@ -72,20 +64,19 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     .fill({ id: 0 }))
                                     .map((skeleton, index) => {
                                         return (
-                                            <SkeletonTheme
+                                            <CoreModules.SkeletonTheme
                                                 key={index}
                                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
-                                                <Skeleton key={skeleton + index} width={200} height={30} />
-                                            </SkeletonTheme>
-
+                                                <CoreModules.Skeleton key={skeleton + index} width={200} height={30} />
+                                            </CoreModules.SkeletonTheme>
                                         )
                                     })
                             }
-                        </Stack>
+                        </CoreModules.Stack>
                 }
-            </Stack>
+            </CoreModules.Stack>
             {/* Description section */}
             {/* 
             <Stack direction={'row'} mt={'1%'}>
@@ -124,7 +115,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
 
             </Stack> */}
 
-            <Stack direction={type == 's' ? 'column' : type == 'xs' ? 'column' : 'row'} spacing={2} mt={'1%'}>
+            <CoreModules.Stack direction={type == 's' ? 'column' : type == 'xs' ? 'column' : 'row'} spacing={2} mt={'1%'}>
 
                 <BasicCard
                     subtitle={{}}
@@ -133,52 +124,52 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                     headerStatus={true}
                     content={
 
-                        <Stack direction={'column'} justifyContent={'center'}>
+                        <CoreModules.Stack direction={'column'} justifyContent={'center'}>
 
-                            <Stack direction={'row'} justifyContent={'center'}>
-                                <Typography
+                            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                                <CoreModules.Typography
                                     variant="h2"
                                 >
                                     {`Task #${validatedSelectedTask}`}
-                                </Typography>
-                            </Stack>
+                                </CoreModules.Typography>
+                            </CoreModules.Stack>
 
-                            <Stack direction={'row'} justifyContent={'center'}>
+                            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
                                 {
                                     loading ?
-                                        <Stack>
-                                            <SkeletonTheme
+                                        <CoreModules.Stack>
+                                            <CoreModules.SkeletonTheme
                                                 baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                                 highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                             >
-                                                <Skeleton width={300} count={12} />
-                                            </SkeletonTheme>
-                                        </Stack>
+                                                <CoreModules.Skeleton width={300} count={12} />
+                                            </CoreModules.SkeletonTheme>
+                                        </CoreModules.Stack>
                                         :
                                         <img src={`data:image/png;base64,${qrcode}`} alt="qrcode" />
                                 }
-                            </Stack>
+                            </CoreModules.Stack>
 
-                            <Stack mt={'1.5%'} direction={'row'} justifyContent={'center'} spacing={5}>
-                                <Stack
+                            <CoreModules.Stack mt={'1.5%'} direction={'row'} justifyContent={'center'} spacing={5}>
+                                <CoreModules.Stack
                                     width={50}
                                     height={50}
                                     borderRadius={55}
                                     boxShadow={2}
                                     justifyContent={'center'}
                                 >
-                                    <IconButton onClick={() => {
+                                    <CoreModules.IconButton onClick={() => {
                                         const linkSource = `data:image/png;base64,${qrcode}`;
                                         const downloadLink = document.createElement("a");
                                         downloadLink.href = linkSource;
                                         downloadLink.download = `Task_${validatedSelectedTask}`;
                                         downloadLink.click();
                                     }} disabled={loading} color="info" aria-label="download qrcode">
-                                        <FileDownloadIcon sx={{ fontSize: 30, }} />
-                                    </IconButton>
-                                </Stack>
+                                        <AssetModules.FileDownloadIcon sx={{ fontSize: 30, }} />
+                                    </CoreModules.IconButton>
+                                </CoreModules.Stack>
 
-                                <Stack
+                                <CoreModules.Stack
                                     width={50}
                                     height={50}
                                     borderRadius={55}
@@ -186,11 +177,11 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     justifyContent={'center'}
                                 >
 
-                                    <IconButton onClick={() => {
+                                    <CoreModules.IconButton onClick={() => {
                                         setOpen(true)
                                     }} disabled={loading} color="info" aria-label="share qrcode">
-                                        <ShareIcon sx={{ fontSize: 30 }} />
-                                    </IconButton>
+                                        <AssetModules.ShareIcon sx={{ fontSize: 30 }} />
+                                    </CoreModules.IconButton>
 
                                     <BasicDialog
                                         title={"Share with"}
@@ -207,10 +198,10 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                     />
 
 
-                                </Stack>
+                                </CoreModules.Stack>
 
-                            </Stack>
-                        </Stack>
+                            </CoreModules.Stack>
+                        </CoreModules.Stack>
                     }
                 />
 
@@ -220,31 +211,31 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                     variant={'elevation'}
                     headerStatus={true}
                     content={
-                        <Stack direction={'column'} spacing={1}>
+                        <CoreModules.Stack direction={'column'} spacing={1}>
 
-                            <Stack direction={'row'} justifyContent={'center'}>
-                                <Typography
+                            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                                <CoreModules.Typography
                                     variant="h2"
                                 >
                                     {`Task #${validatedSelectedTask}`}
-                                </Typography>
-                            </Stack>
+                                </CoreModules.Typography>
+                            </CoreModules.Stack>
 
 
                             {
                                 loading ?
 
-                                    <SkeletonTheme
+                                    <CoreModules.SkeletonTheme
                                         baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                         highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
-                                        <Skeleton width={'100%'} height={30} />
-                                    </SkeletonTheme>
+                                        <CoreModules.Skeleton width={'100%'} height={30} />
+                                    </CoreModules.SkeletonTheme>
                                     :
-                                    <Button
+                                    <CoreModules.Button
                                         variant="contained"
                                         color="error"
-                                        startIcon={<VerifiedIcon />}
+                                        startIcon={<AssetModules.VerifiedIcon />}
                                         disabled={loading}
                                         onClick={() => {
                                             dispatch(HomeActions.SetSnackBar({
@@ -256,23 +247,23 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         }}
                                     >
                                         Mark as mapped
-                                    </Button>
+                                    </CoreModules.Button>
                             }
 
                             {
                                 loading ?
 
-                                    <SkeletonTheme
+                                    <CoreModules.SkeletonTheme
                                         baseColor={defaultTheme.palette.loading['skeleton_rgb']}
                                         highlightColor={defaultTheme.palette.loading['skeleton_rgb']}
                                     >
-                                        <Skeleton width={'100%'} height={30} />
-                                    </SkeletonTheme>
+                                        <CoreModules.Skeleton width={'100%'} height={30} />
+                                    </CoreModules.SkeletonTheme>
                                     :
-                                    <Button
+                                    <CoreModules.Button
                                         variant="contained"
                                         color="error"
-                                        startIcon={<LockOpenIcon />}
+                                        startIcon={<AssetModules.LockOpenIcon />}
                                         disabled={loading}
                                         onClick={() => {
                                             dispatch(HomeActions.SetSnackBar({
@@ -284,7 +275,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                                         }}
                                     >
                                         Unlock Task
-                                    </Button>
+                                    </CoreModules.Button>
                             }
 
                             {/* Comments section  */}
@@ -316,12 +307,12 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                             /> */}
 
                             {/* <BasicTextField others={{ style: { width: '100%' } }} label={""} defaultValue={""} multiline={true} variant={'outlined'} rows={4} placeholder={"write a comment"} /> */}
-                        </Stack>
+                        </CoreModules.Stack>
                     }
                 />
 
-            </Stack>
-        </Box>
+            </CoreModules.Stack>
+        </CoreModules.Box>
     )
 
 }

@@ -1,19 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../../node_modules/ol/ol.css";
 import '../styles/home.scss'
-import { Box, Divider, Stack, Typography } from '@mui/material';
 import WindowDimension from "fmtm/WindowDimension";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import TasksComponent from "../components/TasksComponent";
 import OpenLayersMap from "../components/OpenLayersMap";
 import BasicTabs from "fmtm/BasicTabs";
 import environment from "fmtm/environment";
 import { ProjectById } from "../api/Project";
-import { ProjectActions } from "../store/slices/ProjectSlice";
+import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from 'fmtm/CustomizedSnackbar'
 import { defaults } from "ol/control/defaults";
 import OnScroll from 'fmtm/OnScroll';
@@ -22,19 +18,21 @@ import { OSM } from 'ol/source.js';
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import TasksLayer from "../layers/TasksLayer";
-import { easeIn, easeOut } from 'ol/easing';
 import Map from 'ol/Map'
 import View from 'ol/View'
 import { HomeActions } from 'fmtm/HomeSlice';
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
+
 const Home = () => {
 
-    const dispatch = useDispatch();
-    const params = useParams();
-    const defaultTheme = useSelector(state => state.theme.hotTheme)
-    const state = useSelector(state => state.project)
-    const projectInfo = useSelector(state => state.home.selectedProject)
-    const stateDialog = useSelector(state => state.home.dialogStatus)
-    const stateSnackBar = useSelector(state => state.home.snackbar)
+    const dispatch = CoreModules.useDispatch();
+    const params = CoreModules.useParams();
+    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const state = CoreModules.useSelector(state => state.project)
+    const projectInfo = CoreModules.useSelector(state => state.home.selectedProject)
+    const stateDialog = CoreModules.useSelector(state => state.home.dialogStatus)
+    const stateSnackBar = CoreModules.useSelector(state => state.home.snackbar)
     const [taskId, setTaskId] = useState()
     const mapElement = useRef();
     const [map, setMap] = useState()
@@ -161,7 +159,7 @@ const Home = () => {
 
 
     return (
-        <Stack spacing={2}>
+        <CoreModules.Stack spacing={2}>
 
             {/* Home snackbar */}
             <CustomizedSnackbar
@@ -173,7 +171,7 @@ const Home = () => {
             />
 
             {/* Top project details heading medium dimension*/}
-            <Stack
+            <CoreModules.Stack
                 sx={{ display: { md: 'flex', xs: 'none' } }}
                 direction="column"
                 justifyContent="center"
@@ -181,78 +179,78 @@ const Home = () => {
                 alignItems={"center"}
             >
 
-                <Stack direction={'row'} p={2} spacing={2}
+                <CoreModules.Stack direction={'row'} p={2} spacing={2}
                     divider={
-                        <Divider
+                        <CoreModules.Divider
                             sx={{ backgroundColor: defaultTheme.palette.grey['main'] }}
                             orientation="vertical"
                             flexItem
                         />
                     }
                 >
-                    <Stack direction={'row'} justifyContent={'center'}>
-                        <LocationOnIcon color='error' style={{ fontSize: 22 }} />
-                        <Typography variant="h1" >
+                    <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                        <AssetModules.LocationOn color='error' style={{ fontSize: 22 }} />
+                        <CoreModules.Typography variant="h1" >
                             {state.projectInfo.title}
-                        </Typography>
-                    </Stack>
+                        </CoreModules.Typography>
+                    </CoreModules.Stack>
 
-                    <Stack>
-                        <Typography
+                    <CoreModules.Stack>
+                        <CoreModules.Typography
                             variant="h4"
                             fontSize={defaultTheme.typography.fontSize}
                         >
                             {`#${state.projectInfo.id}`}
-                        </Typography>
-                    </Stack>
+                        </CoreModules.Typography>
+                    </CoreModules.Stack>
 
-                    <Stack mt={'5%'} >
-                        <Typography
+                    <CoreModules.Stack mt={'5%'} >
+                        <CoreModules.Typography
                             variant="h4"
                             fontSize={defaultTheme.typography.fontSize}
                             color={defaultTheme.palette.warning['main']}
                         >
                             {state.projectInfo.priority_str}
-                        </Typography>
-                    </Stack>
+                        </CoreModules.Typography>
+                    </CoreModules.Stack>
 
-                </Stack>
-            </Stack>
+                </CoreModules.Stack>
+            </CoreModules.Stack>
 
 
             {/* project Details Title */}
-            <Stack sx={{ display: { xs: 'flex', md: 'none' } }} spacing={2}>
+            <CoreModules.Stack sx={{ display: { xs: 'flex', md: 'none' } }} spacing={2}>
 
-                <Stack direction={'row'} justifyContent={'center'}>
-                    <LocationOnIcon color='error' style={{ marginTop: '1.5%', fontSize: 22 }} />
-                    <Typography variant="caption" >
+                <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                    <AssetModules.LocationOn color='error' style={{ marginTop: '1.5%', fontSize: 22 }} />
+                    <CoreModules.Typography variant="caption" >
                         {state.projectInfo.title}
-                    </Typography>
-                </Stack>
+                    </CoreModules.Typography>
+                </CoreModules.Stack>
 
-                <Stack direction={'row'} justifyContent={'center'}>
-                    <Typography
+                <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                    <CoreModules.Typography
                         variant="h1"
                         fontSize={defaultTheme.typography.fontSize}
                     >
                         {`#${state.projectInfo.id}`}
-                    </Typography>
-                </Stack>
+                    </CoreModules.Typography>
+                </CoreModules.Stack>
 
-                <Stack direction={'row'} justifyContent={'center'}>
-                    <Typography
+                <CoreModules.Stack direction={'row'} justifyContent={'center'}>
+                    <CoreModules.Typography
                         variant="h1"
                         fontSize={defaultTheme.typography.fontSize}
                         color={defaultTheme.palette.warning['main']}
                     >
                         {state.projectInfo.priority_str}
-                    </Typography>
-                </Stack>
+                    </CoreModules.Typography>
+                </CoreModules.Stack>
 
-            </Stack>
+            </CoreModules.Stack>
 
             {/* Center descriptin and map */}
-            <Stack direction={'column'} spacing={1}>
+            <CoreModules.Stack direction={'column'} spacing={1}>
                 <MapDescriptionComponents defaultTheme={defaultTheme} state={state} type={type} />
                 <OpenLayersMap
                     defaultTheme={defaultTheme}
@@ -268,15 +266,15 @@ const Home = () => {
                     environment={environment}
                     mapDivPostion={y}
                 />
-            </Stack>
+            </CoreModules.Stack>
 
 
             {/* project Details Tabs */}
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                 <BasicTabs listOfData={panelData} />
-            </Box>
+            </CoreModules.Box>
 
-        </Stack>
+        </CoreModules.Stack>
     )
 }
 

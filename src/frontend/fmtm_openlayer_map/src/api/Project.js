@@ -1,6 +1,5 @@
-import axios from "axios"
-import { ProjectActions } from "../store/slices/ProjectSlice"
-
+import { ProjectActions } from "fmtm/ProjectSlice"
+import CoreModules from 'fmtm/CoreModules';
 export const ProjectById = (url, existingProjectList) => {
 
     return async (dispatch) => {
@@ -9,7 +8,7 @@ export const ProjectById = (url, existingProjectList) => {
 
             try {
                 // console.log('loading :')
-                const project = await axios.get(url)
+                const project = await CoreModules.axios.get(url)
                 const resp = project.data;
 
                 const persistingValues = resp.project_tasks.map((data) => {

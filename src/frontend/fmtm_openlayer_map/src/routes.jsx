@@ -1,12 +1,9 @@
 import React from 'react';
-import {
-    createBrowserRouter,
-} from "react-router-dom";
 import MainView from './views/MainView';
 import Home from './views/Home';
+import CoreModules from 'fmtm/CoreModules';
 
-
-const routes = createBrowserRouter(
+const routes = CoreModules.createBrowserRouter(
     [
         {
             element: <MainView />,

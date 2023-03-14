@@ -1,20 +1,10 @@
 import * as React from 'react';
 import { Drawer } from 'rsuite';
-import { Box } from '@mui/system';
-import { Button, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import PersonIcon from '@mui/icons-material/Person';
-import LoginIcon from '@mui/icons-material/Login';
-import { useSelector } from 'react-redux';
-
-
+import CoreModules from '../shared/CoreModules';
+import AssetModules from '../shared/AssetModules';
 
 const CustomDrawer = ({ open, placement, size, onClose }) => {
-  const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+  const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
   const onMouseEnter = (event) => {
     const element: any = document.getElementById(`text${event.target.id}`);
     element != null ? element.style.color = `${defaultTheme.palette.error['main']}` : null
@@ -58,60 +48,60 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
 
       >
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
-          <Box sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
-            <IconButton
+        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
+          <CoreModules.Box sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
+            <CoreModules.IconButton
               size="large"
               aria-label="show more"
               aria-haspopup="true"
               onClick={onClose}
               color="info"
             >
-              <CloseIcon />
-            </IconButton>
-          </Box>
+              <AssetModules.CloseIcon />
+            </CoreModules.IconButton>
+          </CoreModules.Box>
 
-          <Divider />
-          <List sx={Drawerstyles.list} component="nav" aria-label="mailbox folders">
+          <CoreModules.Divider />
+          <CoreModules.List sx={Drawerstyles.list} component="nav" aria-label="mailbox folders">
             {
               ['Explore Projects', 'My Contributions', 'Learn', 'About', 'Support'].map((value, index) => {
                 return (
-                  <ListItem
+                  <CoreModules.ListItem
                     id={index.toString()}
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
                     key={index}
                   >
-                    <ListItemText
+                    <CoreModules.ListItemText
                       id={`text${index}`}
                       primary={value}
 
                     />
-                  </ListItem>
+                  </CoreModules.ListItem>
                 )
               })
             }
-          </List>
-          <Button
+          </CoreModules.List>
+          <CoreModules.Button
             variant="contained"
             color="error"
-            startIcon={<LoginIcon />}
+            startIcon={<AssetModules.LoginIcon />}
             style={Drawerstyles.containedBtn}
             href="/login"
           >
             Sign in
-          </Button>
-          <Button
+          </CoreModules.Button>
+          <CoreModules.Button
             variant="outlined"
             color="error"
-            startIcon={<PersonIcon />}
+            startIcon={<AssetModules.PersonIcon />}
             style={Drawerstyles.outlineBtn}
             href="/signup"
           >
             Sign up
-          </Button>
+          </CoreModules.Button>
 
-        </Box>
+        </CoreModules.Box>
       </Drawer>
     </>
   );

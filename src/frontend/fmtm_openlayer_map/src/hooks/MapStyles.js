@@ -2,12 +2,11 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
-
+import CoreModules from 'fmtm/CoreModules';
 export default function MapStyles() {
 
 
-    const mapTheme = useSelector(state => state.theme.hotTheme)
+    const mapTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     const [style, setStyle] = useState({})
 
     useEffect(() => {

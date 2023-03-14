@@ -1,21 +1,12 @@
-import { IconButton, Stack } from "@mui/material";
+
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import IconButtonCard from "../utilities/IconButtonCard";
 import BasicDialog from "../utilities/BasicDialog";
 import DialogActions from "../components/DialogActions";
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import GridViewIcon from '@mui/icons-material/GridView';
-import AddIcon from '@mui/icons-material/Add';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import RemoveIcon from '@mui/icons-material/Remove';
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import '../styles/home.scss'
-import { ProjectActions } from "../store/slices/ProjectSlice";
 import { HomeActions } from 'fmtm/HomeSlice';
-
+import CoreModules from 'fmtm/CoreModules';
+import AssetModules from 'fmtm/AssetModules';
 
 
 const OpenLayersMap = (
@@ -39,11 +30,11 @@ const OpenLayersMap = (
             Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1
         );
     }
-    const dispatch = useDispatch();
+    const dispatch = CoreModules.useDispatch();
     const [fullView, setFullView] = useState(false)
     return (
-        <Stack spacing={1} direction={'column'}>
-            <Stack
+        <CoreModules.Stack spacing={1} direction={'column'}>
+            <CoreModules.Stack
                 style={{ border: `4px solid ${defaultTheme.palette.error.main}`, }}
                 justifyContent={'center'}
                 height={608}
@@ -61,7 +52,7 @@ const OpenLayersMap = (
                         />}
                     />
 
-                    <Stack
+                    <CoreModules.Stack
                         p={1}
                         // style={{ backgroundColor: 'rgb(0, 128, 153,0.1)' }}
                         className="fullview"
@@ -79,7 +70,7 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     const main = document.getElementsByClassName('mainview')[0]
                                     main.scrollTo({
                                         top: mapDivPostion
@@ -87,8 +78,8 @@ const OpenLayersMap = (
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <KeyboardDoubleArrowUpIcon color="error" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.KeyboardDoubleArrowUpIcon color="error" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -100,14 +91,14 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     let actualZoom = map.getView().getZoom();
                                     map.getView().setZoom(actualZoom + 1)
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <AddIcon color="info" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.AddIcon color="info" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -119,14 +110,14 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     let actualZoom = map.getView().getZoom();
                                     map.getView().setZoom(actualZoom - 1)
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <RemoveIcon color="info" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.RemoveIcon color="info" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -139,7 +130,7 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     // if (fullView == true) {
                                     //     setFullView(false)
                                     //     mapElement.current.style.position = 'relative';
@@ -156,8 +147,8 @@ const OpenLayersMap = (
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <FullscreenIcon color="info" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.FullscreenIcon color="info" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -169,13 +160,13 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     map.getView().setZoom(15);
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <MyLocationIcon color="warning" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.MyLocationIcon color="warning" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -187,7 +178,7 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
 
                                     if (state.projectTaskBoundries.length != 0 && map != undefined) {
                                         if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
@@ -210,8 +201,8 @@ const OpenLayersMap = (
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <GridViewIcon color="success" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.GridViewIcon color="success" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
 
@@ -223,7 +214,7 @@ const OpenLayersMap = (
                             }}
                             radius={0}
                             element={
-                                <IconButton onClick={() => {
+                                <CoreModules.IconButton onClick={() => {
                                     const main = document.getElementsByClassName('mainview')[0]
                                     const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
                                     let taskHistories = [];
@@ -242,14 +233,14 @@ const OpenLayersMap = (
                                 }}
                                     color="info" aria-label="share qrcode"
                                 >
-                                    <KeyboardDoubleArrowDownIcon color="error" sx={{ fontSize: 30 }} />
-                                </IconButton>
+                                    <AssetModules.KeyboardDoubleArrowDownIcon color="error" sx={{ fontSize: 30 }} />
+                                </CoreModules.IconButton>
                             }
                         />
-                    </Stack>
+                    </CoreModules.Stack>
                 </div>
-            </Stack>
-        </Stack>
+            </CoreModules.Stack>
+        </CoreModules.Stack>
     )
 }
 

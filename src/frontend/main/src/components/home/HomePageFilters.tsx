@@ -1,20 +1,13 @@
 import React from "react";
-import Box from '@mui/material/Box';
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled, alpha } from '@mui/material/styles';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import windowDimention from "../../hooks/WindowDimension";
 import CustomDropdown from "../../utilities/CustomDropdown";
-import { Button } from "@mui/material";
-import { useSelector } from "react-redux";
-
+import CoreModules from '../../shared/CoreModules';
+import AssetModules from '../../shared/AssetModules';
 
 //Home Filter
 const HomePageFilters = () => {
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     const { windowSize } = windowDimention();
     const searchableInnerStyle: any = {
         toolbar: {
@@ -44,12 +37,12 @@ const HomePageFilters = () => {
 
     }
 
-    const Search = styled('div')(({ theme }) => ({
+    const Search = AssetModules.styled('div')(({ theme }) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
+        backgroundColor: AssetModules.alpha(theme.palette.common.white, 0.15),
         '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
+            backgroundColor: AssetModules.alpha(theme.palette.common.white, 0.25),
         },
         marginRight: theme.spacing(2),
         marginLeft: 0,
@@ -62,7 +55,7 @@ const HomePageFilters = () => {
         },
     }));
 
-    const SearchIconWrapper = styled('div')(({ theme }) => ({
+    const SearchIconWrapper = AssetModules.styled('div')(({ theme }) => ({
         padding: theme.spacing(0, 2),
         height: '100%',
         position: 'absolute',
@@ -72,7 +65,7 @@ const HomePageFilters = () => {
         justifyContent: 'center',
     }));
 
-    const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    const StyledInputBase = AssetModules.styled(CoreModules.InputBase)(({ theme }) => ({
         color: 'primary',
         '& .MuiInputBase-input': {
             padding: theme.spacing(1, 1, 1, 0),
@@ -88,31 +81,31 @@ const HomePageFilters = () => {
     }));
 
     return (
-        <Box>
+        <CoreModules.Box>
 
             {/* Explore project typography in mobile size */}
-            <Box sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
-                <Typography
+            <CoreModules.Box sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
+                <CoreModules.Typography
                     variant="subtitle2"
                     noWrap
                     mt={'2%'}
                     ml={'3%'}
                 >
                     EXPLORE PROJECTS
-                </Typography>
-            </Box>
+                </CoreModules.Typography>
+            </CoreModules.Box>
             {/* <======End======> */}
 
             {/* full Searchables container in md,lg,xl size */}
-            <Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
-                <Button
+            <CoreModules.Stack sx={{ display: { xs: 'none', md: 'flex', } }} direction={'row'} spacing={2} justifyContent="center">
+                <CoreModules.Button
                     variant="outlined"
                     color="error"
-                    startIcon={<AutoAwesomeIcon />}
+                    startIcon={<AssetModules.AutoAwesome />}
                     style={searchableInnerStyle.outlineBtn}
                 >
                     Filters
-                </Button>
+                </CoreModules.Button>
 
                 <CustomDropdown
                     color={'red'}
@@ -130,7 +123,7 @@ const HomePageFilters = () => {
                 />
                 <Search id="search">
                     <SearchIconWrapper>
-                        <SearchIcon color="info" />
+                        <AssetModules.SearchIcon color="info" />
                     </SearchIconWrapper>
                     <StyledInputBase
                         placeholder="Search…"
@@ -138,14 +131,14 @@ const HomePageFilters = () => {
                         style={{ width: '100%' }}
                     />
                 </Search>
-            </Stack>
+            </CoreModules.Stack>
             {/* <======End======> */}
 
             {/* Search field in mobile size */}
-            <Stack sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center', } }}>
+            <CoreModules.Stack sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center', } }}>
                 <Search id="searchXs">
                     <SearchIconWrapper>
-                        <SearchIcon />
+                        <AssetModules.SearchIcon />
                     </SearchIconWrapper>
                     <StyledInputBase
                         placeholder="Search…"
@@ -153,24 +146,24 @@ const HomePageFilters = () => {
                         style={{ width: '100%' }}
                     />
                 </Search>
-            </Stack>
+            </CoreModules.Stack>
             {/* <======End======> */}
 
             {/* filter and sort button in mobile size */}
-            <Stack spacing={1} mt={'2%'} mb={'2%'} direction={'row'} sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center' }}>
-                <Button
+            <CoreModules.Stack spacing={1} mt={'2%'} mb={'2%'} direction={'row'} sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center' }}>
+                <CoreModules.Button
                     variant="outlined"
                     color="error"
-                    startIcon={<AutoAwesomeIcon />}
+                    startIcon={<AssetModules.AutoAwesome />}
                     style={searchableInnerStyle.outlineBtnXs}
                 >
                     Filters
-                </Button>
+                </CoreModules.Button>
                 <CustomDropdown color={'red'} appearance={'ghost'} names={['Urgent Projects', 'Active Projects', 'New Projects', 'Old Projects', 'Easy Projects', 'Challenging Projects']} toolBarStyle={searchableInnerStyle.toolbarXs} text={"SORT BY"} size={"lg"} />
-            </Stack>
+            </CoreModules.Stack>
             {/* <======End======> */}
 
-        </Box>
+        </CoreModules.Box>
     )
 }
 
