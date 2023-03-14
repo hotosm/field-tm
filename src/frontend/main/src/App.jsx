@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import routes from "./routes";
 import { PersistGate } from "redux-persist/integration/react";
 import "./index.css";
-
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'rsuite/dist/rsuite.min.css'

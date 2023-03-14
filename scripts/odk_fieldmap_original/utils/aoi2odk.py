@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -26,8 +26,7 @@ from overpass import query
 
 
 def get_buildings(aoi_file):
-    """
-    Given a GeoJSON AOI polygon, returns a centroid for every
+    """Given a GeoJSON AOI polygon, returns a centroid for every
     OSM building polygon within it.
     """
     (infilepath, extension) = os.path.splitext(aoi_file)
@@ -43,9 +42,7 @@ def get_buildings(aoi_file):
 
 
 def get_roads(aoi_file):
-    """
-    Given a GeoJSON AOI polygon, returns roads
-    """
+    """Given a GeoJSON AOI polygon, returns roads."""
     (infilepath, extension) = os.path.splitext(aoi_file)
     extent = get_extent_bbox(aoi_file, extension)
     querystring = (
@@ -61,11 +58,10 @@ def get_roads(aoi_file):
 
 
 def aoi2project(AOIfile):
-    """
-    Takes a GeoJSON file with an aoi polygon, creates
+    """Takes a GeoJSON file with an aoi polygon, creates
     - A GeoJSON of all the OSM building polygons in it
     - A GeoJSON of the centroids thereof
-    -
+    -.
     """
     (AOIpath, ext) = os.path.splitext(AOIfile)
     buildings = get_buildings(AOIfile)

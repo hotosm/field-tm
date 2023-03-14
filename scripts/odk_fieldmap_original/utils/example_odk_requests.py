@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -15,9 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""
-Example on how to go through the workflow of creating project, adding app users etc.
-"""
+"""Example on how to go through the workflow of creating project, adding app users etc."""
 from odk2odm import odk_requests
 
 base_url = "https://3dstreetview.org"
@@ -25,8 +23,7 @@ aut = ("email", "password")
 
 
 # Create a project
-odk_requests.create_project(
-    base_url, aut, project_name="Reetta_example_odk_requests")
+odk_requests.create_project(base_url, aut, project_name="Reetta_example_odk_requests")
 
 
 # Upload a form for the project
@@ -34,8 +31,7 @@ projectId = odk_requests.project_id(
     base_url, aut, projectName="Reetta_example_odk_requests"
 )  # get project id for the created project
 path2Form = "../odm360_photos_0-1-2.xlsx"  # or the fill photos
-odk_requests.create_form(
-    base_url, aut, projectId=projectId, path2Form=path2Form)
+odk_requests.create_form(base_url, aut, projectId=projectId, path2Form=path2Form)
 
 
 # Create an app user for the project
