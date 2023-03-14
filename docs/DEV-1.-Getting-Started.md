@@ -83,18 +83,37 @@ Environmental variables are used throughout this project. To get started, create
 
 Your env should look like this
 
+    ### ODK Central ###
     ODK_CENTRAL_URL=https://central-proxy
     ODK_CENTRAL_USER=`<any_valid_email_address>`
     ODK_CENTRAL_PASSWD=`<password_of_central_user>`
+
+    ### FMTM ###
+    # DEBUG=True
+    # LOG_LEVEL=DEBUG
     API_URL=http://127.0.0.1:8000
     FRONTEND_MAIN_URL=http://localhost:8080
     FRONTEND_MAP_URL=http://localhost:8081
+    # API_PREFIX=/api
+
+    ### OSM ###
     OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
     OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
     OSM_URL=https://www.openstreetmap.org
     OSM_SCOPE=read_prefs
     OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
-    OSM_SECRET_KEY=`<random_key_for_development>`
+    OSM_SECRET_KEY=<random_key_for_development>
+
+    ### Database (optional) ###
+    CENTRAL_DB_HOST=central-db
+    CENTRAL_DB_USER=odk
+    CENTRAL_DB_PASSWORD=odk
+    CENTRAL_DB_NAME=odk
+
+    FMTM_DB_HOST=fmtm-db
+    FMTM_DB_USER=fmtm
+    FMTM_DB_PASSWORD=fmtm
+    FMTM_DB_NAME=fmtm'
 
 ## Verify Setup
 
@@ -106,12 +125,12 @@ For details on how to run this project locally for development, please look at: 
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1. Navigate to `API_URL/docs`
+1.  Navigate to `API_URL/docs`
 
     Three endpoints are responsible for oauth
     <img width="698" alt="image" src="https://user-images.githubusercontent.com/36752999/216319601-949c4262-782f-4da4-ae26-dac81c141403.png">
 
-2. Hit `/auth/osm_login/` : This will give you the Login URL where you can supply your osm username/password
+2.  Hit `/auth/osm_login/` : This will give you the Login URL where you can supply your osm username/password
 
     Response should be like this :
 
@@ -121,7 +140,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 
     After successful login, you will get your `access_token` for FMTM Copy it and now you can use it for rest of the endpoints that need authorizations
 
-3. Check your access token: Hit `/auth/me/` and pass your `access_token` You should get your osm id, username and profile picture id
+3.  Check your access token: Hit `/auth/me/` and pass your `access_token` You should get your osm id, username and profile picture id
 
 # Start Developing
 
