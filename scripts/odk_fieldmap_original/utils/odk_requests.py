@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021, 2022 Humanitarian OpenStreetMap Team
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -16,10 +16,8 @@
 #
 
 #!/usr/bin/python3
-"""
-
-TODO: move this documentation to README.md
-TODO: move functions that logically combine several requests to a new module
+"""TODO: move this documentation to README.md
+TODO: move functions that logically combine several requests to a new module.
 
 Utilities for interacting with ODK Central API
 
@@ -61,16 +59,14 @@ r.json()[0]['name']
 
 """
 
-import codecs
 import json
 import os
-import sys
 import zlib
+
 # QR code stuff
 from base64 import b64encode
 
 import requests
-
 import segno
 
 
@@ -81,7 +77,7 @@ def projects(base_url, aut):
 
 
 def project(base_url, aut, pid):
-    """Fetch details of a specific project on an ODK Central server"""
+    """Fetch details of a specific project on an ODK Central server."""
     url = f"{base_url}/v1/projects/{pid}"
     return requests.get(url, auth=aut)
 
@@ -107,8 +103,7 @@ def form(base_url, aut, pid, formId):
 
 
 def form_attachments(base_url, aut, pid, formId):
-    """Find out what attachments are expected by the form"""
-    url = f"{base_url}/v1/projects/{pid}/forms/" f"{formId}/draft/attachments"
+    """Find out what attachments are expected by the form."""
     # TODO: do (may not be necessary but fgood for safety)
 
 
@@ -139,8 +134,7 @@ def csv_submissions(base_url, aut, pid, formId):
 
 
 def odata_submissions(base_url, aut, pid, formId):
-    """
-    Fetch the submissions using the odata api.
+    """Fetch the submissions using the odata api.
     use submissions.json()['value'] to get a list of dicts, wherein
     each dict is a single submission with the form question names as keys.
     """
@@ -189,7 +183,7 @@ def app_users(base_url, aut, pid):
 
 
 def create_project(base_url, aut, project_name):
-    """Create a new project on an ODK Central server"""
+    """Create a new project on an ODK Central server."""
     # TODO definitely should complain if project
     # already exists. Currently it just creates
     # another with the same name but a different
@@ -199,8 +193,7 @@ def create_project(base_url, aut, project_name):
 
 
 def create_app_user(base_url, aut, pid, app_user_name="Surveyor"):
-    """
-    Create a new project on an ODK Central server
+    """Create a new project on an ODK Central server.
 
     Atm. you can create multiple app users with the same name,
     this should probably be illegal?
@@ -210,7 +203,7 @@ def create_app_user(base_url, aut, pid, app_user_name="Surveyor"):
 
 
 def update_role_app_user(base_url, aut, pid, fid, actorId, roleId=2):
-    """Give specified app-user specified role for given project"""
+    """Give specified app-user specified role for given project."""
     url = f"{base_url}/v1/projects/{pid}/forms/{fid}/" f"assignments/{roleId}/{actorId}"
     return requests.post(url, auth=aut)
 
@@ -218,19 +211,19 @@ def update_role_app_user(base_url, aut, pid, fid, actorId, roleId=2):
 def create_form(base_url, aut, pid, name, form):
     """Create a new form on an ODK Central server
     Does not publish the form because we may need to
-    add attachments, so it must be published later."""
-    basename = os.path.splitext(os.path.basename(form))[0]
+    add attachments, so it must be published later.
+    """
+    os.path.splitext(os.path.basename(form))[0]
     headers = {
         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        f"X-XlsForm-FormId-Fallback": name,
+        "X-XlsForm-FormId-Fallback": name,
     }
     url = f"{base_url}/v1/projects/{pid}/forms" f"?ignoreWarnings=true&publish=false"
     return requests.post(url, auth=aut, data=form, headers=headers)
 
 
 def attach_to_form(base_url, aut, pid, fid, name, att):
-    """
-    """
+    """ """
     basename = os.path.basename(name)
     # TODO it might not always be geojson!
     # Take the application type as a parameter.
@@ -241,17 +234,14 @@ def attach_to_form(base_url, aut, pid, fid, name, att):
 
 
 def publish_form(base_url, aut, pid, fid):
-    """Publish a form thats in draft state on server
-    """
-
+    """Publish a form thats in draft state on server."""
     url = f"{base_url}/v1/projects/{pid}/forms/" f"{fid}/draft/publish?version=yeahgo"
     return requests.post(url, auth=aut)
 
 
 def qr_code(base_url, aut, pid, pname, form, token, outdir):
-    """
-    Based on the info at
-    https://docs.getodk.org/collect-import-export/
+    """Based on the info at
+    https://docs.getodk.org/collect-import-export/.
     """
     settings = {
         "general": {
