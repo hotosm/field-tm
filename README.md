@@ -86,9 +86,9 @@ The ODK Collect app connects to a back-end server (in this case ODK Central), wh
 
 ## ODK Central server
 
-An ODK Central server which functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
+An ODK Central server functions as the back end for the field data collectors. ODK Collect is an application that can be downloaded on Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
 
-[Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (it's very similar on AWS or whatever)
+[Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (It's very similar on AWS)
 
 ## Field Mapping Tasking Manager Web App
 
