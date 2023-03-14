@@ -25,7 +25,7 @@ Open a terminal and navigate to the directory you want to work in using the foll
 
 `cd <work-dir>`
 
-Make sure to replace `work-dir` with the name of your directory.
+Make sure to replace `<work-dir>` with the name of your directory.
 
 ### 4. Clone the forked repository
 
@@ -33,7 +33,7 @@ Clone the forked repository to your local machine using the following command:
 
 `git clone https://github.com/<your-username>/fmtm.git`
 
-Make sure to replace `your-username` with your GitHub username.
+Make sure to replace `<your-username>` with your GitHub username.
 
 ### 5. Create a new branch
 
@@ -53,7 +53,7 @@ Add the changes you've made using the following command:
 
 `git add <file-name>`
 
-Make sure you replace `file-name` with the name of the file you made changes to
+Make sure you replace `<file-name>` with the name of the file you made changes to
 
 ### 8. Commit and push
 
