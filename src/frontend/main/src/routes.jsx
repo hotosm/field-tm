@@ -11,7 +11,6 @@ import MainView from './views/MainView';
 import { Suspense } from 'react';
 // import ProjectDetails from "map/ProjectDetails";
 
-
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const routes = createBrowserRouter(
     [
