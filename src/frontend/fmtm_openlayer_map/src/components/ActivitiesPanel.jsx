@@ -116,7 +116,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
         }
 
 
-    }, [taskDisplay, searchText])
+    }, [taskDisplay,state,searchText])
 
     return (
         <CoreModules.Stack spacing={2}>
