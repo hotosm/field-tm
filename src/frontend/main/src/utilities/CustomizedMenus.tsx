@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Menu, { MenuProps } from '@mui/material/Menu';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { MenuProps } from '@mui/material/Menu';
+import CoreModules from '../shared/CoreModules';
+import AssetModules from '../shared/AssetModules';
 
-const StyledMenu = styled((props: MenuProps) => (
-    <Menu
+const StyledMenu = AssetModules.styled((props: MenuProps) => (
+    <CoreModules.Menu
         elevation={0}
         anchorOrigin={{
             vertical: 'bottom',
@@ -46,7 +45,7 @@ export default function CustomizedMenus({ element, btnProps, btnName }) {
 
     return (
         <div>
-            <Button
+            <CoreModules.Button
                 id="demo-customized-button"
                 aria-controls={open ? 'demo-customized-menu' : undefined}
                 aria-haspopup="true"
@@ -56,10 +55,10 @@ export default function CustomizedMenus({ element, btnProps, btnName }) {
                 disableElevation
                 onClick={handleClick}
                 {...btnProps}
-                endIcon={<KeyboardArrowDownIcon />}
+                endIcon={<AssetModules.KeyboardArrowDownIcon />}
             >
                 {btnName}
-            </Button>
+            </CoreModules.Button>
             <StyledMenu
                 id="demo-customized-menu"
                 MenuListProps={{

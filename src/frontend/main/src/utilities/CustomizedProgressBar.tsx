@@ -1,10 +1,9 @@
 import { Box } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
-
+import CoreModules from "../shared/CoreModules";
 
 const CustomizedProgressBar = ({ height, data }) => {
-    const defaultTheme: any = useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     return (
 
         <div className="progress" style={{ marginTop: '2%', height }}>
