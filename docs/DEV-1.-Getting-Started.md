@@ -53,7 +53,7 @@ Add the changes you've made using the following command:
 
 `git add <file-name>`
 
-Make sure you replace `<file-name>` with the name of the file you made changes to
+Make sure you replace `<file-name>` with the name of the file you made changes to.
 
 ### 8. Commit and push
 
