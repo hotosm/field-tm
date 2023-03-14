@@ -97,28 +97,81 @@ def expand_geopoints(csv, geopoint_column_name):
         print(e)
 
     return newcsv
+ 
+def odk_geo2wkt(jrstring, node_delimiter = ';', delimiter = ' '):
+    """Takes a Javarosa geo string and converts it into Well-Known-Text.
+    Assumes that the string consists of the usual space-delimited 
+    lat, lon, elevation, accuracy elements for each node, and nodes are
+    semicolon-delimited (as is the case with ODK geowidget output). 
+    If there's only one node, it creates a WKT point. If more than one,
+    and the last isn't identical to the first, it creates a polyline.
+    If more than two, and the last is identical to the first, it creates
+    a polygon. In any other cases it should return an error."""
+    nodes = [x.strip() for x in jrstring.split(node_delimiter)]
+    wkt_feature_type = ''
+    end_paren = ')'
+    if len(nodes) == 0:
+        print("There's nothing in there.")
+        return None
+    elif len(nodes) == 1:
+        wkt_feature_type = 'POINT ('
+    elif len(nodes) == 2:
+        wkt_feature_type = 'LINESTRING ('
+    elif len(nodes) >= 3:
+        if nodes[0] == nodes[-1]:
+            wkt_feature_type = 'POLYGON (('
+            end_paren = '))'
+        else:
+            wkt_feature_type = 'LINESTRING ('
 
+    
+    try:
+        positions = []
+        for node in nodes:
+            coords = node.split(delimiter)
+            lat = float(coords[0])
+            lon = float(coords[1])
+            positions.append(f'{lon} {lat}')
+        positions_string = ','.join(positions)
+        return (f'{wkt_feature_type}{positions_string}{end_paren}')
+    except Exception as e:
+        return None
+        
+        
 
 def project_submissions_unzipped(
     url, aut, pid, formsl, outdir, collate, expand_geopoint
 ):
     """Downloads and unzips all of the submissions from a given ODK project."""
     if collate:
-        collated_outfilepath = os.path.join(outdir, f"_project_{pid}.csv")
-        c_outfile = open(collated_outfilepath, "w")
+
+        collated_outfilepath = os.path.join(outdir, f'project_{pid}_submissions'
+                                            '_collated.csv')
+        c_outfile = open(collated_outfilepath, 'w')
         cw = csv.writer(c_outfile)
-        firstline = True
-    for form in formsl:
-        form_id = form["xmlFormId"]
-        print(f"Checking submissions from {form_id}.")
+
+        # create a single file to dump all repeat data lines
+        # TODO multiple collated files for multiple repeats
+        c_repeatfilepath = os.path.join(outdir, f'project_{pid}_repeats'
+                                        '_collated.csv')
+        c_repeatfile = open(c_repeatfilepath, 'w')
+        cr = csv.writer(c_repeatfile)
+        
+    for fidx, form in enumerate(formsl):
+        form_id = form['xmlFormId']
+        print(f'Checking submissions from {form_id}.')
         subs_zip = csv_submissions(url, aut, pid, form_id)
         subs_bytes = BytesIO(subs_zip.content)
         subs_bytes.seek(0)
         subs_unzipped = zf(subs_bytes)
         sub_namelist = subs_unzipped.namelist()
-        print(f"Files in submissions from {form_id}:")
+
+        subcount = len(sub_namelist)
+        print(f'There are {subcount} files in submissions from {form_id}:')
         print(sub_namelist)
-        for sub_name in sub_namelist:
+
+        # Now save the rest of the files
+        for idx, sub_name in enumerate(sub_namelist):
             subs_bytes = subs_unzipped.read(sub_name)
             outfilename = os.path.join(outdir, sub_name)
 
@@ -129,16 +182,14 @@ def project_submissions_unzipped(
 
             # If it is a csv, open it and see if it is more than one line
             # This might go wrong if something is encoded in other than UTF-8
-            #
-            # TODO: identify and collate repeats separate from the parent
-            # submission.
-            if os.path.splitext(sub_name)[1] == ".csv":
+
+            if os.path.splitext(sub_name)[1] == '.csv':
                 subs_stringio = StringIO(subs_bytes.decode())
                 subs_list = list(csv.reader(subs_stringio))
                 # Check if there are CSV lines after the headers
-                subs_num = len(subs_list)
-                print(f"{sub_name} has {subs_num - 1} submissions")
-                if subs_num > 1:
+                subs_len = len(subs_list)
+                print(f'{sub_name} has {subs_len - 1} submissions')
+                if subs_len > 1:
                     subs_to_write = subs_list
                     if expand_geopoint:
                         subs_to_write = expand_geopoints(subs_list, expand_geopoint)
@@ -146,12 +197,19 @@ def project_submissions_unzipped(
                         w = csv.writer(outfile)
                         w.writerows(subs_to_write)
                     if collate:
-                        if firstline:
-                            cw.writerows(subs_to_write)
-                            firstline = False
+                        if not idx:                            
+                            if not fidx:
+                                # First form. Include header
+                                cw.writerows(subs_to_write)
+                            else:
+                                # Not first form. Skip first row (header)
+                                cw.writerows(subs_to_write[1:])
                         else:
-                            cw.writerows(subs_to_write[1:])
-
+                            # Include header because it's a repeat
+                            # TODO actually create a separate collated
+                            # CSV output for each repeat in the survey
+                            cr.writerows(subs_to_write)
+    
             else:
                 with open(outfilename, "wb") as outfile:
                     outfile.write(subs_bytes)
@@ -170,13 +228,10 @@ if __name__ == "__main__":
     p.add_argument("outdir", help="Output directory to write submissions")
 
     # Optional args
-    p.add_argument(
-        "-gc",
-        "--geopoint_column",
-        default="all-xlocation",
-        help="The name of the column in the submissions containing "
-        "single-point geometry in Javarosa form for expansion",
-    )
+
+    p.add_argument('-gc', '--geopoint_column', default='all-xlocation', help=
+                   'The name of the column in the submissions containing '
+                   'geometry in Javarosa form for expansion or conversion')
 
     # Flag args
     p.add_argument(
@@ -204,24 +259,22 @@ if __name__ == "__main__":
 
     a = p.parse_args()
 
-    print(a)
-#    formsl = project_forms(a.url, (a.username, a.password), a.pid)
-#
-#    if a.zipped:
-#        subs = project_submissions_zipped(a.url,
-#                                          (a.username, a.password),
-#                                          a.pid,
-#                                          formsl,
-#                                          a.outdir
-#                                          )
-#    else:
-#        subs = project_submissions_unzipped(a.url,
-#                                            (a.username, a.password),
-#                                            a.pid,
-#                                            formsl,
-#                                            a.outdir,
-#                                            a.collate,
-#                                            a.expand_geopoint
-#                                            )
-#
-#
+    formsl = project_forms(a.url, (a.username, a.password), a.pid)
+    
+    if a.zipped:
+        subs = project_submissions_zipped(a.url,
+                                          (a.username, a.password),
+                                          a.pid,
+                                          formsl,
+                                          a.outdir
+                                          )
+    else:
+        subs = project_submissions_unzipped(a.url,
+                                            (a.username, a.password),
+                                            a.pid,
+                                            formsl,
+                                            a.outdir,
+                                            a.collate,
+                                            a.expand_geopoint
+                                            )
+    

@@ -87,32 +87,6 @@ def make_centroids(infile):
     print(r)
 
 
-#    (infilepath, ext) = os.path.splitext(infile)
-#    outfn = (infilepath + '_centroids' + ext)
-#    inDriver = get_ogr_driver(ext)
-#    inDatasource = inDriver.Open(infile, 0)
-#    inLayer = inDatasource.GetLayer()
-#
-#    outDriver = get_ogr_driver('.geojson')
-#    outDataSource = outDriver.CreateDataSource(outfn)
-#    outLayer = outDataSource.CreateLayer("centroids",
-#                                         geom_type=ogr.wkbPoint)
-#    # Add input Layer Fields to the output Layer
-#    inLayerDefn = inLayer.GetLayerDefn()
-#    for i in range(0, inLayerDefn.GetFieldCount()):
-#        fieldDefn = inLayerDefn.GetFieldDefn(i)
-#        outLayer.CreateField(fieldDefn)
-#
-#    outLayerDefn = outLayer.GetLayerDefn()
-#
-#    # Add features to the ouput Layer
-#    for inFeature in inLayer:
-#        outFeature = ogr.Feature(outLayerDefn)
-#        geom = inFeature.GetGeometryRef()
-#        centroid = geom.Centroid()
-#        outFeature.SetGeometry(centroid)
-#        outLayer.CreateFeature(outFeature)
-#
 def osm_json_to_geojson(infile):
     """Accept a raw JSON file of data from an Overpass API query.
     Return a GeoJSON string of the same data, after converting all polygons
