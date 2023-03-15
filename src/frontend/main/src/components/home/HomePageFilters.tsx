@@ -81,10 +81,10 @@ const HomePageFilters = () => {
     }));
 
     return (
-        <CoreModules.Box>
+        <CoreModules.Stack>
 
             {/* Explore project typography in mobile size */}
-            <CoreModules.Box sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
+            <CoreModules.Stack sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
                 <CoreModules.Typography
                     variant="subtitle2"
                     noWrap
@@ -93,7 +93,7 @@ const HomePageFilters = () => {
                 >
                     EXPLORE PROJECTS
                 </CoreModules.Typography>
-            </CoreModules.Box>
+            </CoreModules.Stack>
             {/* <======End======> */}
 
             {/* full Searchables container in md,lg,xl size */}
@@ -163,7 +163,7 @@ const HomePageFilters = () => {
             </CoreModules.Stack>
             {/* <======End======> */}
 
-        </CoreModules.Box>
+        </CoreModules.Stack>
     )
 }
 

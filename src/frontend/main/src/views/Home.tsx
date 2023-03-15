@@ -42,15 +42,15 @@ const Home = () => {
                             </CoreModules.Grid>
                         ))}
                     </CoreModules.Grid>
-                    : <CoreModules.Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
+                    : <CoreModules.Stack sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
                         <ProjectCardSkeleton defaultTheme={theme} cardsPerRow={cardsPerRow} />
-                    </CoreModules.Box>
+                    </CoreModules.Stack>
 
             }
             {/*pagingation*/}
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
                 <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-            </CoreModules.Box>
+            </CoreModules.Stack>
 
         </div>
 

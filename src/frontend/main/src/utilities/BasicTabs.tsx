@@ -14,9 +14,9 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <CoreModules.Box sx={{ p: 3 }}>
+                <CoreModules.Stack sx={{ p: 3 }}>
                     {children}
-                </CoreModules.Box>
+                </CoreModules.Stack>
             )}
         </div>
     );
@@ -46,13 +46,13 @@ export default function BasicTabs({ listOfData }) {
     };
 
     return (
-        <CoreModules.Box sx={{
+        <CoreModules.Stack sx={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'
         }}>
-            <CoreModules.Box sx={{ borderColor: 'divider' }}>
+            <CoreModules.Stack sx={{ borderColor: 'divider' }}>
                 <CoreModules.Tabs
                     centered
                     textColor='inherit'
@@ -86,7 +86,7 @@ export default function BasicTabs({ listOfData }) {
                         })
                     }
                 </CoreModules.Tabs>
-            </CoreModules.Box>
+            </CoreModules.Stack>
             {
                 listOfData.map((item, index) => {
                     return (
@@ -98,6 +98,6 @@ export default function BasicTabs({ listOfData }) {
                     )
                 })
             }
-        </CoreModules.Box>
+        </CoreModules.Stack>
     );
 }
