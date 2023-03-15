@@ -33,24 +33,42 @@ const Home = () => {
     return (
         <div style={{ padding: 7 }}>
             <SearchablesRow />
+            
+            {/*pagingationtop*/}
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+                <Pagination 
+                    color="standard" 
+                    count={Math.ceil(stateHome.homeProjectSummary.length/10)} 
+                    variant="outlined"
+                    onChange = {(event, pageNumber) => setPageNumber(pageNumber)} />
+            </Box>
+
             {
                 stateHome.homeProjectLoading == false ?
-                    <CoreModules.Grid mt={2} container spacing={1} columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
-                        {stateHome.homeProjectSummary.map((value, index) => (
-                            <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
+                    <Grid mt={2} container spacing={1} columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
+
+
+                        {stateHome.homeProjectSummary.slice((pageNumber - 1) * 10, pageNumber * 10).map((value, index) => (
+                            <Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
                                 <ExploreProjectCard data={value} key={index} />
-                            </CoreModules.Grid>
+                            </Grid>
                         ))}
-                    </CoreModules.Grid>
-                    : <CoreModules.Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
+
+            
+                    </Grid>
+                    : <Box sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
                         <ProjectCardSkeleton defaultTheme={theme} cardsPerRow={cardsPerRow} />
-                    </CoreModules.Box>
+                    </Box>
 
             }
-            {/*pagingation*/}
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
-                <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-            </CoreModules.Box>
+            {/*pagingation bottom*/}
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+                <Pagination 
+                    color="standard" 
+                    count={Math.ceil(stateHome.homeProjectSummary.length/10)} 
+                    variant="outlined"
+                    onChange = {(event, pageNumber) => setPageNumber(pageNumber)} />
+            </Box>
 
         </div>
 
