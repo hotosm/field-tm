@@ -81,17 +81,17 @@ These steps are essential to run and test your code!
 
 The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your FMTM project, you will need to create keys for OSM.
 
-1. Login to OSM, Click on My Settings and register your local fmtm backend app to Oauth2applications
+1. [Login to OSM](https://www.openstreetmap.org/login). If you do not have an account yet, click the signup button at the top navigation bar to create one. Click the drop down arrow on the extreme right of the navigation bar and select My Settings.
 
-2. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
+2. Register your local fmtm backend app to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
 
 > Note: `127.0.0.1` is required instead of `localhost` due to OSM restrictions.
 
 <img width="716" alt="image" src="https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png">
 
-3. Right now read user preferences permission is enough later on fmtm may need permission to modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
+3. Right now read user preferences permission is enough later on fmtm may need permission to modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now.
 
-4. Now Copy your Client ID , Client Secret and put it to `.env`
+4. Now Copy your Client ID and Client Secret. Put them in the `OSM_CLIENT_ID` and `OSM_CLIENT_SECRET` of your `.env` file
 
 ### 2. Create an `.env` File
 
