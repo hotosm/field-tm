@@ -9,6 +9,7 @@ import SearchablesRow from "../components/home/HomePageFilters";
 import CoreModules from "../shared/CoreModules";
 
 const Home = () => {
+    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // const state:any = useSelector<any>(state=>state.project.projectData)
     // console.log('state main :',state)
 
@@ -18,13 +19,13 @@ const Home = () => {
     const dispatch = CoreModules.useDispatch()
     //dispatch function to perform redux state mutation
 
-    const stateHome = CoreModules.useSelector((state: any) => state.home);
+    const stateHome = CoreModules.useSelector((state) => state.home);
     //we use use selector from redux to get all state of home from home slice
 
-    let cardsPerRow: any = new Array(type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1).fill(0);
+    let cardsPerRow = new Array(type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1).fill(0);
     //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
-    const theme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
+    const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
         dispatch(HomeSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
@@ -43,7 +44,7 @@ const Home = () => {
                         ))}
                     </CoreModules.Grid>
                     : <CoreModules.Stack sx={{ display: { xs: 'flex', sm: 'flex', md: 'flex', lg: 'flex', xl: 'flex', flexDirection: 'row', justifyContent: 'left', width: '100%' } }}>
-                        <ProjectCardSkeleton defaultTheme={theme} cardsPerRow={cardsPerRow} />
+                        <ProjectCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
                     </CoreModules.Stack>
 
             }
