@@ -19,15 +19,23 @@ Here are the steps to contribute to the frontend of Field Mapping Tasking Manage
 Forking creates a copy of the repository in your own GitHub account.
 Go to the [Field Mapping Tasking Manager repository](https://github.com/hotosm/fmtm) and click the "Fork" button in the top right corner of the page.
 
-### 3. Clone the forked repository
+### 3. Navigate to your working directory
+
+Open a terminal and navigate to the directory you want to work in using the following command:
+
+`cd <work-dir>`
+
+Make sure to replace `<work-dir>` with the name of your directory.
+
+### 4. Clone the forked repository
 
 Clone the forked repository to your local machine using the following command:
 
 `git clone https://github.com/<your-username>/fmtm.git`
 
-Make sure to replace <your-username> with your GitHub username.
+Make sure to replace `<your-username>` with your GitHub username.
 
-### 4. Create a new branch
+### 5. Create a new branch
 
 Create a new branch for your changes using the following command:
 
@@ -35,13 +43,21 @@ Create a new branch for your changes using the following command:
 
 Make sure to give your branch a descriptive name that reflects the changes you'll be making.
 
-### 5. Make changes
+### 6. Make changes
 
-Make your changes to the codebase.
+Make your cotribution, run tests where needed and save.
 
-### 6. Commit and push
+### 7. Add changes
 
-Once you've made and tested your changes, commit them to your local branch using the following command:
+Add the changes you've made using the following command:
+
+`git add <file-name>`
+
+Make sure you replace `<file-name>` with the name of the file you made changes to.
+
+### 8. Commit and push
+
+Once you've added changes, commit them to your local branch using the following command:
 
 `git commit -m "Add feature"`
 
@@ -49,11 +65,13 @@ Make sure to write a descriptive commit message that explains the changes you've
 
 `git push origin branch-name`
 
-### 6. Submit a pull request
+### 9. Submit a pull request
 
-Go to your forked repository on GitHub and click the "New pull request" button. Select the branch that contains your changes, then click "Create pull request". This will open a new pull request in the Field Mapping Tasking Manager repository, where you can describe your changes and request that they be merged into the main codebase.
+Go to your forked repository on GitHub and click the "New pull request" button.  
+Select the branch that contains your changes, then click "Create pull request".  
+This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
-That's it! You've now contributed to the frontend of the Field Mapping Tasking Manager.
+That's it! You've now contributed to the Field Mapping Tasking Manager.
 
 ## Development: Setup Your Local Environment
 
