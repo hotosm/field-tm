@@ -24,7 +24,7 @@ export default function BasicDialog({ open, onClose, title, iconCloseMode, actio
                 onClose={onClose}
                 aria-describedby="alert-dialog-slide-description"
             >
-                <CoreModules.Box>
+                <CoreModules.Stack>
                     {
                         iconCloseMode &&
                         <CoreModules.Stack
@@ -42,7 +42,7 @@ export default function BasicDialog({ open, onClose, title, iconCloseMode, actio
                         </CoreModules.Stack>
                     }
                     <CoreModules.DialogTitle variant='h2'>{title}</CoreModules.DialogTitle>
-                </CoreModules.Box>
+                </CoreModules.Stack>
                 <CoreModules.DialogContent>
                     {element}
                 </CoreModules.DialogContent>

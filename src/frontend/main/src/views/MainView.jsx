@@ -13,13 +13,13 @@ const MainView = () => {
             <CoreModules.CssBaseline />
             <CoreModules.Paper>
                 <CoreModules.Container disableGutters={true} maxWidth={false}>
-                    <CoreModules.Box sx={{ height: '100vh' }} >
+                    <CoreModules.Stack sx={{ height: '100vh' }} >
                         <PrimaryAppBar />
-                        <CoreModules.Box className="mainview" sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto' }}>
+                        <CoreModules.Stack className="mainview" sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto' }}>
                             <CoreModules.Outlet />
                             {/* Footer */}
-                        </CoreModules.Box>
-                    </CoreModules.Box>
+                        </CoreModules.Stack>
+                    </CoreModules.Stack>
                 </CoreModules.Container>
             </CoreModules.Paper>
         </CoreModules.ThemeProvider>

@@ -32,7 +32,7 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
     ]
     return (
 
-        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 1 }}>
+        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: 1 }}>
             <CoreModules.Stack
                 width={'100%'}
                 p={1}
@@ -63,7 +63,7 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
                     })
                 }
             </CoreModules.Stack>
-        </CoreModules.Box>
+        </CoreModules.Stack>
     )
 }
 

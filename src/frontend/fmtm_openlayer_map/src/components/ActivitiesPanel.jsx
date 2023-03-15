@@ -167,9 +167,9 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
                 </CoreModules.Grid>
             </CoreModules.Grid>
 
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
                 <CoreModules.Pagination onChange={handleChange} color="standard" count={paginationSize} variant="outlined" />
-            </CoreModules.Box>
+            </CoreModules.Stack>
         </CoreModules.Stack>
     )
 }

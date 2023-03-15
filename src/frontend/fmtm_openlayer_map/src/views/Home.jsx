@@ -270,9 +270,9 @@ const Home = () => {
 
 
             {/* project Details Tabs */}
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                 <BasicTabs listOfData={panelData} />
-            </CoreModules.Box>
+            </CoreModules.Stack>
 
         </CoreModules.Stack>
     )

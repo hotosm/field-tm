@@ -48,8 +48,8 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
 
       >
 
-        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
-          <CoreModules.Box sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
+        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
+          <CoreModules.Stack sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
             <CoreModules.IconButton
               size="large"
               aria-label="show more"
@@ -59,10 +59,10 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
             >
               <AssetModules.CloseIcon />
             </CoreModules.IconButton>
-          </CoreModules.Box>
+          </CoreModules.Stack>
 
           <CoreModules.Divider />
-          <CoreModules.List sx={Drawerstyles.list} component="nav" aria-label="mailbox folders">
+          <CoreModules.List sx={Drawerstyles.list} component="nav" aria-label="mailStack folders">
             {
               ['Explore Projects', 'My Contributions', 'Learn', 'About', 'Support'].map((value, index) => {
                 return (
@@ -101,7 +101,7 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
             Sign up
           </CoreModules.Button>
 
-        </CoreModules.Box>
+        </CoreModules.Stack>
       </Drawer>
     </>
   );
