@@ -51,11 +51,11 @@ const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatu
                                 <AssetModules.LockIcon style={{ color: data.status == 'none' ? data.color : 'white' }} />
                             </CoreModules.IconButton>
                             {
-                                valueStatus && <CoreModules.Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                valueStatus && <CoreModules.Stack style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                     <CoreModules.Typography>
                                         {data.value}
                                     </CoreModules.Typography>
-                                </CoreModules.Box>
+                                </CoreModules.Stack>
                             }
                         </CoreModules.Stack>
                     )

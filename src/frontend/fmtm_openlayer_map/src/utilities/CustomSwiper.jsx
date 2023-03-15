@@ -13,7 +13,7 @@ const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected,
 
     return (
         <CoreModules.Stack className="App" >
-            <CoreModules.Box marginTop={4}>
+            <CoreModules.Stack direction={'row'} marginTop={4}>
                 <CoreModules.Swiper
                     navigation={true}
                     modules={[CoreModules.SwiperNavigation]}
@@ -61,7 +61,7 @@ const CustomSwiper = ({ listOfData, defaultTheme, screenType, onClick, selected,
                         )
                     })}
                 </CoreModules.Swiper>
-            </CoreModules.Box>
+            </CoreModules.Stack>
         </CoreModules.Stack>
     )
 }

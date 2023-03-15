@@ -37,7 +37,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
     }
 
     return (
-        <CoreModules.Box>
+        <CoreModules.Stack>
 
 
             <CoreModules.Stack>
@@ -312,7 +312,7 @@ const TasksComponent = ({ type, state, defaultTheme }) => {
                 />
 
             </CoreModules.Stack>
-        </CoreModules.Box>
+        </CoreModules.Stack>
     )
 
 }

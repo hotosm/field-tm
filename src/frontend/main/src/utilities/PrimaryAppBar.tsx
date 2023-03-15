@@ -46,7 +46,7 @@ export default function PrimaryAppBar() {
   const { type } = windowDimention();
 
   return (
-    <CoreModules.Box sx={{ flexGrow: 1 }}>
+    <CoreModules.Stack sx={{ flexGrow: 1 }}>
       <DrawerComponent
         open={open}
         placement={'right'}
@@ -79,8 +79,9 @@ export default function PrimaryAppBar() {
 
           </CoreModules.Link>
 
-          <CoreModules.Box sx={{ flexGrow: 1 }} />
-          <CoreModules.Box >
+          <CoreModules.Stack sx={{ flexGrow: 1 }} />
+
+          <CoreModules.Stack >
             <CoreModules.IconButton
               size="large"
               aria-label="show more"
@@ -92,9 +93,9 @@ export default function PrimaryAppBar() {
                 <AssetModules.DarkModeIcon />
               }
             </CoreModules.IconButton>
-          </CoreModules.Box>
+          </CoreModules.Stack>
 
-          <CoreModules.Box sx={{ display: { md: 'flex', xs: 'none' } }}>
+          <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex', xs: 'none' } }}>
             <CoreModules.Button
               className='btnLogin'
               style={appBarInnerStyles.btnLogin}
@@ -110,8 +111,8 @@ export default function PrimaryAppBar() {
               href="/signup">
               Sign up
             </CoreModules.Button>
-          </CoreModules.Box>
-          <CoreModules.Box >
+          </CoreModules.Stack>
+          <CoreModules.Stack >
             <CoreModules.IconButton
               size="large"
               aria-label="show more"
@@ -121,10 +122,10 @@ export default function PrimaryAppBar() {
             >
               <AssetModules.MenuIcon />
             </CoreModules.IconButton>
-          </CoreModules.Box>
+          </CoreModules.Stack>
         </CoreModules.Toolbar>
       </CoreModules.AppBar>
 
-    </CoreModules.Box>
+    </CoreModules.Stack>
   );
 }
