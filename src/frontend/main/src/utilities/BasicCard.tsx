@@ -18,9 +18,9 @@ export default function BasicCard({ title, subtitle, content, variant, contentPr
                         {subtitle}
                     </Typography> */}
                 </CoreModules.Stack>}
-                <CoreModules.Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
+                <CoreModules.Stack style={{ display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
                     {content}
-                </CoreModules.Box>
+                </CoreModules.Stack>
             </CoreModules.CardContent>
         </CoreModules.Card>
     );
