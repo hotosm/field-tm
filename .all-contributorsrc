@@ -124,6 +124,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "Roseford",
+      "name": "Uju",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75838716?v=4",
+      "profile": "https://github.com/Roseford",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
