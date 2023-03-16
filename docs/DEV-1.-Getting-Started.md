@@ -65,6 +65,11 @@ Make sure to write a descriptive commit message that explains the changes you've
 
 `git push origin branch-name`
 
+> Note: After a PR has been approved and merged and is not in use, delete the branch both locally and remotely with the following command:
+> `git branch -d branch-name` to delete locally
+> `git push origin --delete branch-name` to delete remotely.
+> Otherwise we get buried in dead branches we don't need.
+
 ### 9. Submit a pull request
 
 Go to your forked repository on GitHub and click the "New pull request" button.  
