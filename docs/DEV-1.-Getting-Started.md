@@ -71,10 +71,10 @@ Go to your forked repository on GitHub and click the "New pull request" button.
 Select the branch that contains your changes, then click "Create pull request".  
 This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
-> Note: After a PR has been approved and merged, if it is not in use, delete the branch both locally and remotely with the following commands:  
+> Note: After a PR has been approved and merged, if the branch is not in use, delete the it both locally and remotely, otherwise we get buried in dead branches we don't need.  
+> Use the following commands:  
 > Switch out of the branch you want to delete `git checkout <some-other-branch>`(_Replace `<some-other-branch>` with any other existing branch name_).  
-> Delete the branch locally `git branch -d <branch-name>` them delete the branch remotely `git push origin --delete <branch-name>`(_Replace `<branch-name>` with the namof the branch you want to delete_).  
-> Otherwise we get buried in dead branches we don't need.
+> Delete the branch locally `git branch -d <branch-name>` and then delete the branch remotely `git push origin --delete <branch-name>`(_Replace `<branch-name>` with the namof the branch you want to delete_).
 
 That's it! You've now contributed to the Field Mapping Tasking Manager.
 
