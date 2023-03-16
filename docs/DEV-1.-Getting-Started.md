@@ -71,6 +71,11 @@ Go to your forked repository on GitHub and click the "New pull request" button.
 Select the branch that contains your changes, then click "Create pull request".  
 This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
+> Note: After a PR has been approved and merged, if the branch is no longer in use, delete it both locally and remotely. Otherwise we get buried in dead branches we don't need.  
+> Use the following commands:  
+> Switch out of the branch you want to delete `git checkout <some-other-branch>`(_Replace `<some-other-branch>` with any other existing branch name_).  
+> Delete the branch locally `git branch -d <branch-name>` and then delete the branch remotely `git push origin --delete <branch-name>`(_Replace `<branch-name>` with the name of the branch you want to delete_).
+
 That's it! You've now contributed to the Field Mapping Tasking Manager.
 
 ## Development: Setup Your Local Environment
@@ -81,17 +86,17 @@ These steps are essential to run and test your code!
 
 The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your FMTM project, you will need to create keys for OSM.
 
-1. Login to OSM, Click on My Settings and register your local fmtm backend app to Oauth2applications
+1. [Login to OSM](https://www.openstreetmap.org/login) (_If you do not have an account yet, click the signup button at the top navigation bar to create one_). Click the drop down arrow on the extreme right of the navigation bar and select My Settings.
 
-2. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
+2. Register your local fmtm backend app to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
 
 > Note: `127.0.0.1` is required instead of `localhost` due to OSM restrictions.
 
 <img width="716" alt="image" src="https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png">
 
-3. Right now read user preferences permission is enough later on fmtm may need permission to modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now
+3. Right now read user preferences permission is enough later on fmtm may need permission to modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now.
 
-4. Now Copy your Client ID , Client Secret and put it to `.env`
+4. Now Copy your Client ID and Client Secret. Put them in the `OSM_CLIENT_ID` and `OSM_CLIENT_SECRET` of your `.env` file
 
 ### 2. Create an `.env` File
 
