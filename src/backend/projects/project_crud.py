@@ -96,7 +96,6 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
     #         db_models.DbProject.tasks_bad_imagery,
     #     ).join(db_models.DbProject.project_info) \
     #         .with_entities(
-    #             db_models.DbProjectInfo.locale,
     #             db_models.DbProjectInfo.name,
     #             db_models.DbProjectInfo.short_description) \
     #         .filter(
@@ -168,7 +167,6 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
-        default_locale=project_info_1.locale,
         country=[project_metadata.country],
         location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -177,13 +175,9 @@ def create_project_with_project_info(
     # add project info (project id needed to create project info)
     db_project_info = db_models.DbProjectInfo(
         project=db_project,
-        locale=project_info_1.locale,
         name=project_info_1.name,
         short_description=project_info_1.short_description,
         description=project_info_1.description,
-        instructions=project_info_1.instructions,
-        project_id_str=f"{db_project.id}",
-        per_task_instructions=project_info_1.per_task_instructions,
     )
     db.add(db_project_info)
 
@@ -708,14 +702,7 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         summary: project_schemas.ProjectSummary = db_project
 
         if db_project.project_info and len(db_project.project_info) > 0:
-            default_project_info = next(
-                (
-                    x
-                    for x in db_project.project_info
-                    if x.locale == db_project.default_locale
-                ),
-                None,
-            )
+            default_project_info = project_schemas.ProjectInfo
             summary.title = default_project_info.name
             summary.description = default_project_info.short_description
 
