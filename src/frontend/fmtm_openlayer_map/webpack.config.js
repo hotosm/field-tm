@@ -35,9 +35,11 @@ module.exports = (webpackEnv) => {
       rules: [
         {
           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/],
-          loader: "file-loader",
-          options: {
-            name: "[name].[ext]",
+          type: 'asset',
+          parser: {
+            dataUrlCondition: {
+              maxSize: 1000,
+            },
           },
         },
         {
