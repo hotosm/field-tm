@@ -1,11 +1,11 @@
 # Structures To Improve GitHub Documentation
 
 ## Overview
-An overall documentation structure outline, that cuts across, project, product, system and process documentation. These structures can be replicated for all forms of documentation needed by HOTOSM. It also includes specific tips for improving already existing documentation.
+An overall documentation structure outline, that cuts across; **Project**, **Product**, **System** and **Process documentation**. These structures can be replicated for all forms of documentation needed by **HOTOSM**. It also includes specific tips for improving already existing documentation.
 
 ## Goals
 1. Highlight the definitions of each type of documentation that are commonly used on Github.
-2. Provide a basic foundation to lay information on top of, in order to build strong, sturdy and efficient documentation about any product or project in the future.
+2. Provide a basic foundation to lay information on top of, in order to procduce efficient documentation about any product or project in the future.
 3. List key parts of each documentation type that aid the flow and experience of the reader.
 4. Outline general tips to improve already existing documentation.
 
