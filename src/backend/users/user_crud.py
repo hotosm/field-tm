@@ -31,7 +31,7 @@ from . import user_schemas
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     db_users = db.query(db_models.DbUser).offset(skip).limit(limit).all()
-    return convert_to_app_user(db_users)
+    return convert_to_app_user(db_users) if db_users else []
 
 
 def get_user(db: Session, user_id: int, db_obj: bool = False):
