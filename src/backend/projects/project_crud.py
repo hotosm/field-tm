@@ -702,7 +702,11 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         summary: project_schemas.ProjectSummary = db_project
 
         if db_project.project_info and len(db_project.project_info) > 0:
-            default_project_info = project_schemas.ProjectInfo
+            default_project_info = next(
+                ( x for x in db_project.project_info ),
+                None,
+            )
+            # default_project_info = project_schemas.ProjectInfo
             summary.title = default_project_info.name
             summary.description = default_project_info.short_description
 
