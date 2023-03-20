@@ -185,19 +185,15 @@ class DbProjectInfo(Base):
 
     project_id = Column(Integer, ForeignKey("projects.id"), primary_key=True)
     project_id_str = Column(String)
-    locale = Column(String(10), primary_key=True)
     name = Column(String(512))
     short_description = Column(String)
     description = Column(String)
-    instructions = Column(String)
-
     text_searchable = Column(
         TSVECTOR
     )  # This contains searchable text and is populated by a DB Trigger
     per_task_instructions = Column(String)
 
     __table_args__ = (
-        Index("idx_project_info_composite", "locale", "project_id"),
         Index("textsearch_idx", "text_searchable"),
         {},
     )
@@ -412,9 +408,6 @@ class DbProject(Base):
     # PROJECT DETAILS
     project_name_prefix = Column(String)
     task_type_prefix = Column(String)
-    default_locale = Column(
-        String(10), default="en"
-    )  # The locale that is returned if requested locale not available
     project_info = relationship(
         DbProjectInfo, cascade="all, delete, delete-orphan", backref="project"
     )

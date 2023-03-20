@@ -27,13 +27,9 @@ from ..users.user_schemas import User
 
 
 class ProjectInfo(BaseModel):
-    locale: str
     name: str
     short_description: str
     description: str
-    instructions: str
-    per_task_instructions: str
-
     class Config:
         orm_mode = True
 
@@ -66,7 +62,6 @@ class ProjectBase(BaseModel):
     id: int
     odkid: int
     author: User
-    default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
     # location_str: str
