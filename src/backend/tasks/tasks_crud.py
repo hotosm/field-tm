@@ -40,8 +40,16 @@ from ..users import user_crud
 # --------------
 
 
-def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 1000):
-    if user_id:
+def get_tasks(db: Session, user_id: int, task_id:int ,skip: int = 0, limit: int = 1000):
+    if task_id:
+        db_tasks = (
+            db.query(db_models.DbTask)
+            .filter(db_models.DbTask.id == task_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    elif user_id:
         db_tasks = (
             db.query(db_models.DbTask)
             .filter(db_models.DbTask.locked_by == user_id)

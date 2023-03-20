@@ -85,7 +85,7 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/create_project", response_model=project_schemas.ProjectOut)
+@router.post("/create_project", response_model=project_schemas.ProjectOut)
 async def create_project(
     project_info: project_schemas.BETAProjectUpload,
     db: Session = Depends(database.get_db),
