@@ -68,9 +68,9 @@ def load_test_data_as_test_user() -> None:
                 description=f"Test{index}: {name}",
                 instructions="No instructions",
                 per_task_instructions="No per task instructions",
-            ),
-            city=name,
-            country="Unknown",
+            )
+            # city=name,
+            # country="Unknown",
         )
         log.debug(f"Creating ODKCentral project for: {project_obj}")
         odkproject = create_odk_project(project_obj.project_info.name)
