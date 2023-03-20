@@ -62,12 +62,9 @@ def load_test_data_as_test_user() -> None:
         project_obj = BETAProjectUpload(
             author=User(username="test", id=user_id),
             project_info=ProjectInfo(
-                locale="en",
                 name=name,
                 short_description=f"Test{index}: {name}",
                 description=f"Test{index}: {name}",
-                instructions="No instructions",
-                per_task_instructions="No per task instructions",
             ),
             city=name,
             country="Unknown",
