@@ -517,7 +517,7 @@ class DbProject(Base):
     license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
     # GEOMETRY
     centroid = Column(Geometry("POINT", srid=4326))
-    country = Column(ARRAY(String), default=[])
+    # country = Column(ARRAY(String), default=[])
     # FEEDBACK
     project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
 
