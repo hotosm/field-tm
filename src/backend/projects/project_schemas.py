@@ -41,8 +41,8 @@ class ProjectInfo(BaseModel):
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    city: str
-    country: str
+    # city: str
+    # country: str
 
 
 class ProjectSummary(BaseModel):
@@ -69,7 +69,7 @@ class ProjectBase(BaseModel):
     default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
-    location_str: str
+    # location_str: str
     outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
 

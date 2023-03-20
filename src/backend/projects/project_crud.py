@@ -169,8 +169,8 @@ def create_project_with_project_info(
         odkid=project_id,
         project_name_prefix=project_info_1.name,
         default_locale=project_info_1.locale,
-        country=[project_metadata.country],
-        location_str=f"{project_metadata.city}, {project_metadata.country}",
+        # country=[project_metadata.country],
+        # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
     db.add(db_project)
 
