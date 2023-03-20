@@ -67,8 +67,8 @@ Make sure to write a descriptive commit message that explains the changes you've
 
 ### 9. Submit a pull request
 
-Go to your forked repository on GitHub and click the "New pull request" button.  
-Select the branch that contains your changes, then click "Create pull request".  
+Go to your forked repository on GitHub and click the "Pull requests" tab.  
+Change the base branch from `main` to `developement`, select the branch that contains your changes from the compare branch, then click "Create pull request".  
 This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
 That's it! You've now contributed to the Field Mapping Tasking Manager.
