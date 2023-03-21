@@ -104,6 +104,70 @@ async def create_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
+@router.put("/project/{id}", response_model=project_schemas.ProjectOut)
+async def update_project(
+    id : int,
+    project_info: project_schemas.BETAProjectUpload,
+    db: Session = Depends(database.get_db)
+    ):
+    """
+    Update an existing project by ID.
+
+    Parameters:
+    - id: ID of the project to update
+    - author: Author username and id
+    - project_info: Updated project information
+
+    Returns:
+    - Updated project information
+
+    Raises:
+    - HTTPException with 404 status code if project not found
+    """
+
+    project = project_crud.update_project_info(
+        db, project_info, id
+    )
+    if project:
+        return project
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
+@router.patch("/project/{id}", response_model=project_schemas.ProjectOut)
+async def project_partial_update(
+    id : int,
+    project_info: project_schemas.ProjectUpdate,
+    db: Session = Depends(database.get_db)
+    ):
+
+    """
+    Partial Update an existing project by ID.
+
+    Parameters:
+    - id
+    - name 
+    - short_description 
+    - description
+
+    Returns:
+    - Updated project information
+
+    Raises:
+    - HTTPException with 404 status code if project not found
+    """
+    
+    # Update project informations 
+    project = project_crud.partial_update_project_info(
+        db, project_info, id
+    )
+
+    if project:
+        return project
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
 @router.post("/beta/{project_id}/upload")
 async def upload_project_boundary_with_zip(
     project_id: int,
