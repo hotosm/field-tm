@@ -126,6 +126,17 @@ def get_project_by_id(db: Session, project_id: int):
     return convert_to_app_project(db_project)
 
 
+def get_project_info_by_id(db: Session, project_id: int):
+
+    db_project_info = (
+        db.query(db_models.DbProjectInfo)
+        .filter(db_models.DbProjectInfo.project_id == project_id)
+        .order_by(db_models.DbProjectInfo.project_id)
+        .first()
+    )
+    return convert_to_app_project_info(db_project_info)
+
+
 def delete_project_by_id(db: Session, project_id: int):
     try:
         db_project = (
@@ -140,6 +151,84 @@ def delete_project_by_id(db: Session, project_id: int):
     except Exception as e:
         raise HTTPException(e)
     return f"Project {project_id} deleted"
+
+
+def partial_update_project_info(
+    db: Session, project_metadata: project_schemas.ProjectUpdate, project_id
+    ):
+
+    # Get the project from db
+    db_project = get_project_by_id(db, project_id)
+
+    # Raise an exception if project is not found.
+    if not db_project:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+
+    # Get project info
+    db_project_info = get_project_info_by_id(db, project_id)
+
+    # Update project informations 
+    if project_metadata.name:
+        db_project.project_name_prefix = project_metadata.name
+        db_project_info.name = project_metadata.name
+    if project_metadata.description:
+        db_project_info.description=project_metadata.description
+    if project_metadata.short_description:
+        db_project_info.short_description=project_metadata.short_description
+
+    db.commit()
+    db.refresh(db_project)
+
+    return convert_to_app_project(db_project)
+
+
+def update_project_info(
+    db: Session, project_metadata: project_schemas.BETAProjectUpload, project_id
+    ):
+    user = project_metadata.author
+    project_info_1 = project_metadata.project_info
+
+    # verify data coming in
+    if not user:
+        raise HTTPException("No user passed in")
+    if not project_info_1:
+        raise HTTPException("No project info passed in")
+
+    # get db user
+    db_user = user_crud.get_user(db, user.id)
+    if not db_user:
+        raise HTTPException(
+            status_code=400, detail=f"User {user.username} does not exist"
+        )
+
+    # verify project exists in db
+    db_project = get_project_by_id(db, project_id)
+    if not db_project:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+
+    # Project meta informations
+    project_info_1 = project_metadata.project_info
+
+    # Update author of the project
+    db_project.author = db_user
+    db_project.project_name_prefix = project_info_1.name
+
+    # get project info
+    db_project_info = get_project_info_by_id(db, project_id)
+
+    # Update projects meta informations (name, descriptions)
+    db_project_info.name = project_info_1.name
+    db_project_info.short_description=project_info_1.short_description
+    db_project_info.description=project_info_1.description
+
+    db.commit()
+    db.refresh(db_project)
+
+    return convert_to_app_project(db_project)
 
 
 def create_project_with_project_info(
@@ -685,6 +774,14 @@ def convert_to_app_project(db_project: db_models.DbProject):
         return None
 
 
+def convert_to_app_project_info(db_project_info: db_models.DbProjectInfo):
+    if db_project_info:
+        app_project_info: project_schemas.ProjectInfo = db_project_info
+        return app_project_info
+    else:
+        return None
+
+
 def convert_to_app_projects(db_projects: List[db_models.DbProject]):
     if db_projects and len(db_projects) > 0:
         app_projects = []
@@ -702,7 +799,11 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         summary: project_schemas.ProjectSummary = db_project
 
         if db_project.project_info and len(db_project.project_info) > 0:
-            default_project_info = project_schemas.ProjectInfo
+            default_project_info = next(
+                ( x for x in db_project.project_info ),
+                None,
+            )
+            # default_project_info = project_schemas.ProjectInfo
             summary.title = default_project_info.name
             summary.description = default_project_info.short_description
 
