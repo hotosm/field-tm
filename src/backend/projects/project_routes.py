@@ -170,7 +170,8 @@ async def upload_project_boundary(
     # result = project_crud.generate_appuser_files(db, grid, project_id)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {"message":"Project Boundary Uploaded",
+            "project_id": f"{project_id}"}
 
 
 @router.post("/{project_id}/download")
