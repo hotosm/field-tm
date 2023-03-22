@@ -49,3 +49,7 @@ python-multipart==0.0.5
 
 # ----- LOGGING -----
 python-json-logger==2.0.6
+
+# Testing
+pytest==7.2.2
+SQLAlchemy-Utils==0.40.0
