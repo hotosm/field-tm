@@ -1,11 +1,11 @@
 # Tutorial On How To Use FMTM For A Mapping Campaign
 
 ## Table of content
-1. **Introduction**
+### 1. Introduction
 
-2. ** An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).**
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
 
-3. **Using The FMTM Tool For A Mapping Campaign.**
+### 3. Using The FMTM Tool For A Mapping Campaign.
 
 
 ### Introduction
