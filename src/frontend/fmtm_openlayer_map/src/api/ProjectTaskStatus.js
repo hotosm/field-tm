@@ -11,8 +11,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
 
             try {
                 dispatch(HomeActions.SetDialogStatus(false))
-                map.getTargetElement().classList.add('spinner');
-
+        
                 const response = await CoreModules.axios.post(url, body);
                 const findIndexForUpdation = existingData[index].taskBoundries.findIndex(obj => obj.id == response.data.id)
 
@@ -50,10 +49,6 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
             })[0].outline_centroid.geometry.coordinates;
 
         await feature.setStyle(style)
-        await map.getView().setCenter(centroid)
-        setTimeout(() => {
-            view.animate({ zoom: 20, easing: easeOut, duration: 2000, });
-        }, 100);
     }
 }
 
