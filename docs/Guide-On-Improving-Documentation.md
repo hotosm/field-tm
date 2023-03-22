@@ -61,9 +61,9 @@ The structures I have suggested above are similar, consistent, and can be easily
 
 3. **Generally simplifying words and phrases**. This makes documentation more user friendly and much easier to understand, since users come from all different backgrounds. For example:
 
-“ODK incorporates a new functionality” can become “ODK has brought in a new feature”.
+ “ODK incorporates a new functionality” can become “ODK has brought in a new feature”.
 
-“Field Mappers select (or are allocated) individual tasks within a project’s AOI” could be changed to “Field Mappers choose or are given tasks that are part of a project’s Areas Of Interest.”
+ “Field Mappers select (or are allocated) individual tasks within a project’s AOI” could be changed to “Field Mappers choose or are given tasks that are part of a project’s Areas Of Interest.”
 
 4. **Avoid long paragraphs**. Short paragraphs that pass a clear message are less clumsy and flustering for readers. Breaking down topics into little, easy to understand chunks, is more user friendly. 
 
@@ -73,5 +73,5 @@ The structures I have suggested above are similar, consistent, and can be easily
 
 7. **Consistency in the documentation format**. Maintaining consistency is a key aspect of creating clear and effective documentation.This consistency includes but is not limited to elements like numbering, font styles, heading sizes, and spacing.
 
-Using the same font for all headings and subheadings can help readers quickly identify important sections of the document. Similarly, using consistent spacing between paragraphs and sections can make the document more visually appealing and easier to follow. This helps to create a documentation that is clear, effective, and easy to use.
+ Using the same font for all headings and subheadings can help readers quickly identify important sections of the document. Similarly, using consistent spacing between paragraphs and sections can make the document more visually appealing and easier to follow. This helps to create a documentation that is clear, effective, and easy to use.
 
