@@ -73,5 +73,5 @@ The structures I have suggested above are similar, consistent, and can be easily
 
 7. **Consistency in the documentation format**. Maintaining consistency is a key aspect of creating clear and effective documentation.This consistency includes but is not limited to elements like numbering, font styles, heading sizes, and spacing.
 
- Using the same font for all headings and subheadings can help readers quickly identify important sections of the document. Similarly, using consistent spacing between paragraphs and sections can make the document more visually appealing and easier to follow. This helps to create a documentation that is clear, effective, and easy to use.
+    Using the same font for all headings and subheadings can help readers quickly identify important sections of the document. Similarly, using consistent spacing between paragraphs and sections can make the document more visually appealing and easier to follow. This helps to create a documentation that is clear, effective, and easy to use.
 
