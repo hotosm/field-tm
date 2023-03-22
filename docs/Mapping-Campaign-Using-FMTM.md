@@ -5,10 +5,10 @@
 
 ### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
 
-### 3. Using The FMTM Tool For A Mapping Campaign.
+### 3. Steps On How To Use The FMTM Tool For A Mapping Campaign.
 
 
-### Introduction
+### 1. Introduction
 
 A **Mapping Campaign** refers to an organized effort of collecting data from a particular geographic area/feature and creating maps. This may involve using various mapping technologies such as; GPS, satellite imagery, or crowdsourced data. These technologies are used to gather information about the area of interest.
 
@@ -27,7 +27,7 @@ Once the data is collected, it is analyzed and processed to create detailed maps
 - Planning infrastructure and development projects.
 - Understanding the impact of environmental changes on the landscape, etc.
 
-### An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit organization that uses open mapping data to support humanitarian and disaster response efforts around the world. **The Field Mapping Task Manager (FMTM)** is one of the tools that **HOT** used to coordinate and manage mapping projects.
 
@@ -39,7 +39,7 @@ Project managers use **FMTM** to manage tasks and assign them to volunteers. The
 
 Overall, the **FMTM** tool is an important component of **HOT**'s efforts to support disaster response and humanitarian efforts around the world. By coordinating mapping activities and ensuring the accuracy and reliability of the data collected by volunteers, **FMTM** helps to provide critical information that can be used to support decision-making and improve the effectiveness of humanitarian efforts.
 
-### Using The FMTM Tool For A Mapping Campaign.
+### 3. Steps On How To Use The FMTM Tool For A Mapping Campaign.
 
 1. Navigate to the [FMTM website](https://fmtm.hotosm.org/).
 
