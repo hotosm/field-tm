@@ -76,37 +76,6 @@ This will open a new pull request in the fmtm repository, where you can describe
 > Switch out of the branch you want to delete `git checkout <some-other-branch>`(_Replace `<some-other-branch>` with any other existing branch name_).  
 > Delete the branch locally `git branch -d <branch-name>` and then delete the branch remotely `git push origin --delete <branch-name>`(_Replace `<branch-name>` with the name of the branch you want to delete_).
 
-### 10. Merging your forked repository with the development branch
-
-> Note: Merging the upstream **development branch** into your forked repository can introduce new bugs or issues.
-
-Add the upstream repository as a remote to your local repository using the following command:   
-
-`git remote add upstream https://github.com/hotosm/fmtm`    
-
-Fetch the latest changes from the upstream repository using the following command:  
-
-`git fetch upstream`  
-
-Switch to the local branch you want to update using the following command:  
-
-`git checkout <branch-name>`  
-
-Merge the changes from the upstream **development branch** into your local main branch using the following command:  
-
-`git merge upstream/development`  
-
-This will merge the changes from the upstream **development branch** into your local branch.  
-
-Push the changes to your remote repository using the following command:  
-
-`git push origin <branch-name>`  
-
-This will update your forked main branch with the changes from the upstream **development 
-branch**.
-> To merge any branch, replace development with the name of your choiced branch  
-
-
 That's it! You've now contributed to the Field Mapping Tasking Manager.
 
 ## Development: Setup Your Local Environment
