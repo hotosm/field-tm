@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import IconButtonCard from "../utilities/IconButtonCard";
 import BasicDialog from "../utilities/BasicDialog";
-import DialogActions from "../components/DialogActions";
+import DialogTaskActions from "../components/DialogTaskActions";
 import "../styles/home.scss";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
@@ -9,6 +9,7 @@ import AssetModules from "fmtm/AssetModules";
 import Control from "ol/control/Control";
 import locationImg from "../assets/images/location.png";
 import gridIcon from "../assets/images/grid.png";
+import QrcodeComponent from "./QrcodeComponent";
 const OpenLayersMap = ({
   defaultTheme,
   stateDialog,
@@ -31,7 +32,7 @@ const OpenLayersMap = ({
   const dispatch = CoreModules.useDispatch();
 
   useEffect(() => {
-    let btnsPosition = 22;
+    let btnsPosition = 0;
     var btnList = ["add", "minus", "defaultPosition", "taskBoundries"];
 
     if (map != undefined) {
@@ -71,21 +72,16 @@ const OpenLayersMap = ({
         }
       };
 
-      //Div element
-      let div = document.createElement("div");
-      div.id = "btnsContainer";
-      div.style.height = "inherit";
-      div.style.width = "50px"
-      div.style.backgroundColor = defaultTheme.palette.info["info_rgb"];
-
       //List buttons avoiding code duplication
-      btnList.map((elmnt) => {
+      btnList.map((elmnt, index) => {
         //Add Button
         let btn = document.createElement("button");
         if (elmnt == "add") {
           btn.innerHTML = "+";
+          btn.style.fontSize = defaultTheme.typography.fontSize;
         } else if (elmnt == "minus") {
           btn.innerHTML = "-";
+          btn.style.fontSize = defaultTheme.typography.fontSize;
         } else if (elmnt == "defaultPosition") {
           let img = document.createElement("img");
           img.src = locationImg;
@@ -101,51 +97,55 @@ const OpenLayersMap = ({
         }
         btn.id = `${elmnt}`;
         btn.style.backgroundColor = "white";
-        btn.style.boxShadow =
-          " 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
+        btn.style.boxShadow = `0 2px 2px 0 ${defaultTheme.palette.info["main"]}`;
         btn.style.width = "40px";
         btn.style.height = "40px";
+        btn.style.borderRadius = "50%";
         btn.addEventListener("click", handleOnClick, false);
 
         //Add Button Div
         let btnDiv = document.createElement("div");
+        btnDiv.id = "btnsContainer";
+        btnDiv.style.borderRadius = "50%";
         btnDiv.className = "ol-unselectable ol-control";
-        btnDiv.style.top = `${(btnsPosition = btnsPosition + 9)}%`;
+        index == 0
+          ? (btnDiv.style.top = `${(btnsPosition = btnsPosition + 2)}%`)
+          : (btnDiv.style.top = `${(btnsPosition = btnsPosition + 9)}%`);
         btnDiv.appendChild(btn);
-        div.appendChild(btnDiv);
-      });
+        var control = new Control({
+          element: btnDiv,
+        });
 
-      var control = new Control({
-        element: div,
+        map.addControl(control);
       });
-
-      map.addControl(control);
     }
   }, [map]);
 
   return (
-    <CoreModules.Stack spacing={1} direction={"column"}>
+    <CoreModules.Stack spacing={1} p={2.5} direction={"column"}>
       <CoreModules.Stack
         style={{ border: `4px solid ${defaultTheme.palette.error.main}` }}
         justifyContent={"center"}
         height={608}
       >
-        <div ref={mapElement} id="map_container">
-          <BasicDialog
-            open={stateDialog}
-            title={`Task #${taskId}`}
-            onClose={() => {
-              dispatch(HomeActions.SetDialogStatus(false));
-            }}
-            actions={
-              <DialogActions
+        <div ref={mapElement} id="map_container"></div>
+        <div id="popup" className="ol-popup">
+          <a href="#" id="popup-closer" className="ol-popup-closer"></a>
+          {featuresLayer != undefined && (
+            <CoreModules.Stack>
+              <DialogTaskActions
                 map={map}
                 view={mainView}
                 feature={featuresLayer}
                 taskId={taskId}
               />
-            }
-          />
+              <QrcodeComponent
+                defaultTheme={defaultTheme}
+                task={taskId}
+                type={windowType}
+              />
+            </CoreModules.Stack>
+          )}
         </div>
       </CoreModules.Stack>
     </CoreModules.Stack>

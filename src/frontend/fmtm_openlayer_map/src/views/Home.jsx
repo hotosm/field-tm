@@ -4,9 +4,7 @@ import "../styles/home.scss";
 import WindowDimension from "fmtm/WindowDimension";
 import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
-import TasksComponent from "../components/TasksComponent";
 import OpenLayersMap from "../components/OpenLayersMap";
-import BasicTabs from "fmtm/BasicTabs";
 import environment from "fmtm/environment";
 import { ProjectById } from "../api/Project";
 import { ProjectActions } from "fmtm/ProjectSlice";
@@ -24,6 +22,11 @@ import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
 import Control from "ol/control/Control";
+
+import Overlay from "ol/Overlay";
+import XYZ from "ol/source/XYZ.js";
+import { toLonLat } from "ol/proj";
+import { toStringHDMS } from "ol/coordinate";
 
 const Home = () => {
   const dispatch = CoreModules.useDispatch();
@@ -46,32 +49,6 @@ const Home = () => {
   const encodedId = params.id;
   const { windowSize, type } = WindowDimension();
   const { y } = OnScroll(map, windowSize.width);
-  const panelData = [
-    {
-      label: "Activities",
-      element: (
-        <ActivitiesPanel
-          params={params}
-          state={state.projectTaskBoundries}
-          defaultTheme={defaultTheme}
-          map={map}
-          view={mainView}
-          mapDivPostion={y}
-          states={state}
-        />
-      ),
-    },
-    {
-      label: "My Tasks",
-      element: (
-        <TasksComponent
-          defaultTheme={defaultTheme}
-          state={state.projectTaskBoundries}
-          type={type}
-        />
-      ),
-    },
-  ];
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -113,6 +90,26 @@ const Home = () => {
   }, [params.id]);
 
   useEffect(() => {
+    const container = document.getElementById("popup");
+    const closer = document.getElementById("popup-closer");
+
+    const overlay = new Overlay({
+      element: container,
+      autoPan: {
+        animation: {
+          duration: 250,
+        },
+      },
+    });
+
+    closer.style.textDecoration = "none";
+    closer.style.color = defaultTheme.palette.info["main"];
+    closer.onclick = function () {
+      overlay.setPosition(undefined);
+      closer.blur();
+      return false;
+    };
+
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource(),
     });
@@ -136,6 +133,7 @@ const Home = () => {
         }),
         initalFeaturesLayer,
       ],
+      overlays: [overlay],
       view: view,
     });
 
@@ -143,11 +141,13 @@ const Home = () => {
       initialMap.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
         const status = feature.getId().replace("_", ",").split(",")[1];
         if (
-          environment.tasksStatus.findIndex((data) => data.key == status) != -1
+          environment.tasksStatus.findIndex((data) => data.label == status) !=
+          -1
         ) {
-          setFeaturesLayer(feature);
           setTaskId(feature.getId().split("_")[0]);
-          dispatch(HomeActions.SetDialogStatus(true));
+          const coordinate = event.coordinate;
+          overlay.setPosition(coordinate);
+          setFeaturesLayer(feature);
         }
       });
     });
@@ -264,7 +264,7 @@ const Home = () => {
         </CoreModules.Stack>
       </CoreModules.Stack>
 
-      {/* Center descriptin and map */}
+      {/* Center description and map */}
       <CoreModules.Stack direction={"column"} spacing={1}>
         <MapDescriptionComponents
           defaultTheme={defaultTheme}
@@ -291,7 +291,16 @@ const Home = () => {
       <CoreModules.Stack
         sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
       >
-        <BasicTabs listOfData={panelData} />
+        {/* <BasicTabs listOfData={panelData} /> */}
+        <ActivitiesPanel
+          params={params}
+          state={state.projectTaskBoundries}
+          defaultTheme={defaultTheme}
+          map={map}
+          view={mainView}
+          mapDivPostion={y}
+          states={state}
+        />
       </CoreModules.Stack>
     </CoreModules.Stack>
   );
