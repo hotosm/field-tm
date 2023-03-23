@@ -10,13 +10,31 @@ export default {
     return window.btoa(desimaal);
   },
   tasksStatus: [
-    { key: 'READY', value: ["LOCKED_FOR_MAPPING", "BAD"], action: 'none', status: 2 },
-    { key: 'LOCKED_FOR_MAPPING', value: ["READY", "MAPPED", "BAD"], action: 'qrcode', status: 1 },
-    { key: 'MAPPED', value: ["LOCKED_FOR_MAPPING", "LOCKED_FOR_VALIDATION", "BAD"], actin: 'none', status: 3 },
-    { key: 'LOCKED_FOR_VALIDATION', value: ["VALIDATED", "INVALIDATED", "BAD"], action: 'submissions', status: 4 },
-    { key: 'VALIDATED', value: [], action: 'none', status: 5 },
-    { key: 'INVALIDATED', value: ["LOCKED_FOR_MAPPING", "BAD"], action: 'none', status: 7 },
-    { key: 'BAD', value: [], action: 'none', status: 6 },
+    {
+      label: "READY",
+      action: [{ key: "Start Mapping", value: "LOCKED_FOR_MAPPING" }],
+    },
+    {
+      label: "LOCKED_FOR_MAPPING",
+      action: [
+        { key: "Mark as fully mapped", value: "MAPPED" },
+        { key: "Assign to someone else", value: "READY" },
+      ],
+    },
+    {
+      label: "MAPPED",
+      action: [
+        { key: "Start Validating", value: "LOCKED_FOR_VALIDATION" },
+        { key: "Return to Mapping", value: "LOCKED_FOR_MAPPING" },
+      ],
+    },
+    {
+      label: "LOCKED_FOR_VALIDATION",
+      action: [{key:"Confirm fully Mapped",value:"VALIDATED"},{key:"More Mapping Needed",value:"INVALIDATED"}],
+    },
+    { label: "VALIDATED", action: [] },
+    { label: "INVALIDATED", action: [{key:"Map Again",value:"LOCKED_FOR_MAPPING"}] },
+    { label: 'BAD', action: []},
     // "SPLIT",
     // "ARCHIVED",
   ],
