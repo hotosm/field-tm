@@ -27,7 +27,13 @@ const reducers = CoreModules.combineReducers({
     //you can persist your auth reducer here similar to project reducer
     home: HomeSlice.reducer,
     theme: ThemeSlice.reducer,
-    createproject: CreateProjectSlice.reducer,
+    createproject: persistReducer(
+        {
+            key: 'createproject',
+            storage
+        },
+        CreateProjectSlice.reducer
+    ),
 })
 // const middleware = routerMiddleware(history);
 

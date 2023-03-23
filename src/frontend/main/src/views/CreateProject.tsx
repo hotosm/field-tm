@@ -36,6 +36,8 @@ const CreateProject = () => {
               >
                 Create New Project
               </CoreModules.Typography>
+              <CoreModules.Box sx={{height:location.pathname !== '/create-project'?'8px':'12px',width:'64px',background:location.pathname !== '/create-project'?'#68707F':'#D73F3F',mx:'16px',borderRadius:'10px'}}></CoreModules.Box>
+              <CoreModules.Box sx={{height:location.pathname !== '/upload-area'?'8px':'12px',width:'64px', background:location.pathname !== '/upload-area'?'#68707F':'#D73F3F',mx:'16px',borderRadius:'10px'}}></CoreModules.Box>
             </CoreModules.Stack>
             <CoreModules.Stack sx={{paddingLeft:'13rem',paddingTop:'6rem'}} direction="row" spacing={13}>
               
