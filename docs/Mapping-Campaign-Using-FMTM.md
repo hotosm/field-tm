@@ -66,6 +66,6 @@ Overall, the **FMTM** tool is an important component of **HOT**'s efforts to sup
 
 8. Open your ODK collect app, tap on the icon on the top right hand corner of the app and select 'Add project'. Proceed to scan the code generated earlier on the FMTM website.
 
-> Note: If you just downloaded the app, click on **Configure with QR code** option.
+> Note: If you just downloaded the app, click on the **Configure with QR code** option.
 
 Now you can start field mapping!!
