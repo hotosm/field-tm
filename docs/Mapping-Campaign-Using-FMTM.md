@@ -3,7 +3,7 @@
 ## Table of content
 ### 1. Introduction
 
-### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Data Kit (ODK).
 
 ### 3. Steps On How To Use The FMTM Tool For A Mapping Campaign.
 
@@ -19,7 +19,7 @@ Mapping campaigns can be carried out for lots of different purposes, some exampl
 - Urban planning or;
 - Social and Political Activism.
 
-They often involve collaboration between organizations like; Government Agencies, Non-profit Groups and volunteers.
+They often involve collaboration between organizations like: Government Agencies, Non-profit Groups and volunteers.
 
 Once the data is collected, it is analyzed and processed to create detailed maps that can have a variety of use cases. These could be:
 
