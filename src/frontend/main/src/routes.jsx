@@ -10,6 +10,7 @@ import Forgot from './views/Forgot';
 import MainView from './views/MainView';
 import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
+import NewPage from './views/NewPage';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const routes = createBrowserRouter(
@@ -41,6 +42,12 @@ const routes = createBrowserRouter(
                     path: '/project_details/:id',
                     element: <Suspense fallback={<div></div>}>
                         <ProjectDetails />
+                    </Suspense>
+                },
+                {
+                    path: '/newpage/:id',
+                    element: <Suspense fallback={<div></div>}>
+                        <NewPage />
                     </Suspense>
                 },
                 {
