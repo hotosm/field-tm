@@ -33,6 +33,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
 from odkconvert.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
+from shapely import wkt
 from sqlalchemy import (
     column,
     insert,
@@ -291,6 +292,51 @@ def upload_xlsform(
     )
     db.execute(sql)
     db.commit()
+
+    return True
+
+
+def update_multi_polygon_project_boundary(
+    db: Session,
+    project_id: int,
+    boundary: str,        
+):
+
+    """ verify project exists in db """
+    db_project = get_project_by_id(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    """Update the boundary polyon on the database."""
+    polygons = boundary["features"]
+    for polygon in polygons:
+        task_name = str(polygon['properties']['id'])
+        db_task = db_models.DbTask(
+            project_id=project_id,
+            project_task_name=task_name,
+            outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
+            project_task_index=1,
+        )
+        db.add(db_task)
+        db.commit()
+
+    """ Generate project outline from tasks """
+    # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
+    #            FROM tasks 
+    #           where project_id={project_id};'''
+
+    query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
+                FROM tasks
+                WHERE project_id={project_id};'''
+    result = db.execute(query)
+    data = result.fetchone()
+
+    db_project.outline = data[0]
+    db_project.centroid = (wkt.loads(data[0])).centroid.wkt
+    db.commit()
+    db.refresh(db_project)
+    logger.debug("Added project boundary!")
 
     return True
 
