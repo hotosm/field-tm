@@ -117,6 +117,9 @@ Your env should look like this
     API_URL=http://127.0.0.1:8000
     FRONTEND_MAIN_URL=http://localhost:8080
     FRONTEND_MAP_URL=http://localhost:8081
+    
+    BACKEND_CORS_ORIGINS=http://localhost:8000
+
     # API_PREFIX=/api
 
     ### OSM ###
