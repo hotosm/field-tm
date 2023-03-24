@@ -1,0 +1,33 @@
+name: Dev Server Deploy
+
+on:
+  push:
+    branches: 
+      - development
+      - '*-development-*'
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Environment to .env
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
+        run: echo "${{ secrets.DOTENV }}" > .env
+
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Disable Host key verification
+        # Hack to prevent "Host key verification failed". Should be replaced with a ssh-keyscan based solution
+        run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Deploy
+        run: ssh fmtm-dev@ec2-3-108-14-126.ap-south-1.compute.amazonaws.com "cd /home/fmtm-dev/Projects/fmtm/;git pull origin development; docker compose --file docker-compose.prod.yml up -d --build"
