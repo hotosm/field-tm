@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     createBrowserRouter,
+    Navigate
 } from "react-router-dom";
 import Home from './views/Home';
 import Login from './views/Login';
@@ -20,6 +21,10 @@ const routes = createBrowserRouter(
                 {
                     path: "/",
                     element: <Home />,
+                },
+                {
+                    path: '/explore', 
+                    element: <Navigate to="/" />,
                 },
                 {
                     path: "/tabbed",
