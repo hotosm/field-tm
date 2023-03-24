@@ -48,8 +48,8 @@ const UploadArea = () => {
             <FormControl sx={{mb:3}}>
                 <CoreModules.FormLabel>Upload GEOJSON of Area</CoreModules.FormLabel>
                 <CoreModules.Button
-                variant="contained"
-                component="label"
+                    variant="contained"
+                    component="label"
                 >   
                     <CoreModules.Input
                         type="file"
