@@ -12,7 +12,7 @@ import Input from '@mui/material/Input';
 const UploadArea = () => {
     const [fileUpload,setFileUpload]= useState(null);
     const navigate = useNavigate();
-    // const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
 
@@ -51,14 +51,14 @@ const UploadArea = () => {
                 variant="contained"
                 component="label"
                 >   
-                    <Input
+                    <CoreModules.Input
                         type="file"
                         onChange={(e)=>{  
                             setFileUpload(e.target.files)}
                         }
                     />
                 </CoreModules.Button>
-                {!fileUpload  &&<CoreModules.FormLabel component="h3">Geojson file is required.</CoreModules.FormLabel>}
+                {!fileUpload  &&<CoreModules.FormLabel component="h3" sx={{mt:2,color: defaultTheme.palette.error.main}}>Geojson file is required.</CoreModules.FormLabel>}
             </FormControl>
             {/* END */}
 
@@ -66,8 +66,11 @@ const UploadArea = () => {
             <CoreModules.Button 
                 variant="contained"
                 color="error"
+                disabled={!fileUpload?true:false}
                 onClick={()=> {
-                    dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${projectId}/upload`,fileUpload))
+                    if(fileUpload){
+                        dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${projectId}/upload`,fileUpload))
+                    }
                 }}
             >
                 Submit
