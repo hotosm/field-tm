@@ -7,6 +7,7 @@ import FormGroup from '@mui/material/FormGroup'
 import { UploadAreaService } from "../../api/CreateProjectService";
 import { useNavigate } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import Input from '@mui/material/Input';
 
 const UploadArea = () => {
     const [fileUpload,setFileUpload]= useState(null);
@@ -32,7 +33,10 @@ const UploadArea = () => {
         if(projectArea !== null){
             navigate('/');
             dispatch(CreateProjectActions.ClearCreateProjectFormData())
-
+            
+        }
+        return ()=>{
+            dispatch(CreateProjectActions.ClearCreateProjectFormData())
         }
 
     }, [projectArea])
@@ -42,20 +46,19 @@ const UploadArea = () => {
         <FormGroup >
             {/* Form Geojson File Upload For Create Project */}
             <FormControl sx={{mb:3}}>
+                <CoreModules.FormLabel>Upload GEOJSON of Area</CoreModules.FormLabel>
                 <CoreModules.Button
                 variant="contained"
                 component="label"
-                >
-                    Upload File
-                    <input
+                >   
+                    <Input
                         type="file"
-                        onChange={(e)=>{
-                            console.log(e.target.files,'files');    
+                        onChange={(e)=>{  
                             setFileUpload(e.target.files)}
                         }
-                        hidden
-                        />
+                    />
                 </CoreModules.Button>
+                {!fileUpload  &&<CoreModules.FormLabel component="h3">Geojson file is required.</CoreModules.FormLabel>}
             </FormControl>
             {/* END */}
 
@@ -66,8 +69,8 @@ const UploadArea = () => {
                 onClick={()=> {
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${projectId}/upload`,fileUpload))
                 }}
-                >
-                Next
+            >
+                Submit
             </CoreModules.Button>
             {/* END */}
         </FormGroup>
