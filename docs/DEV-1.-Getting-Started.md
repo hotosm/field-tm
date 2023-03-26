@@ -148,22 +148,24 @@ For details on how to run this project locally for development, please look at: 
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1.  Navigate to `API_URL/docs`
+1.  Navigate to `http://127.0.0.1:8000/docs`
 
     Three endpoints are responsible for oauth
     <img width="698" alt="image" src="../images/endpoints_responsible_for_auth_screenshot-2023-03-26-092756.png">
 
-2.  Hit `/auth/osm_login/` : This will give you the Login URL where you can supply your osm username/password
+2.  Select the `/auth/osm_login/` endpoint, click `Try it out` and then `Execute`.  
+    This would give you the Login URL where you can supply your osm username and password.
 
-    Response should be like this :
+    Your response should look like this:
 
         {"login_url": "https://www.openstreetmap.org/oauth2/authorize/?response_type=code&client_id=xxxx"}
 
-    Now Copy your login_url and hit it in new tab, and you will be redirected to OSM for your LOGIN. Give FMTM the necessary permission
+    Now copy and paste your login_url in a new tab. You would be redirected to OSM for your LOGIN. Give FMTM the necessary permission.
 
-    After successful login, you will get your `access_token` for FMTM Copy it and now you can use it for rest of the endpoints that need authorizations
+    After a successful login, you will get your `access_token` for FMTM, Copy it. Now, you can use it for rest of the endpoints that needs authorization.
 
-3.  Check your access token: Hit `/auth/me/` and pass your `access_token` You should get your osm id, username and profile picture id
+3.  Check your access token: Select the `/auth/me/` endpoint and click `Try it out`.  
+    Pass in the `access_token` you copied in the previous step into the `access-token` field and click `Execute`. You should get your osm id, username and profile picture id.
 
 # Start Developing
 
