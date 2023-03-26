@@ -151,7 +151,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 1.  Navigate to `API_URL/docs`
 
     Three endpoints are responsible for oauth
-    <img width="698" alt="image" src="https://user-images.githubusercontent.com/36752999/216319601-949c4262-782f-4da4-ae26-dac81c141403.png">
+    <img width="698" alt="image" src="../images/endpoints_responsible_for_auth_screenshot-2023-03-26-092756.png">
 
 2.  Hit `/auth/osm_login/` : This will give you the Login URL where you can supply your osm username/password
 
