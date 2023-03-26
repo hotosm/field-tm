@@ -30,6 +30,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from ..config import settings
+from ..db import db_models
 
 url = settings.ODK_CENTRAL_URL
 user = settings.ODK_CENTRAL_USER
@@ -120,6 +121,14 @@ def list_submissions(project_id: int):
             submissions.append(subm)
 
     return submissions
+
+
+def get_form_list(
+        db:Session,
+        skip:int,
+        limit:int
+    ):
+    return db.query(db_models.DbXForm.id, db_models.DbXForm.title).offset(skip).limit(limit).all()
 
 
 def download_submissions(project_id: int, xform_id: str):
