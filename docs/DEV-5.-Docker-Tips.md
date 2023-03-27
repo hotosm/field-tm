@@ -1,6 +1,6 @@
 # Docker organization
 
-When `docker-compose` is ran:
+When `docker-compose` is run:
 
 - the scripts in `Dockerfile` run (there is also a `Dockerfile.prod` for production)
 - for each container (`db`,`api`,`web`, etc.):

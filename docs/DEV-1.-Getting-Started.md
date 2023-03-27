@@ -45,7 +45,7 @@ Make sure to give your branch a descriptive name that reflects the changes you'l
 
 ### 6. Make changes
 
-Make your cotribution, run tests where needed and save.
+Make your contribution, run tests where needed and save.
 
 ### 7. Add changes
 
@@ -67,8 +67,8 @@ Make sure to write a descriptive commit message that explains the changes you've
 
 ### 9. Submit a pull request
 
-Go to your forked repository on GitHub and click the "New pull request" button.  
-Select the branch that contains your changes, then click "Create pull request".  
+Go to your forked repository on GitHub and click the "Pull requests" tab.  
+Change the base branch from `main` to `development`, select the branch that contains your changes from the compare branch, then click "Create pull request".  
 This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
 > Note: After a PR has been approved and merged, if the branch is no longer in use, delete it both locally and remotely. Otherwise we get buried in dead branches we don't need.  
@@ -117,6 +117,9 @@ Your env should look like this
     API_URL=http://127.0.0.1:8000
     FRONTEND_MAIN_URL=http://localhost:8080
     FRONTEND_MAP_URL=http://localhost:8081
+    
+    BACKEND_CORS_ORIGINS=http://localhost:8000
+
     # API_PREFIX=/api
 
     ### OSM ###

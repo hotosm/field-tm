@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from typing import List
+from typing import List, Union
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
@@ -27,22 +27,23 @@ from ..users.user_schemas import User
 
 
 class ProjectInfo(BaseModel):
-    locale: str
     name: str
     short_description: str
     description: str
-    instructions: str
-    per_task_instructions: str
-
     class Config:
         orm_mode = True
+
+class ProjectUpdate(BaseModel):
+    name: Union[str, None]
+    short_description: Union[str, None]
+    description: Union[str, None]
 
 
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    city: str
-    country: str
+    # city: str
+    # country: str
 
 
 class ProjectSummary(BaseModel):
@@ -66,10 +67,9 @@ class ProjectBase(BaseModel):
     id: int
     odkid: int
     author: User
-    default_locale: str
     project_info: List[ProjectInfo]
     status: ProjectStatus
-    location_str: str
+    # location_str: str
     outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
 
