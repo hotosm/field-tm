@@ -17,9 +17,9 @@ export default function Dialog({ taskId, feature, map, view }) {
     (project) => project.id == currentProjectId
   );
   const currentStatus = {
-    ...projectData[projectIndex].taskBoundries.filter((task) => {
+    ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task.id == taskId;
-    })[0],
+    })?.[0],
   };
 
   const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
