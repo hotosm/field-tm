@@ -211,6 +211,29 @@ async def upload_custom_xls(
     return {"Message": f"{project_id}"}
 
 
+@router.post("/{project_id}/upload_multi_polygon")
+async def upload_multi_project_boundary(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+    ):
+
+    # read entire file
+    content = await upload.read()
+    boundary = json.loads(content)
+
+    '''Create tasks for each polygon '''
+    result = project_crud.update_multi_polygon_project_boundary(db, project_id, boundary)
+
+    if not result:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+
+    return {"message":"Project Boundary Uploaded",
+            "project_id": f"{project_id}"}
+
+
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
     project_id: int,
@@ -233,7 +256,6 @@ async def upload_project_boundary(
     # type = DataCategory()
     # result = project_crud.generate_appuser_files(db, grid, project_id)
 
-    # FIXME: fix return value
     return {"message":"Project Boundary Uploaded",
             "project_id": f"{project_id}"}
 

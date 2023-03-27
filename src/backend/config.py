@@ -65,6 +65,8 @@ class Settings(BaseSettings):
     FMTM_DB_USER: Optional[str] = "fmtm"
     FMTM_DB_PASSWORD: Optional[str] = "fmtm"
     FMTM_DB_NAME: Optional[str] = "fmtm"
+    FMTM_TEST_DB_NAME: Optional[str] = "fmtm_test"
+
     DB_URL: Optional[PostgresDsn]
 
     @validator("DB_URL", pre=True)
