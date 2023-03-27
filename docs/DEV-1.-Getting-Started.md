@@ -45,7 +45,7 @@ Make sure to give your branch a descriptive name that reflects the changes you'l
 
 ### 6. Make changes
 
-Make your cotribution, run tests where needed and save.
+Make your contribution, run tests where needed and save.
 
 ### 7. Add changes
 
@@ -117,6 +117,9 @@ Your env should look like this
     API_URL=http://127.0.0.1:8000
     FRONTEND_MAIN_URL=http://localhost:8080
     FRONTEND_MAP_URL=http://localhost:8081
+    
+    BACKEND_CORS_ORIGINS=http://localhost:8000
+
     # API_PREFIX=/api
 
     ### OSM ###

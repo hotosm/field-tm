@@ -26,7 +26,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-
 from ..central import central_crud
 from ..db import database
 from ..projects import project_crud
@@ -66,6 +65,16 @@ async def create_appuser(
 #     submissions = central_crud.list_submissions(project_id)
 #     logger.info("/central/list_submissions is Unimplemented!")
 #     return {"data": submissions}
+
+
+@router.get("/list-forms")
+async def get_form_lists(
+    db: Session = Depends(database.get_db),
+    skip: int = 0,
+    limit: int = 100
+):
+    forms = central_crud.get_form_list(db, skip, limit)
+    return forms
 
 
 @router.get("/download_submissions")
