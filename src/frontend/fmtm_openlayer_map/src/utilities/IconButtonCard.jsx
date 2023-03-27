@@ -5,8 +5,8 @@ export default function IconButtonCard({ element, style, radius }) {
 
         <CoreModules.Stack
             style={style}
-            width={50}
-            height={50}
+            width={40}
+            height={40}
             borderRadius={radius == undefined ? 55 : radius}
             boxShadow={2}
             justifyContent={'center'}
