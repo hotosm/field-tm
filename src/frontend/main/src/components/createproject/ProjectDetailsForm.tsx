@@ -50,7 +50,9 @@ const ProjectDetailsForm = () => {
 
     const submission = () => {
         // eslint-disable-next-line no-use-before-define
-        submitForm();
+        // submitForm();
+        navigate("/upload-area", { replace: true, state: { values: values } });
+
     };
 
     //   errors
