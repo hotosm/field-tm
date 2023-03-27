@@ -51,16 +51,16 @@ const UploadArea = () => {
     const dispatch = CoreModules.useDispatch()
     // //dispatch function to perform redux state mutation
 
-    const projectArea = CoreModules.useSelector((state) => state.createproject.projectArea);
+    const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const projectDetailsResponse = CoreModules.useSelector((state) => state.createproject.projectDetailsResponse);
+    const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const formCategory = CoreModules.useSelector((state) => state.createproject.formCategory);
+    const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
     // //we use use selector from redux to get all state of formCategory from createProject slice
 
-    const projectDetails = CoreModules.useSelector((state) => state.createproject.projectDetails);
+    const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
     // const { id: projectId } = projectDetailsResponse;
@@ -85,7 +85,7 @@ const UploadArea = () => {
     }, [])
     // END
 
-    const formCategoryData = formCategory.map(
+    const formCategoryData = formCategoryList.map(
         item => ({ label: item.title, value: item.title })
     );
     const algorithmListData = ['Divide on Square', 'Custom Multipolygon', 'Openstreet Map Extract'].map(
