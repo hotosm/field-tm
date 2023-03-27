@@ -9,7 +9,7 @@ const CreateProject = CoreModules.createSlice({
         projectDetailsLoading:false,
         projectArea:null,
         projectAreaLoading:false,
-        formCategoryList:null,
+        formCategoryList:[],
     },
     reducers: {
         SetProjectDetails(state, action) {
