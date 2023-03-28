@@ -27,7 +27,7 @@ Once the data is collected, it is analyzed and processed to create detailed maps
 - Planning infrastructure and development projects.
 - Understanding the impact of environmental changes on the landscape, etc.
 
-### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Data Kit (ODK).
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit organization that uses open mapping data to support humanitarian and disaster response efforts around the world. **The Field Mapping Task Manager (FMTM)** is one of the tools that **HOT** used to coordinate and manage mapping projects.
 
