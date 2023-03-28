@@ -2,14 +2,37 @@ import React from "react";
 import windowDimention from "../hooks/WindowDimension";
 import PrimaryAppBar from "../utilities/PrimaryAppBar";
 import CoreModules from "../shared/CoreModules";
+import CustomizedSnackbars from "../utilities/CustomizedSnackbar";
+import { CommonActions } from "../store/slices/CommonSlice";
 
 const MainView = () => {
     const dispatch = CoreModules.useDispatch();
     const { windowSize } = windowDimention();
     const checkTheme = CoreModules.useSelector(state => state.theme.hotTheme)
-    const theme = CoreModules.createTheme(checkTheme)
+    const theme = CoreModules.createTheme(checkTheme)  
+    const stateSnackBar = CoreModules.useSelector((state) => state.common.snackbar);
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        dispatch(
+            CommonActions.SetSnackBar({
+                open: false,
+                message: stateSnackBar.message,
+                variant: stateSnackBar.variant,
+                duration: 0,
+            })
+        );
+    };
     return (
         <CoreModules.ThemeProvider theme={theme}>
+            <CustomizedSnackbars
+                duration={stateSnackBar.duration}
+                open={stateSnackBar.open}
+                variant={stateSnackBar.variant}
+                message={stateSnackBar.message}
+                handleClose={handleClose}
+            />
             <CoreModules.CssBaseline />
             <CoreModules.Paper>
                 <CoreModules.Container disableGutters={true} maxWidth={false}>
