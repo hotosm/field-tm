@@ -117,9 +117,6 @@ Your env should look like this
     API_URL=http://127.0.0.1:8000
     FRONTEND_MAIN_URL=http://localhost:8080
     FRONTEND_MAP_URL=http://localhost:8081
-    
-    BACKEND_CORS_ORIGINS=http://localhost:8000
-
     # API_PREFIX=/api
 
     ### OSM ###
@@ -141,6 +138,8 @@ Your env should look like this
     FMTM_DB_PASSWORD=fmtm
     FMTM_DB_NAME=fmtm'
 
+> Note: If extra cors origins are required for testing, the variable `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g. <http://localhost:7050,http://localhost:7051>
+
 ## Verify Setup
 
 ### Check Deployment
@@ -151,12 +150,12 @@ For details on how to run this project locally for development, please look at: 
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1.  Navigate to `http://127.0.0.1:8000/docs`
+1. Navigate to `http://127.0.0.1:8000/docs`
 
     Three endpoints are responsible for oauth
     <img width="698" alt="image" src="../images/endpoints_responsible_for_auth_screenshot-2023-03-26-092756.png">
 
-2.  Select the `/auth/osm_login/` endpoint, click `Try it out` and then `Execute`.  
+2. Select the `/auth/osm_login/` endpoint, click `Try it out` and then `Execute`.  
     This would give you the Login URL where you can supply your osm username and password.
 
     Your response should look like this:
@@ -167,7 +166,7 @@ Once you have deployed, you will need to check that you can properly authenticat
 
     After a successful login, you will get your `access_token` for FMTM, Copy it. Now, you can use it for rest of the endpoints that needs authorization.
 
-3.  Check your access token: Select the `/auth/me/` endpoint and click `Try it out`.  
+3. Check your access token: Select the `/auth/me/` endpoint and click `Try it out`.  
     Pass in the `access_token` you copied in the previous step into the `access-token` field and click `Execute`. You should get your osm id, username and profile picture id.
 
 # Start Developing
