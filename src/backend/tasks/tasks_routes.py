@@ -84,3 +84,11 @@ async def update_task_status(
         return task
     else:
         raise HTTPException(status_code=404, detail="Task status could not be updated.")
+
+
+@router.post("/task-qr-code/{task_id}")
+async def get_qr_code_list(
+    task_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+    return tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
