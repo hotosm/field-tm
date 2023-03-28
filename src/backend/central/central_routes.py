@@ -73,6 +73,20 @@ async def get_form_lists(
     skip: int = 0,
     limit: int = 100
 ):
+    '''
+    This function retrieves a list of XForms from a database, 
+    with the option to skip a certain number of records and limit the number of records returned.
+
+    
+    Parameters:
+    skip:int: the number of records to skip before starting to retrieve records. Defaults to 0 if not provided.
+    limit:int: the maximum number of records to retrieve. Defaults to 10 if not provided.
+
+
+    Returns:
+    A list of dictionary containing the id and title of each XForm record retrieved from the database.
+    '''
+
     forms = central_crud.get_form_list(db, skip, limit)
     return forms
 

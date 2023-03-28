@@ -218,6 +218,19 @@ async def upload_multi_project_boundary(
     db: Session = Depends(database.get_db),
     ):
 
+    '''
+    This API allows for the uploading of a multi-polygon project boundary 
+        in JSON format for a specified project ID. Each polygon in the uploaded geojson are made a single task.
+
+    Required Parameters:
+    project_id: ID of the project to which the boundary is being uploaded.
+    upload: a file upload containing the multi-polygon boundary in geojson format.
+
+    Returns:
+    A success message indicating that the boundary was successfully uploaded.
+    If the project ID does not exist in the database, an HTTP 428 error is raised.
+    '''
+
     # read entire file
     content = await upload.read()
     boundary = json.loads(content)
@@ -249,7 +262,6 @@ async def upload_project_boundary(
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
-        return f"No project with id {project_id}"
 
     # Use the ID we get from Central, as it's needed for many queries
     eval(project_crud.create_task_grid(db, project_id))
