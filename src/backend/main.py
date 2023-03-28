@@ -22,7 +22,7 @@ import os
 import sys
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -38,6 +38,9 @@ from .projects import project_routes
 from .projects.project_crud import read_xlsforms
 from .tasks import tasks_routes
 from .users import user_routes
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
@@ -97,6 +100,17 @@ def get_application() -> FastAPI:
 
 
 api = get_application()
+
+
+@api.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for error in exc.errors():
+        errors.append({"loc": error["loc"],
+                       "msg":error["msg"],
+                       "error":error["msg"] + str([x for x in error["loc"]])
+                        })
+    return JSONResponse(status_code=400, content={"errors": errors})
 
 
 @api.on_event("startup")
