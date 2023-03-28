@@ -237,6 +237,7 @@ def create_project_with_project_info(
 ):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
+    xform_title = project_metadata.xform_title
 
     # verify data coming in
     if not user:
@@ -257,6 +258,7 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
+        xform_title= xform_title
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )

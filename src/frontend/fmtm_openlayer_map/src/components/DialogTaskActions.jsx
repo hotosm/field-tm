@@ -21,6 +21,11 @@ export default function Dialog({ taskId, feature, map, view }) {
   const projectIndex = projectData.findIndex(
     (project) => project.id == currentProjectId
   );
+  const currentStatus = {
+    ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
+      return task.id == taskId;
+    })?.[0],
+  };
 
   useEffect(() => {
     if (projectIndex != -1) {

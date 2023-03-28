@@ -64,3 +64,8 @@ export interface CreateProjectDetailsModel {
       task_status_str: string;
     }[];
   }
+
+  export interface FormCategoryListModel {
+    id: number,
+    title: string,
+  }

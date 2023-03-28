@@ -9,6 +9,7 @@ const CreateProject = CoreModules.createSlice({
         projectDetailsLoading:false,
         projectArea:null,
         projectAreaLoading:false,
+        formCategoryList:[],
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -30,6 +31,15 @@ const CreateProject = CoreModules.createSlice({
         },
         PostUploadAreaSuccess(state, action) {
             state.projectArea = action.payload
+        },
+        GetFormCategoryLoading(state, action) {
+            state.formCategoryLoading = action.payload
+        },
+        GetFormCategoryList(state, action) {
+            state.formCategoryList = action.payload
+        },
+        SetFormCategory(state, action) {
+            state.formCategoryList = action.payload
         },
     }
 })
