@@ -53,6 +53,9 @@ class Settings(BaseSettings):
             values.get("FRONTEND_MAP_URL"),
         ]
 
+        if val is None:
+            return default_origins
+
         if isinstance(val, str):
             default_origins += [i.strip() for i in val.split(",")]
             return default_origins
