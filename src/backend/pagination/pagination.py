@@ -21,6 +21,7 @@ def paginate_data(
     next_page, prev_page = get_pages_nav(total_pages, page_no)
 
     return {
+        'count':total_content,
         'next_page':next_page,
         'prev_page':prev_page,
         'results':data
