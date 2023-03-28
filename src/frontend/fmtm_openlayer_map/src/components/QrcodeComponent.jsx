@@ -6,8 +6,10 @@ import { ProjectFilesById } from "../api/Files";
 import { ShareSocial } from "react-share-social";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
+import { HomeActions } from "fmtm/HomeSlice";
 
 const TasksComponent = ({ type, task, defaultTheme }) => {
+  const dispatch = CoreModules.useDispatch();
   const [open, setOpen] = useState(false);
   const params = CoreModules.useParams();
   const { loading, qrcode } = ProjectFilesById(
@@ -60,7 +62,11 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                     </CoreModules.SkeletonTheme>
                   </CoreModules.Stack>
                 ) : (
-                  <img id="qrcodeImg" src={`data:image/png;base64,${qrcode}`} alt="qrcode" />
+                  <img
+                    id="qrcodeImg"
+                    src={`data:image/png;base64,${qrcode}`}
+                    alt="qrcode"
+                  />
                 )}
               </CoreModules.Stack>
 
@@ -85,11 +91,13 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                       downloadLink.download = `Task_${task}`;
                       downloadLink.click();
                     }}
-                    disabled={loading}
+                    disabled={qrcode == "" ? true : false}
                     color="info"
                     aria-label="download qrcode"
                   >
-                    <AssetModules.FileDownloadIcon sx={{ fontSize: defaultTheme.typography.fontSize }} />
+                    <AssetModules.FileDownloadIcon
+                      sx={{ fontSize: defaultTheme.typography.fontSize }}
+                    />
                   </CoreModules.IconButton>
                 </CoreModules.Stack>
 
@@ -102,13 +110,23 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                 >
                   <CoreModules.IconButton
                     onClick={() => {
-                      setOpen(true);
+                      dispatch(
+                        HomeActions.SetSnackBar({
+                          open: true,
+                          message: `not implemented`,
+                          variant: "warning",
+                          duration: 3000,
+                        })
+                      );
+                      // setOpen(true);
                     }}
-                    disabled={loading}
+                    disabled={qrcode == "" ? true : false}
                     color="info"
                     aria-label="share qrcode"
                   >
-                    <AssetModules.ShareIcon sx={{ fontSize: defaultTheme.typography.fontSize }} />
+                    <AssetModules.ShareIcon
+                      sx={{ fontSize: defaultTheme.typography.fontSize }}
+                    />
                   </CoreModules.IconButton>
 
                   {/* <BasicDialog
