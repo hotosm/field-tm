@@ -138,10 +138,36 @@ services:
       - pyxform
     env_file:
       - .env
+    environment:
+      - DOMAIN=local
+      - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
+      - HTTPS_PORT=${HTTPS_PORT:-443}
+      - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
+      - DB_USER=${CENTRAL_DB_USER:-odk}
+      - DB_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
+      - DB_NAME=${CENTRAL_DB_NAME:-odk}
+      - DB_SSL=${DB_SSL:-null}
+      - EMAIL_FROM=${ODK_CENTRAL_USER}
+      - EMAIL_HOST=${EMAIL_HOST:-mail}
+      - EMAIL_PORT=${EMAIL_PORT:-25}
+      - EMAIL_SECURE=${EMAIL_SECURE:-false}
+      - EMAIL_IGNORE_TLS=${EMAIL_IGNORE_TLS:-true}
+      - EMAIL_USER=${EMAIL_USER:-''}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
+      - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
+      - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
+      - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
     ports:
       - "8383:8383"
     networks:
       - fmtm-dev
+    command:
+      [
+        "./wait-for-it.sh",
+        "${CENTRAL_DB_HOST:-central-db}:5432",
+        "--",
+        "./init-user-and-start.sh",
+      ]
     restart: unless-stopped
 
   central-proxy:
