@@ -2,6 +2,7 @@ import axios from 'axios';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import { CreateProjectDetailsModel, FormCategoryListModel } from '../models/createproject/createProjectModel';
 import enviroment from "../environment";
+import { CommonActions } from '../store/slices/CommonSlice';
 
 
 const CreateProjectService: Function = (url: string,payload: any,fileUpload: any) => {
@@ -17,11 +18,32 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                 if(payload.splitting_algorithm === 'Custom Multipolygon'){
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
                 }
-                dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload));
-                dispatch(CreateProjectActions.PostProjectDetails(resp));
+                await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload));
+                await dispatch(CreateProjectActions.PostProjectDetails(resp));
+                // Added Snackbar toast for success message 
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: 'Project Successfully Created.',
+                        variant: "success",
+                        duration: 2000,
+                    })
+                );
+                // END
 
             } catch (error) {
-                console.log(error,'error');
+                console.log(error.response,'error');
+
+                // Added Snackbar toast for error message 
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong.' ,
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
+                //END
                 dispatch(CreateProjectActions.CreateProjectLoading(false));
             }
         }
@@ -72,7 +94,16 @@ const UploadAreaService: Function = (url: string,payload: any) => {
                 // const resp: UploadAreaDetailsModel = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.UploadAreaLoading(false))
                 await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
+                
             } catch (error) {
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: JSON.stringify(error.response.data.detail),
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
                 dispatch(CreateProjectActions.UploadAreaLoading(false))
             }
         }
