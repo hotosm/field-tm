@@ -73,7 +73,7 @@ class ProjectBase(BaseModel):
     # location_str: str
     outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
-    xform_title: str
+    xform_title: str = None
 
     class Config:
         orm_mode = True
