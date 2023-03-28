@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import environment from "fmtm/environment";
 import ProjectTaskStatus from "../api/ProjectTaskStatus";
 import MapStyles from "../hooks/MapStyles";
 import CoreModules from "fmtm/CoreModules";
+import { useEffect } from "react";
 
 export default function Dialog({ taskId, feature, map, view }) {
   // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
   const projectData = CoreModules.useSelector(
     (state) => state.project.projectTaskBoundries
   );
+
+  const [list_of_task_status, set_list_of_task_status] = useState([]);
+  const [task_status, set_task_status] = useState("READY");
+
   const geojsonStyles = MapStyles();
   const dispatch = CoreModules.useDispatch();
   const params = CoreModules.useParams();
@@ -22,20 +27,34 @@ export default function Dialog({ taskId, feature, map, view }) {
     })?.[0],
   };
 
-  const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
-    (data) => data.label == currentStatus.task_status_str
-  );
-  const tasksStatus =
-    feature.id_ != undefined
-      ? environment.tasksStatus[findCorrectTaskStatusIndex]["label"]
-      : "";
-  const tasksStatusList =
-    feature.id_ != undefined
-      ? environment.tasksStatus[findCorrectTaskStatusIndex]["action"]
-      : [];
-  const tasksList = environment.tasksStatus.map((status) => {
-    return status.key;
-  });
+  useEffect(() => {
+    if (projectIndex != -1) {
+      const currentStatus = {
+        ...projectData[projectIndex].taskBoundries.filter((task) => {
+          return task.id == taskId;
+        })[0],
+      };
+
+      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
+        (data) => data.label == currentStatus.task_status_str
+      );
+      const tasksStatus =
+        feature.id_ != undefined
+          ? environment.tasksStatus[findCorrectTaskStatusIndex]["label"]
+          : "";
+      set_task_status(tasksStatus);
+      const tasksStatusList =
+        feature.id_ != undefined
+          ? environment.tasksStatus[findCorrectTaskStatusIndex]["action"]
+          : [];
+
+      set_list_of_task_status(tasksStatusList);
+    }
+  }, [projectData,taskId,feature]);
+
+  // const tasksList = environment.tasksStatus.map((status) => {
+  //   return status.key;
+  // });
 
   const handleOnClick = (event) => {
     const status = event.target.id;
@@ -64,18 +83,18 @@ export default function Dialog({ taskId, feature, map, view }) {
   return (
     <CoreModules.Stack direction={"column"} spacing={2}>
       <CoreModules.Stack direction={"row"} pl={1}>
-        <CoreModules.Typography fontWeight={'bold'} variant="h3">
+        <CoreModules.Typography fontWeight={"bold"} variant="h3">
           {`Task : ${taskId}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
       <CoreModules.Stack direction={"row"} pl={1}>
         <CoreModules.Typography variant="h3">
-          {`STATUS : ${tasksStatus.replaceAll("_", " ")}`}
+          {`STATUS : ${task_status.replaceAll("_", " ")}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
 
-      {tasksStatusList.map((data, index) => {
-        return tasksStatusList.length != 0 ? (
+      {list_of_task_status.map((data, index) => {
+        return list_of_task_status.length != 0 ? (
           <CoreModules.Button
             id={data.value}
             key={index}
