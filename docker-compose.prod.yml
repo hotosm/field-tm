@@ -19,7 +19,6 @@ version: "3"
 
 volumes:
   fmtm_db_data:
-  central_db_data:
   traefik-public-certificates:
 
 networks:
@@ -82,7 +81,6 @@ services:
     container_name: fmtm_api
     depends_on:
       - fmtm-db
-      - central-proxy
       - traefik
     env_file:
       - .env
@@ -144,48 +142,3 @@ services:
       - "traefik.http.routers.ui-map.rule=Host(`map.fmtm.hotosm.org`)"
       - "traefik.http.services.ui-map-svc.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui-map.service=ui-map-svc"
-
-  central-db:
-    image: postgis/postgis:14-3.3-alpine
-    container_name: central_db
-    volumes:
-      - central_db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
-      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
-    networks:
-      - fmtm-prod
-    restart: unless-stopped
-
-  central:
-    image: "quay.io/hotosm/odkcentral-api:latest"
-    build:
-      context: odkcentral/api
-    container_name: central_api
-    depends_on:
-      - central-db
-      - pyxform
-    env_file:
-      - .env
-    networks:
-      - fmtm-prod
-    restart: unless-stopped
-
-  central-proxy:
-    image: "quay.io/hotosm/odkcentral-proxy:latest"
-    build:
-      context: odkcentral/proxy
-    container_name: central_proxy
-    depends_on:
-      - central
-    networks:
-      - fmtm-prod
-    restart: unless-stopped
-
-  pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
-    container_name: central_pyxform
-    networks:
-      - fmtm-prod
-    restart: always
