@@ -7,7 +7,7 @@ We welcome and encourage contributors of all skill levels, and we are committed 
 
 You can see an overview of the project and the process we have gone through in developing FMTM so far in these [slides](https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0)
 
-Furthermore, there are many ways to contribute to the **Field Mapping Tasking Manager (FMTM)**, including:
+Furthermore, there are many ways to contribute to the **Field Mapping Tasking Manager (FMTM)**, which includes:
 
 ## Testing
 
