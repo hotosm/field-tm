@@ -136,8 +136,6 @@ services:
     depends_on:
       - central-db
       - pyxform
-    env_file:
-      - .env
     environment:
       - DOMAIN=local
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
