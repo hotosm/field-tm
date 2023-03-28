@@ -28,6 +28,7 @@ from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 from ..config import settings
 from ..db import db_models
@@ -128,7 +129,11 @@ def get_form_list(
         skip:int,
         limit:int
     ):
-    return db.query(db_models.DbXForm.id, db_models.DbXForm.title).offset(skip).limit(limit).all()
+    """Returns the list of id and title of xforms from the database"""
+    try:
+        return db.query(db_models.DbXForm.id, db_models.DbXForm.title).offset(skip).limit(limit).all()
+    except Exception as e:
+        raise HTTPException(e)
 
 
 def download_submissions(project_id: int, xform_id: str):
