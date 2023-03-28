@@ -301,44 +301,61 @@ def update_multi_polygon_project_boundary(
     project_id: int,
     boundary: str,        
 ):
+    """
+        This function receives the project_id and boundary as a parameter
+        and creates a task for each polygon in the database. 
+        This function also creates a project outline from the multiple polygons received.
+    """
 
-    """ verify project exists in db """
-    db_project = get_project_by_id(db, project_id)
-    if not db_project:
-        logger.error(f"Project {project_id} doesn't exist!")
-        return False
+    try:
+        """ verify project exists in db """
+        db_project = get_project_by_id(db, project_id)
+        if not db_project:
+            logger.error(f"Project {project_id} doesn't exist!")
+            return False
 
-    """Update the boundary polyon on the database."""
-    polygons = boundary["features"]
-    for polygon in polygons:
-        task_name = str(polygon['properties']['id'])
-        db_task = db_models.DbTask(
-            project_id=project_id,
-            project_task_name=task_name,
-            outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
-            project_task_index=1,
-        )
-        db.add(db_task)
+        """Update the boundary polyon on the database."""
+        polygons = boundary["features"]
+        for polygon in polygons:
+
+            """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
+            remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
+
+            """ Apply the lambda function to each coordinate in its geometry """
+            list(map(remove_z_dimension, polygon['geometry']['coordinates'][0]))
+
+            db_task = db_models.DbTask(
+                project_id=project_id,
+                outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
+                project_task_index=1,
+            )
+            db.add(db_task)
+            db.commit()
+
+            """ Id is passed in the task_name too. """
+            db_task.project_task_name = str(db_task.id)
+            db.commit()
+
+        """ Generate project outline from tasks """
+        # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
+        #            FROM tasks 
+        #           where project_id={project_id};'''
+
+        query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
+                    FROM tasks
+                    WHERE project_id={project_id};'''
+        result = db.execute(query)
+        data = result.fetchone()
+
+        db_project.outline = data[0]
+        db_project.centroid = (wkt.loads(data[0])).centroid.wkt
         db.commit()
+        db.refresh(db_project)
+        logger.debug("Added project boundary!")
 
-    """ Generate project outline from tasks """
-    # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
-    #            FROM tasks 
-    #           where project_id={project_id};'''
-
-    query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
-                FROM tasks
-                WHERE project_id={project_id};'''
-    result = db.execute(query)
-    data = result.fetchone()
-
-    db_project.outline = data[0]
-    db_project.centroid = (wkt.loads(data[0])).centroid.wkt
-    db.commit()
-    db.refresh(db_project)
-    logger.debug("Added project boundary!")
-
-    return True
+        return True
+    except Exception as e:
+        raise HTTPException(e)
 
 
 def update_project_boundary(
