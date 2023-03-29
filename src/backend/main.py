@@ -16,16 +16,18 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+"""Entrypoint for FastAPI app."""
 
 import logging
 import os
 import sys
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from odkconvert.xlsforms import xlsforms_path
 
 from .__version__ import __version__
@@ -64,7 +66,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_application() -> FastAPI:
-
+    """Get the FastAPI app instance, with settings."""
     _app = FastAPI(
         title=settings.APP_NAME,
         description="HOTOSM Field Tasking Manager",
@@ -78,7 +80,7 @@ def get_application() -> FastAPI:
 
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_origins=settings.EXTRA_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -99,6 +101,21 @@ def get_application() -> FastAPI:
 api = get_application()
 
 
+@api.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Exception handler for more descriptive logging."""
+    errors = []
+    for error in exc.errors():
+        errors.append(
+            {
+                "loc": error["loc"],
+                "msg": error["msg"],
+                "error": error["msg"] + str([x for x in error["loc"]]),
+            }
+        )
+    return JSONResponse(status_code=400, content={"errors": errors})
+
+
 @api.on_event("startup")
 async def startup_event():
     """Commands to run on server startup."""
@@ -117,17 +134,19 @@ async def shutdown_event():
 
 
 @api.get("/")
-def read_root():
-    logger.info("logging from the root logger")
-    return {"Hello": "Big, big World"}
+def home():
+    """Redirect home to docs."""
+    return RedirectResponse("/docs")
 
 
 @api.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
+    """Get item IDs."""
     return {"item_id": item_id, "q": q}
 
 
 @api.get("/images/{image_filename}")
 def get_images(image_filename: str):
+    """Download image files."""
     path = f"./backend/images/{image_filename}"
     return FileResponse(path)

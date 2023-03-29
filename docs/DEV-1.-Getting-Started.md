@@ -45,7 +45,7 @@ Make sure to give your branch a descriptive name that reflects the changes you'l
 
 ### 6. Make changes
 
-Make your cotribution, run tests where needed and save.
+Make your contribution, run tests where needed and save.
 
 ### 7. Add changes
 
@@ -67,8 +67,8 @@ Make sure to write a descriptive commit message that explains the changes you've
 
 ### 9. Submit a pull request
 
-Go to your forked repository on GitHub and click the "New pull request" button.  
-Select the branch that contains your changes, then click "Create pull request".  
+Go to your forked repository on GitHub and click the "Pull requests" tab.  
+Change the base branch from `main` to `development`, select the branch that contains your changes from the compare branch, then click "Create pull request".  
 This will open a new pull request in the fmtm repository, where you can describe your changes and request that they be merged into the main codebase.
 
 > Note: After a PR has been approved and merged, if the branch is no longer in use, delete it both locally and remotely. Otherwise we get buried in dead branches we don't need.  
@@ -96,7 +96,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 3. Right now read user preferences permission is enough later on fmtm may need permission to modify the map option which should be updated on OSM_SCOPE variable on .env , Keep read_prefs for now.
 
-4. Now Copy your Client ID and Client Secret. Put them in the `OSM_CLIENT_ID` and `OSM_CLIENT_SECRET` of your `.env` file
+4. Now Copy your Client ID and Client Secret. Put them in the `OSM_CLIENT_ID` and `OSM_CLIENT_SECRET` field of your `.env` file
 
 ### 2. Create an `.env` File
 
@@ -138,6 +138,8 @@ Your env should look like this
     FMTM_DB_PASSWORD=fmtm
     FMTM_DB_NAME=fmtm'
 
+> Note: If extra cors origins are required for testing, the variable `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g. <http://localhost:7050,http://localhost:7051>
+
 ## Verify Setup
 
 ### Check Deployment
@@ -148,22 +150,24 @@ For details on how to run this project locally for development, please look at: 
 
 Once you have deployed, you will need to check that you can properly authenticate.
 
-1.  Navigate to `API_URL/docs`
+1. Navigate to `http://127.0.0.1:8000/docs`
 
     Three endpoints are responsible for oauth
-    <img width="698" alt="image" src="https://user-images.githubusercontent.com/36752999/216319601-949c4262-782f-4da4-ae26-dac81c141403.png">
+    <img width="698" alt="image" src="../images/endpoints_responsible_for_auth_screenshot-2023-03-26-092756.png">
 
-2.  Hit `/auth/osm_login/` : This will give you the Login URL where you can supply your osm username/password
+2. Select the `/auth/osm_login/` endpoint, click `Try it out` and then `Execute`.  
+    This would give you the Login URL where you can supply your osm username and password.
 
-    Response should be like this :
+    Your response should look like this:
 
         {"login_url": "https://www.openstreetmap.org/oauth2/authorize/?response_type=code&client_id=xxxx"}
 
-    Now Copy your login_url and hit it in new tab, and you will be redirected to OSM for your LOGIN. Give FMTM the necessary permission
+    Now copy and paste your login_url in a new tab. You would be redirected to OSM for your LOGIN. Give FMTM the necessary permission.
 
-    After successful login, you will get your `access_token` for FMTM Copy it and now you can use it for rest of the endpoints that need authorizations
+    After a successful login, you will get your `access_token` for FMTM, Copy it. Now, you can use it for rest of the endpoints that needs authorization.
 
-3.  Check your access token: Hit `/auth/me/` and pass your `access_token` You should get your osm id, username and profile picture id
+3. Check your access token: Select the `/auth/me/` endpoint and click `Try it out`.  
+    Pass in the `access_token` you copied in the previous step into the `access-token` field and click `Execute`. You should get your osm id, username and profile picture id.
 
 # Start Developing
 

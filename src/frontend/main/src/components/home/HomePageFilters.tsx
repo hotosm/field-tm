@@ -82,7 +82,6 @@ const HomePageFilters = () => {
 
     return (
         <CoreModules.Stack>
-
             {/* Explore project typography in mobile size */}
             <CoreModules.Stack sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}>
                 <CoreModules.Typography
@@ -131,6 +130,25 @@ const HomePageFilters = () => {
                         style={{ width: '100%' }}
                     />
                 </Search>
+
+            </CoreModules.Stack>
+            {/* Create New Project Button  */}
+            <CoreModules.Stack sx={{ display: "flex", alignItems: 'flex-end', marginRight: '3rem' }}>
+                <CoreModules.Link to={'/create-project'} style={{
+                    //   marginLeft: '3%',
+                    textDecoration: 'none',
+                    //   color: defaultTheme.palette.info.main
+                }}>
+                    <CoreModules.Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<AssetModules.AddIcon />}
+                        style={searchableInnerStyle.outlineBtn}
+                    >
+                        Create New Project
+                    </CoreModules.Button>
+                </CoreModules.Link>
+                {/* <======End======> */}
             </CoreModules.Stack>
             {/* <======End======> */}
 
