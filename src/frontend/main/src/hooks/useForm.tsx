@@ -11,7 +11,7 @@ const useForm = (initialState, callback, validate) => {
   };
 
   const handleCustomChange = (name, value) => {
-    setValues((prev) => ({ ...prev, [name]: value }));
+    setValues((prev) => ({ ...prev, ...initialState, [name]: value }));
     setErrors(validate({ ...values, [name]: value }));
   };
 
@@ -48,7 +48,7 @@ const useForm = (initialState, callback, validate) => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [errors]);
   useEffect(() => {
-    setValues(initialState);
+    // setValues(initialState);
     setErrors({});
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
