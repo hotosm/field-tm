@@ -25,4 +25,5 @@ def init_osm_auth():
 
 
 def login_required(access_token: str = Header(...)):
+    osm_auth = init_osm_auth()
     return osm_auth.deserialize_access_token(access_token)
