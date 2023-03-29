@@ -41,6 +41,9 @@ const CreateProject = CoreModules.createSlice({
         SetFormCategory(state, action) {
             state.formCategoryList = action.payload
         },
+        SetIndividualProjectDetailsData(state,action){
+            state.projectDetails= action.payload
+        }
     }
 })
 
