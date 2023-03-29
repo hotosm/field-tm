@@ -19,7 +19,7 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 4. Once everything is pulled, from the command line run: `docker compose up -d api`
 5. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
-> Note: If the images do not exist yet, run `docker compose build`.
+> Note: If that link doesn't work, check the logs with `docker log fmtm_api`.
 
 > Note: If the link doesn't work, check the logs with `docker logs fmtm_api`.
 
