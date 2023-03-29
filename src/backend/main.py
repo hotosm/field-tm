@@ -106,6 +106,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """Exception handler for more descriptive logging."""
     errors = []
     for error in exc.errors():
+        #TODO Handle this properly
+        if error["msg"] in ["Invalid input","field required"]:
+            status_code = 422  # Unprocessable Entity
+        else:
+            status_code = 400  # Bad Request
         errors.append(
             {
                 "loc": error["loc"],
@@ -113,7 +118,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
                 "error": error["msg"] + str([x for x in error["loc"]]),
             }
         )
-    return JSONResponse(status_code=400, content={"errors": errors})
+    return JSONResponse(status_code=status_code, content={"errors": errors})
 
 
 @api.on_event("startup")

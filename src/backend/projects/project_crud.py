@@ -364,6 +364,7 @@ def update_project_boundary(
     db: Session,
     project_id: int,
     boundary: str,
+    dimension : int
 ):
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
     remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
@@ -388,7 +389,8 @@ def update_project_boundary(
     db.refresh(db_project)
     logger.debug("Added project boundary!")
 
-    result = create_task_grid(db, project_id=project_id)
+    result = create_task_grid(db, project_id=project_id, delta=dimension)
+
     tasks = eval(result)
     for poly in tasks["features"]:
         logger.debug(poly)
@@ -719,7 +721,7 @@ def download_geometry(
     return {"filespec": out}
 
 
-def create_task_grid(db: Session, project_id: int):
+def create_task_grid(db: Session, project_id: int, delta:int):
     try:
         # Query DB for project AOI
         projects = table("projects", column("outline"), column("id"))
@@ -735,9 +737,12 @@ def create_task_grid(db: Session, project_id: int):
         data = result.fetchall()
         boundary = shape(loads(data[0][0]))
         minx, miny, maxx, maxy = boundary.bounds
-        delta = 0.005
-        nx = int((maxx - minx) / delta)
-        ny = int((maxy - miny) / delta)
+
+        # 1 degree = 111139 m
+        value = delta/111139
+
+        nx = int((maxx - minx) / value)
+        ny = int((maxy - miny) / value)
         gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
         grid = list()
 
