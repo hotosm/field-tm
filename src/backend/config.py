@@ -37,17 +37,24 @@ class Settings(BaseSettings):
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
-    BACKEND_CORS_ORIGINS: Union[str, list[AnyUrl]]
+    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]]
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @validator("EXTRA_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(
         cls, val: Union[str, list[AnyUrl]], values: dict
     ) -> list[str]:
-        """Build and validate CORS origins list."""
+        """Build and validate CORS origins list.
+
+        By default, the provided frontend URLs are included in the origins list.
+        If this variable used, the provided urls are appended to the list.
+        """
         default_origins = [
             values.get("FRONTEND_MAIN_URL"),
             values.get("FRONTEND_MAP_URL"),
         ]
+
+        if val is None:
+            return default_origins
 
         if isinstance(val, str):
             default_origins += [i.strip() for i in val.split(",")]
@@ -65,6 +72,8 @@ class Settings(BaseSettings):
     FMTM_DB_USER: Optional[str] = "fmtm"
     FMTM_DB_PASSWORD: Optional[str] = "fmtm"
     FMTM_DB_NAME: Optional[str] = "fmtm"
+    FMTM_TEST_DB_NAME: Optional[str] = "fmtm_test"
+
     DB_URL: Optional[PostgresDsn]
 
     @validator("DB_URL", pre=True)
