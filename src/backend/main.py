@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+"""Entrypoint for FastAPI app."""
 
 import logging
 import os
@@ -23,9 +24,10 @@ import sys
 from typing import Union
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from odkconvert.xlsforms import xlsforms_path
 
 from .__version__ import __version__
@@ -38,9 +40,6 @@ from .projects import project_routes
 from .projects.project_crud import read_xlsforms
 from .tasks import tasks_routes
 from .users import user_routes
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
@@ -67,7 +66,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_application() -> FastAPI:
-
+    """Get the FastAPI app instance, with settings."""
     _app = FastAPI(
         title=settings.APP_NAME,
         description="HOTOSM Field Tasking Manager",
@@ -81,7 +80,7 @@ def get_application() -> FastAPI:
 
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_origins=settings.EXTRA_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -104,6 +103,7 @@ api = get_application()
 
 @api.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Exception handler for more descriptive logging."""
     errors = []
     for error in exc.errors():
         #TODO Handle this properly
@@ -111,10 +111,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             status_code = 422  # Unprocessable Entity
         else:
             status_code = 400  # Bad Request
-        errors.append({"loc": error["loc"],
-                       "msg":error["msg"],
-                       "error":error["msg"] + str([x for x in error["loc"]])
-                        })
+        errors.append(
+            {
+                "loc": error["loc"],
+                "msg": error["msg"],
+                "error": error["msg"] + str([x for x in error["loc"]]),
+            }
+        )
     return JSONResponse(status_code=status_code, content={"errors": errors})
 
 
@@ -136,17 +139,19 @@ async def shutdown_event():
 
 
 @api.get("/")
-def read_root():
-    logger.info("logging from the root logger")
-    return {"Hello": "Big, big World"}
+def home():
+    """Redirect home to docs."""
+    return RedirectResponse("/docs")
 
 
 @api.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
+    """Get item IDs."""
     return {"item_id": item_id, "q": q}
 
 
 @api.get("/images/{image_filename}")
 def get_images(image_filename: str):
+    """Download image files."""
     path = f"./backend/images/{image_filename}"
     return FileResponse(path)

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
 import { diffObject } from "../../utilfunctions/compareUtils";
+import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 
 
 const ProjectDetailsForm = () => {
@@ -51,11 +52,12 @@ const ProjectDetailsForm = () => {
     const submission = () => {
         // eslint-disable-next-line no-use-before-define
         // submitForm();
+        dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
         navigate("/upload-area", { replace: true, state: { values: values } });
+
 
     };
 
-    //   errors
     const { handleChange, handleSubmit, handleCustomChange, values, errors } = useForm(
         projectDetails,
         submission,
