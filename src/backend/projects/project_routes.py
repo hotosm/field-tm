@@ -251,20 +251,21 @@ async def upload_multi_project_boundary(
 async def upload_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
+    dimension : int = 500,
     db: Session = Depends(database.get_db),
 ):
     # read entire file
     content = await upload.read()
     boundary = json.loads(content)
 
-    result = project_crud.update_project_boundary(db, project_id, boundary)
+    result = project_crud.update_project_boundary(db, project_id, boundary, dimension)
     if not result:
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
     # Use the ID we get from Central, as it's needed for many queries
-    eval(project_crud.create_task_grid(db, project_id))
+    eval(project_crud.create_task_grid(db, project_id, dimension))
     # type = DataCategory()
     # result = project_crud.generate_appuser_files(db, grid, project_id)
 
