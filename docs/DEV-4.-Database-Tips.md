@@ -8,31 +8,86 @@ And then connect to the database
 
     `\c fmtm`
 
-## A few helpful psql commands
+## To access the fmtm database using psql, follow the instructions below:
 
-    Switch connection to the new database: `\c dbname`
-    List databases: `\l`
-    List all schemes of currently connected database: `\dn`
-    List functions of current database: `\df`
-    List views in current database: `\dv`
-    List users and roles: `\du`
+### A few helpful psql commands
 
-    List tables: `\dt`
-    Describe a table: `\d table_name`
+- Open a terminal window and run the following command:
 
-    Last command again: `\g`
-    Command history: `\s`
-    Save command history to file: `\s filename`
-    Execute commands from file: `\i filename`
-    List psql commands: `\?`
-    Help: `\h`
-    Exit: `\q`
+        docker exec -it fmtm-db-1 psql -U fmtm fmtm
 
-If you make a change, don't forget to commit the change!
+    This will open the psql command-line interface and connect you to the fmtm database.
+
+- Once connected to the fmtm database, you can switch to a different database using the command:
+
+        \c dbname
+    Replace "dbname" with the name of the database you want to switch to. forexample `\c fmtm`
+
+- You can list all the databases using the command:
+
+        \l
+
+- To list all the schemas of the currently connected database, use the command:
+
+        \dn
+
+- To list all the functions in the current database, use the command:
+
+        \df
+
+- To list all the views in the current database, use the command:
+
+        \dv
+
+- To list all the users and roles, use the command:
+
+        \du
+
+- To list all the tables in the current database, use the command:
+
+        \dt
+
+- To describe a table, use the command:
+
+        \d table_name
+    Replace "table_name" with the name of the table you want to describe.
+
+- To execute the last command again, use the command:
+
+        \g
+
+- To view your command history, use the command:
+
+        \s
+
+- To save your command history to a file, use the command:
+
+        \s filename
+    Replace "filename" with the name of the file you want to save the command history to.
+
+- To execute commands from a file, use the command:
+
+        \i filename
+    Replace "filename" with the name of the file containing the commands you want to execute.
+
+- To view a list of all psql commands, use the command:
+
+        \?
+
+- To view help for a specific command, use the command:
+
+        \h command_name
+    Replace "command_name" with the name of the command you want help with.
+
+- To exit psql, use the command:
+
+        \q
+
+**Note:** If you make a change, don't forget to commit the change!
 
 # Migrations
 
-We haven't yet implemented migrations.
+Migrations are a way to manage changes to the database schema over time. We haven't yet implemented migrations in fmtm, but if you need to drop all tables, you can use the following commands while connected to the fmtm database:
 
 If you need to drop all tables, connect to fmtm and...
 
@@ -52,3 +107,5 @@ If you need to drop all tables, connect to fmtm and...
     drop table user_licenses cascade;
     drop table users cascade;
     drop table x_form cascade;
+
+**Note:** Remember to use caution when dropping tables, as this will permanently delete all data in those tables. If you make any changes to the database, be sure to commit them to ensure that they are saved.
