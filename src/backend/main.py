@@ -106,6 +106,7 @@ api = get_application()
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = []
     for error in exc.errors():
+        #TODO Handle this properly
         if error["msg"] in ["Invalid input","field required"]:
             status_code = 422  # Unprocessable Entity
         else:
