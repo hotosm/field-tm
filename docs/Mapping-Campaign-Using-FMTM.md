@@ -31,9 +31,9 @@ Overall, the **FMTM** tool is an important component of **HOT**'s efforts to sup
 
 1. Navigate to the [HOT website](https://www.hotosm.org/).
 
-2.Click on the Tools & Data feature on the **HOT** Dashboard.
+2. Click on the Tools & Data feature on the **HOT** Dashboard.
 
-3.Select Task Manager from **“Tools we use”**.
+3. Select Task Manager from **“Tools we use”**.
 
 4. Click on the **Sign up button** in the upper right corner of the Tasking Manager homepage.
 
