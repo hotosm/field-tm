@@ -29,30 +29,30 @@ Overall, the **FMTM** tool is an important component of **HOT**'s efforts to sup
 
 ### Using The FMTM Tool For A Mapping Campaign Via The HOT Website
 
-1.Navigate to the [HOT website](https://www.hotosm.org/).
+1. Navigate to the [HOT website](https://www.hotosm.org/).
 
-2.Click on the Tools & Data feature on the **HOT** Dashboard.
+2. Click on the Tools & Data feature on the **HOT** Dashboard.
 
-3.Select Task Manager from **“Tools we use”**.
+3. Select Task Manager from **“Tools we use”**.
 
-4.Click on the **Sign up button** in the upper right corner of the Tasking Manager homepage.
+4. Click on the **Sign up button** in the upper right corner of the Tasking Manager homepage.
 
-5.Provide your name and email address (We will use this information to guide you through the sign-up process).
+5. Provide your name and email address (We will use this information to guide you through the sign-up process).
 
-6.A new tab will open allowing you to register on **OpenStreetMap.org**. Provide your account information and press the Sign up button at the bottom of the form.
+6. A new tab will open allowing you to register on **OpenStreetMap.org**. Provide your account information and press the Sign up button at the bottom of the form.
 
-7.Close the tab and go back to the Tasking Manager. Click the button to Log in.
+7. Close the tab and go back to the Tasking Manager. Click the button to Log in.
 
-8.Select Explore projects in the main navigation to find a project to help map. Or use the link provided by your mapathon instructor.
+8. Select Explore projects in the main navigation to find a project to help map. Or use the link provided by your mapathon instructor.
 
-9.Read the introductions to the project and click on **Contribute** to begin with a mapping task.
+9. Read the introductions to the project and click on **Contribute** to begin with a mapping task.
 
-10.Map a randomly selected task for mapping by clicking on the button **Map a task**.
+10. Map a randomly selected task for mapping by clicking on the button **Map a task**.
 Alternatively, you can select one from the map or the task, and choose **“Map selected task”**.
 
-11.This opens the editor; map all the features asked for in the instructions.
+11. This opens the editor; map all the features asked for in the instructions.
 
-12.When finished mapping, save your edits and select the button **Submit task**.
+12. When finished mapping, save your edits and select the button **Submit task**.
 After this, you can go back to step 7 and select a new task for mapping.
 
 - A step by step procedure on how to begin mapping can be found [here](https://learnosm.org/en/beginner/)
