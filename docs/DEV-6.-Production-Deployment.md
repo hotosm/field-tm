@@ -58,12 +58,6 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
     OSM_SECRET_KEY=`<CHANGEME>`
 
-    # Database (optional)
-    CENTRAL_DB_HOST=central-db
-    CENTRAL_DB_USER=odk
-    CENTRAL_DB_PASSWORD=`<CHANGEME>`
-    CENTRAL_DB_NAME=odk
-
     FMTM_DB_HOST=fmtm-db
     FMTM_DB_USER=fmtm
     FMTM_DB_PASSWORD=`<CHANGEME>`
@@ -71,9 +65,11 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
 
 > Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
 
+> Note: You must have an existing version of ODKCentral running, to provide the URL and credentials here.
+
 Run the production docker-compose config:
-`docker compose -f docker-compose.prod.yml up --build -d`
+`docker compose -f docker-compose.prod.yml up -d`
+
+> Note: The images should be built already on Quay. If they don't exist, use the `--build` flag during run.
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
-
-> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend).

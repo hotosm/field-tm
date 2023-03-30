@@ -19,26 +19,18 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 4. Once everything is pulled, from the command line run: `docker compose up -d api`
 5. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
+> Note: If that link doesn't work, check the logs with `docker log fmtm_api`.
+
 > Note: If the link doesn't work, check the logs with `docker logs fmtm_api`.
 
-### 1B: Setup ODK Central User
+> Note: The ODKCentral admin user will be generated automatically, with provided credentials ODK_CENTRAL_USER:ODK_CENTRAL_PASSWD
 
-The FMTM uses ODK Central to store ODK data. By default, the docker setup includes a Central server.
-
-1. Create a user with the email you provided in the **ODK_CENTRAL_USER** field of your `.env` file using the following command:    
-  `docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create`
-2. When prompted to put a password, input the password you provided in the **ODK_CENTRAL_PASSWD** field of the `.env` file
-3. Promote the user created to an admin using the following command:  
-  `docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote`
-
-> Note: Alternatively, you may use an external Central server and user.
-
-### 1C: Import Test Data
+### 1B: Import Test Data
 
 Some test data is available to get started quickly.
 
 1. Navigate to the `import-test-data` endpoint in the API docs page:
-  <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
+   <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
 2. Click `Try it out`, then `execute`.
 
 ## 2. Start the API locally (OUTDATED)

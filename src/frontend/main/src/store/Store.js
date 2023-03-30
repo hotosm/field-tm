@@ -15,6 +15,7 @@ import {
 import storage from 'redux-persist/lib/storage';
 import ProjectSlice from "./slices/ProjectSlice";
 import CreateProjectSlice from "./slices/CreateProjectSlice";
+import CommonSlice from "./slices/CommonSlice";
 
 const reducers = CoreModules.combineReducers({
     project: persistReducer(
@@ -28,6 +29,8 @@ const reducers = CoreModules.combineReducers({
     home: HomeSlice.reducer,
     theme: ThemeSlice.reducer,
     createproject: CreateProjectSlice.reducer,
+    // added common slice in order to handle all the common things like snackbar etc
+    common: CommonSlice.reducer
 })
 // const middleware = routerMiddleware(history);
 

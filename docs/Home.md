@@ -6,7 +6,7 @@ They never forget the people they are building for (^^)
 
 So who are we building field mapping solutions for? In short, we build solutions for:
 
-- The **Field Mapping Manager** (The person who coordinates field mapping)
+- The **Mapping Coordinator/Field Mapping Manager** (The person who coordinates field mapping)
 - The **Field Mapper** (The person who collects data)
 - The **Validator** (The person who checks the quality of data collected)
 
@@ -40,7 +40,7 @@ The **Field Mapping Manager** is tasked with coordinating all mapping activities
 1. **Pre-field data collection activities**
     - Setting up and testing tools
     - Creating a form
-    - Training field mappers (making sure they understand the form and how to fill it)
+    - Training field mappers (making sure that they understand the form and how to fill it)
     - Creating an area of interest within the location to be mapped
     
 2. **Data collection activities**
