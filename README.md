@@ -38,7 +38,7 @@ HOT is already in the early stages of developing the Field Mapping Tasking Manag
 
 # How to contribute
 
-👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. We have a specific request for volunteer developers at the moment!
+👍🎉We are actively looking for contributors for this project- from design, user testing and both front and backend developers. We have a specific request for volunteer developers at the moment!
 ![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
 Please take a look at our [Wiki pages](https://github.com/hotosm/fmtm/wiki/Home/90b86d34ddd42f0eafd03ea7e6d443eb37db2df6) and [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more details! Reach out to us if any questions! 👍🎉
 
@@ -157,6 +157,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AugustHottie"><img src="https://avatars.githubusercontent.com/u/96122635?v=4?s=100" width="100px;" alt="AugustHottie"/><br /><sub><b>AugustHottie</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=AugustHottie" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Balofire"><img src="https://avatars.githubusercontent.com/u/102294666?v=4?s=100" width="100px;" alt="Ahmeed Etti-Balogun"/><br /><sub><b>Ahmeed Etti-Balogun</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Balofire" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Roseford"><img src="https://avatars.githubusercontent.com/u/75838716?v=4?s=100" width="100px;" alt="Uju"/><br /><sub><b>Uju</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Roseford" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/neelimagoogly"><img src="https://avatars.githubusercontent.com/u/97789856?v=4?s=100" width="100px;" alt="Neelima Mohanty"/><br /><sub><b>Neelima Mohanty</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=neelimagoogly" title="Documentation">📖</a></td>
     </tr>
   </tbody>
   <tfoot>

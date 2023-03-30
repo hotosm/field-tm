@@ -133,11 +133,11 @@ const HomePageFilters = () => {
 
             </CoreModules.Stack>
             {/* Create New Project Button  */}
-            <CoreModules.Stack sx={{display:"flex", alignItems:'flex-end',marginRight:'3rem' }}>
+            <CoreModules.Stack sx={{ display: "flex", alignItems: 'flex-end', marginRight: '3rem' }}>
                 <CoreModules.Link to={'/create-project'} style={{
                     //   marginLeft: '3%',
                     textDecoration: 'none',
-                //   color: defaultTheme.palette.info.main
+                    //   color: defaultTheme.palette.info.main
                 }}>
                     <CoreModules.Button
                         variant="contained"
@@ -148,7 +148,7 @@ const HomePageFilters = () => {
                         Create New Project
                     </CoreModules.Button>
                 </CoreModules.Link>
-            {/* <======End======> */}
+                {/* <======End======> */}
             </CoreModules.Stack>
             {/* <======End======> */}
 

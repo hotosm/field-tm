@@ -42,6 +42,7 @@ class ProjectUpdate(BaseModel):
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
+    xform_title: str
     # city: str
     # country: str
 
@@ -72,6 +73,7 @@ class ProjectBase(BaseModel):
     # location_str: str
     outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
+    xform_title: str = None
 
     class Config:
         orm_mode = True

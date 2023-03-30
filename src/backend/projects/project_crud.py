@@ -51,7 +51,6 @@ from odkconvert.make_data_extract import PostgresClient, OverpassClient
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
 from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 
@@ -237,6 +236,7 @@ def create_project_with_project_info(
 ):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
+    xform_title = project_metadata.xform_title
 
     # verify data coming in
     if not user:
@@ -257,6 +257,7 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
+        xform_title= xform_title
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -301,51 +302,76 @@ def update_multi_polygon_project_boundary(
     project_id: int,
     boundary: str,        
 ):
+    """
+        This function receives the project_id and boundary as a parameter
+        and creates a task for each polygon in the database. 
+        This function also creates a project outline from the multiple polygons received.
+    """
 
-    """ verify project exists in db """
-    db_project = get_project_by_id(db, project_id)
-    if not db_project:
-        logger.error(f"Project {project_id} doesn't exist!")
-        return False
+    try:
+        """ verify project exists in db """
+        db_project = get_project_by_id(db, project_id)
+        if not db_project:
+            logger.error(f"Project {project_id} doesn't exist!")
+            return False
 
-    """Update the boundary polyon on the database."""
-    polygons = boundary["features"]
-    for polygon in polygons:
-        task_name = str(polygon['properties']['id'])
-        db_task = db_models.DbTask(
-            project_id=project_id,
-            project_task_name=task_name,
-            outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
-            project_task_index=1,
-        )
-        db.add(db_task)
+        """Update the boundary polyon on the database."""
+        polygons = boundary["features"]
+        for polygon in polygons:
+
+            """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
+            remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
+
+            """ Apply the lambda function to each coordinate in its geometry """
+            list(map(remove_z_dimension, polygon['geometry']['coordinates'][0]))
+
+            db_task = db_models.DbTask(
+                project_id=project_id,
+                outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
+                project_task_index=1,
+            )
+            db.add(db_task)
+            db.commit()
+
+            """ Id is passed in the task_name too. """
+            db_task.project_task_name = str(db_task.id)
+            db.commit()
+
+        """ Generate project outline from tasks """
+        # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
+        #            FROM tasks 
+        #           where project_id={project_id};'''
+
+        query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
+                    FROM tasks
+                    WHERE project_id={project_id};'''
+        result = db.execute(query)
+        data = result.fetchone()
+
+        db_project.outline = data[0]
+        db_project.centroid = (wkt.loads(data[0])).centroid.wkt
         db.commit()
+        db.refresh(db_project)
+        logger.debug("Added project boundary!")
 
-    """ Generate project outline from tasks """
-    # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
-    #            FROM tasks 
-    #           where project_id={project_id};'''
-
-    query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
-                FROM tasks
-                WHERE project_id={project_id};'''
-    result = db.execute(query)
-    data = result.fetchone()
-
-    db_project.outline = data[0]
-    db_project.centroid = (wkt.loads(data[0])).centroid.wkt
-    db.commit()
-    db.refresh(db_project)
-    logger.debug("Added project boundary!")
-
-    return True
+        return True
+    except Exception as e:
+        raise HTTPException(e)
 
 
 def update_project_boundary(
     db: Session,
     project_id: int,
     boundary: str,
+    dimension : int
 ):
+    """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
+    remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
+
+    """ Apply the lambda function to each coordinate in its geometry """
+    for feature in boundary['features']:
+        list(map(remove_z_dimension, feature['geometry']['coordinates'][0]))
+
     """Update the boundary polyon on the database."""
     outline = shape(boundary["features"][0]["geometry"])
 
@@ -362,7 +388,8 @@ def update_project_boundary(
     db.refresh(db_project)
     logger.debug("Added project boundary!")
 
-    result = create_task_grid(db, project_id=project_id)
+    result = create_task_grid(db, project_id=project_id, delta=dimension)
+
     tasks = eval(result)
     for poly in tasks["features"]:
         logger.debug(poly)
@@ -693,7 +720,7 @@ def download_geometry(
     return {"filespec": out}
 
 
-def create_task_grid(db: Session, project_id: int):
+def create_task_grid(db: Session, project_id: int, delta:int):
     try:
         # Query DB for project AOI
         projects = table("projects", column("outline"), column("id"))
@@ -709,9 +736,12 @@ def create_task_grid(db: Session, project_id: int):
         data = result.fetchall()
         boundary = shape(loads(data[0][0]))
         minx, miny, maxx, maxy = boundary.bounds
-        delta = 0.005
-        nx = int((maxx - minx) / delta)
-        ny = int((maxy - miny) / delta)
+
+        # 1 degree = 111139 m
+        value = delta/111139
+
+        nx = int((maxx - minx) / value)
+        ny = int((maxy - miny) / value)
         gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
         grid = list()
 
@@ -737,6 +767,24 @@ def create_task_grid(db: Session, project_id: int):
         # jsonout = open("tmp.geojson", 'w')
         # out = dump(collection, jsonout)
         out = dumps(collection)
+
+        # If project outline cannot be divided into multiple tasks,
+        #   whole boundary is made into a single task.
+        result = json.loads(out)
+        if len(result['features']) == 0:
+            geom = loads(data[0][0])
+            out = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                            "type": "Feature",
+                            "geometry": geom,
+                            "properties": {"id":project_id},
+                        }
+                        ]
+                    }
+            out = json.dumps(out)
+
     except Exception as e:
         logger.error(e)
 
