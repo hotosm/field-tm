@@ -51,7 +51,6 @@ from odkconvert.make_data_extract import PostgresClient, OverpassClient
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
 from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 
@@ -768,6 +767,24 @@ def create_task_grid(db: Session, project_id: int, delta:int):
         # jsonout = open("tmp.geojson", 'w')
         # out = dump(collection, jsonout)
         out = dumps(collection)
+
+        # If project outline cannot be divided into multiple tasks,
+        #   whole boundary is made into a single task.
+        result = json.loads(out)
+        if len(result['features']) == 0:
+            geom = loads(data[0][0])
+            out = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                            "type": "Feature",
+                            "geometry": geom,
+                            "properties": {"id":project_id},
+                        }
+                        ]
+                    }
+            out = json.dumps(out)
+
     except Exception as e:
         logger.error(e)
 
