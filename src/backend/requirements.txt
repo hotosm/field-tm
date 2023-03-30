@@ -53,3 +53,6 @@ python-json-logger==2.0.6
 # Testing
 pytest==7.2.2
 SQLAlchemy-Utils==0.40.0
+
+# Hashing
+bcrypt==4.0.1
