@@ -19,7 +19,7 @@
 import json
 from typing import List
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -91,7 +91,12 @@ async def create_project(
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
-    odkproject = central_crud.create_odk_project(project_info.project_info.name)
+    try:
+        odkproject = central_crud.create_odk_project(project_info.odk_central,
+                                                    project_info.project_info.name)
+    except:
+        raise HTTPException(status_code=400, detail="Connection failed to central odk. ")
+
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
     project = project_crud.create_project_with_project_info(
