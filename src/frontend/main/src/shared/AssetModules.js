@@ -26,11 +26,13 @@ import {
     LockOpen as LockOpenIcon,
     Description as DescriptionIcon,
     FileDownload as FileDownloadIcon,
-    Share as ShareIcon
+    Share as ShareIcon,
+    ExitToApp as ExitToAppIcon
 } from '@mui/icons-material';
 
 import { styled, alpha } from '@mui/material/styles';
 export default {
+    ExitToAppIcon,
     ShareIcon,
     VerifiedIcon,
     LockOpenIcon,
