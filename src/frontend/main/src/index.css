@@ -10,6 +10,13 @@ body {
   margin-top: 20px;
 }
 
+.sweet-loading{
+  position: absolute;
+  top: 50%;  
+  z-index: 5;
+  transform: translate(-50%, -50%);
+}
+
 .btnLogin,
 btnSignUp {
   width: 100px;

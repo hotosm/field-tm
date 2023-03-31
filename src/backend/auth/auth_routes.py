@@ -32,9 +32,13 @@ router = APIRouter(
 )
 
 
-@router.get("/login/")
+@router.post("/login/")
 def login(user: user_schemas.UserIn, db: Session = Depends(database.get_db)):
-    return JSONResponse(content=user_crud.verify_user(db, user), status_code=200)
+    """
+    The Login API allows users to authenticate themselves with the application.
+    Username and password are passed and users information is obtained in the response.
+    """
+    return user_crud.verify_user(db, user)
 
 
 @router.get("/osm_login/")

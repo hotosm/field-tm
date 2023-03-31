@@ -48,13 +48,13 @@ Overall, the **FMTM** tool is an important component of **HOT**'s efforts to sup
 3. Select a project to map in your location.
 
 4. The drop down icon beside **LEGEND** displays a color code. This color code lets you know the status of each task on the map.
-- **READY** means that task is available to be mapped
-- **LOCKED FOR MAPPING** means that task is already being mapped by another volunteer and therefore unavailable for mapping
-- **MAPPED** or **READY FOR VALIDATION** means that task has been completely mapped and ready to be validated.
-- **LOCKED FOR VALIDATION** means that task has been mapped and being validated.
-- **VALIDATED** means that task has successfully been validated and completely mapped with no errors
-- **INVALIDATED** or **MORE MAPPING NEEDED** means that task did not pass the validation process and needs more mapping
-- **BAD** means that task is not clear and cannot be mapped
+    - **READY** means that task is available to be mapped
+    - **LOCKED FOR MAPPING** means that task is already being mapped by another volunteer and therefore unavailable for mapping
+    - **MAPPED** or **READY FOR VALIDATION** means that task has been completely mapped and ready to be validated.
+    - **LOCKED FOR VALIDATION** means that task has been mapped and being validated.
+    - **VALIDATED** means that task has successfully been validated and completely mapped with no errors
+    - **INVALIDATED** or **MORE MAPPING NEEDED** means that task did not pass the validation process and needs more mapping
+    - **BAD** means that task is not clear and cannot be mapped
 
 > Note: 'task' refers to each section of the map enclosed in the dotted lines and each task has a corresponding number tag.
 

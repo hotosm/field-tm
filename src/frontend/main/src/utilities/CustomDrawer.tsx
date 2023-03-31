@@ -4,7 +4,7 @@ import CoreModules from "../shared/CoreModules";
 import AssetModules from "../shared/AssetModules";
 import { NavLink } from "react-router-dom";
 
-const CustomDrawer = ({ open, placement, size, onClose }) => {
+const CustomDrawer = ({ open, placement, size, onClose,onSignOut }) => {
   const defaultTheme: any = CoreModules.useSelector<any>(
     (state) => state.theme.hotTheme
   );
@@ -14,13 +14,14 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
       ? (element.style.color = `${defaultTheme.palette.error["main"]}`)
       : null;
   };
-
+  const token = CoreModules.useSelector<any>(state=>state.login.loginToken)
   const onMouseLeave = (event) => {
     const element: any = document.getElementById(`text${event.target.id}`);
     element != null
       ? (element.style.color = `${defaultTheme.palette.info["main"]}`)
       : null;
   };
+
 
   const Drawerstyles = {
     list: {
@@ -102,7 +103,23 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
             </CoreModules.IconButton>
           </CoreModules.Stack>
 
-          <CoreModules.Divider />
+          <CoreModules.Divider color={'info'} />
+          {
+            token !=null &&
+            <CoreModules.Stack direction={'row'} justifyContent={'center'}  ml={'3%'} spacing={1}>
+            <AssetModules.PersonIcon color='success' sx={{ display: { xs: 'block', md: 'none'},mt:'1%' }} />
+            <CoreModules.Typography
+                variant="subtitle2"
+                color={'info'}
+                noWrap
+                sx={{ display: { xs: 'block', md: 'none', } }}
+               
+              >
+                {token['username']}
+              </CoreModules.Typography>
+          </CoreModules.Stack>
+          }
+          <CoreModules.Divider color={'info'} />
           <CoreModules.List
             sx={Drawerstyles.list}
             component="nav"
@@ -162,24 +179,47 @@ const CustomDrawer = ({ open, placement, size, onClose }) => {
                 )
             )}
           </CoreModules.List>
-          <CoreModules.Button
-            variant="contained"
-            color="error"
-            startIcon={<AssetModules.LoginIcon />}
-            style={Drawerstyles.containedBtn}
-            href="/login"
-          >
-            Sign in
-          </CoreModules.Button>
-          <CoreModules.Button
-            variant="outlined"
-            color="error"
-            startIcon={<AssetModules.PersonIcon />}
-            style={Drawerstyles.outlineBtn}
-            href="/signup"
-          >
-            Sign up
-          </CoreModules.Button>
+          <CoreModules.Stack sx={{display:{xs:'flex',md:'none'}}}>
+              {
+                token != null?
+                <CoreModules.Link  style={{textDecoration:'none'}} to={"/"}>
+                <CoreModules.Button
+                  onClick={onSignOut}
+                  variant="contained"
+                  color="error"
+                  startIcon={<AssetModules.ExitToAppIcon />}
+                  style={Drawerstyles.containedBtn}
+                
+                > 
+                  Sign Out
+                </CoreModules.Button>
+              </CoreModules.Link>
+              :
+              <CoreModules.Link  style={{textDecoration:'none'}} to={"/login"}>
+              <CoreModules.Button
+                onClick={onClose}
+                variant="contained"
+                color="error"
+                startIcon={<AssetModules.LoginIcon />}
+                style={Drawerstyles.containedBtn}
+              
+              > 
+                Sign in
+              </CoreModules.Button>
+            </CoreModules.Link>
+              }
+              <CoreModules.Link  style={{textDecoration:'none'}} to={"/signup"}>
+                <CoreModules.Button
+                  onClick={onClose}
+                  variant="outlined"
+                  color="error"
+                  startIcon={<AssetModules.PersonIcon />}
+                  style={Drawerstyles.outlineBtn}
+                >
+                  Sign up
+                </CoreModules.Button>
+              </CoreModules.Link >
+          </CoreModules.Stack>
         </CoreModules.Stack>
       </Drawer>
     </>
