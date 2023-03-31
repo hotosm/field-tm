@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, {useEffect, useState } from "react";
 import '../styles/login.css' 
 import enviroment from "../environment";
 import CoreModules from "../shared/CoreModules";
@@ -42,13 +42,19 @@ const Login = () => {
         })
     }
 
+    useEffect(()=>{
+        if (token != null) {
+            setTimeout(() => {
+                navigate('/')
+            }, 500);
+        }
+    },[token])
+
     const handleOnSubmit = useCallback(async()=>{
         const body:SingUpModel = {...userForm}
         setUserForm(initalUserForm)
         await dispatch(SignInService(`${enviroment.baseApiUrl}/users/`,body))
-        setTimeout(() => {
-            navigate('/')
-        }, 500);
+     
     },[initalUserForm])
 
     return (
