@@ -31,7 +31,7 @@ import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from odkconvert.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
 from shapely import wkt
 from sqlalchemy import (
@@ -45,8 +45,8 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from odkconvert.xlsforms import xlsforms_path
-from odkconvert.make_data_extract import PostgresClient, OverpassClient
+from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
@@ -55,7 +55,7 @@ from ..tasks import tasks_crud
 from ..users import user_crud
 
 
-# from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
+# from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from . import project_schemas
 
 # --------------
