@@ -12,6 +12,7 @@ import MainView from './views/MainView';
 import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
 import NewPage from './views/NewPage';
+import ProtectedRoute from './utilities/ProtectedRoute';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const routes = createBrowserRouter(
@@ -23,10 +24,10 @@ const routes = createBrowserRouter(
                     path: "/",
                     element: <Home />,
                 },
-                {
-                    path: '/explore', 
-                    element: <Navigate to="/" />,
-                },
+                // {
+                //     path: '/explore', 
+                //     element: <Navigate to="/" />,
+                // },
                 {
                     path: "/tabbed",
                     element: <Tabbed />,
@@ -39,33 +40,42 @@ const routes = createBrowserRouter(
                     path: "/signup",
                     element: <Create />,
                 },
-                {
-                    path: "/recoveraccess",
-                    element: <Forgot />,
-                },
+                // {
+                //     path: "/recoveraccess",
+                //     element: <Forgot />,
+                // },
                 {
                     path: '/project_details/:id',
-                    element: <Suspense fallback={<div></div>}>
-                        <ProjectDetails />
-                    </Suspense>
+                    element:
+                               <ProtectedRoute>
+                                 <Suspense fallback={<div></div>}>
+                                    <ProjectDetails />
+                                </Suspense>
+                               </ProtectedRoute>
                 },
                 {
                     path: '/newpage/:id',
-                    element: <Suspense fallback={<div></div>}>
-                        <NewPage />
-                    </Suspense>
+                    element: <ProtectedRoute>
+                                <Suspense fallback={<div></div>}>
+                                     <NewPage />
+                                </Suspense>
+                            </ProtectedRoute>
                 },
                 {
                     path: '/create-project',
-                    element: <Suspense fallback={<div>Loading...</div>}>
-                        <CreateProject />
-                    </Suspense>
+                    element: <ProtectedRoute>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <CreateProject />
+                                </Suspense>
+                            </ProtectedRoute>
                 },
                 {
                     path: '/upload-area',
-                    element: <Suspense fallback={<div>Loading...</div>}>
-                        <CreateProject />
-                    </Suspense>
+                    element: <ProtectedRoute>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <CreateProject />
+                                </Suspense>
+                            </ProtectedRoute>
                 },
             ],
         },
