@@ -26,6 +26,15 @@ from ..tasks import tasks_schemas
 from ..users.user_schemas import User
 
 
+class ODKCentral(BaseModel):
+    odk_central_url: str
+    odk_central_user: str
+    odk_central_password: str
+
+    class Config:
+        orm_mode = True
+
+
 class ProjectInfo(BaseModel):
     name: str
     short_description: str
@@ -43,6 +52,7 @@ class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
     xform_title: str
+    odk_central : ODKCentral
     # city: str
     # country: str
 
