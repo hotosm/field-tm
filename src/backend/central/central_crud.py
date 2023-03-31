@@ -19,11 +19,11 @@
 import os
 import pathlib
 
-import odkconvert
+import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
-from odkconvert.CSVDump import CSVDump
-from odkconvert.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from osm_fieldwork.CSVDump import CSVDump
+from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
@@ -238,7 +238,7 @@ def convert_csv(
     data: bytes,
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
-    parent = pathlib.Path(odkconvert.__file__).resolve().parent
+    parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
     csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"
@@ -249,7 +249,7 @@ def convert_csv(
 
     if len(data) == 0:
         logger.debug("Parsing csv file %r" % filespec)
-        # The yaml file is in the package files for odkconvert
+        # The yaml file is in the package files for osm_fieldwork
         data = csvin.parse(filespec)
     else:
         csvdata = csvin.parse(filespec, data)
