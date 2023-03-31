@@ -45,7 +45,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import { useNavigate, useParams, Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { useNavigate, useParams, Link, Outlet, RouterProvider,useLocation,createBrowserRouter } from "react-router-dom";
 import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
@@ -70,6 +70,7 @@ export default {
     createSlice,
     configureStore,
     combineReducers,
+    useLocation,
     getDefaultMiddleware,
     Dialog,
     DialogActions,
