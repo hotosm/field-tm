@@ -52,6 +52,7 @@
     "react-loading-skeleton": "^3.1.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.6.0",
+    "react-spinners": "^0.13.8",
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
     "rsuite": "^5.23.3",

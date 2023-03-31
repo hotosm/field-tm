@@ -9,11 +9,15 @@ const CommonSlice = CoreModules.createSlice({
             variant: 'info',
             duration: 0
         },
+        loading:false
     },
     reducers: {
         SetSnackBar(state, action) {
             state.snackbar = action.payload
         },
+        SetLoading(state,action){
+            state.loading = action.payload
+        }
     }
 })
 
