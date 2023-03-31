@@ -45,7 +45,7 @@ Make sure to give your branch a descriptive name that reflects the changes you'l
 
 ### 6. Make changes
 
-Make your cotribution, run tests where needed and save.
+Make your contribution, run tests where needed and save.
 
 ### 7. Add changes
 
