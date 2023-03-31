@@ -52,22 +52,20 @@ const UploadArea = () => {
     // //dispatch function to perform redux state mutation
 
     const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-    // //we use use selector from redux to get all state of formCategory from createProject slice
+    // //we use use-selector from redux to get all state of formCategory from createProject slice
 
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
-    // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
-    console.log(userDetails, 'userDetails');
+    // //we use use-selector from redux to get all state of loginToken from login slice
 
-    // const { id: projectId } = projectDetailsResponse;
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
     useEffect(() => {
