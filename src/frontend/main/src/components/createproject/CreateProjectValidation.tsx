@@ -15,7 +15,6 @@ interface ValidationErrors {
 }
 
 function CreateProjectValidation(values: ProjectValues) {
-  console.log(values);
   const emailCondition = /\S+@\S+\.\S+/;
   const errors: ValidationErrors = {};
 
