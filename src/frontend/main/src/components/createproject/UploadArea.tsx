@@ -63,6 +63,10 @@ const UploadArea = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
+    const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
+    // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
+    console.log(userDetails, 'userDetails');
+
     // const { id: projectId } = projectDetailsResponse;
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
@@ -108,8 +112,13 @@ const UploadArea = () => {
             {
                 "project_info": { ...values },
                 "author": {
-                    "username": values.username,
-                    "id": values.id
+                    "username": userDetails.username,
+                    "id": userDetails.id
+                },
+                "odk_central": {
+                    "odk_central_url": values.odk_central_url,
+                    "odk_central_user": values.odk_central_user,
+                    "odk_central_password": values.odk_central_password
                 },
                 "xform_title": projectDetails.xform_title,
                 "dimension": projectDetails.dimension,
