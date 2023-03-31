@@ -4,6 +4,7 @@ import PrimaryAppBar from "../utilities/PrimaryAppBar";
 import CoreModules from "../shared/CoreModules";
 import CustomizedSnackbars from "../utilities/CustomizedSnackbar";
 import { CommonActions } from "../store/slices/CommonSlice";
+import Loader from "../utilities/AppLoader";
 
 const MainView = () => {
     const dispatch = CoreModules.useDispatch();
@@ -34,6 +35,7 @@ const MainView = () => {
                 handleClose={handleClose}
             />
             <CoreModules.CssBaseline />
+            <Loader />
             <CoreModules.Paper>
                 <CoreModules.Container disableGutters={true} maxWidth={false}>
                     <CoreModules.Stack sx={{ height: '100vh' }} >

@@ -8,6 +8,7 @@ import AssetModules from '../../shared/AssetModules';
 const HomePageFilters = () => {
 
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
+    const token:any = CoreModules.useSelector<any>(state=>state.login.loginToken)
     const { windowSize } = windowDimention();
     const searchableInnerStyle: any = {
         toolbar: {
@@ -144,6 +145,7 @@ const HomePageFilters = () => {
                         color="error"
                         startIcon={<AssetModules.AddIcon />}
                         style={searchableInnerStyle.outlineBtn}
+                        disabled={token==null}
                     >
                         Create New Project
                     </CoreModules.Button>

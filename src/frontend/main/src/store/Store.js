@@ -16,6 +16,7 @@ import storage from 'redux-persist/lib/storage';
 import ProjectSlice from "./slices/ProjectSlice";
 import CreateProjectSlice from "./slices/CreateProjectSlice";
 import CommonSlice from "./slices/CommonSlice";
+import LoginSlice from "./slices/LoginSlice";
 
 const reducers = CoreModules.combineReducers({
     project: persistReducer(
@@ -24,6 +25,13 @@ const reducers = CoreModules.combineReducers({
             storage
         },
         ProjectSlice.reducer
+    ),
+    login: persistReducer(
+        {
+            key: 'login',
+            storage
+        },
+        LoginSlice.reducer
     ),
     //you can persist your auth reducer here similar to project reducer
     home: HomeSlice.reducer,
