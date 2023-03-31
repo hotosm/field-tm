@@ -29,6 +29,7 @@ from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from ..projects import project_schemas
 
 from ..config import settings
 from ..db import db_models
@@ -48,9 +49,13 @@ def list_odk_projects():
     return project.listProjects()
 
 
-def create_odk_project(name: str):
+def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
     """Create a project on a remote ODK Server."""
-    result = project.createProject(name)
+    odk_project = OdkProject(odk_central.odk_central_url,
+                             odk_central.odk_central_user,
+                             odk_central.odk_central_password
+                             )
+    result = odk_project.createProject(name)
     logger.debug(f"create_odk_project return from ODKCentral: {result}")
     project.id = result.get("id")
     logger.info(f"Project {name} has been created on the ODK Central server.")
@@ -107,6 +112,8 @@ def delete_odk_xform(project_id: int, xform_id: str):
     logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return result
+
+
 def list_odk_xforms(project_id: int):
     """List all XForms in an ODK Central project."""
     xforms = project.listForms(project_id)
