@@ -14,14 +14,14 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
-3. From the command line run: `docker compose pull`.
+3. From the command line run: `docker-compose pull`.
    This will pull the latest container builds from **main** branch.
 4. Once everything is pulled, from the command line run: `docker compose up -d api`
 5. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
-> Note: If those link doesn't work, check the logs with `docker log fmtm_api`.
+> Note: If that link doesn't work, check the logs with `docker log fmtm_api`.
 
-### 1B: Setup ODK Central User
+> Note: If the link doesn't work, check the logs with `docker logs fmtm_api`.
 
 FMTM uses ODK Central to store ODK data. By default, the Docker setup
 includes a Central server. To add an admin user, with the user (email)
@@ -39,9 +39,9 @@ Then, run the following command to add the user:
 
 Some test data is available to get started quickly.
 
-- Navigate to the `import-test-data` endpoint in the API docs page:
-  <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
-- Click `Try it out`, then `execute`.
+1. Navigate to the `import-test-data` endpoint in the API docs page:
+   <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
+2. Click `Try it out`, then `execute`.
 
 ## 2. Start the API locally (OUTDATED)
 
@@ -55,7 +55,7 @@ Running the database in Docker means postgres/postgis does not need to be instal
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line, navigate into the top level directory of the FMTM project.
-3. From command line, start up database with `docker-compose -f docker-compose.local.yml up --build`
+3. From the command line, start up database with `docker-compose -f docker-compose.local.yml up --build`
 
 The `docker-compose.local.yml` file only includes the database container (`db`), so only the database runs on docker.
 
@@ -68,7 +68,7 @@ For advanced users, it is also possible to run a postgresql/postgis database loc
 After starting the database, from the command line:
 
 1. Navigate to the top level directory of the FMTM project.
-2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer's python environment is kept clean.
+2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer's Python environment is kept clean.
 3. Start the FMTM virtual environment with: `source fmtm-env/bin/activate`
 4. Install backend dependencies with: `pip install -r src/backend/requirements.txt`
 5. Run the Fast API backend with: `uvicorn src.backend.main:api --reload`

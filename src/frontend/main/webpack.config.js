@@ -133,10 +133,11 @@ module.exports = function (webpackEnv) {
         exposes: {
           "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
           "./HomeSlice": "./src/store/slices/HomeSlice.ts",
+          "./CommonSlice": "./src/store/slices/CommonSlice.ts",
+          "./LoginSlice": "./src/store/slices/LoginSlice.ts",
           "./ProjectSlice": "./src/store/slices/ProjectSlice.ts",
           "./Store": "./src/store/Store.js",
           "./BasicCard": "./src/utilities/BasicCard.tsx",
-          "./BasicTabs": "./src/utilities/BasicTabs.tsx",
           "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
           "./CustomizedSnackbar": "./src/utilities/CustomizedSnackbar.jsx",
           "./PrimaryAppBar": "./src/utilities/PrimaryAppBar.tsx",

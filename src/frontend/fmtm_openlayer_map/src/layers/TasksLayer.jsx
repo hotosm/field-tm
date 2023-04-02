@@ -50,8 +50,8 @@ const TasksLayer = (map, view, feature) => {
 
                 const centroid = state.projectTaskBoundries[index].
                     taskBoundries[state.projectTaskBoundries[index].
-                        taskBoundries.length - 1].
-                    outline_centroid.geometry.coordinates;
+                        taskBoundries.length - 1]?.
+                    outline_centroid?.geometry?.coordinates || null;
 
                 map.getView().setCenter(centroid)
 

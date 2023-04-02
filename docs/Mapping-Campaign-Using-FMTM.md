@@ -1,5 +1,15 @@
 # Tutorial On How To Use FMTM For A Mapping Campaign
 
+## Table of content
+### 1. Introduction
+
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Data Kit (ODK).
+
+### 3. Steps On How To Use The FMTM Tool For A Mapping Campaign.
+
+
+### 1. Introduction
+
 A **Mapping Campaign** refers to an organized effort of collecting data from a particular geographic area/feature and creating maps. This may involve using various mapping technologies such as; GPS, satellite imagery, or crowdsourced data. These technologies are used to gather information about the area of interest.
 
 Mapping campaigns can be carried out for lots of different purposes, some examples are:
@@ -9,7 +19,7 @@ Mapping campaigns can be carried out for lots of different purposes, some exampl
 - Urban planning or;
 - Social and Political Activism.
 
-They often involve collaboration between organizations like; Government Agencies, Non-profit Groups and volunteers.
+They often involve collaboration between organizations like: Government Agencies, Non-profit Groups and volunteers.
 
 Once the data is collected, it is analyzed and processed to create detailed maps that can have a variety of use cases. These could be:
 
@@ -17,17 +27,15 @@ Once the data is collected, it is analyzed and processed to create detailed maps
 - Planning infrastructure and development projects.
 - Understanding the impact of environmental changes on the landscape, etc.
 
-### An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT) and Open Street Mapping (OSM)
+### 2. An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Data Kit (ODK).
 
-The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit organization that uses open mapping data to support humanitarian and disaster response efforts around the world. **The Field Mapping Task Manager (FMTM)** is one of the tools that **HOT** uses to coordinate and manage mapping projects.
+The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit organization that uses open mapping data to support humanitarian and disaster response efforts around the world. **The Field Mapping Task Manager (FMTM)** is one of the tools that **HOT** used to coordinate and manage mapping projects.
 
-In the context of **HOT**, **FMTM** is a software tool that helps project managers to organize and manage mapping tasks. It assigns those tasks to volunteers and tracks their progress. The tool includes features for collaborative editing, data validation, and error detection. This ensures that the data collected by volunteers is accurate and reliable.
+**FMTM** is a software tool that helps project managers to organize and manage mapping tasks. It assigns those tasks to volunteers and tracks their progress. The tool includes features for collaborative editing, data validation, and error detection. This ensures that the data collected by volunteers is accurate and reliable.
 
-**FMTM** is designed to be used in conjunction with **OpenStreetMap (OSM)**. **OSM** is a free and open-source map of the world that is created and maintained by volunteers. When volunteers use **FMTM** to collect data, that data is typically uploaded to **OSM**, where it is used to create more detailed and accurate maps of the affected area.
+**FMTM** is designed to be used in conjunction with **Open Data Kit (ODK)**. **ODK** is a free and open-source set of tools that allows users to create, collect, and manage data with mobile devices. The **ODK** provides a set of open-source tools that allow users to build forms, collect data in the field, and aggregate data on a central server. It is commonly used for data collection in research, monitoring and evaluation, and other development projects.  
 
-Overall, the **FMTM** tool is an important component of **HOT**'s efforts to support disaster response and humanitarian efforts around the world. By coordinating mapping activities and ensuring the accuracy and reliability of the data collected by volunteers, **FMTM** helps to provide critical information that can be used to support decision-making and improve the effectiveness of humanitarian efforts.
-
-### Using The FMTM Tool For A Mapping Campaign Via The HOT Website
+Project managers use **FMTM** to manage tasks and assign them to volunteers. The data collected by the volunteer via ODK is typically uploaded to **OpenStreetMap (OSM)**. **OSM** is a free and open-source map of the world that is created and maintained by volunteers.
 
 1. Navigate to the [HOT website](https://www.hotosm.org/).
 
@@ -55,14 +63,14 @@ Alternatively, you can select one from the map or the task, and choose **“Map 
 12. When finished mapping, save your edits and select the button **Submit task**.
 After this, you can go back to step 7 and select a new task for mapping.
 
-- A step by step procedure on how to begin mapping can be found [here](https://learnosm.org/en/beginner/)
+5. To begin mapping, click on a task closest to you that has the color code associated with **READY** and change it's status from **READY** to **LOCKED FOR MAPPING**. Remember to take note of the number tag.
 
-A short guide for beginners on how to begin mapping.
+6. Scroll to the bottom of the page. The **ACTIVITIES** tab shows the tasks either **LOCKED FOR MAPPING**, **BAD** or **LOCKED FOR VALIDATION**. You can search for tasks with the status mentioned using the number tag associated with each task.
 
-- How to choose and contribute to a project that suits you can be found [here](https://learnosm.org/en/coordination/tm-user/#select-a-task-to-map).
+7. The **MY TASKS** tab shows the tasks available for mapping and the QR code associated with each task. Scroll through and select the number tag of the task you locked earlier for mapping to bring out the corresponding QR code.
 
-This is a guide on the steps to take to ensure that not only are you contributing, but you are contributing properly because inaccurate and ill documented data does a lot of harm.
+8. Open your ODK collect app, tap on the icon on the top right hand corner of the app and select 'Add project'. Proceed to scan the code generated earlier on the FMTM website.
 
-- A cheat sheet for HOT Tasking Manager can be found [here](https://drive.google.com/file/d/19pckU4Cru-cSz_aclsLsBk-45SQ1Qyy_/view)
+> Note: If you just downloaded the app, click on the **Configure with QR code** option.
 
-This is a sheet that has a run down on all the steps involved in contributing to a mapping project.
+Now you can start field mapping!!

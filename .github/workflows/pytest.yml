@@ -1,11 +1,15 @@
 name: pytest
 
 on:
+  # Run tests on all pushed branches
   push:
-    branches: [main]
-  # Run tests on PR, prior to merge
+    branches:
+      - "*"
+  # Run tests on PR, prior to merge to main & development.
   pull_request:
-    branches: [main]
+    branches: 
+      - main
+      - development
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
@@ -27,7 +31,27 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    # pytest needs a valid reachable database service.
+    services:
+      # Label used to access the postgres service container
+      fmtm-db:
+        # Uses dockerhub postgis image
+        image: postgis/postgis:14-3.3-alpine
+        # Provide the password, initilized database for pytest user
+        env:
+          POSTGRES_PASSWORD: fmtm
+          POSTGRES_DB: fmtm  # Test DB name
+          POSTGRES_USER: fmtm
+        ports:
+          # Opens tcp port 5432 on the host and service container,
+          # since we running pytest on actions machine, not in another service container
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
@@ -49,3 +73,12 @@ jobs:
       - name: Run pytest
         run: |
           pytest
+        env:
+          FMTM_TEST_DB_NAME: fmtm
+          # using fmtm-db as host fails, since the job is not running in container in docker host.
+          # port mapping for now.
+          FMTM_DB_HOST: localhost
+          FMTM_DB_USER: fmtm
+          FMTM_DB_PASSWORD: fmtm
+          FRONTEND_MAIN_URL: "http://localhost:8080"
+          FRONTEND_MAP_URL: "http://localhost:8081"

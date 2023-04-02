@@ -48,14 +48,14 @@ const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, pa
                                 map.getView().setCenter(centroid)
 
                                 setTimeout(() => {
-                                    view.animate({ zoom: 20, easing: easeOut, duration: 2000, });
+                                    view.animate({ zoom: 19, easing: easeOut, duration: 2000, });
                                 }, 100);
 
 
                             }}
                                 color="info" aria-label="share qrcode"
                             >
-                                <AssetModules.LinkIcon color="info" sx={{ fontSize: 30 }} />
+                                <AssetModules.LinkIcon color="info" sx={{ fontSize: defaultTheme.typography.fontSize }} />
                             </CoreModules.IconButton>
                         }
                     />
