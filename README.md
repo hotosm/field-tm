@@ -4,11 +4,18 @@
 
 **Workflows**
 
-[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml)
+[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml) [![Production Deploy](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml)
 
-**Builds**
+**Backend Builds**
 
-**Backend** [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/fmtm-backend) **ODKCentral-API** [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api) **ODKCentral-Proxy** [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy) **Frontend Main** [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main) **Frontend Map** [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map)
+| Backend API | ODKCentral API  | ODKCentral Proxy  |
+|---|---|---|
+| [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/backend) | [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api)  |  [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy)  |
+
+**Microfrontend Builds**
+|  Main | Map |
+|---|---|
+| [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main)| [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map) |
 
 # Field Mapping Tasking Manager (FMTM)
 
@@ -31,7 +38,7 @@ HOT is already in the early stages of developing the Field Mapping Tasking Manag
 
 # How to contribute
 
-👍🎉We are actively looking for contributors to this project- from design, user testing and both front and backend developers. We have a specific request for volunteer developers at the moment!
+👍🎉We are actively looking for contributors for this project- from design, user testing and both front and backend developers. We have a specific request for volunteer developers at the moment!
 ![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
 Please take a look at our [Wiki pages](https://github.com/hotosm/fmtm/wiki/Home/90b86d34ddd42f0eafd03ea7e6d443eb37db2df6) and [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution) for more details! Reach out to us if any questions! 👍🎉
 

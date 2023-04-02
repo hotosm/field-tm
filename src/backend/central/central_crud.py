@@ -19,17 +19,20 @@
 import os
 import pathlib
 
-import odkconvert
+import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
-from odkconvert.CSVDump import CSVDump
-from odkconvert.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from osm_fieldwork.CSVDump import CSVDump
+from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
+from ..projects import project_schemas
 
 from ..config import settings
+from ..db import db_models
 
 url = settings.ODK_CENTRAL_URL
 user = settings.ODK_CENTRAL_USER
@@ -46,9 +49,13 @@ def list_odk_projects():
     return project.listProjects()
 
 
-def create_odk_project(name: str):
+def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
     """Create a project on a remote ODK Server."""
-    result = project.createProject(name)
+    odk_project = OdkProject(odk_central.odk_central_url,
+                             odk_central.odk_central_user,
+                             odk_central.odk_central_password
+                             )
+    result = odk_project.createProject(name)
     logger.debug(f"create_odk_project return from ODKCentral: {result}")
     project.id = result.get("id")
     logger.info(f"Project {name} has been created on the ODK Central server.")
@@ -105,6 +112,8 @@ def delete_odk_xform(project_id: int, xform_id: str):
     logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return result
+
+
 def list_odk_xforms(project_id: int):
     """List all XForms in an ODK Central project."""
     xforms = project.listForms(project_id)
@@ -120,6 +129,18 @@ def list_submissions(project_id: int):
             submissions.append(subm)
 
     return submissions
+
+
+def get_form_list(
+        db:Session,
+        skip:int,
+        limit:int
+    ):
+    """Returns the list of id and title of xforms from the database"""
+    try:
+        return db.query(db_models.DbXForm.id, db_models.DbXForm.title).offset(skip).limit(limit).all()
+    except Exception as e:
+        raise HTTPException(e)
 
 
 def download_submissions(project_id: int, xform_id: str):
@@ -224,7 +245,7 @@ def convert_csv(
     data: bytes,
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
-    parent = pathlib.Path(odkconvert.__file__).resolve().parent
+    parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
     csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"
@@ -235,7 +256,7 @@ def convert_csv(
 
     if len(data) == 0:
         logger.debug("Parsing csv file %r" % filespec)
-        # The yaml file is in the package files for odkconvert
+        # The yaml file is in the package files for osm_fieldwork
         data = csvin.parse(filespec)
     else:
         csvdata = csvin.parse(filespec, data)
