@@ -6,6 +6,7 @@ import {
     Stack,
     Button,
     InputBase,
+    Input,
     Dialog,
     DialogActions,
     DialogContent,
@@ -29,16 +30,24 @@ import {
     CssBaseline,
     Paper,
     createTheme,
-    Container
+    Container,
+    TextField,
+    FormControlLabel,
+    Select,
+    MenuItem,
+    FormControl,
+    FormLabel,
+    FormGroup,
+    Box
 } from "@mui/material";
 import axios from 'axios';
 import { PersistGate } from "redux-persist/integration/react";
 import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import { useNavigate, useParams, Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { useNavigate, useParams, Link, Outlet, RouterProvider,useLocation,createBrowserRouter } from "react-router-dom";
 import { useSelector, useDispatch, Provider } from 'react-redux';
-import { createSlice, configureStore } from "@reduxjs/toolkit";
+import { createSlice, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
 export default {
     Provider,
@@ -55,11 +64,14 @@ export default {
     Typography,
     Button,
     InputBase,
+    Input,
     Skeleton,
     SkeletonTheme,
     createSlice,
     configureStore,
     combineReducers,
+    useLocation,
+    getDefaultMiddleware,
     Dialog,
     DialogActions,
     DialogContent,
@@ -90,5 +102,13 @@ export default {
     SwiperPagination,
     Swiper,
     SwiperSlide,
-    axios
+    axios,
+    TextField,
+    FormControlLabel,
+    Select,
+    MenuItem,
+    FormControl,
+    FormLabel,
+    FormGroup,
+    Box
 }
