@@ -42,10 +42,17 @@ pyxform==1.12.0
 qrcode==7.4.2
 pyxform==1.12.0
 xmltodict==0.13.0
-git+https://github.com/hotosm/odkconvert#odkconvert
+osm-fieldwork==0.2.0
 
 # ----- FILE UPLOAD ----
 python-multipart==0.0.5
 
 # ----- LOGGING -----
 python-json-logger==2.0.6
+
+# Testing
+pytest==7.2.2
+SQLAlchemy-Utils==0.40.0
+
+# Hashing
+bcrypt==4.0.1
