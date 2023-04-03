@@ -33,6 +33,7 @@ const Home = () => {
   const params = CoreModules.useParams();
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useSelector((state) => state.project);
+
   const projectInfo = CoreModules.useSelector(
     (state) => state.home.selectedProject
   );
