@@ -609,7 +609,7 @@ def read_xlsforms(
 
 def generate_appuser_files(
     db: Session,
-    dbname: str,
+    # dbname: str,
     category: str,
     project_id: int,
 ):
@@ -644,7 +644,9 @@ def generate_appuser_files(
         for poly in result.fetchall():
             # poly = result.first()
             name = f"{prefix}_{category}_{poly.id}"
-            appuser = central_crud.create_appuser(project_id, name)
+            # appuser = central_crud.create_appuser(project_id, name)
+            appuser = central_crud.create_appuser(one[3], name)
+
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
@@ -653,9 +655,16 @@ def generate_appuser_files(
             xlsform = f"{xlsforms_path}/{xform_title}.xls"
             xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
             outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
-            pg = PostgresClient('localhost', dbname, outfile)
+            # pg = PostgresClient('localhost', dbname, outfile)
+
             outline = eval(poly.outline)
-            pg.getFeature(outline, outfile, xform_title)
+            pg = OverpassClient(outfile)
+
+            out = {     "type": "Feature",
+                        "geometry": outline,
+                        "properties": {},
+                    }
+            pg.getFeatures(out, outfile, xform_title)
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
             # import epdb; epdb.st()
             result = central_crud.create_odk_xform(project_id, poly.id, outfile)
