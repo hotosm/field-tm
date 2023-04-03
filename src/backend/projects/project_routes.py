@@ -303,11 +303,11 @@ async def download_task_boundaries(
 @router.post("/{project_id}/generate")
 async def generate_files(
     project_id: int,
-    dbname: str,
+    # dbname: str,
     category: str,
     db: Session = Depends(database.get_db),
 ):
-    project_crud.generate_appuser_files(db, dbname, category, project_id)
+    project_crud.generate_appuser_files(db, category, project_id)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
