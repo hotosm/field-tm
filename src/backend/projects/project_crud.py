@@ -23,6 +23,9 @@ import os
 from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
+import base64
+import segno
+from base64 import b64encode
 
 import geoalchemy2
 import geojson
@@ -651,7 +654,9 @@ def generate_appuser_files(
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
 
-            create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
+            create_qr = create_qrcode(db, one[3], appuser.json()["token"], f"/tmp/{name}")
+
+            # create_qr = create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
             xlsform = f"{xlsforms_path}/{xform_title}.xls"
             xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
             outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
@@ -666,8 +671,25 @@ def generate_appuser_files(
                     }
             pg.getFeatures(out, outfile, xform_title)
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+
+
+            """Update tasks table qith qr_Code id"""
+            task = tasks_crud.get_task(db, poly.id)
+            task.qr_code_id = create_qr['qr_code_id']
+            db.commit()
+            db.refresh(task)
+
+            try:
+                odk_app = central_crud.appuser
+                odk_app.updateRole(projectId=one[3], 
+                                xmlFormId=xform_title, 
+                                actorId=appuser.json()["token"])
+            except Exception as e:
+                print('Error ', str(e))
+
             # import epdb; epdb.st()
-            result = central_crud.create_odk_xform(project_id, poly.id, outfile)
+            result = central_crud.create_odk_xform(one[3], poly.id, outfile)
+            # result = central_crud.create_odk_xform(project_id, poly.id, outfile)
 
 
 def create_qrcode(
@@ -678,8 +700,15 @@ def create_qrcode(
 ):
     """Make a QR code for an app_user."""
     qrcode = central_crud.create_QRCode(project_id, token, project_name)
+
+    qrcode = segno.make(qrcode, micro=False)
+    image_name = f"{project_name}.png"
+    with open(image_name, "rb") as f:
+        base64_data = b64encode(f.read()).decode()
+    qr_code_text = base64.b64decode(base64_data)
     qrdb = db_models.DbQrCode(
-        image=qrcode,
+        image=qr_code_text,
+        filename = image_name
     )
     db.add(qrdb)
     db.commit()
@@ -687,7 +716,7 @@ def create_qrcode(
     sql = select(sqlalchemy.func.count(codes.c.id))
     result = db.execute(sql)
     rows = result.fetchone()[0]
-    return {"data": qrcode, "id": rows + 1}
+    return {"data": qrcode, "id": rows + 1,"qr_code_id":qrdb.id}
 
 
 def download_geometry(
