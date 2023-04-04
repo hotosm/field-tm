@@ -4,44 +4,17 @@ import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService, UploadAreaService } from "../../api/CreateProjectService";
+import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { SelectPicker } from 'rsuite';
 
-const UploadArea = () => {
+const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
-    const searchableInnerStyle: any = {
-        toolbar: {
-            marginTop: '0.7%',
-            width: 250,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        outlineBtn: {
-            width: 250,
-            marginTop: '0.7%',
-            borderRadius: 7,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        outlineBtnXs: {
-            width: '50%',
-            borderRadius: 7,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        toolbarXs: {
-            width: '50%',
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-
-    }
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
 
@@ -54,8 +27,6 @@ const UploadArea = () => {
     const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
 
     const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
     // //we use use selector from redux to get all state of formCategory from createProject slice
@@ -68,7 +39,7 @@ const UploadArea = () => {
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
     useEffect(() => {
         if (projectArea !== null) {
-            navigate('/');
+            navigate('/basemap-selection');
             dispatch(CreateProjectActions.ClearCreateProjectFormData())
 
         }
@@ -127,7 +98,6 @@ const UploadArea = () => {
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
-                    color='red'
                     searchable={false}
                     onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} />
                 <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
@@ -137,7 +107,6 @@ const UploadArea = () => {
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
-                    color='red'
                     searchable={false}
                     onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} />
 
@@ -186,7 +155,7 @@ const UploadArea = () => {
                         onCreateProjectSubmission();
                     }}
                 >
-                    Submit
+                    Next
                 </CoreModules.Button>
                 {/* END */}
             </FormGroup>
