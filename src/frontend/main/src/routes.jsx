@@ -13,6 +13,7 @@ import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
 import NewPage from './views/NewPage';
 import ProtectedRoute from './utilities/ProtectedRoute';
+import BasemapSelection from './components/createproject/BasemapSelection';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const routes = createBrowserRouter(
@@ -47,11 +48,11 @@ const routes = createBrowserRouter(
                 {
                     path: '/project_details/:id',
                     element:
-                               <ProtectedRoute>
-                                 <Suspense fallback={<div></div>}>
-                                    <ProjectDetails />
-                                </Suspense>
-                               </ProtectedRoute>
+                           <ProtectedRoute>
+                             <Suspense fallback={<div></div>}>
+                                <ProjectDetails />
+                            </Suspense>
+                           </ProtectedRoute>
                 },
                 {
                     path: '/newpage/:id',
@@ -71,6 +72,14 @@ const routes = createBrowserRouter(
                 },
                 {
                     path: '/upload-area',
+                    element: <ProtectedRoute>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <CreateProject />
+                                </Suspense>
+                            </ProtectedRoute>
+                },
+                {
+                    path: '/basemap-selection',
                     element: <ProtectedRoute>
                                 <Suspense fallback={<div>Loading...</div>}>
                                     <CreateProject />
