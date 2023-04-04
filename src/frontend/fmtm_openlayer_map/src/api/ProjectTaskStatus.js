@@ -2,6 +2,7 @@ import { ProjectActions } from "fmtm/ProjectSlice";
 import { easeIn, easeOut } from "ol/easing";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
+import { CommonActions } from "fmtm/CommonSlice";
 const UpdateTaskStatus = (
   url,
   style,
@@ -19,7 +20,7 @@ const UpdateTaskStatus = (
     );
     const updateTask = async (url, existingData, body, feature) => {
       try {
-        dispatch(HomeActions.SetDialogStatus(false));
+        dispatch(CommonActions.SetLoading(true));
 
         const response = await CoreModules.axios.post(url, body);
         const findIndexForUpdation = existingData[
@@ -39,7 +40,7 @@ const UpdateTaskStatus = (
         dispatch(ProjectActions.SetProjectTaskBoundries(updatedProject));
 
         await feature.setStyle(style);
-
+        dispatch(CommonActions.SetLoading(false));
         dispatch(
           HomeActions.SetSnackBar({
             open: true,
@@ -49,6 +50,7 @@ const UpdateTaskStatus = (
           })
         );
       } catch (error) {
+        dispatch(CommonActions.SetLoading(false));
         dispatch(
           HomeActions.SetSnackBar({
             open: true,

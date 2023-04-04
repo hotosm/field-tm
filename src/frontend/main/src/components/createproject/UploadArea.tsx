@@ -25,16 +25,17 @@ const UploadArea: React.FC = () => {
     // //dispatch function to perform redux state mutation
 
     const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
-
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-    // //we use use selector from redux to get all state of formCategory from createProject slice
+    // //we use use-selector from redux to get all state of formCategory from createProject slice
 
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    // const { id: projectId } = projectDetailsResponse;
+    const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
     useEffect(() => {
@@ -79,8 +80,13 @@ const UploadArea: React.FC = () => {
             {
                 "project_info": { ...values },
                 "author": {
-                    "username": values.username,
-                    "id": values.id
+                    "username": userDetails.username,
+                    "id": userDetails.id
+                },
+                "odk_central": {
+                    "odk_central_url": values.odk_central_url,
+                    "odk_central_user": values.odk_central_user,
+                    "odk_central_password": values.odk_central_password
                 },
                 "xform_title": projectDetails.xform_title,
                 "dimension": projectDetails.dimension,
