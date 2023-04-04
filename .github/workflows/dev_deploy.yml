@@ -30,4 +30,4 @@ jobs:
         run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Deploy
-        run: ssh fmtm-dev@ec2-3-108-14-126.ap-south-1.compute.amazonaws.com "cd /home/fmtm-dev/Projects/fmtm/;git pull origin development; docker compose --file docker-compose.prod.yml up -d --build"
+        run: ssh fmtm-dev@ec2-3-108-14-126.ap-south-1.compute.amazonaws.com "cd /home/fmtm-dev/Projects/fmtm/;git pull origin development; docker compose up -d --build --remove-orphans"
