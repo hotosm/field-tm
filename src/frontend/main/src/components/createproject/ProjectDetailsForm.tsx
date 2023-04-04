@@ -1,16 +1,13 @@
 import React, { useEffect } from "react";
 import windowDimention from "../../hooks/WindowDimension";
-import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
-import { CreateProjectService } from "../../api/CreateProjectService";
 import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
-import { diffObject } from "../../utilfunctions/compareUtils";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 
 
-const ProjectDetailsForm = () => {
+const ProjectDetailsForm: React.FC = () => {
     const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
@@ -28,19 +25,6 @@ const ProjectDetailsForm = () => {
     const projectDetailsResponse = CoreModules.useSelector((state) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
-    // // passing payloads for creating project from form
-    const onCreateProjectSubmission = (values) => {
-        dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
-            {
-                "project_info": { ...values },
-                "author": {
-                    "username": values.username,
-                    "id": values.id
-                },
-            }
-        ));
-    }
-    // Might Need To Fix little after all backend PR merges  // 
 
     useEffect(() => {
         if (projectDetailsResponse !== null) {
@@ -58,15 +42,12 @@ const ProjectDetailsForm = () => {
 
     };
 
-    const { handleChange, handleSubmit, handleCustomChange, values, errors } = useForm(
+    const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
         projectDetails,
         submission,
         CreateProjectValidation,
     );
-    const submitForm = () => {
-        // const changedValues = diffObject(projectDetails, values);
-        onCreateProjectSubmission(values);
-    };
+
     const inputFormStyles = () => {
         return {
             style: {
