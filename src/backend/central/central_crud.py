@@ -161,7 +161,7 @@ def generate_updated_xform(
 
     outfile = xform
     try:
-        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=True)
+        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
     except Exception:
         logger.error(f"Couldn't convert {xlsform} to an XForm!")
         return None
