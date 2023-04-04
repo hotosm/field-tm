@@ -10,6 +10,7 @@ const CreateProject = CoreModules.createSlice({
         projectArea:null,
         projectAreaLoading:false,
         formCategoryList:[],
+        generateQrLoading:false,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -43,6 +44,9 @@ const CreateProject = CoreModules.createSlice({
         },
         SetIndividualProjectDetailsData(state,action){
             state.projectDetails= action.payload
+        },
+        GenerateProjectQRLoading(state,action){
+            state.generateQrLoading= action.payload
         }
     }
 })
