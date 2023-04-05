@@ -19,20 +19,22 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
                 }
                 await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload));
-                await dispatch(CreateProjectActions.PostProjectDetails(resp));
-                // Added Snackbar toast for success message 
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
                         message: 'Project Successfully Created.',
                         variant: "success",
-                        duration: 2000,
+                        duration: 1000,
                     })
                 );
+                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate?category=${payload.xform_title}`));
+                await dispatch(CreateProjectActions.PostProjectDetails(resp));
+                // Added Snackbar toast for success message 
                 // END
 
             } catch (error) {
                 console.log(error.response,'error');
+                console.log(error,'error2');
 
                 // Added Snackbar toast for error message 
                 dispatch(
@@ -113,5 +115,42 @@ const UploadAreaService: Function = (url: string,payload: any) => {
     }
 
 }
+const GenerateProjectQRService: Function = (url: string,payload: any) => {
 
-export {UploadAreaService,CreateProjectService,FormCategoryService}
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.GenerateProjectQRLoading(true))
+
+        const postUploadArea = async (url,payload) => {
+
+            try {
+                const postNewProjectDetails = await axios.post(url);
+                // const resp: UploadAreaDetailsModel = postNewProjectDetails.data;
+                await dispatch(CreateProjectActions.GenerateProjectQRLoading(false))
+                CommonActions.SetSnackBar({
+                    open: true,
+                    message: 'Generating QR For Project',
+                    variant: "success",
+                    duration: 2000,
+                })
+                // await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
+                
+            } catch (error) {
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: JSON.stringify(error.response.data.detail),
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
+                dispatch(CreateProjectActions.GenerateProjectQRLoading(false))
+            }
+        }
+
+        await postUploadArea(url,payload);
+
+    }
+
+}
+
+export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService}
