@@ -1,16 +1,13 @@
 import React, { useEffect } from "react";
 import windowDimention from "../../hooks/WindowDimension";
-import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
-import { CreateProjectService } from "../../api/CreateProjectService";
 import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
-import { diffObject } from "../../utilfunctions/compareUtils";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 
 
-const ProjectDetailsForm = () => {
+const ProjectDetailsForm: React.FC = () => {
     const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
@@ -29,7 +26,6 @@ const ProjectDetailsForm = () => {
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
 
-
     useEffect(() => {
         if (projectDetailsResponse !== null) {
             navigate('/upload-area');
@@ -46,15 +42,11 @@ const ProjectDetailsForm = () => {
 
     };
 
-    const { handleChange, handleSubmit, handleCustomChange, values, errors } = useForm(
+    const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
         projectDetails,
         submission,
         CreateProjectValidation,
     );
-    const submitForm = () => {
-        // const changedValues = diffObject(projectDetails, values);
-        // onCreateProjectSubmission(values);
-    };
     const inputFormStyles = () => {
         return {
             style: {
