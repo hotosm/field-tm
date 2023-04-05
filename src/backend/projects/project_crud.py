@@ -36,6 +36,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
 from osm_fieldwork.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
+from osm_fieldwork.OdkCentral import OdkAppUser
 from shapely import wkt
 from sqlalchemy import (
     column,
@@ -624,7 +625,13 @@ def generate_appuser_files(
     and the OSM data extract.
     """
     project = table(
-        "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+        "projects", column("project_name_prefix"), 
+        column("xform_title"), 
+        column("id"), 
+        column("odkid"),
+        column("odk_central_url"),
+        column("odk_central_user"),
+        column("odk_central_password"),
     )
     where = f"id={project_id}"
     sql = select(project).where(text(where))
@@ -648,17 +655,25 @@ def generate_appuser_files(
             geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
         ).where(text(where))
         result = db.execute(sql)
+
+        # Get odk project id, and odk credentials from project. 
+        odk_id = one.odkid
+        odk_credentials={
+            'odk_central_url' : one.odk_central_url,
+            'odk_central_user' : one.odk_central_user,
+            'odk_central_password' : one.odk_central_password
+        }
         for poly in result.fetchall():
             # poly = result.first()
             name = f"{prefix}_{category}_{poly.id}"
             # appuser = central_crud.create_appuser(project_id, name)
-            appuser = central_crud.create_appuser(one[3], name)
+            appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
 
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
 
-            create_qr = create_qrcode(db, one[3], appuser.json()["token"], f"/tmp/{name}")
+            create_qr = create_qrcode(db, odk_id, appuser.json()["token"], f"/tmp/{name}", odk_credentials)
 
             # create_qr = create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
             xlsform = f"{xlsforms_path}/{xform_title}.xls"
@@ -676,24 +691,29 @@ def generate_appuser_files(
             pg.getFeatures(out, outfile, xform_title)
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
 
-
             """Update tasks table qith qr_Code id"""
             task = tasks_crud.get_task(db, poly.id)
             task.qr_code_id = create_qr['qr_code_id']
             db.commit()
             db.refresh(task)
 
+            # import epdb; epdb.st()
+            result = central_crud.create_odk_xform(odk_id, poly.id, outfile, odk_credentials)
             try:
-                odk_app = central_crud.appuser
+                # Pass odk credentials
+                if odk_credentials:
+                    url = odk_credentials['odk_central_url']
+                    user = odk_credentials['odk_central_user']
+                    pw = odk_credentials['odk_central_password']
+                    odk_app = OdkAppUser(url, user, pw)
+                else:
+                    odk_app = central_crud.appuser
+
                 odk_app.updateRole(projectId=one[3], 
-                                xmlFormId=xform_title, 
-                                actorId=appuser.json()["token"])
+                                xmlFormId=poly.id, 
+                                actorId=appuser.json()["id"])
             except Exception as e:
                 print('Error ', str(e))
-
-            # import epdb; epdb.st()
-            result = central_crud.create_odk_xform(one[3], poly.id, outfile)
-            # result = central_crud.create_odk_xform(project_id, poly.id, outfile)
 
 
 def create_qrcode(
@@ -701,9 +721,10 @@ def create_qrcode(
     project_id: int,
     token: str,
     project_name: str,
+    odk_credentials: dict = None
 ):
     """Make a QR code for an app_user."""
-    qrcode = central_crud.create_QRCode(project_id, token, project_name)
+    qrcode = central_crud.create_QRCode(project_id, token, project_name, odk_credentials)
 
     qrcode = segno.make(qrcode, micro=False)
     image_name = f"{project_name}.png"
