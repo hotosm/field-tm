@@ -73,13 +73,24 @@ def delete_odk_project(project_id: int):
     return result
 
 
-def create_appuser(project_id: int, name: str):
-    """Create an app-user on a remote ODK Server."""
+def create_appuser(project_id: int, name: str, odk_credentials:dict = None):
+    """
+        Create an app-user on a remote ODK Server.
+        If odk credentials of the project are provided, use them to create an app user.
+    """
     # project.listAppUsers(project_id)
     # user = project.findAppUser(name=name)
     # user = False
     # if not user:
-    result = appuser.create(project_id, name)
+
+    if odk_credentials:
+        url = odk_credentials['odk_central_url']
+        user = odk_credentials['odk_central_user']
+        pw = odk_credentials['odk_central_password']
+        app_user = OdkAppUser(url, user, pw)
+        result = app_user.create(project_id, name)
+    else:
+        result = appuser.create(project_id, name)
     logger.info(f"Created app user: {result.json()}")
     return result
 
@@ -91,17 +102,29 @@ def delete_app_user(project_id: int, name: str):
     return result
 
 
-def create_odk_xform(project_id: int, xform_id: str, filespec: str):
+def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credentials:dict=None):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
-    result = xform.createForm(project_id, title, filespec, False)
+    # result = xform.createForm(project_id, title, filespec, True)
+    # Pass odk credentials of project in xform 
+    if odk_credentials:
+        url = odk_credentials['odk_central_url']
+        user = odk_credentials['odk_central_user']
+        pw = odk_credentials['odk_central_password']
+        try:
+            xform = OdkForm(url, user, pw)
+        except:
+            raise HTTPException(status_code=500, detail={'message':'Connection failed to odk central'})
+        
+    result = xform.createForm(project_id, xform_id, filespec, True)
+
     if result != 200 and result != 409:
         return result
     data = f"/tmp/{title}.geojson"
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     result = xform.uploadMedia(project_id, title, data)
-    #if result == 200:
+    
     result = xform.publishForm(project_id, title)
     return result
 
@@ -224,10 +247,19 @@ def create_QRCode(
     project_id: int,
     token: str,
     name: str,
+    odk_credentials: dict=None
 ):
     """Create the QR Code for an app-user."""
-    appuser = OdkAppUser()
-    return appuser.createQRCode(project_id, token, name)
+    
+    if odk_credentials:
+        url = odk_credentials['odk_central_url']
+        user = odk_credentials['odk_central_user']
+        pw = odk_credentials['odk_central_password']
+        app_user = OdkAppUser(url,user,pw)
+    else:
+        app_user = appuser
+    return app_user.createQRCode(project_id, token, name)
+
 
 def upload_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central."""
