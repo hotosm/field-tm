@@ -240,7 +240,7 @@ def create_project_with_project_info(
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
-
+    odk_credentials = project_metadata.odk_central
     # verify data coming in
     if not user:
         raise HTTPException("No user passed in")
@@ -260,7 +260,11 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
-        xform_title= xform_title
+        xform_title= xform_title,
+        odk_central_url = odk_credentials.odk_central_url,
+        odk_central_user = odk_credentials.odk_central_user,
+        odk_central_password = odk_credentials.odk_central_password,
+
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
