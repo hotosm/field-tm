@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { SelectPicker } from 'rsuite';
 
 
 const ProjectDetailsForm: React.FC = () => {
@@ -56,10 +57,32 @@ const ProjectDetailsForm: React.FC = () => {
             } // or className: 'your-class'
         }
     }
+    const organizationList = ['Naxa', 'Org 1', 'Org 2'].map(
+        item => ({ label: item, value: item })
+    );
     return (
         <CoreModules.Stack sx={{ width: '50%' }}>
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
+                    {/* Organization Dropdown For Create Project */}
+                    <CoreModules.FormControl sx={{ mb: 3 }}>
+                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Organization<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <SelectPicker data={organizationList}
+                            style={{
+                                width: '40%',
+                                fontFamily: defaultTheme.typography.h3.fontFamily,
+                                fontSize: defaultTheme.typography.h3.fontSize
+                            }}
+
+                            searchable={false}
+                            onChange={(value) => {
+                                handleCustomChange('organization', value);
+                                dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value }))
+                            }
+                            } />
+                        {errors.organization && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.organization}</CoreModules.FormLabel>}
+                    </CoreModules.FormControl>
+                    {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
@@ -80,6 +103,7 @@ const ProjectDetailsForm: React.FC = () => {
                         {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
                     </CoreModules.FormControl>
                     {/* END */}
+
                     {/* Project Name Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
                         <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Email/Username <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
@@ -99,6 +123,7 @@ const ProjectDetailsForm: React.FC = () => {
                         {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
                     </CoreModules.FormControl>
                     {/* END */}
+
                     {/* Project Name Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
                         <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Password <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
