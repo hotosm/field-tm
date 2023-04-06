@@ -673,13 +673,17 @@ def generate_appuser_files(
                 logger.error(f"Couldn't create appuser for project {project_id}")
                 return None
 
-            create_qr = create_qrcode(db, odk_id, appuser.json()["token"], f"/tmp/{name}", odk_credentials)
+            #prefix should be sent instead of name
+            create_qr = create_qrcode(db, odk_id, appuser.json()["token"], prefix, odk_credentials)
 
             # create_qr = create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
             xlsform = f"{xlsforms_path}/{xform_title}.xls"
             xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
             outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
             # pg = PostgresClient('localhost', dbname, outfile)
+
+            #xform_id_format
+            xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
 
             outline = eval(poly.outline)
             pg = OverpassClient(outfile)
@@ -710,7 +714,7 @@ def generate_appuser_files(
                     odk_app = central_crud.appuser
 
                 odk_app.updateRole(projectId=one[3], 
-                                xmlFormId=poly.id, 
+                                xmlFormId=xform_id, 
                                 actorId=appuser.json()["id"])
             except Exception as e:
                 print('Error ', str(e))
@@ -725,7 +729,6 @@ def create_qrcode(
 ):
     """Make a QR code for an app_user."""
     qrcode = central_crud.create_QRCode(project_id, token, project_name, odk_credentials)
-
     qrcode = segno.make(qrcode, micro=False)
     image_name = f"{project_name}.png"
     with open(image_name, "rb") as f:

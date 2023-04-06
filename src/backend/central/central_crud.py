@@ -19,6 +19,12 @@
 import os
 import pathlib
 
+#Qr code imports
+import segno
+import base64
+import json
+import zlib
+
 import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
@@ -258,7 +264,20 @@ def create_QRCode(
         app_user = OdkAppUser(url,user,pw)
     else:
         app_user = appuser
-    return app_user.createQRCode(project_id, token, name)
+    
+    qr_code_setting = {
+            "general": {
+                "server_url": f"{url}key/{token}/projects/{project_id}",
+                "form_update_mode": "match_exactly",
+                "autosend": "wifi_and_cellular",
+            },
+            "project": {"name": f"{name}"},
+            "admin": {},
+        }
+    qr_data = base64.b64encode(zlib.compress(json.dumps(qr_code_setting).encode("utf-8")))
+    qrcode = segno.make(qr_data, micro=False)
+    qrcode.save(f"{name}.png", scale=5)
+    return qr_data
 
 
 def upload_media(project_id: int, xform_id: str, filespec: str):
