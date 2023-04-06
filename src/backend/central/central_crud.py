@@ -19,6 +19,12 @@
 import os
 import pathlib
 
+#Qr code imports
+import segno
+import base64
+import json
+import zlib
+
 import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
@@ -116,7 +122,7 @@ def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credenti
         except:
             raise HTTPException(status_code=500, detail={'message':'Connection failed to odk central'})
         
-    result = xform.createForm(project_id, xform_id, filespec, True)
+    result = xform.createForm(project_id, xform_id, filespec, False)
 
     if result != 200 and result != 409:
         return result
@@ -252,13 +258,23 @@ def create_QRCode(
     """Create the QR Code for an app-user."""
     
     if odk_credentials:
-        url = odk_credentials['odk_central_url']
-        user = odk_credentials['odk_central_user']
-        pw = odk_credentials['odk_central_password']
-        app_user = OdkAppUser(url,user,pw)
+        central_url = odk_credentials['odk_central_url']
     else:
-        app_user = appuser
-    return app_user.createQRCode(project_id, token, name)
+        central_url = url
+    
+    qr_code_setting = {
+            "general": {
+                "server_url": f"{central_url}key/{token}/projects/{project_id}",
+                "form_update_mode": "match_exactly",
+                "autosend": "wifi_and_cellular",
+            },
+            "project": {"name": f"{name}"},
+            "admin": {},
+        }
+    qr_data = base64.b64encode(zlib.compress(json.dumps(qr_code_setting).encode("utf-8")))
+    qrcode = segno.make(qr_data, micro=False)
+    qrcode.save(f"{name}.png", scale=5)
+    return qr_data
 
 
 def upload_media(project_id: int, xform_id: str, filespec: str):
