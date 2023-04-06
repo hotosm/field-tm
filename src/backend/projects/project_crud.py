@@ -727,7 +727,7 @@ def create_qrcode(
     project_name: str,
     odk_credentials: dict = None
 ):
-    """Make a QR code for an app_user."""
+    #Make QR code for an app_user.
     qrcode = central_crud.create_QRCode(project_id, token, project_name, odk_credentials)
     qrcode = segno.make(qrcode, micro=False)
     image_name = f"{project_name}.png"
