@@ -264,7 +264,7 @@ def create_QRCode(
     
     qr_code_setting = {
             "general": {
-                "server_url": f"{central_url}key/{token}/projects/{project_id}",
+                "server_url": f"{central_url}/key/{token}/projects/{project_id}",
                 "form_update_mode": "match_exactly",
                 "autosend": "wifi_and_cellular",
             },
