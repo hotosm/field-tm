@@ -37,26 +37,31 @@ The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit organization that 
 
 Project managers use **FMTM** to manage tasks and assign them to volunteers. The data collected by the volunteer via ODK is typically uploaded to **OpenStreetMap (OSM)**. **OSM** is a free and open-source map of the world that is created and maintained by volunteers.
 
-Overall, the **FMTM** tool is an important component of **HOT**'s efforts to support disaster response and humanitarian efforts around the world. By coordinating mapping activities and ensuring the accuracy and reliability of the data collected by volunteers, **FMTM** helps to provide critical information that can be used to support decision-making and improve the effectiveness of humanitarian efforts.
+1. Navigate to the [HOT website](https://www.hotosm.org/).
 
-### 3. Steps On How To Use The FMTM Tool For A Mapping Campaign.
+2. Click on the Tools & Data feature on the **HOT** Dashboard.
 
-1. Navigate to the [FMTM website](https://fmtm.hotosm.org/).
+3. Select Task Manager from **“Tools we use”**.
 
-2. Click on **EXPLORE PROJECTS** to checkout the projects available for mapping
+4. Click on the **Sign up button** in the upper right corner of the Tasking Manager homepage.
 
-3. Select a project to map in your location.
+5. Provide your name and email address (We will use this information to guide you through the sign-up process).
 
-4. The drop down icon beside **LEGEND** displays a color code. This color code lets you know the status of each task on the map.
-    - **READY** means that task is available to be mapped
-    - **LOCKED FOR MAPPING** means that task is already being mapped by another volunteer and therefore unavailable for mapping
-    - **MAPPED** or **READY FOR VALIDATION** means that task has been completely mapped and ready to be validated.
-    - **LOCKED FOR VALIDATION** means that task has been mapped and being validated.
-    - **VALIDATED** means that task has successfully been validated and completely mapped with no errors
-    - **INVALIDATED** or **MORE MAPPING NEEDED** means that task did not pass the validation process and needs more mapping
-    - **BAD** means that task is not clear and cannot be mapped
+6. A new tab will open allowing you to register on **OpenStreetMap.org**. Provide your account information and press the Sign up button at the bottom of the form.
 
-> Note: 'task' refers to each section of the map enclosed in the dotted lines and each task has a corresponding number tag.
+7. Close the tab and go back to the Tasking Manager. Click the button to Log in.
+
+8. Select Explore projects in the main navigation to find a project to help map. Or use the link provided by your mapathon instructor.
+
+9. Read the introductions to the project and click on **Contribute** to begin with a mapping task.
+
+10. Map a randomly selected task for mapping by clicking on the button **Map a task**.
+Alternatively, you can select one from the map or the task, and choose **“Map selected task”**.
+
+11. This opens the editor; map all the features asked for in the instructions.
+
+12. When finished mapping, save your edits and select the button **Submit task**.
+After this, you can go back to step 7 and select a new task for mapping.
 
 5. To begin mapping, click on a task closest to you that has the color code associated with **READY** and change it's status from **READY** to **LOCKED FOR MAPPING**. Remember to take note of the number tag.
 
