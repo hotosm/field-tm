@@ -122,7 +122,7 @@ def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credenti
         except:
             raise HTTPException(status_code=500, detail={'message':'Connection failed to odk central'})
         
-    result = xform.createForm(project_id, xform_id, filespec, True)
+    result = xform.createForm(project_id, xform_id, filespec, False)
 
     if result != 200 and result != 409:
         return result
@@ -258,16 +258,13 @@ def create_QRCode(
     """Create the QR Code for an app-user."""
     
     if odk_credentials:
-        url = odk_credentials['odk_central_url']
-        user = odk_credentials['odk_central_user']
-        pw = odk_credentials['odk_central_password']
-        app_user = OdkAppUser(url,user,pw)
+        central_url = odk_credentials['odk_central_url']
     else:
-        app_user = appuser
+        central_url = url
     
     qr_code_setting = {
             "general": {
-                "server_url": f"{url}key/{token}/projects/{project_id}",
+                "server_url": f"{central_url}key/{token}/projects/{project_id}",
                 "form_update_mode": "match_exactly",
                 "autosend": "wifi_and_cellular",
             },
