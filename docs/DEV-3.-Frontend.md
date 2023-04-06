@@ -59,3 +59,27 @@ The frontend should now be accessible at: <<http://127.0.0.1:<PORT_NUMBER>>>.
 ### 2D. Repeat for each module
 
 Each module in the microfrontend must be running for it to operate as a whole.
+
+## Frontend Tips
+
+The frontend is built with React and Typescript. Here are some tips on how to work with the frontend:
+
+### Adding Environment Variables
+To add environment variables, create a .env.local file in the `src/`
+frontend directory. Any variables defined here will override those in .
+env.
+
+### Adding New Routes
+To add a new route, create a new page in the src/frontend/pages
+directory. Then add a new entry to the `src/frontend/router.tsx` file.
+
+### Adding New Components
+To add a new component, create a new .tsx file in the src/frontend/
+components directory.
+
+### Conclusion
+Running the FMTM project is easy with Docker. You can also run the
+project locally outside of Docker, but it requires more setup. The
+frontend is built with React and Typescript, and the backend is built
+with FastAPI. Use the tips provided to customize and extend the
+functionality of the project.
