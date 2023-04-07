@@ -257,21 +257,27 @@ def create_QRCode(
 ):
     """Create the QR Code for an app-user."""
     
+    # Odk central url of the project
     if odk_credentials:
         central_url = odk_credentials['odk_central_url']
     else:
         central_url = url
     
+    # Qr code text json in the format acceptable by odk collect.
     qr_code_setting = {
             "general": {
-                "server_url": f"{central_url}/key/{token}/projects/{project_id}",
+                "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
                 "form_update_mode": "match_exactly",
                 "autosend": "wifi_and_cellular",
             },
             "project": {"name": f"{name}"},
             "admin": {},
         }
+    
+    # Base64 encoded
     qr_data = base64.b64encode(zlib.compress(json.dumps(qr_code_setting).encode("utf-8")))
+
+    #Generate qr code using segno
     qrcode = segno.make(qr_data, micro=False)
     qrcode.save(f"{name}.png", scale=5)
     return qr_data
