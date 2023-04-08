@@ -91,3 +91,13 @@ class ProjectBase(BaseModel):
 
 class ProjectOut(ProjectBase):
     pass
+
+
+class Organisation(BaseModel):
+    # id: int
+    slug: str
+    logo: str
+    name: str
+    description:str
+    url:str
+    type:int

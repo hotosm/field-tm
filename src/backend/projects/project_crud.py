@@ -986,3 +986,33 @@ def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
         return app_projects_without_nones
     else:
         return []
+
+
+def get_organisations(
+    db: Session,
+):
+    db_organisation = ( 
+        db.query(db_models.DbOrganisation)
+        .all()
+    )
+    return db_organisation
+
+
+def create_organization(
+    db: Session,
+    org: project_schemas.Organisation
+):
+     # create new project
+    db_organization = db_models.DbOrganisation(
+        name=org.name,
+        slug=org.slug,
+        logo=org.logo,
+        description= org.description,
+        url= org.url,
+        type= org.type,
+    )
+    db.add(db_organization)
+    db.commit()
+    db.refresh(db_organization)
+
+    return True
