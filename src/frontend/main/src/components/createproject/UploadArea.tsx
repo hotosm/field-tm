@@ -73,7 +73,7 @@ const UploadArea: React.FC = () => {
         }
     }
 
-    // // passing payloads for creating project from form
+    // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
     const onCreateProjectSubmission = () => {
         const { values } = location.state;
         dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
@@ -91,6 +91,7 @@ const UploadArea: React.FC = () => {
                 "xform_title": projectDetails.xform_title,
                 "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
+                "organization": values.organization
             }, fileUpload
         ));
     }

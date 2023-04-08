@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
-import { CreateProjectDetailsModel, FormCategoryListModel } from '../models/createproject/createProjectModel';
+import { CreateProjectDetailsModel, FormCategoryListModel, OrganisationListModel } from '../models/createproject/createProjectModel';
 import enviroment from "../environment";
 import { CommonActions } from '../store/slices/CommonSlice';
 
@@ -153,4 +153,26 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
 
 }
 
-export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService}
+const OrganisationService: Function = (url: string) => {
+
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.GetOrganisationListLoading(true))
+
+        const getOrganisationList = async (url) => {
+            try {
+                const getOrganisationListResponse = await axios.get(url)
+                const resp: OrganisationListModel = getOrganisationListResponse.data;
+                dispatch(CreateProjectActions.GetOrganisationList(resp));
+
+            } catch (error) {
+                dispatch(CreateProjectActions.GetOrganizationListLoading(false));
+            }
+        }
+
+        await getOrganisationList(url);
+
+    }
+
+}
+
+export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService}

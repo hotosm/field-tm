@@ -69,3 +69,13 @@ export interface CreateProjectDetailsModel {
     id: number,
     title: string,
   }
+  export interface OrganisationListModel {
+    name: string;
+    slug: string;
+    description: string;
+    type: number;
+    subscription_tier: null | string;
+    id: number;
+    logo: string;
+    url: string;
+  }
