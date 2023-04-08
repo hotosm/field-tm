@@ -6,6 +6,8 @@ import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { SelectPicker } from 'rsuite';
+import { OrganisationService } from "../../api/CreateProjectService";
+import environment from "../../environment";
 
 
 const ProjectDetailsForm: React.FC = () => {
@@ -23,9 +25,16 @@ const ProjectDetailsForm: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
+    const organizationListData = CoreModules.useSelector((state) => state.createproject.organizationList);
+    // //we use use selector from redux to get all state of projectDetails from createProject slice
+
     const projectDetailsResponse = CoreModules.useSelector((state) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
+    useEffect(() => {
+        dispatch(OrganisationService(`${environment.baseApiUrl}/projects/organization/`))
+
+    }, [])
 
     useEffect(() => {
         if (projectDetailsResponse !== null) {
@@ -57,8 +66,9 @@ const ProjectDetailsForm: React.FC = () => {
             } // or className: 'your-class'
         }
     }
-    const organizationList = ['Naxa', 'Org 1', 'Org 2'].map(
-        item => ({ label: item, value: item })
+    // Changed OrganizationList Data into the Picker Component Format i.e label and value
+    const organizationList = organizationListData.map(
+        item => ({ label: item.name, value: item.id })
     );
     return (
         <CoreModules.Stack sx={{ width: '50%' }}>
