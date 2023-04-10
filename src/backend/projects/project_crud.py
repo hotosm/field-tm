@@ -615,6 +615,34 @@ def read_xlsforms(
     return xlsforms
 
 
+
+def get_odk_id_for_project(
+        db: Session,
+        project_id:int
+        ):
+    
+    """
+    Get the odk project id for the fmtm project id
+    """
+    
+    project = table(
+        "projects", 
+        column("odkid"),
+    )
+
+    where = f"id={project_id}"
+    sql = select(project).where(text(where))
+    logger.info(str(sql))
+    result = db.execute(sql)
+
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+    project_info = result.first()
+    return project_info.odkid
+
+
 def generate_appuser_files(
     db: Session,
     # dbname: str,
