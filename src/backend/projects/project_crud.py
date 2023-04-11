@@ -714,14 +714,20 @@ def generate_appuser_files(
             xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
 
             outline = eval(poly.outline)
-            pg = OverpassClient(outfile)
+            # pg = OverpassClient(outfile)
+            # pg = PostgresClient()
+            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+            outline = eval(poly.outline)
+            pg.getFeatures(outline, outfile, xform_title)
 
-            out = {     "type": "Feature",
-                        "geometry": outline,
-                        "properties": {},
-                    }
-            pg.getFeatures(out, outfile, xform_title)
+            # out = {     "type": "Feature",
+            #             "geometry": outline,
+            #             "properties": {},
+            #         }
+            # aaa = pg.getFeatures(out, outfile, xform_title)
+
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+
 
             """Update tasks table qith qr_Code id"""
             task = tasks_crud.get_task(db, poly.id)
