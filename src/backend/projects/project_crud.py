@@ -48,6 +48,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -615,6 +616,34 @@ def read_xlsforms(
     return xlsforms
 
 
+
+def get_odk_id_for_project(
+        db: Session,
+        project_id:int
+        ):
+    
+    """
+    Get the odk project id for the fmtm project id
+    """
+    
+    project = table(
+        "projects", 
+        column("odkid"),
+    )
+
+    where = f"id={project_id}"
+    sql = select(project).where(text(where))
+    logger.info(str(sql))
+    result = db.execute(sql)
+
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+    project_info = result.first()
+    return project_info.odkid
+
+
 def generate_appuser_files(
     db: Session,
     # dbname: str,
@@ -686,14 +715,20 @@ def generate_appuser_files(
             xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
 
             outline = eval(poly.outline)
-            pg = OverpassClient(outfile)
 
-            out = {     "type": "Feature",
-                        "geometry": outline,
-                        "properties": {},
-                    }
-            pg.getFeatures(out, outfile, xform_title)
+            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+            outline = eval(poly.outline)
+            outline_geojson = pg.getFeatures(outline, outfile, xform_title)
+            for feature in outline_geojson["features"]:
+                feature["properties"]["title"] = ""
+
+            with open(outfile, "w") as jsonfile:
+                jsonfile.truncate(0)  # clear the contents of the file
+                dump(outline_geojson, jsonfile)
+            
+
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+
 
             """Update tasks table qith qr_Code id"""
             task = tasks_crud.get_task(db, poly.id)
