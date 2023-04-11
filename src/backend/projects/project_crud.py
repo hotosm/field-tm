@@ -48,6 +48,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -714,17 +715,17 @@ def generate_appuser_files(
             xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
 
             outline = eval(poly.outline)
-            # pg = OverpassClient(outfile)
-            # pg = PostgresClient()
+
             pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
             outline = eval(poly.outline)
-            pg.getFeatures(outline, outfile, xform_title)
+            outline_geojson = pg.getFeatures(outline, outfile, xform_title)
+            for feature in outline_geojson["features"]:
+                feature["properties"]["title"] = ""
 
-            # out = {     "type": "Feature",
-            #             "geometry": outline,
-            #             "properties": {},
-            #         }
-            # aaa = pg.getFeatures(out, outfile, xform_title)
+            with open(outfile, "w") as jsonfile:
+                jsonfile.truncate(0)  # clear the contents of the file
+                dump(outline_geojson, jsonfile)
+            
 
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
 
