@@ -40,6 +40,7 @@ from .projects import project_routes
 from .projects.project_crud import read_xlsforms
 from .tasks import tasks_routes
 from .users import user_routes
+from .submission import submission_routes
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
@@ -91,6 +92,7 @@ def get_application() -> FastAPI:
     _app.include_router(tasks_routes.router)
     _app.include_router(central_routes.router)
     _app.include_router(auth_routes.router)
+    _app.include_router(submission_routes.router)
 
     if settings.DEBUG:
         _app.include_router(debug_routes.router)
