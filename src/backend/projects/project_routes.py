@@ -201,10 +201,10 @@ async def upload_project_boundary_with_zip(
     return {"Message": "Uploading project ZIP failed"}
 
 
-@router.post("/{project_id}/upload_xlsform")
+@router.post("/upload_xlsform")
 async def upload_custom_xls(
-    project_id: int,
     upload: UploadFile = File(...),
+    project_id: int=None,
     db: Session = Depends(database.get_db),
 ):
     # read entire file
@@ -213,7 +213,7 @@ async def upload_custom_xls(
     project_crud.upload_xlsform(db, project_id, content, category)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {"xform_title": f"{category}"}
 
 
 @router.post("/{project_id}/upload_multi_polygon")
