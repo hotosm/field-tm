@@ -293,17 +293,19 @@ def upload_xlsform(
     xlsform: str,
     name: str,
 ):
-    forms = table(
-        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
-    )
-    ins = insert(forms).values(title=name, xls=xlsform)
-    sql = ins.on_conflict_do_update(
-        constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
-    )
-    db.execute(sql)
-    db.commit()
-
-    return True
+    try:
+        forms = table(
+            "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+        )
+        ins = insert(forms).values(title=name, xls=xlsform)
+        sql = ins.on_conflict_do_update(
+            constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
+        )
+        db.execute(sql)
+        db.commit()
+        return True
+    except Exception as e:
+        raise HTTPException(status=400, detail={'message':str(e)})
 
 
 def update_multi_polygon_project_boundary(
