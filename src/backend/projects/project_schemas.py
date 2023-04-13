@@ -51,7 +51,7 @@ class ProjectUpdate(BaseModel):
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    xform_title: str
+    xform_title: Union[str, None]
     odk_central : ODKCentral
     # city: str
     # country: str
