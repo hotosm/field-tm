@@ -718,7 +718,7 @@ def generate_appuser_files(
 
             pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
             outline = eval(poly.outline)
-            outline_geojson = pg.getFeatures(outline, outfile)
+            outline_geojson = pg.getFeatures(outline, outfile,category)
             for feature in outline_geojson["features"]:
                 feature["properties"]["title"] = ""
 
