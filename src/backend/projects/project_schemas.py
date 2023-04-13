@@ -20,6 +20,7 @@ from typing import List, Union
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
+from typing import List
 
 from ..models.enums import ProjectPriority, ProjectStatus
 from ..tasks import tasks_schemas
@@ -51,7 +52,7 @@ class ProjectUpdate(BaseModel):
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    xform_title: str
+    xform_title: Union[str, None]
     odk_central : ODKCentral
     # city: str
     # country: str
