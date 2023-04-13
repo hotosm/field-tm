@@ -187,16 +187,16 @@ def generate_updated_xform(
 ):
     """Update the version in an XForm so it's unique"""
     name =  os.path.basename(xform).replace(".xml", "")
-
     outfile = xform
     try:
         xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
-    except Exception:
-        logger.error(f"Couldn't convert {xlsform} to an XForm!")
-        return None
+    except Exception as e:
+        logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
+        raise HTTPException(status_code=400, detail = str(e))
+
     if os.path.getsize(outfile) <= 0:
         logger.warning(f"{outfile} is empty!")
-        return None
+        raise HTTPException(status=400, detail=f"{outfile} is empty!")
 
     xls = open(outfile, "r")
     data = xls.read()
