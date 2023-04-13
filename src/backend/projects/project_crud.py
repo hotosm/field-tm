@@ -293,17 +293,19 @@ def upload_xlsform(
     xlsform: str,
     name: str,
 ):
-    forms = table(
-        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
-    )
-    ins = insert(forms).values(title=name, xls=xlsform)
-    sql = ins.on_conflict_do_update(
-        constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
-    )
-    db.execute(sql)
-    db.commit()
-
-    return True
+    try:
+        forms = table(
+            "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+        )
+        ins = insert(forms).values(title=name, xls=xlsform)
+        sql = ins.on_conflict_do_update(
+            constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
+        )
+        db.execute(sql)
+        db.commit()
+        return True
+    except Exception as e:
+        raise HTTPException(status=400, detail={'message':str(e)})
 
 
 def update_multi_polygon_project_boundary(
@@ -644,15 +646,18 @@ def get_odk_id_for_project(
     return project_info.odkid
 
 
-def generate_appuser_files(
+async def generate_appuser_files(
     db: Session,
     # dbname: str,
-    category: str,
     project_id: int,
+    upload: UploadFile
 ):
-    """Generate the files for each appuser, the qrcode, the new XForm,
-    and the OSM data extract.
     """
+        Generate the files for each appuser, the qrcode, the new XForm,
+        and the OSM data extract.
+    """
+
+    # Get the project table contents.
     project = table(
         "projects", column("project_name_prefix"), 
         column("xform_title"), 
@@ -664,19 +669,20 @@ def generate_appuser_files(
     )
     where = f"id={project_id}"
     sql = select(project).where(text(where))
-    logger.info(str(sql))
     result = db.execute(sql)
+
     # There should only be one match
     if result.rowcount != 1:
         logger.warning(str(sql))
-        return False
+        if result.rowcount < 1:
+            raise HTTPException(status_code=400, detail="Project not found")
+        else:
+            raise HTTPException(status_code=400, detail="Multiple projects found")
+
     one = result.first()
     if one:
         prefix = one.project_name_prefix
-        if not one.xform_title:
-            xform_title = category
-        else:
-            xform_title = one.xform_title
+
         task = table("tasks", column("outline"), column("id"))
         where = f"project_id={project_id}"
         sql = select(
@@ -692,52 +698,77 @@ def generate_appuser_files(
             'odk_central_user' : one.odk_central_user,
             'odk_central_password' : one.odk_central_password
         }
+
+        xform_title = one.xform_title if one.xform_title else None
+
+        if upload:
+            # Validating for .XLS File.
+            file_name = os.path.splitext(upload.filename)
+            file_ext = file_name[1]
+            allowed_extensions = ['.xls']
+            if file_ext not in allowed_extensions:
+                raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+
+            # Read the contents of the xls file and write it into tmp file.
+            contents = await upload.read()
+            xlsform = f"/tmp/custom_form.xls"
+
+            with open(xlsform, "wb") as f:
+                f.write(contents)
+            
+            xform_title = file_name[0]
+        else:
+            xlsform = f"{xlsforms_path}/{xform_title}.xls"
+
+        category = xform_title
         for poly in result.fetchall():
-            # poly = result.first()
             name = f"{prefix}_{category}_{poly.id}"
-            # appuser = central_crud.create_appuser(project_id, name)
+
+            # Create an app user for the task
             appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
 
+            # If app user could not be created, raise an exception.
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
-                return None
+                raise HTTPException(status_code=400, detail="Could not create appuser")
 
             #prefix should be sent instead of name
             create_qr = create_qrcode(db, odk_id, appuser.json()["token"], prefix, odk_credentials)
 
-            # create_qr = create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
-            xlsform = f"{xlsforms_path}/{xform_title}.xls"
-            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
-            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
-            # pg = PostgresClient('localhost', dbname, outfile)
+            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"        # This file will store xml contents of an xls form.
+            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"  # This file will store osm extracts
 
             #xform_id_format
             xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
 
             outline = eval(poly.outline)
 
+            # Generating an osm extract from the underpass database.
             pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
             outline = eval(poly.outline)
-            outline_geojson = pg.getFeatures(outline, outfile, xform_title)
+            outline_geojson = pg.getFeatures(outline, outfile)
+
+            # If the osm extracts contents does not have title, provide an empty text for that.
             for feature in outline_geojson["features"]:
                 feature["properties"]["title"] = ""
 
+            # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
             with open(outfile, "w") as jsonfile:
                 jsonfile.truncate(0)  # clear the contents of the file
                 dump(outline_geojson, jsonfile)
-            
 
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
 
-
-            """Update tasks table qith qr_Code id"""
+            # Update tasks table qith qr_Code id
             task = tasks_crud.get_task(db, poly.id)
             task.qr_code_id = create_qr['qr_code_id']
             db.commit()
             db.refresh(task)
-
-            # import epdb; epdb.st()
+            
+            # Create an odk xform
             result = central_crud.create_odk_xform(odk_id, poly.id, outfile, odk_credentials)
+
+            # Update the user role for the created xform.
             try:
                 # Pass odk credentials
                 if odk_credentials:
@@ -752,7 +783,7 @@ def generate_appuser_files(
                                 xmlFormId=xform_id, 
                                 actorId=appuser.json()["id"])
             except Exception as e:
-                print('Error ', str(e))
+                logger.warning(str(e))
 
 
 def create_qrcode(

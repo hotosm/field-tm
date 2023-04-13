@@ -37,6 +37,13 @@ const reducers = CoreModules.combineReducers({
     home: HomeSlice.reducer,
     theme: ThemeSlice.reducer,
     createproject: CreateProjectSlice.reducer,
+    // createproject: persistReducer(
+    //     {
+    //         key: 'createproject',
+    //         storage
+    //     },
+    //     CreateProjectSlice.reducer
+    // ),
     // added common slice in order to handle all the common things like snackbar etc
     common: CommonSlice.reducer
 })

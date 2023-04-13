@@ -17,7 +17,7 @@
 #
 
 import json
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
 from fastapi.logger import logger as logger
@@ -201,10 +201,10 @@ async def upload_project_boundary_with_zip(
     return {"Message": "Uploading project ZIP failed"}
 
 
-@router.post("/{project_id}/upload_xlsform")
+@router.post("/upload_xlsform")
 async def upload_custom_xls(
-    project_id: int,
     upload: UploadFile = File(...),
+    project_id: int=None,
     db: Session = Depends(database.get_db),
 ):
     # read entire file
@@ -213,7 +213,7 @@ async def upload_custom_xls(
     project_crud.upload_xlsform(db, project_id, content, category)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {"xform_title": f"{category}"}
 
 
 @router.post("/{project_id}/upload_multi_polygon")
@@ -303,11 +303,31 @@ async def download_task_boundaries(
 @router.post("/{project_id}/generate")
 async def generate_files(
     project_id: int,
-    # dbname: str,
-    category: str,
+    upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    project_crud.generate_appuser_files(db, category, project_id)
+    """
+    Description:
+    This API generates required media files for each task in the project based on the provided parameters. 
+    It accepts a project ID, category, custom form flag, and an uploaded file as inputs.
+    The generated files are associated with the project ID and stored in the database.
+    This api generates qr_code, forms. This api also creates an app user for each task and provides the required roles.
+    Some of the other functionality of this api includes converting a xls file provided by the user to the xform, 
+    generates osm data extracts and uploads it to the form.
+
+
+    Parameters:
+
+    project_id (int): The ID of the project for which files are being generated. This is a required field.
+
+    upload (UploadFile): An uploaded file that is used as input for generating the files. 
+        This is not a required field. A file should be provided if user wants to upload a custom xls form.
+
+    Returns:
+    Message (str): A success message containing the project ID.
+
+    """
+    await project_crud.generate_appuser_files(db, project_id, upload)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
