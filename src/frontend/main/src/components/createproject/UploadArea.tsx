@@ -8,9 +8,11 @@ import { CreateProjectService, FormCategoryService } from "../../api/CreateProje
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { SelectPicker } from 'rsuite';
+import AssetModules from '../../shared/AssetModules.js';
 
 const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
+    const [formFileUpload, setFormFileUpload] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
@@ -56,7 +58,10 @@ const UploadArea: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
-
+    const selectFormWaysList = ['Select Form From Category', 'Upload a Form'];
+    const selectFormWays = selectFormWaysList.map(
+        item => ({ label: item, value: item })
+    );
     const formCategoryData = formCategoryList.map(
         item => ({ label: item.title, value: item.title })
     );
@@ -88,25 +93,57 @@ const UploadArea: React.FC = () => {
                     "odk_central_user": values.odk_central_user,
                     "odk_central_password": values.odk_central_password
                 },
-                "xform_title": projectDetails.xform_title,
+                // dont send xform_title if upload custom form is selected 
+                "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
                 "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
-                "organization": values.organization
+                "organization": values.organization,
+                "form_ways": projectDetails.form_ways,
+                "uploaded_form": formFileUpload
             }, fileUpload
         ));
     }
     return (
         <CoreModules.Stack>
             <FormGroup >
-                <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
-                <SelectPicker data={formCategoryData}
+                <CoreModules.FormLabel>Select/Upload Form</CoreModules.FormLabel>
+                <SelectPicker data={selectFormWays}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
                     searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} />
+                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value }))} />
+                {projectDetails.form_ways === 'Select Form From Category' ? <>
+                    <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
+                    <SelectPicker data={formCategoryData}
+                        style={{
+                            marginBottom: '6%',
+                            fontFamily: defaultTheme.typography.h3.fontFamily,
+                            fontSize: defaultTheme.typography.h3.fontSize
+                        }}
+                        searchable={false}
+                        onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} />
+                </> : null}
+                {projectDetails.form_ways === 'Upload a Form' ? <>
+                    <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
+                        <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
+                    </CoreModules.IconButton></a>
+                    <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
+                    <CoreModules.Button
+                        variant="contained"
+                        component="label"
+                    >
+                        <CoreModules.Input
+                            type="file"
+                            onChange={(e) => {
+                                setFormFileUpload(e.target.files)
+                            }}
+                        />
+                    </CoreModules.Button>
+                    {!formFileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
+                </> : null}
                 <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
                 <SelectPicker data={algorithmListData}
                     style={{
