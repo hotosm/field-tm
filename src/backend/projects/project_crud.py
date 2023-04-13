@@ -649,9 +649,7 @@ def get_odk_id_for_project(
 async def generate_appuser_files(
     db: Session,
     # dbname: str,
-    category: str,
     project_id: int,
-    custom_form: bool,
     upload: UploadFile
 ):
     """
@@ -684,10 +682,7 @@ async def generate_appuser_files(
     one = result.first()
     if one:
         prefix = one.project_name_prefix
-        if not one.xform_title:
-            xform_title = category
-        else:
-            xform_title = one.xform_title
+
         task = table("tasks", column("outline"), column("id"))
         where = f"project_id={project_id}"
         sql = select(
@@ -704,13 +699,12 @@ async def generate_appuser_files(
             'odk_central_password' : one.odk_central_password
         }
 
-        if custom_form:
-            # If custom_form is passed as true, xls form is required.
-            if not upload:
-                raise HTTPException(status_code=400, detail="Provide an xls file for the form")
+        xform_title = one.xform_title if one.xform_title else None
 
+        if upload:
             # Validating for .XLS File.
-            file_ext = os.path.splitext(upload.filename)[1]
+            file_name = os.path.splitext(upload.filename)
+            file_ext = file_name[1]
             allowed_extensions = ['.xls']
             if file_ext not in allowed_extensions:
                 raise HTTPException(status_code=400, detail="Provide a valid .xls file")
@@ -721,9 +715,12 @@ async def generate_appuser_files(
 
             with open(xlsform, "wb") as f:
                 f.write(contents)
+            
+            xform_title = file_name[0]
         else:
             xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
+        category = xform_title
         for poly in result.fetchall():
             name = f"{prefix}_{category}_{poly.id}"
 

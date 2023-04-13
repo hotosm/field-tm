@@ -20,6 +20,7 @@ from typing import List, Union
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
+from typing import List
 
 from ..models.enums import ProjectPriority, ProjectStatus
 from ..tasks import tasks_schemas
