@@ -303,8 +303,6 @@ async def download_task_boundaries(
 @router.post("/{project_id}/generate")
 async def generate_files(
     project_id: int,
-    category: str,
-    custom_form: bool,
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
@@ -322,18 +320,14 @@ async def generate_files(
 
     project_id (int): The ID of the project for which files are being generated. This is a required field.
 
-    category (str): The category of the form. This is a required field.
-
-    custom_form (bool): A flag indicating whether a custom form is being used or the form already in the system is used. This is a required field.
-
     upload (UploadFile): An uploaded file that is used as input for generating the files. 
-        This is not a required field. A file should be provided if custom_form is passed as True.
+        This is not a required field. A file should be provided if user wants to upload a custom xls form.
 
     Returns:
     Message (str): A success message containing the project ID.
 
     """
-    await project_crud.generate_appuser_files(db, category, project_id, custom_form, upload)
+    await project_crud.generate_appuser_files(db, project_id, upload)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
