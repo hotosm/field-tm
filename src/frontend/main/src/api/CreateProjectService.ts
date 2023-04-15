@@ -39,9 +39,9 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: 'Project Successfully Created.',
+                        message: 'Project Successfully Created Now Generating QR For Project',
                         variant: "success",
-                        duration: 1000,
+                        duration: 2000,
                     })
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`,payload));
@@ -118,7 +118,7 @@ const UploadAreaService: Function = (url: string,payload: any) => {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: JSON.stringify(error.response.data.detail),
+                        message: JSON.stringify(error?.response?.data?.detail) || 'Something Went Wrong.',
                         variant: "error",
                         duration: 2000,
                     })
@@ -142,8 +142,12 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
 
             try {
                 const generateApiFormData = new FormData();
-                generateApiFormData.append('upload',payload.uploaded_form[0]);
-                
+                if(payload.splitting_algorithm === 'Custom Multipolygon'){
+                    generateApiFormData.append('upload',payload.uploaded_form[0]);
+                }else{
+                    generateApiFormData.append('upload','');
+
+                }
                 const postNewProjectDetails = await axios.post(url,generateApiFormData,
                     { 
                         headers: {
@@ -153,12 +157,13 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
                 // const postNewProjectDetails = await axios.post(url);
                 const resp: string = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.GenerateProjectQRLoading(false))
-                CommonActions.SetSnackBar({
+                dispatch(
+                    CommonActions.SetSnackBar({
                     open: true,
-                    message: 'Generating QR For Project',
+                    message: 'QR Generation Completed.',
                     variant: "success",
                     duration: 2000,
-                })
+                }));
                 dispatch(CommonActions.SetLoading(false))
                 // await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
                 
@@ -227,7 +232,7 @@ const UploadCustomXLSFormService: Function = (url: string,payload: any) => {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: JSON.stringify(error.response.data.detail),
+                        message: JSON.stringify(error.response.data.detail) || "Something Went Wrong",
                         variant: "error",
                         duration: 2000,
                     })
