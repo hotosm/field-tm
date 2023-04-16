@@ -1,6 +1,6 @@
 import React from 'react'
 import CoreModules from '../../shared/CoreModules.js';
-import { SelectPicker } from 'rsuite';
+// import { SelectPicker } from 'rsuite';
 import { useDispatch } from 'react-redux';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ const BasemapSelection: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const defaultTheme:any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
     const imagerySource = ['OAM', 'Topo'];
     const imagerySourceData = imagerySource.map(
@@ -23,7 +23,7 @@ const BasemapSelection: React.FC = () => {
         <CoreModules.Stack>
             <CoreModules.FormGroup >
                 <CoreModules.FormLabel>Imagery Source</CoreModules.FormLabel>
-                <SelectPicker data={imagerySourceData}
+                {/* <SelectPicker data={imagerySourceData}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
@@ -31,9 +31,9 @@ const BasemapSelection: React.FC = () => {
                     }}
                     searchable={false}
                     onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))}
-                />
+                /> */}
                 <CoreModules.FormLabel>Output Type</CoreModules.FormLabel>
-                <SelectPicker data={mapTilesData}
+                {/* <SelectPicker data={mapTilesData}
                     style={{
                         width: '100%',
                         marginBottom: '6%',
@@ -42,7 +42,7 @@ const BasemapSelection: React.FC = () => {
                     }}
                     searchable={false}
                 // onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))}
-                />
+                /> */}
                 <CoreModules.Button
                     sx={{ mt: 4 }}
                     variant="contained"

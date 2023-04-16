@@ -21,12 +21,12 @@ import View from "ol/View";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
-import Control from "ol/control/Control";
+// import Control from "ol/control/Control";
 
 import Overlay from "ol/Overlay";
-import XYZ from "ol/source/XYZ.js";
-import { toLonLat } from "ol/proj";
-import { toStringHDMS } from "ol/coordinate";
+// import XYZ from "ol/source/XYZ.js";
+// import { toLonLat } from "ol/proj";
+// import { toStringHDMS } from "ol/coordinate";
 
 const Home = () => {
   const dispatch = CoreModules.useDispatch();

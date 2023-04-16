@@ -26,10 +26,8 @@ import {
     Toolbar,
     Grid,
     Pagination,
-    ThemeProvider,
     CssBaseline,
     Paper,
-    createTheme,
     Container,
     TextField,
     FormControlLabel,
@@ -40,10 +38,11 @@ import {
     FormGroup,
     Box
 } from "@mui/material";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { PersistGate } from "redux-persist/integration/react";
-import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
-import { Swiper, SwiperSlide } from 'swiper/react';
+// import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from "swiper";
+// import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import { useNavigate, useParams, Link, Outlet, RouterProvider,useLocation,createBrowserRouter } from "react-router-dom";
 import { useSelector, useDispatch, Provider } from 'react-redux';
@@ -98,10 +97,10 @@ export default {
     createTheme,
     Outlet,
     Container,
-    SwiperNavigation,
-    SwiperPagination,
-    Swiper,
-    SwiperSlide,
+    // SwiperNavigation,
+    // SwiperPagination,
+    // Swiper,
+    // SwiperSlide,
     axios,
     TextField,
     FormControlLabel,
