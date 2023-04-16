@@ -34,7 +34,7 @@ const UploadArea: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
+    const userDetails:any = CoreModules.useSelector<any>((state) => state.login.loginToken);
     // //we use use-selector from redux to get all state of loginToken from login slice
 
 
