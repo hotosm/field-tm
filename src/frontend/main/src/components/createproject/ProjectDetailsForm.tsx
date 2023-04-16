@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { SelectPicker } from 'rsuite';
+// import { SelectPicker } from 'rsuite';
 import { OrganisationService } from "../../api/CreateProjectService";
 import environment from "../../environment";
 
 
 const ProjectDetailsForm: React.FC = () => {
-    const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const defaultTheme:any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
 
@@ -22,13 +22,13 @@ const ProjectDetailsForm: React.FC = () => {
     const dispatch = CoreModules.useDispatch()
     // //dispatch function to perform redux state mutation
 
-    const projectDetails = CoreModules.useSelector((state) => state.createproject.projectDetails);
+    const projectDetails:any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const organizationListData = CoreModules.useSelector((state) => state.createproject.organizationList);
+    const organizationListData:any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const projectDetailsResponse = CoreModules.useSelector((state) => state.createproject.projectDetailsResponse);
+    const projectDetailsResponse:any = CoreModules.useSelector<any>((state) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
     useEffect(() => {
@@ -77,7 +77,7 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* Organization Dropdown For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
                         <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Organization<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
-                        <SelectPicker data={organizationList}
+                        {/* <SelectPicker data={organizationList}
                             style={{
                                 width: '40%',
                                 fontFamily: defaultTheme.typography.h3.fontFamily,
@@ -89,7 +89,7 @@ const ProjectDetailsForm: React.FC = () => {
                                 handleCustomChange('organization', value);
                                 dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value }))
                             }
-                            } />
+                            } /> */}
                         {errors.organization && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.organization}</CoreModules.FormLabel>}
                     </CoreModules.FormControl>
                     {/* END */}
