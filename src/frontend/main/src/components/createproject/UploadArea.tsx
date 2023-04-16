@@ -7,7 +7,7 @@ import FormGroup from '@mui/material/FormGroup'
 import { CreateProjectService, FormCategoryService, UploadAreaService } from "../../api/CreateProjectService";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { SelectPicker } from 'rsuite';
+// import { SelectPicker } from 'rsuite';
 
 const UploadArea = () => {
     const [fileUpload, setFileUpload] = useState(null);
@@ -66,17 +66,17 @@ const UploadArea = () => {
     // const { id: projectId } = projectDetailsResponse;
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
-    useEffect(() => {
-        if (projectArea !== null) {
-            navigate('/');
-            dispatch(CreateProjectActions.ClearCreateProjectFormData())
+    // useEffect(() => {
+    //     if (projectArea !== null) {
+    //         navigate('/');
+    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
 
-        }
-        return () => {
-            dispatch(CreateProjectActions.ClearCreateProjectFormData())
-        }
+    //     }
+    //     return () => {
+    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
+    //     }
 
-    }, [projectArea])
+    // }, [projectArea])
     // END
 
     // Fetching form category list 
@@ -121,7 +121,7 @@ const UploadArea = () => {
         <CoreModules.Stack>
             <FormGroup >
                 <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
-                <SelectPicker data={formCategoryData}
+                {/* <SelectPicker data={formCategoryData}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
@@ -129,9 +129,9 @@ const UploadArea = () => {
                     }}
                     color='red'
                     searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} />
+                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} /> */}
                 <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
-                <SelectPicker data={algorithmListData}
+                {/* <SelectPicker data={algorithmListData}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
@@ -139,7 +139,7 @@ const UploadArea = () => {
                     }}
                     color='red'
                     searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} />
+                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} /> */}
 
                 {/* Square Input For Create Project inorder to set the square dimension of tasks*/}
                 {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3 }}>
