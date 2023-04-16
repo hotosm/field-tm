@@ -102,6 +102,17 @@ const Home = () => {
         },
       },
     });
+    /**
+     * Function to setPosition of Popup to Undefined so that the popup closes
+     */
+    function handleClickOutside(event) {
+      if (container && !container.contains(event.target)) {
+        overlay.setPosition(undefined);
+        closer.blur();
+      }
+    }
+    // Bind the event listener for outside click and trigger handleClickOutside
+    document.addEventListener('mousedown', handleClickOutside);
 
     closer.style.textDecoration = "none";
     closer.style.color = defaultTheme.palette.info["main"];
@@ -160,6 +171,13 @@ const Home = () => {
     setMap(initialMap);
     setView(view);
     setFeaturesLayer(initalFeaturesLayer);
+
+    return ()=>{
+       /**
+     * Removed handleClickOutside Eventlistener on unmount
+     */
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
   }, []);
 
   useEffect(() => {
