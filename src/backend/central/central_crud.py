@@ -19,16 +19,23 @@
 import os
 import pathlib
 
-import odkconvert
+#Qr code imports
+import segno
+import base64
+import json
+import zlib
+
+import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
-from odkconvert.CSVDump import CSVDump
-from odkconvert.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from osm_fieldwork.CSVDump import CSVDump
+from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from ..projects import project_schemas
 
 from ..config import settings
 from ..db import db_models
@@ -48,9 +55,13 @@ def list_odk_projects():
     return project.listProjects()
 
 
-def create_odk_project(name: str):
+def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
     """Create a project on a remote ODK Server."""
-    result = project.createProject(name)
+    odk_project = OdkProject(odk_central.odk_central_url,
+                             odk_central.odk_central_user,
+                             odk_central.odk_central_password
+                             )
+    result = odk_project.createProject(name)
     logger.debug(f"create_odk_project return from ODKCentral: {result}")
     project.id = result.get("id")
     logger.info(f"Project {name} has been created on the ODK Central server.")
@@ -68,13 +79,24 @@ def delete_odk_project(project_id: int):
     return result
 
 
-def create_appuser(project_id: int, name: str):
-    """Create an app-user on a remote ODK Server."""
+def create_appuser(project_id: int, name: str, odk_credentials:dict = None):
+    """
+        Create an app-user on a remote ODK Server.
+        If odk credentials of the project are provided, use them to create an app user.
+    """
     # project.listAppUsers(project_id)
     # user = project.findAppUser(name=name)
     # user = False
     # if not user:
-    result = appuser.create(project_id, name)
+
+    if odk_credentials:
+        url = odk_credentials['odk_central_url']
+        user = odk_credentials['odk_central_user']
+        pw = odk_credentials['odk_central_password']
+        app_user = OdkAppUser(url, user, pw)
+        result = app_user.create(project_id, name)
+    else:
+        result = appuser.create(project_id, name)
     logger.info(f"Created app user: {result.json()}")
     return result
 
@@ -86,17 +108,29 @@ def delete_app_user(project_id: int, name: str):
     return result
 
 
-def create_odk_xform(project_id: int, xform_id: str, filespec: str):
+def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credentials:dict=None):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
-    result = xform.createForm(project_id, title, filespec, False)
+    # result = xform.createForm(project_id, title, filespec, True)
+    # Pass odk credentials of project in xform 
+    if odk_credentials:
+        url = odk_credentials['odk_central_url']
+        user = odk_credentials['odk_central_user']
+        pw = odk_credentials['odk_central_password']
+        try:
+            xform = OdkForm(url, user, pw)
+        except:
+            raise HTTPException(status_code=500, detail={'message':'Connection failed to odk central'})
+        
+    result = xform.createForm(project_id, xform_id, filespec, False)
+
     if result != 200 and result != 409:
         return result
     data = f"/tmp/{title}.geojson"
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     result = xform.uploadMedia(project_id, title, data)
-    #if result == 200:
+    
     result = xform.publishForm(project_id, title)
     return result
 
@@ -107,6 +141,8 @@ def delete_odk_xform(project_id: int, xform_id: str):
     logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return result
+
+
 def list_odk_xforms(project_id: int):
     """List all XForms in an ODK Central project."""
     xforms = project.listForms(project_id)
@@ -151,16 +187,16 @@ def generate_updated_xform(
 ):
     """Update the version in an XForm so it's unique"""
     name =  os.path.basename(xform).replace(".xml", "")
-
     outfile = xform
     try:
-        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=True)
-    except Exception:
-        logger.error(f"Couldn't convert {xlsform} to an XForm!")
-        return None
+        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
+    except Exception as e:
+        logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
+        raise HTTPException(status_code=400, detail = str(e))
+
     if os.path.getsize(outfile) <= 0:
         logger.warning(f"{outfile} is empty!")
-        return None
+        raise HTTPException(status=400, detail=f"{outfile} is empty!")
 
     xls = open(outfile, "r")
     data = xls.read()
@@ -217,10 +253,36 @@ def create_QRCode(
     project_id: int,
     token: str,
     name: str,
+    odk_credentials: dict=None
 ):
     """Create the QR Code for an app-user."""
-    appuser = OdkAppUser()
-    return appuser.createQRCode(project_id, token, name)
+    
+    # Odk central url of the project
+    if odk_credentials:
+        central_url = odk_credentials['odk_central_url']
+    else:
+        central_url = url
+    
+    # Qr code text json in the format acceptable by odk collect.
+    qr_code_setting = {
+            "general": {
+                "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
+                "form_update_mode": "match_exactly",
+                "basemap_source": "MapBox",
+                "autosend": "wifi_and_cellular",
+            },
+            "project": {"name": f"{name}"},
+            "admin": {},
+        }
+    
+    # Base64 encoded
+    qr_data = base64.b64encode(zlib.compress(json.dumps(qr_code_setting).encode("utf-8")))
+
+    #Generate qr code using segno
+    qrcode = segno.make(qr_data, micro=False)
+    qrcode.save(f"{name}.png", scale=5)
+    return qr_data
+
 
 def upload_media(project_id: int, xform_id: str, filespec: str):
     """Upload a data file to Central."""
@@ -238,7 +300,7 @@ def convert_csv(
     data: bytes,
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
-    parent = pathlib.Path(odkconvert.__file__).resolve().parent
+    parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
     csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"
@@ -249,7 +311,7 @@ def convert_csv(
 
     if len(data) == 0:
         logger.debug("Parsing csv file %r" % filespec)
-        # The yaml file is in the package files for odkconvert
+        # The yaml file is in the package files for osm_fieldwork
         data = csvin.parse(filespec)
     else:
         csvdata = csvin.parse(filespec, data)

@@ -4,44 +4,18 @@ import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService, UploadAreaService } from "../../api/CreateProjectService";
+import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 // import { SelectPicker } from 'rsuite';
 
-const UploadArea = () => {
+const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
+    const [formFileUpload, setFormFileUpload] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
-    const searchableInnerStyle: any = {
-        toolbar: {
-            marginTop: '0.7%',
-            width: 250,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        outlineBtn: {
-            width: 250,
-            marginTop: '0.7%',
-            borderRadius: 7,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        outlineBtnXs: {
-            width: '50%',
-            borderRadius: 7,
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-        toolbarXs: {
-            width: '50%',
-            fontFamily: defaultTheme.typography.h3.fontFamily,
-            fontSize: defaultTheme.typography.h3.fontSize
-        },
-
-    }
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
 
@@ -52,18 +26,17 @@ const UploadArea = () => {
     // //dispatch function to perform redux state mutation
 
     const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
-
-    const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-    // //we use use selector from redux to get all state of formCategory from createProject slice
+    // //we use use-selector from redux to get all state of formCategory from createProject slice
 
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
-    // //we use use selector from redux to get all state of projectDetails from createProject slice
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    // const { id: projectId } = projectDetailsResponse;
+    const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
     // useEffect(() => {
@@ -84,7 +57,10 @@ const UploadArea = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
-
+    const selectFormWaysList = ['Select Form From Category', 'Upload a Form'];
+    const selectFormWays = selectFormWaysList.map(
+        item => ({ label: item, value: item })
+    );
     const formCategoryData = formCategoryList.map(
         item => ({ label: item.title, value: item.title })
     );
@@ -101,19 +77,28 @@ const UploadArea = () => {
         }
     }
 
-    // // passing payloads for creating project from form
+    // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
     const onCreateProjectSubmission = () => {
         const { values } = location.state;
         dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
             {
                 "project_info": { ...values },
                 "author": {
-                    "username": values.username,
-                    "id": values.id
+                    "username": userDetails.username,
+                    "id": userDetails.id
                 },
-                "xform_title": projectDetails.xform_title,
+                "odk_central": {
+                    "odk_central_url": values.odk_central_url,
+                    "odk_central_user": values.odk_central_user,
+                    "odk_central_password": values.odk_central_password
+                },
+                // dont send xform_title if upload custom form is selected 
+                "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
                 "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
+                "organization": values.organization,
+                "form_ways": projectDetails.form_ways,
+                "uploaded_form": formFileUpload
             }, fileUpload
         ));
     }
@@ -127,7 +112,6 @@ const UploadArea = () => {
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
-                    color='red'
                     searchable={false}
                     onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} /> */}
                 <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
@@ -137,7 +121,6 @@ const UploadArea = () => {
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
-                    color='red'
                     searchable={false}
                     onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} /> */}
 
@@ -186,7 +169,7 @@ const UploadArea = () => {
                         onCreateProjectSubmission();
                     }}
                 >
-                    Submit
+                    Next
                 </CoreModules.Button>
                 {/* END */}
             </FormGroup>

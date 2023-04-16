@@ -20,10 +20,20 @@ from typing import List, Union
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
+from typing import List
 
 from ..models.enums import ProjectPriority, ProjectStatus
 from ..tasks import tasks_schemas
 from ..users.user_schemas import User
+
+
+class ODKCentral(BaseModel):
+    odk_central_url: str
+    odk_central_user: str
+    odk_central_password: str
+
+    class Config:
+        orm_mode = True
 
 
 class ProjectInfo(BaseModel):
@@ -42,7 +52,8 @@ class ProjectUpdate(BaseModel):
 class BETAProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    xform_title: str
+    xform_title: Union[str, None]
+    odk_central : ODKCentral
     # city: str
     # country: str
 
@@ -81,3 +92,13 @@ class ProjectBase(BaseModel):
 
 class ProjectOut(ProjectBase):
     pass
+
+
+class Organisation(BaseModel):
+    # id: int
+    slug: str
+    logo: str
+    name: str
+    description:str
+    url:str
+    type:int

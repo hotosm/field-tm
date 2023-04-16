@@ -23,6 +23,9 @@ import os
 from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
+import base64
+import segno
+from base64 import b64encode
 
 import geoalchemy2
 import geojson
@@ -31,8 +34,9 @@ import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from odkconvert.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
+from osm_fieldwork.OdkCentral import OdkAppUser
 from shapely import wkt
 from sqlalchemy import (
     column,
@@ -44,19 +48,19 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from geojson import dump
 
-from odkconvert.xlsforms import xlsforms_path
-from odkconvert.make_data_extract import PostgresClient, OverpassClient
+from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
 from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 
 
-# from ..odkconvert.make_data_extract import PostgresClient, OverpassClient
+# from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from . import project_schemas
 
 # --------------
@@ -238,7 +242,7 @@ def create_project_with_project_info(
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
-
+    odk_credentials = project_metadata.odk_central
     # verify data coming in
     if not user:
         raise HTTPException("No user passed in")
@@ -258,7 +262,11 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
-        xform_title= xform_title
+        xform_title= xform_title,
+        odk_central_url = odk_credentials.odk_central_url,
+        odk_central_user = odk_credentials.odk_central_user,
+        odk_central_password = odk_credentials.odk_central_password,
+
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -285,17 +293,19 @@ def upload_xlsform(
     xlsform: str,
     name: str,
 ):
-    forms = table(
-        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
-    )
-    ins = insert(forms).values(title=name, xls=xlsform)
-    sql = ins.on_conflict_do_update(
-        constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
-    )
-    db.execute(sql)
-    db.commit()
-
-    return True
+    try:
+        forms = table(
+            "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+        )
+        ins = insert(forms).values(title=name, xls=xlsform)
+        sql = ins.on_conflict_do_update(
+            constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
+        )
+        db.execute(sql)
+        db.commit()
+        return True
+    except Exception as e:
+        raise HTTPException(status=400, detail={'message':str(e)})
 
 
 def update_multi_polygon_project_boundary(
@@ -608,33 +618,71 @@ def read_xlsforms(
     return xlsforms
 
 
-def generate_appuser_files(
-    db: Session,
-    dbname: str,
-    category: str,
-    project_id: int,
-):
-    """Generate the files for each appuser, the qrcode, the new XForm,
-    and the OSM data extract.
+
+def get_odk_id_for_project(
+        db: Session,
+        project_id:int
+        ):
+    
     """
+    Get the odk project id for the fmtm project id
+    """
+    
     project = table(
-        "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+        "projects", 
+        column("odkid"),
     )
+
     where = f"id={project_id}"
     sql = select(project).where(text(where))
     logger.info(str(sql))
     result = db.execute(sql)
+
     # There should only be one match
     if result.rowcount != 1:
         logger.warning(str(sql))
         return False
+    project_info = result.first()
+    return project_info.odkid
+
+
+async def generate_appuser_files(
+    db: Session,
+    # dbname: str,
+    project_id: int,
+    upload: UploadFile
+):
+    """
+        Generate the files for each appuser, the qrcode, the new XForm,
+        and the OSM data extract.
+    """
+
+    # Get the project table contents.
+    project = table(
+        "projects", column("project_name_prefix"), 
+        column("xform_title"), 
+        column("id"), 
+        column("odkid"),
+        column("odk_central_url"),
+        column("odk_central_user"),
+        column("odk_central_password"),
+    )
+    where = f"id={project_id}"
+    sql = select(project).where(text(where))
+    result = db.execute(sql)
+
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        if result.rowcount < 1:
+            raise HTTPException(status_code=400, detail="Project not found")
+        else:
+            raise HTTPException(status_code=400, detail="Multiple projects found")
+
     one = result.first()
     if one:
         prefix = one.project_name_prefix
-        if not one.xform_title:
-            xform_title = category
-        else:
-            xform_title = one.xform_title
+
         task = table("tasks", column("outline"), column("id"))
         where = f"project_id={project_id}"
         sql = select(
@@ -642,24 +690,100 @@ def generate_appuser_files(
             geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
         ).where(text(where))
         result = db.execute(sql)
+
+        # Get odk project id, and odk credentials from project. 
+        odk_id = one.odkid
+        odk_credentials={
+            'odk_central_url' : one.odk_central_url,
+            'odk_central_user' : one.odk_central_user,
+            'odk_central_password' : one.odk_central_password
+        }
+
+        xform_title = one.xform_title if one.xform_title else None
+
+        if upload:
+            # Validating for .XLS File.
+            file_name = os.path.splitext(upload.filename)
+            file_ext = file_name[1]
+            allowed_extensions = ['.xls']
+            if file_ext not in allowed_extensions:
+                raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+
+            # Read the contents of the xls file and write it into tmp file.
+            contents = await upload.read()
+            xlsform = f"/tmp/custom_form.xls"
+
+            with open(xlsform, "wb") as f:
+                f.write(contents)
+            
+            xform_title = file_name[0]
+        else:
+            xlsform = f"{xlsforms_path}/{xform_title}.xls"
+
+        category = xform_title
         for poly in result.fetchall():
-            # poly = result.first()
             name = f"{prefix}_{category}_{poly.id}"
-            appuser = central_crud.create_appuser(project_id, name)
+
+            # Create an app user for the task
+            appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
+
+            # If app user could not be created, raise an exception.
             if not appuser:
                 logger.error(f"Couldn't create appuser for project {project_id}")
-                return None
+                raise HTTPException(status_code=400, detail="Could not create appuser")
 
-            create_qrcode(db, project_id, appuser.json()["token"], f"/tmp/{name}")
-            xlsform = f"{xlsforms_path}/{xform_title}.xls"
-            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"
-            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"
-            pg = PostgresClient('localhost', dbname, outfile)
+            #prefix should be sent instead of name
+            create_qr = create_qrcode(db, odk_id, appuser.json()["token"], prefix, odk_credentials)
+
+            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"        # This file will store xml contents of an xls form.
+            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"  # This file will store osm extracts
+
+            #xform_id_format
+            xform_id = f'{prefix}_{xform_title}_{poly.id}'.split('_')[2]
+
             outline = eval(poly.outline)
-            pg.getFeature(outline, outfile, xform_title)
+
+            # Generating an osm extract from the underpass database.
+            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+            outline = eval(poly.outline)
+            outline_geojson = pg.getFeatures(outline, outfile)
+
+            # If the osm extracts contents does not have title, provide an empty text for that.
+            for feature in outline_geojson["features"]:
+                feature["properties"]["title"] = ""
+
+            # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+            with open(outfile, "w") as jsonfile:
+                jsonfile.truncate(0)  # clear the contents of the file
+                dump(outline_geojson, jsonfile)
+
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
-            # import epdb; epdb.st()
-            result = central_crud.create_odk_xform(project_id, poly.id, outfile)
+
+            # Update tasks table qith qr_Code id
+            task = tasks_crud.get_task(db, poly.id)
+            task.qr_code_id = create_qr['qr_code_id']
+            db.commit()
+            db.refresh(task)
+            
+            # Create an odk xform
+            result = central_crud.create_odk_xform(odk_id, poly.id, outfile, odk_credentials)
+
+            # Update the user role for the created xform.
+            try:
+                # Pass odk credentials
+                if odk_credentials:
+                    url = odk_credentials['odk_central_url']
+                    user = odk_credentials['odk_central_user']
+                    pw = odk_credentials['odk_central_password']
+                    odk_app = OdkAppUser(url, user, pw)
+                else:
+                    odk_app = central_crud.appuser
+
+                odk_app.updateRole(projectId=one[3], 
+                                xmlFormId=xform_id, 
+                                actorId=appuser.json()["id"])
+            except Exception as e:
+                logger.warning(str(e))
 
 
 def create_qrcode(
@@ -667,11 +791,18 @@ def create_qrcode(
     project_id: int,
     token: str,
     project_name: str,
+    odk_credentials: dict = None
 ):
-    """Make a QR code for an app_user."""
-    qrcode = central_crud.create_QRCode(project_id, token, project_name)
+    #Make QR code for an app_user.
+    qrcode = central_crud.create_QRCode(project_id, token, project_name, odk_credentials)
+    qrcode = segno.make(qrcode, micro=False)
+    image_name = f"{project_name}.png"
+    with open(image_name, "rb") as f:
+        base64_data = b64encode(f.read()).decode()
+    qr_code_text = base64.b64decode(base64_data)
     qrdb = db_models.DbQrCode(
-        image=qrcode,
+        image=qr_code_text,
+        filename = image_name
     )
     db.add(qrdb)
     db.commit()
@@ -679,7 +810,7 @@ def create_qrcode(
     sql = select(sqlalchemy.func.count(codes.c.id))
     result = db.execute(sql)
     rows = result.fetchone()[0]
-    return {"data": qrcode, "id": rows + 1}
+    return {"data": qrcode, "id": rows + 1,"qr_code_id":qrdb.id}
 
 
 def download_geometry(
@@ -768,6 +899,24 @@ def create_task_grid(db: Session, project_id: int, delta:int):
         # jsonout = open("tmp.geojson", 'w')
         # out = dump(collection, jsonout)
         out = dumps(collection)
+
+        # If project outline cannot be divided into multiple tasks,
+        #   whole boundary is made into a single task.
+        result = json.loads(out)
+        if len(result['features']) == 0:
+            geom = loads(data[0][0])
+            out = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                            "type": "Feature",
+                            "geometry": geom,
+                            "properties": {"id":project_id},
+                        }
+                        ]
+                    }
+            out = json.dumps(out)
+
     except Exception as e:
         logger.error(e)
 
@@ -903,3 +1052,33 @@ def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
         return app_projects_without_nones
     else:
         return []
+
+
+def get_organisations(
+    db: Session,
+):
+    db_organisation = ( 
+        db.query(db_models.DbOrganisation)
+        .all()
+    )
+    return db_organisation
+
+
+def create_organization(
+    db: Session,
+    org: project_schemas.Organisation
+):
+     # create new project
+    db_organization = db_models.DbOrganisation(
+        name=org.name,
+        slug=org.slug,
+        logo=org.logo,
+        description= org.description,
+        url= org.url,
+        type= org.type,
+    )
+    db.add(db_organization)
+    db.commit()
+    db.refresh(db_organization)
+
+    return True

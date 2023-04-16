@@ -17,9 +17,9 @@
 #
 
 import json
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -91,7 +91,12 @@ async def create_project(
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
-    odkproject = central_crud.create_odk_project(project_info.project_info.name)
+    try:
+        odkproject = central_crud.create_odk_project(project_info.odk_central,
+                                                    project_info.project_info.name)
+    except:
+        raise HTTPException(status_code=400, detail="Connection failed to central odk. ")
+
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
     project = project_crud.create_project_with_project_info(
@@ -196,10 +201,10 @@ async def upload_project_boundary_with_zip(
     return {"Message": "Uploading project ZIP failed"}
 
 
-@router.post("/{project_id}/upload_xlsform")
+@router.post("/upload_xlsform")
 async def upload_custom_xls(
-    project_id: int,
     upload: UploadFile = File(...),
+    project_id: int=None,
     db: Session = Depends(database.get_db),
 ):
     # read entire file
@@ -208,7 +213,7 @@ async def upload_custom_xls(
     project_crud.upload_xlsform(db, project_id, content, category)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {"xform_title": f"{category}"}
 
 
 @router.post("/{project_id}/upload_multi_polygon")
@@ -298,11 +303,74 @@ async def download_task_boundaries(
 @router.post("/{project_id}/generate")
 async def generate_files(
     project_id: int,
-    dbname: str,
-    category: str,
+    upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    project_crud.generate_appuser_files(db, dbname, category, project_id)
+    """
+    Description:
+    This API generates required media files for each task in the project based on the provided parameters. 
+    It accepts a project ID, category, custom form flag, and an uploaded file as inputs.
+    The generated files are associated with the project ID and stored in the database.
+    This api generates qr_code, forms. This api also creates an app user for each task and provides the required roles.
+    Some of the other functionality of this api includes converting a xls file provided by the user to the xform, 
+    generates osm data extracts and uploads it to the form.
+
+
+    Parameters:
+
+    project_id (int): The ID of the project for which files are being generated. This is a required field.
+
+    upload (UploadFile): An uploaded file that is used as input for generating the files. 
+        This is not a required field. A file should be provided if user wants to upload a custom xls form.
+
+    Returns:
+    Message (str): A success message containing the project ID.
+
+    """
+    await project_crud.generate_appuser_files(db, project_id, upload)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
+
+
+@router.get("/organization/")
+def get_organisations(
+    db: Session = Depends(database.get_db),
+):
+    """Get api for fetching organization list."""
+    organizations = project_crud.get_organisations(db)
+    return organizations
+
+
+@router.post("/organization/")
+async def create_organization(
+    organization: project_schemas.Organisation,
+    db: Session = Depends(database.get_db),
+):
+    """
+    Create a new organization.
+
+    This endpoint allows you to create a new organization by providing the necessary details in the request body.
+
+    ## Request Body
+    - `slug` (str): the organization's slug. Required.
+    - `logo` (str): the URL of the organization's logo. Required.
+    - `name` (str): the name of the organization. Required.
+    - `description` (str): a description of the organization. Required.
+    - `url` (str): the URL of the organization's website. Required.
+    - `type` (int): the type of the organization. Required.
+
+
+    ## Response
+    - Returns a JSON object containing a success message .
+
+    ### Example Response
+    ```
+    {
+        "Message": "Organization Created Successfully.",
+    }
+    ```
+    """
+    created= project_crud.create_organization(db, organization)
+
+    return {"Message": f"Organization Created Successfully."}

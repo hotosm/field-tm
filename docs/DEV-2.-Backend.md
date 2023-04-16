@@ -23,9 +23,19 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 > Note: If the link doesn't work, check the logs with `docker logs fmtm_api`.
 
-> Note: The ODKCentral admin user will be generated automatically, with provided credentials ODK_CENTRAL_USER:ODK_CENTRAL_PASSWD
+FMTM uses ODK Central to store ODK data. By default, the Docker setup
+includes a Central server. To add an admin user, with the user (email)
+and password you included in .env, run the following command:
 
-### 1B: Import Test Data
+    docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create
+
+Then, run the following command to add the user:
+
+    docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote
+
+> Note: Alternatively, you may use an external Central server and user.
+
+### 1C: Import Test Data
 
 Some test data is available to get started quickly.
 
@@ -111,4 +121,11 @@ Example launch.json config for vscode:
 }
 ```
 
-> Note: Either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+> Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
+
+### Conclusion
+Running the FMTM project is easy with Docker. You can also run the
+project locally outside of Docker, but it requires more setup. The
+frontend is built with React and Typescript, and the backend is built
+with FastAPI. Use the tips provided to customize and extend the
+functionality of the project.
