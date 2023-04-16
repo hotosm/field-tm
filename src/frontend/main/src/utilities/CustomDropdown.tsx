@@ -1,4 +1,4 @@
-import { Dropdown } from 'rsuite';
+// import { Dropdown } from 'rsuite';
 import React, { useState } from 'react';
 import '../styles/home.css'
 import CoreModules from '../shared/CoreModules';
@@ -25,29 +25,30 @@ const CustomDropdown = ({ toolBarStyle, text, size, names, appearance, color }) 
     }
 
     return (
-        <Dropdown
-            menuStyle={{ width: '100%' }}
-            style={toolBarStyle}
-            title={text}
-            size={size}
-            appearance={appearance}
-            color={color}
-        >
-            {
-                names.map((value, index) => {
-                    return (
-                        <Dropdown.Item
-                            key={index}
-                            id={index}
-                            style={styles}
-                            onMouseEnter={onMouseEnter}
-                            onMouseLeave={onMouseLeave}>
-                            {value}
-                        </Dropdown.Item>
-                    )
-                })
-            }
-        </Dropdown>
+        <div></div>
+        // <Dropdown
+        //     menuStyle={{ width: '100%' }}
+        //     style={toolBarStyle}
+        //     title={text}
+        //     size={size}
+        //     appearance={appearance}
+        //     color={color}
+        // >
+        //     {
+        //         names.map((value, index) => {
+        //             return (
+        //                 <Dropdown.Item
+        //                     key={index}
+        //                     id={index}
+        //                     style={styles}
+        //                     onMouseEnter={onMouseEnter}
+        //                     onMouseLeave={onMouseLeave}>
+        //                     {value}
+        //                 </Dropdown.Item>
+        //             )
+        //         })
+        //     }
+        // </Dropdown>
     )
 }
 
