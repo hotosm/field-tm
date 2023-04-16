@@ -16,6 +16,7 @@ export interface CreateProjectDetailsModel {
       per_task_instructions: string;
     }[];
     status: number;
+    xform_title: string;
     location_str: string;
     outline_geojson: {
       type: string;
@@ -68,4 +69,14 @@ export interface CreateProjectDetailsModel {
   export interface FormCategoryListModel {
     id: number,
     title: string,
+  }
+  export interface OrganisationListModel {
+    name: string;
+    slug: string;
+    description: string;
+    type: number;
+    subscription_tier: null | string;
+    id: number;
+    logo: string;
+    url: string;
   }

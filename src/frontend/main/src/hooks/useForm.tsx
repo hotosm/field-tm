@@ -12,7 +12,7 @@ const useForm = (initialState, callback, validate) => {
 
   const handleCustomChange = (name, value) => {
     setValues((prev) => ({ ...prev, ...initialState, [name]: value }));
-    setErrors(validate({ ...values, [name]: value }));
+    // setErrors(validate({ ...values, [name]: value }));
   };
 
   const handleAllValues = (value) => {

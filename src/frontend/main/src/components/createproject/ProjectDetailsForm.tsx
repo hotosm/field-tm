@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import windowDimention from "../../hooks/WindowDimension";
-import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
-import { CreateProjectService } from "../../api/CreateProjectService";
 import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./CreateProjectValidation";
-import { diffObject } from "../../utilfunctions/compareUtils";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { SelectPicker } from 'rsuite';
+import { OrganisationService } from "../../api/CreateProjectService";
+import environment from "../../environment";
 
 
-const ProjectDetailsForm = () => {
+const ProjectDetailsForm: React.FC = () => {
     const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
@@ -25,22 +25,16 @@ const ProjectDetailsForm = () => {
     const projectDetails = CoreModules.useSelector((state) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
+    const organizationListData = CoreModules.useSelector((state) => state.createproject.organizationList);
+    // //we use use selector from redux to get all state of projectDetails from createProject slice
+
     const projectDetailsResponse = CoreModules.useSelector((state) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
-    // // passing payloads for creating project from form
-    const onCreateProjectSubmission = (values) => {
-        dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
-            {
-                "project_info": { ...values },
-                "author": {
-                    "username": values.username,
-                    "id": values.id
-                },
-            }
-        ));
-    }
-    // Might Need To Fix little after all backend PR merges  // 
+    useEffect(() => {
+        dispatch(OrganisationService(`${environment.baseApiUrl}/projects/organization/`))
+
+    }, [])
 
     useEffect(() => {
         if (projectDetailsResponse !== null) {
@@ -58,15 +52,11 @@ const ProjectDetailsForm = () => {
 
     };
 
-    const { handleChange, handleSubmit, handleCustomChange, values, errors } = useForm(
+    const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
         projectDetails,
         submission,
         CreateProjectValidation,
     );
-    const submitForm = () => {
-        // const changedValues = diffObject(projectDetails, values);
-        onCreateProjectSubmission(values);
-    };
     const inputFormStyles = () => {
         return {
             style: {
@@ -76,46 +66,93 @@ const ProjectDetailsForm = () => {
             } // or className: 'your-class'
         }
     }
+    // Changed OrganizationList Data into the Picker Component Format i.e label and value
+    const organizationList = organizationListData.map(
+        item => ({ label: item.name, value: item.id })
+    );
     return (
         <CoreModules.Stack sx={{ width: '50%' }}>
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
-                    {/* User Id Form Input For Create Project  as Oauth is Not Working   "FIX ME" */}
+                    {/* Organization Dropdown For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>User Id<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel>
-                        </CoreModules.FormLabel>
-                        <CoreModules.TextField
-                            id="id"
-                            label=""
-                            variant="filled"
-                            inputProps={{ sx: { padding: '8.5px 14px' } }}
-                            value={values.id}
-                            onChange={(e) => { handleCustomChange('id', e.target.value); }}
-                            helperText={errors.id}
-                            FormHelperTextProps={inputFormStyles()}
-                        />
-                    </CoreModules.FormControl>
-                    {/* END */}
-
-                    {/* User Name Form Input For Create Project  as Oauth is Not Working   "FIX ME" */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Username  <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
-                        <CoreModules.TextField
-                            id="username"
-                            label=""
-                            variant="filled"
-                            inputProps={{ sx: { padding: '8.5px 14px' } }}
-                            value={values.username}
-                            onChange={(e) => {
-                                handleCustomChange('username', e.target.value);
+                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Organization<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <SelectPicker data={organizationList}
+                            style={{
+                                width: '40%',
+                                fontFamily: defaultTheme.typography.h3.fontFamily,
+                                fontSize: defaultTheme.typography.h3.fontSize
                             }}
-                            helperText={errors.username}
-                            FormHelperTextProps={inputFormStyles()}
 
-                        />
+                            searchable={false}
+                            onChange={(value) => {
+                                handleCustomChange('organization', value);
+                                dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value }))
+                            }
+                            } />
+                        {errors.organization && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.organization}</CoreModules.FormLabel>}
                     </CoreModules.FormControl>
                     {/* END */}
 
+                    {/* Project Name Form Input For Create Project */}
+                    <CoreModules.FormControl sx={{ mb: 3 }}>
+                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Url<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.TextField
+                            id="odk_central_url"
+                            label=""
+                            variant="filled"
+                            inputProps={{ sx: { padding: '8.5px 14px' } }}
+                            value={values.odk_central_url}
+                            onChange={(e) => {
+                                handleCustomChange('odk_central_url', e.target.value);
+                            }}
+                            helperText={errors.odk_central_url}
+                            FormHelperTextProps={inputFormStyles()}
+
+                        />
+                        {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
+                    </CoreModules.FormControl>
+                    {/* END */}
+
+                    {/* Project Name Form Input For Create Project */}
+                    <CoreModules.FormControl sx={{ mb: 3 }}>
+                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Email/Username <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.TextField
+                            id="odk_central_user"
+                            label=""
+                            variant="filled"
+                            inputProps={{ sx: { padding: '8.5px 14px' } }}
+                            value={values.odk_central_user}
+                            onChange={(e) => {
+                                handleCustomChange('odk_central_user', e.target.value);
+                            }}
+                            helperText={errors.odk_central_user}
+                            FormHelperTextProps={inputFormStyles()}
+
+                        />
+                        {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
+                    </CoreModules.FormControl>
+                    {/* END */}
+
+                    {/* Project Name Form Input For Create Project */}
+                    <CoreModules.FormControl sx={{ mb: 3 }}>
+                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Password <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.TextField
+                            id="odk_central_password"
+                            label=""
+                            variant="filled"
+                            inputProps={{ sx: { padding: '8.5px 14px' } }}
+                            value={values.odk_central_password}
+                            onChange={(e) => {
+                                handleCustomChange('odk_central_password', e.target.value);
+                            }}
+                            helperText={errors.odk_central_password}
+                            FormHelperTextProps={inputFormStyles()}
+
+                        />
+                        {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
+                    </CoreModules.FormControl>
+                    {/* END */}
                     {/* Project Name Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
                         <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Project Name <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>

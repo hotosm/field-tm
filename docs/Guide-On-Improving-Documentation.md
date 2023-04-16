@@ -41,7 +41,7 @@ Project documentation is the process of recording the key project details that a
 - Access
 - Resources
 - Support / Guidelines
-- 
+ 
 ### 3. Structure for System Documentation
 System documentation is an all-encompassing record of details of a full working system. It is very similar to the structure of product documentation but it’s usually on a wider scale. It may even include some forms of product and process documentation within it. In addition to the structure of product documentation above, other key components it might include are: **architecture design**, **program source code** and **maintenance / help guide**.
 

@@ -514,6 +514,11 @@ class DbProject(Base):
     # FEEDBACK
     project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
 
+    ## Odk central server
+    odk_central_url = Column(String)
+    odk_central_user = Column(String)
+    odk_central_password = Column(String)
+
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")
