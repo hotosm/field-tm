@@ -7,8 +7,7 @@ import FormGroup from '@mui/material/FormGroup'
 import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { SelectPicker } from 'rsuite';
-import AssetModules from '../../shared/AssetModules.js';
+// import { SelectPicker } from 'rsuite';
 
 const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
@@ -35,22 +34,22 @@ const UploadArea: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    const userDetails = CoreModules.useSelector((state) => state.login.loginToken);
+    const userDetails:any = CoreModules.useSelector<any>((state) => state.login.loginToken);
     // //we use use-selector from redux to get all state of loginToken from login slice
 
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
-    useEffect(() => {
-        if (projectArea !== null) {
-            navigate('/basemap-selection');
-            dispatch(CreateProjectActions.ClearCreateProjectFormData())
+    // useEffect(() => {
+    //     if (projectArea !== null) {
+    //         navigate('/');
+    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
 
-        }
-        return () => {
-            dispatch(CreateProjectActions.ClearCreateProjectFormData())
-        }
+    //     }
+    //     return () => {
+    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
+    //     }
 
-    }, [projectArea])
+    // }, [projectArea])
     // END
 
     // Fetching form category list 
@@ -106,53 +105,24 @@ const UploadArea: React.FC = () => {
     return (
         <CoreModules.Stack>
             <FormGroup >
-                <CoreModules.FormLabel>Select/Upload Form</CoreModules.FormLabel>
-                <SelectPicker data={selectFormWays}
+                <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
+                {/* <SelectPicker data={formCategoryData}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
                     searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value }))} />
-                {projectDetails.form_ways === 'Select Form From Category' ? <>
-                    <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
-                    <SelectPicker data={formCategoryData}
-                        style={{
-                            marginBottom: '6%',
-                            fontFamily: defaultTheme.typography.h3.fontFamily,
-                            fontSize: defaultTheme.typography.h3.fontSize
-                        }}
-                        searchable={false}
-                        onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} />
-                </> : null}
-                {projectDetails.form_ways === 'Upload a Form' ? <>
-                    <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
-                        <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
-                    </CoreModules.IconButton></a>
-                    <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
-                    <CoreModules.Button
-                        variant="contained"
-                        component="label"
-                    >
-                        <CoreModules.Input
-                            type="file"
-                            onChange={(e) => {
-                                setFormFileUpload(e.target.files)
-                            }}
-                        />
-                    </CoreModules.Button>
-                    {!formFileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
-                </> : null}
+                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} /> */}
                 <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
-                <SelectPicker data={algorithmListData}
+                {/* <SelectPicker data={algorithmListData}
                     style={{
                         marginBottom: '6%',
                         fontFamily: defaultTheme.typography.h3.fontFamily,
                         fontSize: defaultTheme.typography.h3.fontSize
                     }}
                     searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} />
+                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} /> */}
 
                 {/* Square Input For Create Project inorder to set the square dimension of tasks*/}
                 {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3 }}>
