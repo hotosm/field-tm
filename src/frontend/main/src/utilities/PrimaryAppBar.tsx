@@ -51,7 +51,7 @@ export default function PrimaryAppBar() {
     dispatch(ProjectActions.clearProjects([]))
   }
 
-  const { type } = windowDimention();
+  const { type,windowSize } = windowDimention();
 
   return (
     <CoreModules.Stack sx={{ flexGrow: 1 }}>
@@ -59,7 +59,8 @@ export default function PrimaryAppBar() {
         open={open}
         placement={'right'}
         onClose={handleOnCloseDrawer}
-        size={type == 'xs' ? 'full' : 'xs'}
+        size={windowSize}
+        type={type}
         onSignOut={handleOnSignOut}
       />
       <CoreModules.AppBar position="static">

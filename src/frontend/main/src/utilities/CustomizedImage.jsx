@@ -1,20 +1,21 @@
 import React from "react";
 import cardImg from '../assets/images/project_icon.png';
 import logo from '../assets/images/hotLog.png'
-
-const Switcher = ({ status, style }) => {
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+const Switcher = ({ status,width,height }) => {
     switch (status) {
         case 'card':
-            return <img src={cardImg} style={style} />
+            return  <LazyLoadImage src={cardImg} width={width} height={height} alt="Image Alt" effect="blur" />
         case 'logo':
-            return <img src={logo} style={style} />
+            return <LazyLoadImage src={logo} width={width} height={height} alt="Image Alt" effect="blur" />
 
     }
 }
 
-const CustomizedImage = ({ status, style }) => {
+const CustomizedImage = ({ status,style }) => {
+    console.log('style : ',style.width);
     return (
-        <Switcher status={status} style={style} />
+        <Switcher status={status} width={style.width} height={style.height}/>
     )
 }
 
