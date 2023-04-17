@@ -1,6 +1,10 @@
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 const deps = require("./package.json").dependencies;
 module.exports = (webpackEnv) => {
@@ -11,7 +15,7 @@ module.exports = (webpackEnv) => {
     cache: true,
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
-    bail: isEnvProduction,
+    // bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'inline-source-map',
     output: {
       publicPath: `${process.env.FRONTEND_MAP_URL}/`,
@@ -63,8 +67,61 @@ module.exports = (webpackEnv) => {
         },
       ],
     },
-    
+    optimization: {
+      minimize: isEnvProduction,
+      minimizer: [
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            warnings: false,
+            parse: {},
+            compress: {},
+            mangle: true, // Note `mangle.properties` is `false` by default.
+            output: null,
+            toplevel: false,
+            nameCache: null,
+            ie8: false,
+            keep_fnames: false,
+          },
+        }),
+        // This is only used in production mode
+        new TerserPlugin({
+          terserOptions: {
+            terserOptions: {
+              parse: {
+                // We want terser to parse ecma 8 code. However, we don't want it
+                // to apply minification steps that turns valid ecma 5 code
+                // into invalid ecma 5 code. This is why the `compress` and `output`
+                ecma: 8,
+              },
+              compress: {
+                ecma: 5,
+                warning: false,
+                inline: 2,
+              },
+              mangle: {
+                // Find work around for Safari 10+
+                safari10: true,
+              },
+              output: {
+                ecma: 5,
+                comments: false,
+                ascii__only: true,
+              }
+            },
+          
+            // Use multi-process parallel running to improve the build speed
+            parallel: true,
+          
+            // Enable file caching
+            cache: true,
+          },
+        }),
+        // This is only used in production mode
+        new CssMinimizerPlugin(),
+      ],
+    },
     plugins: [
+      // new BundleAnalyzerPlugin(),
       new ModuleFederationPlugin({
         name: "fmtm_openlayer_map",
         filename: "remoteEntry.js",
@@ -86,9 +143,30 @@ module.exports = (webpackEnv) => {
           },
         },
       }),
-      new HtmlWebPackPlugin({
-        template: "./src/index.html",
-      }),
+      new HtmlWebPackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: "./src/index.html",
+          },
+          // Only for production
+          isEnvProduction ? {
+          minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true
+          }
+        } : undefined
+        )
+      ),
       new EnvironmentPlugin(["FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
     ],
   }

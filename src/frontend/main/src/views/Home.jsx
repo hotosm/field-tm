@@ -9,6 +9,7 @@ import SearchablesRow from "../components/home/HomePageFilters";
 import CoreModules from "../shared/CoreModules";
 
 const Home = () => {
+    
     const defaultTheme = CoreModules.useSelector(state => state.theme.hotTheme)
     // const state:any = useSelector<any>(state=>state.project.projectData)
     // console.log('state main :',state)
