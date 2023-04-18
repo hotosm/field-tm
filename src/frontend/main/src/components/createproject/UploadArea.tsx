@@ -7,6 +7,7 @@ import FormGroup from '@mui/material/FormGroup'
 import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { InputLabel, MenuItem, Select } from "@mui/material";
 // import { SelectPicker } from 'rsuite';
 
 const UploadArea: React.FC = () => {
@@ -34,7 +35,7 @@ const UploadArea: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    const userDetails:any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+    const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
     // //we use use-selector from redux to get all state of loginToken from login slice
 
 
@@ -105,28 +106,32 @@ const UploadArea: React.FC = () => {
     return (
         <CoreModules.Stack>
             <FormGroup >
-                <CoreModules.FormLabel>Form Category</CoreModules.FormLabel>
-                {/* <SelectPicker data={formCategoryData}
-                    style={{
-                        marginBottom: '6%',
-                        fontFamily: defaultTheme.typography.h3.fontFamily,
-                        fontSize: defaultTheme.typography.h3.fontSize
-                    }}
-                    searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value }))} /> */}
-                <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel>
-                {/* <SelectPicker data={algorithmListData}
-                    style={{
-                        marginBottom: '6%',
-                        fontFamily: defaultTheme.typography.h3.fontFamily,
-                        fontSize: defaultTheme.typography.h3.fontSize
-                    }}
-                    searchable={false}
-                    onChange={(value) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value }))} /> */}
+                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
+                    <InputLabel id="form-category">Form Category</InputLabel>
+                    <Select
+                        labelId="form_category-label"
+                        id="form_category"
+                        value={projectDetails.xform_title}
+                        label="Form Category"
+                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} >
+                        {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                    </Select>
+                </CoreModules.FormControl>
 
-                {/* Square Input For Create Project inorder to set the square dimension of tasks*/}
+                {/* <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel> */}
+                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
+                    <InputLabel id="demo-simple-select-label">Splitting Algorithm</InputLabel>
+                    <Select
+                        labelId="splitting_algorithm-label"
+                        id="splitting_algorithm"
+                        value={projectDetails.splitting_algorithm}
+                        label="Splitting Algorithm"
+                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value: e.target.value }))} >
+                        {algorithmListData?.map((listData) => <MenuItem value={listData.value}>{listData.label}</MenuItem>)}
+                    </Select>
+                </CoreModules.FormControl>
                 {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3 }}>
-                    <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Dimension <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                    <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                     <CoreModules.TextField
                         id="dimension"
                         label=""
