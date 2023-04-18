@@ -8,6 +8,8 @@ import { CreateProjectService, FormCategoryService } from "../../api/CreateProje
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
+import AssetModules from '../../shared/AssetModules.js';
+
 // import { SelectPicker } from 'rsuite';
 
 const UploadArea: React.FC = () => {
@@ -58,7 +60,7 @@ const UploadArea: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
-    const selectFormWaysList = ['Select Form From Category', 'Upload a Form'];
+    const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
     const selectFormWays = selectFormWaysList.map(
         item => ({ label: item, value: item })
     );
@@ -105,9 +107,13 @@ const UploadArea: React.FC = () => {
     }
     return (
         <CoreModules.Stack>
-            <FormGroup >
+            <FormGroup sx={{ width: '200px' }}>
                 <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                    <InputLabel id="form-category">Form Category</InputLabel>
+                    <InputLabel id="form-category" sx={{
+                        '&.Mui-focused': {
+                            color: defaultTheme.palette.black
+                        }
+                    }} >Form Category</InputLabel>
                     <Select
                         labelId="form_category-label"
                         id="form_category"
@@ -117,10 +123,49 @@ const UploadArea: React.FC = () => {
                         {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
                     </Select>
                 </CoreModules.FormControl>
+                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
+                    <InputLabel id="form-category" sx={{
+                        '&.Mui-focused': {
+                            color: defaultTheme.palette.black
+                        }
+                    }}>Form Selection</InputLabel>
+                    <Select
+                        labelId="form_ways-label"
+                        id="form_ways"
+                        value={projectDetails.form_ways}
+                        label="Form Ways"
+                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))} >
+                        {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                    </Select>
+                </CoreModules.FormControl>
+
+                {projectDetails.form_ways === 'Upload a Custom Form' ? <>
+                    <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
+                        <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
+                    </CoreModules.IconButton></a>
+                    <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
+                    <CoreModules.Button
+                        variant="contained"
+                        component="label"
+                    >
+                        <CoreModules.Input
+                            type="file"
+                            onChange={(e) => {
+                                setFormFileUpload(e.target.files)
+                            }}
+                        />
+                    </CoreModules.Button>
+                    {!formFileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
+                </> : null}
+
 
                 {/* <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel> */}
                 <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                    <InputLabel id="demo-simple-select-label">Splitting Algorithm</InputLabel>
+                    <InputLabel id="demo-simple-select-label" sx={{
+                        '&.Mui-focused': {
+                            color: defaultTheme.palette.black
+                        }
+                    }} >Splitting Algorithm</InputLabel>
                     <Select
                         labelId="splitting_algorithm-label"
                         id="splitting_algorithm"
