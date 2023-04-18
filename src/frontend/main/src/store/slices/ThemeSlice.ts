@@ -5,6 +5,7 @@ const ThemeSlice = CoreModules.createSlice({
     initialState: {
         hotTheme: {
             palette: {
+                black:'#000000',
                 mode: 'light',
                 primary: {
                     main: '#ffffff',
