@@ -8,10 +8,11 @@ import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 // import { SelectPicker } from 'rsuite';
 import { OrganisationService } from "../../api/CreateProjectService";
 import environment from "../../environment";
+import { InputLabel, MenuItem, Select } from "@mui/material";
 
 
 const ProjectDetailsForm: React.FC = () => {
-    const defaultTheme:any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
 
@@ -22,18 +23,17 @@ const ProjectDetailsForm: React.FC = () => {
     const dispatch = CoreModules.useDispatch()
     // //dispatch function to perform redux state mutation
 
-    const projectDetails:any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
+    const projectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const organizationListData:any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
+    const organizationListData: any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const projectDetailsResponse:any = CoreModules.useSelector<any>((state) => state.createproject.projectDetailsResponse);
+    const projectDetailsResponse: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetailsResponse);
     // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
     useEffect(() => {
         dispatch(OrganisationService(`${environment.baseApiUrl}/projects/organization/`))
-
     }, [])
 
     useEffect(() => {
@@ -75,28 +75,27 @@ const ProjectDetailsForm: React.FC = () => {
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
                     {/* Organization Dropdown For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Organization<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
-                        {/* <SelectPicker data={organizationList}
-                            style={{
-                                width: '40%',
-                                fontFamily: defaultTheme.typography.h3.fontFamily,
-                                fontSize: defaultTheme.typography.h3.fontSize
+                    <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
+                        <InputLabel id="demo-simple-select-label">Organization</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={values.organization}
+                            label="Organization"
+                            onChange={(e) => {
+                                handleCustomChange('organization', e.target.value);
+                                dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }))
                             }}
-
-                            searchable={false}
-                            onChange={(value) => {
-                                handleCustomChange('organization', value);
-                                dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value }))
-                            }
-                            } /> */}
+                        >
+                            {organizationList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
+                        </Select>
                         {errors.organization && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.organization}</CoreModules.FormLabel>}
                     </CoreModules.FormControl>
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Url<CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                    <CoreModules.FormControl sx={{ mb: 0 }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Central ODK Url</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="odk_central_url"
                             label=""
@@ -115,10 +114,11 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Email/Username <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                    <CoreModules.FormControl sx={{ mb: 1 }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel sx={{}} component="h3">Central ODK Email/Username</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
-                            id="odk_central_user"
+                            id="odk_central_name"
+                            name="odk"
                             label=""
                             variant="filled"
                             inputProps={{ sx: { padding: '8.5px 14px' } }}
@@ -126,6 +126,7 @@ const ProjectDetailsForm: React.FC = () => {
                             onChange={(e) => {
                                 handleCustomChange('odk_central_user', e.target.value);
                             }}
+                            autoComplete="new-password"
                             helperText={errors.odk_central_user}
                             FormHelperTextProps={inputFormStyles()}
 
@@ -135,14 +136,16 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Central ODK Password <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                    <CoreModules.FormControl sx={{ mb: 1 }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Central ODK Password </CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
-                            id="odk_central_password"
+                            id="odk_central_new_password"
                             label=""
                             variant="filled"
                             inputProps={{ sx: { padding: '8.5px 14px' } }}
                             value={values.odk_central_password}
+                            type="password"
+                            autoComplete="new-password"
                             onChange={(e) => {
                                 handleCustomChange('odk_central_password', e.target.value);
                             }}
@@ -155,7 +158,7 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
                     {/* Project Name Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Project Name <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Project Name</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="project_name"
                             label=""
@@ -175,7 +178,7 @@ const ProjectDetailsForm: React.FC = () => {
 
                     {/* Short Description Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Short Description <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Short Description</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="short_description"
                             label=""
@@ -194,7 +197,7 @@ const ProjectDetailsForm: React.FC = () => {
 
                     {/* Description Form Input For Create Project */}
                     <CoreModules.FormControl sx={{ mb: 3 }}>
-                        <CoreModules.FormLabel component="h3" sx={{ display: 'flex' }}>Description <CoreModules.FormLabel component="h4" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.FormLabel>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Description</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="description"
                             label=""

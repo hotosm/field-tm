@@ -13,6 +13,7 @@ const CreateProject = CoreModules.createSlice({
         generateQrLoading:false,
         organizationList:[],
         organizationListLoading:false,
+        generateQrSuccess:null,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -55,6 +56,9 @@ const CreateProject = CoreModules.createSlice({
         },
         GetOrganisationListLoading(state,action){
             state.organizationListLoading= action.payload
+        },
+        GenerateProjectQRSuccess(state,action){
+            state.generateQrSuccess= action.payload
         }
     }
 })
