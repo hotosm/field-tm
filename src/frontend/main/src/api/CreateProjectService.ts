@@ -142,7 +142,7 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
 
             try {
                 const generateApiFormData = new FormData();
-                if(payload.splitting_algorithm === 'Custom Multipolygon'){
+                if(payload.form_ways === 'Upload a Custom Form'){
                     generateApiFormData.append('upload',payload.uploaded_form[0]);
                 }else{
                     generateApiFormData.append('upload','');
@@ -165,7 +165,8 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
                     duration: 2000,
                 }));
                 dispatch(CommonActions.SetLoading(false))
-                // await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
+                await dispatch(CreateProjectActions.ClearCreateProjectFormData())
+                await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp))
                 
             } catch (error) {
                 dispatch(CommonActions.SetLoading(false))
