@@ -236,15 +236,15 @@ def generate_updated_xform(
     outxml.close()
 
     # insert the new version
-    forms = table(
-        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
-    )
-    ins = insert(forms).values(title=name, xml=data)
-    sql = ins.on_conflict_do_update(
-        constraint="xlsforms_title_key", set_=dict(title=name, xml=newxml)
-    )
-    db.execute(sql)
-    db.commit()
+    # forms = table(
+    #     "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+    # )
+    # ins = insert(forms).values(title=name, xml=data)
+    # sql = ins.on_conflict_do_update(
+    #     constraint="xlsforms_title_key", set_=dict(title=name, xml=newxml)
+    # )
+    # db.execute(sql)
+    # db.commit()
 
     return outfile
 
