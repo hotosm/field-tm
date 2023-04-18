@@ -2,7 +2,6 @@ const { EnvironmentPlugin } = require("webpack");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
@@ -70,19 +69,6 @@ module.exports = (webpackEnv) => {
     optimization: {
       minimize: isEnvProduction,
       minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            warnings: false,
-            parse: {},
-            compress: {},
-            mangle: true, // Note `mangle.properties` is `false` by default.
-            output: null,
-            toplevel: false,
-            nameCache: null,
-            ie8: false,
-            keep_fnames: false,
-          },
-        }),
         // This is only used in production mode
         new TerserPlugin({
           terserOptions: {

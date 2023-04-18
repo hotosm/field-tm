@@ -6,7 +6,6 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const path = require('path');
 const deps = require("./package.json").dependencies;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 //const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = function (webpackEnv) {
   
@@ -83,19 +82,6 @@ module.exports = function (webpackEnv) {
       },
       minimize: isEnvProduction,
       minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            warnings: false,
-            parse: {},
-            compress: {},
-            mangle: true, // Note `mangle.properties` is `false` by default.
-            output: null,
-            toplevel: false,
-            nameCache: null,
-            ie8: false,
-            keep_fnames: false,
-          },
-        }),
         // This is only used in production mode
         new TerserPlugin({
           terserOptions: {

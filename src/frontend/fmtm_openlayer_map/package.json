@@ -44,7 +44,6 @@
     "react-dom": "^17.0.2",
     "react-share-social": "^0.1.55",
     "terser-webpack-plugin": "^5.3.7",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack-bundle-analyzer": "^4.8.0"
   }
 }

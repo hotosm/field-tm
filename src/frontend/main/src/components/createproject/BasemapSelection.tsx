@@ -2,14 +2,13 @@ import React from 'react'
 import CoreModules from '../../shared/CoreModules.js';
 // import { SelectPicker } from 'rsuite';
 import { useDispatch } from 'react-redux';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { useNavigate } from 'react-router-dom';
 
 const BasemapSelection: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const defaultTheme:any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
+    const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
     const imagerySource = ['OAM', 'Topo'];
     const imagerySourceData = imagerySource.map(
