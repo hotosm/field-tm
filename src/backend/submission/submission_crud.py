@@ -19,6 +19,7 @@
 from sqlalchemy.orm import Session
 from ..central.central_crud import xform
 from ..projects import project_crud
+from ..central.central_crud import project
 
 def get_submission_of_project(
         db: Session,
@@ -52,6 +53,9 @@ def get_submission_of_project(
             submission_list = xform.listSubmissions(odkid, xml_form_id)
             if isinstance(submission_list,list):
                 for submission in submission_list:
+                    # App User Id is a combination of project_name, category and task_id 
+                    # Need to access from api
+                    submission['submitted_by'] = f'{project_name}_{form_category}_{id}'
                     data.append(submission)
         return data
     
@@ -59,4 +63,27 @@ def get_submission_of_project(
         # If task_id is provided, submission made to this particular task is returned.
         xml_form_id = f'{project_name}_{form_category}_{task_id}'.split('_')[2]
         submission_list = xform.listSubmissions(odkid, xml_form_id)
+        for x in submission_list:
+            x['submitted_by'] = f'{project_name}_{form_category}_{task_id}'
         return submission_list
+
+
+def get_forms_of_project(
+        db : Session,
+        project_id: int
+    ):
+    project_info = project_crud.get_project_by_id(db, project_id)
+    odkid = project_info.odkid
+
+    result = project.listForms(odkid)
+    return result
+
+
+def list_app_users_or_project(
+        db : Session,
+        project_id: int
+    ):
+    project_info = project_crud.get_project_by_id(db, project_id)
+    odkid = project_info.odkid
+    result = project.listAppUsers(odkid)
+    return result

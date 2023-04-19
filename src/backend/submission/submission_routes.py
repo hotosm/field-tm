@@ -51,3 +51,38 @@ async def read_submissions(
     """
 
     return submission_crud.get_submission_of_project(db, project_id, task_id)
+
+@router.get("/list-forms")
+async def list_forms(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """
+        This api returns the list of forms in the odk central.
+
+        It takes one parameter: project_id.
+
+        project_id: The ID of the project. This endpoint returns the list of forms in this project.
+
+        Returns the list of forms details provided by the central api.
+    """
+
+    return submission_crud.get_forms_of_project(db, project_id)
+
+
+@router.get("/list-app-users")
+async def list_app_users(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """
+        This api returns the list of forms in the odk central.
+
+        It takes one parameter: project_id.
+
+        project_id: The ID of the project. This endpoint returns the list of forms in this project.
+
+        Returns the list of forms details provided by the central api.
+    """
+
+    return submission_crud.list_app_users_or_project(db, project_id)
