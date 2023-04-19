@@ -52,6 +52,7 @@ from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
+from shapely.geometry import MultiPolygon
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
@@ -330,6 +331,11 @@ def update_multi_polygon_project_boundary(
         polygons = boundary["features"]
         for polygon in polygons:
 
+            """ If the polygon is a MultiPolygon, convert it to a Polygon"""
+            if polygon['geometry']['type'] == 'MultiPolygon':
+                polygon['geometry']['type'] = 'Polygon'
+                polygon['geometry']['coordinates'] = polygon['geometry']['coordinates'][0]
+
             """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
             remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
 
@@ -385,6 +391,10 @@ def update_project_boundary(
 
     """Update the boundary polyon on the database."""
     outline = shape(boundary["features"][0]["geometry"])
+
+    # If the outline is a multipolygon, use the first polygon
+    if isinstance(outline, MultiPolygon):
+        outline = outline.geoms[0]
 
     # verify project exists in db
     db_project = get_project_by_id(db, project_id)
