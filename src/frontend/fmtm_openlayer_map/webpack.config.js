@@ -116,6 +116,7 @@ module.exports = (webpackEnv) => {
         },
         exposes: {
           "./ProjectDetails": "./src/views/Home.jsx",
+          "./Submissions": "./src/views/Submissions.tsx",
         },
         shared: {
           ...deps,

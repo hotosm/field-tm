@@ -93,6 +93,10 @@ const ThemeSlice = CoreModules.createSlice({
                     fontFamily: 'BarlowMedium',
                     fontSize: 20
                 },
+                subtitle3: {
+                    fontFamily: 'BarlowMedium',
+                    fontSize: 15
+                },
                 h1: {
                     fontFamily: 'ArchivoBold',
                     fontSize: 20
