@@ -14,9 +14,12 @@ const Submissions = () => {
 
     const projectState = CoreModules.useSelector((state) => state.project);
 
+    const params = CoreModules.useParams();
+    const encodedId = params.id;
+
     // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
-        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=23`))
+        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${environment.decode(encodedId)}`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
 
