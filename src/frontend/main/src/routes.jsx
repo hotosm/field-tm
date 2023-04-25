@@ -8,11 +8,11 @@ import Forgot from './views/Forgot';
 import MainView from './views/MainView';
 import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
-import NewPage from './views/NewPage';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
+const Submissions = React.lazy(() => import('map/Submissions'));
 const routes = createBrowserRouter([
   {
     element: <MainView />,
@@ -42,6 +42,16 @@ const routes = createBrowserRouter([
       //     element: <Forgot />,
       // },
       {
+        path: '/submissions/:id',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <Submissions />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/project_details/:id',
         element: (
           <ProtectedRoute>
@@ -52,17 +62,17 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/newpage/:id',
+        path: '/create-project',
         element: (
           <ProtectedRoute>
-            <Suspense fallback={<div></div>}>
-              <NewPage />
+            <Suspense fallback={<div>Loading...</div>}>
+              <CreateProject />
             </Suspense>
           </ProtectedRoute>
         ),
       },
       {
-        path: '/create-project',
+        path: '/select-form',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
