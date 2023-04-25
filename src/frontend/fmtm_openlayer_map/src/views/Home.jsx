@@ -21,7 +21,6 @@ import View from "ol/View";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
-// import Control from "ol/control/Control";
 
 import Overlay from "ol/Overlay";
 // import XYZ from "ol/source/XYZ.js";
@@ -82,7 +81,7 @@ const Home = () => {
       );
     }
     if (Object.keys(state.projectInfo).length == 0) {
-      dispatch(ProjectActions.SetProjectInfo(projectInfo));
+      dispatch(ProjectActions.SetProjectInfo({...projectInfo}));
     } else {
       if (state.projectInfo.id != environment.decode(encodedId)) {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
@@ -290,6 +289,17 @@ const Home = () => {
           state={state}
           type={type}
         />
+              <CoreModules.Stack direction={"column"} spacing={1} justifyContent="flex-end" >
+                <CoreModules.Link to={`/submissions/${encodedId}`} style={{display:'flex',justifyContent:'flex-end',textDecoration:'none',marginRight:'15px'}}>
+                  <CoreModules.Button
+                      variant="contained"
+                      color="error"
+                      sx={{"width":"10%"}}
+                  >
+                    Go To Submission        
+                  </CoreModules.Button>
+                </CoreModules.Link>
+              </CoreModules.Stack>
         <OpenLayersMap
           defaultTheme={defaultTheme}
           stateDialog={stateDialog}

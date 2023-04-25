@@ -1,6 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
 import { useEffect, useMemo } from 'react';
 // import * as olExtent from 'ol/extent';
 import VectorTile from 'ol/layer/VectorTile';
@@ -9,11 +6,8 @@ import VectorTileSource from 'ol/source/VectorTile';
 import { transformExtent } from 'ol/proj';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
-import Fill from 'ol/style/Fill';
-import Feature from 'ol/Feature';
 import { getStyles, defaultStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
-import checkIfSvgUrl from '../helpers/checkIfSvgUrl';
 
 const selectElement = 'singleselect';
 
