@@ -5,7 +5,7 @@ import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
 import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import AssetModules from '../../shared/AssetModules.js';
@@ -14,7 +14,6 @@ import AssetModules from '../../shared/AssetModules.js';
 
 const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
-    const [formFileUpload, setFormFileUpload] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
@@ -31,8 +30,8 @@ const UploadArea: React.FC = () => {
     const projectArea = CoreModules.useSelector((state: any) => state.createproject.projectArea);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-    const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-    // //we use use-selector from redux to get all state of formCategory from createProject slice
+    // const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
+    // // //we use use-selector from redux to get all state of formCategory from createProject slice
 
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
@@ -42,17 +41,17 @@ const UploadArea: React.FC = () => {
 
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
-    // useEffect(() => {
-    //     if (projectArea !== null) {
-    //         navigate('/');
-    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
+    useEffect(() => {
+        if (projectArea !== null) {
+            navigate('/');
+            dispatch(CreateProjectActions.ClearCreateProjectFormData())
 
-    //     }
-    //     return () => {
-    //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
-    //     }
+        }
+        return () => {
+            dispatch(CreateProjectActions.ClearCreateProjectFormData())
+        }
 
-    // }, [projectArea])
+    }, [projectArea])
     // END
 
     // Fetching form category list 
@@ -60,13 +59,7 @@ const UploadArea: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
-    const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
-    const selectFormWays = selectFormWaysList.map(
-        item => ({ label: item, value: item })
-    );
-    const formCategoryData = formCategoryList.map(
-        item => ({ label: item.title, value: item.title })
-    );
+
     const algorithmListData = ['Divide on Square', 'Custom Multipolygon', 'Openstreet Map Extract'].map(
         item => ({ label: item, value: item })
     );
@@ -80,6 +73,8 @@ const UploadArea: React.FC = () => {
         }
     }
 
+    const values = location?.state?.values;
+    console.log(values, 'values');
     // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
     const onCreateProjectSubmission = () => {
         const { values } = location.state;
@@ -101,128 +96,95 @@ const UploadArea: React.FC = () => {
                 "splitting_algorithm": projectDetails.splitting_algorithm,
                 "organization": values.organization,
                 "form_ways": projectDetails.form_ways,
-                "uploaded_form": formFileUpload
+                "uploaded_form": values.uploaded_form
             }, fileUpload
         ));
     }
     return (
-        <CoreModules.Stack>
-            <FormGroup sx={{ width: '200px' }}>
-                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                    <InputLabel id="form-category" sx={{
-                        '&.Mui-focused': {
-                            color: defaultTheme.palette.black
-                        }
-                    }} >Form Category</InputLabel>
-                    <Select
-                        labelId="form_category-label"
-                        id="form_category"
-                        value={projectDetails.xform_title}
-                        label="Form Category"
-                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} >
-                        {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
-                    </Select>
-                </CoreModules.FormControl>
-                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                    <InputLabel id="form-category" sx={{
-                        '&.Mui-focused': {
-                            color: defaultTheme.palette.black
-                        }
-                    }}>Form Selection</InputLabel>
-                    <Select
-                        labelId="form_ways-label"
-                        id="form_ways"
-                        value={projectDetails.form_ways}
-                        label="Form Ways"
-                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))} >
-                        {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
-                    </Select>
-                </CoreModules.FormControl>
+        <CoreModules.Stack sx={{ width: '50%' }}>
+            <form>
+                <FormGroup >
+                    {/* <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel> */}
+                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
+                        <InputLabel id="demo-simple-select-label" sx={{
+                            '&.Mui-focused': {
+                                color: defaultTheme.palette.black
+                            }
+                        }} >Choose Splitting Algorithm</InputLabel>
+                        <Select
+                            labelId="splitting_algorithm-label"
+                            id="splitting_algorithm"
+                            value={projectDetails.splitting_algorithm}
+                            label="Splitting Algorithm"
+                            onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value: e.target.value }))} >
+                            {algorithmListData?.map((listData) => <MenuItem value={listData.value}>{listData.label}</MenuItem>)}
+                        </Select>
+                    </CoreModules.FormControl>
+                    {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3, width: '30%' }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension (in metre)</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                        <CoreModules.TextField
+                            id="dimension"
+                            label=""
+                            variant="filled"
+                            inputProps={{ sx: { padding: '8.5px 14px' } }}
+                            value={projectDetails.dimension}
+                            onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
+                            // helperText={errors.username}
+                            FormHelperTextProps={inputFormStyles()}
 
-                {projectDetails.form_ways === 'Upload a Custom Form' ? <>
-                    <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
-                        <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
-                    </CoreModules.IconButton></a>
-                    <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
-                    <CoreModules.Button
-                        variant="contained"
-                        component="label"
-                    >
-                        <CoreModules.Input
-                            type="file"
-                            onChange={(e) => {
-                                setFormFileUpload(e.target.files)
-                            }}
                         />
-                    </CoreModules.Button>
-                    {!formFileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
-                </> : null}
+                    </CoreModules.FormControl>}
+                    {/* END */}
 
 
-                {/* <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel> */}
-                <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                    <InputLabel id="demo-simple-select-label" sx={{
-                        '&.Mui-focused': {
-                            color: defaultTheme.palette.black
-                        }
-                    }} >Splitting Algorithm</InputLabel>
-                    <Select
-                        labelId="splitting_algorithm-label"
-                        id="splitting_algorithm"
-                        value={projectDetails.splitting_algorithm}
-                        label="Splitting Algorithm"
-                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'splitting_algorithm', value: e.target.value }))} >
-                        {algorithmListData?.map((listData) => <MenuItem value={listData.value}>{listData.label}</MenuItem>)}
-                    </Select>
-                </CoreModules.FormControl>
-                {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3 }}>
-                    <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
-                    <CoreModules.TextField
-                        id="dimension"
-                        label=""
-                        variant="filled"
-                        inputProps={{ sx: { padding: '8.5px 14px' } }}
-                        value={projectDetails.dimension}
-                        onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
-                        // helperText={errors.username}
-                        FormHelperTextProps={inputFormStyles()}
+                    {/* Form Geojson File Upload For Create Project */}
+                    {['Divide on Square', 'Custom Multipolygon'].includes(projectDetails.splitting_algorithm) && < FormControl sx={{ mb: 3 }}>
+                        <CoreModules.FormLabel>Upload GEOJSON</CoreModules.FormLabel>
+                        <CoreModules.Button
+                            variant="contained"
+                            component="label"
+                        >
+                            <CoreModules.Input
+                                type="file"
+                                onChange={(e) => {
+                                    setFileUpload(e.target.files)
+                                }}
+                            />
+                        </CoreModules.Button>
+                        {!fileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
+                    </FormControl>}
+                    {/* END */}
 
-                    />
-                </CoreModules.FormControl>}
-                {/* END */}
-
-
-                {/* Form Geojson File Upload For Create Project */}
-                {['Divide on Square', 'Custom Multipolygon'].includes(projectDetails.splitting_algorithm) && < FormControl sx={{ mb: 3 }}>
-                    <CoreModules.FormLabel>Upload GEOJSON</CoreModules.FormLabel>
-                    <CoreModules.Button
-                        variant="contained"
-                        component="label"
-                    >
-                        <CoreModules.Input
-                            type="file"
-                            onChange={(e) => {
-                                setFileUpload(e.target.files)
-                            }}
-                        />
-                    </CoreModules.Button>
-                    {!fileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
-                </FormControl>}
-                {/* END */}
-
-                {/* Submit Button For Create Project on Area Upload */}
-                <CoreModules.Button
-                    variant="contained"
-                    color="error"
-                    // disabled={!fileUpload ? true : false}
-                    onClick={() => {
-                        onCreateProjectSubmission();
-                    }}
-                >
-                    Next
-                </CoreModules.Button>
-                {/* END */}
-            </FormGroup>
+                    {/* Submit Button For Create Project on Area Upload */}
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                        {/* Previous Button  */}
+                        <Link to="/select-form">
+                            <CoreModules.Button
+                                sx={{ width: '150px' }}
+                                variant="outlined"
+                                color="error"
+                            >
+                                Previous
+                            </CoreModules.Button>
+                        </Link>
+                        {/* END */}
+                        <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <CoreModules.Button
+                                variant="contained"
+                                color="error"
+                                sx={{ width: '20%' }}
+                                // disabled={!fileUpload ? true : false}
+                                onClick={() => {
+                                    onCreateProjectSubmission();
+                                }}
+                            >
+                                Next
+                            </CoreModules.Button>
+                        </CoreModules.Stack>
+                    </CoreModules.Stack>
+                    {/* END */}
+                </FormGroup>
+            </form>
         </CoreModules.Stack >
     )
 };
