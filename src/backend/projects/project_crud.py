@@ -385,12 +385,20 @@ def update_project_boundary(
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
     remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
 
+
+    """ Check if the boundary is a Feature or a FeatureCollection """
+    if boundary['type'] == 'Feature':
+        features = [boundary]
+    elif boundary['type'] == 'FeatureCollection':
+        features = boundary['features']
+
+
     """ Apply the lambda function to each coordinate in its geometry """
-    for feature in boundary['features']:
+    for feature in features:
         list(map(remove_z_dimension, feature['geometry']['coordinates'][0]))
 
     """Update the boundary polyon on the database."""
-    outline = shape(boundary["features"][0]["geometry"])
+    outline = shape(features[0]["geometry"])
 
     # If the outline is a multipolygon, use the first polygon
     if isinstance(outline, MultiPolygon):

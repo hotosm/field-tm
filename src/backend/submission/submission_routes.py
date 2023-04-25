@@ -17,7 +17,8 @@
 #
 
 from typing import List
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
+from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from ..central import central_crud
@@ -86,3 +87,23 @@ async def list_app_users(
     """
 
     return submission_crud.list_app_users_or_project(db, project_id)
+
+
+
+@router.get("/download")
+async def download_submission(
+    project_id: int,
+    task_id: int = None,
+    db: Session = Depends(database.get_db),
+):
+    """
+        This api downloads the the submission made in the project.
+        It takes two parameters: project_id and task_id.
+
+        project_id: The ID of the project. This endpoint returns the submission made in this project.
+
+        task_id: The ID of the task. This parameter is optional. If task_id is provided, this endpoint returns the submissions made for this task.
+
+    """
+
+    return submission_crud.download_submission(db, project_id, task_id)
