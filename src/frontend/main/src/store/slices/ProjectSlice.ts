@@ -9,7 +9,8 @@ const ProjectSlice = createSlice({
         projectTaskBoundries: [],
         newProjectTrigger: false,
         projectInfo: {},
-
+        projectSubmissionLoading:false,
+        projectSubmission:[]
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
@@ -27,6 +28,12 @@ const ProjectSlice = createSlice({
         clearProjects(state,action) {
             storage.removeItem('persist:project')
             state.projectTaskBoundries = action.payload
+        },
+        GetProjectSubmissionLoading(state,action) {
+            state.projectSubmissionLoading = action.payload
+        },
+        SetProjectSubmission(state,action) {
+            state.projectSubmission = action.payload
         },
     }
 })

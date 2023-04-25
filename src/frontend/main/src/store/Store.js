@@ -19,14 +19,14 @@ import CommonSlice from "./slices/CommonSlice";
 import LoginSlice from "./slices/LoginSlice";
 
 const reducers = CoreModules.combineReducers({
-    // project: persistReducer(
-    //     {
-    //         key: 'project',
-    //         storage
-    //     },
-    //     ProjectSlice.reducer
-    // ),
-    project: ProjectSlice.reducer,
+    project: persistReducer(
+        {
+            key: 'project',
+            storage
+        },
+        ProjectSlice.reducer
+    ),
+    // project: ProjectSlice.reducer,
     login: persistReducer(
         {
             key: 'login',

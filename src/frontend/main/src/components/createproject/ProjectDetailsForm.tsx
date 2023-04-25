@@ -3,7 +3,7 @@ import windowDimention from "../../hooks/WindowDimension";
 import CoreModules from "../../shared/CoreModules";
 import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
-import CreateProjectValidation from "./CreateProjectValidation";
+import CreateProjectValidation from "./validation/CreateProjectValidation";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 // import { SelectPicker } from 'rsuite';
 import { OrganisationService } from "../../api/CreateProjectService";
@@ -38,7 +38,7 @@ const ProjectDetailsForm: React.FC = () => {
 
     useEffect(() => {
         if (projectDetailsResponse !== null) {
-            navigate('/upload-area');
+            navigate('/select-form');
         }
 
     }, [projectDetailsResponse])
@@ -47,7 +47,7 @@ const ProjectDetailsForm: React.FC = () => {
         // eslint-disable-next-line no-use-before-define
         // submitForm();
         dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
-        navigate("/upload-area", { replace: true, state: { values: values } });
+        navigate("/select-form", { replace: true, state: { values: values } });
 
 
     };
@@ -75,8 +75,16 @@ const ProjectDetailsForm: React.FC = () => {
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
                     {/* Organization Dropdown For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }} variant="filled">
-                        <InputLabel id="demo-simple-select-label">Organization</InputLabel>
+
+                    <CoreModules.FormControl sx={{ mb: 0, width: '30%', }} variant="filled">
+                        <CoreModules.Box sx={{
+                            display: 'flex', flexDirection: 'row', pt: 0,
+                        }}><CoreModules.FormLabel component="h3" sx={{
+                            '&.Mui-focused': {
+                                color: 'black',
+                            },
+                        }}>Organization</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                        {/* <InputLabel id="demo-simple-select-label">Organization</InputLabel> */}
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -94,8 +102,8 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 0 }}>
-                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Central ODK Url</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                    <CoreModules.FormControl sx={{ mb: 0, width: '50%', }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}><CoreModules.FormLabel component="h3">Central ODK Url</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="odk_central_url"
                             label=""
@@ -114,7 +122,7 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 1 }}>
+                    <CoreModules.FormControl sx={{ mb: 1, width: '50%', }}>
                         <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel sx={{}} component="h3">Central ODK Email/Username</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="odk_central_name"
@@ -136,7 +144,7 @@ const ProjectDetailsForm: React.FC = () => {
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 1 }}>
+                    <CoreModules.FormControl sx={{ mb: 1, width: '50%', }}>
                         <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Central ODK Password </CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="odk_central_new_password"
@@ -157,7 +165,7 @@ const ProjectDetailsForm: React.FC = () => {
                     </CoreModules.FormControl>
                     {/* END */}
                     {/* Project Name Form Input For Create Project */}
-                    <CoreModules.FormControl sx={{ mb: 3 }}>
+                    <CoreModules.FormControl sx={{ mb: 3, width: '50%', }}>
                         <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Project Name</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         <CoreModules.TextField
                             id="project_name"
