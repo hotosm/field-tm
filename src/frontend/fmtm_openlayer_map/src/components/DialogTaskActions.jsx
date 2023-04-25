@@ -41,12 +41,12 @@ export default function Dialog({ taskId, feature, map, view }) {
       );
       const tasksStatus =
         feature.id_ != undefined
-          ? environment.tasksStatus[findCorrectTaskStatusIndex]["label"]
+          ? environment.tasksStatus[findCorrectTaskStatusIndex]?.["label"]
           : "";
       set_task_status(tasksStatus);
       const tasksStatusList =
         feature.id_ != undefined
-          ? environment.tasksStatus[findCorrectTaskStatusIndex]["action"]
+          ? environment.tasksStatus[findCorrectTaskStatusIndex]?.["action"]
           : [];
 
       set_list_of_task_status(tasksStatusList);
@@ -107,7 +107,7 @@ export default function Dialog({ taskId, feature, map, view }) {
       </CoreModules.Stack>
       <CoreModules.Stack direction={"row"} pl={1}>
         <CoreModules.Typography variant="h3">
-          {`STATUS : ${task_status.replaceAll("_", " ")}`}
+          {`STATUS : ${task_status?.replaceAll("_", " ")}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
 
