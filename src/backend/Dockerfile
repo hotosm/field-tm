@@ -123,5 +123,6 @@ CMD ["python", "-m", "debugpy", "--wait-for-client", "--listen", \
 FROM runtime as prod
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
+# Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
 CMD ["uvicorn", "backend.main:api", "--host", "0.0.0.0", "--port", "8000", \
-    "--workers", "1", "--reload", "--log-level", "error", "--no-access-log"]
+    "--workers", "4", "--log-level", "error", "--no-access-log"]
