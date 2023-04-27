@@ -374,3 +374,28 @@ async def create_organization(
     created= project_crud.create_organization(db, organization)
 
     return {"Message": f"Organization Created Successfully."}
+
+
+@router.get("/generate-log")
+async def generate_log():
+    """
+    Get the contents of a log file in a log format.
+
+    ### Response
+    - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
+
+    - **500 Internal Server Error**: Returns an error message if the log file cannot be generated.
+
+    ### Return format
+    A string containing the contents of the log file in a log format.
+
+    ### Example response
+    """
+
+    # Open log file and return the content in the api
+    try:
+        with open("log.log", "r") as f:
+            return f.read()
+    except Exception as e:
+        logger.error(e)
+        return "Error in generating log file"
