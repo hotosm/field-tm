@@ -2,9 +2,9 @@ name: Dev Server Deploy
 
 on:
   push:
-    branches: 
+    branches:
       - development
-      - '*-development-*'
+      - "*-development-*"
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
