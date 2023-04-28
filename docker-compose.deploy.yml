@@ -23,7 +23,8 @@ volumes:
   traefik-public-certificates:
 
 networks:
-  fmtm-prod:
+  fmtm-net:
+    name: fmtm-${GIT_BRANCH}
 
 services:
   traefik:
@@ -36,7 +37,7 @@ services:
       - 80:80
       - 443:443
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: unless-stopped
     command:
       - "--entrypoints.web.address=:80"
@@ -51,7 +52,7 @@ services:
       # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=fmtm_fmtm-prod"
+      - "traefik.docker.network=fmtm-${GIT_BRANCH}"
       - "traefik.api.dashboard=false"
       - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
@@ -71,11 +72,11 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: unless-stopped
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:0.1.0-main"
+    image: "ghcr.io/hotosm/fmtm/backend:0.1.0-${GIT_BRANCH}"
     build:
       context: src/backend
       target: prod
@@ -87,7 +88,7 @@ services:
     env_file:
       - .env
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -100,7 +101,7 @@ services:
       - "traefik.http.routers.api.service=api-svc"
 
   ui-main:
-    image: "ghcr.io/hotosm/fmtm/frontend/main:0.1.0-main"
+    image: "ghcr.io/hotosm/fmtm/frontend/main:0.1.0-${GIT_BRANCH}"
     build:
       context: src/frontend/main
     container_name: fmtm_main
@@ -108,7 +109,7 @@ services:
       - api
       - traefik
     networks:
-      - fmtm-prod
+      - fmtm-net
     environment:
       - BROTLI=true
     restart: unless-stopped
@@ -123,7 +124,7 @@ services:
       - "traefik.http.routers.ui-main.service=ui-main-svc"
 
   ui-map:
-    image: "ghcr.io/hotosm/fmtm/frontend/map:0.1.0-main"
+    image: "ghcr.io/hotosm/fmtm/frontend/map:0.1.0-${GIT_BRANCH}"
     build:
       context: src/frontend/fmtm_openlayer_map
     container_name: fmtm_map
@@ -131,7 +132,7 @@ services:
       - api
       - traefik
     networks:
-      - fmtm-prod
+      - fmtm-net
     environment:
       - BROTLI=true
     restart: unless-stopped
@@ -155,13 +156,15 @@ services:
       - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
       - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: unless-stopped
 
   central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
+    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_VERSION}-${GIT_BRANCH}"
     build:
       context: odkcentral/api
+      args:
+        ODK_CENTRAL_VERSION: ${ODK_CENTRAL_VERSION}
     container_name: central_api
     depends_on:
       - central-db
@@ -186,7 +189,7 @@ services:
       - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
       - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
     networks:
-      - fmtm-prod
+      - fmtm-net
     command:
       [
         "./wait-for-it.sh",
@@ -197,19 +200,19 @@ services:
     restart: unless-stopped
 
   central-proxy:
-    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:0.1.0-main"
+    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:0.1.0-${GIT_BRANCH}"
     build:
       context: odkcentral/proxy
     container_name: central_proxy
     depends_on:
       - central
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: unless-stopped
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
     container_name: central_pyxform
     networks:
-      - fmtm-prod
+      - fmtm-net
     restart: always
