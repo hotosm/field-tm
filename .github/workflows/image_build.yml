@@ -1,0 +1,52 @@
+name: Build Container Image in GHCR
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - development
+      - "*-development-*"
+    paths:
+      # Workflow is Trigged only if src changes
+      - "src/**"
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for image
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/fmtm/backend
+
+        # First extract {{ secrets.DOTENV }} to environment
+        # TODO
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args:
+            VAR1: { { env.VAR1 } }

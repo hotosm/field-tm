@@ -1,14 +1,19 @@
 name: Production Deploy
 
 on:
+  # Push includes PRs
   push:
     branches:
       - main
-    paths:
-      # Workflow is Trigged only if src changes
-      - "src/**"
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
+  # Trigger on image build
+  workflow_run:
+    workflows: ["Build Container Image in GHCR"]
+    types:
+      - completed
+    branches:
+      - main
 
 jobs:
   deploy-prod:
@@ -32,6 +37,6 @@ jobs:
         run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Deploy
-        run: docker compose --file docker-compose.prod.yml up --build --detach
+        run: docker compose --file docker-compose.deploy.yml up --detach --pull
         env:
           DOCKER_HOST: "ssh://svcfmtm@fmtm.hotosm.org"
