@@ -133,6 +133,8 @@ services:
     image: "ghcr.io/hotosm/fmtm/odkcentral:debug"
     build:
       context: odkcentral/api
+      args:
+        ODK_CENTRAL_VERSION: ${ODK_CENTRAL_VERSION}
     container_name: central_api
     depends_on:
       - central-db
