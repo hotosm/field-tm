@@ -184,6 +184,7 @@ services:
     environment:
       - DOMAIN=local
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
+      - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
       - HTTPS_PORT=${HTTPS_PORT:-443}
       - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
       - DB_USER=${CENTRAL_DB_USER:-odk}
