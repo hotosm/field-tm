@@ -18,6 +18,8 @@
 
 import os
 import zipfile
+import io
+import csv
 from sqlalchemy.orm import Session
 from ..central.central_crud import xform
 from ..projects import project_crud
@@ -159,5 +161,61 @@ def download_submission(
         f.write(file.content)
     return FileResponse(file_path)
 
+
+
+def get_submission_points(
+        db: Session,
+        project_id: int,
+        task_id: int = None
+        ):
+    """
+        Gets the submission points of project.
+        This function takes project_id and task_id as a parameter.
+        If task_id is provided, it returns all the submission points made to that particular task, 
+            else all the submission points made in the projects are returned.
+    """
+    project_info = project_crud.get_project_by_id(db, project_id)
+    odkid = project_info.odkid
+    project_name = project_info.project_name_prefix
+    form_category = project_info.xform_title
+    if task_id:
+        xml_form_id = f'{project_name}_{form_category}_{task_id}'.split('_')[2] #FIXME: fix xml_form_id
+        # file_path = f"{project_id}_submissions.zip"
+        response_file = xform.getSubmissionMedia(odkid, xml_form_id)
+
+        # Create a file-like object from the bytes object
+        response_file_obj = io.BytesIO(response_file.content)
+        try:
+            # Open the zipfile
+            with zipfile.ZipFile(response_file_obj, 'r') as zip_ref:
+                # Find the CSV file in the zipfile (assuming it has a .csv extension)
+                csv_filename = [f for f in zip_ref.namelist() if f.endswith('.csv')][0]
+                # Open the CSV file
+                with zip_ref.open(csv_filename) as csv_file:
+                    # Read the CSV data
+                    csv_reader = csv.DictReader(io.TextIOWrapper(csv_file))
+                    geometry = []
+                    for row in csv_reader:
+                        # Check if the row contains the 'warmup-Latitude' and 'warmup-Longitude' columns 
+                        # FIXME: fix the column names (they might not be same warmup-Latitude and warmup-Longitude)
+                        if 'warmup-Latitude' in row and 'warmup-Longitude' in row:
+                            point=(row['warmup-Latitude'],row['warmup-Longitude'])
+
+                            # Create a GeoJSON Feature object
+                            geometry.append({
+                                'type': 'Feature',
+                                'geometry': {
+                                    'type': 'Point',
+                                    'coordinates': point
+                                }
+
+                            })
+                            # points.append(point)
+                return geometry
+        except zipfile.BadZipFile:
+            print("The file is not a valid zip file.")
+            return None
+    else:
+        return None
 
 
