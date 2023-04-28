@@ -7,7 +7,7 @@ on:
       - "*"
   # Run tests on PR, prior to merge to main & development.
   pull_request:
-    branches: 
+    branches:
       - main
       - development
   # Allow manual trigger (workflow_dispatch)
@@ -40,7 +40,7 @@ jobs:
         # Provide the password, initilized database for pytest user
         env:
           POSTGRES_PASSWORD: fmtm
-          POSTGRES_DB: fmtm  # Test DB name
+          POSTGRES_DB: fmtm # Test DB name
           POSTGRES_USER: fmtm
         ports:
           # Opens tcp port 5432 on the host and service container,
@@ -80,5 +80,6 @@ jobs:
           FMTM_DB_HOST: localhost
           FMTM_DB_USER: fmtm
           FMTM_DB_PASSWORD: fmtm
-          FRONTEND_MAIN_URL: "http://localhost:8080"
-          FRONTEND_MAP_URL: "http://localhost:8081"
+          URL_SCHEME: "http"
+          FRONTEND_MAIN_URL: "localhost:8080"
+          FRONTEND_MAP_URL: "localhost:8081"
