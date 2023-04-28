@@ -43,17 +43,18 @@ The following instructions set up FMTM on your own cloud server.
 ```dotenv
 # Deployment Environment
 GIT_BRANCH=main
-ODK_CENTRAL_VERSION=v2023.2.1
 
 # ODK Central
+ODK_CENTRAL_VERSION=v2023.2.1
 ODK_CENTRAL_URL=https://central-proxy
 ODK_CENTRAL_USER=`<CHANGEME>`
 ODK_CENTRAL_PASSWD=`<CHANGEME>`
 
 # FMTM
-API_URL=https://fmtm-api.hotosm.org
-FRONTEND_MAIN_URL=https://fmtm.hotosm.org
-FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
+URL_SCHEME=https
+API_URL=fmtm-api.hotosm.org
+FRONTEND_MAIN_URL=fmtm.hotosm.org
+FRONTEND_MAP_URL=map.fmtm.hotosm.org
 # API_PREFIX=/api
 
 # OSM
@@ -61,7 +62,7 @@ OSM_CLIENT_ID=`<CHANGEME>`
 OSM_CLIENT_SECRET=`<CHANGEME>`
 OSM_URL=https://www.openstreetmap.org
 OSM_SCOPE=read_prefs
-OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
+OSM_LOGIN_REDIRECT_URI=https://fmtm-api.hotosm.org/auth/callback/
 OSM_SECRET_KEY=`<CHANGEME>`
 
 FMTM_DB_HOST=fmtm-db
