@@ -19,7 +19,7 @@
 import json
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -302,6 +302,7 @@ async def download_task_boundaries(
 
 @router.post("/{project_id}/generate")
 async def generate_files(
+    background_tasks: BackgroundTasks,
     project_id: int,
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
@@ -327,7 +328,8 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
-    await project_crud.generate_appuser_files(db, project_id, upload)
+    # await project_crud.generate_appuser_files(db, project_id, upload)
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
