@@ -25,6 +25,7 @@ from typing import List
 from zipfile import ZipFile
 import base64
 import segno
+import logging
 from base64 import b64encode
 
 import geoalchemy2
@@ -664,7 +665,7 @@ def get_odk_id_for_project(
     return project_info.odkid
 
 
-async def generate_appuser_files(
+def generate_appuser_files(
     db: Session,
     # dbname: str,
     project_id: int,
@@ -674,6 +675,22 @@ async def generate_appuser_files(
         Generate the files for each appuser, the qrcode, the new XForm,
         and the OSM data extract.
     """
+
+
+    ## Logging ##
+    # create file handler
+    handler = logging.FileHandler(f'{project_id}_generate.log')
+    handler.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+
+    # add handler to logger
+    logger.addHandler(handler)
+    logger.info('my_function was called')
+
+
 
     # Get the project table contents.
     project = table(
@@ -728,7 +745,7 @@ async def generate_appuser_files(
                 raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
             # Read the contents of the xls file and write it into tmp file.
-            contents = await upload.read()
+            contents = upload.read()
             xlsform = f"/tmp/custom_form.xls"
 
             with open(xlsform, "wb") as f:

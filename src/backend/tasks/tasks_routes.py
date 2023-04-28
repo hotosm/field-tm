@@ -18,11 +18,12 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from typing import List
 from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
+
 
 router = APIRouter(
     prefix="/tasks",
@@ -31,22 +32,21 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
-@router.get("/", response_model=tasks_schemas.TaskOut)
+@router.get("/", response_model=List[tasks_schemas.TaskOut])
 async def read_tasks(
+    project_id: int,
     user_id: int = None,
-    task_id: int = None,
     skip: int = 0,
     limit: int = 1000,
     db: Session = Depends(database.get_db),
 ):
-    if user_id and task_id:
+    if user_id:
         raise HTTPException(
             status_code=300,
             detail="Please provide either user_id OR task_id, not both.",
         )
 
-    tasks = tasks_crud.get_tasks(db, user_id, task_id, skip, limit)
+    tasks = tasks_crud.get_tasks(db, project_id, user_id, skip, limit)
     if tasks:
         return tasks
     else:
