@@ -67,6 +67,7 @@ services:
       dockerfile: debug.dockerfile
       args:
         APP_NAME: main
+        URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
@@ -77,9 +78,9 @@ services:
       - ./src/frontend/main:/app
       - /app/node_modules/
     environment:
-      - API_URL=${API_URL}
-      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8080:8080"
     networks:
@@ -93,6 +94,7 @@ services:
       dockerfile: debug.dockerfile
       args:
         APP_NAME: fmtm_openlayer_map
+        URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
@@ -103,9 +105,9 @@ services:
       - ./src/frontend/fmtm_openlayer_map:/app
       - /app/node_modules/
     environment:
-      - API_URL=${API_URL}
-      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8081:8081"
     networks:

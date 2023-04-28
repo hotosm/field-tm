@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     DEBUG: str = False
     LOG_LEVEL: str = "DEBUG"
 
+    URL_SCHEME: Optional[str]
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
@@ -49,10 +50,17 @@ class Settings(BaseSettings):
         By default, the provided frontend URLs are included in the origins list.
         If this variable used, the provided urls are appended to the list.
         """
-        default_origins = [
-            values.get("FRONTEND_MAIN_URL"),
-            values.get("FRONTEND_MAP_URL"),
-        ]
+        default_origins = []
+
+        # Build default origins from env vars
+        url_scheme = values.get("URL_SCHEME")
+        main_url = values.get("FRONTEND_MAIN_URL")
+        map_url = values.get("FRONTEND_MAP_URL")
+        if url_scheme and main_url and map_url:
+            default_origins = [
+                f"{url_scheme}://{main_url}",
+                f"{url_scheme}://{map_url}",
+            ]
 
         if val is None:
             return default_origins

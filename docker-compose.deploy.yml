@@ -94,9 +94,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      # The Go regex below requires escaping or changing, is this possible?
-      # - "traefik.http.routers.api.rule=HostRegexp(`${API_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
-      - "traefik.http.routers.api.rule=Host(`fmtm-api.hotosm.org`)"
+      - "traefik.http.routers.api.rule=Host(`${API_URL}`)"
       - "traefik.http.services.api-svc.loadbalancer.server.port=8000"
       - "traefik.http.routers.api.service=api-svc"
 
@@ -104,6 +102,12 @@ services:
     image: "ghcr.io/hotosm/fmtm/frontend/main:0.1.0-${GIT_BRANCH}"
     build:
       context: src/frontend/main
+      args:
+        APP_NAME: main
+        URL_SCHEME: ${URL_SCHEME}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -112,14 +116,15 @@ services:
       - fmtm-net
     environment:
       - BROTLI=true
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui-main.tls=true"
       - "traefik.http.routers.ui-main.tls.certresolver=letsencrypt"
-      # The Go regex below requires escaping or changing, is this possible?
-      # - "traefik.http.routers.ui-main.rule=HostRegexp(`${FRONTEND_MAIN_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
-      - "traefik.http.routers.ui-main.rule=Host(`fmtm.hotosm.org`)"
+      - "traefik.http.routers.ui-main.rule=Host(`${FRONTEND_MAIN_URL}`)"
       - "traefik.http.services.ui-main-svc.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui-main.service=ui-main-svc"
 
@@ -127,6 +132,12 @@ services:
     image: "ghcr.io/hotosm/fmtm/frontend/map:0.1.0-${GIT_BRANCH}"
     build:
       context: src/frontend/fmtm_openlayer_map
+      args:
+        APP_NAME: fmtm_openlayer_map
+        URL_SCHEME: ${URL_SCHEME}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
     container_name: fmtm_map
     depends_on:
       - api
@@ -135,14 +146,15 @@ services:
       - fmtm-net
     environment:
       - BROTLI=true
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui-map.tls=true"
       - "traefik.http.routers.ui-map.tls.certresolver=letsencrypt"
-      # The Go regex below requires escaping or changing, is this possible?
-      # - "traefik.http.routers.ui-map.rule=HostRegexp(`${FRONTEND_MAP_URL}`, `{regex:[a-z]+\.[a-z].*}`)"
-      - "traefik.http.routers.ui-map.rule=Host(`map.fmtm.hotosm.org`)"
+      - "traefik.http.routers.ui-map.rule=Host(`${FRONTEND_MAP_URL}`)"
       - "traefik.http.services.ui-map-svc.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui-map.service=ui-map-svc"
 
