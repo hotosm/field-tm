@@ -19,7 +19,7 @@
 import json
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -302,6 +302,7 @@ async def download_task_boundaries(
 
 @router.post("/{project_id}/generate")
 async def generate_files(
+    background_tasks: BackgroundTasks,
     project_id: int,
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
@@ -327,7 +328,8 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
-    await project_crud.generate_appuser_files(db, project_id, upload)
+    # await project_crud.generate_appuser_files(db, project_id, upload)
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload)
 
     # FIXME: fix return value
     return {"Message": f"{project_id}"}
@@ -371,6 +373,27 @@ async def create_organization(
     }
     ```
     """
-    created= project_crud.create_organization(db, organization)
+    created = project_crud.create_organization(db, organization)
 
     return {"Message": f"Organization Created Successfully."}
+
+
+@router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
+def get_project_features(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """
+    Get api for fetching all the features of a project.
+
+    This endpoint allows you to get all the features of a project.
+
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
+
+    ## Response
+    - Returns a JSON object containing a list of features.
+
+    """
+    features = project_crud.get_project_features(db, project_id)
+    return features
