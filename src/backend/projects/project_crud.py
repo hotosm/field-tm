@@ -25,6 +25,7 @@ from typing import List
 from zipfile import ZipFile
 import base64
 import segno
+import logging
 from base64 import b64encode
 
 import geoalchemy2
@@ -59,6 +60,8 @@ from ..central import central_crud
 from ..db import db_models
 from ..tasks import tasks_crud
 from ..users import user_crud
+from geoalchemy2.shape import from_shape
+from shapely.geometry import shape
 
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -664,7 +667,7 @@ def get_odk_id_for_project(
     return project_info.odkid
 
 
-async def generate_appuser_files(
+def generate_appuser_files(
     db: Session,
     # dbname: str,
     project_id: int,
@@ -674,6 +677,22 @@ async def generate_appuser_files(
         Generate the files for each appuser, the qrcode, the new XForm,
         and the OSM data extract.
     """
+
+
+    ## Logging ##
+    # create file handler
+    handler = logging.FileHandler(f'{project_id}_generate.log')
+    handler.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+
+    # add handler to logger
+    logger.addHandler(handler)
+    logger.info('my_function was called')
+
+
 
     # Get the project table contents.
     project = table(
@@ -728,7 +747,7 @@ async def generate_appuser_files(
                 raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
             # Read the contents of the xls file and write it into tmp file.
-            contents = await upload.read()
+            contents = upload.read()
             xlsform = f"/tmp/custom_form.xls"
 
             with open(xlsform, "wb") as f:
@@ -769,6 +788,20 @@ async def generate_appuser_files(
             # If the osm extracts contents does not have title, provide an empty text for that.
             for feature in outline_geojson["features"]:
                 feature["properties"]["title"] = ""
+
+                # Insert the osm extracts into the database.
+                feature_shape = shape(feature['geometry'])
+                wkb_element = from_shape(feature_shape, srid=4326)
+                feature_obj = db_models.DbFeatures(
+                    project_id=project_id,
+                    task_id=poly.id,
+                    category_title=category,
+                    geometry=wkb_element,
+                    properties=feature["properties"],
+                )
+                db.add(feature_obj)
+                db.commit()
+
 
             # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
             with open(outfile, "w") as jsonfile:
@@ -1100,3 +1133,32 @@ def create_organization(
     db.refresh(db_organization)
 
     return True
+
+
+def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
+    if db_project_feature:
+        app_project_feature: project_schemas.Feature = db_project_feature
+
+        if db_project_feature.geometry:
+            app_project_feature.geometry = geometry_to_geojson(db_project_feature.geometry)
+
+        return app_project_feature
+    else:
+        return None
+
+
+def convert_to_project_features(db_project_features: List[db_models.DbFeatures]):
+    if db_project_features and len(db_project_features) > 0:
+        app_project_features = []
+        for project_feature in db_project_features:
+            if project_feature:
+                app_project_features.append(convert_to_project_feature(project_feature))
+        return app_project_features
+    else:
+        return []
+
+
+def get_project_features(db: Session, 
+                         project_id: int):
+    features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
+    return convert_to_project_features(features)

@@ -27,6 +27,7 @@ from pydantic import AnyUrl, BaseSettings, PostgresDsn, validator
 logger = logging.getLogger(__name__)
 
 
+
 class Settings(BaseSettings):
     """Main settings class, defining environment variables."""
 
@@ -118,7 +119,7 @@ class Settings(BaseSettings):
 def get_settings():
     """Cache settings, for calling in multiple modules."""
     _settings = Settings()
-    logger.info(f"Loaded settings: {_settings.dict()}")
+    # logger.info(f"Loaded settings: {_settings.dict()}")
     return _settings
 
 

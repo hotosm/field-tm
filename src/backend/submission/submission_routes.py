@@ -107,3 +107,48 @@ async def download_submission(
     """
 
     return submission_crud.download_submission(db, project_id, task_id)
+
+
+@router.get("/submission-points")
+async def submission_points(
+    project_id: int,
+    task_id: int = None,
+    db: Session = Depends(database.get_db),
+    ):
+    """
+        This api returns the submission points of a project.
+        It takes two parameter: project_id and task_id.
+
+        project_id: The ID of the project. This endpoint returns the submission points of this project.
+        task_id: The task_id of the project. This endpoint returns the submission points of this task.
+    """
+
+    return submission_crud.get_submission_points(db, project_id,task_id)
+
+
+@router.get("/generate-log")
+async def generate_log(
+    project_id : int
+):
+    """
+    Get the contents of a log file in a log format.
+
+    ### Response
+    - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
+
+    - **500 Internal Server Error**: Returns an error message if the log file cannot be generated.
+
+    ### Return format
+    A string containing the contents of the log file in a log format.
+
+    ### Example response
+    """
+
+    try:
+        with open(f"{project_id}_generate.log", "r") as f:
+            lines = f.readlines()
+            last_100_lines = lines[-50:]
+            return ''.join(last_100_lines)
+    except Exception as e:
+        logger.error(e)
+        return "Error in generating log file"
