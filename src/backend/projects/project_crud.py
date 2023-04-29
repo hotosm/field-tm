@@ -60,6 +60,8 @@ from ..central import central_crud
 from ..db import db_models
 from ..tasks import tasks_crud
 from ..users import user_crud
+from geoalchemy2.shape import from_shape
+from shapely.geometry import shape
 
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -783,9 +785,24 @@ def generate_appuser_files(
             outline = eval(poly.outline)
             outline_geojson = pg.getFeatures(outline, outfile)
 
+
             # If the osm extracts contents does not have title, provide an empty text for that.
             for feature in outline_geojson["features"]:
                 feature["properties"]["title"] = ""
+
+                # Insert the osm extracts into the database.
+                feature_shape = shape(feature['geometry'])
+                wkb_element = from_shape(feature_shape, srid=4326)
+                feature_obj = db_models.DbFeatures(
+                    project_id=project_id,
+                    task_id=poly.id,
+                    category_title=category,
+                    geometry=wkb_element,
+                    properties=feature["properties"],
+                )
+                db.add(feature_obj)
+                db.commit()
+
 
             # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
             with open(outfile, "w") as jsonfile:
