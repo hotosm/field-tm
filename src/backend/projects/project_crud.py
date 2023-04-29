@@ -785,7 +785,6 @@ def generate_appuser_files(
             outline = eval(poly.outline)
             outline_geojson = pg.getFeatures(outline, outfile)
 
-
             # If the osm extracts contents does not have title, provide an empty text for that.
             for feature in outline_geojson["features"]:
                 feature["properties"]["title"] = ""
@@ -1134,3 +1133,32 @@ def create_organization(
     db.refresh(db_organization)
 
     return True
+
+
+def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
+    if db_project_feature:
+        app_project_feature: project_schemas.Feature = db_project_feature
+
+        if db_project_feature.geometry:
+            app_project_feature.geometry = geometry_to_geojson(db_project_feature.geometry)
+
+        return app_project_feature
+    else:
+        return None
+
+
+def convert_to_project_features(db_project_features: List[db_models.DbFeatures]):
+    if db_project_features and len(db_project_features) > 0:
+        app_project_features = []
+        for project_feature in db_project_features:
+            if project_feature:
+                app_project_features.append(convert_to_project_feature(project_feature))
+        return app_project_features
+    else:
+        return []
+
+
+def get_project_features(db: Session, 
+                         project_id: int):
+    features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
+    return convert_to_project_features(features)

@@ -373,6 +373,27 @@ async def create_organization(
     }
     ```
     """
-    created= project_crud.create_organization(db, organization)
+    created = project_crud.create_organization(db, organization)
 
     return {"Message": f"Organization Created Successfully."}
+
+
+@router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
+def get_project_features(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """
+    Get api for fetching all the features of a project.
+
+    This endpoint allows you to get all the features of a project.
+
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
+
+    ## Response
+    - Returns a JSON object containing a list of features.
+
+    """
+    features = project_crud.get_project_features(db, project_id)
+    return features
