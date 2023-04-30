@@ -25,10 +25,17 @@ from geo_utils import get_extent_bbox, make_centroids, osm_json_to_geojson
 from overpass import query
 
 
-def get_buildings(aoi_file):
+def get_buildings(aoi_file: str) -> dict:
     """Given a GeoJSON AOI polygon, returns a centroid for every
     OSM building polygon within it.
+
+    Args:
+        aoi_file (str): Filepath of the AOI GeoJSON polygon.
+
+    Returns:
+        dict: JSON response from Overpass API containing building data.
     """
+
     (infilepath, extension) = os.path.splitext(aoi_file)
     extent = get_extent_bbox(aoi_file, extension)
     querystring = (
@@ -41,8 +48,16 @@ def get_buildings(aoi_file):
     return overpass_json
 
 
-def get_roads(aoi_file):
-    """Given a GeoJSON AOI polygon, returns roads."""
+def get_roads(aoi_file: str) -> dict:
+    """Given a GeoJSON AOI polygon, returns roads.
+
+    Args:
+        aoi_file (str): Filepath of the AOI GeoJSON polygon.
+
+    Returns:
+        dict: JSON response from Overpass API containing road data.
+    """
+    
     (infilepath, extension) = os.path.splitext(aoi_file)
     extent = get_extent_bbox(aoi_file, extension)
     querystring = (
@@ -57,11 +72,14 @@ def get_roads(aoi_file):
     return overpass_json
 
 
-def aoi2project(AOIfile):
+def aoi2project(AOIfile: str) -> None:
     """Takes a GeoJSON file with an aoi polygon, creates
     - A GeoJSON of all the OSM building polygons in it
     - A GeoJSON of the centroids thereof
     -.
+
+    Args:
+        AOIfile (str): Filepath of the AOI GeoJSON polygon.
     """
     (AOIpath, ext) = os.path.splitext(AOIfile)
     buildings = get_buildings(AOIfile)
