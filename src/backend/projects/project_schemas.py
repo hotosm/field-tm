@@ -102,3 +102,12 @@ class Organisation(BaseModel):
     description:str
     url:str
     type:int
+
+
+class Feature(BaseModel):
+    id:int
+    project_id: int
+    geometry: Feature
+
+    class Config:
+        orm_mode = True

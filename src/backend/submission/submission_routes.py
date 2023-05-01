@@ -109,7 +109,6 @@ async def download_submission(
     return submission_crud.download_submission(db, project_id, task_id)
 
 
-
 @router.get("/submission-points")
 async def submission_points(
     project_id: int,
@@ -128,7 +127,9 @@ async def submission_points(
 
 
 @router.get("/generate-log")
-async def generate_log():
+async def generate_log(
+    project_id : int
+):
     """
     Get the contents of a log file in a log format.
 
@@ -143,10 +144,11 @@ async def generate_log():
     ### Example response
     """
 
-    # Open log file and return the content in the api
     try:
-        with open("log.log", "r") as f:
-            return f.read()
+        with open(f"{project_id}_generate.log", "r") as f:
+            lines = f.readlines()
+            last_100_lines = lines[-50:]
+            return ''.join(last_100_lines)
     except Exception as e:
         logger.error(e)
         return "Error in generating log file"

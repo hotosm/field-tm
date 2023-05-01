@@ -373,31 +373,27 @@ async def create_organization(
     }
     ```
     """
-    created= project_crud.create_organization(db, organization)
+    created = project_crud.create_organization(db, organization)
 
     return {"Message": f"Organization Created Successfully."}
 
 
-@router.get("/generate-log")
-async def generate_log():
+@router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
+def get_project_features(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
     """
-    Get the contents of a log file in a log format.
+    Get api for fetching all the features of a project.
 
-    ### Response
-    - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
+    This endpoint allows you to get all the features of a project.
 
-    - **500 Internal Server Error**: Returns an error message if the log file cannot be generated.
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
 
-    ### Return format
-    A string containing the contents of the log file in a log format.
+    ## Response
+    - Returns a JSON object containing a list of features.
 
-    ### Example response
     """
-
-    # Open log file and return the content in the api
-    try:
-        with open("log.log", "r") as f:
-            return f.read()
-    except Exception as e:
-        logger.error(e)
-        return "Error in generating log file"
+    features = project_crud.get_project_features(db, project_id)
+    return features
