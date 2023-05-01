@@ -13,23 +13,10 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
         const postCreateProjectDetails = async (url,payload,fileUpload) => {
 
             try {
-                // let postNewProjectDetails
-                // if(payload.form_ways === 'Upload a Form'){
-                //     // const uploadformResponse = await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/upload_xlsform`,payload.uploaded_form));
-                //     const customXLSFormData = new FormData();
-                //     customXLSFormData.append('upload',payload.uploaded_form[0]);
-                //     const postCustomXLSForm = await axios.post(`${enviroment.baseApiUrl}/projects/upload_xlsform`,customXLSFormData,
-                //         { 
-                //             headers: {
-                //                 "Content-Type": "multipart/form-data",
-                //             }
-                //         });
-                //     // const postUploadForm = await axios.post(`${enviroment.baseApiUrl}/projects/upload_xlsform`,payload.uploaded_form);
-                //     postNewProjectDetails = await axios.post(url,{...payload,xform_title:postCustomXLSForm.data.xform_title })
-                // }else{
-                    // }
                 const postNewProjectDetails = await axios.post(url,payload)
                 const resp: CreateProjectDetailsModel = postNewProjectDetails.data;
+                await dispatch(CreateProjectActions.PostProjectDetails(resp));
+
                 if(payload.splitting_algorithm === 'Custom Multipolygon'){
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
                 }else{
@@ -45,9 +32,7 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                     })
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`,payload));
-                await dispatch(CreateProjectActions.PostProjectDetails(resp));
-                // Added Snackbar toast for success message 
-                // END
+               
 
             } catch (error) {
                 console.log(error.response,'error');
@@ -154,7 +139,6 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
                             "Content-Type": "multipart/form-data",
                         }
                     });
-                // const postNewProjectDetails = await axios.post(url);
                 const resp: string = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.GenerateProjectQRLoading(false))
                 dispatch(
@@ -173,7 +157,7 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: JSON.stringify(error.response.data.detail),
+                        message: JSON.stringify(error?.response?.data?.detail),
                         variant: "error",
                         duration: 2000,
                     })
@@ -248,4 +232,25 @@ const UploadCustomXLSFormService: Function = (url: string,payload: any) => {
 
 }
 
-export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService,UploadCustomXLSFormService}
+const GenerateProjectLog: Function = (url: string,params:any) => {
+
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.GenerateProjectLogLoading(true))
+
+        const getGenerateProjectLog = async (url,params) => {
+            try {
+                const getGenerateProjectLogResponse = await axios.get(url,{params})
+                const resp: OrganisationListModel = getGenerateProjectLogResponse.data;
+                dispatch(CreateProjectActions.SetGenerateProjectLog(resp));
+
+            } catch (error) {
+                dispatch(CreateProjectActions.GenerateProjectLogLoading(false));
+            }
+        }
+
+        await getGenerateProjectLog(url,params);
+
+    }
+
+}
+export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService,UploadCustomXLSFormService,GenerateProjectLog}

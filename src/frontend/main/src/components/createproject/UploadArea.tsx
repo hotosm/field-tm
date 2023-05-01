@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
-import windowDimention from "../../hooks/WindowDimension";
+import React, { useState, useEffect, useRef } from "react";
 import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
+import { CreateProjectService, FormCategoryService, GenerateProjectLog } from "../../api/CreateProjectService";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
-import AssetModules from '../../shared/AssetModules.js';
-
-// import { SelectPicker } from 'rsuite';
+let generateProjectLogIntervalCb = null
 
 const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
@@ -36,14 +33,21 @@ const UploadArea: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
+    const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
+
     const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+    const generateQrLoading: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrLoading);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+    const generateProjectLog: any = CoreModules.useSelector<any>((state) => state.createproject.generateProjectLog);
     // //we use use-selector from redux to get all state of loginToken from login slice
 
 
     // if projectarea is not null navigate to projectslist page and that is when user submits create project
     useEffect(() => {
         if (projectArea !== null) {
-            navigate('/');
+            // navigate('/');
             dispatch(CreateProjectActions.ClearCreateProjectFormData())
 
         }
@@ -57,7 +61,23 @@ const UploadArea: React.FC = () => {
     // Fetching form category list 
     useEffect(() => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
+        return () => {
+            clearInterval(generateProjectLogIntervalCb);
+        }
     }, [])
+    // END
+
+    // Fetching form category list 
+    useEffect(() => {
+        if (generateQrLoading) {
+            if (generateProjectLogIntervalCb === null) {
+                generateProjectLogIntervalCb = setInterval(() => {
+                    dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/submission/generate-log`, { project_id: projectDetailsResponse?.id }))
+                }, 2000)
+            }
+        }
+
+    }, [generateQrLoading])
     // END
 
     const algorithmListData = ['Divide on Square', 'Custom Multipolygon', 'Openstreet Map Extract'].map(
@@ -100,12 +120,31 @@ const UploadArea: React.FC = () => {
             }, fileUpload
         ));
     }
+    const renderTraceback = (errorText: string) => {
+        if (!errorText) {
+            return null;
+        }
+
+        return errorText.split("\n").map((line, index) => (
+            <div key={index} style={{ display: "flex" }}>
+                <span style={{ color: "gray", marginRight: "1em" }}>{index + 1}.</span>
+                <span>{line}</span>
+            </div>
+        ));
+    };
+    const divRef = useRef(null);
+    useEffect(() => {
+        console.log(divRef?.current, 'current');
+        if (!divRef?.current) return;
+        const myDiv = divRef?.current;
+        myDiv.scrollTop = myDiv?.scrollHeight;
+    });
     return (
-        <CoreModules.Stack sx={{ width: '50%' }}>
+        <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
             <form>
                 <FormGroup >
                     {/* <CoreModules.FormLabel>Splitting Algorithm</CoreModules.FormLabel> */}
-                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
+                    <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="filled">
                         <InputLabel id="demo-simple-select-label" sx={{
                             '&.Mui-focused': {
                                 color: defaultTheme.palette.black
@@ -168,6 +207,7 @@ const UploadArea: React.FC = () => {
                             </CoreModules.Button>
                         </Link>
                         {/* END */}
+
                         <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <CoreModules.Button
                                 variant="contained"
@@ -181,10 +221,18 @@ const UploadArea: React.FC = () => {
                                 Next
                             </CoreModules.Button>
                         </CoreModules.Stack>
+                        {/* <CustomizedModal isOpen={openTerminal} toggleOpen={setOpenTerminal}>
+                            
+                        </CustomizedModal> */}
                     </CoreModules.Stack>
                     {/* END */}
                 </FormGroup>
             </form>
+            {generateProjectLog ? <CoreModules.Stack sx={{ width: '60%', height: '68vh' }}>
+                <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
+                    {renderTraceback(generateProjectLog)}
+                </div>
+            </CoreModules.Stack> : null}
         </CoreModules.Stack >
     )
 };
