@@ -50,10 +50,10 @@ const FormSelection: React.FC = () => {
     );
 
     const submission = () => {
-        console.log('subm clciked')
         // eslint-disable-next-line no-use-before-define
         // submitForm();
         dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
+        dispatch(CreateProjectActions.SetCreateProjectFormStep('upload-area'));
         navigate("/upload-area", { replace: true, state: { values: values } });
 
 
