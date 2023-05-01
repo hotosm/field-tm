@@ -17,6 +17,7 @@
 #
 
 import base64
+import logging
 from typing import List
 
 from fastapi import HTTPException
@@ -45,7 +46,6 @@ def get_tasks(db: Session,
               user_id: int, 
               skip: int = 0, 
               limit: int = 1000):
-              
     if project_id:
         db_tasks = (
                     db.query(db_models.DbTask)

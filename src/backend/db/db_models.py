@@ -34,7 +34,7 @@ from sqlalchemy import (
     UniqueConstraint,
     desc,
 )
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
 from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
     backref,
     object_session,
@@ -546,3 +546,27 @@ class DbLicense(Base):
     users = relationship(
         DbUser, secondary=user_licenses_table
     )  # Many to Many relationship
+
+
+class DbFeatures(Base):
+    """Features extracted from osm data"""
+
+    __tablename__ = "features"
+
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    project = relationship(DbProject, backref="features")
+
+    category_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
+    category = relationship(DbXForm)
+    task_id = Column(Integer, nullable=False)
+    properties = Column(JSONB)
+    geometry = Column(Geometry(geometry_type='GEOMETRY', srid=4326))
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [task_id, project_id], ["tasks.id", "tasks.project_id"], name="fk_tasks"
+        ),
+        Index("idx_features_composite", "task_id", "project_id"),
+        {},
+    )
