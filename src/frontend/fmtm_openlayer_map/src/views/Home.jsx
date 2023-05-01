@@ -67,11 +67,6 @@ const Home = () => {
 
   //Fetch project for the first time
   useEffect(() => {
-    if (
-      state.projectTaskBoundries.findIndex(
-        (project) => project.id == environment.decode(encodedId)
-      ) == -1
-    ) {
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
@@ -79,14 +74,7 @@ const Home = () => {
         ),
         state.projectTaskBoundries
       );
-    }
-    if (Object.keys(state.projectInfo).length == 0) {
-      dispatch(ProjectActions.SetProjectInfo({...projectInfo}));
-    } else {
-      if (state.projectInfo.id != environment.decode(encodedId)) {
-        dispatch(ProjectActions.SetProjectInfo(projectInfo));
-      }
-    }
+
   }, [params.id]);
 
   useEffect(() => {

@@ -13,7 +13,6 @@ const Switcher = ({ status,width,height }) => {
 }
 
 const CustomizedImage = ({ status,style }) => {
-    console.log('style : ',style.width);
     return (
         <Switcher status={status} width={style.width} height={style.height}/>
     )
