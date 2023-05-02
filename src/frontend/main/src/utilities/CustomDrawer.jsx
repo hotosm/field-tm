@@ -15,7 +15,6 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
   };
 
-  console.log('size :',type);
 
   const Drawerstyles = {
     list: {
@@ -73,7 +72,7 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
   return (
     <div>
       <React.Fragment>
-        <SwipeableDrawer  anchor={'right'} open={open} onClose={onClose}>
+        <SwipeableDrawer onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
           <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
             <CoreModules.Stack sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
               <CoreModules.IconButton
@@ -106,6 +105,7 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
               {MenuItems.filter((menuItem) => menuItem.isActive).map((menuDetails, index) =>
                 menuDetails.isExternalLink ? (
                   <a
+                    key={index}
                     href={menuDetails.ref}
                     style={{
                       textDecoration: 'inherit',
@@ -128,6 +128,7 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
                   </a>
                 ) : (
                   <NavLink
+                  key={index}
                     to={menuDetails.ref}
                     style={{
                       textDecoration: 'inherit',
