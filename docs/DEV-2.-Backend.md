@@ -68,10 +68,9 @@ For advanced users, it is also possible to run a postgresql/postgis database loc
 After starting the database, from the command line:
 
 1. Navigate to the top level directory of the FMTM project.
-2. Create a virtual environment with: `python3 -m venv fmtm-env`. This ensures that your computer's Python environment is kept clean.
-3. Start the FMTM virtual environment with: `source fmtm-env/bin/activate`
-4. Install backend dependencies with: `pip install -r src/backend/requirements.txt`
-5. Run the Fast API backend with: `uvicorn src.backend.main:api --reload`
+2. Install PDM with: `pip install pdm`
+3. Install backend dependencies with PDM: `pdm install`
+4. Run the Fast API backend with: `pdm run uvicorn app.main:api --host 0.0.0.0 --port 8000`
 
 The API should now be accessible at: <http://127.0.0.1:8000/docs>
 
@@ -124,6 +123,7 @@ Example launch.json config for vscode:
 > Note: either port 5678 needs to be bound to your localhost, or the `host` parameter can be set to the container IP address.
 
 ### Conclusion
+
 Running the FMTM project is easy with Docker. You can also run the
 project locally outside of Docker, but it requires more setup. The
 frontend is built with React and Typescript, and the backend is built
