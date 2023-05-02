@@ -256,21 +256,15 @@ def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
 def get_qr_codes_for_task(
     db: Session,
     task_id: int,
-    ):
+):
     task = get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
-            logger.debug(
-                f"QR code found for task ID {task.id}. Converting to base64"
-            )
+            logger.debug(f"QR code found for task ID {task.id}. Converting to base64")
             qr_code = base64.b64encode(task.qr_code.image)
         else:
-            logger.debug(
-                f"QR code not found for task ID {task.id}."
-            )
+            logger.debug(f"QR code not found for task ID {task.id}.")
             qr_code = None
-        return {'id':task_id,'qr_code':qr_code}
+        return {"id": task_id, "qr_code": qr_code}
     else:
-        raise HTTPException(
-            status_code=400, detail=f"Task does not exist"
-        )
+        raise HTTPException(status_code=400, detail="Task does not exist")

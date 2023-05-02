@@ -25,7 +25,6 @@ from typing import Union
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.logger import logger as fastapi_logger
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -38,9 +37,9 @@ from .db.database import Base, engine, get_db
 from .debug import debug_routes
 from .projects import project_routes
 from .projects.project_crud import read_xlsforms
+from .submission import submission_routes
 from .tasks import tasks_routes
 from .users import user_routes
-from .submission import submission_routes
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
@@ -101,8 +100,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """Exception handler for more descriptive logging."""
     errors = []
     for error in exc.errors():
-        #TODO Handle this properly
-        if error["msg"] in ["Invalid input","field required"]:
+        # TODO Handle this properly
+        if error["msg"] in ["Invalid input", "field required"]:
             status_code = 422  # Unprocessable Entity
         else:
             status_code = 400  # Bad Request
