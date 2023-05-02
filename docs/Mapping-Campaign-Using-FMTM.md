@@ -4,7 +4,7 @@
 
 1. [Introduction](#introduction)
 
-2. [An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open StreetMapping (OSM) and Open Date Kit (ODK).](#an-overview-of-the-field-mapping-tasking-manager-fmtm-in-relations-with-humanitarian-openstreetmap-team-hot-open-street-mapping-osm-and-open-date-kit-odk)
+2. [An Overview Of FMTM In Relations With HOT, OSM and ODK.](#an-overview-of-fmtm-in-relations-with-hot-osm-and-odk)
 
 3. [Using The FMTM Tool For A Mapping Campaign.](#using-the-fmtm-tool-for-a-mapping-campaign)
 
@@ -35,7 +35,7 @@ detailed maps that can have a variety of use cases. These could be:
 - Understanding the impact of environmental changes on the landscape,
   etc.
 
-## An Overview Of The Field Mapping Tasking Manager (FMTM) In Relations With Humanitarian OpenStreetMap Team (HOT), Open Street Mapping (OSM) and Open Date Kit (ODK).
+## An Overview Of FMTM In Relations With HOT, OSM and ODK.
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit
 organization that uses open mapping data to support humanitarian and
