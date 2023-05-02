@@ -18,13 +18,13 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from ..main import api
-from ..db.database import get_db, Base
-from ..config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy_utils import create_database, database_exists
 
+from app.config import settings
+from app.db.database import Base, get_db
+from app.main import api
 
 test_db_name = settings.FMTM_TEST_DB_NAME
 db_host = settings.FMTM_DB_HOST
@@ -33,9 +33,7 @@ password = settings.FMTM_DB_PASSWORD
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{db_host}/{test_db_name}"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -57,7 +55,7 @@ def db(db_engine):
     connection = db_engine.connect()
 
     # begin a non-ORM transaction
-    transaction = connection.begin()
+    connection.begin()
 
     # bind an individual Session to the connection
     db = TestingSessionLocal(bind=connection)
