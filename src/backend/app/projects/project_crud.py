@@ -17,6 +17,7 @@
 #
 
 
+import base64
 import io
 import json
 import os
@@ -32,14 +33,17 @@ from base64 import b64encode
 import geoalchemy2
 import geojson
 import numpy as np
+import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from osm_fieldwork.xlsforms import xlsforms_path
-from shapely.geometry import Polygon, shape
+from geojson import dump
+from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
+from osm_fieldwork.xlsforms import xlsforms_path
 from shapely import wkt
+from shapely.geometry import MultiPolygon, Polygon, shape
 from sqlalchemy import (
     column,
     insert,
@@ -50,7 +54,6 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -58,11 +61,11 @@ from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
 from ..db import db_models
+from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 from geoalchemy2.shape import from_shape
 from shapely.geometry import shape, mapping, MultiLineString, MultiPolygon
-
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from . import project_schemas
@@ -173,7 +176,7 @@ def delete_project_by_id(db: Session, project_id: int):
 
 def partial_update_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpdate, project_id
-    ):
+):
 
     # Get the project from db
     db_project = get_project_by_id(db, project_id)
@@ -187,14 +190,14 @@ def partial_update_project_info(
     # Get project info
     db_project_info = get_project_info_by_id(db, project_id)
 
-    # Update project informations 
+    # Update project informations
     if project_metadata.name:
         db_project.project_name_prefix = project_metadata.name
         db_project_info.name = project_metadata.name
     if project_metadata.description:
-        db_project_info.description=project_metadata.description
+        db_project_info.description = project_metadata.description
     if project_metadata.short_description:
-        db_project_info.short_description=project_metadata.short_description
+        db_project_info.short_description = project_metadata.short_description
 
     db.commit()
     db.refresh(db_project)
@@ -204,7 +207,7 @@ def partial_update_project_info(
 
 def update_project_info(
     db: Session, project_metadata: project_schemas.BETAProjectUpload, project_id
-    ):
+):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
 
@@ -240,8 +243,8 @@ def update_project_info(
 
     # Update projects meta informations (name, descriptions)
     db_project_info.name = project_info_1.name
-    db_project_info.short_description=project_info_1.short_description
-    db_project_info.description=project_info_1.description
+    db_project_info.short_description = project_info_1.short_description
+    db_project_info.description = project_info_1.description
 
     db.commit()
     db.refresh(db_project)
@@ -275,11 +278,10 @@ def create_project_with_project_info(
         author=db_user,
         odkid=project_id,
         project_name_prefix=project_info_1.name,
-        xform_title= xform_title,
-        odk_central_url = odk_credentials.odk_central_url,
-        odk_central_user = odk_credentials.odk_central_user,
-        odk_central_password = odk_credentials.odk_central_password,
-
+        xform_title=xform_title,
+        odk_central_url=odk_credentials.odk_central_url,
+        odk_central_user=odk_credentials.odk_central_user,
+        odk_central_password=odk_credentials.odk_central_password,
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -318,22 +320,20 @@ def upload_xlsform(
         db.commit()
         return True
     except Exception as e:
-        raise HTTPException(status=400, detail={'message':str(e)})
+        raise HTTPException(status=400, detail={"message": str(e)})
 
 
 def update_multi_polygon_project_boundary(
     db: Session,
     project_id: int,
-    boundary: str,        
+    boundary: str,
 ):
+    """This function receives the project_id and boundary as a parameter
+    and creates a task for each polygon in the database.
+    This function also creates a project outline from the multiple polygons received.
     """
-        This function receives the project_id and boundary as a parameter
-        and creates a task for each polygon in the database. 
-        This function also creates a project outline from the multiple polygons received.
-    """
-
     try:
-        """ verify project exists in db """
+        """verify project exists in db"""
         db_project = get_project_by_id(db, project_id)
         if not db_project:
             logger.error(f"Project {project_id} doesn't exist!")
@@ -343,16 +343,20 @@ def update_multi_polygon_project_boundary(
         polygons = boundary["features"]
         for polygon in polygons:
 
-            """ If the polygon is a MultiPolygon, convert it to a Polygon"""
-            if polygon['geometry']['type'] == 'MultiPolygon':
-                polygon['geometry']['type'] = 'Polygon'
-                polygon['geometry']['coordinates'] = polygon['geometry']['coordinates'][0]
+            """If the polygon is a MultiPolygon, convert it to a Polygon"""
+            if polygon["geometry"]["type"] == "MultiPolygon":
+                polygon["geometry"]["type"] = "Polygon"
+                polygon["geometry"]["coordinates"] = polygon["geometry"]["coordinates"][
+                    0
+                ]
 
             """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
-            remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
+
+            def remove_z_dimension(coord):
+                return coord.pop() if len(coord) == 3 else None
 
             """ Apply the lambda function to each coordinate in its geometry """
-            list(map(remove_z_dimension, polygon['geometry']['coordinates'][0]))
+            list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
 
             db_task = db_models.DbTask(
                 project_id=project_id,
@@ -368,12 +372,12 @@ def update_multi_polygon_project_boundary(
 
         """ Generate project outline from tasks """
         # query = f'''SELECT ST_AsText(ST_Buffer(ST_Union(outline), 0.5, 'endcap=round')) as oval_envelope
-        #            FROM tasks 
+        #            FROM tasks
         #           where project_id={project_id};'''
 
-        query = f'''SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
+        query = f"""SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
                     FROM tasks
-                    WHERE project_id={project_id};'''
+                    WHERE project_id={project_id};"""
         result = db.execute(query)
         data = result.fetchone()
 
@@ -480,10 +484,7 @@ async def preview_tasks(boundary:str, dimension:int):
 
 
 def update_project_boundary(
-    db: Session,
-    project_id: int,
-    boundary: str,
-    dimension : int
+    db: Session, project_id: int, boundary: str, dimension: int
 ):
     # verify project exists in db
     db_project = get_project_by_id(db, project_id)
@@ -494,9 +495,11 @@ def update_project_boundary(
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
     remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
 
+    def remove_z_dimension(coord):
+        return coord.pop() if len(coord) == 3 else None
 
     """ Check if the boundary is a Feature or a FeatureCollection """
-    if boundary['type'] == 'Feature':
+    if boundary["type"] == "Feature":
         features = [boundary]
     elif boundary['type'] == 'FeatureCollection':
         features = boundary['features']
@@ -511,7 +514,7 @@ def update_project_boundary(
 
     """ Apply the lambda function to each coordinate in its geometry """
     for feature in features:
-        list(map(remove_z_dimension, feature['geometry']['coordinates'][0]))
+        list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
 
     """Update the boundary polyon on the database."""
     outline = shape(features[0]["geometry"])
@@ -532,7 +535,7 @@ def update_project_boundary(
     tasks = eval(result)
     for poly in tasks["features"]:
         logger.debug(poly)
-        task_name = str(poly['properties']['id'])
+        task_name = str(poly["properties"]["id"])
         db_task = db_models.DbTask(
             project_id=project_id,
             project_task_name=task_name,
@@ -746,18 +749,10 @@ def read_xlsforms(
     return xlsforms
 
 
-
-def get_odk_id_for_project(
-        db: Session,
-        project_id:int
-        ):
-    
-    """
-    Get the odk project id for the fmtm project id
-    """
-    
+def get_odk_id_for_project(db: Session, project_id: int):
+    """Get the odk project id for the fmtm project id."""
     project = table(
-        "projects", 
+        "projects",
         column("odkid"),
     )
 
@@ -969,26 +964,25 @@ def create_qrcode(
     project_id: int,
     token: str,
     project_name: str,
-    odk_credentials: dict = None
+    odk_credentials: dict = None,
 ):
-    #Make QR code for an app_user.
-    qrcode = central_crud.create_QRCode(project_id, token, project_name, odk_credentials)
+    # Make QR code for an app_user.
+    qrcode = central_crud.create_QRCode(
+        project_id, token, project_name, odk_credentials
+    )
     qrcode = segno.make(qrcode, micro=False)
     image_name = f"{project_name}.png"
     with open(image_name, "rb") as f:
         base64_data = b64encode(f.read()).decode()
     qr_code_text = base64.b64decode(base64_data)
-    qrdb = db_models.DbQrCode(
-        image=qr_code_text,
-        filename = image_name
-    )
+    qrdb = db_models.DbQrCode(image=qr_code_text, filename=image_name)
     db.add(qrdb)
     db.commit()
     codes = table("qr_code", column("id"))
     sql = select(sqlalchemy.func.count(codes.c.id))
     result = db.execute(sql)
     rows = result.fetchone()[0]
-    return {"data": qrcode, "id": rows + 1,"qr_code_id":qrdb.id}
+    return {"data": qrcode, "id": rows + 1, "qr_code_id": qrdb.id}
 
 
 def download_geometry(
@@ -1030,7 +1024,7 @@ def download_geometry(
     return {"filespec": out}
 
 
-def create_task_grid(db: Session, project_id: int, delta:int):
+def create_task_grid(db: Session, project_id: int, delta: int):
     try:
         # Query DB for project AOI
         projects = table("projects", column("outline"), column("id"))
@@ -1048,7 +1042,7 @@ def create_task_grid(db: Session, project_id: int, delta:int):
         minx, miny, maxx, maxy = boundary.bounds
 
         # 1 degree = 111139 m
-        value = delta/111139
+        value = delta / 111139
 
         nx = int((maxx - minx) / value)
         ny = int((maxy - miny) / value)
@@ -1104,18 +1098,18 @@ def create_task_grid(db: Session, project_id: int, delta:int):
         # If project outline cannot be divided into multiple tasks,
         #   whole boundary is made into a single task.
         result = json.loads(out)
-        if len(result['features']) == 0:
+        if len(result["features"]) == 0:
             geom = loads(data[0][0])
             out = {
                 "type": "FeatureCollection",
                 "features": [
                     {
-                            "type": "Feature",
-                            "geometry": geom,
-                            "properties": {"id":project_id},
-                        }
-                        ]
+                        "type": "Feature",
+                        "geometry": geom,
+                        "properties": {"id": project_id},
                     }
+                ],
+            }
             out = json.dumps(out)
 
         return out
@@ -1227,7 +1221,7 @@ def convert_to_project_summary(db_project: db_models.DbProject):
 
         if db_project.project_info and len(db_project.project_info) > 0:
             default_project_info = next(
-                ( x for x in db_project.project_info ),
+                (x for x in db_project.project_info),
                 None,
             )
             # default_project_info = project_schemas.ProjectInfo
@@ -1258,25 +1252,19 @@ def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
 def get_organisations(
     db: Session,
 ):
-    db_organisation = ( 
-        db.query(db_models.DbOrganisation)
-        .all()
-    )
+    db_organisation = db.query(db_models.DbOrganisation).all()
     return db_organisation
 
 
-def create_organization(
-    db: Session,
-    org: project_schemas.Organisation
-):
-     # create new project
+def create_organization(db: Session, org: project_schemas.Organisation):
+    # create new project
     db_organization = db_models.DbOrganisation(
         name=org.name,
         slug=org.slug,
         logo=org.logo,
-        description= org.description,
-        url= org.url,
-        type= org.type,
+        description=org.description,
+        url=org.url,
+        type=org.type,
     )
     db.add(db_organization)
     db.commit()

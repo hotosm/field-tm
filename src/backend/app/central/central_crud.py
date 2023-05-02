@@ -16,29 +16,27 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import os
-import pathlib
-
-#Qr code imports
-import segno
 import base64
 import json
+import os
+import pathlib
 import zlib
 
 import osm_fieldwork
+
+# Qr code imports
+import segno
 import xmltodict
+from fastapi import HTTPException
 from fastapi.logger import logger as logger
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
-from sqlalchemy import column, table
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
-from ..projects import project_schemas
 
 from ..config import settings
 from ..db import db_models
+from ..projects import project_schemas
 
 url = settings.ODK_CENTRAL_URL
 user = settings.ODK_CENTRAL_USER
@@ -55,7 +53,7 @@ def list_odk_projects():
     return project.listProjects()
 
 
-def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
+def create_odk_project(odk_central: project_schemas.ODKCentral, name: str):
     """Create a project on a remote ODK Server."""
     try:
         odk_project = OdkProject(odk_central.odk_central_url,
@@ -72,22 +70,22 @@ def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
         raise HTTPException(status_code=500, detail=f"Error creating project on ODK Central: {e}")
 
 
+
 def delete_odk_project(project_id: int):
-    """Delete a project from a remote ODK Server"""
+    """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
     # odkid in the projects table
 
     result = project.deleteProject(project_id)
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
-    projects = project.listProjects()
+    project.listProjects()
 
     return result
 
 
-def create_appuser(project_id: int, name: str, odk_credentials:dict = None):
-    """
-        Create an app-user on a remote ODK Server.
-        If odk credentials of the project are provided, use them to create an app user.
+def create_appuser(project_id: int, name: str, odk_credentials: dict = None):
+    """Create an app-user on a remote ODK Server.
+    If odk credentials of the project are provided, use them to create an app user.
     """
     # project.listAppUsers(project_id)
     # user = project.findAppUser(name=name)
@@ -95,9 +93,9 @@ def create_appuser(project_id: int, name: str, odk_credentials:dict = None):
     # if not user:
 
     if odk_credentials:
-        url = odk_credentials['odk_central_url']
-        user = odk_credentials['odk_central_user']
-        pw = odk_credentials['odk_central_password']
+        url = odk_credentials["odk_central_url"]
+        user = odk_credentials["odk_central_user"]
+        pw = odk_credentials["odk_central_password"]
         app_user = OdkAppUser(url, user, pw)
         result = app_user.create(project_id, name)
     else:
@@ -113,20 +111,24 @@ def delete_app_user(project_id: int, name: str):
     return result
 
 
-def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credentials:dict=None):
+def create_odk_xform(
+    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
+):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
     # result = xform.createForm(project_id, title, filespec, True)
-    # Pass odk credentials of project in xform 
+    # Pass odk credentials of project in xform
     if odk_credentials:
-        url = odk_credentials['odk_central_url']
-        user = odk_credentials['odk_central_user']
-        pw = odk_credentials['odk_central_password']
+        url = odk_credentials["odk_central_url"]
+        user = odk_credentials["odk_central_user"]
+        pw = odk_credentials["odk_central_password"]
         try:
             xform = OdkForm(url, user, pw)
         except:
-            raise HTTPException(status_code=500, detail={'message':'Connection failed to odk central'})
-        
+            raise HTTPException(
+                status_code=500, detail={"message": "Connection failed to odk central"}
+            )
+
     result = xform.createForm(project_id, xform_id, filespec, False)
 
     if result != 200 and result != 409:
@@ -135,7 +137,7 @@ def create_odk_xform(project_id: int, xform_id: str, filespec: str, odk_credenti
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     result = xform.uploadMedia(project_id, title, data)
-    
+
     result = xform.publishForm(project_id, title)
     return result
 
@@ -165,14 +167,15 @@ def list_submissions(project_id: int):
     return submissions
 
 
-def get_form_list(
-        db:Session,
-        skip:int,
-        limit:int
-    ):
-    """Returns the list of id and title of xforms from the database"""
+def get_form_list(db: Session, skip: int, limit: int):
+    """Returns the list of id and title of xforms from the database."""
     try:
-        return db.query(db_models.DbXForm.id, db_models.DbXForm.title).offset(skip).limit(limit).all()
+        return (
+            db.query(db_models.DbXForm.id, db_models.DbXForm.title)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
     except Exception as e:
         raise HTTPException(e)
 
@@ -184,20 +187,21 @@ def download_submissions(project_id: int, xform_id: str, submission_id: str = No
     fixed = str(data, "utf-8")
     return fixed.splitlines()
 
+
 def generate_updated_xform(
     db: Session,
     task_id: dict,
     xlsform: str,
     xform: str,
 ):
-    """Update the version in an XForm so it's unique"""
-    name =  os.path.basename(xform).replace(".xml", "")
+    """Update the version in an XForm so it's unique."""
+    name = os.path.basename(xform).replace(".xml", "")
     outfile = xform
     try:
         xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
     except Exception as e:
         logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
-        raise HTTPException(status_code=400, detail = str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
     if os.path.getsize(outfile) <= 0:
         logger.warning(f"{outfile} is empty!")
@@ -207,10 +211,10 @@ def generate_updated_xform(
     data = xls.read()
     xls.close()
 
-    tmp = name.split('_')
-    project = tmp[0]
-    category = tmp[1]
-    id = tmp[2].split('.')[0]
+    tmp = name.split("_")
+    tmp[0]
+    tmp[1]
+    id = tmp[2].split(".")[0]
     extract = f"jr://file/{name}.geojson"
     xml = xmltodict.parse(str(data))
     # First change the osm data extract file
@@ -218,17 +222,20 @@ def generate_updated_xform(
     for inst in xml["h:html"]["h:head"]["model"]["instance"]:
         try:
             if "@src" in inst:
-                if xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split('.')[1] == "geojson":
-                    xml["h:html"]["h:head"]["model"]["instance"][index]["@src"] = extract
+                if (
+                    xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split(
+                        "."
+                    )[1]
+                    == "geojson"
+                ):
+                    xml["h:html"]["h:head"]["model"]["instance"][index][
+                        "@src"
+                    ] = extract
             if "data" in inst:
                 if "data" == inst:
-                    xml["h:html"]["h:head"]["model"]["instance"]["data"][
-                        "@id"
-                    ] = xform
+                    xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
                 else:
-                    xml["h:html"]["h:head"]["model"]["instance"][0]["data"][
-                        "@id"
-                    ] = id
+                    xml["h:html"]["h:head"]["model"]["instance"][0]["data"]["@id"] = id
         except Exception:
             continue
         index += 1
@@ -254,36 +261,32 @@ def generate_updated_xform(
     return outfile
 
 
-def create_QRCode(
-    project_id: int,
-    token: str,
-    name: str,
-    odk_credentials: dict=None
-):
+def create_QRCode(project_id: int, token: str, name: str, odk_credentials: dict = None):
     """Create the QR Code for an app-user."""
-    
     # Odk central url of the project
     if odk_credentials:
-        central_url = odk_credentials['odk_central_url']
+        central_url = odk_credentials["odk_central_url"]
     else:
         central_url = url
-    
+
     # Qr code text json in the format acceptable by odk collect.
     qr_code_setting = {
-            "general": {
-                "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
-                "form_update_mode": "match_exactly",
-                "basemap_source": "MapBox",
-                "autosend": "wifi_and_cellular",
-            },
-            "project": {"name": f"{name}"},
-            "admin": {},
-        }
-    
-    # Base64 encoded
-    qr_data = base64.b64encode(zlib.compress(json.dumps(qr_code_setting).encode("utf-8")))
+        "general": {
+            "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
+            "form_update_mode": "match_exactly",
+            "basemap_source": "MapBox",
+            "autosend": "wifi_and_cellular",
+        },
+        "project": {"name": f"{name}"},
+        "admin": {},
+    }
 
-    #Generate qr code using segno
+    # Base64 encoded
+    qr_data = base64.b64encode(
+        zlib.compress(json.dumps(qr_code_setting).encode("utf-8"))
+    )
+
+    # Generate qr code using segno
     qrcode = segno.make(qr_data, micro=False)
     qrcode.save(f"{name}.png", scale=5)
     return qr_data

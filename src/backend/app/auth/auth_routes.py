@@ -34,8 +34,7 @@ router = APIRouter(
 
 @router.post("/login/")
 def login(user: user_schemas.UserIn, db: Session = Depends(database.get_db)):
-    """
-    The Login API allows users to authenticate themselves with the application.
+    """The Login API allows users to authenticate themselves with the application.
     Username and password are passed and users information is obtained in the response.
     """
     return user_crud.verify_user(db, user)
@@ -48,7 +47,7 @@ def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
 
     Parameters: None
 
-    Returns
+    Returns:
     -------
     - login_url (string) - URL to authorize user to the application via. Openstreetmap
         OAuth2 with client_id, redirect_uri, and permission scope as query_string parameters
@@ -67,7 +66,7 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
 
     Parameters: None
 
-    Returns
+    Returns:
     -------
     - access_token (string)
     """

@@ -1,5 +1,6 @@
-from typing import Any, List
 import math
+from typing import List
+
 
 def get_pages_nav(total_pages, current_page):
     next_page = None
@@ -11,18 +12,13 @@ def get_pages_nav(total_pages, current_page):
     return next_page, prev_page
 
 
-def paginate_data(
-        data: List[dict],
-        page_no:int,
-        page_size:int,
-        total_content:int
-    ):
+def paginate_data(data: List[dict], page_no: int, page_size: int, total_content: int):
     total_pages = math.ceil(total_content / page_size)
     next_page, prev_page = get_pages_nav(total_pages, page_no)
 
     return {
-        'count':total_content,
-        'next_page':next_page,
-        'prev_page':prev_page,
-        'results':data
+        "count": total_content,
+        "next_page": next_page,
+        "prev_page": prev_page,
+        "results": data,
     }

@@ -15,9 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-import bcrypt
 from typing import List
 
+import bcrypt
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
@@ -68,21 +68,19 @@ def create_user(db: Session, user: user_schemas.UserIn):
 
 
 def hash_password(password: str):
-    '''
-        Hashing the password using bcrypt
-    '''
-    hashed_password_encoded = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+    """Hashing the password using bcrypt."""
+    hashed_password_encoded = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
     hashed_password = hashed_password_encoded.decode("utf8")
     return hashed_password
 
 
 def verify_password(user_password, hashed_password):
-    '''
-        This function takes the password user entered and the hashed password in the db
-        and check if they matches.
-    '''
-    is_valid = bcrypt.checkpw(user_password.encode('utf8'), 
-                              hashed_password.encode('utf8'))
+    """This function takes the password user entered and the hashed password in the db
+    and check if they matches.
+    """
+    is_valid = bcrypt.checkpw(
+        user_password.encode("utf8"), hashed_password.encode("utf8")
+    )
     return is_valid
 
 
@@ -94,10 +92,7 @@ def verify_user(db: Session, questionable_user: user_schemas.UserIn):
     db_user = get_user_by_username(db, questionable_user.username)
     if db_user:
         if verify_password(questionable_user.password, db_user.password):
-            return {'id':db_user.id, 
-                    'name':db_user.username,
-                    'role':db_user.role
-                    }
+            return {"id": db_user.id, "name": db_user.username, "role": db_user.role}
 
         else:
             raise HTTPException(status_code=400, detail="Incorrect password.")

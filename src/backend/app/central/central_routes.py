@@ -27,6 +27,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+
 from ..central import central_crud
 from ..db import database
 from ..projects import project_crud
@@ -74,8 +75,7 @@ async def get_form_lists(
     skip: int = 0,
     limit: int = 100
 ):
-    '''
-    This function retrieves a list of XForms from a database, 
+    """This function retrieves a list of XForms from a database,
     with the option to skip a certain number of records and limit the number of records returned.
 
     
@@ -86,8 +86,7 @@ async def get_form_lists(
 
     Returns:
     A list of dictionary containing the id and title of each XForm record retrieved from the database.
-    '''
-
+    """
     forms = central_crud.get_form_list(db, skip, limit)
     return forms
 

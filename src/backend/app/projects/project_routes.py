@@ -96,10 +96,13 @@ async def create_project(
 ):
     """Create a project in ODK Central and the local database."""
     try:
-        odkproject = central_crud.create_odk_project(project_info.odk_central,
-                                                    project_info.project_info.name)
+        odkproject = central_crud.create_odk_project(
+            project_info.odk_central, project_info.project_info.name
+        )
     except:
-        raise HTTPException(status_code=400, detail="Connection failed to central odk. ")
+        raise HTTPException(
+            status_code=400, detail="Connection failed to central odk. "
+        )
 
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
@@ -115,12 +118,11 @@ async def create_project(
 
 @router.put("/project/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
-    id : int,
+    id: int,
     project_info: project_schemas.BETAProjectUpload,
-    db: Session = Depends(database.get_db)
-    ):
-    """
-    Update an existing project by ID.
+    db: Session = Depends(database.get_db),
+):
+    """Update an existing project by ID.
 
     Parameters:
     - id: ID of the project to update
@@ -133,10 +135,7 @@ async def update_project(
     Raises:
     - HTTPException with 404 status code if project not found
     """
-
-    project = project_crud.update_project_info(
-        db, project_info, id
-    )
+    project = project_crud.update_project_info(db, project_info, id)
     if project:
         return project
     else:
@@ -145,18 +144,16 @@ async def update_project(
 
 @router.patch("/project/{id}", response_model=project_schemas.ProjectOut)
 async def project_partial_update(
-    id : int,
+    id: int,
     project_info: project_schemas.ProjectUpdate,
-    db: Session = Depends(database.get_db)
-    ):
-
-    """
-    Partial Update an existing project by ID.
+    db: Session = Depends(database.get_db),
+):
+    """Partial Update an existing project by ID.
 
     Parameters:
     - id
-    - name 
-    - short_description 
+    - name
+    - short_description
     - description
 
     Returns:
@@ -165,11 +162,8 @@ async def project_partial_update(
     Raises:
     - HTTPException with 404 status code if project not found
     """
-    
-    # Update project informations 
-    project = project_crud.partial_update_project_info(
-        db, project_info, id
-    )
+    # Update project informations
+    project = project_crud.partial_update_project_info(db, project_info, id)
 
     if project:
         return project
@@ -231,10 +225,8 @@ async def upload_multi_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
     db: Session = Depends(database.get_db),
-    ):
-
-    '''
-    This API allows for the uploading of a multi-polygon project boundary 
+):
+    """This API allows for the uploading of a multi-polygon project boundary
         in JSON format for a specified project ID. Each polygon in the uploaded geojson are made a single task.
 
     Required Parameters:
@@ -244,22 +236,22 @@ async def upload_multi_project_boundary(
     Returns:
     A success message indicating that the boundary was successfully uploaded.
     If the project ID does not exist in the database, an HTTP 428 error is raised.
-    '''
-
+    """
     # read entire file
     content = await upload.read()
     boundary = json.loads(content)
 
-    '''Create tasks for each polygon '''
-    result = project_crud.update_multi_polygon_project_boundary(db, project_id, boundary)
+    """Create tasks for each polygon """
+    result = project_crud.update_multi_polygon_project_boundary(
+        db, project_id, boundary
+    )
 
     if not result:
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
-    return {"message":"Project Boundary Uploaded",
-            "project_id": f"{project_id}"}
+    return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
 
 @router.post("/{project_id}/upload")
@@ -292,8 +284,7 @@ async def upload_project_boundary(
     # type = DataCategory()
     # result = project_crud.generate_appuser_files(db, grid, project_id)
 
-    return {"message":"Project Boundary Uploaded",
-            "project_id": f"{project_id}"}
+    return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
 
 @router.post("/{project_id}/download")
@@ -326,13 +317,12 @@ async def generate_files(
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    """
-    Description:
-    This API generates required media files for each task in the project based on the provided parameters. 
+    """Description:
+    This API generates required media files for each task in the project based on the provided parameters.
     It accepts a project ID, category, custom form flag, and an uploaded file as inputs.
     The generated files are associated with the project ID and stored in the database.
     This api generates qr_code, forms. This api also creates an app user for each task and provides the required roles.
-    Some of the other functionality of this api includes converting a xls file provided by the user to the xform, 
+    Some of the other functionality of this api includes converting a xls file provided by the user to the xform,
     generates osm data extracts and uploads it to the form.
 
 
@@ -341,7 +331,7 @@ async def generate_files(
     project_id (int): The ID of the project for which files are being generated. This is a required field.
     polygon (bool): A boolean flag indicating whether the polygon is extracted or not.
 
-    upload (UploadFile): An uploaded file that is used as input for generating the files. 
+    upload (UploadFile): An uploaded file that is used as input for generating the files.
         This is not a required field. A file should be provided if user wants to upload a custom xls form.
 
     Returns:
@@ -390,8 +380,7 @@ async def create_organization(
     organization: project_schemas.Organisation,
     db: Session = Depends(database.get_db),
 ):
-    """
-    Create a new organization.
+    """Create a new organization.
 
     This endpoint allows you to create a new organization by providing the necessary details in the request body.
 

@@ -29,15 +29,10 @@ from fastapi import HTTPException
 from osm_fieldwork.OdkCentral import OdkForm, OdkProject
 
 
-def get_submission_of_project(
-        db: Session,
-        project_id: int,
-        task_id: int = None
-        ):
-    """ 
-        Gets the submission of project.
-        This function takes project_id and task_id as a parameter.
-        If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
+def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
+    """Gets the submission of project.
+    This function takes project_id and task_id as a parameter.
+    If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
     """
 
     project_info = project_crud.get_project(db, project_id)
@@ -80,17 +75,14 @@ def get_submission_of_project(
 
     else:
         # If task_id is provided, submission made to this particular task is returned.
-        xml_form_id = f'{project_name}_{form_category}_{task_id}'.split('_')[2]
+        xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
         submission_list = xform.listSubmissions(odkid, xml_form_id)
         for x in submission_list:
-            x['submitted_by'] = f'{project_name}_{form_category}_{task_id}'
+            x["submitted_by"] = f"{project_name}_{form_category}_{task_id}"
         return submission_list
 
 
-def get_forms_of_project(
-        db : Session,
-        project_id: int
-    ):
+def get_forms_of_project(db: Session, project_id: int):
     project_info = project_crud.get_project_by_id(db, project_id)
 
     # Return empty list if project is not found
@@ -105,10 +97,7 @@ def get_forms_of_project(
     return result
 
 
-def list_app_users_or_project(
-        db : Session,
-        project_id: int
-    ):
+def list_app_users_or_project(db: Session, project_id: int):
     project_info = project_crud.get_project_by_id(db, project_id)
 
     # Return empty list if project is not found
@@ -121,17 +110,13 @@ def list_app_users_or_project(
 
 
 def create_zip_file(files, output_file_path):
-    with zipfile.ZipFile(output_file_path, mode='w') as zip_file:
+    with zipfile.ZipFile(output_file_path, mode="w") as zip_file:
         for file_path in files:
             zip_file.write(file_path)
     return output_file_path
 
 
-def download_submission(
-    db: Session,
-    project_id: int,
-    task_id: int    
-    ):
+def download_submission(db: Session, project_id: int, task_id: int):
 
     project_info = project_crud.get_project_by_id(db, project_id)
 
@@ -161,30 +146,36 @@ def download_submission(
 
             # XML Form Id is a combination or project_name, category and task_id
             # FIXME: fix xml_form_id
-            xml_form_id = f'{project_name}_{form_category}_{id}'.split('_')[2]
+            xml_form_id = f"{project_name}_{form_category}_{id}".split("_")[2]
             file = xform.getSubmissionMedia(odkid, xml_form_id)
 
             file_path = f"{project_name}_{form_category}_submission_{id}.zip"  # Create a new output file for each submission
             with open(file_path, "wb") as f:
                 f.write(file.content)
 
-            files.append(file_path)  # Add the output file path to the list of files for the final ZIP file
+            files.append(
+                file_path
+            )  # Add the output file path to the list of files for the final ZIP file
 
         extracted_files = []
         for file_path in files:
-            with zipfile.ZipFile(file_path, 'r') as zip_file:
-                zip_file.extractall(os.path.splitext(file_path)[0])  # Extract the contents of the nested ZIP files to a directory with the same name as the ZIP file
-                extracted_files += [os.path.join(os.path.splitext(file_path)[0], f) for f in zip_file.namelist()]  # Add the extracted file paths to the list of extracted files
+            with zipfile.ZipFile(file_path, "r") as zip_file:
+                zip_file.extractall(
+                    os.path.splitext(file_path)[0]
+                )  # Extract the contents of the nested ZIP files to a directory with the same name as the ZIP file
+                extracted_files += [
+                    os.path.join(os.path.splitext(file_path)[0], f)
+                    for f in zip_file.namelist()
+                ]  # Add the extracted file paths to the list of extracted files
 
         final_zip_file_path = f"{project_name}_{form_category}_submissions_final.zip"  # Create a new ZIP file for the extracted files
-        with zipfile.ZipFile(final_zip_file_path, mode='w') as final_zip_file:
+        with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
             for file_path in extracted_files:
                 final_zip_file.write(file_path)
 
         return FileResponse(final_zip_file_path)
 
-
-    xml_form_id = f'{project_name}_{form_category}_{task_id}'.split('_')[2]
+    xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
     file = xform.getSubmissionMedia(odkid, xml_form_id)
     with open(file_path, "wb") as f:
         f.write(file.content)
