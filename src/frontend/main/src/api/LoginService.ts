@@ -1,40 +1,110 @@
 import react from 'react';
 import axios from 'axios';
 import { LoginActions } from '../store/slices/LoginSlice';
-import { LoginProjectCardModel } from '../models/login/loginModel';
+import {SignInModel, SingUpModel } from '../models/login/loginModel';
+import { CommonActions } from '../store/slices/CommonSlice';
 
-export const LoginSummaryService: Function = (url: string) => {
+export const SignUpService: Function = (url: string, body:SingUpModel) => {
 
     return async (dispatch) => {
-        dispatch(LoginActions.LoginProjectLoading(true))
 
-        const fetchLoginSummaries = async (url) => {
+        dispatch(CommonActions.SetLoading(true))
 
+        const createUser= async (url,body) => {
             try {
-                const fetchLoginData = await axios.get(url)
-                const resp: LoginProjectCardModel = fetchLoginData.data;
-                // let resp = new Array(10).fill({
-                //     id: 1234,
-                //     priority: "MEDIUM",
-                //     title: "Naivasha",
-                //     location_str: "Lake Naivasha, Kenya",
-                //     description: "HOT demo",
-                //     total_tasks: 320,
-                //     tasks_mapped: 0,
-                //     tasks_validated: 0,
-                //     contributors: 0,
-                //     tasks_bad: 0,
-                //     priority_str: 'HIGH',
-                //     num_contributors: 12
-                // })
-                dispatch(LoginActions.SetLoginProjectSummary(resp))
-                dispatch(LoginActions.LoginProjectLoading(false))
+                const createUserData = await axios.post(url,body)
+                const resp: any = createUserData.data;                
+                dispatch(CommonActions.SetLoading(false))
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: 'User Successfully Created.',
+                        variant: "success",
+                        duration: 2000,
+                    })
+                );
             } catch (error) {
-                dispatch(LoginActions.LoginProjectLoading(false))
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: 'Error in creating user.',
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
+                dispatch(CommonActions.SetLoading(false))
             }
         }
 
-        await fetchLoginSummaries(url);
+         await createUser(url,body);
+     
+
+    }
+
+}
+
+export const SignInService: Function = (url: string, body:SignInModel) => {
+  
+    return async (dispatch) => {
+
+        dispatch(CommonActions.SetLoading(true))
+
+        const signIn= async (url,body) => {
+            
+            try {
+                const fetchUsers = await axios.get(url)
+                const resp: any = fetchUsers.data;    
+                const userIndex = resp.findIndex(user=>user.username.toString() == body.username.toString())
+                
+                if (userIndex!= -1 ) {
+                    if (resp[userIndex].hasOwnProperty('id')) {
+                        dispatch(LoginActions.SetLoginToken(resp[userIndex]))
+                        dispatch(
+                            CommonActions.SetSnackBar({
+                                open: true,
+                                message: 'Successfully Logged in.',
+                                variant: "success",
+                                duration: 2000,
+                            })
+                        );
+                        dispatch(CommonActions.SetLoading(false))
+                    }else{
+                        dispatch(
+                            CommonActions.SetSnackBar({
+                                open: true,
+                                message: 'User does\'t exist',
+                                variant: "error",
+                                duration: 2000,
+                            })
+                        );
+                        dispatch(CommonActions.SetLoading(false))
+                    }
+                
+                }else{
+                    dispatch(
+                        CommonActions.SetSnackBar({
+                            open: true,
+                            message: 'User does\'t exist',
+                            variant: "error",
+                            duration: 2000,
+                        })
+                    );
+                    dispatch(CommonActions.SetLoading(false))
+                }
+      
+            } catch (error) {
+                CommonActions.SetSnackBar({
+                    open: true,
+                    message: 'User does\'t exist',
+                    variant: "error",
+                    duration: 2000,
+                })
+                dispatch(CommonActions.SetLoading(false))
+            }
+        }
+
+         await signIn(url,body);
+
 
     }
 

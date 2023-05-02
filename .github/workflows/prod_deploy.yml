@@ -2,7 +2,11 @@ name: Production Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      # Workflow is Trigged only if src changes
+      - "src/**"
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
