@@ -9,6 +9,7 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.CreateProjectLoading(true))
+        dispatch(CommonActions.SetLoading(true))
 
         const postCreateProjectDetails = async (url,payload,fileUpload) => {
 
@@ -32,11 +33,13 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                     })
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`,payload));
-               
+                dispatch(CommonActions.SetLoading(false))
+
 
             } catch (error) {
                 console.log(error.response,'error');
                 console.log(error,'error2');
+                dispatch(CommonActions.SetLoading(false))
 
                 // Added Snackbar toast for error message 
                 dispatch(
