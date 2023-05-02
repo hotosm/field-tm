@@ -5,6 +5,7 @@ const ThemeSlice = CoreModules.createSlice({
     initialState: {
         hotTheme: {
             palette: {
+                black:'#000000',
                 mode: 'light',
                 primary: {
                     main: '#ffffff',
@@ -91,6 +92,10 @@ const ThemeSlice = CoreModules.createSlice({
                 subtitle2: {
                     fontFamily: 'BarlowMedium',
                     fontSize: 20
+                },
+                subtitle3: {
+                    fontFamily: 'BarlowMedium',
+                    fontSize: 15
                 },
                 h1: {
                     fontFamily: 'ArchivoBold',

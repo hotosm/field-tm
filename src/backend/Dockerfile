@@ -125,3 +125,4 @@ FROM runtime as prod
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 CMD ["uvicorn", "backend.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "1", "--reload", "--log-level", "error", "--no-access-log"]
+    

@@ -4,19 +4,23 @@
 
 ## A project to provide tools for Open Mapping campaigns
 
-While we have pretty good field mapping applications, we don’t have great tools to coordinate field mapping. However, we have most of the elements needed to create a field mapping-oriented version of the HOT Tasking Manager, which allows people to select specific areas and complete tasks in a coordinated, organized fashion.
+The Field Mapping Tasking Manager (FMTM) is a project that aims to provide tools for coordinating field mapping activities in Open Mapping campaigns. While there are existing field mapping applications, there is a lack of efficient tools to coordinate these activities. The FMTM builds on the HOT Tasking Manager and other mapping applications to provide a more streamlined and organized process for completing mapping tasks.
 
-It’s already possible to implement a sort of Field Mapping Tasking Manager workflow using existing tools (mostly based on ODK, particularly the new "select from map" functionality), but it’s pretty labor-intensive and tricky. We’re working on some automation to ease the pain points, which moves us closer to a fully-fledged Field Mapping Tasking Manager (FMTM).
+Currently, it is possible to implement a Field Mapping Tasking Manager workflow using existing tools, but it requires significant effort and can be challenging. The FMTM project is developing automation features to address these challenges and make the process more accessible to users.
+
+By providing a centralized platform for organizing and managing mapping tasks, assigning them to specific users, and tracking their progress, the FMTM aims to simplify the coordination of mapping activities. The tool also provides analytics and reporting features, allowing users to gain insights into mapping campaigns and adjust their strategies accordingly.
 
 [Background and description of the project and idea are here: please have a look at this blog if you haven't yet!](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
 
 # How to contribute
 
-👍🎉We are actively looking for contributors to this project- from design, user testing, and both front and backend developers. Please take a look at our [contributor guidance](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more details! Reach out to us if any questions! 👍🎉
+The FMTM project is open source and community-driven, welcoming contributions from designers, user testers, and both front-end and back-end developers. If you're interested in getting involved, please see our [contributor guidelines](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md) for more information. We welcome questions and feedback, so don't hesitate to reach out to us. 👍🎉
 
 # Using OpenDataKit's Select From Map feature
 
-As of mid-2022, ODK incorporates a new functionality, select from map, that allows field mappers to select an object from a map, view the existing attributes, and fill out a form adding new information and attributes to that object. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
+OpenDataKit's Select From Map feature is a useful tool for field mappers to collect data in a well-structured questionnaire format. The tool was incorporated into ODK in mid-2022 and allows mappers to select an object from a map, view its existing attributes, and fill out a form with new information and attributes.
+
+To prepare map files for ODK, inspiration is taken from the HOT Tasking Manager, which allows remote mappers to choose well-defined small "task" areas, ensuring full coverage of the project area and no unintended duplication of tasks. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
 
 <img src="https://github.com/hotosm/fmtm/blob/main/images/ODK_Select_one_from_file_map_screenshot.jpg?raw=true"  width=800 height= 800>
 
@@ -25,6 +29,8 @@ To prepare the appropriate map files for ODK, we are taking our inspiration from
 <img src="https://github.com/hotosm/fmtm/blob/main/images/HOT_TM_task_selection_screenshot.jpg?raw=true"  width=800 height= 800>
 
 # Users
+
+There are three main user roles for using ODK's Select From Map feature: campaign managers, field mappers, and validators.
 
 ## Campaign managers
 

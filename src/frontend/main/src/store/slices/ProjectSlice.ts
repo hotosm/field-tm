@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import storage from "redux-persist/lib/storage";
 
 
 const ProjectSlice = createSlice({
@@ -8,7 +9,8 @@ const ProjectSlice = createSlice({
         projectTaskBoundries: [],
         newProjectTrigger: false,
         projectInfo: {},
-
+        projectSubmissionLoading:false,
+        projectSubmission:[]
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
@@ -22,7 +24,17 @@ const ProjectSlice = createSlice({
         },
         SetNewProjectTrigger(state, action) {
             state.newProjectTrigger = !state.newProjectTrigger
-        }
+        },
+        clearProjects(state,action) {
+            storage.removeItem('persist:project')
+            state.projectTaskBoundries = action.payload
+        },
+        GetProjectSubmissionLoading(state,action) {
+            state.projectSubmissionLoading = action.payload
+        },
+        SetProjectSubmission(state,action) {
+            state.projectSubmission = action.payload
+        },
     }
 })
 

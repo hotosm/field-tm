@@ -14,6 +14,9 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage';
 import ProjectSlice from "./slices/ProjectSlice";
+import CreateProjectSlice from "./slices/CreateProjectSlice";
+import CommonSlice from "./slices/CommonSlice";
+import LoginSlice from "./slices/LoginSlice";
 
 const reducers = CoreModules.combineReducers({
     project: persistReducer(
@@ -23,19 +26,41 @@ const reducers = CoreModules.combineReducers({
         },
         ProjectSlice.reducer
     ),
+    // project: ProjectSlice.reducer,
+    login: persistReducer(
+        {
+            key: 'login',
+            storage
+        },
+        LoginSlice.reducer
+    ),
     //you can persist your auth reducer here similar to project reducer
     home: HomeSlice.reducer,
     theme: ThemeSlice.reducer,
+    createproject: CreateProjectSlice.reducer,
+    // createproject: persistReducer(
+    //     {
+    //         key: 'createproject',
+    //         storage
+    //     },
+    //     CreateProjectSlice.reducer
+    // ),
+    // added common slice in order to handle all the common things like snackbar etc
+    common: CommonSlice.reducer
 })
+// const middleware = routerMiddleware(history);
+
+const middleware = [
+    ...CoreModules.getDefaultMiddleware({ serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    }, }),
+    // add any other middleware here
+  ];
 
 export const store = CoreModules.configureStore({
     reducer: reducers,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-            },
-        }),
+    middleware: middleware
+
 })
 
 export const persistor = persistStore(store)

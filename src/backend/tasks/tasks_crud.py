@@ -17,6 +17,7 @@
 #
 
 import base64
+import logging
 from typing import List
 
 from fastapi import HTTPException
@@ -40,8 +41,20 @@ from ..users import user_crud
 # --------------
 
 
-def get_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 1000):
-    if user_id:
+def get_tasks(db: Session, 
+              project_id:int, 
+              user_id: int, 
+              skip: int = 0, 
+              limit: int = 1000):
+    if project_id:
+        db_tasks = (
+                    db.query(db_models.DbTask)
+                    .filter(db_models.DbTask.project_id == project_id)
+                    .offset(skip)
+                    .limit(limit)
+                    .all()
+                )
+    elif user_id:
         db_tasks = (
             db.query(db_models.DbTask)
             .filter(db_models.DbTask.locked_by == user_id)
@@ -238,3 +251,26 @@ def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
         return app_tasks_without_nones
     else:
         return []
+
+
+def get_qr_codes_for_task(
+    db: Session,
+    task_id: int,
+    ):
+    task = get_task(db=db, task_id=task_id)
+    if task:
+        if task.qr_code:
+            logger.debug(
+                f"QR code found for task ID {task.id}. Converting to base64"
+            )
+            qr_code = base64.b64encode(task.qr_code.image)
+        else:
+            logger.debug(
+                f"QR code not found for task ID {task.id}."
+            )
+            qr_code = None
+        return {'id':task_id,'qr_code':qr_code}
+    else:
+        raise HTTPException(
+            status_code=400, detail=f"Task does not exist"
+        )

@@ -14,22 +14,22 @@ The following instructions are needed to set up FMTM for production on your own 
 
 #### Docker
 
-Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) is a good tutorial for that; do steps 1 and 2. At the time of writing that consisted of:
+- Install Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) is a good tutorial for that; do steps 1 and 2.   At the time of writing that consisted of:
 
-    sudo apt update
-    sudo apt install apt-transport-https ca-certificates curl software-properties-common
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt update
-    sudo apt install docker-ce
-    sudo usermod -aG docker ${USER}
-    su - ${USER}
+      sudo apt update
+      sudo apt install apt-transport-https ca-certificates curl software-properties-common
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      sudo apt update
+      sudo apt install docker-ce
+      sudo usermod -aG docker ${USER}
+      su - ${USER}
 
-Now install Docker Compose (as per [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At the time of writing (the latest version of Docker Compose may change, so the version number might be out of date, but the rest shouldn't change) this consisted of:
+- Now install Docker Compose (as per [this tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At the     time of writing (the latest version of Docker Compose may change, so the version number might be out of date, but the rest shouldn't change) this consisted of:
 
-    mkdir -p ~/.docker/cli-plugins/
-    curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-    sudo chmod +x ~/.docker/cli-plugins/docker-compose
+      mkdir -p ~/.docker/cli-plugins/
+      curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+      sudo chmod +x ~/.docker/cli-plugins/docker-compose
 
 ### Grab the FMTM code
 
@@ -58,12 +58,6 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
     OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
     OSM_SECRET_KEY=`<CHANGEME>`
 
-    # Database (optional)
-    CENTRAL_DB_HOST=central-db
-    CENTRAL_DB_USER=odk
-    CENTRAL_DB_PASSWORD=`<CHANGEME>`
-    CENTRAL_DB_NAME=odk
-
     FMTM_DB_HOST=fmtm-db
     FMTM_DB_USER=fmtm
     FMTM_DB_PASSWORD=`<CHANGEME>`
@@ -71,9 +65,11 @@ Create the env file from the example with `cp .env.example .env`. Edit that file
 
 > Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
 
+> Note: You must have an existing version of ODKCentral running, to provide the URL and credentials here.
+
 Run the production docker-compose config:
-`docker compose -f docker-compose.prod.yml up --build -d`
+`docker compose -f docker-compose.prod.yml up -d`
+
+> Note: The images should be built already on Quay. If they don't exist, use the `--build` flag during run.
 
 With any luck, this will launch the docker container where the project runs, and you can access the working website from the domain name!
-
-> Note: don't forget to make an admin user for odkcentral [see Deployment page](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend).

@@ -5,8 +5,10 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const path = require('path');
 const deps = require("./package.json").dependencies;
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = function (webpackEnv) {
-
+  
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
 
@@ -15,7 +17,7 @@ module.exports = function (webpackEnv) {
     cache: true,
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
-    bail: isEnvProduction,
+    // bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'inline-source-map',
     output: {
       publicPath: `${process.env.FRONTEND_MAIN_URL}/`,
@@ -68,6 +70,7 @@ module.exports = function (webpackEnv) {
     optimization: {
       moduleIds: 'deterministic',
       runtimeChunk: 'single',
+      usedExports: true,
       splitChunks: {
           cacheGroups: {
               vendor: {
@@ -82,41 +85,34 @@ module.exports = function (webpackEnv) {
         // This is only used in production mode
         new TerserPlugin({
           terserOptions: {
-            parse: {
-              // We want terser to parse ecma 8 code. However, we don't want it
-              // to apply any minification steps that turns valid ecma 5 code
-              // into invalid ecma 5 code. This is why the 'compress' and 'output'
-              // sections only apply transformations that are ecma 5 safe
-              // https://github.com/facebook/create-react-app/pull/4234
-              ecma: 8,
+            terserOptions: {
+              parse: {
+                // We want terser to parse ecma 8 code. However, we don't want it
+                // to apply minification steps that turns valid ecma 5 code
+                // into invalid ecma 5 code. This is why the `compress` and `output`
+                ecma: 8,
+              },
+              compress: {
+                ecma: 5,
+                warning: false,
+                inline: 2,
+              },
+              mangle: {
+                // Find work around for Safari 10+
+                safari10: true,
+              },
+              output: {
+                ecma: 5,
+                comments: false,
+                ascii__only: true,
+              }
             },
-            compress: {
-              ecma: 5,
-              warnings: false,
-              // Disabled because of an issue with Uglify breaking seemingly valid code:
-              // https://github.com/facebook/create-react-app/issues/2376
-              // Pending further investigation:
-              // https://github.com/mishoo/UglifyJS2/issues/2011
-              comparisons: false,
-              // Disabled because of an issue with Terser breaking valid code:
-              // https://github.com/facebook/create-react-app/issues/5250
-              // Pending further investigation:
-              // https://github.com/terser-js/terser/issues/120
-              inline: 2,
-            },
-            mangle: {
-              safari10: true,
-            },
-            // Added for profiling in devtools
-            // keep_classnames: isEnvProductionProfile,
-            // keep_fnames: isEnvProductionProfile,
-            output: {
-              ecma: 5,
-              comments: false,
-              // Turned on because emoji and regex is not minified properly using default
-              // https://github.com/facebook/create-react-app/issues/2488
-              ascii_only: true,
-            },
+          
+            // Use multi-process parallel running to improve the build speed
+            parallel: true,
+          
+            // Enable file caching
+            cache: true,
           },
         }),
         // This is only used in production mode
@@ -124,6 +120,11 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      //new BundleAnalyzerPlugin(),
+      new MiniCssExtractPlugin({
+        filename: 'static/css/[name].[contenthash:8].css',
+        chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
+      }),
       new ModuleFederationPlugin({
         name: "fmtm",
         filename: "remoteEntry.js",
@@ -133,10 +134,11 @@ module.exports = function (webpackEnv) {
         exposes: {
           "./ThemeSlice": "./src/store/slices/ThemeSlice.ts",
           "./HomeSlice": "./src/store/slices/HomeSlice.ts",
+          "./CommonSlice": "./src/store/slices/CommonSlice.ts",
+          "./LoginSlice": "./src/store/slices/LoginSlice.ts",
           "./ProjectSlice": "./src/store/slices/ProjectSlice.ts",
           "./Store": "./src/store/Store.js",
           "./BasicCard": "./src/utilities/BasicCard.tsx",
-          "./BasicTabs": "./src/utilities/BasicTabs.tsx",
           "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
           "./CustomizedSnackbar": "./src/utilities/CustomizedSnackbar.jsx",
           "./PrimaryAppBar": "./src/utilities/PrimaryAppBar.tsx",
@@ -159,10 +161,32 @@ module.exports = function (webpackEnv) {
           },
         },
       }),
-      new HtmlWebPackPlugin({
-        template: "./src/index.html",
-        favicon: './src/assets/images/favicon.png',
-      }),
+      new HtmlWebPackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: "./src/index.html",
+            favicon: './src/assets/images/favicon.png',
+          },
+          // Only for production
+          isEnvProduction ? {
+          minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true
+          }
+        } : undefined
+        )
+      ),
+
       new EnvironmentPlugin(["API_URL", "FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
     ],
   }
