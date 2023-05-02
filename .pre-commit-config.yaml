@@ -9,41 +9,18 @@ repos:
   # Autoformat: Python code
   - repo: https://github.com/psf/black
     rev: 23.1.0
+    files: src/backend/**/*
     hooks:
       - id: black
         args: [--target-version=py39]
 
   # Lint / autoformat: Python code
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    # Ruff version.
+    files: src/backend/**/*
     rev: "v0.0.248"
     hooks:
       - id: ruff
-        args:
-          [
-            --select,
-            "I",
-            --select,
-            "E",
-            --select,
-            "W",
-            --select,
-            "D",
-            --select,
-            "B",
-            --select,
-            "F",
-            --select,
-            "N",
-            --select,
-            "Q",
-            --fix,
-            --exit-non-zero-on-fix,
-            --target-version,
-            py39,
-            --ignore,
-            "N805",
-          ]
+        args: [--fix, --exit-non-zero-on-fix]
 
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pre-commit/mirrors-prettier
