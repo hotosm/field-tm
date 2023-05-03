@@ -20,6 +20,7 @@
 import io
 import json
 import os
+import uuid
 from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
@@ -1162,3 +1163,52 @@ def get_project_features(db: Session,
                          project_id: int):
     features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
+
+
+async def get_background_task_status(
+        task_id:uuid.UUID,
+        db: Session
+        ):
+    """
+    Get the status of a background task.
+    """
+    task = db.query(db_models.BackgroundTasks).filter(db_models.BackgroundTasks.id == str(task_id)).first()
+    return task.status
+
+
+async def insert_background_task_into_database(db: Session,
+                                    task_id: uuid.UUID, 
+                                    name: str = None):
+    """
+        Inserts a new task into the database
+        Params:
+            db: database session
+            task_id: uuid of the task
+            name: name of the task
+    """
+
+    task = db_models.BackgroundTasks(id=str(task_id),
+                                     name = name,
+                                    status=1) # 1 = running
+
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+
+    return True
+
+
+def update_background_task_status_in_database(db: Session,
+                                            task_id: uuid.UUID, 
+                                            status: int):
+        """
+            Updates the status of a task in the database
+            Params:
+                db: database session
+                task_id: uuid of the task
+                status: status of the task
+        """
+        db.query(db_models.BackgroundTasks).filter(db_models.BackgroundTasks.id == str(task_id)).update({db_models.BackgroundTasks.status: status})
+        db.commit()
+    
+        return True
