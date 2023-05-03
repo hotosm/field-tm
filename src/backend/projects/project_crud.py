@@ -848,7 +848,7 @@ def generate_appuser_files(
         update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
 
     except Exception as e:
-        logger.Error(str(e))
+        logger.warning(str(e))
 
         # Update background task status to FAILED
         update_background_task_status_in_database(db, background_task_id, 3) # 2 is FAILED
