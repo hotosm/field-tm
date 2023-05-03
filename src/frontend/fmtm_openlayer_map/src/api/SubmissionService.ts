@@ -24,3 +24,25 @@ export const ProjectSubmissionService: Function = (url: string) => {
     }
 
 }
+export const ProjectBuildingGeojsonService: Function = (url: string) => {
+
+    return async (dispatch) => {
+        dispatch(ProjectActions.GetProjectBuildingGeojsonLoading(true))
+
+        const fetchProjectBuildingGeojson = async (url:string) => {
+
+            try {
+                const fetchBuildingGeojsonData = await CoreModules.axios.get(url)
+                const resp: any = fetchBuildingGeojsonData.data;
+                dispatch(ProjectActions.SetProjectBuildingGeojson(resp))
+                dispatch(ProjectActions.GetProjectBuildingGeojsonLoading(false))
+            } catch (error) {
+                dispatch(ProjectActions.GetProjectBuildingGeojsonLoading(false))
+            }
+        }
+
+        await fetchProjectBuildingGeojson(url);
+
+    }
+
+}

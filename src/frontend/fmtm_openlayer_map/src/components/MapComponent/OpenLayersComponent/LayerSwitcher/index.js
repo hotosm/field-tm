@@ -136,7 +136,7 @@ const watercolor = new LayerTile({
   }),
 });
 
-const LayerSwitcherControl = ({ map, visible = 'mapbox' }) => {
+const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
   useEffect(() => {
     if (!map) return;
 

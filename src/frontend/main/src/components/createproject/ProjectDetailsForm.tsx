@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import windowDimention from "../../hooks/WindowDimension";
 import CoreModules from "../../shared/CoreModules";
+import AssetModules from "../../shared/AssetModules";
 import { useNavigate } from 'react-router-dom';
 import useForm from "../../hooks/useForm";
 import CreateProjectValidation from "./validation/CreateProjectValidation";
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-// import { SelectPicker } from 'rsuite';
 import { OrganisationService } from "../../api/CreateProjectService";
 import environment from "../../environment";
-import { InputLabel, MenuItem, Select } from "@mui/material";
+import { MenuItem, Select } from "@mui/material";
+import CustomizedModal from "../../utilities/CustomizedModal";
+import OrganizationAddForm from "../organization/OrganizationAddForm";
 
 
 const ProjectDetailsForm: React.FC = () => {
+
+    const [openOrganizationModal, setOpenOrganizationModal] = useState(false)
+
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     // // const state:any = useSelector<any>(state=>state.project.projectData)
     // // console.log('state main :',state)
@@ -29,24 +34,23 @@ const ProjectDetailsForm: React.FC = () => {
     const organizationListData: any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
     // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-    const projectDetailsResponse: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetailsResponse);
-    // //we use use selector from redux to get all state of projectDetailsResponse from createProject slice
 
     useEffect(() => {
         dispatch(OrganisationService(`${environment.baseApiUrl}/projects/organization/`))
     }, [])
 
-    useEffect(() => {
-        if (projectDetailsResponse !== null) {
-            navigate('/select-form');
-        }
+    // useEffect(() => {
+    //     if (createProjectStep === 'select-form') {
+    //         navigate('/select-form');
+    //     }
 
-    }, [projectDetailsResponse])
+    // }, [projectDetails])
 
     const submission = () => {
         // eslint-disable-next-line no-use-before-define
         // submitForm();
         dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
+        dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
         navigate("/select-form", { replace: true, state: { values: values } });
 
 
@@ -72,6 +76,7 @@ const ProjectDetailsForm: React.FC = () => {
     );
     return (
         <CoreModules.Stack sx={{ width: '50%' }}>
+
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
                     {/* Organization Dropdown For Create Project */}
@@ -79,26 +84,45 @@ const ProjectDetailsForm: React.FC = () => {
                     <CoreModules.FormControl sx={{ mb: 0, width: '30%', }} variant="filled">
                         <CoreModules.Box sx={{
                             display: 'flex', flexDirection: 'row', pt: 0,
-                        }}><CoreModules.FormLabel component="h3" sx={{
-                            '&.Mui-focused': {
-                                color: 'black',
-                            },
-                        }}>Organization</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                        }}>
+                            <CoreModules.FormLabel component="h3" sx={{
+                                '&.Mui-focused': {
+                                    color: 'black',
+                                },
+                            }}>Organization</CoreModules.FormLabel>
+                            {/* </CoreModules.IconButton> */}
+                            <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                         {/* <InputLabel id="demo-simple-select-label">Organization</InputLabel> */}
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={values.organization}
-                            label="Organization"
-                            onChange={(e) => {
-                                handleCustomChange('organization', e.target.value);
-                                dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }))
-                            }}
-                        >
-                            {organizationList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
-                        </Select>
+                        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <Select
+                                sx={{ width: '100%' }}
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={values.organization || ''}
+                                label="Organization"
+                                onChange={(e) => {
+                                    handleCustomChange('organization', e.target.value);
+                                    dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }))
+                                }}
+                            >
+                                {organizationList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
+                            </Select>
+                            {/* <CoreModules.IconButton
+                                sx={{ width: 'auto' }}
+                                onClick={() => setOpenOrganizationModal(true)}
+                                // disabled={qrcode == "" ? true : false}
+                                color="info"
+                                aria-label="download qrcode"
+                            >
+                                <AssetModules.AddIcon
+                                    sx={{ fontSize: 25, border: '1px solid', borderRadius: '20px', backgroundColor: defaultTheme.palette.success.main, color: 'white', }}
+                                />
+                            </CoreModules.IconButton> */}
+
+                        </CoreModules.Stack>
                         {errors.organization && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.organization}</CoreModules.FormLabel>}
                     </CoreModules.FormControl>
+
                     {/* END */}
 
                     {/* Project Name Form Input For Create Project */}
@@ -234,7 +258,10 @@ const ProjectDetailsForm: React.FC = () => {
                     </CoreModules.Box>
                 </CoreModules.FormGroup>
             </form>
-        </CoreModules.Stack>
+            <CustomizedModal isOpen={openOrganizationModal} toggleOpen={setOpenOrganizationModal}>
+                <OrganizationAddForm />
+            </CustomizedModal>
+        </CoreModules.Stack >
     )
 };
 export default ProjectDetailsForm;
