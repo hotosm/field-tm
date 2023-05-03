@@ -17,6 +17,8 @@
 #
 
 import json
+import uuid
+
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
@@ -328,11 +330,20 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
-    # await project_crud.generate_appuser_files(db, project_id, upload)
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload)
+
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
+
+    # insert task and task ID into database
+    await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
+
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload, background_task_id)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {
+            "Message": f"{project_id}",
+            "task_id": f"{background_task_id}"
+            }
 
 
 @router.get("/organization/")
