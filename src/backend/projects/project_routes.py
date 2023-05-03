@@ -408,3 +408,37 @@ def get_project_features(
     """
     features = project_crud.get_project_features(db, project_id)
     return features
+
+
+@router.get("/generate-log/")
+async def generate_log(
+    project_id : int,
+    uuid:uuid.UUID,
+    db: Session = Depends(database.get_db)
+):
+    """
+    Get the contents of a log file in a log format.
+
+    ### Response
+    - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
+
+    - **500 Internal Server Error**: Returns an error message if the log file cannot be generated.
+
+    ### Return format
+    Task Status and Logs are returned in a JSON format.
+    """
+    try:
+        # Get the backgrund task status
+        task_status = await project_crud.get_background_task_status(uuid, db)
+
+        with open(f"{project_id}_generate.log", "r") as f:
+            lines = f.readlines()
+            last_100_lines = lines[-50:]
+            logs = ''.join(last_100_lines)
+            return {
+                'status':task_status.name,
+                'logs':logs
+            }
+    except Exception as e:
+        logger.error(e)
+        return "Error in generating log file"
