@@ -17,6 +17,8 @@
 #
 
 import json
+import uuid
+
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
@@ -328,11 +330,20 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
-    # await project_crud.generate_appuser_files(db, project_id, upload)
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload)
+
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
+
+    # insert task and task ID into database
+    await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
+
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload, background_task_id)
 
     # FIXME: fix return value
-    return {"Message": f"{project_id}"}
+    return {
+            "Message": f"{project_id}",
+            "task_id": f"{background_task_id}"
+            }
 
 
 @router.get("/organization/")
@@ -397,3 +408,37 @@ def get_project_features(
     """
     features = project_crud.get_project_features(db, project_id)
     return features
+
+
+@router.get("/generate-log/")
+async def generate_log(
+    project_id : int,
+    uuid:uuid.UUID,
+    db: Session = Depends(database.get_db)
+):
+    """
+    Get the contents of a log file in a log format.
+
+    ### Response
+    - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
+
+    - **500 Internal Server Error**: Returns an error message if the log file cannot be generated.
+
+    ### Return format
+    Task Status and Logs are returned in a JSON format.
+    """
+    try:
+        # Get the backgrund task status
+        task_status = await project_crud.get_background_task_status(uuid, db)
+
+        with open(f"{project_id}_generate.log", "r") as f:
+            lines = f.readlines()
+            last_100_lines = lines[-50:]
+            logs = ''.join(last_100_lines)
+            return {
+                'status':task_status.name,
+                'logs':logs
+            }
+    except Exception as e:
+        logger.error(e)
+        return "Error in generating log file"

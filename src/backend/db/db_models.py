@@ -53,6 +53,7 @@ from ..models.enums import (
     TeamVisibility,
     UserRole,
     ValidationPermission,
+    BackgroundTaskStatus,
 )
 from .database import Base, FmtmMetadata
 from .postgis_utils import timestamp
@@ -570,3 +571,11 @@ class DbFeatures(Base):
         Index("idx_features_composite", "task_id", "project_id"),
         {},
     )
+
+
+class BackgroundTasks(Base):
+    __tablename__ = "background_tasks"
+
+    id = Column(String, primary_key=True)
+    name = Column(String)
+    status = Column(Enum(BackgroundTaskStatus), nullable=False)
