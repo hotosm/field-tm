@@ -79,6 +79,15 @@ const Home = () => {
         ),
         state.projectTaskBoundries
       );
+    }else{
+      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
