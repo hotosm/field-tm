@@ -27,7 +27,7 @@ export const SignUpService: Function = (url: string, body:SingUpModel) => {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: 'Error in creating user.',
+                        message: error?.response?.data?.detail ||'Error in creating user.',
                         variant: "error",
                         duration: 2000,
                     })

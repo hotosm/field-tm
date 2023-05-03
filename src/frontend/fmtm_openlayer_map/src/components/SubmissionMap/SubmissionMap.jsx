@@ -1,11 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import useOLMap from '../../hooks/useOlMap';
 import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
-import { fromLonLat } from 'ol/proj';
 import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js'
-import CoreModules from 'fmtm/CoreModules';
 import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
-import { getStyles } from '../../components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
 function elastic(t) {
     return (
@@ -16,8 +13,9 @@ const basicGeojsonTemplate = {
     "type": "FeatureCollection",
     "features": []
 };
-const SubmissionMap = () => {
-    const projectState = CoreModules.useSelector((state) => state.project);
+const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
+    // const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
+    // const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
 
     const { mapRef, map } = useOLMap({
         // center: fromLonLat([85.3, 27.7]),
@@ -28,16 +26,13 @@ const SubmissionMap = () => {
 
     const taskGeojsonFeatureCollection = {
         ...basicGeojsonTemplate,
-        features: [{ ...projectState?.projectTaskBoundries[projectState?.projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson, id: projectState?.projectTaskBoundries[projectState?.projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson?.properties.uid }]
+        features: [{ ...projectTaskBoundries[projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson, id: projectTaskBoundries[projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson?.properties.uid }]
 
     };
     const buildingGeojsonFeatureCollection = {
         ...basicGeojsonTemplate,
-        features: projectState?.projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
+        features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
 
-        // features: projectState?.projectTaskBoundries?.map((task) => {
-        //     return { ...task.taskBoundries?.[0]?.outline_geojson, id: task.taskBoundries?.[0]?.outline_geojson?.properties.uid }
-        // })
     };
 
     return (

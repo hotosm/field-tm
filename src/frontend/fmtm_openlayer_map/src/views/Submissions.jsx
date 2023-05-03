@@ -12,18 +12,20 @@ import { ProjectBuildingGeojsonService, ProjectSubmissionService } from "../api/
 const Submissions = () => {
     const dispatch = CoreModules.useDispatch();
 
-    const projectState = CoreModules.useSelector((state) => state.project);
-
+    const projectSubmissionState = CoreModules.useSelector((state) => state.project.projectSubmission);
+    const projectState = CoreModules.useSelector((state) => state.project.project);
+    const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
+    const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
     const params = CoreModules.useParams();
     const encodedId = params.id;
 
     // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
         dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${environment.decode(encodedId)}`))
-        // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+        dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
-
+    console.log('test1')
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
@@ -55,7 +57,7 @@ const Submissions = () => {
                         {/* END */}
                     </CoreModules.Stack>
                     <CoreModules.Box component="h4" sx={{ background: '#e1e1e1', mt: 5, height: '90%', p: 5, display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'scroll' }}>
-                        {projectState?.projectSubmission?.map((submission) => {
+                        {projectSubmissionState?.map((submission) => {
                             const date = new Date(submission.createdAt);
 
                             const dateOptions = {
@@ -94,7 +96,7 @@ const Submissions = () => {
                     </CoreModules.Box>
                 </CoreModules.Stack>
                 <CoreModules.Box sx={{ width: '100%', ml: 6, border: '1px solid green' }}>
-                    <SubmissionMap />
+                    {projectTaskBoundries && projectBuildingGeojson && <SubmissionMap projectBuildingGeojson={projectBuildingGeojson} projectTaskBoundries={projectTaskBoundries} />}
                 </CoreModules.Box>
             </CoreModules.Stack >
 

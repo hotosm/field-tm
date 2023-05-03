@@ -231,7 +231,6 @@ const Home = () => {
   }, [map, y]);
 
   TasksLayer(map, mainView, featuresLayer);
-
   return (
     <CoreModules.Stack spacing={2}>
       {/* Home snackbar */}
