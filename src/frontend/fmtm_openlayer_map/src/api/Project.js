@@ -19,7 +19,7 @@ export const ProjectById = (url, existingProjectList) => {
           };
         });
 
-        console.log("loading :", persistingValues);
+        // console.log("loading :", persistingValues);
         dispatch(
           ProjectActions.SetProjectTaskBoundries([
             { id: resp.id, taskBoundries: persistingValues },

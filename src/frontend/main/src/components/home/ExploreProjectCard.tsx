@@ -6,6 +6,7 @@ import { HomeActions } from '../../store/slices/HomeSlice';
 import { HomeProjectCardModel } from '../../models/home/homeModel';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
+import { ProjectActions } from '../../store/slices/ProjectSlice';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
@@ -58,6 +59,7 @@ export default function ExploreProjectCard({ data }) {
     return (
         <CoreModules.Card onClick={() => {
             const project: HomeProjectCardModel = data;
+            // dispatch(ProjectActions.SetProjectTaskBoundries([]))
             dispatch(HomeActions.SetSelectedProject(project))
             navigate(`/project_details/${environment.encode(data.id)}`)
         }}

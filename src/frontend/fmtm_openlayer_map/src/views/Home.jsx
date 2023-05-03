@@ -67,6 +67,11 @@ const Home = () => {
 
   //Fetch project for the first time
   useEffect(() => {
+    if (
+      state.projectTaskBoundries.findIndex(
+        (project) => project.id == environment.decode(encodedId)
+      ) == -1
+    ) {
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
@@ -74,7 +79,23 @@ const Home = () => {
         ),
         state.projectTaskBoundries
       );
-
+    }else{
+      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
+    }
+    if (Object.keys(state.projectInfo).length == 0) {
+      dispatch(ProjectActions.SetProjectInfo(projectInfo));
+    } else {
+      if (state.projectInfo.id != environment.decode(encodedId)) {
+        dispatch(ProjectActions.SetProjectInfo(projectInfo));
+      }
+    }
   }, [params.id]);
 
   useEffect(() => {
@@ -99,7 +120,7 @@ const Home = () => {
       }
     }
     // Bind the event listener for outside click and trigger handleClickOutside
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     closer.style.textDecoration = "none";
     closer.style.color = defaultTheme.palette.info["main"];
@@ -159,12 +180,12 @@ const Home = () => {
     setView(view);
     setFeaturesLayer(initalFeaturesLayer);
 
-    return ()=>{
-       /**
-     * Removed handleClickOutside Eventlistener on unmount
-     */
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
+    return () => {
+      /**
+       * Removed handleClickOutside Eventlistener on unmount
+       */
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -277,17 +298,29 @@ const Home = () => {
           state={state}
           type={type}
         />
-              <CoreModules.Stack direction={"column"} spacing={1} justifyContent="flex-end" >
-                <CoreModules.Link to={`/submissions/${encodedId}`} style={{display:'flex',justifyContent:'flex-end',textDecoration:'none',marginRight:'15px'}}>
-                  <CoreModules.Button
-                      variant="contained"
-                      color="error"
-                      sx={{"width":"10%"}}
-                  >
-                    Go To Submission        
-                  </CoreModules.Button>
-                </CoreModules.Link>
-              </CoreModules.Stack>
+        <CoreModules.Stack
+          direction={"column"}
+          spacing={1}
+          justifyContent="flex-end"
+        >
+          <CoreModules.Link
+            to={`/submissions/${encodedId}`}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              textDecoration: "none",
+              marginRight: "15px",
+            }}
+          >
+            <CoreModules.Button
+              variant="contained"
+              color="error"
+              sx={{ width: "10%" }}
+            >
+              Go To Submission
+            </CoreModules.Button>
+          </CoreModules.Link>
+        </CoreModules.Stack>
         <OpenLayersMap
           defaultTheme={defaultTheme}
           stateDialog={stateDialog}
