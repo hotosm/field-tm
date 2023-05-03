@@ -9,7 +9,8 @@ const CommonSlice = CoreModules.createSlice({
             variant: 'info',
             duration: 0
         },
-        loading:false
+        loading:false,
+        postOrganizationLoading:false
     },
     reducers: {
         SetSnackBar(state, action) {
@@ -17,6 +18,9 @@ const CommonSlice = CoreModules.createSlice({
         },
         SetLoading(state,action){
             state.loading = action.payload
+        },
+        PostOrganizationLoading(state,action){
+            state.organization = action.payload
         }
     }
 })

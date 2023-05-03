@@ -14,6 +14,9 @@ const CreateProject = CoreModules.createSlice({
         organizationList:[],
         organizationListLoading:false,
         generateQrSuccess:null,
+        generateProjectLogLoading:false,
+        generateProjectLog:null,
+        createProjectStep:1,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -26,7 +29,7 @@ const CreateProject = CoreModules.createSlice({
             state.projectDetailsResponse = action.payload
         },
         ClearCreateProjectFormData(state) {
-            state.projectDetailsResponse = null
+            // state.projectDetailsResponse = null
             state.projectDetails = {}
             state.projectArea = null
         },
@@ -59,7 +62,16 @@ const CreateProject = CoreModules.createSlice({
         },
         GenerateProjectQRSuccess(state,action){
             state.generateQrSuccess= action.payload
-        }
+        },
+        GenerateProjectLogLoading(state,action){
+            state.generateProjectLogLoading= action.payload
+        },
+        SetGenerateProjectLog(state,action){
+            state.generateProjectLog= action.payload
+        },
+        SetCreateProjectFormStep(state,action){
+            state.createProjectStep= action.payload
+        },
     }
 })
 
