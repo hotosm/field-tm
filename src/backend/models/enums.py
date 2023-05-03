@@ -207,3 +207,12 @@ class ProjectSplitStrategy(IntEnum, Enum):
     GRID = 0
     OSM_VECTORS = 1
     OTHER = 2
+
+
+class BackgroundTaskStatus(IntEnum, Enum):
+    """Enum describing fast api background Task Statuses."""
+
+    PENDING = 1
+    FAILED = 2
+    RECEIVED = 3
+    SUCCESS = 4
