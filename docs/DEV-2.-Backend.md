@@ -16,24 +16,19 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 2. From the command line: navigate to the top level directory of the FMTM project.
 3. From the command line run: `docker-compose pull`.
    This will pull the latest container builds from **main** branch.
-4. Once everything is pulled, from the command line run: `docker compose up -d api`
-5. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
+4. Make sure you have a .env file with all required variables, see [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md).
+5. Once everything is pulled, from the command line run: `docker compose up -d api`
+6. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
 > Note: If that link doesn't work, check the logs with `docker log fmtm_api`.
 
-> Note: If the link doesn't work, check the logs with `docker logs fmtm_api`.
+> Note: the database host `fmtm-db` is automatically resolved by docker compose to the database container IP.
 
-FMTM uses ODK Central to store ODK data. By default, the Docker setup
-includes a Central server. To add an admin user, with the user (email)
-and password you included in .env, run the following command:
+- FMTM uses ODK Central to store ODK data.
+- To facilitate faster development, the Docker setup includes a Central server.
+- The credentials are provided via the `.env` file.
 
-    docker compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-create
-
-Then, run the following command to add the user:
-
-    docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promote
-
-> Note: Alternatively, you may use an external Central server and user.
+> Note: Alternatively, you may use an external Central server and user in the `.env`.
 
 ### 1C: Import Test Data
 
@@ -43,27 +38,32 @@ Some test data is available to get started quickly.
    <http://127.0.0.1:8000/docs#/debug/import_test_data_debug_import_test_data_get>
 2. Click `Try it out`, then `execute`.
 
-## 2. Start the API locally (OUTDATED)
+## 2. Start the API without Docker
 
-To run FMTM locally, you will need to start the database, the api, and the frontend separately, one by one. It is important to do this in the proper order.
+To run FMTM without Docker, you will need to start the database, then the API.
 
 ### 2A: Starting the Database
 
 #### Option 1: Run the Database (only) in Docker
 
-Running the database in Docker means postgres/postgis does not need to be installed and ran on your local machine, and you can use the same database no matter your method of deployment.
+Running the database in Docker means postgres does not need to be installed on your local machine.
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
-2. From the command line, navigate into the top level directory of the FMTM project.
-3. From the command line, start up database with `docker-compose -f docker-compose.local.yml up --build`
+2. Start an instance of Postgres (with Postgis):
 
-The `docker-compose.local.yml` file only includes the database container (`db`), so only the database runs on docker.
+```bash
+docker run -d --name fmtm_db -e POSTGRES_PASSWORD=xxxx -p 5432:5432 postgis/postgis:15-3.3
+```
+
+The database should be accessible at localhost:5432.
+
+> Note: if port 5432 is already taken, then change the `-p ANY_PORT:5432` declaration.
 
 #### Option 2: Run the database locally
 
-For advanced users, it is also possible to run a postgresql/postgis database locally, however you will need to set it up yourself, and may need to modify the `LOCAL_DEV_URL` environmental variable found in your `.env` file.
+For advanced users, it is also possible to run a postgresql/postgis database locally, however you will need to set it up yourself and make it accessible on a port.
 
-### 2B. Starting the API (not in docker)
+### 2B. Starting the API
 
 After starting the database, from the command line:
 
@@ -73,6 +73,14 @@ After starting the database, from the command line:
 4. Run the Fast API backend with: `pdm run uvicorn app.main:api --host 0.0.0.0 --port 8000`
 
 The API should now be accessible at: <http://127.0.0.1:8000/docs>
+
+## 3. Hybrid Docker/Local
+
+- It is not recommended to run FMTM in a container while using a local database on your machine.
+- It is possible, but complicates the docker networking slightly.
+- The FMTM container cannot see the local machine's `localhost`, so we need a workaround.
+- **Option 1**: add `network_mode: "host"` under the `api:` service in the **docker-compose.yml** file.
+- **Option 2**: use the direct container IP address for the database for **FMTM_DB_HOST**, found via `docker inspect fmtm_db`.
 
 ## Backend Tips
 
