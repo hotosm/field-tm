@@ -58,6 +58,8 @@ export default function ExploreProjectCard({ data }) {
     return (
         <CoreModules.Card onClick={() => {
             const project: HomeProjectCardModel = data;
+            console.log('project inf :',project);
+            
             dispatch(HomeActions.SetSelectedProject(project))
             navigate(`/project_details/${environment.encode(data.id)}`)
         }}
