@@ -6,7 +6,7 @@ import CoreModules from 'fmtm/CoreModules';
 import Avatar from '../assets/images/avatar.png'
 import SubmissionMap from "../components/SubmissionMap/SubmissionMap";
 import environment from "fmtm/environment";
-import { ProjectSubmissionService } from "../api/SubmissionService";
+import { ProjectBuildingGeojsonService, ProjectSubmissionService } from "../api/SubmissionService";
 
 // import { useDispatch } from 'react-redux';
 const Submissions = () => {
@@ -20,6 +20,7 @@ const Submissions = () => {
     // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
         dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${environment.decode(encodedId)}`))
+        // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
 

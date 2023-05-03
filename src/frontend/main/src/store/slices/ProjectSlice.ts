@@ -10,7 +10,9 @@ const ProjectSlice = createSlice({
         newProjectTrigger: false,
         projectInfo: {},
         projectSubmissionLoading:false,
-        projectSubmission:[]
+        projectSubmission:[],
+        projectBuildingGeojsonLoading:false,
+        projectBuildingGeojson:[]
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
@@ -34,6 +36,12 @@ const ProjectSlice = createSlice({
         },
         SetProjectSubmission(state,action) {
             state.projectSubmission = action.payload
+        },
+        GetProjectBuildingGeojsonLoading(state,action) {
+            state.projectSubmissionLoading = action.payload
+        },
+        SetProjectBuildingGeojson(state,action) {
+            state.projectBuildingGeojson = action.payload
         },
     }
 })

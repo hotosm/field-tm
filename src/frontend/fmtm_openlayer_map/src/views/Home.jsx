@@ -21,17 +21,25 @@ import View from "ol/View";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
+import { ProjectBuildingGeojsonService } from "../api/SubmissionService";
+import GeoJSON from 'ol/format/GeoJSON';
+import { get } from 'ol/proj';
 
 import Overlay from "ol/Overlay";
+import { defaultStyles, getStyles } from "../components/MapComponent/OpenLayersComponent/helpers/styleUtils";
 // import XYZ from "ol/source/XYZ.js";
 // import { toLonLat } from "ol/proj";
 // import { toStringHDMS } from "ol/coordinate";
-
+const basicGeojsonTemplate = {
+  "type": "FeatureCollection",
+  "features": []
+};
 const Home = () => {
   const dispatch = CoreModules.useDispatch();
   const params = CoreModules.useParams();
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useSelector((state) => state.project);
+  const projectState = CoreModules.useSelector((state) => state.project);
 
   const projectInfo = CoreModules.useSelector(
     (state) => state.home.selectedProject
@@ -73,10 +81,36 @@ const Home = () => {
           state.projectTaskBoundries
         ),
         state.projectTaskBoundries
-      );
+      );        
+      dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+
 
   }, [params.id]);
 
+  //Added Building Geojson on Project Details Page
+  useEffect(() => {
+    if(!map) return
+    
+    const buildingGeojsonFeatureCollection = {
+      ...basicGeojsonTemplate,
+      features: projectState?.projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
+
+      // features: projectState?.projectTaskBoundries?.map((task) => {
+      //     return { ...task.taskBoundries?.[0]?.outline_geojson, id: task.taskBoundries?.[0]?.outline_geojson?.properties.uid }
+      // })
+    };
+    const buildingFeaturesLayer = new VectorLayer({
+      source: new VectorSource({
+        features: new GeoJSON().readFeatures(buildingGeojsonFeatureCollection, {
+          featureProjection: get('EPSG:4326'),
+        }),
+      }),
+      // style:(styles,feature,resolution)=> getStyles({ styles:defaultStyles, feature, resolution })
+    });
+    map.addLayer(buildingFeaturesLayer);
+
+  }, [map,projectState?.projectBuildingGeojson])
+  
   useEffect(() => {
     const container = document.getElementById("popup");
     const closer = document.getElementById("popup-closer");
@@ -112,6 +146,7 @@ const Home = () => {
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource(),
     });
+    
 
     const view = new View({
       projection: "EPSG:4326",
@@ -130,7 +165,7 @@ const Home = () => {
           source: new OSM(),
           visible: true,
         }),
-        initalFeaturesLayer,
+        initalFeaturesLayer
       ],
       overlays: [overlay],
       view: view,

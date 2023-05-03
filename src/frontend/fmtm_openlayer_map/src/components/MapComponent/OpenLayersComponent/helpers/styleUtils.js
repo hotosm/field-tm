@@ -29,7 +29,7 @@ export const defaultStyles = {
   fillColor: '#1a2fa2',
   fillOpacity: 50,
   lineThickness: 1,
-  circleRadius: 5,
+  circleRadius: 3,
   dashline: 0,
   showLabel: false,
   customLabelText: null,
