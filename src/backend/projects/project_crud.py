@@ -386,6 +386,12 @@ def update_project_boundary(
     boundary: str,
     dimension : int
 ):
+    # verify project exists in db
+    db_project = get_project_by_id(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
     remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
 
@@ -395,6 +401,13 @@ def update_project_boundary(
         features = [boundary]
     elif boundary['type'] == 'FeatureCollection':
         features = boundary['features']
+    else:
+        # Delete the created Project
+        db.delete(db_project)
+        db.commit()
+
+        # Raise an exception
+        raise HTTPException(status_code=400, detail=f"Invalid GeoJSON type: {boundary['type']}")
 
 
     """ Apply the lambda function to each coordinate in its geometry """
@@ -407,12 +420,6 @@ def update_project_boundary(
     # If the outline is a multipolygon, use the first polygon
     if isinstance(outline, MultiPolygon):
         outline = outline.geoms[0]
-
-    # verify project exists in db
-    db_project = get_project_by_id(db, project_id)
-    if not db_project:
-        logger.error(f"Project {project_id} doesn't exist!")
-        return False
 
     db_project.outline = outline.wkt
     db_project.centroid = outline.centroid.wkt
