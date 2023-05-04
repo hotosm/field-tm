@@ -131,8 +131,10 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
             try {
                 const generateApiFormData = new FormData();
                 if(payload.form_ways === 'Upload a Custom Form'){
+                    generateApiFormData.append('extractPolygon',payload.data_extractWays);
                     generateApiFormData.append('upload',payload.uploaded_form[0]);
                 }else{
+                    generateApiFormData.append('extractPolygon',payload.data_extractWays);
                     generateApiFormData.append('upload','');
 
                 }
