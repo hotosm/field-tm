@@ -21,7 +21,7 @@ import uuid
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Form, BackgroundTasks
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -306,7 +306,7 @@ async def download_task_boundaries(
 async def generate_files(
     background_tasks: BackgroundTasks,
     project_id: int,
-    extractPolygon: bool = False,
+    extractPolygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
