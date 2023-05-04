@@ -18,14 +18,13 @@ const Submissions = () => {
     const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
     const params = CoreModules.useParams();
     const encodedId = params.id;
-
+    const decodedId = environment.decode(encodedId);
     // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
-        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${environment.decode(encodedId)}`))
-        dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${decodedId}`))
+        dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${decodedId}/features`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
-    console.log('test1')
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
@@ -48,12 +47,14 @@ const Submissions = () => {
                         >
                             Convert
                         </CoreModules.Button>
-                        <CoreModules.Button
-                            variant="contained"
-                            color="error"
-                        >
-                            Download CSV
-                        </CoreModules.Button>
+                        <a href={`${environment.baseApiUrl}/submission/download?project_id=${decodedId}`} download>
+                                <CoreModules.Button
+                                    variant="contained"
+                                    color="error"
+                                >
+                                    Download CSV
+                                </CoreModules.Button>
+                        </a>
                         {/* END */}
                     </CoreModules.Stack>
                     <CoreModules.Box component="h4" sx={{ background: '#e1e1e1', mt: 5, height: '90%', p: 5, display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'scroll' }}>
@@ -87,7 +88,7 @@ const Submissions = () => {
                                         mt={'2%'}
                                         ml={'3%'}
                                     >
-                                        Submitted {projectState.project} at {formattedDate}
+                                        Submitted {projectState?.project} at {formattedDate}
                                     </CoreModules.Typography>
                                 </CoreModules.Box>
                             </CoreModules.Box>

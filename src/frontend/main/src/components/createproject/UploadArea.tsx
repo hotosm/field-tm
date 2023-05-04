@@ -7,6 +7,7 @@ import { CreateProjectService, FormCategoryService, GenerateProjectLog } from ".
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
+import { CommonActions } from "../../store/slices/CommonSlice";
 let generateProjectLogIntervalCb = null
 
 const UploadArea: React.FC = () => {
@@ -38,9 +39,11 @@ const UploadArea: React.FC = () => {
 
     const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
     // //we use use-selector from redux to get all state of loginToken from login slice
-    const generateQrLoading: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrLoading);
+    // const generateQrLoading: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrLoading);
     // //we use use-selector from redux to get all state of loginToken from login slice
     const generateProjectLog: any = CoreModules.useSelector<any>((state) => state.createproject.generateProjectLog);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+    const generateQrSuccess: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrSuccess);
     // //we use use-selector from redux to get all state of loginToken from login slice
 
 
@@ -69,15 +72,36 @@ const UploadArea: React.FC = () => {
 
     // Fetching form category list 
     useEffect(() => {
-        if (generateQrLoading) {
+        if (generateQrSuccess) {
+            if (generateProjectLogIntervalCb === null) {
+                dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/projects/generate-log/`, { project_id: projectDetailsResponse?.id, uuid: generateQrSuccess.task_id }));
+            }
+        }
+
+    }, [generateQrSuccess])
+    useEffect(() => {
+        if (generateProjectLog?.status === 'SUCCESS') {
+            clearInterval(generateProjectLogIntervalCb);
+            navigate('/');
+            dispatch(
+                CommonActions.SetSnackBar({
+                    open: true,
+                    message: 'QR Generation Completed.',
+                    variant: "success",
+                    duration: 2000,
+                })
+            );
+        }
+        if (generateQrSuccess && generateProjectLog?.status === 'PENDING') {
             if (generateProjectLogIntervalCb === null) {
                 generateProjectLogIntervalCb = setInterval(() => {
-                    dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/submission/generate-log`, { project_id: projectDetailsResponse?.id }))
+                    dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/projects/generate-log/`, { project_id: projectDetailsResponse?.id, uuid: generateQrSuccess.task_id }))
                 }, 2000)
             }
         }
 
-    }, [generateQrLoading])
+
+    }, [generateQrSuccess, generateProjectLog])
     // END
 
     const algorithmListData = ['Divide on Square', 'Custom Multipolygon', 'Openstreet Map Extract'].map(
@@ -116,7 +140,8 @@ const UploadArea: React.FC = () => {
                 "splitting_algorithm": projectDetails.splitting_algorithm,
                 "organization": values.organization,
                 "form_ways": projectDetails.form_ways,
-                "uploaded_form": values.uploaded_form
+                "uploaded_form": values.uploaded_form,
+                "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
             }, fileUpload
         ));
     }
@@ -230,7 +255,7 @@ const UploadArea: React.FC = () => {
             </form>
             {generateProjectLog ? <CoreModules.Stack sx={{ width: '60%', height: '68vh' }}>
                 <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
-                    {renderTraceback(generateProjectLog)}
+                    {renderTraceback(generateProjectLog?.logs)}
                 </div>
             </CoreModules.Stack> : null}
         </CoreModules.Stack >
