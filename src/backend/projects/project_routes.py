@@ -21,7 +21,7 @@ import uuid
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Form, BackgroundTasks
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -306,6 +306,7 @@ async def download_task_boundaries(
 async def generate_files(
     background_tasks: BackgroundTasks,
     project_id: int,
+    extractPolygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
@@ -322,6 +323,7 @@ async def generate_files(
     Parameters:
 
     project_id (int): The ID of the project for which files are being generated. This is a required field.
+    polygon (bool): A boolean flag indicating whether the polygon is extracted or not.
 
     upload (UploadFile): An uploaded file that is used as input for generating the files. 
         This is not a required field. A file should be provided if user wants to upload a custom xls form.
@@ -337,7 +339,7 @@ async def generate_files(
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
 
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, upload, background_task_id)
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, upload, background_task_id)
 
     # FIXME: fix return value
     return {

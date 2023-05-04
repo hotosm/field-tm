@@ -678,6 +678,7 @@ def get_odk_id_for_project(
 def generate_appuser_files(
     db: Session,
     project_id: int,
+    extractPolygon: bool,
     upload: UploadFile,
     background_task_id: uuid.UUID,
 ):
@@ -698,9 +699,7 @@ def generate_appuser_files(
 
         # add handler to logger
         logger.addHandler(handler)
-        logger.info('my_function was called')
-
-
+        logger.info(f"Starting generate_appuser_files for project {project_id}")
 
         # Get the project table contents.
         project = table(
@@ -791,7 +790,7 @@ def generate_appuser_files(
                 # Generating an osm extract from the underpass database.
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
-                outline_geojson = pg.getFeatures(outline, outfile)
+                outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
