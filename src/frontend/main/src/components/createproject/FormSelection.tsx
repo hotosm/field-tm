@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import windowDimention from "../../hooks/WindowDimension";
 import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
-import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService } from "../../api/CreateProjectService";
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { FormCategoryService } from "../../api/CreateProjectService";
+import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import AssetModules from '../../shared/AssetModules.js';
@@ -15,7 +14,6 @@ import SelectFormValidation from "./validation/SelectFormValidation";
 // import { SelectPicker } from 'rsuite';
 
 const FormSelection: React.FC = () => {
-    const [formFileUpload, setFormFileUpload] = useState(null);
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     const navigate = useNavigate();
 
@@ -41,6 +39,10 @@ const FormSelection: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
+    const selectExtractWaysList = ['Centroid', 'Polygon'];
+    const selectExtractWays = selectExtractWaysList.map(
+        item => ({ label: item, value: item })
+    );
     const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
     const selectFormWays = selectFormWaysList.map(
         item => ({ label: item, value: item })
@@ -64,12 +66,28 @@ const FormSelection: React.FC = () => {
         submission,
         SelectFormValidation,
     );
-    console.log(values, 'values');
-    console.log(errors, 'errors');
     return (
         <CoreModules.Stack sx={{ width: '50%' }}>
             <form onSubmit={handleSubmit}>
                 <FormGroup >
+                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
+                        <InputLabel id="form-category" sx={{
+                            '&.Mui-focused': {
+                                color: defaultTheme.palette.black
+                            }
+                        }} >Data Extract Category</InputLabel>
+                        <Select
+                            labelId="data_extractWays-label"
+                            id="data_extractWays"
+                            value={values.data_extractWays}
+                            label="Data Extract Category"
+                            onChange={(e) => handleCustomChange('data_extractWays', e.target.value)}
+                        >
+                            {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
+                            {selectExtractWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                        </Select>
+                        {errors.data_extractWays && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.data_extractWays}</CoreModules.FormLabel>}
+                    </CoreModules.FormControl>
                     <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
                         <InputLabel id="form-category" sx={{
                             '&.Mui-focused': {
