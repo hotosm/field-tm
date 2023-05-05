@@ -804,7 +804,7 @@ def generate_appuser_files(
                     # Insert the osm extracts into the database.
                     feature_shape = shape(feature['geometry'])
 
-                    if(not shape(outline).contains(shape(feature_shape.centroid))):
+                    if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
                         continue
 
 
