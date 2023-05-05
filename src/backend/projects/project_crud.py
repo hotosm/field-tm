@@ -791,6 +791,11 @@ def generate_appuser_files(
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
+                
+
+                updated_outline_geojson = []
+
+
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -800,7 +805,6 @@ def generate_appuser_files(
                     feature_shape = shape(feature['geometry'])
 
                     if(not shape(outline).contains(shape(feature_shape.centroid))):
-                        print('not contain')
                         continue
 
 
@@ -813,6 +817,7 @@ def generate_appuser_files(
                         geometry=wkb_element,
                         properties=feature["properties"],
                     )
+                    updated_outline_geojson.append(feature)
                     db.add(feature_obj)
                     db.commit()
 
@@ -820,7 +825,7 @@ def generate_appuser_files(
                 # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
                 with open(outfile, "w") as jsonfile:
                     jsonfile.truncate(0)  # clear the contents of the file
-                    dump(outline_geojson, jsonfile)
+                    dump(updated_outline_geojson, jsonfile)
 
                 outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
 
