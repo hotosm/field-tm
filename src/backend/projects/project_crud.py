@@ -798,6 +798,13 @@ def generate_appuser_files(
 
                     # Insert the osm extracts into the database.
                     feature_shape = shape(feature['geometry'])
+
+                    if(not shape(outline).contains(shape(feature_shape.centroid))):
+                        print('not contain')
+                        continue
+
+
+
                     wkb_element = from_shape(feature_shape, srid=4326)
                     feature_obj = db_models.DbFeatures(
                         project_id=project_id,
