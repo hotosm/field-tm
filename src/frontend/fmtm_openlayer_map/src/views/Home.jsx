@@ -194,12 +194,12 @@ const Home = () => {
 
     initialMap.on("click", function (event) {
       initialMap.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-        const status = feature.getId().replace("_", ",").split(",")[1];
+        const status = feature.getId()?.toString()?.replace("_", ",")?.split(",")?.[1];
         if (
           environment.tasksStatus.findIndex((data) => data.label == status) !=
           -1
         ) {
-          setTaskId(feature.getId().split("_")[0]);
+          setTaskId(feature?.getId()?.split("_")?.[0]);
           const coordinate = event.coordinate;
           overlay.setPosition(coordinate);
           setFeaturesLayer(feature);
