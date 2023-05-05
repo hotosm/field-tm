@@ -258,7 +258,7 @@ async def upload_multi_project_boundary(
 async def upload_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
-    dimension : int = 500,
+    dimension : int = Form(500),
     db: Session = Depends(database.get_db),
 ):
     # read entire file
