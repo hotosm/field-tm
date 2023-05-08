@@ -380,7 +380,7 @@ def update_multi_polygon_project_boundary(
         raise HTTPException(e)
 
 
-def preview_tasks(boundary:str, dimension:int):
+async def preview_tasks(boundary:str, dimension:int):
     """
     Preview tasks by returning a list of task objects
     """
