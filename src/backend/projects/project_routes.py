@@ -16,12 +16,14 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import os
 import json
 import uuid
 
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Form, BackgroundTasks
+from osm_fieldwork.make_data_extract import getChoices
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -206,13 +208,19 @@ async def upload_project_boundary_with_zip(
 @router.post("/upload_xlsform")
 async def upload_custom_xls(
     upload: UploadFile = File(...),
-    project_id: int=None,
+    category: str = Form(...),
     db: Session = Depends(database.get_db),
 ):
-    # read entire file
-    content = await upload.read()
-    category = upload.filename.split(".")[0]
-    project_crud.upload_xlsform(db, project_id, content, category)
+    """
+        Upload a custom XLSForm to the database.
+        Parameters:
+        - upload: the XLSForm file
+        - category: the category of the XLSForm
+    """
+
+    content = await upload.read() # read file content
+    name = upload.filename.split(".")[0] # get name of file without extension
+    project_crud.upload_xlsform(db, content,name, category)
 
     # FIXME: fix return value
     return {"xform_title": f"{category}"}
