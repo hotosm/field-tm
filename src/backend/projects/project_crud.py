@@ -444,6 +444,23 @@ async def preview_tasks(boundary:str, dimension:int):
                     grid.append(feature)
 
     collection = geojson.FeatureCollection(grid)
+
+    # If project outline cannot be divided into multiple tasks,
+    #   whole boundary is made into a single task.
+    if len(collection['features']) == 0:
+        boundary = mapping(boundary)
+        out = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                        "type": "Feature",
+                        "geometry": boundary,
+                        "properties": {}
+                    }
+                    ]
+                }
+        return out
+
     return collection
 
 
@@ -748,7 +765,7 @@ def generate_appuser_files(
     extractPolygon: bool,
     upload: UploadFile,
     background_task_id: uuid.UUID,
-):
+    ):
     """
         Generate the files for each appuser, the qrcode, the new XForm,
         and the OSM data extract.
@@ -1023,12 +1040,27 @@ def create_task_grid(db: Session, project_id: int, delta:int):
                         [gx[i], gy[j]],
                     ]
                 )
-                # FIXME: this should clip the features that intersect with the
-                # boundary.
+
                 if boundary.intersection(poly):
                     feature = geojson.Feature(geometry=boundary.intersection(poly), properties={"id": str(id)})
-                    id += 1
-                    grid.append(feature)
+
+                    geom = shape(feature['geometry'])
+                    # Check if the geometry is a MultiPolygon
+                    if geom.geom_type == 'MultiPolygon':
+
+                        # Get the constituent Polygon objects from the MultiPolygon
+                        polygons = geom.geoms
+
+                        for x in range(len(polygons)):
+                            id += 1
+                            # Convert the two polygons to GeoJSON format
+                            feature1 = {'type': 'Feature', 'properties': {"id":str(id)}, 'geometry': mapping(polygons[x])}
+                            grid.append(feature1)
+                    else:
+                        id += 1
+                        grid.append(feature)
+
+
         collection = geojson.FeatureCollection(grid)
         # jsonout = open("tmp.geojson", 'w')
         # out = dump(collection, jsonout)
@@ -1051,10 +1083,10 @@ def create_task_grid(db: Session, project_id: int, delta:int):
                     }
             out = json.dumps(out)
 
+        return out
     except Exception as e:
         logger.error(e)
 
-    return out
 
 
 def get_json_from_zip(zip, filename: str, error_detail: str):
