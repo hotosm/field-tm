@@ -294,17 +294,17 @@ def create_project_with_project_info(
 
 def upload_xlsform(
     db: Session,
-    project_id: int,
     xlsform: str,
     name: str,
+    category: str,
 ):
     try:
         forms = table(
-            "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+            "xlsforms", column("title"), column("xls"), column("xml"), column("id"), column("category")
         )
-        ins = insert(forms).values(title=name, xls=xlsform)
+        ins = insert(forms).values(title=name, xls=xlsform, category=category)
         sql = ins.on_conflict_do_update(
-            constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform)
+            constraint="xlsforms_title_key", set_=dict(title=name, xls=xlsform, category=category)
         )
         db.execute(sql)
         db.commit()
