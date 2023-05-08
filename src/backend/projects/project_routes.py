@@ -480,10 +480,8 @@ async def get_categories():
 
 @router.post("/preview_tasks/")
 async def preview_tasks(
-    project_id: int,
     upload: UploadFile = File(...),
-    dimension : int = Form(500),
-    db: Session = Depends(database.get_db),
+    dimension : int = Form(500)
 ):
     """
     Preview tasks for a project.
@@ -509,9 +507,5 @@ async def preview_tasks(
     content = await upload.read()
     boundary = json.loads(content)
 
-    result = project_crud.preview_tasks(db, project_id, boundary, dimension)
-    if not result:
-        raise HTTPException(
-            status_code=428, detail=f"Project with id {project_id} does not exist"
-        )
+    result = project_crud.preview_tasks(boundary, dimension)
     return result
