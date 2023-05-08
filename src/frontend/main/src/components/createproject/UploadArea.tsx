@@ -8,7 +8,10 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import { CommonActions } from "../../store/slices/CommonSlice";
+import DefineAreaMap from "map/DefineAreaMap";
 let generateProjectLogIntervalCb = null
+// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
+// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 
 const UploadArea: React.FC = () => {
     const [fileUpload, setFileUpload] = useState(null);
@@ -122,28 +125,28 @@ const UploadArea: React.FC = () => {
     // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
     const onCreateProjectSubmission = () => {
         const { values } = location.state;
-        dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
-            {
-                "project_info": { ...values },
-                "author": {
-                    "username": userDetails.username,
-                    "id": userDetails.id
-                },
-                "odk_central": {
-                    "odk_central_url": values.odk_central_url,
-                    "odk_central_user": values.odk_central_user,
-                    "odk_central_password": values.odk_central_password
-                },
-                // dont send xform_title if upload custom form is selected 
-                "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
-                "dimension": projectDetails.dimension,
-                "splitting_algorithm": projectDetails.splitting_algorithm,
-                "organization": values.organization,
-                "form_ways": projectDetails.form_ways,
-                "uploaded_form": values.uploaded_form,
-                "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
-            }, fileUpload
-        ));
+        // dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
+        //     {
+        //         "project_info": { ...values },
+        //         "author": {
+        //             "username": userDetails.username,
+        //             "id": userDetails.id
+        //         },
+        //         "odk_central": {
+        //             "odk_central_url": values.odk_central_url,
+        //             "odk_central_user": values.odk_central_user,
+        //             "odk_central_password": values.odk_central_password
+        //         },
+        //         // dont send xform_title if upload custom form is selected 
+        //         "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
+        //         "dimension": projectDetails.dimension,
+        //         "splitting_algorithm": projectDetails.splitting_algorithm,
+        //         "organization": values.organization,
+        //         "form_ways": projectDetails.form_ways,
+        //         "uploaded_form": values.uploaded_form,
+        //         "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
+        //     }, fileUpload
+        // ));
     }
     const renderTraceback = (errorText: string) => {
         if (!errorText) {
@@ -218,7 +221,6 @@ const UploadArea: React.FC = () => {
                         {!fileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
                     </FormControl>}
                     {/* END */}
-
                     {/* Submit Button For Create Project on Area Upload */}
                     <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                         {/* Previous Button  */}
@@ -249,6 +251,7 @@ const UploadArea: React.FC = () => {
                         {/* <CustomizedModal isOpen={openTerminal} toggleOpen={setOpenTerminal}>
                             
                         </CustomizedModal> */}
+
                     </CoreModules.Stack>
                     {/* END */}
                 </FormGroup>
@@ -258,6 +261,7 @@ const UploadArea: React.FC = () => {
                     {renderTraceback(generateProjectLog?.logs)}
                 </div>
             </CoreModules.Stack> : null}
+            <DefineAreaMap uploadedGeojson={fileUpload?.[0]} />
         </CoreModules.Stack >
     )
 };

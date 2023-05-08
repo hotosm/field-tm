@@ -52,8 +52,6 @@ const ProjectDetailsForm: React.FC = () => {
         dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
         dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
         navigate("/select-form", { replace: true, state: { values: values } });
-
-
     };
 
     const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
