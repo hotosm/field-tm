@@ -269,6 +269,14 @@ async def upload_project_boundary(
     dimension : int = Form(500),
     db: Session = Depends(database.get_db),
 ):
+    
+    # Validating for .geojson File.
+    file_name = os.path.splitext(upload.filename)
+    file_ext = file_name[1]
+    allowed_extensions = ['.geojson','.json']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+
     # read entire file
     content = await upload.read()
     boundary = json.loads(content)
