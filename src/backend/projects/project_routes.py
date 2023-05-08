@@ -460,3 +460,58 @@ async def generate_log(
     except Exception as e:
         logger.error(e)
         return "Error in generating log file"
+
+
+@router.get("/categories/")
+async def get_categories():
+    """
+    Get api for fetching all the categories.
+
+    This endpoint fetches all the categories from osm_fieldwork.
+
+    ## Response
+    - Returns a JSON object containing a list of categories and their respoective forms.
+
+    """
+    
+    categories = getChoices() # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
+    return categories
+
+
+@router.post("/preview_tasks/")
+async def preview_tasks(
+    project_id: int,
+    upload: UploadFile = File(...),
+    dimension : int = Form(500),
+    db: Session = Depends(database.get_db),
+):
+    """
+    Preview tasks for a project.
+
+    This endpoint allows you to preview tasks for a project.
+
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
+
+    ## Response
+    - Returns a JSON object containing a list of tasks.
+
+    """
+
+    # Validating for .geojson File.
+    file_name = os.path.splitext(upload.filename)
+    file_ext = file_name[1]
+    allowed_extensions = ['.geojson','.json']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+
+    # read entire file
+    content = await upload.read()
+    boundary = json.loads(content)
+
+    result = project_crud.preview_tasks(db, project_id, boundary, dimension)
+    if not result:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+    return result

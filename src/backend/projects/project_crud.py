@@ -380,6 +380,60 @@ def update_multi_polygon_project_boundary(
         raise HTTPException(e)
 
 
+def preview_tasks(db: Session, project_id: int, boundary:str, dimension:int):
+    """
+    Preview tasks by returning a list of task objects
+    """
+
+    """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
+    remove_z_dimension = lambda coord: coord.pop() if len(coord) == 3 else None
+
+    """ Check if the boundary is a Feature or a FeatureCollection """
+    if boundary['type'] == 'Feature':
+        features = [boundary]
+    elif boundary['type'] == 'FeatureCollection':
+        features = boundary['features']
+    else:
+        raise HTTPException(status_code=400, detail=f"Invalid GeoJSON type: {boundary['type']}")
+
+    """ Apply the lambda function to each coordinate in its geometry ro remove the z-dimension - if it exists"""
+    for feature in features:
+        list(map(remove_z_dimension, feature['geometry']['coordinates'][0]))
+
+    boundary = shape(features[0]["geometry"])
+
+    minx, miny, maxx, maxy = boundary.bounds
+
+    # 1 degree = 111139 m
+    value = dimension/111139
+
+    nx = int((maxx - minx) / value)
+    ny = int((maxy - miny) / value)
+    gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+    grid = list()
+
+    id = 0
+    for i in range(len(gx) - 1):
+        for j in range(len(gy) - 1):
+            poly = Polygon(
+                [
+                    [gx[i], gy[j]],
+                    [gx[i], gy[j + 1]],
+                    [gx[i + 1], gy[j + 1]],
+                    [gx[i + 1], gy[j]],
+                    [gx[i], gy[j]],
+                ]
+            )
+
+            if boundary.intersection(poly):
+                feature = geojson.Feature(geometry=boundary.intersection(poly), properties={"id": str(id)})
+                id += 1
+                grid.append(feature)
+
+    collection = geojson.FeatureCollection(grid)
+    return collection
+
+
 def update_project_boundary(
     db: Session,
     project_id: int,
