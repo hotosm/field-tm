@@ -1012,8 +1012,8 @@ def create_task_grid(db: Session, project_id: int, delta:int):
                 )
                 # FIXME: this should clip the features that intersect with the
                 # boundary.
-                if boundary.contains(poly):
-                    feature = geojson.Feature(geometry=poly, properties={"id": str(id)})
+                if boundary.intersection(poly):
+                    feature = geojson.Feature(geometry=boundary.intersection(poly), properties={"id": str(id)})
                     id += 1
                     grid.append(feature)
         collection = geojson.FeatureCollection(grid)
