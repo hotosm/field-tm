@@ -62,7 +62,7 @@ from ..db import db_models
 from ..tasks import tasks_crud
 from ..users import user_crud
 from geoalchemy2.shape import from_shape
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
 
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -428,7 +428,20 @@ def preview_tasks(db: Session, project_id: int, boundary:str, dimension:int):
             if boundary.intersection(poly):
                 feature = geojson.Feature(geometry=boundary.intersection(poly), properties={"id": str(id)})
                 id += 1
-                grid.append(feature)
+
+                geom = shape(feature['geometry'])
+                # Check if the geometry is a MultiPolygon
+                if geom.geom_type == 'MultiPolygon':
+
+                    # Get the constituent Polygon objects from the MultiPolygon
+                    polygons = geom.geoms
+
+                    for x in range(len(polygons)):
+                        # Convert the two polygons to GeoJSON format
+                        feature1 = {'type': 'Feature', 'properties': {}, 'geometry': mapping(polygons[x])}
+                        grid.append(feature1)
+                else:
+                    grid.append(feature)
 
     collection = geojson.FeatureCollection(grid)
     return collection
