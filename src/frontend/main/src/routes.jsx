@@ -86,7 +86,7 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <CreateProject/>
             </Suspense>
           </ProtectedRoute>
         ),
