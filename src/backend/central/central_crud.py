@@ -57,15 +57,20 @@ def list_odk_projects():
 
 def create_odk_project(odk_central:project_schemas.ODKCentral, name: str):
     """Create a project on a remote ODK Server."""
-    odk_project = OdkProject(odk_central.odk_central_url,
-                             odk_central.odk_central_user,
-                             odk_central.odk_central_password
-                             )
-    result = odk_project.createProject(name)
-    logger.debug(f"create_odk_project return from ODKCentral: {result}")
-    project.id = result.get("id")
-    logger.info(f"Project {name} has been created on the ODK Central server.")
-    return result
+    try:
+        odk_project = OdkProject(odk_central.odk_central_url,
+                                odk_central.odk_central_user,
+                                odk_central.odk_central_password
+                                )
+        result = odk_project.createProject(name)
+
+        logger.debug(f"create_odk_project return from ODKCentral: {result}")
+        project.id = result.get("id")
+        logger.info(f"Project {name} has been created on the ODK Central server.")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating project on ODK Central: {e}")
+
 
 def delete_odk_project(project_id: int):
     """Delete a project from a remote ODK Server"""
@@ -175,7 +180,7 @@ def get_form_list(
 def download_submissions(project_id: int, xform_id: str):
     """Download submissions from a remote ODK server."""
     # FIXME: should probably filter by timestamps or status value
-    data = xform.getSubmissions(project_id, xform_id, True)
+    data = xform.getSubmission(project_id, xform_id, True)
     fixed = str(data, "utf-8")
     return fixed.splitlines()
 
