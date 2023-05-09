@@ -3,12 +3,13 @@ import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService, GenerateProjectLog } from "../../api/CreateProjectService";
+import { FormCategoryService, GenerateProjectLog, GetDividedTaskFromGeojson } from "../../api/CreateProjectService";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import { CommonActions } from "../../store/slices/CommonSlice";
 import DefineAreaMap from "map/DefineAreaMap";
+
 let generateProjectLogIntervalCb = null
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
@@ -167,6 +168,10 @@ const UploadArea: React.FC = () => {
         const myDiv = divRef?.current;
         myDiv.scrollTop = myDiv?.scrollHeight;
     });
+    const generateTasksOnMap = () => {
+        dispatch(GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, { geojson: fileUpload?.[0], dimension: projectDetails?.dimension }))
+    }
+
     return (
         <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
             <form>
@@ -187,25 +192,8 @@ const UploadArea: React.FC = () => {
                             {algorithmListData?.map((listData) => <MenuItem value={listData.value}>{listData.label}</MenuItem>)}
                         </Select>
                     </CoreModules.FormControl>
-                    {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3, width: '30%' }}>
-                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension (in metre)</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
-                        <CoreModules.TextField
-                            id="dimension"
-                            label=""
-                            variant="filled"
-                            inputProps={{ sx: { padding: '8.5px 14px' } }}
-                            value={projectDetails.dimension}
-                            onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
-                            // helperText={errors.username}
-                            FormHelperTextProps={inputFormStyles()}
-
-                        />
-                    </CoreModules.FormControl>}
-                    {/* END */}
-
-
                     {/* Form Geojson File Upload For Create Project */}
-                    {['Divide on Square', 'Custom Multipolygon'].includes(projectDetails.splitting_algorithm) && < FormControl sx={{ mb: 3 }}>
+                    {['Divide on Square', 'Custom Multipolygon'].includes(projectDetails.splitting_algorithm) && <FormControl sx={{ mb: 3 }}>
                         <CoreModules.FormLabel>Upload GEOJSON</CoreModules.FormLabel>
                         <CoreModules.Button
                             variant="contained"
@@ -221,6 +209,35 @@ const UploadArea: React.FC = () => {
                         {!fileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
                     </FormControl>}
                     {/* END */}
+                    {projectDetails.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3, width: '100%' }}>
+                        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
+                                <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension (in metre)</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                                <CoreModules.TextField
+                                    id="dimension"
+                                    label=""
+                                    variant="filled"
+                                    inputProps={{ sx: { padding: '8.5px 14px' } }}
+                                    value={projectDetails.dimension}
+                                    onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
+                                    // helperText={errors.username}
+                                    FormHelperTextProps={inputFormStyles()}
+
+                                />
+                            </CoreModules.Stack>
+                            <CoreModules.Button
+                                variant="contained"
+                                color="error"
+                                onClick={generateTasksOnMap}
+                            >
+                                Generate Tasks on Map
+                            </CoreModules.Button>
+                        </CoreModules.Stack>
+                    </CoreModules.FormControl>}
+                    {/* END */}
+
+
+
                     {/* Submit Button For Create Project on Area Upload */}
                     <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                         {/* Previous Button  */}

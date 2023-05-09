@@ -259,4 +259,28 @@ const GenerateProjectLog: Function = (url: string,params:any) => {
     }
 
 }
-export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService,UploadCustomXLSFormService,GenerateProjectLog}
+const GetDividedTaskFromGeojson: Function = (url: string,payload:any) => {
+
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(true))
+
+        const getDividedTaskFromGeojson = async (url,payload) => {
+            try {
+                const dividedTaskFormData = new FormData();
+                dividedTaskFormData.append("upload",payload.geojson);
+                dividedTaskFormData.append("dimension",payload.dimension);
+                const getGetDividedTaskFromGeojsonResponse = await axios.post(url,dividedTaskFormData)
+                const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
+                dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
+
+            } catch (error) {
+                dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(false));
+            }
+        }
+
+        await getDividedTaskFromGeojson(url,payload);
+
+    }
+
+}
+export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService,UploadCustomXLSFormService,GenerateProjectLog,GetDividedTaskFromGeojson}
