@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useOLMap from '../hooks/useOlMap';
 import { MapContainer as MapComponent } from '../components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '../components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js'
 import { VectorLayer } from '../components/MapComponent/OpenLayersComponent/Layers';
 // import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import CoreModules from "fmtm/CoreModules";
+import { ProjectActions } from "fmtm/ProjectSlice";
+// import { CreateProjectActions } from '../../../main/src/store/slices/CreateProjectSlice';
+import { CreateProjectActions } from 'fmtm/CreateProjectSlice';
+
 
 function elastic(t) {
     return (
@@ -15,9 +20,8 @@ const basicGeojsonTemplate = {
     "features": []
 };
 const DefineAreaMap = ({uploadedGeojson}) => {
-    const [convertedJSON, setConvertedJSON] = useState(null)
-    // const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
-    // const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
+    const dispatch = CoreModules.useDispatch();
+    const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
 
     const { mapRef, map } = useOLMap({
         // center: fromLonLat([85.3, 27.7]),
@@ -25,17 +29,21 @@ const DefineAreaMap = ({uploadedGeojson}) => {
         zoom: 4,
         maxZoom: 25,
     });
-    console.log(uploadedGeojson,'uploadedGeojson');
     // const formattedGeojson = 
-    if(uploadedGeojson){
-
-        const fileReader = new FileReader();
-        fileReader.readAsText(uploadedGeojson, "UTF-8");
-        fileReader.onload = e => {
-        //   console.log("e.target.result", e.target.result);
-          setConvertedJSON(e.target.result);
-        };
-    }
+    useEffect(() => {
+        if(uploadedGeojson){
+            const fileReader = new FileReader();
+            fileReader.readAsText(uploadedGeojson, "UTF-8");
+            fileReader.onload = e => {
+            //   console.log("e.target.result", e.target.result);
+            //   setConvertedJSON(e.target.result);
+              dispatch(CreateProjectActions.SetDividedTaskGeojson(e.target.result));
+    
+            };
+        }
+    }, [uploadedGeojson])
+    
+    
     return (
         <div className="map-container" style={{ height: '100%',width:'100%' }}>
             <MapComponent
@@ -48,8 +56,8 @@ const DefineAreaMap = ({uploadedGeojson}) => {
                 }}
             >
                 <LayerSwitcherControl />
-                {convertedJSON && <VectorLayer
-                    geojson={convertedJSON}
+                {dividedTaskGeojson && <VectorLayer
+                    geojson={dividedTaskGeojson}
                     // stylestyle={{
                     //     ...getStyles,
                     //     fillOpacity: 100,
