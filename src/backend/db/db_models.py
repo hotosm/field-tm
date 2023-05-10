@@ -222,6 +222,7 @@ class DbXForm(Base):
     # The XLSForm name is the only unique thing we can use for a key
     # so on conflict update works. Otherwise we get multiple entries.
     title = Column(String, unique=True)
+    category = Column(String)
     description = Column(String)
     xml = Column(String)  # Internal form representation
     xls = Column(LargeBinary)  # Human readable representation

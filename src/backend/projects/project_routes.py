@@ -16,12 +16,14 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import os
 import json
 import uuid
 
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Form, BackgroundTasks
+from osm_fieldwork.make_data_extract import getChoices
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 
@@ -206,13 +208,19 @@ async def upload_project_boundary_with_zip(
 @router.post("/upload_xlsform")
 async def upload_custom_xls(
     upload: UploadFile = File(...),
-    project_id: int=None,
+    category: str = Form(...),
     db: Session = Depends(database.get_db),
 ):
-    # read entire file
-    content = await upload.read()
-    category = upload.filename.split(".")[0]
-    project_crud.upload_xlsform(db, project_id, content, category)
+    """
+        Upload a custom XLSForm to the database.
+        Parameters:
+        - upload: the XLSForm file
+        - category: the category of the XLSForm
+    """
+
+    content = await upload.read() # read file content
+    name = upload.filename.split(".")[0] # get name of file without extension
+    project_crud.upload_xlsform(db, content,name, category)
 
     # FIXME: fix return value
     return {"xform_title": f"{category}"}
@@ -258,9 +266,17 @@ async def upload_multi_project_boundary(
 async def upload_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
-    dimension : int = 500,
+    dimension : int = Form(500),
     db: Session = Depends(database.get_db),
 ):
+    
+    # Validating for .geojson File.
+    file_name = os.path.splitext(upload.filename)
+    file_ext = file_name[1]
+    allowed_extensions = ['.geojson','.json']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+
     # read entire file
     content = await upload.read()
     boundary = json.loads(content)
@@ -444,3 +460,52 @@ async def generate_log(
     except Exception as e:
         logger.error(e)
         return "Error in generating log file"
+
+
+@router.get("/categories/")
+async def get_categories():
+    """
+    Get api for fetching all the categories.
+
+    This endpoint fetches all the categories from osm_fieldwork.
+
+    ## Response
+    - Returns a JSON object containing a list of categories and their respoective forms.
+
+    """
+    
+    categories = getChoices() # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
+    return categories
+
+
+@router.post("/preview_tasks/")
+async def preview_tasks(
+    upload: UploadFile = File(...),
+    dimension : int = Form(500)
+):
+    """
+    Preview tasks for a project.
+
+    This endpoint allows you to preview tasks for a project.
+
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
+
+    ## Response
+    - Returns a JSON object containing a list of tasks.
+
+    """
+
+    # Validating for .geojson File.
+    file_name = os.path.splitext(upload.filename)
+    file_ext = file_name[1]
+    allowed_extensions = ['.geojson','.json']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+
+    # read entire file
+    content = await upload.read()
+    boundary = json.loads(content)
+
+    result = await project_crud.preview_tasks(boundary, dimension)
+    return result
