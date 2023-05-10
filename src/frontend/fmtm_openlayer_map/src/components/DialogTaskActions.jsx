@@ -111,8 +111,8 @@ export default function Dialog({ taskId, feature, map, view }) {
         </CoreModules.Typography>
       </CoreModules.Stack>
 
-      {list_of_task_status.map((data, index) => {
-        return list_of_task_status.length != 0 ? (
+      {list_of_task_status?.map((data, index) => {
+        return list_of_task_status?.length != 0 ? (
           <CoreModules.Button
             id={data.value}
             key={index}

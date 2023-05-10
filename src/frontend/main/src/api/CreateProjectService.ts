@@ -22,7 +22,7 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
                 }else{
 
-                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload));
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload,{dimension:payload.dimension}));
                 }
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -82,7 +82,7 @@ const FormCategoryService: Function = (url: string) => {
     }
 
 }
-const UploadAreaService: Function = (url: string,payload: any) => {
+const UploadAreaService: Function = (url: string,filePayload: any,payload:any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadAreaLoading(true))
@@ -91,7 +91,8 @@ const UploadAreaService: Function = (url: string,payload: any) => {
 
             try {
                 const areaFormData = new FormData();
-                areaFormData.append('upload',payload[0]);
+                areaFormData.append('upload',filePayload[0]);
+                areaFormData.append('dimension',payload.dimension);
                 const postNewProjectDetails = await axios.post(url,areaFormData,
                     { 
                         headers: {
