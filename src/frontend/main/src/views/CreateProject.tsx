@@ -30,7 +30,7 @@ const CreateProject: React.FC = () => {
           <CoreModules.Box sx={{ height: location.pathname !== '/create-project' ? '8px' : '12px', width: '64px', background: location.pathname !== '/create-project' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
           <CoreModules.Box sx={{ height: location.pathname !== '/select-form' ? '8px' : '12px', width: '64px', background: location.pathname !== '/select-form' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
           <CoreModules.Box sx={{ height: location.pathname !== '/upload-area' ? '8px' : '12px', width: '64px', background: location.pathname !== '/upload-area' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
-          <CoreModules.Box sx={{ height: location.pathname !== '/basemap-selection' ? '8px' : '12px', width: '64px', background: location.pathname !== '/basemap-selection' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
+          {/* <CoreModules.Box sx={{ height: location.pathname !== '/basemap-selection' ? '8px' : '12px', width: '64px', background: location.pathname !== '/basemap-selection' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box> */}
         </CoreModules.Stack>
       </CoreModules.Stack>
       <CoreModules.Stack sx={{ paddingLeft: '13rem', paddingTop: '6rem' }} direction="row" spacing={13}>
@@ -75,7 +75,7 @@ const CreateProject: React.FC = () => {
           {/* END */}
 
           {/* Basemap Selection of Project Boundary   */}
-          <Link to="/basemap-selection">
+          {/* <Link to="/basemap-selection">
             <CoreModules.Button
               sx={boxSX}
               variant="contained"
@@ -84,7 +84,7 @@ const CreateProject: React.FC = () => {
             >
               Basemap Selection
             </CoreModules.Button>
-          </Link>
+          </Link> */}
           {/* END */}
 
         </CoreModules.Stack>
@@ -93,7 +93,7 @@ const CreateProject: React.FC = () => {
         {location.pathname === "/create-project" ? <ProjectDetailsForm /> : null}
         {location.pathname === "/select-form" ? <FormSelection /> : null}
         {location.pathname === "/upload-area" ? <UploadArea /> : null}
-        {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null}
+        {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
 
       </CoreModules.Stack>
