@@ -56,6 +56,7 @@ def get_users(
 async def get_user_by_id(id: int, db: Session = Depends(database.get_db)):
     user = user_crud.get_user(db, user_id=id)
     if user:
+        user.role = user.role.name
         return user
     else:
         raise HTTPException(status_code=404, detail="User not found")
