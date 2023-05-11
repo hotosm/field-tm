@@ -137,6 +137,7 @@ module.exports = function (webpackEnv) {
           "./CommonSlice": "./src/store/slices/CommonSlice.ts",
           "./LoginSlice": "./src/store/slices/LoginSlice.ts",
           "./ProjectSlice": "./src/store/slices/ProjectSlice.ts",
+          "./CreateProjectSlice": "./src/store/slices/CreateProjectSlice.ts",
           "./Store": "./src/store/Store.js",
           "./BasicCard": "./src/utilities/BasicCard.tsx",
           "./CustomizedMenus": "./src/utilities/CustomizedMenus.tsx",
