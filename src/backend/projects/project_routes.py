@@ -507,5 +507,5 @@ async def preview_tasks(
     content = await upload.read()
     boundary = json.loads(content)
 
-    result = project_crud.preview_tasks(boundary, dimension)
+    result = await project_crud.preview_tasks(boundary, dimension)
     return result
