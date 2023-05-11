@@ -380,7 +380,7 @@ def update_multi_polygon_project_boundary(
         raise HTTPException(e)
 
 
-def preview_tasks(boundary:str, dimension:int):
+async def preview_tasks(boundary:str, dimension:int):
     """
     Preview tasks by returning a list of task objects
     """
@@ -444,6 +444,23 @@ def preview_tasks(boundary:str, dimension:int):
                     grid.append(feature)
 
     collection = geojson.FeatureCollection(grid)
+
+    # If project outline cannot be divided into multiple tasks,
+    #   whole boundary is made into a single task.
+    if len(collection['features']) == 0:
+        boundary = mapping(boundary)
+        out = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                        "type": "Feature",
+                        "geometry": boundary,
+                        "properties": {}
+                    }
+                    ]
+                }
+        return out
+
     return collection
 
 
@@ -748,7 +765,7 @@ def generate_appuser_files(
     extractPolygon: bool,
     upload: UploadFile,
     background_task_id: uuid.UUID,
-):
+    ):
     """
         Generate the files for each appuser, the qrcode, the new XForm,
         and the OSM data extract.
@@ -858,6 +875,11 @@ def generate_appuser_files(
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
+                
+
+                updated_outline_geojson = []
+
+
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -865,6 +887,13 @@ def generate_appuser_files(
 
                     # Insert the osm extracts into the database.
                     feature_shape = shape(feature['geometry'])
+
+                    # If the centroid of the Polygon is not inside the outline, skip the feature.
+                    if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
+                        continue
+
+
+
                     wkb_element = from_shape(feature_shape, srid=4326)
                     feature_obj = db_models.DbFeatures(
                         project_id=project_id,
@@ -873,6 +902,7 @@ def generate_appuser_files(
                         geometry=wkb_element,
                         properties=feature["properties"],
                     )
+                    updated_outline_geojson.append(feature)
                     db.add(feature_obj)
                     db.commit()
 
@@ -880,7 +910,7 @@ def generate_appuser_files(
                 # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
                 with open(outfile, "w") as jsonfile:
                     jsonfile.truncate(0)  # clear the contents of the file
-                    dump(outline_geojson, jsonfile)
+                    dump(updated_outline_geojson, jsonfile)
 
                 outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
 
@@ -1023,12 +1053,27 @@ def create_task_grid(db: Session, project_id: int, delta:int):
                         [gx[i], gy[j]],
                     ]
                 )
-                # FIXME: this should clip the features that intersect with the
-                # boundary.
+
                 if boundary.intersection(poly):
                     feature = geojson.Feature(geometry=boundary.intersection(poly), properties={"id": str(id)})
-                    id += 1
-                    grid.append(feature)
+
+                    geom = shape(feature['geometry'])
+                    # Check if the geometry is a MultiPolygon
+                    if geom.geom_type == 'MultiPolygon':
+
+                        # Get the constituent Polygon objects from the MultiPolygon
+                        polygons = geom.geoms
+
+                        for x in range(len(polygons)):
+                            id += 1
+                            # Convert the two polygons to GeoJSON format
+                            feature1 = {'type': 'Feature', 'properties': {"id":str(id)}, 'geometry': mapping(polygons[x])}
+                            grid.append(feature1)
+                    else:
+                        id += 1
+                        grid.append(feature)
+
+
         collection = geojson.FeatureCollection(grid)
         # jsonout = open("tmp.geojson", 'w')
         # out = dump(collection, jsonout)
@@ -1051,10 +1096,10 @@ def create_task_grid(db: Session, project_id: int, delta:int):
                     }
             out = json.dumps(out)
 
+        return out
     except Exception as e:
         logger.error(e)
 
-    return out
 
 
 def get_json_from_zip(zip, filename: str, error_detail: str):
