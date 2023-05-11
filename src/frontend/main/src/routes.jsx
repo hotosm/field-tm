@@ -72,17 +72,27 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/select-form',
+        path: '/upload-area',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <CreateProject/>
             </Suspense>
           </ProtectedRoute>
         ),
       },
       {
-        path: '/upload-area',
+        path: '/define-tasks',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <CreateProject/>
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/select-form',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>

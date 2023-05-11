@@ -1,27 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import windowDimention from "../../hooks/WindowDimension";
 import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormGroup from '@mui/material/FormGroup'
-import { FormCategoryService } from "../../api/CreateProjectService";
-import { useNavigate, Link } from 'react-router-dom';
+import { CreateProjectService, FormCategoryService, GenerateProjectLog } from "../../api/CreateProjectService";
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import AssetModules from '../../shared/AssetModules.js';
 import useForm from "../../hooks/useForm";
 import SelectFormValidation from "./validation/SelectFormValidation";
+import { CommonActions } from "../../store/slices/CommonSlice";
 
 // import { SelectPicker } from 'rsuite';
+let generateProjectLogIntervalCb = null
 
 const FormSelection: React.FC = () => {
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
     const navigate = useNavigate();
-
-    // // const state:any = useSelector<any>(state=>state.project.projectData)
-    // // console.log('state main :',state)
-
-    // const { type } = windowDimention();
-    // //get window dimension
+    const location = useLocation();
 
     const dispatch = CoreModules.useDispatch()
     // //dispatch function to perform redux state mutation
@@ -33,6 +30,13 @@ const FormSelection: React.FC = () => {
     const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
     // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
+
+    const generateProjectLog: any = CoreModules.useSelector<any>((state) => state.createproject.generateProjectLog);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+    const generateQrSuccess: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrSuccess);
+    // //we use use-selector from redux to get all state of loginToken from login slice
+    const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
+    // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
     // Fetching form category list 
     useEffect(() => {
@@ -50,16 +54,101 @@ const FormSelection: React.FC = () => {
     const formCategoryData = formCategoryList.map(
         item => ({ label: item.title, value: item.title })
     );
+    const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+    // //we use use-selector from redux to get all state of loginToken from login slice
 
     const submission = () => {
-        // eslint-disable-next-line no-use-before-define
-        // submitForm();
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
-        dispatch(CreateProjectActions.SetCreateProjectFormStep('upload-area'));
-        navigate("/upload-area", { replace: true, state: { values: values } });
+
+        const previousValues = location.state.values;
+        console.log(previousValues, 'previousValues');
+        dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
+            {
+                "project_info": { ...previousValues },
+                "author": {
+                    "username": userDetails.username,
+                    "id": userDetails.id
+                },
+                "odk_central": {
+                    "odk_central_url": previousValues.odk_central_url,
+                    "odk_central_user": previousValues.odk_central_user,
+                    "odk_central_password": previousValues.odk_central_password
+                },
+                // dont send xform_title if upload custom form is selected 
+                "xform_title": values.form_ways === 'Upload a Form' ? null : values.xform_title,
+                "dimension": projectDetails.dimension,
+                "splitting_algorithm": projectDetails.splitting_algorithm,
+                "organization": previousValues.organization,
+                "form_ways": projectDetails.form_ways,
+                "uploaded_form": previousValues.uploaded_form,
+                "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
+            }, previousValues?.areaGeojson
+        ));
+        // navigate("/select-form", { replace: true, state: { values: values } });
 
 
     };
+
+    // Fetching form category list 
+    useEffect(() => {
+        dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
+        return () => {
+            clearInterval(generateProjectLogIntervalCb);
+        }
+    }, [])
+    // END
+
+    // Fetching form category list 
+    useEffect(() => {
+        if (generateQrSuccess) {
+            if (generateProjectLogIntervalCb === null) {
+                dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/projects/generate-log/`, { project_id: projectDetailsResponse?.id, uuid: generateQrSuccess.task_id }));
+            }
+        }
+
+    }, [generateQrSuccess])
+    useEffect(() => {
+        if (generateProjectLog?.status === 'SUCCESS') {
+            clearInterval(generateProjectLogIntervalCb);
+            navigate('/');
+            dispatch(
+                CommonActions.SetSnackBar({
+                    open: true,
+                    message: 'QR Generation Completed.',
+                    variant: "success",
+                    duration: 2000,
+                })
+            );
+        }
+        if (generateQrSuccess && generateProjectLog?.status === 'PENDING') {
+            if (generateProjectLogIntervalCb === null) {
+                generateProjectLogIntervalCb = setInterval(() => {
+                    dispatch(GenerateProjectLog(`${enviroment.baseApiUrl}/projects/generate-log/`, { project_id: projectDetailsResponse?.id, uuid: generateQrSuccess.task_id }))
+                }, 2000)
+            }
+        }
+
+
+    }, [generateQrSuccess, generateProjectLog])
+    // END
+    const renderTraceback = (errorText: string) => {
+        if (!errorText) {
+            return null;
+        }
+
+        return errorText.split("\n").map((line, index) => (
+            <div key={index} style={{ display: "flex" }}>
+                <span style={{ color: "gray", marginRight: "1em" }}>{index + 1}.</span>
+                <span>{line}</span>
+            </div>
+        ));
+    };
+    const divRef = useRef(null);
+    useEffect(() => {
+        console.log(divRef?.current, 'current');
+        if (!divRef?.current) return;
+        const myDiv = divRef?.current;
+        myDiv.scrollTop = myDiv?.scrollHeight;
+    });
 
     const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
         projectDetails,
@@ -176,6 +265,11 @@ const FormSelection: React.FC = () => {
                     </CoreModules.Stack>
                 </FormGroup>
             </form>
+            {generateProjectLog ? <CoreModules.Stack sx={{ width: '60%', height: '68vh' }}>
+                <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
+                    {renderTraceback(generateProjectLog?.logs)}
+                </div>
+            </CoreModules.Stack> : null}
         </CoreModules.Stack >
     )
 };
