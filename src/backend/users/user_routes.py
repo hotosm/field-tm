@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from ..db import database
 from . import user_crud, user_schemas
+from ..models.enums import UserRole as UserRoleEnum
 
 router = APIRouter(
     prefix="/users",
@@ -93,3 +94,11 @@ async def create_user_role(
     print('Hellooo')
 
     return await user_crud.create_user_roles(user_role, db)
+
+
+@router.get("/user-role-options/")
+async def get_user_roles():
+    user_roles = {}
+    for role in UserRoleEnum:
+        user_roles[role.name] = role.value
+    return user_roles

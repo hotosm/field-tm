@@ -62,13 +62,12 @@ class ProjectPriority(IntEnum, Enum):
 class UserRole(IntEnum, Enum):
     """Describes the role a user can be assigned, app doesn't support multiple roles."""
 
-    READ_ONLY = -1
     MAPPER = 0
     ADMIN = 1
     VALIDATOR = 2
     FIELD_ADMIN = 3
     ORGANIZATION_ADMIN = 4
-
+    READ_ONLY = 5
 
 class MappingLevel(IntEnum, Enum):
     """The mapping level the mapper has achieved."""
