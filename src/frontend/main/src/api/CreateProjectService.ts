@@ -21,7 +21,6 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                 if(payload.splitting_algorithm === 'Custom Multipolygon'){
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
                 }else{
-
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload,{dimension:payload.dimension}));
                 }
                 dispatch(
@@ -87,11 +86,11 @@ const UploadAreaService: Function = (url: string,filePayload: any,payload:any) =
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadAreaLoading(true))
 
-        const postUploadArea = async (url,payload) => {
-
+        const postUploadArea = async (url,filePayload,payload) => {
+            
             try {
                 const areaFormData = new FormData();
-                areaFormData.append('upload',filePayload[0]);
+                areaFormData.append('upload',filePayload);
                 areaFormData.append('dimension',payload.dimension);
                 const postNewProjectDetails = await axios.post(url,areaFormData,
                     { 
@@ -116,7 +115,7 @@ const UploadAreaService: Function = (url: string,filePayload: any,payload:any) =
             }
         }
 
-        await postUploadArea(url,payload);
+        await postUploadArea(url,filePayload,payload);
 
     }
 
