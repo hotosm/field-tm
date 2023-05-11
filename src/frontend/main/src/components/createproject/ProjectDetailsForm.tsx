@@ -50,8 +50,8 @@ const ProjectDetailsForm: React.FC = () => {
         // eslint-disable-next-line no-use-before-define
         // submitForm();
         dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
-        dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-        navigate("/select-form", { replace: true, state: { values: values } });
+        dispatch(CreateProjectActions.SetCreateProjectFormStep('upload-area'));
+        navigate("/upload-area", { replace: true, state: { values: values } });
     };
 
     const { handleSubmit, handleCustomChange, values, errors }: any = useForm(

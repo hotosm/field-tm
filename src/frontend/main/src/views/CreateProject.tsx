@@ -6,6 +6,7 @@ import { useLocation, Link } from 'react-router-dom';
 import ProjectDetailsForm from "../components/createproject/ProjectDetailsForm";
 import BasemapSelection from '../components/createproject/BasemapSelection';
 import FormSelection from '../components/createproject/FormSelection';
+import DefineTasks from '../components/createproject/DefineTasks';
 
 const CreateProject: React.FC = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const CreateProject: React.FC = () => {
         <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', mt: 3 }}>
           <CoreModules.Box sx={{ height: location.pathname !== '/create-project' ? '8px' : '12px', width: '64px', background: location.pathname !== '/create-project' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
           <CoreModules.Box sx={{ height: location.pathname !== '/upload-area' ? '8px' : '12px', width: '64px', background: location.pathname !== '/upload-area' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
+          <CoreModules.Box sx={{ height: location.pathname !== '/define-tasks' ? '8px' : '12px', width: '64px', background: location.pathname !== '/define-tasks' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
           <CoreModules.Box sx={{ height: location.pathname !== '/select-form' ? '8px' : '12px', width: '64px', background: location.pathname !== '/select-form' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box>
           {/* <CoreModules.Box sx={{ height: location.pathname !== '/basemap-selection' ? '8px' : '12px', width: '64px', background: location.pathname !== '/basemap-selection' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box> */}
         </CoreModules.Stack>
@@ -58,6 +60,19 @@ const CreateProject: React.FC = () => {
               disabled={location.pathname !== '/upload-area'}
             >
               Upload Area
+            </CoreModules.Button>
+          </Link>
+          {/* END */}
+
+          {/* Define Tasks SideBar Button for define tasks page  */}
+          <Link to="/define-tasks">
+            <CoreModules.Button
+              sx={boxSX}
+              variant="contained"
+              color="error"
+              disabled={location.pathname !== '/define-tasks'}
+            >
+              Define Tasks
             </CoreModules.Button>
           </Link>
           {/* END */}
@@ -93,6 +108,7 @@ const CreateProject: React.FC = () => {
 
         {location.pathname === "/create-project" ? <ProjectDetailsForm /> : null}
         {location.pathname === "/upload-area" ? <UploadArea /> : null}
+        {location.pathname === "/define-tasks" ? <DefineTasks /> : null}
         {location.pathname === "/select-form" ? <FormSelection /> : null}
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
