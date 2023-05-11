@@ -65,6 +65,9 @@ class UserRole(IntEnum, Enum):
     READ_ONLY = -1
     MAPPER = 0
     ADMIN = 1
+    VALIDATOR = 2
+    FIELD_ADMIN = 3
+    ORGANIZATION_ADMIN = 4
 
 
 class MappingLevel(IntEnum, Enum):
