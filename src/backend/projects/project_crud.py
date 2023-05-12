@@ -763,7 +763,8 @@ def generate_appuser_files(
     db: Session,
     project_id: int,
     extractPolygon: bool,
-    upload: UploadFile,
+    upload:str,
+    category:str,
     background_task_id: uuid.UUID,
     ):
     """
@@ -830,21 +831,11 @@ def generate_appuser_files(
             xform_title = one.xform_title if one.xform_title else None
 
             if upload:
-                # Validating for .XLS File.
-                file_name = os.path.splitext(upload.filename)
-                file_ext = file_name[1]
-                allowed_extensions = ['.xls']
-                if file_ext not in allowed_extensions:
-                    raise HTTPException(status_code=400, detail="Provide a valid .xls file")
-
-                # Read the contents of the xls file and write it into tmp file.
-                contents = upload.read()
                 xlsform = f"/tmp/custom_form.xls"
-
+                contents = upload
                 with open(xlsform, "wb") as f:
                     f.write(contents)
-                
-                xform_title = file_name[0]
+                xform_title = category
             else:
                 xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
@@ -934,7 +925,7 @@ def generate_appuser_files(
         logger.warning(str(e))
 
         # Update background task status to FAILED
-        update_background_task_status_in_database(db, background_task_id, 3) # 2 is FAILED
+        update_background_task_status_in_database(db, background_task_id, 2) # 2 is FAILED
 
 
 def create_qrcode(
