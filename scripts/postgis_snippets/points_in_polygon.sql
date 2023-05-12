@@ -1,5 +1,5 @@
-select p._uid_, count(c.geom) as numpoints
-from OSM_polygons p
-left join OSM_Building_centroids c 
+select p._uid_, p.geom, count(c.geom) as numpoints
+from islingtonsplitpolygons p
+left join islingtonbuildingcentroids c 
 on st_contains(p.geom,c.geom)
 group by p._uid_
