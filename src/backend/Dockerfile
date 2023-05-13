@@ -126,7 +126,7 @@ RUN pip install --no-warn-script-location \
     && update-ca-certificates
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
-    "-m", "uvicorn", "backend.main:api", \
+    "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
     "--reload", "--log-level", "error", "--no-access-log"]
 
@@ -135,7 +135,7 @@ CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
 FROM runtime as prod
 USER appuser
 # Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
-CMD ["uvicorn", "backend.main:api", "--host", "0.0.0.0", "--port", "8000", \
+CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "4", "--log-level", "error", "--no-access-log"]
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
