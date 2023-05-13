@@ -16,7 +16,7 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 2. From the command line: navigate to the top level directory of the FMTM project.
 3. From the command line run: `docker-compose pull`.
    This will pull the latest container builds from **main** branch.
-4. Make sure you have a .env file with all required variables, see [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md).
+4. Make sure you have a `.env` file with all required variables, see [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md).
 5. Once everything is pulled, from the command line run: `docker compose up -d api`
 6. If everything goes well you should now be able to **navigate to the project in your browser:** `http://127.0.0.1:8000/docs`
 
