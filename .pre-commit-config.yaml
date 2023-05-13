@@ -9,17 +9,17 @@ repos:
   # Autoformat: Python code
   - repo: https://github.com/psf/black
     rev: 23.1.0
-    files: src/backend/**/*
     hooks:
       - id: black
+        files: ^src/backend/(?:.*/)*.*$
         args: [--target-version=py39]
 
   # Lint / autoformat: Python code
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    files: src/backend/**/*
     rev: "v0.0.248"
     hooks:
       - id: ruff
+        files: ^src/backend/(?:.*/)*.*$
         args: [--fix, --exit-non-zero-on-fix]
 
   # Autoformat: YAML, JSON, Markdown, etc.
