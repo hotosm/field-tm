@@ -34,7 +34,7 @@ wheels/
 .installed.cfg
 *.egg
 venv/
-src/backend/odkconvert
+src/backend/osm-fieldwork
 
 __pycache__
 credentials.txt
