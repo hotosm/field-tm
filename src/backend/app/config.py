@@ -81,11 +81,10 @@ class Settings(BaseSettings):
     FMTM_DB_USER: Optional[str] = "fmtm"
     FMTM_DB_PASSWORD: Optional[str] = "fmtm"
     FMTM_DB_NAME: Optional[str] = "fmtm"
-    FMTM_TEST_DB_NAME: Optional[str] = "fmtm_test"
 
-    DB_URL: Optional[PostgresDsn]
+    FMTM_DB_URL: Optional[PostgresDsn]
 
-    @validator("DB_URL", pre=True)
+    @validator("FMTM_DB_URL", pre=True)
     def assemble_db_connection(cls, v: str, values: dict[str, Any]) -> Any:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):

@@ -16,13 +16,15 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+"""Config for the FMTM database connection."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from ..config import settings
 
-SQLALCHEMY_DATABASE_URL = settings.DB_URL
+SQLALCHEMY_DATABASE_URL = settings.FMTM_DB_URL
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -32,6 +34,7 @@ FmtmMetadata = Base.metadata
 
 
 def get_db():
+    """Create SQLAlchemy DB session."""
     db = SessionLocal()
     try:
         yield db
