@@ -147,5 +147,5 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @api.get("/images/{image_filename}")
 def get_images(image_filename: str):
     """Download image files."""
-    path = f"./backend/images/{image_filename}"
+    path = f"./app/images/{image_filename}"
     return FileResponse(path)
