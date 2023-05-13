@@ -2,6 +2,7 @@ FROM docker.io/node:18 as builder
 ARG MAINTAINER=admin@hotosm.org
 
 ARG APP_NAME
+ARG APP_VERSION
 ARG URL_SCHEME
 ARG API_URL
 ENV API_URL=${URL_SCHEME}://${API_URL}
@@ -10,10 +11,12 @@ ENV FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
 ARG FRONTEND_MAP_URL
 ENV FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
 
-LABEL fmtm.hotosm.org.maintainer="${MAINTAINER}" \
-      fmtm.hotosm.org.api-url="${API_URL}" \
-      fmtm.hotosm.org.main-url="${FRONTEND_MAIN_URL}" \
-      fmtm.hotosm.org.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
+LABEL org.hotosm.fmtm.app-name="${APP_NAME}" \
+      org.hotosm.fmtm.app-version="${APP_VERSION}" \
+      org.hotosm.fmtm.maintainer="${MAINTAINER}" \
+      org.hotosm.fmtm.api-url="${API_URL}" \
+      org.hotosm.fmtm.main-url="${FRONTEND_MAIN_URL}" \
+      org.hotosm.fmtm.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
 
 WORKDIR /app
 COPY ./${APP_NAME}/package*.json ./

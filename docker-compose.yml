@@ -45,6 +45,8 @@ services:
     build:
       context: src/backend
       target: debug
+      args:
+        APP_VERSION: debug
     container_name: fmtm_api
     volumes:
       - ./src/backend/app:/opt/app

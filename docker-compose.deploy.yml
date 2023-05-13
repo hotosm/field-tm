@@ -75,10 +75,12 @@ services:
     restart: unless-stopped
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:0.1.0-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
     build:
       context: src/backend
       target: prod
+      args:
+        APP_VERSION: ${API_VERSION}
     container_name: fmtm_api
     depends_on:
       - fmtm-db
@@ -97,11 +99,12 @@ services:
       - "traefik.http.routers.api.service=api-svc"
 
   ui-main:
-    image: "ghcr.io/hotosm/fmtm/frontend/main:0.1.0-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/frontend/main:${FRONTEND_MAIN_VERSION}-${GIT_BRANCH}"
     build:
       context: src/frontend/main
       args:
         APP_NAME: main
+        APP_VERSION: ${FRONTEND_MAIN_VERSION}
         URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
@@ -127,11 +130,12 @@ services:
       - "traefik.http.routers.ui-main.service=ui-main-svc"
 
   ui-map:
-    image: "ghcr.io/hotosm/fmtm/frontend/map:0.1.0-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/frontend/map:${FRONTEND_MAP_VERSION}-${GIT_BRANCH}"
     build:
       context: src/frontend/fmtm_openlayer_map
       args:
         APP_NAME: fmtm_openlayer_map
+        APP_VERSION: ${FRONTEND_MAP_VERSION}
         URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
