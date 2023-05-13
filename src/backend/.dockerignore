@@ -7,4 +7,3 @@ Dockerfile
 # pdm
 **/.pdm.toml
 **/__pypackages__
-**/pdm.lock
