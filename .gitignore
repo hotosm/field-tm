@@ -72,4 +72,3 @@ src/frontend/node_modules
 # pdm
 **/.pdm.toml
 **/__pypackages__
-**/pdm.lock
