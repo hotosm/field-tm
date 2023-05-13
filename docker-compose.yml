@@ -47,7 +47,7 @@ services:
       target: debug
     container_name: fmtm_api
     volumes:
-      - ./src/backend:/app/backend
+      - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
       - central-proxy
