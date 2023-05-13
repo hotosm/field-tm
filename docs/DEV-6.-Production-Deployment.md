@@ -45,7 +45,6 @@ The following instructions set up FMTM on your own cloud server.
 GIT_BRANCH=main
 
 # ODK Central
-ODK_CENTRAL_VERSION=v2023.2.1
 ODK_CENTRAL_URL=https://central-proxy
 ODK_CENTRAL_USER=`<CHANGEME>`
 ODK_CENTRAL_PASSWD=`<CHANGEME>`
@@ -75,11 +74,8 @@ FMTM_DB_NAME=fmtm
 
 > Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
 
-Run the production (and staging) docker-compose config:
+Run the docker-compose.deploy.yml for prod, staging, and dev (using different variables):
 `docker compose -f docker-compose.deploy.yml up -d`
-
-To deploy with an external ODKCentral (development):
-`docker compose -f docker-compose.noodk.yml up -d`
 
 > Note: The images should be built in Github Container Registry. If they don't exist, use the `--build` flag during run.
 
