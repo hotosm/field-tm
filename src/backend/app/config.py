@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     """Main settings class, defining environment variables."""
 
     APP_NAME: str = "FMTM"
-    DEBUG: str = False
+    DEBUG: bool = False
     LOG_LEVEL: str = "DEBUG"
 
     URL_SCHEME: Optional[str]
