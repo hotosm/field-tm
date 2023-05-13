@@ -44,7 +44,7 @@ services:
     image: "ghcr.io/hotosm/fmtm/backend:debug"
     build:
       context: src/backend
-      # target: debug
+      target: debug
     container_name: fmtm_api
     volumes:
       - ./src/backend:/app/backend
@@ -55,7 +55,7 @@ services:
       - .env
     ports:
       - "8000:8000"
-      # - "5678:5678"
+      - "5678:5678"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -130,11 +130,11 @@ services:
     restart: unless-stopped
 
   central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:debug"
+    image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
     build:
       context: odkcentral/api
       args:
-        ODK_CENTRAL_VERSION: ${ODK_CENTRAL_VERSION}
+        ODK_CENTRAL_VERSION: v2023.2.1
     container_name: central_api
     depends_on:
       - central-db
@@ -173,7 +173,7 @@ services:
     restart: unless-stopped
 
   central-proxy:
-    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:debug"
+    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
     build:
       context: odkcentral/proxy
     container_name: central_proxy
