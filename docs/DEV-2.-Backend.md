@@ -118,8 +118,8 @@ Example launch.json config for vscode:
       "port": 5678,
       "pathMappings": [
         {
-          "localRoot": "${workspaceFolder}/src/backend",
-          "remoteRoot": "/app/backend"
+          "localRoot": "${workspaceFolder}/src/backend/app",
+          "remoteRoot": "/opt/app"
         }
       ],
       "justMyCode": false
