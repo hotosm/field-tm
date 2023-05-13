@@ -19,7 +19,6 @@ version: "3"
 
 volumes:
   fmtm_db_data:
-  central_db_data:
   traefik-public-certificates:
 
 networks:
@@ -83,7 +82,6 @@ services:
     container_name: fmtm_api
     depends_on:
       - fmtm-db
-      - central-proxy
       - traefik
     env_file:
       - .env
@@ -157,75 +155,3 @@ services:
       - "traefik.http.routers.ui-map.rule=Host(`${FRONTEND_MAP_URL}`)"
       - "traefik.http.services.ui-map-svc.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui-map.service=ui-map-svc"
-
-  central-db:
-    image: postgis/postgis:14-3.3-alpine
-    container_name: central_db
-    volumes:
-      - central_db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
-      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
-    networks:
-      - fmtm-net
-    restart: unless-stopped
-
-  central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_VERSION}-${GIT_BRANCH}"
-    build:
-      context: odkcentral/api
-      args:
-        ODK_CENTRAL_VERSION: ${ODK_CENTRAL_VERSION}
-    container_name: central_api
-    depends_on:
-      - central-db
-      - pyxform
-    environment:
-      - DOMAIN=local
-      - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
-      - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
-      - HTTPS_PORT=${HTTPS_PORT:-443}
-      - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
-      - DB_USER=${CENTRAL_DB_USER:-odk}
-      - DB_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
-      - DB_NAME=${CENTRAL_DB_NAME:-odk}
-      - DB_SSL=${DB_SSL:-null}
-      - EMAIL_FROM=${ODK_CENTRAL_USER}
-      - EMAIL_HOST=${EMAIL_HOST:-mail}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - EMAIL_SECURE=${EMAIL_SECURE:-false}
-      - EMAIL_IGNORE_TLS=${EMAIL_IGNORE_TLS:-true}
-      - EMAIL_USER=${EMAIL_USER:-''}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
-      - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
-      - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
-      - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
-    networks:
-      - fmtm-net
-    command:
-      [
-        "./wait-for-it.sh",
-        "${CENTRAL_DB_HOST:-central-db}:5432",
-        "--",
-        "./init-user-and-start.sh",
-      ]
-    restart: unless-stopped
-
-  central-proxy:
-    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:0.1.0-${GIT_BRANCH}"
-    build:
-      context: odkcentral/proxy
-    container_name: central_proxy
-    depends_on:
-      - central
-    networks:
-      - fmtm-net
-    restart: unless-stopped
-
-  pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
-    container_name: central_pyxform
-    networks:
-      - fmtm-net
-    restart: always
