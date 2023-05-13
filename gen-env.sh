@@ -4,7 +4,7 @@ echo "Generate dotenv config for FMTM"
 echo "Reading .env.example"
 source .env.example
 
-DOTENV_NAME=.env.new
+DOTENV_NAME=.env
 
 if [ -f "${DOTENV_NAME}" ]
 then
