@@ -17,7 +17,7 @@
 ARG PYTHON_IMG_TAG=3.9
 
 FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bullseye as base
-ARG APP_VERSION=0.1.0
+ARG APP_VERSION
 ARG PYTHON_IMG_TAG
 ARG MAINTAINER=admin@hotosm.org
 LABEL org.hotosm.fmtm.app-version="${APP_VERSION}" \
