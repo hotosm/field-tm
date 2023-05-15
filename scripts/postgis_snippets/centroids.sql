@@ -1,3 +1,8 @@
+/*
+Several recipes for creating centroids from a layer of polygons.
+Here assuming the polygons are called "buildings".
+*/
+
 -- simple version (does not retain attributes)
 /*
 SELECT st_centroid(geom) as geom
