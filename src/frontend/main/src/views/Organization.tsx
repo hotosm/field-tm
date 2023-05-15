@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import SearchIcon from '@mui/icons-material/Search';
+import CreateOrganization from './CreateOrganization';
 
 const Organization = () => {
   const url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI8DK8HCuvWNyHHg8enmbmmf1ue4AeeF3GDw&usqp=CAU';
