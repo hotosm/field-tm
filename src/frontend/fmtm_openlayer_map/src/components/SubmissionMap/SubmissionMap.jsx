@@ -23,10 +23,11 @@ const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
         zoom: 4,
         maxZoom: 25,
     });
+    console.log(projectTaskBoundries,'projectTaskBoundries');
 
     const taskGeojsonFeatureCollection = {
         ...basicGeojsonTemplate,
-        features: [{ ...projectTaskBoundries[projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson, id: projectTaskBoundries[projectTaskBoundries.length - 1].taskBoundries?.[0]?.outline_geojson?.properties.uid }]
+        features: [{ ...projectTaskBoundries?.[0]?.taskBoundries?.[0]?.outline_geojson, id: projectTaskBoundries[0]?.taskBoundries?.[0]?.outline_geojson?.properties.uid }]
 
     };
     const buildingGeojsonFeatureCollection = {
@@ -70,7 +71,6 @@ const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
                 />
                 <VectorLayer
                     geojson={buildingGeojsonFeatureCollection}
-                    zoomToLayer
                 />
                 {/* )} */}
             </MapComponent>
