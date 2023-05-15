@@ -19,14 +19,14 @@ import CommonSlice from "./slices/CommonSlice";
 import LoginSlice from "./slices/LoginSlice";
 
 const reducers = CoreModules.combineReducers({
-    project: persistReducer(
-        {
-            key: 'project',
-            storage
-        },
-        ProjectSlice.reducer
-    ),
-    // project: ProjectSlice.reducer,
+    // project: persistReducer(
+    //     {
+    //         key: 'project',
+    //         storage
+    //     },
+    //     ProjectSlice.reducer
+    // ),
+    project: ProjectSlice.reducer,
     login: persistReducer(
         {
             key: 'login',
@@ -50,16 +50,16 @@ const reducers = CoreModules.combineReducers({
 })
 // const middleware = routerMiddleware(history);
 
-const middleware = [
-    ...CoreModules.getDefaultMiddleware({ serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    }, }),
-    // add any other middleware here
-  ];
+// const middleware = [
+//     ...CoreModules.getDefaultMiddleware({ serializableCheck: {
+//         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+//     }, }),
+//     // add any other middleware here
+//   ];
 
 export const store = CoreModules.configureStore({
     reducer: reducers,
-    middleware: middleware
+    // middleware: middleware
 
 })
 
