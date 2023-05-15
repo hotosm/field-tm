@@ -17,7 +17,7 @@
 #
 
 from pydantic import BaseModel
-
+from typing import Optional
 
 class UserBase(BaseModel):
     username: str
@@ -36,10 +36,21 @@ class User(UserBase):
 
 class UserOut(UserBase):
     id: int
-
+    role: str
     class Config:
         orm_mode = True
 
 
 class LoginResult(BaseModel):
     user: UserOut
+
+
+class UserRole(BaseModel):
+    role: str
+
+
+class UserRoles(BaseModel):
+    user_id: int
+    organization_id: Optional[int] = None
+    project_id: Optional[int] = None
+    role: str
