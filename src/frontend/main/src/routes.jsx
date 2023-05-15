@@ -28,7 +28,7 @@ const routes = createBrowserRouter([
         element: <Organization />,
       },
       {
-        path: '/organization',
+        path: '/createOrganization',
         element: <CreateOrganization />,
       },
       // {

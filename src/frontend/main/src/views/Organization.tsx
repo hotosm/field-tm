@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
-import SearchIcon from '@mui/icons-material/Search';
-import CreateOrganization from './CreateOrganization';
 
 const Organization = () => {
   const url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI8DK8HCuvWNyHHg8enmbmmf1ue4AeeF3GDw&usqp=CAU';
 
   const cardStyle = {
     width: 500,
-    p: 3,
+    padding: 3,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -31,7 +29,7 @@ const Organization = () => {
 
   return (
     <CoreModules.Box
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', background: '#f0efef', flex: 1 }}
+      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', background: '#f0efef', flex: 1, gap: 4 }}
     >
       <CoreModules.Box
         sx={{
@@ -44,16 +42,18 @@ const Organization = () => {
         }}
       >
         <CoreModules.Typography variant="condensed">MANAGE ORGANIZATIONS</CoreModules.Typography>
-        <CoreModules.Button
-          variant="outlined"
-          color="error"
-          startIcon={<AssetModules.AddIcon />}
-          sx={{ minWidth: 'fit-content', width: 'auto', fontWeight: 'bold' }}
-        >
-          New
-        </CoreModules.Button>
+        <CoreModules.Link to={'/createOrganization'}>
+          <CoreModules.Button
+            variant="outlined"
+            color="error"
+            startIcon={<AssetModules.AddIcon />}
+            sx={{ minWidth: 'fit-content', width: 'auto', fontWeight: 'bold' }}
+          >
+            New
+          </CoreModules.Button>
+        </CoreModules.Link>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', justifyContent: 'center', marginLeft: '7.5%', paddingTop: '2%' }}>
+      <CoreModules.Box sx={{ display: 'flex', justifyContent: 'center', marginLeft: '7.5%' }}>
         <CoreModules.TextField
           variant="outlined"
           size="small"
@@ -63,13 +63,13 @@ const Organization = () => {
           InputProps={{
             startAdornment: (
               <CoreModules.InputAdornment position="start">
-                <SearchIcon />
+                <AssetModules.SearchIcon />
               </CoreModules.InputAdornment>
             ),
           }}
         />
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'center', padding: '2%' }}>
+      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'center' }}>
         {filteredCardData.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.Typography variant="subtitle1">{data.title}</CoreModules.Typography>
