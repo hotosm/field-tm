@@ -11,6 +11,7 @@ import CreateProject from './views/CreateProject';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
 import Organization from './views/Organization';
+import CreateOrganization from './views/CreateOrganization';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
@@ -25,6 +26,10 @@ const routes = createBrowserRouter([
       {
         path: '/organization',
         element: <Organization />,
+      },
+      {
+        path: '/organization',
+        element: <CreateOrganization />,
       },
       // {
       //     path: '/explore',
