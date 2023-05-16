@@ -408,7 +408,14 @@ async def preview_tasks(boundary:str, dimension:int):
 
     nx = int((maxx - minx) / value)
     ny = int((maxy - miny) / value)
-    gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+    # gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+
+    xdiff = abs(maxx-minx)
+    ydiff = abs(maxy-miny)
+    if  xdiff > ydiff:
+        gx, gy = np.linspace(minx, maxx, ny), np.linspace(miny, miny+xdiff, ny)
+    else:
+        gx, gy = np.linspace(minx, minx+ydiff, nx), np.linspace(miny, maxy, nx)
     grid = list()
 
     id = 0
@@ -1028,7 +1035,15 @@ def create_task_grid(db: Session, project_id: int, delta:int):
 
         nx = int((maxx - minx) / value)
         ny = int((maxy - miny) / value)
-        gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+        # gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+
+        xdiff = maxx-minx
+        ydiff = maxy-miny
+        if  xdiff>ydiff:
+            gx, gy = np.linspace(minx, maxx, ny), np.linspace(miny, miny+xdiff, ny)
+        else:
+            gx, gy = np.linspace(minx, minx+ydiff, nx), np.linspace(miny, maxy, nx)
+
         grid = list()
 
         id = 0
