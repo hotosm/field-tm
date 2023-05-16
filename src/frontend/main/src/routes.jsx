@@ -10,6 +10,7 @@ import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
+import Authorized from './views/Authorized';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
@@ -106,6 +107,14 @@ const routes = createBrowserRouter([
         element: <ProtectedRoute>
                     <Suspense fallback={<div>Loading...</div>}>
                         <CreateProject />
+                    </Suspense>
+                </ProtectedRoute>
+      },
+      {
+        path: '/osmauth',
+        element: <ProtectedRoute>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Authorized/>
                     </Suspense>
                 </ProtectedRoute>
       },
