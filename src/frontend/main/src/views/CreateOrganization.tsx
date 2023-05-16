@@ -1,43 +1,36 @@
 import React, { useState } from 'react';
 import { InputLabel } from '@mui/material';
 import CoreModules from '../shared/CoreModules';
+import environment from '../environment';
+import useForm from '../hooks/useForm';
+import { useDispatch } from 'react-redux';
+import OrganizationAddValidation from '../components/organization/Validation/OrganizationAddValidation';
+import { PostOrganizationDataService } from '../api/OrganizationService';
 
-const CreateOrganizationForm: React.FC = () => {
-  const [organizationName, setOrganizationName] = useState('');
-  const [website, setWebsite] = useState('');
-  const [description, setDescription] = useState('');
-  const [dropdownValue, setDropdownValue] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const formData = {};
+const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
+const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
+const CreateOrganizationForm = () => {
+  const dispatch = useDispatch();
+  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
-  const handleOrganizationNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setOrganizationName(event.target.value);
+  const submission = () => {
+    dispatch(PostOrganizationDataService(`${environment.baseApiUrl}/projects/organization/`, values));
   };
+  const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
+    formData,
+    submission,
+    OrganizationAddValidation,
+  );
 
-  const handleWebsiteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setWebsite(event.target.value);
-  };
-
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
-  };
-
-  const handleDropdownChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setDropdownValue(event.target.value as string);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    setOrganizationName('');
-    setWebsite('');
-    setDescription('');
-    setDropdownValue('');
-    setSelectedFile(null);
+  const inputFormStyles = () => {
+    return {
+      style: {
+        color: defaultTheme.palette.error.main,
+        fontFamily: defaultTheme.typography.fontFamily,
+        fontSize: defaultTheme.typography.fontSize,
+      }, // or className: 'your-class'
+    };
   };
 
   return (
@@ -65,54 +58,101 @@ const CreateOrganizationForm: React.FC = () => {
       >
         <form onSubmit={handleSubmit}>
           <CoreModules.TextField
-            variant="outlined"
+            id="name"
+            variant="filled"
             label="Organization Name"
-            value={organizationName}
-            onChange={handleOrganizationNameChange}
             fullWidth
             margin="normal"
+            value={values.name}
+            onChange={(e) => {
+              handleCustomChange('name', e.target.value);
+            }}
+            helperText={errors.name}
+            FormHelperTextProps={inputFormStyles()}
           />
           <CoreModules.TextField
+            id="url"
             label="Website"
-            value={website}
-            onChange={handleWebsiteChange}
-            fullWidth
+            value={values.url}
+            variant="filled"
             margin="normal"
+            onChange={(e) => {
+              handleCustomChange('url', e.target.value);
+            }}
+            fullWidth
+            helperText={errors.url}
+            FormHelperTextProps={inputFormStyles()}
           />
           <CoreModules.TextField
-            label="Description"
-            value={description}
-            onChange={handleDescriptionChange}
-            multiline
+            id="description"
+            label=""
+            variant="filled"
+            value={values.description}
+            onChange={(e) => {
+              handleCustomChange('description', e.target.value);
+            }}
             fullWidth
-            margin="normal"
+            multiline
+            rows={4}
+            helperText={errors.description}
+            FormHelperTextProps={inputFormStyles()}
           />
           <CoreModules.FormControl fullWidth margin="normal">
             <InputLabel id="dropdown-label">Dropdown</InputLabel>
-            <CoreModules.Select labelId="dropdown-label" value={dropdownValue} onChange={handleDropdownChange}>
-              <CoreModules.MenuItem value="">Select an option</CoreModules.MenuItem>
-              <CoreModules.MenuItem value="option1">Option 1</CoreModules.MenuItem>
-              <CoreModules.MenuItem value="option2">Option 2</CoreModules.MenuItem>
-              <CoreModules.MenuItem value="option3">Option 3</CoreModules.MenuItem>
+            <CoreModules.Select
+              labelId="dropdown-label"
+              id="type"
+              value={values.type || ''}
+              onChange={(e) => {
+                handleCustomChange('type', e.target.value);
+              }}
+            >
+              {organizationDataList?.map((org) => (
+                <CoreModules.MenuItem value={org.value}>{org.label}</CoreModules.MenuItem>
+              ))}
             </CoreModules.Select>
+            {errors.type && (
+              <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                {errors.type}
+              </CoreModules.FormLabel>
+            )}
           </CoreModules.FormControl>
-          <CoreModules.Input type="file" onChange={handleFileChange} style={{ display: 'none' }} />
-          <label htmlFor="file">
-            <CoreModules.Button variant="contained" component="span">
-              Choose File
+          <CoreModules.Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <CoreModules.TextField
+              id="logo"
+              type="file"
+              variant="filled"
+              value={values.logo}
+              onChange={(e) => {
+                handleCustomChange('logo', e.target.value);
+              }}
+              inputProps={{ accept: 'image/*' }}
+              style={{ display: 'none' }}
+              helperText={errors.logo}
+              FormHelperTextProps={inputFormStyles()}
+            />
+            <label htmlFor="logo">
+              <CoreModules.Button variant="contained" component="span">
+                Choose Logo
+              </CoreModules.Button>
+            </label>
+            {errors.logo && (
+              <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                {errors.logo}
+              </CoreModules.FormLabel>
+            )}
+          </CoreModules.Box>
+          <CoreModules.Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <CoreModules.Button
+              type="submit"
+              variant="outlined"
+              color="error"
+              size="large"
+              sx={{ minWidth: 'fit-content', width: 'auto', fontWeight: 'bold' }}
+            >
+              Submit
             </CoreModules.Button>
-          </label>
-          <CoreModules.Typography>{selectedFile?.name || 'No file chosen'}</CoreModules.Typography>
-
-          <CoreModules.Button
-            type="submit"
-            variant="outlined"
-            color="error"
-            size="large"
-            sx={{ minWidth: 'fit-content', width: 'auto', fontWeight: 'bold' }}
-          >
-            Submit
-          </CoreModules.Button>
+          </CoreModules.Box>
         </form>
       </CoreModules.Box>
     </CoreModules.Box>
