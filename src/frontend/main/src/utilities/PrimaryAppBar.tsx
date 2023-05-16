@@ -7,6 +7,7 @@ import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
+import { createLoginWindow } from '../utilfunctions/login';
 
 export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -135,11 +136,21 @@ export default function PrimaryAppBar() {
                   </CoreModules.Button>
                 </CoreModules.Link> :
                 <>
+                  {/* <CoreModules.Link style={{ textDecoration: 'none' }} to={"/login"}> */}
+                  <CoreModules.Button
+                    className='btnLogin'
+                    style={appBarInnerStyles.btnLogin}
+                    color="info"
+                    onClick={() => createLoginWindow('/')}
+                  >
+                    Test OSM Sign in
+                  </CoreModules.Button>
                   <CoreModules.Link style={{ textDecoration: 'none' }} to={"/login"}>
                     <CoreModules.Button
                       className='btnLogin'
                       style={appBarInnerStyles.btnLogin}
                       color="info"
+                    // onClick={() => createLoginWindow('/')}
                     >
                       Sign in
                     </CoreModules.Button>
