@@ -1,22 +1,23 @@
 
 interface ProjectValues {
-    xform_title: string;
-    form_ways: string;
+    splitting_algorithm: string;
+    dimension: number;
 }
 interface ValidationErrors {
-    xform_title?: string;
-    form_ways?: string;
+    splitting_algorithm?: string;
+    dimension?: string;
 }
 
 function DefineTaskValidation(values: ProjectValues) {
     const errors: ValidationErrors = {};
 
-    if (!values?.xform_title) {
-        errors.xform_title = 'Form Category is Required.';
+    if (!values?.splitting_algorithm) {
+        errors.splitting_algorithm = 'Splitting Algorithm is Required.';
     }
-    if (!values?.form_ways) {
-        errors.form_ways = 'Form Selection is Required.';
+    if (values?.splitting_algorithm === 'Divide on Square' && !values?.dimension) {
+        errors.dimension = 'Dimension is Required.';
     }
+
 
 
     console.log(errors);
