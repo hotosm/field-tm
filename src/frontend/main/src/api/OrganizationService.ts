@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { HomeActions } from '../store/slices/HomeSlice';
 import { HomeProjectCardModel } from '../models/home/homeModel';
-import { OrganizationModal } from '../models/organization/organizationModal';
+import { OrganizationDataModel, OrganizationModal } from '../models/organization/organizationModel';
 import { CommonActions } from '../store/slices/CommonSlice';
+import { OrganizationAction } from '../store/slices/organizationSlice';
 
 function appendObjectToFormData(formData, object) {
     for (const [key, value] of Object.entries(object)) {
@@ -42,4 +42,20 @@ export const OrganizationService: Function = (url: string,payload:OrganizationMo
 
     }
 
+}
+
+export const OrganizationDataService : Function = (url : string) => {
+    return async (dispatch) => {
+        dispatch(OrganizationAction.GetOrganizationDataLoading(true))
+        const getOrganizationData = async (url) => {
+            try {
+                const getOrganizationDataResponse = await axios.get(url);
+                const response : OrganizationDataModel = getOrganizationDataResponse.data;
+                dispatch(OrganizationAction.GetOrganizationsData(response))
+            } catch(error) {
+                dispatch(OrganizationAction.GetOrganizationDataLoading(false))
+            }
+        }
+        await getOrganizationData(url);
+    }
 }
