@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
+import environment from '../environment';
+import { OrganizationDataService } from '../api/OrganizationService';
 
 const Organization = () => {
-  const url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI8DK8HCuvWNyHHg8enmbmmf1ue4AeeF3GDw&usqp=CAU';
+  const url = 'http://localhost:8080/d907cf67fe587072a592.png';
 
   const cardStyle = {
-    width: 500,
+    width: 520,
     padding: 3,
     display: 'flex',
     flexDirection: 'column',
@@ -14,22 +16,26 @@ const Organization = () => {
     cursor: 'pointer',
   };
 
-  const cardData = Array.from({ length: 9 }).map((_, index) => ({
-    title: `Organization ${index + 1}`,
-    content: 'ADMINISTRATORS',
-  }));
-
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
   };
 
-  const filteredCardData = cardData.filter((data) => data.title.toLowerCase().includes(searchKeyword.toLowerCase()));
+  const dispatch = CoreModules.useDispatch();
+
+  const oraganizationData: any = CoreModules.useSelector<any>((state) => state.organization.oraganizationData);
+  const filteredCardData = oraganizationData?.filter((data) =>
+    data.name.toLowerCase().includes(searchKeyword.toLowerCase()),
+  );
+
+  useEffect(() => {
+    dispatch(OrganizationDataService(`${environment.baseApiUrl}/projects/organization/`));
+  }, []);
 
   return (
     <CoreModules.Box
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', background: '#f0efef', flex: 1, gap: 4 }}
+      sx={{ display: 'flex', flexDirection: 'column', background: '#f0efef', flex: 1, gap: 4, paddingLeft: '6%' }}
     >
       <CoreModules.Box
         sx={{
@@ -37,8 +43,6 @@ const Organization = () => {
           alignItems: 'center',
           paddingTop: '2%',
           gap: 2,
-          justifyContent: 'flex-start',
-          marginLeft: '7.5%',
         }}
       >
         <CoreModules.Typography variant="condensed">MANAGE ORGANIZATIONS</CoreModules.Typography>
@@ -53,7 +57,7 @@ const Organization = () => {
           </CoreModules.Button>
         </CoreModules.Link>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', justifyContent: 'center', marginLeft: '7.5%' }}>
+      <CoreModules.Box sx={{}}>
         <CoreModules.TextField
           variant="outlined"
           size="small"
@@ -69,16 +73,19 @@ const Organization = () => {
           }}
         />
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'center' }}>
-        {filteredCardData.map((data, index) => (
+      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
+        {filteredCardData?.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
-            <CoreModules.Typography variant="subtitle1">{data.title}</CoreModules.Typography>
+            {console.log(data)}
+            <CoreModules.Typography variant="subtitle1">{data.name}</CoreModules.Typography>
             <CoreModules.CardContent>
-              <CoreModules.Typography variant="subtitle1">{data.content}</CoreModules.Typography>
+              <CoreModules.Typography variant="subtitle3">{data.description}</CoreModules.Typography>
             </CoreModules.CardContent>
-            <CoreModules.Avatar alt="organization" src={url || ''}>
-              Org
-            </CoreModules.Avatar>
+            <CoreModules.Link to={data.url} target="_blank">
+              <CoreModules.Avatar alt={data.title} src={data.logo}>
+                {!data.logo || data.logo === 'string' ? data.name[0] : null}
+              </CoreModules.Avatar>
+            </CoreModules.Link>
           </CoreModules.Card>
         ))}
       </CoreModules.Box>
