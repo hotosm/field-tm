@@ -75,7 +75,7 @@ const FormSelection: React.FC = () => {
                 },
                 // dont send xform_title if upload custom form is selected 
                 "xform_title": values.form_ways === 'Upload a Form' ? null : values.xform_title,
-                "dimension": projectDetails.dimension,
+                "dimension": previousValues.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
                 "organization": previousValues.organization,
                 "form_ways": projectDetails.form_ways,
@@ -107,7 +107,7 @@ const FormSelection: React.FC = () => {
 
     }, [generateQrSuccess])
     useEffect(() => {
-        if (generateProjectLog?.status === 'SUCCESS') {
+        if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
             clearInterval(generateProjectLogIntervalCb);
             navigate('/');
             dispatch(
@@ -144,7 +144,6 @@ const FormSelection: React.FC = () => {
     };
     const divRef = useRef(null);
     useEffect(() => {
-        console.log(divRef?.current, 'current');
         if (!divRef?.current) return;
         const myDiv = divRef?.current;
         myDiv.scrollTop = myDiv?.scrollHeight;

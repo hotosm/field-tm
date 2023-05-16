@@ -4,25 +4,25 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
-        projectDetails:{},
-        projectDetailsResponse:null,
-        projectDetailsLoading:false,
-        projectArea:null,
-        projectAreaLoading:false,
-        formCategoryList:[],
-        generateQrLoading:false,
-        organizationList:[],
-        organizationListLoading:false,
-        generateQrSuccess:null,
-        generateProjectLogLoading:false,
-        generateProjectLog:null,
-        createProjectStep:1,
-        dividedTaskLoading:false,
-        dividedTaskGeojson:false,
+        projectDetails: {},
+        projectDetailsResponse: null,
+        projectDetailsLoading: false,
+        projectArea: null,
+        projectAreaLoading: false,
+        formCategoryList: [],
+        generateQrLoading: false,
+        organizationList: [],
+        organizationListLoading: false,
+        generateQrSuccess: null,
+        generateProjectLogLoading: false,
+        generateProjectLog: null,
+        createProjectStep: 1,
+        dividedTaskLoading: false,
+        dividedTaskGeojson: false,
     },
     reducers: {
         SetProjectDetails(state, action) {
-            state.projectDetails = {...state.projectDetails,[action.payload.key]:action.payload.value}
+            state.projectDetails = { ...state.projectDetails, [action.payload.key]: action.payload.value }
         },
         CreateProjectLoading(state, action) {
             state.projectDetailsLoading = action.payload
@@ -50,35 +50,39 @@ const CreateProject = CoreModules.createSlice({
         SetFormCategory(state, action) {
             state.formCategoryList = action.payload
         },
-        SetIndividualProjectDetailsData(state,action){
-            state.projectDetails= action.payload
+        SetIndividualProjectDetailsData(state, action) {
+            state.projectDetails = action.payload
         },
-        GenerateProjectQRLoading(state,action){
-            state.generateQrLoading= action.payload
+        GenerateProjectQRLoading(state, action) {
+            state.generateQrLoading = action.payload
         },
-        GetOrganisationList(state,action){
-            state.organizationList= action.payload
+        GetOrganisationList(state, action) {
+            state.organizationList = action.payload
         },
-        GetOrganisationListLoading(state,action){
-            state.organizationListLoading= action.payload
+        GetOrganisationListLoading(state, action) {
+            state.organizationListLoading = action.payload
         },
-        GenerateProjectQRSuccess(state,action){
-            state.generateQrSuccess= action.payload
+        GenerateProjectQRSuccess(state, action) {
+            if (action.payload.status === 'SUCCESS') {
+                state.generateQrSuccess = null
+            } else {
+                state.generateQrSuccess = action.payload
+            }
         },
-        GenerateProjectLogLoading(state,action){
-            state.generateProjectLogLoading= action.payload
+        GenerateProjectLogLoading(state, action) {
+            state.generateProjectLogLoading = action.payload
         },
-        SetGenerateProjectLog(state,action){
-            state.generateProjectLog= action.payload
+        SetGenerateProjectLog(state, action) {
+            state.generateProjectLog = action.payload
         },
-        SetCreateProjectFormStep(state,action){
-            state.createProjectStep= action.payload
+        SetCreateProjectFormStep(state, action) {
+            state.createProjectStep = action.payload
         },
-        GetDividedTaskFromGeojsonLoading(state,action){
-            state.dividedTaskLoading= action.payload
+        GetDividedTaskFromGeojsonLoading(state, action) {
+            state.dividedTaskLoading = action.payload
         },
-        SetDividedTaskGeojson(state,action){
-            state.dividedTaskGeojson= action.payload
+        SetDividedTaskGeojson(state, action) {
+            state.dividedTaskGeojson = action.payload
         },
     }
 })
