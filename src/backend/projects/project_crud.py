@@ -54,7 +54,6 @@ from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
-from shapely.geometry import MultiPolygon
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
@@ -62,7 +61,7 @@ from ..db import db_models
 from ..tasks import tasks_crud
 from ..users import user_crud
 from geoalchemy2.shape import from_shape
-from shapely.geometry import shape, mapping
+from shapely.geometry import shape, mapping, MultiLineString, MultiPolygon
 
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -1330,3 +1329,43 @@ def update_background_task_status_in_database(db: Session,
         db.commit()
     
         return True
+
+
+def add_features_into_database( db: Session,
+                                project_id: int,
+                                 features: dict,
+                                 background_task_id: uuid.UUID
+                                 ):
+     """
+          Inserts a new task into the database
+          Params:
+                db: database session
+                project_id: id of the project
+                features: features to be added
+     """
+
+     success = 0
+     failure = 0
+     for feature in features['features']:
+        try:
+            feature_geometry = feature['geometry']
+            feature_shape = shape(feature_geometry)
+
+            wkb_element = from_shape(feature_shape, srid=4326)
+            feature_obj = db_models.DbFeatures(
+            project_id=project_id,
+            category_title='buildings',
+            geometry=wkb_element,
+            task_id=1,
+            properties = feature["properties"],
+            )
+            db.add(feature_obj)
+            db.commit()
+            success += 1
+        except Exception as e:
+            failure += 1
+            continue
+
+     update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
+
+     return True
