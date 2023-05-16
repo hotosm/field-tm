@@ -76,7 +76,6 @@ const Organization = () => {
       <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
         {filteredCardData?.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
-            {console.log(data)}
             <CoreModules.Typography variant="subtitle1">{data.name}</CoreModules.Typography>
             <CoreModules.CardContent>
               <CoreModules.Typography variant="subtitle3">{data.description}</CoreModules.Typography>
