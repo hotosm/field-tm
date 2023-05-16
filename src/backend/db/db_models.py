@@ -580,3 +580,16 @@ class BackgroundTasks(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
+
+
+
+class DbUserRoles(Base):
+    __tablename__ = "user_roles"
+
+    user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    user = relationship(DbUser, backref="user_roles")
+    organization_id = Column(Integer, ForeignKey("organisations.id"))
+    organization = relationship(DbOrganisation, backref="user_roles")
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    project = relationship(DbProject, backref="user_roles")
+    role = Column(Enum(UserRole), nullable=False)

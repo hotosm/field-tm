@@ -349,13 +349,25 @@ async def generate_files(
 
     """
 
+    contents = None
+    xform_title = None
+    if upload:
+        # Validating for .XLS File.
+        file_name = os.path.splitext(upload.filename)
+        file_ext = file_name[1]
+        allowed_extensions = ['.xls']
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+        xform_title = file_name[0]
+        contents = await upload.read()
+
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
 
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, upload, background_task_id)
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, contents, xform_title, background_task_id)
 
     # FIXME: fix return value
     return {
