@@ -21,7 +21,17 @@ export interface OrganizationModal {
     url: string;
   }
 
-  export interface OrganizationDataModel {
+  export interface GetOrganizationDataModel {
+    name : string;
+    slug : string;
+    description : string;
+    type : number;
+    subscription_tier : null;
+    id: number;
+    logo : string;
+    url : string;
+  }
+  export interface PostOrganizationDataModel {
     name : string;
     slug : string;
     description : string;
