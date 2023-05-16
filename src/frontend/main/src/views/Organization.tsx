@@ -5,8 +5,6 @@ import environment from '../environment';
 import { OrganizationDataService } from '../api/OrganizationService';
 
 const Organization = () => {
-  const url = 'http://localhost:8080/d907cf67fe587072a592.png';
-
   const cardStyle = {
     width: 520,
     padding: 3,
@@ -78,7 +76,20 @@ const Organization = () => {
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.Typography variant="subtitle1">{data.name}</CoreModules.Typography>
             <CoreModules.CardContent>
-              <CoreModules.Typography variant="subtitle3">{data.description}</CoreModules.Typography>
+              <CoreModules.Typography
+                variant="subtitle3"
+                sx={{
+                  height: '5rem',
+                  display: '-webkit-box',
+                  '-webkit-line-clamp': 3,
+                  '-webkit-box-orient': 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxHeight: '4.5em',
+                }}
+              >
+                {data.description}
+              </CoreModules.Typography>
             </CoreModules.CardContent>
             <CoreModules.Link to={data.url} target="_blank">
               <CoreModules.Avatar alt={data.title} src={data.logo}>
