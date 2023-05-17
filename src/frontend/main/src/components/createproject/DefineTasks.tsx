@@ -33,6 +33,7 @@ const DefineTasks: React.FC = () => {
     const submission = () => {
 
         // const previousValues = location.state.values;
+        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
 
         navigate("/select-form");
 
