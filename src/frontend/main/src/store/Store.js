@@ -17,6 +17,7 @@ import ProjectSlice from "./slices/ProjectSlice";
 import CreateProjectSlice from "./slices/CreateProjectSlice";
 import CommonSlice from "./slices/CommonSlice";
 import LoginSlice from "./slices/LoginSlice";
+import OrganizationSlice from "./slices/organizationSlice.ts"
 
 const reducers = CoreModules.combineReducers({
     // project: persistReducer(
@@ -38,6 +39,8 @@ const reducers = CoreModules.combineReducers({
     home: HomeSlice.reducer,
     theme: ThemeSlice.reducer,
     createproject: CreateProjectSlice.reducer,
+    organization: OrganizationSlice.reducer,
+
     // createproject: persistReducer(
     //     {
     //         key: 'createproject',
