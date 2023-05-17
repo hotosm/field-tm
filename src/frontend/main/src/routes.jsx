@@ -12,6 +12,7 @@ import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
 import Organization from './views/Organization';
 import CreateOrganization from './views/CreateOrganization';
+import Authorized from './views/Authorized';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
