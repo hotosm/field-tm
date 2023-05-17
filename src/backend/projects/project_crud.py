@@ -877,8 +877,6 @@ def generate_appuser_files(
                     "type": "FeatureCollection",
                     "features": []}
 
-                updated_outline_geojson=[]
-
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
                     feature["properties"]["title"] = ""
