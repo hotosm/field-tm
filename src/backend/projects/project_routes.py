@@ -460,6 +460,7 @@ async def generate_log(
     try:
         # Get the backgrund task status
         task_status = await project_crud.get_background_task_status(uuid, db)
+        extract_completion_count = await project_crud.get_extract_completion_count(project_id, db)
 
         with open(f"{project_id}_generate.log", "r") as f:
             lines = f.readlines()
@@ -467,6 +468,7 @@ async def generate_log(
             logs = ''.join(last_100_lines)
             return {
                 'status':task_status.name,
+                'progress':extract_completion_count,
                 'logs':logs
             }
     except Exception as e:
