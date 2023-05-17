@@ -6,7 +6,7 @@ import FormGroup from '@mui/material/FormGroup'
 import { CreateProjectService, FormCategoryService, GenerateProjectLog } from "../../api/CreateProjectService";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { InputLabel, MenuItem, Select } from "@mui/material";
+import { Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import AssetModules from '../../shared/AssetModules.js';
 import useForm from "../../hooks/useForm";
 import SelectFormValidation from "./validation/SelectFormValidation";
@@ -43,6 +43,8 @@ const FormSelection: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
+
+
     const selectExtractWaysList = ['Centroid', 'Polygon'];
     const selectExtractWays = selectExtractWaysList.map(
         item => ({ label: item, value: item })
@@ -59,29 +61,27 @@ const FormSelection: React.FC = () => {
 
     const submission = () => {
 
-        const previousValues = location.state.values;
-        console.log(previousValues, 'previousValues');
         dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
             {
-                "project_info": { ...previousValues },
+                "project_info": { name: projectDetails.name, short_description: projectDetails.short_description, description: projectDetails.description },
                 "author": {
                     "username": userDetails.username,
                     "id": userDetails.id
                 },
                 "odk_central": {
-                    "odk_central_url": previousValues.odk_central_url,
-                    "odk_central_user": previousValues.odk_central_user,
-                    "odk_central_password": previousValues.odk_central_password
+                    "odk_central_url": projectDetails.odk_central_url,
+                    "odk_central_user": projectDetails.odk_central_user,
+                    "odk_central_password": projectDetails.odk_central_password
                 },
                 // dont send xform_title if upload custom form is selected 
-                "xform_title": values.form_ways === 'Upload a Form' ? null : values.xform_title,
-                "dimension": previousValues.dimension,
+                "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
+                "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
-                "organization": previousValues.organization,
+                "organization": projectDetails.organization,
                 "form_ways": projectDetails.form_ways,
-                "uploaded_form": previousValues.uploaded_form,
-                "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
-            }, previousValues?.areaGeojson
+                "uploaded_form": projectDetails.uploaded_form,
+                "data_extractWays": projectDetails.data_extractWays === 'Polygon' ? true : false,
+            }, projectDetails?.areaGeojson
         ));
         // navigate("/select-form", { replace: true, state: { values: values } });
 
@@ -155,88 +155,116 @@ const FormSelection: React.FC = () => {
         SelectFormValidation,
     );
     return (
-        <CoreModules.Stack sx={{ width: '50%' }}>
+        <CoreModules.Stack sx={{ width: '100%', marginLeft: '215px !important' }}>
             <form onSubmit={handleSubmit}>
                 <FormGroup >
-                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
-                        <InputLabel id="form-category" sx={{
-                            '&.Mui-focused': {
-                                color: defaultTheme.palette.black
-                            }
-                        }} >Data Extract Category</InputLabel>
-                        <Select
-                            labelId="data_extractWays-label"
-                            id="data_extractWays"
-                            value={values.data_extractWays}
-                            label="Data Extract Category"
-                            onChange={(e) => handleCustomChange('data_extractWays', e.target.value)}
-                        >
-                            {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                            {selectExtractWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
-                        </Select>
-                        {errors.data_extractWays && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.data_extractWays}</CoreModules.FormLabel>}
-                    </CoreModules.FormControl>
-                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
-                        <InputLabel id="form-category" sx={{
-                            '&.Mui-focused': {
-                                color: defaultTheme.palette.black
-                            }
-                        }} >Form Category</InputLabel>
-                        <Select
-                            labelId="form_category-label"
-                            id="form_category"
-                            value={values.xform_title}
-                            label="Form Category"
-                            onChange={(e) => handleCustomChange('xform_title', e.target.value)}
-                        >
-                            {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                            {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
-                        </Select>
-                        {errors.xform_title && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.xform_title}</CoreModules.FormLabel>}
-                    </CoreModules.FormControl>
-                    <CoreModules.FormControl sx={{ mb: 3, width: '30%' }} variant="filled">
-                        <InputLabel id="form-category" sx={{
-                            '&.Mui-focused': {
-                                color: defaultTheme.palette.black
-                            }
-                        }}>Form Selection</InputLabel>
-                        <Select
-                            labelId="form_ways-label"
-                            id="form_ways"
-                            value={values.form_ways}
-                            label="Form Ways"
-                            onChange={(e) => handleCustomChange('form_ways', e.target.value)}
-                        // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))} 
-                        >
-                            {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
-                        </Select>
-                        {errors.form_ways && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.form_ways}</CoreModules.FormLabel>}
+                    <Grid container spacing={5}>
+                        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <CoreModules.FormControl sx={{ mb: 3, }} variant="filled">
+                                <InputLabel id="form-category" sx={{
+                                    '&.Mui-focused': {
+                                        color: defaultTheme.palette.black
+                                    }
+                                }} >Data Extract Category</InputLabel>
+                                <Select
+                                    labelId="data_extractWays-label"
+                                    id="data_extractWays"
+                                    value={values.data_extractWays}
+                                    label="Data Extract Category"
+                                    onChange={(e) => {
+                                        handleCustomChange('data_extractWays', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "data_extractWays": e.target.value,
+                                        }));
 
-                    </CoreModules.FormControl>
+                                    }}
+                                >
+                                    {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
+                                    {selectExtractWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                                </Select>
+                                {errors.data_extractWays && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.data_extractWays}</CoreModules.FormLabel>}
+                            </CoreModules.FormControl>
+                            <CoreModules.FormControl sx={{ mb: 3, }} variant="filled">
+                                <InputLabel id="form-category" sx={{
+                                    '&.Mui-focused': {
+                                        color: defaultTheme.palette.black
+                                    }
+                                }} >Form Category</InputLabel>
+                                <Select
+                                    labelId="form_category-label"
+                                    id="form_category"
+                                    value={values.xform_title}
+                                    label="Form Category"
+                                    onChange={(e) => {
+                                        handleCustomChange('xform_title', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "xform_title": e.target.value,
+                                        }));
+                                    }}
+                                >
+                                    {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
+                                    {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                                </Select>
+                                {errors.xform_title && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.xform_title}</CoreModules.FormLabel>}
+                            </CoreModules.FormControl>
+                            <CoreModules.FormControl sx={{ mb: 3, }} variant="filled">
+                                <InputLabel id="form-category" sx={{
+                                    '&.Mui-focused': {
+                                        color: defaultTheme.palette.black
+                                    }
+                                }}>Form Selection</InputLabel>
+                                <Select
+                                    labelId="form_ways-label"
+                                    id="form_ways"
+                                    value={values.form_ways}
+                                    label="Form Ways"
+                                    onChange={(e) => {
+                                        handleCustomChange('form_ways', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "form_ways": e.target.value,
+                                        }));
+                                    }}
+                                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))} 
+                                >
+                                    {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                                </Select>
+                                {errors.form_ways && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.form_ways}</CoreModules.FormLabel>}
 
-                    {values.form_ways === 'Upload a Custom Form' ? <>
-                        <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
-                            <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
-                        </CoreModules.IconButton></a>
-                        <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
-                        <CoreModules.Button
-                            variant="contained"
-                            component="label"
-                        >
-                            <CoreModules.Input
-                                type="file"
-                                onChange={(e) => {
-                                    handleCustomChange('uploaded_form', e.target.files)
-                                    // setFormFileUpload(e.target.files)
-                                }}
-                            />
-                        </CoreModules.Button>
-                        {!values.uploaded_form && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
-                    </> : null}
+                            </CoreModules.FormControl>
 
-                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                            {values.form_ways === 'Upload a Custom Form' ? <>
+                                <a download>Download Form Template <CoreModules.IconButton style={{ borderRadius: 0 }} color="primary" component="label">
+                                    <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
+                                </CoreModules.IconButton></a>
+                                <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
+                                <CoreModules.Button
+                                    variant="contained"
+                                    component="label"
+                                >
+                                    <CoreModules.Input
+                                        type="file"
+                                        onChange={(e) => {
+                                            handleCustomChange('uploaded_form', e.target.files)
+                                            // setFormFileUpload(e.target.files)
+                                        }}
+                                    />
+                                </CoreModules.Button>
+                                {!values.uploaded_form && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
+                            </> : null}
+                        </Grid>
+                        <Grid item xs={8}>
+                            <CoreModules.Stack>
+                                {generateProjectLog ? <CoreModules.Stack sx={{ width: '90%', height: '48vh' }}>
+                                    <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
+                                        {renderTraceback(generateProjectLog?.logs)}
+                                    </div>
+                                </CoreModules.Stack> : null}
+                            </CoreModules.Stack>
+                        </Grid>
+                    </Grid>
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', marginTop: '3rem', paddingRight: '5rem' }}>
                         {/* Previous Button  */}
-                        <Link to="/create-project">
+                        <Link to="/define-tasks">
                             <CoreModules.Button
                                 sx={{ width: '150px' }}
                                 variant="outlined"
@@ -257,18 +285,16 @@ const FormSelection: React.FC = () => {
                             // disabled={!fileUpload ? true : false}
 
                             >
-                                Next
+                                Submit
                             </CoreModules.Button>
                         </CoreModules.Stack>
                         {/* END */}
                     </CoreModules.Stack>
+
                 </FormGroup>
+
             </form>
-            {generateProjectLog ? <CoreModules.Stack sx={{ width: '60%', height: '68vh' }}>
-                <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
-                    {renderTraceback(generateProjectLog?.logs)}
-                </div>
-            </CoreModules.Stack> : null}
+
         </CoreModules.Stack >
     )
 };
