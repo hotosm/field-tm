@@ -124,11 +124,9 @@ const routes = createBrowserRouter([
       },
       {
         path: '/osmauth',
-        element: <ProtectedRoute>
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <Authorized/>
-                    </Suspense>
-                </ProtectedRoute>
+        element:<Suspense fallback={<div>Loading...</div>}>
+                  <Authorized/>
+                </Suspense>
       },
       {
         path: '*',
