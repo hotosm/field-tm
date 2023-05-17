@@ -872,11 +872,8 @@ def generate_appuser_files(
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
-                
 
                 updated_outline_geojson = []
-
-
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -888,8 +885,6 @@ def generate_appuser_files(
                     # If the centroid of the Polygon is not inside the outline, skip the feature.
                     if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
                         continue
-
-
 
                     wkb_element = from_shape(feature_shape, srid=4326)
                     feature_obj = db_models.DbFeatures(
@@ -936,6 +931,12 @@ def generate_appuser_files(
                                     actorId=appuser.json()["id"])
                 except Exception as e:
                     logger.warning(str(e))
+
+                # Add the count of completed task in project table extract_completed_count column.
+                project = get_project_by_id(db, project_id)
+                project.extract_completed_count += 1
+                db.commit()
+                db.refresh(project)
 
         # Update background task status to COMPLETED 
         update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
@@ -1295,6 +1296,14 @@ def get_project_features(db: Session,
                          project_id: int):
     features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
+
+
+async def get_extract_completion_count(
+       project_id: int,
+       db: Session 
+    ):
+    project = db.query(db_models.DbProject).filter(db_models.DbProject.id == project_id).first()
+    return project.extract_completed_count
 
 
 async def get_background_task_status(
