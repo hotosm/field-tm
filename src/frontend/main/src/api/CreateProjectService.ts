@@ -31,7 +31,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                         duration: 2000,
                     })
                 );
-                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload));
+                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, { ...payload, form_ways: payload.form_ways === 'Upload a Form' ? null : payload.xform_title }));
                 dispatch(CommonActions.SetLoading(false))
 
 
