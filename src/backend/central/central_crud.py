@@ -306,7 +306,7 @@ def convert_csv(
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
     parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
-    csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
+    csvin = CSVDump("/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"
     csvin.createOSM(osmoutfile)
