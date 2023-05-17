@@ -245,11 +245,13 @@ const FormSelection: React.FC = () => {
                                         type="file"
                                         onChange={(e) => {
                                             handleCustomChange('uploaded_form', e.target.files)
+                                            dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, uploaded_form: e.target.files[0], uploadedFormFileName: e.target.files[0].name }));
+
                                             // setFormFileUpload(e.target.files)
                                         }}
                                     />
                                 </CoreModules.Button>
-                                {!values.uploaded_form && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
+                                {!projectDetails.uploadedFormFileName && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Form File is required.</CoreModules.FormLabel>}
                             </> : null}
                         </Grid>
                         <Grid item xs={8}>

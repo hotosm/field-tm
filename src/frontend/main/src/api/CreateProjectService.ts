@@ -18,7 +18,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 const resp: CreateProjectDetailsModel = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
-                if (payload.splitting_algorithm === 'Custom Multipolygon') {
+                if (payload.splitting_algorithm === 'Choose Area as Tasks') {
                     dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
                 } else {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
@@ -83,13 +83,15 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadAreaLoading(true))
-
+        console.log(filePayload, 'filePayload');
         const postUploadArea = async (url, filePayload, payload) => {
 
             try {
                 const areaFormData = new FormData();
                 areaFormData.append('upload', filePayload);
-                areaFormData.append('dimension', payload.dimension);
+                if (payload?.dimension) {
+                    areaFormData.append('dimension', payload?.dimension);
+                }
                 const postNewProjectDetails = await axios.post(url, areaFormData,
                     {
                         headers: {
@@ -101,6 +103,7 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
                 await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
 
             } catch (error) {
+                console.log(error, 'error');
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
@@ -129,10 +132,10 @@ const GenerateProjectQRService: Function = (url: string, payload: any) => {
             try {
                 const generateApiFormData = new FormData();
                 if (payload.form_ways === 'Upload a Custom Form') {
-                    generateApiFormData.append('extractPolygon', payload.data_extractWays);
+                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', payload.uploaded_form[0]);
                 } else {
-                    generateApiFormData.append('extractPolygon', payload.data_extractWays);
+                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', '');
 
                 }
