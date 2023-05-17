@@ -50,9 +50,9 @@ const Home = () => {
 
             }
             {/*pagingation*/}
-            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+            {/* <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
                 <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-            </CoreModules.Stack>
+            </CoreModules.Stack> */}
 
         </div>
 
