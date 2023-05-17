@@ -14,11 +14,11 @@ function Authorized(props) {
         const params = new URLSearchParams(location.search);
         let authCode = params.get('code');
         let state = params.get('state');
-        // if (authCode !== null) {
-        //     window.opener.authComplete(state, state);
-        //     window.close();
-        //     return;
-        // }
+        if (authCode !== null) {
+            window.opener.authComplete(state, state);
+            window.close();
+            return;
+        }
         const username = params.get('username');
         const sessionToken = params.get('session_token');
         const osm_oauth_token = params.get('osm_oauth_token');
