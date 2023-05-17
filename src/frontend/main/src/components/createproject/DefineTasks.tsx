@@ -3,7 +3,7 @@ import enviroment from "../../environment";
 import CoreModules from "../../shared/CoreModules";
 import FormGroup from '@mui/material/FormGroup'
 import { GetDividedTaskFromGeojson } from "../../api/CreateProjectService";
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import DefineAreaMap from "map/DefineAreaMap";
