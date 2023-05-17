@@ -53,6 +53,16 @@ export const createLoginWindow = (redirectTo) => {
           }).toString();
           let redirectUrl = `/osmauth?${params}`;
           window.location.href = redirectUrl;
+          fetch(`${environment.baseApiUrl}/auth/me/?access`, {
+            headers: {
+              "access-token": res.access_token
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            }
+          }).then((resp) => resp.json()).then((resp) => {
+            console.log(resp, 'resp');
+            alert(resp);
+          });
+          // window.close();
         });
       } else {
         throw new Error('States do not match');
