@@ -121,6 +121,7 @@ const DefineTasks: React.FC = () => {
                                     onChange={(e) => { handleCustomChange('dimension', e.target.value) }}
                                     // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
                                     // helperText={errors.username}
+                                    InputProps={{ inputProps: { min: 10, } }}
                                     FormHelperTextProps={inputFormStyles()}
 
                                 />
