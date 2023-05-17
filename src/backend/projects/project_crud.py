@@ -1298,6 +1298,14 @@ def get_project_features(db: Session,
     return convert_to_project_features(features)
 
 
+async def get_extract_completion_count(
+       project_id: int,
+       db: Session 
+    ):
+    project = db.query(db_models.DbProject).filter(db_models.DbProject.id == project_id).first()
+    return project.extract_completed_count
+
+
 async def get_background_task_status(
         task_id:uuid.UUID,
         db: Session
