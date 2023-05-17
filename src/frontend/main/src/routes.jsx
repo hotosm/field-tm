@@ -10,7 +10,8 @@ import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
-import Authorized from './views/Authorized';
+import Organization from './views/Organization';
+import CreateOrganization from './views/CreateOrganization';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
@@ -21,6 +22,14 @@ const routes = createBrowserRouter([
       {
         path: '/',
         element: <Home />,
+      },
+      {
+        path: '/organization',
+        element: <Organization />,
+      },
+      {
+        path: '/createOrganization',
+        element: <CreateOrganization />,
       },
       // {
       //     path: '/explore',
@@ -77,7 +86,7 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject/>
+              <CreateProject />
             </Suspense>
           </ProtectedRoute>
         ),
@@ -87,7 +96,7 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject/>
+              <CreateProject />
             </Suspense>
           </ProtectedRoute>
         ),
@@ -104,11 +113,13 @@ const routes = createBrowserRouter([
       },
       {
         path: '/basemap-selection',
-        element: <ProtectedRoute>
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <CreateProject />
-                    </Suspense>
-                </ProtectedRoute>
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <CreateProject />
+            </Suspense>
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/osmauth',
@@ -120,9 +131,7 @@ const routes = createBrowserRouter([
       },
       {
         path: '*',
-        element: (
-          <NotFoundPage />
-        ),
+        element: <NotFoundPage />,
       },
     ],
   },
