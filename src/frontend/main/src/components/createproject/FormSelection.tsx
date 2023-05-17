@@ -80,7 +80,7 @@ const FormSelection: React.FC = () => {
                 "organization": projectDetails.organization,
                 "form_ways": projectDetails.form_ways,
                 "uploaded_form": projectDetails.uploaded_form,
-                "data_extractWays": projectDetails.data_extractWays === 'Polygon' ? true : false,
+                "data_extractWays": projectDetails.data_extractWays,
             }, projectDetails?.areaGeojson
         ));
         // navigate("/select-form", { replace: true, state: { values: values } });
