@@ -73,7 +73,7 @@ const ProjectDetailsForm: React.FC = () => {
         item => ({ label: item.name, value: item.id })
     );
     return (
-        <CoreModules.Stack sx={{ width: '50%' }}>
+        <CoreModules.Stack sx={{ width: '50%', mb: '10rem' }} style={{ marginLeft: '215px' }}>
 
             <form onSubmit={handleSubmit}>
                 <CoreModules.FormGroup>
@@ -242,7 +242,7 @@ const ProjectDetailsForm: React.FC = () => {
                     </CoreModules.FormControl>
                     {/* END */}
 
-                    <CoreModules.Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                    <CoreModules.Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', marginBottom: '4rem' }}>
                         {/* Form Submission Button For Create Project */}
                         <CoreModules.Button
                             variant="contained"
