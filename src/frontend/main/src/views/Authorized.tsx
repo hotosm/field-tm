@@ -15,7 +15,7 @@ function Authorized(props) {
         let authCode = params.get('code');
         let state = params.get('state');
         if (authCode !== null) {
-            window.opener.authComplete(authCode, state);
+            window.opener.authComplete(state, state);
             window.close();
             return;
         }
