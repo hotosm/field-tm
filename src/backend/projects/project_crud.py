@@ -873,7 +873,11 @@ def generate_appuser_files(
                 outline = eval(poly.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
 
-                updated_outline_geojson = []
+                updated_outline_geojson = {
+                    "type": "FeatureCollection",
+                    "features": []}
+
+                updated_outline_geojson=[]
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -894,10 +898,9 @@ def generate_appuser_files(
                         geometry=wkb_element,
                         properties=feature["properties"],
                     )
-                    updated_outline_geojson.append(feature)
+                    updated_outline_geojson['features'].append(feature)
                     db.add(feature_obj)
                     db.commit()
-
 
                 # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
                 with open(outfile, "w") as jsonfile:
