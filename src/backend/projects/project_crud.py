@@ -871,8 +871,12 @@ def generate_appuser_files(
                 # Generating an osm extract from the underpass database.
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
-                outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
-                
+                outline_geojson = pg.getFeatures(boundary = outline, 
+                                                 filespec = outfile, 
+                                                 polygon = extractPolygon,
+                                                 xlsfile =  category,
+                                                 category = category
+                                                 )
 
                 updated_outline_geojson = []
 
