@@ -15,7 +15,6 @@ import DefineTaskValidation from "./validation/DefineTaskValidation";
 
 const DefineTasks: React.FC = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
     // // const state:any = useSelector<any>(state=>state.project.projectData)
@@ -33,9 +32,9 @@ const DefineTasks: React.FC = () => {
 
     const submission = () => {
 
-        const previousValues = location.state.values;
+        // const previousValues = location.state.values;
 
-        navigate("/select-form", { replace: true, state: { values: { ...previousValues, ...formValues } } });
+        navigate("/select-form");
 
 
     };
@@ -59,11 +58,11 @@ const DefineTasks: React.FC = () => {
 
     // }, [projectArea])
     // END
-    const previousValues = location?.state?.values;
+    // const previousValues = location?.state?.values;
 
 
     const generateTasksOnMap = () => {
-        dispatch(GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, { geojson: previousValues.areaGeojson, dimension: formValues?.dimension }))
+        dispatch(GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, { geojson: projectDetails.areaGeojson, dimension: formValues?.dimension }))
     }
 
 
@@ -86,7 +85,7 @@ const DefineTasks: React.FC = () => {
 
 
     return (
-        <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginLeft: '215px !important', gap: '4rem' }}>
             <form onSubmit={handleSubmit}>
                 <FormGroup >
                     <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="filled">
@@ -107,13 +106,14 @@ const DefineTasks: React.FC = () => {
                         {errors.splitting_algorithm && <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>{errors.splitting_algorithm}</CoreModules.FormLabel>}
                     </CoreModules.FormControl>
                     {formValues.splitting_algorithm === 'Divide on Square' && <CoreModules.FormControl sx={{ mb: 3, width: '100%' }}>
-                        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension (in metre)</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
+                        <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
                             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
-                                <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}><CoreModules.FormLabel component="h3">Dimension (in metre)</CoreModules.FormLabel><CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>*</CoreModules.FormLabel></CoreModules.Box>
                                 <CoreModules.TextField
                                     id="dimension"
                                     label=""
                                     type="number"
+                                    min="10"
                                     variant="filled"
                                     inputProps={{ sx: { padding: '8.5px 14px' } }}
                                     value={formValues.dimension}
@@ -130,7 +130,7 @@ const DefineTasks: React.FC = () => {
                                 color="error"
                                 onClick={generateTasksOnMap}
                             >
-                                Generate Tasks on Map
+                                Generate Tasks
                             </CoreModules.Button>
                         </CoreModules.Stack>
                     </CoreModules.FormControl>}
@@ -139,9 +139,9 @@ const DefineTasks: React.FC = () => {
 
 
                     {/* Submit Button For Create Project on Area Upload */}
-                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: '5rem' }}>
                         {/* Previous Button  */}
-                        <Link to="/select-form">
+                        <Link to="/upload-area">
                             <CoreModules.Button
                                 sx={{ width: '150px' }}
                                 variant="outlined"
@@ -158,18 +158,11 @@ const DefineTasks: React.FC = () => {
                                 color="error"
                                 sx={{ width: '20%' }}
                                 type="submit"
-                            // disabled={!fileUpload ? true : false}
-                            // onClick={() => {
-                            //     onCreateProjectSubmission();
-                            // }}
+
                             >
                                 Next
                             </CoreModules.Button>
                         </CoreModules.Stack>
-                        {/* <CustomizedModal isOpen={openTerminal} toggleOpen={setOpenTerminal}>
-                            
-                        </CustomizedModal> */}
-
                     </CoreModules.Stack>
                     {/* END */}
                 </FormGroup>
