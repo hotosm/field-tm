@@ -43,6 +43,8 @@ const FormSelection: React.FC = () => {
         dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
     }, [])
     // END
+
+
     const selectExtractWaysList = ['Centroid', 'Polygon'];
     const selectExtractWays = selectExtractWaysList.map(
         item => ({ label: item, value: item })
@@ -59,28 +61,27 @@ const FormSelection: React.FC = () => {
 
     const submission = () => {
 
-        const previousValues = location.state.values;
         dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
             {
-                "project_info": { ...previousValues },
+                "project_info": { name: projectDetails.name, short_description: projectDetails.short_description, description: projectDetails.description },
                 "author": {
                     "username": userDetails.username,
                     "id": userDetails.id
                 },
                 "odk_central": {
-                    "odk_central_url": previousValues.odk_central_url,
-                    "odk_central_user": previousValues.odk_central_user,
-                    "odk_central_password": previousValues.odk_central_password
+                    "odk_central_url": projectDetails.odk_central_url,
+                    "odk_central_user": projectDetails.odk_central_user,
+                    "odk_central_password": projectDetails.odk_central_password
                 },
                 // dont send xform_title if upload custom form is selected 
-                "xform_title": values.form_ways === 'Upload a Form' ? null : values.xform_title,
-                "dimension": previousValues.dimension,
+                "xform_title": projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
+                "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
-                "organization": previousValues.organization,
+                "organization": projectDetails.organization,
                 "form_ways": projectDetails.form_ways,
-                "uploaded_form": previousValues.uploaded_form,
-                "data_extractWays": values.data_extractWays === 'Polygon' ? true : false,
-            }, previousValues?.areaGeojson
+                "uploaded_form": projectDetails.uploaded_form,
+                "data_extractWays": projectDetails.data_extractWays === 'Polygon' ? true : false,
+            }, projectDetails?.areaGeojson
         ));
         // navigate("/select-form", { replace: true, state: { values: values } });
 
@@ -170,7 +171,13 @@ const FormSelection: React.FC = () => {
                                     id="data_extractWays"
                                     value={values.data_extractWays}
                                     label="Data Extract Category"
-                                    onChange={(e) => handleCustomChange('data_extractWays', e.target.value)}
+                                    onChange={(e) => {
+                                        handleCustomChange('data_extractWays', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "data_extractWays": e.target.value,
+                                        }));
+
+                                    }}
                                 >
                                     {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
                                     {selectExtractWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
@@ -188,7 +195,12 @@ const FormSelection: React.FC = () => {
                                     id="form_category"
                                     value={values.xform_title}
                                     label="Form Category"
-                                    onChange={(e) => handleCustomChange('xform_title', e.target.value)}
+                                    onChange={(e) => {
+                                        handleCustomChange('xform_title', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "xform_title": e.target.value,
+                                        }));
+                                    }}
                                 >
                                     {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
                                     {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
@@ -206,7 +218,12 @@ const FormSelection: React.FC = () => {
                                     id="form_ways"
                                     value={values.form_ways}
                                     label="Form Ways"
-                                    onChange={(e) => handleCustomChange('form_ways', e.target.value)}
+                                    onChange={(e) => {
+                                        handleCustomChange('form_ways', e.target.value)
+                                        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({
+                                            ...projectDetails, "form_ways": e.target.value,
+                                        }));
+                                    }}
                                 // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))} 
                                 >
                                     {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
