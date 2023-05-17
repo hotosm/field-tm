@@ -16,7 +16,7 @@ function Authorized(props) {
         let state = params.get('state');
         if (authCode !== null) {
             window.opener.authComplete(state, state);
-            window.close();
+            // window.close();
             return;
         }
         const username = params.get('username');
