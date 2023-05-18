@@ -934,7 +934,7 @@ def generate_appuser_files(
                         odk_app = central_crud.appuser
 
                     odk_app.updateRole(projectId=one[3], 
-                                    xmlFormId=xform_id, 
+                                    xform=xform_id, 
                                     actorId=appuser.json()["id"])
                 except Exception as e:
                     logger.warning(str(e))
