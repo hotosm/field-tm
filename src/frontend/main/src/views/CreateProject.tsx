@@ -16,8 +16,8 @@ const CreateProject: React.FC = () => {
     },
   };
   return (
-    <div style={{ padding: 7, height: '100%' }}>
-      <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', }}>
+    <div >
+      <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', position: "sticky", top: 0, background: 'white', zIndex: 1, paddingBottom: '0.8rem' }}>
         <CoreModules.Typography
           variant="subtitle2"
           color={'info'}
@@ -35,9 +35,9 @@ const CreateProject: React.FC = () => {
           {/* <CoreModules.Box sx={{ height: location.pathname !== '/basemap-selection' ? '8px' : '12px', width: '64px', background: location.pathname !== '/basemap-selection' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box> */}
         </CoreModules.Stack>
       </CoreModules.Stack>
-      <CoreModules.Stack sx={{ paddingLeft: '13rem', py: '6rem', height: '100%' }} direction="row" spacing={13}>
+      <CoreModules.Stack sx={{ paddingLeft: '13rem', paddingTop: '3rem', height: '80vh' }} direction="row" spacing={13}>
 
-        <CoreModules.Stack spacing={2}>
+        <CoreModules.Stack spacing={2} sx={{ position: 'fixed' }}>
           {/* Project Details SideBar Button for Creating Project */}
           <Link to="/create-project">
             <CoreModules.Button

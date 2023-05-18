@@ -85,6 +85,11 @@ const ThemeSlice = CoreModules.createSlice({
                     fontFamily: 'BarlowBold',
                     fontSize: 24,
                 },
+                // new font size added
+                condensed: {
+                    fontSize: 36,
+                    fontWeight: 'bold'
+                },
                 subtitle1: {
                     fontFamily: 'BarlowBold',
                     fontSize: 20,

@@ -5,23 +5,23 @@ import enviroment from "../environment";
 import { CommonActions } from '../store/slices/CommonSlice';
 
 
-const CreateProjectService: Function = (url: string,payload: any,fileUpload: any) => {
+const CreateProjectService: Function = (url: string, payload: any, fileUpload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.CreateProjectLoading(true))
         dispatch(CommonActions.SetLoading(true))
 
-        const postCreateProjectDetails = async (url,payload,fileUpload) => {
+        const postCreateProjectDetails = async (url, payload, fileUpload) => {
 
             try {
-                const postNewProjectDetails = await axios.post(url,payload)
+                const postNewProjectDetails = await axios.post(url, payload)
                 const resp: CreateProjectDetailsModel = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
-                if(payload.splitting_algorithm === 'Custom Multipolygon'){
-                    dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`,fileUpload));
-                }else{
-                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`,fileUpload,{dimension:payload.dimension}));
+                if (payload.splitting_algorithm === 'Choose Area as Tasks') {
+                    dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
+                } else {
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
                 }
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -31,20 +31,18 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
                         duration: 2000,
                     })
                 );
-                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`,payload));
+                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, { ...payload, form_ways: payload.form_ways === 'Upload a Form' ? null : payload.xform_title }));
                 dispatch(CommonActions.SetLoading(false))
 
 
             } catch (error) {
-                console.log(error.response,'error');
-                console.log(error,'error2');
                 dispatch(CommonActions.SetLoading(false))
 
                 // Added Snackbar toast for error message 
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
-                        message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong.' ,
+                        message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong.',
                         variant: "error",
                         duration: 2000,
                     })
@@ -54,7 +52,7 @@ const CreateProjectService: Function = (url: string,payload: any,fileUpload: any
             }
         }
 
-        await postCreateProjectDetails(url,payload,fileUpload);
+        await postCreateProjectDetails(url, payload, fileUpload);
 
     }
 
@@ -81,19 +79,21 @@ const FormCategoryService: Function = (url: string) => {
     }
 
 }
-const UploadAreaService: Function = (url: string,filePayload: any,payload:any) => {
+const UploadAreaService: Function = (url: string, filePayload: any, payload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadAreaLoading(true))
+        console.log(filePayload, 'filePayload');
+        const postUploadArea = async (url, filePayload, payload) => {
 
-        const postUploadArea = async (url,filePayload,payload) => {
-            
             try {
                 const areaFormData = new FormData();
-                areaFormData.append('upload',filePayload);
-                areaFormData.append('dimension',payload.dimension);
-                const postNewProjectDetails = await axios.post(url,areaFormData,
-                    { 
+                areaFormData.append('upload', filePayload);
+                if (payload?.dimension) {
+                    areaFormData.append('dimension', payload?.dimension);
+                }
+                const postNewProjectDetails = await axios.post(url, areaFormData,
+                    {
                         headers: {
                             "Content-Type": "multipart/form-data",
                         }
@@ -101,8 +101,9 @@ const UploadAreaService: Function = (url: string,filePayload: any,payload:any) =
                 // const resp: UploadAreaDetailsModel = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.UploadAreaLoading(false))
                 await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
-                
+
             } catch (error) {
+                console.log(error, 'error');
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
@@ -115,48 +116,41 @@ const UploadAreaService: Function = (url: string,filePayload: any,payload:any) =
             }
         }
 
-        await postUploadArea(url,filePayload,payload);
+        await postUploadArea(url, filePayload, payload);
 
     }
 
 }
-const GenerateProjectQRService: Function = (url: string,payload: any) => {
+const GenerateProjectQRService: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.GenerateProjectQRLoading(true))
         dispatch(CommonActions.SetLoading(true))
-        
-        const postUploadArea = async (url,payload) => {
+
+        const postUploadArea = async (url, payload) => {
 
             try {
                 const generateApiFormData = new FormData();
-                if(payload.form_ways === 'Upload a Custom Form'){
-                    generateApiFormData.append('extractPolygon',payload.data_extractWays);
-                    generateApiFormData.append('upload',payload.uploaded_form[0]);
-                }else{
-                    generateApiFormData.append('extractPolygon',payload.data_extractWays);
-                    generateApiFormData.append('upload','');
+                if (payload.form_ways === 'Upload a Custom Form') {
+                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('upload', payload.uploaded_form[0]);
+                } else {
+                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('upload', '');
 
                 }
-                const postNewProjectDetails = await axios.post(url,generateApiFormData,
-                    { 
+                const postNewProjectDetails = await axios.post(url, generateApiFormData,
+                    {
                         headers: {
                             "Content-Type": "multipart/form-data",
                         }
                     });
                 const resp: string = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.GenerateProjectQRLoading(false))
-                dispatch(
-                    CommonActions.SetSnackBar({
-                    open: true,
-                    message: 'QR Generation Completed.',
-                    variant: "success",
-                    duration: 2000,
-                }));
                 dispatch(CommonActions.SetLoading(false))
                 await dispatch(CreateProjectActions.ClearCreateProjectFormData())
                 await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp))
-                
+
             } catch (error) {
                 dispatch(CommonActions.SetLoading(false))
                 dispatch(
@@ -171,7 +165,7 @@ const GenerateProjectQRService: Function = (url: string,payload: any) => {
             }
         }
 
-        await postUploadArea(url,payload);
+        await postUploadArea(url, payload);
 
     }
 
@@ -199,25 +193,25 @@ const OrganisationService: Function = (url: string) => {
 
 }
 
-const UploadCustomXLSFormService: Function = (url: string,payload: any) => {
+const UploadCustomXLSFormService: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadCustomXLSFormLoading(true))
 
-        const postUploadCustomXLSForm = async (url,payload) => {
+        const postUploadCustomXLSForm = async (url, payload) => {
 
             try {
                 const customXLSFormData = new FormData();
-                customXLSFormData.append('upload',payload[0]);
-                const postCustomXLSForm = await axios.post(url,customXLSFormData,
-                    { 
+                customXLSFormData.append('upload', payload[0]);
+                const postCustomXLSForm = await axios.post(url, customXLSFormData,
+                    {
                         headers: {
                             "Content-Type": "multipart/form-data",
                         }
                     });
                 await dispatch(CreateProjectActions.UploadCustomXLSFormLoading(false))
                 await dispatch(CreateProjectActions.UploadCustomXLSFormSuccess(postCustomXLSForm.data))
-                
+
             } catch (error) {
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -231,20 +225,20 @@ const UploadCustomXLSFormService: Function = (url: string,payload: any) => {
             }
         }
 
-        await postUploadCustomXLSForm(url,payload);
+        await postUploadCustomXLSForm(url, payload);
 
     }
 
 }
 
-const GenerateProjectLog: Function = (url: string,params:any) => {
+const GenerateProjectLog: Function = (url: string, params: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.GenerateProjectLogLoading(true))
 
-        const getGenerateProjectLog = async (url,params) => {
+        const getGenerateProjectLog = async (url, params) => {
             try {
-                const getGenerateProjectLogResponse = await axios.get(url,{params})
+                const getGenerateProjectLogResponse = await axios.get(url, { params })
                 const resp: OrganisationListModel = getGenerateProjectLogResponse.data;
                 dispatch(CreateProjectActions.SetGenerateProjectLog(resp));
 
@@ -253,22 +247,22 @@ const GenerateProjectLog: Function = (url: string,params:any) => {
             }
         }
 
-        await getGenerateProjectLog(url,params);
+        await getGenerateProjectLog(url, params);
 
     }
 
 }
-const GetDividedTaskFromGeojson: Function = (url: string,payload:any) => {
+const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(true))
 
-        const getDividedTaskFromGeojson = async (url,payload) => {
+        const getDividedTaskFromGeojson = async (url, payload) => {
             try {
                 const dividedTaskFormData = new FormData();
-                dividedTaskFormData.append("upload",payload.geojson);
-                dividedTaskFormData.append("dimension",payload.dimension);
-                const getGetDividedTaskFromGeojsonResponse = await axios.post(url,dividedTaskFormData)
+                dividedTaskFormData.append("upload", payload.geojson);
+                dividedTaskFormData.append("dimension", payload.dimension);
+                const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData)
                 const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
                 dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
 
@@ -277,9 +271,9 @@ const GetDividedTaskFromGeojson: Function = (url: string,payload:any) => {
             }
         }
 
-        await getDividedTaskFromGeojson(url,payload);
+        await getDividedTaskFromGeojson(url, payload);
 
     }
 
 }
-export {UploadAreaService,CreateProjectService,FormCategoryService,GenerateProjectQRService,OrganisationService,UploadCustomXLSFormService,GenerateProjectLog,GetDividedTaskFromGeojson}
+export { UploadAreaService, CreateProjectService, FormCategoryService, GenerateProjectQRService, OrganisationService, UploadCustomXLSFormService, GenerateProjectLog, GetDividedTaskFromGeojson }
