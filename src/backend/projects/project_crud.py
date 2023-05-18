@@ -36,9 +36,9 @@ import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from ..osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
-from ..osm_fieldwork.OdkCentral import OdkAppUser
+from osm_fieldwork.OdkCentral import OdkAppUser
 from shapely import wkt
 from sqlalchemy import (
     column,
