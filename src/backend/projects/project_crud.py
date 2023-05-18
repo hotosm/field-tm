@@ -36,9 +36,9 @@ import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
-from osm_fieldwork.xlsforms import xlsforms_path
+from ..osm_fieldwork.xlsforms import xlsforms_path
 from shapely.geometry import Polygon, shape
-from osm_fieldwork.OdkCentral import OdkAppUser
+from ..osm_fieldwork.OdkCentral import OdkAppUser
 from shapely import wkt
 from sqlalchemy import (
     column,
@@ -871,16 +871,17 @@ def generate_appuser_files(
                 # Generating an osm extract from the underpass database.
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
+
                 outline_geojson = pg.getFeatures(boundary = outline, 
-                                                 filespec = outfile, 
-                                                 polygon = extractPolygon,
-                                                 xlsfile =  category,
-                                                 category = category
-                                                 )
+                                                    filespec = outfile,
+                                                    polygon = extractPolygon,
+                                                    xlsfile =  f'{category}.xls',
+                                                    category = category
+                                                    )
 
-                updated_outline_geojson = []
-
-
+                updated_outline_geojson = {
+                    "type": "FeatureCollection",
+                    "features": []}
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -893,8 +894,6 @@ def generate_appuser_files(
                     if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
                         continue
 
-
-
                     wkb_element = from_shape(feature_shape, srid=4326)
                     feature_obj = db_models.DbFeatures(
                         project_id=project_id,
@@ -903,10 +902,9 @@ def generate_appuser_files(
                         geometry=wkb_element,
                         properties=feature["properties"],
                     )
-                    updated_outline_geojson.append(feature)
+                    updated_outline_geojson['features'].append(feature)
                     db.add(feature_obj)
                     db.commit()
-
 
                 # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
                 with open(outfile, "w") as jsonfile:
@@ -940,6 +938,12 @@ def generate_appuser_files(
                                     actorId=appuser.json()["id"])
                 except Exception as e:
                     logger.warning(str(e))
+
+                # Add the count of completed task in project table extract_completed_count column.
+                project = get_project_by_id(db, project_id)
+                project.extract_completed_count += 1
+                db.commit()
+                db.refresh(project)
 
         # Update background task status to COMPLETED 
         update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
@@ -1299,6 +1303,14 @@ def get_project_features(db: Session,
                          project_id: int):
     features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
+
+
+async def get_extract_completion_count(
+       project_id: int,
+       db: Session 
+    ):
+    project = db.query(db_models.DbProject).filter(db_models.DbProject.id == project_id).first()
+    return project.extract_completed_count
 
 
 async def get_background_task_status(

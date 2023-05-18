@@ -521,6 +521,9 @@ class DbProject(Base):
     odk_central_user = Column(String)
     odk_central_password = Column(String)
 
+    # Count of tasks where osm extracts is completed, used for progress bar.
+    extract_completed_count = Column(Integer, default=0)
+
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")

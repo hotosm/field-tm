@@ -7,6 +7,7 @@ import enviroment from "../environment";
 import ProjectCardSkeleton from "../components/home/ProjectCardSkeleton";
 import SearchablesRow from "../components/home/HomePageFilters";
 import CoreModules from "../shared/CoreModules";
+import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 
 const Home = () => {
     
@@ -26,9 +27,12 @@ const Home = () => {
     let cardsPerRow = new Array(type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1).fill(0);
     //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
+    
+
     const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
         dispatch(HomeSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`))
+        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({}));
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
 
@@ -50,9 +54,9 @@ const Home = () => {
 
             }
             {/*pagingation*/}
-            <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+            {/* <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
                 <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-            </CoreModules.Stack>
+            </CoreModules.Stack> */}
 
         </div>
 
