@@ -871,7 +871,13 @@ def generate_appuser_files(
                 # Generating an osm extract from the underpass database.
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
-                outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
+
+                outline_geojson = pg.getFeatures(boundary = outline, 
+                                                    filespec = outfile,
+                                                    polygon = extractPolygon,
+                                                    xlsfile =  f'{category}.xls',
+                                                    category = category
+                                                    )
 
                 updated_outline_geojson = {
                     "type": "FeatureCollection",
@@ -928,7 +934,7 @@ def generate_appuser_files(
                         odk_app = central_crud.appuser
 
                     odk_app.updateRole(projectId=one[3], 
-                                    xmlFormId=xform_id, 
+                                    xform=xform_id, 
                                     actorId=appuser.json()["id"])
                 except Exception as e:
                     logger.warning(str(e))
