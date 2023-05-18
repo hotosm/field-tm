@@ -19,7 +19,6 @@ version: "3"
 
 volumes:
   fmtm_db_data:
-  central_db_data:
 
 networks:
   fmtm-dev:
@@ -44,7 +43,7 @@ services:
     image: "ghcr.io/hotosm/fmtm/backend:debug"
     build:
       context: src/backend
-      target: debug-with-odk
+      target: debug-no-odk
       args:
         APP_VERSION: debug
     container_name: fmtm_api
@@ -52,11 +51,10 @@ services:
       - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
-      - central-proxy
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "7050:8000"
       - "5678:5678"
     networks:
       - fmtm-dev
@@ -84,7 +82,7 @@ services:
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -111,76 +109,7 @@ services:
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
-      - "8081:8081"
-    networks:
-      - fmtm-dev
-    restart: unless-stopped
-
-  central-db:
-    image: "postgis/postgis:14-3.3-alpine"
-    container_name: central_db
-    volumes:
-      - central_db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
-      - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
-      - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
-    ports:
-      - "5433:5432"
-    networks:
-      - fmtm-dev
-    restart: unless-stopped
-
-  central:
-    image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
-    build:
-      context: odkcentral/api
-      args:
-        ODK_CENTRAL_VERSION: v2023.2.1
-    container_name: central_api
-    depends_on:
-      - central-db
-      - pyxform
-    environment:
-      - DOMAIN=local
-      - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
-      - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
-      - HTTPS_PORT=${HTTPS_PORT:-443}
-      - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
-      - DB_USER=${CENTRAL_DB_USER:-odk}
-      - DB_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
-      - DB_NAME=${CENTRAL_DB_NAME:-odk}
-      - DB_SSL=${DB_SSL:-null}
-      - EMAIL_FROM=${ODK_CENTRAL_USER}
-      - EMAIL_HOST=${EMAIL_HOST:-mail}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - EMAIL_SECURE=${EMAIL_SECURE:-false}
-      - EMAIL_IGNORE_TLS=${EMAIL_IGNORE_TLS:-true}
-      - EMAIL_USER=${EMAIL_USER:-''}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-''}
-      - SENTRY_ORG_SUBDOMAIN=${SENTRY_ORG_SUBDOMAIN:-o130137}
-      - SENTRY_KEY=${SENTRY_KEY:-3cf75f54983e473da6bd07daddf0d2ee}
-      - SENTRY_PROJECT=${SENTRY_PROJECT:-1298632}
-    ports:
-      - "8383:8383"
-    networks:
-      - fmtm-dev
-    command:
-      [
-        "./wait-for-it.sh",
-        "${CENTRAL_DB_HOST:-central-db}:5432",
-        "--",
-        "./init-user-and-start.sh",
-      ]
-    restart: unless-stopped
-
-  central-proxy:
-    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
-    build:
-      context: odkcentral/proxy
-    container_name: central_proxy
-    depends_on:
-      - central
+      - "8082:8082"
     networks:
       - fmtm-dev
     restart: unless-stopped
