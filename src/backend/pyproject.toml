@@ -58,7 +58,7 @@ build-backend = "pdm.pep517.api"
 
 [tool.pdm]
 source-includes = ["../../CHANGELOG.md", "../../LICENSE", "../../README.md"]
-version = {from = "__version__.py"}
+version = {from = "app/__version__.py"}
 [tool.pdm.dev-dependencies]
 dev = [
     "ipdb==0.13.11",
@@ -75,7 +75,7 @@ ignore = ["N805", "B008"]
 exclude = [
     ".ruff_cache",
     "__pypackages__",
-    "__version__.py",
+    "app/__version__.py",
 ]
 [tool.ruff.pydocstyle]
 convention = "google"
