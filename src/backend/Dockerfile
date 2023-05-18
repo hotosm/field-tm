@@ -133,7 +133,7 @@ FROM debug-no-odk as debug-with-odk
 # Add the SSL cert for debug odkcentral
 USER root
 COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
-    /etc/nginx/central-cert.pem /usr/local/share/ca-certificates/central.crt
+    /etc/nginx/ca.crt /etc/nginx/central.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 USER appuser
 
