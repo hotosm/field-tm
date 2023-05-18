@@ -116,19 +116,26 @@ RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appu
 
 
 
-FROM runtime as debug
-COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
-    /etc/nginx/central-cert.pem /usr/local/share/ca-certificates/central.crt
+FROM runtime as debug-no-odk
 COPY --from=extract-deps \
     /opt/python/requirements-dev.txt /opt/python/
 RUN pip install --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements-dev.txt \
-    && update-ca-certificates
+    --no-cache-dir -r /opt/python/requirements-dev.txt
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
     "--reload", "--log-level", "error", "--no-access-log"]
+
+
+
+FROM debug-no-odk as debug-with-odk
+# Add the SSL cert for debug odkcentral
+USER root
+COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
+    /etc/nginx/central-cert.pem /usr/local/share/ca-certificates/central.crt
+RUN update-ca-certificates
+USER appuser
 
 
 
