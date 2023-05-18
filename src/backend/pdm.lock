@@ -390,11 +390,10 @@ dependencies = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.3.0"
+version = "0.3.1rc1"
 requires_python = ">=3.9"
 summary = "Convert CSV files from ODK Central to OSM format."
 dependencies = [
-    "OSMPythonTools>=0.3.5",
     "PyYAML>=6.0",
     "codetiming>=1.4.0",
     "epdb>=0.15.1",
@@ -839,7 +838,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:1d24b9f227209895925190abe690b92a6372e278d08372fa1271659906c04d38"
+content_hash = "sha256:9178287cdc6ca2c60c266dde5c755b7f50de85c3ef774fbbb03054cc958581fb"
 
 [metadata.files]
 "alembic 1.8.1" = [
@@ -1511,9 +1510,9 @@ content_hash = "sha256:1d24b9f227209895925190abe690b92a6372e278d08372fa127165990
     {url = "https://files.pythonhosted.org/packages/1c/a6/8ce4d2ef2c29be3235c08bb00e0b81e29d38ebc47d82b17af681bf662b74/openpyxl-3.0.9-py2.py3-none-any.whl", hash = "sha256:8f3b11bd896a95468a4ab162fc4fcd260d46157155d1f8bfaabb99d88cfcf79f"},
     {url = "https://files.pythonhosted.org/packages/9e/19/c45fb7a40cd46e03e36d60d1db26a50a795fa0b6b8a2a8094f4ac0c71ae5/openpyxl-3.0.9.tar.gz", hash = "sha256:40f568b9829bf9e446acfffce30250ac1fa39035124d55fc024025c41481c90f"},
 ]
-"osm-fieldwork 0.3.0" = [
-    {url = "https://files.pythonhosted.org/packages/9a/fb/546a960b5a61fa68417d9eaa53d1bf067727dfd09c3da5aa14f10236567e/osm_fieldwork-0.3.0-py3-none-any.whl", hash = "sha256:95e56465ad1de945c366af7629295c01489438de246bcc6bbc77c1c8197601b3"},
-    {url = "https://files.pythonhosted.org/packages/f3/93/5c9faf52363035c0108092acf69a6bbf443624b5e2e7c5a79a3e77e232e8/osm-fieldwork-0.3.0.tar.gz", hash = "sha256:1dabf8256f2a91f5d063f429053aee1d6f607971a52585baa07e53233871f518"},
+"osm-fieldwork 0.3.1rc1" = [
+    {url = "https://files.pythonhosted.org/packages/16/02/a236c6710487653c143ae32569d058782d2e7cf0046af52be7a7e4c98a14/osm_fieldwork-0.3.1rc1-py3-none-any.whl", hash = "sha256:3cbf108abeb4c5aa4be79af9e6c5139ac48c814f50718a089592682b3c5d1098"},
+    {url = "https://files.pythonhosted.org/packages/32/d9/4706a3fcf0f1d9c15c6502416eb94e9a748ec75f5220ac431981fdf18103/osm-fieldwork-0.3.1rc1.tar.gz", hash = "sha256:f4950a8fae38bfa271d9b66021d6979e18156283b8b760fe7db6326be233940e"},
 ]
 "osm-login-python 0.0.4" = [
     {url = "https://files.pythonhosted.org/packages/d1/81/9c36618b20b570ddcf6fd7770a528a5d93f5b1f853d7ef81e536fdd39f76/osm-login-python-0.0.4.tar.gz", hash = "sha256:f10c9bc91978aebb38c5083502d42d78463b617d4a9a05d9a8bdc44550de32b8"},
