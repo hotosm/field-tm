@@ -1,7 +1,21 @@
 /*
-Create a specified number of clusters 
-
+Create a specified number of clusters from any geometry
+(tested with points and polygons, no idea what it does with lines)
+Simply adds a "cid" column to all features, with the same
+value for all features in each cluster
 */
-select st_clusterkmeans(geom, 100) --creates 100 clusters
+
+/*
+-- Version that does not retain attributes
+select st_clusterkmeans(geom, 200) --creates 200 clusters
 over () 
-as cid, geom from points
+as cid, geom 
+from features
+*/
+
+-- This version retains attributes
+select *, st_clusterkmeans(geom, 200) --creates 200 clusters
+over ()  
+as cid 
+from features
+
