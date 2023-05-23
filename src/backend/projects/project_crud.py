@@ -841,7 +841,6 @@ def generate_appuser_files(
                 contents = upload
                 with open(xlsform, "wb") as f:
                     f.write(contents)
-                xform_title = category
             else:
                 xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
@@ -875,7 +874,8 @@ def generate_appuser_files(
                 outline_geojson = pg.getFeatures(boundary = outline, 
                                                     filespec = outfile,
                                                     polygon = extractPolygon,
-                                                    xlsfile =  f'{category}.xls',
+                                                    # xlsfile =  f'{category}.xls' if not upload else xlsform,
+                                                    xlsfile = f'{category}.xls',
                                                     category = category
                                                     )
 
