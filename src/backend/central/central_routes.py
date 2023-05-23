@@ -127,6 +127,51 @@ async def download_submissions(
     return {"data": result}
 
 
+@router.get("/list-submissions")
+async def list_submissions(
+    project_id: int,
+    xmlFormId: str = None,
+    db: Session = Depends(database.get_db),
+    ):
+    try:
+        project = table(
+            "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+        )
+        where = f"id={project_id}"
+        sql = select(project).where(text(where))
+        result = db.execute(sql)
+        first = result.first()
+        if not first:
+            return {"error": "No such project!"}
+
+        submissions = list()
+
+        if not xmlFormId:
+            xforms = central_crud.list_odk_xforms(first.odkid)
+
+            for xform in xforms:
+                try:
+                    data = central_crud.download_submissions(first.odkid, xform["xmlFormId"], None, False)
+                except Exception as e:
+                    continue
+                if len(submissions) == 0:
+                    submissions.append(json.loads(data[0]))
+                if len(data) >= 2:
+                    for entry in range(1, len(data)):
+                        submissions.append(json.loads(data[entry]))
+        else:
+            data = central_crud.download_submissions(first.odkid, xmlFormId)
+            if len(submissions) == 0:
+                submissions.append(json.loads(data[0]))
+            if len(data) >= 2:
+                for entry in range(1, len(data)):
+                    submissions.append(json.loads(data[entry]))
+
+        return submissions
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/submission")
 async def get_submission(
     project_id: int,
@@ -173,7 +218,10 @@ async def get_submission(
             if not xmlFormId:
                 xforms = central_crud.list_odk_xforms(first.odkid)
                 for xform in xforms:
-                    data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
+                    try:
+                        data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
+                    except Exception as e:
+                        continue
                     if len(submissions) == 0:
                         submissions.append(json.loads(data[0]))
                     if len(data) >= 2:
