@@ -61,15 +61,11 @@ def get_submission_of_project(
 
             # XML Form Id is a combination or project_name, category and task_id
             xml_form_id = f'{project_name}_{form_category}_{id}'.split('_')[2]
-
-            print('xml_form_id',xml_form_id)
             submission_list = xform.listSubmissions(odkid, xml_form_id)
-            print('submission_list ',submission_list)
+
+            # data.append(submission_list)
             if isinstance(submission_list,list):
                 for submission in submission_list:
-                    # App User Id is a combination of project_name, category and task_id 
-                    # Need to access from api
-                    submission['submitted_by'] = f'{project_name}_{form_category}_{id}'
                     data.append(submission)
         return data
 

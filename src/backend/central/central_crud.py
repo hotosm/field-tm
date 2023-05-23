@@ -177,10 +177,10 @@ def get_form_list(
         raise HTTPException(e)
 
 
-def download_submissions(project_id: int, xform_id: str, submission_id: str = None):
+def download_submissions(project_id: int, xform_id: str, submission_id: str = None, get_json: bool = True):
     """Download submissions from a remote ODK server."""
     # FIXME: should probably filter by timestamps or status value
-    data = xform.getSubmissions(project_id, xform, submission_id, True)
+    data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
     fixed = str(data, "utf-8")
     return fixed.splitlines()
 
