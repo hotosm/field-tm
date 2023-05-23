@@ -28,8 +28,8 @@ import zlib
 import osm_fieldwork
 import xmltodict
 from fastapi.logger import logger as logger
-from ..osm_fieldwork.CSVDump import CSVDump
-from ..osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from osm_fieldwork.CSVDump import CSVDump
+from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy import column, table
 from sqlalchemy.dialects.postgresql import insert
