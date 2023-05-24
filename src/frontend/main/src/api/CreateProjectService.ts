@@ -5,7 +5,7 @@ import enviroment from "../environment";
 import { CommonActions } from '../store/slices/CommonSlice';
 
 
-const CreateProjectService: Function = (url: string, payload: any, fileUpload: any) => {
+const CreateProjectService: Function = (url: string, payload: any, fileUpload: any, formUpload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.CreateProjectLoading(true))
@@ -31,7 +31,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                         duration: 2000,
                     })
                 );
-                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, { ...payload, form_ways: payload.form_ways === 'Upload a Form' ? null : payload.xform_title }));
+                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload));
                 dispatch(CommonActions.SetLoading(false))
 
 
@@ -121,19 +121,21 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
     }
 
 }
-const GenerateProjectQRService: Function = (url: string, payload: any) => {
+const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.GenerateProjectQRLoading(true))
         dispatch(CommonActions.SetLoading(true))
 
-        const postUploadArea = async (url, payload) => {
-
+        const postUploadArea = async (url, payload, formUpload) => {
+            // debugger;
+            console.log(formUpload, 'formUpload');
+            console.log(payload, 'payload');
             try {
                 const generateApiFormData = new FormData();
                 if (payload.form_ways === 'Upload a Custom Form') {
                     generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
-                    generateApiFormData.append('upload', payload.uploaded_form[0]);
+                    generateApiFormData.append('upload', formUpload);
                 } else {
                     generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', '');
@@ -165,7 +167,7 @@ const GenerateProjectQRService: Function = (url: string, payload: any) => {
             }
         }
 
-        await postUploadArea(url, payload);
+        await postUploadArea(url, payload, formUpload);
 
     }
 
