@@ -891,7 +891,7 @@ def generate_appuser_files(
                     feature_shape = shape(feature['geometry'])
 
                     # If the centroid of the Polygon is not inside the outline, skip the feature.
-                    if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
+                    if(not shape(outline).contains(shape(feature_shape.centroid))):
                         continue
 
                     wkb_element = from_shape(feature_shape, srid=4326)
