@@ -82,9 +82,9 @@ const FormSelection: React.FC = () => {
         "splitting_algorithm": projectDetails.splitting_algorithm,
         "organization": projectDetails.organization,
         "form_ways": projectDetails.form_ways,
-        "uploaded_form": projectDetails.uploaded_form,
+        // "uploaded_form": projectDetails.uploaded_form,
         "data_extractWays": projectDetails.data_extractWays,
-      }, projectDetails?.areaGeojson
+      }, projectDetails?.areaGeojson, values.uploaded_form?.[0]
     ));
     // navigate("/select-form", { replace: true, state: { values: values } });
 
@@ -120,6 +120,9 @@ const FormSelection: React.FC = () => {
           variant: "success",
           duration: 2000,
         })
+      );
+      dispatch(
+        CreateProjectActions.SetGenerateProjectLog(null)
       );
     }
     if (generateQrSuccess && generateProjectLog?.status === 'PENDING') {
