@@ -60,7 +60,7 @@ const FormSelection: React.FC = () => {
     // //we use use-selector from redux to get all state of loginToken from login slice
 
     const submission = () => {
-
+        console.log(projectDetails.uploaded_form, 'uploadedForm');
         dispatch(CreateProjectService(`${enviroment.baseApiUrl}/projects/create_project`,
             {
                 "project_info": { name: projectDetails.name, short_description: projectDetails.short_description, description: projectDetails.description },
@@ -78,10 +78,9 @@ const FormSelection: React.FC = () => {
                 "dimension": projectDetails.dimension,
                 "splitting_algorithm": projectDetails.splitting_algorithm,
                 "organization": projectDetails.organization,
-                "form_ways": projectDetails.form_ways,
-                "uploaded_form": projectDetails.uploaded_form,
+                "form_ways": values.form_ways,
                 "data_extractWays": projectDetails.data_extractWays,
-            }, projectDetails?.areaGeojson
+            }, projectDetails?.areaGeojson, projectDetails.uploaded_form
         ));
         // navigate("/select-form", { replace: true, state: { values: values } });
 
