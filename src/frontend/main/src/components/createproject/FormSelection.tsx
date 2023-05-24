@@ -38,6 +38,9 @@ const FormSelection: React.FC = () => {
   const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
+  const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
+  // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
+
   // Fetching form category list 
   useEffect(() => {
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`))
@@ -154,8 +157,8 @@ const FormSelection: React.FC = () => {
     submission,
     SelectFormValidation,
   );
-
-  const totalSteps = 5;
+  console.log(dividedTaskGeojson, 'dividedTaskGeojson');
+  const totalSteps = dividedTaskGeojson?.features?.length;
 
   return (
     <CoreModules.Stack sx={{ width: '100%', marginLeft: '215px !important' }}>
@@ -259,10 +262,9 @@ const FormSelection: React.FC = () => {
             </Grid>
             <Grid item xs={8}>
               <CoreModules.Stack>
-                <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '40%' }}>
-                  <CoreModules.Typography variant="subtitle1">Progress Bar</CoreModules.Typography>
-                  <LoadingBar steps={totalSteps} activeStep={2} totalSteps={totalSteps} />
-                </CoreModules.Stack>
+                {generateProjectLog ? <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '60%', pb: '2rem' }}>
+                  <LoadingBar title={"Task Progress"} steps={totalSteps} activeStep={generateProjectLog.progress} totalSteps={totalSteps} />
+                </CoreModules.Stack> : null}
                 {generateProjectLog ? <CoreModules.Stack sx={{ width: '90%', height: '48vh' }}>
                   <div ref={divRef} style={{ backgroundColor: 'black', color: 'white', padding: '10px', fontSize: '12px', whiteSpace: 'pre-wrap', fontFamily: 'monospace', overflow: 'auto', height: '100%' }}>
                     {renderTraceback(generateProjectLog?.logs)}
