@@ -871,10 +871,40 @@ def generate_appuser_files(
                                             )
 
 
+        updated_outline_geojson = {
+            "type": "FeatureCollection",
+            "features": []}
+
+        # If the osm extracts contents does not have title, provide an empty text for that.
+        for feature in outline_geojson["features"]:
+            feature["properties"]["title"] = ""
+
+            # Insert the osm extracts into the database.
+            feature_shape = shape(feature['geometry'])
+
+            # If the centroid of the Polygon is not inside the outline, skip the feature.
+            if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
+                continue
+
+            wkb_element = from_shape(feature_shape, srid=4326)
+            feature_obj = db_models.DbFeatures(
+                project_id=project_id,
+                category_title=category,
+                geometry=wkb_element,
+                properties=feature["properties"],
+            )
+            updated_outline_geojson['features'].append(feature)
+            db.add(feature_obj)
+            db.commit()
+
+        # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+        with open(outfile, "w") as jsonfile:
+            jsonfile.truncate(0)  # clear the contents of the file
+            dump(updated_outline_geojson, jsonfile)
+
+
         for poly in result.fetchall():
 
-            
-            
             name = f"{prefix}_{category}_{poly.id}"
 
             # Create an app user for the task
@@ -896,51 +926,53 @@ def generate_appuser_files(
 
             outline = eval(poly.outline)
 
-            # # Generating an osm extract from the underpass database.
-            # pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
-            # outline = eval(poly.outline)
+            # Generating an osm extract from the underpass database.
+            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+            outline = eval(poly.outline)
 
-            # outline_geojson = pg.getFeatures(boundary = outline, 
-            #                                     filespec = outfile,
-            #                                     polygon = extractPolygon,
-            #                                     # xlsfile =  f'{category}.xls' if not upload else xlsform,
-            #                                     xlsfile = f'{category}.xls',
-            #                                     category = category
-            #                                     )
+            outline_geojson = pg.getFeatures(boundary = outline, 
+                                                filespec = outfile,
+                                                polygon = extractPolygon,
+                                                # xlsfile =  f'{category}.xls' if not upload else xlsform,
+                                                xlsfile = f'{category}.xls',
+                                                category = category
+                                                )
 
-            updated_outline_geojson = {
-                "type": "FeatureCollection",
-                "features": []}
+            # updated_outline_geojson = {
+            #     "type": "FeatureCollection",
+            #     "features": []}
 
-            # If the osm extracts contents does not have title, provide an empty text for that.
-            for feature in outline_geojson["features"]:
-                feature["properties"]["title"] = ""
+            # # If the osm extracts contents does not have title, provide an empty text for that.
+            # for feature in outline_geojson["features"]:
+            #     feature["properties"]["title"] = ""
 
-                # Insert the osm extracts into the database.
-                feature_shape = shape(feature['geometry'])
+            #     # Insert the osm extracts into the database.
+            #     feature_shape = shape(feature['geometry'])
 
-                # If the centroid of the Polygon is not inside the outline, skip the feature.
-                if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
-                    continue
+            #     # If the centroid of the Polygon is not inside the outline, skip the feature.
+            #     if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
+            #         continue
 
-                wkb_element = from_shape(feature_shape, srid=4326)
-                feature_obj = db_models.DbFeatures(
-                    project_id=project_id,
-                    task_id=poly.id,
-                    category_title=category,
-                    geometry=wkb_element,
-                    properties=feature["properties"],
-                )
-                updated_outline_geojson['features'].append(feature)
-                db.add(feature_obj)
-                db.commit()
+            #     wkb_element = from_shape(feature_shape, srid=4326)
+            #     feature_obj = db_models.DbFeatures(
+            #         project_id=project_id,
+            #         task_id=poly.id,
+            #         category_title=category,
+            #         geometry=wkb_element,
+            #         properties=feature["properties"],
+            #     )
+            #     updated_outline_geojson['features'].append(feature)
+            #     db.add(feature_obj)
+            #     db.commit()
 
-            # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
-            with open(outfile, "w") as jsonfile:
-                jsonfile.truncate(0)  # clear the contents of the file
-                dump(updated_outline_geojson, jsonfile)
+            # # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+            # with open(outfile, "w") as jsonfile:
+            #     jsonfile.truncate(0)  # clear the contents of the file
+            #     dump(updated_outline_geojson, jsonfile)
 
+            print('Outfile ', outfile)
             outfile = central_crud.generate_updated_xform(db, poly.id, xlsform, xform)
+            print('Outfile 2 ', outfile)
 
             # Update tasks table qith qr_Code id
             task = tasks_crud.get_task(db, poly.id)
