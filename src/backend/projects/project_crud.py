@@ -1300,8 +1300,17 @@ def convert_to_project_features(db_project_features: List[db_models.DbFeatures])
 
 
 def get_project_features(db: Session, 
-                         project_id: int):
-    features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
+                         project_id: int,
+                         task_id: int = None):
+    if task_id:
+        features = (
+            db.query(db_models.DbFeatures)
+            .filter(db_models.DbFeatures.project_id == project_id)
+            .filter(db_models.DbFeatures.task_id == task_id)
+            .all()
+        )
+    else:
+        features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
 
 
