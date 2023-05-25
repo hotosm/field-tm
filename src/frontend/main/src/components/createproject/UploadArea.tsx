@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CoreModules from "../../shared/CoreModules";
 import FormControl from '@mui/material/FormControl'
 import FormGroup from '@mui/material/FormGroup'
@@ -7,11 +7,11 @@ import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import DefineAreaMap from "map/DefineAreaMap";
 
 const UploadArea: React.FC = () => {
-    const [fileUpload, setFileUpload] = useState(null);
     const navigate = useNavigate();
-    const location = useLocation();
     const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
 
+    const projectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
+    // //we use use selector from redux to get all state of projectDetails from createProject slice
 
     const dispatch = CoreModules.useDispatch()
     // //dispatch function to perform redux state mutation
@@ -33,21 +33,17 @@ const UploadArea: React.FC = () => {
 
 
 
-
-    const values = location?.state?.values;
-    console.log(values, 'values');
     // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
     const onCreateProjectSubmission = () => {
-        if (!fileUpload) return;
-        const { values } = location.state;
-        dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...values }));
+        if (!projectDetails.areaGeojson) return;
+        // dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: fileUpload?.[0], areaGeojsonfileName: fileUpload?.name }));
         dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-        navigate("/define-tasks", { replace: true, state: { values: { ...values, areaGeojson: fileUpload?.[0] } } });
+        navigate("/define-tasks");
     }
 
 
     return (
-        <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <CoreModules.Stack sx={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginLeft: '215px !important', gap: '4rem' }}>
             <form>
                 <FormGroup >
                     {/* Area Geojson File Upload For Create Project */}
@@ -59,12 +55,14 @@ const UploadArea: React.FC = () => {
                         >
                             <CoreModules.Input
                                 type="file"
+                                // value={projectDetails.areaGeojsonfileName || ''}
                                 onChange={(e) => {
-                                    setFileUpload(e.target.files)
+                                    dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: e.target.files[0], areaGeojsonfileName: e.target.files[0].name }));
                                 }}
                             />
+                            <CoreModules.Typography component="h4">{projectDetails?.areaGeojsonfileName}</CoreModules.Typography>
                         </CoreModules.Button>
-                        {!fileUpload && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
+                        {!projectDetails.areaGeojson && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
                     </FormControl>
                     {/* END */}
 
@@ -73,7 +71,7 @@ const UploadArea: React.FC = () => {
                     {/* Submit Button For Create Project on Area Upload */}
                     <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                         {/* Previous Button  */}
-                        <Link to="/select-form">
+                        <Link to="/create-project">
                             <CoreModules.Button
                                 sx={{ width: '150px' }}
                                 variant="outlined"
@@ -105,7 +103,7 @@ const UploadArea: React.FC = () => {
                     {/* END */}
                 </FormGroup>
             </form>
-            <DefineAreaMap uploadedGeojson={fileUpload?.[0]} />
+            <DefineAreaMap uploadedGeojson={projectDetails?.areaGeojson} />
         </CoreModules.Stack >
     )
 };

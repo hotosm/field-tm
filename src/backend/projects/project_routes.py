@@ -349,13 +349,25 @@ async def generate_files(
 
     """
 
+    contents = None
+    xform_title = None
+    if upload:
+        # Validating for .XLS File.
+        file_name = os.path.splitext(upload.filename)
+        file_ext = file_name[1]
+        allowed_extensions = ['.xls']
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+        xform_title = file_name[0]
+        contents = await upload.read()
+
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
 
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, upload, background_task_id)
+    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, contents, xform_title, background_task_id)
 
     # FIXME: fix return value
     return {
@@ -410,6 +422,7 @@ async def create_organization(
 @router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
 def get_project_features(
     project_id: int,
+    task_id: int = None,
     db: Session = Depends(database.get_db),
 ):
     """
@@ -424,7 +437,7 @@ def get_project_features(
     - Returns a JSON object containing a list of features.
 
     """
-    features = project_crud.get_project_features(db, project_id)
+    features = project_crud.get_project_features(db, project_id, task_id)
     return features
 
 
@@ -448,6 +461,7 @@ async def generate_log(
     try:
         # Get the backgrund task status
         task_status = await project_crud.get_background_task_status(uuid, db)
+        extract_completion_count = await project_crud.get_extract_completion_count(project_id, db)
 
         with open(f"{project_id}_generate.log", "r") as f:
             lines = f.readlines()
@@ -455,6 +469,7 @@ async def generate_log(
             logs = ''.join(last_100_lines)
             return {
                 'status':task_status.name,
+                'progress':extract_completion_count,
                 'logs':logs
             }
     except Exception as e:
@@ -509,3 +524,42 @@ async def preview_tasks(
 
     result = await project_crud.preview_tasks(boundary, dimension)
     return result
+
+
+@router.post("/add_features/")
+async def add_features(
+    background_tasks: BackgroundTasks,
+    project_id : int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db)
+):
+    """
+    Add features to a project.
+
+    This endpoint allows you to add features to a project.
+
+    ## Request Body
+    - `project_id` (int): the project's id. Required.
+    - `upload` (file): Geojson files with the features. Required.
+
+    """
+
+    # Validating for .geojson File.
+    file_name = os.path.splitext(upload.filename)
+    file_ext = file_name[1]
+    allowed_extensions = ['.geojson','.json']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+
+    # read entire file
+    content = await upload.read()
+    features = json.loads(content)
+
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
+
+    # insert task and task ID into database
+    await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
+
+    background_tasks.add_task(project_crud.add_features_into_database, db, project_id, features, background_task_id)
+    return True

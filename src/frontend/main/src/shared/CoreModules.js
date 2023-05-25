@@ -36,7 +36,9 @@ import {
     FormControl,
     FormLabel,
     FormGroup,
-    Box
+    Box,
+    Avatar,
+    InputAdornment,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
@@ -109,5 +111,7 @@ export default {
     FormControl,
     FormLabel,
     FormGroup,
-    Box
+    Box,
+    Avatar,
+    InputAdornment,
 }

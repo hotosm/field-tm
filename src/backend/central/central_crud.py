@@ -177,10 +177,10 @@ def get_form_list(
         raise HTTPException(e)
 
 
-def download_submissions(project_id: int, xform_id: str):
+def download_submissions(project_id: int, xform_id: str, submission_id: str = None, get_json: bool = True):
     """Download submissions from a remote ODK server."""
     # FIXME: should probably filter by timestamps or status value
-    data = xform.getSubmission(project_id, xform_id, True)
+    data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
     fixed = str(data, "utf-8")
     return fixed.splitlines()
 
@@ -306,7 +306,7 @@ def convert_csv(
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
     parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
-    csvin = CSVDump(str(parent.absolute()) + "/xforms.yaml")
+    csvin = CSVDump("/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"
     csvin.createOSM(osmoutfile)

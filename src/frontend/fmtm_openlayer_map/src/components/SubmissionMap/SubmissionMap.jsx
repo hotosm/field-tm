@@ -1,8 +1,9 @@
-import React from 'react';
+import React,{useState} from 'react';
 import useOLMap from '../../hooks/useOlMap';
 import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js'
 import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import CoreModules from 'fmtm/CoreModules';
 
 function elastic(t) {
     return (
@@ -13,28 +14,36 @@ const basicGeojsonTemplate = {
     "type": "FeatureCollection",
     "features": []
 };
-const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
-    // const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
-    // const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
-
+const SubmissionMap = () => {
+    const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
+    const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
+    const [projectBoundaries, setProjectBoundaries] = useState(null)
+    const [buildingBoundaries, setBuildingBoundaries] = useState(null)
     const { mapRef, map } = useOLMap({
         // center: fromLonLat([85.3, 27.7]),
         center: [0, 0],
         zoom: 4,
         maxZoom: 25,
     });
-    console.log(projectTaskBoundries,'projectTaskBoundries');
 
-    const taskGeojsonFeatureCollection = {
-        ...basicGeojsonTemplate,
-        features: [{ ...projectTaskBoundries?.[0]?.taskBoundries?.[0]?.outline_geojson, id: projectTaskBoundries[0]?.taskBoundries?.[0]?.outline_geojson?.properties.uid }]
+    if(projectTaskBoundries?.length>0 && projectBoundaries === null){
 
-    };
-    const buildingGeojsonFeatureCollection = {
-        ...basicGeojsonTemplate,
-        features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
-
-    };
+        const taskGeojsonFeatureCollection = {
+            ...basicGeojsonTemplate,
+            features: [...projectTaskBoundries?.[0]?.taskBoundries?.map((task)=> ({...task.outline_geojson,id:task.outline_geojson.properties.uid}))]
+    
+        };
+        setProjectBoundaries(taskGeojsonFeatureCollection)
+    }
+    if(projectBuildingGeojson?.length>0 && buildingBoundaries === null){
+        
+        const buildingGeojsonFeatureCollection = {
+            ...basicGeojsonTemplate,
+            features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
+            
+        };
+        setBuildingBoundaries(buildingGeojsonFeatureCollection);
+    }
 
     return (
         <div className="map-container" style={{ height: '100%' }}>
@@ -48,8 +57,8 @@ const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
                 }}
             >
                 <LayerSwitcherControl />
-                <VectorLayer
-                    geojson={taskGeojsonFeatureCollection}
+                {projectBoundaries?.type && <VectorLayer
+                    geojson={projectBoundaries}
                     // stylestyle={{
                     //     ...getStyles,
                     //     fillOpacity: 100,
@@ -68,10 +77,12 @@ const SubmissionMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
                         duration: 2000,
                     }}
                     zoomToLayer
-                />
-                <VectorLayer
-                    geojson={buildingGeojsonFeatureCollection}
-                />
+                    zIndex={5}
+                />}
+                {buildingBoundaries?.type && <VectorLayer
+                    geojson={buildingBoundaries}
+                    zIndex={10}
+                />}
                 {/* )} */}
             </MapComponent>
         </div>
