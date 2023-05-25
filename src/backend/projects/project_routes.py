@@ -422,6 +422,7 @@ async def create_organization(
 @router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
 def get_project_features(
     project_id: int,
+    task_id: int = None,
     db: Session = Depends(database.get_db),
 ):
     """
@@ -436,7 +437,7 @@ def get_project_features(
     - Returns a JSON object containing a list of features.
 
     """
-    features = project_crud.get_project_features(db, project_id)
+    features = project_crud.get_project_features(db, project_id, task_id)
     return features
 
 
