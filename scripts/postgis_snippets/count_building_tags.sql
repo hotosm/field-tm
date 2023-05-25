@@ -14,6 +14,10 @@ database schema:
 https://github.com/hotosm/underpass/blob/master/utils/raw.lua
 
 which converts all tags into a jsonb object in a 'tags' column.
+
+Probably useful at some point to  punt tags that don't help 
+identify field mapping, such as 'source' (usually just a reference
+to the imagery used to digitize)
 */
 
 
@@ -29,7 +33,11 @@ tagscounted as
 (
 select *, array_length(keys, 1) as numkeys
 from tagsarrayed
-)
+)/*,
+tagsignored as
+(
+select * from ()
+)*/
 select *
 from tagscounted
 where numkeys > 1
