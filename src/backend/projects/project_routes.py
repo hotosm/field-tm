@@ -437,7 +437,7 @@ def get_project_features(
     - Returns a JSON object containing a list of features.
 
     """
-    features = project_crud.get_project_features(db, project_id)
+    features = project_crud.get_project_features(db, project_id, task_id)
     return features
 
 
