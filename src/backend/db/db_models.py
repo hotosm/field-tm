@@ -564,7 +564,7 @@ class DbFeatures(Base):
 
     category_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
     category = relationship(DbXForm)
-    task_id = Column(Integer, nullable=False)
+    task_id = Column(Integer, nullable=True)
     properties = Column(JSONB)
     geometry = Column(Geometry(geometry_type='GEOMETRY', srid=4326))
 
