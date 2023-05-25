@@ -521,6 +521,9 @@ class DbProject(Base):
     odk_central_user = Column(String)
     odk_central_password = Column(String)
 
+    # Count of tasks where osm extracts is completed, used for progress bar.
+    extract_completed_count = Column(Integer, default=0)
+
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")
@@ -580,3 +583,16 @@ class BackgroundTasks(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
+
+
+
+class DbUserRoles(Base):
+    __tablename__ = "user_roles"
+
+    user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    user = relationship(DbUser, backref="user_roles")
+    organization_id = Column(Integer, ForeignKey("organisations.id"))
+    organization = relationship(DbOrganisation, backref="user_roles")
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    project = relationship(DbProject, backref="user_roles")
+    role = Column(Enum(UserRole), nullable=False)

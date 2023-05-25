@@ -54,7 +54,6 @@ from geojson import dump
 
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
-from shapely.geometry import MultiPolygon
 
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..central import central_crud
@@ -62,7 +61,7 @@ from ..db import db_models
 from ..tasks import tasks_crud
 from ..users import user_crud
 from geoalchemy2.shape import from_shape
-from shapely.geometry import shape, mapping
+from shapely.geometry import shape, mapping, MultiLineString, MultiPolygon
 
 
 # from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
@@ -409,7 +408,14 @@ async def preview_tasks(boundary:str, dimension:int):
 
     nx = int((maxx - minx) / value)
     ny = int((maxy - miny) / value)
-    gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+    # gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+
+    xdiff = abs(maxx-minx)
+    ydiff = abs(maxy-miny)
+    if  xdiff > ydiff:
+        gx, gy = np.linspace(minx, maxx, ny), np.linspace(miny, miny+xdiff, ny)
+    else:
+        gx, gy = np.linspace(minx, minx+ydiff, nx), np.linspace(miny, maxy, nx)
     grid = list()
 
     id = 0
@@ -763,7 +769,8 @@ def generate_appuser_files(
     db: Session,
     project_id: int,
     extractPolygon: bool,
-    upload: UploadFile,
+    upload:str,
+    category:str,
     background_task_id: uuid.UUID,
     ):
     """
@@ -830,21 +837,10 @@ def generate_appuser_files(
             xform_title = one.xform_title if one.xform_title else None
 
             if upload:
-                # Validating for .XLS File.
-                file_name = os.path.splitext(upload.filename)
-                file_ext = file_name[1]
-                allowed_extensions = ['.xls']
-                if file_ext not in allowed_extensions:
-                    raise HTTPException(status_code=400, detail="Provide a valid .xls file")
-
-                # Read the contents of the xls file and write it into tmp file.
-                contents = upload.read()
                 xlsform = f"/tmp/custom_form.xls"
-
+                contents = upload
                 with open(xlsform, "wb") as f:
                     f.write(contents)
-                
-                xform_title = file_name[0]
             else:
                 xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
@@ -874,12 +870,18 @@ def generate_appuser_files(
                 # Generating an osm extract from the underpass database.
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outline = eval(poly.outline)
-                outline_geojson = pg.getFeatures(boundary = outline, filespec = outfile, polygon = extractPolygon)
-                
 
-                updated_outline_geojson = []
+                outline_geojson = pg.getFeatures(boundary = outline, 
+                                                    filespec = outfile,
+                                                    polygon = extractPolygon,
+                                                    # xlsfile =  f'{category}.xls' if not upload else xlsform,
+                                                    xlsfile = f'{category}.xls',
+                                                    category = category
+                                                    )
 
-
+                updated_outline_geojson = {
+                    "type": "FeatureCollection",
+                    "features": []}
 
                 # If the osm extracts contents does not have title, provide an empty text for that.
                 for feature in outline_geojson["features"]:
@@ -889,10 +891,8 @@ def generate_appuser_files(
                     feature_shape = shape(feature['geometry'])
 
                     # If the centroid of the Polygon is not inside the outline, skip the feature.
-                    if(extractPolygon and (not shape(outline).contains(shape(feature_shape.centroid)))):
+                    if(not shape(outline).contains(shape(feature_shape.centroid))):
                         continue
-
-
 
                     wkb_element = from_shape(feature_shape, srid=4326)
                     feature_obj = db_models.DbFeatures(
@@ -902,10 +902,9 @@ def generate_appuser_files(
                         geometry=wkb_element,
                         properties=feature["properties"],
                     )
-                    updated_outline_geojson.append(feature)
+                    updated_outline_geojson['features'].append(feature)
                     db.add(feature_obj)
                     db.commit()
-
 
                 # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
                 with open(outfile, "w") as jsonfile:
@@ -935,10 +934,16 @@ def generate_appuser_files(
                         odk_app = central_crud.appuser
 
                     odk_app.updateRole(projectId=one[3], 
-                                    xmlFormId=xform_id, 
+                                    xform=xform_id, 
                                     actorId=appuser.json()["id"])
                 except Exception as e:
                     logger.warning(str(e))
+
+                # Add the count of completed task in project table extract_completed_count column.
+                project = get_project_by_id(db, project_id)
+                project.extract_completed_count += 1
+                db.commit()
+                db.refresh(project)
 
         # Update background task status to COMPLETED 
         update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
@@ -947,7 +952,7 @@ def generate_appuser_files(
         logger.warning(str(e))
 
         # Update background task status to FAILED
-        update_background_task_status_in_database(db, background_task_id, 3) # 2 is FAILED
+        update_background_task_status_in_database(db, background_task_id, 2) # 2 is FAILED
 
 
 def create_qrcode(
@@ -1038,7 +1043,15 @@ def create_task_grid(db: Session, project_id: int, delta:int):
 
         nx = int((maxx - minx) / value)
         ny = int((maxy - miny) / value)
-        gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+        # gx, gy = np.linspace(minx, maxx, nx), np.linspace(miny, maxy, ny)
+
+        xdiff = maxx-minx
+        ydiff = maxy-miny
+        if  xdiff>ydiff:
+            gx, gy = np.linspace(minx, maxx, ny), np.linspace(miny, miny+xdiff, ny)
+        else:
+            gx, gy = np.linspace(minx, minx+ydiff, nx), np.linspace(miny, maxy, nx)
+
         grid = list()
 
         id = 0
@@ -1287,9 +1300,26 @@ def convert_to_project_features(db_project_features: List[db_models.DbFeatures])
 
 
 def get_project_features(db: Session, 
-                         project_id: int):
-    features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
+                         project_id: int,
+                         task_id: int = None):
+    if task_id:
+        features = (
+            db.query(db_models.DbFeatures)
+            .filter(db_models.DbFeatures.project_id == project_id)
+            .filter(db_models.DbFeatures.task_id == task_id)
+            .all()
+        )
+    else:
+        features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
+
+
+async def get_extract_completion_count(
+       project_id: int,
+       db: Session 
+    ):
+    project = db.query(db_models.DbProject).filter(db_models.DbProject.id == project_id).first()
+    return project.extract_completed_count
 
 
 async def get_background_task_status(
@@ -1339,3 +1369,43 @@ def update_background_task_status_in_database(db: Session,
         db.commit()
     
         return True
+
+
+def add_features_into_database( db: Session,
+                                project_id: int,
+                                 features: dict,
+                                 background_task_id: uuid.UUID
+                                 ):
+     """
+          Inserts a new task into the database
+          Params:
+                db: database session
+                project_id: id of the project
+                features: features to be added
+     """
+
+     success = 0
+     failure = 0
+     for feature in features['features']:
+        try:
+            feature_geometry = feature['geometry']
+            feature_shape = shape(feature_geometry)
+
+            wkb_element = from_shape(feature_shape, srid=4326)
+            feature_obj = db_models.DbFeatures(
+            project_id=project_id,
+            category_title='buildings',
+            geometry=wkb_element,
+            task_id=1,
+            properties = feature["properties"],
+            )
+            db.add(feature_obj)
+            db.commit()
+            success += 1
+        except Exception as e:
+            failure += 1
+            continue
+
+     update_background_task_status_in_database(db, background_task_id, 4) # 4 is COMPLETED
+
+     return True

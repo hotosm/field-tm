@@ -105,8 +105,9 @@ class Organisation(BaseModel):
 
 
 class Feature(BaseModel):
-    id:int
+    id: int
     project_id: int
+    task_id: int
     geometry: Feature
 
     class Config:

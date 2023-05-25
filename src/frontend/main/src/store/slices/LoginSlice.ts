@@ -5,16 +5,20 @@ const LoginSlice = CoreModules.createSlice({
     name: 'login',
     initialState: {
         loginToken: null,
+        authDetails: null,
     },
     reducers: {
         SetLoginToken(state, action) {
             state.loginToken = action.payload
         },
-        signOut(state,action) {
+        signOut(state, action) {
             storage.removeItem('persist:login')
             state.loginToken = action.payload
         },
-     
+        setAuthDetails(state, action) {
+            state.authDetails = action.payload
+        },
+
     }
 })
 
