@@ -903,6 +903,7 @@ def generate_appuser_files(
             # Bulk insert the osm extracts into the db.
             db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
+
             for poly in result.fetchall():
 
                 name = f"{prefix}_{category}_{poly.id}"
@@ -1353,10 +1354,18 @@ def convert_to_project_features(db_project_features: List[db_models.DbFeatures])
 
 
 def get_project_features(db: Session, 
-                         project_id: int):
-    features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
+                         project_id: int,
+                         task_id: int = None):
+    if task_id:
+        features = (
+            db.query(db_models.DbFeatures)
+            .filter(db_models.DbFeatures.project_id == project_id)
+            .filter(db_models.DbFeatures.task_id == task_id)
+            .all()
+        )
+    else:
+        features = db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).all()
     return convert_to_project_features(features)
-
 
 async def get_extract_completion_count(
        project_id: int,
