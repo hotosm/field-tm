@@ -8,3 +8,12 @@ from islingtonsplitpolygons poly
 left join islingtonbuildingcentroids cent 
 on st_contains(poly.geom,cent.geom)
 group by poly._uid_
+
+-- Count with intersect instead
+/*
+select sp.polyid, sp.geom, count(b.geom) as numfeatures
+from "splitpolys" sp
+left join "buildings" b
+on st_intersects(sp.geom,b.geom)
+group by sp.polyid, sp.geom
+*/
