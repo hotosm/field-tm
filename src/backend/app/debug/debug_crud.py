@@ -70,7 +70,9 @@ def load_test_data_as_test_user() -> None:
             # country="Unknown",
         )
         log.debug(f"Creating ODKCentral project for: {project_obj}")
-        odkproject = create_odk_project(project_obj.project_info.name)
+        odkproject = create_odk_project(
+            project_obj.project_info.name, project_obj.odk_central
+        )
         log.debug("Submitting project to API")
         new_project = create_project_with_project_info(
             db, project_obj, odkproject["id"]
