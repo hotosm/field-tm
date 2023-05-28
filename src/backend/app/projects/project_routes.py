@@ -109,10 +109,11 @@ async def create_project(
             project_info.project_info.name, project_info.odk_central
         )
         logger.debug(f"ODKCentral return: {odkproject}")
-    except:
+    except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
-        )
+        ) from e
 
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
@@ -321,13 +322,13 @@ async def download_task_boundaries(
 async def generate_files(
     background_tasks: BackgroundTasks,
     project_id: int,
-    extractPolygon: bool = Form(False),
+    extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    """Description:
-    This API generates required media files for each task in the project based on the provided parameters.
-    It accepts a project ID, category, custom form flag, and an uploaded file as inputs.
+    """Generate required media files tasks in the project based on the provided params.
+
+    Accepts a project ID, category, custom form flag, and an uploaded file as inputs.
     The generated files are associated with the project ID and stored in the database.
     This api generates qr_code, forms. This api also creates an app user for each task and provides the required roles.
     Some of the other functionality of this api includes converting a xls file provided by the user to the xform,
@@ -370,7 +371,7 @@ async def generate_files(
         project_crud.generate_appuser_files,
         db,
         project_id,
-        extractPolygon,
+        extract_polygon,
         contents,
         xform_title,
         background_task_id,
@@ -447,7 +448,7 @@ def get_project_features(
 async def generate_log(
     project_id: int, uuid: uuid.UUID, db: Session = Depends(database.get_db)
 ):
-    """Get the contents of a log file in a log format.
+    r"""Get the contents of a log file in a log format.
 
     ### Response
     - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".

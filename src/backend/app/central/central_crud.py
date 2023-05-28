@@ -80,9 +80,10 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
-        )
+        ) from e
 
 
 def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral = None):
@@ -170,10 +171,11 @@ def create_odk_xform(
 
     try:
         xform = OdkForm(url, user, pw)
-    except:
+    except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=500, detail={"message": "Connection failed to odk central"}
-        )
+        ) from e
 
     result = xform.createForm(project_id, xform_id, filespec, False)
 
@@ -189,7 +191,10 @@ def create_odk_xform(
 
 
 def delete_odk_xform(
-    project_id: int, xform_id: str, odk_central: project_schemas.ODKCentral = None
+    project_id: int,
+    xform_id: str,
+    filespec: str,
+    odk_central: project_schemas.ODKCentral = None,
 ):
     """Delete an XForm from a remote ODK Central server."""
     if odk_central:
@@ -261,7 +266,8 @@ def get_form_list(db: Session, skip: int, limit: int):
             .all()
         )
     except Exception as e:
-        raise HTTPException(e)
+        logger.error(e)
+        raise HTTPException(e) from e
 
 
 def download_submissions(
@@ -304,11 +310,11 @@ def generate_updated_xform(
         xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
     except Exception as e:
         logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     if os.path.getsize(outfile) <= 0:
         logger.warning(f"{outfile} is empty!")
-        raise HTTPException(status=400, detail=f"{outfile} is empty!")
+        raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
 
     xls = open(outfile, "r")
     data = xls.read()
@@ -364,7 +370,7 @@ def generate_updated_xform(
     return outfile
 
 
-def create_QRCode(project_id: int, token: str, name: str, odk_credentials: dict = None):
+def create_qrcode(project_id: int, token: str, name: str, odk_credentials: dict = None):
     """Create the QR Code for an app-user."""
     if odk_credentials:
         central_url = odk_credentials["odk_central_url"]
