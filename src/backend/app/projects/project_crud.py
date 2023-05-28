@@ -45,7 +45,6 @@ from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import (
     column,
-    insert,
     inspect,
     select,
     table,
@@ -164,7 +163,8 @@ def delete_project_by_id(db: Session, project_id: int):
             db.delete(db_project)
             db.commit()
     except Exception as e:
-        raise HTTPException(e)
+        logger.error(e)
+        raise HTTPException(e) from e
     return f"Project {project_id} deleted"
 
 
@@ -179,7 +179,7 @@ def partial_update_project_info(
     if not db_project:
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
-        )
+        ) from None
 
     # Get project info
     db_project_info = get_project_info_by_id(db, project_id)
@@ -334,7 +334,7 @@ def upload_xlsform(
         db.commit()
         return True
     except Exception as e:
-        raise HTTPException(status=400, detail={"message": str(e)})
+        raise HTTPException(status=400, detail={"message": str(e)}) from e
 
 
 def update_multi_polygon_project_boundary(
@@ -403,7 +403,8 @@ def update_multi_polygon_project_boundary(
 
         return True
     except Exception as e:
-        raise HTTPException(e)
+        logger.error(e)
+        raise HTTPException(e) from e
 
 
 async def preview_tasks(boundary: str, dimension: int):
@@ -508,9 +509,6 @@ def update_project_boundary(
         return False
 
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
-
-    def remove_z_dimension(coord):
-        return coord.pop() if len(coord) == 3 else None
 
     def remove_z_dimension(coord):
         return coord.pop() if len(coord) == 3 else None
@@ -790,13 +788,14 @@ def get_odk_id_for_project(db: Session, project_id: int):
 def generate_appuser_files(
     db: Session,
     project_id: int,
-    extractPolygon: bool,
+    extract_polygon: bool,
     upload: str,
     category: str,
     background_task_id: uuid.UUID,
 ):
-    """Generate the files for each appuser, the qrcode, the new XForm,
-    and the OSM data extract.
+    """Generate the files for each appuser.
+
+    QR code, new XForm, and the OSM data extract.
     """
     try:
         ## Logging ##
@@ -901,7 +900,7 @@ def generate_appuser_files(
                 outline_geojson = pg.getFeatures(
                     boundary=outline,
                     filespec=outfile,
-                    polygon=extractPolygon,
+                    polygon=extract_polygon,
                     # xlsfile =  f'{category}.xls' if not upload else xlsform,
                     xlsfile=f"{category}.xls",
                     category=category,
@@ -1182,10 +1181,11 @@ def get_outline_from_geojson_file_in_zip(
             shape_from_geom = shape(geom)
             return shape_from_geom
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400,
             detail=f"{error_detail} ----- Error: {e} ----",
-        )
+        ) from e
 
 
 def get_shape_from_json_str(feature: str, error_detail: str):
@@ -1193,10 +1193,11 @@ def get_shape_from_json_str(feature: str, error_detail: str):
         geom = feature["geometry"]
         return shape(geom)
     except Exception as e:
+        logger.error(e)
         raise HTTPException(
             status_code=400,
             detail=f"{error_detail} ----- Error: {e} ---- Json: {feature}",
-        )
+        ) from e
 
 
 def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
@@ -1211,9 +1212,12 @@ def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
             else:
                 raise HTTPException(
                     status_code=400, detail=f"{qr_filename} is an empty file"
-                )
+                ) from None
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"{error_detail} ----- Error: {e}")
+        logger.error(e)
+        raise HTTPException(
+            status_code=400, detail=f"{error_detail} ----- Error: {e}"
+        ) from e
 
 
 # --------------------
