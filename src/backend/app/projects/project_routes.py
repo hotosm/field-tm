@@ -86,6 +86,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
+    # TODO allow passing odkcentral credentials from user
     central_crud.delete_odk_project(project_id)
     # if not odkproject:
     #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
@@ -105,7 +106,7 @@ async def create_project(
     logger.debug(f"Creating project {project_info.project_info.name}")
     try:
         odkproject = central_crud.create_odk_project(
-            project_info.odk_central, project_info.project_info.name
+            project_info.project_info.name, project_info.odk_central
         )
         logger.debug(f"ODKCentral return: {odkproject}")
     except:
@@ -188,7 +189,7 @@ async def upload_project_boundary_with_zip(
     upload: UploadFile,
     db: Session = Depends(database.get_db),
 ):
-    """Upload a ZIP with task geojson polygons and QR codes for an existing project.
+    r"""Upload a ZIP with task geojson polygons and QR codes for an existing project.
 
     {PROJECT_NAME}/\n
     ├─ {PROJECT_NAME}.geojson\n

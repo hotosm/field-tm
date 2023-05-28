@@ -44,6 +44,7 @@ router = APIRouter(
 @router.get("/projects")
 async def list_projects():
     """List projects in Central."""
+    # TODO update for option to pass credentials by user
     projects = central_crud.list_odk_projects()
     if projects is None:
         return {"message": "No projects found"}

@@ -102,9 +102,9 @@ class Settings(BaseSettings):
             path=f"/{values.get('FMTM_DB_NAME') or ''}",
         )
 
-    ODK_CENTRAL_URL: AnyUrl
-    ODK_CENTRAL_USER: str
-    ODK_CENTRAL_PASSWD: str
+    ODK_CENTRAL_URL: Optional[AnyUrl]
+    ODK_CENTRAL_USER: Optional[str]
+    ODK_CENTRAL_PASSWD: Optional[str]
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
