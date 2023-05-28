@@ -1,36 +1,34 @@
-name: Production Deploy
+name: Deploy FMTM
 
 on:
-  # Push includes PRs
-  push:
-    branches:
-      - main
-  # Allow manual trigger (workflow_dispatch)
-  workflow_dispatch:
-  # Trigger on image build
+  # Trigger on image build complete
   workflow_run:
-    workflows: ["Build Container Image in GHCR"]
+    workflows: ["Build Container Images"]
     types:
       - completed
     branches:
       - main
+      - staging
+      - development
+      - "*-development-*"
+  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
-  deploy-prod:
+  deploy-container:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: ${{ github.ref_slug }}
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Environment to .env
-        env:
-          DOTENV: ${{ secrets.DOTENV }}
         run: echo "${{ secrets.DOTENV }}" > .env
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.FMTM_HOTOSM_ORG_PRIV_KEY }}
+          # TODO update FMTM_HOTOSM_ORG_PRIV_KEY --> SSH_PRIVATE_KEY in Github
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Disable Host key verification
         # Hack to prevent "Host key verification failed". Should be replaced with a ssh-keyscan based solution
@@ -39,4 +37,5 @@ jobs:
       - name: Deploy
         run: docker compose --file docker-compose.deploy.yml up --detach --pull
         env:
-          DOCKER_HOST: "ssh://svcfmtm@fmtm.hotosm.org"
+          # TODO create DOCKER_HOST secret = "ssh://svcfmtm@fmtm.hotosm.org"
+          DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
