@@ -95,10 +95,12 @@ async def create_project(
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
+    logger.debug(f"Creating project {project_info.project_info.name}")
     try:
         odkproject = central_crud.create_odk_project(
             project_info.odk_central, project_info.project_info.name
         )
+        logger.debug(f"ODKCentral return: {odkproject}")
     except:
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
