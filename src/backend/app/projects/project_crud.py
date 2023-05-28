@@ -55,6 +55,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from ..central import central_crud
+from ..config import settings
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
@@ -252,6 +253,20 @@ def create_project_with_project_info(
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
+
+    # Check / set credentials
+    if odk_credentials:
+        url = odk_credentials["odk_central_url"]
+        user = odk_credentials["odk_central_user"]
+        pw = odk_credentials["odk_central_password"]
+
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
     # verify data coming in
     if not user:
         raise HTTPException("No user passed in")
@@ -272,9 +287,9 @@ def create_project_with_project_info(
         odkid=project_id,
         project_name_prefix=project_info_1.name,
         xform_title=xform_title,
-        odk_central_url=odk_credentials.odk_central_url,
-        odk_central_user=odk_credentials.odk_central_user,
-        odk_central_password=odk_credentials.odk_central_password,
+        odk_central_url=url,
+        odk_central_user=user,
+        odk_central_password=pw,
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -944,9 +959,17 @@ def generate_appuser_files(
                         url = odk_credentials["odk_central_url"]
                         user = odk_credentials["odk_central_user"]
                         pw = odk_credentials["odk_central_password"]
-                        odk_app = OdkAppUser(url, user, pw)
+
                     else:
-                        odk_app = central_crud.appuser
+                        logger.debug(
+                            "ODKCentral connection variables not set in function"
+                        )
+                        logger.debug("Attempting extraction from environment variables")
+                        url = settings.ODK_CENTRAL_URL
+                        user = settings.ODK_CENTRAL_USER
+                        pw = settings.ODK_CENTRAL_PASSWD
+
+                    odk_app = OdkAppUser(url, user, pw)
 
                     odk_app.updateRole(
                         projectId=one[3], xform=xform_id, actorId=appuser.json()["id"]

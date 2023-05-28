@@ -37,37 +37,46 @@ from ..config import settings
 from ..db import db_models
 from ..projects import project_schemas
 
-url = settings.ODK_CENTRAL_URL
-user = settings.ODK_CENTRAL_USER
-pw = settings.ODK_CENTRAL_PASSWD
 
-project = OdkProject(url, user, pw)
-xform = OdkForm(url, user, pw)
-appuser = OdkAppUser(url, user, pw)
-# project.authenticate()
-
-
-def list_odk_projects():
+def list_odk_projects(odk_central: project_schemas.ODKCentral = None):
     """List all projects on a remote ODK Server."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    project = OdkProject(url, user, pw)
     return project.listProjects()
 
 
-def create_odk_project(odk_central: project_schemas.ODKCentral, name: str):
+def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None):
     """Create a project on a remote ODK Server."""
     try:
-        logger.debug(
-            f"Connecting to ODKCentral: url={odk_central.odk_central_url} "
-            f"user={odk_central.odk_central_user}"
-        )
+        if odk_central:
+            url = odk_central.odk_central_url
+            user = odk_central.odk_central_user
+            pw = odk_central.odk_central_password
+        else:
+            logger.debug("ODKCentral connection variables not set in function")
+            logger.debug("Attempting extraction from environment variables")
+            url = settings.ODK_CENTRAL_URL
+            user = settings.ODK_CENTRAL_USER
+            pw = settings.ODK_CENTRAL_PASSWD
+
+        logger.debug(f"Connecting to ODKCentral: url={url} user={user}")
         odk_project = OdkProject(
-            odk_central.odk_central_url,
-            odk_central.odk_central_user,
-            odk_central.odk_central_password,
+            url,
+            user,
+            pw,
         )
         result = odk_project.createProject(name)
         logger.debug(f"create_odk_project return from ODKCentral: {result}")
-
-        project.id = result.get("id")
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result
     except Exception as e:
@@ -76,15 +85,25 @@ def create_odk_project(odk_central: project_schemas.ODKCentral, name: str):
         )
 
 
-def delete_odk_project(project_id: int):
+def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral = None):
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
     # odkid in the projects table
 
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    project = OdkProject(url, user, pw)
     result = project.deleteProject(project_id)
     logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
-    project.listProjects()
-
     return result
 
 
@@ -92,26 +111,40 @@ def create_appuser(project_id: int, name: str, odk_credentials: dict = None):
     """Create an app-user on a remote ODK Server.
     If odk credentials of the project are provided, use them to create an app user.
     """
-    # project.listAppUsers(project_id)
-    # user = project.findAppUser(name=name)
-    # user = False
-    # if not user:
-
     if odk_credentials:
         url = odk_credentials["odk_central_url"]
         user = odk_credentials["odk_central_user"]
         pw = odk_credentials["odk_central_password"]
-        app_user = OdkAppUser(url, user, pw)
-        result = app_user.create(project_id, name)
+
     else:
-        result = appuser.create(project_id, name)
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    app_user = OdkAppUser(url, user, pw)
+    result = app_user.create(project_id, name)
     logger.info(f"Created app user: {result.json()}")
     return result
 
 
-def delete_app_user(project_id: int, name: str):
+def delete_app_user(
+    project_id: int, name: str, odk_central: project_schemas.ODKCentral = None
+):
     """Delete an app-user from a remote ODK Server."""
-    appuser = OdkAppUser()
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    appuser = OdkAppUser(url, user, pw)
     result = appuser.delete(project_id, name)
     return result
 
@@ -127,12 +160,20 @@ def create_odk_xform(
         url = odk_credentials["odk_central_url"]
         user = odk_credentials["odk_central_user"]
         pw = odk_credentials["odk_central_password"]
-        try:
-            xform = OdkForm(url, user, pw)
-        except:
-            raise HTTPException(
-                status_code=500, detail={"message": "Connection failed to odk central"}
-            )
+
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    try:
+        xform = OdkForm(url, user, pw)
+    except:
+        raise HTTPException(
+            status_code=500, detail={"message": "Connection failed to odk central"}
+        )
 
     result = xform.createForm(project_id, xform_id, filespec, False)
 
@@ -147,23 +188,61 @@ def create_odk_xform(
     return result
 
 
-def delete_odk_xform(project_id: int, xform_id: str):
+def delete_odk_xform(
+    project_id: int, xform_id: str, odk_central: project_schemas.ODKCentral = None
+):
     """Delete an XForm from a remote ODK Central server."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    xform = OdkForm(url, user, pw)
     result = xform.deleteForm(project_id, xform_id, filespec, True)
-    logger.error("delete_odk_xform is unimplemented!")
     # FIXME: make sure it's a valid project id
     return result
 
 
-def list_odk_xforms(project_id: int):
+def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None):
     """List all XForms in an ODK Central project."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    project = OdkProject(url, user, pw)
     xforms = project.listForms(project_id)
     # FIXME: make sure it's a valid project id
     return xforms
 
 
-def list_submissions(project_id: int):
+def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = None):
     """List submissions from a remote ODK server."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    project = OdkProject(url, user, pw)
+    xform = OdkForm(url, user, pw)
     submissions = list()
     for user in project.listAppUsers(project_id):
         for subm in xform.listSubmissions(project_id, user["displayName"]):
@@ -186,9 +265,26 @@ def get_form_list(db: Session, skip: int, limit: int):
 
 
 def download_submissions(
-    project_id: int, xform_id: str, submission_id: str = None, get_json: bool = True
+    project_id: int,
+    xform_id: str,
+    submission_id: str = None,
+    get_json: bool = True,
+    odk_central: project_schemas.ODKCentral = None,
 ):
     """Download submissions from a remote ODK server."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    xform = OdkForm(url, user, pw)
+
     # FIXME: should probably filter by timestamps or status value
     data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
     fixed = str(data, "utf-8")
@@ -270,11 +366,13 @@ def generate_updated_xform(
 
 def create_QRCode(project_id: int, token: str, name: str, odk_credentials: dict = None):
     """Create the QR Code for an app-user."""
-    # Odk central url of the project
     if odk_credentials:
         central_url = odk_credentials["odk_central_url"]
+
     else:
-        central_url = url
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        central_url = settings.ODK_CENTRAL_URL
 
     # Qr code text json in the format acceptable by odk collect.
     qr_code_setting = {
@@ -299,13 +397,47 @@ def create_QRCode(project_id: int, token: str, name: str, odk_credentials: dict 
     return qr_data
 
 
-def upload_media(project_id: int, xform_id: str, filespec: str):
+def upload_media(
+    project_id: int,
+    xform_id: str,
+    filespec: str,
+    odk_central: project_schemas.ODKCentral = None,
+):
     """Upload a data file to Central."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    xform = OdkForm(url, user, pw)
     xform.uploadMedia(project_id, xform_id, filespec)
 
 
-def download_media(project_id: int, xform_id: str, filespec: str):
+def download_media(
+    project_id: int,
+    xform_id: str,
+    filespec: str,
+    odk_central: project_schemas.ODKCentral = None,
+):
     """Upload a data file to Central."""
+    if odk_central:
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    xform = OdkForm(url, user, pw)
     filename = "test"
     xform.getMedia(project_id, xform_id, filename)
 
