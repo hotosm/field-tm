@@ -26,6 +26,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from osm_fieldwork import OdkProject, OdkForm
 
+from ..central.central_crud import get_odk_form, get_odk_project
 from ..projects import project_crud
 
 
@@ -88,7 +89,7 @@ def get_forms_of_project(db: Session, project_id: int):
         return []
 
     odkid = project_info.odkid
-    project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+    project = get_odk_project()
 
     result = project.listForms(odkid)
     return result
@@ -102,8 +103,7 @@ def list_app_users_or_project(db: Session, project_id: int):
         return []
 
     odkid = project_info.odkid
-    project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
-    
+    project = get_odk_project()
     result = project.listAppUsers(odkid)
     return result
 
@@ -127,6 +127,9 @@ def download_submission(db: Session, project_id: int, task_id: int):
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
+
+    # TODO use explicit credentials
+    xform = get_odk_form()
 
     file_path = f"{project_id}_submissions.zip"
 
@@ -188,6 +191,8 @@ def get_submission_points(db: Session, project_id: int, task_id: int = None):
         else all the submission points made in the projects are returned.
     """
     project_info = project_crud.get_project_by_id(db, project_id)
+    # TODO use explicit credentials
+    xform = get_odk_form()
 
     # Return empty list if project is not found
     if not project_info:
