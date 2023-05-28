@@ -100,9 +100,9 @@ class Organisation(BaseModel):
     slug: str
     logo: str
     name: str
-    description:str
-    url:str
-    type:int
+    description: str
+    url: str
+    type: int
 
 
 class Feature(BaseModel):

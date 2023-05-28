@@ -16,8 +16,10 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
+
 
 class UserBase(BaseModel):
     username: str
@@ -37,6 +39,7 @@ class User(UserBase):
 class UserOut(UserBase):
     id: int
     role: str
+
     class Config:
         orm_mode = True
 

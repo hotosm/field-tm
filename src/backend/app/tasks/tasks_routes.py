@@ -16,14 +16,15 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+
 from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
-
 
 router = APIRouter(
     prefix="/tasks",
@@ -31,6 +32,7 @@ router = APIRouter(
     dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
+
 
 @router.get("/", response_model=List[tasks_schemas.TaskOut])
 async def read_tasks(

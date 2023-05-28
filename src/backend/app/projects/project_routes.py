@@ -16,15 +16,22 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-import os
 import json
+import os
 import uuid
-
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, Form, BackgroundTasks
-from osm_fieldwork.make_data_extract import getChoices
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+)
 from fastapi.logger import logger as logger
+from osm_fieldwork.make_data_extract import getChoices
 from sqlalchemy.orm import Session
 
 from ..central import central_crud
@@ -207,16 +214,14 @@ async def upload_custom_xls(
     category: str = Form(...),
     db: Session = Depends(database.get_db),
 ):
+    """Upload a custom XLSForm to the database.
+    Parameters:
+    - upload: the XLSForm file
+    - category: the category of the XLSForm.
     """
-        Upload a custom XLSForm to the database.
-        Parameters:
-        - upload: the XLSForm file
-        - category: the category of the XLSForm
-    """
-
-    content = await upload.read() # read file content
-    name = upload.filename.split(".")[0] # get name of file without extension
-    project_crud.upload_xlsform(db, content,name, category)
+    content = await upload.read()  # read file content
+    name = upload.filename.split(".")[0]  # get name of file without extension
+    project_crud.upload_xlsform(db, content, name, category)
 
     # FIXME: fix return value
     return {"xform_title": f"{category}"}
@@ -260,14 +265,14 @@ async def upload_multi_project_boundary(
 async def upload_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
-    dimension : int = Form(500),
+    dimension: int = Form(500),
     db: Session = Depends(database.get_db),
 ):
-    
+
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
     file_ext = file_name[1]
-    allowed_extensions = ['.geojson','.json']
+    allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
@@ -340,14 +345,13 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
-
     contents = None
     xform_title = None
     if upload:
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = ['.xls']
+        allowed_extensions = [".xls"]
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
@@ -357,15 +361,22 @@ async def generate_files(
     background_task_id = uuid.uuid4()
 
     # insert task and task ID into database
-    await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
+    await project_crud.insert_background_task_into_database(
+        db, task_id=background_task_id
+    )
 
-    background_tasks.add_task(project_crud.generate_appuser_files, db, project_id, extractPolygon, contents, xform_title, background_task_id)
+    background_tasks.add_task(
+        project_crud.generate_appuser_files,
+        db,
+        project_id,
+        extractPolygon,
+        contents,
+        xform_title,
+        background_task_id,
+    )
 
     # FIXME: fix return value
-    return {
-            "Message": f"{project_id}",
-            "task_id": f"{background_task_id}"
-            }
+    return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
 
 
 @router.get("/organization/")
@@ -405,19 +416,18 @@ async def create_organization(
     }
     ```
     """
-    created = project_crud.create_organization(db, organization)
+    project_crud.create_organization(db, organization)
 
-    return {"Message": f"Organization Created Successfully."}
+    return {"Message": "Organization Created Successfully."}
 
 
-@router.get("/{project_id}/features",  response_model=List[project_schemas.Feature])
+@router.get("/{project_id}/features", response_model=List[project_schemas.Feature])
 def get_project_features(
     project_id: int,
     task_id: int = None,
     db: Session = Depends(database.get_db),
 ):
-    """
-    Get api for fetching all the features of a project.
+    """Get api for fetching all the features of a project.
 
     This endpoint allows you to get all the features of a project.
 
@@ -434,12 +444,9 @@ def get_project_features(
 
 @router.get("/generate-log/")
 async def generate_log(
-    project_id : int,
-    uuid:uuid.UUID,
-    db: Session = Depends(database.get_db)
+    project_id: int, uuid: uuid.UUID, db: Session = Depends(database.get_db)
 ):
-    """
-    Get the contents of a log file in a log format.
+    """Get the contents of a log file in a log format.
 
     ### Response
     - **200 OK**: Returns the contents of the log file in a log format. Each line is separated by a newline character "\n".
@@ -452,16 +459,18 @@ async def generate_log(
     try:
         # Get the backgrund task status
         task_status = await project_crud.get_background_task_status(uuid, db)
-        extract_completion_count = await project_crud.get_extract_completion_count(project_id, db)
+        extract_completion_count = await project_crud.get_extract_completion_count(
+            project_id, db
+        )
 
         with open(f"{project_id}_generate.log", "r") as f:
             lines = f.readlines()
             last_100_lines = lines[-50:]
-            logs = ''.join(last_100_lines)
+            logs = "".join(last_100_lines)
             return {
-                'status':task_status.name,
-                'progress':extract_completion_count,
-                'logs':logs
+                "status": task_status.name,
+                "progress": extract_completion_count,
+                "logs": logs,
             }
     except Exception as e:
         logger.error(e)
@@ -470,8 +479,7 @@ async def generate_log(
 
 @router.get("/categories/")
 async def get_categories():
-    """
-    Get api for fetching all the categories.
+    """Get api for fetching all the categories.
 
     This endpoint fetches all the categories from osm_fieldwork.
 
@@ -479,18 +487,15 @@ async def get_categories():
     - Returns a JSON object containing a list of categories and their respoective forms.
 
     """
-    
-    categories = getChoices() # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
+    categories = (
+        getChoices()
+    )  # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
     return categories
 
 
 @router.post("/preview_tasks/")
-async def preview_tasks(
-    upload: UploadFile = File(...),
-    dimension : int = Form(500)
-):
-    """
-    Preview tasks for a project.
+async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(500)):
+    """Preview tasks for a project.
 
     This endpoint allows you to preview tasks for a project.
 
@@ -501,11 +506,10 @@ async def preview_tasks(
     - Returns a JSON object containing a list of tasks.
 
     """
-
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
     file_ext = file_name[1]
-    allowed_extensions = ['.geojson','.json']
+    allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
@@ -520,12 +524,11 @@ async def preview_tasks(
 @router.post("/add_features/")
 async def add_features(
     background_tasks: BackgroundTasks,
-    project_id : int,
+    project_id: int,
     upload: UploadFile = File(...),
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
 ):
-    """
-    Add features to a project.
+    """Add features to a project.
 
     This endpoint allows you to add features to a project.
 
@@ -534,11 +537,10 @@ async def add_features(
     - `upload` (file): Geojson files with the features. Required.
 
     """
-
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
     file_ext = file_name[1]
-    allowed_extensions = ['.geojson','.json']
+    allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
@@ -550,7 +552,15 @@ async def add_features(
     background_task_id = uuid.uuid4()
 
     # insert task and task ID into database
-    await project_crud.insert_background_task_into_database(db, task_id = background_task_id)
+    await project_crud.insert_background_task_into_database(
+        db, task_id=background_task_id
+    )
 
-    background_tasks.add_task(project_crud.add_features_into_database, db, project_id, features, background_task_id)
+    background_tasks.add_task(
+        project_crud.add_features_into_database,
+        db,
+        project_id,
+        features,
+        background_task_id,
+    )
     return True

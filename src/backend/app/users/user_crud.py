@@ -126,7 +126,11 @@ def convert_to_app_users(db_users: List[db_models.DbUser]):
 
 
 def get_user_role_by_user_id(db: Session, user_id: int):
-    db_user_role = db.query(db_models.DbUserRoles).filter(db_models.DbUserRoles.user_id == user_id).first()
+    db_user_role = (
+        db.query(db_models.DbUserRoles)
+        .filter(db_models.DbUserRoles.user_id == user_id)
+        .first()
+    )
     if db_user_role:
         return db_user_role.role.value
     return None
@@ -145,4 +149,3 @@ async def create_user_roles(user_role: user_schemas.UserRoles, db: Session):
     db.commit()
     db.refresh(db_user_role)
     return db_user_role
-
