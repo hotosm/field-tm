@@ -14,7 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-ARG PYTHON_IMG_TAG=3.9
+ARG PYTHON_IMG_TAG=3.10
 
 FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bullseye as base
 ARG APP_VERSION

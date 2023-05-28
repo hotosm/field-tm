@@ -290,15 +290,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "importlib-resources"
-version = "5.12.0"
-requires_python = ">=3.7"
-summary = "Read resources from Python packages"
-dependencies = [
-    "zipp>=3.1.0; python_version < \"3.10\"",
-]
-
-[[package]]
 name = "iniconfig"
 version = "2.0.0"
 requires_python = ">=3.7"
@@ -335,7 +326,6 @@ dependencies = [
     "pygments>=2.4.0",
     "stack-data",
     "traitlets>=5",
-    "typing-extensions; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -398,7 +388,6 @@ dependencies = [
     "contourpy>=1.0.1",
     "cycler>=0.10",
     "fonttools>=4.22.0",
-    "importlib-resources>=3.2.0; python_version < \"3.10\"",
     "kiwisolver>=1.0.1",
     "numpy>=1.20",
     "packaging>=20.0",
@@ -501,7 +490,6 @@ version = "2.0.1"
 requires_python = ">=3.8"
 summary = "Powerful data structures for data analysis, time series, and statistics"
 dependencies = [
-    "numpy>=1.20.3; python_version < \"3.10\"",
     "numpy>=1.21.0; python_version >= \"3.10\"",
     "numpy>=1.23.2; python_version >= \"3.11\"",
     "python-dateutil>=2.8.2",
@@ -811,7 +799,6 @@ requires_python = ">=3.7"
 summary = "The little ASGI library that shines."
 dependencies = [
     "anyio<5,>=3.4.0",
-    "typing-extensions>=3.10.0; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -908,7 +895,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:dfa66313f09b2bb520d444bef8bca2cdc06bfcfc2807a05083487c7a779f34b1"
+content_hash = "sha256:e45a19ed4492154796db853553d0c8964d5e5c77671d8e7eb178c9ed09e0ba4c"
 
 [metadata.files]
 "alembic 1.8.1" = [
@@ -1281,10 +1268,6 @@ content_hash = "sha256:dfa66313f09b2bb520d444bef8bca2cdc06bfcfc2807a05083487c7a7
 "importlib-metadata 6.6.0" = [
     {url = "https://files.pythonhosted.org/packages/0b/1f/9de392c2b939384e08812ef93adf37684ec170b5b6e7ea302d9f163c2ea0/importlib_metadata-6.6.0.tar.gz", hash = "sha256:92501cdf9cc66ebd3e612f1b4f0c0765dfa42f0fa38ffb319b6bd84dd675d705"},
     {url = "https://files.pythonhosted.org/packages/30/bb/bf2944b8b88c65b797acc2c6a2cb0fb817f7364debf0675792e034013858/importlib_metadata-6.6.0-py3-none-any.whl", hash = "sha256:43dd286a2cd8995d5eaef7fee2066340423b818ed3fd70adf0bad5f1fac53fed"},
-]
-"importlib-resources 5.12.0" = [
-    {url = "https://files.pythonhosted.org/packages/38/71/c13ea695a4393639830bf96baea956538ba7a9d06fcce7cef10bfff20f72/importlib_resources-5.12.0-py3-none-any.whl", hash = "sha256:7b1deeebbf351c7578e09bf2f63fa2ce8b5ffec296e0d349139d43cca061a81a"},
-    {url = "https://files.pythonhosted.org/packages/4e/a2/3cab1de83f95dd15297c15bdc04d50902391d707247cada1f021bbfe2149/importlib_resources-5.12.0.tar.gz", hash = "sha256:4be82589bf5c1d7999aedf2a45159d10cb3ca4f19b2271f8792bc8e6da7b22f6"},
 ]
 "iniconfig 2.0.0" = [
     {url = "https://files.pythonhosted.org/packages/d7/4b/cbd8e699e64a6f16ca3a8220661b5f83792b3017d0f79807cb8708d33913/iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
