@@ -42,14 +42,14 @@ jobs:
         id: extract_api_version
         run: |
           cd src/backend
-          echo "::set-env name=API_VERSION::$(python -c 'from app.__version__ import __version__; print(__version__)')"
+          echo "API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')" >> $GITHUB_ENV
 
       - name: Extract frontend versions
         id: extract_frontend_versions
         run: |
           cd src/frontend
-          echo "::set-env name=FRONTEND_MAIN_VERSION::$(jq -r '.version' main/package.json)"
-          echo "::set-env name=FRONTEND_MAP_VERSION::$(jq -r '.version' fmtm_openlayer_map/package.json)"
+          echo "FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)" >> $GITHUB_ENV
+          echo "FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)" >> $GITHUB_ENV
 
       - name: Build and push backend
         uses: docker/build-push-action@v4

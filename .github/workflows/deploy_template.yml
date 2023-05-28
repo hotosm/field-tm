@@ -27,7 +27,6 @@ jobs:
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:
-          # TODO update FMTM_HOTOSM_ORG_PRIV_KEY --> SSH_PRIVATE_KEY in Github
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Disable Host key verification
@@ -37,5 +36,4 @@ jobs:
       - name: Deploy
         run: docker compose --file docker-compose.deploy.yml up --detach --pull
         env:
-          # TODO create DOCKER_HOST secret = "ssh://svcfmtm@fmtm.hotosm.org"
           DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
