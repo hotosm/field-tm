@@ -35,7 +35,7 @@ detailed maps that can have a variety of use cases. These could be:
 - Understanding the impact of environmental changes on the landscape,
   etc.
 
-## An Overview Of FMTM In Relations With HOT, OSM and ODK.
+## An Overview Of FMTM In Relations With HOT, OSM and ODK
 
 The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit
 organization that uses open mapping data to support humanitarian and
@@ -71,7 +71,7 @@ reliability of the data collected by volunteers, **FMTM** helps to
 provide critical information that can be used to support decision-making
 and improve the effectiveness of humanitarian efforts.
 
-## Using The FMTM Tool For A Mapping Campaign.
+## Using The FMTM Tool For A Mapping Campaign
 
 1. Navigate to the [FMTM website](https://fmtm.hotosm.org/).
 

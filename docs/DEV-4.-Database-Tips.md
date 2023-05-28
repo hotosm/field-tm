@@ -8,7 +8,7 @@ And then connect to the database
 
     `\c fmtm`
 
-## To access the fmtm database using psql, follow the instructions below:
+## To access the fmtm database using psql, follow the instructions below
 
 ### A few helpful psql commands
 
@@ -16,12 +16,13 @@ And then connect to the database
 
         docker exec -it fmtm-db-1 psql -U fmtm fmtm
 
-    This will open the psql command-line interface and connect you to the fmtm database.
+  This will open the psql command-line interface and connect you to the fmtm database.
 
 - Once connected to the fmtm database, you can switch to a different database using the command:
 
         \c dbname
-    Replace "dbname" with the name of the database you want to switch to. forexample `\c fmtm`
+
+  Replace "dbname" with the name of the database you want to switch to. forexample `\c fmtm`
 
 - You can list all the databases using the command:
 
@@ -50,7 +51,8 @@ And then connect to the database
 - To describe a table, use the command:
 
         \d table_name
-    Replace "table_name" with the name of the table you want to describe.
+
+  Replace "table_name" with the name of the table you want to describe.
 
 - To execute the last command again, use the command:
 
@@ -63,12 +65,14 @@ And then connect to the database
 - To save your command history to a file, use the command:
 
         \s filename
-    Replace "filename" with the name of the file you want to save the command history to.
+
+  Replace "filename" with the name of the file you want to save the command history to.
 
 - To execute commands from a file, use the command:
 
         \i filename
-    Replace "filename" with the name of the file containing the commands you want to execute.
+
+  Replace "filename" with the name of the file containing the commands you want to execute.
 
 - To view a list of all psql commands, use the command:
 
@@ -77,7 +81,8 @@ And then connect to the database
 - To view help for a specific command, use the command:
 
         \h command_name
-    Replace "command_name" with the name of the command you want help with.
+
+  Replace "command_name" with the name of the command you want help with.
 
 - To exit psql, use the command:
 

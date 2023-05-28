@@ -54,7 +54,7 @@ Install the dependencies by running the following command: `npm install`
 
 Run the microfrontend with hot-reloading: `npm run start:live`
 
-The frontend should now be accessible at: <<<http://127.0.0.1:<PORT_NUMBER>>>>.
+The frontend should now be accessible at: <<<<<<http://127.0.0.1:<PORT_NUMBER>>>>>>>.
 
 ### 2D. Repeat for each module
 
