@@ -17,6 +17,7 @@
 #
 
 import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.logger import logger as logger
 from fastapi.responses import JSONResponse
@@ -151,7 +152,7 @@ async def list_submissions(
             for xform in xforms:
                 try:
                     data = central_crud.download_submissions(first.odkid, xform["xmlFormId"], None, False)
-                except Exception as e:
+                except Exception:
                     continue
                 if len(submissions) == 0:
                     submissions.append(json.loads(data[0]))
@@ -178,19 +179,17 @@ async def get_submission(
     submission_id: str=None,
     db: Session = Depends(database.get_db),
 ):
+    """This api returns the submission json.
+
+    Parameters:
+    project_id:int the id of the project in the database.
+    xmlFormId:str: the xmlFormId of the form in Central.
+    submission_id:str: the submission id of the submission in Central.
+
+    If the submission_id is provided, an individual submission is returned.
+
+    Returns: Submission json.
     """
-        This api returns the submission json.
-
-        Parameters:
-        project_id:int the id of the project in the database.
-        xmlFormId:str: the xmlFormId of the form in Central.
-        submission_id:str: the submission id of the submission in Central.
-
-        If the submission_id is provided, an individual submission is returned.
-
-        Returns: Submission json.
-    """
-
     try:
         """Download the submissions data from Central."""
         project = table(
@@ -219,7 +218,7 @@ async def get_submission(
                 for xform in xforms:
                     try:
                         data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
-                    except Exception as e:
+                    except Exception:
                         continue
                     if len(submissions) == 0:
                         submissions.append(json.loads(data[0]))

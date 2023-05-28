@@ -69,6 +69,7 @@ class UserRole(IntEnum, Enum):
     ORGANIZATION_ADMIN = 4
     READ_ONLY = 5
 
+
 class MappingLevel(IntEnum, Enum):
     """The mapping level the mapper has achieved."""
 

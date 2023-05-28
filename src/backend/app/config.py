@@ -27,7 +27,6 @@ from pydantic import AnyUrl, BaseSettings, PostgresDsn, validator
 logger = logging.getLogger(__name__)
 
 
-
 class Settings(BaseSettings):
     """Main settings class, defining environment variables."""
 

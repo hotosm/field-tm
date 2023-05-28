@@ -22,8 +22,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import database
-from . import user_crud, user_schemas
 from ..models.enums import UserRole as UserRoleEnum
+from . import user_crud, user_schemas
 
 router = APIRouter(
     prefix="/users",
@@ -65,11 +65,9 @@ async def get_user_by_id(id: int, db: Session = Depends(database.get_db)):
 
 @router.post("/user-role")
 async def create_user_role(
-                            user_role: user_schemas.UserRoles,
-                            db: Session = Depends(database.get_db)
-                           ):
-    """
-    This api creates a new role for the user. 
+    user_role: user_schemas.UserRoles, db: Session = Depends(database.get_db)
+):
+    """This api creates a new role for the user.
     The role can be Admin, Organization Admin, Field Admin, Mapper, Validator or Read Only.
 
     Request Parameters:
@@ -82,8 +80,9 @@ async def create_user_role(
         Status Code 200 (OK): If the role is successfully created
         Status Code 400 (Bad Request): If the user is already assigned a role
     """
-
-    existing_user_role = user_crud.get_user_role_by_user_id(db, user_id=user_role.user_id)
+    existing_user_role = user_crud.get_user_role_by_user_id(
+        db, user_id=user_role.user_id
+    )
     if existing_user_role is not None:
         raise HTTPException(status_code=400, detail="User is already assigned a role")
 
@@ -91,7 +90,7 @@ async def create_user_role(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    print('Hellooo')
+    print("Hellooo")
 
     return await user_crud.create_user_roles(user_role, db)
 

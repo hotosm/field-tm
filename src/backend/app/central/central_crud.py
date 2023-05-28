@@ -59,10 +59,11 @@ def create_odk_project(odk_central: project_schemas.ODKCentral, name: str):
             f"Connecting to ODKCentral: url={odk_central.odk_central_url} "
             f"user={odk_central.odk_central_user}"
         )
-        odk_project = OdkProject(odk_central.odk_central_url,
-                                odk_central.odk_central_user,
-                                odk_central.odk_central_password
-                                )
+        odk_project = OdkProject(
+            odk_central.odk_central_url,
+            odk_central.odk_central_user,
+            odk_central.odk_central_password,
+        )
         result = odk_project.createProject(name)
         logger.debug(f"create_odk_project return from ODKCentral: {result}")
 
@@ -70,7 +71,9 @@ def create_odk_project(odk_central: project_schemas.ODKCentral, name: str):
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating project on ODK Central: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error creating project on ODK Central: {e}"
+        )
 
 
 def delete_odk_project(project_id: int):
@@ -182,7 +185,9 @@ def get_form_list(db: Session, skip: int, limit: int):
         raise HTTPException(e)
 
 
-def download_submissions(project_id: int, xform_id: str, submission_id: str = None, get_json: bool = True):
+def download_submissions(
+    project_id: int, xform_id: str, submission_id: str = None, get_json: bool = True
+):
     """Download submissions from a remote ODK server."""
     # FIXME: should probably filter by timestamps or status value
     data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
@@ -310,7 +315,7 @@ def convert_csv(
     data: bytes,
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
-    parent = pathlib.Path(osm_fieldwork.__file__).resolve().parent
+    pathlib.Path(osm_fieldwork.__file__).resolve().parent
     csvin = CSVDump("/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"

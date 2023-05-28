@@ -34,7 +34,7 @@ from sqlalchemy import (
     UniqueConstraint,
     desc,
 )
-from sqlalchemy.dialects.postgresql import TSVECTOR, JSONB
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
     backref,
     object_session,
@@ -42,6 +42,7 @@ from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
 )
 
 from ..models.enums import (
+    BackgroundTaskStatus,
     MappingLevel,
     MappingPermission,
     OrganisationType,
@@ -53,7 +54,6 @@ from ..models.enums import (
     TeamVisibility,
     UserRole,
     ValidationPermission,
-    BackgroundTaskStatus,
 )
 from .database import Base, FmtmMetadata
 from .postgis_utils import timestamp
@@ -554,7 +554,7 @@ class DbLicense(Base):
 
 
 class DbFeatures(Base):
-    """Features extracted from osm data"""
+    """Features extracted from osm data."""
 
     __tablename__ = "features"
 
@@ -566,7 +566,7 @@ class DbFeatures(Base):
     category = relationship(DbXForm)
     task_id = Column(Integer, nullable=False)
     properties = Column(JSONB)
-    geometry = Column(Geometry(geometry_type='GEOMETRY', srid=4326))
+    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -583,7 +583,6 @@ class BackgroundTasks(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
-
 
 
 class DbUserRoles(Base):

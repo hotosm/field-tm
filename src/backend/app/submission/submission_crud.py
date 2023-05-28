@@ -16,17 +16,17 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import csv
+import io
 import os
 import zipfile
-import io
-import csv
-from sqlalchemy.orm import Session
-from ..central.central_crud import xform
-from ..projects import project_crud
-from ..central.central_crud import project
-from fastapi.responses import FileResponse
+
 from fastapi import HTTPException
-from osm_fieldwork.OdkCentral import OdkForm, OdkProject
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from osm_fieldwork import OdkProject, OdkForm
+
+from ..projects import project_crud
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -62,13 +62,11 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
         for id in task_list:
 
             # XML Form Id is a combination or project_name, category and task_id
-            xml_form_id = f'{project_name}_{form_category}_{id}'.split('_')[2]
-            
-
+            xml_form_id = f"{project_name}_{form_category}_{id}".split("_")[2]
             submission_list = xform.listSubmissions(odkid, xml_form_id)
 
             # data.append(submission_list)
-            if isinstance(submission_list,list):
+            if isinstance(submission_list, list):
                 for submission in submission_list:
                     data.append(submission)
         return data
@@ -90,7 +88,6 @@ def get_forms_of_project(db: Session, project_id: int):
         return []
 
     odkid = project_info.odkid
-
     project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
 
     result = project.listForms(odkid)
@@ -105,6 +102,8 @@ def list_app_users_or_project(db: Session, project_id: int):
         return []
 
     odkid = project_info.odkid
+    project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+    
     result = project.listAppUsers(odkid)
     return result
 
@@ -124,14 +123,14 @@ def download_submission(db: Session, project_id: int, task_id: int):
     if not project_info:
         raise HTTPException(status_code=404, detail="Project not found")
 
-
-    central_url = project_info.odk_central_url
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
     file_path = f"{project_id}_submissions.zip"
+
+    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
@@ -182,17 +181,11 @@ def download_submission(db: Session, project_id: int, task_id: int):
     return FileResponse(file_path)
 
 
-
-def get_submission_points(
-        db: Session,
-        project_id: int,
-        task_id: int = None
-        ):
-    """
-        Gets the submission points of project.
-        This function takes project_id and task_id as a parameter.
-        If task_id is provided, it returns all the submission points made to that particular task, 
-            else all the submission points made in the projects are returned.
+def get_submission_points(db: Session, project_id: int, task_id: int = None):
+    """Gets the submission points of project.
+    This function takes project_id and task_id as a parameter.
+    If task_id is provided, it returns all the submission points made to that particular task,
+        else all the submission points made in the projects are returned.
     """
     project_info = project_crud.get_project_by_id(db, project_id)
 
@@ -203,8 +196,11 @@ def get_submission_points(
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
+    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
     if task_id:
-        xml_form_id = f'{project_name}_{form_category}_{task_id}'.split('_')[2] #FIXME: fix xml_form_id
+        xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[
+            2
+        ]  # FIXME: fix xml_form_id
         # file_path = f"{project_id}_submissions.zip"
         response_file = xform.getSubmissionMedia(odkid, xml_form_id)
 
@@ -212,29 +208,27 @@ def get_submission_points(
         response_file_obj = io.BytesIO(response_file.content)
         try:
             # Open the zipfile
-            with zipfile.ZipFile(response_file_obj, 'r') as zip_ref:
+            with zipfile.ZipFile(response_file_obj, "r") as zip_ref:
                 # Find the CSV file in the zipfile (assuming it has a .csv extension)
-                csv_filename = [f for f in zip_ref.namelist() if f.endswith('.csv')][0]
+                csv_filename = [f for f in zip_ref.namelist() if f.endswith(".csv")][0]
                 # Open the CSV file
                 with zip_ref.open(csv_filename) as csv_file:
                     # Read the CSV data
                     csv_reader = csv.DictReader(io.TextIOWrapper(csv_file))
                     geometry = []
                     for row in csv_reader:
-                        # Check if the row contains the 'warmup-Latitude' and 'warmup-Longitude' columns 
+                        # Check if the row contains the 'warmup-Latitude' and 'warmup-Longitude' columns
                         # FIXME: fix the column names (they might not be same warmup-Latitude and warmup-Longitude)
-                        if 'warmup-Latitude' in row and 'warmup-Longitude' in row:
-                            point=(row['warmup-Latitude'],row['warmup-Longitude'])
+                        if "warmup-Latitude" in row and "warmup-Longitude" in row:
+                            point = (row["warmup-Latitude"], row["warmup-Longitude"])
 
                             # Create a GeoJSON Feature object
-                            geometry.append({
-                                'type': 'Feature',
-                                'geometry': {
-                                    'type': 'Point',
-                                    'coordinates': point
+                            geometry.append(
+                                {
+                                    "type": "Feature",
+                                    "geometry": {"type": "Point", "coordinates": point},
                                 }
-
-                            })
+                            )
                             # points.append(point)
                 return geometry
         except zipfile.BadZipFile:
@@ -242,5 +236,3 @@ def get_submission_points(
             return None
     else:
         return None
-
-

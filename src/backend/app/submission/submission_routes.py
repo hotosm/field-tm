@@ -104,15 +104,11 @@ async def submission_points(
     project_id: int,
     task_id: int = None,
     db: Session = Depends(database.get_db),
-    ):
+):
+    """This api returns the submission points of a project.
+    It takes two parameter: project_id and task_id.
+
+    project_id: The ID of the project. This endpoint returns the submission points of this project.
+    task_id: The task_id of the project. This endpoint returns the submission points of this task.
     """
-        This api returns the submission points of a project.
-        It takes two parameter: project_id and task_id.
-
-        project_id: The ID of the project. This endpoint returns the submission points of this project.
-        task_id: The task_id of the project. This endpoint returns the submission points of this task.
-    """
-
-    return submission_crud.get_submission_points(db, project_id,task_id)
-
-
+    return submission_crud.get_submission_points(db, project_id, task_id)
