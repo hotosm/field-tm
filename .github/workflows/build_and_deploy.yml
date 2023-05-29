@@ -15,6 +15,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  GIT_BRANCH: ${{ github.ref_name }}
 
 jobs:
   build-and-push-images:
@@ -92,6 +93,7 @@ jobs:
 
   deploy-containers:
     runs-on: ubuntu-latest
+    needs: build-and-push-images
     environment:
       name: ${{ github.ref_name }}
 
@@ -99,8 +101,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Extract api version
+        id: extract_api_version
+        run: |
+          cd src/backend
+          echo "API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')" >> $GITHUB_OUTPUT
+
+      - name: Extract frontend versions
+        id: extract_frontend_versions
+        run: |
+          cd src/frontend
+          echo "FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)" >> $GITHUB_OUTPUT
+          echo "FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)" >> $GITHUB_OUTPUT
+
       - name: Environment to .env
-        run: echo "${{ secrets.DOTENV }}" > .env
+        run: |
+          echo "${{ secrets.DOTENV }}" > .env
+          echo "API_VERSION=${{ env.extract_api_version.outputs.API_VERSION }}" >> .env
+          echo "FRONTEND_MAIN_VERSION=${{ env.extract_frontend_versions.outputs.FRONTEND_MAIN_VERSION }}" >> .env
+          echo "FRONTEND_MAP_VERSION=${{ env.extract_frontend_versions.outputs.FRONTEND_MAP_VERSION }}" >> .env
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:
