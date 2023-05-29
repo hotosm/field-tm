@@ -40,7 +40,7 @@ def get_submission_of_project(
         If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
     """
 
-    project_info = project_crud.get_project_by_id(db, project_id)
+    project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -58,11 +58,14 @@ def get_submission_of_project(
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
+        print('Tassksssssssssssssssssssssssssssss')
         task_list = []
 
         task_list = [x.id for x in project_tasks]
 
         data = []
+        print('Tassksssssssssssssssssssssssssssss 222')
+
         for id in task_list:
 
             # XML Form Id is a combination or project_name, category and task_id
@@ -75,6 +78,7 @@ def get_submission_of_project(
             if isinstance(submission_list,list):
                 for submission in submission_list:
                     data.append(submission)
+        print('Task  333333333')
         return data
 
     else:
