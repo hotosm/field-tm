@@ -1,5 +1,8 @@
-# Docker
-Dockerfile
+# Ignore everything
+**
 
-# Python
-**/*.pyc
+# Allow files and directories
+!**/*.py
+!app
+!pyproject.toml
+!pdm.lock

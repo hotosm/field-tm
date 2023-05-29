@@ -7,14 +7,16 @@ on:
       - "*"
   # Run tests on PR, prior to merge to main & development.
   pull_request:
-    branches: 
+    branches:
       - main
+      - staging
       - development
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
 env:
-  DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
+  # using fmtm-db compose name fails as running FMTM outside docker, port map to localhost service instead
+  FMTM_DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
   ODK_CENTRAL_URL: http://localhost:8383
   ODK_CENTRAL_USER: odk
   ODK_CENTRAL_PASSWD: odk
@@ -24,6 +26,9 @@ env:
   OSM_SCOPE: read_prefs
   OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
   OSM_SECRET_KEY: test
+  URL_SCHEME: "http"
+  FRONTEND_MAIN_URL: "localhost:8080"
+  FRONTEND_MAP_URL: "localhost:8081"
 
 permissions:
   contents: read
@@ -40,7 +45,7 @@ jobs:
         # Provide the password, initilized database for pytest user
         env:
           POSTGRES_PASSWORD: fmtm
-          POSTGRES_DB: fmtm  # Test DB name
+          POSTGRES_DB: fmtm
           POSTGRES_USER: fmtm
         ports:
           # Opens tcp port 5432 on the host and service container,
@@ -62,23 +67,16 @@ jobs:
         id: cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.*') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r src/backend/requirements.txt
-          pip install -r src/backend/requirements-dev.txt
+          cd src/backend
+          python -m pip install pdm==2.6.1
+          pdm export --dev > requirements-all.txt
+          pip install -r requirements-all.txt
       - name: Run pytest
         run: |
+          cd src/backend
           pytest
-        env:
-          FMTM_TEST_DB_NAME: fmtm
-          # using fmtm-db as host fails, since the job is not running in container in docker host.
-          # port mapping for now.
-          FMTM_DB_HOST: localhost
-          FMTM_DB_USER: fmtm
-          FMTM_DB_PASSWORD: fmtm
-          FRONTEND_MAIN_URL: "http://localhost:8080"
-          FRONTEND_MAP_URL: "http://localhost:8081"

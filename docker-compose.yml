@@ -41,13 +41,15 @@ services:
     restart: unless-stopped
 
   api:
-    image: "quay.io/hotosm/fmtm-backend:latest"
+    image: "ghcr.io/hotosm/fmtm/backend:debug"
     build:
       context: src/backend
-      # target: debug
+      target: debug-with-odk
+      args:
+        APP_VERSION: debug
     container_name: fmtm_api
     volumes:
-      - ./src/backend:/app/backend
+      - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
       - central-proxy
@@ -55,18 +57,19 @@ services:
       - .env
     ports:
       - "8000:8000"
-      # - "5678:5678"
+      - "5678:5678"
     networks:
       - fmtm-dev
     restart: unless-stopped
 
   ui-main:
-    image: "quay.io/hotosm/fmtm-mf-main:debug"
+    image: "ghcr.io/hotosm/fmtm/frontend/main:debug"
     build:
       context: src/frontend
       dockerfile: debug.dockerfile
       args:
         APP_NAME: main
+        URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
@@ -77,9 +80,9 @@ services:
       - ./src/frontend/main:/app
       - /app/node_modules/
     environment:
-      - API_URL=${API_URL}
-      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8080:8080"
     networks:
@@ -87,12 +90,13 @@ services:
     restart: unless-stopped
 
   ui-map:
-    image: "quay.io/hotosm/fmtm-mf-map:debug"
+    image: "ghcr.io/hotosm/fmtm/frontend/map:debug"
     build:
       context: src/frontend
       dockerfile: debug.dockerfile
       args:
         APP_NAME: fmtm_openlayer_map
+        URL_SCHEME: ${URL_SCHEME}
         API_URL: ${API_URL}
         FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
         FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
@@ -103,9 +107,9 @@ services:
       - ./src/frontend/fmtm_openlayer_map:/app
       - /app/node_modules/
     environment:
-      - API_URL=${API_URL}
-      - FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8081:8081"
     networks:
@@ -128,9 +132,11 @@ services:
     restart: unless-stopped
 
   central:
-    image: "quay.io/hotosm/odkcentral-api:latest"
+    image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
     build:
       context: odkcentral/api
+      args:
+        ODK_CENTRAL_VERSION: v2023.2.1
     container_name: central_api
     depends_on:
       - central-db
@@ -138,6 +144,7 @@ services:
     environment:
       - DOMAIN=local
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
+      - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
       - HTTPS_PORT=${HTTPS_PORT:-443}
       - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
       - DB_USER=${CENTRAL_DB_USER:-odk}
@@ -168,7 +175,7 @@ services:
     restart: unless-stopped
 
   central-proxy:
-    image: "quay.io/hotosm/odkcentral-proxy:latest"
+    image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
     build:
       context: odkcentral/proxy
     container_name: central_proxy

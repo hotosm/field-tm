@@ -1,0 +1,121 @@
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+version: "3"
+
+volumes:
+  fmtm_db_data:
+
+networks:
+  fmtm-dev:
+
+services:
+  fmtm-db:
+    image: "postgis/postgis:14-3.3-alpine"
+    container_name: fmtm_db
+    volumes:
+      - fmtm_db_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
+      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+    ports:
+      - "5432:5432"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  api:
+    image: "ghcr.io/hotosm/fmtm/backend:debug"
+    build:
+      context: src/backend
+      target: debug-no-odk
+      args:
+        APP_VERSION: debug
+    container_name: fmtm_api
+    volumes:
+      - ./src/backend/app:/opt/app
+    depends_on:
+      - fmtm-db
+    env_file:
+      - .env
+    ports:
+      - "7050:8000"
+      - "5678:5678"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  ui-main:
+    image: "ghcr.io/hotosm/fmtm/frontend/main:debug"
+    build:
+      context: src/frontend
+      dockerfile: debug.dockerfile
+      args:
+        APP_NAME: main
+        URL_SCHEME: ${URL_SCHEME}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+    container_name: fmtm_main
+    depends_on:
+      - api
+    volumes:
+      - ./src/frontend/main:/app
+      - /app/node_modules/
+    environment:
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
+    ports:
+      - "8081:8081"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  ui-map:
+    image: "ghcr.io/hotosm/fmtm/frontend/map:debug"
+    build:
+      context: src/frontend
+      dockerfile: debug.dockerfile
+      args:
+        APP_NAME: fmtm_openlayer_map
+        URL_SCHEME: ${URL_SCHEME}
+        API_URL: ${API_URL}
+        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+    container_name: fmtm_map
+    depends_on:
+      - api
+    volumes:
+      - ./src/frontend/fmtm_openlayer_map:/app
+      - /app/node_modules/
+    environment:
+      - API_URL=${URL_SCHEME}://${API_URL}
+      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
+    ports:
+      - "8082:8082"
+    networks:
+      - fmtm-dev
+    restart: unless-stopped
+
+  pyxform:
+    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
+    networks:
+      - fmtm-dev
+    restart: always

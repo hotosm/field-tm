@@ -34,7 +34,7 @@ wheels/
 .installed.cfg
 *.egg
 venv/
-src/backend/odkconvert
+src/backend/osm-fieldwork
 
 __pycache__
 credentials.txt
@@ -68,3 +68,7 @@ temp_webmaps/Naivasha
 
 # node
 src/frontend/node_modules
+
+# pdm
+**/.pdm.toml
+**/__pypackages__
