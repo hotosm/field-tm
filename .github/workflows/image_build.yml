@@ -18,7 +18,7 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-and-push-image:
+  build-and-push-images:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref_name }}

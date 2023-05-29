@@ -4,8 +4,7 @@ on:
   # Trigger on image build complete
   workflow_run:
     workflows: ["Build Container Images"]
-    types:
-      - completed
+    types: [completed]
   # Allow manual trigger
   workflow_dispatch:
 

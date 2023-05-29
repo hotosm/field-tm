@@ -19,7 +19,7 @@ env:
   ODK_CENTRAL_VERSION: v2023.2.1
 
 jobs:
-  build-and-push-image:
+  build-and-push-images:
     runs-on: ubuntu-latest
     permissions:
       contents: read
