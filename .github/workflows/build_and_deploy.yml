@@ -1,4 +1,4 @@
-name: Build Container Images
+name: Build and Deploy
 
 on:
   # Push includes PR merge
@@ -7,7 +7,6 @@ on:
       - main
       - staging
       - development
-      - "*-development-*"
     paths:
       # Workflow is triggered only if src changes
       - "src/**"
@@ -90,3 +89,30 @@ jobs:
             API_URL=${{ env.URL_SCHEME }}://${{ env.API_URL }}
             FRONTEND_MAIN_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAIN_URL }}
             FRONTEND_MAP_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAP_URL }}
+
+  deploy-containers:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Environment to .env
+        run: echo "${{ secrets.DOTENV }}" > .env
+
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Disable Host key verification
+        # Hack to prevent "Host key verification failed". Should be replaced with a ssh-keyscan based solution
+        run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Deploy
+        run: |
+          docker compose --file docker-compose.deploy.yml pull
+          docker compose --file docker-compose.deploy.yml up --detach
+        env:
+          DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
