@@ -23,8 +23,8 @@ import zipfile
 
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
+from osm_fieldwork import OdkForm
 from sqlalchemy.orm import Session
-from osm_fieldwork import OdkProject, OdkForm
 
 from ..central.central_crud import get_odk_form, get_odk_project
 from ..projects import project_crud
@@ -35,7 +35,6 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
     This function takes project_id and task_id as a parameter.
     If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
     """
-
     project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
@@ -47,10 +46,20 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
-    if not (project_info.odk_central_url or project_info.odk_central_user or project_info.odk_central_password):
-        raise HTTPException(status_code=404, detail="ODK Central Credentials not found in project")
+    if not (
+        project_info.odk_central_url
+        or project_info.odk_central_user
+        or project_info.odk_central_password
+    ):
+        raise HTTPException(
+            status_code=404, detail="ODK Central Credentials not found in project"
+        )
 
-    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+    xform = OdkForm(
+        project_info.odk_central_url,
+        project_info.odk_central_user,
+        project_info.odk_central_password,
+    )
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
@@ -133,7 +142,11 @@ def download_submission(db: Session, project_id: int, task_id: int):
 
     file_path = f"{project_id}_submissions.zip"
 
-    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+    xform = OdkForm(
+        project_info.odk_central_url,
+        project_info.odk_central_user,
+        project_info.odk_central_password,
+    )
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
@@ -201,7 +214,11 @@ def get_submission_points(db: Session, project_id: int, task_id: int = None):
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
-    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+    xform = OdkForm(
+        project_info.odk_central_url,
+        project_info.odk_central_user,
+        project_info.odk_central_password,
+    )
     if task_id:
         xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[
             2
