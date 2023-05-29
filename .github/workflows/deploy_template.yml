@@ -15,7 +15,13 @@ jobs:
       name: ${{ github.ref_name }}
 
     steps:
+      # Hack to checkout to triggering branch
+      # As workflow_run only works for main branch by default
       - uses: actions/checkout@v3
+        with:
+          ref: $
+      - run: git branch
+      - run: env
 
       - name: Environment to .env
         run: echo "${{ secrets.DOTENV }}" > .env
