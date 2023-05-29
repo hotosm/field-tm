@@ -11,11 +11,11 @@ echo "The server will not start on this run"
 
 
 ### Create admin user
-echo "Creating test user ${ODK_CENTRAL_USER} with password ${ODK_CENTRAL_PASSWD}"
-echo "${ODK_CENTRAL_PASSWD}" | odk-cmd --email "${ODK_CENTRAL_USER}" user-create || true
+echo "Creating test user ${SYSADMIN_EMAIL} with password ${SYSADMIN_PASSWD}"
+echo "${SYSADMIN_PASSWD}" | odk-cmd --email "${SYSADMIN_EMAIL}" user-create || true
 
 echo "Elevating user to admin"
-odk-cmd --email "${ODK_CENTRAL_USER}" user-promote || true
+odk-cmd --email "${SYSADMIN_EMAIL}" user-promote || true
 
 
 ### Run server

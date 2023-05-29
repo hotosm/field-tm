@@ -1,0 +1,90 @@
+name: Build Container Images
+
+on:
+  # Push includes PR merge
+  push:
+    branches:
+      - main
+      - staging
+      - development
+      - "*-development-*"
+    paths:
+      # Workflow is Trigged only if src changes
+      - "src/**"
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Persist env vars
+        run: echo "${{ secrets.DOTENV }}" >> $GITHUB_ENV
+
+      - name: Extract api version
+        id: extract_api_version
+        run: |
+          cd src/backend
+          echo "API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')" >> $GITHUB_ENV
+
+      - name: Extract frontend versions
+        id: extract_frontend_versions
+        run: |
+          cd src/frontend
+          echo "FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)" >> $GITHUB_ENV
+          echo "FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)" >> $GITHUB_ENV
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v4
+        with:
+          context: src/backend
+          target: prod
+          push: true
+          tags: "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_slug }}"
+          build-args: |
+            APP_VERSION="${{ env.API_VERSION }}"
+
+      - name: Build and push frontend main
+        uses: docker/build-push-action@v4
+        with:
+          context: src/frontend/main
+          push: true
+          tags: "ghcr.io/hotosm/fmtm/frontend/main:${{ env.FRONTEND_MAIN_VERSION }}-${{ github.ref_slug }}"
+          build-args: |
+            APP_NAME=main
+            APP_VERSION="${{ env.FRONTEND_MAIN_VERSION }}"
+            URL_SCHEME=${URL_SCHEME}
+            API_URL=${API_URL}
+            FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+            FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+
+      - name: Build and push frontend map
+        uses: docker/build-push-action@v4
+        with:
+          context: src/frontend/fmtm_openlayer_map
+          push: true
+          tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_slug }}"
+          build-args: |
+            APP_NAME=fmtm_openlayer_map
+            APP_VERSION="${{ env.FRONTEND_MAP_VERSION }}"
+            URL_SCHEME=${URL_SCHEME}
+            API_URL=${API_URL}
+            FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
+            FRONTEND_MAP_URL=${FRONTEND_MAP_URL}

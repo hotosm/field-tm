@@ -1,9 +1,10 @@
 # Docker organization
+
 This section explains how the Docker deployment works when running `docker-compose`. It gives an overview of what happens when the scripts in `Dockerfile` are run and what happens for each container.
 
 When running `docker-compose`, it sets up the environment for the project and deploys the containers specified in the `docker-compose.yml` file. The scripts in the `Dockerfile` are used to set up the environment and dependencies for each container.
 
-### For example, let's say that we have the following `docker-compose.yml` file:
+### For example, let's say that we have the following `docker-compose.yml` file
 
     version: "3"
     services:
@@ -28,7 +29,6 @@ When running `docker-compose`, it sets up the environment for the project and de
         API_URL: http://api:8000
         ports:
         - "3000:3000"
-
 
 In this file, we have three containers: `db`, `api`, and `web`. For each container, we specify the `image` or `build` to use, any environment variables to set, and any ports to expose.
 
@@ -97,4 +97,5 @@ A few of those commands:
 To exit IPython debugging mode, we can press CTRL + D.
 
 ### Conclusion
+
 Overall, the documentation provides a clear overview of how the Docker deployment works when running `docker-compose`, what to do when updating Docker, and how to debug an application when using Docker using IPython debugger (ipdb). The provided examples make it easier to understand how to implement these concepts in practice.

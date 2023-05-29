@@ -8,12 +8,12 @@
 
 **Backend Builds**
 
-| Backend API | ODKCentral API  | ODKCentral Proxy  |
-|---|---|---|
-| [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/backend) | [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api)  |  [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy)  |
+| Backend API                                                                                                                          | ODKCentral API                                                                                                                                        | ODKCentral Proxy                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/backend) | [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api) | [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy) |
 
 **Microfrontend Builds**
-|  Main | Map |
+| Main | Map |
 |---|---|
 | [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main)| [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map) |
 
