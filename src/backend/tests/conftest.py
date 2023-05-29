@@ -27,11 +27,10 @@ from app.db.database import Base, get_db
 from app.main import api
 
 db_name = settings.FMTM_DB_NAME
-db_host = settings.FMTM_DB_HOST
 user = settings.FMTM_DB_USER
 password = settings.FMTM_DB_PASSWORD
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{db_host}/{db_name}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{localhost}/{db_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
