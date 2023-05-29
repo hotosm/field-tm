@@ -57,7 +57,7 @@ jobs:
           context: src/backend
           target: prod
           push: true
-          tags: "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_slug }}"
+          tags: "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_name }}"
           build-args: |
             APP_VERSION="${{ env.API_VERSION }}"
 
@@ -66,7 +66,7 @@ jobs:
         with:
           context: src/frontend/main
           push: true
-          tags: "ghcr.io/hotosm/fmtm/frontend/main:${{ env.FRONTEND_MAIN_VERSION }}-${{ github.ref_slug }}"
+          tags: "ghcr.io/hotosm/fmtm/frontend/main:${{ env.FRONTEND_MAIN_VERSION }}-${{ github.ref_name }}"
           build-args: |
             APP_NAME=main
             APP_VERSION="${{ env.FRONTEND_MAIN_VERSION }}"
@@ -80,7 +80,7 @@ jobs:
         with:
           context: src/frontend/fmtm_openlayer_map
           push: true
-          tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_slug }}"
+          tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_name }}"
           build-args: |
             APP_NAME=fmtm_openlayer_map
             APP_VERSION="${{ env.FRONTEND_MAP_VERSION }}"
