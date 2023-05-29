@@ -30,7 +30,7 @@ db_name = settings.FMTM_DB_NAME
 user = settings.FMTM_DB_USER
 password = settings.FMTM_DB_PASSWORD
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{localhost}/{db_name}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@localhost/{db_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
