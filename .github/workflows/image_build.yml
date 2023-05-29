@@ -20,6 +20,7 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
     permissions:
       contents: read
       packages: write
@@ -71,10 +72,9 @@ jobs:
           build-args: |
             APP_NAME=main
             APP_VERSION="${{ env.FRONTEND_MAIN_VERSION }}"
-            URL_SCHEME=${URL_SCHEME}
-            API_URL=${API_URL}
-            FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-            FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+            API_URL=${URL_SCHEME}://${API_URL}
+            FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+            FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
 
       - name: Build and push frontend map
         uses: docker/build-push-action@v4
@@ -86,7 +86,6 @@ jobs:
           build-args: |
             APP_NAME=fmtm_openlayer_map
             APP_VERSION="${{ env.FRONTEND_MAP_VERSION }}"
-            URL_SCHEME=${URL_SCHEME}
-            API_URL=${API_URL}
-            FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}
-            FRONTEND_MAP_URL=${FRONTEND_MAP_URL}
+            API_URL=${URL_SCHEME}://${API_URL}
+            FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+            FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
