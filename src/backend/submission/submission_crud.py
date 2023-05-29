@@ -58,13 +58,11 @@ def get_submission_of_project(
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
-        print('Tassksssssssssssssssssssssssssssss')
         task_list = []
 
         task_list = [x.id for x in project_tasks]
 
         data = []
-        print('Tassksssssssssssssssssssssssssssss 222')
 
         for id in task_list:
 
@@ -78,7 +76,6 @@ def get_submission_of_project(
             if isinstance(submission_list,list):
                 for submission in submission_list:
                     data.append(submission)
-        print('Task  333333333')
         return data
 
     else:
