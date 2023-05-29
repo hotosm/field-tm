@@ -134,4 +134,4 @@ jobs:
           docker compose --file docker-compose.deploy.yml pull
           docker compose --file docker-compose.deploy.yml up --detach
         env:
-          DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
+          DOCKER_HOST: ${{ vars.DOCKER_HOST }}
