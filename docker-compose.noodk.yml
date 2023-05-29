@@ -113,9 +113,3 @@ services:
     networks:
       - fmtm-dev
     restart: unless-stopped
-
-  pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v1.10.1.1"
-    networks:
-      - fmtm-dev
-    restart: always
