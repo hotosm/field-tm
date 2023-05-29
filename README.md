@@ -5,13 +5,13 @@
 **Workflows - Production**
 
 [![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml)
-[![Build Container Images](https://github.com/hotosm/fmtm/actions/workflows/image_build.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/image_build.yml)
+[![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml)
 [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml)
 
 **Workflows - Development**
 
 [![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml)
-[![Build Container Images](https://github.com/hotosm/fmtm/actions/workflows/image_build.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/image_build.yml)
+[![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml)
 
 # Field Mapping Tasking Manager (FMTM)
 
