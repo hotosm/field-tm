@@ -123,7 +123,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings():
-    """Cache settings, for calling in multiple modules."""
+    """Cache settings when accessed throughout app."""
     _settings = Settings()
     # logger.info(f"Loaded settings: {_settings.dict()}")
     return _settings
