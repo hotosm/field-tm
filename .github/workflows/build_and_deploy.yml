@@ -117,9 +117,9 @@ jobs:
       - name: Environment to .env
         run: |
           echo "${{ secrets.DOTENV }}" > .env
-          echo "API_VERSION=${{ env.extract_api_version.outputs.API_VERSION }}" >> .env
-          echo "FRONTEND_MAIN_VERSION=${{ env.extract_frontend_versions.outputs.FRONTEND_MAIN_VERSION }}" >> .env
-          echo "FRONTEND_MAP_VERSION=${{ env.extract_frontend_versions.outputs.FRONTEND_MAP_VERSION }}" >> .env
+          echo "API_VERSION=${{ steps.extract_api_version.outputs.API_VERSION }}" >> .env
+          echo "FRONTEND_MAIN_VERSION=${{ steps.extract_frontend_versions.outputs.FRONTEND_MAIN_VERSION }}" >> .env
+          echo "FRONTEND_MAP_VERSION=${{ steps.extract_frontend_versions.outputs.FRONTEND_MAP_VERSION }}" >> .env
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:
