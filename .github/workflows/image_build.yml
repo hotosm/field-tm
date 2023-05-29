@@ -9,7 +9,7 @@ on:
       - development
       - "*-development-*"
     paths:
-      # Workflow is Trigged only if src changes
+      # Workflow is triggered only if src changes
       - "src/**"
   # Allow manual trigger
   workflow_dispatch:
