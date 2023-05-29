@@ -17,7 +17,7 @@ on:
 jobs:
   deploy-container:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_slug }}
+    environment: ${{ github.ref_name }}
 
     steps:
       - uses: actions/checkout@v3
