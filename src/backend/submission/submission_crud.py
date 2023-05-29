@@ -26,6 +26,7 @@ from ..projects import project_crud
 from ..central.central_crud import project
 from fastapi.responses import FileResponse
 from fastapi import HTTPException
+from osm_fieldwork.OdkCentral import OdkForm, OdkProject
 
 
 def get_submission_of_project(
@@ -49,6 +50,11 @@ def get_submission_of_project(
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
+
+    if not (project_info.odk_central_url or project_info.odk_central_user or project_info.odk_central_password):
+        raise HTTPException(status_code=404, detail="ODK Central Credentials not found in project")
+
+    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
