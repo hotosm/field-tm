@@ -6,16 +6,11 @@ on:
     workflows: ["Build Container Images"]
     types:
       - completed
-    branches:
-      - main
-      - staging
-      - development
-      - "*-development-*"
   # Allow manual trigger
   workflow_dispatch:
 
 jobs:
-  deploy-container:
+  deploy-containers:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref_name }}
