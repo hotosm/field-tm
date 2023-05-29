@@ -26,6 +26,7 @@ from ..projects import project_crud
 from ..central.central_crud import project
 from fastapi.responses import FileResponse
 from fastapi import HTTPException
+from osm_fieldwork.OdkCentral import OdkForm, OdkProject
 
 
 def get_submission_of_project(
@@ -39,7 +40,7 @@ def get_submission_of_project(
         If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
     """
 
-    project_info = project_crud.get_project_by_id(db, project_id)
+    project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -50,6 +51,11 @@ def get_submission_of_project(
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
+    if not (project_info.odk_central_url or project_info.odk_central_user or project_info.odk_central_password):
+        raise HTTPException(status_code=404, detail="ODK Central Credentials not found in project")
+
+    xform = OdkForm(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
+
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
         task_list = []
@@ -57,10 +63,13 @@ def get_submission_of_project(
         task_list = [x.id for x in project_tasks]
 
         data = []
+
         for id in task_list:
 
             # XML Form Id is a combination or project_name, category and task_id
             xml_form_id = f'{project_name}_{form_category}_{id}'.split('_')[2]
+            
+
             submission_list = xform.listSubmissions(odkid, xml_form_id)
 
             # data.append(submission_list)
@@ -89,6 +98,8 @@ def get_forms_of_project(
         return []
 
     odkid = project_info.odkid
+
+    project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
 
     result = project.listForms(odkid)
     return result
