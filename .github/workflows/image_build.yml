@@ -64,7 +64,8 @@ jobs:
       - name: Build and push frontend main
         uses: docker/build-push-action@v4
         with:
-          context: src/frontend/main
+          context: src/frontend
+          dockerfile: src/frontend/prod.dockerfile
           push: true
           tags: "ghcr.io/hotosm/fmtm/frontend/main:${{ env.FRONTEND_MAIN_VERSION }}-${{ github.ref_name }}"
           build-args: |
@@ -78,7 +79,8 @@ jobs:
       - name: Build and push frontend map
         uses: docker/build-push-action@v4
         with:
-          context: src/frontend/fmtm_openlayer_map
+          context: src/frontend
+          dockerfile: src/frontend/prod.dockerfile
           push: true
           tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_name }}"
           build-args: |
