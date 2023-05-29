@@ -20,7 +20,8 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+    environment:
+      name: ${{ github.ref_name }}
     permissions:
       contents: read
       packages: write
@@ -60,7 +61,7 @@ jobs:
           push: true
           tags: "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_name }}"
           build-args: |
-            APP_VERSION="${{ env.API_VERSION }}"
+            APP_VERSION=${{ env.API_VERSION }}
 
       - name: Build and push frontend main
         uses: docker/build-push-action@v4
@@ -71,10 +72,10 @@ jobs:
           tags: "ghcr.io/hotosm/fmtm/frontend/main:${{ env.FRONTEND_MAIN_VERSION }}-${{ github.ref_name }}"
           build-args: |
             APP_NAME=main
-            APP_VERSION="${{ env.FRONTEND_MAIN_VERSION }}"
-            API_URL=${URL_SCHEME}://${API_URL}
-            FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-            FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
+            APP_VERSION=${{ env.FRONTEND_MAIN_VERSION }}
+            API_URL=${{ env.URL_SCHEME }}://${{ env.API_URL }}
+            FRONTEND_MAIN_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAIN_URL }}
+            FRONTEND_MAP_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAP_URL }}
 
       - name: Build and push frontend map
         uses: docker/build-push-action@v4
@@ -85,7 +86,7 @@ jobs:
           tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_name }}"
           build-args: |
             APP_NAME=fmtm_openlayer_map
-            APP_VERSION="${{ env.FRONTEND_MAP_VERSION }}"
-            API_URL=${URL_SCHEME}://${API_URL}
-            FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-            FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
+            APP_VERSION=${{ env.FRONTEND_MAP_VERSION }}
+            API_URL=${{ env.URL_SCHEME }}://${{ env.API_URL }}
+            FRONTEND_MAIN_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAIN_URL }}
+            FRONTEND_MAP_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAP_URL }}

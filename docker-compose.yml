@@ -69,10 +69,9 @@ services:
       dockerfile: debug.dockerfile
       args:
         APP_NAME: main
-        URL_SCHEME: ${URL_SCHEME}
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+        API_URL: ${URL_SCHEME}://${API_URL}
+        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -96,10 +95,9 @@ services:
       dockerfile: debug.dockerfile
       args:
         APP_NAME: fmtm_openlayer_map
-        URL_SCHEME: ${URL_SCHEME}
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+        API_URL: ${URL_SCHEME}://${API_URL}
+        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_map
     depends_on:
       - api
