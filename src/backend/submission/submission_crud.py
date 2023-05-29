@@ -67,6 +67,8 @@ def get_submission_of_project(
 
             # XML Form Id is a combination or project_name, category and task_id
             xml_form_id = f'{project_name}_{form_category}_{id}'.split('_')[2]
+            
+
             submission_list = xform.listSubmissions(odkid, xml_form_id)
 
             # data.append(submission_list)
@@ -95,6 +97,8 @@ def get_forms_of_project(
         return []
 
     odkid = project_info.odkid
+
+    project = OdkProject(project_info.odk_central_url, project_info.odk_central_user, project_info.odk_central_password)
 
     result = project.listForms(odkid)
     return result
