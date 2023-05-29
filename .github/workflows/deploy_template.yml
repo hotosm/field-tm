@@ -12,7 +12,7 @@ jobs:
   deploy-containers:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref_name }}
+      name: ${{ github.event.workflow_run.head_branch }}
 
     steps:
       - uses: actions/checkout@v3
@@ -33,6 +33,8 @@ jobs:
         run: echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Deploy
-        run: docker compose --file docker-compose.deploy.yml up --detach --pull
+        run: |
+          docker compose --file docker-compose.deploy.yml pull
+          docker compose --file docker-compose.deploy.yml up --detach
         env:
           DOCKER_HOST: ${{ secrets.DOCKER_HOST }}
