@@ -101,14 +101,14 @@ services:
   ui-main:
     image: "ghcr.io/hotosm/fmtm/frontend/main:${FRONTEND_MAIN_VERSION}-${GIT_BRANCH}"
     build:
-      context: src/frontend/main
+      context: src/frontend
+      dockerfile: prod.dockerfile
       args:
         APP_NAME: main
         APP_VERSION: ${FRONTEND_MAIN_VERSION}
-        URL_SCHEME: ${URL_SCHEME}
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+        API_URL: ${URL_SCHEME}://${API_URL}
+        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -132,14 +132,14 @@ services:
   ui-map:
     image: "ghcr.io/hotosm/fmtm/frontend/map:${FRONTEND_MAP_VERSION}-${GIT_BRANCH}"
     build:
-      context: src/frontend/fmtm_openlayer_map
+      context: src/frontend
+      dockerfile: prod.dockerfile
       args:
         APP_NAME: fmtm_openlayer_map
         APP_VERSION: ${FRONTEND_MAP_VERSION}
-        URL_SCHEME: ${URL_SCHEME}
-        API_URL: ${API_URL}
-        FRONTEND_MAIN_URL: ${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${FRONTEND_MAP_URL}
+        API_URL: ${URL_SCHEME}://${API_URL}
+        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_map
     depends_on:
       - api
