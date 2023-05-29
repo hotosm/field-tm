@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""Test data for debugging the API and test cases."""
+"""Test data for debugging and test cases."""
 
 import os
 
