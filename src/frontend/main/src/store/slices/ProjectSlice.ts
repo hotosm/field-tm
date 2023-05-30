@@ -9,10 +9,10 @@ const ProjectSlice = createSlice({
         projectTaskBoundries: [],
         newProjectTrigger: false,
         projectInfo: {},
-        projectSubmissionLoading:false,
-        projectSubmission:[],
-        projectBuildingGeojsonLoading:false,
-        projectBuildingGeojson:[]
+        projectSubmissionLoading: false,
+        projectSubmission: [],
+        projectBuildingGeojsonLoading: false,
+        projectBuildingGeojson: [],
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
@@ -27,22 +27,22 @@ const ProjectSlice = createSlice({
         SetNewProjectTrigger(state, action) {
             state.newProjectTrigger = !state.newProjectTrigger
         },
-        clearProjects(state,action) {
+        clearProjects(state, action) {
             storage.removeItem('persist:project')
             state.projectTaskBoundries = action.payload
         },
-        GetProjectSubmissionLoading(state,action) {
+        GetProjectSubmissionLoading(state, action) {
             state.projectSubmissionLoading = action.payload
         },
-        SetProjectSubmission(state,action) {
+        SetProjectSubmission(state, action) {
             state.projectSubmission = action.payload
         },
-        GetProjectBuildingGeojsonLoading(state,action) {
+        GetProjectBuildingGeojsonLoading(state, action) {
             state.projectSubmissionLoading = action.payload
         },
-        SetProjectBuildingGeojson(state,action) {
+        SetProjectBuildingGeojson(state, action) {
             state.projectBuildingGeojson = action.payload
-        },
+        }
     }
 })
 
