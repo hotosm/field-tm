@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 // import '../styles/home.css'
 import "../../node_modules/ol/ol.css";
 import CoreModules from 'fmtm/CoreModules';
@@ -9,9 +9,12 @@ import environment from "fmtm/environment";
 import { ProjectBuildingGeojsonService, ProjectSubmissionService } from "../api/SubmissionService";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import { ProjectById } from "../api/Project";
-
+const basicGeojsonTemplate = {
+    "type": "FeatureCollection",
+    "features": []
+};
 // import { useDispatch } from 'react-redux';
-const Submissions = () => {
+const TasksSubmission = () => {
     const dispatch = CoreModules.useDispatch();
     const state = CoreModules.useSelector((state) => state.project);
     const projectInfo = CoreModules.useSelector(
@@ -24,49 +27,74 @@ const Submissions = () => {
     const params = CoreModules.useParams();
     const encodedProjectId = params.projectId;
     const decodedProjectId = environment.decode(encodedProjectId);
-    const encodedTaskId = params.projectId;
+    const encodedTaskId = params.taskId;
     const decodedTaskId = environment.decode(encodedTaskId);
     // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
     useEffect(() => {
-        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${decodedProjectId}`))
-        dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${decodedProjectId}/features`))
+        dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`))
+        dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`))
         //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
     }, [])
+    //Fetch project for the first time
+  useEffect(() => {
+    if (
+      state.projectTaskBoundries.findIndex(
+        (project) => project.id == environment.decode(encodedProjectId)
+      ) == -1
+    ) {
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
+      dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}/features`))
 
-    // Requesting Task Boundaries on Page Load
-    useEffect(() => {
-        if (
-          state.projectTaskBoundries.findIndex(
-            (project) => project.id == environment.decode(encodedProjectId)
-          ) == -1
-        ) {
-          dispatch(
-            ProjectById(
-              `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
-              state.projectTaskBoundries
-            ),
-            state.projectTaskBoundries
-          );
-          dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}/features`))
+    }else{
+      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
+    }
+    if (Object.keys(state.projectInfo).length == 0) {
+      dispatch(ProjectActions.SetProjectInfo(projectInfo));
+    } else {
+      if (state.projectInfo.id != environment.decode(encodedProjectId)) {
+        dispatch(ProjectActions.SetProjectInfo(projectInfo));
+      }
+    }
+  }, [params.id]);
+    const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
+    const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
+    const [projectBoundaries, setProjectBoundaries] = useState(null)
+    const [buildingBoundaries, setBuildingBoundaries] = useState(null)
+
+    if(projectTaskBoundries?.length>0 && projectBoundaries === null){
+
+        const taskGeojsonFeatureCollection = {
+            ...basicGeojsonTemplate,
+            features: [...projectTaskBoundries?.[0]?.taskBoundries?.filter((task)=> task.id===decodedTaskId).map((task)=> ({...task.outline_geojson,id:task.outline_geojson.properties.uid}))]
     
-        }else{
-          dispatch(ProjectActions.SetProjectTaskBoundries([]))
-          dispatch(
-            ProjectById(
-              `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
-              state.projectTaskBoundries
-            ),
-            state.projectTaskBoundries
-          );
-        }
-        if (Object.keys(state.projectInfo).length == 0) {
-          dispatch(ProjectActions.SetProjectInfo(projectInfo));
-        } else {
-          if (state.projectInfo.id != environment.decode(encodedProjectId)) {
-            dispatch(ProjectActions.SetProjectInfo(projectInfo));
-          }
-        }
-      }, [params.id]);
+        };
+        console.log(taskGeojsonFeatureCollection,'taskGeojsonFeatureCollection');
+        setProjectBoundaries(taskGeojsonFeatureCollection)
+    }
+    if(projectBuildingGeojson?.length>0 && buildingBoundaries === null){
+        
+        const buildingGeojsonFeatureCollection = {
+            ...basicGeojsonTemplate,
+            features: [...projectBuildingGeojson?.filter((task)=> task.task_id===decodedTaskId).map((task)=> ({...task.geometry,id:task.id}))]
+            // features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
+            
+        };
+        setBuildingBoundaries(buildingGeojsonFeatureCollection);
+    }
+
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
@@ -113,7 +141,7 @@ const Submissions = () => {
                             };
 
                             const formattedDate = date.toLocaleDateString('en-US', dateOptions);
-                            return <CoreModules.Box sx={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '10px' }}>
+                            return <CoreModules.Link to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}><CoreModules.Box sx={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '10px',p:'0.5rem' }}>
                                 <CoreModules.Box><img src={Avatar} style={{ marginRight: '10px', marginLeft: '5px' }} /> </CoreModules.Box>
                                 <CoreModules.Box>
                                     <CoreModules.Typography
@@ -133,13 +161,13 @@ const Submissions = () => {
                                         Submitted {projectState?.project} at {formattedDate}
                                     </CoreModules.Typography>
                                 </CoreModules.Box>
-                            </CoreModules.Box>
+                            </CoreModules.Box></CoreModules.Link>
                         })}
 
                     </CoreModules.Box>
                 </CoreModules.Stack>
                 <CoreModules.Box sx={{ width: '100%', ml: 6, border: '1px solid green' }}>
-                    <SubmissionMap />
+                    <SubmissionMap outlineBoundary={projectBoundaries} featureGeojson={buildingBoundaries}/>
                 </CoreModules.Box>
             </CoreModules.Stack >
 
@@ -148,4 +176,4 @@ const Submissions = () => {
 
 }
 
-export default Submissions;
+export default TasksSubmission;
