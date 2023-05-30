@@ -13,6 +13,7 @@ import NotFoundPage from './views/NotFound404';
 import Organization from './views/Organization';
 import CreateOrganization from './views/CreateOrganization';
 import Authorized from './views/Authorized';
+import SubmissionDetails from './views/SubmissionDetails';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
@@ -64,6 +65,16 @@ const routes = createBrowserRouter([
       //     path: "/recoveraccess",
       //     element: <Forgot />,
       // },
+      {
+        path: '/project/:projectId/tasks/:taskId/submission/:instanceId',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <SubmissionDetails />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/submissions/:id',
         element: (
