@@ -8,3 +8,4 @@ Paul Ramsey is a Canadian open source geographical analyst and developer. [His b
 
 ## Random
 - [A nice Stack Exchange](https://gis.stackexchange.com/questions/172198/constructing-voronoi-diagram-in-postgis/174219#174219) on Voronoi Polygons
+- [Best answer ever](https://stackoverflow.com/questions/49531535/pass-fields-when-applying-st-voronoipolygons-and-clip-output) on how to subdivide existing areas with Voronoi polygons
