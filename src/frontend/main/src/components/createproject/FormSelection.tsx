@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import windowDimention from "../../hooks/WindowDimension";
-import enviroment from "../../environment";
-import CoreModules from "../../shared/CoreModules";
-import FormGroup from '@mui/material/FormGroup'
-import { CreateProjectService, FormCategoryService, GenerateProjectLog } from "../../api/CreateProjectService";
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import enviroment from '../../environment';
+import CoreModules from '../../shared/CoreModules';
+import FormGroup from '@mui/material/FormGroup';
+import { CreateProjectService, FormCategoryService, GenerateProjectLog } from '../../api/CreateProjectService';
+import { useNavigate, Link, } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import AssetModules from '../../shared/AssetModules.js';
@@ -14,7 +13,7 @@ import { CommonActions } from "../../store/slices/CommonSlice";
 import LoadingBar from "./LoadingBar";
 
 // import { SelectPicker } from 'rsuite';
-let generateProjectLogIntervalCb = null
+let generateProjectLogIntervalCb = null;
 
 const FormSelection: React.FC = () => {
   const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
@@ -23,13 +22,25 @@ const FormSelection: React.FC = () => {
   const dispatch = CoreModules.useDispatch()
   // //dispatch function to perform redux state mutation
 
-
   const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
   // //we use use-selector from redux to get all state of formCategory from createProject slice
+
 
   const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
+  // Fetching form category list
+  useEffect(() => {
+    dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
+  }, []);
+  // END
+  const selectExtractWaysList = ['Centroid', 'Polygon'];
+  const selectExtractWays = selectExtractWaysList.map((item) => ({ label: item, value: item }));
+  const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
+  const selectFormWays = selectFormWaysList.map((item) => ({ label: item, value: item }));
+  const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
+  const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+  // //we use use-selector from redux to get all state of loginToken from login slice
 
   const generateProjectLog: any = CoreModules.useSelector<any>((state) => state.createproject.generateProjectLog);
   // //we use use-selector from redux to get all state of loginToken from login slice
@@ -47,20 +58,6 @@ const FormSelection: React.FC = () => {
   }, [])
   // END
 
-
-  const selectExtractWaysList = ['Centroid', 'Polygon'];
-  const selectExtractWays = selectExtractWaysList.map(
-    item => ({ label: item, value: item })
-  );
-  const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
-  const selectFormWays = selectFormWaysList.map(
-    item => ({ label: item, value: item })
-  );
-  const formCategoryData = formCategoryList.map(
-    item => ({ label: item.title, value: item.title })
-  );
-  const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
-  // //we use use-selector from redux to get all state of loginToken from login slice
 
   const submission = () => {
 
