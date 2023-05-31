@@ -6,13 +6,19 @@ import { OrganizationDataService } from '../api/OrganizationService';
 
 const Organization = () => {
   const cardStyle = {
-    width: 520,
-    padding: 3,
+    width: {
+      xs: 350,
+      sm: 420,
+      lg: 520,
+    },
+    padding: 2,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     cursor: 'pointer',
   };
+
+  const url = 'https://fmtm.naxa.com.np/d907cf67fe587072a592.png';
 
   const [searchKeyword, setSearchKeyword] = useState('');
 
@@ -71,7 +77,18 @@ const Organization = () => {
           }}
         />
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
+      <CoreModules.Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          sm: { flexWrap: 'nowrap' },
+          gap: {
+            xs: '2rem',
+            md: '2rem',
+            lg: '3rem',
+          },
+        }}
+      >
         {filteredCardData?.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.Typography variant="subtitle1">{data.name}</CoreModules.Typography>
@@ -91,9 +108,9 @@ const Organization = () => {
                 {data.description}
               </CoreModules.Typography>
             </CoreModules.CardContent>
-            <CoreModules.Link to={data.url} target="_blank">
-              <CoreModules.Avatar alt={data.title} src={data.logo}>
-                {!data.logo || data.logo === 'string' ? data.name[0] : null}
+            <CoreModules.Link to={data.url} target="_blank" style={{ textDecoration: 'none' }}>
+              <CoreModules.Avatar alt={data.title} src={data.logo} sx={{ height: '45px', width: '45px' }}>
+                {!data.logo || data.logo === 'string' ? data.name[0] : url}
               </CoreModules.Avatar>
             </CoreModules.Link>
           </CoreModules.Card>
