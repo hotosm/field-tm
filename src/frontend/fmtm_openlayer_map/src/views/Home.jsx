@@ -27,6 +27,7 @@ import { get } from 'ol/proj';
 
 import Overlay from "ol/Overlay";
 import { defaultStyles, getStyles } from "../components/MapComponent/OpenLayersComponent/helpers/styleUtils";
+import ProjectMap from "../components/ProjectMap/ProjectMap";
 // import XYZ from "ol/source/XYZ.js";
 // import { toLonLat } from "ol/proj";
 // import { toStringHDMS } from "ol/coordinate";
@@ -89,7 +90,7 @@ const Home = () => {
       );
       dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
 
-    }else{
+    } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]))
       dispatch(
         ProjectById(
@@ -110,8 +111,8 @@ const Home = () => {
 
   //Added Building Geojson on Project Details Page
   useEffect(() => {
-    if(!map) return
-    
+    if (!map) return
+
     const buildingGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: projectState?.projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
@@ -130,8 +131,8 @@ const Home = () => {
     });
     map.addLayer(buildingFeaturesLayer);
 
-  }, [map,projectState?.projectBuildingGeojson])
-  
+  }, [map, projectState?.projectBuildingGeojson])
+
   useEffect(() => {
     const container = document.getElementById("popup");
     const closer = document.getElementById("popup-closer");
@@ -167,7 +168,7 @@ const Home = () => {
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource(),
     });
-    
+
 
     const view = new View({
       projection: "EPSG:4326",
@@ -355,6 +356,7 @@ const Home = () => {
             </CoreModules.Button>
           </CoreModules.Link>
         </CoreModules.Stack>
+        {/* <ProjectMap /> */}
         <OpenLayersMap
           defaultTheme={defaultTheme}
           stateDialog={stateDialog}
