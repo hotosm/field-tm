@@ -3,7 +3,7 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
-export default function CustomDrawer({ open, placement, size,type, onClose, onSignOut }) {
+export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
@@ -15,10 +15,9 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
   };
 
-
   const Drawerstyles = {
     list: {
-      width: type == 'xs'?(size.width-48):type == 'sm'?(size.width-48):350 ,
+      width: type == 'xs' ? size.width - 48 : type == 'sm' ? size.width - 48 : 350,
     },
     outlineBtn: {
       padding: 8,
@@ -39,6 +38,18 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
   const MenuItems = [
     {
       name: 'Explore Projects',
+      ref: '/',
+      isExternalLink: false,
+      isActive: true,
+    },
+    {
+      name: 'Manage Organization',
+      ref: '/organization',
+      isExternalLink: false,
+      isActive: true,
+    },
+    {
+      name: 'Manage Category',
       ref: '/',
       isExternalLink: false,
       isActive: true,
@@ -128,7 +139,7 @@ export default function CustomDrawer({ open, placement, size,type, onClose, onSi
                   </a>
                 ) : (
                   <NavLink
-                  key={index}
+                    key={index}
                     to={menuDetails.ref}
                     style={{
                       textDecoration: 'inherit',
