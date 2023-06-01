@@ -127,7 +127,7 @@ def create_zip_file(files, output_file_path):
 
 def download_submission(db: Session, project_id: int, task_id: int):
 
-    project_info = project_crud.get_project_by_id(db, project_id)
+    project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
