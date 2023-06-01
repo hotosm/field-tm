@@ -42,6 +42,7 @@ import {
     InputLabel,
     Tooltip,
     Breadcrumbs,
+    CardMedia,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
@@ -120,4 +121,6 @@ export default {
     InputLabel,
     Tooltip,
     Breadcrumbs,
+    CardMedia,
+    
 }
