@@ -9,7 +9,6 @@ import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import { createLoginWindow } from '../utilfunctions/login';
 import { useState } from 'react';
-import { Typography } from '@mui/material';
 
 export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -59,7 +58,7 @@ export default function PrimaryAppBar() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <CoreModules.Stack sx={{ flexGrow: 0.2 }}>
+    <CoreModules.Stack sx={{ flexGrow: 0 }}>
       <DrawerComponent
         open={open}
         placement={'right'}
@@ -166,7 +165,7 @@ export default function PrimaryAppBar() {
             ) : (
               <>
                 <CoreModules.Button
-                  className='btnLogin'
+                  className="btnLogin"
                   style={appBarInnerStyles.btnLogin}
                   color="info"
                   onClick={() => createLoginWindow('/')}
