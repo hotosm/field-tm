@@ -256,9 +256,9 @@ def create_project_with_project_info(
 
     # Check / set credentials
     if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
+        url = odk_credentials.odk_central_url
+        user = odk_credentials.odk_central_user
+        pw = odk_credentials.odk_central_password
 
     else:
         logger.debug("ODKCentral connection variables not set in function")
