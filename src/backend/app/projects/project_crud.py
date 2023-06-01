@@ -249,7 +249,7 @@ def update_project_info(
 def create_project_with_project_info(
     db: Session, project_metadata: project_schemas.BETAProjectUpload, project_id
 ):
-    user = project_metadata.author
+    project_user = project_metadata.author
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
@@ -268,16 +268,16 @@ def create_project_with_project_info(
         pw = settings.ODK_CENTRAL_PASSWD
 
     # verify data coming in
-    if not user:
+    if not project_user:
         raise HTTPException("No user passed in")
     if not project_info_1:
         raise HTTPException("No project info passed in")
 
     # get db user
-    db_user = user_crud.get_user(db, user.id)
+    db_user = user_crud.get_user(db, project_user.id)
     if not db_user:
         raise HTTPException(
-            status_code=400, detail=f"User {user.username} does not exist"
+            status_code=400, detail=f"User {project_user.username} does not exist"
         )
     # TODO: get this from logged in user, return 403 (forbidden) if not authorized
 
