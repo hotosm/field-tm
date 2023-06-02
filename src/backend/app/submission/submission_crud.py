@@ -26,7 +26,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from ..central.central_crud import get_odk_form, get_odk_project
-from ..projects import project_crud
+from ..projects import project_crud, project_schemas
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -56,9 +56,9 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
     xform = get_odk_form(
         {
-            odk_central_url: project_info.odk_central_url,
-            odk_central_user: project_info.odk_central_user,
-            odk_central_password: project_info.odk_central_password,
+            'odk_central_url': project_info.odk_central_url,
+            'odk_central_user': project_info.odk_central_user,
+            'odk_central_password': project_info.odk_central_password,
         }
     )
 
