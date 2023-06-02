@@ -27,6 +27,8 @@ from sqlalchemy.orm import Session
 
 from ..central.central_crud import get_odk_form, get_odk_project
 from ..projects import project_crud, project_schemas
+from osm_fieldwork.json2osm import JsonDump
+from pathlib import Path
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -159,9 +161,6 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     with open(file_path, "wb") as f:
         f.write(file)
 
-
-    from osm_fieldwork.json2osm import JsonDump
-    from pathlib import Path
 
     jsonin = JsonDump()
     infile = Path(file_path)
