@@ -115,7 +115,7 @@ async def download_submissions(
     xforms = central_crud.list_odk_xforms(first.odkid)
     submissions = list()
     for xform in xforms:
-        data = central_crud.download_submissions(first.odkid, xform["xml_form_id"])
+        data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
         # An empty submissions only has the CSV headers
         # headers = data[0]
         if len(submissions) == 0:

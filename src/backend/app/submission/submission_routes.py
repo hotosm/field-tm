@@ -112,3 +112,12 @@ async def submission_points(
     task_id: The task_id of the project. This endpoint returns the submission points of this task.
     """
     return submission_crud.get_submission_points(db, project_id, task_id)
+
+
+@router.get("/convert-to-osm")
+async def convert_to_osm(
+    project_id: int,
+    task_id: int = None,
+    db: Session = Depends(database.get_db),
+    ):
+    return await submission_crud.convert_to_osm(db, project_id, task_id)

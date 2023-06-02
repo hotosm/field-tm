@@ -20,13 +20,16 @@ import csv
 import io
 import os
 import zipfile
-
+import logging
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from ..central.central_crud import get_odk_form, get_odk_project
-from ..projects import project_crud
+from ..projects import project_crud, project_schemas
+from osm_fieldwork.json2osm import JsonDump
+from pathlib import Path
+from fastapi.logger import logger as logger
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -56,9 +59,9 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
     xform = get_odk_form(
         {
-            odk_central_url: project_info.odk_central_url,
-            odk_central_user: project_info.odk_central_user,
-            odk_central_password: project_info.odk_central_password,
+            'odk_central_url': project_info.odk_central_url,
+            'odk_central_user': project_info.odk_central_user,
+            'odk_central_password': project_info.odk_central_password,
         }
     )
 
@@ -125,9 +128,87 @@ def create_zip_file(files, output_file_path):
     return output_file_path
 
 
+async def convert_to_osm(db: Session, project_id: int, task_id: int):
+
+    project_info = project_crud.get_project(db, project_id)
+
+    # Return exception if project is not found
+    if not project_info:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    odkid = project_info.odkid
+    project_name = project_info.project_name_prefix
+    form_category = project_info.xform_title
+
+    xform = get_odk_form(
+        {
+            'odk_central_url': project_info.odk_central_url,
+            'odk_central_user': project_info.odk_central_user,
+            'odk_central_password': project_info.odk_central_password,
+        }
+    )
+
+    xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
+
+    file_path = f"/tmp/{project_id}_submissions.json"
+
+    file = xform.getSubmissions(odkid, xml_form_id, None, False, True)
+
+
+    with open(file_path, "wb") as f:
+        f.write(file)
+
+
+    jsonin = JsonDump()
+    infile = Path(file_path)
+
+    base = os.path.splitext(infile.name)[0]
+    osmoutfile = f"/tmp/{base}-out.osm"
+    jsonin.createOSM(osmoutfile)
+
+    jsonoutfile = f"/tmp/{base}-out.geojson"
+    jsonin.createGeoJson(jsonoutfile)
+
+    data = jsonin.parse(infile.as_posix())
+
+    for entry in data:
+        feature = jsonin.createEntry(entry)
+        # Sometimes bad entries, usually from debugging XForm design, sneak in
+        if len(feature) == 0:
+            continue
+        if len(feature) > 0:
+            if "lat" not in feature["attrs"]:
+                if 'geometry' in feature['tags']:
+                    if type(feature['tags']['geometry']) == str:
+                        coords = list(feature['tags']['geometry'])
+                        # del feature['tags']['geometry']
+                    else:
+                        coords = feature['tags']['geometry']['coordinates']
+                        # del feature['tags']['geometry']
+                    feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
+                else:
+                    logger.warning("Bad record! %r" % feature)
+                    continue
+            jsonin.writeOSM(feature)
+            # This GeoJson file has all the data values
+            jsonin.writeGeoJson(feature)
+
+    jsonin.finishOSM()
+    jsonin.finishGeoJson()
+    logger.info("Wrote OSM XML file: %r" % osmoutfile)
+    logger.info("Wrote GeoJson file: %r" % jsonoutfile)
+
+    final_zip_file_path = f"{project_name}_{form_category}_osm.zip"  # Create a new ZIP file for the extracted files
+    with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
+        final_zip_file.write(osmoutfile)
+        final_zip_file.write(jsonoutfile)
+
+    return FileResponse(final_zip_file_path)
+
+
 def download_submission(db: Session, project_id: int, task_id: int):
 
-    project_info = project_crud.get_project_by_id(db, project_id)
+    project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -140,9 +221,9 @@ def download_submission(db: Session, project_id: int, task_id: int):
 
     xform = get_odk_form(
         {
-            odk_central_url: project_info.odk_central_url,
-            odk_central_user: project_info.odk_central_user,
-            odk_central_password: project_info.odk_central_password,
+            'odk_central_url': project_info.odk_central_url,
+            'odk_central_user': project_info.odk_central_user,
+            'odk_central_password': project_info.odk_central_password,
         }
     )
 
