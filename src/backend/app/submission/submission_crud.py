@@ -171,7 +171,6 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
 
     data = jsonin.parse(infile.as_posix())
 
-
     for entry in data:
         feature = jsonin.createEntry(entry)
         # Sometimes bad entries, usually from debugging XForm design, sneak in
@@ -199,8 +198,12 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     logger.info("Wrote OSM XML file: %r" % osmoutfile)
     logger.info("Wrote GeoJson file: %r" % jsonoutfile)
 
+    final_zip_file_path = f"{project_name}_{form_category}_osm.zip"  # Create a new ZIP file for the extracted files
+    with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
+        final_zip_file.write(osmoutfile)
+        final_zip_file.write(jsonoutfile)
 
-    return FileResponse(file_path)
+    return FileResponse(final_zip_file_path)
 
 
 def download_submission(db: Session, project_id: int, task_id: int):
