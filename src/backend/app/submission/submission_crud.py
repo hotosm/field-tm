@@ -140,9 +140,9 @@ def download_submission(db: Session, project_id: int, task_id: int):
 
     xform = get_odk_form(
         {
-            odk_central_url: project_info.odk_central_url,
-            odk_central_user: project_info.odk_central_user,
-            odk_central_password: project_info.odk_central_password,
+            'odk_central_url': project_info.odk_central_url,
+            'odk_central_user': project_info.odk_central_user,
+            'odk_central_password': project_info.odk_central_password,
         }
     )
 
