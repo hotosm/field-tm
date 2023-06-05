@@ -15,7 +15,7 @@ const CreateOrganizationForm = () => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
   const submission = () => {
-    dispatch(PostOrganizationDataService(`${environment.baseApiUrl}/projects/organization/`, values));
+    dispatch(PostOrganizationDataService(`${environment.baseApiUrl}/organization/`, values));
   };
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
     formData,
