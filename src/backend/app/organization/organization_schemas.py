@@ -1,4 +1,5 @@
 # Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+#
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -13,63 +14,15 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
-# 
+#
+from pydantic import BaseModel
 
-# Distribution / packaging
-.Python
-src/backend/app/images
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-venv/
-src/backend/osm-fieldwork
 
-__pycache__
-credentials.txt
-odk2odm_venv/
 
-# PyCharm
-.idea/
-
-# VSCode
-.vscode
-
-# test scripts and files
-db.sqlite3
-
-# emacs
-*~
-
-# mac
-.DS_Store
-
-# ignore settings
-.env
-
-# ignore python environments
-venv
-fmtm-env
-
-# project related
-temp_webmaps/local_only
-temp_webmaps/Naivasha
-
-# node
-src/frontend/node_modules
-
-# pdm
-**/.pdm.toml
-**/__pypackages__
+class Organisation(BaseModel):
+    # id: int
+    slug: str
+    name: str
+    description: str
+    url: str
+    type: int
