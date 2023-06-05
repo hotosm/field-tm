@@ -137,7 +137,7 @@ const HomePageFilters = () => {
           gap: 5,
         }}
       >
-        <CoreModules.FormControl size="small" sx={{ m: 1, minWidth: 120, width: 250 }} margin="normal">
+        {/* <CoreModules.FormControl size="small" sx={{ m: 1, minWidth: 120, width: 250 }} margin="normal">
           <CoreModules.InputLabel
             id="demo-simple-select-helper-label"
             sx={{
@@ -158,7 +158,7 @@ const HomePageFilters = () => {
               <CoreModules.MenuItem value={org.value}>{org.label}</CoreModules.MenuItem>
             ))}
           </CoreModules.Select>
-        </CoreModules.FormControl>
+        </CoreModules.FormControl> */}
         <Search id="search">
           <SearchIconWrapper>
             <AssetModules.SearchIcon color="info" />
