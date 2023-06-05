@@ -381,47 +381,6 @@ async def generate_files(
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
 
 
-@router.get("/organization/")
-def get_organisations(
-    db: Session = Depends(database.get_db),
-):
-    """Get api for fetching organization list."""
-    organizations = project_crud.get_organisations(db)
-    return organizations
-
-
-@router.post("/organization/")
-async def create_organization(
-    organization: project_schemas.Organisation,
-    db: Session = Depends(database.get_db),
-):
-    """Create a new organization.
-
-    This endpoint allows you to create a new organization by providing the necessary details in the request body.
-
-    ## Request Body
-    - `slug` (str): the organization's slug. Required.
-    - `logo` (str): the URL of the organization's logo. Required.
-    - `name` (str): the name of the organization. Required.
-    - `description` (str): a description of the organization. Required.
-    - `url` (str): the URL of the organization's website. Required.
-    - `type` (int): the type of the organization. Required.
-
-
-    ## Response
-    - Returns a JSON object containing a success message .
-
-    ### Example Response
-    ```
-    {
-        "Message": "Organization Created Successfully.",
-    }
-    ```
-    """
-    project_crud.create_organization(db, organization)
-
-    return {"Message": "Organization Created Successfully."}
-
 
 @router.get("/{project_id}/features", response_model=List[project_schemas.Feature])
 def get_project_features(
