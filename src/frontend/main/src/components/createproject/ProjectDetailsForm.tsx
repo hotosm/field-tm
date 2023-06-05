@@ -33,7 +33,7 @@ const ProjectDetailsForm: React.FC = () => {
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {
-    dispatch(OrganisationService(`${environment.baseApiUrl}/projects/organization/`));
+    dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
   // useEffect(() => {
@@ -73,7 +73,7 @@ const ProjectDetailsForm: React.FC = () => {
         <CoreModules.FormGroup>
           {/* Organization Dropdown For Create Project */}
 
-          <CoreModules.FormControl sx={{ mb: 0, width: '30%' }} variant="filled">
+          <CoreModules.FormControl sx={{ mb: 0, width: '30%' }} variant="outlined">
             <CoreModules.Box
               sx={{
                 display: 'flex',
@@ -109,11 +109,17 @@ const ProjectDetailsForm: React.FC = () => {
               sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}
             >
               <Select
-                sx={{ width: '100%' }}
+                inputProps={{ sx: { padding: '8.5px 14px' } }}
+                sx={{
+                  width: '100%',
+                  '&.Mui-focused': {
+                    border: '2px solid black',
+                  },
+                }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 value={values.organization || ''}
-                label="Organization"
+                // label="Organization"
                 onChange={(e) => {
                   handleCustomChange('organization', e.target.value);
                   dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }));
@@ -155,8 +161,15 @@ const ProjectDetailsForm: React.FC = () => {
             <CoreModules.TextField
               id="odk_central_url"
               label=""
-              variant="filled"
+              variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               value={values.odk_central_url}
               onChange={(e) => {
                 handleCustomChange('odk_central_url', e.target.value);
@@ -182,8 +195,15 @@ const ProjectDetailsForm: React.FC = () => {
               id="odk_central_name"
               name="odk"
               label=""
-              variant="filled"
+              variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               value={values.odk_central_user}
               onChange={(e) => {
                 handleCustomChange('odk_central_user', e.target.value);
@@ -207,8 +227,15 @@ const ProjectDetailsForm: React.FC = () => {
             <CoreModules.TextField
               id="odk_central_new_password"
               label=""
-              variant="filled"
+              variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               value={values.odk_central_password}
               type="password"
               autoComplete="new-password"
@@ -232,8 +259,15 @@ const ProjectDetailsForm: React.FC = () => {
             <CoreModules.TextField
               id="project_name"
               label=""
-              variant="filled"
+              variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               value={values.name}
               onChange={(e) => {
                 handleCustomChange('name', e.target.value);
@@ -256,13 +290,20 @@ const ProjectDetailsForm: React.FC = () => {
             <CoreModules.TextField
               id="short_description"
               label=""
-              variant="filled"
+              variant="outlined"
               value={values.short_description}
               onChange={(e) => {
                 handleCustomChange('short_description', e.target.value);
               }}
               multiline
               rows={4}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               helperText={errors.short_description}
               FormHelperTextProps={inputFormStyles()}
             />
@@ -280,13 +321,20 @@ const ProjectDetailsForm: React.FC = () => {
             <CoreModules.TextField
               id="description"
               label=""
-              variant="filled"
+              variant="outlined"
               value={values.description}
               onChange={(e) => {
                 handleCustomChange('description', e.target.value);
               }}
               multiline
               rows={4}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
               helperText={errors.description}
               FormHelperTextProps={inputFormStyles()}
             />
