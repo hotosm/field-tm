@@ -499,6 +499,77 @@ async def preview_tasks(boundary: str, dimension: int):
     return collection
 
 
+def upload_boundary(
+    db: Session, project_id: int, boundary: str   
+    ):
+
+    # verify project exists in db
+    db_project = get_project(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    outline = json.loads(boundary)
+
+    """Update the boundary polyon on the database."""
+    boundary_data = outline["features"][0]["geometry"]
+    outline = shape(boundary_data)
+
+    # Update the project outline and centroid in project table.
+    db_project.outline = outline.wkt
+    db_project.centroid = outline.centroid.wkt
+    db.commit()
+    db.refresh(db_project)
+
+    category = db_project.xform_title
+
+    # Generating an osm extract from the underpass database.
+    pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
+
+    outfile = f"/tmp/buildings_{project_id}.geojson"  # This file will store osm extracts
+
+    outline_geojson = pg.getFeatures(
+        boundary = boundary_data,
+        filespec = outfile,
+        polygon = False,
+        xlsfile = f"{category}.xls",
+        category = category,
+    )
+
+    updated_outline_geojson = {
+        "type": "FeatureCollection",
+        "features": []}
+
+    # Collect feature mappings for bulk insert
+    feature_mappings = []
+
+    for feature in outline_geojson["features"]:
+        
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature["properties"]["title"] = ""
+
+        feature_shape = shape(feature['geometry'])
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+        feature_mapping = {
+            'project_id': project_id,
+            'category_title': category,
+            'geometry': wkb_element,
+            'properties': feature["properties"],
+        }
+        updated_outline_geojson['features'].append(feature)
+        feature_mappings.append(feature_mapping)
+
+    # Bulk insert the osm extracts into the db.
+    db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
+
+
+    print('Outline geojson ', outline_geojson)
+
+    return True
+
+
+
 def update_project_boundary(
     db: Session, project_id: int, boundary: str, dimension: int
 ):

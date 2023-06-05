@@ -263,6 +263,21 @@ async def upload_multi_project_boundary(
     return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
 
+@router.post("/implement-hackathin/{project_id}/")
+async def implement_hackathon(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db)
+    ):
+
+    # read entire file
+    content = await upload.read()
+
+    result = project_crud.upload_boundary(db, project_id, content)
+
+    return True
+
+
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
     project_id: int,
