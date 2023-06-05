@@ -67,7 +67,10 @@ export default function PrimaryAppBar() {
         type={type}
         onSignOut={handleOnSignOut}
       />
-      <CoreModules.AppBar position="static">
+      <CoreModules.AppBar
+        position="static"
+        sx={{ boxShadow: 0, borderBottom: '1px solid #e1e0e0', borderTop: '1px solid #e1e0e0' }}
+      >
         <CoreModules.Toolbar>
           <CoreModules.Link to={'/'}>
             <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />

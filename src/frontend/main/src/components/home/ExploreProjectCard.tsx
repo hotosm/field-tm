@@ -28,19 +28,18 @@ export default function ExploreProjectCard({ data }) {
   //Inline styles mainly for overidding css
   const cardInnerStyles: any = {
     outlinedButton: {
-      width: 80,
-      height: 35,
+      width: 70,
+      height: 22,
       marginTop: '5%',
       position: 'absolute',
       fontFamily: defaultTheme.typography.h3.fontFamily,
-      backgroundColor: defaultTheme.palette.warning['main'],
-      color: defaultTheme.palette.primary['main'],
+      // backgroundColor: defaultTheme.palette.error['main'],
+      // color: defaultTheme.palette.primary['main'],
       right: 6,
-      borderRadius: '4px',
+      borderRadius: '0px',
     },
     card: {
-      //   border: `0.1px solid red`,
-      boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+      border: `1px solid #e1e0e0`,
       marginLeft: '0.1%',
       marginRight: '0.1%',
       marginTop: '0.7%',
@@ -66,7 +65,7 @@ export default function ExploreProjectCard({ data }) {
         navigate(`/project_details/${environment.encode(data.id)}`);
       }}
       style={cardInnerStyles.card}
-      //   sx={{ boxShadow: shadowBox }}
+      sx={{ boxShadow: 0, borderRadius: 0 }}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
     >
@@ -81,10 +80,10 @@ export default function ExploreProjectCard({ data }) {
         <div>
           <CoreModules.Button
             size="small"
-            variant="contained"
+            variant="outlined"
+            color="error"
             style={cardInnerStyles.outlinedButton}
-            color="warning"
-            disabled
+            // disabled
           >
             {data.priority_str}
           </CoreModules.Button>
@@ -94,8 +93,23 @@ export default function ExploreProjectCard({ data }) {
 
         {/*Project Info and description*/}
         <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
-          <CoreModules.Typography ml={'2%'} mt={'5%'} variant="subtitle1" color="info" gutterBottom>
+          <CoreModules.Typography
+            ml={'2%'}
+            mt={'5%'}
+            variant="subtitle1"
+            color="info"
+            gutterBottom
+            sx={{
+              display: '-webkit-box',
+              '-webkit-line-clamp': 2,
+              '-webkit-box-orient': 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxHeight: '5em',
+            }}
+          >
             {data.title}
+            lore
           </CoreModules.Typography>
 
           <CoreModules.Stack direction={'row'}>
@@ -105,7 +119,21 @@ export default function ExploreProjectCard({ data }) {
             </CoreModules.Typography>
           </CoreModules.Stack>
 
-          <CoreModules.Typography mt={'7%'} ml={'2%'} variant="h4" color="info" gutterBottom>
+          <CoreModules.Typography
+            mt={'7%'}
+            ml={'2%'}
+            variant="h4"
+            color="info"
+            gutterBottom
+            sx={{
+              display: '-webkit-box',
+              '-webkit-line-clamp': 2,
+              '-webkit-box-orient': 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxHeight: '5em',
+            }}
+          >
             {data.description}
           </CoreModules.Typography>
         </CoreModules.Stack>

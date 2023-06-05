@@ -34,10 +34,10 @@ const Home = () => {
   }, []);
 
   return (
-    <div style={{ padding: 7, backgroundColor: '#f0f0f0', flex: 1 }}>
+    <div style={{ padding: 7, flex: 1 }}>
       <SearchablesRow />
       {stateHome.homeProjectLoading == false ? (
-        <CoreModules.Grid mt={2} px={4} spacing={2} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
+        <CoreModules.Grid mt={2} px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
           {stateHome.homeProjectSummary.map((value, index) => (
             <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
               <ExploreProjectCard data={value} key={index} />
@@ -63,9 +63,9 @@ const Home = () => {
         </CoreModules.Stack>
       )}
       {/*pagingation*/}
-      <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
+      {/* <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
         <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-      </CoreModules.Stack>
+      </CoreModules.Stack> */}
     </div>
   );
 };
