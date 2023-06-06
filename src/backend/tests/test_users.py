@@ -17,12 +17,10 @@
 #
 
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import status
-from ..main import api
-from .conftest import client
-from ..users.user_crud import create_user
-from ..users import user_schemas
+
+from app.users import user_schemas
+from app.users.user_crud import create_user
 
 
 @pytest.fixture
@@ -38,26 +36,15 @@ def test_list_users(users, client):
 
 
 def test_create_users(client):
-    response = client.post('/users/',json={
-                                        "username": "test3",
-                                        "password": "test1"
-                                        })
+    response = client.post("/users/", json={"username": "test3", "password": "test1"})
     assert response.status_code == status.HTTP_200_OK
 
-    response = client.post('/users/',json={
-                                        "username": "niraj",
-                                        "password": "niraj"
-                                        })
+    response = client.post("/users/", json={"username": "niraj", "password": "niraj"})
     assert response.status_code == status.HTTP_200_OK
 
-    response = client.post('/users/',json={
-                                        "username": "niraj"
-                                        })
+    response = client.post("/users/", json={"username": "niraj"})
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    response = client.post('/users/',json={
-                                        "username": "niraj",
-                                        "password": "niraj"
-                                        })
+    response = client.post("/users/", json={"username": "niraj", "password": "niraj"})
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == {"detail": "Username already registered" }
+    assert response.json() == {"detail": "Username already registered"}

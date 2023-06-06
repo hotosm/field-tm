@@ -92,7 +92,7 @@ const ThemeSlice = CoreModules.createSlice({
                 },
                 subtitle1: {
                     fontFamily: 'BarlowBold',
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: 'bold'
                 },
                 subtitle2: {
