@@ -36,7 +36,7 @@ const Organization = () => {
   );
 
   useEffect(() => {
-    dispatch(OrganizationDataService(`${environment.baseApiUrl}/projects/organization/`));
+    dispatch(OrganizationDataService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
   return (
