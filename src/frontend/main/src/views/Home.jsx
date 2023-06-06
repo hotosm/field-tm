@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import ExploreProjectCard from '../components/home/ExploreProjectCard';
 import windowDimention from '../hooks/WindowDimension';
@@ -9,6 +9,8 @@ import SearchablesRow from '../components/home/HomePageFilters';
 import CoreModules from '../shared/CoreModules';
 
 const Home = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   // const state:any = useSelector<any>(state=>state.project.projectData)
   // console.log('state main :',state)
@@ -33,17 +35,29 @@ const Home = () => {
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const filteredProjectCards = stateHome.homeProjectSummary.filter((value) => value.title.includes(searchQuery));
+
   return (
     <div style={{ padding: 7, flex: 1 }}>
-      <SearchablesRow />
+      <SearchablesRow onSearch={handleSearch} />
       {stateHome.homeProjectLoading == false ? (
-        <CoreModules.Grid mt={2} px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
-          {stateHome.homeProjectSummary.map((value, index) => (
-            <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
-              <ExploreProjectCard data={value} key={index} />
-            </CoreModules.Grid>
-          ))}
-        </CoreModules.Grid>
+        filteredProjectCards.length > 0 ? (
+          <CoreModules.Grid px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
+            {filteredProjectCards.map((value, index) => (
+              <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
+                <ExploreProjectCard data={value} key={index} />
+              </CoreModules.Grid>
+            ))}
+          </CoreModules.Grid>
+        ) : (
+          <CoreModules.Typography variant="h2" color="error" sx={{ p: 2, textAlign: 'center' }}>
+            No projects found.
+          </CoreModules.Typography>
+        )
       ) : (
         <CoreModules.Stack
           sx={{
@@ -59,6 +73,7 @@ const Home = () => {
             },
           }}
         >
+          No
           <ProjectCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
         </CoreModules.Stack>
       )}
