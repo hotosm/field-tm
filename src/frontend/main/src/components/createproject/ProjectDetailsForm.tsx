@@ -196,7 +196,6 @@ const ProjectDetailsForm: React.FC = () => {
               name="odk"
               label=""
               variant="outlined"
-              inputProps={{ sx: { padding: '8.5px 14px' } }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
