@@ -7,7 +7,7 @@ const MappingHeader = () => {
       <CoreModules.Typography color="error" sx={{ fontSize: '14px' }}>
         Mapping our world together
       </CoreModules.Typography>
-      <CoreModules.Link to="http://hotosm.org/" style={{ textDecoration: 'none', color: '#d73f3e' }} target="_blank">
+      <CoreModules.Link to="https://www.hotosm.org/" style={{ textDecoration: 'none', color: '#d73f3e' }} target="_blank">
         hotosm.org
       </CoreModules.Link>
     </CoreModules.Box>
