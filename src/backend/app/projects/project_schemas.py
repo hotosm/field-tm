@@ -99,7 +99,7 @@ class ProjectOut(ProjectBase):
 class Feature(BaseModel):
     id: int
     project_id: int
-    task_id: int
+    task_id: int = None
     geometry: Feature
 
     class Config:
