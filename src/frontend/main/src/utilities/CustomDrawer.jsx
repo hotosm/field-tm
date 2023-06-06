@@ -43,7 +43,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
       isActive: true,
     },
     {
-      name: 'Manage Organization',
+      name: 'Manage Organizations',
       ref: '/organization',
       isExternalLink: false,
       isActive: true,
@@ -116,6 +116,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
               {MenuItems.filter((menuItem) => menuItem.isActive).map((menuDetails, index) =>
                 menuDetails.isExternalLink ? (
                   <a
+                    target="_blank" rel="noopener noreferrer"
                     key={index}
                     href={menuDetails.ref}
                     style={{
