@@ -18,6 +18,7 @@ import CreateProjectSlice from "./slices/CreateProjectSlice";
 import CommonSlice from "./slices/CommonSlice";
 import LoginSlice from "./slices/LoginSlice";
 import OrganizationSlice from "./slices/organizationSlice.ts"
+import SubmissionSlice from "./slices/SubmissionSlice.ts"
 
 const reducers = CoreModules.combineReducers({
     // project: persistReducer(
@@ -40,16 +41,9 @@ const reducers = CoreModules.combineReducers({
     theme: ThemeSlice.reducer,
     createproject: CreateProjectSlice.reducer,
     organization: OrganizationSlice.reducer,
-
-    // createproject: persistReducer(
-    //     {
-    //         key: 'createproject',
-    //         storage
-    //     },
-    //     CreateProjectSlice.reducer
-    // ),
     // added common slice in order to handle all the common things like snackbar etc
-    common: CommonSlice.reducer
+    common: CommonSlice.reducer,
+    submission: SubmissionSlice.reducer
 })
 // const middleware = routerMiddleware(history);
 

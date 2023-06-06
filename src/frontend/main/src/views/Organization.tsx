@@ -6,15 +6,23 @@ import { OrganizationDataService } from '../api/OrganizationService';
 
 const Organization = () => {
   const cardStyle = {
-    width: 520,
-    padding: 3,
+    width: {
+      xs: 350,
+      sm: 440,
+      lg: 862,
+    },
+    padding: 2,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
     cursor: 'pointer',
+    gap: 5,
   };
 
+  const url = 'https://fmtm.naxa.com.np/d907cf67fe587072a592.png';
+
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
@@ -33,7 +41,7 @@ const Organization = () => {
 
   return (
     <CoreModules.Box
-      sx={{ display: 'flex', flexDirection: 'column', background: '#f0efef', flex: 1, gap: 4, paddingLeft: '6%' }}
+      sx={{ display: 'flex', flexDirection: 'column', background: '#f0efef', flex: 1, gap: 2, paddingLeft: '4.5%' }}
     >
       <CoreModules.Box
         sx={{
@@ -55,7 +63,40 @@ const Organization = () => {
           </CoreModules.Button>
         </CoreModules.Link>
       </CoreModules.Box>
-      <CoreModules.Box sx={{}}>
+      <CoreModules.Box>
+        <CoreModules.Tabs>
+          <CoreModules.Tab
+            label="All"
+            sx={{
+              background: activeTab === 0 ? 'grey' : 'white',
+              color: activeTab === 0 ? 'white' : 'grey',
+              minWidth: 'fit-content',
+              width: 'auto',
+              '&:hover': { backgroundColor: '#fff', color: 'grey' },
+              fontSize: '16px',
+              minHeight: '36px',
+              height: '36px',
+            }}
+            onClick={() => setActiveTab(0)}
+          />
+          <CoreModules.Tab
+            label="My Organizations"
+            sx={{
+              background: activeTab === 1 ? 'grey' : 'white',
+              color: activeTab === 1 ? 'white' : 'grey',
+              marginLeft: '20px',
+              minWidth: 'fit-content',
+              width: 'auto',
+              '&:hover': { backgroundColor: '#fff', color: 'grey' },
+              fontSize: '16px',
+              minHeight: '36px',
+              height: '36px',
+            }}
+            onClick={() => setActiveTab(1)}
+          />
+        </CoreModules.Tabs>
+      </CoreModules.Box>
+      <CoreModules.Box>
         <CoreModules.TextField
           variant="outlined"
           size="small"
@@ -69,19 +110,33 @@ const Organization = () => {
               </CoreModules.InputAdornment>
             ),
           }}
+          sx={{ width: '20%' }}
         />
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
+      <CoreModules.Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          sm: { flexWrap: 'nowrap' },
+          gap: 2,
+        }}
+      >
         {filteredCardData?.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
-            <CoreModules.Typography variant="subtitle1">{data.name}</CoreModules.Typography>
-            <CoreModules.CardContent>
+            <CoreModules.CardMedia
+              component="img"
+              src={'http://localhost:8080/d907cf67fe587072a592.png' || data.logo}
+              sx={{ width: '150px' }}
+            />
+            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <CoreModules.Typography variant="subtitle1" sx={{ textTransform: 'uppercase' }}>
+                {data.name}
+              </CoreModules.Typography>
               <CoreModules.Typography
                 variant="subtitle3"
                 sx={{
-                  height: '5rem',
                   display: '-webkit-box',
-                  '-webkit-line-clamp': 3,
+                  '-webkit-line-clamp': 2,
                   '-webkit-box-orient': 'vertical',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -89,13 +144,21 @@ const Organization = () => {
                 }}
               >
                 {data.description}
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nulla itaque maiores dignissimos inventore
+                optio, quis neque dolorum voluptate. Porro, sit cumque. Error, fuga maxime voluptatum, commodi qui
+                dolorum corrupti at voluptas aperiam natus eius enim atque, adipisci molestiae. Maxime aut recusandae
+                incidunt inventore voluptates nam maiores dolor cumque temporibus totam repellendus amet, perferendis ut
+                commodi reprehenderit dolores vitae neque ducimus pariatur accusamus esse non aspernatur voluptate!
+                Deleniti perspiciatis dolor blanditiis nesciunt eaque nam neque iure sunt dolorem, quaerat laborum
+                voluptatum reiciendis placeat minus natus temporibus aliquid molestias voluptatibus quam sed hic. Nihil
+                nostrum sequi consequatur harum alias natus non placeat?
               </CoreModules.Typography>
-            </CoreModules.CardContent>
-            <CoreModules.Link to={data.url} target="_blank">
-              <CoreModules.Avatar alt={data.title} src={data.logo}>
-                {!data.logo || data.logo === 'string' ? data.name[0] : null}
-              </CoreModules.Avatar>
-            </CoreModules.Link>
+              <CoreModules.Link to={data.url} target="_blank" style={{ textDecoration: 'none' }}>
+                <CoreModules.Avatar alt={data.title} src={data.logo} sx={{ height: '25px', width: '25px' }}>
+                  {!data.logo || data.logo === 'string' ? data.name[0] : url}
+                </CoreModules.Avatar>
+              </CoreModules.Link>
+            </CoreModules.Box>
           </CoreModules.Card>
         ))}
       </CoreModules.Box>
