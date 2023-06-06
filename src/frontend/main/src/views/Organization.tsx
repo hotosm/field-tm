@@ -144,14 +144,6 @@ const Organization = () => {
                 }}
               >
                 {data.description}
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nulla itaque maiores dignissimos inventore
-                optio, quis neque dolorum voluptate. Porro, sit cumque. Error, fuga maxime voluptatum, commodi qui
-                dolorum corrupti at voluptas aperiam natus eius enim atque, adipisci molestiae. Maxime aut recusandae
-                incidunt inventore voluptates nam maiores dolor cumque temporibus totam repellendus amet, perferendis ut
-                commodi reprehenderit dolores vitae neque ducimus pariatur accusamus esse non aspernatur voluptate!
-                Deleniti perspiciatis dolor blanditiis nesciunt eaque nam neque iure sunt dolorem, quaerat laborum
-                voluptatum reiciendis placeat minus natus temporibus aliquid molestias voluptatibus quam sed hic. Nihil
-                nostrum sequi consequatur harum alias natus non placeat?
               </CoreModules.Typography>
               <CoreModules.Link to={data.url} target="_blank" style={{ textDecoration: 'none' }}>
                 <CoreModules.Avatar alt={data.title} src={data.logo} sx={{ height: '25px', width: '25px' }}>
