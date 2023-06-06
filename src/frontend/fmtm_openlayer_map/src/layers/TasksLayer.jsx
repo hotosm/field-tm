@@ -47,17 +47,31 @@ const TasksLayer = (map, view, feature) => {
                     source: vectorSource,
                     style: styleFunction,
                 });
+                // Initialize variables to store the extent
+                var minX = Infinity;
+                var minY = Infinity;
+                var maxX = -Infinity;
+                var maxY = -Infinity;
 
-                const centroid = state.projectTaskBoundries[index].
-                    taskBoundries[state.projectTaskBoundries[index].
-                        taskBoundries.length - 1]?.
-                    outline_centroid?.geometry?.coordinates || null;
+                // Iterate through the features and calculate the extent
+                vectorSource.getFeatures().forEach(function (feature) {
+                    var geometry = feature.getGeometry();
+                    var extent = geometry.getExtent();
 
-                map.getView().setCenter(centroid)
+                    minX = Math.min(minX, extent[0]);
+                    minY = Math.min(minY, extent[1]);
+                    maxX = Math.max(maxX, extent[2]);
+                    maxY = Math.max(maxY, extent[3]);
+                });
 
-                setTimeout(() => {
-                    view.animate({ zoom: 15, easing: easeOut, duration: 2000, });
-                }, 500);
+                // The extent of the vector layer
+                var extent = [minX, minY, maxX, maxY];
+
+                map.getView().fit(extent, {
+                    duration: 2000, // Animation duration in milliseconds
+                    padding: [50, 50, 50, 50], // Optional padding around the extent
+                })
+
 
                 map.addLayer(vectorLayer)
                 map.on('loadend', function () {
