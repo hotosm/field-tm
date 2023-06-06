@@ -103,7 +103,7 @@ export default function PrimaryAppBar() {
             </CoreModules.Link>
             <CoreModules.Link to={'/organization'} style={{ color: defaultTheme.palette.black }}>
               <CoreModules.Tab
-                label="MANAGE ORGANIZATION"
+                label="MANAGE ORGANIZATIONS"
                 sx={{
                   borderBottom: activeTab === 1 ? '2.5px solid #2c3038' : 'none',
                   '&:hover': { backgroundColor: '#fff' },
