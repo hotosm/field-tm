@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import windowDimention from '../../hooks/WindowDimension';
 import CustomDropdown from '../../utilities/CustomDropdown';
 import CoreModules from '../../shared/CoreModules';
@@ -8,7 +8,9 @@ const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
 const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
 
 //Home Filter
-const HomePageFilters = () => {
+const HomePageFilters = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const token: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
   const { windowSize } = windowDimention();
@@ -82,6 +84,12 @@ const HomePageFilters = () => {
     },
   }));
 
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    onSearch(query);
+  };
+
   return (
     <CoreModules.Stack>
       {/* Explore project typography in mobile size */}
@@ -132,9 +140,8 @@ const HomePageFilters = () => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
-          marginRight: '3rem',
-          gap: 5,
+          gap: 2,
+          p: 1,
         }}
       >
         {/* <CoreModules.FormControl size="small" sx={{ m: 1, minWidth: 120, width: 250 }} margin="normal">
@@ -159,12 +166,30 @@ const HomePageFilters = () => {
             ))}
           </CoreModules.Select>
         </CoreModules.FormControl> */}
-        <Search id="search">
-          <SearchIconWrapper>
-            <AssetModules.SearchIcon color="info" />
-          </SearchIconWrapper>
-          <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} style={{ width: '100%' }} />
-        </Search>
+
+        <CoreModules.Box>
+          <CoreModules.TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search Project"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: 'black',
+                },
+              },
+            }}
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <CoreModules.InputAdornment position="start">
+                  <AssetModules.SearchIcon />
+                </CoreModules.InputAdornment>
+              ),
+            }}
+          />
+        </CoreModules.Box>
         <CoreModules.Link
           to={'/create-project'}
           style={{
