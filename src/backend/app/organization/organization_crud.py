@@ -51,7 +51,7 @@ async def create_organization(db: Session, name:str, description:str, url:str, t
             slug = generate_slug(name),
             description=description,
             url=url,
-            type=type,
+            # type=type,
         )
         file_path = os.path.join("app/images")
 

@@ -25,4 +25,4 @@ class Organisation(BaseModel):
     name: str
     description: str
     url: str
-    type: int
+    # type: int
