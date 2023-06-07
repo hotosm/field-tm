@@ -56,7 +56,7 @@ async def create_organization(
     name: str=Form(),
     description: str=Form(None),
     url: str=Form(None),
-    type: int=Form(),
+    # type: int=Form(),
     logo: UploadFile = File(...),
     db: Session = Depends(database.get_db),
 ):

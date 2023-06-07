@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CoreModules from '../shared/CoreModules';
 import environment from '../environment';
 import useForm from '../hooks/useForm';
@@ -6,13 +6,19 @@ import { useDispatch } from 'react-redux';
 import OrganizationAddValidation from '../components/organization/Validation/OrganizationAddValidation';
 import { PostOrganizationDataService } from '../api/OrganizationService';
 import { FormControl } from '@mui/material/FormControl';
+import { useNavigate } from 'react-router-dom';
+import { OrganizationAction } from '../store/slices/organizationSlice';
 
 const formData = {};
 const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
 const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
+
+
 const CreateOrganizationForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const postOrganizationData: any = CoreModules.useSelector<any>((state) => state.organization.postOrganizationData);
 
   const submission = () => {
     dispatch(PostOrganizationDataService(`${environment.baseApiUrl}/organization/`, values));
@@ -32,6 +38,17 @@ const CreateOrganizationForm = () => {
       },
     };
   };
+
+  useEffect(() => {
+    if (postOrganizationData) {
+
+      navigate('/organization');
+      dispatch(OrganizationAction.postOrganizationData(null))
+    }
+
+
+  }, [postOrganizationData])
+
 
   return (
     <CoreModules.Box
@@ -126,7 +143,7 @@ const CreateOrganizationForm = () => {
               />
             </CoreModules.FormControl>
 
-            <CoreModules.FormControl fullWidth margin="normal" variant="filled">
+            {/* <CoreModules.FormControl fullWidth margin="normal" variant="filled">
               <CoreModules.Box
                 sx={{
                   display: 'flex',
@@ -174,7 +191,7 @@ const CreateOrganizationForm = () => {
                   {errors.type}
                 </CoreModules.FormLabel>
               )}
-            </CoreModules.FormControl>
+            </CoreModules.FormControl> */}
             <CoreModules.FormControl fullWidth margin="normal" variant="filled" sx={{ gap: 1 }}>
               <CoreModules.Box
                 sx={{
@@ -209,7 +226,7 @@ const CreateOrganizationForm = () => {
                 <CoreModules.Input
                   type="file"
                   onChange={(e) => {
-                    handleCustomChange('logo', e.target.files);
+                    handleCustomChange('logo', e.target?.files?.[0]);
                   }}
                 />
               </CoreModules.Button>
