@@ -140,6 +140,7 @@ const HomePageFilters = ({ onSearch }) => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: 2,
           p: 1,
         }}
@@ -167,6 +168,25 @@ const HomePageFilters = ({ onSearch }) => {
           </CoreModules.Select>
         </CoreModules.FormControl> */}
 
+        <CoreModules.Link
+          to={'/create-project'}
+          style={{
+            //   marginLeft: '3%',
+            textDecoration: 'none',
+            // color: defaultTheme.palette.info.main,
+          }}
+        >
+          <CoreModules.Button
+            variant="outlined"
+            color="error"
+            startIcon={<AssetModules.AddIcon />}
+            style={searchableInnerStyle.outlineBtn}
+            // disabled={token == null}
+          >
+            Create New Project
+          </CoreModules.Button>
+        </CoreModules.Link>
+
         <CoreModules.Box>
           <CoreModules.TextField
             variant="outlined"
@@ -190,24 +210,7 @@ const HomePageFilters = ({ onSearch }) => {
             }}
           />
         </CoreModules.Box>
-        <CoreModules.Link
-          to={'/create-project'}
-          style={{
-            //   marginLeft: '3%',
-            textDecoration: 'none',
-            // color: defaultTheme.palette.info.main,
-          }}
-        >
-          <CoreModules.Button
-            variant="outlined"
-            color="error"
-            startIcon={<AssetModules.AddIcon />}
-            style={searchableInnerStyle.outlineBtn}
-            // disabled={token == null}
-          >
-            Create New Project
-          </CoreModules.Button>
-        </CoreModules.Link>
+
         {/* <======End======> */}
       </CoreModules.Stack>
       {/* <======End======> */}
