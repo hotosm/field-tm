@@ -83,7 +83,7 @@ export default function ExploreProjectCard({ data }) {
             variant="outlined"
             color="error"
             style={cardInnerStyles.outlinedButton}
-            // disabled
+          // disabled
           >
             {data.priority_str}
           </CoreModules.Button>
@@ -109,7 +109,6 @@ export default function ExploreProjectCard({ data }) {
             }}
           >
             {data.title}
-            lore
           </CoreModules.Typography>
 
           <CoreModules.Stack direction={'row'}>
