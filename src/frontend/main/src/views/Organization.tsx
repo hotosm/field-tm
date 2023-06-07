@@ -125,7 +125,7 @@ const Organization = () => {
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.CardMedia
               component="img"
-              src={'http://localhost:8080/d907cf67fe587072a592.png' || data.logo}
+              src={data.logo ? `${environment.baseApiUrl}/images/${data.logo}` : 'http://localhost:8080/d907cf67fe587072a592.png'}
               sx={{ width: '150px' }}
             />
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
