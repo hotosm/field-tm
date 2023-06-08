@@ -2,20 +2,16 @@
 
 [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-)
 
-**Workflows**
+**Workflows - Production**
 
-[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml) [![Production Deploy](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml)
+[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml)
+[![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml)
+[![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml)
 
-**Backend Builds**
+**Workflows - Development**
 
-| Backend API | ODKCentral API  | ODKCentral Proxy  |
-|---|---|---|
-| [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/backend) | [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api)  |  [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy)  |
-
-**Microfrontend Builds**
-|  Main | Map |
-|---|---|
-| [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main)| [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map) |
+[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml)
+[![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml)
 
 # Field Mapping Tasking Manager (FMTM)
 

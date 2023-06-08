@@ -39,9 +39,6 @@ function OrganizationAddValidation(values: OrganizationValues) {
   } else if (!isValidUrl(values.url)) {
     errors.url = 'Invalid URL.';
   }
-  if (!values?.type) {
-    errors.type = 'Type is Required.';
-  }
 
   return errors;
 }

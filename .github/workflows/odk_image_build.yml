@@ -1,0 +1,53 @@
+name: Build ODK Images
+
+on:
+  # Push includes PR merge
+  push:
+    branches:
+      - main
+      - staging
+      - development
+      - "*-development-*"
+    paths:
+      # Workflow is triggered only if odkcentral dir changes
+      - "odkcentral/**"
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  ODK_CENTRAL_VERSION: v2023.2.1
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push odkcentral api
+        uses: docker/build-push-action@v4
+        with:
+          context: odkcentral/api
+          push: true
+          tags: "ghcr.io/hotosm/fmtm/odkcentral:${{ env.ODK_CENTRAL_VERSION }}"
+          build-args: |
+            ODK_CENTRAL_VERSION=${{ env.ODK_CENTRAL_VERSION }}
+
+      - name: Build and push odkcentral proxy
+        uses: docker/build-push-action@v4
+        with:
+          context: odkcentral/proxy
+          push: true
+          tags: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
