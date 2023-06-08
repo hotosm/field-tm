@@ -54,6 +54,8 @@ import { useNavigate, useParams, Link, Outlet, RouterProvider,useLocation,create
 import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
+import LoadingBar from "../components/createproject/LoadingBar";
+
 export default {
     Provider,
     PersistGate,
@@ -122,5 +124,7 @@ export default {
     Tooltip,
     Breadcrumbs,
     CardMedia,
+    LoadingBar,
+    
     
 }
