@@ -58,7 +58,7 @@ export default function PrimaryAppBar() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <CoreModules.Stack sx={{ flexGrow: 1 }}>
+    <CoreModules.Stack sx={{ flexGrow: 0 }}>
       <DrawerComponent
         open={open}
         placement={'right'}
@@ -67,14 +67,29 @@ export default function PrimaryAppBar() {
         type={type}
         onSignOut={handleOnSignOut}
       />
-      <CoreModules.AppBar position="static">
+      <CoreModules.AppBar
+        position="static"
+        sx={{ boxShadow: 0, borderBottom: '1px solid #e1e0e0', borderTop: '1px solid #e1e0e0' }}
+      >
         <CoreModules.Toolbar>
           <CoreModules.Link to={'/'}>
             <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
           </CoreModules.Link>
 
           {/* Tabs switch added */}
-          <CoreModules.Tabs sx={{ marginLeft: '2%' }} className="header-tabs" width={'50%'}>
+          <CoreModules.Tabs
+            sx={{
+              marginLeft: '2%',
+              flexGrow: 20,
+              display: {
+                xs: 'none',
+                sm: 'none',
+                md: 'block',
+                lg: 'block',
+              },
+            }}
+            className="header-tabs"
+          >
             <CoreModules.Link to={'/'} style={{ color: defaultTheme.palette.black }}>
               <CoreModules.Tab
                 label="EXPLORE PROJECTS"
@@ -88,7 +103,7 @@ export default function PrimaryAppBar() {
             </CoreModules.Link>
             <CoreModules.Link to={'/organization'} style={{ color: defaultTheme.palette.black }}>
               <CoreModules.Tab
-                label="MANAGE ORGANIZATION"
+                label="MANAGE ORGANIZATIONS"
                 sx={{
                   borderBottom: activeTab === 1 ? '2.5px solid #2c3038' : 'none',
                   '&:hover': { backgroundColor: '#fff' },
@@ -111,7 +126,7 @@ export default function PrimaryAppBar() {
           </CoreModules.Tabs>
           {/* position changed */}
           {token != null && (
-            <CoreModules.Stack direction={'row'} spacing={1} ml={'46%'} justifyContent="center" alignItems="center">
+            <CoreModules.Stack direction={'row'} spacing={1} justifyContent="center" alignItems="center">
               <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }} />
               <CoreModules.Typography
                 variant="typography"
@@ -153,7 +168,7 @@ export default function PrimaryAppBar() {
             ) : (
               <>
                 <CoreModules.Button
-                  className='btnLogin'
+                  className="btnLogin"
                   style={appBarInnerStyles.btnLogin}
                   color="info"
                   onClick={() => createLoginWindow('/')}

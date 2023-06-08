@@ -10,40 +10,15 @@ function elastic(t) {
         Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1
     );
 }
-const basicGeojsonTemplate = {
-    "type": "FeatureCollection",
-    "features": []
-};
-const SubmissionMap = () => {
-    const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
-    const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
-    const [projectBoundaries, setProjectBoundaries] = useState(null)
-    const [buildingBoundaries, setBuildingBoundaries] = useState(null)
+
+const SubmissionMap = ({outlineBoundary,featureGeojson}) => {
+   
     const { mapRef, map } = useOLMap({
         // center: fromLonLat([85.3, 27.7]),
         center: [0, 0],
         zoom: 4,
         maxZoom: 25,
     });
-
-    if(projectTaskBoundries?.length>0 && projectBoundaries === null){
-
-        const taskGeojsonFeatureCollection = {
-            ...basicGeojsonTemplate,
-            features: [...projectTaskBoundries?.[0]?.taskBoundries?.map((task)=> ({...task.outline_geojson,id:task.outline_geojson.properties.uid}))]
-    
-        };
-        setProjectBoundaries(taskGeojsonFeatureCollection)
-    }
-    if(projectBuildingGeojson?.length>0 && buildingBoundaries === null){
-        
-        const buildingGeojsonFeatureCollection = {
-            ...basicGeojsonTemplate,
-            features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
-            
-        };
-        setBuildingBoundaries(buildingGeojsonFeatureCollection);
-    }
 
     return (
         <div className="map-container" style={{ height: '100%' }}>
@@ -57,8 +32,8 @@ const SubmissionMap = () => {
                 }}
             >
                 <LayerSwitcherControl />
-                {projectBoundaries?.type && <VectorLayer
-                    geojson={projectBoundaries}
+                {outlineBoundary?.type && <VectorLayer
+                    geojson={outlineBoundary}
                     // stylestyle={{
                     //     ...getStyles,
                     //     fillOpacity: 100,
@@ -79,8 +54,8 @@ const SubmissionMap = () => {
                     zoomToLayer
                     zIndex={5}
                 />}
-                {buildingBoundaries?.type && <VectorLayer
-                    geojson={buildingBoundaries}
+                {featureGeojson?.type && <VectorLayer
+                    geojson={featureGeojson}
                     zIndex={10}
                 />}
                 {/* )} */}

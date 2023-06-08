@@ -27,6 +27,7 @@ import { get } from 'ol/proj';
 
 import Overlay from "ol/Overlay";
 import { defaultStyles, getStyles } from "../components/MapComponent/OpenLayersComponent/helpers/styleUtils";
+import ProjectMap from "../components/ProjectMap/ProjectMap";
 // import XYZ from "ol/source/XYZ.js";
 // import { toLonLat } from "ol/proj";
 // import { toStringHDMS } from "ol/coordinate";
@@ -39,7 +40,6 @@ const Home = () => {
   const params = CoreModules.useParams();
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useSelector((state) => state.project);
-  const projectState = CoreModules.useSelector((state) => state.project);
 
   const projectInfo = CoreModules.useSelector(
     (state) => state.home.selectedProject
@@ -75,11 +75,14 @@ const Home = () => {
 
   //Fetch project for the first time
   useEffect(() => {
+
     if (
       state.projectTaskBoundries.findIndex(
         (project) => project.id == environment.decode(encodedId)
       ) == -1
     ) {
+      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
@@ -87,9 +90,9 @@ const Home = () => {
         ),
         state.projectTaskBoundries
       );
-      dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+      // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
 
-    }else{
+    } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]))
       dispatch(
         ProjectById(
@@ -108,30 +111,6 @@ const Home = () => {
     }
   }, [params.id]);
 
-  //Added Building Geojson on Project Details Page
-  useEffect(() => {
-    if(!map) return
-    
-    const buildingGeojsonFeatureCollection = {
-      ...basicGeojsonTemplate,
-      features: projectState?.projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
-
-      // features: projectState?.projectTaskBoundries?.map((task) => {
-      //     return { ...task.taskBoundries?.[0]?.outline_geojson, id: task.taskBoundries?.[0]?.outline_geojson?.properties.uid }
-      // })
-    };
-    const buildingFeaturesLayer = new VectorLayer({
-      source: new VectorSource({
-        features: new GeoJSON().readFeatures(buildingGeojsonFeatureCollection, {
-          featureProjection: get('EPSG:4326'),
-        }),
-      }),
-      // style:(styles,feature,resolution)=> getStyles({ styles:defaultStyles, feature, resolution })
-    });
-    map.addLayer(buildingFeaturesLayer);
-
-  }, [map,projectState?.projectBuildingGeojson])
-  
   useEffect(() => {
     const container = document.getElementById("popup");
     const closer = document.getElementById("popup-closer");
@@ -167,7 +146,7 @@ const Home = () => {
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource(),
     });
-    
+
 
     const view = new View({
       projection: "EPSG:4326",
@@ -191,7 +170,6 @@ const Home = () => {
       overlays: [overlay],
       view: view,
     });
-
     initialMap.on("click", function (event) {
       initialMap.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
         const status = feature.getId()?.toString()?.replace("_", ",")?.split(",")?.[1];
@@ -220,8 +198,12 @@ const Home = () => {
        * Removed handleClickOutside Eventlistener on unmount
        */
       document.removeEventListener("mousedown", handleClickOutside);
+      mapElement.current = null;
+      setFeaturesLayer();
+      setView();
+      setMap();
     };
-  }, []);
+  }, [params.id]);
 
   useEffect(() => {
     if (map != undefined) {
@@ -332,7 +314,7 @@ const Home = () => {
           state={state}
           type={type}
         />
-        <CoreModules.Stack
+        {/* <CoreModules.Stack
           direction={"column"}
           spacing={1}
           justifyContent="flex-end"
@@ -354,8 +336,10 @@ const Home = () => {
               Go To Submission
             </CoreModules.Button>
           </CoreModules.Link>
-        </CoreModules.Stack>
-        <OpenLayersMap
+        </CoreModules.Stack> */}
+        {/* <ProjectMap /> */}
+        {params?.id && <OpenLayersMap
+          key={params.id}
           defaultTheme={defaultTheme}
           stateDialog={stateDialog}
           params={params}
@@ -368,7 +352,7 @@ const Home = () => {
           mapElement={mapElement}
           environment={environment}
           windowType={type}
-        />
+        />}
       </CoreModules.Stack>
 
       {/* project Details Tabs */}

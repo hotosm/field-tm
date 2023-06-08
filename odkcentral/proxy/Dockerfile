@@ -21,3 +21,5 @@ WORKDIR /usr/share/nginx/html
 # Remove default Nginx static assets
 RUN rm -rf ./* /etc/nginx/conf.d/default.conf /etc/nginx/nginx.conf
 COPY . /etc/nginx
+RUN cat /etc/nginx/central.crt /etc/nginx/ca.crt \
+    >> /etc/nginx/central-fullchain.crt \

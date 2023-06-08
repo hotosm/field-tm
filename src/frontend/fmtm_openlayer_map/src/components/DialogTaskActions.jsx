@@ -19,6 +19,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   const dispatch = CoreModules.useDispatch();
   const params = CoreModules.useParams();
   const currentProjectId = environment.decode(params.id);
+  const currentTaskId = environment.encode(taskId);
   const projectIndex = projectData.findIndex(
     (project) => project.id == currentProjectId
   );
@@ -110,7 +111,26 @@ export default function Dialog({ taskId, feature, map, view }) {
           {`STATUS : ${task_status?.replaceAll("_", " ")}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
-
+      <CoreModules.Link
+        to={`/project/${params.id}/tasks/${currentTaskId}`}
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          textDecoration: "none",
+          marginRight: "15px",
+        }}
+      >
+        <CoreModules.Button
+          // id={data.value}
+          // key={index}
+          variant="contained"
+          color="error"
+          onClick={handleOnClick}
+          // disabled={loading} 
+        >
+          Task Submission
+        </CoreModules.Button>
+      </CoreModules.Link>
       {list_of_task_status?.map((data, index) => {
         return list_of_task_status?.length != 0 ? (
           <CoreModules.Button

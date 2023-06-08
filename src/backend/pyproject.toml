@@ -1,0 +1,106 @@
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+[project]
+name = "fmtm"
+dynamic = ["version"]
+description = "Field mapping tasking manager"
+authors = [
+    {name = "HOTOSM", email = "sysadmin@hotosm.org"},
+]
+dependencies = [
+    "fastapi==0.85.1",
+    "pydantic==1.10.2",
+    "geojson-pydantic==0.4.3",
+    "uvicorn==0.19.0",
+    "fastapi-sqlalchemy==0.2.1",
+    "psycopg2==2.9.3",
+    "geoalchemy2==0.12.5",
+    "alembic==1.8.1",
+    "sqlmodel==0.0.8",
+    "geojson==2.5.0",
+    "shapely==2.0.1",
+    "OSMPythonTools==0.3.5",
+    "osm-login-python==0.0.4",
+    "pyxform==1.12.0",
+    "qrcode==7.4.2",
+    "pyxform==1.12.0",
+    "xmltodict==0.13.0",
+    "osm-fieldwork==0.3.1rc1",
+    "python-multipart==0.0.5",
+    "python-json-logger==2.0.6",
+    "SQLAlchemy-Utils==0.40.0",
+    "bcrypt==4.0.1",
+    "segno==1.5.2"
+]
+requires-python = ">=3.10"
+readme = "../../README.md"
+license = {text = "GPL-3.0-only"}
+[project.optional-dependencies]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.pdm]
+source-includes = ["../../CHANGELOG.md", "../../LICENSE", "../../README.md"]
+version = {from = "app/__version__.py"}
+[tool.pdm.dev-dependencies]
+dev = [
+    "ipdb==0.13.11",
+    "debugpy==1.6.6",
+    "pytest==7.2.2",
+    "httpx==0.23.3",
+    "commitizen>=3.2.2",
+]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+select = ["I", "E", "W", "D", "B", "F", "N", "Q"]
+ignore = ["N805", "B008"]
+exclude = [
+    ".ruff_cache",
+    "__pypackages__",
+    "app/__version__.py",
+]
+[tool.ruff.pydocstyle]
+convention = "google"
+[tool.ruff.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.params.Depends",
+    "fastapi.Query",
+    "fastapi.params.Query",
+    "fastapi.File",
+    "fastapi.Security",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_files = [
+    "pyproject.toml:version",
+    "app/__version__.py",
+]

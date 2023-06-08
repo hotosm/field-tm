@@ -32,6 +32,10 @@ module.exports = (webpackEnv) => {
       port: `${new URL(process.env.FRONTEND_MAP_URL).port}`,
       historyApiFallback: true,
       allowedHosts: [`${process.env.FRONTEND_MAP_URL}`],
+      headers:{
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      },
     },
 
     module: {
@@ -118,6 +122,7 @@ module.exports = (webpackEnv) => {
           "./ProjectDetails": "./src/views/Home.jsx",
           "./Submissions": "./src/views/Submissions.jsx",
           "./DefineAreaMap": "./src/views/DefineAreaMap.jsx",
+          "./Tasks": "./src/views/Tasks.jsx",
         },
         shared: {
           ...deps,
