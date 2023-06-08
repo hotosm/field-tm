@@ -21,15 +21,15 @@ import os
 import pathlib
 import zlib
 
-import osm_fieldwork
+# import osm_fieldwork
 
 # Qr code imports
 import segno
 import xmltodict
 from fastapi import HTTPException
 from fastapi.logger import logger as logger
-from osm_fieldwork.CSVDump import CSVDump
-from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from ..osm_fieldwork.CSVDump import CSVDump
+from ..osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy.orm import Session
 
