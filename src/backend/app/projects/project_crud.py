@@ -28,6 +28,7 @@ from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
 
+
 import geoalchemy2
 import geojson
 import numpy as np
@@ -38,9 +39,9 @@ from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
-from osm_fieldwork.make_data_extract import PostgresClient
-from osm_fieldwork.OdkCentral import OdkAppUser
-from osm_fieldwork.xlsforms import xlsforms_path
+from ..osm_fieldwork.make_data_extract import PostgresClient
+from ..osm_fieldwork.OdkCentral import OdkAppUser
+from ..osm_fieldwork.xlsforms import xlsforms_path
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import (
@@ -528,12 +529,11 @@ def upload_boundary(
 
     outfile = f"/tmp/buildings_{project_id}.geojson"  # This file will store osm extracts
 
-    outline_geojson = pg.getFeatures(
+    outline_geojson = pg.getOSMFeatures(
         boundary = boundary_data,
         filespec = outfile,
-        polygon = False,
-        xlsfile = f"{category}.xls",
-        category = category,
+        polygon = True,
+        category = "highway"
     )
 
     updated_outline_geojson = {
@@ -564,10 +564,11 @@ def upload_boundary(
     db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
 
+    # OSM Lines
+    lines = ['waterways']
     print('Outline geojson ', outline_geojson)
 
     return True
-
 
 
 def update_project_boundary(
