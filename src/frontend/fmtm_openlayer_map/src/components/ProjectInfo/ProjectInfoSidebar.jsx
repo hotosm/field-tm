@@ -1,6 +1,5 @@
 import React from "react";
 import CoreModules from "fmtm/CoreModules";
-import LoadingBar from "./LoadingBar";
 
 const ProjectInfoSidebar = () => {
   return (
