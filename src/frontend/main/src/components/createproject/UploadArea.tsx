@@ -102,6 +102,7 @@ const UploadArea: React.FC = () => {
                     </CoreModules.Stack>
                     {/* END */}
                 </FormGroup>
+
             </form>
             <DefineAreaMap uploadedGeojson={projectDetails?.areaGeojson} />
         </CoreModules.Stack >
