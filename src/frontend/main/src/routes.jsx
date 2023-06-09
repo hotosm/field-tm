@@ -18,6 +18,7 @@ import SubmissionDetails from './views/SubmissionDetails';
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
 const Tasks = React.lazy(() => import('map/Tasks'));
+const ProjectInfo = React.lazy(() => import('map/ProjectInfo'));
 
 const routes = createBrowserRouter([
   {
@@ -51,6 +52,18 @@ const routes = createBrowserRouter([
         path: '/signup',
         element: <Create />,
       },
+
+      {
+        path: '/projectInfo',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <ProjectInfo />{' '}
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+
       {
         path: '/project/:projectId/tasks/:taskId',
         element: (
@@ -65,6 +78,7 @@ const routes = createBrowserRouter([
       //     path: "/recoveraccess",
       //     element: <Forgot />,
       // },
+
       {
         path: '/project/:projectId/tasks/:taskId/submission/:instanceId',
         element: (
@@ -85,6 +99,7 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
       {
         path: '/project_details/:id',
         element: (
@@ -147,9 +162,11 @@ const routes = createBrowserRouter([
       },
       {
         path: '/osmauth',
-        element:<Suspense fallback={<div>Loading...</div>}>
-                  <Authorized/>
-                </Suspense>
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Authorized />
+          </Suspense>
+        ),
       },
       {
         path: '*',
