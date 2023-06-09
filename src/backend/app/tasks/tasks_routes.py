@@ -34,6 +34,19 @@ router = APIRouter(
 )
 
 
+@router.get("/task-list", response_model=List[tasks_schemas.TaskOut])
+async def read_task_list(
+    project_id: int,
+    limit: int = 1000,
+    db: Session = Depends(database.get_db),
+    ):
+    tasks = tasks_crud.get_tasks(db, project_id, limit)
+    if tasks:
+        return tasks
+    else:
+        raise HTTPException(status_code=404, detail="Tasks not found")
+    
+
 @router.get("/", response_model=List[tasks_schemas.TaskOut])
 async def read_tasks(
     project_id: int,
