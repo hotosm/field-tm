@@ -97,6 +97,7 @@ const FormSelection: React.FC = () => {
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
+      dispatch(CreateProjectActions.SetGenerateProjectLog(null));
     };
   }, []);
   // END
@@ -166,8 +167,8 @@ const FormSelection: React.FC = () => {
     submission,
     SelectFormValidation,
   );
-  console.log(dividedTaskGeojson, 'dividedTaskGeojson');
-  const totalSteps = dividedTaskGeojson?.features?.length;
+  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+  const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   return (
     <CoreModules.Stack sx={{ width: '100%', marginLeft: '215px !important' }}>
@@ -289,7 +290,7 @@ const FormSelection: React.FC = () => {
                       }),
                     );
                   }}
-                  // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
+                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
                   {selectFormWays?.map((form) => (
                     <MenuItem value={form.value}>{form.label}</MenuItem>
@@ -394,7 +395,7 @@ const FormSelection: React.FC = () => {
                 variant="contained"
                 color="error"
                 type="submit"
-                // disabled={!fileUpload ? true : false}
+              // disabled={!fileUpload ? true : false}
               >
                 Submit
               </CoreModules.Button>

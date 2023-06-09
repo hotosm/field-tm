@@ -67,7 +67,7 @@ const DefineTasks: React.FC = () => {
     );
   };
 
-  const algorithmListData = ['Divide on Square', 'Choose Area as Tasks', 'Openstreet Map Extract'].map((item) => ({
+  const algorithmListData = ['Divide on Square', 'Choose Area as Tasks'].map((item) => ({
     label: item,
     value: item,
   }));
@@ -80,9 +80,11 @@ const DefineTasks: React.FC = () => {
       }, // or className: 'your-class'
     };
   };
-
+  const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
+  console.log(dividedTaskGeojson, 'dividedTaskGeojson');
+  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
-
+  // const filteredAlgorithmListData = algorithmListData?.filter((algo) => parsedTaskGeojsonCount > 1 ? algo.label === 'Choose Area as Tasks' : algo);
   return (
     <CoreModules.Stack
       sx={{
@@ -184,6 +186,10 @@ const DefineTasks: React.FC = () => {
               </CoreModules.Stack>
             </CoreModules.FormControl>
           )}
+          {parsedTaskGeojsonCount ? <CoreModules.Stack direction="row" alignItems="center" spacing={2}>
+            <h2>Total Tasks:</h2>
+            <h3>{parsedTaskGeojsonCount}</h3>
+          </CoreModules.Stack> : null}
           {/* END */}
 
           {/* Submit Button For Create Project on Area Upload */}
