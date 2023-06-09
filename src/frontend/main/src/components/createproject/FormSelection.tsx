@@ -342,7 +342,7 @@ const FormSelection: React.FC = () => {
                   <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '60%', pb: '2rem' }}>
                     <LoadingBar
                       title={'Task Progress'}
-                      steps={totalSteps}
+                      // steps={totalSteps}
                       activeStep={generateProjectLog.progress}
                       totalSteps={totalSteps}
                     />
