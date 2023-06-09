@@ -8,26 +8,32 @@ const ProjectInfo = () => {
     <>
       <CoreModules.Box
         sx={{
-          px: 5,
-          py: 2,
+          px: 3,
+          py: 1,
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <CoreModules.Typography>
-          14455 | Union of Brazilian Mappers of OSM (UMBRAOSM)
-        </CoreModules.Typography>
+        <CoreModules.Box>
+          <CoreModules.Typography variant="h1" color="#929db3">
+            #14455
+          </CoreModules.Typography>
+          <CoreModules.Typography variant="subtitle1">
+            Union of Brazilian Mappers of OSM (UMBRAOSM)
+          </CoreModules.Typography>
+        </CoreModules.Box>
         <CoreModules.Button
           variant="outlined"
           color="error"
           size="small"
-          sx={{ width: "fit-content", marginLeft: 25 }}
+          sx={{ width: "fit-content", height: "fit-content" }}
         >
           Monitoring
         </CoreModules.Button>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: "flex", flex: 1 }}>
+      <CoreModules.Box sx={{ display: "flex", flex: 1, pb: 2 }}>
         {/* Project Info side bar */}
         <ProjectInfoSidebar
           projectId="#14455"
@@ -41,8 +47,6 @@ const ProjectInfo = () => {
             flexDirection: "column",
             gap: 1,
             px: 2,
-            pb: 2,
-            // background: "#F0F0F0",
           }}
         >
           <ProjectInfomap />
