@@ -4,7 +4,7 @@ import { LinearProgress } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import CoreModules from '../../shared/CoreModules';
 
-const LoadingBar = ({ steps, activeStep, totalSteps, title }) => {
+const LoadingBar = ({ activeStep, totalSteps, title }) => {
   const theme = createTheme({
     palette: {
       primary: {
@@ -19,17 +19,18 @@ const LoadingBar = ({ steps, activeStep, totalSteps, title }) => {
     return (activeStep / totalSteps) * 100;
   };
 
-
-
-  const completedPercentage = calculateProgress(steps, activeStep);
+  const completedPercentage = calculateProgress(totalSteps, activeStep);
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-        <CoreModules.Typography variant="subtitle6" sx={{ width: '100%' }}>
+      <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: 0.5 }}>
+        <CoreModules.Typography variant="h1" sx={{ width: '100%' }}>
           {title}
-          <CoreModules.Typography variant="subtitle1">{`${completedPercentage.toFixed(2)}% Completed`}</CoreModules.Typography>
-          <CoreModules.Typography sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }} variant="subtitle2">{`${activeStep} out of ${totalSteps} Tasks`}</CoreModules.Typography>
+          <CoreModules.Typography variant="h2">{`${completedPercentage.toFixed(2)}% Completed`}</CoreModules.Typography>
+          <CoreModules.Typography
+            sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}
+            variant="h3"
+          >{`${activeStep} out of ${totalSteps} Tasks`}</CoreModules.Typography>
         </CoreModules.Typography>
       </Box>
       <CoreModules.ThemeProvider theme={theme}>
@@ -48,11 +49,12 @@ const LoadingBar = ({ steps, activeStep, totalSteps, title }) => {
                 borderRadius: '12px',
                 height: '20px',
                 width: '100%',
-                backgroundImage: `linear-gradient(to right, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main
-                  } ${calculateProgress(steps, totalSteps)}%, lightgray ${calculateProgress(
-                    steps,
-                    activeStep,
-                  )}%, lightgray 100%)`,
+                backgroundImage: `linear-gradient(to right, ${theme.palette.primary.main} 0%, ${
+                  theme.palette.secondary.main
+                } ${calculateProgress(totalSteps, totalSteps)}%, lightgray ${calculateProgress(
+                  totalSteps,
+                  activeStep,
+                )}%, lightgray 100%)`,
               }}
             />
           </Box>
