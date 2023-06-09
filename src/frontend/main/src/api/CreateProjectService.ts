@@ -19,7 +19,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
                 if (payload.splitting_algorithm === 'Choose Area as Tasks') {
-                    dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
                 } else {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
                 }
