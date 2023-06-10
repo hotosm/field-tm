@@ -21,7 +21,7 @@ TODO: implement the config table
 
 -- The Area of Interest provided by the person creating the project
 WITH aoi AS (
-  SELECT * FROM "project_aoi"
+  SELECT * FROM "project-aoi"
 )
 -- Extract all lines to be used as splitlines from a table of lines
 -- with the schema from Underpass (all tags as jsonb column called 'tags')
