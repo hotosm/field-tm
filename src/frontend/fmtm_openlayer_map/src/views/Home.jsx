@@ -133,7 +133,7 @@ const Home = () => {
       }
     }
     // Bind the event listener for outside click and trigger handleClickOutside
-    document.addEventListener("mousedown", handleClickOutside);
+    // document.addEventListener("mousedown", handleClickOutside);
 
     closer.style.textDecoration = "none";
     closer.style.color = defaultTheme.palette.info["main"];
