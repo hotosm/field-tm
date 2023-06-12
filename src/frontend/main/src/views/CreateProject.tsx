@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/home.css';
+// import "../../node_modules/ol/ol.css";
 import CoreModules from "../shared/CoreModules";
 import UploadArea from "../components/createproject/UploadArea";
 import { useLocation, Link } from 'react-router-dom';
