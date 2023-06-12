@@ -500,7 +500,7 @@ async def preview_tasks(boundary: str, dimension: int):
     return collection
 
 
-def upload_boundary(
+async def split_into_tasks(
     db: Session, project_id: int, boundary: str   
     ):
 
