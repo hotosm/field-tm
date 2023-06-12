@@ -19,6 +19,7 @@ import CommonSlice from "./slices/CommonSlice";
 import LoginSlice from "./slices/LoginSlice";
 import OrganizationSlice from "./slices/organizationSlice.ts"
 import SubmissionSlice from "./slices/SubmissionSlice.ts"
+import TaskSlice from "./slices/TaskSlice.ts"
 
 const reducers = CoreModules.combineReducers({
     project: persistReducer(
@@ -43,7 +44,8 @@ const reducers = CoreModules.combineReducers({
     organization: OrganizationSlice.reducer,
     // added common slice in order to handle all the common things like snackbar etc
     common: CommonSlice.reducer,
-    submission: SubmissionSlice.reducer
+    submission: SubmissionSlice.reducer,
+    task: TaskSlice.reducer
 })
 // const middleware = routerMiddleware(history);
 
