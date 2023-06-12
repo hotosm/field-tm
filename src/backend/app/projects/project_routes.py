@@ -275,7 +275,7 @@ async def implement_hackathon(
 
     result = project_crud.upload_boundary(db, project_id, content)
 
-    return True
+    return result
 
 
 @router.post("/{project_id}/upload")
