@@ -595,3 +595,13 @@ class DbUserRoles(Base):
     project_id = Column(Integer, ForeignKey("projects.id"))
     project = relationship(DbProject, backref="user_roles")
     role = Column(Enum(UserRole), nullable=False)
+
+
+class DbOsmLines(Base):
+    __tablename__ = "osm_lines"
+    
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    project = relationship(DbProject, backref="osm_lines")
+    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    properties = Column(JSONB)
