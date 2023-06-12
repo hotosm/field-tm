@@ -1,11 +1,99 @@
 # Overview
 
+The basic setup here is::point_down:
+
+## ODK Collect
+
+A mobile data collection tool that functions on almost all Android phones. Field mappers use ODK Collect to select features such as buildings or amenities, and fill out forms with survey questions to collect attributes or data about those features (normally at least some of these attributes are intended to become OSM tags associated with those features).
+
+The ODK Collect app connects to a back-end server (in this case ODK Central), which provides the features to be mapped and the survey form definitions.
+
+## ODK Central server
+
+An ODK Central server that functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
+
+[Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (it's very similar on AWS or whatever)
+
+## Field Mapping Tasking Manager Web App
+
+The FMTM web app is a Python/Flask/Leaflet app that serves as a frontend for the ODK Central server, using the [ODK Central API](https://odkcentral.docs.apiary.io/#) to allocate specific areas/features to individual mappers, and receive their data submissions.
+
+![1](https://github.com/hotosm/fmtm/assets/97789856/305be31a-96b4-42df-96fc-6968e9bd4e5f)
+
 The FMTM codebase consists of:
 
 - An API backend in FastAPI (code in: `src/backend`)
 - A frontend website (soon to be a PWA) in react (code in: `src/frontend`)
 
-<img src="https://github.com/hotosm/fmtm/blob/main/images/dataflow.png?raw=true"  width=800 height= 800>
+### Manager Web Interface (with PC browser-friendlymap view)
+
+A computer-screen-optimized web app that allows Campaign Managers to:
+
+- Select AOIs
+- Choose task-splitting schemes
+- Provide instructions and guidance specific to the project
+- View areas that are at various stages of completion
+- Provide a project-specific URL that field mappers can access from their mobile phones to select and map tasks.
+
+### Steps to create a project in FMTM
+- Go to [fmtm](https://fmtm.hotosm.org/) .
+- If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
+- Click the '+ CREATE NEW PROJECT' button.
+- Enter the project details.
+
+![2](https://github.com/hotosm/fmtm/assets/97789856/97c38c80-aa0e-4fe2-b8a5-f4ee43a9a63a)
+
+- Upload Area in the GEOJSON file format.
+
+![3](https://github.com/hotosm/fmtm/assets/97789856/680eb831-790a-48f1-8997-c20b5213909d)
+
+- Define the tasks of the project.
+
+![Screenshot 2023-06-07 232152](https://github.com/hotosm/fmtm/assets/97789856/b735a661-d0f6-46b8-b548-5ad7b1928480)
+
+- Select Form .
+
+![Screenshot 2023-06-07 232316](https://github.com/hotosm/fmtm/assets/97789856/475a6070-4897-4e84-8050-6ecf024d0095)
+
+- Click on Submit button.
+
+ - __Please watch the video below for more details__:point_down:
+ 
+
+<!-- <video src="https://github.com/hotosm/fmtm/assets/97789856/8b63d8b5-2d13-4e54-8ddb-c262b0745b4f" align="centre"> -->
+<!--        -->
+https://github.com/hotosm/fmtm/assets/97789856/8b63d8b5-2d13-4e54-8ddb-c262b0745b4f
+
+
+
+
+
+
+
+
+### FMTM back end
+
+A back end that converts the project parameters entered by the Campaign Manager in the Manager Web Interface into a corresponding ODK Central project. Its functions include:
+
+- Convert the AOI into a bounding box and corresponding Overpass API query
+- Download (using the Overpass API) the OSM features that will be mapped in that bounding box (buildings and/or amenities) as well as the OSM line features that will be used as cutlines to subdivide the area
+- Trim the features within the bounding box but outside the AOI polygon
+- Convert the polygon features into centroid points (needed because ODK select from map doesn't yet deal with polygons; this is likely to change in the future but for now we'll work with points only)
+- Use line features as cutlines to create individual tasks (squares don't make sense for field mapping, neighborhoods delineated by large roads, watercourses, and railways do)
+- Split the AOI into those tasks based on parameters set in the Manager Web Interface (number of features or area per task, splitting strategy, etc).
+- Use the ODK Central API to create, on the associated ODK Central server:
+  - A project for the whole AOI
+  - One survey form for each split task (neighborhood)
+    - This might require modifying the xlsforms (to update the version ID of the forms and change the name of the geography file being referred to). This is pretty straightforward using [OpenPyXL](https://openpyxl.readthedocs.io/en/stable/), though we have to be careful to keep the location within the spreadsheet of these two items consistent.
+  - GeoJSON feature collections for each form (the buildings/amenities or whatever)
+  - An App User for each form, which in turn corresponds to a single task. When the ODK Collect app on a user's phone is configured to function as that App User, they have access to _only_ the form and features/area of that task.
+  - A set of QR Codes and/or configuration files/strings for ODK Collect, one for each App User
+
+### Field Mapper Web Interface (with mobile-friendly map view)
+
+ Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
+
+![5](https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3)
 
 ## Prerequisites for Contribution
 
