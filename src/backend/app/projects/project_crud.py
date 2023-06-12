@@ -39,9 +39,9 @@ from fastapi import HTTPException, UploadFile
 from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
-from ..osm_fieldwork.make_data_extract import PostgresClient
-from ..osm_fieldwork.OdkCentral import OdkAppUser
-from ..osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.make_data_extract import PostgresClient
+from osm_fieldwork.OdkCentral import OdkAppUser
+from osm_fieldwork.xlsforms import xlsforms_path
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import (
