@@ -216,7 +216,7 @@ const HomePageFilters = ({ onSearch }) => {
       {/* <======End======> */}
 
       {/* Search field in mobile size */}
-      <CoreModules.Stack
+      {/* <CoreModules.Stack
         sx={{ display: { xs: 'flex', md: 'none', flexDirection: 'column', justifyContent: 'center' } }}
       >
         <Search id="searchXs">
@@ -225,16 +225,16 @@ const HomePageFilters = ({ onSearch }) => {
           </SearchIconWrapper>
           <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} style={{ width: '100%' }} />
         </Search>
-      </CoreModules.Stack>
+      </CoreModules.Stack> */}
       {/* <======End======> */}
 
       {/* filter and sort button in mobile size */}
-      <CoreModules.Stack
+      {/* <CoreModules.Stack
         spacing={1}
         mt={'2%'}
         mb={'2%'}
         direction={'row'}
-        sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center' }}
+        sx={{ display: { xs: 'flex', md: 'none' }, width: '100%', justifyContent: 'center'}}
       >
         <CoreModules.Button
           variant="outlined"
@@ -259,7 +259,7 @@ const HomePageFilters = ({ onSearch }) => {
           text={'SORT BY'}
           size={'lg'}
         />
-      </CoreModules.Stack>
+      </CoreModules.Stack> */}
       {/* <======End======> */}
     </CoreModules.Stack>
   );
