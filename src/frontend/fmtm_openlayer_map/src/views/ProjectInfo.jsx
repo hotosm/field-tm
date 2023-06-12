@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
+import environment from "fmtm/environment";
+import { fetchInfoTask } from "../api/task";
 
 const ProjectInfo = () => {
+  const dispatch = CoreModules.useDispatch();
+
+  const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
+
+  useEffect(() => {
+    dispatch(
+      fetchInfoTask(`${environment.baseApiUrl}/tasks/task-list?project_id=2`)
+    );
+  }, []);
+
   return (
     <>
       <CoreModules.Box
@@ -38,6 +50,7 @@ const ProjectInfo = () => {
         <ProjectInfoSidebar
           projectId="#14455"
           projectName="Union of Brazilian Mappers of OSM (UMBRAOSM)"
+          taskInfo={taskInfo}
         />
         <CoreModules.Box
           sx={{

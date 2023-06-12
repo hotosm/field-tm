@@ -55,6 +55,7 @@ import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
 import LoadingBar from "../components/createproject/LoadingBar";
+import { TaskActions } from "../store/slices/TaskSlice";
 
 export default {
     Provider,
@@ -125,6 +126,7 @@ export default {
     Breadcrumbs,
     CardMedia,
     LoadingBar,
+    TaskActions,
     
     
 }

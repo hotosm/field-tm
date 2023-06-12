@@ -1,7 +1,9 @@
 import React from "react";
 import CoreModules from "fmtm/CoreModules";
 
-const ProjectInfoSidebar = () => {
+const ProjectInfoSidebar = ({ taskInfo }) => {
+  const taskInfoData = Array.from(taskInfo);
+
   const innerBoxStyles = {
     boxStyle: {
       borderBottom: "1px solid #F0F0F0",
@@ -53,83 +55,36 @@ const ProjectInfoSidebar = () => {
             },
           }}
         >
-          <CoreModules.CardContent sx={innerBoxStyles.boxStyle}>
-            <CoreModules.Box
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <CoreModules.Box>
-                <CoreModules.Typography variant="h2" color="#929db3">
-                  #14455
-                </CoreModules.Typography>
-                <CoreModules.Typography>3 contributors</CoreModules.Typography>
-              </CoreModules.Box>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                sx={{ width: "fit-content", height: "fit-content" }}
-                size="small"
+          {taskInfoData?.map((task, index) => (
+            <CoreModules.CardContent key={index} sx={innerBoxStyles.boxStyle}>
+              {console.log(task, "taskInfoData")}
+              <CoreModules.Box
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
-                Zoom to Task
-              </CoreModules.Button>
-            </CoreModules.Box>
-            <CoreModules.LoadingBar
-              title="Task Progress"
-              totalSteps={5}
-              activeStep={2}
-            />
-          </CoreModules.CardContent>
-          <CoreModules.CardContent sx={innerBoxStyles.boxStyle}>
-            <CoreModules.Box
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <CoreModules.Box>
-                <CoreModules.Typography variant="h2" color="#929db3">
-                  #14455
-                </CoreModules.Typography>
-                <CoreModules.Typography>3 contributors</CoreModules.Typography>
+                <CoreModules.Box>
+                  <CoreModules.Typography variant="h2" color="#929db3">
+                    #{task.id}
+                  </CoreModules.Typography>
+                  {/* <CoreModules.Typography>
+                    {task.project_task_name}
+                  </CoreModules.Typography> */}
+                </CoreModules.Box>
+                <CoreModules.Button
+                  variant="outlined"
+                  color="error"
+                  sx={{ width: "fit-content", height: "fit-content" }}
+                  size="small"
+                >
+                  Zoom to Task
+                </CoreModules.Button>
               </CoreModules.Box>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                sx={{ width: "fit-content", height: "fit-content" }}
-                size="small"
-              >
-                Zoom to Task
-              </CoreModules.Button>
-            </CoreModules.Box>
-            <CoreModules.LoadingBar
-              title="Task Progress"
-              totalSteps={5}
-              steps={5}
-              activeStep={4}
-            />
-          </CoreModules.CardContent>
-          <CoreModules.CardContent sx={innerBoxStyles.boxStyle}>
-            <CoreModules.Box
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <CoreModules.Box>
-                <CoreModules.Typography variant="h2" color="#929db3">
-                  #14455
-                </CoreModules.Typography>
-                <CoreModules.Typography>3 contributors</CoreModules.Typography>
-              </CoreModules.Box>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                sx={{ width: "fit-content", height: "fit-content" }}
-                size="small"
-              >
-                Zoom to Task
-              </CoreModules.Button>
-            </CoreModules.Box>
-            <CoreModules.LoadingBar
-              title="Task Progress"
-              totalSteps={5}
-              steps={5}
-              activeStep={3}
-            />
-          </CoreModules.CardContent>
+              <CoreModules.LoadingBar
+                title="Task Progress"
+                totalSteps={5}
+                activeStep={2}
+              />
+            </CoreModules.CardContent>
+          ))}
         </CoreModules.Card>
         <CoreModules.Card
           sx={{ width: "100%", p: 1, flex: 0.4, background: "white" }}
