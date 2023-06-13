@@ -25,6 +25,9 @@ from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
+from ..projects import project_crud, project_schemas
+from ..central import central_crud
+
 
 router = APIRouter(
     prefix="/tasks",
@@ -108,3 +111,41 @@ async def get_qr_code_list(
     db: Session = Depends(database.get_db),
 ):
     return tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
+
+
+@router.get("/tasks-features/")
+async def task_features_count(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+
+    task_list = await tasks_crud.get_task_lists(db, project_id)
+
+    # Get the project object.
+    project = project_crud.get_project(db, project_id)
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
+    data = []
+    for task in task_list:
+        
+        feature_count_query = f"""
+            select count(*) from features where project_id = {project_id} and task_id = {task['id']}
+        """
+        result = db.execute(feature_count_query)
+        feature_count = result.fetchone()
+
+        submission_list = central_crud.list_task_submissions(project.odkid, task['id'], odk_credentials)
+
+        data.append({
+            'task_id': task['id'],
+            'feature_count': feature_count['count'],
+            'submission_count': len(submission_list)
+        })
+
+    return data

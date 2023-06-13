@@ -66,9 +66,10 @@ def get_odk_project(odk_central: project_schemas.ODKCentral = None):
 def get_odk_form(odk_central: project_schemas.ODKCentral = None):
     """Helper function to get the OdkForm with credentials."""
     if odk_central:
-        url = odk_central['odk_central_url']
-        user = odk_central['odk_central_user']
-        pw = odk_central['odk_central_password']
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+
     else:
         logger.debug("ODKCentral connection variables not set in function")
         logger.debug("Attempting extraction from environment variables")
@@ -235,6 +236,12 @@ def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = N
     xforms = project.listForms(project_id)
     # FIXME: make sure it's a valid project id
     return xforms
+
+
+def list_task_submissions(odk_project_id:int, form_id: str, odk_central: project_schemas.ODKCentral = None):
+    project = get_odk_form(odk_central)
+    submissions = project.listSubmissions(odk_project_id, form_id)
+    return submissions
 
 
 def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = None):
