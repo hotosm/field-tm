@@ -66,9 +66,10 @@ def get_odk_project(odk_central: project_schemas.ODKCentral = None):
 def get_odk_form(odk_central: project_schemas.ODKCentral = None):
     """Helper function to get the OdkForm with credentials."""
     if odk_central:
-        url = odk_central['odk_central_url']
-        user = odk_central['odk_central_user']
-        pw = odk_central['odk_central_password']
+        url = odk_central.odk_central_url
+        user = odk_central.odk_central_user
+        pw = odk_central.odk_central_password
+
     else:
         logger.debug("ODKCentral connection variables not set in function")
         logger.debug("Attempting extraction from environment variables")
