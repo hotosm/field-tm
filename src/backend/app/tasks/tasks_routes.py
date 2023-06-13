@@ -26,6 +26,8 @@ from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
 from ..projects import project_crud, project_schemas
+from ..central import central_crud
+
 
 router = APIRouter(
     prefix="/tasks",
@@ -129,10 +131,6 @@ async def task_features_count(
         odk_central_password = project.odk_central_password,
         )
 
-    # odk_forms = central_crud.list_odk_xforms(project.odkid , odk_credentials)
-
-    import random
-
     data = []
     for task in task_list:
         
@@ -142,10 +140,12 @@ async def task_features_count(
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
+        submission_list = central_crud.list_task_submissions(project.odkid, task['id'], odk_credentials)
+
         data.append({
             'task_id': task['id'],
             'feature_count': feature_count['count'],
-            'submission_count': random.randint(0,feature_count['count'])
+            'submission_count': len(submission_list)
         })
 
     return data
