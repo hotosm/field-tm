@@ -40,6 +40,16 @@ from ..users import user_crud
 # --------------
 
 
+async def get_task_lists(db: Session, project_id: int):
+    """
+    Get a list of tasks for a project
+    """
+    query = f"""select id from tasks where project_id = {project_id}"""
+    result = db.execute(query)
+    tasks = result.fetchall()
+    return tasks
+
+
 def get_tasks(
     db: Session, project_id: int, user_id: int, skip: int = 0, limit: int = 1000
 ):
