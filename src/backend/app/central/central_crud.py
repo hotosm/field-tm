@@ -238,6 +238,12 @@ def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = N
     return xforms
 
 
+def list_task_submissions(odk_project_id:int, form_id: str, odk_central: project_schemas.ODKCentral = None):
+    project = get_odk_form(odk_central)
+    submissions = project.listSubmissions(odk_project_id, form_id)
+    return submissions
+
+
 def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = None):
     """List submissions from a remote ODK server."""
     project = get_odk_project(odk_central)
