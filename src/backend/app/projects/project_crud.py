@@ -28,6 +28,7 @@ from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
 
+
 import geoalchemy2
 import geojson
 import numpy as np
@@ -497,6 +498,156 @@ async def preview_tasks(boundary: str, dimension: int):
         return out
 
     return collection
+
+
+def get_osm_extracts(boundary: str):
+    # Filters for osm extracts
+    query={"filters":{
+            "tags": {
+                "all_geometry": {
+                    "join_or": {
+                        "highway": [],
+                        "waterway":[]     
+                        }
+                    }
+                }
+            },
+            "geometryType": [
+                "polygon",
+                "line",
+                "line"
+            ],
+            "centroid": "false"
+        }
+    query["geometry"] = json.loads(boundary)["features"][0]["geometry"]
+
+    base_url = "https://raw-data-api0.hotosm.org/v1"
+    query_url = f"{base_url}/snapshot/"
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
+
+    import requests
+    import time
+    import zipfile
+    from io import BytesIO
+
+    result = requests.post(query_url, data=json.dumps(query), headers=headers)
+
+    if result.status_code == 200:
+        task_id = result.json()['task_id']
+    else:
+        return False
+
+    task_url = f"{base_url}/tasks/status/{task_id}"
+    # extracts = requests.get(task_url)
+    while True:
+        result = requests.get(task_url, headers=headers)
+        if result.json()['status'] == "PENDING":
+            time.sleep(1)
+        elif result.json()['status'] == "SUCCESS":
+            break
+
+    zip_url = result.json()['result']['download_url']
+    zip_url
+    result = requests.get(zip_url, headers=headers)
+    # result.content
+    fp = BytesIO(result.content)
+    zfp = zipfile.ZipFile(fp, "r")
+    zfp.extract("Export.geojson", "/tmp/")
+    data = eval(zfp.read("Export.geojson"))
+
+    return data
+
+
+async def split_into_tasks(
+    db: Session, project_id: int, boundary: str   
+    ):
+
+    # verify project exists in db
+    db_project = get_project(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    outline = json.loads(boundary)
+
+    """Update the boundary polyon on the database."""
+    boundary_data = outline["features"][0]["geometry"]
+    outline = shape(boundary_data)
+
+    # Update the project outline and centroid in project table.
+    db_project.outline = outline.wkt
+    db_project.centroid = outline.centroid.wkt
+    db.commit()
+    db.refresh(db_project)
+
+    data = get_osm_extracts(boundary)
+
+    for feature in data["features"]:
+        
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature_shape = shape(feature['geometry'])
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+
+        db_feature = db_models.DbOsmLines(
+            project_id=project_id,
+            geometry=wkb_element,
+            properties=feature["properties"]
+        )
+
+        db.add(db_feature)
+        db.commit()
+
+
+    query = f"""    
+        WITH boundary AS (
+        SELECT ST_Boundary(outline) AS geom
+        FROM "projects" WHERE id={project_id}
+        ),
+        splitlines AS (
+        SELECT ST_Intersection(a.outline, l.geometry) AS geom
+        FROM "projects" a, "osm_lines" l
+        WHERE a.id={project_id} and l.project_id={project_id}
+        AND ST_Intersects(a.outline, l.geometry)
+        ),
+        merged AS (
+        SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+        FROM splitlines
+        ),
+        comb AS (
+        SELECT ST_Union(boundary.geom, merged.geom) AS geom
+        FROM boundary, merged
+        ),
+        splitpolysnoindex AS (
+        SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
+        FROM comb
+        )
+        -- Add row numbers to function as temporary unique IDs for our new polygons
+        SELECT row_number () over () as polyid, * 
+        from splitpolysnoindex
+
+        """
+
+    result = db.execute(query)
+    geom_data = result.fetchall()
+
+    for geom in geom_data:
+        # Add tasks in the database
+        db_task = db_models.DbTask(
+            project_id=project_id,
+            outline=geom[1]
+        )
+
+        db.add(db_task)
+        db.commit()
+
+        """ Id is passed in the task_name too. """
+        db_task.project_task_name = str(db_task.id)
+        db.commit()
+
+        print('tasks added to db')
+
+    return True
 
 
 def update_project_boundary(
