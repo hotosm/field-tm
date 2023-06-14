@@ -25,7 +25,9 @@ const reducers = CoreModules.combineReducers({
     project: persistReducer(
         {
             key: 'project',
-            storage
+            storage,
+            blacklist: ['projectBuildingGeojson'],
+
         },
         ProjectSlice.reducer
     ),
@@ -33,7 +35,7 @@ const reducers = CoreModules.combineReducers({
     login: persistReducer(
         {
             key: 'login',
-            storage
+            storage,
         },
         LoginSlice.reducer
     ),

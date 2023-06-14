@@ -34,7 +34,7 @@ const LoadingBar = ({ activeStep, totalSteps, title }) => {
         </CoreModules.Typography>
       </Box>
       <CoreModules.ThemeProvider theme={theme}>
-        <Tooltip title={`Step: ${totalSteps} / ${activeStep + 1}`} placement="top">
+        <Tooltip title={`Step: ${activeStep + 1} / ${totalSteps}`} placement="top">
           <Box
             component="span"
             sx={{
@@ -49,18 +49,17 @@ const LoadingBar = ({ activeStep, totalSteps, title }) => {
                 borderRadius: '12px',
                 height: '20px',
                 width: '100%',
-                backgroundImage: `linear-gradient(to right, ${theme.palette.primary.main} 0%, ${
-                  theme.palette.secondary.main
-                } ${calculateProgress(totalSteps, totalSteps)}%, lightgray ${calculateProgress(
-                  totalSteps,
-                  activeStep,
-                )}%, lightgray 100%)`,
+                backgroundImage: `linear-gradient(to right, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main
+                  } ${calculateProgress(totalSteps, totalSteps)}%, lightgray ${calculateProgress(
+                    totalSteps,
+                    activeStep,
+                  )}%, lightgray 100%)`,
               }}
             />
           </Box>
         </Tooltip>
       </CoreModules.ThemeProvider>
-    </Box>
+    </Box >
   );
 };
 
