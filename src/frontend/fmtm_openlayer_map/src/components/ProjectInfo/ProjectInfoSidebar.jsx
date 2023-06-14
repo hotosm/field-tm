@@ -2,8 +2,13 @@ import React from "react";
 import CoreModules from "fmtm/CoreModules";
 
 const ProjectInfoSidebar = ({ taskInfo }) => {
+  const dispatch = CoreModules.useDispatch();
   const taskInfoData = Array.from(taskInfo);
+  const selectedTask = CoreModules.useSelector((state) => state.task.selectedTask);
 
+  const onTaskClick = (taskId) => {
+    dispatch(CoreModules.TaskActions.SetSelectedTask(taskId))
+  }
   const innerBoxStyles = {
     boxStyle: {
       borderBottom: "1px solid #F0F0F0",
@@ -56,14 +61,13 @@ const ProjectInfoSidebar = ({ taskInfo }) => {
           }}
         >
           {taskInfoData?.map((task, index) => (
-            <CoreModules.CardContent key={index} sx={innerBoxStyles.boxStyle}>
-              {console.log(task, "taskInfoData")}
+            <CoreModules.CardContent key={index} sx={{ ...innerBoxStyles.boxStyle, backgroundColor: task.task_id === selectedTask ? "#F0FBFF" : "#FFFFFF" }} onClick={() => onTaskClick(task.task_id)}>
               <CoreModules.Box
                 sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <CoreModules.Box>
-                  <CoreModules.Typography variant="h2" color="#929db3">
-                    #{task.id}
+                  <CoreModules.Typography variant="h1" color="#929db3">
+                    #{task.task_id}
                   </CoreModules.Typography>
                   {/* <CoreModules.Typography>
                     {task.project_task_name}
@@ -80,8 +84,8 @@ const ProjectInfoSidebar = ({ taskInfo }) => {
               </CoreModules.Box>
               <CoreModules.LoadingBar
                 title="Task Progress"
-                totalSteps={5}
-                activeStep={2}
+                totalSteps={task.feature_count}
+                activeStep={task.submission_count}
               />
             </CoreModules.CardContent>
           ))}

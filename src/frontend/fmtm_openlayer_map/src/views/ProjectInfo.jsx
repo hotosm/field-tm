@@ -9,12 +9,15 @@ const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
-
+  const params = CoreModules.useParams();
+  const encodedId = params.projectId;
+  const decodedId = environment.decode(encodedId);
   useEffect(() => {
     dispatch(
-      fetchInfoTask(`${environment.baseApiUrl}/tasks/task-list?project_id=2`)
+      fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`)
     );
   }, []);
+  const projectInfo = CoreModules.useSelector((state) => state.project.projectInfo);
 
   return (
     <>
@@ -30,10 +33,10 @@ const ProjectInfo = () => {
       >
         <CoreModules.Box>
           <CoreModules.Typography variant="h1" color="#929db3">
-            #14455
+            #{projectInfo?.id}
           </CoreModules.Typography>
           <CoreModules.Typography variant="subtitle1">
-            Union of Brazilian Mappers of OSM (UMBRAOSM)
+            {projectInfo?.title}
           </CoreModules.Typography>
         </CoreModules.Box>
         <CoreModules.Button
@@ -48,8 +51,8 @@ const ProjectInfo = () => {
       <CoreModules.Box sx={{ display: "flex", flex: 1, pb: 2 }}>
         {/* Project Info side bar */}
         <ProjectInfoSidebar
-          projectId="#14455"
-          projectName="Union of Brazilian Mappers of OSM (UMBRAOSM)"
+          projectId={projectInfo?.id}
+          projectName={projectInfo?.title}
           taskInfo={taskInfo}
         />
         <CoreModules.Box
