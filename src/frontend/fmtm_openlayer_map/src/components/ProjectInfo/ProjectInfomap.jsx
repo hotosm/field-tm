@@ -11,6 +11,7 @@ import { get } from 'ol/proj';
 import { ProjectBuildingGeojsonService } from "../../api/SubmissionService";
 import environment from "fmtm/environment";
 import { getStyles } from "../MapComponent/OpenLayersComponent/helpers/styleUtils";
+import { ProjectActions } from "fmtm/ProjectSlice";
 
 
 export const defaultStyles = {
@@ -66,7 +67,7 @@ const colorCodes = {
 };
 function colorRange(data, noOfRange) {
   if (data?.length === 0) return [];
-  const actualCodes = [{ min: 0, max: 0, color: '#D7D7D7' }];
+  const actualCodes = [{ min: 0, max: 0, color: '#605f5e' }];
   console.log(data, 'data');
   const maxVal = Math.max(...data?.map((d) => d.count));
   const maxValue = maxVal <= noOfRange ? 10 : maxVal;
@@ -113,7 +114,6 @@ const ProjectInfomap = () => {
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
   const legendColorArray = colorRange(federalWiseProjectCount, '4');
-  console.log(legendColorArray, 'legendColorArray')
   const { mapRef, map } = useOLMap({
     center: [0, 0],
     zoom: 4,
@@ -123,7 +123,7 @@ const ProjectInfomap = () => {
   useEffect(() => {
 
     return () => {
-      dispatch(CoreModules.ProjectActions.SetProjectBuildingGeojson(null));
+      dispatch(ProjectActions.SetProjectBuildingGeojson(null));
     }
   }, [])
 
@@ -205,6 +205,10 @@ const ProjectInfomap = () => {
     },
     [federalWiseProjectCount],
   );
+
+  map?.on("loadstart", function () {
+    map.getTargetElement().classList.add("spinner");
+  });
   return (
     <CoreModules.Box
       sx={{
@@ -225,28 +229,16 @@ const ProjectInfomap = () => {
         }}
       >
         <LayerSwitcherControl />
-        {/* <VectorLayer /> */}
         {taskBoundaries && <VectorLayer
           hoverEffect
           setStyle={(feature, resolution) =>
-            setChoropleth({ ...municipalStyles, lineThickness: 1 }, feature, resolution)
+            setChoropleth({ ...municipalStyles, lineThickness: 3 }, feature, resolution)
           }
           geojson={taskBoundaries}
           mapOnClick={taskOnSelect}
-          // stylestyle={{
-          //     ...getStyles,
-          //     fillOpacity: 100,
-          //     lineColor: getStyles.fillColor,
-          //     lineThickness: 7,
-          //     lineOpacity: 40,
-          // }}
           viewProperties={{
-            // easing: elastic,
-            // animate: true,
             size: map?.getSize(),
-            // maxZoom: 15,
             padding: [50, 50, 50, 50],
-            // duration: 900,
             constrainResolution: true,
             duration: 2000,
           }}
