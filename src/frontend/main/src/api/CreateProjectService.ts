@@ -20,6 +20,8 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
 
                 if (payload.splitting_algorithm === 'Choose Area as Tasks') {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
+                } else if (payload.splitting_algorithm === 'Use natural Boundary') {
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/task_split/${resp.id}/`, fileUpload));
                 } else {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
                 }
@@ -83,7 +85,6 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.UploadAreaLoading(true))
-        console.log(filePayload, 'filePayload');
         const postUploadArea = async (url, filePayload, payload) => {
 
             try {
