@@ -66,7 +66,7 @@ const DefineTasks: React.FC = () => {
       }),
     );
   };
-
+  // 'Use natural Boundary'
   const algorithmListData = ['Divide on Square', 'Choose Area as Tasks'].map((item) => ({
     label: item,
     value: item,

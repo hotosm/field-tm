@@ -73,7 +73,6 @@ const Home = () => {
             },
           }}
         >
-          No
           <ProjectCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
         </CoreModules.Stack>
       )}

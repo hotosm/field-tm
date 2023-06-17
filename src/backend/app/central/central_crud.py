@@ -21,7 +21,7 @@ import os
 import pathlib
 import zlib
 
-import osm_fieldwork
+# import osm_fieldwork
 
 # Qr code imports
 import segno
