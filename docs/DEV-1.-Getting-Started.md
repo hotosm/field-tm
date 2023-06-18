@@ -1,7 +1,4 @@
 # Overview
-- [Prerequisites for Contribution](#prerequisites)
-
-- [Titles](#titles)
 
 The basic setup here is::point_down:
 
@@ -16,31 +13,7 @@ The ODK Collect app connects to a back-end server (in this case ODK Central), wh
 An ODK Central server that functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
 
 [Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (it's very similar on AWS or whatever)
-
-
-# Titles 
-
-### Title 1
-### Title 2
-
-	Title 1
-	========================
-	Title 2 
-	------------------------
-
-# Title 1
-## Title 2
-### Title 3
-#### Title 4
-##### Title 5
-###### Title 6
-
-    # Title 1
-    ## Title 2
-    ### Title 3    
-    #### Title 4
-    ##### Title 5
-    ###### Title 6    
+   
 
 ## Field Mapping Tasking Manager Web App
 
@@ -123,7 +96,7 @@ A back end that converts the project parameters entered by the Campaign Manager 
 
 ![5](https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3)
 
-## Prerequisites 
+## Prerequisites for Contribution
 
 ### 1. Review documentation
 
