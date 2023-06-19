@@ -439,7 +439,7 @@ async def generate_log(
             project_id, db
         )
 
-        with open(f"{project_id}_generate.log", "r") as f:
+        with open(f"/tmp/{project_id}_generate.log", "r") as f:
             lines = f.readlines()
             last_100_lines = lines[-50:]
             logs = "".join(last_100_lines)
