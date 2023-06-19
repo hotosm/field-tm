@@ -14,10 +14,14 @@ const ProjectInfo = () => {
   const decodedId = environment.decode(encodedId);
   useEffect(() => {
     dispatch(
-      fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`)
+      fetchInfoTask(
+        `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
+      )
     );
   }, []);
-  const projectInfo = CoreModules.useSelector((state) => state.project.projectInfo);
+  const projectInfo = CoreModules.useSelector(
+    (state) => state.project.projectInfo
+  );
 
   return (
     <>
@@ -48,7 +52,7 @@ const ProjectInfo = () => {
           Monitoring
         </CoreModules.Button>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: "flex", flex: 1, pb: 2 }}>
+      <CoreModules.Box sx={{ display: "flex", pb: 2, height: "80vh" }}>
         {/* Project Info side bar */}
         <ProjectInfoSidebar
           projectId={projectInfo?.id}
@@ -89,7 +93,7 @@ const ProjectInfo = () => {
               Download
             </CoreModules.Button>
           </CoreModules.Box>
-          <CoreModules.Card sx={{ flex: 1 }}>
+          <CoreModules.Card>
             <CoreModules.CardContent>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum
               atque soluta qui repudiandae molestias quam veritatis iure magnam
