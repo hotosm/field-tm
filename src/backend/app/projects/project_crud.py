@@ -951,7 +951,7 @@ def generate_appuser_files(
     # try:
     ## Logging ##
     # create file handler
-    handler = logging.FileHandler(f"{project_id}_generate.log")
+    handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
     handler.setLevel(logging.DEBUG)
 
     # create formatter
