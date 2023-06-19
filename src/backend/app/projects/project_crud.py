@@ -945,270 +945,269 @@ def generate_appuser_files(
     background_task_id: uuid.UUID,
 ):
     """Generate the files for each appuser.
+        QR code, new XForm, and the OSM data extract.
 
-    QR code, new XForm, and the OSM data extract.
-    """
-    # try:
-    ## Logging ##
-    # create file handler
-    handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
-    handler.setLevel(logging.DEBUG)
+        Parameters:
+            - db: the database session
+            - project_id: Project ID
+            - extract_polygon: boolean to determine if we should extract the polygon
+            - upload: the xls file to upload if we have a custom form
+            - category: the category of the project
+            - background_task_id: the task_id of the background task running this function.
+        """
 
-    # create formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
+    try:
+        ## Logging ##
+        # create file handler
+        handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
+        handler.setLevel(logging.DEBUG)
 
-    # add handler to logger
-    logger.addHandler(handler)
-    logger.info(f"Starting generate_appuser_files for project {project_id}")
+        # create formatter
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
 
-    # Get the project table contents.
-    project = table(
-        "projects", 
-        column("project_name_prefix"), 
-        column("xform_title"), 
-        column("id"), 
-        column("odkid"),
-        column("odk_central_url"),
-        column("odk_central_user"),
-        column("odk_central_password"),
-        column("outline")
-    )
+        # add handler to logger
+        logger.addHandler(handler)
+        logger.info(f"Starting generate_appuser_files for project {project_id}")
 
-    where = f"id={project_id}"
-    sql = select(
-                    project.c.project_name_prefix,
-                    project.c.xform_title,
-                    project.c.id,
-                    project.c.odkid,
-                    project.c.odk_central_url,
-                    project.c.odk_central_user,
-                    project.c.odk_central_password,
+        # Get the project table contents.
+        project = table(
+            "projects", 
+            column("project_name_prefix"), 
+            column("xform_title"), 
+            column("id"), 
+            column("odkid"),
+            column("odk_central_url"),
+            column("odk_central_user"),
+            column("odk_central_password"),
+            column("outline")
+        )
 
-                geoalchemy2.functions.ST_AsGeoJSON(project.c.outline).label("outline"),
-                ).where(text(where))
-    result = db.execute(sql)
+        where = f"id={project_id}"
+        sql = select(
+                        project.c.project_name_prefix,
+                        project.c.xform_title,
+                        project.c.id,
+                        project.c.odkid,
+                        project.c.odk_central_url,
+                        project.c.odk_central_user,
+                        project.c.odk_central_password,
 
-    # There should only be one match
-    if result.rowcount != 1:
-        logger.warning(str(sql))
-        if result.rowcount < 1:
-            raise HTTPException(status_code=400, detail="Project not found")
-        else:
-            raise HTTPException(status_code=400, detail="Multiple projects found")
-
-    one = result.first()
-
-    if one:
-        prefix = one.project_name_prefix
-
-        task = table("tasks", column("outline"), column("id"))
-        where = f"project_id={project_id}"
-        sql = select(task
-            # task.c.id,
-            # geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
-        ).where(text(where))
+                    geoalchemy2.functions.ST_AsGeoJSON(project.c.outline).label("outline"),
+                    ).where(text(where))
         result = db.execute(sql)
 
-        # Get odk project id, and odk credentials from project.
-        odk_id = one.odkid
-        odk_credentials = {
-            "odk_central_url": one.odk_central_url,
-            "odk_central_user": one.odk_central_user,
-            "odk_central_password": one.odk_central_password,
-        }
+        # There should only be one match
+        if result.rowcount != 1:
+            logger.warning(str(sql))
+            if result.rowcount < 1:
+                raise HTTPException(status_code=400, detail="Project not found")
+            else:
+                raise HTTPException(status_code=400, detail="Multiple projects found")
 
-        xform_title = one.xform_title if one.xform_title else None
+        one = result.first()
 
-        if upload:
-            xlsform = "/tmp/custom_form.xls"
-            contents = upload
-            with open(xlsform, "wb") as f:
-                f.write(contents)
-        else:
-            xlsform = f"{xlsforms_path}/{xform_title}.xls"
+        if one:
+            prefix = one.project_name_prefix
 
-        category = xform_title
+            task = table("tasks", column("outline"), column("id"))
+            where = f"project_id={project_id}"
+            sql = select(task
+                # task.c.id,
+                # geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
+            ).where(text(where))
+            result = db.execute(sql)
 
-        print('Category ', category)
-
-        # OSM Extracts for whole project
-        pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
-        outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
-
-        outline = eval(one.outline)
-        outline_geojson = pg.getFeatures(boundary = outline, 
-                                            filespec = outfile,
-                                            polygon = extract_polygon,
-                                            xlsfile = f'{category}.xls',
-                                            category = category
-                                            )
-
-        print(outline_geojson)
-        print("===========================")
-
-        updated_outline_geojson = {
-            "type": "FeatureCollection",
-            "features": []}
-
-        # Collect feature mappings for bulk insert
-        feature_mappings = []
-
-        for feature in outline_geojson["features"]:
-            
-            # If the osm extracts contents do not have a title, provide an empty text for that.
-            feature["properties"]["title"] = ""
-
-            feature_shape = shape(feature['geometry'])
-
-            # If the centroid of the Polygon is not inside the outline, skip the feature.
-            if extract_polygon and (not shape(outline).contains(shape(feature_shape.centroid))):
-                continue
-
-            wkb_element = from_shape(feature_shape, srid=4326)
-            feature_mapping = {
-                'project_id': project_id,
-                'category_title': category,
-                'geometry': wkb_element,
-                'properties': feature["properties"],
+            # Get odk project id, and odk credentials from project.
+            odk_id = one.odkid
+            odk_credentials = {
+                "odk_central_url": one.odk_central_url,
+                "odk_central_user": one.odk_central_user,
+                "odk_central_password": one.odk_central_password,
             }
-            updated_outline_geojson['features'].append(feature)
-            feature_mappings.append(feature_mapping)
 
-        print('Features mapping', feature_mappings)
+            xform_title = one.xform_title if one.xform_title else None
 
-        # Bulk insert the osm extracts into the db.
-        db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
+            if upload:
+                xlsform = "/tmp/custom_form.xls"
+                contents = upload
+                with open(xlsform, "wb") as f:
+                    f.write(contents)
+            else:
+                xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
+            category = xform_title
 
-        for poly in result.fetchall():
+            print('Category ', category)
 
-            name = f"{prefix}_{category}_{poly.id}"
+            # OSM Extracts for whole project
+            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+            outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
 
-            # Create an app user for the task
-            appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
+            outline = eval(one.outline)
+            outline_geojson = pg.getFeatures(boundary = outline, 
+                                                filespec = outfile,
+                                                polygon = extract_polygon,
+                                                xlsfile = f'{category}.xls',
+                                                category = category
+                                                )
 
-            # If app user could not be created, raise an exception.
-            if not appuser:
-                logger.error(f"Couldn't create appuser for project {project_id}")
-                raise HTTPException(
-                    status_code=400, detail="Could not create appuser"
-                )
+            updated_outline_geojson = {
+                "type": "FeatureCollection",
+                "features": []}
 
-            # prefix should be sent instead of name
-            create_qr = create_qrcode(
-                db, odk_id, appuser.json()["token"], prefix, odk_credentials
-            )
+            # Collect feature mappings for bulk insert
+            feature_mappings = []
 
-            xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"  # This file will store xml contents of an xls form.
-            outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"  # This file will store osm extracts
+            for feature in outline_geojson["features"]:
+                
+                # If the osm extracts contents do not have a title, provide an empty text for that.
+                feature["properties"]["title"] = ""
 
-            # xform_id_format
-            xform_id = f"{prefix}_{xform_title}_{poly.id}".split("_")[2]
+                feature_shape = shape(feature['geometry'])
 
+                # If the centroid of the Polygon is not inside the outline, skip the feature.
+                if extract_polygon and (not shape(outline).contains(shape(feature_shape.centroid))):
+                    continue
 
-            # Get the features for this task.
-            # Postgis query to filter task inside this task outline and of this project
-            # Update those features and set task_id
-            query = f'''UPDATE features
-                        SET task_id={poly.id}
-                        WHERE id in (
-                        
-                        SELECT id
-                        FROM features
-                        WHERE project_id={project_id} and ST_Intersects(geometry, '{poly.outline}'::Geometry)
+                wkb_element = from_shape(feature_shape, srid=4326)
+                feature_mapping = {
+                    'project_id': project_id,
+                    'category_title': category,
+                    'geometry': wkb_element,
+                    'properties': feature["properties"],
+                }
+                updated_outline_geojson['features'].append(feature)
+                feature_mappings.append(feature_mapping)
 
-                        )'''
+            # Bulk insert the osm extracts into the db.
+            db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
-            result = db.execute(query)
+            for poly in result.fetchall():
 
-            
+                name = f"{prefix}_{category}_{poly.id}"
 
-            # Get the geojson of those features for this task.
-            query = f'''SELECT jsonb_build_object(
-                        'type', 'FeatureCollection',
-                        'features', jsonb_agg(feature)
-                        )
-                        FROM (
-                        SELECT jsonb_build_object(
-                            'type', 'Feature',
-                            'id', id,
-                            'geometry', ST_AsGeoJSON(geometry)::jsonb,
-                            'properties', properties
-                        ) AS feature
-                        FROM features
-                        WHERE project_id={project_id} and task_id={poly.id}
-                        ) features;'''
+                # Create an app user for the task
+                appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
 
-
-            result = db.execute(query)
-            features = result.fetchone()[0]
-
-            # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
-            with open(outfile, "w") as jsonfile:
-                jsonfile.truncate(0)  # clear the contents of the file
-                dump(features, jsonfile)
-
-            outfile = central_crud.generate_updated_xform(
-                db, poly.id, xlsform, xform
-            )
-
-            # Update tasks table qith qr_Code id
-            task = tasks_crud.get_task(db, poly.id)
-            task.qr_code_id = create_qr["qr_code_id"]
-            db.commit()
-            db.refresh(task)
-
-            # Create an odk xform
-            result = central_crud.create_odk_xform(
-                odk_id, poly.id, outfile, odk_credentials
-            )
-
-            # Update the user role for the created xform.
-            try:
-                # Pass odk credentials
-                if odk_credentials:
-                    url = odk_credentials["odk_central_url"]
-                    user = odk_credentials["odk_central_user"]
-                    pw = odk_credentials["odk_central_password"]
-
-                else:
-                    logger.debug(
-                        "ODKCentral connection variables not set in function"
+                # If app user could not be created, raise an exception.
+                if not appuser:
+                    logger.error(f"Couldn't create appuser for project {project_id}")
+                    raise HTTPException(
+                        status_code=400, detail="Could not create appuser"
                     )
-                    logger.debug("Attempting extraction from environment variables")
-                    url = settings.ODK_CENTRAL_URL
-                    user = settings.ODK_CENTRAL_USER
-                    pw = settings.ODK_CENTRAL_PASSWD
 
-                odk_app = OdkAppUser(url, user, pw)
-
-                odk_app.updateRole(
-                    projectId=one[3], xform=xform_id, actorId=appuser.json()["id"]
+                # prefix should be sent instead of name
+                create_qr = create_qrcode(
+                    db, odk_id, appuser.json()["token"], prefix, odk_credentials
                 )
-            except Exception as e:
-                logger.warning(str(e))
 
-            # Add the count of completed task in project table extract_completed_count column.
-            project = get_project_by_id(db, project_id)
-            project.extract_completed_count += 1
-            db.commit()
-            db.refresh(project)
+                xform = f"/tmp/{prefix}_{xform_title}_{poly.id}.xml"  # This file will store xml contents of an xls form.
+                outfile = f"/tmp/{prefix}_{xform_title}_{poly.id}.geojson"  # This file will store osm extracts
 
-    # Update background task status to COMPLETED
-    update_background_task_status_in_database(
-        db, background_task_id, 4
-    )  # 4 is COMPLETED
+                # xform_id_format
+                xform_id = f"{prefix}_{xform_title}_{poly.id}".split("_")[2]
 
-    # except Exception as e:
-    #     logger.warning(str(e))
+                # Get the features for this task.
+                # Postgis query to filter task inside this task outline and of this project
+                # Update those features and set task_id
+                query = f'''UPDATE features
+                            SET task_id={poly.id}
+                            WHERE id in (
+                            
+                            SELECT id
+                            FROM features
+                            WHERE project_id={project_id} and ST_Intersects(geometry, '{poly.outline}'::Geometry)
 
-    #     # Update background task status to FAILED
-    #     update_background_task_status_in_database(
-    #         db, background_task_id, 2
-    #     )  # 2 is FAILED
+                            )'''
+
+                result = db.execute(query)
+
+                # Get the geojson of those features for this task.
+                query = f'''SELECT jsonb_build_object(
+                            'type', 'FeatureCollection',
+                            'features', jsonb_agg(feature)
+                            )
+                            FROM (
+                            SELECT jsonb_build_object(
+                                'type', 'Feature',
+                                'id', id,
+                                'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                                'properties', properties
+                            ) AS feature
+                            FROM features
+                            WHERE project_id={project_id} and task_id={poly.id}
+                            ) features;'''
+
+
+                result = db.execute(query)
+                features = result.fetchone()[0]
+
+                # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+                with open(outfile, "w") as jsonfile:
+                    jsonfile.truncate(0)  # clear the contents of the file
+                    dump(features, jsonfile)
+
+                outfile = central_crud.generate_updated_xform(
+                    db, poly.id, xlsform, xform
+                )
+
+                # Update tasks table qith qr_Code id
+                task = tasks_crud.get_task(db, poly.id)
+                task.qr_code_id = create_qr["qr_code_id"]
+                db.commit()
+                db.refresh(task)
+
+                # Create an odk xform
+                result = central_crud.create_odk_xform(
+                    odk_id, poly.id, outfile, odk_credentials
+                )
+
+                # Update the user role for the created xform.
+                try:
+                    # Pass odk credentials
+                    if odk_credentials:
+                        url = odk_credentials["odk_central_url"]
+                        user = odk_credentials["odk_central_user"]
+                        pw = odk_credentials["odk_central_password"]
+
+                    else:
+                        logger.debug(
+                            "ODKCentral connection variables not set in function"
+                        )
+                        logger.debug("Attempting extraction from environment variables")
+                        url = settings.ODK_CENTRAL_URL
+                        user = settings.ODK_CENTRAL_USER
+                        pw = settings.ODK_CENTRAL_PASSWD
+
+                    odk_app = OdkAppUser(url, user, pw)
+
+                    odk_app.updateRole(
+                        projectId=one[3], xform=xform_id, actorId=appuser.json()["id"]
+                    )
+                except Exception as e:
+                    logger.warning(str(e))
+
+                # Add the count of completed task in project table extract_completed_count column.
+                project = get_project_by_id(db, project_id)
+                project.extract_completed_count += 1
+                db.commit()
+                db.refresh(project)
+
+        # Update background task status to COMPLETED
+        update_background_task_status_in_database(
+            db, background_task_id, 4
+        )  # 4 is COMPLETED
+
+    except Exception as e:
+        logger.warning(str(e))
+
+        # Update background task status to FAILED
+        update_background_task_status_in_database(
+            db, background_task_id, 2
+        )  # 2 is FAILED
 
 
 def create_qrcode(
