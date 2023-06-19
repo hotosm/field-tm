@@ -3,7 +3,11 @@ import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
-import { fetchInfoTask } from "../api/task";
+import {
+  fectchConvertToOsmDetails,
+  fetchInfoTask,
+  postDownloadProjectBoundary,
+} from "../api/task";
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
@@ -12,6 +16,24 @@ const ProjectInfo = () => {
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
+
+  const handleDownload = () => {
+    console.log("lkjhgfghjk");
+    dispatch(
+      postDownloadProjectBoundary(
+        `${environment.baseApiUrl}/projects/2/download`
+      )
+    );
+  };
+
+  const handleConvert = () => {
+    dispatch(
+      fectchConvertToOsmDetails(
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=1&task_id=2`
+      )
+    );
+  };
+
   useEffect(() => {
     dispatch(
       fetchInfoTask(
@@ -82,6 +104,7 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleConvert}
             >
               Convert
             </CoreModules.Button>
@@ -89,6 +112,7 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleDownload}
             >
               Download
             </CoreModules.Button>
