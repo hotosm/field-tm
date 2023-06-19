@@ -95,20 +95,11 @@ class ProjectOut(ProjectBase):
     pass
 
 
-class Organisation(BaseModel):
-    # id: int
-    slug: str
-    logo: str
-    name: str
-    description: str
-    url: str
-    type: int
-
 
 class Feature(BaseModel):
     id: int
     project_id: int
-    task_id: int
+    task_id: int = None
     geometry: Feature
 
     class Config:

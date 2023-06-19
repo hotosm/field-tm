@@ -21,7 +21,7 @@ import os
 import pathlib
 import zlib
 
-import osm_fieldwork
+# import osm_fieldwork
 
 # Qr code imports
 import segno
@@ -69,6 +69,7 @@ def get_odk_form(odk_central: project_schemas.ODKCentral = None):
         url = odk_central.odk_central_url
         user = odk_central.odk_central_user
         pw = odk_central.odk_central_password
+
     else:
         logger.debug("ODKCentral connection variables not set in function")
         logger.debug("Attempting extraction from environment variables")
@@ -125,6 +126,12 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
 
     try:
         result = project.createProject(name)
+        if result.get("code") == 401.2:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Could not authenticate to odk central.",
+            )
+
         logger.debug(f"ODKCentral response: {result}")
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result
@@ -235,6 +242,12 @@ def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = N
     xforms = project.listForms(project_id)
     # FIXME: make sure it's a valid project id
     return xforms
+
+
+def list_task_submissions(odk_project_id:int, form_id: str, odk_central: project_schemas.ODKCentral = None):
+    project = get_odk_form(odk_central)
+    submissions = project.listSubmissions(odk_project_id, form_id)
+    return submissions
 
 
 def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = None):

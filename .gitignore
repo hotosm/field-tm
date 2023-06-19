@@ -17,6 +17,7 @@
 
 # Distribution / packaging
 .Python
+src/backend/app/images
 env/
 build/
 develop-eggs/

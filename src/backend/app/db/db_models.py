@@ -125,7 +125,7 @@ class DbOrganisation(Base):
     description = Column(String)
     url = Column(String)
     type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
-    subscription_tier = Column(Integer)
+    # subscription_tier = Column(Integer)
 
     managers = relationship(
         DbUser,
@@ -564,7 +564,7 @@ class DbFeatures(Base):
 
     category_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
     category = relationship(DbXForm)
-    task_id = Column(Integer, nullable=False)
+    task_id = Column(Integer, nullable=True)
     properties = Column(JSONB)
     geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
 
@@ -595,3 +595,13 @@ class DbUserRoles(Base):
     project_id = Column(Integer, ForeignKey("projects.id"))
     project = relationship(DbProject, backref="user_roles")
     role = Column(Enum(UserRole), nullable=False)
+
+
+class DbOsmLines(Base):
+    __tablename__ = "osm_lines"
+    
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    project = relationship(DbProject, backref="osm_lines")
+    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    properties = Column(JSONB)

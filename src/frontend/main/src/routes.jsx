@@ -13,9 +13,13 @@ import NotFoundPage from './views/NotFound404';
 import Organization from './views/Organization';
 import CreateOrganization from './views/CreateOrganization';
 import Authorized from './views/Authorized';
+import SubmissionDetails from './views/SubmissionDetails';
 
 const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
 const Submissions = React.lazy(() => import('map/Submissions'));
+const Tasks = React.lazy(() => import('map/Tasks'));
+const ProjectInfo = React.lazy(() => import('map/ProjectInfo'));
+
 const routes = createBrowserRouter([
   {
     element: <MainView />,
@@ -48,10 +52,43 @@ const routes = createBrowserRouter([
         path: '/signup',
         element: <Create />,
       },
+
+      {
+        path: '/projectInfo/:projectId',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <ProjectInfo />{' '}
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+
+      {
+        path: '/project/:projectId/tasks/:taskId',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <Tasks />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
       // {
       //     path: "/recoveraccess",
       //     element: <Forgot />,
       // },
+
+      {
+        path: '/project/:projectId/tasks/:taskId/submission/:instanceId',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div></div>}>
+              <SubmissionDetails />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/submissions/:id',
         element: (
@@ -62,6 +99,7 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
       {
         path: '/project_details/:id',
         element: (
@@ -124,9 +162,11 @@ const routes = createBrowserRouter([
       },
       {
         path: '/osmauth',
-        element:<Suspense fallback={<div>Loading...</div>}>
-                  <Authorized/>
-                </Suspense>
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Authorized />
+          </Suspense>
+        ),
       },
       {
         path: '*',

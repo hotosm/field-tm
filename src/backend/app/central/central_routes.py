@@ -115,7 +115,7 @@ async def download_submissions(
     xforms = central_crud.list_odk_xforms(first.odkid)
     submissions = list()
     for xform in xforms:
-        data = central_crud.download_submissions(first.odkid, xform["xml_form_id"])
+        data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
         # An empty submissions only has the CSV headers
         # headers = data[0]
         if len(submissions) == 0:
@@ -177,7 +177,7 @@ async def list_submissions(
 @router.get("/submission")
 async def get_submission(
     project_id: int,
-    xml_form_id: str = None,
+    xmlFormId: str = None,
     submission_id: str=None,
     db: Session = Depends(database.get_db),
 ):
@@ -206,8 +206,8 @@ async def get_submission(
         
         submissions = list()
 
-        if xml_form_id and submission_id:
-            data = central_crud.download_submissions(first.odkid, xml_form_id, submission_id)
+        if xmlFormId and submission_id:
+            data = central_crud.download_submissions(first.odkid, xmlFormId, submission_id)
             if len(submissions) == 0:
                 submissions.append(json.loads(data[0]))
             if len(data) >= 2:
@@ -215,7 +215,7 @@ async def get_submission(
                     submissions.append(json.loads(data[entry]))
 
         else:
-            if not xml_form_id:
+            if not xmlFormId:
                 xforms = central_crud.list_odk_xforms(first.odkid)
                 for xform in xforms:
                     try:
@@ -228,7 +228,7 @@ async def get_submission(
                         for entry in range(1, len(data)):
                             submissions.append(json.loads(data[entry]))
             else:
-                data = central_crud.download_submissions(first.odkid, xml_form_id)
+                data = central_crud.download_submissions(first.odkid, xmlFormId)
                 if len(submissions) == 0:
                     submissions.append(json.loads(data[0]))
                 if len(data) >= 2:
