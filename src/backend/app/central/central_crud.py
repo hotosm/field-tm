@@ -129,7 +129,7 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
         if result.get("code") == 401.2:
             raise HTTPException(
                 status_code=500,
-                detail=f"Error creating project on ODK Central: {result}",
+                detail=f"Could not authenticate to odk central.",
             )
 
         logger.debug(f"ODKCentral response: {result}")
