@@ -126,6 +126,12 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
 
     try:
         result = project.createProject(name)
+        if result.get("code") == 401.2:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error creating project on ODK Central: {result}",
+            )
+
         logger.debug(f"ODKCentral response: {result}")
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result
