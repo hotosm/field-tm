@@ -3,7 +3,11 @@ import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
-import { fetchInfoTask } from "../api/task";
+import {
+  fectchConvertToOsmDetails,
+  fetchInfoTask,
+  postDownloadProjectBoundary,
+} from "../api/task";
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
@@ -12,12 +16,34 @@ const ProjectInfo = () => {
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
+
+  const handleDownload = () => {
+    console.log("lkjhgfghjk");
+    dispatch(
+      postDownloadProjectBoundary(
+        `${environment.baseApiUrl}/projects/2/download`
+      )
+    );
+  };
+
+  const handleConvert = () => {
+    dispatch(
+      fectchConvertToOsmDetails(
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=1&task_id=2`
+      )
+    );
+  };
+
   useEffect(() => {
     dispatch(
-      fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`)
+      fetchInfoTask(
+        `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
+      )
     );
   }, []);
-  const projectInfo = CoreModules.useSelector((state) => state.project.projectInfo);
+  const projectInfo = CoreModules.useSelector(
+    (state) => state.project.projectInfo
+  );
 
   return (
     <>
@@ -48,7 +74,7 @@ const ProjectInfo = () => {
           Monitoring
         </CoreModules.Button>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: "flex", flex: 1, pb: 2 }}>
+      <CoreModules.Box sx={{ display: "flex", pb: 2, height: "80vh" }}>
         {/* Project Info side bar */}
         <ProjectInfoSidebar
           projectId={projectInfo?.id}
@@ -78,6 +104,7 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleConvert}
             >
               Convert
             </CoreModules.Button>
@@ -85,11 +112,12 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleDownload}
             >
               Download
             </CoreModules.Button>
           </CoreModules.Box>
-          <CoreModules.Card sx={{ flex: 1 }}>
+          <CoreModules.Card>
             <CoreModules.CardContent>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum
               atque soluta qui repudiandae molestias quam veritatis iure magnam
