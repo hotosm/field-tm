@@ -60,7 +60,7 @@ const UploadArea: React.FC = () => {
                                     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: e.target.files[0], areaGeojsonfileName: e.target.files[0].name }));
                                 }}
                             />
-                            <CoreModules.Typography component="h4">{projectDetails?.areaGeojsonfileName}</CoreModules.Typography>
+                            {/* <CoreModules.Typography component="h4">{projectDetails?.areaGeojsonfileName}</CoreModules.Typography> */}
                         </CoreModules.Button>
                         {!projectDetails.areaGeojson && <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>Geojson file is required.</CoreModules.FormLabel>}
                     </FormControl>
@@ -102,6 +102,7 @@ const UploadArea: React.FC = () => {
                     </CoreModules.Stack>
                     {/* END */}
                 </FormGroup>
+
             </form>
             <DefineAreaMap uploadedGeojson={projectDetails?.areaGeojson} />
         </CoreModules.Stack >

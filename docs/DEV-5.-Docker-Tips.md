@@ -96,6 +96,6 @@ A few of those commands:
 
 To exit IPython debugging mode, we can press CTRL + D.
 
-### Conclusion
+## Conclusion
 
 Overall, the documentation provides a clear overview of how the Docker deployment works when running `docker-compose`, what to do when updating Docker, and how to debug an application when using Docker using IPython debugger (ipdb). The provided examples make it easier to understand how to implement these concepts in practice.

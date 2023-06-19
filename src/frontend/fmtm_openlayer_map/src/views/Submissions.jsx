@@ -34,37 +34,35 @@ const Submissions = () => {
     // Requesting Task Boundaries on Page Load
     useEffect(() => {
         if (
-          state.projectTaskBoundries.findIndex(
-            (project) => project.id == environment.decode(encodedId)
-          ) == -1
+            state.projectTaskBoundries.findIndex(
+                (project) => project.id == environment.decode(encodedId)
+            ) == -1
         ) {
-          dispatch(
-            ProjectById(
-              `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-              state.projectTaskBoundries
-            ),
-            state.projectTaskBoundries
-          );
-          dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
-    
-        }else{
-          dispatch(ProjectActions.SetProjectTaskBoundries([]))
-          dispatch(
-            ProjectById(
-              `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-              state.projectTaskBoundries
-            ),
-            state.projectTaskBoundries
-          );
+            dispatch(
+                ProjectById(
+                    `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+                    state.projectTaskBoundries
+                ),
+                state.projectTaskBoundries
+            );
+        } else {
+            dispatch(ProjectActions.SetProjectTaskBoundries([]))
+            dispatch(
+                ProjectById(
+                    `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+                    state.projectTaskBoundries
+                ),
+                state.projectTaskBoundries
+            );
         }
         if (Object.keys(state.projectInfo).length == 0) {
-          dispatch(ProjectActions.SetProjectInfo(projectInfo));
-        } else {
-          if (state.projectInfo.id != environment.decode(encodedId)) {
             dispatch(ProjectActions.SetProjectInfo(projectInfo));
-          }
+        } else {
+            if (state.projectInfo.id != environment.decode(encodedId)) {
+                dispatch(ProjectActions.SetProjectInfo(projectInfo));
+            }
         }
-      }, [params.id]);
+    }, [params.id]);
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
@@ -88,12 +86,12 @@ const Submissions = () => {
                             Convert
                         </CoreModules.Button>
                         <a href={`${environment.baseApiUrl}/submission/download?project_id=${decodedId}`} download>
-                                <CoreModules.Button
-                                    variant="contained"
-                                    color="error"
-                                >
-                                    Download CSV
-                                </CoreModules.Button>
+                            <CoreModules.Button
+                                variant="contained"
+                                color="error"
+                            >
+                                Download CSV
+                            </CoreModules.Button>
                         </a>
                         {/* END */}
                     </CoreModules.Stack>
