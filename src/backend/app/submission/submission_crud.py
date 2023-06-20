@@ -129,33 +129,11 @@ def create_zip_file(files, output_file_path):
     return output_file_path
 
 
-async def convert_to_osm(db: Session, project_id: int, task_id: int):
+async def convert_to_osm_for_task(odk_id: int, form_id: int, xform:any):
 
-    project_info = project_crud.get_project(db, project_id)
+    file_path = f"/tmp/{odk_id}_{form_id}.json"
 
-    # Return exception if project is not found
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
-    odkid = project_info.odkid
-    project_name = project_info.project_name_prefix
-    form_category = project_info.xform_title
-
-    # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
-        odk_central_url = project_info.odk_central_url,
-        odk_central_user = project_info.odk_central_user,
-        odk_central_password = project_info.odk_central_password,
-        )
-
-    xform = get_odk_form(odk_credentials)
-
-    xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
-
-    file_path = f"/tmp/{project_id}_submissions.json"
-
-    file = xform.getSubmissions(odkid, xml_form_id, None, False, True)
-
+    file = xform.getSubmissions(odk_id, form_id, None, False, True)
 
     with open(file_path, "wb") as f:
         f.write(file)
@@ -165,10 +143,11 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     infile = Path(file_path)
 
     base = os.path.splitext(infile.name)[0]
-    osmoutfile = f"/tmp/{base}-out.osm"
+
+    osmoutfile = f"/tmp/{base}.osm"
     jsonin.createOSM(osmoutfile)
 
-    jsonoutfile = f"/tmp/{base}-out.geojson"
+    jsonoutfile = f"/tmp/{base}.geojson"
     jsonin.createGeoJson(jsonoutfile)
 
     data = jsonin.parse(infile.as_posix())
@@ -200,10 +179,43 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     logger.info("Wrote OSM XML file: %r" % osmoutfile)
     logger.info("Wrote GeoJson file: %r" % jsonoutfile)
 
+    return osmoutfile, jsonoutfile
+
+
+async def convert_to_osm(db: Session, project_id: int, task_id: int):
+
+    project_info = project_crud.get_project(db, project_id)
+
+    # Return exception if project is not found
+    if not project_info:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    odkid = project_info.odkid
+    project_name = project_info.project_name_prefix
+    form_category = project_info.xform_title
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project_info.odk_central_url,
+        odk_central_user = project_info.odk_central_user,
+        odk_central_password = project_info.odk_central_password,
+        )
+
+    xform = get_odk_form(odk_credentials)
+
+    xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
+
+    tasks = [task_id] if task_id else await tasks_crud.get_task_lists(db, project_id)
+
     final_zip_file_path = f"{project_name}_{form_category}_osm.zip"  # Create a new ZIP file for the extracted files
-    with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
-        final_zip_file.write(osmoutfile)
-        final_zip_file.write(jsonoutfile)
+
+    for task in tasks:
+        xml_form_id = f"{project_name}_{form_category}_{task}".split("_")[2]
+        osmoutfile, jsonoutfile = await convert_to_osm_for_task(odkid, xml_form_id, xform)
+
+        with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
+            final_zip_file.write(osmoutfile)
+            final_zip_file.write(jsonoutfile)
 
     return FileResponse(final_zip_file_path)
 
