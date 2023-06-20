@@ -46,7 +46,7 @@ async def get_task_lists(db: Session, project_id: int):
     """
     query = f"""select id from tasks where project_id = {project_id}"""
     result = db.execute(query)
-    tasks = result.fetchall()
+    tasks = [task[0] for task in result.fetchall()]
     return tasks
 
 
