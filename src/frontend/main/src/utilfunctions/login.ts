@@ -66,7 +66,7 @@ export const createLoginWindow = (redirectTo) => {
             // window.close();
           });
         } else {
-          throw new Error('States do not match');
+          // throw new Error('States do not match');
         }
       } catch (error) {
         console.log(error, 'error');
