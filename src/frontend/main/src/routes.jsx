@@ -161,7 +161,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/osmauth',
+        path: '/osmauth/',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <Authorized />
