@@ -1,46 +1,67 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
 import {
-  fectchConvertToOsmDetails,
+  fetchConvertToOsmDetails,
   fetchInfoTask,
   postDownloadProjectBoundary,
 } from "../api/task";
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
+  console.log(taskInfo.task_id, "a;slkjdf");
+  const selectedTask = CoreModules.useSelector(
+    (state) => state.task.selectedTask
+  );
+  console.log(selectedTask, "selectedTask");
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
   const handleDownload = () => {
-    console.log("lkjhgfghjk");
     dispatch(
       postDownloadProjectBoundary(
-        `${environment.baseApiUrl}/projects/2/download`
+        `${environment.baseApiUrl}/projects/${decodedId}/download`
       )
     );
   };
 
   const handleConvert = () => {
     dispatch(
-      fectchConvertToOsmDetails(
-        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=1&task_id=2`
+      fetchConvertToOsmDetails(
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&task_id=${selectedTask}`
       )
     );
   };
 
   useEffect(() => {
-    dispatch(
-      fetchInfoTask(
-        `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
-      )
-    );
-  }, []);
+    const fetchData = () => {
+      dispatch(
+        fetchInfoTask(
+          `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
+        )
+      );
+    };
+    fetchData();
+    let interval;
+    if (isMonitoring) {
+      interval = setInterval(fetchData, 3000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [dispatch, isMonitoring]);
+
+  const handleMonitoring = () => {
+    setIsMonitoring(true);
+  };
+
   const projectInfo = CoreModules.useSelector(
     (state) => state.project.projectInfo
   );
@@ -70,6 +91,7 @@ const ProjectInfo = () => {
           color="error"
           size="small"
           sx={{ width: "fit-content", height: "fit-content" }}
+          onClick={handleMonitoring}
         >
           Monitoring
         </CoreModules.Button>

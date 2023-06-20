@@ -29,8 +29,25 @@ export const postDownloadProjectBoundary : Function = (url: string, ) => {
         dispatch(CoreModules.TaskActions.PostProjectBoundaryLoading(true))
         const postProjectBoundaryDetails = async (url: string) => {
             try {
-                const postProjectBoundaryResponse = await CoreModules.axios.post(url);
-                const response = postProjectBoundaryResponse.data;
+                const response = await CoreModules.axios.post(url, null, {
+                    headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  responseType : 'blob',
+                });
+                console.log(response
+                    , 'response');
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = window.URL.createObjectURL(new Blob([response]));
+                downloadLink.setAttribute('download', 'download.zip');
+                document.body.appendChild(downloadLink);
+
+                downloadLink.click();
+
+                document.body.removeChild(downloadLink);
+                window.URL.revokeObjectURL(downloadLink.href);
+
                 dispatch(CoreModules.TaskActions.PostDownloadProjectBoundary(response))
             } catch (error) {
                 dispatch(CoreModules.TaskActions.PostProjectBoundaryLoading(false))
@@ -40,21 +57,29 @@ export const postDownloadProjectBoundary : Function = (url: string, ) => {
     }
 }
 
-export const fectchConvertToOsmDetails : Function = (url: string, ) => {
-
+export const fetchConvertToOsmDetails: Function = (url: string) => {
     return async (dispatch) => {
-        dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(true))
-        const fectchConvertToOsmDetail = async (url: string) => {
-            try {
-                const fectchConvertToOsmDetailResponse = await CoreModules.axios.get(url);
-                const response = fectchConvertToOsmDetailResponse.data;
-                dispatch(CoreModules.TaskActions.FetchConvertToOsm(response))
-            } catch (error) {
-                dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(false))
-            }
-        }
-        await fectchConvertToOsmDetail(url);
-    }
-}
+      dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(true));
+  
+      try {
+        const response = await CoreModules.axios.get(url, { responseType: 'blob' });
+  
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(new Blob([response.data]));
+        downloadLink.setAttribute('download', 'task.zip');
+        document.body.appendChild(downloadLink);
+  
+        downloadLink.click();
+  
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(downloadLink.href);
+  
+        dispatch(CoreModules.TaskActions.FetchConvertToOsm(response.data));
+      } catch (error) {
+        dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(false));
+      }
+    };
+  };
+  
 
 
