@@ -135,15 +135,15 @@ async def task_features_count(
     for task in task_list:
         
         feature_count_query = f"""
-            select count(*) from features where project_id = {project_id} and task_id = {task['id']}
+            select count(*) from features where project_id = {project_id} and task_id = {task}
         """
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
-        submission_list = central_crud.list_task_submissions(project.odkid, task['id'], odk_credentials)
+        submission_list = central_crud.list_task_submissions(project.odkid, task, odk_credentials)
 
         data.append({
-            'task_id': task['id'],
+            'task_id': task,
             'feature_count': feature_count['count'],
             'submission_count': len(submission_list)
         })
