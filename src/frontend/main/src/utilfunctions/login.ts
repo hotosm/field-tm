@@ -45,7 +45,7 @@ export const createLoginWindow = (redirectTo) => {
       try {
         console.log(resp, 'resp');
         console.log(responseState, 'state');
-        if (resp.state === state) {
+        if (responseState === state) {
           fetch(callback_url).then((res) => {
             const params = new URLSearchParams({
               // username: res.username,
