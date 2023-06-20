@@ -23,23 +23,18 @@ export const fetchInfoTask: Function = (url: string) => {
 }
 
 
-export const postDownloadProjectBoundary : Function = (url: string, ) => {
+export const getDownloadProjectBoundary : Function = (url: string, ) => {
 
     return async (dispatch) => {
-        dispatch(CoreModules.TaskActions.PostProjectBoundaryLoading(true))
-        const postProjectBoundaryDetails = async (url: string) => {
+        dispatch(CoreModules.TaskActions.GetProjectBoundaryLoading(true))
+        const getProjectBoundaryDetails = async (url: string) => {
             try {
-                const response = await CoreModules.axios.post(url, null, {
-                    headers: {
-                    'Content-Type': 'application/json',
-                  },
+                const response = await CoreModules.axios.get(url, {
                   responseType : 'blob',
                 });
-                console.log(response
-                    , 'response');
 
                 const downloadLink = document.createElement('a');
-                downloadLink.href = window.URL.createObjectURL(new Blob([response]));
+                downloadLink.href = window.URL.createObjectURL(new Blob([response.data]));
                 downloadLink.setAttribute('download', 'download.zip');
                 document.body.appendChild(downloadLink);
 
@@ -48,14 +43,15 @@ export const postDownloadProjectBoundary : Function = (url: string, ) => {
                 document.body.removeChild(downloadLink);
                 window.URL.revokeObjectURL(downloadLink.href);
 
-                dispatch(CoreModules.TaskActions.PostDownloadProjectBoundary(response))
+                dispatch(CoreModules.TaskActions.GetDownloadProjectBoundary(response.data))
             } catch (error) {
-                dispatch(CoreModules.TaskActions.PostProjectBoundaryLoading(false))
+                dispatch(CoreModules.TaskActions.GetProjectBoundaryLoading(false))
             }
         }
-        await postProjectBoundaryDetails(url);
+        await getProjectBoundaryDetails(url);
     }
 }
+
 
 export const fetchConvertToOsmDetails: Function = (url: string) => {
     return async (dispatch) => {

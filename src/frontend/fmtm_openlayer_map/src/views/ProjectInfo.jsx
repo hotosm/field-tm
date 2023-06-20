@@ -6,27 +6,46 @@ import environment from "fmtm/environment";
 import {
   fetchConvertToOsmDetails,
   fetchInfoTask,
-  postDownloadProjectBoundary,
+  getDownloadProjectBoundary,
 } from "../api/task";
+
+const boxStyles = {
+  width: "16px",
+  height: "16px",
+  background: "#5ca8ac",
+  borderRadius: "50%",
+  animation: "blink 1s infinite",
+  mr: 1,
+  "@keyframes blink": {
+    "0%": {
+      opacity: 1,
+    },
+    "50%": {
+      opacity: 0,
+    },
+    "100%": {
+      opacity: 1,
+    },
+  },
+};
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
   const [isMonitoring, setIsMonitoring] = useState(false);
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
-  console.log(taskInfo.task_id, "a;slkjdf");
   const selectedTask = CoreModules.useSelector(
     (state) => state.task.selectedTask
   );
-  console.log(selectedTask, "selectedTask");
+
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
   const handleDownload = () => {
     dispatch(
-      postDownloadProjectBoundary(
-        `${environment.baseApiUrl}/projects/${decodedId}/download`
+      getDownloadProjectBoundary(
+        `${environment.baseApiUrl}/submission/download?project_id=${decodedId}`
       )
     );
   };
@@ -86,15 +105,18 @@ const ProjectInfo = () => {
             {projectInfo?.title}
           </CoreModules.Typography>
         </CoreModules.Box>
-        <CoreModules.Button
-          variant="outlined"
-          color="error"
-          size="small"
-          sx={{ width: "fit-content", height: "fit-content" }}
-          onClick={handleMonitoring}
-        >
-          Monitoring
-        </CoreModules.Button>
+        <CoreModules.Box sx={{ display: "flex", position: "relative" }}>
+          <CoreModules.Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ width: "fit-content", height: "fit-content" }}
+            onClick={handleMonitoring}
+          >
+            {isMonitoring && <CoreModules.Box sx={boxStyles} />}
+            Monitoring
+          </CoreModules.Button>
+        </CoreModules.Box>
       </CoreModules.Box>
       <CoreModules.Box sx={{ display: "flex", pb: 2, height: "80vh" }}>
         {/* Project Info side bar */}
@@ -140,12 +162,12 @@ const ProjectInfo = () => {
             </CoreModules.Button>
           </CoreModules.Box>
           <CoreModules.Card>
-            <CoreModules.CardContent>
+            {/* <CoreModules.CardContent>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum
               atque soluta qui repudiandae molestias quam veritatis iure magnam
               omnis sequi possimus laboriosam, sed error incidunt numquam eius
               unde ducimus voluptatem.
-            </CoreModules.CardContent>
+            </CoreModules.CardContent> */}
           </CoreModules.Card>
         </CoreModules.Box>
       </CoreModules.Box>
