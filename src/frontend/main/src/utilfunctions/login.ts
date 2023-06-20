@@ -38,13 +38,13 @@ export const createLoginWindow = (redirectTo) => {
 
     // Retrieve individual parameters by name
     const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    window.authComplete = () => {
-      let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${code}&state=${state}`;
+    const responseState = searchParams.get('state');
+    window.authComplete = (authCode, state) => {
+      let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${authCode}&state=${state}`;
 
       try {
         console.log(resp, 'resp');
-        console.log(state, 'state');
+        console.log(responseState, 'state');
         if (resp.state === state) {
           fetch(callback_url).then((res) => {
             const params = new URLSearchParams({
