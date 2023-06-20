@@ -1,46 +1,81 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
 import {
-  fectchConvertToOsmDetails,
+  fetchConvertToOsmDetails,
   fetchInfoTask,
-  postDownloadProjectBoundary,
+  getDownloadProjectBoundary,
 } from "../api/task";
+
+const boxStyles = {
+  animation: "blink 1s infinite",
+  "@keyframes blink": {
+    "0%": {
+      opacity: 1,
+    },
+    "50%": {
+      opacity: 0,
+    },
+    "100%": {
+      opacity: 1,
+    },
+  },
+};
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
+  const selectedTask = CoreModules.useSelector(
+    (state) => state.task.selectedTask
+  );
+
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
   const handleDownload = () => {
-    console.log("lkjhgfghjk");
     dispatch(
-      postDownloadProjectBoundary(
-        `${environment.baseApiUrl}/projects/2/download`
+      getDownloadProjectBoundary(
+        `${environment.baseApiUrl}/submission/download?project_id=${decodedId}`
       )
     );
   };
 
   const handleConvert = () => {
     dispatch(
-      fectchConvertToOsmDetails(
-        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=1&task_id=2`
+      fetchConvertToOsmDetails(
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&task_id=${selectedTask}`
       )
     );
   };
 
   useEffect(() => {
-    dispatch(
-      fetchInfoTask(
-        `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
-      )
-    );
-  }, []);
+    const fetchData = () => {
+      dispatch(
+        fetchInfoTask(
+          `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
+        )
+      );
+    };
+    fetchData();
+    let interval;
+    if (isMonitoring) {
+      interval = setInterval(fetchData, 3000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [dispatch, isMonitoring]);
+
+  const handleMonitoring = () => {
+    setIsMonitoring((prevState) => !prevState);
+  };
+
   const projectInfo = CoreModules.useSelector(
     (state) => state.project.projectInfo
   );
@@ -65,14 +100,27 @@ const ProjectInfo = () => {
             {projectInfo?.title}
           </CoreModules.Typography>
         </CoreModules.Box>
-        <CoreModules.Button
-          variant="outlined"
-          color="error"
-          size="small"
-          sx={{ width: "fit-content", height: "fit-content" }}
-        >
-          Monitoring
-        </CoreModules.Button>
+        <CoreModules.Box sx={{ display: "flex", position: "relative" }}>
+          <CoreModules.Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ width: "fit-content", height: "fit-content" }}
+            onClick={handleMonitoring}
+          >
+            <CoreModules.Box
+              sx={{
+                background: isMonitoring ? "green" : "red",
+                width: "15px",
+                height: "15px",
+                mr: 1,
+                borderRadius: "50%",
+                ...(isMonitoring && boxStyles),
+              }}
+            />
+            Monitoring
+          </CoreModules.Button>
+        </CoreModules.Box>
       </CoreModules.Box>
       <CoreModules.Box sx={{ display: "flex", pb: 2, height: "80vh" }}>
         {/* Project Info side bar */}
@@ -118,12 +166,12 @@ const ProjectInfo = () => {
             </CoreModules.Button>
           </CoreModules.Box>
           <CoreModules.Card>
-            <CoreModules.CardContent>
+            {/* <CoreModules.CardContent>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum
               atque soluta qui repudiandae molestias quam veritatis iure magnam
               omnis sequi possimus laboriosam, sed error incidunt numquam eius
               unde ducimus voluptatem.
-            </CoreModules.CardContent>
+            </CoreModules.CardContent> */}
           </CoreModules.Card>
         </CoreModules.Box>
       </CoreModules.Box>

@@ -38,12 +38,14 @@ export const createLoginWindow = (redirectTo) => {
 
     // Retrieve individual parameters by name
     const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    window.authComplete = () => {
-      let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${code}&state=${state}`;
+    const responseState = searchParams.get('state');
+    window.authComplete = (authCode, state) => {
+      let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${authCode}&state=${state}`;
 
       try {
-        if (resp.state === state) {
+        console.log(resp, 'resp');
+        console.log(responseState, 'state');
+        if (responseState === state) {
           fetch(callback_url).then((res) => {
             const params = new URLSearchParams({
               // username: res.username,
@@ -54,19 +56,20 @@ export const createLoginWindow = (redirectTo) => {
             }).toString();
             let redirectUrl = `/osmauth?${params}`;
             window.location.href = redirectUrl;
-            fetch(`${environment.baseApiUrl}/auth/me/?access`, {
+            fetch(`${environment.baseApiUrl}/auth/me/`, {
               headers: {
                 "access-token": res.access_token
                 // 'Content-Type': 'application/x-www-form-urlencoded',
               }
             }).then((resp) => resp.json()).then((resp) => {
               console.log(resp, 'resp');
-              alert(resp);
+              // alert(resp);
+              window.close();
             });
-            // window.close();
           });
         } else {
-          throw new Error('States do not match');
+          alert('else');
+          // throw new Error('States do not match');
         }
       } catch (error) {
         console.log(error, 'error');
