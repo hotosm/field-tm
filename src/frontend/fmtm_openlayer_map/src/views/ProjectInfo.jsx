@@ -10,12 +10,7 @@ import {
 } from "../api/task";
 
 const boxStyles = {
-  width: "16px",
-  height: "16px",
-  background: "#5ca8ac",
-  borderRadius: "50%",
   animation: "blink 1s infinite",
-  mr: 1,
   "@keyframes blink": {
     "0%": {
       opacity: 1,
@@ -78,7 +73,7 @@ const ProjectInfo = () => {
   }, [dispatch, isMonitoring]);
 
   const handleMonitoring = () => {
-    setIsMonitoring(true);
+    setIsMonitoring((prevState) => !prevState);
   };
 
   const projectInfo = CoreModules.useSelector(
@@ -113,7 +108,16 @@ const ProjectInfo = () => {
             sx={{ width: "fit-content", height: "fit-content" }}
             onClick={handleMonitoring}
           >
-            {isMonitoring && <CoreModules.Box sx={boxStyles} />}
+            <CoreModules.Box
+              sx={{
+                background: isMonitoring ? "green" : "red",
+                width: "15px",
+                height: "15px",
+                mr: 1,
+                borderRadius: "50%",
+                ...(isMonitoring && boxStyles),
+              }}
+            />
             Monitoring
           </CoreModules.Button>
         </CoreModules.Box>
