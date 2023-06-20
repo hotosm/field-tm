@@ -263,6 +263,21 @@ async def upload_multi_project_boundary(
     return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
 
+@router.post("/task_split/{project_id}/")
+async def task_split(
+    project_id: int,
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db)
+    ):
+
+    # read entire file
+    content = await upload.read()
+
+    result = await project_crud.split_into_tasks(db, project_id, content)
+
+    return result
+
+
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
     project_id: int,
@@ -424,7 +439,7 @@ async def generate_log(
             project_id, db
         )
 
-        with open(f"{project_id}_generate.log", "r") as f:
+        with open(f"/tmp/{project_id}_generate.log", "r") as f:
             lines = f.readlines()
             last_100_lines = lines[-50:]
             logs = "".join(last_100_lines)
