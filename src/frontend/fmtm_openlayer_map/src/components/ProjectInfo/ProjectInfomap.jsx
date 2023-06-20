@@ -139,6 +139,7 @@ const ProjectInfomap = () => {
   }, []);
 
   useEffect(() => {
+    if (!projectTaskBoundries) return
     const taskGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [
@@ -149,18 +150,19 @@ const ProjectInfomap = () => {
       ],
     };
     setTaskBoundaries(taskGeojsonFeatureCollection);
-    const taskBuildingGeojsonFeatureCollection = {
-      ...basicGeojsonTemplate,
-      features: [
-        ...projectBuildingGeojson?.map((feature) => ({
-          ...feature.geometry,
-          id: feature.id,
-        })),
-      ],
-    };
-    setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
+    // const taskBuildingGeojsonFeatureCollection = {
+    //   ...basicGeojsonTemplate,
+    //   features: [
+    //     ...projectBuildingGeojson?.map((feature) => ({
+    //       ...feature.geometry,
+    //       id: feature.id,
+    //     })),
+    //   ],
+    // };
+    // setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
   }, [projectTaskBoundries]);
   useEffect(() => {
+    if (!projectBuildingGeojson) return
     const taskBuildingGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [
@@ -238,6 +240,9 @@ const ProjectInfomap = () => {
 
   map?.on("loadstart", function () {
     map.getTargetElement().classList.add("spinner");
+  });
+  map?.on("loadend", function () {
+    map.getTargetElement().classList.remove("spinner");
   });
   return (
     <CoreModules.Box
