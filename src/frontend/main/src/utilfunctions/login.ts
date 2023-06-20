@@ -43,6 +43,8 @@ export const createLoginWindow = (redirectTo) => {
       let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${code}&state=${state}`;
 
       try {
+        console.log(resp, 'resp');
+        console.log(state, 'state');
         if (resp.state === state) {
           fetch(callback_url).then((res) => {
             const params = new URLSearchParams({
@@ -66,6 +68,7 @@ export const createLoginWindow = (redirectTo) => {
             // window.close();
           });
         } else {
+          alert('else');
           // throw new Error('States do not match');
         }
       } catch (error) {
