@@ -4,7 +4,7 @@ The recommended way to run FMTM is with Docker. You can also develop on your loc
 
 > NOTE: If you haven't yet downloaded the Repository and setup your environment variables, please check the [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md) wiki page.
 
-Now let's get started!
+Now let's get started :thumbsup:
 
 ## 1. Start the API with Docker
 
@@ -30,7 +30,7 @@ The easiest way to get up and running is by using the FMTM Docker deployment. Do
 
 > Note: Alternatively, you may use an external Central server and user in the `.env`.
 
-### 1C: Import Test Data
+### 1B: Import Test Data
 
 Some test data is available to get started quickly.
 
@@ -126,7 +126,7 @@ Example launch.json config for vscode:
 
 > Note: either port 5678 needs to be bound to your localhost (default), or the `host` parameter can be set to the container IP address.
 
-### Conclusion
+## Conclusion
 
 Running the FMTM project is easy with Docker. You can also run the
 project locally outside of Docker, but it requires more setup. The

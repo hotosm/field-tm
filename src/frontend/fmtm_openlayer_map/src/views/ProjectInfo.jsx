@@ -1,23 +1,84 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
-import { fetchInfoTask } from "../api/task";
+import {
+  fetchConvertToOsmDetails,
+  fetchInfoTask,
+  getDownloadProjectBoundary,
+} from "../api/task";
+
+const boxStyles = {
+  animation: "blink 1s infinite",
+  "@keyframes blink": {
+    "0%": {
+      opacity: 1,
+    },
+    "50%": {
+      opacity: 0,
+    },
+    "100%": {
+      opacity: 1,
+    },
+  },
+};
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
+  const selectedTask = CoreModules.useSelector(
+    (state) => state.task.selectedTask
+  );
+
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
-  useEffect(() => {
+
+  const handleDownload = () => {
     dispatch(
-      fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`)
+      getDownloadProjectBoundary(
+        `${environment.baseApiUrl}/submission/download?project_id=${decodedId}`
+      )
     );
-  }, []);
-  const projectInfo = CoreModules.useSelector((state) => state.project.projectInfo);
+  };
+
+  const handleConvert = () => {
+    dispatch(
+      fetchConvertToOsmDetails(
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&task_id=${selectedTask}`
+      )
+    );
+  };
+
+  useEffect(() => {
+    const fetchData = () => {
+      dispatch(
+        fetchInfoTask(
+          `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`
+        )
+      );
+    };
+    fetchData();
+    let interval;
+    if (isMonitoring) {
+      interval = setInterval(fetchData, 3000);
+    } else {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [dispatch, isMonitoring]);
+
+  const handleMonitoring = () => {
+    setIsMonitoring((prevState) => !prevState);
+  };
+
+  const projectInfo = CoreModules.useSelector(
+    (state) => state.project.projectInfo
+  );
 
   return (
     <>
@@ -39,16 +100,29 @@ const ProjectInfo = () => {
             {projectInfo?.title}
           </CoreModules.Typography>
         </CoreModules.Box>
-        <CoreModules.Button
-          variant="outlined"
-          color="error"
-          size="small"
-          sx={{ width: "fit-content", height: "fit-content" }}
-        >
-          Monitoring
-        </CoreModules.Button>
+        <CoreModules.Box sx={{ display: "flex", position: "relative" }}>
+          <CoreModules.Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ width: "fit-content", height: "fit-content" }}
+            onClick={handleMonitoring}
+          >
+            <CoreModules.Box
+              sx={{
+                background: isMonitoring ? "green" : "red",
+                width: "15px",
+                height: "15px",
+                mr: 1,
+                borderRadius: "50%",
+                ...(isMonitoring && boxStyles),
+              }}
+            />
+            Monitoring
+          </CoreModules.Button>
+        </CoreModules.Box>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: "flex", flex: 1, pb: 2 }}>
+      <CoreModules.Box sx={{ display: "flex", pb: 2, height: "80vh" }}>
         {/* Project Info side bar */}
         <ProjectInfoSidebar
           projectId={projectInfo?.id}
@@ -78,6 +152,7 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleConvert}
             >
               Convert
             </CoreModules.Button>
@@ -85,17 +160,18 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
+              onClick={handleDownload}
             >
               Download
             </CoreModules.Button>
           </CoreModules.Box>
-          <CoreModules.Card sx={{ flex: 1 }}>
-            <CoreModules.CardContent>
+          <CoreModules.Card>
+            {/* <CoreModules.CardContent>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum
               atque soluta qui repudiandae molestias quam veritatis iure magnam
               omnis sequi possimus laboriosam, sed error incidunt numquam eius
               unde ducimus voluptatem.
-            </CoreModules.CardContent>
+            </CoreModules.CardContent> */}
           </CoreModules.Card>
         </CoreModules.Box>
       </CoreModules.Box>

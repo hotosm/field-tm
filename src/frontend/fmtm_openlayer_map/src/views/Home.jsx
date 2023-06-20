@@ -314,13 +314,13 @@ const Home = () => {
           state={state}
           type={type}
         />
-        {/* <CoreModules.Stack
+        <CoreModules.Stack
           direction={"column"}
           spacing={1}
           justifyContent="flex-end"
         >
           <CoreModules.Link
-            to={`/submissions/${encodedId}`}
+            to={`/projectInfo/${encodedId}`}
             style={{
               display: "flex",
               justifyContent: "flex-end",
@@ -333,10 +333,10 @@ const Home = () => {
               color="error"
               sx={{ width: "10%" }}
             >
-              Go To Submission
+              ProjectInfo
             </CoreModules.Button>
           </CoreModules.Link>
-        </CoreModules.Stack> */}
+        </CoreModules.Stack>
         {/* <ProjectMap /> */}
         {params?.id && <OpenLayersMap
           key={params.id}

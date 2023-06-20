@@ -21,7 +21,7 @@ import os
 import pathlib
 import zlib
 
-import osm_fieldwork
+# import osm_fieldwork
 
 # Qr code imports
 import segno
@@ -126,6 +126,12 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
 
     try:
         result = project.createProject(name)
+        if result.get("code") == 401.2:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Could not authenticate to odk central.",
+            )
+
         logger.debug(f"ODKCentral response: {result}")
         logger.info(f"Project {name} has been created on the ODK Central server.")
         return result

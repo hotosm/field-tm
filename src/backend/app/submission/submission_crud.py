@@ -57,13 +57,14 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
             status_code=404, detail="ODK Central Credentials not found in project"
         )
 
-    xform = get_odk_form(
-        {
-            'odk_central_url': project_info.odk_central_url,
-            'odk_central_user': project_info.odk_central_user,
-            'odk_central_password': project_info.odk_central_password,
-        }
-    )
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project_info.odk_central_url,
+        odk_central_user = project_info.odk_central_user,
+        odk_central_password = project_info.odk_central_password,
+        )
+
+    xform = get_odk_form(odk_credentials)
 
     # If task id is not provided, submission for all the task are listed
     if task_id is None:
@@ -140,13 +141,14 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
 
-    xform = get_odk_form(
-        {
-            'odk_central_url': project_info.odk_central_url,
-            'odk_central_user': project_info.odk_central_user,
-            'odk_central_password': project_info.odk_central_password,
-        }
-    )
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project_info.odk_central_url,
+        odk_central_user = project_info.odk_central_user,
+        odk_central_password = project_info.odk_central_password,
+        )
+
+    xform = get_odk_form(odk_credentials)
 
     xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
 
@@ -219,13 +221,14 @@ def download_submission(db: Session, project_id: int, task_id: int):
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
-    xform = get_odk_form(
-        {
-            'odk_central_url': project_info.odk_central_url,
-            'odk_central_user': project_info.odk_central_user,
-            'odk_central_password': project_info.odk_central_password,
-        }
-    )
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project_info.odk_central_url,
+        odk_central_user = project_info.odk_central_user,
+        odk_central_password = project_info.odk_central_password,
+        )
+
+    xform = get_odk_form(odk_credentials)
 
     file_path = f"{project_id}_submissions.zip"
 
@@ -294,13 +297,14 @@ def get_submission_points(db: Session, project_id: int, task_id: int = None):
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
 
-    xform = get_odk_form(
-        {
-            odk_central_url: project_info.odk_central_url,
-            odk_central_user: project_info.odk_central_user,
-            odk_central_password: project_info.odk_central_password,
-        }
-    )
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project_info.odk_central_url,
+        odk_central_user = project_info.odk_central_user,
+        odk_central_password = project_info.odk_central_password,
+        )
+
+    xform = get_odk_form(odk_credentials)
 
     if task_id:
         xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[
