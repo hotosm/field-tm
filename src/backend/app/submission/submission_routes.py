@@ -120,4 +120,15 @@ async def convert_to_osm(
     task_id: int = None,
     db: Session = Depends(database.get_db),
     ):
+
+    """
+        This api converts the submission to osm format.
+        It takes two parameter: project_id and task_id.
+
+        task_id is optional. 
+        If task_id is provided, this endpoint converts the submission of this task.
+        If task_id is not provided, this endpoint converts the submission of the whole project.
+
+    """
+
     return await submission_crud.convert_to_osm(db, project_id, task_id)
