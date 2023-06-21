@@ -66,8 +66,8 @@ export const createLoginWindow = (redirectTo) => {
                 // 'Content-Type': 'application/x-www-form-urlencoded',
               }
             }).then((resp) => resp.json()).then((res) => {
-              localStorage.setItem("user", JSON.stringify(res.user_data));
-              window.close();
+              // localStorage.setItem("user", JSON.stringify(res.user_data));
+              // window.close();
             });
           });
         } else {
