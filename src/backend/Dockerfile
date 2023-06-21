@@ -45,7 +45,8 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export --dev --no-default > requirements-dev.txt
+    && pdm export --dev --no-default > requirements-dev.txt \
+    && pip install osm-fieldwork==0.3.1rc2
 
 
 
