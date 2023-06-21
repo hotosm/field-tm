@@ -41,6 +41,7 @@ dependencies = [
     "qrcode==7.4.2",
     "pyxform==1.12.0",
     "xmltodict==0.13.0",
+    "osm-fieldwork==0.3.1rc1",
     "python-multipart==0.0.5",
     "python-json-logger==2.0.6",
     "SQLAlchemy-Utils==0.40.0",
