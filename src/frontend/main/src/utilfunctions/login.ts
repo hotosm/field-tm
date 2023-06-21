@@ -65,7 +65,7 @@ export const createLoginWindow = (redirectTo) => {
             }).then((resp) => resp.json()).then((resp) => {
               console.log(resp, 'resp');
               // alert(resp);
-              window.close();
+              // window.close();
             });
           });
         } else {
