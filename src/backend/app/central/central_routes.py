@@ -31,7 +31,7 @@ from sqlalchemy.sql import text
 
 from ..central import central_crud
 from ..db import database
-from ..projects import project_crud
+from ..projects import project_crud, project_schemas
 
 router = APIRouter(
     prefix="/central",
@@ -195,7 +195,8 @@ async def get_submission(
     try:
         """Download the submissions data from Central."""
         project = table(
-            "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+            "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid"),
+            column("odk_central_url"), column("odk_central_user"), column("odk_central_password")
         )
         where = f"id={project_id}"
         sql = select(project).where(text(where))
@@ -203,11 +204,22 @@ async def get_submission(
         first = result.first()
         if not first:
             return {"error": "No such project!"}
-        
+
+        # ODK Credentials
+        odk_credentials = project_schemas.ODKCentral(
+            odk_central_url = first.odk_central_url,
+            odk_central_user = first.odk_central_user,
+            odk_central_password = first.odk_central_password,
+            )
+
         submissions = list()
 
         if xmlFormId and submission_id:
-            data = central_crud.download_submissions(first.odkid, xmlFormId, submission_id)
+            data = central_crud.download_submissions(first.odkid, 
+                                                     xmlFormId, 
+                                                     submission_id, 
+                                                     True, 
+                                                     odk_credentials)
             if len(submissions) == 0:
                 submissions.append(json.loads(data[0]))
             if len(data) >= 2:
@@ -219,7 +231,11 @@ async def get_submission(
                 xforms = central_crud.list_odk_xforms(first.odkid)
                 for xform in xforms:
                     try:
-                        data = central_crud.download_submissions(first.odkid, xform["xml_form_id"])
+                        data = central_crud.download_submissions(first.odkid, 
+                                                                 xform["xml_form_id"], 
+                                                                 None, 
+                                                                 True, 
+                                                                 odk_credentials)
                     except Exception:
                         continue
                     if len(submissions) == 0:
