@@ -48,6 +48,7 @@ export const createLoginWindow = (redirectTo) => {
         if (responseState === state) {
           fetch(callback_url).then((res) => {
             console.log(res, 'res token wala');
+            console.log(JSON.stringify(res), 'JSON stringify res token wala');
             const params = new URLSearchParams({
               // username: res.username,
               osm_oauth_token: res.access_token,
@@ -64,7 +65,8 @@ export const createLoginWindow = (redirectTo) => {
               }
             }).then((resp) => resp.json()).then((resp) => {
               console.log(resp, 'resp');
-              // alert(resp);
+              alert(resp);
+
               // window.close();
             });
           });
