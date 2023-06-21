@@ -112,7 +112,7 @@ export default function PrimaryAppBar() {
                 onClick={() => setActiveTab(1)}
               />
             </CoreModules.Link>
-            <CoreModules.Link to={''} style={{ color: defaultTheme.palette.black }}>
+            {/* <CoreModules.Link to={''} style={{ color: defaultTheme.palette.black }}>
               <CoreModules.Tab
                 label="MANAGE CATEGORY"
                 sx={{
@@ -122,7 +122,7 @@ export default function PrimaryAppBar() {
                 }}
                 onClick={() => setActiveTab(2)}
               />
-            </CoreModules.Link>
+            </CoreModules.Link> */}
           </CoreModules.Tabs>
           {/* position changed */}
           {token != null && (
