@@ -32,7 +32,6 @@ const DefineTasks: React.FC = () => {
   const submission = () => {
     // const previousValues = location.state.values;
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
-
     navigate('/select-form');
   };
 
@@ -42,21 +41,6 @@ const DefineTasks: React.FC = () => {
     values: formValues,
     errors,
   }: any = useForm(projectDetails, submission, DefineTaskValidation);
-
-  // if projectarea is not null navigate to projectslist page and that is when user submits create project
-  // useEffect(() => {
-  //     if (projectArea !== null) {
-  //         // navigate('/');
-  //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
-
-  //     }
-  //     return () => {
-  //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
-  //     }
-
-  // }, [projectArea])
-  // END
-  // const previousValues = location?.state?.values;
 
   const generateTasksOnMap = () => {
     dispatch(
@@ -81,7 +65,6 @@ const DefineTasks: React.FC = () => {
     };
   };
   const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
-  console.log(dividedTaskGeojson, 'dividedTaskGeojson');
   const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   // const filteredAlgorithmListData = algorithmListData?.filter((algo) => parsedTaskGeojsonCount > 1 ? algo.label === 'Choose Area as Tasks' : algo);
@@ -171,7 +154,7 @@ const DefineTasks: React.FC = () => {
                     }}
                     // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
                     // helperText={errors.username}
-                    InputProps={{ inputProps: { min: 10 } }}
+                    InputProps={{ inputProps: { min: 50 } }}
                     FormHelperTextProps={inputFormStyles()}
                   />
                   {errors.dimension && (
