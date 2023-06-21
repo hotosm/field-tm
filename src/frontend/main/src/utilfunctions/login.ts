@@ -53,7 +53,7 @@ export const createLoginWindow = (redirectTo) => {
             console.log(JSON.stringify(res), '2nd JSON stringify res token wala');
             const params = new URLSearchParams({
               // username: res.username,
-              osm_oauth_token: res.access_token,
+              osm_oauth_token: res.access_token.access_token,
               // session_token: res.session_token,
               // picture: res.picture,
               redirect_to: redirectTo,
@@ -62,7 +62,7 @@ export const createLoginWindow = (redirectTo) => {
             window.location.href = redirectUrl;
             fetch(`${environment.baseApiUrl}/auth/me/`, {
               headers: {
-                "access-token": res.access_token
+                "access-token": res.access_token.access_token
                 // 'Content-Type': 'application/x-www-form-urlencoded',
               }
             }).then((resp) => resp.json()).then((resp) => {
