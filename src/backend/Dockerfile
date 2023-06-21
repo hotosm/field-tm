@@ -45,8 +45,7 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export --dev --no-default > requirements-dev.txt \
-    && pip install osm-fieldwork==0.3.1rc2
+    && pdm export --dev --no-default > requirements-dev.txt 
 
 
 
@@ -68,7 +67,7 @@ RUN set -ex \
 COPY --from=extract-deps \
     /opt/python/requirements.txt /opt/python/
 RUN pip install --user --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements.txt
+    --no-cache-dir -r /opt/python/requirements.txt 
 
 
 
@@ -121,7 +120,9 @@ FROM runtime as debug-no-odk
 COPY --from=extract-deps \
     /opt/python/requirements-dev.txt /opt/python/
 RUN pip install --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements-dev.txt
+    --no-cache-dir -r /opt/python/requirements-dev.txt \
+    && pip install osm-fieldwork==0.3.1rc2
+
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
