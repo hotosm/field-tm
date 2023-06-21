@@ -65,16 +65,13 @@ export const createLoginWindow = (redirectTo) => {
                 "access-token": res.access_token.access_token
                 // 'Content-Type': 'application/x-www-form-urlencoded',
               }
-            }).then((resp) => resp.json()).then((resp) => {
-              console.log(resp, 'resp');
-              alert(resp);
-
-              // window.close();
+            }).then((resp) => resp.json()).then((res) => {
+              localStorage.setItem("user", JSON.stringify(res.user_data));
+              window.close();
             });
           });
         } else {
-          alert('else');
-          // throw new Error('States do not match');
+          throw new Error('States do not match');
         }
       } catch (error) {
         console.log(error, 'error');
