@@ -116,7 +116,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
         }
 
 
-    }, [taskDisplay,state,searchText])
+    }, [taskDisplay, state, searchText])
 
     return (
         <CoreModules.Stack p={2.5} width={'100%'} spacing={2}>
@@ -141,6 +141,13 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
             </Search>
 
             <CoreModules.Grid container item columns={{ xs: 2, sm: 3, md: 7 }}>
+                {allActivities === 0 && <CoreModules.Typography
+                    variant="h1"
+                    fontSize={defaultTheme.typography.htmlFontSize}
+                    color={defaultTheme.palette.info['main']}
+                >
+                    No Results found.
+                </CoreModules.Typography>}
                 <CoreModules.Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
                     {taskHistories.map((history, index) => (
                         <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>

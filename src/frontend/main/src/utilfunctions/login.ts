@@ -46,10 +46,14 @@ export const createLoginWindow = (redirectTo) => {
         console.log(resp, 'resp');
         console.log(responseState, 'state');
         if (responseState === state) {
-          fetch(callback_url).then((res) => {
+          fetch(callback_url).then((resp) => resp.json()).then((res) => {
+            console.log(res.data, 'res token wala');
+            console.log(JSON.stringify(res.data), 'JSON stringify res token wala');
+            console.log(res, '2nd res token wala');
+            console.log(JSON.stringify(res), '2nd JSON stringify res token wala');
             const params = new URLSearchParams({
               // username: res.username,
-              osm_oauth_token: res.access_token,
+              osm_oauth_token: res.access_token.access_token,
               // session_token: res.session_token,
               // picture: res.picture,
               redirect_to: redirectTo,
@@ -58,18 +62,16 @@ export const createLoginWindow = (redirectTo) => {
             window.location.href = redirectUrl;
             fetch(`${environment.baseApiUrl}/auth/me/`, {
               headers: {
-                "access-token": res.access_token
+                "access-token": res.access_token.access_token
                 // 'Content-Type': 'application/x-www-form-urlencoded',
               }
-            }).then((resp) => resp.json()).then((resp) => {
-              console.log(resp, 'resp');
-              // alert(resp);
-              window.close();
+            }).then((resp) => resp.json()).then((res) => {
+              // localStorage.setItem("user", JSON.stringify(res.user_data));
+              // window.close();
             });
           });
         } else {
-          alert('else');
-          // throw new Error('States do not match');
+          throw new Error('States do not match');
         }
       } catch (error) {
         console.log(error, 'error');

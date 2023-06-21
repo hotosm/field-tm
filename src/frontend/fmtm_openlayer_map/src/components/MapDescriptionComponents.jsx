@@ -14,14 +14,14 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
         </CoreModules.Typography>
       ),
     },
-    {
-      value: "Instructions",
-      element: (
-        <CoreModules.Typography align="center">
-          {state.projectInfo.location_str}
-        </CoreModules.Typography>
-      ),
-    },
+    // {
+    //   value: "Instructions",
+    //   element: (
+    //     <CoreModules.Typography align="center">
+    //       {state.projectInfo.location_str}
+    //     </CoreModules.Typography>
+    //   ),
+    // },
     {
       value: "Legends",
       element: (
