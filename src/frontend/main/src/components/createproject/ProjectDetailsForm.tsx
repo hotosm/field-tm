@@ -68,12 +68,12 @@ const ProjectDetailsForm: React.FC = () => {
   // Changed OrganizationList Data into the Picker Component Format i.e label and value
   const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
   return (
-    <CoreModules.Stack sx={{ width: '50%', marginLeft: '215px !important' }}>
+    <CoreModules.Stack sx={{ width: { xs: '95%' }, marginLeft: { md: '215px !important' } }}>
       <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
         <CoreModules.FormGroup>
           {/* Organization Dropdown For Create Project */}
 
-          <CoreModules.FormControl sx={{ mb: 0, width: '30%' }} variant="outlined">
+          <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }} variant="outlined">
             <CoreModules.Box
               sx={{
                 display: 'flex',
@@ -151,7 +151,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* END */}
 
           {/* Project Name Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 0, width: '50%' }}>
+          <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
               <CoreModules.FormLabel component="h3">Central ODK Url</CoreModules.FormLabel>
               <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
@@ -182,7 +182,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* END */}
 
           {/* Project Name Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 1, width: '50%' }}>
+          <CoreModules.FormControl sx={{ mb: 1, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <CoreModules.FormLabel sx={{}} component="h3">
                 Central ODK Email/Username
@@ -196,6 +196,7 @@ const ProjectDetailsForm: React.FC = () => {
               name="odk"
               label=""
               variant="outlined"
+              inputProps={{ sx: { padding: '8.5px 14px' } }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
@@ -216,7 +217,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* END */}
 
           {/* Project Name Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 1, width: '50%' }}>
+          <CoreModules.FormControl sx={{ mb: 1, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <CoreModules.FormLabel component="h3">Central ODK Password </CoreModules.FormLabel>
               <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
@@ -248,7 +249,7 @@ const ProjectDetailsForm: React.FC = () => {
           </CoreModules.FormControl>
           {/* END */}
           {/* Project Name Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 3, width: '50%' }}>
+          <CoreModules.FormControl sx={{ mb: 3, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <CoreModules.FormLabel component="h3">Project Name</CoreModules.FormLabel>
               <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
@@ -279,7 +280,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* END */}
 
           {/* Short Description Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 3 }}>
+          <CoreModules.FormControl sx={{ mb: 3, width: { md: '50%', lg: '50%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <CoreModules.FormLabel component="h3">Short Description</CoreModules.FormLabel>
               <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
@@ -310,7 +311,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* END */}
 
           {/* Description Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 3 }}>
+          <CoreModules.FormControl sx={{ mb: 3, width: { md: '50%', lg: '50%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <CoreModules.FormLabel component="h3">Description</CoreModules.FormLabel>
               <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
@@ -340,9 +341,15 @@ const ProjectDetailsForm: React.FC = () => {
           </CoreModules.FormControl>
           {/* END */}
 
-          <CoreModules.Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+          <CoreModules.Box
+            sx={{
+              display: 'flex',
+              width: { xs: 'full', md: '50%' },
+              justifyContent: 'center',
+            }}
+          >
             {/* Form Submission Button For Create Project */}
-            <CoreModules.Button variant="contained" color="error" sx={{ width: '20%' }} type="submit">
+            <CoreModules.Button variant="contained" color="error" sx={{ width: '10%' }} type="submit">
               Next
             </CoreModules.Button>
             {/* END */}
