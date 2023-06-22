@@ -67,7 +67,7 @@ RUN set -ex \
 COPY --from=extract-deps \
     /opt/python/requirements.txt /opt/python/
 RUN pip install --user --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements.txt 
+    --no-cache-dir -r /opt/python/requirements.txt  
 
 
 
@@ -95,7 +95,7 @@ RUN set -ex \
         "libproj19" \
         "libgeos-c1v5" \
         # "libgdal32" \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* 
 COPY --from=build \
     /root/.local \
     /home/appuser/.local
@@ -113,6 +113,8 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && chown -R appuser:appuser /opt /home/appuser
+# Add volume for persistent images
+VOLUME /opt/app/images
 
 
 
@@ -120,9 +122,7 @@ FROM runtime as debug-no-odk
 COPY --from=extract-deps \
     /opt/python/requirements-dev.txt /opt/python/
 RUN pip install --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements-dev.txt \
-    && pip install osm-fieldwork==0.3.1rc2
-
+    --no-cache-dir -r /opt/python/requirements-dev.txt 
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \

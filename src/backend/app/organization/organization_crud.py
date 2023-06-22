@@ -43,30 +43,55 @@ def generate_slug(text: str) -> str:
     slug = re.sub(r'[-\s]+', '-', slug)
     return slug
 
-async def create_organization(db: Session, name:str, description:str, url:str, type:int, logo: UploadFile = File(...)):
-    # create new project
+
+async def get_organisation_by_name(db: Session, name: str):
+
+    # Construct the SQL query with the case-insensitive search
+    query = f"SELECT * FROM organisations WHERE LOWER(name) LIKE LOWER('%{name}%') LIMIT 1"
+
+    # Execute the query and retrieve the result
+    result = db.execute(query)
+
+    # Fetch the first row of the result
+    db_organisation = result.fetchone()
+    return db_organisation
+
+
+async def create_organization(db: Session, name: str, description: str, url: str, logo: UploadFile = File(...)):
+    """
+    Creates a new organization with the given name, description, url, type, and logo.
+    Saves the logo file to the app/images folder.
+
+    Args:
+        db (Session): database session
+        name (str): name of the organization
+        description (str): description of the organization
+        url (str): url of the organization
+        type (int): type of the organization
+        logo (UploadFile, optional): logo file of the organization. Defaults to File(...).
+
+    Returns:
+        bool: True if organization was created successfully
+    """
+
+    # create new organization
     try:
         db_organization = db_models.DbOrganisation(
             name=name,
-            slug = generate_slug(name),
+            slug=generate_slug(name),
             description=description,
-            url=url,
-            # type=type,
+            url=url
         )
-        file_path = os.path.join("app/images")
 
-        # Save logo file to assets folder
-        if not os.path.exists(file_path):
-            try:
-                os.makedirs(file_path)
-            except OSError:
-                pass
+        # Save logo file to app/images folder
+        # file_path = os.path.join("app/images")
+        # if not os.path.exists(file_path):
+        #     os.makedirs(file_path)
 
-        with open(file_path+'/'+logo.filename, "wb") as file:
-            file.write(await logo.read())
-            file.close()
+        # with open(os.path.join(file_path, logo.filename), "wb") as file:
+        #     file.write(await logo.read())
 
-        db_organization.logo = logo.filename
+        db_organization.logo = logo.filename if logo else None
         db.add(db_organization)
         db.commit()
         db.refresh(db_organization)

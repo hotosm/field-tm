@@ -6,7 +6,6 @@ import { HomeActions } from '../../store/slices/HomeSlice';
 import { HomeProjectCardModel } from '../../models/home/homeModel';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
-import { ProjectActions } from '../../store/slices/ProjectSlice';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
@@ -83,7 +82,7 @@ export default function ExploreProjectCard({ data }) {
             variant="outlined"
             color="error"
             style={cardInnerStyles.outlinedButton}
-          // disabled
+            // disabled
           >
             {data.priority_str}
           </CoreModules.Button>
@@ -96,7 +95,7 @@ export default function ExploreProjectCard({ data }) {
           <CoreModules.Typography
             ml={'2%'}
             mt={'5%'}
-            variant="subtitle1"
+            variant="subtitle2"
             color="info"
             gutterBottom
             sx={{
@@ -106,6 +105,7 @@ export default function ExploreProjectCard({ data }) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               maxHeight: '5em',
+              textTransform: 'capitalize',
             }}
           >
             {data.title}
@@ -121,7 +121,7 @@ export default function ExploreProjectCard({ data }) {
           <CoreModules.Typography
             mt={'7%'}
             ml={'2%'}
-            variant="h4"
+            variant="h2"
             color="info"
             gutterBottom
             sx={{
@@ -131,6 +131,7 @@ export default function ExploreProjectCard({ data }) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               maxHeight: '5em',
+              textTransform: 'capitalize',
             }}
           >
             {data.description}
@@ -143,7 +144,7 @@ export default function ExploreProjectCard({ data }) {
           <CoreModules.Typography
             mt={'7%'}
             ml={'2%'}
-            variant={'h2'}
+            variant="h2"
             fontSize={defaultTheme.typography.subtitle1.fontSize}
             fontWeight={'bold'}
             color="info"
@@ -154,7 +155,7 @@ export default function ExploreProjectCard({ data }) {
           <CoreModules.Typography
             mt={'8%'}
             ml={'2%'}
-            variant={'h4'}
+            variant="h2"
             fontSize={defaultTheme.typography.htmlFontSize}
             color="info"
           >
