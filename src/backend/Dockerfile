@@ -114,7 +114,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && chown -R appuser:appuser /opt /home/appuser
 # Add volume for persistent images
-VOLUME /app/images
+VOLUME /opt/app/images
 
 
 
