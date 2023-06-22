@@ -19,6 +19,7 @@ version: "3"
 
 volumes:
   fmtm_db_data:
+  fmtm_images:
 
 networks:
   fmtm-dev:
