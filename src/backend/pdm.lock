@@ -895,7 +895,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.0"
-content_hash = "sha256:50383bfd72b5243fc7af1870bcf4787e0f573b21b280d2dc26c78df5c484fc20"
+content_hash = "sha256:00c23107fecfccbc9a7c87850263f72566daa57802d08160992af8b058b3e29b"
 
 [metadata.files]
 "alembic 1.8.1" = [

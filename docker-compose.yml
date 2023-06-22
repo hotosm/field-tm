@@ -19,6 +19,7 @@ version: "3"
 
 volumes:
   fmtm_db_data:
+  fmtm_images:
   central_db_data:
 
 networks:
@@ -34,8 +35,8 @@ services:
       - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
       - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
       - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -49,14 +50,16 @@ services:
         APP_VERSION: debug
     container_name: fmtm_api
     volumes:
+      - fmtm_images:/opt/app/images
       - ./src/backend/app:/opt/app
+      - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.10/site-packages/osm_fieldwork
     depends_on:
       - fmtm-db
       - central-proxy
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "7050:8000"
       - "5678:5678"
     networks:
       - fmtm-dev
@@ -83,7 +86,7 @@ services:
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -109,7 +112,7 @@ services:
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
       - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
-      - "8081:8081"
+      - "8082:8082"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -123,8 +126,8 @@ services:
       - POSTGRES_USER=${CENTRAL_DB_USER:-odk}
       - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
       - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
-    ports:
-      - "5433:5432"
+    # ports:
+    #   - "5433:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped

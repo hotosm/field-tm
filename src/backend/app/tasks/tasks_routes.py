@@ -145,7 +145,7 @@ async def task_features_count(
         data.append({
             'task_id': task,
             'feature_count': feature_count['count'],
-            'submission_count': len(submission_list)
+            'submission_count': len(submission_list) if isinstance(submission_list, list) else 0
         })
 
     return data
