@@ -122,6 +122,8 @@ COPY --from=extract-deps \
 RUN pip install --no-warn-script-location \
     --no-cache-dir -r /opt/python/requirements-dev.txt 
 
+RUN pip install osm-fieldwork==0.3.1
+
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
@@ -138,7 +140,6 @@ COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
 RUN update-ca-certificates
 USER appuser
 
-RUN pip install osm-fieldwork==0.3.1
 
 FROM runtime as prod
 USER appuser
