@@ -113,6 +113,8 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && chown -R appuser:appuser /opt /home/appuser
+# Add volume for persistent images
+VOLUME /app/images
 
 
 
@@ -121,9 +123,6 @@ COPY --from=extract-deps \
     /opt/python/requirements-dev.txt /opt/python/
 RUN pip install --no-warn-script-location \
     --no-cache-dir -r /opt/python/requirements-dev.txt 
-
-RUN pip install osm-fieldwork==0.3.1
-
 USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
@@ -139,6 +138,7 @@ COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
     /etc/nginx/ca.crt /etc/nginx/central.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 USER appuser
+
 
 
 FROM runtime as prod
