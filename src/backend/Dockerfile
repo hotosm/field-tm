@@ -138,7 +138,6 @@ COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
 RUN update-ca-certificates
 USER appuser
 
-RUN pip install osm-fieldwork==0.3.1rc2
 
 FROM runtime as prod
 USER appuser
