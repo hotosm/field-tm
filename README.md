@@ -2,20 +2,17 @@
 
 [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-)
 
-**Workflows**
+**Production Workflows**
 
-[![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml) [![Production Deploy](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/prod_deploy.yml)
-
-**Backend Builds**
-
-| Backend API | ODKCentral API  | ODKCentral Proxy  |
+| PyTest | Build & Deploy  | Wiki Docs |
 |---|---|---|
-| [![Backend Build](https://quay.io/repository/hotosm/fmtm-backend/status "Backend Build")](https://quay.io/repository/hotosm/backend) | [![Central-API Build](https://quay.io/repository/hotosm/odkcentral-api/status "Central-API Build")](https://quay.io/repository/hotosm/odkcentral-api)  |  [![Central-Proxy Build](https://quay.io/repository/hotosm/odkcentral-proxy/status "Central-Proxy Build")](https://quay.io/repository/hotosm/odkcentral-proxy)  |
+| [![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) | [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml) | [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml) |
 
-**Microfrontend Builds**
-|  Main | Map |
+**Development Workflows**
+
+| PyTest | Build & Deploy  |
 |---|---|
-| [![Frontend Main Build](https://quay.io/repository/hotosm/fmtm-mf-main/status "Frontend Main Build")](https://quay.io/repository/hotosm/fmtm-mf-main)| [![Frontend Map Build](https://quay.io/repository/hotosm/fmtm-mf-map/status "Frontend Map Build")](https://quay.io/repository/hotosm/fmtm-mf-map) |
+| [![pytest](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/pytest.yml) | [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml) |
 
 # Field Mapping Tasking Manager (FMTM)
 
@@ -46,11 +43,7 @@ Please take a look at our [Wiki pages](https://github.com/hotosm/fmtm/wiki/Home/
 
 As of mid-2022, ODK incorporates a new functionality, select from map, that allows field mappers to select an object from a map, view the existing attributes, and fill out a form adding new information and attributes to that object. For example, a mapper can approach a building, select that building from a map view within ODK on their mobile phone, and add the opening hours, number of floors, construction material, or any number of useful attributes in a well-structured questionnaire format
 
-
-
 To prepare the appropriate map files for ODK, we are taking our inspiration from the [HOT Tasking Manager](https://tasks.hotosm.org/), which allows remote mappers to choose well-defined small "task" areas, ensuring full coverage of the project area and no unintended duplication of tasks.
-
-
 
 # Users
 
@@ -114,6 +107,7 @@ A computer-screen-optimized web app that allows Campaign Managers to:
 - Provide a project-specific URL that field mappers can access from their mobile phones to select and map tasks.
 
 ### Steps to create a project in FMTM
+
 - Go to [fmtm](https://fmtm.hotosm.org/) .
 - If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
 - Click the '+ CREATE NEW PROJECT' button.
@@ -155,7 +149,7 @@ A back end that converts the project parameters entered by the Campaign Manager 
 
 ### Field Mapper Web Interface (with mobile-friendly map view)
 
- Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
+Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
 
 ## Contributors ✨
 
