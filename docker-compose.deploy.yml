@@ -82,6 +82,8 @@ services:
       args:
         APP_VERSION: ${API_VERSION}
     container_name: fmtm_api
+    volumes:
+      - fmtm_images:/app/images
     depends_on:
       - fmtm-db
       - traefik

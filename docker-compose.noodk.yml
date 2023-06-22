@@ -48,6 +48,7 @@ services:
         APP_VERSION: debug
     container_name: fmtm_api
     volumes:
+      - fmtm_images:/app/images
       - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
