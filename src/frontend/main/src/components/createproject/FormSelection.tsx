@@ -311,7 +311,7 @@ const FormSelection: React.FC = () => {
                       <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
                     </CoreModules.IconButton>
                   </a>
-                  <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
+                  <CoreModules.FormLabel>Upload .xls/.xlsx/.xml Form</CoreModules.FormLabel>
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
