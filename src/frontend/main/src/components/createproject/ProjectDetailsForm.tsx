@@ -69,7 +69,7 @@ const ProjectDetailsForm: React.FC = () => {
   const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
   return (
     <CoreModules.Stack sx={{ width: '50%', marginLeft: '215px !important' }}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
         <CoreModules.FormGroup>
           {/* Organization Dropdown For Create Project */}
 
