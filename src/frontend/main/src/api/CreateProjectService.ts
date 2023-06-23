@@ -135,10 +135,10 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
             try {
                 const generateApiFormData = new FormData();
                 if (payload.form_ways === 'Upload a Custom Form') {
-                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', formUpload);
                 } else {
-                    generateApiFormData.append('extractPolygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', '');
 
                 }
