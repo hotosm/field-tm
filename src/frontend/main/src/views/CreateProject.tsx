@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/home.css';
 // import "../../node_modules/ol/ol.css";
 import CoreModules from '../shared/CoreModules';
@@ -8,14 +8,24 @@ import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
 import BasemapSelection from '../components/createproject/BasemapSelection';
 import FormSelection from '../components/createproject/FormSelection';
 import DefineTasks from '../components/createproject/DefineTasks';
+import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
+import { useDispatch } from 'react-redux';
 
 const CreateProject: React.FC = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const boxSX = {
     'button:hover': {
       textDecoration: 'none',
     },
   };
+  useEffect(() => {
+
+    return () => {
+      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 50 }));
+    }
+  }, [])
+
   return (
     <div>
       <CoreModules.Stack

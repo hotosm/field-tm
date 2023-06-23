@@ -168,7 +168,7 @@ const FormSelection: React.FC = () => {
     SelectFormValidation,
   );
   const parsedTaskGeojsonCount =
-    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length || projectDetails?.areaGeojson?.features?.length;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   return (
@@ -301,7 +301,7 @@ const FormSelection: React.FC = () => {
                       }),
                     );
                   }}
-                  // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
+                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
                   {selectFormWays?.map((form) => (
                     <MenuItem value={form.value}>{form.label}</MenuItem>
@@ -340,7 +340,7 @@ const FormSelection: React.FC = () => {
                       }}
                     />
                   </CoreModules.Button>
-                  {!projectDetails.uploadedFormFileName && (
+                  {!values.uploaded_form && (
                     <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>
                       Form File is required.
                     </CoreModules.FormLabel>
@@ -355,6 +355,7 @@ const FormSelection: React.FC = () => {
                     <LoadingBar
                       title={'Task Progress'}
                       // steps={totalSteps}
+                      // activeStep={10}
                       activeStep={generateProjectLog.progress}
                       totalSteps={totalSteps}
                     />
@@ -406,7 +407,7 @@ const FormSelection: React.FC = () => {
                 variant="contained"
                 color="error"
                 type="submit"
-                // disabled={!fileUpload ? true : false}
+              // disabled={!fileUpload ? true : false}
               >
                 Submit
               </CoreModules.Button>
