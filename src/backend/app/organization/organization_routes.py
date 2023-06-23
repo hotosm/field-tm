@@ -52,37 +52,29 @@ def get_organisations(
 
 @router.post("/")
 async def create_organization(
-    # organization: organization_schemas.Organisation = Form(...),
-    name: str=Form(),
-    description: str=Form(None),
-    url: str=Form(None),
-    # type: int=Form(),
-    logo: UploadFile = File(...),
-    db: Session = Depends(database.get_db),
+    name: str = Form(),  # Required field for organization name
+    description: str = Form(None),  # Optional field for organization description
+    url: str = Form(None),  # Optional field for organization URL
+    logo: UploadFile = File(None),  # Optional field for organization logo
+    db: Session = Depends(database.get_db),  # Dependency for database session
 ):
-    """Create a new organization.
-
-    This endpoint allows you to create a new organization by providing the necessary details in the request body.
-
-    ## Request Body
-    - `slug` (str): the organization's slug. Required.
-    - `logo` (str): the URL of the organization's logo. Required.
-    - `name` (str): the name of the organization. Required.
-    - `description` (str): a description of the organization.0
-    - `url` (str): the URL of the organization's website. Required.
-    - `type` (int): the type of the organization. Required.
-
-
-    ## Response
-    - Returns a JSON object containing a success message .
-
-    ### Example Response
-    ```
-    {
-        "Message": "Organization Created Successfully.",
-    }
-    ```
     """
-    await organization_crud.create_organization(db,name,description,url,type,logo)
+    Create an organization with the given details.
+
+    Parameters:
+        name (str): The name of the organization. Required.
+        description (str): The description of the organization. Optional.
+        url (str): The URL of the organization. Optional.
+        logo (UploadFile): The logo of the organization. Optional.
+        db (Session): The database session. Dependency.
+
+    Returns:
+        dict: A dictionary with a message indicating successful creation of the organization.
+    """
+    # Check if the organization with the same already exists
+    if await organization_crud.get_organisation_by_name(db, name=name):
+        raise HTTPException(status_code=400, detail=f"Organization already exists with the name {name}")
+
+    await organization_crud.create_organization(db, name, description, url, logo)
 
     return {"Message": "Organization Created Successfully."}

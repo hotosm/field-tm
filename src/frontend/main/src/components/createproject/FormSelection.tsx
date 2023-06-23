@@ -167,15 +167,26 @@ const FormSelection: React.FC = () => {
     submission,
     SelectFormValidation,
   );
-  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+  const parsedTaskGeojsonCount =
+    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   return (
-    <CoreModules.Stack sx={{ width: '100%', marginLeft: '215px !important' }}>
+    <CoreModules.Stack
+      sx={{
+        width: { xs: '95%', md: '80%' },
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        justifyContent: 'space-between',
+        gap: '4rem',
+        marginLeft: { md: '215px !important' },
+        pr: 2,
+      }}
+    >
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <Grid container spacing={5}>
-            <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Grid item xs={40} md={40} sx={{ display: 'flex', flexDirection: 'column' }}>
               <CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
@@ -290,7 +301,7 @@ const FormSelection: React.FC = () => {
                       }),
                     );
                   }}
-                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
+                  // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
                   {selectFormWays?.map((form) => (
                     <MenuItem value={form.value}>{form.label}</MenuItem>
@@ -311,7 +322,7 @@ const FormSelection: React.FC = () => {
                       <AssetModules.FileDownloadIcon style={{ color: '#2DCB70' }} />
                     </CoreModules.IconButton>
                   </a>
-                  <CoreModules.FormLabel>Upload XLS Form</CoreModules.FormLabel>
+                  <CoreModules.FormLabel>Upload .xls/.xlsx/.xml Form</CoreModules.FormLabel>
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
@@ -395,7 +406,7 @@ const FormSelection: React.FC = () => {
                 variant="contained"
                 color="error"
                 type="submit"
-              // disabled={!fileUpload ? true : false}
+                // disabled={!fileUpload ? true : false}
               >
                 Submit
               </CoreModules.Button>
