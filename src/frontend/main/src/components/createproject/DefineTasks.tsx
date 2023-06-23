@@ -65,18 +65,20 @@ const DefineTasks: React.FC = () => {
     };
   };
   const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
-  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+  const parsedTaskGeojsonCount =
+    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   // const filteredAlgorithmListData = algorithmListData?.filter((algo) => parsedTaskGeojsonCount > 1 ? algo.label === 'Choose Area as Tasks' : algo);
   return (
     <CoreModules.Stack
       sx={{
-        width: '80%',
+        width: { xs: '95%', md: '80%' },
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: { xs: 'column', md: 'row' },
         justifyContent: 'space-between',
-        marginLeft: '215px !important',
         gap: '4rem',
+        marginLeft: { md: '215px !important' },
+        px: 2,
       }}
     >
       <form onSubmit={handleSubmit}>
@@ -169,19 +171,21 @@ const DefineTasks: React.FC = () => {
               </CoreModules.Stack>
             </CoreModules.FormControl>
           )}
-          {parsedTaskGeojsonCount ? <CoreModules.Stack direction="row" alignItems="center" spacing={2}>
-            <h2>Total Tasks:</h2>
-            <h3>{parsedTaskGeojsonCount}</h3>
-          </CoreModules.Stack> : null}
+          {parsedTaskGeojsonCount ? (
+            <CoreModules.Stack direction="row" alignItems="center" spacing={2}>
+              <h2>Total Tasks:</h2>
+              <h3>{parsedTaskGeojsonCount}</h3>
+            </CoreModules.Stack>
+          ) : null}
           {/* END */}
 
           {/* Submit Button For Create Project on Area Upload */}
           <CoreModules.Stack
-            sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: '5rem' }}
+            sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-evenly', gap: '5rem' }}
           >
             {/* Previous Button  */}
             <Link to="/upload-area">
-              <CoreModules.Button sx={{ width: '150px' }} variant="outlined" color="error">
+              <CoreModules.Button sx={{ width: '100px' }} variant="outlined" color="error">
                 Previous
               </CoreModules.Button>
             </Link>
