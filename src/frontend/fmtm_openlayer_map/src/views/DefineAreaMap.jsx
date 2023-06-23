@@ -32,6 +32,7 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
   });
   // const formattedGeojson =
   useEffect(() => {
+    console.log(uploadedGeojson, 'uploadedGeojson')
     if (uploadedGeojson) {
       const fileReader = new FileReader();
       fileReader.readAsText(uploadedGeojson, "UTF-8");
@@ -40,6 +41,8 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
         //   setConvertedJSON(e.target.result);
         dispatch(CreateProjectActions.SetDividedTaskGeojson(e.target.result));
       };
+    } else {
+      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
     }
   }, [uploadedGeojson]);
 
