@@ -32,6 +32,7 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
   });
   // const formattedGeojson =
   useEffect(() => {
+    console.log(uploadedGeojson, 'uploadedGeojson')
     if (uploadedGeojson) {
       const fileReader = new FileReader();
       fileReader.readAsText(uploadedGeojson, "UTF-8");
