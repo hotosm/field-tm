@@ -1206,7 +1206,7 @@ def generate_appuser_files(
 
         # Update background task status to FAILED
         update_background_task_status_in_database(
-            db, background_task_id, 2
+            db, background_task_id, 2, str(e)
         )  # 2 is FAILED
 
 
@@ -1568,7 +1568,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
         .filter(db_models.BackgroundTasks.id == str(task_id))
         .first()
     )
-    return task.status
+    return task.status, task.message
 
 
 async def insert_background_task_into_database(
@@ -1592,7 +1592,7 @@ async def insert_background_task_into_database(
 
 
 def update_background_task_status_in_database(
-    db: Session, task_id: uuid.UUID, status: int
+    db: Session, task_id: uuid.UUID, status: int, message: str = None
 ):
     """Updates the status of a task in the database
     Params:
@@ -1602,7 +1602,10 @@ def update_background_task_status_in_database(
     """
     db.query(db_models.BackgroundTasks).filter(
         db_models.BackgroundTasks.id == str(task_id)
-    ).update({db_models.BackgroundTasks.status: status})
+    ).update({
+            db_models.BackgroundTasks.status: status,
+            db_models.BackgroundTasks.message: message
+        })
     db.commit()
 
     return True
