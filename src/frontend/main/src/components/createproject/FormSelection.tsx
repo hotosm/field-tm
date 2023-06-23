@@ -168,7 +168,7 @@ const FormSelection: React.FC = () => {
     SelectFormValidation,
   );
   const parsedTaskGeojsonCount =
-    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length || projectDetails?.areaGeojson?.features?.length;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   return (
@@ -350,12 +350,13 @@ const FormSelection: React.FC = () => {
             </Grid>
             <Grid item xs={8}>
               <CoreModules.Stack>
-                {generateProjectLog ? (
+                {!generateProjectLog ? (
                   <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '60%', pb: '2rem' }}>
                     <LoadingBar
                       title={'Task Progress'}
                       // steps={totalSteps}
-                      activeStep={generateProjectLog.progress}
+                      activeStep={10}
+                      // activeStep={generateProjectLog.progress}
                       totalSteps={totalSteps}
                     />
                   </CoreModules.Stack>
