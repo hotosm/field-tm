@@ -104,6 +104,10 @@ async def create_project(
 ):
     """Create a project in ODK Central and the local database."""
     logger.debug(f"Creating project {project_info.project_info.name}")
+
+    if project_info.odk_central.odk_central_url.endswith("/"):
+        project_info.odk_central.odk_central_url = project_info.odk_central.odk_central_url[:-1]
+
     try:
         odkproject = central_crud.create_odk_project(
             project_info.project_info.name, project_info.odk_central
