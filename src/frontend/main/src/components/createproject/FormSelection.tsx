@@ -350,13 +350,13 @@ const FormSelection: React.FC = () => {
             </Grid>
             <Grid item xs={8}>
               <CoreModules.Stack>
-                {!generateProjectLog ? (
+                {generateProjectLog ? (
                   <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '60%', pb: '2rem' }}>
                     <LoadingBar
                       title={'Task Progress'}
                       // steps={totalSteps}
-                      activeStep={10}
-                      // activeStep={generateProjectLog.progress}
+                      // activeStep={10}
+                      activeStep={generateProjectLog.progress}
                       totalSteps={totalSteps}
                     />
                   </CoreModules.Stack>
