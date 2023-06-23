@@ -583,6 +583,7 @@ class BackgroundTasks(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
+    message = Column(String)
 
 
 class DbUserRoles(Base):
