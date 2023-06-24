@@ -27,7 +27,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-# from ..osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.xlsforms import xlsforms_path
 
 from .__version__ import __version__
