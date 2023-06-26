@@ -24,7 +24,7 @@ const CreateProject: React.FC = () => {
   useEffect(() => {
 
     return () => {
-      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 50 }));
+      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
     }
   }, [])
 
