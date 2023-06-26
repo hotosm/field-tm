@@ -230,7 +230,7 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     return FileResponse(final_zip_file_path)
 
 
-def download_submission(db: Session, project_id: int, task_id: int, exportJson: bool):
+def download_submission(db: Session, project_id: int, task_id: int, export_json: bool):
 
     project_info = project_crud.get_project(db, project_id)
 
@@ -253,7 +253,7 @@ def download_submission(db: Session, project_id: int, task_id: int, exportJson: 
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
-    if not exportJson:
+    if not export_json:
         file_path = f"{project_id}_submissions.zip"
 
         # If task id is not provided, submission for all the task are listed
@@ -310,9 +310,8 @@ def download_submission(db: Session, project_id: int, task_id: int, exportJson: 
                 f.write(file.content)
             return FileResponse(file_path)
     else:
-        timestamp = datetime.now().strftime("%Y_%m_%d")
         headers = {
-            "Content-Disposition": f"attachment; filename=Submission_data_{timestamp}.json",
+            "Content-Disposition": "attachment; filename=submission_data.json",
             "Content-Type": "application/json",
         }
 
