@@ -61,7 +61,6 @@ from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 
-# from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from . import project_schemas
 
 # --------------
@@ -942,6 +941,7 @@ def generate_appuser_files(
     extract_polygon: bool,
     upload: str,
     category: str,
+    form_type: str,
     background_task_id: uuid.UUID,
 ):
     """Generate the files for each appuser.
@@ -953,6 +953,7 @@ def generate_appuser_files(
             - extract_polygon: boolean to determine if we should extract the polygon
             - upload: the xls file to upload if we have a custom form
             - category: the category of the project
+            - form_type: weather the form is xls, xlsx or xml
             - background_task_id: the task_id of the background task running this function.
         """
 
@@ -1031,7 +1032,7 @@ def generate_appuser_files(
             xform_title = one.xform_title if one.xform_title else None
 
             if upload:
-                xlsform = "/tmp/custom_form.xls"
+                xlsform = f"/tmp/custom_form.{form_type}"
                 contents = upload
                 with open(xlsform, "wb") as f:
                     f.write(contents)
