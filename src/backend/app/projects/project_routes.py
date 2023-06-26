@@ -87,13 +87,21 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
-    # TODO allow passing odkcentral credentials from user
-    central_crud.delete_odk_project(project_id)
-    # if not odkproject:
-    #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
-    project = project_crud.delete_project_by_id(db, project_id)
-    if project:
-        return project
+
+    project = project_crud.get_project(db, project_id)
+
+    # Odk crendentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
+    central_crud.delete_odk_project(project_id, odk_credentials)
+
+    deleted_project = project_crud.delete_project_by_id(db, project_id)
+    if deleted_project:
+        return deleted_project
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
