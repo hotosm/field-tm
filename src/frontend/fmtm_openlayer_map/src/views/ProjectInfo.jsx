@@ -6,7 +6,7 @@ import environment from "fmtm/environment";
 import {
   fetchConvertToOsmDetails,
   fetchInfoTask,
-  getDownloadProjectBoundary,
+  getDownloadProjectSubmission,
 } from "../api/task";
 
 const boxStyles = {
@@ -37,12 +37,20 @@ const ProjectInfo = () => {
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
-  const handleDownload = () => {
-    dispatch(
-      getDownloadProjectBoundary(
-        `${environment.baseApiUrl}/submission/download?project_id=${decodedId}`
-      )
-    );
+  const handleDownload = (downloadType) => {
+    if(downloadType === 'csv'){
+      dispatch(
+        getDownloadProjectSubmission(
+          `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&exportJson=false`
+        )
+      );
+    }else if(downloadType === 'json'){
+      dispatch(
+        getDownloadProjectSubmission(
+          `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&exportJson=true`
+        )
+      );
+    }
   };
 
   const handleConvert = () => {
@@ -160,9 +168,17 @@ const ProjectInfo = () => {
               variant="outlined"
               color="error"
               sx={{ width: "fit-content" }}
-              onClick={handleDownload}
+              onClick={()=>handleDownload("csv")}
             >
-              Download
+              Download CSV
+            </CoreModules.Button>
+            <CoreModules.Button
+              variant="outlined"
+              color="error"
+              sx={{ width: "fit-content" }}
+              onClick={()=>handleDownload("json")}
+            >
+              Download JSON
             </CoreModules.Button>
           </CoreModules.Box>
           <CoreModules.Card>
