@@ -11,7 +11,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
         dispatch(CreateProjectActions.CreateProjectLoading(true))
         dispatch(CommonActions.SetLoading(true))
 
-        const postCreateProjectDetails = async (url, payload, fileUpload) => {
+        const postCreateProjectDetails = async (url, payload, fileUpload,formUpload) => {
 
             try {
                 const postNewProjectDetails = await axios.post(url, payload)
@@ -54,7 +54,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
             }
         }
 
-        await postCreateProjectDetails(url, payload, fileUpload);
+        await postCreateProjectDetails(url, payload, fileUpload,formUpload);
 
     }
 
