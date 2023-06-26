@@ -6,8 +6,8 @@ const TaskSlice = createSlice({
         taskLoading: true,
         taskInfo: [],
         selectedTask: null,
-        projectBoundaryLoading: true,
-        projectBoundary: [],
+        projectSubmissionLoading: true,
+        projectSubmission: [],
         convertToOsmLoading: null,
         convertToOsm: [],
     },
@@ -15,8 +15,8 @@ const TaskSlice = createSlice({
         SetTaskLoading(state, action) {
             state.taskLoading = action.payload
         },
-        GetProjectBoundaryLoading(state, action) {
-            state.projectBoundaryLoading = action.payload
+        GetProjectSubmissionLoading(state, action) {
+            state.projectSubmissionLoading = action.payload
         },
         FetchConvertToOsmLoading(state, action) {
             state.convertToOsmLoading = action.payload
@@ -28,8 +28,8 @@ const TaskSlice = createSlice({
             state.selectedTask = action.payload;
         },
  
-        GetDownloadProjectBoundary(state, action) {
-            state.projectBoundary = action.payload;
+        GetDownloadProjectSubmission(state, action) {
+            state.projectSubmission = action.payload;
         },
         FetchConvertToOsm(state, action) {
             state.convertToOsm = action.payload;
