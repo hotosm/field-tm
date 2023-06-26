@@ -90,6 +90,9 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
 
     project = project_crud.get_project(db, project_id)
 
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
     # Odk crendentials
     odk_credentials = project_schemas.ODKCentral(
         odk_central_url = project.odk_central_url,
