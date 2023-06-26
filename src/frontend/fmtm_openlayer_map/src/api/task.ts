@@ -25,7 +25,11 @@ export const fetchInfoTask: Function = (url: string) => {
 export const getDownloadProjectSubmission : Function = (url: string, ) => {
 
     return async (dispatch) => {
-        dispatch(CoreModules.TaskActions.GetProjectSubmissionLoading(true))
+        const params = new URLSearchParams(url.split('?')[1])
+        const isExportJson=params.get('export_json');
+        const isJsonOrCsv = isExportJson==='true' ? 'json' : 'csv'
+        dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:true}))
+
         const getProjectSubmission = async (url: string) => {
             try {
                 const response = await CoreModules.axios.get(url, {
@@ -35,8 +39,11 @@ export const getDownloadProjectSubmission : Function = (url: string, ) => {
                 a.href = window.URL.createObjectURL(response.data);
                 a.download = "Submissions";
                 a.click();
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
             } catch (error) {
-                dispatch(CoreModules.TaskActions.GetProjectSubmissionLoading(false))
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
+            } finally{
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
             }
         }
         await getProjectSubmission(url);

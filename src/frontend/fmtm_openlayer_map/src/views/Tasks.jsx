@@ -12,6 +12,7 @@ import environment from "fmtm/environment";
 import { ProjectBuildingGeojsonService, ProjectSubmissionService } from "../api/SubmissionService";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import { ProjectById } from "../api/Project";
+import { getDownloadProjectSubmission } from "../api/task";
 const basicGeojsonTemplate = {
     "type": "FeatureCollection",
     "features": []
@@ -139,15 +140,24 @@ const TasksSubmission = () => {
         },
     }));
 
+    const handleDownload = (downloadType) => {
+        if(downloadType === 'csv'){
+          dispatch(
+            getDownloadProjectSubmission(
+              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&export_json=false`
+            )
+          );
+        }else if(downloadType === 'json'){
+          dispatch(
+            getDownloadProjectSubmission(
+              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&export_json=true`
+            )
+          );
+        }
+      };
 
-    const [anchorEl, setAnchorEl] = React.useState([]);
-    const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl([]);
-    };
+      const downloadSubmissionLoading = CoreModules.useSelector((state)=>state.task.downloadSubmissionLoading)
+
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
@@ -155,6 +165,7 @@ const TasksSubmission = () => {
                     <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                         {/* Project Details SideBar Button for Creating Project */}
                         <CoreModules.Button
+                            sx={{width:'unset'}}
                             variant="contained"
                             color="error"
                         >
@@ -165,31 +176,41 @@ const TasksSubmission = () => {
 
                         {/* Upload Area SideBar Button for uploading Area page  */}
                         <CoreModules.Button
+                            sx={{width:'unset'}}
                             variant="contained"
                             color="error"
                         >
                             Convert
                         </CoreModules.Button>
-                        <a href={`${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&exportJson=${false}`} download>
-                            <CoreModules.Button
-                                variant="contained"
+                        <a onClick={()=>handleDownload('csv')}>
+                            <CoreModules.LoadingButton
+                                sx={{width:'unset'}}
+                                loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
+                                loadingPosition="end"
+                                endIcon={<AssetModules.FileDownloadIcon />}
+                                variant="contained"                            
                                 color="error"
-                            >
-                                Download CSV
-                            </CoreModules.Button>
+                              >
+                            
+                                CSV
+                            </CoreModules.LoadingButton>
                         </a>
-                        <a href={`${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}`} download>
-                            <CoreModules.Button
-                                variant="contained"
+                        <a onClick={()=>handleDownload('json')}>
+                            <CoreModules.LoadingButton
+                                sx={{width:'unset'}}
+                                loading={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
+                                loadingPosition="end"
+                                endIcon={<AssetModules.FileDownloadIcon />}
+                                variant="contained"                            
                                 color="error"
-                            >
-                                Download JSON
-                            </CoreModules.Button>
+                              >
+                                JSON
+                            </CoreModules.LoadingButton>
                         </a>
 
                         {/* END */}
                     </CoreModules.Stack>
-                    <CoreModules.Box component="h4" sx={{ background: '#e1e1e1', mt: 5, height: '90%', p: 5, display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'scroll' }}>
+                    <CoreModules.Box component="h4" sx={{ background: '#e1e1e1', mt: 5, height: '90%', p: 5, display: 'flex', flexDirection: 'column', gap: 1,borderRadius:'10px'  }}>
                         {projectSubmissionState?.map((submission) => {
                             const date = new Date(submission.createdAt);
 
@@ -203,7 +224,7 @@ const TasksSubmission = () => {
                             };
 
                             const formattedDate = date.toLocaleDateString('en-US', dateOptions);
-                            return <CoreModules.Link to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}><CoreModules.Box sx={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '10px', p: '0.5rem' }}>
+                            return <CoreModules.Link style={{"textDecoration":'auto'}} className="submission-item" to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}><CoreModules.Box sx={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '10px', p: '0.5rem' }}>
                                 <CoreModules.Box><img src={Avatar} style={{ marginRight: '10px', marginLeft: '5px' }} /> </CoreModules.Box>
                                 <CoreModules.Box>
                                     <CoreModules.Typography
@@ -216,7 +237,7 @@ const TasksSubmission = () => {
                                     </CoreModules.Typography>
                                     <CoreModules.Typography
                                         variant="subtitle3"
-                                        sx={{ color: 'gray' }}
+                                        sx={{ color: 'gray', }}
                                         mt={'2%'}
                                         ml={'3%'}
                                     >
