@@ -86,7 +86,7 @@ async def list_app_users(
 async def download_submission(
     project_id: int,
     task_id: int = None,
-    exportJson: bool = True,
+    export_json: bool = True,
     db: Session = Depends(database.get_db),
 ):
     """This api downloads the the submission made in the project.
@@ -97,7 +97,7 @@ async def download_submission(
     task_id: The ID of the task. This parameter is optional. If task_id is provided, this endpoint returns the submissions made for this task.
 
     """
-    return submission_crud.download_submission(db, project_id, task_id, exportJson)
+    return submission_crud.download_submission(db, project_id, task_id, export_json)
 
 
 @router.get("/submission-points")

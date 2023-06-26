@@ -37,6 +37,7 @@ from sqlalchemy.orm import Session
 from ..central import central_crud
 from ..db import database
 from . import project_crud, project_schemas
+from ..tasks import tasks_crud
 
 router = APIRouter(
     prefix="/projects",
@@ -86,13 +87,24 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
-    # TODO allow passing odkcentral credentials from user
-    central_crud.delete_odk_project(project_id)
-    # if not odkproject:
-    #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
-    project = project_crud.delete_project_by_id(db, project_id)
-    if project:
-        return project
+
+    project = project_crud.get_project(db, project_id)
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Odk crendentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
+    central_crud.delete_odk_project(project_id, odk_credentials)
+
+    deleted_project = project_crud.delete_project_by_id(db, project_id)
+    if deleted_project:
+        return deleted_project
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
@@ -289,6 +301,18 @@ async def upload_project_boundary(
     dimension: int = Form(500),
     db: Session = Depends(database.get_db),
 ):
+    """
+    Uploads the project boundary. The boundary is uploaded as a geojson file.
+
+    Params:
+    - project_id (int): The ID of the project to update.
+    - upload (UploadFile): The boundary file to upload.
+    - dimension (int): The new dimension of the project.
+    - db (Session): The database session to use.
+
+    Returns:
+    - Dict: A dictionary with a message, the project ID, and the number of tasks in the project.
+    """
 
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
@@ -301,18 +325,21 @@ async def upload_project_boundary(
     content = await upload.read()
     boundary = json.loads(content)
 
+    # update project boundary and dimension
     result = project_crud.update_project_boundary(db, project_id, boundary, dimension)
     if not result:
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
-    # Use the ID we get from Central, as it's needed for many queries
-    eval(project_crud.create_task_grid(db, project_id, dimension))
-    # type = DataCategory()
-    # result = project_crud.generate_appuser_files(db, grid, project_id)
+    # Get the number of tasks in a project
+    task_count = await tasks_crud.get_task_count_in_project(db, project_id)
 
-    return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
+    return {
+        "message": "Project Boundary Uploaded", 
+        "project_id": project_id,
+        "task_count": task_count
+    }
 
 
 @router.post("/{project_id}/download")
@@ -372,7 +399,7 @@ async def generate_files(
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls"]
+        allowed_extensions = [".xls", '.xlsx']
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
@@ -393,6 +420,7 @@ async def generate_files(
         extract_polygon,
         contents,
         xform_title,
+        file_ext[1:],
         background_task_id,
     )
 
@@ -438,7 +466,7 @@ async def generate_log(
     """
     try:
         # Get the backgrund task status
-        task_status = await project_crud.get_background_task_status(uuid, db)
+        task_status, task_message = await project_crud.get_background_task_status(uuid, db)
         extract_completion_count = await project_crud.get_extract_completion_count(
             project_id, db
         )
@@ -449,6 +477,7 @@ async def generate_log(
             logs = "".join(last_100_lines)
             return {
                 "status": task_status.name,
+                "message":task_message,
                 "progress": extract_completion_count,
                 "logs": logs,
             }
