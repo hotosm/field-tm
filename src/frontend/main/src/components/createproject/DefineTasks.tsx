@@ -12,8 +12,8 @@ import DefineTaskValidation from './validation/DefineTaskValidation';
 
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
-
-const DefineTasks: React.FC = () => {
+const alogrithmList = [{id:1,value:'Divide on Square',label:'Divide on Square'}, {id:2,value:'Choose Area as Tasks',label:'Choose Area as Tasks'}];
+const DefineTasks: React.FC = ({geojsonFile}) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
@@ -45,16 +45,12 @@ const DefineTasks: React.FC = () => {
   const generateTasksOnMap = () => {
     dispatch(
       GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, {
-        geojson: projectDetails.areaGeojson,
+        geojson: geojsonFile,
         dimension: formValues?.dimension,
       }),
     );
   };
   // 'Use natural Boundary'
-  const algorithmListData = ['Divide on Square', 'Choose Area as Tasks'].map((item) => ({
-    label: item,
-    value: item,
-  }));
   const inputFormStyles = () => {
     return {
       style: {
@@ -66,9 +62,16 @@ const DefineTasks: React.FC = () => {
   };
   const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
   const parsedTaskGeojsonCount =
-    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+  dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   // const filteredAlgorithmListData = algorithmListData?.filter((algo) => parsedTaskGeojsonCount > 1 ? algo.label === 'Choose Area as Tasks' : algo);
+  console.log(dividedTaskGeojson,'dividedTaskGeojson');
+  const algorithmListData =alogrithmList;
+  // const algorithmListData = alogrithmList.filter((algorithm)=> {
+  //   console.log(dividedTaskGeojson?.features?.length,'dividedTaskGeojson?.features?.length');
+    
+  //   return parsedTaskGeojsonCount>1 ? algorithm.label === 'Choose Area as Tasks':algorithm;
+  // });
   return (
     <CoreModules.Stack
       sx={{
@@ -110,7 +113,7 @@ const DefineTasks: React.FC = () => {
               }}
             >
               {algorithmListData?.map((listData) => (
-                <MenuItem value={listData.value}>{listData.label}</MenuItem>
+                <MenuItem key={listData.id} value={listData.value}>{listData.label}</MenuItem>
               ))}
             </Select>
             {errors.splitting_algorithm && (
@@ -200,7 +203,7 @@ const DefineTasks: React.FC = () => {
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap />
+      <DefineAreaMap uploadedGeojson={geojsonFile}/>
     </CoreModules.Stack>
   );
 };
