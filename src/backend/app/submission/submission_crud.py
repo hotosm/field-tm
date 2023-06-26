@@ -284,6 +284,8 @@ def download_submission(db: Session, project_id: int, task_id: int, exportJson: 
 
             extracted_files = []
             for file_path in files:
+                print(file_path,'---filepath')
+                print(files,'---files')
                 with zipfile.ZipFile(file_path, "r") as zip_file:
                     zip_file.extractall(
                         os.path.splitext(file_path)[0]
@@ -323,10 +325,14 @@ def download_submission(db: Session, project_id: int, task_id: int, exportJson: 
                     2]
                 file = xform.getSubmissions(
                     odkid, xml_form_id, None, False, True)
-                json_data = json.loads(file)
-                json_data_value = json_data.get('value')
-                if json_data_value:
-                    files.extend(json_data_value)
+                print(file,'----file')
+                if not file:
+                    json_data = None
+                else:
+                    json_data = json.loads(file)
+                    json_data_value = json_data.get('value')
+                    if json_data_value:
+                        files.extend(json_data_value)
         else:
             xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[
                 2]
