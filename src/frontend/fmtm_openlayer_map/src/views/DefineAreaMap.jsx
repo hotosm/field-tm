@@ -41,6 +41,8 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
         //   setConvertedJSON(e.target.result);
         dispatch(CreateProjectActions.SetDividedTaskGeojson(e.target.result));
       };
+    }else{
+      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
     }
   }, [uploadedGeojson]);
 

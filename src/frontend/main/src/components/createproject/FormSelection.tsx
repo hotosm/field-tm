@@ -15,7 +15,7 @@ import LoadingBar from './LoadingBar';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb = null;
 
-const FormSelection: React.FC = () => {
+const FormSelection: React.FC = ({geojsonFile}) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -85,7 +85,7 @@ const FormSelection: React.FC = () => {
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
         },
-        projectDetails?.areaGeojson,
+        geojsonFile,
         values.uploaded_form?.[0],
       ),
     );

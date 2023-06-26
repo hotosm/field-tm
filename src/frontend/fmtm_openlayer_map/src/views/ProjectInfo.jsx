@@ -6,8 +6,9 @@ import environment from "fmtm/environment";
 import {
   fetchConvertToOsmDetails,
   fetchInfoTask,
-  getDownloadProjectBoundary,
+  getDownloadProjectSubmission,
 } from "../api/task";
+import AssetModules from 'fmtm/AssetModules';
 
 const boxStyles = {
   animation: "blink 1s infinite",
@@ -37,12 +38,20 @@ const ProjectInfo = () => {
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
-  const handleDownload = () => {
-    dispatch(
-      getDownloadProjectBoundary(
-        `${environment.baseApiUrl}/submission/download?project_id=${decodedId}`
-      )
-    );
+  const handleDownload = (downloadType) => {
+    if(downloadType === 'csv'){
+      dispatch(
+        getDownloadProjectSubmission(
+          `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&export_json=false`
+        )
+      );
+    }else if(downloadType === 'json'){
+      dispatch(
+        getDownloadProjectSubmission(
+          `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&export_json=true`
+        )
+      );
+    }
   };
 
   const handleConvert = () => {
@@ -79,6 +88,7 @@ const ProjectInfo = () => {
   const projectInfo = CoreModules.useSelector(
     (state) => state.project.projectInfo
   );
+  const downloadSubmissionLoading = CoreModules.useSelector((state)=>state.task.downloadSubmissionLoading)
 
   return (
     <>
@@ -156,14 +166,29 @@ const ProjectInfo = () => {
             >
               Convert
             </CoreModules.Button>
-            <CoreModules.Button
-              variant="outlined"
-              color="error"
-              sx={{ width: "fit-content" }}
-              onClick={handleDownload}
-            >
-              Download
-            </CoreModules.Button>
+            <CoreModules.LoadingButton
+                onClick={()=>handleDownload('csv')}
+                sx={{width:'unset'}}
+                loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
+                loadingPosition="end"
+                endIcon={<AssetModules.FileDownloadIcon />}
+                variant="contained"                            
+                color="error"
+                >
+            
+                CSV
+            </CoreModules.LoadingButton>
+            <CoreModules.LoadingButton
+                onClick={()=>handleDownload('json')}
+                sx={{width:'unset'}}
+                loading={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
+                loadingPosition="end"
+                endIcon={<AssetModules.FileDownloadIcon />}
+                variant="contained"                            
+                color="error"
+                >
+                JSON
+            </CoreModules.LoadingButton>
           </CoreModules.Box>
           <CoreModules.Card>
             {/* <CoreModules.CardContent>
