@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 // import "../../node_modules/ol/ol.css";
 import CoreModules from '../shared/CoreModules';
@@ -12,6 +12,8 @@ import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
 
 const CreateProject: React.FC = () => {
+  const [geojsonFile ,setGeojsonFile]= useState(null);
+  const [inputValue ,setInputValue]= useState(null);
   const dispatch = useDispatch();
   const location = useLocation();
   const boxSX = {
@@ -171,9 +173,9 @@ const CreateProject: React.FC = () => {
         {/* Showing Different Create Project Component When the url pathname changes */}
 
         {location.pathname === '/create-project' ? <ProjectDetailsForm /> : null}
-        {location.pathname === '/upload-area' ? <UploadArea /> : null}
-        {location.pathname === '/define-tasks' ? <DefineTasks /> : null}
-        {location.pathname === '/select-form' ? <FormSelection /> : null}
+        {location.pathname === '/upload-area' ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
+        {location.pathname === '/define-tasks' ? <DefineTasks  geojsonFile={geojsonFile}/> : null}
+        {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} /> : null}
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
       </CoreModules.Stack>
