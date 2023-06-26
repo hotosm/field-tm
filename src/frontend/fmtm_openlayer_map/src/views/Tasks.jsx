@@ -156,7 +156,7 @@ const TasksSubmission = () => {
         }
       };
 
-      const downloadSubmissionLoading = CoreModules.useSelector((state)=>state.task.downloadSubmissionLoading)
+    const downloadSubmissionLoading = CoreModules.useSelector((state)=>state.task.downloadSubmissionLoading)
 
     return (
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
@@ -182,31 +182,31 @@ const TasksSubmission = () => {
                         >
                             Convert
                         </CoreModules.Button>
-                        <a onClick={()=>handleDownload('csv')}>
-                            <CoreModules.LoadingButton
-                                sx={{width:'unset'}}
-                                loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
-                                loadingPosition="end"
-                                endIcon={<AssetModules.FileDownloadIcon />}
-                                variant="contained"                            
-                                color="error"
-                              >
-                            
-                                CSV
-                            </CoreModules.LoadingButton>
-                        </a>
-                        <a onClick={()=>handleDownload('json')}>
-                            <CoreModules.LoadingButton
-                                sx={{width:'unset'}}
-                                loading={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
-                                loadingPosition="end"
-                                endIcon={<AssetModules.FileDownloadIcon />}
-                                variant="contained"                            
-                                color="error"
-                              >
-                                JSON
-                            </CoreModules.LoadingButton>
-                        </a>
+                        <CoreModules.LoadingButton
+                            onClick={()=>handleDownload('csv')}
+                            sx={{width:'unset'}}
+                            loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
+                            loadingPosition="end"
+                            endIcon={<AssetModules.FileDownloadIcon />}
+                            variant="contained"                            
+                            color="error"
+                            >
+                        
+                            CSV
+                        </CoreModules.LoadingButton>
+                
+                    
+                        <CoreModules.LoadingButton
+                            onClick={()=>handleDownload('json')}
+                            sx={{width:'unset'}}
+                            loading={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
+                            loadingPosition="end"
+                            endIcon={<AssetModules.FileDownloadIcon />}
+                            variant="contained"                            
+                            color="error"
+                            >
+                            JSON
+                        </CoreModules.LoadingButton>
 
                         {/* END */}
                     </CoreModules.Stack>
