@@ -118,6 +118,72 @@ const OpenLayersMap = ({
 
         map.addControl(control);
       });
+
+      const MapDetails = [
+        {
+            value: 'Ready',
+            color: defaultTheme.palette.mapFeatureColors.ready,
+            status: 'none'
+        },
+        {
+            value: 'Locked For Mapping',
+            color: defaultTheme.palette.mapFeatureColors.locked_for_mapping,
+            status: 'lock'
+        },
+        {
+            value: 'Locked For Validation',
+            color: defaultTheme.palette.mapFeatureColors.locked_for_validation,
+            status: 'lock'
+        },
+        {
+            value: 'Ready For Validation',
+            color: defaultTheme.palette.mapFeatureColors.mapped,
+            status: 'none'
+        },
+        {
+            value: 'Validated',
+            color: defaultTheme.palette.mapFeatureColors.validated,
+            status: 'none'
+        },
+        {
+            value: 'Bad',
+            color: defaultTheme.palette.mapFeatureColors.bad,
+            status: 'none'
+        },
+        {
+            value: 'More mapping needed',
+            color: defaultTheme.palette.mapFeatureColors.invalidated,
+            status: 'none'
+        }
+    ]
+    let legendContainer = document.createElement("div");
+    legendContainer.className = "legend-container";
+
+
+    // const legendContainer = document.getElementById('legendContainer');
+    MapDetails.forEach((detail) => {
+      const legend = document.createElement('div');
+      legend.className = 'legend';
+
+      const legendText = document.createElement('span');
+      legendText.className = 'legend-text';
+      legendText.textContent = detail.value;
+
+      const legendSquare = document.createElement('div');
+      legendSquare.className = 'legend-square';
+      legendSquare.style.backgroundColor = detail.color;
+
+      legend.appendChild(legendText);
+      legend.appendChild(legendSquare);
+
+      legendContainer.appendChild(legend);
+    });
+
+    var controlx = new Control({
+      element: legendContainer,
+    });
+
+    map.addControl(controlx);
     }
   }, [map]);
 
