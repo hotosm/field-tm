@@ -50,6 +50,20 @@ class TaskHistoryOut(TaskHistoryBase):
     pass
 
 
+class TaskBasicInfo(BaseModel):
+    id: int
+    project_id: int
+    project_task_index: int
+    task_status: TaskStatus
+    locked_by_uid: int = None
+    locked_by_username: str = None
+    task_history: List[TaskHistoryBase]
+
+    class Config:
+        orm_mode = True
+
+
+
 class TaskBase(BaseModel):
     id: int
     project_id: int

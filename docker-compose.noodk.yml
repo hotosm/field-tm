@@ -19,6 +19,7 @@ version: "3"
 
 volumes:
   fmtm_db_data:
+  fmtm_images:
 
 networks:
   fmtm-dev:
@@ -48,6 +49,7 @@ services:
         APP_VERSION: debug
     container_name: fmtm_api
     volumes:
+      - fmtm_images:/opt/app/images
       - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db

@@ -28,6 +28,7 @@ from json import dumps, loads
 from typing import List
 from zipfile import ZipFile
 
+
 import geoalchemy2
 import geojson
 import numpy as np
@@ -60,7 +61,6 @@ from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 
-# from ..osm_fieldwork.make_data_extract import PostgresClient, OverpassClient
 from . import project_schemas
 
 # --------------
@@ -78,13 +78,13 @@ def get_projects(
         db_projects = (
             db.query(db_models.DbProject)
             .filter(db_models.DbProject.author_id == user_id)
+            .order_by(db_models.DbProject.id.asc())
             .offset(skip)
             .limit(limit)
             .all()
         )
     else:
-
-        db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
+        db_projects = db.query(db_models.DbProject).order_by(db_models.DbProject.id.asc()).offset(skip).limit(limit).all()
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
@@ -499,6 +499,156 @@ async def preview_tasks(boundary: str, dimension: int):
     return collection
 
 
+def get_osm_extracts(boundary: str):
+    # Filters for osm extracts
+    query={"filters":{
+            "tags": {
+                "all_geometry": {
+                    "join_or": {
+                        "highway": [],
+                        "waterway":[]     
+                        }
+                    }
+                }
+            },
+            "geometryType": [
+                "polygon",
+                "line",
+                "line"
+            ],
+            "centroid": "false"
+        }
+    query["geometry"] = json.loads(boundary)["features"][0]["geometry"]
+
+    base_url = "https://raw-data-api0.hotosm.org/v1"
+    query_url = f"{base_url}/snapshot/"
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
+
+    import requests
+    import time
+    import zipfile
+    from io import BytesIO
+
+    result = requests.post(query_url, data=json.dumps(query), headers=headers)
+
+    if result.status_code == 200:
+        task_id = result.json()['task_id']
+    else:
+        return False
+
+    task_url = f"{base_url}/tasks/status/{task_id}"
+    # extracts = requests.get(task_url)
+    while True:
+        result = requests.get(task_url, headers=headers)
+        if result.json()['status'] == "PENDING":
+            time.sleep(1)
+        elif result.json()['status'] == "SUCCESS":
+            break
+
+    zip_url = result.json()['result']['download_url']
+    zip_url
+    result = requests.get(zip_url, headers=headers)
+    # result.content
+    fp = BytesIO(result.content)
+    zfp = zipfile.ZipFile(fp, "r")
+    zfp.extract("Export.geojson", "/tmp/")
+    data = eval(zfp.read("Export.geojson"))
+
+    return data
+
+
+async def split_into_tasks(
+    db: Session, project_id: int, boundary: str   
+    ):
+
+    # verify project exists in db
+    db_project = get_project(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    outline = json.loads(boundary)
+
+    """Update the boundary polyon on the database."""
+    boundary_data = outline["features"][0]["geometry"]
+    outline = shape(boundary_data)
+
+    # Update the project outline and centroid in project table.
+    db_project.outline = outline.wkt
+    db_project.centroid = outline.centroid.wkt
+    db.commit()
+    db.refresh(db_project)
+
+    data = get_osm_extracts(boundary)
+
+    for feature in data["features"]:
+        
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature_shape = shape(feature['geometry'])
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+
+        db_feature = db_models.DbOsmLines(
+            project_id=project_id,
+            geometry=wkb_element,
+            properties=feature["properties"]
+        )
+
+        db.add(db_feature)
+        db.commit()
+
+
+    query = f"""    
+        WITH boundary AS (
+        SELECT ST_Boundary(outline) AS geom
+        FROM "projects" WHERE id={project_id}
+        ),
+        splitlines AS (
+        SELECT ST_Intersection(a.outline, l.geometry) AS geom
+        FROM "projects" a, "osm_lines" l
+        WHERE a.id={project_id} and l.project_id={project_id}
+        AND ST_Intersects(a.outline, l.geometry)
+        ),
+        merged AS (
+        SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+        FROM splitlines
+        ),
+        comb AS (
+        SELECT ST_Union(boundary.geom, merged.geom) AS geom
+        FROM boundary, merged
+        ),
+        splitpolysnoindex AS (
+        SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
+        FROM comb
+        )
+        -- Add row numbers to function as temporary unique IDs for our new polygons
+        SELECT row_number () over () as polyid, * 
+        from splitpolysnoindex
+
+        """
+
+    result = db.execute(query)
+    geom_data = result.fetchall()
+
+    for geom in geom_data:
+        # Add tasks in the database
+        db_task = db_models.DbTask(
+            project_id=project_id,
+            outline=geom[1]
+        )
+
+        db.add(db_task)
+        db.commit()
+
+        """ Id is passed in the task_name too. """
+        db_task.project_task_name = str(db_task.id)
+        db.commit()
+
+        print('tasks added to db')
+
+    return True
+
+
 def update_project_boundary(
     db: Session, project_id: int, boundary: str, dimension: int
 ):
@@ -791,16 +941,26 @@ def generate_appuser_files(
     extract_polygon: bool,
     upload: str,
     category: str,
+    form_type: str,
     background_task_id: uuid.UUID,
 ):
     """Generate the files for each appuser.
+        QR code, new XForm, and the OSM data extract.
 
-    QR code, new XForm, and the OSM data extract.
-    """
+        Parameters:
+            - db: the database session
+            - project_id: Project ID
+            - extract_polygon: boolean to determine if we should extract the polygon
+            - upload: the xls file to upload if we have a custom form
+            - category: the category of the project
+            - form_type: weather the form is xls, xlsx or xml
+            - background_task_id: the task_id of the background task running this function.
+        """
+
     try:
         ## Logging ##
         # create file handler
-        handler = logging.FileHandler(f"{project_id}_generate.log")
+        handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
         handler.setLevel(logging.DEBUG)
 
         # create formatter
@@ -872,7 +1032,7 @@ def generate_appuser_files(
             xform_title = one.xform_title if one.xform_title else None
 
             if upload:
-                xlsform = "/tmp/custom_form.xls"
+                xlsform = f"/tmp/custom_form.{form_type}"
                 contents = upload
                 with open(xlsform, "wb") as f:
                     f.write(contents)
@@ -880,6 +1040,8 @@ def generate_appuser_files(
                 xlsform = f"{xlsforms_path}/{xform_title}.xls"
 
             category = xform_title
+
+            print('Category ', category)
 
             # OSM Extracts for whole project
             pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
@@ -924,7 +1086,6 @@ def generate_appuser_files(
             # Bulk insert the osm extracts into the db.
             db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
-
             for poly in result.fetchall():
 
                 name = f"{prefix}_{category}_{poly.id}"
@@ -950,7 +1111,6 @@ def generate_appuser_files(
                 # xform_id_format
                 xform_id = f"{prefix}_{xform_title}_{poly.id}".split("_")[2]
 
-
                 # Get the features for this task.
                 # Postgis query to filter task inside this task outline and of this project
                 # Update those features and set task_id
@@ -965,8 +1125,6 @@ def generate_appuser_files(
                             )'''
 
                 result = db.execute(query)
-
-                
 
                 # Get the geojson of those features for this task.
                 query = f'''SELECT jsonb_build_object(
@@ -1049,7 +1207,7 @@ def generate_appuser_files(
 
         # Update background task status to FAILED
         update_background_task_status_in_database(
-            db, background_task_id, 2
+            db, background_task_id, 2, str(e)
         )  # 2 is FAILED
 
 
@@ -1411,7 +1569,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
         .filter(db_models.BackgroundTasks.id == str(task_id))
         .first()
     )
-    return task.status
+    return task.status, task.message
 
 
 async def insert_background_task_into_database(
@@ -1435,7 +1593,7 @@ async def insert_background_task_into_database(
 
 
 def update_background_task_status_in_database(
-    db: Session, task_id: uuid.UUID, status: int
+    db: Session, task_id: uuid.UUID, status: int, message: str = None
 ):
     """Updates the status of a task in the database
     Params:
@@ -1445,7 +1603,10 @@ def update_background_task_status_in_database(
     """
     db.query(db_models.BackgroundTasks).filter(
         db_models.BackgroundTasks.id == str(task_id)
-    ).update({db_models.BackgroundTasks.status: status})
+    ).update({
+            db_models.BackgroundTasks.status: status,
+            db_models.BackgroundTasks.message: message
+        })
     db.commit()
 
     return True

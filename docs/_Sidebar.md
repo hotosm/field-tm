@@ -4,6 +4,8 @@
 
 [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct)
 
+[User Manual for FMTM](https://github.com/hotosm/fmtm/wiki/User-Manual-For-Project-Managers)
+
 [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution)
 
 [FAQ](https://github.com/hotosm/fmtm/wiki/FAQ)

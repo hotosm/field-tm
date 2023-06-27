@@ -79,7 +79,7 @@ directory. Then add a new entry to the `src/frontend/router.tsx` file.
 To add a new component, create a new .tsx file in the src/frontend/
 components directory.
 
-### Conclusion
+## Conclusion
 
 Running the FMTM project is easy with Docker. You can also run the
 project locally outside of Docker, but it requires more setup. The

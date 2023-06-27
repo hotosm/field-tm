@@ -25,6 +25,9 @@ from ..db import database
 from ..models.enums import TaskStatus
 from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
+from ..projects import project_crud, project_schemas
+from ..central import central_crud
+
 
 router = APIRouter(
     prefix="/tasks",
@@ -33,6 +36,19 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
+@router.get("/task-list", response_model=List[tasks_schemas.TaskOut])
+async def read_task_list(
+    project_id: int,
+    limit: int = 1000,
+    db: Session = Depends(database.get_db),
+    ):
+    tasks = tasks_crud.get_tasks(db, project_id, limit)
+    if tasks:
+        return tasks
+    else:
+        raise HTTPException(status_code=404, detail="Tasks not found")
+    
 
 @router.get("/", response_model=List[tasks_schemas.TaskOut])
 async def read_tasks(
@@ -95,3 +111,41 @@ async def get_qr_code_list(
     db: Session = Depends(database.get_db),
 ):
     return tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
+
+
+@router.get("/tasks-features/")
+async def task_features_count(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+
+    task_list = await tasks_crud.get_task_lists(db, project_id)
+
+    # Get the project object.
+    project = project_crud.get_project(db, project_id)
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
+    data = []
+    for task in task_list:
+        
+        feature_count_query = f"""
+            select count(*) from features where project_id = {project_id} and task_id = {task}
+        """
+        result = db.execute(feature_count_query)
+        feature_count = result.fetchone()
+
+        submission_list = central_crud.list_task_submissions(project.odkid, task, odk_credentials)
+
+        data.append({
+            'task_id': task,
+            'feature_count': feature_count['count'],
+            'submission_count': len(submission_list) if isinstance(submission_list, list) else 0
+        })
+
+    return data

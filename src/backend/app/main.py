@@ -27,14 +27,13 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-from osm_fieldwork.xlsforms import xlsforms_path
+# from ..osm_fieldwork.xlsforms import xlsforms_path
 
 from .__version__ import __version__
 from .auth import auth_routes
 from .central import central_routes
 from .config import settings
 from .db.database import Base, engine, get_db
-from .debug import debug_routes
 from .projects import project_routes
 from .projects.project_crud import read_xlsforms
 from .submission import submission_routes
@@ -125,7 +124,7 @@ async def startup_event():
     Base.metadata.create_all(bind=engine)
 
     # Read in XLSForms
-    read_xlsforms(next(get_db()), xlsforms_path)
+    # read_xlsforms(next(get_db()), xlsforms_path)
 
 
 @api.on_event("shutdown")

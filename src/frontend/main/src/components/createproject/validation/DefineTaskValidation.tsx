@@ -17,6 +17,9 @@ function DefineTaskValidation(values: ProjectValues) {
     if (values?.splitting_algorithm === 'Divide on Square' && !values?.dimension) {
         errors.dimension = 'Dimension is Required.';
     }
+    if (values?.splitting_algorithm === 'Divide on Square' && values?.dimension && values.dimension < 10) {
+        errors.dimension = 'Dimension should be greater than 10.';
+    }
 
 
 

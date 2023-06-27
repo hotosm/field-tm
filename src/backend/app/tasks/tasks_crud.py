@@ -35,9 +35,21 @@ from ..models.enums import (
 from ..tasks import tasks_schemas
 from ..users import user_crud
 
-# --------------
-# ---- CRUD ----
-# --------------
+
+async def get_task_count_in_project(db: Session, project_id: int):
+    query = f"""select count(*) from tasks where project_id = {project_id}"""
+    result = db.execute(query)
+    return result.fetchone()[0]
+
+
+async def get_task_lists(db: Session, project_id: int):
+    """
+    Get a list of tasks for a project
+    """
+    query = f"""select id from tasks where project_id = {project_id}"""
+    result = db.execute(query)
+    tasks = [task[0] for task in result.fetchall()]
+    return tasks
 
 
 def get_tasks(

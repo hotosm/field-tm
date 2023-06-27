@@ -113,6 +113,8 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && chown -R appuser:appuser /opt /home/appuser
+# Add volume for persistent images
+VOLUME /opt/app/images
 
 
 
@@ -133,16 +135,17 @@ FROM debug-no-odk as debug-with-odk
 # Add the SSL cert for debug odkcentral
 USER root
 COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
-    /etc/nginx/ca.crt /etc/nginx/central.crt /usr/local/share/ca-certificates/
+    /etc/nginx/central-fullchain.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 USER appuser
 
 
 
 FROM runtime as prod
+# Pre-compile packages to .pyc (init speed gains)
+RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
+# Change to non-root user after pre-compile
 USER appuser
 # Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "4", "--log-level", "error", "--no-access-log"]
-# Pre-compile packages to .pyc (init speed gains)
-RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"

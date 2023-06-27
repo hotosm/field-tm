@@ -44,6 +44,7 @@ import {
     Breadcrumbs,
     CardMedia,
 } from "@mui/material";
+import {LoadingButton} from "@mui/lab";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { PersistGate } from "redux-persist/integration/react";
@@ -54,6 +55,9 @@ import { useNavigate, useParams, Link, Outlet, RouterProvider,useLocation,create
 import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { combineReducers } from 'redux'
+import LoadingBar from "../components/createproject/LoadingBar";
+import { TaskActions } from "../store/slices/TaskSlice";
+
 export default {
     Provider,
     PersistGate,
@@ -122,5 +126,8 @@ export default {
     Tooltip,
     Breadcrumbs,
     CardMedia,
+    LoadingBar,
+    TaskActions,
+    LoadingButton,
     
 }

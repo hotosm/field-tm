@@ -4,7 +4,7 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
-        projectDetails: {},
+        projectDetails: { dimension: 50 },
         projectDetailsResponse: null,
         projectDetailsLoading: false,
         projectArea: null,
