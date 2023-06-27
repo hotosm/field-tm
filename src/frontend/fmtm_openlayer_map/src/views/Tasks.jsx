@@ -144,13 +144,13 @@ const TasksSubmission = () => {
         if(downloadType === 'csv'){
           dispatch(
             getDownloadProjectSubmission(
-              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&export_json=false`
+              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=false`
             )
           );
         }else if(downloadType === 'json'){
           dispatch(
             getDownloadProjectSubmission(
-              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&export_json=true`
+              `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=true`
             )
           );
         }
