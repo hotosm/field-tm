@@ -128,3 +128,13 @@ button {
   height: 20px;
   background-color: red;
 }
+
+.submission-item{
+  text-decoration: none;
+  
+}
+.submission-item:hover{
+  background-color: rgba(215, 63, 62, 0.04);
+  border: 1px solid #d73f3e;
+  border-radius: 10px;
+}
