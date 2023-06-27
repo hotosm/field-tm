@@ -78,13 +78,13 @@ def get_projects(
         db_projects = (
             db.query(db_models.DbProject)
             .filter(db_models.DbProject.author_id == user_id)
+            .order_by(db_models.DbProject.id.asc())
             .offset(skip)
             .limit(limit)
             .all()
         )
     else:
-
-        db_projects = db.query(db_models.DbProject).offset(skip).limit(limit).all()
+        db_projects = db.query(db_models.DbProject).order_by(db_models.DbProject.id.asc()).offset(skip).limit(limit).all()
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
