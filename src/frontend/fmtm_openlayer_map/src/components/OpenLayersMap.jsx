@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import IconButtonCard from "../utilities/IconButtonCard";
-import BasicDialog from "../utilities/BasicDialog";
 import DialogTaskActions from "../components/DialogTaskActions";
 import "../styles/home.scss";
-import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
-import AssetModules from "fmtm/AssetModules";
 import Control from "ol/control/Control";
 import locationImg from "../assets/images/location.png";
+import accDownImg from "../assets/images/acc-down.png";
+import accUpImg from "../assets/images/acc-up.png";
 import gridIcon from "../assets/images/grid.png";
 import QrcodeComponent from "./QrcodeComponent";
 const OpenLayersMap = ({
@@ -158,9 +156,36 @@ const OpenLayersMap = ({
     ]
     let legendContainer = document.createElement("div");
     legendContainer.className = "legend-container";
+    const legendLabel = document.createElement('span');
+    legendLabel.innerHTML= 'Legend';
+    const legendAccIcon = document.createElement('span');
+    legendAccIcon.className = "legend-acc-icon";
+    let img = document.createElement("img");
+    img.src = accDownImg;
+    img.style.width = '24px';
+    img.style.height = '24px';
+    img.style.display = 'none';
+    let accUp = document.createElement("img");
+    accUp.src = accUpImg;
+    accUp.style.width = '18px';
+    accUp.style.height = '18px';
+    // accUp.style.display = 'none';
+    // img.id = `${elmnt}`;
+    // legendAccIcon.addEventListener("click", function(){
 
-
+    // }, false);
+    legendAccIcon.appendChild(img);
+    legendAccIcon.appendChild(accUp);
+    legendContainer.appendChild(legendLabel)
+    legendContainer.appendChild(legendAccIcon)
+    
+    
+    
     // const legendContainer = document.getElementById('legendContainer');
+    let legendContent = document.createElement("div");
+    legendContent.className = "legend-content";
+    legendContent.style.display = "none";
+    legendContainer.style.margin = '552px 6px';
     MapDetails.forEach((detail) => {
       const legend = document.createElement('div');
       legend.className = 'legend';
@@ -176,9 +201,23 @@ const OpenLayersMap = ({
       legend.appendChild(legendText);
       legend.appendChild(legendSquare);
 
-      legendContainer.appendChild(legend);
+      legendContent.appendChild(legend);
     });
-
+    legendContainer.appendChild(legendContent);
+    // Add event listener to toggle the accordion content
+    legendAccIcon.addEventListener('click', function() {
+      if (legendContent.style.display === 'none') {
+        accUp.style.display="none";
+        img.style.display="inline";
+        legendContent.style.display = 'block';
+        legendContainer.style.margin = '250px 10px';
+      } else {
+        img.style.display="none";
+        accUp.style.display="inline";
+        legendContent.style.display = 'none';
+        legendContainer.style.margin = '552px 6px';
+      }
+    });
     var controlx = new Control({
       element: legendContainer,
     });

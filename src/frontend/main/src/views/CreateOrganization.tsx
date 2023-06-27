@@ -208,19 +208,9 @@ const CreateOrganizationForm = () => {
                     },
                   }}
                 >
-                  Choose Logo
+                  Upload Logo
                 </CoreModules.FormLabel>
-                <CoreModules.FormLabel
-                  component="h3"
-                  sx={{
-                    color: 'red',
-                    '&.Mui-focused': {
-                      color: 'red',
-                    },
-                  }}
-                >
-                  *
-                </CoreModules.FormLabel>
+                
               </CoreModules.Box>
               <CoreModules.Button variant="contained" component="span">
                 <CoreModules.Input
