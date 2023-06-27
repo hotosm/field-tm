@@ -420,7 +420,7 @@ async def generate_files(
         extract_polygon,
         contents,
         xform_title,
-        file_ext[1:],
+        file_ext[1:] if upload else 'xls',
         background_task_id,
     )
 
