@@ -69,7 +69,7 @@ const TasksLayer = (map, view, feature) => {
 
                 map.getView().fit(extent, {
                     duration: 2000, // Animation duration in milliseconds
-                    padding: [50, 50, 50, 50], // Optional padding around the extent
+                    padding: [50, 50, 50, 200], // Optional padding around the extent
                 })
 
 
