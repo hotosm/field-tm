@@ -379,7 +379,7 @@ def create_qrcode(project_id: int, token: str, name: str, odk_credentials: dict 
         "general": {
             "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
             "form_update_mode": "match_exactly",
-            "basemap_source": "MapBox",
+            "basemap_source": "osm",
             "autosend": "wifi_and_cellular",
         },
         "project": {"name": f"{name}"},
