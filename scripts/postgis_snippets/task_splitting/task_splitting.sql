@@ -217,9 +217,9 @@ select * from hulls
 -- Aggregate the points by the unique ids of the clusters so that the next
 -- step (Voronoi polygons) can treat each cluster as a discrete dataset
 ,dumpedpointsuid as (
-SELECT dp.clusteruid, dp.geom
-FROM dumpedpoints dp
-GROUP by dp. geom, dp.clusteruid
+  SELECT dp.clusteruid, dp.geom
+  FROM dumpedpoints dp
+  GROUP by dp.geom, dp.clusteruid
 )
 
 -- Generate a set of voronoi polygons for each splitpolygon, so that the
