@@ -1,12 +1,12 @@
 import { Vector as VectorLayer } from 'ol/layer.js';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source.js';
-import { easeOut } from 'ol/easing';
 import { useEffect } from 'react';
 import { geojsonObjectModel } from '../models/geojsonObjectModel';
 import MapStyles from '../hooks/MapStyles';
 import environment from "fmtm/environment";
 import CoreModules from 'fmtm/CoreModules';
+import { get } from 'ol/proj';
 
 const TasksLayer = (map, view, feature) => {
     const params = CoreModules.useParams();
@@ -39,8 +39,9 @@ const TasksLayer = (map, view, feature) => {
                 })
 
                 const vectorSource = new VectorSource({
-                    features: new GeoJSON().readFeatures(geojsonObject),
-
+                    features: new GeoJSON().readFeatures(geojsonObject,{        
+                        featureProjection: get("EPSG:3857")
+                    }),
                 });
 
                 const vectorLayer = new VectorLayer({
