@@ -14,26 +14,26 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
         </CoreModules.Typography>
       ),
     },
-    {
-      value: "Instructions",
-      element: (
-        <CoreModules.Typography align="center">
-          {state.projectInfo.location_str}
-        </CoreModules.Typography>
-      ),
-    },
-    {
-      value: "Legends",
-      element: (
-        <MapLegends
-          direction={"column"}
-          defaultTheme={defaultTheme}
-          spacing={1}
-          iconBtnProps={{ disabled: true }}
-          valueStatus
-        />
-      ),
-    },
+    // {
+    //   value: "Instructions",
+    //   element: (
+    //     <CoreModules.Typography align="center">
+    //       {state.projectInfo.location_str}
+    //     </CoreModules.Typography>
+    //   ),
+    // },
+    // {
+    //   value: "Legends",
+    //   element: (
+    //     <MapLegends
+    //       direction={"column"}
+    //       defaultTheme={defaultTheme}
+    //       spacing={1}
+    //       iconBtnProps={{ disabled: true }}
+    //       valueStatus
+    //     />
+    //   ),
+    // },
   ];
   return (
     <CoreModules.Stack

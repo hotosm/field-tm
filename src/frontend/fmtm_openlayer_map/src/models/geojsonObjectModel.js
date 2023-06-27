@@ -3,7 +3,7 @@ export const geojsonObjectModel = {
     'SRID': {
         'type': 'name',
         'properties': {
-            'name': 'EPSG:4326',
+            'name': 'EPSG:3857',
         },
     },
     'features': []

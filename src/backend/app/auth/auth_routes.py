@@ -72,7 +72,8 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     """
     access_token = osm_auth.callback(str(request.url))
     log.debug(f"Access token returned: {access_token}")
-    return JSONResponse(content=access_token, status_code=200)
+    print(access_token, 'access_token')
+    return JSONResponse(content={"access_token": access_token}, status_code=200)
 
 
 @router.get("/me/", response_model=AuthUser)
@@ -84,4 +85,6 @@ def my_data(user_data: AuthUser = Depends(login_required)):
 
     Returns: user_data
     """
-    return user_data
+    print(user_data, 'user_data')
+    return JSONResponse(content={"user_data": user_data}, status_code=200)
+    # return user_data

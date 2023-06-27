@@ -1,10 +1,16 @@
 # Access the database (psql)
 
-Option #1 (when running the database in Docker):
+**Option 1** (when the docker container is running) use this command to access it through the local psql using the below command:
+
+    `psql -d fmtm -U fmtm -h localhost`
+
+**Option 2** (when running the database in Docker) use this command to access the
+PostgreSQL shell inside the fmtm-db-1 container and interact with the fmtm database 
+using the psql command-line interface:
 
     `docker exec -it fmtm-db-1 psql -U fmtm fmtm`
 
-And then connect to the database
+And then connect to the database using this command : 
 
     `\c fmtm`
 

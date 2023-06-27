@@ -16,6 +16,8 @@ export const ProjectById = (url, existingProjectList) => {
             outline_geojson: data.outline_geojson,
             outline_centroid: data.outline_centroid,
             task_history: data.task_history,
+            locked_by_uid:data.locked_by_uid,
+            locked_by_username:data.locked_by_username,
           };
         });
 
