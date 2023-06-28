@@ -69,6 +69,10 @@ const CreateProject = CoreModules.createSlice({
                 state.generateQrSuccess = action.payload
             }
         },
+        SetGenerateProjectQRSuccess(state, action) {
+            state.generateQrSuccess = action.payload
+            
+        },
         GenerateProjectLogLoading(state, action) {
             state.generateProjectLogLoading = action.payload
         },
