@@ -258,7 +258,7 @@ const GenerateProjectLog: Function = (url: string, params: any) => {
 const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
-        dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(true))
+        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true))
 
         const getDividedTaskFromGeojson = async (url, payload) => {
             try {
@@ -268,9 +268,11 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
                 const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData)
                 const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
                 dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             } catch (error) {
-                dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(false));
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             }
         }
 

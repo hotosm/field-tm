@@ -1,6 +1,7 @@
 import React from 'react';
 import enviroment from '../../environment';
 import CoreModules from '../../shared/CoreModules';
+import AssetModules from '../../shared/AssetModules.js';
 import FormGroup from '@mui/material/FormGroup';
 import { GetDividedTaskFromGeojson } from '../../api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
@@ -64,14 +65,10 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
   const parsedTaskGeojsonCount =
   dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
-  // const filteredAlgorithmListData = algorithmListData?.filter((algo) => parsedTaskGeojsonCount > 1 ? algo.label === 'Choose Area as Tasks' : algo);
-  console.log(dividedTaskGeojson,'dividedTaskGeojson');
   const algorithmListData =alogrithmList;
-  // const algorithmListData = alogrithmList.filter((algorithm)=> {
-  //   console.log(dividedTaskGeojson?.features?.length,'dividedTaskGeojson?.features?.length');
-    
-  //   return parsedTaskGeojsonCount>1 ? algorithm.label === 'Choose Area as Tasks':algorithm;
-  // });
+  const dividedTaskLoading = CoreModules.useSelector((state) => state.createproject.dividedTaskLoading);
+
+
   return (
     <CoreModules.Stack
       sx={{
@@ -168,9 +165,19 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
                     </CoreModules.FormLabel>
                   )}
                 </CoreModules.Stack>
-                <CoreModules.Button variant="contained" color="error" onClick={generateTasksOnMap}>
-                  Generate Tasks
-                </CoreModules.Button>
+                <CoreModules.LoadingButton
+                    disabled={formValues?.dimension < 50}
+                    onClick={generateTasksOnMap}
+                    loading={dividedTaskLoading}
+                    loadingPosition="end"
+                    endIcon={<AssetModules.SettingsSuggestIcon />}
+                    variant="contained"                            
+                    color="error"
+                    >
+                
+                Generate Tasks
+                </CoreModules.LoadingButton>
+               
               </CoreModules.Stack>
             </CoreModules.FormControl>
           )}
