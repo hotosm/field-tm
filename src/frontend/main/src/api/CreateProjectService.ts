@@ -35,10 +35,12 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload));
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
 
             } catch (error) {
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
                 // Added Snackbar toast for error message 
                 dispatch(
@@ -51,6 +53,9 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 //END
                 dispatch(CreateProjectActions.CreateProjectLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.CreateProjectLoading(false))
+
             }
         }
 

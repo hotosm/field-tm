@@ -15,7 +15,7 @@ import LoadingBar from './LoadingBar';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb = null;
 
-const FormSelection: React.FC = ({ geojsonFile }) => {
+const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile, customFormInputValue, setCustomFormInputValue }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -49,6 +49,8 @@ const FormSelection: React.FC = ({ geojsonFile }) => {
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
   const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
+  // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
+  const projectDetailsLoading = CoreModules.useSelector((state) => state.createproject.projectDetailsLoading);
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
 
   // Fetching form category list
@@ -86,7 +88,7 @@ const FormSelection: React.FC = ({ geojsonFile }) => {
           data_extractWays: projectDetails.data_extractWays,
         },
         geojsonFile,
-        values.uploaded_form?.[0],
+        customFormFile,
       ),
     );
     // navigate("/select-form", { replace: true, state: { values: values } });
@@ -330,17 +332,9 @@ const FormSelection: React.FC = ({ geojsonFile }) => {
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
+                      value={customFormInputValue}
                       onChange={(e) => {
-                        handleCustomChange('uploaded_form', e.target.files);
-                        dispatch(
-                          CreateProjectActions.SetIndividualProjectDetailsData({
-                            ...projectDetails,
-                            uploaded_form: e.target.files[0],
-                            uploadedFormFileName: e.target.files[0].name,
-                          }),
-                        );
-
-                        // setFormFileUpload(e.target.files)
+                        setCustomFormFile(e.target.files[0]);
                       }}
                     />
                   </CoreModules.Button>
@@ -405,16 +399,19 @@ const FormSelection: React.FC = ({ geojsonFile }) => {
             {/* END */}
 
             {/* Submit Button For Create Project on Area Upload */}
-            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <CoreModules.Button
-                sx={{ px: '20px' }}
-                variant="contained"
-                color="error"
-                type="submit"
-                // disabled={!fileUpload ? true : false}
+            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}> 
+            <CoreModules.LoadingButton
+              disabled={projectDetailsLoading}               
+              type="submit"
+              loading={projectDetailsLoading}
+              loadingPosition="end"
+              endIcon={<AssetModules.SettingsSuggestIcon />}
+              variant="contained"                            
+              color="error"
               >
                 Submit
-              </CoreModules.Button>
+              </CoreModules.LoadingButton>
+              
             </CoreModules.Stack>
             {/* END */}
           </CoreModules.Stack>
