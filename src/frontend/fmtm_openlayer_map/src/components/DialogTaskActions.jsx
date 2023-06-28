@@ -125,7 +125,7 @@ export default function Dialog({ taskId, feature, map, view }) {
           // key={index}
           variant="contained"
           color="error"
-          onClick={handleOnClick}
+          // onClick={handleOnClick}
           // disabled={loading} 
         >
           Task Submission

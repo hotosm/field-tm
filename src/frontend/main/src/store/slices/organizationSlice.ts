@@ -3,6 +3,7 @@ import CoreModules from "../../shared/CoreModules.js"
 const OrganizationSlice = CoreModules.createSlice({
     name: 'organization',
     initialState: {
+        organizationFormData:{},
         organizationData: [],
         postOrganizationData: null,
         organizationDataLoading: false,
@@ -20,6 +21,9 @@ const OrganizationSlice = CoreModules.createSlice({
         },
         PostOrganizationDataLoading(state, action) {
             state.postOrganizationDataLoading = action.payload
+        },
+        SetOrganizationFormData(state, action) {
+            state.organizationFormData = action.payload
         },
     }
 })

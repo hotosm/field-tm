@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux';
 
 const CreateProject: React.FC = () => {
   const [geojsonFile ,setGeojsonFile]= useState(null);
+  const [customFormFile ,setCustomFormFile]= useState(null);
+  const [customFormInputValue ,setCustomFormInputValue]= useState(null);
   const [inputValue ,setInputValue]= useState(null);
   const dispatch = useDispatch();
   const location = useLocation();
@@ -25,6 +27,7 @@ const CreateProject: React.FC = () => {
 
     return () => {
       dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
+      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
     }
   }, [])
 
@@ -175,7 +178,7 @@ const CreateProject: React.FC = () => {
         {location.pathname === '/create-project' ? <ProjectDetailsForm /> : null}
         {location.pathname === '/upload-area' ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
         {location.pathname === '/define-tasks' ? <DefineTasks  geojsonFile={geojsonFile}/> : null}
-        {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} /> : null}
+        {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} customFormFile={customFormFile} setCustomFormFile={setCustomFormFile} customFormInputValue={customFormInputValue} setCustomFormInputValue={setCustomFormInputValue} /> : null }
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
       </CoreModules.Stack>
