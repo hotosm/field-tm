@@ -35,10 +35,12 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload));
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
 
             } catch (error) {
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
                 // Added Snackbar toast for error message 
                 dispatch(
@@ -51,6 +53,9 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 //END
                 dispatch(CreateProjectActions.CreateProjectLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.CreateProjectLoading(false))
+
             }
         }
 
@@ -258,7 +263,7 @@ const GenerateProjectLog: Function = (url: string, params: any) => {
 const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
-        dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(true))
+        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true))
 
         const getDividedTaskFromGeojson = async (url, payload) => {
             try {
@@ -268,9 +273,11 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
                 const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData)
                 const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
                 dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             } catch (error) {
-                dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(false));
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             }
         }
 

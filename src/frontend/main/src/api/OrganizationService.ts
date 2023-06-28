@@ -65,6 +65,8 @@ export const PostOrganizationDataService = (url: string, payload: PostOrganizati
         dispatch(OrganizationAction.PostOrganizationDataLoading(true));
 
         const postOrganizationData = async (url, payload) => {
+            dispatch(OrganizationAction.SetOrganizationFormData(payload))
+
             try {
                 const generateApiFormData = new FormData();
                 appendObjectToFormData(generateApiFormData, payload);
@@ -91,7 +93,16 @@ export const PostOrganizationDataService = (url: string, payload: PostOrganizati
                     })
                 );
             } catch (error) {
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: error.response.data.detail,
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
                 dispatch(OrganizationAction.PostOrganizationDataLoading(false))
+
             }
         };
 
