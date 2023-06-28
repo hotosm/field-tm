@@ -15,7 +15,7 @@ import LoadingBar from './LoadingBar';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb = null;
 
-const FormSelection: React.FC = ({geojsonFile}) => {
+const FormSelection: React.FC = ({ geojsonFile }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -168,15 +168,15 @@ const FormSelection: React.FC = ({geojsonFile}) => {
     SelectFormValidation,
   );
   const parsedTaskGeojsonCount =
-    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length || projectDetails?.areaGeojson?.features?.length;
+    dividedTaskGeojson?.features?.length ||
+    JSON?.parse(dividedTaskGeojson)?.features?.length ||
+    projectDetails?.areaGeojson?.features?.length;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   return (
     <CoreModules.Stack
       sx={{
-        width: { xs: '95%', md: '80%' },
-        display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
+        width: { xs: '100%', md: '80%' },
         justifyContent: 'space-between',
         gap: '4rem',
         marginLeft: { md: '215px !important' },
@@ -185,8 +185,12 @@ const FormSelection: React.FC = ({geojsonFile}) => {
     >
       <form onSubmit={handleSubmit}>
         <FormGroup>
-          <Grid container spacing={5}>
-            <Grid item xs={40} md={40} sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Grid
+            container
+            spacing={{ xs: 2, md: 10 }}
+            sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}
+          >
+            <Grid item xs={16} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
               <CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
@@ -301,7 +305,7 @@ const FormSelection: React.FC = ({geojsonFile}) => {
                       }),
                     );
                   }}
-                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
+                  // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
                   {selectFormWays?.map((form) => (
                     <MenuItem value={form.value}>{form.label}</MenuItem>
@@ -348,14 +352,14 @@ const FormSelection: React.FC = ({geojsonFile}) => {
                 </>
               ) : null}
             </Grid>
-            <Grid item xs={8}>
+            <Grid item md={8}>
               <CoreModules.Stack>
                 {generateProjectLog ? (
-                  <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: '60%', pb: '2rem' }}>
+                  <CoreModules.Stack
+                    sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: { xs: '100%', md: '60%' }, pb: '2rem' }}
+                  >
                     <LoadingBar
                       title={'Task Progress'}
-                      // steps={totalSteps}
-                      // activeStep={10}
                       activeStep={generateProjectLog.progress}
                       totalSteps={totalSteps}
                     />
@@ -407,7 +411,7 @@ const FormSelection: React.FC = ({geojsonFile}) => {
                 variant="contained"
                 color="error"
                 type="submit"
-              // disabled={!fileUpload ? true : false}
+                // disabled={!fileUpload ? true : false}
               >
                 Submit
               </CoreModules.Button>
