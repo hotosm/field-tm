@@ -370,6 +370,7 @@ async def generate_files(
     project_id: int,
     extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
+    data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
     """Generate required media files tasks in the project based on the provided params.
@@ -405,6 +406,14 @@ async def generate_files(
         xform_title = file_name[0]
         contents = await upload.read()
 
+    if data_extracts:
+        # Validating for .geojson File.
+        data_extracts_file_name = os.path.splitext(data_extracts.filename)
+        extracts_file_ext = data_extracts_file_name[1]
+        if extracts_file_ext != '.geojson':
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+        extracts_contents = await data_extracts.read()
+
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
 
@@ -419,6 +428,7 @@ async def generate_files(
         project_id,
         extract_polygon,
         contents,
+        extracts_contents if data_extracts else None,
         xform_title,
         file_ext[1:] if upload else 'xls',
         background_task_id,
