@@ -977,6 +977,7 @@ def generate_appuser_files(
     project_id: int,
     extract_polygon: bool,
     upload: str,
+    extracts_contents: str,
     category: str,
     form_type: str,
     background_task_id: uuid.UUID,
@@ -1078,50 +1079,53 @@ def generate_appuser_files(
 
             category = xform_title
 
-            print('Category ', category)
+            if extracts_contents is not None:
+                upload_custom_data_extracts(db, project_id, extracts_contents)
 
-            # OSM Extracts for whole project
-            pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
-            outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
+            else:
 
-            outline = eval(one.outline)
-            outline_geojson = pg.getFeatures(boundary = outline, 
-                                                filespec = outfile,
-                                                polygon = extract_polygon,
-                                                xlsfile = f'{category}.xls',
-                                                category = category
-                                                )
+                # OSM Extracts for whole project
+                pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+                outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
 
-            updated_outline_geojson = {
-                "type": "FeatureCollection",
-                "features": []}
+                outline = eval(one.outline)
+                outline_geojson = pg.getFeatures(boundary = outline, 
+                                                    filespec = outfile,
+                                                    polygon = extract_polygon,
+                                                    xlsfile = f'{category}.xls',
+                                                    category = category
+                                                    )
 
-            # Collect feature mappings for bulk insert
-            feature_mappings = []
+                updated_outline_geojson = {
+                    "type": "FeatureCollection",
+                    "features": []}
 
-            for feature in outline_geojson["features"]:
-                
-                # If the osm extracts contents do not have a title, provide an empty text for that.
-                feature["properties"]["title"] = ""
+                # Collect feature mappings for bulk insert
+                feature_mappings = []
 
-                feature_shape = shape(feature['geometry'])
+                for feature in outline_geojson["features"]:
+                    
+                    # If the osm extracts contents do not have a title, provide an empty text for that.
+                    feature["properties"]["title"] = ""
 
-                # If the centroid of the Polygon is not inside the outline, skip the feature.
-                if extract_polygon and (not shape(outline).contains(shape(feature_shape.centroid))):
-                    continue
+                    feature_shape = shape(feature['geometry'])
 
-                wkb_element = from_shape(feature_shape, srid=4326)
-                feature_mapping = {
-                    'project_id': project_id,
-                    'category_title': category,
-                    'geometry': wkb_element,
-                    'properties': feature["properties"],
-                }
-                updated_outline_geojson['features'].append(feature)
-                feature_mappings.append(feature_mapping)
+                    # If the centroid of the Polygon is not inside the outline, skip the feature.
+                    if extract_polygon and (not shape(outline).contains(shape(feature_shape.centroid))):
+                        continue
 
-            # Bulk insert the osm extracts into the db.
-            db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
+                    wkb_element = from_shape(feature_shape, srid=4326)
+                    feature_mapping = {
+                        'project_id': project_id,
+                        'category_title': category,
+                        'geometry': wkb_element,
+                        'properties': feature["properties"],
+                    }
+                    updated_outline_geojson['features'].append(feature)
+                    feature_mappings.append(feature_mapping)
+
+                # Bulk insert the osm extracts into the db.
+                db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
             for poly in result.fetchall():
 
