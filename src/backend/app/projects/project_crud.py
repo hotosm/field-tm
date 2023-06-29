@@ -42,13 +42,14 @@ from geojson import dump
 from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
-from shapely import wkt
+from shapely import wkt,wkb
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import (
     column,
     inspect,
     select,
     table,
+    func,
 )
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -933,6 +934,42 @@ def get_odk_id_for_project(db: Session, project_id: int):
         return False
     project_info = result.first()
     return project_info.odkid
+
+
+def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
+    project = get_project(db, project_id)
+
+    if not project:
+        raise HTTPException(
+            status_code=404, detail="Project not found")
+
+    project_geojson = json.loads(db.query(func.ST_AsGeoJSON(project.outline)).scalar())
+
+    features_data = json.loads(contents)
+
+    for feature in features_data["features"]:
+
+        feature_shape = shape(feature['geometry'])
+
+        if not (shape(project_geojson).contains(feature_shape)):
+            continue
+
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature["properties"]["title"] = ""
+
+        feature_shape = shape(feature['geometry'])
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+        feature_mapping = {
+            'project_id': project_id,
+            'geometry': wkb_element,
+            'properties': feature["properties"],
+        }
+        featuree = db_models.DbFeatures(**feature_mapping)
+        db.add(featuree)
+        db.commit()
+
+    return True
 
 
 def generate_appuser_files(
