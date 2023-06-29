@@ -18,7 +18,7 @@ const basicGeojsonTemplate = {
   type: "FeatureCollection",
   features: [],
 };
-const DefineAreaMap = ({ uploadedGeojson }) => {
+const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile }) => {
   const dispatch = CoreModules.useDispatch();
   const dividedTaskGeojson = CoreModules.useSelector(
     (state) => state.createproject.dividedTaskGeojson
@@ -30,7 +30,10 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
     zoom: 4,
     maxZoom: 25,
   });
-  // const formattedGeojson =
+
+  
+  
+
   useEffect(() => {
     console.log(uploadedGeojson, 'uploadedGeojson')
     if (uploadedGeojson) {
@@ -45,7 +48,7 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
       dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
     }
   }, [uploadedGeojson]);
-
+  
   return (
     <div className="map-container" style={{ height: "600px", width: "100%" }}>
       <MapComponent
@@ -77,6 +80,19 @@ const DefineAreaMap = ({ uploadedGeojson }) => {
               // duration: 900,
               constrainResolution: true,
               duration: 2000,
+            }}
+            onModify={(modifiedGeojson)=>{
+              console.log(JSON.parse(modifiedGeojson));
+              const parsedJSON = JSON.parse(modifiedGeojson)
+              // dispatch(CreateProjectActions.SetDividedTaskGeojson(parsedJSON));
+              // Convert GeoJSON to a JSON string
+              // var jsonString = JSON.stringify(geoJSONData);
+
+              var f = new File([modifiedGeojson], "AOI.geojson", {type: "application/geo+json" })
+              console.log(f,'file F');
+              setGeojsonFile(f);
+
+
             }}
             zoomToLayer
           />
