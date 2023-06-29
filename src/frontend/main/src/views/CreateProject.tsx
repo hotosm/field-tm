@@ -176,7 +176,7 @@ const CreateProject: React.FC = () => {
 
         {location.pathname === '/create-project' ? <ProjectDetailsForm /> : null}
         {location.pathname === '/upload-area' ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
-        {location.pathname === '/define-tasks' ? <DefineTasks  geojsonFile={geojsonFile}/> : null}
+        {location.pathname === '/define-tasks' ? <DefineTasks  geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile}/> : null}
         {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} customFormFile={customFormFile} setCustomFormFile={setCustomFormFile} customFormInputValue={customFormInputValue} setCustomFormInputValue={setCustomFormInputValue} /> : null }
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}

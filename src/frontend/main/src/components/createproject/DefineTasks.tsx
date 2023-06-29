@@ -14,7 +14,7 @@ import DefineTaskValidation from './validation/DefineTaskValidation';
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 const alogrithmList = [{id:1,value:'Divide on Square',label:'Divide on Square'}, {id:2,value:'Choose Area as Tasks',label:'Choose Area as Tasks'}];
-const DefineTasks: React.FC = ({geojsonFile}) => {
+const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
@@ -141,7 +141,7 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
                     id="dimension"
                     label=""
                     type="number"
-                    min="10"
+                    min="9"
                     inputProps={{ sx: { padding: '8.5px 14px' } }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
@@ -156,7 +156,7 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
                     }}
                     // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'dimension', value: e.target.value }))}
                     // helperText={errors.username}
-                    InputProps={{ inputProps: { min: 50 } }}
+                    InputProps={{ inputProps: { min: 9 } }}
                     FormHelperTextProps={inputFormStyles()}
                   />
                   {errors.dimension && (
@@ -166,7 +166,7 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
                   )}
                 </CoreModules.Stack>
                 <CoreModules.LoadingButton
-                    disabled={formValues?.dimension < 50}
+                    disabled={formValues?.dimension < 10}
                     onClick={generateTasksOnMap}
                     loading={dividedTaskLoading}
                     loadingPosition="end"
@@ -210,7 +210,7 @@ const DefineTasks: React.FC = ({geojsonFile}) => {
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap uploadedGeojson={geojsonFile}/>
+      <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile}/>
     </CoreModules.Stack>
   );
 };

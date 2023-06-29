@@ -23,7 +23,8 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 } else if (payload.splitting_algorithm === 'Use natural Boundary') {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/task_split/${resp.id}/`, fileUpload));
                 } else {
-                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
+                    // await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
                 }
                 dispatch(
                     CommonActions.SetSnackBar({
