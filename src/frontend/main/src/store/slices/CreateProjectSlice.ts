@@ -4,7 +4,7 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
-        projectDetails: { dimension: 50 },
+        projectDetails: { dimension: 10 },
         projectDetailsResponse: null,
         projectDetailsLoading: false,
         projectArea: null,
@@ -69,6 +69,10 @@ const CreateProject = CoreModules.createSlice({
                 state.generateQrSuccess = action.payload
             }
         },
+        SetGenerateProjectQRSuccess(state, action) {
+            state.generateQrSuccess = action.payload
+            
+        },
         GenerateProjectLogLoading(state, action) {
             state.generateProjectLogLoading = action.payload
         },
@@ -83,6 +87,9 @@ const CreateProject = CoreModules.createSlice({
         },
         SetDividedTaskGeojson(state, action) {
             state.dividedTaskGeojson = action.payload
+        },
+        SetDividedTaskFromGeojsonLoading(state, action) {
+            state.dividedTaskLoading = action.payload
         },
     }
 })

@@ -10,6 +10,7 @@ const TaskSlice = createSlice({
         projectBoundary: [],
         convertToOsmLoading: null,
         convertToOsm: [],
+        downloadSubmissionLoading:{type:'',loading:false}
     },
     reducers: {
         SetTaskLoading(state, action) {
@@ -33,6 +34,9 @@ const TaskSlice = createSlice({
         },
         FetchConvertToOsm(state, action) {
             state.convertToOsm = action.payload;
+        },
+        GetDownloadProjectSubmissionLoading(state, action) {
+            state.downloadSubmissionLoading = action.payload;
         }
     },
 })

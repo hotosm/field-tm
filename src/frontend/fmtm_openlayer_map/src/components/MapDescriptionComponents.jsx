@@ -22,18 +22,18 @@ const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
     //     </CoreModules.Typography>
     //   ),
     // },
-    {
-      value: "Legends",
-      element: (
-        <MapLegends
-          direction={"column"}
-          defaultTheme={defaultTheme}
-          spacing={1}
-          iconBtnProps={{ disabled: true }}
-          valueStatus
-        />
-      ),
-    },
+    // {
+    //   value: "Legends",
+    //   element: (
+    //     <MapLegends
+    //       direction={"column"}
+    //       defaultTheme={defaultTheme}
+    //       spacing={1}
+    //       iconBtnProps={{ disabled: true }}
+    //       valueStatus
+    //     />
+    //   ),
+    // },
   ];
   return (
     <CoreModules.Stack

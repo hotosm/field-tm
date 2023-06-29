@@ -1,6 +1,5 @@
 import CoreModules from "fmtm/CoreModules";
 import { CommonActions } from "fmtm/CommonSlice";
-import { fectchConvertToOsmDetail } from './task';
 
 
 export const fetchInfoTask: Function = (url: string) => {
@@ -23,32 +22,31 @@ export const fetchInfoTask: Function = (url: string) => {
 }
 
 
-export const getDownloadProjectBoundary : Function = (url: string, ) => {
+export const getDownloadProjectSubmission : Function = (url: string, ) => {
 
     return async (dispatch) => {
-        dispatch(CoreModules.TaskActions.GetProjectBoundaryLoading(true))
-        const getProjectBoundaryDetails = async (url: string) => {
+        const params = new URLSearchParams(url.split('?')[1])
+        const isExportJson=params.get('export_json');
+        const isJsonOrCsv = isExportJson==='true' ? 'json' : 'csv'
+        dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:true}))
+
+        const getProjectSubmission = async (url: string) => {
             try {
                 const response = await CoreModules.axios.get(url, {
                   responseType : 'blob',
                 });
-
-                const downloadLink = document.createElement('a');
-                downloadLink.href = window.URL.createObjectURL(new Blob([response.data]));
-                downloadLink.setAttribute('download', 'download.zip');
-                document.body.appendChild(downloadLink);
-
-                downloadLink.click();
-
-                document.body.removeChild(downloadLink);
-                window.URL.revokeObjectURL(downloadLink.href);
-
-                dispatch(CoreModules.TaskActions.GetDownloadProjectBoundary(response.data))
+                var a = document.createElement("a");
+                a.href = window.URL.createObjectURL(response.data);
+                a.download = "Submissions";
+                a.click();
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
             } catch (error) {
-                dispatch(CoreModules.TaskActions.GetProjectBoundaryLoading(false))
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
+            } finally{
+                dispatch(CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({type:isJsonOrCsv ,loading:false}))
             }
         }
-        await getProjectBoundaryDetails(url);
+        await getProjectSubmission(url);
     }
 }
 

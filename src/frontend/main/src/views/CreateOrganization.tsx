@@ -5,13 +5,8 @@ import useForm from '../hooks/useForm';
 import { useDispatch } from 'react-redux';
 import OrganizationAddValidation from '../components/organization/Validation/OrganizationAddValidation';
 import { PostOrganizationDataService } from '../api/OrganizationService';
-import { FormControl } from '@mui/material/FormControl';
 import { useNavigate } from 'react-router-dom';
 import { OrganizationAction } from '../store/slices/organizationSlice';
-
-const formData = {};
-const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
-const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
 
 
 const CreateOrganizationForm = () => {
@@ -19,16 +14,18 @@ const CreateOrganizationForm = () => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const postOrganizationData: any = CoreModules.useSelector<any>((state) => state.organization.postOrganizationData);
+  const postOrganizationDataLoading: any = CoreModules.useSelector<any>((state) => state.organization.postOrganizationDataLoading);
+  const organizationFormData: any = CoreModules.useSelector<any>((state) => state.organization.organizationFormData);
 
   const submission = () => {
     dispatch(PostOrganizationDataService(`${environment.baseApiUrl}/organization/`, values));
   };
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
-    formData,
+    organizationFormData,
     submission,
     OrganizationAddValidation,
   );
-
+    console.log(values,'values');
   const inputFormStyles = () => {
     return {
       style: {
@@ -44,6 +41,7 @@ const CreateOrganizationForm = () => {
 
       navigate('/organization');
       dispatch(OrganizationAction.postOrganizationData(null))
+      dispatch(OrganizationAction.SetOrganizationFormData({}))
     }
 
 
@@ -142,56 +140,6 @@ const CreateOrganizationForm = () => {
                 FormHelperTextProps={inputFormStyles()}
               />
             </CoreModules.FormControl>
-
-            {/* <CoreModules.FormControl fullWidth margin="normal" variant="filled">
-              <CoreModules.Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  pt: 0,
-                }}
-              >
-                <CoreModules.FormLabel
-                  component="h3"
-                  sx={{
-                    '&.Mui-focused': {
-                      color: 'black',
-                    },
-                  }}
-                >
-                  Organization
-                </CoreModules.FormLabel>
-                <CoreModules.FormLabel
-                  component="h3"
-                  sx={{
-                    color: 'red',
-                    '&.Mui-focused': {
-                      color: 'red',
-                    },
-                  }}
-                >
-                  *
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.Select
-                id="demo-simple-select-helper-label"
-                labelId="demo-simple-select-helper-label"
-                label="Organization type"
-                value={values.type || ''}
-                onChange={(e) => {
-                  handleCustomChange('type', e.target.value);
-                }}
-              >
-                {organizationDataList?.map((org) => (
-                  <CoreModules.MenuItem value={org.value}>{org.label}</CoreModules.MenuItem>
-                ))}
-              </CoreModules.Select>
-              {errors.type && (
-                <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                  {errors.type}
-                </CoreModules.FormLabel>
-              )}
-            </CoreModules.FormControl> */}
             <CoreModules.FormControl fullWidth margin="normal" variant="filled" sx={{ gap: 1 }}>
               <CoreModules.Box
                 sx={{
@@ -208,19 +156,9 @@ const CreateOrganizationForm = () => {
                     },
                   }}
                 >
-                  Choose Logo
+                  Upload Logo
                 </CoreModules.FormLabel>
-                <CoreModules.FormLabel
-                  component="h3"
-                  sx={{
-                    color: 'red',
-                    '&.Mui-focused': {
-                      color: 'red',
-                    },
-                  }}
-                >
-                  *
-                </CoreModules.FormLabel>
+                
               </CoreModules.Box>
               <CoreModules.Button variant="contained" component="span">
                 <CoreModules.Input

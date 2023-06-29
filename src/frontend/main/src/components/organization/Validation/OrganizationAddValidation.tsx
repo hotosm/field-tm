@@ -25,9 +25,9 @@ function isValidUrl(url: string) {
 function OrganizationAddValidation(values: OrganizationValues) {
   const errors: ValidationErrors = {};
 
-  if (!values?.logo) {
-    errors.logo = 'Logo is Required.';
-  }
+  // if (!values?.logo) {
+  //   errors.logo = 'Logo is Required.';
+  // }
   if (!values?.name) {
     errors.name = 'Name is Required.';
   }

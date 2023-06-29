@@ -36,7 +36,6 @@ export default function Dialog({ taskId, feature, map, view }) {
           return task.id == taskId;
         })[0],
       };
-
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
         (data) => data.label == currentStatus.task_status_str
       );
@@ -98,6 +97,7 @@ export default function Dialog({ taskId, feature, map, view }) {
       );
     }
   };
+  const checkIfTaskAssignedOrNot = currentStatus?.locked_by_username === token?.username || currentStatus?.locked_by_username === null;
 
   return (
     <CoreModules.Stack direction={"column"} spacing={2}>
@@ -125,13 +125,13 @@ export default function Dialog({ taskId, feature, map, view }) {
           // key={index}
           variant="contained"
           color="error"
-          onClick={handleOnClick}
+          // onClick={handleOnClick}
           // disabled={loading} 
         >
           Task Submission
         </CoreModules.Button>
       </CoreModules.Link>
-      {list_of_task_status?.map((data, index) => {
+      { checkIfTaskAssignedOrNot && list_of_task_status?.map((data, index) => {
         return list_of_task_status?.length != 0 ? (
           <CoreModules.Button
             id={data.value}

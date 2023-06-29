@@ -87,13 +87,24 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
-    # TODO allow passing odkcentral credentials from user
-    central_crud.delete_odk_project(project_id)
-    # if not odkproject:
-    #     logger.error(f"Couldn't delete project {project_id} from the ODK Central server")
-    project = project_crud.delete_project_by_id(db, project_id)
-    if project:
-        return project
+
+    project = project_crud.get_project(db, project_id)
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Odk crendentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
+    central_crud.delete_odk_project(project_id, odk_credentials)
+
+    deleted_project = project_crud.delete_project_by_id(db, project_id)
+    if deleted_project:
+        return deleted_project
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
@@ -359,6 +370,7 @@ async def generate_files(
     project_id: int,
     extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
+    data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
     """Generate required media files tasks in the project based on the provided params.
@@ -388,11 +400,24 @@ async def generate_files(
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls"]
+        allowed_extensions = [".xls", '.xlsx']
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
         contents = await upload.read()
+
+    if data_extracts:
+        # Validating for .geojson File.
+        data_extracts_file_name = os.path.splitext(data_extracts.filename)
+        extracts_file_ext = data_extracts_file_name[1]
+        if extracts_file_ext != '.geojson':
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+        try:
+            extracts_contents = await data_extracts.read()
+            json.loads(extracts_contents)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+
 
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
@@ -408,11 +433,12 @@ async def generate_files(
         project_id,
         extract_polygon,
         contents,
+        extracts_contents if data_extracts else None,
         xform_title,
+        file_ext[1:] if upload else 'xls',
         background_task_id,
     )
 
-    # FIXME: fix return value
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
 
 

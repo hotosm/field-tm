@@ -2,13 +2,77 @@
 <br>
 This manual is a step by step guide for the project managers on how to get started with the Field Mapping Tasking Manager.
 
+- [Introduction](#introduction)
+- [An Overview Of FMTM In Relations With HOT, OSM and ODK.](#an-overview-of-fmtm-in-relations-with-hot-osm-and-odk)
 - [Prerequisites](#prerequisites)
 - [Video Tutorial](#video-tutorial)
 - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
-- [Steps to start access your project and Start mapping](#steps-to-start-access-your-project-and-start-mapping)
+- [Steps to start access your project and Start mapping](#steps-to-start-access-your-project-and-start-mapping-or-a-mapping-campaign)
 - [Help and Support](#help-and-support)
 - [Thank you note](#thank-you)   
 
+## Introduction
+
+A **Mapping Campaign** refers to an organized effort of collecting data
+from a particular geographic area/feature and creating maps. This may
+involve using various mapping technologies such as; GPS, satellite
+imagery, or crowdsourced data. These technologies are used to gather
+information about the area of interest.
+
+Mapping campaigns can be carried out for lots of different purposes,
+some examples are:
+
+- Disaster Response and Recovery
+- Environmental Conservation
+- Urban planning or;
+- Social and Political Activism.
+
+They often involve collaboration between organizations like; Government
+Agencies, Non-profit Groups and volunteers.
+
+Once the data is collected, it is analyzed and processed to create
+detailed maps that can have a variety of use cases. These could be:
+
+- Identifying areas of need.
+- Planning infrastructure and development projects.
+- Understanding the impact of environmental changes on the landscape,
+  etc.
+
+## An Overview Of FMTM In Relations With HOT, OSM and ODK
+
+The **Humanitarian OpenStreetMap Team (HOT**) is a non-profit
+organization that uses open mapping data to support humanitarian and
+disaster response efforts around the world. **The Field Mapping Task
+Manager (FMTM)** is one of the tools that **HOT** used to coordinate and
+manage mapping projects.
+
+**FMTM** is a software tool that helps project managers to organize and
+manage mapping tasks. It assigns those tasks to volunteers and tracks
+their progress. The tool includes features for collaborative editing,
+data validation, and error detection. This ensures that the data
+collected by volunteers is accurate and reliable.
+
+**FMTM** is designed to be used in conjunction with **Open Data Kit
+(ODK)**. **ODK** is a free and open-source set of tools that allows
+users to create, collect, and manage data with mobile devices. The
+**ODK** provides a set of open-source tools that allow users to build
+forms, collect data in the field, and aggregate data on a central
+server. It is commonly used for data collection in research, monitoring
+and evaluation, and other development projects.
+
+Project managers use **FMTM** to manage tasks and assign them to
+volunteers. The data collected by the volunteer via ODK is typically
+uploaded to **OpenStreetMap (OSM)** where it is used to create more
+detailed and accurate maps of the affected area. **OSM** is a free and
+open-source map of the world that is created and maintained by
+volunteers.
+
+Overall, the **FMTM** tool is an important component of **HOT**'s
+efforts to support disaster response and humanitarian efforts around the
+world. By coordinating mapping activities and ensuring the accuracy and
+reliability of the data collected by volunteers, **FMTM** helps to
+provide critical information that can be used to support decision-making
+and improve the effectiveness of humanitarian efforts.
 
 
 ## Prerequisites
@@ -60,14 +124,14 @@ https://github.com/hotosm/fmtm/assets/97789856/d8b2bf72-e8e0-41bc-a568-77854f45e
    
    ![WhatsApp Image 2023-06-23 at 1 23 07 PM](https://github.com/hotosm/fmtm/assets/97789856/c0d272f0-c69c-483f-9e9d-83dd75b9e748)
 
-4. Start by exploring the projects listed by different nations and world communities for field mapping exercises.
-5. Use the filters or search option to narrow down the project cards based on your preferences.
+3. Start by exploring the projects listed by different nations and world communities for field mapping exercises.
+4. Use the filters or search option to narrow down the project cards based on your preferences.
    ![WhatsApp Image 2023-06-23 at 1 21 05 PM](https://github.com/hotosm/fmtm/assets/97789856/a5d61628-70e6-426c-a860-b9c7968b4dea)
-6. If you are not logged into the system, the "Create new project" button will be disabled.
-7. If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
-8. Once signed in, the "Create new project" button will be enabled. Click on it.
-9. The process of creating a new project involves four steps: Project Details, Uploading the Area, Defining the Task, and Selecting the Form.
-10. Start by filling in the project details, including the organization name, project name, description, and other relevant information.
+5. If you are not logged into the system, the "Create new project" button will be disabled.
+6. If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
+7. Once signed in, the "Create new project" button will be enabled. Click on it.
+8. The process of creating a new project involves four steps: Project Details, Uploading the Area, Defining the Task, and Selecting the Form.
+9. Start by filling in the project details, including the organization name, project name, description, and other relevant information.
 
 ![2](https://github.com/hotosm/fmtm/assets/97789856/97c38c80-aa0e-4fe2-b8a5-f4ee43a9a63a)
 
@@ -103,22 +167,44 @@ Click on "Submit" to proceed.
 
 <br>
 
-## Steps to start access your project and Start mapping
+## Steps to start access your project and Start mapping or a mapping campaign
 
 1. Go to the Explore projects tab . Click on the project card and proceed to the next step.
 2. Select one of the available tasks and start the field mapping exercise.
    ![WhatsApp Image 2023-06-23 at 1 26 39 PM](https://github.com/hotosm/fmtm/assets/97789856/162af2e0-dbfa-4787-8037-f03e71417df8)
 
-4. If a task is already locked by another user, choose a different task that is available for mapping.If a task is already locked by another user, choose a different task that is available for mapping.
-   ![WhatsApp Image 2023-06-23 at 1 29 10 PM](https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c)
+3. If a task is already locked by another user, choose a different task that is available for mapping.If a task is already locked by another user, choose a different task that is available for mapping.
+  - The drop down icon beside **LEGEND** displays a color code. This
+   color code lets you know the status of each task on the map.
 
-6. Use the QR code to start mapping the selected task using the ODK Collect app on your mobile phone.
-7. Install and open the ODK Collect app on your phone.
-8. Set up the project details by scanning the QR code provided.
-9. Once the project is set up in the app, start a new form based on the selected form from the project setup.
-10. Fill in the questionnaires and collect data for the field mapping exercise.
-11. Save and send the completed form to the server.
-12. After completing the assigned task, go back to the project platform on FMTM and mark it as fully mapped.
+     - **READY** means that task is available to be mapped
+     - **LOCKED FOR MAPPING** means that task is already being mapped by another volunteer and therefore unavailable for mapping
+     - **MAPPED** or **READY FOR VALIDATION** means that task has been completely mapped and ready to be validated.
+     - **LOCKED FOR VALIDATION** means that task has been mapped and being validated.
+     - **VALIDATED** means that task has successfully been validated and completely mapped with no errors
+     - **INVALIDATED** or **MORE MAPPING NEEDED** means that task did not pass the validation process and needs more mapping
+     - **BAD** means that task is not clear and cannot be mapped
+
+> Note: 'task' refers to each section of the map enclosed in the dotted
+> lines and each task has a corresponding number tag.
+
+   ![WhatsApp Image 2023-06-23 at 1 29 10 PM](https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c)
+  - To begin mapping, click on a task closest to you that has the color
+   code associated with **READY** and change it's status from **READY**
+   to **LOCKED FOR MAPPING**. Remember to take note of the number tag.
+  - Scroll to the bottom of the page. The **ACTIVITIES** tab shows the
+   tasks either **LOCKED FOR MAPPING**, **BAD** or **LOCKED FOR
+   VALIDATION**. You can search for tasks with the status mentioned
+   using the number tag associated with each task.
+
+
+4. Use the QR code to start mapping the selected task using the ODK Collect app on your mobile phone.
+5. Install and open the ODK Collect app on your phone.
+6. Set up the project details by scanning the QR code provided.
+7. Once the project is set up in the app, start a new form based on the selected form from the project setup.
+8. Fill in the questionnaires and collect data for the field mapping exercise.
+9. Save and send the completed form to the server.
+10. After completing the assigned task, go back to the project platform on FMTM and mark it as fully mapped.
 
 ## Help and Support
 If you encounter any issues or need assistance while using FMTM, you can access the following resources:
