@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 // import "../../node_modules/ol/ol.css";
 import CoreModules from '../shared/CoreModules';
 import UploadArea from '../components/createproject/UploadArea';
 import { useLocation, Link } from 'react-router-dom';
 import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
-import BasemapSelection from '../components/createproject/BasemapSelection';
 import FormSelection from '../components/createproject/FormSelection';
 import DefineTasks from '../components/createproject/DefineTasks';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
 
 const CreateProject: React.FC = () => {
+  const [geojsonFile ,setGeojsonFile]= useState(null);
+  const [customFormFile ,setCustomFormFile]= useState(null);
+  const [customFormInputValue ,setCustomFormInputValue]= useState(null);
+  const [inputValue ,setInputValue]= useState(null);
   const dispatch = useDispatch();
   const location = useLocation();
   const boxSX = {
@@ -22,7 +25,8 @@ const CreateProject: React.FC = () => {
   useEffect(() => {
 
     return () => {
-      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 50 }));
+      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
+      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
     }
   }, [])
 
@@ -171,9 +175,9 @@ const CreateProject: React.FC = () => {
         {/* Showing Different Create Project Component When the url pathname changes */}
 
         {location.pathname === '/create-project' ? <ProjectDetailsForm /> : null}
-        {location.pathname === '/upload-area' ? <UploadArea /> : null}
-        {location.pathname === '/define-tasks' ? <DefineTasks /> : null}
-        {location.pathname === '/select-form' ? <FormSelection /> : null}
+        {location.pathname === '/upload-area' ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
+        {location.pathname === '/define-tasks' ? <DefineTasks  geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile}/> : null}
+        {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} customFormFile={customFormFile} setCustomFormFile={setCustomFormFile} customFormInputValue={customFormInputValue} setCustomFormInputValue={setCustomFormInputValue} /> : null }
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
       </CoreModules.Stack>

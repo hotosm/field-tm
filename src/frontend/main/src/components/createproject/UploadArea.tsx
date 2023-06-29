@@ -6,7 +6,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import DefineAreaMap from 'map/DefineAreaMap';
 
-const UploadArea: React.FC = () => {
+const UploadArea: React.FC = ({geojsonFile,setGeojsonFile,setInputValue,inputValue}) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
@@ -16,28 +16,15 @@ const UploadArea: React.FC = () => {
   const dispatch = CoreModules.useDispatch();
   // //dispatch function to perform redux state mutation
 
-  // if projectarea is not null navigate to projectslist page and that is when user submits create project
-  // useEffect(() => {
-  //     if (projectArea !== null) {
-  //         // navigate('/');
-  //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
-
-  //     }
-  //     return () => {
-  //         dispatch(CreateProjectActions.ClearCreateProjectFormData())
-  //     }
-
-  // }, [projectArea])
-  // // END
 
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   const onCreateProjectSubmission = () => {
-    if (!projectDetails.areaGeojson) return;
+    if (!geojsonFile) return;
     // dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: fileUpload?.[0], areaGeojsonfileName: fileUpload?.name }));
     dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
     navigate('/define-tasks');
   };
-
+ 
   return (
     <CoreModules.Stack
       sx={{
@@ -58,21 +45,16 @@ const UploadArea: React.FC = () => {
             <CoreModules.FormLabel>Upload GEOJSON</CoreModules.FormLabel>
             <CoreModules.Button variant="contained" component="label">
               <CoreModules.Input
+                sx={{color:'white'}}
                 type="file"
-                // value={projectDetails.areaGeojsonfileName || ''}
+                value={inputValue}
                 onChange={(e) => {
-                  dispatch(
-                    CreateProjectActions.SetIndividualProjectDetailsData({
-                      ...projectDetails,
-                      areaGeojson: e.target.files[0],
-                      areaGeojsonfileName: e.target.files[0].name,
-                    }),
-                  );
+                  setGeojsonFile(e.target.files[0]);
                 }}
               />
-              {/* <CoreModules.Typography component="h4">{projectDetails?.areaGeojsonfileName}</CoreModules.Typography> */}
+              <CoreModules.Typography component="h4">{geojsonFile?.name}</CoreModules.Typography>
             </CoreModules.Button>
-            {!projectDetails.areaGeojson && (
+            {!geojsonFile && (
               <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>
                 Geojson file is required.
               </CoreModules.FormLabel>
@@ -112,7 +94,7 @@ const UploadArea: React.FC = () => {
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap uploadedGeojson={projectDetails?.areaGeojson} />
+      <DefineAreaMap uploadedGeojson={geojsonFile} />
     </CoreModules.Stack>
   );
 };

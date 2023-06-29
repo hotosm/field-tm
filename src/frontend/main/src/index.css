@@ -98,3 +98,43 @@ button {
   fill: #44546a !important;
   stroke: #44546a !important;
 }
+
+.legend-container{
+  background-color: white;
+  width: 14rem;
+  padding: 7px;
+  margin: 250px 10px;
+  border-radius: 4px;
+}
+
+.legend {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  justify-content: space-between;
+}
+
+.legend-text {
+  margin-right: 10px;
+}
+
+.legend-square {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+}
+
+.submission-item{
+  text-decoration: none;
+  
+}
+.submission-item:hover{
+  background-color: rgba(215, 63, 62, 0.04);
+  border: 1px solid #d73f3e;
+  border-radius: 10px;
+}

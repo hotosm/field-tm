@@ -27,7 +27,8 @@ import {
     Description as DescriptionIcon,
     FileDownload as FileDownloadIcon,
     Share as ShareIcon,
-    ExitToApp as ExitToAppIcon
+    ExitToApp as ExitToAppIcon,
+    SettingsSuggest as SettingsSuggestIcon
 } from '@mui/icons-material';
 
 import { styled, alpha } from '@mui/material/styles';
@@ -61,5 +62,6 @@ export default {
     FormatAlignCenterIcon,
     RemoveIcon,
     KeyboardDoubleArrowUpIcon,
-    KeyboardDoubleArrowDownIcon
+    KeyboardDoubleArrowDownIcon,
+    SettingsSuggestIcon
 }

@@ -11,7 +11,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
         dispatch(CreateProjectActions.CreateProjectLoading(true))
         dispatch(CommonActions.SetLoading(true))
 
-        const postCreateProjectDetails = async (url, payload, fileUpload) => {
+        const postCreateProjectDetails = async (url, payload, fileUpload,formUpload) => {
 
             try {
                 const postNewProjectDetails = await axios.post(url, payload)
@@ -23,7 +23,8 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 } else if (payload.splitting_algorithm === 'Use natural Boundary') {
                     await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/task_split/${resp.id}/`, fileUpload));
                 } else {
-                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
+                    await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload_multi_polygon`, fileUpload));
+                    // await dispatch(UploadAreaService(`${enviroment.baseApiUrl}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
                 }
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -35,10 +36,12 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload));
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
 
             } catch (error) {
                 dispatch(CommonActions.SetLoading(false))
+                dispatch(CreateProjectActions.CreateProjectLoading(true))
 
                 // Added Snackbar toast for error message 
                 dispatch(
@@ -51,10 +54,13 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 );
                 //END
                 dispatch(CreateProjectActions.CreateProjectLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.CreateProjectLoading(false))
+
             }
         }
 
-        await postCreateProjectDetails(url, payload, fileUpload);
+        await postCreateProjectDetails(url, payload, fileUpload,formUpload);
 
     }
 
@@ -258,7 +264,7 @@ const GenerateProjectLog: Function = (url: string, params: any) => {
 const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
 
     return async (dispatch) => {
-        dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(true))
+        dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true))
 
         const getDividedTaskFromGeojson = async (url, payload) => {
             try {
@@ -268,9 +274,11 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
                 const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData)
                 const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
                 dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
-
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             } catch (error) {
-                dispatch(CreateProjectActions.GetDividedTaskFromGeojsonLoading(false));
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
             }
         }
 
