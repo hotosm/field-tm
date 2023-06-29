@@ -27,6 +27,19 @@ export const ProjectById = (url, existingProjectList) => {
             { id: resp.id, taskBoundries: persistingValues },
           ])
         );
+        dispatch(
+          ProjectActions.SetProjectInfo({id:resp.id,
+            priority:resp.priority || 2,
+            priority_str:resp.priority_str || "MEDIUM",
+            title:resp.project_info?.[0]?.name,
+            location_str:resp.location_str,
+            description:resp.description,
+            num_contributors:resp.num_contributors,
+            total_tasks:resp.total_tasks,
+            tasks_mapped:resp.tasks_mapped,
+            tasks_validated:resp.tasks_validated,
+            tasks_bad:resp.tasks_bad})
+        );
       } catch (error) {
         // console.log('error :', error)
       }
