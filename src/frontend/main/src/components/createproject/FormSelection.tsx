@@ -11,6 +11,7 @@ import useForm from '../../hooks/useForm';
 import SelectFormValidation from './validation/SelectFormValidation';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import LoadingBar from './LoadingBar';
+import environment from '../../environment';
 
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb = null;
@@ -120,7 +121,8 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
   useEffect(() => {
     if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
       clearInterval(generateProjectLogIntervalCb);
-      navigate('/');
+      const encodedProjectId =  environment.encode(projectDetailsResponse?.id)
+      navigate(`/project_details/${encodedProjectId}`);
       dispatch(
         CommonActions.SetSnackBar({
           open: true,

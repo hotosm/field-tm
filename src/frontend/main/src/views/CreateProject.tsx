@@ -5,7 +5,6 @@ import CoreModules from '../shared/CoreModules';
 import UploadArea from '../components/createproject/UploadArea';
 import { useLocation, Link } from 'react-router-dom';
 import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
-import BasemapSelection from '../components/createproject/BasemapSelection';
 import FormSelection from '../components/createproject/FormSelection';
 import DefineTasks from '../components/createproject/DefineTasks';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
