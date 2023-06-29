@@ -35,8 +35,9 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile }) => {
   
 
   useEffect(() => {
-    console.log(uploadedGeojson, 'uploadedGeojson')
-    if (uploadedGeojson) {
+    if(dividedTaskGeojson){
+
+    }else if (uploadedGeojson) {
       const fileReader = new FileReader();
       fileReader.readAsText(uploadedGeojson, "UTF-8");
       fileReader.onload = (e) => {

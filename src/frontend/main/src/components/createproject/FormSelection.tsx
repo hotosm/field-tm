@@ -339,6 +339,7 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
                         setCustomFormFile(e.target.files[0]);
                       }}
                     />
+                    <CoreModules.Typography component="h4">{customFormFile?.name}</CoreModules.Typography>
                   </CoreModules.Button>
                   {!values.uploaded_form && (
                     <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>
