@@ -107,6 +107,7 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
+      generateProjectLogIntervalCb = null
       dispatch(CreateProjectActions.SetGenerateProjectLog(null));
     };
   }, []);
