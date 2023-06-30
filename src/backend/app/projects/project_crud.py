@@ -937,6 +937,18 @@ def get_odk_id_for_project(db: Session, project_id: int):
 
 
 def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
+    """
+    Uploads custom data extracts to the database.
+
+    Args:
+        db (Session): The database session object.
+        project_id (int): The ID of the project.
+        contents (str): The custom data extracts contents.
+
+    Returns:
+        bool: True if the upload is successful.
+    """
+
     project = get_project(db, project_id)
 
     if not project:
