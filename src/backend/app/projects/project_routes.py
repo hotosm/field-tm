@@ -412,7 +412,12 @@ async def generate_files(
         extracts_file_ext = data_extracts_file_name[1]
         if extracts_file_ext != '.geojson':
             raise HTTPException(status_code=400, detail="Provide a valid geojson file")
-        extracts_contents = await data_extracts.read()
+        try:
+            extracts_contents = await data_extracts.read()
+            json.loads(extracts_contents)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+
 
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
@@ -434,7 +439,6 @@ async def generate_files(
         background_task_id,
     )
 
-    # FIXME: fix return value
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
 
 
