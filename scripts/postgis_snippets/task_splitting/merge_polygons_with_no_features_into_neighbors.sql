@@ -5,26 +5,26 @@ This script divides an layer of buildings into clusters suitable for field
 mapping as part of the HOT Field Mapping Tasking Manager.
 */
 
+-- Grab a reference to all of the polygons with area (for sorting)
+allpolys AS (
+   SELECT *, st_area(p.geom) AS area
+   FROM "splitpolygons" AS p
+),
 -- Grab the areas with fewer than the requisite number of features
 with lowfeaturecountpolys as (
-  select *, st_area(p.geom) 
-  as area   
-  from "polys-with-count" as p
+  select *
+  from allpolys as p
   -- TODO: feature count should not be hard-coded
   where p.numfeatures < 5   
 ), 
--- Grab a reference to all of the polygons with area (for sorting)
-allpolys as (
-   select *, st_area(p.geom) as area
-   from "polys-with-count" as p
-),
+
 -- Find the neighbors of the low-feature-count polygons
 -- Store their ids as n_polyid, numfeatures as n_numfeatures, etc
 allneighborlist as (
   select p.*, 
     pf.polyid as n_polyid,
     pf.area as n_area, 
-    pf.numfeatures as n_numfeatures,
+    p.numfeatures as n_numfeatures,
     -- length of shared boundary to make nice merge decisions 
     st_length2d(st_intersection(p.geom, pf.geom)) as sharedbound
   from lowfeaturecountpolys as p 
@@ -38,7 +38,7 @@ allneighborlist as (
   -- Then by descending featurecount and area of the 
   -- high-feature-count neighbors (area is in case of equal 
   -- featurecounts, we'll just pick the biggest to add to)
-  order by p.polyid, pf.numfeatures desc, pf.area desc
+  order by p.polyid, p.numfeatures desc, pf.area desc
   -- OR, maybe for more aesthetic merges:
   -- order by p.polyid, sharedbound desc
 )
