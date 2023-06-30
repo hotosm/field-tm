@@ -54,6 +54,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from osm_fieldwork.filter_data import FilterData
 
 from ..central import central_crud
 from ..config import settings
@@ -936,7 +937,11 @@ def get_odk_id_for_project(db: Session, project_id: int):
     return project_info.odkid
 
 
-def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
+def upload_custom_data_extracts(db: Session, 
+                                project_id: int, 
+                                contents: str,
+                                category: str = 'buildings',
+                                ):
     """
     Uploads custom data extracts to the database.
 
@@ -959,7 +964,19 @@ def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
 
     features_data = json.loads(contents)
 
-    for feature in features_data["features"]:
+    # Data Cleaning
+    cleaned = FilterData()
+    models = xlsforms_path.replace("xlsforms", "data_models")
+    xlsfile = f"{category}.xls" # FIXME: for custom form
+    file = f"{xlsforms_path}/{xlsfile}"
+    if os.path.exists(file):
+        title, extract = cleaned.parse(file)
+    elif os.path.exists(f"{file}x"):
+        title, extract = cleaned.parse(f"{file}x")
+    # Remove anything in the data extract not in the choices sheet.
+    cleaned_data = cleaned.cleanData(features_data)
+
+    for feature in cleaned_data["features"]:
 
         feature_shape = shape(feature['geometry'])
 
