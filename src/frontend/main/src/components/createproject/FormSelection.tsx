@@ -258,10 +258,13 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
+                      
                       value={customFormInputValue}
                       onChange={(e) => {
                         setCustomFormFile(e.target.files[0]);
                       }}
+                      inputProps={{ "accept":".xml, .xls, .xlsx" }}
+
                     />
                     <CoreModules.Typography component="h4">{customFormFile?.name}</CoreModules.Typography>
                   </CoreModules.Button>
