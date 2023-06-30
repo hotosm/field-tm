@@ -7,7 +7,7 @@ import MapStyles from '../hooks/MapStyles';
 import environment from "fmtm/environment";
 import CoreModules from 'fmtm/CoreModules';
 import { get } from 'ol/proj';
-
+let geojsonObject;
 const TasksLayer = (map, view, feature) => {
     const params = CoreModules.useParams();
     const state = CoreModules.useSelector(state => state.project)
@@ -18,7 +18,7 @@ const TasksLayer = (map, view, feature) => {
         if (state.projectTaskBoundries.length != 0 && map != undefined) {
 
             if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
-
+                geojsonObject=null;
                 const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
 
                 const styleFunction = function (feature) {
@@ -27,8 +27,8 @@ const TasksLayer = (map, view, feature) => {
                     return geojsonStyles[id.split(',')[1]];
                 };
 
-                const geojsonObject = { ...geojsonObjectModel }
-
+                geojsonObject = { ...geojsonObjectModel }
+                geojsonObject['features']= [];
                 state.projectTaskBoundries[index].taskBoundries.forEach((task) => {
                     geojsonObject['features'].push({
                         id: `${task.id}_${task.task_status_str}`,
@@ -37,7 +37,8 @@ const TasksLayer = (map, view, feature) => {
                         // properties: task.properties
                     })
                 })
-
+                console.log(geojsonObject,'geojsonObject');
+                console.log(state.projectTaskBoundries,'projectTaskBoundries');
                 const vectorSource = new VectorSource({
                     features: new GeoJSON().readFeatures(geojsonObject,{        
                         featureProjection: get("EPSG:3857")
@@ -75,6 +76,8 @@ const TasksLayer = (map, view, feature) => {
 
 
                 map.addLayer(vectorLayer)
+                window.vector =vectorLayer
+                window.testmap = map
                 map.on('loadend', function () {
                     map.getTargetElement().classList.remove('spinner');
                 });
