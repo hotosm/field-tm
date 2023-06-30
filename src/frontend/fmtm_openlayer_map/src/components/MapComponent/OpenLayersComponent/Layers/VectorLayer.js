@@ -11,6 +11,12 @@ import { Vector as VectorSource } from 'ol/source';
 import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
+import {
+  Modify,
+  Select,
+  defaults as defaultInteractions,
+} from 'ol/interaction.js';
+
 const selectElement = 'singleselect';
 
 const selectedCountry = new Style({
@@ -40,12 +46,45 @@ const VectorLayer = ({
   viewProperties,
   hoverEffect,
   mapOnClick,
-  setStyle
+  setStyle,
+  onModify,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
 
   useEffect(() => () => map && vectorLayer && map.removeLayer(vectorLayer), [map, vectorLayer]);
 
+  // Modify Feature
+  useEffect(() => {
+    if(!map) return;
+    if(!vectorLayer) return;
+    if(!onModify) return;
+    const select = new Select({
+      wrapX: false,
+    });
+    const vectorLayerSource = vectorLayer.getSource();
+    const modify = new Modify({
+      // features: select.getFeatures(),
+      source:vectorLayerSource
+    });
+    modify.on('modifyend',function(e){
+      var geoJSONFormat = new GeoJSON();
+
+      // Step 3: Convert features to GeoJSON
+      var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+
+      // Step 4: Log the GeoJSON string
+      console.log(geoJSONString,'geojsonString');
+      onModify(geoJSONString);
+      // console.log(JSON.stringify(geoJSONString),'geojsonString Stringify');
+    });
+    map.addInteraction(modify);
+    map.addInteraction(select);
+
+    // map.addInteraction(defaultInteractions().extend([select, modify]));
+    return () => {
+      // map.removeInteraction(defaultInteractions().extend([select, modify]))
+    }
+  }, [map,vectorLayer,onModify])
   useEffect(() => {
     if (!map) return;
 
@@ -175,6 +214,8 @@ VectorLayer.defaultProps = {
   style: { ...defaultStyles },
   zoomToLayer: false,
   viewProperties: layerViewProperties,
+  mapOnClick:()=>{},
+  onModify:null,
 };
 
 VectorLayer.propTypes = {
@@ -184,6 +225,7 @@ VectorLayer.propTypes = {
   zoomToLayer: PropTypes.bool,
   viewProperties: PropTypes.object,
   mapOnClick:PropTypes.func,
+  onModify:PropTypes.func,
   // Context: PropTypes.object.isRequired,
 };
 

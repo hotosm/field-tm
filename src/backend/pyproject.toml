@@ -46,13 +46,11 @@ dependencies = [
     "SQLAlchemy-Utils==0.40.0",
     "bcrypt==4.0.1",
     "segno==1.5.2",
-    "osm-fieldwork==0.3.1",
+    "osm-fieldwork==0.3.2",
 ]
 requires-python = ">=3.10"
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}
-[project.optional-dependencies]
-
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
