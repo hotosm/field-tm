@@ -35,11 +35,11 @@ const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setD
   // END
   const selectExtractWaysList = ['Centroid', 'Polygon'];
   const selectExtractWays = selectExtractWaysList.map((item) => ({ label: item, value: item }));
+  const dataExtractOptionsList = ['Data Extract Ways', 'Upload Custom Data Extract'];
+  const dataExtractOptions = dataExtractOptionsList.map((item) => ({ label: item, value: item }));
   const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
-  const projectDetailsLoading = CoreModules.useSelector((state) => state.createproject.projectDetailsLoading);
-  // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
-
+ 
   // Fetching form category list
   useEffect(() => {
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
@@ -129,10 +129,50 @@ const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setD
                   </CoreModules.FormLabel>
                 )}
               </CoreModules.FormControl>
-              <Divider sx={{m:2}}></Divider>
-            
+              <CoreModules.FormControl sx={{ mb: 3 }}>
+                <InputLabel
+                  id="form-category"
+                  sx={{
+                    '&.Mui-focused': {
+                      color: defaultTheme.palette.black,
+                    },
+                  }}
+                >
+                  Choose Data Extract
+                </InputLabel>
+                <Select
+                  labelId="data_extract_options-label"
+                  id="data_extract_options"
+                  value={values.data_extract_options}
+                  label="Data Extract Category"
+                  sx={{
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      border: '2px solid black',
+                    },
+                  }}
+                  onChange={(e) => {
+                    handleCustomChange('data_extract_options', e.target.value);
+                    dispatch(
+                      CreateProjectActions.SetIndividualProjectDetailsData({
+                        ...projectDetails,
+                        data_extract_options: e.target.value,
+                      }),
+                    );
+                  }}
+                >
+                  {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
+                  {dataExtractOptions?.map((form) => (
+                    <MenuItem value={form.value}>{form.label}</MenuItem>
+                  ))}
+                </Select>
+                {errors.data_extract_options && (
+                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                    {errors.data_extract_options}
+                  </CoreModules.FormLabel>
+                )}
+              </CoreModules.FormControl> 
                {/* Area Geojson File Upload For Create Project */}
-              <FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
+              {values.data_extract_options === 'Upload Custom Data Extract' && <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
                 <CoreModules.FormLabel>Upload Custom Data Extract </CoreModules.FormLabel>
                 <CoreModules.Button variant="contained" component="label">
                   <CoreModules.Input
@@ -146,16 +186,15 @@ const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setD
                   />
                   <CoreModules.Typography component="h4">{dataExtractFile?.name}</CoreModules.Typography>
                 </CoreModules.Button>
-                {!dataExtractFile && (
-                  <CoreModules.FormLabel component="h3" sx={{ mt: 2, color: defaultTheme.palette.error.main }}>
-                    Geojson file is required.
+                {errors.data_extractFile && (
+                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                    {errors.data_extractFile}
                   </CoreModules.FormLabel>
                 )}
-              </FormControl>
-              <Typography align='center' sx={{m:2}} component="h5">Or</Typography>
+              </CoreModules.FormControl>}
               
               
-              <CoreModules.FormControl sx={{ mb: 3 }}>
+              {values.data_extract_options === 'Data Extract Ways' &&<CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
                   sx={{
@@ -164,7 +203,7 @@ const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setD
                     },
                   }}
                 >
-                  Select Data Extract Ways
+                  Data Extract Type
                 </InputLabel>
                 <Select
                   labelId="data_extractWays-label"
@@ -196,7 +235,7 @@ const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setD
                     {errors.data_extractWays}
                   </CoreModules.FormLabel>
                 )}
-              </CoreModules.FormControl> 
+              </CoreModules.FormControl> }
             </Grid>
           <Grid item md={8}>
             <CoreModules.Stack>
