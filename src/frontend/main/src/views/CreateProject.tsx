@@ -29,7 +29,11 @@ const CreateProject: React.FC = () => {
 
     return () => {
       dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
-      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
+      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));      
+      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
+      setGeojsonFile(null);
+      setCustomFormFile(null);
+      setDataExtractFile(null);
     }
   }, [])
 
@@ -77,6 +81,15 @@ const CreateProject: React.FC = () => {
               height: location.pathname !== '/define-tasks' ? '8px' : '12px',
               width: '64px',
               background: location.pathname !== '/define-tasks' ? '#68707F' : '#D73F3F',
+              mx: '16px',
+              borderRadius: '10px',
+            }}
+          ></CoreModules.Box>
+          <CoreModules.Box
+            sx={{
+              height: location.pathname !== '/data-extract' ? '8px' : '12px',
+              width: '64px',
+              background: location.pathname !== '/data-extract' ? '#68707F' : '#D73F3F',
               mx: '16px',
               borderRadius: '10px',
             }}
