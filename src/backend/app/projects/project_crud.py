@@ -1091,6 +1091,7 @@ def generate_appuser_files(
 
             category = xform_title
 
+            # Data Extracts
             if extracts_contents is not None:
                 upload_custom_data_extracts(db, project_id, extracts_contents)
 
@@ -1139,6 +1140,7 @@ def generate_appuser_files(
                 # Bulk insert the osm extracts into the db.
                 db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
+            # Generating QR Code, XForm and uploading OSM Extracts to the form. Creating app users and updating the role of that user.
             for poly in result.fetchall():
 
                 name = f"{prefix}_{category}_{poly.id}"
@@ -1205,8 +1207,7 @@ def generate_appuser_files(
                     dump(features, jsonfile)
 
                 outfile = central_crud.generate_updated_xform(
-                    db, poly.id, xlsform, xform
-                )
+                    xlsform, xform, form_type)
 
                 # Update tasks table qith qr_Code id
                 task = tasks_crud.get_task(db, poly.id)
