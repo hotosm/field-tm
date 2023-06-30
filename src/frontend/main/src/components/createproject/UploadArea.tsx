@@ -52,6 +52,7 @@ const UploadArea: React.FC = ({geojsonFile,setGeojsonFile,setInputValue,inputVal
                   dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
                   setGeojsonFile(e.target.files[0]);
                 }}
+                inputProps={{ "accept":".geojson, .json" }}
               />
               <CoreModules.Typography component="h4">{geojsonFile?.name}</CoreModules.Typography>
             </CoreModules.Button>
