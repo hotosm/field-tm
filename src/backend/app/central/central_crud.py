@@ -292,27 +292,31 @@ def download_submissions(
 
 
 def generate_updated_xform(
-    db: Session,
-    task_id: dict,
     xlsform: str,
     xform: str,
+    form_type : str,
 ):
     """Update the version in an XForm so it's unique."""
     name = os.path.basename(xform).replace(".xml", "")
     outfile = xform
-    try:
-        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
-    except Exception as e:
-        logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    if form_type != 'xml':
+        try:
+            xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
+        except Exception as e:
+            logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
 
-    if os.path.getsize(outfile) <= 0:
-        logger.warning(f"{outfile} is empty!")
-        raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
+        if os.path.getsize(outfile) <= 0:
+            logger.warning(f"{outfile} is empty!")
+            raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
 
-    xls = open(outfile, "r")
-    data = xls.read()
-    xls.close()
+        xls = open(outfile, "r")
+        data = xls.read()
+        xls.close()
+    else:
+        xls = open(xlsform, "r")
+        data = xls.read()
+        xls.close()
 
     tmp = name.split("_")
     tmp[0]
