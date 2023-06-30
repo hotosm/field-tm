@@ -16,7 +16,7 @@ import environment from '../../environment';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb = null;
 
-const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile, customFormInputValue, setCustomFormInputValue }) => {
+const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile, customFormInputValue, setCustomFormInputValue,dataExtractFile }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -61,6 +61,12 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
   // END
 
   const submission = () => {
+    const newDividedTaskGeojson = JSON.stringify(dividedTaskGeojson);
+    const parsedNewDividedTaskGeojson = JSON.parse(newDividedTaskGeojson);
+    const exparsedNewDividedTaskGeojson = JSON.stringify(parsedNewDividedTaskGeojson);
+    var newUpdatedTaskGeojsonFile = new File([exparsedNewDividedTaskGeojson], "AOI.geojson", {type: "application/geo+json" })
+    // console.log(f,'file F');
+    // setGeojsonFile(f);
     dispatch(
       CreateProjectService(
         `${enviroment.baseApiUrl}/projects/create_project`,
@@ -88,8 +94,9 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
         },
-        geojsonFile,
+        newUpdatedTaskGeojsonFile,
         customFormFile,
+        dataExtractFile
       ),
     );
     // navigate("/select-form", { replace: true, state: { values: values } });
@@ -195,90 +202,6 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
             sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}
           >
             <Grid item xs={16} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <CoreModules.FormControl sx={{ mb: 3 }}>
-                <InputLabel
-                  id="form-category"
-                  sx={{
-                    '&.Mui-focused': {
-                      color: defaultTheme.palette.black,
-                    },
-                  }}
-                >
-                  Data Extract Category
-                </InputLabel>
-                <Select
-                  labelId="data_extractWays-label"
-                  id="data_extractWays"
-                  value={values.data_extractWays}
-                  label="Data Extract Category"
-                  sx={{
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      border: '2px solid black',
-                    },
-                  }}
-                  onChange={(e) => {
-                    handleCustomChange('data_extractWays', e.target.value);
-                    dispatch(
-                      CreateProjectActions.SetIndividualProjectDetailsData({
-                        ...projectDetails,
-                        data_extractWays: e.target.value,
-                      }),
-                    );
-                  }}
-                >
-                  {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                  {selectExtractWays?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
-                  ))}
-                </Select>
-                {errors.data_extractWays && (
-                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                    {errors.data_extractWays}
-                  </CoreModules.FormLabel>
-                )}
-              </CoreModules.FormControl>
-              <CoreModules.FormControl sx={{ mb: 3 }}>
-                <InputLabel
-                  id="form-category"
-                  sx={{
-                    '&.Mui-focused': {
-                      color: defaultTheme.palette.black,
-                    },
-                  }}
-                >
-                  Form Category
-                </InputLabel>
-                <Select
-                  labelId="form_category-label"
-                  id="form_category"
-                  value={values.xform_title}
-                  label="Form Category"
-                  sx={{
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      border: '2px solid black',
-                    },
-                  }}
-                  onChange={(e) => {
-                    handleCustomChange('xform_title', e.target.value);
-                    dispatch(
-                      CreateProjectActions.SetIndividualProjectDetailsData({
-                        ...projectDetails,
-                        xform_title: e.target.value,
-                      }),
-                    );
-                  }}
-                >
-                  {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                  {formCategoryData?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
-                  ))}
-                </Select>
-                {errors.xform_title && (
-                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                    {errors.xform_title}
-                  </CoreModules.FormLabel>
-                )}
-              </CoreModules.FormControl>
               <CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
