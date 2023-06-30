@@ -49,6 +49,7 @@ const UploadArea: React.FC = ({geojsonFile,setGeojsonFile,setInputValue,inputVal
                 type="file"
                 value={inputValue}
                 onChange={(e) => {
+                  dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
                   setGeojsonFile(e.target.files[0]);
                 }}
               />
