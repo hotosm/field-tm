@@ -131,6 +131,16 @@ const routes = createBrowserRouter([
         ),
       },
       {
+        path: '/data-extract',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <CreateProject />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/define-tasks',
         element: (
           <ProtectedRoute>
