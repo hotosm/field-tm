@@ -24,7 +24,7 @@ allneighborlist as (
   select p.*, 
     pf.polyid as n_polyid,
     pf.area as n_area, 
-    pf.numfeatures as n_numfeatures
+    pf.numfeatures as n_numfeatures,
     -- length of shared boundary to make nice merge decisions 
     st_length2d(st_intersection(p.geom, pf.geom)) as sharedbound
   from lowfeaturecountpolys as p 
