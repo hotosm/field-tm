@@ -598,11 +598,28 @@ class DbUserRoles(Base):
     role = Column(Enum(UserRole), nullable=False)
 
 
+class DbProjectAOI(Base):
+    __tablename__ = "project_aoi"
+    
+    id = Column(Integer, primary_key=True)
+    project_id = Column(String)
+    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    properties = Column(JSONB)
+
+
 class DbOsmLines(Base):
     __tablename__ = "osm_lines"
     
     id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"))
-    project = relationship(DbProject, backref="osm_lines")
+    project_id = Column(String)
+    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    properties = Column(JSONB)
+
+
+class DbBuildings(Base):
+    __tablename__ = "buildings"
+
+    id = Column(Integer, primary_key=True)
+    project_id = Column(String)
     geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
     properties = Column(JSONB)
