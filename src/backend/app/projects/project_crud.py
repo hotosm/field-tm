@@ -64,6 +64,12 @@ from ..users import user_crud
 
 from . import project_schemas
 
+import requests
+import time
+import zipfile
+from io import BytesIO
+
+
 # --------------
 # ---- CRUD ----
 # --------------
@@ -506,6 +512,7 @@ def get_osm_extracts(boundary: str):
             "tags": {
                 "all_geometry": {
                     "join_or": {
+                        "building":[],
                         "highway": [],
                         "waterway":[]     
                         }
@@ -524,11 +531,6 @@ def get_osm_extracts(boundary: str):
     base_url = "https://raw-data-api0.hotosm.org/v1"
     query_url = f"{base_url}/snapshot/"
     headers = {"accept": "application/json", "Content-Type": "application/json"}
-
-    import requests
-    import time
-    import zipfile
-    from io import BytesIO
 
     result = requests.post(query_url, data=json.dumps(query), headers=headers)
 
@@ -578,62 +580,7 @@ async def split_into_tasks(
     db.add(db_task)
     db.commit()
 
-
-    # Filters for osm extracts
-    query={"filters":{
-            "tags": {
-                "all_geometry": {
-                    "join_or": {
-                        "building":[],
-                        "highway": [],
-                        "waterway":[]     
-                        }
-                    }
-                }
-            },
-            "geometryType": [
-                "polygon",
-                "line",
-                "line"
-            ],
-            "centroid": "false"
-        }
-    query["geometry"] = json.loads(boundary)["features"][0]["geometry"]
-
-    base_url = "https://raw-data-api0.hotosm.org/v1"
-    query_url = f"{base_url}/snapshot/"
-    headers = {"accept": "application/json", "Content-Type": "application/json"}
-
-    import requests
-    import time
-    import zipfile
-    from io import BytesIO
-
-    result = requests.post(query_url, data=json.dumps(query), headers=headers)
-
-    if result.status_code == 200:
-        task_id = result.json()['task_id']
-    else:
-        return False
-
-    task_url = f"{base_url}/tasks/status/{task_id}"
-    # extracts = requests.get(task_url)
-    while True:
-        result = requests.get(task_url, headers=headers)
-        if result.json()['status'] == "PENDING":
-            time.sleep(1)
-        elif result.json()['status'] == "SUCCESS":
-            break
-
-    zip_url = result.json()['result']['download_url']
-    zip_url
-    result = requests.get(zip_url, headers=headers)
-    # result.content
-    fp = BytesIO(result.content)
-    zfp = zipfile.ZipFile(fp, "r")
-    zfp.extract("Export.geojson", "/tmp/")
-    data = json.loads(zfp.read("Export.geojson"))
-
+    data = get_osm_extracts(boundary)
 
     for feature in data["features"]:
 
