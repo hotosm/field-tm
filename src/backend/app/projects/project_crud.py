@@ -612,36 +612,36 @@ async def split_into_tasks(
 
     query = f"""
 
-            WITH boundary AS (
+        WITH boundary AS (
             SELECT ST_Boundary(geometry) AS geom
             FROM "project_aoi"
             WHERE project_id='{project_id}'
-            ),
-            splitlines AS (
+        ),
+        splitlines AS (
             SELECT ST_Intersection(a.geometry, l.geometry) AS geom
             FROM "project_aoi" a, "osm_lines" l
             WHERE a.project_id='{project_id}'
                 AND l.project_id='{project_id}'
                 AND ST_Intersects(a.geometry, l.geometry)
-            ),
-            merged AS (
+        ),
+        merged AS (
             SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
             FROM splitlines
-            ),
-            comb AS (
+        ),
+        comb AS (
             SELECT ST_Union(boundary.geom, merged.geom) AS geom
             FROM boundary, merged
-            ),
-            polygons AS (
+        ),
+        polygons AS (
             SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom AS geom
             FROM comb
-            ),
-            buildings AS (
+        ),
+        buildings AS (
             SELECT *
             FROM "buildings"
             WHERE project_id='{project_id}'
-            ),
-            polbuild AS (
+        ),
+        polbuild AS (
             SELECT buildings.geometry
             FROM buildings
             JOIN polygons ON ST_Contains(polygons.geom, buildings.geometry)
@@ -649,36 +649,47 @@ async def split_into_tasks(
                 SELECT polygons.geom
                 FROM polygons
                 ORDER BY polygons.geom
-                -- OFFSET 66 LIMIT 1
             )
-            ),
-            points AS (
+        ),
+        points AS (
             SELECT ST_Centroid(geometry) AS geom
             FROM polbuild
-            ),
-            clusters AS (
+        ),
+        clusters AS (
             SELECT ST_ClusterKMeans(geometry, 15) OVER () AS cid, geometry
             FROM polbuild
-            ),
-            polycluster AS (
+        ),
+        polycluster AS (
             SELECT polbuild.geometry, cid
             FROM polbuild
             JOIN clusters ON ST_Contains(polbuild.geometry, clusters.geometry)
             GROUP BY cid, polbuild.geometry
-            ),
-            polyboundary AS (
+        ),
+        polyboundary AS (
             SELECT ST_ConvexHull(ST_Collect(polycluster.geometry)) AS geom
             FROM polycluster
             GROUP BY cid
-            )
-            SELECT ST_AsGeoJSON(ST_Multi(ST_Collect(polyboundary.geom))) AS geojson
-            FROM polyboundary;
+        )
+        SELECT
+            json_build_object(
+                'type', 'FeatureCollection',
+                'features', json_agg(
+                    json_build_object(
+                        'type', 'Feature',
+                        'properties', json_build_object(),
+                        'geometry', ST_AsGeoJSON(geom)::json
+                    )
+                )
+            ) AS geojson
+        FROM polyboundary;
+
+            
             """
 
     result = db.execute(query)
     geom_data = result.fetchone()
 
-    return json.loads(geom_data['geojson'])
+    return geom_data['geojson']
 
 
 
