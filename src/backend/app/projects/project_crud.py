@@ -853,7 +853,7 @@ async def split_into_tasks(
     result = db.execute(query)
     geom_data = result.fetchone()
 
-    return geom_data
+    return geom_data['geojson']
 
 
 
