@@ -279,7 +279,7 @@ async def upload_multi_project_boundary(
     return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
 
-@router.post("/task_split/{project_id}/")
+@router.post("/task_split")
 async def task_split(
     upload: UploadFile = File(...),
     db: Session = Depends(database.get_db)
