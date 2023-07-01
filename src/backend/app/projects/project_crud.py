@@ -785,70 +785,76 @@ async def split_into_tasks(
 
     #     """
 
-
     query = f"""
-    WITH boundary AS (
-    SELECT ST_Boundary(outline) AS geom
-    FROM "projects" WHERE id={project_id}
-    ),
-    splitlines AS (
-    SELECT ST_Intersection(a.outline, l.geometry) AS geom
-    FROM "projects" a, "osm_lines" l
-    where a.id={project_id} and l.project_id={project_id}
-    and ST_Intersects(a.outline, l.geometry)
-    -- AND (tags->>'highway' = 'primary' OR tags->>'waterway' = 'river')
-    ),
-    merged AS (
-    SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
-    FROM splitlines
-    ),
-    comb AS (
-    SELECT ST_Union(boundary.geom, merged.geom) AS geom
-    FROM boundary, merged
-    ),
-    polygons AS (
-    SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom AS geom
-    FROM comb
-    ),
-    buildings AS (
-    SELECT *
-    FROM "features"
-    where project_id={project_id}
-    -- and tags->>'building' IS NOT NULL
-    ),
-    polbuild AS(
-    SELECT buildings.geometry
-    FROM buildings
-    JOIN polygons ON st_contains(polygons.geom, buildings.geometry)
-    WHERE polygons.geom IN (
-        SELECT polygons.geom
-        FROM polygons
-        ORDER BY polygons.geom 
-    --    OFFSET 66 LIMIT 1
-    )),
-    points as(
-    SELECT  st_centroid(geometry) AS geom
-    FROM polbuild
-    ),
-    clusters AS (
-    SELECT ST_ClusterKMeans(geometry, 15) OVER () AS cid, geometry
-    FROM polbuild
-    ),
-    polycluster AS(
-    select polbuild.geometry,cid from polbuild join clusters on st_contains( polbuild.geometry, clusters.geometry) group by cid, polbuild.geometry),
 
-    polyboundary AS (
-    SELECT ST_ConvexHull(ST_Collect(polycluster.geometry)) AS geom
-    FROM polycluster group by cid
-    )
-    SELECT polyboundary.geom
-    FROM polyboundary;
-    """
+            WITH boundary AS (
+            SELECT ST_Boundary(geometry) AS geom
+            FROM "project_aoi"
+            WHERE project_id = {project_id}
+            ),
+            splitlines AS (
+            SELECT ST_Intersection(a.geometry, l.geometry) AS geom
+            FROM "project_aoi" a, "osm_lines" l
+            WHERE a.project_id = {project_id}
+                AND l.project_id = {project_id}
+                AND ST_Intersects(a.geometry, l.geometry)
+            ),
+            merged AS (
+            SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+            FROM splitlines
+            ),
+            comb AS (
+            SELECT ST_Union(boundary.geom, merged.geom) AS geom
+            FROM boundary, merged
+            ),
+            polygons AS (
+            SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom AS geom
+            FROM comb
+            ),
+            buildings AS (
+            SELECT *
+            FROM "buildings"
+            WHERE project_id = {project_id}
+            ),
+            polbuild AS (
+            SELECT buildings.geometry
+            FROM buildings
+            JOIN polygons ON ST_Contains(polygons.geom, buildings.geometry)
+            WHERE polygons.geom IN (
+                SELECT polygons.geom
+                FROM polygons
+                ORDER BY polygons.geom
+                -- OFFSET 66 LIMIT 1
+            )
+            ),
+            points AS (
+            SELECT ST_Centroid(geometry) AS geom
+            FROM polbuild
+            ),
+            clusters AS (
+            SELECT ST_ClusterKMeans(geometry, 15) OVER () AS cid, geometry
+            FROM polbuild
+            ),
+            polycluster AS (
+            SELECT polbuild.geometry, cid
+            FROM polbuild
+            JOIN clusters ON ST_Contains(polbuild.geometry, clusters.geometry)
+            GROUP BY cid, polbuild.geometry
+            ),
+            polyboundary AS (
+            SELECT ST_ConvexHull(ST_Collect(polycluster.geometry)) AS geom
+            FROM polycluster
+            GROUP BY cid
+            )
+            SELECT ST_AsGeoJSON(ST_Multi(ST_Collect(polyboundary.geom))) AS geojson
+            FROM polyboundary;
+            """
 
     result = db.execute(query)
     geom_data = result.fetchall()
 
-    return data
+    return geom_data
+
 
 
 def update_project_boundary(
