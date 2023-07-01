@@ -15,13 +15,15 @@ This script takes 4 inputs, all of which are Postgresql/PostGIS tables/layers.
 - ```ways_poly```, a Postgis polygon layer containing all OpenSTreetMap "closed ways" (the OSM term for polygons) in the AOI.
 - ```project-config```, a Postgresql table containing settings (for example, the average number of features desired per task). _This isn't yet implemented; these settings are hard-coded for the moment. The script runs without a ```project-config``` table, but the number of features per task needs to be tweaked within the code._
 
-OSM data (```ways-line``` and ```ways_poly```) can be loaded into a PostGIS database using the [Underpass] configuration file [raw.lua](https://github.com/hotosm/underpass/blob/master/utils/raw.lua). If these two layers are present in the same database and schema as the ```project-aoi``` layer, the script will make use of them automatically (non-desctructively; it doesn't modify any tables other than the ones it creates unless you're unlucky enough to have tables matching the very specific names I'm using, which I'll later change to names that should avoid all realistically possible collisions).
+OSM data (```ways-line``` and ```ways_poly```) can be loaded into a PostGIS database using the [Underpass](https://github.com/hotosm/underpass) configuration file [raw.lua](https://github.com/hotosm/underpass/blob/master/utils/raw.lua). If these two layers are present in the same database and schema as the ```project-aoi``` layer, the script will make use of them automatically (non-desctructively; it doesn't modify any tables other than the ones it creates unless you're unlucky enough to have tables matching the very specific names I'm using, which I'll later change to names that should avoid all realistically possible collisions).
 
 ## Running the script
 You need a Postgresql database with PostGIS extension enabled. If both Postgresql and PostGIS are installed and you have permissions set up properly (doing both of those things is way beyond scope here), this should do the trick (choose whatever database name you want):
 
 ```
 createdb [databasename] -O [username]
+```
+```
 psql  -U [username] -d [databasename] -c 'CREATE EXTENSION POSTGIS'
 ```
 
