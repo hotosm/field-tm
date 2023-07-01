@@ -790,13 +790,13 @@ async def split_into_tasks(
             WITH boundary AS (
             SELECT ST_Boundary(geometry) AS geom
             FROM "project_aoi"
-            WHERE project_id = {project_id}
+            WHERE project_id='{project_id}'
             ),
             splitlines AS (
             SELECT ST_Intersection(a.geometry, l.geometry) AS geom
             FROM "project_aoi" a, "osm_lines" l
-            WHERE a.project_id = {project_id}
-                AND l.project_id = {project_id}
+            WHERE a.project_id='{project_id}'
+                AND l.project_id='{project_id}'
                 AND ST_Intersects(a.geometry, l.geometry)
             ),
             merged AS (
@@ -814,7 +814,7 @@ async def split_into_tasks(
             buildings AS (
             SELECT *
             FROM "buildings"
-            WHERE project_id = {project_id}
+            WHERE project_id='{project_id}'
             ),
             polbuild AS (
             SELECT buildings.geometry
@@ -851,7 +851,7 @@ async def split_into_tasks(
             """
 
     result = db.execute(query)
-    geom_data = result.fetchall()
+    geom_data = result.fetchone()
 
     return geom_data
 
