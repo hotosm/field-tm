@@ -610,35 +610,6 @@ async def split_into_tasks(
             db.commit()
 
 
-    # query = f"""    
-    #     WITH boundary AS (
-    #     SELECT ST_Boundary(outline) AS geom
-    #     FROM "projects" WHERE id={project_id}
-    #     ),
-    #     splitlines AS (
-    #     SELECT ST_Intersection(a.outline, l.geometry) AS geom
-    #     FROM "projects" a, "osm_lines" l
-    #     WHERE a.id={project_id} and l.project_id={project_id}
-    #     AND ST_Intersects(a.outline, l.geometry)
-    #     ),
-    #     merged AS (
-    #     SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
-    #     FROM splitlines
-    #     ),
-    #     comb AS (
-    #     SELECT ST_Union(boundary.geom, merged.geom) AS geom
-    #     FROM boundary, merged
-    #     ),
-    #     splitpolysnoindex AS (
-    #     SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
-    #     FROM comb
-    #     )
-    #     -- Add row numbers to function as temporary unique IDs for our new polygons
-    #     SELECT row_number () over () as polyid, * 
-    #     from splitpolysnoindex
-
-    #     """
-
     query = f"""
 
             WITH boundary AS (
