@@ -281,7 +281,6 @@ async def upload_multi_project_boundary(
 
 @router.post("/task_split/{project_id}/")
 async def task_split(
-    project_id: int,
     upload: UploadFile = File(...),
     db: Session = Depends(database.get_db)
     ):
@@ -289,9 +288,10 @@ async def task_split(
     # read entire file
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, project_id, content)
+    result = await project_crud.split_into_tasks(db, content)
 
     return result
+
 
 
 @router.post("/{project_id}/upload")
