@@ -553,7 +553,7 @@ def get_osm_extracts(boundary: str):
     fp = BytesIO(result.content)
     zfp = zipfile.ZipFile(fp, "r")
     zfp.extract("Export.geojson", "/tmp/")
-    data = eval(zfp.read("Export.geojson"))
+    data = json.loads(zfp.read("Export.geojson"))
 
     return data
 
