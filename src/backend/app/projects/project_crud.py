@@ -558,15 +558,104 @@ def get_osm_extracts(boundary: str):
     return data
 
 
+# async def split_into_tasks(
+#     db: Session, project_id: int, boundary: str   
+#     ):
+
+#     # verify project exists in db
+#     db_project = get_project(db, project_id)
+#     if not db_project:
+#         logger.error(f"Project {project_id} doesn't exist!")
+#         return False
+
+#     outline = json.loads(boundary)
+
+#     """Update the boundary polyon on the database."""
+#     boundary_data = outline["features"][0]["geometry"]
+#     outline = shape(boundary_data)
+
+#     # Update the project outline and centroid in project table.
+#     db_project.outline = outline.wkt
+#     db_project.centroid = outline.centroid.wkt
+#     db.commit()
+#     db.refresh(db_project)
+
+#     data = get_osm_extracts(boundary)
+
+#     for feature in data["features"]:
+        
+#         # If the osm extracts contents do not have a title, provide an empty text for that.
+#         feature_shape = shape(feature['geometry'])
+
+#         wkb_element = from_shape(feature_shape, srid=4326)
+
+#         db_feature = db_models.DbOsmLines(
+#             project_id=project_id,
+#             geometry=wkb_element,
+#             properties=feature["properties"]
+#         )
+
+#         db.add(db_feature)
+#         db.commit()
+
+
+#     query = f"""    
+#         WITH boundary AS (
+#         SELECT ST_Boundary(outline) AS geom
+#         FROM "projects" WHERE id={project_id}
+#         ),
+#         splitlines AS (
+#         SELECT ST_Intersection(a.outline, l.geometry) AS geom
+#         FROM "projects" a, "osm_lines" l
+#         WHERE a.id={project_id} and l.project_id={project_id}
+#         AND ST_Intersects(a.outline, l.geometry)
+#         ),
+#         merged AS (
+#         SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+#         FROM splitlines
+#         ),
+#         comb AS (
+#         SELECT ST_Union(boundary.geom, merged.geom) AS geom
+#         FROM boundary, merged
+#         ),
+#         splitpolysnoindex AS (
+#         SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
+#         FROM comb
+#         )
+#         -- Add row numbers to function as temporary unique IDs for our new polygons
+#         SELECT row_number () over () as polyid, * 
+#         from splitpolysnoindex
+
+#         """
+
+#     result = db.execute(query)
+#     geom_data = result.fetchall()
+
+#     for geom in geom_data:
+#         # Add tasks in the database
+#         db_task = db_models.DbTask(
+#             project_id=project_id,
+#             outline=geom[1],
+#             project_task_index=1
+#         )
+
+#         db.add(db_task)
+#         db.commit()
+
+#         """ Id is passed in the task_name too. """
+#         db_task.project_task_name = str(db_task.id)
+#         db.commit()
+
+#         print('tasks added to db')
+
+#     return True
+
+
 async def split_into_tasks(
-    db: Session, project_id: int, boundary: str   
+    db: Session, boundary: str   
     ):
 
-    # verify project exists in db
-    db_project = get_project(db, project_id)
-    if not db_project:
-        logger.error(f"Project {project_id} doesn't exist!")
-        return False
+    project_id = uuid.uuid4()
 
     outline = json.loads(boundary)
 
@@ -574,79 +663,262 @@ async def split_into_tasks(
     boundary_data = outline["features"][0]["geometry"]
     outline = shape(boundary_data)
 
-    # Update the project outline and centroid in project table.
-    db_project.outline = outline.wkt
-    db_project.centroid = outline.centroid.wkt
-    db.commit()
-    db.refresh(db_project)
+    db_task = db_models.DbProjectAOI(
+        project_id=project_id,
+        geometry=outline.wkt,
+    )
 
-    data = get_osm_extracts(boundary)
+    db.add(db_task)
+    db.commit()
+
+
+    # Filters for osm extracts
+    query={"filters":{
+            "tags": {
+                "all_geometry": {
+                    "join_or": {
+                        "building":[],
+                        "highway": [],
+                        "waterway":[]     
+                        }
+                    }
+                }
+            },
+            "geometryType": [
+                "polygon",
+                "line",
+                "line"
+            ],
+            "centroid": "false"
+        }
+    query["geometry"] = json.loads(boundary)["features"][0]["geometry"]
+
+    base_url = "https://raw-data-api0.hotosm.org/v1"
+    query_url = f"{base_url}/snapshot/"
+    headers = {"accept": "application/json", "Content-Type": "application/json"}
+
+    import requests
+    import time
+    import zipfile
+    from io import BytesIO
+
+    result = requests.post(query_url, data=json.dumps(query), headers=headers)
+
+    if result.status_code == 200:
+        task_id = result.json()['task_id']
+    else:
+        return False
+
+    task_url = f"{base_url}/tasks/status/{task_id}"
+    # extracts = requests.get(task_url)
+    while True:
+        result = requests.get(task_url, headers=headers)
+        if result.json()['status'] == "PENDING":
+            time.sleep(1)
+        elif result.json()['status'] == "SUCCESS":
+            break
+
+    zip_url = result.json()['result']['download_url']
+    zip_url
+    result = requests.get(zip_url, headers=headers)
+    # result.content
+    fp = BytesIO(result.content)
+    zfp = zipfile.ZipFile(fp, "r")
+    zfp.extract("Export.geojson", "/tmp/")
+    data = json.loads(zfp.read("Export.geojson"))
+
 
     for feature in data["features"]:
-        
+
         # If the osm extracts contents do not have a title, provide an empty text for that.
         feature_shape = shape(feature['geometry'])
 
         wkb_element = from_shape(feature_shape, srid=4326)
 
-        db_feature = db_models.DbOsmLines(
-            project_id=project_id,
-            geometry=wkb_element,
-            properties=feature["properties"]
-        )
+        if feature['properties']['tags'].get('building') == 'yes':
+            db_feature = db_models.DbBuildings(
+                project_id=project_id,
+                geometry=wkb_element,
+                properties=feature["properties"]
+                # category="buildings"
+            )
+            db.add(db_feature)
+            db.commit()
 
-        db.add(db_feature)
-        db.commit()
+        else:
+            db_feature = db_models.DbOsmLines(
+                project_id=project_id,
+                geometry=wkb_element,
+                properties=feature["properties"]
+            )
+
+            db.add(db_feature)
+            db.commit()
 
 
-    query = f"""    
-        WITH boundary AS (
-        SELECT ST_Boundary(outline) AS geom
-        FROM "projects" WHERE id={project_id}
-        ),
-        splitlines AS (
-        SELECT ST_Intersection(a.outline, l.geometry) AS geom
-        FROM "projects" a, "osm_lines" l
-        WHERE a.id={project_id} and l.project_id={project_id}
-        AND ST_Intersects(a.outline, l.geometry)
-        ),
-        merged AS (
-        SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
-        FROM splitlines
-        ),
-        comb AS (
-        SELECT ST_Union(boundary.geom, merged.geom) AS geom
-        FROM boundary, merged
-        ),
-        splitpolysnoindex AS (
-        SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
-        FROM comb
-        )
-        -- Add row numbers to function as temporary unique IDs for our new polygons
-        SELECT row_number () over () as polyid, * 
-        from splitpolysnoindex
+    # query = f"""    
+    #     WITH boundary AS (
+    #     SELECT ST_Boundary(outline) AS geom
+    #     FROM "projects" WHERE id={project_id}
+    #     ),
+    #     splitlines AS (
+    #     SELECT ST_Intersection(a.outline, l.geometry) AS geom
+    #     FROM "projects" a, "osm_lines" l
+    #     WHERE a.id={project_id} and l.project_id={project_id}
+    #     AND ST_Intersects(a.outline, l.geometry)
+    #     ),
+    #     merged AS (
+    #     SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+    #     FROM splitlines
+    #     ),
+    #     comb AS (
+    #     SELECT ST_Union(boundary.geom, merged.geom) AS geom
+    #     FROM boundary, merged
+    #     ),
+    #     splitpolysnoindex AS (
+    #     SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
+    #     FROM comb
+    #     )
+    #     -- Add row numbers to function as temporary unique IDs for our new polygons
+    #     SELECT row_number () over () as polyid, * 
+    #     from splitpolysnoindex
 
-        """
+    #     """
+
+
+    query = f"""
+    WITH boundary AS (
+    SELECT ST_Boundary(outline) AS geom
+    FROM "projects" WHERE id={project_id}
+    ),
+    splitlines AS (
+    SELECT ST_Intersection(a.outline, l.geometry) AS geom
+    FROM "projects" a, "osm_lines" l
+    where a.id={project_id} and l.project_id={project_id}
+    and ST_Intersects(a.outline, l.geometry)
+    -- AND (tags->>'highway' = 'primary' OR tags->>'waterway' = 'river')
+    ),
+    merged AS (
+    SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
+    FROM splitlines
+    ),
+    comb AS (
+    SELECT ST_Union(boundary.geom, merged.geom) AS geom
+    FROM boundary, merged
+    ),
+    polygons AS (
+    SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom AS geom
+    FROM comb
+    ),
+    buildings AS (
+    SELECT *
+    FROM "features"
+    where project_id={project_id}
+    -- and tags->>'building' IS NOT NULL
+    ),
+    polbuild AS(
+    SELECT buildings.geometry
+    FROM buildings
+    JOIN polygons ON st_contains(polygons.geom, buildings.geometry)
+    WHERE polygons.geom IN (
+        SELECT polygons.geom
+        FROM polygons
+        ORDER BY polygons.geom 
+    --    OFFSET 66 LIMIT 1
+    )),
+    points as(
+    SELECT  st_centroid(geometry) AS geom
+    FROM polbuild
+    ),
+    clusters AS (
+    SELECT ST_ClusterKMeans(geometry, 15) OVER () AS cid, geometry
+    FROM polbuild
+    ),
+    polycluster AS(
+    select polbuild.geometry,cid from polbuild join clusters on st_contains( polbuild.geometry, clusters.geometry) group by cid, polbuild.geometry),
+
+    polyboundary AS (
+    SELECT ST_ConvexHull(ST_Collect(polycluster.geometry)) AS geom
+    FROM polycluster group by cid
+    )
+    SELECT polyboundary.geom
+    FROM polyboundary;
+    """
 
     result = db.execute(query)
     geom_data = result.fetchall()
 
-    for geom in geom_data:
-        # Add tasks in the database
-        db_task = db_models.DbTask(
-            project_id=project_id,
-            outline=geom[1]
+    return data
+
+
+def update_project_boundary(
+    db: Session, project_id: int, boundary: str, dimension: int
+):
+    # verify project exists in db
+    db_project = get_project_by_id(db, project_id)
+    if not db_project:
+        logger.error(f"Project {project_id} doesn't exist!")
+        return False
+
+    """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
+
+    def remove_z_dimension(coord):
+        return coord.pop() if len(coord) == 3 else None
+
+    """ Check if the boundary is a Feature or a FeatureCollection """
+    if boundary["type"] == "Feature":
+        features = [boundary]
+    elif boundary["type"] == "FeatureCollection":
+        features = boundary["features"]
+    else:
+        # Delete the created Project
+        db.delete(db_project)
+        db.commit()
+
+        # Raise an exception
+        raise HTTPException(
+            status_code=400, detail=f"Invalid GeoJSON type: {boundary['type']}"
         )
 
+    """ Apply the lambda function to each coordinate in its geometry """
+    for feature in features:
+        list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
+
+    """Update the boundary polyon on the database."""
+    outline = shape(features[0]["geometry"])
+
+    # If the outline is a multipolygon, use the first polygon
+    if isinstance(outline, MultiPolygon):
+        outline = outline.geoms[0]
+
+    db_project.outline = outline.wkt
+    db_project.centroid = outline.centroid.wkt
+
+    db.commit()
+    db.refresh(db_project)
+    logger.debug("Added project boundary!")
+
+    result = create_task_grid(db, project_id=project_id, delta=dimension)
+
+    tasks = eval(result)
+    for poly in tasks["features"]:
+        logger.debug(poly)
+        task_name = str(poly["properties"]["id"])
+        db_task = db_models.DbTask(
+            project_id=project_id,
+            project_task_name=task_name,
+            outline=wkblib.dumps(shape(poly["geometry"]), hex=True),
+            # qr_code=db_qr,
+            # qr_code_id=db_qr.id,
+            # project_task_index=feature["properties"]["fid"],
+            project_task_index=1,
+            # geometry_geojson=geojson.dumps(task_geojson),
+            # initial_feature_count=len(task_geojson["features"]),
+        )
         db.add(db_task)
         db.commit()
 
-        """ Id is passed in the task_name too. """
-        db_task.project_task_name = str(db_task.id)
-        db.commit()
-
-        print('tasks added to db')
-
+        # FIXME: write to tasks table
     return True
 
 
