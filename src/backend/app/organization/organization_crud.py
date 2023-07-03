@@ -16,6 +16,8 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 import os
+import random
+import string
 from fastapi import HTTPException, File,UploadFile
 from fastapi.logger import logger as logger
 import re
@@ -24,6 +26,7 @@ from sqlalchemy.orm import Session
 
 from ..db import db_models
 
+IMAGEDIR = "app/images/"
 
 # --------------
 # ---- CRUD ----
