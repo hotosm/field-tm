@@ -60,7 +60,31 @@ async def get_organisation_by_name(db: Session, name: str):
     return db_organisation
 
 
-async def create_organization(db: Session, name: str, description: str, url: str, logo: UploadFile = File(...)):
+async def upload_image(db: Session, file: UploadFile(None)):
+    # Check if file with the same name exists
+    filename = file.filename
+    file_path = f"{IMAGEDIR}{filename}"
+    while os.path.exists(file_path):
+
+        # Generate a random character
+        random_char = ''.join(random.choices(string.ascii_letters + string.digits, k=3))
+
+        # Add the random character to the filename
+        logo_name, extension = os.path.splitext(filename)
+        filename = f"{logo_name}_{random_char}{extension}"
+        file_path = f"{IMAGEDIR}{filename}"
+
+    # Read the file contents
+    contents = await file.read()
+
+    # Save the file
+    with open(file_path, "wb") as f:
+        f.write(contents)
+
+    return filename
+
+
+async def create_organization(db: Session, name: str, description: str, url: str, logo: UploadFile(None)):
     """
     Creates a new organization with the given name, description, url, type, and logo.
     Saves the logo file to the app/images folder.
@@ -79,30 +103,23 @@ async def create_organization(db: Session, name: str, description: str, url: str
 
     # create new organization
     try:
+        logo_name = await upload_image(db, logo) if logo else None
+
         db_organization = db_models.DbOrganisation(
             name=name,
             slug=generate_slug(name),
             description=description,
-            url=url
+            url=url,
+            logo=logo_name
         )
 
-        # Save logo file to app/images folder
-        # file_path = os.path.join("app/images")
-        # if not os.path.exists(file_path):
-        #     os.makedirs(file_path)
-
-        # with open(os.path.join(file_path, logo.filename), "wb") as file:
-        #     file.write(await logo.read())
-
-        db_organization.logo = logo.filename if logo else None
         db.add(db_organization)
         db.commit()
         db.refresh(db_organization)
     except Exception as e:
         logger.error(e)
         raise HTTPException(
-            status_code=400, detail=f" ----- Error: {e}"
+            status_code=400, detail=f"Error creating organization: {e}"
         ) from e
 
     return True
-
