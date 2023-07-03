@@ -307,7 +307,6 @@ async def edit_task_boundary(
 
     task = await get_task_by_id(db, task_id)
     if not task:
-        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         raise HTTPException(status_code=404, detail="Task not found")
 
     task.outline = outline.wkt
@@ -321,18 +320,17 @@ async def edit_task_boundary(
     project_name = project.project_name_prefix
     odk_id = project.odkid
 
-    print('Project', task.project_id)
-    task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"  # This file will store osm extracts
+    # This file will store osm extracts
+    task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
 
     # Update data extracts in the odk central
-
-    # OSM Extracts for whole project
     pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
 
     category = 'buildings'
 
     outfile = f"/tmp/test_project_{category}.geojson"  # This file will store osm extracts
 
+    # OSM Extracts
     outline_geojson = pg.getFeatures(boundary = geometry, 
                                         filespec = outfile,
                                         polygon = True,
@@ -369,6 +367,7 @@ async def edit_task_boundary(
         jsonfile.truncate(0)  # clear the contents of the file
         dump(updated_outline_geojson, jsonfile)
 
+    # Update the osm extracts in the form.
     central_crud.upload_xform_media(odk_id, task_id, task_polygons, None)
 
     return True
