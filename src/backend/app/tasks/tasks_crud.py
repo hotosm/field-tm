@@ -24,6 +24,12 @@ from fastapi.logger import logger as logger
 from sqlalchemy import column, select, table
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from osm_fieldwork.make_data_extract import PostgresClient
+from geoalchemy2.shape import from_shape
+from shapely.geometry import shape
+from geojson import dump
+from ..projects import project_crud
+from ..central import central_crud
 
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
@@ -287,11 +293,6 @@ async def get_task_by_id(db: Session, task_id: int):
     )
     print('Task ', task)
     return task
-
-
-from geojson import dump
-from ..projects import project_crud
-from ..central import central_crud
 
 
 async def edit_task_boundary(
