@@ -300,78 +300,76 @@ async def edit_task_boundary(
       task_id: int,
       boundary: str  
     ):
-    try:
-        geometry = boundary['features'][0]['geometry']
+    geometry = boundary['features'][0]['geometry']
 
-        """Update the boundary polyon on the database."""
-        outline = shape(geometry)
+    """Update the boundary polyon on the database."""
+    outline = shape(geometry)
 
-        task = await get_task_by_id(db, task_id)
-        if not task:
-            raise HTTPException(status_code=404, detail="Task not found")
+    task = await get_task_by_id(db, task_id)
+    if not task:
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        raise HTTPException(status_code=404, detail="Task not found")
 
-        task.outline = outline.wkt
+    task.outline = outline.wkt
+    db.commit()
+
+
+    # Get category, project_name
+    project_id = task.project_id
+    project = project_crud.get_project(db, project_id)
+    category = project.xform_title
+    project_name = project.project_name_prefix
+    odk_id = project.odkid
+
+    print('Project', task.project_id)
+    task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"  # This file will store osm extracts
+
+    # Update data extracts in the odk central
+
+    # OSM Extracts for whole project
+    pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+
+    category = 'buildings'
+
+    outfile = f"/tmp/test_project_{category}.geojson"  # This file will store osm extracts
+
+    outline_geojson = pg.getFeatures(boundary = geometry, 
+                                        filespec = outfile,
+                                        polygon = True,
+                                        xlsfile = f'{category}.xls',
+                                        category = category
+                                        )
+
+    updated_outline_geojson = {
+        "type": "FeatureCollection",
+        "features": []}
+
+    # Collect feature mappings for bulk insert
+    for feature in outline_geojson["features"]:
+
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature["properties"]["title"] = ""
+
+        feature_shape = shape(feature['geometry'])
+
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+        updated_outline_geojson['features'].append(feature)
+
+        db_feature = db_models.DbFeatures(
+                        project_id=3,
+                        geometry=wkb_element,
+                        properties=feature["properties"]
+                    )
+        db.add(db_feature)
         db.commit()
 
+    # Update task_polygons file containing osm extracts with the new geojson contents containing title in the properties.
+    with open(task_polygons, "w") as jsonfile:
+        jsonfile.truncate(0)  # clear the contents of the file
+        dump(updated_outline_geojson, jsonfile)
 
-        # Get category, project_name
-        project_id = task.project_id
-        project = project_crud.get_project(db, project_id)
-        category = project.xform_title
-        project_name = project.project_name_prefix
-        odk_id = project.odkid
+    central_crud.upload_xform_media(odk_id, task_id, task_polygons, None)
 
-        print('Project', task.project_id)
-        task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"  # This file will store osm extracts
+    return True
 
-        # Update data extracts in the odk central
-
-        # OSM Extracts for whole project
-        pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
-
-        category = 'buildings'
-
-        outfile = f"/tmp/test_project_{category}.geojson"  # This file will store osm extracts
-
-        outline_geojson = pg.getFeatures(boundary = geometry, 
-                                            filespec = outfile,
-                                            polygon = True,
-                                            xlsfile = f'{category}.xls',
-                                            category = category
-                                            )
-
-        updated_outline_geojson = {
-            "type": "FeatureCollection",
-            "features": []}
-
-        # Collect feature mappings for bulk insert
-        for feature in outline_geojson["features"]:
-
-            # If the osm extracts contents do not have a title, provide an empty text for that.
-            feature["properties"]["title"] = ""
-
-            feature_shape = shape(feature['geometry'])
-
-
-            wkb_element = from_shape(feature_shape, srid=4326)
-            updated_outline_geojson['features'].append(feature)
-
-            db_feature = db_models.DbFeatures(
-                            project_id=3,
-                            geometry=wkb_element,
-                            properties=feature["properties"]
-                        )
-            db.add(db_feature)
-            db.commit()
-
-        # Update task_polygons file containing osm extracts with the new geojson contents containing title in the properties.
-        with open(task_polygons, "w") as jsonfile:
-            jsonfile.truncate(0)  # clear the contents of the file
-            dump(updated_outline_geojson, jsonfile)
-
-        central_crud.upload_xform_media(odk_id, task_id, task_polygons, None)
-
-        return True
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
