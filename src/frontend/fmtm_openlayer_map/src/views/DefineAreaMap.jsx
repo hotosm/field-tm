@@ -28,7 +28,7 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
-    zoom: 4,
+    zoom: 1,
     maxZoom: 25,
   });
   

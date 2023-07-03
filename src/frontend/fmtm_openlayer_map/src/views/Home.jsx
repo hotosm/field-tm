@@ -139,7 +139,7 @@ const Home = () => {
     const view = new View({
       projection: "EPSG:3857",
       center: [0, 0],
-      zoom: 4,
+      zoom: 1,
     });
 
     const initialMap = new Map({
