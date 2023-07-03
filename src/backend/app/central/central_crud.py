@@ -183,6 +183,36 @@ def delete_app_user(
     return result
 
 
+def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_credentials: dict = None):
+
+    title = os.path.basename(os.path.splitext(filespec)[0])
+
+    if odk_credentials:
+        url = odk_credentials["odk_central_url"]
+        user = odk_credentials["odk_central_user"]
+        pw = odk_credentials["odk_central_password"]
+
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    try:
+        xform = OdkForm(url, user, pw)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=500, detail={"message": "Connection failed to odk central"}
+        ) from e
+
+    result = xform.uploadMedia(project_id, title, filespec)
+    result = xform.publishForm(project_id, title)
+    return result
+
+
+
 def create_odk_xform(
     project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
 ):
