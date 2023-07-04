@@ -214,7 +214,9 @@ def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_cred
 
 
 def create_odk_xform(
-    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
+    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None,
+    draft: bool = False,
+    upload_media = True
 ):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
@@ -240,14 +242,16 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.createForm(project_id, xform_id, filespec, False)
+    result = xform.createForm(project_id, xform_id, filespec, draft)
 
     if result != 200 and result != 409:
         return result
     data = f"/tmp/{title}.geojson"
+
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
-    result = xform.uploadMedia(project_id, title, data)
+    if upload_media:
+        result = xform.uploadMedia(project_id, title, data)
 
     result = xform.publishForm(project_id, title)
     return result
