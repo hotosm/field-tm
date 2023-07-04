@@ -16,9 +16,10 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import json
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 
 from ..db import database
@@ -111,6 +112,22 @@ async def get_qr_code_list(
     db: Session = Depends(database.get_db),
 ):
     return tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
+
+
+@router.post("/edit-task-boundary")
+async def edit_task_boundary(
+    task_id: int,
+    boundary: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+    ):
+
+    # read entire file
+    content = await boundary.read()
+    boundary_json = json.loads(content)
+
+    edit_boundary = await tasks_crud.edit_task_boundary(db, task_id, boundary_json)    
+
+    return edit_boundary
 
 
 @router.get("/tasks-features/")

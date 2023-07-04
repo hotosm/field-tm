@@ -183,6 +183,36 @@ def delete_app_user(
     return result
 
 
+def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_credentials: dict = None):
+
+    title = os.path.basename(os.path.splitext(filespec)[0])
+
+    if odk_credentials:
+        url = odk_credentials["odk_central_url"]
+        user = odk_credentials["odk_central_user"]
+        pw = odk_credentials["odk_central_password"]
+
+    else:
+        logger.debug("ODKCentral connection variables not set in function")
+        logger.debug("Attempting extraction from environment variables")
+        url = settings.ODK_CENTRAL_URL
+        user = settings.ODK_CENTRAL_USER
+        pw = settings.ODK_CENTRAL_PASSWD
+
+    try:
+        xform = OdkForm(url, user, pw)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=500, detail={"message": "Connection failed to odk central"}
+        ) from e
+
+    result = xform.uploadMedia(project_id, title, filespec)
+    result = xform.publishForm(project_id, title)
+    return result
+
+
+
 def create_odk_xform(
     project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
 ):
@@ -292,27 +322,31 @@ def download_submissions(
 
 
 def generate_updated_xform(
-    db: Session,
-    task_id: dict,
     xlsform: str,
     xform: str,
+    form_type : str,
 ):
     """Update the version in an XForm so it's unique."""
     name = os.path.basename(xform).replace(".xml", "")
     outfile = xform
-    try:
-        xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
-    except Exception as e:
-        logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    if form_type != 'xml':
+        try:
+            xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
+        except Exception as e:
+            logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
+            raise HTTPException(status_code=400, detail=str(e)) from e
 
-    if os.path.getsize(outfile) <= 0:
-        logger.warning(f"{outfile} is empty!")
-        raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
+        if os.path.getsize(outfile) <= 0:
+            logger.warning(f"{outfile} is empty!")
+            raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
 
-    xls = open(outfile, "r")
-    data = xls.read()
-    xls.close()
+        xls = open(outfile, "r")
+        data = xls.read()
+        xls.close()
+    else:
+        xls = open(xlsform, "r")
+        data = xls.read()
+        xls.close()
 
     tmp = name.split("_")
     tmp[0]

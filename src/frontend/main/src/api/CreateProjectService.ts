@@ -5,7 +5,7 @@ import enviroment from "../environment";
 import { CommonActions } from '../store/slices/CommonSlice';
 
 
-const CreateProjectService: Function = (url: string, payload: any, fileUpload: any, formUpload: any) => {
+const CreateProjectService: Function = (url: string, payload: any, fileUpload: any, formUpload: any,dataExtractFile:any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.CreateProjectLoading(true))
@@ -34,7 +34,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                         duration: 2000,
                     })
                 );
-                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload));
+                await dispatch(GenerateProjectQRService(`${enviroment.baseApiUrl}/projects/${resp.id}/generate`, payload, formUpload,dataExtractFile));
                 dispatch(CommonActions.SetLoading(false))
                 dispatch(CreateProjectActions.CreateProjectLoading(true))
 
@@ -128,7 +128,7 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
     }
 
 }
-const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any) => {
+const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any,dataExtractFile:any) => {
 
     return async (dispatch) => {
         dispatch(CreateProjectActions.GenerateProjectQRLoading(true))
@@ -143,9 +143,15 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
                 if (payload.form_ways === 'Upload a Custom Form') {
                     generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', formUpload);
+                    if(dataExtractFile){
+                        generateApiFormData.append('data_extracts', dataExtractFile);
+                    }
                 } else {
                     generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
                     generateApiFormData.append('upload', '');
+                    if(dataExtractFile){
+                        generateApiFormData.append('data_extracts', dataExtractFile);
+                    }
 
                 }
                 const postNewProjectDetails = await axios.post(url, generateApiFormData,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import enviroment from '../../environment';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules.js';
@@ -32,8 +32,9 @@ const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
 
   const submission = () => {
     // const previousValues = location.state.values;
+    generateTasksOnMap();
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
-    navigate('/select-form');
+    navigate('/data-extract');
   };
 
   const {
@@ -51,6 +52,9 @@ const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
       }),
     );
   };
+  
+  
+
   // 'Use natural Boundary'
   const inputFormStyles = () => {
     return {
@@ -68,7 +72,7 @@ const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
   const algorithmListData =alogrithmList;
   const dividedTaskLoading = CoreModules.useSelector((state) => state.createproject.dividedTaskLoading);
 
-
+  
   return (
     <CoreModules.Stack
       sx={{
@@ -202,7 +206,7 @@ const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
             {/* END */}
 
             <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <CoreModules.Button variant="contained" color="error" sx={{ width: '20%' }} type="submit">
+              <CoreModules.Button disabled={!dividedTaskGeojson} variant="contained" color="error" sx={{ width: '20%' }} type="submit">
                 Next
               </CoreModules.Button>
             </CoreModules.Stack>
