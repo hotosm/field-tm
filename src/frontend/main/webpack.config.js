@@ -168,7 +168,7 @@ module.exports = function (webpackEnv) {
           {
             inject: true,
             template: "./src/index.html",
-            favicon: './src/assets/images/favicon.png',
+            favicon: './src/assets/images/favicon.ico',
           },
           // Only for production
           isEnvProduction ? {

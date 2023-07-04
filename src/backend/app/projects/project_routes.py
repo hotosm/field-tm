@@ -400,7 +400,7 @@ async def generate_files(
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls", '.xlsx']
+        allowed_extensions = [".xls", '.xlsx', '.xml']
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
@@ -587,5 +587,3 @@ async def add_features(
         background_task_id,
     )
     return True
-
-
