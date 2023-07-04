@@ -123,3 +123,20 @@ async def create_organization(db: Session, name: str, description: str, url: str
         ) from e
 
     return True
+
+
+async def get_organisation_by_id(db: Session, id: int):
+    """
+    Get an organization by its id.
+
+    Args:
+        db (Session): database session
+        id (int): id of the organization
+
+    Returns:
+        DbOrganisation: organization with the given id
+    """
+    db_organization = (
+        db.query(db_models.DbOrganisation).filter(db_models.DbOrganisation.id == id).first()
+    )
+    return db_organization
