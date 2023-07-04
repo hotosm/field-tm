@@ -1719,3 +1719,51 @@ def add_features_into_database(
     )  # 4 is COMPLETED
 
     return True
+
+
+def update_project_form(
+        db: Session,
+        project_id: int,
+        form: str
+        ):
+    
+    project = get_project(db, project_id)
+    category = project.xform_title
+    project_title = project.project_name_prefix
+    odk_id = project.odkid
+
+    task = table("tasks", column("outline"), column("id"))
+    where = f"project_id={project_id}"
+    sql = select(task
+    ).where(text(where))
+    result = db.execute(sql)
+
+    form_type = "xls"
+
+    try:
+        xlsform = f"/tmp/custom_form.{form_type}"
+        with open(xlsform, "wb") as f:
+            f.write(form)
+    except Exception as e:
+        print(str(e))
+
+
+    for poly in result.fetchall():
+        name = f"{project_title}_{category}_{poly.id}" 
+
+
+        xform = f"/tmp/{project_title}_{category}_{poly.id}.xml"  # This file will store xml contents of an xls form.
+        outfile = f"/tmp/{project_title}_{category}_{poly.id}.geojson"  # This file will store osm extracts
+
+        # xform_id_format
+        xform_id = f"{project_title}_{category}_{poly.id}".split("_")[2]
+
+        outfile = central_crud.generate_updated_xform(
+            xlsform, xform, form_type)
+
+        # Create an odk xform
+        result = central_crud.create_odk_xform(
+            odk_id, poly.id, outfile, None, True, False
+        )
+
+    pass
