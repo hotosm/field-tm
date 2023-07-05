@@ -133,3 +133,11 @@ async def convert_to_osm(
     """
 
     return await submission_crud.convert_to_osm(db, project_id, task_id)
+
+
+@router.get("/get-submission-count/{project_id}")
+async def get_submission_count(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+    return await submission_crud.get_submission_count_of_a_project(db, project_id)
