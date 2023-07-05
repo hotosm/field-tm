@@ -579,7 +579,7 @@ async def split_into_tasks(
 
     db_task = db_models.DbProjectAOI(
         project_id=project_id,
-        geometry=outline.wkt,
+        geom=outline.wkt,
     )
 
     db.add(db_task)
