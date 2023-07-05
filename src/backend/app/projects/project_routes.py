@@ -293,7 +293,6 @@ async def task_split(
     return result
 
 
-
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
     project_id: int,

@@ -589,7 +589,6 @@ async def split_into_tasks(
     data = get_osm_extracts(boundary)
 
     for feature in data["features"]:
-
         # If the osm extracts contents do not have a title, provide an empty text for that.
         feature_shape = shape(feature['geometry'])
 
@@ -973,6 +972,7 @@ def update_project_boundary(
             # geometry_geojson=geojson.dumps(task_geojson),
             # initial_feature_count=len(task_geojson["features"]),
         )
+
         db.add(db_task)
         db.commit()
 
