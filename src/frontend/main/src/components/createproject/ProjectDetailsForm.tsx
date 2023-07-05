@@ -122,7 +122,6 @@ const ProjectDetailsForm: React.FC = () => {
                 // label="Organization"
                 onChange={(e) => {
                   handleCustomChange('organization', e.target.value);
-                  dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }));
                 }}
               >
                 {organizationList?.map((org) => (
@@ -159,7 +158,10 @@ const ProjectDetailsForm: React.FC = () => {
               </CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
-              id="odk_central_url"
+              id="url"
+              name="url"
+              type="url"
+              autoComplete="on"
               label=""
               variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
@@ -193,7 +195,7 @@ const ProjectDetailsForm: React.FC = () => {
             </CoreModules.Box>
             <CoreModules.TextField
               id="odk_central_name"
-              name="odk"
+              name="username"
               label=""
               variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
@@ -208,7 +210,7 @@ const ProjectDetailsForm: React.FC = () => {
               onChange={(e) => {
                 handleCustomChange('odk_central_user', e.target.value);
               }}
-              autoComplete="new-password"
+              autoComplete="on"
               helperText={errors.odk_central_user}
               FormHelperTextProps={inputFormStyles()}
             />
@@ -238,7 +240,7 @@ const ProjectDetailsForm: React.FC = () => {
               }}
               value={values.odk_central_password}
               type="password"
-              autoComplete="new-password"
+              autoComplete="on"
               onChange={(e) => {
                 handleCustomChange('odk_central_password', e.target.value);
               }}
