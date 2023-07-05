@@ -78,3 +78,18 @@ async def create_organization(
     await organization_crud.create_organization(db, name, description, url, logo)
 
     return {"Message": "Organization Created Successfully."}
+
+
+@router.delete("/{organization_id}")
+async def delete_organisations(
+    organization_id: int, db: Session = Depends(database.get_db)
+    ):
+
+    organization = await organization_crud.get_organisation_by_id(db, organization_id)
+
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    db.delete(organization)
+    db.commit()
+    return {"Message": "Organization Deleted Successfully."}

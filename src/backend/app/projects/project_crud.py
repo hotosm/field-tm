@@ -54,6 +54,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from osm_fieldwork.filter_data import FilterData
 
 from ..central import central_crud
 from ..config import settings
@@ -1265,7 +1266,11 @@ def get_odk_id_for_project(db: Session, project_id: int):
     return project_info.odkid
 
 
-def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
+def upload_custom_data_extracts(db: Session, 
+                                project_id: int, 
+                                contents: str,
+                                category: str = 'buildings',
+                                ):
     """
     Uploads custom data extracts to the database.
 
@@ -1288,7 +1293,19 @@ def upload_custom_data_extracts(db: Session, project_id: int, contents: str):
 
     features_data = json.loads(contents)
 
-    for feature in features_data["features"]:
+    # Data Cleaning
+    cleaned = FilterData()
+    models = xlsforms_path.replace("xlsforms", "data_models")
+    xlsfile = f"{category}.xls" # FIXME: for custom form
+    file = f"{xlsforms_path}/{xlsfile}"
+    if os.path.exists(file):
+        title, extract = cleaned.parse(file)
+    elif os.path.exists(f"{file}x"):
+        title, extract = cleaned.parse(f"{file}x")
+    # Remove anything in the data extract not in the choices sheet.
+    cleaned_data = cleaned.cleanData(features_data)
+
+    for feature in cleaned_data["features"]:
 
         feature_shape = shape(feature['geometry'])
 
@@ -1420,6 +1437,7 @@ def generate_appuser_files(
 
             category = xform_title
 
+            # Data Extracts
             if extracts_contents is not None:
                 upload_custom_data_extracts(db, project_id, extracts_contents)
 
@@ -1468,6 +1486,7 @@ def generate_appuser_files(
                 # Bulk insert the osm extracts into the db.
                 db.bulk_insert_mappings(db_models.DbFeatures, feature_mappings)
 
+            # Generating QR Code, XForm and uploading OSM Extracts to the form. Creating app users and updating the role of that user.
             for poly in result.fetchall():
 
                 name = f"{prefix}_{category}_{poly.id}"
@@ -1534,8 +1553,7 @@ def generate_appuser_files(
                     dump(features, jsonfile)
 
                 outfile = central_crud.generate_updated_xform(
-                    db, poly.id, xlsform, xform
-                )
+                    xlsform, xform, form_type)
 
                 # Update tasks table qith qr_Code id
                 task = tasks_crud.get_task(db, poly.id)
@@ -2028,5 +2046,46 @@ def add_features_into_database(
     update_background_task_status_in_database(
         db, background_task_id, 4
     )  # 4 is COMPLETED
+
+    return True
+
+
+async def update_project_form(
+        db: Session,
+        project_id: int,
+        form: str,
+        form_type: str,
+        ):
+
+    project = get_project(db, project_id)
+    category = project.xform_title
+    project_title = project.project_name_prefix
+    odk_id = project.odkid
+
+    task = table("tasks", column("outline"), column("id"))
+    where = f"project_id={project_id}"
+
+    sql = select(task).where(text(where))
+    result = db.execute(sql)
+
+    form_type = "xls"
+
+    xlsform = f"/tmp/custom_form.{form_type}"
+    with open(xlsform, "wb") as f:
+        f.write(form)
+
+
+    for poly in result.fetchall():
+
+        xform = f"/tmp/{project_title}_{category}_{poly.id}.xml"  # This file will store xml contents of an xls form.
+        outfile = f"/tmp/{project_title}_{category}_{poly.id}.geojson"  # This file will store osm extracts
+
+        outfile = central_crud.generate_updated_xform(
+            xlsform, xform, form_type)
+
+        # Create an odk xform
+        result = central_crud.create_odk_xform(
+            odk_id, poly.id, outfile, None, True, False
+        )
 
     return True

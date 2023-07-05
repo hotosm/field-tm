@@ -400,7 +400,7 @@ async def generate_files(
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls", '.xlsx']
+        allowed_extensions = [".xls", '.xlsx', '.xml']
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
@@ -441,6 +441,29 @@ async def generate_files(
 
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
 
+
+@router.post("/update-form/{project_id}")
+async def update_project_form(
+    project_id: int,
+    form: Optional[UploadFile],
+    db: Session = Depends(database.get_db),
+    ):
+
+    file_name = os.path.splitext(form.filename)
+    file_ext = file_name[1]
+    allowed_extensions = [".xls"]
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+    contents = await form.read()
+
+    form_updated = await project_crud.update_project_form(
+        db, 
+        project_id,  
+        contents,    # Form Contents
+        file_ext[1:] # File type
+        )
+
+    return form_updated
 
 
 @router.get("/{project_id}/features", response_model=List[project_schemas.Feature])
@@ -587,5 +610,3 @@ async def add_features(
         background_task_id,
     )
     return True
-
-
