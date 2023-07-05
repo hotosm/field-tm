@@ -557,6 +557,11 @@ def get_osm_extracts(boundary: str):
     zfp.extract("Export.geojson", "/tmp/")
     data = json.loads(zfp.read("Export.geojson"))
 
+    for feature in data['features']:
+        properties = feature['properties']
+        tags = properties.pop('tags', {})
+        properties.update(tags)
+
     return data
 
 
