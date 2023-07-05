@@ -594,21 +594,21 @@ async def split_into_tasks(
 
         wkb_element = from_shape(feature_shape, srid=4326)
 
-        if feature['properties']['tags'].get('building') == 'yes':
+        if feature['properties'].get('building') == 'yes':
             db_feature = db_models.DbBuildings(
                 project_id=project_id,
-                geometry=wkb_element,
-                properties=feature["properties"]
+                geom=wkb_element,
+                tags=feature["properties"]
                 # category="buildings"
             )
             db.add(db_feature)
             db.commit()
 
-        else:
+        elif 'highway' in feature['properties']:
             db_feature = db_models.DbOsmLines(
                 project_id=project_id,
-                geometry=wkb_element,
-                properties=feature["properties"]
+                geom=wkb_element,
+                tags=feature["properties"]
             )
 
             db.add(db_feature)
