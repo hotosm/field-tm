@@ -603,23 +603,23 @@ class DbProjectAOI(Base):
     
     id = Column(Integer, primary_key=True)
     project_id = Column(String)
-    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    properties = Column(JSONB)
+    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    tags = Column(JSONB)
 
 
 class DbOsmLines(Base):
-    __tablename__ = "osm_lines"
+    __tablename__ = "ways_line"
     
     id = Column(Integer, primary_key=True)
     project_id = Column(String)
-    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    properties = Column(JSONB)
+    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    tags = Column(JSONB)
 
 
 class DbBuildings(Base):
-    __tablename__ = "buildings"
+    __tablename__ = "ways_poly"
 
     id = Column(Integer, primary_key=True)
     project_id = Column(String)
-    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    properties = Column(JSONB)
+    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    tags = Column(JSONB)
