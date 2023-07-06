@@ -1,10 +1,10 @@
-// import { fetchLocalJSONAPI } from '../network/genericJSONRequest';
-// import * as safeStorage from '../utils/safe_storage';
-
 import environment from "../environment";
+declare global {
+  interface Window {
+    authComplete:any;
+  }
+}
 
-// import { OSM_REDIRECT_URI } from '../config';
-const OSM_REDIRECT_URI = "http://127.0.0.1:8080/authorized"
 // Code taken from https://github.com/mapbox/osmcha-frontend/blob/master/src/utils/create_popup.js
 export function createPopup(title: string = 'Authentication', location: string) {
   const width = 500;
@@ -18,7 +18,7 @@ export function createPopup(title: string = 'Authentication', location: string) 
     .map((x) => x.join('='))
     .join(',');
 
-  const popup = window.open(location, '_blank', settings);
+  const popup = window.open(location, title, settings);
   if (!popup) return;
 
   return popup;
@@ -41,8 +41,6 @@ export const createLoginWindow = (redirectTo) => {
       let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${authCode}&state=${state}`;
 
       try {
-        console.log(resp, 'resp');
-        console.log(responseState, 'state');
         if (responseState === state) {
           fetch(callback_url).then((resp) => resp.json()).then((res) => {
 
