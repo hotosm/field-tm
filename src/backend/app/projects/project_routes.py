@@ -434,6 +434,16 @@ async def generate_files(
     """
     contents = None
     xform_title = None
+
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+
+    project.data_extract_type = 'polygon' if extract_polygon else 'centroid'
+    db.commit()
+
     if upload:
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
@@ -443,6 +453,9 @@ async def generate_files(
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
         contents = await upload.read()
+
+        project.form_xls = contents
+        db.commit()
 
     if data_extracts:
         # Validating for .geojson File.
