@@ -61,6 +61,7 @@ export const createLoginWindow = (redirectTo) => {
               // localStorage.setItem("user", JSON.stringify(res.user_data));
               // window.close();
               console.log(userRes,'userRes')
+              console.log(JSON.stringify(userRes),' string userRes')
               const params = new URLSearchParams({
                 username: userRes.user_data.username,
                 osm_oauth_token: res.access_token.access_token,
