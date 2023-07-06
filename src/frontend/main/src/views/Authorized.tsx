@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { LoginActions } from '../store/slices/LoginSlice';
 
 
-function Authorized(props) {
+function Authorized() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
@@ -24,12 +24,12 @@ function Authorized(props) {
         const sessionToken = params.get('session_token');
         const osm_oauth_token = params.get('osm_oauth_token');
         dispatch(LoginActions.setAuthDetails(username, sessionToken, osm_oauth_token));
-        dispatch(LoginActions.SetLoginToken({loginToken:{username,id, sessionToken, osm_oauth_token}}));
+        dispatch(LoginActions.SetLoginToken({username,id, sessionToken, osm_oauth_token}));
 
         const redirectUrl =
             params.get('redirect_to') && params.get('redirect_to') !== '/'
                 ? params.get('redirect_to')
-                : '/welcome';
+                : '/';
         setIsReadyToRedirect(true);
         navigate(redirectUrl);
     }, [dispatch, location.search, navigate]);
