@@ -29,7 +29,10 @@ from fastapi import (
     Form,
     HTTPException,
     UploadFile,
+    Response
 )
+from fastapi.responses import FileResponse
+from osm_fieldwork.xlsforms import xlsforms_path
 from fastapi.logger import logger as logger
 from osm_fieldwork.make_data_extract import getChoices
 from sqlalchemy.orm import Session
@@ -645,3 +648,25 @@ async def add_features(
         background_task_id,
     )
     return True
+
+
+@router.get("/download_form/{project_id}/")
+async def download_form(project_id: int, 
+                        db: Session = Depends(database.get_db)
+                        ):
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    headers = {
+        "Content-Disposition": "attachment; filename=submission_data.xls",
+        "Content-Type": "application/json",
+    }
+    if not project.form_xls:
+        project_category = project.xform_title
+        xlsform_path = f"{xlsforms_path}/{project_category}.xls"
+        if os.path.exists(xlsform_path):
+            return FileResponse(xlsform_path, filename="form.xls")
+        else:
+            raise HTTPException(status_code=404, detail="Form not found")
+    return Response(content=project.form_xls, headers=headers)
