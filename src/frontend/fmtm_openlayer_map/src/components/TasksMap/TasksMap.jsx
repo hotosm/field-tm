@@ -25,23 +25,6 @@ const TasksMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
   });
   console.log(projectTaskBoundries, "projectTaskBoundries");
 
-  const taskGeojsonFeatureCollection = {
-    ...basicGeojsonTemplate,
-    features: [
-      {
-        ...projectTaskBoundries?.[0]?.taskBoundries?.[0]?.outline_geojson,
-        id: projectTaskBoundries[0]?.taskBoundries?.[0]?.outline_geojson
-          ?.properties.uid,
-      },
-    ],
-  };
-  const buildingGeojsonFeatureCollection = {
-    ...basicGeojsonTemplate,
-    features: projectBuildingGeojson.map((feature) => ({
-      ...feature.geometry,
-      id: feature.id,
-    })),
-  };
 
   return (
     <div className="map-container" style={{ height: "100%" }}>
