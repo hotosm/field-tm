@@ -1,27 +1,40 @@
 /*
 Task polygons made by creating and merging Voronoi polygons have lots of jagged edges. Simplifying them makes them both nicer to look at, and easier to render on a map. 
 
-The problem is that the polygons seem not to perfectly tile the plane; there are centimeter-level slivers. So when simplified, the adjacent polygons don't simplify in exactly the same way, creating big visible gaps. 
-
-When the polygons are converted to lines and then to line segments, each line segment seems to have at least one near-exact duplicate; near enough to be visibly indistinguishable, but not precisely equal according to PostGIS when trying to select distinct or otherwise get rid of duplicate geometries.
+At the moment the algorithm is working, except that the 
 */
 
--- Convert all polygons into boundary lines
-with lines as (
-  select st_boundary(tp.geom) as geom, 
-  row_number () over () as gid
-  from taskpolygons as tp
+-- convert task polygon boundaries to linestrings
+with rawlines as (
+   select tp.clusteruid, st_boundary(tp.geom) as geom
+   from taskpolygons as tp 
 )
--- Break the lines into segments
-,segments AS (
-  SELECT gid, ST_Astext(ST_MakeLine(lag((pt).geom, 1, NULL) 
-  OVER (PARTITION BY gid ORDER BY gid, (pt).path), (pt).geom)) 
-  AS geom
-  FROM (SELECT gid, ST_DumpPoints(geom) AS pt FROM lines) as dumps
+-- Union, which eliminates duplicates from adjacent polygon boundaries
+,unionlines as (
+  select st_union(l.geom) as geom from rawlines l
 )
--- Select distinct (unique) segments (DOESN'T WORK CORRECTLY)
-select distinct on(ST_AsBinary(geom)) geom, geom as geomstring 
-from segments 
-where geom is not null;
-
--- If you load up the resulting layer, the individual line segments all seem to have a twin.
+-- Dump, which gives unique segments.
+,dumpedlinesegments as (
+  select (st_dump(l.geom)).geom as geom
+  from unionlines l 
+)
+-- TODO: this step using st_union, st_unaryunion, st_collect, st_node,
+-- and maybe a few others I've tried to dissolve the line segments
+-- appears to work, but the resulting multiline geometry fails to simplify.
+-- On the other hand, the QGIS Dissolve tool works, and produces multiline
+-- geometry that simplifies nicely.
+-- QGIS Multipart to Singleparts does something arguably even better: it
+-- unions all of the segments between intersections.
+,dissolved as (
+  select st_collect(l.geom) as geom from dumpedlinesegments l
+)
+-- Cheating by loading an external layer because QGIS dissolve works.
+-- I'm loading the dumpedlinesegements to the QGIS canvas, dissolving them,
+-- and pulling that layer back into the DB as dissolvedfromdumpedlinesegments,
+-- which st_simplify appears happy with.
+,simplified as (
+  select st_simplify(l.geom, 0.000075) 
+  as geom from dissolvedfromdumpedlinesegements l -- import from QGIS
+)
+-- Rehydrate the task areas after simplification
+select (st_dump(st_polygonize(s.geom))).geom as geom from simplified s
