@@ -1,7 +1,7 @@
 /*
 Task polygons made by creating and merging Voronoi polygons have lots of jagged edges. Simplifying them makes them both nicer to look at, and easier to render on a map. 
 
-At the moment the algorithm is working, except that the 
+At the moment the algorithm is working, except that the dissolve step just before simplification only works using an external tool (see TODO below).
 */
 
 -- convert task polygon boundaries to linestrings
@@ -28,6 +28,7 @@ with rawlines as (
 ,dissolved as (
   select st_collect(l.geom) as geom from dumpedlinesegments l
 )
+-- Dissolve segments into linestrings or multilinestrings for simplification
 -- Cheating by loading an external layer because QGIS dissolve works.
 -- I'm loading the dumpedlinesegements to the QGIS canvas, dissolving them,
 -- and pulling that layer back into the DB as dissolvedfromdumpedlinesegments,
@@ -36,5 +37,5 @@ with rawlines as (
   select st_simplify(l.geom, 0.000075) 
   as geom from dissolvedfromdumpedlinesegements l -- import from QGIS
 )
--- Rehydrate the task areas after simplification
+-- Rehydrate the task areas into polygons after simplification
 select (st_dump(st_polygonize(s.geom))).geom as geom from simplified s
