@@ -26,7 +26,6 @@ export function createPopup(title: string = 'Authentication', location: string) 
 
 export const createLoginWindow = (redirectTo) => {
   const popup = createPopup('OSM auth', '');
-  // let url = `system/authentication/login/?redirect_uri=${OSM_REDIRECT_URI}`;
   fetch(`${environment.baseApiUrl}/auth/osm_login/`).then((resp) => resp.json()).then((resp) => {
     popup.location = resp.login_url;
     // Perform token exchange.
@@ -37,7 +36,6 @@ export const createLoginWindow = (redirectTo) => {
     const searchParams = new URLSearchParams(url.search);
 
     // Retrieve individual parameters by name
-    const code = searchParams.get('code');
     const responseState = searchParams.get('state');
     window.authComplete = (authCode, state) => {
       let callback_url = `${environment.baseApiUrl}/auth/callback/?code=${authCode}&state=${state}`;
@@ -47,25 +45,16 @@ export const createLoginWindow = (redirectTo) => {
         console.log(responseState, 'state');
         if (responseState === state) {
           fetch(callback_url).then((resp) => resp.json()).then((res) => {
-            console.log(res.data, 'res token wala');
-            console.log(JSON.stringify(res.data), 'JSON stringify res token wala');
-            console.log(res, '2nd res token wala');
-            console.log(JSON.stringify(res), '2nd JSON stringify res token wala');
 
             fetch(`${environment.baseApiUrl}/auth/me/`, {
               headers: {
                 "access-token": res.access_token.access_token
-                // 'Content-Type': 'application/x-www-form-urlencoded',
               }
             }).then((resp) => resp.json()).then((userRes) => {
-              // localStorage.setItem("user", JSON.stringify(res.user_data));
-              // window.close();
-              console.log(userRes,'userRes')
-              console.log(JSON.stringify(userRes),' string userRes')
               const params = new URLSearchParams({
                 username: userRes.user_data.username,
                 osm_oauth_token: res.access_token.access_token,
-                // session_token: res.session_token,
+                id:userRes.user_data.id,
                 picture: userRes.user_data.img_url,
                 redirect_to: redirectTo,
               }).toString();
