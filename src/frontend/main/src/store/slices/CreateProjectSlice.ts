@@ -91,6 +91,17 @@ const CreateProject = CoreModules.createSlice({
         SetDividedTaskFromGeojsonLoading(state, action) {
             state.dividedTaskLoading = action.payload
         },
+
+
+        //EDIT Project
+
+        SetIndividualProjectDetails(state, action) {
+            state.projectDetails= action.payload
+            state.dividedTaskGeojson= action.payload.outline_geojson
+        },
+        SetIndividualProjectDetailsLoading(state, action) {
+            state.projectDetailsLoading= action.payload
+        }
     }
 })
 
