@@ -524,6 +524,9 @@ class DbProject(Base):
     # Count of tasks where osm extracts is completed, used for progress bar.
     extract_completed_count = Column(Integer, default=0)
 
+    form_xls = Column(LargeBinary)           # XLSForm file if custom xls is uploaded
+    data_extract_type = Column(String)       # Type of data extract (Polygon or Centroid)
+
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")

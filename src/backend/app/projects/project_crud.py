@@ -700,6 +700,11 @@ def update_project_boundary(
 
     result = create_task_grid(db, project_id=project_id, delta=dimension)
 
+    # Delete all tasks of the project if there are some
+    db.query(db_models.DbTask).filter(
+        db_models.DbTask.project_id == project_id
+    ).delete()
+
     tasks = eval(result)
     for poly in tasks["features"]:
         logger.debug(poly)
