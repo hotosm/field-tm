@@ -74,6 +74,7 @@ const ProjectDetailsForm: React.FC = () => {
   };
   useEffect(() => {
     window.addEventListener("focus", onFocus);
+    onFocus()
     // Calls onFocus when the window first loads
     return () => {
         window.removeEventListener("focus", onFocus);
