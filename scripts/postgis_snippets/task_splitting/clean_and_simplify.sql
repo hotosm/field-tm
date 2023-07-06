@@ -18,6 +18,8 @@ with rawlines as (
   select (st_dump(l.geom)).geom as geom
   from unionlines l 
 )
+-- Dissolve segments into linestrings or multilinestrings for simplification
+
 -- TODO: this step using st_union, st_unaryunion, st_collect, st_node,
 -- and maybe a few others I've tried to dissolve the line segments
 -- appears to work, but the resulting multiline geometry fails to simplify.
@@ -28,7 +30,8 @@ with rawlines as (
 ,dissolved as (
   select st_collect(l.geom) as geom from dumpedlinesegments l
 )
--- Dissolve segments into linestrings or multilinestrings for simplification
+-- Simplify the line layer (using a tolerance in degrees to annoy Steve)
+-- (actually just because I haven't yet bothered to reproject)
 -- Cheating by loading an external layer because QGIS dissolve works.
 -- I'm loading the dumpedlinesegements to the QGIS canvas, dissolving them,
 -- and pulling that layer back into the DB as dissolvedfromdumpedlinesegments,
