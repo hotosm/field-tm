@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
-import { CreateProjectDetailsModel, FormCategoryListModel, OrganisationListModel } from '../models/createproject/createProjectModel';
+import { ProjectDetailsModel, FormCategoryListModel, OrganisationListModel } from '../models/createproject/createProjectModel';
 import enviroment from "../environment";
 import { CommonActions } from '../store/slices/CommonSlice';
 
@@ -15,7 +15,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
 
             try {
                 const postNewProjectDetails = await axios.post(url, payload)
-                const resp: CreateProjectDetailsModel = postNewProjectDetails.data;
+                const resp: ProjectDetailsModel = postNewProjectDetails.data;
                 await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
                 if (payload.splitting_algorithm === 'Choose Area as Tasks') {
@@ -293,4 +293,36 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
     }
 
 }
-export { UploadAreaService, CreateProjectService, FormCategoryService, GenerateProjectQRService, OrganisationService, UploadCustomXLSFormService, GenerateProjectLog, GetDividedTaskFromGeojson }
+
+const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
+
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(true))
+
+        const getIndividualProjectDetails = async (url, payload) => {
+            try {
+                const getIndividualProjectDetailsResponse = await axios.get(url, { params: payload })
+                const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
+                const formattedOutlineGeojson = {type:'FeatureCollection',features:[{...resp.outline_geojson,id:1}]}
+                const modifiedResponse = {...resp,
+                    name:resp.project_info?.[0].name,
+                    description:resp.project_info?.[0].description,
+                    short_description:resp.project_info?.[0].short_description,
+                    outline_geojson:formattedOutlineGeojson
+                }
+
+                dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
+                dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
+            } catch (error) {
+                dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
+            }
+        }
+
+        await getIndividualProjectDetails(url, payload);
+
+    }
+
+}
+export { UploadAreaService, CreateProjectService, FormCategoryService, GenerateProjectQRService, OrganisationService, UploadCustomXLSFormService, GenerateProjectLog, GetDividedTaskFromGeojson,GetIndividualProjectDetails }
