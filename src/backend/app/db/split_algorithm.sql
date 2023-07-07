@@ -270,5 +270,15 @@ USING GIST (geom);
 -- VACUUM ANALYZE taskpolygons;
 
 
-SELECT ST_AsGeoJSON(ST_Collect(geom)) AS geojson
-FROM taskpolygons;
+SELECT jsonb_build_object(
+    'type', 'FeatureCollection',
+    'features', jsonb_agg(feature)
+)
+FROM (
+    SELECT jsonb_build_object(
+        'type', 'Feature',
+        'geometry', ST_AsGeoJSON(geom)::jsonb,
+        'properties', jsonb_build_object()
+    ) AS feature
+    FROM taskpolygons
+) AS features;
