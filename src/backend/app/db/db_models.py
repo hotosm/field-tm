@@ -526,7 +526,7 @@ class DbProject(Base):
 
     form_xls = Column(LargeBinary)           # XLSForm file if custom xls is uploaded
     data_extract_type = Column(String)       # Type of data extract (Polygon or Centroid)
-
+    task_split_type = Column(String)         # Type of split (Grid or Feature)
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")
@@ -624,5 +624,6 @@ class DbBuildings(Base):
 
     id = Column(Integer, primary_key=True)
     project_id = Column(String)
+    osm_id = Column(String)
     geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
     tags = Column(JSONB)

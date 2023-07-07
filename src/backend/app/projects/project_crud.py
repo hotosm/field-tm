@@ -619,9 +619,8 @@ async def split_into_tasks(
         query = sql_file.read()
 
     result = db.execute(query)
-    data = result.fetchone()
-    final_geojson = json.loads(data['geojson'])
-
+    data = result.fetchall()[0]
+    final_geojson = data['jsonb_build_object']
 
     db.query(db_models.DbBuildings).delete()
     db.query(db_models.DbOsmLines).delete()
