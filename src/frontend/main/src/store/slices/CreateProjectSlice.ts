@@ -91,8 +91,6 @@ const CreateProject = CoreModules.createSlice({
         SetDividedTaskFromGeojsonLoading(state, action) {
             state.dividedTaskLoading = action.payload
         },
-
-
         //EDIT Project
 
         SetIndividualProjectDetails(state, action) {
@@ -101,7 +99,6 @@ const CreateProject = CoreModules.createSlice({
         },
         SetIndividualProjectDetailsLoading(state, action) {
             state.projectDetailsLoading= action.payload
-        }
     }
 })
 

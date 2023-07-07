@@ -8,6 +8,14 @@ import accDownImg from "../assets/images/acc-down.png";
 import accUpImg from "../assets/images/acc-up.png";
 import gridIcon from "../assets/images/grid.png";
 import QrcodeComponent from "./QrcodeComponent";
+import * as ol from 'ol';
+import { Point } from 'ol/geom';
+import Vector from 'ol/layer/Vector';
+import VectorSource from "ol/source/Vector";
+import { transform } from "ol/proj";
+import { Icon, Style } from "ol/style";
+import LocationImage from '../assets/images/location.png'
+let currentLocationLayer = null;
 const OpenLayersMap = ({
   defaultTheme,
   stateDialog,
@@ -22,17 +30,18 @@ const OpenLayersMap = ({
   environment,
   windowType,
 }) => {
+  const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
+  const [currentLocLayer, setCurrentLocLayer]=useState(null);
   function elastic(t) {
     return (
       Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1
     );
   }
-  const dispatch = CoreModules.useDispatch();
 
   useEffect(() => {
     let btnsPosition = 0;
     var btnList = ["add", "minus", "defaultPosition", "taskBoundries"];
-
+  
     if (map != undefined) {
       var handleOnClick = function (e) {
         if (e.target.id == "add") {
@@ -42,7 +51,35 @@ const OpenLayersMap = ({
           let actualZoom = map.getView().getZoom();
           map.getView().setZoom(actualZoom - 1);
         } else if (e.target.id == "defaultPosition") {
-          map.getView().setZoom(15);
+          const sourceProjection = 'EPSG:4326'; // The current projection of the coordinates
+          const targetProjection = 'EPSG:3857'; // The desired projection
+          // Create a style for the marker
+          var markerStyle = new Style({
+            image: new Icon({
+              src: LocationImage, // Path to your marker icon image
+              anchor: [0.5, 1], // Anchor point of the marker icon (center bottom)
+              scale: 2 // Scale factor for the marker icon
+            })
+          });
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const convertedCoordinates = transform([lng,lat], sourceProjection, targetProjection);
+                const positionFeature = new ol.Feature(new Point(convertedCoordinates));
+                const positionLayer = new Vector({
+                  source: new VectorSource({
+                    features: [positionFeature]
+                  })
+                });
+                positionFeature.setStyle(markerStyle);
+                setCurrentLocLayer(positionLayer);
+              });
+          }
+            setToggleCurrentLoc(!toggleCurrentLoc);
+       
+          // map.getView().setZoom(15);
         } else if (e.target.id == "taskBoundries") {
           if (state.projectTaskBoundries.length != 0 && map != undefined) {
             if (
@@ -225,6 +262,20 @@ const OpenLayersMap = ({
     map.addControl(controlx);
     }
   }, [map]);
+
+  useEffect(() => {
+    if(!map) return;
+    if(!currentLocLayer) return;
+    map.addLayer(currentLocLayer);
+    map.getView().fit(currentLocLayer.getSource().getExtent(), {
+      maxZoom: 18,
+      duration: 500
+    });
+    return () => {
+      map.removeLayer(currentLocLayer);
+    }
+  }, [map,currentLocLayer])
+  
 
   return (
     <CoreModules.Stack spacing={1} p={2.5} direction={"column"}>
