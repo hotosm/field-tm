@@ -36,7 +36,7 @@ services:
       - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
       - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped
@@ -126,7 +126,7 @@ services:
       - POSTGRES_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
       - POSTGRES_DB=${CENTRAL_DB_NAME:-odk}
     ports:
-      - "5433:5432"
+      - "5434:5432"
     networks:
       - fmtm-dev
     restart: unless-stopped

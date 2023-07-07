@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import CoreModules from '../../shared/CoreModules';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import DefineAreaMap from 'map/DefineAreaMap';
 
 const UploadArea: React.FC = ({geojsonFile,setGeojsonFile,setInputValue,inputValue}) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-
-  const projectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
-  // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   const dispatch = CoreModules.useDispatch();
   // //dispatch function to perform redux state mutation

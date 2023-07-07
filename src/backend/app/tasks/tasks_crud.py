@@ -295,30 +295,13 @@ async def get_task_by_id(db: Session, task_id: int):
     return task
 
 
-async def edit_task_boundary(
-      db: Session,
-      task_id: int,
-      boundary: str  
-    ):
-    geometry = boundary['features'][0]['geometry']
-
-    """Update the boundary polyon on the database."""
-    outline = shape(geometry)
-
-    task = await get_task_by_id(db, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    task.outline = outline.wkt
-    db.commit()
-
-
-    # Get category, project_name
-    project_id = task.project_id
-    project = project_crud.get_project(db, project_id)
-    category = project.xform_title
-    project_name = project.project_name_prefix
-    odk_id = project.odkid
+async def update_task_files(db: Session,
+                            project_id:int,
+                            project_odk_id:int,
+                            project_name:str,
+                            task_id:int,
+                            category:str,
+                            task_boundary:str):
 
     # This file will store osm extracts
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
@@ -330,8 +313,15 @@ async def edit_task_boundary(
 
     outfile = f"/tmp/test_project_{category}.geojson"  # This file will store osm extracts
 
+
+    # Delete all tasks of the project if there are some
+    db.query(db_models.DbFeatures).filter(
+        db_models.DbFeatures.task_id == task_id
+    ).delete()
+
+
     # OSM Extracts
-    outline_geojson = pg.getFeatures(boundary = geometry, 
+    outline_geojson = pg.getFeatures(boundary = task_boundary, 
                                         filespec = outfile,
                                         polygon = True,
                                         xlsfile = f'{category}.xls',
@@ -355,7 +345,7 @@ async def edit_task_boundary(
         updated_outline_geojson['features'].append(feature)
 
         db_feature = db_models.DbFeatures(
-                        project_id=3,
+                        project_id=project_id,
                         geometry=wkb_element,
                         properties=feature["properties"]
                     )
@@ -368,7 +358,35 @@ async def edit_task_boundary(
         dump(updated_outline_geojson, jsonfile)
 
     # Update the osm extracts in the form.
-    central_crud.upload_xform_media(odk_id, task_id, task_polygons, None)
+    central_crud.upload_xform_media(project_odk_id, task_id, task_polygons, None)
 
     return True
 
+
+async def edit_task_boundary(
+      db: Session,
+      task_id: int,
+      boundary: str  
+    ):
+    geometry = boundary['features'][0]['geometry']
+
+    """Update the boundary polyon on the database."""
+    outline = shape(geometry)
+
+    task = await get_task_by_id(db, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task.outline = outline.wkt
+    db.commit()
+
+    # Get category, project_name
+    project_id = task.project_id
+    project = project_crud.get_project(db, project_id)
+    category = project.xform_title
+    project_name = project.project_name_prefix
+    odk_id = project.odkid
+
+    await update_task_files(db, project_id, odk_id, project_name, task_id, category, geometry)
+    
+    return True
