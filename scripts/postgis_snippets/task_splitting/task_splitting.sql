@@ -270,8 +270,8 @@ VACUUM ANALYZE taskpolygons;
 
 --*****************************Simplify*******************************
 -- Extract unique line segments
-DROP TABLE IF EXISTS taskpolysegments;
-CREATE TABLE taskpolysegments AS (
+DROP TABLE IF EXISTS simplifiedpolygons;
+CREATE TABLE simplifiedpolygons AS (
   --Convert task polygon boundaries to linestrings
   WITH rawlines AS (
     SELECT tp.clusteruid, st_boundary(tp.geom) AS geom
@@ -282,23 +282,25 @@ CREATE TABLE taskpolysegments AS (
     SELECT st_union(l.geom) AS geom FROM rawlines l
   )
   -- Dump, which gives unique segments.
-  SELECT (st_dump(l.geom)).geom AS geom
-  FROM unionlines l 
+  ,segments AS (
+    SELECT (st_dump(l.geom)).geom AS geom
+    FROM unionlines l
+  )
+  ,agglomerated AS (
+    SELECT st_linemerge(st_unaryunion(st_collect(s.geom))) AS geom
+    FROM segments s
+  )
+  ,simplifiedlines AS (
+    SELECT st_simplify(a.geom, 0.000075) AS geom
+    FROM agglomerated a
+  )
+  SELECT (st_dump(st_polygonize(s.geom))).geom AS geom
+  FROM simplifiedlines s
 );
-ALTER TABLE taskpolysegments
-  ALTER COLUMN geom
-    TYPE geometry(LineString, 4326)
-    USING ST_SetSRID(geom, 4326);
-CREATE INDEX taskpolysegments_idx
-  ON taskpolysegments
+CREATE INDEX simplifiedpolygons_idx
+  ON simplifiedpolygons
   USING GIST (geom);
-VACUUM ANALYZE taskpolysegments;
-
--- Dissolve the segments
-
--- Simplify
-
--- Rehydrate back into polygons
+VACUUM ANALYZE simplifiedpolygons;
 
 -- Clean results (nuke or merge polygons without features in them)
 
