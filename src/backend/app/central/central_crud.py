@@ -152,14 +152,14 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     return result
 
 
-def create_appuser(project_id: int, name: str, odk_credentials: dict = None):
+def create_appuser(project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None):
     """Create an app-user on a remote ODK Server.
     If odk credentials of the project are provided, use them to create an app user.
     """
     if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
+        url = odk_credentials.odk_central_url
+        user = odk_credentials.odk_central_user
+        pw = odk_credentials.odk_central_password
 
     else:
         logger.debug("ODKCentral connection variables not set in function")
@@ -214,7 +214,7 @@ def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_cred
 
 
 def create_odk_xform(
-    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None,
+    project_id: int, xform_id: str, filespec: str, odk_credentials: project_schemas.ODKCentral = None,
     draft: bool = False,
     upload_media = True
 ):
@@ -223,9 +223,9 @@ def create_odk_xform(
     # result = xform.createForm(project_id, title, filespec, True)
     # Pass odk credentials of project in xform
     if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
+        url = odk_credentials.odk_central_url
+        user = odk_credentials.odk_central_user
+        pw = odk_credentials.odk_central_password
 
     else:
         logger.debug("ODKCentral connection variables not set in function")
