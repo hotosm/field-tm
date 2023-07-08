@@ -48,7 +48,7 @@ async def get_task_count_in_project(db: Session, project_id: int):
     return result.fetchone()[0]
 
 
-async def get_task_lists(db: Session, project_id: int):
+def get_task_lists(db: Session, project_id: int):
     """
     Get a list of tasks for a project
     """
