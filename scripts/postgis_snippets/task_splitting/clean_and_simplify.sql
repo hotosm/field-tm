@@ -20,12 +20,12 @@ with rawlines as (
 )
 -- Dissolve segments into linestrings or multilinestrings for simplification
 
--- TODO: this step using st_union, st_unaryunion, st_collect, st_node,
+-- TODO: Using st_union, st_unaryunion, st_collect, st_node, st_linemerge
 -- and maybe a few others I've tried to dissolve the line segments
 -- appears to work, but the resulting multiline geometry fails to simplify.
 -- On the other hand, the QGIS Dissolve tool works, and produces multiline
 -- geometry that simplifies nicely.
--- QGIS Multipart to Singleparts does something arguably even better: it
+678-- QGIS Multipart to Singleparts does something arguably even better: it
 -- unions all of the segments between intersections.
 ,dissolved as (
   select st_collect(l.geom) as geom from dumpedlinesegments l
