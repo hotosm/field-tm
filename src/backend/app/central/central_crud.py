@@ -402,20 +402,21 @@ def generate_updated_xform(
     return outfile
 
 
-def create_qrcode(project_id: int, token: str, name: str, odk_credentials: dict = None):
+def create_qrcode(project_id: int,
+                  token: str,
+                  name: str,
+                  odk_central_url: str = None
+                  ):
     """Create the QR Code for an app-user."""
-    if odk_credentials:
-        central_url = odk_credentials["odk_central_url"]
-
-    else:
+    if not odk_central_url:
         logger.debug("ODKCentral connection variables not set in function")
         logger.debug("Attempting extraction from environment variables")
-        central_url = settings.ODK_CENTRAL_URL
+        odk_central_url = settings.ODK_CENTRAL_URL
 
     # Qr code text json in the format acceptable by odk collect.
     qr_code_setting = {
         "general": {
-            "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
+            "server_url": f"{odk_central_url}/v1/key/{token}/projects/{project_id}",
             "form_update_mode": "match_exactly",
             "basemap_source": "osm",
             "autosend": "wifi_and_cellular",

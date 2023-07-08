@@ -1343,11 +1343,11 @@ def create_qrcode(
     project_id: int,
     token: str,
     project_name: str,
-    odk_credentials: dict = None,
+    odk_central_url: str = None,
 ):
     # Make QR code for an app_user.
     qrcode = central_crud.create_qrcode(
-        project_id, token, project_name, odk_credentials
+        project_id, token, project_name, odk_central_url
     )
     qrcode = segno.make(qrcode, micro=False)
     image_name = f"{project_name}.png"
