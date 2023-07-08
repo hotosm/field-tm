@@ -103,7 +103,7 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
         odk_central_password = project.odk_central_password,
         )
 
-    central_crud.delete_odk_project(project_id, odk_credentials)
+    central_crud.delete_odk_project(project.odkid, odk_credentials)
 
     deleted_project = project_crud.delete_project_by_id(db, project_id)
     if deleted_project:
