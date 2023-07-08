@@ -146,10 +146,13 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
     # odkid in the projects table
-    project = get_odk_project(odk_central)
-    result = project.deleteProject(project_id)
-    logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
-    return result
+    try:
+        project = get_odk_project(odk_central)
+        result = project.deleteProject(project_id)
+        logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
+        return result
+    except Exception as e:
+        return 'Could not delete project from central odk'
 
 
 def create_appuser(project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None):
