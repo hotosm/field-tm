@@ -1226,7 +1226,6 @@ def generate_appuser_files(
             column("project_name_prefix"), 
             column("xform_title"), 
             column("id"), 
-            column("odkid"),
             column("odk_central_url"),
             column("odk_central_user"),
             column("odk_central_password"),
@@ -1238,7 +1237,6 @@ def generate_appuser_files(
                         project.c.project_name_prefix,
                         project.c.xform_title,
                         project.c.id,
-                        project.c.odkid,
                         project.c.odk_central_url,
                         project.c.odk_central_user,
                         project.c.odk_central_password,
@@ -1260,16 +1258,8 @@ def generate_appuser_files(
         if one:
             prefix = one.project_name_prefix
 
-            task = table("tasks", column("outline"), column("id"))
-            where = f"project_id={project_id}"
-            sql = select(task
-                # task.c.id,
-                # geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
-            ).where(text(where))
-            result = db.execute(sql)
 
-            # Get odk project id, and odk credentials from project.
-            odk_id = one.odkid
+            # Get odk credentials from project.
             odk_credentials = {
                 "odk_central_url": one.odk_central_url,
                 "odk_central_user": one.odk_central_user,
@@ -1341,8 +1331,10 @@ def generate_appuser_files(
 
             # Generating QR Code, XForm and uploading OSM Extracts to the form. 
             # Creating app users and updating the role of that user.
-            for poly in result.fetchall():
-                generate_task_files(db, project_id, poly.id, xlsform, form_type, odk_credentials)
+            tasks_list = tasks_crud.get_task_lists(db, project_id)
+
+            for task in tasks_list:
+                generate_task_files(db, project_id, task, xlsform, form_type, odk_credentials)
 
         # Update background task status to COMPLETED
         update_background_task_status_in_database(
