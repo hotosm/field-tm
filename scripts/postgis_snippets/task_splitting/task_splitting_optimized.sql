@@ -192,7 +192,7 @@ CREATE TABLE clusteredbuildings AS (
   )
   ,clusteredbuildingsnocombineduid AS (
   SELECT *,
-    ST_ClusterKMeans(geom, cast((b.numfeatures / 5) + 1 as integer))
+    ST_ClusterKMeans(geom, cast((b.numfeatures / 20) + 1 as integer))
     over (partition by polyid) as cid
   FROM buildingstocluster b
   )
