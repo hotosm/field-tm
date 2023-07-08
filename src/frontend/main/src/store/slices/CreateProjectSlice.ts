@@ -19,6 +19,8 @@ const CreateProject = CoreModules.createSlice({
         createProjectStep: 1,
         dividedTaskLoading: false,
         dividedTaskGeojson: false,
+        taskSplittingGeojsonLoading: false,
+        taskSplittingGeojson: null,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -93,6 +95,13 @@ const CreateProject = CoreModules.createSlice({
         },
         SetUploadedAreaGeojson(state, action) {
             state.projectArea = action.payload
+        },
+        GetTaskSplittingPreviewLoading(state, action) {
+            state.taskSplittingGeojsonLoading = action.payload
+        },
+        GetTaskSplittingPreview(state, action) {
+            state.dividedTaskGeojson = action.payload
+            state.taskSplittingGeojson = action.payload
         },
     }
 })
