@@ -33,7 +33,7 @@ const ProjectDetailsForm: React.FC = () => {
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {
-    dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
+    // dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
   // useEffect(() => {
@@ -67,6 +67,20 @@ const ProjectDetailsForm: React.FC = () => {
   };
   // Changed OrganizationList Data into the Picker Component Format i.e label and value
   const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
+
+  // User has switched back to the tab
+  const onFocus = () => {
+    dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
+  };
+  useEffect(() => {
+    window.addEventListener("focus", onFocus);
+    onFocus()
+    // Calls onFocus when the window first loads
+    return () => {
+        window.removeEventListener("focus", onFocus);
+        // window.removeEventListener("blur", onBlur);
+    };
+}, []);
   return (
     <CoreModules.Stack sx={{ width: { xs: '95%' }, marginLeft: { md: '215px !important' } }}>
       <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
@@ -122,24 +136,24 @@ const ProjectDetailsForm: React.FC = () => {
                 // label="Organization"
                 onChange={(e) => {
                   handleCustomChange('organization', e.target.value);
-                  dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }));
                 }}
               >
                 {organizationList?.map((org) => (
                   <MenuItem value={org.value}>{org.label}</MenuItem>
                 ))}
               </Select>
-              {/* <CoreModules.IconButton
-                                sx={{ width: 'auto' }}
-                                onClick={() => setOpenOrganizationModal(true)}
-                                // disabled={qrcode == "" ? true : false}
-                                color="info"
-                                aria-label="download qrcode"
-                            >
-                                <AssetModules.AddIcon
-                                    sx={{ fontSize: 25, border: '1px solid', borderRadius: '20px', backgroundColor: defaultTheme.palette.success.main, color: 'white', }}
-                                />
-                            </CoreModules.IconButton> */}
+              <a href="/createOrganization" target='_blank' rel='noreferrer'>
+              <CoreModules.IconButton
+                  sx={{ width: 'auto' }}
+                  // disabled={qrcode == "" ? true : false}
+                  color="info"
+                  aria-label="download qrcode"
+              >
+                  <AssetModules.AddIcon
+                      sx={{ fontSize: 25, border: '1px solid', borderRadius: '20px', backgroundColor: defaultTheme.palette.success.main, color: 'white', }}
+                  />
+              </CoreModules.IconButton>
+              </a>
             </CoreModules.Stack>
             {errors.organization && (
               <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
@@ -159,7 +173,10 @@ const ProjectDetailsForm: React.FC = () => {
               </CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
-              id="odk_central_url"
+              id="url"
+              name="url"
+              type="url"
+              autoComplete="on"
               label=""
               variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
@@ -193,7 +210,7 @@ const ProjectDetailsForm: React.FC = () => {
             </CoreModules.Box>
             <CoreModules.TextField
               id="odk_central_name"
-              name="odk"
+              name="username"
               label=""
               variant="outlined"
               inputProps={{ sx: { padding: '8.5px 14px' } }}
@@ -208,7 +225,7 @@ const ProjectDetailsForm: React.FC = () => {
               onChange={(e) => {
                 handleCustomChange('odk_central_user', e.target.value);
               }}
-              autoComplete="new-password"
+              autoComplete="on"
               helperText={errors.odk_central_user}
               FormHelperTextProps={inputFormStyles()}
             />
@@ -238,7 +255,7 @@ const ProjectDetailsForm: React.FC = () => {
               }}
               value={values.odk_central_password}
               type="password"
-              autoComplete="new-password"
+              autoComplete="on"
               onChange={(e) => {
                 handleCustomChange('odk_central_password', e.target.value);
               }}
