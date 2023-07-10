@@ -1093,11 +1093,11 @@ def generate_task_files(
     db.refresh(task)
 
 
-    xform = f"/tmp/{project_name}_{category}_{category}.xml"  # This file will store xml contents of an xls form.
-    extracts = f"/tmp/{project_name}_{category}_{category}.geojson"  # This file will store osm extracts
+    xform = f"/tmp/{name}.xml"  # This file will store xml contents of an xls form.
+    extracts = f"/tmp/{name}.geojson"  # This file will store osm extracts
 
     # xform_id_format
-    xform_id = f"{project_name}_{category}_{category}".split("_")[2]
+    xform_id = f"{name}".split("_")[2]
 
 
     # Get the features for this task.
