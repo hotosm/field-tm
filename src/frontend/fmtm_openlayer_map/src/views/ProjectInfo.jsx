@@ -27,6 +27,7 @@ const boxStyles = {
 
 const ProjectInfo = () => {
   const dispatch = CoreModules.useDispatch();
+  const navigate = CoreModules.useNavigate();
   const [isMonitoring, setIsMonitoring] = useState(false);
 
   const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
@@ -103,6 +104,19 @@ const ProjectInfo = () => {
         }}
       >
         <CoreModules.Box>
+        <CoreModules.IconButton
+            sx={{display:'flex',justifyContent:'center', alignItems:'center', width:'80px',mb:2}}
+            onClick={() => {
+              navigate(-1);
+              // setOpen(true);
+            }}
+            color="info"
+          >
+            <AssetModules.ArrowBackIcon color='info' sx={{ fontSize: '30px' }} />
+          <CoreModules.Typography ml={2} variant="h1" >
+            Back
+          </CoreModules.Typography>
+          </CoreModules.IconButton>
           <CoreModules.Typography variant="h1" color="#929db3">
             #{projectInfo?.id}
           </CoreModules.Typography>
