@@ -323,7 +323,7 @@ const Home = () => {
               </CoreModules.Button>
             </CoreModules.Link>
           </div>
-          {/* <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
+          <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
             <CoreModules.Link
               to={`/edit-project/project-details/${encodedId}`}
               style={{
@@ -341,7 +341,7 @@ const Home = () => {
                 Edit Project
               </CoreModules.Button>
             </CoreModules.Link>
-          </div> */}
+          </div>
         </CoreModules.Stack>
         {/* <ProjectMap /> */}
         {params?.id && <OpenLayersMap
