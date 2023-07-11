@@ -65,7 +65,7 @@ const EditProject: React.FC = () => {
           </CoreModules.Stack>
           <CoreModules.Stack sx={{display:'flex', flex: '70%',p:3}}>
             {selectedTab === 'project-description' ?<EditProjectDetails projectId={decodedProjectId} />:null}
-            {selectedTab === 'form-update' ?<UpdateForm/>:null}
+            {selectedTab === 'form-update' ?<UpdateForm projectId={decodedProjectId}/>:null}
           </CoreModules.Stack>
         </CoreModules.Stack>
       </CoreModules.Stack>
