@@ -1,60 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
-// import "../../node_modules/ol/ol.css";
 import CoreModules from '../shared/CoreModules';
-import UploadArea from '../components/createproject/UploadArea';
-import { useLocation, Link } from 'react-router-dom';
-import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
-import FormSelection from '../components/createproject/FormSelection';
-import DefineTasks from '../components/createproject/DefineTasks';
-import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
-import DataExtract from '../components/createproject/DataExtract';
 import environment from '../environment';
-import { GetIndividualProjectDetails } from '../api/CreateProjectService';
+import { GetIndividualProjectDetails, OrganisationService } from '../api/CreateProjectService';
+import EditProjectDetails from '../components/editproject/EditProjectDetails';
+import SidebarContent from '../constants/EditProjectSidebarContent';
+import { useNavigate } from 'react-router-dom';
+import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
+import UpdateForm from '../components/editproject/UpdateForm';
 
 const EditProject: React.FC = () => {
-  const [geojsonFile ,setGeojsonFile]= useState(null);
-  const [customFormFile ,setCustomFormFile]= useState(null);
-  const [customFormInputValue ,setCustomFormInputValue]= useState(null);
-  const [inputValue ,setInputValue]= useState(null);
-  const [dataExtractFile ,setDataExtractFile]= useState(null);
-  const [dataExtractFileValue ,setDataExtractFileValue]= useState(null);
-  const dispatch = useDispatch();
-  const location = useLocation();
-  const boxSX = {
-    'button:hover': {
-      textDecoration: 'none',
-    },
-  };
+  const dispatch = useDispatch(); 
+  const [selectedTab, setSelectedTab]= useState('project-description');
   const params = CoreModules.useParams();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
+  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
+  const tabHover = {
+    '&:hover': {
+      background: defaultTheme.palette.grey.light,
+      cursor:'pointer'
+    },
+  };
   useEffect(() => {
-    console.log(decodedProjectId,'dec');
-    
+    dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
+
     if(decodedProjectId){
       dispatch(GetIndividualProjectDetails(`${environment.baseApiUrl}/projects/${decodedProjectId}`));
     }
   }, [decodedProjectId])
 
-  useEffect(() => {
-
-    return () => {
-      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
-      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));      
-      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
-      setGeojsonFile(null);
-      setCustomFormFile(null);
-      setDataExtractFile(null);
-    }
-  }, [])
+// useEffect(() => {
+//   if(!editProjectResponse)return;
+//   const encodedProjectId= environment.encode(editProjectResponse.id);
+//   navigate(`/project_details/${encodedProjectId}`);
+//   dispatch(CreateProjectActions.SetPatchProjectDetails(null));
+// }, [editProjectResponse])
 
   return (
     <div>
-      <CoreModules.Stack
-        sx={{
+      <CoreModules.Stack>
+        <CoreModules.Typography variant="subtitle2" color={'info'} noWrap sx={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -64,165 +52,22 @@ const EditProject: React.FC = () => {
           background: 'white',
           zIndex: 1,
           paddingBottom: '1.5rem',
-        }}
-      >
-        <CoreModules.Typography variant="subtitle2" color={'info'} noWrap sx={{ display: { sm: 'block' } }} ml={'3%'}>
-          Create New Project
+        }} ml={'3%'}>
+          Edit Project
         </CoreModules.Typography>
-        <CoreModules.Stack
-          sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', mt: 3 }}
-        >
-          <CoreModules.Box
-            sx={{
-              height: !location.pathname.includes('edit-project/project-details') ? '8px' : '12px',
-              width: '64px',
-              background: !location.pathname.includes('edit-project/project-details') ? '#68707F' : '#D73F3F',
-              mx: '16px',
-              borderRadius: '10px',
-            }}
-          ></CoreModules.Box>
-          <CoreModules.Box
-            sx={{
-              height: !location.pathname.includes('edit-project/upload-area') ? '8px' : '12px',
-              width: '64px',
-              background: !location.pathname.includes('edit-project/upload-area') ? '#68707F' : '#D73F3F',
-              mx: '16px',
-              borderRadius: '10px',
-            }}
-          ></CoreModules.Box>
-          <CoreModules.Box
-            sx={{
-              height: !location.pathname.includes('edit-project/define-tasks') ? '8px' : '12px',
-              width: '64px',
-              background: !location.pathname.includes('edit-project/define-tasks') ? '#68707F' : '#D73F3F',
-              mx: '16px',
-              borderRadius: '10px',
-            }}
-          ></CoreModules.Box>
-          <CoreModules.Box
-            sx={{
-              height: !location.pathname.includes('edit-project/data-extract') ? '8px' : '12px',
-              width: '64px',
-              background: !location.pathname.includes('edit-project/data-extract') ? '#68707F' : '#D73F3F',
-              mx: '16px',
-              borderRadius: '10px',
-            }}
-          ></CoreModules.Box>
-          <CoreModules.Box
-            sx={{
-              height: !location.pathname.includes('edit-project/select-form') ? '8px' : '12px',
-              width: '64px',
-              background: !location.pathname.includes('edit-project/select-form') ? '#68707F' : '#D73F3F',
-              mx: '16px',
-              borderRadius: '10px',
-            }}
-          ></CoreModules.Box>
-          {/* <CoreModules.Box sx={{ height: location.pathname !== '/basemap-selection' ? '8px' : '12px', width: '64px', background: location.pathname !== '/basemap-selection' ? '#68707F' : '#D73F3F', mx: '16px', borderRadius: '10px' }}></CoreModules.Box> */}
+        <CoreModules.Stack flexDirection="row">
+          <CoreModules.Stack sx={{m:4, display:'flex', flex: '30%',gap:1}}>
+            {SidebarContent.map((content)=>
+              <CoreModules.Typography onClick={()=>setSelectedTab(content.slug)} sx={{p:1, ...tabHover, backgroundColor:selectedTab === content.slug ? defaultTheme.palette.grey.light : 'white'}}    variant="subtitle2">
+                {content.name}
+              </CoreModules.Typography>
+            )}
+          </CoreModules.Stack>
+          <CoreModules.Stack sx={{display:'flex', flex: '70%',p:3}}>
+            {selectedTab === 'project-description' ?<EditProjectDetails projectId={decodedProjectId} />:null}
+            {selectedTab === 'form-update' ?<UpdateForm/>:null}
+          </CoreModules.Stack>
         </CoreModules.Stack>
-      </CoreModules.Stack>
-      <CoreModules.Stack
-        sx={{
-          paddingLeft: { xs: '1rem', md: '5rem', lg: '12rem' },
-          paddingTop: { xs: '1rem', md: '3rem' },
-          height: 'auto',
-          background: 'white',
-        }}
-        direction={{ xs: 'column', md: 'row' }}
-      >
-        <CoreModules.Stack
-          direction={{ xs: 'row', md: 'column' }}
-          spacing={{ xs: 1, md: 2 }}
-          sx={{
-            position: { xs: 'sticky', md: 'fixed' },
-            top: { xs: 80, md: 'unset' },
-            background: { xs: 'white', md: 'unset' },
-            zIndex: { xs: 1, md: 'unset' },
-            paddingBottom: 2,
-            paddingRight: '1rem',
-          }}
-        >
-          {/* Project Details SideBar Button for Creating Project */}
-          <Link to={`/edit-project/project-details/${encodedProjectId}`}>
-            <CoreModules.Button variant="contained" color="error" disabled={!location.pathname.includes('edit-project/project-details')}>
-              Project Details
-            </CoreModules.Button>
-          </Link>
-
-          {/* END */}
-
-          {/* Upload Area SideBar Button for uploading Area page  */}
-          <Link to={`/edit-project/upload-area/${encodedProjectId}`}>
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={!location.pathname.includes('edit-project/upload-area')}
-            >
-              Upload Area
-            </CoreModules.Button>
-          </Link>
-          {/* END */}
-
-          {/* Define Tasks SideBar Button for define tasks page  */}
-          <Link to={`/edit-project/define-tasks/${encodedProjectId}`}>
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={!location.pathname.includes('edit-project/define-tasks')}
-            >
-              Define Tasks
-            </CoreModules.Button>
-          </Link>
-          {/* END */}
-          {/* Extract Data SideBar Button for extracting data page  */}
-          <Link to={`/edit-project/data-extract/${encodedProjectId}`}>
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={!location.pathname.includes('edit-project/data-extract')}
-            >
-              Data Extract
-            </CoreModules.Button>
-          </Link>
-          {/* END */}
-
-          {/* Upload Area SideBar Button for uploading Area page  */}
-          <Link to={`/edit-project/select-form/${encodedProjectId}`}>
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={!location.pathname.includes('edit-project/select-form')}
-            >
-              Select Form
-            </CoreModules.Button>
-          </Link>
-          {/* END */}
-
-          {/* Basemap Selection of Project Boundary   */}
-          {/* <Link to="/basemap-selection">
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={location.pathname !== '/basemap-selection'}
-            >
-              Basemap Selection
-            </CoreModules.Button>
-          </Link> */}
-          {/* END */}
-        </CoreModules.Stack>
-        {/* Showing Different Create Project Component When the url pathname changes */}
-
-        {location.pathname.includes('edit-project/project-details') ? <ProjectDetailsForm /> : null}
-        {location.pathname.includes('edit-project/upload-area') ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
-        {location.pathname.includes('edit-project/define-tasks') ? <DefineTasks  geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile}/> : null}
-        {location.pathname.includes('edit-project/data-extract') ? <DataExtract geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} dataExtractFile={dataExtractFile} setDataExtractFile={setDataExtractFile} dataExtractFileValue={dataExtractFileValue} setDataExtractFileValue={setDataExtractFileValue}/> : null }
-        {location.pathname.includes('edit-project/select-form') ? <FormSelection geojsonFile={geojsonFile} customFormFile={customFormFile} setCustomFormFile={setCustomFormFile} customFormInputValue={customFormInputValue} setCustomFormInputValue={setCustomFormInputValue} dataExtractFile={dataExtractFile} /> : null }
-        {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
-        {/* END */}
       </CoreModules.Stack>
     </div>
   );
