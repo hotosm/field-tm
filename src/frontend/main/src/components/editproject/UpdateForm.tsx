@@ -12,7 +12,7 @@ const UpdateForm = ({projectId}) => {
     dispatch(PostFormUpdate(`${environment.baseApiUrl}/projects/update-form/${projectId}`,uploadForm));
   }
   return (
-    <CoreModules.Stack sx={{width:'30%'}}>
+    <CoreModules.Stack sx={{width:'20%'}}>
         <CoreModules.FormLabel>Upload .xls/.xlsx/.xml Form</CoreModules.FormLabel>
         <CoreModules.Button variant="contained" component="label">
           <CoreModules.Input
