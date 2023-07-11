@@ -303,26 +303,46 @@ const Home = () => {
           state={state}
           type={type}
         />
-       
-        <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
-          <CoreModules.Link
-            to={`/projectInfo/${encodedId}`}
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              textDecoration: "none",
-              marginRight: "15px",
-            }}
-          >
-            <CoreModules.Button
-              variant="contained"
-              color="error"
+      <CoreModules.Stack direction={"row"} justifyContent="flex-end" spacing={1}>
+          <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
+            <CoreModules.Link
+              to={`/projectInfo/${encodedId}`}
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+                textDecoration: "none",
+                marginRight: "15px",
+              }}
             >
-              ProjectInfo
-            </CoreModules.Button>
-          </CoreModules.Link>
-        </div>
+              <CoreModules.Button
+                variant="contained"
+                color="error"
+              >
+                ProjectInfo
+              </CoreModules.Button>
+            </CoreModules.Link>
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
+            <CoreModules.Link
+              to={`/edit-project/project-details/${encodedId}`}
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+                textDecoration: "none",
+                marginRight: "15px",
+              }}
+            >
+              <CoreModules.Button
+                variant="outlined"
+                color="error"
+              >
+                Edit Project
+              </CoreModules.Button>
+            </CoreModules.Link>
+          </div>
+        </CoreModules.Stack>
         {/* <ProjectMap /> */}
         {params?.id && <OpenLayersMap
           key={params.id}
