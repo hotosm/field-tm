@@ -357,4 +357,38 @@ const PatchProjectDetails: Function = (url: string, payload: any) => {
     }
 
 }
-export { UploadAreaService, CreateProjectService, FormCategoryService, GenerateProjectQRService, OrganisationService, UploadCustomXLSFormService, GenerateProjectLog, GetDividedTaskFromGeojson,GetIndividualProjectDetails,PatchProjectDetails }
+const PostFormUpdate: Function = (url: string, payload: any) => {
+
+    return async (dispatch) => {
+        dispatch(CreateProjectActions.SetPostFormUpdateLoading(true))
+
+        const postFormUpdate = async (url, payload) => {
+            try {
+                const formFormData = new FormData();
+                formFormData.append('form',payload);
+                const postFormUpdateResponse = await axios.post(url, formFormData)
+                const resp: ProjectDetailsModel = postFormUpdateResponse.data;
+                // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
+                // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
+                dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: 'Form Successfully Updated',
+                        variant: "success",
+                        duration: 2000,
+                    })
+                );
+            } catch (error) {
+                dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
+            }finally{
+                dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
+            }
+        }
+
+        await postFormUpdate(url, payload);
+
+    }
+
+}
+export { UploadAreaService, CreateProjectService, FormCategoryService, GenerateProjectQRService, OrganisationService, UploadCustomXLSFormService, GenerateProjectLog, GetDividedTaskFromGeojson,GetIndividualProjectDetails,PatchProjectDetails,PostFormUpdate }
