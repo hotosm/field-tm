@@ -136,7 +136,7 @@ async def task_features_count(
     db: Session = Depends(database.get_db),
     ):
 
-    task_list = await tasks_crud.get_task_lists(db, project_id)
+    task_list = tasks_crud.get_task_lists(db, project_id)
 
     # Get the project object.
     project = project_crud.get_project(db, project_id)

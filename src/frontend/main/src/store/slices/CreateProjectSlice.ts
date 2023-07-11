@@ -21,7 +21,9 @@ const CreateProject = CoreModules.createSlice({
         createProjectStep: 1,
         dividedTaskLoading: false,
         dividedTaskGeojson: false,
-        formUpdateLoading:false
+        formUpdateLoading:false,
+        taskSplittingGeojsonLoading: false,
+        taskSplittingGeojson: null,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -110,7 +112,14 @@ const CreateProject = CoreModules.createSlice({
         },
         SetPostFormUpdateLoading(state, action) {
             state.formUpdateLoading= action.payload
-        }
+        },
+        GetTaskSplittingPreviewLoading(state, action) {
+            state.taskSplittingGeojsonLoading = action.payload
+        },
+        GetTaskSplittingPreview(state, action) {
+            state.dividedTaskGeojson = action.payload
+            state.taskSplittingGeojson = action.payload
+        },
     }
 })
 
