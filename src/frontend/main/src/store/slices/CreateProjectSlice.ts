@@ -21,6 +21,7 @@ const CreateProject = CoreModules.createSlice({
         createProjectStep: 1,
         dividedTaskLoading: false,
         dividedTaskGeojson: false,
+        formUpdateLoading:false
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -106,6 +107,9 @@ const CreateProject = CoreModules.createSlice({
         },
         SetPatchProjectDetailsLoading(state, action) {
             state.editProjectDetailsLoading= action.payload
+        },
+        SetPostFormUpdateLoading(state, action) {
+            state.formUpdateLoading= action.payload
         }
     }
 })
