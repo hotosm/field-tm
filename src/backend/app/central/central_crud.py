@@ -146,20 +146,23 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
     # odkid in the projects table
-    project = get_odk_project(odk_central)
-    result = project.deleteProject(project_id)
-    logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
-    return result
+    try:
+        project = get_odk_project(odk_central)
+        result = project.deleteProject(project_id)
+        logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
+        return result
+    except Exception as e:
+        return 'Could not delete project from central odk'
 
 
-def create_appuser(project_id: int, name: str, odk_credentials: dict = None):
+def create_appuser(project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None):
     """Create an app-user on a remote ODK Server.
     If odk credentials of the project are provided, use them to create an app user.
     """
     if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
+        url = odk_credentials.odk_central_url
+        user = odk_credentials.odk_central_user
+        pw = odk_credentials.odk_central_password
 
     else:
         logger.debug("ODKCentral connection variables not set in function")
@@ -214,7 +217,7 @@ def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_cred
 
 
 def create_odk_xform(
-    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None,
+    project_id: int, xform_id: str, filespec: str, odk_credentials: project_schemas.ODKCentral = None,
     draft: bool = False,
     upload_media = True
 ):
@@ -223,9 +226,9 @@ def create_odk_xform(
     # result = xform.createForm(project_id, title, filespec, True)
     # Pass odk credentials of project in xform
     if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
+        url = odk_credentials.odk_central_url
+        user = odk_credentials.odk_central_user
+        pw = odk_credentials.odk_central_password
 
     else:
         logger.debug("ODKCentral connection variables not set in function")
@@ -402,20 +405,21 @@ def generate_updated_xform(
     return outfile
 
 
-def create_qrcode(project_id: int, token: str, name: str, odk_credentials: dict = None):
+def create_qrcode(project_id: int,
+                  token: str,
+                  name: str,
+                  odk_central_url: str = None
+                  ):
     """Create the QR Code for an app-user."""
-    if odk_credentials:
-        central_url = odk_credentials["odk_central_url"]
-
-    else:
+    if not odk_central_url:
         logger.debug("ODKCentral connection variables not set in function")
         logger.debug("Attempting extraction from environment variables")
-        central_url = settings.ODK_CENTRAL_URL
+        odk_central_url = settings.ODK_CENTRAL_URL
 
     # Qr code text json in the format acceptable by odk collect.
     qr_code_setting = {
         "general": {
-            "server_url": f"{central_url}/v1/key/{token}/projects/{project_id}",
+            "server_url": f"{odk_central_url}/v1/key/{token}/projects/{project_id}",
             "form_update_mode": "match_exactly",
             "basemap_source": "osm",
             "autosend": "wifi_and_cellular",
