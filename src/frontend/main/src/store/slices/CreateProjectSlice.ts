@@ -4,6 +4,8 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
+        editProjectDetails: {name:'',description:'',short_description:''},
+        editProjectResponse: null,
         projectDetails: { dimension: 10 },
         projectDetailsResponse: null,
         projectDetailsLoading: false,
@@ -94,11 +96,17 @@ const CreateProject = CoreModules.createSlice({
         //EDIT Project
 
         SetIndividualProjectDetails(state, action) {
-            state.projectDetails= action.payload
-            state.dividedTaskGeojson= action.payload.outline_geojson
+            state.editProjectDetails= action.payload
         },
         SetIndividualProjectDetailsLoading(state, action) {
             state.projectDetailsLoading= action.payload
+        },
+        SetPatchProjectDetails(state, action) {
+            state.editProjectResponse= action.payload
+        },
+        SetPatchProjectDetailsLoading(state, action) {
+            state.editProjectDetailsLoading= action.payload
+        }
     }
 })
 
