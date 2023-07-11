@@ -682,3 +682,55 @@ async def download_form(project_id: int,
         else:
             raise HTTPException(status_code=404, detail="Form not found")
     return Response(content=project.form_xls, headers=headers)
+
+
+@router.post("/update_category")
+async def update_project_category(
+    # background_tasks: BackgroundTasks,
+    project_id: int,
+    category: str,
+    upload: Optional[UploadFile] = File(None),
+    db: Session = Depends(database.get_db),
+    ):
+
+    contents = None
+
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(
+            status_code=400, detail=f"Project with id {project_id} does not exist"
+        )
+
+    current_category = project.xform_title
+    if current_category == category:
+        raise HTTPException(status_code=400, detail="Current category is same as new category")
+
+
+    if upload:
+        # Validating for .XLS File.
+        file_name = os.path.splitext(upload.filename)
+        file_ext = file_name[1]
+        allowed_extensions = [".xls", '.xlsx', '.xml']
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+        contents = await upload.read()
+
+        project.form_xls = contents
+        db.commit()
+    else:
+        form_path = f"{xlsforms_path}/{category}.xls"
+        contents = open(form_path, 'rb')
+
+    project.category = category
+    db.commit()
+
+    # Update odk forms
+    form_updated = await project_crud.update_project_form(
+        db, 
+        project_id,  
+        contents,    # Form Contents
+        file_ext[1:] if upload else 'xls',
+        )
+
+
+    return True
