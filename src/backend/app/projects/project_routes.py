@@ -682,3 +682,13 @@ async def download_form(project_id: int,
         else:
             raise HTTPException(status_code=404, detail="Form not found")
     return Response(content=project.form_xls, headers=headers)
+
+@router.get("/download_template/")
+async def download_template(category: str, db: Session = Depends(database.get_db)):
+    xlsform_path = f"{xlsforms_path}/{category}.xls"
+    if os.path.exists(xlsform_path):
+        return FileResponse(xlsform_path, filename="form.xls")
+    else:
+        raise HTTPException(status_code=404, detail="Form not found")
+
+        
