@@ -407,8 +407,6 @@ def update_multi_polygon_project_boundary(
         result = db.execute(query)
         data = result.fetchone()
 
-        print('Data from query:',data[0])
-
         db_project.outline = data[0]
         db_project.centroid = (wkt.loads(data[0])).centroid.wkt
         db.commit()
@@ -1295,8 +1293,6 @@ def generate_appuser_files(
                 # OSM Extracts for whole project
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
-
-                print(one.outline)
 
                 outline = json.loads(one.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, 
