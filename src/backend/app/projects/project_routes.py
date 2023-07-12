@@ -381,7 +381,7 @@ async def edit_project_boundary(
     }
 
 
-@router.post("/{project_id}/download")
+@router.get("/{project_id}/download")
 async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
