@@ -2,13 +2,11 @@ import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
-import { useDispatch } from 'react-redux';
 import environment from '../environment';
 import { GetIndividualProjectDetails, OrganisationService } from '../api/CreateProjectService';
 import EditProjectDetails from '../components/editproject/EditProjectDetails';
 import SidebarContent from '../constants/EditProjectSidebarContent';
 import { useNavigate } from 'react-router-dom';
-import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import UpdateForm from '../components/editproject/UpdateForm';
 
 const EditProject: React.FC = () => {

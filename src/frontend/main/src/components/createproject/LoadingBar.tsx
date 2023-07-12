@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Box, Tooltip } from '@mui/material';
 import { LinearProgress } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
@@ -26,7 +26,7 @@ const LoadingBar = ({ activeStep, totalSteps, title }) => {
       <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: 0.5 }}>
         <CoreModules.Typography variant="h1" sx={{ width: '100%' }}>
           {title}
-          <CoreModules.Typography variant="h2">{`${completedPercentage.toFixed(2)}% Completed`}</CoreModules.Typography>
+          <CoreModules.Typography variant="h2">{`${completedPercentage ? completedPercentage.toFixed(2) : 0}% Completed`}</CoreModules.Typography>
           <CoreModules.Typography
             sx={{ display: 'flex', width: '100%', justifyContent: 'flex-end' }}
             variant="h3"
