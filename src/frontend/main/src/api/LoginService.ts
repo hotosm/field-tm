@@ -1,4 +1,3 @@
-import react from 'react';
 import axios from 'axios';
 import { LoginActions } from '../store/slices/LoginSlice';
 import {SignInModel, SingUpModel } from '../models/login/loginModel';
@@ -23,7 +22,7 @@ export const SignUpService: Function = (url: string, body:SingUpModel) => {
                         duration: 2000,
                     })
                 );
-            } catch (error) {
+            } catch (error:any) {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,

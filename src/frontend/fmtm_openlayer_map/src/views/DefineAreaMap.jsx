@@ -105,6 +105,4 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
   );
 };
 
-DefineAreaMap.propTypes = {};
-
 export default DefineAreaMap;

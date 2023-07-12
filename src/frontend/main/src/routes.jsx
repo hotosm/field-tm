@@ -4,7 +4,6 @@ import Home from './views/Home';
 import Login from './views/Login';
 import Create from './views/Create';
 import Tabbed from './views/Tabbed';
-import Forgot from './views/Forgot';
 import MainView from './views/MainView';
 import { Suspense } from 'react';
 import CreateProject from './views/CreateProject';

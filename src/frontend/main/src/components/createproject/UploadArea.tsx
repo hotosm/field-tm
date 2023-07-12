@@ -4,9 +4,10 @@ import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import DefineAreaMap from 'map/DefineAreaMap';
+// @ts-ignore  
+const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 
-const UploadArea: React.FC = ({geojsonFile,setGeojsonFile,setInputValue,inputValue}) => {
+const UploadArea: React.FC<any> = ({geojsonFile,setGeojsonFile,setInputValue,inputValue}:any) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
