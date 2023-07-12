@@ -146,7 +146,7 @@ async def create_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.put("/project/{id}", response_model=project_schemas.ProjectOut)
+@router.put("/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     id: int,
     project_info: project_schemas.BETAProjectUpload,
@@ -172,7 +172,7 @@ async def update_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.patch("/project/{id}", response_model=project_schemas.ProjectOut)
+@router.patch("/{id}", response_model=project_schemas.ProjectOut)
 async def project_partial_update(
     id: int,
     project_info: project_schemas.ProjectUpdate,
@@ -734,3 +734,14 @@ async def update_project_category(
 
 
     return True
+
+
+@router.get("/download_template/")
+async def download_template(category: str, db: Session = Depends(database.get_db)):
+    xlsform_path = f"{xlsforms_path}/{category}.xls"
+    if os.path.exists(xlsform_path):
+        return FileResponse(xlsform_path, filename="form.xls")
+    else:
+        raise HTTPException(status_code=404, detail="Form not found")
+
+        
