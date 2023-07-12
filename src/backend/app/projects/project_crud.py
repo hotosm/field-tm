@@ -1290,7 +1290,6 @@ def generate_appuser_files(
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
 
-                print(one.outline)
 
                 outline = json.loads(one.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, 
