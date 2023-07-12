@@ -9,12 +9,7 @@ function SlideTransition(props) {
 }
 
 export default function CustomizedSnackbars({ open, message, variant, handleClose, duration }) {
-    // const handleClose = (event, reason) => {
-    //     if (reason === 'clickaway') {
-    //         return;
-    //     }
-    //     setOpen(false);
-    // };
+
     return (
         <CoreModules.Stack spacing={2} sx={{ width: '100%' }}>
             <CoreModules.Snackbar open={open} autoHideDuration={duration} onClose={handleClose} TransitionComponent={SlideTransition}>

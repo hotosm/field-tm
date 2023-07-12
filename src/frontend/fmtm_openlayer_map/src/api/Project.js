@@ -49,3 +49,28 @@ export const ProjectById = (url, existingProjectList) => {
     dispatch(ProjectActions.SetNewProjectTrigger());
   };
 };
+
+export const DownloadProjectForm = (url,payload) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:true}))
+
+      const fetchProjectForm = async (url,payload) => {
+          try {
+              const response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+              var a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;
+              a.click();
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } finally{
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+          }
+      }
+      await fetchProjectForm(url,payload);
+  }
+}
