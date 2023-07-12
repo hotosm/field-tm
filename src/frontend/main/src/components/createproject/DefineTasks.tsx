@@ -7,6 +7,7 @@ import { GetDividedTaskFromGeojson, TaskSplittingPreviewService } from '../../ap
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from '@mui/material';
+//@ts-ignore
 import DefineAreaMap from 'map/DefineAreaMap';
 import useForm from '../../hooks/useForm';
 import DefineTaskValidation from './validation/DefineTaskValidation';
@@ -14,7 +15,7 @@ import DefineTaskValidation from './validation/DefineTaskValidation';
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 // const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 const alogrithmList = [{id:1,value:'Divide on Square',label:'Divide on Square'}, {id:2,value:'Choose Area as Tasks',label:'Choose Area as Tasks'},{id:3,value:'Task Splitting Algorithm',label:'Task Splitting Algorithm'}];
-const DefineTasks: React.FC = ({geojsonFile,setGeojsonFile}) => {
+const DefineTasks: React.FC<any> = ({geojsonFile,setGeojsonFile}) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 

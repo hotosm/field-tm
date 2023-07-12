@@ -5,17 +5,16 @@ import FormGroup from '@mui/material/FormGroup';
 import { FormCategoryService } from '../../api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { Divider, FormControl, Grid, InputLabel, MenuItem, Select, Typography } from '@mui/material';
-import AssetModules from '../../shared/AssetModules.js';
+import { Grid, InputLabel, MenuItem, Select } from '@mui/material';
 import useForm from '../../hooks/useForm';
-import SelectFormValidation from './validation/SelectFormValidation';
+//@ts-ignore
 import DefineAreaMap from 'map/DefineAreaMap';
 import DataExtractValidation from './validation/DataExtractValidation';
 
 // import { SelectPicker } from 'rsuite';
-let generateProjectLogIntervalCb = null;
+let generateProjectLogIntervalCb:any = null;
 
-const DataExtract: React.FC = ({ geojsonFile,setGeojsonFile,dataExtractFile,setDataExtractFile,setDataExtractFileValue }) => {
+const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile,setDataExtractFile,setDataExtractFileValue }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
