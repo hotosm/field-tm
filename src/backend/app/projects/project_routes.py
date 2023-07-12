@@ -407,7 +407,14 @@ async def download_task_boundaries(
     """Download the task boundary polygons for this project."""
     out = project_crud.download_geometry(db, project_id, True)
     
-    return {"Message": out}
+    buffer = json.dumps(out['filespec']).encode()
+    
+    headers = {
+        "Content-Disposition": "attachment; filename=task_outline.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(buffer, headers=headers)
 
 
 @router.post("/{project_id}/generate")
