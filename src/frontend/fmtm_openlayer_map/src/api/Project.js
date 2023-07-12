@@ -49,3 +49,29 @@ export const ProjectById = (url, existingProjectList) => {
     dispatch(ProjectActions.SetNewProjectTrigger());
   };
 };
+
+export const DownloadProjectForm = (url) => {
+
+  return async (dispatch) => {
+     
+      dispatch(ProjectActions.SetDownloadProjectFormLoading(true))
+
+      const fetchProjectForm = async (url) => {
+          try {
+              const response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+              var a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download = "Form";
+              a.click();
+              dispatch(ProjectActions.SetDownloadProjectFormLoading(false))
+          } catch (error) {
+              dispatch(ProjectActions.SetDownloadProjectFormLoading(false))
+          } finally{
+              dispatch(ProjectActions.SetDownloadProjectFormLoading(false));
+          }
+      }
+      await fetchProjectForm(url);
+  }
+}

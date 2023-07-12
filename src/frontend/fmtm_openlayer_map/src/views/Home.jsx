@@ -6,7 +6,7 @@ import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
 import OpenLayersMap from "../components/OpenLayersMap";
 import environment from "fmtm/environment";
-import { ProjectById } from "../api/Project";
+import { DownloadProjectForm, ProjectById } from "../api/Project";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from "fmtm/CustomizedSnackbar";
 import { defaults } from "ol/control/defaults";
@@ -26,6 +26,7 @@ import Overlay from "ol/Overlay";
 const Home = () => {
   const dispatch = CoreModules.useDispatch();
   const params = CoreModules.useParams();
+
   const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useSelector((state) => state.project);
 
@@ -43,8 +44,10 @@ const Home = () => {
   const [featuresLayer, setFeaturesLayer] = useState();
   const [top, setTop] = useState(0);
   const encodedId = params.id;
+  const decodedId = environment.decode(encodedId);
   const { windowSize, type } = WindowDimension();
   const { y } = OnScroll(map, windowSize.width);
+  const downloadProjectFormLoading = CoreModules.useSelector((state) => state.project.downloadProjectFormLoading)
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -202,6 +205,15 @@ const Home = () => {
   // if(map && mainView && featuresLayer){
   // }
   TasksLayer(map, mainView, featuresLayer);
+
+
+  const handleDownload = (downloadType) => {
+    dispatch(
+      DownloadProjectForm(
+        `${environment.baseApiUrl}/projects/download_form/${decodedId}`
+      )
+    );
+  };
   return (
     <CoreModules.Stack spacing={2}>
       {/* Home snackbar */}
@@ -303,8 +315,34 @@ const Home = () => {
           state={state}
           type={type}
         />
-      <CoreModules.Stack direction={"row"} justifyContent="flex-end" spacing={1}>
-          <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
+        <CoreModules.Stack direction={"row"} spacing={1}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', marginLeft: '1rem', gap: 6 }}>
+            <CoreModules.LoadingButton
+              onClick={() => handleDownload('csv')}
+              sx={{ width: 'unset' }}
+              loading={downloadProjectFormLoading}
+              loadingPosition="end"
+              endIcon={<AssetModules.FileDownloadIcon />}
+              variant="contained"
+              color="error"
+            >
+
+              Form
+            </CoreModules.LoadingButton>
+            <CoreModules.LoadingButton
+              onClick={() => handleDownload('csv')}
+              sx={{ width: 'unset' }}
+              // loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
+              loadingPosition="end"
+              endIcon={<AssetModules.FileDownloadIcon />}
+              variant="contained"
+              color="error"
+            >
+
+              Geojson
+            </CoreModules.LoadingButton>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', width: '100%', }}>
             <CoreModules.Link
               to={`/projectInfo/${encodedId}`}
               style={{
@@ -322,8 +360,6 @@ const Home = () => {
                 ProjectInfo
               </CoreModules.Button>
             </CoreModules.Link>
-          </div>
-          <div style={{display:'flex',justifyContent:'flex-end',alignItems:'flex-end'}}>
             <CoreModules.Link
               to={`/edit-project/project-details/${encodedId}`}
               style={{
