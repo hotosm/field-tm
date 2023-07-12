@@ -208,11 +208,19 @@ const Home = () => {
 
 
   const handleDownload = (downloadType) => {
-    dispatch(
-      DownloadProjectForm(
-        `${environment.baseApiUrl}/projects/download_form/${decodedId}`
-      )
-    );
+    if (downloadType === 'form') {
+      dispatch(
+        DownloadProjectForm(
+          `${environment.baseApiUrl}/projects/download_form/${decodedId}`, downloadType
+        )
+      );
+    } else if (downloadType === 'geojson') {
+      dispatch(
+        DownloadProjectForm(
+          `${environment.baseApiUrl}/projects/${decodedId}/download_tasks`, downloadType
+        )
+      );
+    }
   };
   return (
     <CoreModules.Stack spacing={2}>
@@ -318,9 +326,9 @@ const Home = () => {
         <CoreModules.Stack direction={"row"} spacing={1}>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', marginLeft: '1rem', gap: 6 }}>
             <CoreModules.LoadingButton
-              onClick={() => handleDownload('csv')}
+              onClick={() => handleDownload('form')}
               sx={{ width: 'unset' }}
-              loading={downloadProjectFormLoading}
+              loading={downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading}
               loadingPosition="end"
               endIcon={<AssetModules.FileDownloadIcon />}
               variant="contained"
@@ -330,9 +338,9 @@ const Home = () => {
               Form
             </CoreModules.LoadingButton>
             <CoreModules.LoadingButton
-              onClick={() => handleDownload('csv')}
+              onClick={() => handleDownload('geojson')}
               sx={{ width: 'unset' }}
-              // loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
+              loading={downloadProjectFormLoading.type === 'geojson' && downloadProjectFormLoading.loading}
               loadingPosition="end"
               endIcon={<AssetModules.FileDownloadIcon />}
               variant="contained"

@@ -50,28 +50,27 @@ export const ProjectById = (url, existingProjectList) => {
   };
 };
 
-export const DownloadProjectForm = (url) => {
+export const DownloadProjectForm = (url,payload) => {
 
   return async (dispatch) => {
-     
-      dispatch(ProjectActions.SetDownloadProjectFormLoading(true))
+      dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:true}))
 
-      const fetchProjectForm = async (url) => {
+      const fetchProjectForm = async (url,payload) => {
           try {
               const response = await CoreModules.axios.get(url, {
                 responseType : 'blob',
               });
               var a = document.createElement("a");
               a.href = window.URL.createObjectURL(response.data);
-              a.download = "Form";
+              a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;
               a.click();
-              dispatch(ProjectActions.SetDownloadProjectFormLoading(false))
-          } catch (error) {
-              dispatch(ProjectActions.SetDownloadProjectFormLoading(false))
-          } finally{
-              dispatch(ProjectActions.SetDownloadProjectFormLoading(false));
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } finally{
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
           }
       }
-      await fetchProjectForm(url);
+      await fetchProjectForm(url,payload);
   }
 }

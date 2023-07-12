@@ -13,7 +13,7 @@ const ProjectSlice = createSlice({
         projectSubmission: [],
         projectBuildingGeojsonLoading: false,
         projectBuildingGeojson: [],
-        downloadProjectFormLoading: false,
+        downloadProjectFormLoading: { type: 'form', loading: false },
     },
     reducers: {
         SetProjectTaskBoundries(state, action) {
