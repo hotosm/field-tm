@@ -355,6 +355,10 @@ def update_multi_polygon_project_boundary(
     This function also creates a project outline from the multiple polygons received.
     """
     try:
+
+        if isinstance(boundary, str):
+            boundary = json.loads(boundary)
+
         """verify project exists in db"""
         db_project = get_project_by_id(db, project_id)
         if not db_project:
@@ -1205,8 +1209,8 @@ def generate_appuser_files(
         """
 
     try:
-        ## Logging ##
-        # create file handler
+    ## Logging ##
+    # create file handler
         handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
         handler.setLevel(logging.DEBUG)
 
@@ -1290,7 +1294,7 @@ def generate_appuser_files(
                 pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
                 outfile = f"/tmp/{prefix}_{xform_title}.geojson"  # This file will store osm extracts
 
-                outline = eval(one.outline)
+                outline = json.loads(one.outline)
                 outline_geojson = pg.getFeatures(boundary = outline, 
                                                     filespec = outfile,
                                                     polygon = extract_polygon,
