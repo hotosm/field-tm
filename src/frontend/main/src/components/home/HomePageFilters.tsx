@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import windowDimention from '../../hooks/WindowDimension';
-import CustomDropdown from '../../utilities/CustomDropdown';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 
-const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
-const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
 
 //Home Filter
 const HomePageFilters = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  const token: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
   const { windowSize } = windowDimention();
   const searchableInnerStyle: any = {
     toolbar: {
@@ -118,21 +114,7 @@ const HomePageFilters = ({ onSearch }) => {
                     Filters
                 </CoreModules.Button> */}
 
-        <CustomDropdown
-          color={'red'}
-          appearance={'ghost'}
-          names={[
-            'Urgent Projects',
-            'Active Projects',
-            'New Projects',
-            'Old Projects',
-            'Easy Projects',
-            'Challenging Projects',
-          ]}
-          toolBarStyle={searchableInnerStyle.toolbar}
-          text={'SORT BY'}
-          size={'lg'}
-        />
+
       </CoreModules.Stack>
       {/* Create New Project Button  */}
       <CoreModules.Stack
@@ -181,7 +163,7 @@ const HomePageFilters = ({ onSearch }) => {
             color="error"
             startIcon={<AssetModules.AddIcon />}
             style={searchableInnerStyle.outlineBtn}
-            // disabled={token == null}
+          // disabled={token == null}
           >
             Create New Project
           </CoreModules.Button>

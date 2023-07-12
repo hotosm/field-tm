@@ -27,6 +27,7 @@ export function createPopup(title: string = 'Authentication', location: string) 
 export const createLoginWindow = (redirectTo) => {
   const popup = createPopup('OSM auth', '');
   fetch(`${environment.baseApiUrl}/auth/osm_login/`).then((resp) => resp.json()).then((resp) => {
+    //@ts-ignore
     popup.location = resp.login_url;
     // Perform token exchange.
     // Get the URL from which you want to extract parameters

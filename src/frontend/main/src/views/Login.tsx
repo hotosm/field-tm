@@ -2,7 +2,7 @@ import React, {useEffect, useState } from "react";
 import '../styles/login.css' 
 import enviroment from "../environment";
 import CoreModules from "../shared/CoreModules";
-import {SignInService, SignUpService} from '../api/LoginService'
+import {SignInService} from '../api/LoginService'
 import { useCallback } from "react";
 import { SingUpModel } from "../models/login/loginModel";
 
@@ -18,7 +18,6 @@ const Login = () => {
     const navigate = CoreModules.useNavigate()
     const dispatch = CoreModules.useDispatch()
     //dispatch function to perform redux state mutation
-    const location = CoreModules.useLocation();
     const token:any = CoreModules.useSelector<any>(state=>state.login.loginToken)
     // console.log(location.pathname,'and :',token);
     const initalUserForm = {

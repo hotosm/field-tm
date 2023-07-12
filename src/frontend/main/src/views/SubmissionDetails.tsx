@@ -3,22 +3,8 @@ import React, { useEffect } from 'react';
 import environment from '../environment';
 import { SubmissionService } from '../api/Submission';
 
-function process_data(data) {
-  let result = '';
-  for (let key in data) {
-    if (data.hasOwnProperty(key) && data[key] !== null) {
-      if (typeof data[key] === 'object' && data[key] !== null) {
-        result += `<h2>${key}</h2>`;
-        result += process_data(data[key]);
-      } else {
-        result += `<h4>${key}: ${data[key]}</h4>`;
-      }
-    }
-  }
-  return result;
-}
 
-const SubmissionDetails = (props) => {
+const SubmissionDetails = () => {
   const dispatch = CoreModules.useDispatch();
   const params = CoreModules.useParams();
   const encodedProjectId = params.projectId;
@@ -76,8 +62,6 @@ const SubmissionDetails = (props) => {
     <CoreModules.Box
       sx={{ display: 'flex', m: '4rem', border: '1px solid gray', flexDirection: 'column', flex: 1, p: '1rem' }}
     >
-      {/* <div dangerouslySetInnerHTML={{ __html: process_data(submissionDetails) }}></div> */}
-
       <div>
         {Object.entries(filteredData).map(([key, value]) => (
           <div key={key}>
@@ -90,31 +74,6 @@ const SubmissionDetails = (props) => {
           </div>
         ))}
       </div>
-
-      {/* {Object.entries(submissionDetails).map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
-                    return Object.entries(value).map(([key2, value2]) => {
-                        if (typeof value2 === 'object' && value2 !== null) {
-                            return Object.entries(value2).map(([key3, value3]) => <CoreModules.Stack sx={{ p: '1rem' }}>
-                                <h3>{key3}</h3>
-                                <h4 style={{ backgroundColor: 'red' }}>{value3}</h4>
-                            </CoreModules.Stack>)
-                        } else {
-                            return <CoreModules.Stack sx={{ p: '1rem' }}>
-                                <h3>{key2}</h3>
-                                <h4 style={{ backgroundColor: 'red' }}>{value2}</h4>
-                            </CoreModules.Stack>
-
-                        }
-                    })
-                } else {
-                    return <CoreModules.Stack sx={{ p: '1rem' }}>
-                        <h3>{key}</h3>
-                        <h4 style={{ backgroundColor: 'red' }}>{value}</h4>
-                    </CoreModules.Stack>
-
-                }
-            })} */}
     </CoreModules.Box>
   );
 };
