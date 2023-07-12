@@ -4,6 +4,8 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
+        editProjectDetails: {name:'',description:'',short_description:''},
+        editProjectResponse: null,
         projectDetails: { dimension: 10 },
         projectDetailsResponse: null,
         projectDetailsLoading: false,
@@ -19,6 +21,7 @@ const CreateProject = CoreModules.createSlice({
         createProjectStep: 1,
         dividedTaskLoading: false,
         dividedTaskGeojson: false,
+        formUpdateLoading:false,
         taskSplittingGeojsonLoading: false,
         taskSplittingGeojson: null,
     },
@@ -93,8 +96,22 @@ const CreateProject = CoreModules.createSlice({
         SetDividedTaskFromGeojsonLoading(state, action) {
             state.dividedTaskLoading = action.payload
         },
-        SetUploadedAreaGeojson(state, action) {
-            state.projectArea = action.payload
+        //EDIT Project
+
+        SetIndividualProjectDetails(state, action) {
+            state.editProjectDetails= action.payload
+        },
+        SetIndividualProjectDetailsLoading(state, action) {
+            state.projectDetailsLoading= action.payload
+        },
+        SetPatchProjectDetails(state, action) {
+            state.editProjectResponse= action.payload
+        },
+        SetPatchProjectDetailsLoading(state, action) {
+            state.editProjectDetailsLoading= action.payload
+        },
+        SetPostFormUpdateLoading(state, action) {
+            state.formUpdateLoading= action.payload
         },
         GetTaskSplittingPreviewLoading(state, action) {
             state.taskSplittingGeojsonLoading = action.payload

@@ -36,12 +36,9 @@ const ProjectDetailsForm: React.FC = () => {
     // dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
-  // useEffect(() => {
-  //     if (createProjectStep === 'select-form') {
-  //         navigate('/select-form');
-  //     }
+  
 
-  // }, [projectDetails])
+  
 
   const submission = () => {
     // eslint-disable-next-line no-use-before-define
@@ -56,6 +53,9 @@ const ProjectDetailsForm: React.FC = () => {
     submission,
     CreateProjectValidation,
   );
+
+  
+  
   const inputFormStyles = () => {
     return {
       style: {
@@ -135,8 +135,7 @@ const ProjectDetailsForm: React.FC = () => {
                 value={values.organization || ''}
                 // label="Organization"
                 onChange={(e) => {
-                  handleCustomChange('organization', e.target.value);
-                }}
+                  handleCustomChange('organization', e.target.value);                }}
               >
                 {organizationList?.map((org) => (
                   <MenuItem value={org.value}>{org.label}</MenuItem>
