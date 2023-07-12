@@ -1,4 +1,3 @@
-import react from 'react';
 import axios from 'axios';
 import { HomeActions } from '../store/slices/HomeSlice';
 import { HomeProjectCardModel } from '../models/home/homeModel';

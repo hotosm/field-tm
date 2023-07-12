@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { HomeProjectCardModel } from '../models/home/homeModel';
-import { GetOrganizationDataModel, OrganizationModal, PostOrganizationDataModel } from '../models/organization/organizationModel';
+import { GetOrganizationDataModel, OrganizationModal } from '../models/organization/organizationModel';
 import { CommonActions } from '../store/slices/CommonSlice';
 import { OrganizationAction } from '../store/slices/organizationSlice';
 
@@ -24,13 +24,13 @@ export const OrganizationService: Function = (url: string, payload: Organization
             try {
                 const generateApiFormData = new FormData();
                 appendObjectToFormData(generateApiFormData, payload);
-                const postOrganizationData = await axios.post(url, generateApiFormData,
+                await axios.post(url, generateApiFormData,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
                         }
                     });
-                const resp: HomeProjectCardModel = postOrganizationData.data;
+                // const resp: HomeProjectCardModel = postOrganizationData.data;
                 // dispatch(CommonActions.SetOrganizationDetail(resp))
                 dispatch(CommonActions.PostOrganizationLoading(false))
             } catch (error) {
@@ -60,7 +60,7 @@ export const OrganizationDataService: Function = (url: string) => {
     }
 }
 
-export const PostOrganizationDataService = (url: string, payload: PostOrganizationDataModel) => {
+export const PostOrganizationDataService:Function = (url: string, payload: any) => {
     return async (dispatch) => {
         dispatch(OrganizationAction.PostOrganizationDataLoading(true));
 
@@ -92,7 +92,7 @@ export const PostOrganizationDataService = (url: string, payload: PostOrganizati
                         duration: 2000,
                     })
                 );
-            } catch (error) {
+            } catch (error:any) {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,

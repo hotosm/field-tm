@@ -41,7 +41,6 @@ const ProjectDetailsForm: React.FC = () => {
   
 
   const submission = () => {
-    // eslint-disable-next-line no-use-before-define
     // submitForm();
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
     dispatch(CreateProjectActions.SetCreateProjectFormStep('upload-area'));

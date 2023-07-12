@@ -39,7 +39,7 @@ const CreateProjectService: Function = (url: string, payload: any, fileUpload: a
                 dispatch(CreateProjectActions.CreateProjectLoading(true))
 
 
-            } catch (error) {
+            } catch (error:any) {
                 dispatch(CommonActions.SetLoading(false))
                 dispatch(CreateProjectActions.CreateProjectLoading(true))
 
@@ -109,7 +109,7 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
                 await dispatch(CreateProjectActions.UploadAreaLoading(false))
                 await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data))
 
-            } catch (error) {
+            } catch (error:any) {
                 console.log(error, 'error');
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -134,20 +134,21 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
         dispatch(CreateProjectActions.GenerateProjectQRLoading(true))
         dispatch(CommonActions.SetLoading(true))
 
-        const postUploadArea = async (url, payload, formUpload) => {
+        const postUploadArea = async (url, payload:any, formUpload) => {
             // debugger;
             console.log(formUpload, 'formUpload');
             console.log(payload, 'payload');
             try {
+                const isPolygon =payload.data_extractWays === 'Polygon';
                 const generateApiFormData = new FormData();
                 if (payload.form_ways === 'Upload a Custom Form') {
-                    generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('extract_polygon', isPolygon.toString());
                     generateApiFormData.append('upload', formUpload);
                     if(dataExtractFile){
                         generateApiFormData.append('data_extracts', dataExtractFile);
                     }
                 } else {
-                    generateApiFormData.append('extract_polygon', payload.data_extractWays === 'Polygon' ? true : false,);
+                    generateApiFormData.append('extract_polygon', isPolygon.toString());
                     generateApiFormData.append('upload', '');
                     if(dataExtractFile){
                         generateApiFormData.append('data_extracts', dataExtractFile);
@@ -166,7 +167,7 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
                 await dispatch(CreateProjectActions.ClearCreateProjectFormData())
                 await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp))
 
-            } catch (error) {
+            } catch (error:any) {
                 dispatch(CommonActions.SetLoading(false))
                 dispatch(
                     CommonActions.SetSnackBar({
@@ -227,7 +228,7 @@ const UploadCustomXLSFormService: Function = (url: string, payload: any) => {
                 await dispatch(CreateProjectActions.UploadCustomXLSFormLoading(false))
                 await dispatch(CreateProjectActions.UploadCustomXLSFormSuccess(postCustomXLSForm.data))
 
-            } catch (error) {
+            } catch (error:any) {
                 dispatch(
                     CommonActions.SetSnackBar({
                         open: true,
