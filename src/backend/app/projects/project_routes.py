@@ -37,6 +37,8 @@ from fastapi.logger import logger as logger
 from osm_fieldwork.make_data_extract import getChoices
 from sqlalchemy.orm import Session
 
+import json
+
 from ..central import central_crud
 from ..db import database
 from . import project_crud, project_schemas
@@ -386,8 +388,15 @@ async def download_project_boundary(
 ):
     """Download the boundary polygon for this project."""
     out = project_crud.download_geometry(db, project_id, False)
-    # FIXME: fix return value
-    return {"Message": out}
+    
+    buffer = json.dumps(out['filespec']).encode()
+
+    headers = {
+        "Content-Disposition": "attachment; filename=out.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(buffer, headers=headers)
 
 
 @router.post("/{project_id}/download_tasks")
@@ -397,8 +406,15 @@ async def download_task_boundaries(
 ):
     """Download the task boundary polygons for this project."""
     out = project_crud.download_geometry(db, project_id, True)
-    # FIXME: fix return value
-    return {"Message": out}
+    
+    buffer = json.dumps(out['filespec']).encode()
+    
+    headers = {
+        "Content-Disposition": "attachment; filename=task_outline.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(buffer, headers=headers)
 
 
 @router.post("/{project_id}/generate")
