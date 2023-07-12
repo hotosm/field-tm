@@ -399,7 +399,7 @@ async def download_project_boundary(
     return Response(buffer, headers=headers)
 
 
-@router.post("/{project_id}/download_tasks")
+@router.get("/{project_id}/download_tasks")
 async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
