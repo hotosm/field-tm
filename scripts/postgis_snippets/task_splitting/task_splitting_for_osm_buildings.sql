@@ -1,5 +1,8 @@
  /*
 Licence: GPLv3 <https://www.gnu.org/licenses/gpl-3.0.html>
+Part of the HOT Field Mapping Tasking Manager (FMTM)
+
+This script splits an Area of Interest into task polygons based on OpenStreetMap lines (roads, waterways, and railways) and buildings. More information in the adjacent file task_splitting_readme.md.
 */
 
 --*************************Split by OSM lines***********************
