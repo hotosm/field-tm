@@ -182,7 +182,7 @@ async def update_odk_credentials(
     contents = project_instance.form_xls if project_instance.form_xls else None
     
     if contents:
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xls")
         temp_file.write(contents)
         temp_file.filename = temp_file.name
     else:
