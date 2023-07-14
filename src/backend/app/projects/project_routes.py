@@ -20,6 +20,8 @@ import json
 import os
 import uuid
 from typing import List, Optional
+import tempfile
+import inspect
 
 from fastapi import (
     APIRouter,
@@ -178,10 +180,22 @@ async def update_odk_credentials(
     extract_polygon = True if project_instance.data_extract_type == 'polygon' else False
     project_id = project_instance.id
     contents = project_instance.form_xls if project_instance.form_xls else None
-    return await generate_files(background_tasks=background_task, 
+    
+    if contents:
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+        temp_file.write(contents)
+        temp_file.filename = temp_file.name
+    else:
+        temp_file = None
+        
+    generate_response = await generate_files(background_tasks=background_task, 
                             project_id=project_id, 
                             extract_polygon=extract_polygon, 
-                            upload=contents ,db=db, data_extracts=None)
+                            upload=temp_file ,db=db, data_extracts=None)
+    if temp_file:
+        temp_file.close()
+    
+    return generate_response
     
 
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
@@ -503,7 +517,11 @@ async def generate_files(
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
-        contents = await upload.read()
+        
+        if inspect.iscoroutinefunction(upload.read):
+            contents = await upload.read()
+        else:
+            contents = upload.read()
 
         project.form_xls = contents
         db.commit()
