@@ -147,6 +147,43 @@ async def create_project(
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
+@router.post("/update_odk_credentials", response_model=project_schemas.ProjectOut)
+async def update_odk_credentials(
+    odk_central_cred: project_schemas.ODKCentral,
+    project_id: int,
+    db: Session = Depends(database.get_db)
+):
+    """Update odk credential of a project"""
+    if odk_central_cred.odk_central_url.endswith("/"):
+        odk_central_cred.odk_central_url = odk_central_cred.odk_central_url[:-1]
+    
+    project_info = project_crud.get_project(db, project_id)
+    if not project_info:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    try:
+        odkproject = central_crud.create_odk_project(
+            project_info.project_info[0].name, odk_central_cred
+        )
+        logger.debug(f"ODKCentral return after update: {odkproject}")
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400, detail="Connection failed to central odk. "
+        ) from e
+    
+    project_info.odkid = odkproject["id"]
+    project_info.odk_central_url = odk_central_cred.odk_central_url
+    project_info.odk_central_user = odk_central_cred.odk_central_user
+    project_info.odk_central_password = odk_central_cred.odk_central_password
+    
+    db.commit()
+    db.refresh(project_info)
+    
+    if project_info:
+        return project_info
+    else:
+        raise HTTPException(status_code=404, detail="Project not found")
 
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
