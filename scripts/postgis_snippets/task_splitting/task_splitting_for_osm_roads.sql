@@ -11,84 +11,35 @@ DROP TABLE IF EXISTS roadsdissolved;
 -- Create a new polygon layer of splits by lines
 CREATE TABLE roadsdissolved AS (
   -- The Area of Interest provided by the person creating the project
-  WITH aoi AS (
+    WITH aoi AS (
     SELECT * FROM "project-aoi"
   )
+  -- Grab all roads within the AOI
   ,roadlines AS (
-    SELECT ST_Intersection(a.geom, l.geom) AS geom
+    SELECT ST_Collect(l.geom) AS geom
     FROM aoi a, "ways_line" l
     WHERE ST_Intersects(a.geom, l.geom)
     AND tags->>'highway' IS NOT NULL
   )
-  ,roadpolys AS (
-    SELECT ST_Intersection(a.geom, p.geom) AS geom
+  -- Grab the roads that are polygons in OSM ("Closed ways" with highway tags)
+  ,roadpolystolines AS (
+    SELECT ST_Collect(ST_Boundary(p.geom)) AS geom
     FROM aoi a, "ways_poly" p
     WHERE ST_Intersects(a.geom, p.geom)
     AND tags->>'highway' IS NOT NULL
   )
-  -- Merge all lines, necessary so that the polygonize function works later
-  ,merged AS (
-    SELECT ST_LineMerge(ST_Union(splitlines.geom)) AS geom
-    FROM splitlines
-  )
-  -- Combine the boundary of the AOI with the splitlines
-  -- First extract the Area of Interest boundary as a line
-  ,boundary AS (
-    SELECT ST_Boundary(geom) AS geom
-    FROM aoi
-  )
-  -- Then combine it with the splitlines
-  ,comb AS (
-    SELECT ST_Union(boundary.geom, merged.geom) AS geom
-    FROM boundary, merged
-  )
-  -- TODO add closed ways from OSM to lines (roundabouts etc)
-  -- Create a polygon for each area enclosed by the splitlines
-  ,splitpolysnoindex AS (
-    SELECT (ST_Dump(ST_Polygonize(comb.geom))).geom as geom
-    FROM comb
-  )
-  -- Add an index column to the split polygons
-  ,splitpolygons AS(
-    SELECT
-      row_number () over () as polyid,
-      ST_Transform(spni.geom,4326)::geography AS geog,
-      spni.* 
-    from splitpolysnoindex spni
-  )
-  SELECT * FROM splitpolygons
+  -- Merge the roads from lines with the roads from polys
+  SELECT ST_Union(ml.geom, mp.geom) as geom
+  FROM roadlines ml, roadpolystolines mp
 );
--- Make that index column a primary key
-ALTER TABLE polygonsnocount ADD PRIMARY KEY(polyid);
--- Properly register geometry column (makes QGIS happy)
-SELECT Populate_Geometry_Columns('public.polygonsnocount'::regclass);
 -- Add a spatial index (vastly improves performance for a lot of operations)
-CREATE INDEX polygonsnocount_idx
-  ON polygonsnocount
+CREATE INDEX roadsdissolved_idx
+  ON 
   USING GIST (geom);
 -- Clean up the table which may have gaps and stuff from spatial indexing
-VACUUM ANALYZE polygonsnocount;
+VACUUM ANALYZE roadsdissolved;
 
--- ************************Grab the buildings**************************
--- While we're at it, grab the ID of the polygon the buildings fall within.
--- TODO add outer rings of buildings from relations table of OSM export
-DROP TABLE IF EXISTS buildings;
-CREATE TABLE buildings AS (
-  SELECT b.*, polys.polyid 
-  FROM "ways_poly" b, polygonsnocount polys
-  WHERE ST_Intersects(polys.geom, ST_Centroid(b.geom))
-  AND b.tags->>'building' IS NOT NULL
-);
-ALTER TABLE buildings ADD PRIMARY KEY(osm_id);
--- Properly register geometry column (makes QGIS happy)
-SELECT Populate_Geometry_Columns('public.buildings'::regclass);
--- Add a spatial index (vastly improves performance for a lot of operations)
-CREATE INDEX buildings_idx
-  ON buildings
-  USING GIST (geom);
--- Clean up the table which may have gaps and stuff from spatial indexing
-VACUUM ANALYZE buildings;
-
+/*
 --**************************Count features in polygons*****************
 DROP TABLE IF EXISTS splitpolygons;
 CREATE TABLE splitpolygons AS (
@@ -301,3 +252,4 @@ VACUUM ANALYZE simplifiedpolygons;
 
 -- Clean results (nuke or merge polygons without features in them)
 
+*/
