@@ -90,35 +90,29 @@ CREATE INDEX clusteredroadparts_idx
   USING GIST (geom);
 VACUUM ANALYZE clusteredroadparts;
 
-/*
---*****************Densify dumped building nodes******************
-DROP TABLE IF EXISTS dumpedpoints;
-CREATE TABLE dumpedpoints AS (
-  SELECT cb.osm_id, cb.polyid, cb.cid, cb.clusteruid,
+--***************** dump road segement nodes******************
+DROP TABLE IF EXISTS dumpedroadpoints;
+CREATE TABLE dumpedroadpoints AS (
+  SELECT crp.osm_id, crp.cid,
   -- POSSIBLE BUG: PostGIS' Voronoi implementation seems to panic
   -- with segments less than 0.00004 degrees.
   -- Should probably use geography instead of geometry
-  (st_dumppoints(ST_Segmentize(geom, 0.00001))).geom
-  FROM clusteredbuildings cb
+  (st_dumppoints(ST_Segmentize(crp.geom, 0.0001))).geom
+  --(st_dumppoints(crp.geom)).geom
+  FROM clusteredroadparts crp
 );
 SELECT Populate_Geometry_Columns('public.dumpedpoints'::regclass);
-CREATE INDEX dumpedpoints_idx
-  ON dumpedpoints
+CREATE INDEX dumpedroadpoints_idx
+  ON dumpedroadpoints
   USING GIST (geom);
-VACUUM ANALYZE dumpedpoints;
+VACUUM ANALYZE dumpedroadpoints;
 
 --*******************voronoia****************************************
 DROP TABLE IF EXISTS voronoids;
 CREATE TABLE voronoids AS (
   SELECT
-    st_intersection((ST_Dump(ST_VoronoiPolygons(
- 		ST_Collect(points.geom)
- 		))).geom, 
-                sp.geom) as geom
-    FROM dumpedpoints as points, 
-    splitpolygons as sp
-    where st_contains(sp.geom, points.geom)
-    group by sp.geom
+    (ST_Dump(ST_VoronoiPolygons(ST_Collect(points.geom)))).geom as geom
+    FROM dumpedroadpoints as points
 );
 CREATE INDEX voronoids_idx
   ON voronoids
@@ -127,8 +121,8 @@ VACUUM ANALYZE voronoids;
 
 DROP TABLE IF EXISTS voronois;
 CREATE TABLE voronois AS (
-  SELECT p.clusteruid, v.geom
-  FROM voronoids v, dumpedpoints p
+  SELECT p.cid, st_intersection(v.geom, a.geom) as geom
+  FROM voronoids v, dumpedroadpoints p, "project-aoi" a
   WHERE st_within(p.geom, v.geom)
 );
 CREATE INDEX voronois_idx
@@ -139,9 +133,9 @@ DROP TABLE voronoids;
 
 DROP TABLE IF EXISTS taskpolygons;
 CREATE TABLE taskpolygons AS (
-  SELECT ST_Union(geom) as geom, clusteruid
+  SELECT ST_Union(geom) as geom, cid
   FROM voronois
-  GROUP BY clusteruid
+  GROUP BY cid
 );
 CREATE INDEX taskpolygons_idx
   ON taskpolygons
@@ -154,7 +148,7 @@ DROP TABLE IF EXISTS simplifiedpolygons;
 CREATE TABLE simplifiedpolygons AS (
   --Convert task polygon boundaries to linestrings
   WITH rawlines AS (
-    SELECT tp.clusteruid, st_boundary(tp.geom) AS geom
+    SELECT tp.cid, st_boundary(tp.geom) AS geom
     FROM taskpolygons AS tp 
   )
   -- Union, which eliminates duplicates from adjacent polygon boundaries
@@ -184,4 +178,4 @@ VACUUM ANALYZE simplifiedpolygons;
 
 -- Clean results (nuke or merge polygons without features in them)
 
-*/
+
