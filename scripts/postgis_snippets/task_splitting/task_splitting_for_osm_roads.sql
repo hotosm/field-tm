@@ -4,7 +4,7 @@ Part of the HOT Field Mapping Tasking Manager (FMTM)
 
 This script splits an Area of Interest into task polygons based on OpenStreetMap lines (roads, waterways, and railways) for the purposes of adding information (tags) to road segments.
 */
-
+/*
 --*************************Extract road segments***********************
 -- Nuke whatever was there before
 DROP TABLE IF EXISTS roadsdissolved;
@@ -29,136 +29,68 @@ CREATE TABLE roadsdissolved AS (
     AND tags->>'highway' IS NOT NULL
   )
   -- Merge the roads from lines with the roads from polys
-  SELECT ST_Union(ml.geom, mp.geom) as geom
-  FROM roadlines ml, roadpolystolines mp
+  ,merged AS (
+    SELECT ST_Union(ml.geom, mp.geom) as geom
+    FROM roadlines ml, roadpolystolines mp
+  )
+  SELECT *
+  FROM merged mr
 );
 -- Add a spatial index (vastly improves performance for a lot of operations)
 CREATE INDEX roadsdissolved_idx
-  ON 
+  ON roadsdissolved
   USING GIST (geom);
 -- Clean up the table which may have gaps and stuff from spatial indexing
 VACUUM ANALYZE roadsdissolved;
 
-/*
---**************************Count features in polygons*****************
-DROP TABLE IF EXISTS splitpolygons;
-CREATE TABLE splitpolygons AS (
-  WITH polygonsfeaturecount AS (
-    SELECT sp.polyid,
-           sp.geom,
-	   sp.geog,
-           count(b.geom) AS numfeatures,
-	   ST_Area(sp.geog) AS area
-    FROM polygonsnocount sp
-    LEFT JOIN "buildings" b
-    ON sp.polyid = b.polyid
-    GROUP BY sp.polyid, sp.geom
-  )
-  SELECT * from polygonsfeaturecount
+--**************************MISSING BIT********************************
+-- Here we use QGIS multipart to singleparts, which splits the roads
+-- on all intersections into sensible parts. Need to implement in PostGIS.
+-- Output here is a line layer table called roadparts which consists of one
+-- linestring for each portion of a road between any and all intersections.
+
+-- *****************Re-associate parts with OSM ID and tags*************
+*/
+
+DROP TABLE IF EXISTS roadpartstagged;
+CREATE TABLE roadpartstagged AS (
+  SELECT 
+    wl.osm_id, 
+    wl.tags, 
+    l.geom as geom 
+  FROM "ways_line" wl, roadparts l
+  -- Funky hack here: checking if a roadpart is a subset of an OSM way is
+  -- terribly slow if you check for a line intersection, but if you check for
+  -- any intersection it'll often return the attributes of an intersecting road.
+  -- If you check for intersection with the start and end nodes, sometimes
+  -- cresecent roads (which touch another road at start and end) get the
+  -- attributes from the road that they touch.
+  -- So we check for intersection of the first and second nodes in the part
+  -- (if there are only two, they're the start and end by definition, but they
+  -- also can't be a crescent so that's ok). 
+  WHERE st_intersects(st_startpoint(l.geom), wl.geom) 
+  AND ST_Intersects(st_pointn(l.geom, 2), wl.geom)
 );
-ALTER TABLE splitpolygons ADD PRIMARY KEY(polyid);
-SELECT Populate_Geometry_Columns('public.splitpolygons'::regclass);
-CREATE INDEX splitpolygons_idx
-  ON splitpolygons
+CREATE INDEX roadpartstagged_idx
+  ON roadpartstagged
   USING GIST (geom);
-VACUUM ANALYZE splitpolygons;
+VACUUM ANALYZE roadpartstagged;
 
-DROP TABLE polygonsnocount;
-
-DROP TABLE IF EXISTS lowfeaturecountpolygons;
-CREATE TABLE lowfeaturecountpolygons AS (
-  -- Grab the polygons with fewer than the requisite number of features
-  WITH lowfeaturecountpolys as (
-    SELECT *
-    FROM splitpolygons AS p
-    -- TODO: feature count should not be hard-coded
-    WHERE p.numfeatures < 20  
-  ), 
-  -- Find the neighbors of the low-feature-count polygons
-  -- Store their ids as n_polyid, numfeatures as n_numfeatures, etc
-  allneighborlist AS (
-    SELECT p.*, 
-      pf.polyid AS n_polyid,
-      pf.area AS n_area, 
-      p.numfeatures AS n_numfeatures,
-      -- length of shared boundary to make nice merge decisions 
-      st_length2d(st_intersection(p.geom, pf.geom)) as sharedbound
-    FROM lowfeaturecountpolys AS p 
-    INNER JOIN splitpolygons AS pf 
-    -- Anything that touches
-    ON st_touches(p.geom, pf.geom) 
-    -- But eliminate those whose intersection is a point, because
-    -- polygons that only touch at a corner shouldn't be merged
-    AND st_geometrytype(st_intersection(p.geom, pf.geom)) != 'ST_Point'
-    -- Sort first by polyid of the low-feature-count polygons
-    -- Then by descending featurecount and area of the 
-    -- high-feature-count neighbors (area is in case of equal 
-    -- featurecounts, we'll just pick the biggest to add to)
-    ORDER BY p.polyid, p.numfeatures DESC, pf.area DESC
-    -- OR, maybe for more aesthetic merges:
-    -- order by p.polyid, sharedbound desc
-  )
-  SELECT DISTINCT ON (a.polyid) * FROM allneighborlist AS a
-);  
-ALTER TABLE lowfeaturecountpolygons ADD PRIMARY KEY(polyid);
-SELECT Populate_Geometry_Columns('public.lowfeaturecountpolygons'::regclass);
-CREATE INDEX lowfeaturecountpolygons_idx
-  ON lowfeaturecountpolygons
-  USING GIST (geom);
-VACUUM ANALYZE lowfeaturecountpolygons;
-
---****************Merge low feature count polygons with neighbors*******
-
-
-
---****************Cluster buildings*************************************
-DROP TABLE IF EXISTS clusteredbuildings;
-CREATE TABLE clusteredbuildings AS (
-  WITH splitpolygonswithcontents AS (
-    SELECT *
-    FROM splitpolygons sp
-    WHERE sp.numfeatures > 0
-  )
-  -- Add the count of features in the splitpolygon each building belongs to
-  -- to the buildings table; sets us up to be able to run the clustering.
-  ,buildingswithcount AS (
-    SELECT b.*, p.numfeatures
-    FROM buildings b 
-    LEFT JOIN splitpolygons p
-    ON b.polyid = p.polyid
-  )
-  -- Cluster the buildings within each splitpolygon. The second term in the
-  -- call to the ST_ClusterKMeans function is the number of clusters to create,
-  -- so we're dividing the number of features by a constant (10 in this case)
-  -- to get the number of clusters required to get close to the right number
-  -- of features per cluster.
-  -- TODO: This should certainly not be a hardcoded, the number of features
-  --       per cluster should come from a project configuration table
-  ,buildingstocluster as (
-    SELECT * FROM buildingswithcount bc
-    WHERE bc.numfeatures > 0
-  )
-  ,clusteredbuildingsnocombineduid AS (
+--****************Cluster roadparts*************************************
+DROP TABLE IF EXISTS clusteredroadparts;
+CREATE TABLE clusteredroadparts AS (
   SELECT *,
-    ST_ClusterKMeans(geom, cast((b.numfeatures / 20) + 1 as integer))
-    over (partition by polyid) as cid
-  FROM buildingstocluster b
-  )
-  -- uid combining the id of the outer splitpolygon and inner cluster
-  ,clusteredbuildings as (
-    select *, 
-    polyid::text || '-' || cid as clusteruid
-    from clusteredbuildingsnocombineduid
-  )
-  SELECT * FROM clusteredbuildings
+    -- TODO: replace 4500 with count of roadparts
+    ST_ClusterKMeans(geom, cast((4500 / 20) + 1 as integer))
+    over () as cid
+  FROM roadpartstagged rp
 );  
-ALTER TABLE clusteredbuildings ADD PRIMARY KEY(osm_id);
-SELECT Populate_Geometry_Columns('public.clusteredbuildings'::regclass);
-CREATE INDEX clusteredbuildings_idx
-  ON clusteredbuildings
+CREATE INDEX clusteredroadparts_idx
+  ON clusteredroadparts
   USING GIST (geom);
-VACUUM ANALYZE clusteredbuildings;
+VACUUM ANALYZE clusteredroadparts;
 
+/*
 --*****************Densify dumped building nodes******************
 DROP TABLE IF EXISTS dumpedpoints;
 CREATE TABLE dumpedpoints AS (
