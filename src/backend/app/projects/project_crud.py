@@ -1383,6 +1383,17 @@ def create_qrcode(
 def get_project_geometry(db: Session, 
                          project_id: int):
     
+    """
+    Retrieves the geometry of a project.
+
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+
+    Returns:
+        str: A geojson of the project outline.
+    """
+
     projects = table("projects", column("outline"), column("id"))
     where = f"projects.id={project_id}"
     sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(
@@ -1397,8 +1408,20 @@ def get_project_geometry(db: Session,
     return json.dumps(row)
 
 
+
 def get_task_geometry(db: Session,
                       project_id: int):
+    """
+    Retrieves the geometry of tasks associated with a project.
+
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+
+    Returns:
+        str: A geojson of the task boundaries
+    """
+
     tasks = table("tasks", column("outline"), column("project_id"), column("id"))
     where = f"project_id={project_id}"
     sql = select(geoalchemy2.functions.ST_AsGeoJSON(tasks.c.outline)).where(
