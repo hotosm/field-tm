@@ -381,14 +381,13 @@ async def edit_project_boundary(
     }
 
 
-@router.post("/{project_id}/download")
+@router.get("/{project_id}/download")
 async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
     """Download the boundary polygon for this project."""
-    # out = project_crud.download_geometry(db, project_id, False)
-    
+
     out = project_crud.get_project_geometry(db, project_id)
     headers = {
         "Content-Disposition": "attachment; filename=project_outline.geojson",
@@ -402,18 +401,17 @@ async def download_project_boundary(
 async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
-):
+    ):
     """Download the task boundary polygons for this project."""
-    out = project_crud.download_geometry(db, project_id, True)
-    
-    buffer = json.dumps(out['filespec']).encode()
-    
+
+    out = project_crud.get_task_geometry(db, project_id)
+
     headers = {
-        "Content-Disposition": "attachment; filename=task_outline.geojson",
+        "Content-Disposition": "attachment; filename=project_outline.geojson",
         "Content-Type": "application/media",
     }
 
-    return Response(buffer, headers=headers)
+    return Response(content = out, headers=headers)
 
 
 @router.post("/{project_id}/generate")
