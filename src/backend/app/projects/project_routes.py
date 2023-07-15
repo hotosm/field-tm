@@ -387,16 +387,15 @@ async def download_project_boundary(
     db: Session = Depends(database.get_db),
 ):
     """Download the boundary polygon for this project."""
-    out = project_crud.download_geometry(db, project_id, False)
+    # out = project_crud.download_geometry(db, project_id, False)
     
-    buffer = json.dumps(out['filespec']).encode()
-
+    out = project_crud.get_project_geometry(db, project_id)
     headers = {
-        "Content-Disposition": "attachment; filename=out.geojson",
+        "Content-Disposition": "attachment; filename=project_outline.geojson",
         "Content-Type": "application/media",
     }
 
-    return Response(buffer, headers=headers)
+    return Response(content = out, headers=headers)
 
 
 @router.get("/{project_id}/download_tasks")

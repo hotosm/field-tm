@@ -1380,6 +1380,23 @@ def create_qrcode(
     return {"data": qrcode, "id": rows + 1, "qr_code_id": qrdb.id}
 
 
+def get_project_geometry(db: Session, 
+                         project_id: int):
+    
+    projects = table("projects", column("outline"), column("id"))
+    where = f"projects.id={project_id}"
+    sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(
+        text(where)
+    )
+    result = db.execute(sql)
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+    row = eval(result.first()[0])
+    return json.dumps(row)
+
+
 def download_geometry(
     db: Session,
     project_id: int,
