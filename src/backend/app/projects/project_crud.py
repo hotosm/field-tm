@@ -1380,43 +1380,70 @@ def create_qrcode(
     return {"data": qrcode, "id": rows + 1, "qr_code_id": qrdb.id}
 
 
-def download_geometry(
-    db: Session,
-    project_id: int,
-    download_type: bool,
-):
-    """Download the project or task boundaries from the database."""
-    data = list()
-    if not download_type:
-        projects = table("projects", column("outline"), column("id"))
-        where = f"projects.id={project_id}"
-        sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(
-            text(where)
-        )
-        result = db.execute(sql)
-        # There should only be one match
-        if result.rowcount != 1:
-            logger.warning(str(sql))
-            return False
-        row = eval(result.first()[0])
-        row["id"] = project_id
-        data.append(row)
-    else:
-        task = table("tasks", column("outline"), column("project_id"), column("id"))
-        where = f"project_id={project_id}"
-        sql = select(
-            task.c.id,
-            geoalchemy2.functions.ST_AsGeoJSON(task.c.outline).label("outline"),
-        ).where(text(where))
-        result = db.execute(sql)
-        for item in result.fetchall():
-            poly = eval(item.outline)
-            poly["id"] = item.id
-            data.append(poly)
-    collection = geojson.FeatureCollection(data)
-    out = dumps(collection)
+def get_project_geometry(db: Session, 
+                         project_id: int):
+    
+    """
+    Retrieves the geometry of a project.
 
-    return {"filespec": out}
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+
+    Returns:
+        str: A geojson of the project outline.
+    """
+
+    projects = table("projects", column("outline"), column("id"))
+    where = f"projects.id={project_id}"
+    sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(
+        text(where)
+    )
+    result = db.execute(sql)
+    # There should only be one match
+    if result.rowcount != 1:
+        logger.warning(str(sql))
+        return False
+    row = eval(result.first()[0])
+    return json.dumps(row)
+
+
+
+def get_task_geometry(db: Session,
+                      project_id: int):
+    """
+    Retrieves the geometry of tasks associated with a project.
+
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+
+    Returns:
+        str: A geojson of the task boundaries
+    """
+
+    tasks = table("tasks", column("outline"), column("project_id"), column("id"))
+    where = f"project_id={project_id}"
+    sql = select(geoalchemy2.functions.ST_AsGeoJSON(tasks.c.outline)).where(
+        text(where)
+    )
+    result = db.execute(sql)
+
+    features = []
+    for row in result:
+        geometry = json.loads(row[0])
+        feature = {
+            "type": "Feature",
+            "geometry": geometry,
+            "properties": {}
+        }
+        features.append(feature)
+
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    return json.dumps(feature_collection)
 
 
 def create_task_grid(db: Session, project_id: int, delta: int):
