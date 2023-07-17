@@ -50,6 +50,7 @@ from sqlalchemy import (
     select,
     table,
     func,
+    and_
 )
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -80,25 +81,38 @@ TASK_GEOJSON_DIR = "geojson/"
 
 
 def get_projects(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
+    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False,
+    hashtags: List[str] = None
 ):
+    filters = []
     if user_id:
+        filters.append(db_models.DbProject.author_id == user_id) 
+        
+    if hashtags:
+        filters.append(db_models.DbProject.hashtags.op('&&')(hashtags))
+        
+    if len(filters) > 0:
         db_projects = (
             db.query(db_models.DbProject)
-            .filter(db_models.DbProject.author_id == user_id)
+            .filter(and_(*filters))
             .order_by(db_models.DbProject.id.asc())
             .offset(skip)
             .limit(limit)
             .all()
         )
+    
     else:
-        db_projects = db.query(db_models.DbProject).order_by(db_models.DbProject.id.asc()).offset(skip).limit(limit).all()
+        db_projects = (
+            db.query(db_models.DbProject)
+            .order_by(db_models.DbProject.id.asc())
+            .offset(skip).limit(limit).all()
+        )
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100, hashtags: str = None):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
     #         db_models.DbProject.id,
@@ -114,7 +128,7 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
     #         .filter(
     #         db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
 
-    db_projects = get_projects(db, user_id, skip, limit, True)
+    db_projects = get_projects(db, user_id, skip, limit, True, hashtags)
     return convert_to_project_summaries(db_projects)
 
 
@@ -1863,14 +1877,3 @@ async def update_project_form(
         )
 
     return True
-
-
-async def get_by_hashtags(db: Session, hashtags: List[str]):
-    db_projects = (
-            db.query(db_models.DbProject)
-            .filter(db_models.DbProject.hashtags.op('&&')(hashtags))
-            .order_by(db_models.DbProject.id.asc())
-            .all()
-        )
-    
-    return db_projects
