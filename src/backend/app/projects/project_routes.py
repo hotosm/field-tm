@@ -433,41 +433,6 @@ async def edit_project_boundary(
     }
 
 
-@router.post("/{project_id}/download")
-async def download_project_boundary(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-):
-    """Download the boundary polygon for this project."""
-    out = project_crud.download_geometry(db, project_id, False)
-    
-    buffer = json.dumps(out['filespec']).encode()
-
-    headers = {
-        "Content-Disposition": "attachment; filename=out.geojson",
-        "Content-Type": "application/media",
-    }
-
-    return Response(buffer, headers=headers)
-
-
-@router.get("/{project_id}/download_tasks")
-async def download_task_boundaries(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-):
-    """Download the task boundary polygons for this project."""
-    out = project_crud.download_geometry(db, project_id, True)
-    
-    buffer = json.dumps(out['filespec']).encode()
-    
-    headers = {
-        "Content-Disposition": "attachment; filename=task_outline.geojson",
-        "Content-Type": "application/media",
-    }
-
-    return Response(buffer, headers=headers)
-
 
 @router.post("/{project_id}/generate")
 async def generate_files(
@@ -812,4 +777,51 @@ async def download_template(category: str, db: Session = Depends(database.get_db
     else:
         raise HTTPException(status_code=404, detail="Form not found")
 
-        
+
+@router.get("/{project_id}/download")
+async def download_project_boundary(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """
+    Downloads the boundary of a project as a GeoJSON file.
+
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+
+    out = project_crud.get_project_geometry(db, project_id)
+    headers = {
+        "Content-Disposition": "attachment; filename=project_outline.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(content = out, headers=headers)
+
+
+@router.get("/{project_id}/download_tasks")
+async def download_task_boundaries(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+    """
+    Downloads the boundary of the tasks for a project as a GeoJSON file.
+
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+
+    out = project_crud.get_task_geometry(db, project_id)
+
+    headers = {
+        "Content-Disposition": "attachment; filename=project_outline.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(content = out, headers=headers)
