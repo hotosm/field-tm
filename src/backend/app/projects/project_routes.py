@@ -773,3 +773,19 @@ async def download_task_boundaries(
     }
 
     return Response(content = out, headers=headers)
+
+
+@router.get("/find_projects_by_hashtags/", response_model=List[project_schemas.ProjectOut])
+async def find_projects_by_hashtags(
+    hashtags: str,
+    db: Session = Depends(database.get_db),
+):
+    hashtags = hashtags.split(',') # create list of hashtags
+    hashtags = list(filter(lambda hashtag: hashtag.startswith('#'), hashtags)) # filter hashtags that do start with #
+    
+    if len(hashtags) == 0:
+        raise HTTPException(status_code=400, detail={'Message': "Hashtags must not be empty and must starts with #"})
+    
+    projects = await project_crud.get_by_hashtags(db, hashtags)
+    print("here i am", projects)
+    return projects

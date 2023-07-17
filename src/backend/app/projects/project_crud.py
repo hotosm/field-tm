@@ -1863,3 +1863,14 @@ async def update_project_form(
         )
 
     return True
+
+
+async def get_by_hashtags(db: Session, hashtags: List[str]):
+    db_projects = (
+            db.query(db_models.DbProject)
+            .filter(db_models.DbProject.hashtags.op('@>')(hashtags))
+            .order_by(db_models.DbProject.id.asc())
+            .all()
+        )
+    
+    return db_projects
