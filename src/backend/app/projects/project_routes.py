@@ -183,19 +183,12 @@ async def update_odk_credentials(
     project_id = project_instance.id
     contents = project_instance.form_xls if project_instance.form_xls else None
     
-    # if contents:
-    #     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xls")
-    #     temp_file.write(contents)
-    #     temp_file.filename = temp_file.name
-    # else:
-    #     temp_file = None
         
     generate_response = await utils.generate_files(background_tasks=background_task, 
                             project_id=project_id, 
                             extract_polygon=extract_polygon, 
                             upload=contents if contents else None, db=db)
-    # # if temp_file:
-    #     temp_file.close()
+    
     
     return generate_response
     
