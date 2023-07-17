@@ -45,6 +45,7 @@ from ..central import central_crud
 from ..db import database
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
+from . import utils
 
 router = APIRouter(
     prefix="/projects",
@@ -161,6 +162,7 @@ async def update_odk_credentials(
         odk_central_cred.odk_central_url = odk_central_cred.odk_central_url[:-1]
     
     project_instance = project_crud.get_project(db, project_id)
+    print("contents"*10, project_instance.form_xls)
     if not project_instance:
         raise HTTPException(status_code=404, detail="Project not found")
     
@@ -181,19 +183,21 @@ async def update_odk_credentials(
     project_id = project_instance.id
     contents = project_instance.form_xls if project_instance.form_xls else None
     
-    if contents:
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xls")
-        temp_file.write(contents)
-        temp_file.filename = temp_file.name
-    else:
-        temp_file = None
+    print("contents"*10, project_instance.form_xls)
+    
+    # if contents:
+    #     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xls")
+    #     temp_file.write(contents)
+    #     temp_file.filename = temp_file.name
+    # else:
+    #     temp_file = None
         
-    generate_response = await generate_files(background_tasks=background_task, 
-                            project_id=project_id, 
-                            extract_polygon=extract_polygon, 
-                            upload=temp_file ,db=db, data_extracts=None)
-    if temp_file:
-        temp_file.close()
+    # generate_response = await utils.generate_files(background_tasks=background_task, 
+    #                         project_id=project_id, 
+    #                         extract_polygon=extract_polygon, 
+    #                         upload=contents if contents else None, db=db)
+    # # if temp_file:
+    #     temp_file.close()
     
     return generate_response
     
@@ -525,6 +529,8 @@ async def generate_files(
 
         project.form_xls = contents
         db.commit()
+        # print(project.form_xls)
+        
 
     if data_extracts:
         # Validating for .geojson File.
