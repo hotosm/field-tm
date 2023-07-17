@@ -261,6 +261,7 @@ def create_project_with_project_info(
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
+    hashtags = project_metadata.hashtags
 
     # Check / set credentials
     if odk_credentials:
@@ -289,6 +290,8 @@ def create_project_with_project_info(
         )
     # TODO: get this from logged in user, return 403 (forbidden) if not authorized
 
+    hashtags = list(map(lambda hashtag: hashtag if hashtag.startswith('#') else f"#{hashtag}", hashtags))\
+        if hashtags else None
     # create new project
     db_project = db_models.DbProject(
         author=db_user,
@@ -298,6 +301,7 @@ def create_project_with_project_info(
         odk_central_url=url,
         odk_central_user=user,
         odk_central_password=pw,
+        hashtags=hashtags
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
