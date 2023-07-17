@@ -531,12 +531,18 @@ def get_osm_extracts(boundary: str):
             ],
             "centroid": "false"
         }
-    query["geometry"] = json.loads(boundary)["features"][0]["geometry"]
+
+    json_boundary = json.loads(boundary)
+    
+    if json_boundary.get("features", None) is not None:
+        query["geometry"] = json_boundary["features"][0]["geometry"]
+    
+    else:
+        query["geometry"] = json_boundary
 
     base_url = "https://raw-data-api0.hotosm.org/v1"
     query_url = f"{base_url}/snapshot/"
     headers = {"accept": "application/json", "Content-Type": "application/json"}
-
     result = requests.post(query_url, data=json.dumps(query), headers=headers)
 
     if result.status_code == 200:
@@ -579,7 +585,13 @@ async def split_into_tasks(
     outline = json.loads(boundary)
 
     """Update the boundary polyon on the database."""
-    boundary_data = outline["features"][0]["geometry"]
+    # boundary_data = outline["features"][0]["geometry"]
+    if outline.get("features", None) is not None:
+        boundary_data = outline["features"][0]["geometry"]
+    
+    else:
+        boundary_data = outline
+        
     outline = shape(boundary_data)
 
     db_task = db_models.DbProjectAOI(
