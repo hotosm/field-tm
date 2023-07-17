@@ -72,6 +72,7 @@ class ProjectSummary(BaseModel):
     tasks_mapped: int = None
     tasks_validated: int = None
     tasks_bad: int = None
+    hashtags: List[str] = None
 
     class Config:
         orm_mode = True
