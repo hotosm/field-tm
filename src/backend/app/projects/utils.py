@@ -26,8 +26,8 @@ async def generate_files(
 
     Accepts a project ID, category, custom form flag, and an uploaded file as inputs.
     The generated files are associated with the project ID and stored in the database.
-    This api generates qr_code, forms. This api also creates an app user for each task and provides the required roles.
-    Some of the other functionality of this api includes converting a xls file provided by the user to the xform,
+    This function generates qr_code, forms. This utility function also creates an app user for each task and provides the required roles.
+    Some of the other functionality of this utility includes converting a xls file provided by the user to the xform,
     generates osm data extracts and uploads it to the form.
 
 
