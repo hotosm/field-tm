@@ -91,7 +91,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/delete/{project_id}")
+@router.delete("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
