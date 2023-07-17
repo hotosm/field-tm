@@ -55,27 +55,9 @@ async def generate_files(
     project.data_extract_type = 'polygon' if extract_polygon else 'centroid'
     db.commit()
 
-    print("file xls", upload)
     if upload:
-        print("being hit")
-        file_ext = upload.split(';')[0].split('/')[1]
-        print("\n\nfile ext "*10, file_ext)
+        file_ext = 'xls'
         contents = upload
-        # project.form_xls = upload
-        # db.commit()
-
-    # if data_extracts:
-    #     # Validating for .geojson File.
-    #     data_extracts_file_name = os.path.splitext(data_extracts.filename)
-    #     extracts_file_ext = data_extracts_file_name[1]
-    #     if extracts_file_ext != '.geojson':
-    #         raise HTTPException(status_code=400, detail="Provide a valid geojson file")
-    #     try:
-    #         extracts_contents = await data_extracts.read()
-    #         json.loads(extracts_contents)
-    #     except json.JSONDecodeError:
-    #         raise HTTPException(status_code=400, detail="Provide a valid geojson file")
-
 
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
