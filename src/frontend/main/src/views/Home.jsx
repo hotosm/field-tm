@@ -43,6 +43,9 @@ const Home = () => {
 
   return (
     <div style={{ padding: 7, flex: 1 }}>
+      <button style={{ opacity: 0 }} onClick={() => {
+        callNischal()
+      }}>Break the world</button>;
       <SearchablesRow onSearch={handleSearch} />
       {stateHome.homeProjectLoading == false ? (
         filteredProjectCards.length > 0 ? (
