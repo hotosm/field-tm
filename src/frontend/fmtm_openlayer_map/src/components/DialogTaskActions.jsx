@@ -11,7 +11,7 @@ export default function Dialog({ taskId, feature, map, view }) {
     (state) => state.project.projectTaskBoundries
   );
   const token = CoreModules.useSelector((state) => state.login.loginToken);
-  const loading = CoreModules.useSelector((state)=>state.common.loading)
+  const loading = CoreModules.useSelector((state) => state.common.loading)
   const [list_of_task_status, set_list_of_task_status] = useState([]);
   const [task_status, set_task_status] = useState("READY");
 
@@ -86,7 +86,7 @@ export default function Dialog({ taskId, feature, map, view }) {
           })
         );
       }
-    }else{
+    } else {
       dispatch(
         CommonActions.SetSnackBar({
           open: true,
@@ -108,7 +108,7 @@ export default function Dialog({ taskId, feature, map, view }) {
       </CoreModules.Stack>
       <CoreModules.Stack direction={"row"} pl={1}>
         <CoreModules.Typography variant="h3">
-          {`STATUS : ${task_status?.replaceAll("_", " ")}`}
+          {`STATUS : ${task_status?.toString()?.replaceAll("_", " ")}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
       <CoreModules.Link
@@ -125,13 +125,13 @@ export default function Dialog({ taskId, feature, map, view }) {
           // key={index}
           variant="contained"
           color="error"
-          // onClick={handleOnClick}
-          // disabled={loading} 
+        // onClick={handleOnClick}
+        // disabled={loading} 
         >
           Task Submission
         </CoreModules.Button>
       </CoreModules.Link>
-      { checkIfTaskAssignedOrNot && list_of_task_status?.map((data, index) => {
+      {checkIfTaskAssignedOrNot && list_of_task_status?.map((data, index) => {
         return list_of_task_status?.length != 0 ? (
           <CoreModules.Button
             id={data.value}
@@ -139,7 +139,7 @@ export default function Dialog({ taskId, feature, map, view }) {
             variant="contained"
             color="error"
             onClick={handleOnClick}
-            disabled={loading} 
+            disabled={loading}
           >
             {data.key}
           </CoreModules.Button>
