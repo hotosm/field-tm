@@ -122,6 +122,7 @@ module.exports = (webpackEnv) => {
           "./ProjectDetails": "./src/views/Home.jsx",
           "./Submissions": "./src/views/Submissions.jsx",
           "./DefineAreaMap": "./src/views/DefineAreaMap.jsx",
+          "./EditProjectArea": "./src/views/EditProjectArea.jsx",
           "./Tasks": "./src/views/Tasks.jsx",
           "./ProjectInfo": "./src/views/ProjectInfo.jsx",
         },
