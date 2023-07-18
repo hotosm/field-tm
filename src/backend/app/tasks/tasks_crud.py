@@ -83,7 +83,8 @@ def get_tasks(
 
 
 def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
+    db_task = db.query(db_models.DbTask).filter(
+        db_models.DbTask.id == task_id).first()
     if db_obj:
         return db_task
     return convert_to_app_task(db_task)
@@ -232,7 +233,8 @@ def convert_to_app_task(db_task: db_models.DbTask):
                 "uid": db_task.id,
                 "name": db_task.project_task_name,
             }
-            app_task.outline_geojson = geometry_to_geojson(db_task.outline, properties)
+            app_task.outline_geojson = geometry_to_geojson(
+                db_task.outline, properties, db_task.id)
             app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
@@ -249,7 +251,8 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.qr_code_base64 = ""
 
         if db_task.task_history:
-            app_task.task_history = convert_to_app_history(db_task.task_history)
+            app_task.task_history = convert_to_app_history(
+                db_task.task_history)
 
         return app_task
     else:
@@ -275,7 +278,8 @@ def get_qr_codes_for_task(
     task = get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
-            logger.debug(f"QR code found for task ID {task.id}. Converting to base64")
+            logger.debug(
+                f"QR code found for task ID {task.id}. Converting to base64")
             qr_code = base64.b64encode(task.qr_code.image)
         else:
             logger.debug(f"QR code not found for task ID {task.id}.")
@@ -296,12 +300,12 @@ async def get_task_by_id(db: Session, task_id: int):
 
 
 async def update_task_files(db: Session,
-                            project_id:int,
-                            project_odk_id:int,
-                            project_name:str,
-                            task_id:int,
-                            category:str,
-                            task_boundary:str):
+                            project_id: int,
+                            project_odk_id: int,
+                            project_name: str,
+                            task_id: int,
+                            category: str,
+                            task_boundary: str):
 
     # This file will store osm extracts
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
@@ -311,22 +315,21 @@ async def update_task_files(db: Session,
 
     category = 'buildings'
 
-    outfile = f"/tmp/test_project_{category}.geojson"  # This file will store osm extracts
-
+    # This file will store osm extracts
+    outfile = f"/tmp/test_project_{category}.geojson"
 
     # Delete all tasks of the project if there are some
     db.query(db_models.DbFeatures).filter(
         db_models.DbFeatures.task_id == task_id
     ).delete()
 
-
     # OSM Extracts
-    outline_geojson = pg.getFeatures(boundary = task_boundary, 
-                                        filespec = outfile,
-                                        polygon = True,
-                                        xlsfile = f'{category}.xls',
-                                        category = category
-                                        )
+    outline_geojson = pg.getFeatures(boundary=task_boundary,
+                                     filespec=outfile,
+                                     polygon=True,
+                                     xlsfile=f'{category}.xls',
+                                     category=category
+                                     )
 
     updated_outline_geojson = {
         "type": "FeatureCollection",
@@ -340,15 +343,14 @@ async def update_task_files(db: Session,
 
         feature_shape = shape(feature['geometry'])
 
-
         wkb_element = from_shape(feature_shape, srid=4326)
         updated_outline_geojson['features'].append(feature)
 
         db_feature = db_models.DbFeatures(
-                        project_id=project_id,
-                        geometry=wkb_element,
-                        properties=feature["properties"]
-                    )
+            project_id=project_id,
+            geometry=wkb_element,
+            properties=feature["properties"]
+        )
         db.add(db_feature)
         db.commit()
 
@@ -358,16 +360,17 @@ async def update_task_files(db: Session,
         dump(updated_outline_geojson, jsonfile)
 
     # Update the osm extracts in the form.
-    central_crud.upload_xform_media(project_odk_id, task_id, task_polygons, None)
+    central_crud.upload_xform_media(
+        project_odk_id, task_id, task_polygons, None)
 
     return True
 
 
 async def edit_task_boundary(
-      db: Session,
-      task_id: int,
-      boundary: str  
-    ):
+    db: Session,
+    task_id: int,
+    boundary: str
+):
     geometry = boundary['features'][0]['geometry']
 
     """Update the boundary polyon on the database."""
@@ -388,5 +391,5 @@ async def edit_task_boundary(
     odk_id = project.odkid
 
     await update_task_files(db, project_id, odk_id, project_name, task_id, category, geometry)
-    
+
     return True
