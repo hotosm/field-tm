@@ -1880,3 +1880,15 @@ async def update_project_form(
         )
 
     return True
+
+async def update_odk_credentials(project_instance: project_schemas.BETAProjectUpload, 
+                          odk_central_cred: project_schemas.ODKCentral,
+                          odkid: int, db: Session):
+    project_instance.odkid = odkid
+    project_instance.odk_central_url = odk_central_cred.odk_central_url
+    project_instance.odk_central_user = odk_central_cred.odk_central_user
+    project_instance.odk_central_password = odk_central_cred.odk_central_password
+    
+    db.commit()
+    db.refresh(project_instance)
+
