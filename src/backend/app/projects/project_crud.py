@@ -50,6 +50,7 @@ from sqlalchemy import (
     select,
     table,
     func,
+    and_
 )
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -80,26 +81,38 @@ TASK_GEOJSON_DIR = "geojson/"
 
 
 def get_projects(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False
+    db: Session, user_id: int, skip: int = 0, limit: int = 100, db_objects: bool = False,
+    hashtags: List[str] = None
 ):
+    filters = []
     if user_id:
+        filters.append(db_models.DbProject.author_id == user_id) 
+        
+    if hashtags:
+        filters.append(db_models.DbProject.hashtags.op('&&')(hashtags))
+        
+    if len(filters) > 0:
         db_projects = (
             db.query(db_models.DbProject)
-            .filter(db_models.DbProject.author_id == user_id)
+            .filter(and_(*filters))
             .order_by(db_models.DbProject.id.asc())
             .offset(skip)
             .limit(limit)
             .all()
         )
+    
     else:
-        db_projects = db.query(db_models.DbProject).order_by(
-            db_models.DbProject.id.asc()).offset(skip).limit(limit).all()
+        db_projects = (
+            db.query(db_models.DbProject)
+            .order_by(db_models.DbProject.id.asc())
+            .offset(skip).limit(limit).all()
+        )
     if db_objects:
         return db_projects
     return convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int = 100, hashtags: str = None):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
     #         db_models.DbProject.id,
@@ -115,7 +128,7 @@ def get_project_summaries(db: Session, user_id: int, skip: int = 0, limit: int =
     #         .filter(
     #         db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
 
-    db_projects = get_projects(db, user_id, skip, limit, True)
+    db_projects = get_projects(db, user_id, skip, limit, True, hashtags)
     return convert_to_project_summaries(db_projects)
 
 
@@ -262,6 +275,7 @@ def create_project_with_project_info(
     project_info_1 = project_metadata.project_info
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
+    hashtags = project_metadata.hashtags
 
     # Check / set credentials
     if odk_credentials:
@@ -290,6 +304,8 @@ def create_project_with_project_info(
         )
     # TODO: get this from logged in user, return 403 (forbidden) if not authorized
 
+    hashtags = list(map(lambda hashtag: hashtag if hashtag.startswith('#') else f"#{hashtag}", hashtags))\
+        if hashtags else None
     # create new project
     db_project = db_models.DbProject(
         author=db_user,
@@ -299,6 +315,7 @@ def create_project_with_project_info(
         odk_central_url=url,
         odk_central_user=user,
         odk_central_password=pw,
+        hashtags=hashtags
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
