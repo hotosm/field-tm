@@ -20,6 +20,8 @@ import json
 import os
 import uuid
 from typing import List, Optional
+import tempfile
+import inspect
 
 from fastapi import (
     APIRouter,
@@ -43,6 +45,7 @@ from ..central import central_crud
 from ..db import database
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
+from . import utils
 
 router = APIRouter(
     prefix="/projects",
@@ -88,7 +91,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/delete/{project_id}")
+@router.delete("/delete/{project_id}")
 async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
@@ -147,6 +150,48 @@ async def create_project(
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
+@router.post("/update_odk_credentials")
+async def update_odk_credentials(
+    background_task: BackgroundTasks,
+    odk_central_cred: project_schemas.ODKCentral,
+    project_id: int,
+    db: Session = Depends(database.get_db)
+):
+    """Update odk credential of a project"""
+    if odk_central_cred.odk_central_url.endswith("/"):
+        odk_central_cred.odk_central_url = odk_central_cred.odk_central_url[:-1]
+    
+    project_instance = project_crud.get_project(db, project_id)
+    
+    if not project_instance:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    try:
+        odkproject = central_crud.create_odk_project(
+            project_instance.project_info[0].name, odk_central_cred
+        )
+        logger.debug(f"ODKCentral return after update: {odkproject}")
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=400, detail="Connection failed to central odk. "
+        ) from e
+    
+    await project_crud.update_odk_credentials(project_instance, odk_central_cred, odkproject["id"], db)
+    
+    extract_polygon = True if project_instance.data_extract_type == 'polygon' else False
+    project_id = project_instance.id
+    contents = project_instance.form_xls if project_instance.form_xls else None
+    
+        
+    generate_response = await utils.generate_files(background_tasks=background_task, 
+                            project_id=project_id, 
+                            extract_polygon=extract_polygon, 
+                            upload=contents if contents else None, db=db)
+    
+    
+    return generate_response
+    
 
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
