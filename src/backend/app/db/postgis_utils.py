@@ -29,13 +29,14 @@ def timestamp():
     return datetime.datetime.utcnow()
 
 
-def geometry_to_geojson(geometry: Geometry, properties: str = {}):
+def geometry_to_geojson(geometry: Geometry, properties: str = {}, id: int = None):
     if geometry:
         shape = to_shape(geometry)
         geojson = {
             "type": "Feature",
             "geometry": mapping(shape),
             "properties": properties,
+            "id": id,
         }
         return Feature(**geojson)
 

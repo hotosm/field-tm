@@ -29,6 +29,7 @@ export const ProjectById = (url, existingProjectList) => {
         );
         dispatch(
           ProjectActions.SetProjectInfo({id:resp.id,
+            outline_geojson: resp.outline_geojson,
             priority:resp.priority || 2,
             priority_str:resp.priority_str || "MEDIUM",
             title:resp.project_info?.[0]?.name,
