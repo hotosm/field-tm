@@ -18,7 +18,7 @@ import environment from "./environment";
     integrations: [
       new Sentry.BrowserTracing({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: ["localhost", "https:yourserver.io/api/"],
+        tracePropagationTargets: ["https://fmtm.naxa.com.np/", "https://fmtm.hotosm.org/"],
       }),
       new Sentry.Replay(),
     ],
