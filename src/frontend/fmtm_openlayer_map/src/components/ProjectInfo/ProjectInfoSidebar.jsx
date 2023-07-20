@@ -107,7 +107,7 @@ const ProjectInfoSidebar = ({ taskInfo }) => {
           },
         }}
       >
-        <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
+        {/* <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
           <CoreModules.Typography variant="h1">
             Api Listing
           </CoreModules.Typography>
@@ -124,7 +124,7 @@ const ProjectInfoSidebar = ({ taskInfo }) => {
           <ProjectCard />
           <ProjectCard />
           <ProjectCard />
-        </CoreModules.Box>
+        </CoreModules.Box> */}
       </CoreModules.Card>
     </CoreModules.Box>
   );

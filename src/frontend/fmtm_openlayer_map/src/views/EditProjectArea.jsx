@@ -1,52 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useOLMap from "../hooks/useOlMap";
 import { MapContainer as MapComponent } from "../components/MapComponent/OpenLayersComponent";
 import LayerSwitcherControl from "../components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js";
 import { VectorLayer } from "../components/MapComponent/OpenLayersComponent/Layers";
-import CoreModules from "fmtm/CoreModules";
-import { CreateProjectActions } from "fmtm/CreateProjectSlice";
 
-const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile }) => {
-  const dispatch = CoreModules.useDispatch();
-  const[dataExtractedGeojson, setDataExtractedGeojson] = useState(null);
-  const dividedTaskGeojson = CoreModules.useSelector(
-    (state) => state.createproject.dividedTaskGeojson
-  );
-
+const EditProjectArea = ({ geojson }) => {
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
     zoom: 1,
     maxZoom: 25,
   });
-  
-  
 
-  useEffect(() => {
-    if(dividedTaskGeojson){
 
-    }else if(uploadedGeojson) {
-      const fileReader = new FileReader();
-      fileReader.readAsText(uploadedGeojson, "UTF-8");
-      fileReader.onload = (e) => {
-        dispatch(CreateProjectActions.SetDividedTaskGeojson(e.target.result));
-      };
-    }else{
-      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
-    }
-  }, [uploadedGeojson]);
-  useEffect(() => {
-    if (uploadedDataExtractFile) {
-      const fileReader = new FileReader();
-      fileReader.readAsText(uploadedDataExtractFile, "UTF-8");
-      fileReader.onload = (e) => {
-        setDataExtractedGeojson(e.target.result);
-      };
-    }else{
-    }
-  }, [uploadedDataExtractFile]);
+
   return (
-    <div className="map-container" style={{ height: "600px", width: "100%" }}>
+    <div className="map-container" style={{ height: "600px", marginLeft: '20px' }}>
       <MapComponent
         ref={mapRef}
         mapInstance={map}
@@ -57,26 +26,19 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
         }}
       >
         <LayerSwitcherControl />
-        {dividedTaskGeojson && (
+        {geojson && (
           <VectorLayer
-            geojson={dividedTaskGeojson}
+            geojson={geojson}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
               constrainResolution: true,
               duration: 2000,
             }}
-            onModify={(modifiedGeojson)=>{
-              console.log(JSON.parse(modifiedGeojson));
-              const parsedJSON = JSON.parse(modifiedGeojson)
-              var f = new File([modifiedGeojson], "AOI.geojson", {type: "application/geo+json" })
-              setGeojsonFile(f);
-
-
-            }}
             zoomToLayer
           />
         )}
+        { /*
         {dataExtractedGeojson && (
           <VectorLayer
             geojson={dataExtractedGeojson}
@@ -99,10 +61,10 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
             }}
             // zoomToLayer
           />
-        )}
+        )} */}
       </MapComponent>
     </div>
   );
 };
 
-export default DefineAreaMap;
+export default EditProjectArea;
