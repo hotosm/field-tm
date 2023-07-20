@@ -237,6 +237,8 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
 
 
 def download_submission_for_project(db, project_id):
+    print('Download submission for a project')
+
     project_info = project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
