@@ -12,9 +12,9 @@ import DefineAreaMap from 'map/DefineAreaMap';
 import DataExtractValidation from './validation/DataExtractValidation';
 
 // import { SelectPicker } from 'rsuite';
-let generateProjectLogIntervalCb:any = null;
+let generateProjectLogIntervalCb: any = null;
 
-const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile,setDataExtractFile,setDataExtractFileValue }) => {
+const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFile, setDataExtractFile, setDataExtractFileValue }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
   const dataExtractOptions = dataExtractOptionsList.map((item) => ({ label: item, value: item }));
   const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
- 
+
   // Fetching form category list
   useEffect(() => {
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
@@ -46,9 +46,9 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
   // END
 
   const submission = () => {
-      // const previousValues = location.state.values;
-      dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...values }));
-      navigate('/select-form');
+    // const previousValues = location.state.values;
+    dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...values }));
+    navigate('/select-form');
     // navigate("/select-form", { replace: true, state: { values: values } });
   };
 
@@ -67,7 +67,7 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
     submission,
     DataExtractValidation,
   );
-  
+
   return (
     <CoreModules.Stack
       sx={{
@@ -86,7 +86,7 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
             sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}
           >
             <Grid item xs={16} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
-            <CoreModules.FormControl sx={{ mb: 3 }}>
+              <CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
                   sx={{
@@ -169,13 +169,13 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
                     {errors.data_extract_options}
                   </CoreModules.FormLabel>
                 )}
-              </CoreModules.FormControl> 
-               {/* Area Geojson File Upload For Create Project */}
+              </CoreModules.FormControl>
+              {/* Area Geojson File Upload For Create Project */}
               {values.data_extract_options === 'Upload Custom Data Extract' && <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
                 <CoreModules.FormLabel>Upload Custom Data Extract </CoreModules.FormLabel>
                 <CoreModules.Button variant="contained" component="label">
                   <CoreModules.Input
-                    sx={{color:'white'}}
+                    sx={{ color: 'white' }}
                     type="file"
                     value={setDataExtractFileValue}
                     onChange={(e) => {
@@ -191,9 +191,9 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
                   </CoreModules.FormLabel>
                 )}
               </CoreModules.FormControl>}
-              
-              
-              {values.data_extract_options === 'Data Extract Ways' &&<CoreModules.FormControl sx={{ mb: 3 }}>
+
+
+              {values.data_extract_options === 'Data Extract Ways' && <CoreModules.FormControl sx={{ mb: 3 }}>
                 <InputLabel
                   id="form-category"
                   sx={{
@@ -234,13 +234,13 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
                     {errors.data_extractWays}
                   </CoreModules.FormLabel>
                 )}
-              </CoreModules.FormControl> }
+              </CoreModules.FormControl>}
             </Grid>
-          <Grid item md={8}>
-            <CoreModules.Stack>
-            <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile} uploadedDataExtractFile={dataExtractFile}/>
-            </CoreModules.Stack>
-          </Grid>
+            <Grid item md={8}>
+              <CoreModules.Stack>
+                <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile} uploadedDataExtractFile={dataExtractFile} />
+              </CoreModules.Stack>
+            </Grid>
           </Grid>
           <CoreModules.Stack
             sx={{
@@ -260,19 +260,19 @@ const DataExtract: React.FC<any> = ({ geojsonFile,setGeojsonFile,dataExtractFile
             {/* END */}
 
             {/* Submit Button For Create Project on Area Upload */}
-            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}> 
-            <CoreModules.LoadingButton
-              // disabled={projectDetailsLoading}               
-              type="submit"
-              // loading={projectDetailsLoading}
-              // loadingPosition="end"
-              // endIcon={<AssetModules.SettingsSuggestIcon />}
-              variant="contained"                            
-              color="error"
+            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <CoreModules.LoadingButton
+                // disabled={projectDetailsLoading}               
+                type="submit"
+                // loading={projectDetailsLoading}
+                // loadingPosition="end"
+                // endIcon={<AssetModules.SettingsSuggestIcon />}
+                variant="contained"
+                color="error"
               >
                 Next
               </CoreModules.LoadingButton>
-              
+
             </CoreModules.Stack>
             {/* END */}
           </CoreModules.Stack>
