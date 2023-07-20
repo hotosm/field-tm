@@ -1887,16 +1887,57 @@ async def update_project_form(
 
     for task in tasks_list:
 
+        task_obj = tasks_crud.get_task(db, task)
+
+        # Get the features for this task.
+        # Postgis query to filter task inside this task outline and of this project
+        # Update those features and set task_id
+        query = f'''UPDATE features
+                    SET task_id={task}
+                    WHERE id in (
+                    
+                    SELECT id
+                    FROM features
+                    WHERE project_id={project_id} and ST_Intersects(geometry, '{task_obj.outline}'::Geometry)
+
+                    )'''
+
+        result = db.execute(query)
+
+        # Get the geojson of those features for this task.
+        query = f'''SELECT jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', jsonb_agg(feature)
+                    )
+                    FROM (
+                    SELECT jsonb_build_object(
+                        'type', 'Feature',
+                        'id', id,
+                        'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                        'properties', properties
+                    ) AS feature
+                    FROM features
+                    WHERE project_id={project_id} and task_id={task}
+                    ) features;'''
+
+
+        result = db.execute(query)
+        features = result.fetchone()[0]
 
         xform = f"/tmp/{project_title}_{category}_{task}.xml"  # This file will store xml contents of an xls form.
-        outfile = f"/tmp/{project_title}_{category}_{task}.geojson"  # This file will store osm extracts
+        extracts = f"/tmp/{project_title}_{category}_{task}.geojson"  # This file will store osm extracts
+
+        # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+        with open(extracts, "w") as jsonfile:
+            jsonfile.truncate(0)  # clear the contents of the file
+            dump(features, jsonfile)
 
         outfile = central_crud.generate_updated_xform(
             xlsform, xform, form_type)
 
         # Create an odk xform
         result = central_crud.create_odk_xform(
-            odk_id, task, outfile, None, True, False
+            odk_id, task, xform, None, True, True
         )
 
     return True
