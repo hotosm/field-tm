@@ -16,6 +16,11 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import os
+import zipfile
+import concurrent.futures
+import logging
+import threading
 import csv
 import io
 import os
@@ -228,6 +233,86 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
             final_zip_file.write(jsonoutfile)
 
     return FileResponse(final_zip_file_path)
+
+
+
+def download_submission_for_project(db, project_id):
+    print('Download submission for a project')
+
+    project_info = project_crud.get_project(db, project_id)
+
+    # Return empty list if project is not found
+    if not project_info:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    odkid = project_info.odkid
+    project_name = project_info.project_name_prefix
+    form_category = project_info.xform_title
+    project_tasks = project_info.tasks
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project_info.odk_central_url,
+        odk_central_user=project_info.odk_central_user,
+        odk_central_password=project_info.odk_central_password,
+    )
+
+    # Get ODK Form with odk credentials from the project.
+    xform = get_odk_form(odk_credentials)
+
+    def download_submission_for_task(task_id):
+        logging.info(f"Thread {threading.current_thread().name} - Downloading submission for Task ID {task_id}")
+        xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
+        file = xform.getSubmissionMedia(odkid, xml_form_id)
+        file_path = f"{project_name}_{form_category}_submission_{task_id}.zip"
+        with open(file_path, "wb") as f:
+            f.write(file.content)
+        return file_path
+
+    def extract_files(zip_file_path):
+        logging.info(f"Thread {threading.current_thread().name} - Extracting files from {zip_file_path}")
+        with zipfile.ZipFile(zip_file_path, "r") as zip_file:
+            extract_dir = os.path.splitext(zip_file_path)[0]
+            zip_file.extractall(extract_dir)
+            return [os.path.join(extract_dir, f) for f in zip_file.namelist()]
+
+    # Set up logging configuration
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(threadName)s] %(message)s")
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        task_list = [x.id for x in project_tasks]
+
+        # Download submissions using thread pool
+        futures = {executor.submit(download_submission_for_task, task_id): task_id for task_id in task_list}
+
+        files = []
+        for future in concurrent.futures.as_completed(futures):
+            task_id = futures[future]
+            try:
+                file_path = future.result()
+                files.append(file_path)
+                logging.info(f"Thread {threading.current_thread().name} - Task {task_id} - Download completed.")
+            except Exception as e:
+                logging.error(f"Thread {threading.current_thread().name} - Error occurred while downloading submission for task {task_id}: {e}")
+
+        # Extract files using thread pool
+        extracted_files = []
+        futures = {executor.submit(extract_files, file_path): file_path for file_path in files}
+        for future in concurrent.futures.as_completed(futures):
+            file_path = futures[future]
+            try:
+                extracted_files.extend(future.result())
+                logging.info(f"Thread {threading.current_thread().name} - Extracted files from {file_path}")
+            except Exception as e:
+                logging.error(f"Thread {threading.current_thread().name} - Error occurred while extracting files from {file_path}: {e}")
+
+    # Create a new ZIP file for the extracted files
+    final_zip_file_path = f"{project_name}_{form_category}_submissions_final.zip"
+    with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
+        for file_path in extracted_files:
+            final_zip_file.write(file_path)
+
+    return final_zip_file_path
 
 
 def download_submission(db: Session, project_id: int, task_id: int, export_json: bool):
