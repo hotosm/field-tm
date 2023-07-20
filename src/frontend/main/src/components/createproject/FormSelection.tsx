@@ -14,9 +14,9 @@ import LoadingBar from './LoadingBar';
 import environment from '../../environment';
 
 // import { SelectPicker } from 'rsuite';
-let generateProjectLogIntervalCb = null;
+let generateProjectLogIntervalCb:any = null;
 
-const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile, customFormInputValue, setCustomFormInputValue,dataExtractFile }) => {
+const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, customFormInputValue,dataExtractFile }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -170,7 +170,7 @@ const FormSelection: React.FC = ({ geojsonFile,customFormFile,setCustomFormFile,
   const divRef = useRef(null);
   useEffect(() => {
     if (!divRef?.current) return;
-    const myDiv = divRef?.current;
+    const myDiv: HTMLDivElement = divRef?.current;
     myDiv.scrollTop = myDiv?.scrollHeight;
   });
 

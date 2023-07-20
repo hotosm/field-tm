@@ -2,11 +2,8 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { styled, Box, Theme } from '@mui/system';
 import Modal from '@mui/base/ModalUnstyled';
-import CoreModules from '../shared/CoreModules.js';
-import AssetModules from "../shared/AssetModules.js";
 
 export default function CustomizedModal({ children, isOpen, toggleOpen }) {
-  const defaultTheme: any = CoreModules.useSelector<any>(state => state.theme.hotTheme)
   const handleClose = () => toggleOpen(false);
 
   return (
