@@ -1058,19 +1058,19 @@ def upload_custom_data_extracts(db: Session,
 
     features_data = json.loads(contents)
 
-    # Data Cleaning
-    cleaned = FilterData()
-    models = xlsforms_path.replace("xlsforms", "data_models")
-    xlsfile = f"{category}.xls"  # FIXME: for custom form
-    file = f"{xlsforms_path}/{xlsfile}"
-    if os.path.exists(file):
-        title, extract = cleaned.parse(file)
-    elif os.path.exists(f"{file}x"):
-        title, extract = cleaned.parse(f"{file}x")
-    # Remove anything in the data extract not in the choices sheet.
-    cleaned_data = cleaned.cleanData(features_data)
+    # # Data Cleaning
+    # cleaned = FilterData()
+    # models = xlsforms_path.replace("xlsforms", "data_models")
+    # xlsfile = f"{category}.xls"  # FIXME: for custom form
+    # file = f"{xlsforms_path}/{xlsfile}"
+    # if os.path.exists(file):
+    #     title, extract = cleaned.parse(file)
+    # elif os.path.exists(f"{file}x"):
+    #     title, extract = cleaned.parse(f"{file}x")
+    # # Remove anything in the data extract not in the choices sheet.
+    # cleaned_data = cleaned.cleanData(features_data)
 
-    for feature in cleaned_data["features"]:
+    for feature in features_data["features"]:
 
         feature_shape = shape(feature['geometry'])
 
