@@ -1874,6 +1874,13 @@ async def update_project_form(
     project_title = project.project_name_prefix
     odk_id = project.odkid
 
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
+
 
     if form:
         xlsform = f"/tmp/custom_form.{form_type}"
@@ -2007,7 +2014,7 @@ async def update_project_form(
 
         # Create an odk xform
         result = central_crud.create_odk_xform(
-            odk_id, task, xform, None, True, True
+            odk_id, task, xform, odk_credentials, True, True
         )
 
     return True
