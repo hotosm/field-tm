@@ -392,8 +392,10 @@ const PostFormUpdate: Function = (url: string, payload: any) => {
         const postFormUpdate = async (url, payload) => {
             try {
                 const formFormData = new FormData();
-                formFormData.append('form', payload);
-                const postFormUpdateResponse = await axios.post(url, formFormData)
+                if (payload) {
+                    formFormData.append('form', payload);
+                }
+                const postFormUpdateResponse = await axios.post(url, payload ? formFormData : {})
                 const resp: ProjectDetailsModel = postFormUpdateResponse.data;
                 // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
                 // dispatch(CreateProjectActions.SetPostFormUpdate(resp));
@@ -408,6 +410,15 @@ const PostFormUpdate: Function = (url: string, payload: any) => {
                 );
             } catch (error) {
                 dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
+                console.log(error?.response, 'error');
+                dispatch(
+                    CommonActions.SetSnackBar({
+                        open: true,
+                        message: error?.response?.data?.detail,
+                        variant: "error",
+                        duration: 2000,
+                    })
+                );
             } finally {
                 dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
             }
