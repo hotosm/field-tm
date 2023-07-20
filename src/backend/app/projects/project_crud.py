@@ -35,7 +35,7 @@ import numpy as np
 import segno
 import shapely.wkb as wkblib
 import sqlalchemy
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, UploadFile, File
 from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
@@ -1865,40 +1865,156 @@ def add_features_into_database(
 async def update_project_form(
         db: Session,
         project_id: int,
-        form: str,
         form_type: str,
-):
+        form: UploadFile = File(None)
+        ):
 
     project = get_project(db, project_id)
     category = project.xform_title
     project_title = project.project_name_prefix
     odk_id = project.odkid
 
-    task = table("tasks", column("outline"), column("id"))
-    where = f"project_id={project_id}"
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url = project.odk_central_url,
+        odk_central_user = project.odk_central_user,
+        odk_central_password = project.odk_central_password,
+        )
 
-    sql = select(task).where(text(where))
+
+    if form:
+        xlsform = f"/tmp/custom_form.{form_type}"
+        contents = await form.read()
+        with open(xlsform, "wb") as f:
+            f.write(contents)
+    else:
+        xlsform = f"{xlsforms_path}/{category}.xls"
+
+    db.query(db_models.DbFeatures).filter(db_models.DbFeatures.project_id == project_id).delete()
+    db.commit()
+
+    # OSM Extracts for whole project
+    pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+    outfile = f"/tmp/{project_title}_{category}.geojson"  # This file will store osm extracts
+
+    extract_polygon = True if project.data_extract_type == 'polygon' else False
+
+    project = table(
+        "projects", 
+        column("outline")
+    )
+
+    # where = f"id={project_id}
+    sql = select(
+                geoalchemy2.functions.ST_AsGeoJSON(project.c.outline).label("outline"),
+                ).where(text(f"id={project_id}"))
     result = db.execute(sql)
+    project_outline = result.first()
 
-    form_type = "xls"
+    final_outline = json.loads(project_outline.outline)
 
-    xlsform = f"/tmp/custom_form.{form_type}"
-    with open(xlsform, "wb") as f:
-        f.write(form)
+    outline_geojson = pg.getFeatures(boundary = final_outline, 
+                                        filespec = outfile,
+                                        polygon = extract_polygon,
+                                        xlsfile = f'{category}.xls',
+                                        category = category
+                                        )
 
-    for poly in result.fetchall():
 
-        # This file will store xml contents of an xls form.
-        xform = f"/tmp/{project_title}_{category}_{poly.id}.xml"
-        # This file will store osm extracts
-        outfile = f"/tmp/{project_title}_{category}_{poly.id}.geojson"
+    updated_outline_geojson = {
+        "type": "FeatureCollection",
+        "features": []}
+
+    # Collect feature mappings for bulk insert
+    feature_mappings = []
+
+    for feature in outline_geojson["features"]:
+
+        # If the osm extracts contents do not have a title, provide an empty text for that.
+        feature["properties"]["title"] = ""
+
+        feature_shape = shape(feature['geometry'])
+
+        # # If the centroid of the Polygon is not inside the outline, skip the feature.
+        # if extract_polygon and (not shape(outline).contains(shape(feature_shape.centroid))):
+        #     continue
+
+        wkb_element = from_shape(feature_shape, srid=4326)
+        feature_mapping = {
+            'project_id': project_id,
+            'category_title': category,
+            'geometry': wkb_element,
+            'properties': feature["properties"],
+        }
+        updated_outline_geojson['features'].append(feature)
+        feature_mappings.append(feature_mapping)
+
+        # Insert features into db
+        db_feature = db_models.DbFeatures(
+            project_id=project_id,
+            category_title = category,
+            geometry=wkb_element,
+            properties=feature["properties"]
+        )
+        db.add(db_feature)
+        db.commit()
+
+    tasks_list = tasks_crud.get_task_lists(db, project_id)
+
+    for task in tasks_list:
+
+        task_obj = tasks_crud.get_task(db, task)
+
+        # Get the features for this task.
+        # Postgis query to filter task inside this task outline and of this project
+        # Update those features and set task_id
+        query = f'''UPDATE features
+                    SET task_id={task}
+                    WHERE id in (
+                    
+                    SELECT id
+                    FROM features
+                    WHERE project_id={project_id} and ST_Intersects(geometry, '{task_obj.outline}'::Geometry)
+
+                    )'''
+
+        result = db.execute(query)
+
+        # Get the geojson of those features for this task.
+        query = f'''SELECT jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', jsonb_agg(feature)
+                    )
+                    FROM (
+                    SELECT jsonb_build_object(
+                        'type', 'Feature',
+                        'id', id,
+                        'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                        'properties', properties
+                    ) AS feature
+                    FROM features
+                    WHERE project_id={project_id} and task_id={task}
+                    ) features;'''
+
+
+        result = db.execute(query)
+        features = result.fetchone()[0]
+
+        xform = f"/tmp/{project_title}_{category}_{task}.xml"  # This file will store xml contents of an xls form.
+        extracts = f"/tmp/{project_title}_{category}_{task}.geojson"  # This file will store osm extracts
+
+        # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+        with open(extracts, "w") as jsonfile:
+            jsonfile.truncate(0)  # clear the contents of the file
+            dump(features, jsonfile)
+
 
         outfile = central_crud.generate_updated_xform(
             xlsform, xform, form_type)
 
         # Create an odk xform
         result = central_crud.create_odk_xform(
-            odk_id, poly.id, outfile, None, True, False
+            odk_id, task, xform, odk_credentials, True, True
         )
 
     return True
