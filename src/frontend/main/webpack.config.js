@@ -7,6 +7,7 @@ const path = require('path');
 const deps = require("./package.json").dependencies;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin'); // Add the WorkboxWebpackPlugin
+const CopyPlugin = require("copy-webpack-plugin");
 
 //const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = function (webpackEnv) {
@@ -122,6 +123,12 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      new CopyPlugin({
+        patterns: [
+          { from: "./public/manifest.json", to: "./" },
+          // { from: "other", to: "public" },
+        ],
+      }),
        // Add the WorkboxWebpackPlugin to generate the service worker and handle caching
        new WorkboxWebpackPlugin.GenerateSW({
         clientsClaim: true,
