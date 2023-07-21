@@ -22,7 +22,7 @@ module.exports = function (webpackEnv) {
     // bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'inline-source-map',
     output: {
-      publicPath: `${process.env.FRONTEND_MAIN_URL}/`,
+      publicPath: `/src/frontend/main/`,
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].bundle.js",
       clean:true
