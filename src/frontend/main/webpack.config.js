@@ -125,7 +125,7 @@ module.exports = function (webpackEnv) {
     plugins: [
       new CopyPlugin({
         patterns: [
-          { from: "./public/manifest.json", to: "./" },
+          { from: "./public/", to: "./" },
           // { from: "other", to: "public" },
         ],
       }),
