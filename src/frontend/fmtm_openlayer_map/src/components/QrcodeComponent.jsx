@@ -103,7 +103,9 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                 <CoreModules.Button variant="contained"
                   color="error"
                   onClick={() => {
-                    document.location.href = 'intent:#Intent;scheme=app;package=org.odk.collect.android;end;';
+                    document.location.href = 'intent://instagram.com/#Intent;scheme=https;package=com.instagram.android;end';
+                    // document.location.href = 'intent:#Intent;scheme=app;package=org.odk.collect.android;end;';
+                    // document.location.href = 'https://play.google.com/store/apps/details?id=org.odk.collect.android';
                   }}>Go To ODK</CoreModules.Button>
                 <CoreModules.Stack
                   width={40}
