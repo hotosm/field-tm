@@ -103,7 +103,15 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                 <CoreModules.Button variant="contained"
                   color="error"
                   onClick={() => {
-                    document.location.href = 'intent://getodk.org/#Intent;scheme=https;package=org.odk.collect.android;end';
+                    // Replace "org.odk.collect.android.FORM_DOWNLOAD" with the desired action name
+                    const action = "org.odk.collect.android.FORM_DOWNLOAD";
+                    // Replace "vnd.android.cursor.dir/vnd.odk.form" with the desired data mime type
+                    const mimeType = "vnd.android.cursor.dir/vnd.odk.form";
+
+                    const intentURI = `intent:${action};category=android.intent.category.DEFAULT;type=${mimeType};end;`;
+
+                    document.location.href = intentURI;
+                    // document.location.href = 'intent://getodk.org/#Intent;scheme=app;package=org.odk.collect.android;end';
                     // document.location.href = 'intent:#Intent;scheme=app;package=org.odk.collect.android;end;';
                     // document.location.href = 'https://play.google.com/store/apps/details?id=org.odk.collect.android';
                   }}>Go To ODK</CoreModules.Button>
