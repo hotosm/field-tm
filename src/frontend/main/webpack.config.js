@@ -22,7 +22,7 @@ module.exports = function (webpackEnv) {
     // bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'inline-source-map',
     output: {
-      publicPath: `/src/frontend/main/`,
+      publicPath: `${process.env.FRONTEND_MAIN_URL}/`,
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].bundle.js",
       clean:true
@@ -126,7 +126,7 @@ module.exports = function (webpackEnv) {
        new WorkboxWebpackPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,
-        maximumFileSizeToCacheInBytes:7000000
+        maximumFileSizeToCacheInBytes:50000000
       }),
       //new BundleAnalyzerPlugin(),
       new MiniCssExtractPlugin({
