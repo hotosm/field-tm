@@ -114,6 +114,8 @@ class Settings(BaseSettings):
     OSM_SECRET_KEY: str
     OAUTHLIB_INSECURE_TRANSPORT: Optional[str] = 1
 
+    SENTRY_DSN: Optional[str]
+
     class Config:
         """Pydantic settings config."""
 
