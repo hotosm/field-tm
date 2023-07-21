@@ -6,6 +6,8 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const path = require('path');
 const deps = require("./package.json").dependencies;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin'); // Add the WorkboxWebpackPlugin
+
 //const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = function (webpackEnv) {
   
@@ -120,6 +122,12 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+       // Add the WorkboxWebpackPlugin to generate the service worker and handle caching
+       new WorkboxWebpackPlugin.GenerateSW({
+        clientsClaim: true,
+        skipWaiting: true,
+        maximumFileSizeToCacheInBytes:7000000
+      }),
       //new BundleAnalyzerPlugin(),
       new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:8].css',
