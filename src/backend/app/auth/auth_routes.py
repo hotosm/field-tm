@@ -20,7 +20,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.logger import logger as log
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-
+from ..db.db_models import DbUser
 from ..db import database
 from ..users import user_crud, user_schemas
 from .osm import AuthUser, init_osm_auth, login_required
@@ -85,6 +85,9 @@ def my_data(user_data: AuthUser = Depends(login_required)):
 
     Returns: user_data
     """
-    print(user_data, 'user_data')
+
+    # Save user info in User table
+    db_user = DbUser(id=user_data['id'], username=user_data['username'])
+    db_user.commit()
+
     return JSONResponse(content={"user_data": user_data}, status_code=200)
-    # return user_data
