@@ -58,11 +58,11 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
-sentry_sdk.init(
-    dsn=settings.SENTRY_DSN,
-    traces_sample_rate=0.1,
-)
+if not settings.DEBUG:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        traces_sample_rate=0.1,
+    )
 
 
 def get_application() -> FastAPI:
