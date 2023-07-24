@@ -376,6 +376,7 @@ async def upload_project_boundary(
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
+    await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
 
@@ -412,6 +413,7 @@ async def edit_project_boundary(
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
+    await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
 
@@ -641,6 +643,7 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
+    await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
 
