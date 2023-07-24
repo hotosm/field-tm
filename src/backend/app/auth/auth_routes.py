@@ -77,7 +77,10 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
 
 
 @router.get("/me/", response_model=AuthUser)
-def my_data(user_data: AuthUser = Depends(login_required)):
+def my_data(
+        db: Session = Depends(database.get_db),
+        user_data: AuthUser = Depends(login_required)
+    ):
     """Read the access token and provide  user details from OSM user's API endpoint,
     also integrated with underpass .
 
@@ -87,7 +90,11 @@ def my_data(user_data: AuthUser = Depends(login_required)):
     """
 
     # Save user info in User table
-    db_user = DbUser(id=user_data['id'], username=user_data['username'])
-    db_user.commit()
+    user = user_crud.get_user_by_id(db, user_data['id'])
+    if not user:
+        db_user = DbUser(id=user_data['id'], username=user_data['username'])
+        db.add(db_user)
+        db.commit()
+
 
     return JSONResponse(content={"user_data": user_data}, status_code=200)
