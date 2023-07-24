@@ -155,6 +155,7 @@ async def create_project(
     else:
         raise HTTPException(status_code=404, detail="Project not found")
 
+
 @router.post("/update_odk_credentials")
 async def update_odk_credentials(
     background_task: BackgroundTasks,
@@ -485,6 +486,7 @@ async def generate_files(
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
+        await upload.seek(0)
         contents = await upload.read()
 
         project.form_xls = contents
