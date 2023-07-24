@@ -21,7 +21,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "./src/",
-    "noImplicitAny": false,
+    "noImplicitAny": false, //FIXME: Change This "true" to "false" To Integrate Types Instead Of "Any" Types.
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
@@ -32,7 +32,8 @@
     "noUnusedParameters": true,
   },
   "include": [
-    ".eslintrc.cjs",
+    // ".eslintrc.cjs",
+    // ".eslintrc.js",
     "src",
     "src/**/*.ts"
   ],
