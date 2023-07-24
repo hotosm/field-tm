@@ -318,6 +318,7 @@ async def upload_multi_project_boundary(
     If the project ID does not exist in the database, an HTTP 428 error is raised.
     """
     # read entire file
+    await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
 
