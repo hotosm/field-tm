@@ -20,7 +20,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.logger import logger as log
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-
+from ..db.db_models import DbUser
 from ..db import database
 from ..users import user_crud, user_schemas
 from .osm import AuthUser, init_osm_auth, login_required
@@ -77,7 +77,10 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
 
 
 @router.get("/me/", response_model=AuthUser)
-def my_data(user_data: AuthUser = Depends(login_required)):
+def my_data(
+        db: Session = Depends(database.get_db),
+        user_data: AuthUser = Depends(login_required)
+    ):
     """Read the access token and provide  user details from OSM user's API endpoint,
     also integrated with underpass .
 
@@ -85,6 +88,13 @@ def my_data(user_data: AuthUser = Depends(login_required)):
 
     Returns: user_data
     """
-    print(user_data, 'user_data')
+
+    # Save user info in User table
+    user = user_crud.get_user_by_id(db, user_data['id'])
+    if not user:
+        db_user = DbUser(id=user_data['id'], username=user_data['username'])
+        db.add(db_user)
+        db.commit()
+
+
     return JSONResponse(content={"user_data": user_data}, status_code=200)
-    # return user_data
