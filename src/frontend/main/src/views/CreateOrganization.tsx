@@ -8,14 +8,15 @@ import { PostOrganizationDataService } from '../api/OrganizationService';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { OrganizationAction } from '../store/slices/organizationSlice';
 
-
 const CreateOrganizationForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const postOrganizationData: any = CoreModules.useSelector<any>((state) => state.organization.postOrganizationData);
-  const postOrganizationDataLoading: any = CoreModules.useSelector<any>((state) => state.organization.postOrganizationDataLoading);
+  const postOrganizationDataLoading: any = CoreModules.useSelector<any>(
+    (state) => state.organization.postOrganizationDataLoading,
+  );
   const organizationFormData: any = CoreModules.useSelector<any>((state) => state.organization.organizationFormData);
 
   const submission = () => {
@@ -38,18 +39,15 @@ const CreateOrganizationForm = () => {
 
   useEffect(() => {
     if (postOrganizationData) {
-      dispatch(OrganizationAction.postOrganizationData(null))
-      dispatch(OrganizationAction.SetOrganizationFormData({}))
-      if (searchParams.get("popup") === 'true') {
+      dispatch(OrganizationAction.postOrganizationData(null));
+      dispatch(OrganizationAction.SetOrganizationFormData({}));
+      if (searchParams.get('popup') === 'true') {
         window.close();
       } else {
         navigate('/organization');
       }
     }
-
-
-  }, [postOrganizationData])
-
+  }, [postOrganizationData]);
 
   return (
     <CoreModules.Box
@@ -161,7 +159,6 @@ const CreateOrganizationForm = () => {
                 >
                   Upload Logo
                 </CoreModules.FormLabel>
-
               </CoreModules.Box>
               <CoreModules.Button variant="contained" component="span">
                 <CoreModules.Input
