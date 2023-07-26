@@ -126,11 +126,13 @@ module.exports = function (webpackEnv) {
         ],
       }),
       // Add the WorkboxWebpackPlugin to generate the service worker and handle caching
-      new WorkboxWebpackPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-        maximumFileSizeToCacheInBytes: 50000000,
-      }),
+      ...(isEnvProduction
+        ? new WorkboxWebpackPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
+            maximumFileSizeToCacheInBytes: 50000000,
+          })
+        : []),
       //new BundleAnalyzerPlugin(),
       new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:8].css',
