@@ -9,9 +9,23 @@ import './index.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import * as Sentry from '@sentry/react';
 import environment from './environment';
-// import 'swiper/css';
-// import 'swiper/css/navigation';
-// import 'swiper/css/pagination';
+
+// Added Fix of Console Error of MUI Issue
+const consoleError = console.error;
+const SUPPRESSED_WARNINGS = [
+  'MUI: The `value` provided to the Tabs component is invalid.',
+  'React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead.',
+  'Using kebab-case for css properties in objects is not supported. Did you mean WebkitBoxOrient?',
+  'Using kebab-case for css properties in objects is not supported. Did you mean WebkitLineClamp?',
+  'If you used to conditionally omit it with %s={condition && value}, pass %s={condition ? value : undefined} instead.%s',
+];
+
+console.error = function filterWarnings(msg, ...args) {
+  if (!SUPPRESSED_WARNINGS.some((entry) => msg.includes(entry))) {
+    consoleError(msg, ...args);
+  }
+};
+
 {
   environment.nodeEnv !== 'development'
     ? Sentry.init({
