@@ -82,6 +82,7 @@
         "<rootDir>/tests/mocks/fileMock.ts",
       "^.+\\.(css|less|scss|sass)$": "<rootDir>/tests/mocks/styleMock.ts",
       "(assets|models|services)": "<rootDir>/tests/mocks/fileMock.ts"
-    }
+    },
+    "setupFilesAfterEnv": ["./setupTests.js"]
   }
 }
