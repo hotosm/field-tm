@@ -740,7 +740,8 @@ async def update_project_category(
 
     current_category = project.xform_title
     if current_category == category:
-        raise HTTPException(status_code=400, detail="Current category is same as new category")
+        if not upload:
+            raise HTTPException(status_code=400, detail="Current category is same as new category")
 
 
     if upload:
