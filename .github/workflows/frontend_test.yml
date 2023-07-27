@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - "src/frontend/**" # Trigger the workflow only when files within srv/frontend change
-      - ".github/workflows/**"  # Also trigger if github workflow changes
+      - ".github/workflows/**" # Also trigger if github workflow changes
   workflow_dispatch:
 
 jobs:
@@ -25,7 +25,4 @@ jobs:
         run: |
           cd src/frontend/main
           npm install
-
-      - name: Run Tests
-        run: |
           npm run test
