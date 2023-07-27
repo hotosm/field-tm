@@ -2,10 +2,9 @@ module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
     'plugin:react/recommended', // Uses the recommended rules from @eslint-plugin-react
-    'plugin:@typescript-eslint/recommended', // Uses the recommended rules from @typescript-eslint/eslint-plugin
     'prettier', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
-    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
     'plugin:react/jsx-runtime',
+    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
     ecmaVersion: 'latest',
@@ -14,6 +13,9 @@ module.exports = {
   rules: {
     //FIXME: Remove This Code To Integrate Types Instead Of "Any" Types.
     '@typescript-eslint/no-explicit-any': 0,
+    'react/prop-types': 0,
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
   },
