@@ -98,7 +98,7 @@ async def download_submission(
     task_id: The ID of the task. This parameter is optional. If task_id is provided, this endpoint returns the submissions made for this task.
 
     """
-    if not (task_id and export_json):
+    if not (task_id or export_json):
         file = submission_crud.download_submission_for_project(db, project_id)
         return FileResponse(file)
 
