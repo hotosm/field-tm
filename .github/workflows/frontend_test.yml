@@ -1,0 +1,31 @@
+name: Frontend Tests
+
+on:
+  push:
+    paths:
+      - "src/frontend/**" # Trigger the workflow only when files within srv/frontend change
+      - ".github/workflows/**"  # Also trigger if github workflow changes
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18" # Change this to your preferred Node.js version
+
+      - name: Test Frontend Main
+        run: |
+          cd src/frontend/main
+          npm install
+
+      - name: Run Tests
+        run: |
+          npm run test
