@@ -337,7 +337,6 @@ def download_submission(db: Session, project_id: int, task_id: int, export_json:
 
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
-
     if not export_json:
         file_path = f"{project_id}_submissions.zip"
 
