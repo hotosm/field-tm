@@ -709,7 +709,7 @@ async def download_form(project_id: int,
 
     headers = {
         "Content-Disposition": "attachment; filename=submission_data.xls",
-        "Content-Type": "application/json",
+        "Content-Type": "application/media",
     }
     if not project.form_xls:
         project_category = project.xform_title
