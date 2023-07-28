@@ -724,8 +724,8 @@ async def download_form(project_id: int,
 @router.post("/update_category")
 async def update_project_category(
     # background_tasks: BackgroundTasks,
-    project_id: int,
-    category: str,
+    project_id: int = Form(...),
+    category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
     ):
