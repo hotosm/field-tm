@@ -2014,10 +2014,17 @@ async def update_project_form(
 
         # Create an odk xform
         result = central_crud.create_odk_xform(
-            odk_id, task, xform, odk_credentials, True, True
+            odk_id,
+            task, 
+            xform, 
+            odk_credentials, 
+            True, 
+            True, 
+            False
         )
 
     return True
+
 
 async def update_odk_credentials(project_instance: project_schemas.BETAProjectUpload, 
                           odk_central_cred: project_schemas.ODKCentral,
