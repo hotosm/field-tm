@@ -4,7 +4,7 @@ import CoreModules from "../../shared/CoreModules";
 const CreateProject = CoreModules.createSlice({
     name: 'createproject',
     initialState: {
-        editProjectDetails: {name:'',description:'',short_description:''},
+        editProjectDetails: { name: '', description: '', short_description: '' },
         editProjectResponse: null,
         projectDetails: { dimension: 10 },
         projectDetailsResponse: null,
@@ -21,9 +21,10 @@ const CreateProject = CoreModules.createSlice({
         createProjectStep: 1,
         dividedTaskLoading: false,
         dividedTaskGeojson: false,
-        formUpdateLoading:false,
+        formUpdateLoading: false,
         taskSplittingGeojsonLoading: false,
         taskSplittingGeojson: null,
+        updateBoundaryLoading: false,
     },
     reducers: {
         SetProjectDetails(state, action) {
@@ -76,7 +77,7 @@ const CreateProject = CoreModules.createSlice({
         },
         SetGenerateProjectQRSuccess(state, action) {
             state.generateQrSuccess = action.payload
-            
+
         },
         GenerateProjectLogLoading(state, action) {
             state.generateProjectLogLoading = action.payload
@@ -99,19 +100,19 @@ const CreateProject = CoreModules.createSlice({
         //EDIT Project
 
         SetIndividualProjectDetails(state, action) {
-            state.editProjectDetails= action.payload
+            state.editProjectDetails = action.payload
         },
         SetIndividualProjectDetailsLoading(state, action) {
-            state.projectDetailsLoading= action.payload
+            state.projectDetailsLoading = action.payload
         },
         SetPatchProjectDetails(state, action) {
-            state.editProjectResponse= action.payload
+            state.editProjectResponse = action.payload
         },
         SetPatchProjectDetailsLoading(state, action) {
-            state.editProjectDetailsLoading= action.payload
+            state.editProjectDetailsLoading = action.payload
         },
         SetPostFormUpdateLoading(state, action) {
-            state.formUpdateLoading= action.payload
+            state.formUpdateLoading = action.payload
         },
         GetTaskSplittingPreviewLoading(state, action) {
             state.taskSplittingGeojsonLoading = action.payload
@@ -119,6 +120,9 @@ const CreateProject = CoreModules.createSlice({
         GetTaskSplittingPreview(state, action) {
             state.dividedTaskGeojson = action.payload
             state.taskSplittingGeojson = action.payload
+        },
+        SetEditProjectBoundaryServiceLoading(state, action) {
+            state.updateBoundaryLoading = action.payload
         },
     }
 })

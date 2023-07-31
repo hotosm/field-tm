@@ -55,6 +55,7 @@ class BETAProjectUpload(BaseModel):
     project_info: ProjectInfo
     xform_title: Union[str, None]
     odk_central: ODKCentral
+    hashtags: Union[List[str], None]
     # city: str
     # country: str
 
@@ -71,6 +72,7 @@ class ProjectSummary(BaseModel):
     tasks_mapped: int = None
     tasks_validated: int = None
     tasks_bad: int = None
+    hashtags: List[str] = None
 
     class Config:
         orm_mode = True
@@ -86,6 +88,7 @@ class ProjectBase(BaseModel):
     outline_geojson: Feature = None
     project_tasks: List[tasks_schemas.Task] = None
     xform_title: str = None
+    hashtags: List[str] = None
 
     class Config:
         orm_mode = True
