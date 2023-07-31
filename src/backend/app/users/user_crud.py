@@ -149,3 +149,8 @@ async def create_user_roles(user_role: user_schemas.UserRoles, db: Session):
     db.commit()
     db.refresh(db_user_role)
     return db_user_role
+
+
+def get_user_by_id(db: Session, user_id: int):
+    db_user = db.query(db_models.DbUser).filter(db_models.DbUser.id == user_id).first()
+    return db_user

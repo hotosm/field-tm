@@ -211,7 +211,7 @@ const Home = () => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
-          `${environment.baseApiUrl}/projects/download_form/${decodedId}`, downloadType
+          `${environment.baseApiUrl}/projects/download_form/${decodedId}/`, downloadType
         )
       );
     } else if (downloadType === 'geojson') {

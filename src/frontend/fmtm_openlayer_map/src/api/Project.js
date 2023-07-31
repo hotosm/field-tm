@@ -29,6 +29,7 @@ export const ProjectById = (url, existingProjectList) => {
         );
         dispatch(
           ProjectActions.SetProjectInfo({id:resp.id,
+            outline_geojson: resp.outline_geojson,
             priority:resp.priority || 2,
             priority_str:resp.priority_str || "MEDIUM",
             title:resp.project_info?.[0]?.name,
@@ -57,9 +58,14 @@ export const DownloadProjectForm = (url,payload) => {
 
       const fetchProjectForm = async (url,payload) => {
           try {
-              const response = await CoreModules.axios.get(url, {
+            let response;
+            if(payload=== 'form'){
+              response = await CoreModules.axios.get(url,{responseType : 'blob'});
+            }else{
+              response = await CoreModules.axios.get(url, {
                 responseType : 'blob',
               });
+            }
               var a = document.createElement("a");
               a.href = window.URL.createObjectURL(response.data);
               a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;

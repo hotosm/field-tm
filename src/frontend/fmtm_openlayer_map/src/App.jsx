@@ -1,5 +1,4 @@
 
-import React from "react";
 import './index.css'
 import ReactDOM from "react-dom";
 import { store } from "fmtm/Store";

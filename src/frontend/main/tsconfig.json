@@ -12,16 +12,18 @@
     "skipLibCheck": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    // "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    // "jsx": "react-jsx",
+    "jsx": "react",
     "baseUrl": "./src/",
-    "noImplicitAny": false,
+    "noImplicitAny": false, //FIXME: Change This "true" to "false" To Integrate Types Instead Of "Any" Types.
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
@@ -32,9 +34,11 @@
     "noUnusedParameters": true,
   },
   "include": [
-    ".eslintrc.cjs",
+    // ".eslintrc.cjs",
+    // ".eslintrc.js",
     "src",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "tests"
   ],
   "exclude": [
     "node_modules",
