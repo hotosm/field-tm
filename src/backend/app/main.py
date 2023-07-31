@@ -28,7 +28,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from osm_fieldwork.xlsforms import xlsforms_path
-from osm_fieldwork.xlsforms import xlsforms_path
 
 from .__version__ import __version__
 from .auth import auth_routes
@@ -87,7 +86,6 @@ def get_application() -> FastAPI:
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organization_routes.router)
-
 
     return _app
 
