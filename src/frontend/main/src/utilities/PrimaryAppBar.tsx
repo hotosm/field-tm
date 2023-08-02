@@ -173,18 +173,18 @@ export default function PrimaryAppBar() {
                   color="info"
                   onClick={() => createLoginWindow('/')}
                 >
-                  Test OSM Sign in
+                  Sign in
                 </CoreModules.Button>
-                <CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
+                {/* <CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
                   <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
                     Sign in
                   </CoreModules.Button>
-                </CoreModules.Link>
-                <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
+                </CoreModules.Link> */}
+                {/* <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
                   <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
                     Sign up
                   </CoreModules.Button>
-                </CoreModules.Link>
+                </CoreModules.Link> */}
               </>
             )}
           </CoreModules.Stack>
