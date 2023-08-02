@@ -14,7 +14,7 @@ const EditProject: React.FC = () => {
   const dispatch = CoreModules.useDispatch();
   const [selectedTab, setSelectedTab] = useState('project-description');
   const params = CoreModules.useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
@@ -22,7 +22,7 @@ const EditProject: React.FC = () => {
   const tabHover = {
     '&:hover': {
       background: defaultTheme.palette.grey.light,
-      cursor: 'pointer'
+      cursor: 'pointer',
     },
   };
   useEffect(() => {
@@ -31,8 +31,7 @@ const EditProject: React.FC = () => {
     if (decodedProjectId) {
       dispatch(GetIndividualProjectDetails(`${environment.baseApiUrl}/projects/${decodedProjectId}`));
     }
-  }, [decodedProjectId])
-
+  }, [decodedProjectId]);
 
   return (
     <div>
@@ -46,27 +45,42 @@ const EditProject: React.FC = () => {
             }}
             color="info"
           >
-            <AssetModules.ArrowBackIcon color='info' sx={{ fontSize: '30px' }} />
-            <CoreModules.Typography ml={2} variant="h1" >
+            <AssetModules.ArrowBackIcon color="info" sx={{ fontSize: '30px' }} />
+            <CoreModules.Typography ml={2} variant="h1">
               Back
             </CoreModules.Typography>
           </CoreModules.IconButton>
-          <CoreModules.Typography variant="subtitle2" color={'info'} sx={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }} ml={'3%'} mt={3}>
+          <CoreModules.Typography
+            variant="subtitle2"
+            color={'info'}
+            sx={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            ml={'3%'}
+            mt={3}
+          >
             Edit Project
           </CoreModules.Typography>
         </CoreModules.Stack>
         <CoreModules.Stack flexDirection="row">
           <CoreModules.Stack sx={{ m: 4, display: 'flex', flex: '20%', gap: 1 }}>
-            {SidebarContent.map((content) =>
-              <CoreModules.Typography onClick={() => setSelectedTab(content.slug)} sx={{ p: 1, ...tabHover, backgroundColor: selectedTab === content.slug ? defaultTheme.palette.grey.light : 'white' }} variant="subtitle2">
+            {SidebarContent.map((content) => (
+              <CoreModules.Typography
+                key={content.slug}
+                onClick={() => setSelectedTab(content.slug)}
+                sx={{
+                  p: 1,
+                  ...tabHover,
+                  backgroundColor: selectedTab === content.slug ? defaultTheme.palette.grey.light : 'white',
+                }}
+                variant="subtitle2"
+              >
                 {content.name}
               </CoreModules.Typography>
-            )}
+            ))}
           </CoreModules.Stack>
           <CoreModules.Stack sx={{ display: 'flex', flex: '80%', p: 3 }}>
             {selectedTab === 'project-description' ? <EditProjectDetails projectId={decodedProjectId} /> : null}
