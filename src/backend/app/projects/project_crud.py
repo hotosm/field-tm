@@ -598,7 +598,7 @@ def get_osm_extracts(boundary: str):
 
 
 async def split_into_tasks(
-    db: Session, boundary: str
+    db: Session, boundary: str, no_of_buildings:int
 ):
 
     project_id = uuid.uuid4()
@@ -655,7 +655,10 @@ async def split_into_tasks(
     with open('app/db/split_algorithm.sql', 'r') as sql_file:
         query = sql_file.read()
 
-    result = db.execute(query)
+    # Execute the query with the parameter using the `params` parameter
+    result = db.execute(query, params={'num_buildings': no_of_buildings})
+
+    # result = db.execute(query)
     data = result.fetchall()[0]
     final_geojson = data['jsonb_build_object']
 
