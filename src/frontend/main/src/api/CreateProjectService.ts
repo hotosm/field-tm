@@ -304,7 +304,7 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
   };
 };
 
-const TaskSplittingPreviewService: Function = (url: string, fileUpload: any) => {
+const TaskSplittingPreviewService: Function = (url: string, fileUpload: any, no_of_buildings: string) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
 
@@ -312,6 +312,8 @@ const TaskSplittingPreviewService: Function = (url: string, fileUpload: any) => 
       try {
         const taskSplittingFileFormData = new FormData();
         taskSplittingFileFormData.append('upload', fileUpload);
+        taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
+
         const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
         const resp: OrganisationListModel = getTaskSplittingResponse.data;
         dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
