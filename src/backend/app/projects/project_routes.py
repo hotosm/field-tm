@@ -343,6 +343,7 @@ async def task_split(
     ):
 
     # read entire file
+    await upload.seek(0)
     content = await upload.read()
 
     result = await project_crud.split_into_tasks(db, content)
