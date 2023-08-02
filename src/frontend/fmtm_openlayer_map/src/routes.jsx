@@ -1,4 +1,3 @@
-import React from 'react';
 import MainView from './views/MainView';
 import Home from './views/Home';
 import CoreModules from 'fmtm/CoreModules';

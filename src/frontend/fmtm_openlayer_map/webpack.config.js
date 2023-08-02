@@ -15,14 +15,13 @@ module.exports = (webpackEnv) => {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
     // bail: isEnvProduction,
-    devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'inline-source-map',
+    devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'eval-source-map',
     output: {
       publicPath: `${process.env.FRONTEND_MAP_URL}/`,
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].bundle.js",
       clean:true
     },
-    devtool: "source-map",
     resolve: {
       extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
     },

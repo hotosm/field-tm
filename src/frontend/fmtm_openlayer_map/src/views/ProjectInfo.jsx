@@ -58,7 +58,7 @@ const ProjectInfo = () => {
   const handleConvert = () => {
     dispatch(
       fetchConvertToOsmDetails(
-        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&task_id=${selectedTask}`
+        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&${selectedTask ?`task_id=${selectedTask}`:''}`
       )
     );
   };

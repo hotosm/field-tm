@@ -217,9 +217,14 @@ def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_cred
 
 
 def create_odk_xform(
-    project_id: int, xform_id: str, filespec: str, odk_credentials: project_schemas.ODKCentral = None,
-    draft: bool = False,
-    upload_media = True
+    project_id: int, 
+    xform_id: str, 
+    filespec: str, 
+    odk_credentials: project_schemas.ODKCentral = None,
+    create_draft: bool = False,
+    upload_media = True,
+    convert_to_draft_when_publishing = True
+
 ):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
@@ -245,7 +250,7 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.createForm(project_id, xform_id, filespec, draft)
+    result = xform.createForm(project_id, xform_id, filespec, create_draft)
 
     if result != 200 and result != 409:
         return result
@@ -254,7 +259,11 @@ def create_odk_xform(
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     if upload_media:
-        result = xform.uploadMedia(project_id, title, data)
+        result = xform.uploadMedia(project_id, 
+                                   title, 
+                                   data, 
+                                   convert_to_draft_when_publishing
+                                   )
 
     result = xform.publishForm(project_id, title)
     return result

@@ -39,6 +39,7 @@ export const ProjectById = (url, existingProjectList) => {
             total_tasks:resp.total_tasks,
             tasks_mapped:resp.tasks_mapped,
             tasks_validated:resp.tasks_validated,
+            xform_title:resp.xform_title,
             tasks_bad:resp.tasks_bad})
         );
       } catch (error) {
@@ -58,9 +59,14 @@ export const DownloadProjectForm = (url,payload) => {
 
       const fetchProjectForm = async (url,payload) => {
           try {
-              const response = await CoreModules.axios.get(url, {
+            let response;
+            if(payload=== 'form'){
+              response = await CoreModules.axios.get(url,{responseType : 'blob'});
+            }else{
+              response = await CoreModules.axios.get(url, {
                 responseType : 'blob',
               });
+            }
               var a = document.createElement("a");
               a.href = window.URL.createObjectURL(response.data);
               a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;
