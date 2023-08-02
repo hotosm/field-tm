@@ -39,6 +39,7 @@ export const ProjectById = (url, existingProjectList) => {
             total_tasks:resp.total_tasks,
             tasks_mapped:resp.tasks_mapped,
             tasks_validated:resp.tasks_validated,
+            xform_title:resp.xform_title,
             tasks_bad:resp.tasks_bad})
         );
       } catch (error) {

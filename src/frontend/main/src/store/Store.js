@@ -25,8 +25,8 @@ export default function persist(key, whitelist, reducer) {
 }
 
 const reducers = CoreModules.combineReducers({
-  project: persist('project', ['project'], ProjectSlice.reducer),
-  login: persist('login', ['login'], LoginSlice.reducer),
+  project: persist('project', ['project', 'projectInfo'], ProjectSlice.reducer),
+  login: persist('login', ['loginToken', 'authDetails'], LoginSlice.reducer),
   //you can persist your auth reducer here similar to project reducer
   home: HomeSlice.reducer,
   theme: ThemeSlice.reducer,

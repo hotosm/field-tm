@@ -71,10 +71,10 @@ if (process.env.NODE_ENV === 'production') {
     });
   }
 }
-if (process.env.NODE_ENV === 'development') {
-  navigator.serviceWorker.getRegistrations().then(function (registrations) {
-    for (let registration of registrations) {
-      registration.unregister();
-    }
-  });
-}
+// if (process.env.NODE_ENV === 'development') {
+//   navigator.serviceWorker.getRegistrations().then(function (registrations) {
+//     for (let registration of registrations) {
+//       registration.unregister();
+//     }
+//   });
+// }
