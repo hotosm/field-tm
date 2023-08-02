@@ -124,7 +124,11 @@ const DataExtract: React.FC<any> = ({
                   }}
                 >
                   {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                  {formCategoryData?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                  {formCategoryData?.map((form) => (
+                    <MenuItem key={form.label} value={form.value}>
+                      {form.label}
+                    </MenuItem>
+                  ))}
                 </Select>
                 {errors.xform_title && (
                   <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
@@ -164,7 +168,11 @@ const DataExtract: React.FC<any> = ({
                   }}
                 >
                   {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                  {dataExtractOptions?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                  {dataExtractOptions?.map((form) => (
+                    <MenuItem key={form.label} value={form.value}>
+                      {form.label}
+                    </MenuItem>
+                  ))}
                 </Select>
                 {errors.data_extract_options && (
                   <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
@@ -229,7 +237,11 @@ const DataExtract: React.FC<any> = ({
                     }}
                   >
                     {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                    {selectExtractWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                    {selectExtractWays?.map((form) => (
+                      <MenuItem key={form.label} value={form.value}>
+                        {form.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                   {errors.data_extractWays && (
                     <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
