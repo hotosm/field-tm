@@ -14,7 +14,13 @@ import DataExtractValidation from './validation/DataExtractValidation';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb: any = null;
 
-const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFile, setDataExtractFile, setDataExtractFileValue }) => {
+const DataExtract: React.FC<any> = ({
+  geojsonFile,
+  setGeojsonFile,
+  dataExtractFile,
+  setDataExtractFile,
+  setDataExtractFileValue,
+}) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -119,7 +125,9 @@ const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
                 >
                   {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
                   {formCategoryData?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
+                    <MenuItem key={form.label} value={form.value}>
+                      {form.label}
+                    </MenuItem>
                   ))}
                 </Select>
                 {errors.xform_title && (
@@ -161,7 +169,9 @@ const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
                 >
                   {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
                   {dataExtractOptions?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
+                    <MenuItem key={form.label} value={form.value}>
+                      {form.label}
+                    </MenuItem>
                   ))}
                 </Select>
                 {errors.data_extract_options && (
@@ -171,74 +181,83 @@ const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
                 )}
               </CoreModules.FormControl>
               {/* Area Geojson File Upload For Create Project */}
-              {values.data_extract_options === 'Upload Custom Data Extract' && <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
-                <CoreModules.FormLabel>Upload Custom Data Extract </CoreModules.FormLabel>
-                <CoreModules.Button variant="contained" component="label">
-                  <CoreModules.Input
-                    sx={{ color: 'white' }}
-                    type="file"
-                    value={setDataExtractFileValue}
-                    onChange={(e) => {
-                      setDataExtractFile(e.target.files[0]);
-                      handleCustomChange('data_extractFile', e.target.files[0]);
+              {values.data_extract_options === 'Upload Custom Data Extract' && (
+                <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
+                  <CoreModules.FormLabel>Upload Custom Data Extract </CoreModules.FormLabel>
+                  <CoreModules.Button variant="contained" component="label">
+                    <CoreModules.Input
+                      sx={{ color: 'white' }}
+                      type="file"
+                      value={setDataExtractFileValue}
+                      onChange={(e) => {
+                        setDataExtractFile(e.target.files[0]);
+                        handleCustomChange('data_extractFile', e.target.files[0]);
+                      }}
+                    />
+                    <CoreModules.Typography component="h4">{dataExtractFile?.name}</CoreModules.Typography>
+                  </CoreModules.Button>
+                  {errors.data_extractFile && (
+                    <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                      {errors.data_extractFile}
+                    </CoreModules.FormLabel>
+                  )}
+                </CoreModules.FormControl>
+              )}
+
+              {values.data_extract_options === 'Data Extract Ways' && (
+                <CoreModules.FormControl sx={{ mb: 3 }}>
+                  <InputLabel
+                    id="form-category"
+                    sx={{
+                      '&.Mui-focused': {
+                        color: defaultTheme.palette.black,
+                      },
                     }}
-                  />
-                  <CoreModules.Typography component="h4">{dataExtractFile?.name}</CoreModules.Typography>
-                </CoreModules.Button>
-                {errors.data_extractFile && (
-                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                    {errors.data_extractFile}
-                  </CoreModules.FormLabel>
-                )}
-              </CoreModules.FormControl>}
-
-
-              {values.data_extract_options === 'Data Extract Ways' && <CoreModules.FormControl sx={{ mb: 3 }}>
-                <InputLabel
-                  id="form-category"
-                  sx={{
-                    '&.Mui-focused': {
-                      color: defaultTheme.palette.black,
-                    },
-                  }}
-                >
-                  Data Extract Type
-                </InputLabel>
-                <Select
-                  labelId="data_extractWays-label"
-                  id="data_extractWays"
-                  value={values.data_extractWays}
-                  label="Data Extract Category"
-                  sx={{
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      border: '2px solid black',
-                    },
-                  }}
-                  onChange={(e) => {
-                    handleCustomChange('data_extractWays', e.target.value);
-                    dispatch(
-                      CreateProjectActions.SetIndividualProjectDetailsData({
-                        ...projectDetails,
-                        data_extractWays: e.target.value,
-                      }),
-                    );
-                  }}
-                >
-                  {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
-                  {selectExtractWays?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
-                  ))}
-                </Select>
-                {errors.data_extractWays && (
-                  <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                    {errors.data_extractWays}
-                  </CoreModules.FormLabel>
-                )}
-              </CoreModules.FormControl>}
+                  >
+                    Data Extract Type
+                  </InputLabel>
+                  <Select
+                    labelId="data_extractWays-label"
+                    id="data_extractWays"
+                    value={values.data_extractWays}
+                    label="Data Extract Category"
+                    sx={{
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        border: '2px solid black',
+                      },
+                    }}
+                    onChange={(e) => {
+                      handleCustomChange('data_extractWays', e.target.value);
+                      dispatch(
+                        CreateProjectActions.SetIndividualProjectDetailsData({
+                          ...projectDetails,
+                          data_extractWays: e.target.value,
+                        }),
+                      );
+                    }}
+                  >
+                    {/* onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'xform_title', value: e.target.value }))} > */}
+                    {selectExtractWays?.map((form) => (
+                      <MenuItem key={form.label} value={form.value}>
+                        {form.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.data_extractWays && (
+                    <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                      {errors.data_extractWays}
+                    </CoreModules.FormLabel>
+                  )}
+                </CoreModules.FormControl>
+              )}
             </Grid>
             <Grid item md={8}>
               <CoreModules.Stack>
-                <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile} uploadedDataExtractFile={dataExtractFile} />
+                <DefineAreaMap
+                  uploadedGeojson={geojsonFile}
+                  setGeojsonFile={setGeojsonFile}
+                  uploadedDataExtractFile={dataExtractFile}
+                />
               </CoreModules.Stack>
             </Grid>
           </Grid>
@@ -262,7 +281,7 @@ const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
             {/* Submit Button For Create Project on Area Upload */}
             <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <CoreModules.LoadingButton
-                // disabled={projectDetailsLoading}               
+                // disabled={projectDetailsLoading}
                 type="submit"
                 // loading={projectDetailsLoading}
                 // loadingPosition="end"
@@ -272,7 +291,6 @@ const DataExtract: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
               >
                 Next
               </CoreModules.LoadingButton>
-
             </CoreModules.Stack>
             {/* END */}
           </CoreModules.Stack>

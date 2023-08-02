@@ -6,7 +6,8 @@
     "build:dev": "webpack --mode development",
     "build:start": "cd dist && PORT=8080 npx serve",
     "start": "env-cmd -f .env.dev webpack serve --open --mode development",
-    "start:live": "webpack serve --open --mode development --live-reload --hot"
+    "start:live": "webpack serve --open --mode development --live-reload --hot",
+    "test": "jest tests/"
   },
   "license": "MIT",
   "author": {
@@ -24,9 +25,13 @@
     "autoprefixer": "^10.1.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-import": "^1.13.6",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.3.0",
     "css-minimizer-webpack-plugin": "^4.2.2",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-react": "^7.33.0",
     "html-webpack-plugin": "^5.3.2",
+    "jest-environment-jsdom": "^29.6.1",
     "postcss": "^8.2.1",
     "postcss-loader": "^4.1.0",
     "prettier": "^3.0.0",
@@ -37,16 +42,18 @@
     "webpack": "^5.57.1",
     "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^4.9.0",
-    "webpack-dev-server": "^4.3.1"
+    "webpack-dev-server": "^4.3.1",
+    "workbox-webpack-plugin": "^7.0.0"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.11.1",
     "@reduxjs/toolkit": "^1.9.1",
-    "@sentry/browser": "^7.59.2",
+    "@sentry/react": "^7.59.3",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^12.1.5",
+    "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "axios": "^1.2.2",
@@ -54,8 +61,8 @@
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-react": "^7.32.2",
     "install": "^0.13.0",
+    "jest": "^29.6.1",
     "mini-css-extract-plugin": "^2.7.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -66,5 +73,16 @@
     "react-spinners": "^0.13.8",
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "^components\/(.*)$": "<rootDir>/src/components/$1",
+      "^.+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+        "<rootDir>/tests/mocks/fileMock.ts",
+      "^.+\\.(css|less|scss|sass)$": "<rootDir>/tests/mocks/styleMock.ts",
+      "(assets|models|services)": "<rootDir>/tests/mocks/fileMock.ts"
+    },
+    "setupFilesAfterEnv": ["./setupTests.js"]
   }
 }
