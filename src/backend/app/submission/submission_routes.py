@@ -146,3 +146,48 @@ async def get_submission_count(
     db: Session = Depends(database.get_db),
     ):
     return await submission_crud.get_submission_count_of_a_project(db, project_id)
+
+
+@router.post("/conflate_data")
+async def conflate_osm_date(
+    extracts: UploadFile = File(...),
+    upload: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+    ):
+
+    await upload.seek(0)
+    content = await upload.read()
+
+    await extracts.seek(0)
+    data_extracts = await extracts.read()
+
+    data_extracts = json.loads(data_extracts.decode())
+
+
+    # Data extracts file
+    data_extracts_file = "/tmp/data_extracts_file.geojson"
+    # Write to file
+    with open(data_extracts_file, 'w') as f:
+        json.dump(data_extracts, f)
+
+    # Output file
+    outfile = "/tmp/output_file.osm"
+
+    # JSON FILE PATH
+    jsoninfile = "/tmp/json_infile.json"
+
+    # Write to file
+    content = content.decode()
+    with open(jsoninfile, 'w') as f:
+        f.write(content)
+
+    osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
+
+    odkf = OsmFile(outfile) # output file
+
+    osm = odkf.loadFile(osmoutfile) # input file
+
+    odk_merge = OdkMerge(data_extracts_file,None)
+    data = odk_merge.conflateData(osm)
+
+    return data
