@@ -3,7 +3,7 @@ import '../styles/home.css';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import environment from '../environment';
-import { GetIndividualProjectDetails, OrganisationService } from '../api/CreateProjectService';
+import { FormCategoryService, GetIndividualProjectDetails, OrganisationService } from '../api/CreateProjectService';
 import EditProjectDetails from '../components/editproject/EditProjectDetails';
 import SidebarContent from '../constants/EditProjectSidebarContent';
 import { useNavigate } from 'react-router-dom';
