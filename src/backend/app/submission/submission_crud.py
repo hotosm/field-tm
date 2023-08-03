@@ -145,6 +145,9 @@ async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
     # Get the submission data from ODK Central
     file = xform.getSubmissions(odk_id, form_id, None, False, True)
 
+    if file is None:
+        return None, None
+
     with open(file_path, "wb") as f:
         f.write(file)
 
@@ -221,16 +224,21 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     # Create a new ZIP file for the extracted files
     final_zip_file_path = f"{project_name}_{form_category}_osm.zip"
 
+    # Remove the ZIP file if it already exists
+    if os.path.exists(final_zip_file_path):
+        os.remove(final_zip_file_path)
+
     for task in tasks:
         xml_form_id = f"{project_name}_{form_category}_{task}".split("_")[2]
 
         # Get the osm xml and geojson files for the task
         osmoutfile, jsonoutfile = await convert_to_osm_for_task(odkid, xml_form_id, xform)
 
-        # Add the files to the ZIP file
-        with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
-            final_zip_file.write(osmoutfile)
-            final_zip_file.write(jsonoutfile)
+        if osmoutfile and jsonoutfile:
+            # Add the files to the ZIP file
+            with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
+                final_zip_file.write(osmoutfile)
+                final_zip_file.write(jsonoutfile)
 
     return FileResponse(final_zip_file_path)
 
