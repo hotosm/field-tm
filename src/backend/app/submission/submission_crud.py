@@ -328,6 +328,47 @@ def download_submission_for_project(db, project_id):
     return final_zip_file_path
 
 
+def get_project_submission(db: Session, project_id: int):
+    project_info = project_crud.get_project(db, project_id)
+
+    # Return empty list if project is not found
+    if not project_info:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    odkid = project_info.odkid
+    project_name = project_info.project_name_prefix
+    form_category = project_info.xform_title
+    project_tasks = project_info.tasks
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project_info.odk_central_url,
+        odk_central_user=project_info.odk_central_user,
+        odk_central_password=project_info.odk_central_password,
+    )
+
+    # Get ODK Form with odk credentials from the project.
+    xform = get_odk_form(odk_credentials)
+
+    submissions = []
+
+    task_list = [x.id for x in project_tasks]
+    for id in task_list:
+        xml_form_id = f"{project_name}_{form_category}_{id}".split("_")[
+            2]
+        file = xform.getSubmissions(
+            odkid, xml_form_id, None, False, True)
+        if not file:
+            json_data = None
+        else:
+            json_data = json.loads(file)
+            json_data_value = json_data.get('value')
+            if json_data_value:
+                submissions.extend(json_data_value)
+
+    return submissions
+
+
 def download_submission(db: Session, project_id: int, task_id: int, export_json: bool):
 
     project_info = project_crud.get_project(db, project_id)
