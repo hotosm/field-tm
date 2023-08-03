@@ -37,6 +37,10 @@ const ProjectDetailsForm: React.FC = () => {
     // dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
+
+
+
+
   const submission = () => {
     // submitForm();
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
@@ -49,6 +53,8 @@ const ProjectDetailsForm: React.FC = () => {
     submission,
     CreateProjectValidation,
   );
+
+
 
   const inputFormStyles = () => {
     return {
@@ -67,11 +73,11 @@ const ProjectDetailsForm: React.FC = () => {
     dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   };
   useEffect(() => {
-    window.addEventListener('focus', onFocus);
-    onFocus();
+    window.addEventListener("focus", onFocus);
+    onFocus()
     // Calls onFocus when the window first loads
     return () => {
-      window.removeEventListener('focus', onFocus);
+      window.removeEventListener("focus", onFocus);
       // window.removeEventListener("blur", onBlur);
     };
   }, []);
@@ -133,9 +139,7 @@ const ProjectDetailsForm: React.FC = () => {
                 }}
               >
                 {organizationList?.map((org) => (
-                  <MenuItem key={org.value} value={org.value}>
-                    {org.label}
-                  </MenuItem>
+                  <MenuItem value={org.value}>{org.label}</MenuItem>
                 ))}
               </Select>
               <CoreModules.IconButton
@@ -146,13 +150,7 @@ const ProjectDetailsForm: React.FC = () => {
                 aria-label="download qrcode"
               >
                 <AssetModules.AddIcon
-                  sx={{
-                    fontSize: 25,
-                    border: '1px solid',
-                    borderRadius: '20px',
-                    backgroundColor: defaultTheme.palette.success.main,
-                    color: 'white',
-                  }}
+                  sx={{ fontSize: 25, border: '1px solid', borderRadius: '20px', backgroundColor: defaultTheme.palette.success.main, color: 'white', }}
                 />
               </CoreModules.IconButton>
             </CoreModules.Stack>
@@ -297,37 +295,6 @@ const ProjectDetailsForm: React.FC = () => {
           </CoreModules.FormControl>
           {/* END */}
 
-          {/* Project Name Form Input For Create Project */}
-          <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
-              <CoreModules.FormLabel component="h3">Hashtag</CoreModules.FormLabel>
-            </CoreModules.Box>
-            <CoreModules.TextField
-              id="hashtags"
-              name="hashtags"
-              type="hashtags"
-              autoComplete="on"
-              label=""
-              variant="outlined"
-              inputProps={{ sx: { padding: '8.5px 14px' } }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'black',
-                  },
-                },
-              }}
-              value={values.hashtags}
-              onChange={(e) => {
-                handleCustomChange('hashtags', e.target.value);
-              }}
-              helperText={errors.odk_central_url}
-              FormHelperTextProps={inputFormStyles()}
-            />
-            {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
-          </CoreModules.FormControl>
-          {/* END */}
-
           {/* Short Description Form Input For Create Project */}
           <CoreModules.FormControl sx={{ mb: 3, width: { md: '50%', lg: '50%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -408,7 +375,7 @@ const ProjectDetailsForm: React.FC = () => {
       <CustomizedModal isOpen={openOrganizationModal} toggleOpen={setOpenOrganizationModal}>
         <OrganizationAddForm />
       </CustomizedModal>
-    </CoreModules.Stack>
+    </CoreModules.Stack >
   );
 };
 export default ProjectDetailsForm;
