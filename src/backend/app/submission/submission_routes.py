@@ -15,11 +15,17 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
-from fastapi import APIRouter, Depends
+import os
+import json
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Response
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
+from .submission_crud import convert_json_to_osm
+from osm_fieldwork.odk_merge import OdkMerge
+from osm_fieldwork.osmfile import OsmFile
+from ..projects import project_crud
+
 
 from ..db import database
 from . import submission_crud
@@ -150,57 +156,50 @@ async def get_submission_count(
 
 @router.post("/conflate_data")
 async def conflate_osm_date(
-    extracts: UploadFile = File(...),
-    upload: UploadFile = File(...),
+    project_id: int,
     db: Session = Depends(database.get_db),
     ):
 
-    await upload.seek(0)
-    content = await upload.read()
+    # Submission JSON
+    submission = submission_crud.get_project_submission(db, project_id)
 
-    await extracts.seek(0)
-    data_extracts = await extracts.read()
-
-    data_extracts = json.loads(data_extracts.decode())
-
-
-    # Data extracts file
+    # Data extracta file
     data_extracts_file = "/tmp/data_extracts_file.geojson"
-    # Write to file
-    with open(data_extracts_file, 'w') as f:
-        json.dump(data_extracts, f)
+
+    await project_crud.get_extracted_data_from_db(db, project_id, data_extracts_file)
 
     # Output file
     outfile = "/tmp/output_file.osm"
-
     # JSON FILE PATH
     jsoninfile = "/tmp/json_infile.json"
 
-    # Write to file
-    content = content.decode()
-    with open(jsoninfile, 'w') as f:
-        f.write(content)
+    # # Delete if these files already exist
+    if os.path.exists(outfile):
+        os.remove(outfile)
+    if os.path.exists(jsoninfile):
+        os.remove(jsoninfile)
 
+    # Write the submission to a file
+    with open(jsoninfile, 'w') as f:
+        f.write(json.dumps(submission))
+
+    # Convert the submission to osm xml format
     osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
 
-    # Read the contents of osmoutfile
+    # Remove the extra closing </osm> tag from the end of the file
     with open(osmoutfile, 'r') as f:
         osmoutfile_data = f.read()
-
         # Find the last index of the closing </osm> tag
         last_osm_index = osmoutfile_data.rfind('</osm>')
-
         # Remove the extra closing </osm> tag from the end
         processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
-
+    
     # Write the modified XML data back to the file
     with open(osmoutfile, 'w') as f:
         f.write(processed_xml_string)
 
-    odkf = OsmFile(outfile) # output file
-
-    osm = odkf.loadFile(osmoutfile) # input file
-
+    odkf = OsmFile(outfile)
+    osm = odkf.loadFile(osmoutfile)
     odk_merge = OdkMerge(data_extracts_file,None)
     data = odk_merge.conflateData(osm)
 
