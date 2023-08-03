@@ -14,9 +14,9 @@ import LoadingBar from './LoadingBar';
 import environment from '../../environment';
 
 // import { SelectPicker } from 'rsuite';
-let generateProjectLogIntervalCb:any = null;
+let generateProjectLogIntervalCb: any = null;
 
-const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, customFormInputValue,dataExtractFile }) => {
+const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, customFormInputValue, dataExtractFile }) => {
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -64,7 +64,15 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
     const newDividedTaskGeojson = JSON.stringify(dividedTaskGeojson);
     const parsedNewDividedTaskGeojson = JSON.parse(newDividedTaskGeojson);
     const exparsedNewDividedTaskGeojson = JSON.stringify(parsedNewDividedTaskGeojson);
-    var newUpdatedTaskGeojsonFile = new File([exparsedNewDividedTaskGeojson], "AOI.geojson", {type: "application/geo+json" })
+    var newUpdatedTaskGeojsonFile = new File([exparsedNewDividedTaskGeojson], 'AOI.geojson', {
+      type: 'application/geo+json',
+    });
+    const hashtags = projectDetails.hashtags;
+    const arrayHashtag = hashtags
+      .split('#')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
     // console.log(f,'file F');
     // setGeojsonFile(f);
     dispatch(
@@ -93,10 +101,11 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
           form_ways: projectDetails.form_ways,
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
+          hashtags: arrayHashtag,
         },
         newUpdatedTaskGeojsonFile,
         customFormFile,
-        dataExtractFile
+        dataExtractFile,
       ),
     );
     // navigate("/select-form", { replace: true, state: { values: values } });
@@ -107,7 +116,7 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
-      generateProjectLogIntervalCb = null
+      generateProjectLogIntervalCb = null;
       dispatch(CreateProjectActions.SetGenerateProjectLog(null));
     };
   }, []);
@@ -129,7 +138,7 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
   useEffect(() => {
     if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
       clearInterval(generateProjectLogIntervalCb);
-      const encodedProjectId =  environment.encode(projectDetailsResponse?.id)
+      const encodedProjectId = environment.encode(projectDetailsResponse?.id);
       navigate(`/project_details/${encodedProjectId}`);
       dispatch(
         CommonActions.SetSnackBar({
@@ -235,9 +244,7 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
                   }}
                   // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
-                  {selectFormWays?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
-                  ))}
+                  {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
                 </Select>
                 {errors.form_ways && (
                   <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
@@ -258,13 +265,11 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
-                      
                       value={customFormInputValue}
                       onChange={(e) => {
                         setCustomFormFile(e.target.files[0]);
                       }}
-                      inputProps={{ "accept":".xml, .xls, .xlsx" }}
-
+                      inputProps={{ accept: '.xml, .xls, .xlsx' }}
                     />
                     <CoreModules.Typography component="h4">{customFormFile?.name}</CoreModules.Typography>
                   </CoreModules.Button>
@@ -329,19 +334,18 @@ const FormSelection: React.FC<any> = ({ customFormFile,setCustomFormFile, custom
             {/* END */}
 
             {/* Submit Button For Create Project on Area Upload */}
-            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}> 
-            <CoreModules.LoadingButton
-              disabled={projectDetailsLoading}               
-              type="submit"
-              loading={projectDetailsLoading}
-              loadingPosition="end"
-              endIcon={<AssetModules.SettingsSuggestIcon />}
-              variant="contained"                            
-              color="error"
+            <CoreModules.Stack sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <CoreModules.LoadingButton
+                disabled={projectDetailsLoading}
+                type="submit"
+                loading={projectDetailsLoading}
+                loadingPosition="end"
+                endIcon={<AssetModules.SettingsSuggestIcon />}
+                variant="contained"
+                color="error"
               >
                 Submit
               </CoreModules.LoadingButton>
-              
             </CoreModules.Stack>
             {/* END */}
           </CoreModules.Stack>
