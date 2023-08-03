@@ -183,6 +183,20 @@ async def conflate_osm_date(
 
     osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
 
+    # Read the contents of osmoutfile
+    with open(osmoutfile, 'r') as f:
+        osmoutfile_data = f.read()
+
+        # Find the last index of the closing </osm> tag
+        last_osm_index = osmoutfile_data.rfind('</osm>')
+
+        # Remove the extra closing </osm> tag from the end
+        processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
+
+    # Write the modified XML data back to the file
+    with open(osmoutfile, 'w') as f:
+        f.write(processed_xml_string)
+
     odkf = OsmFile(outfile) # output file
 
     osm = odkf.loadFile(osmoutfile) # input file
