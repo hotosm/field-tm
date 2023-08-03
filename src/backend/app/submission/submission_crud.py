@@ -422,8 +422,6 @@ def download_submission(db: Session, project_id: int, task_id: int, export_json:
 
             extracted_files = []
             for file_path in files:
-                print(file_path,'---filepath')
-                print(files,'---files')
                 with zipfile.ZipFile(file_path, "r") as zip_file:
                     zip_file.extractall(
                         os.path.splitext(file_path)[0]
@@ -462,7 +460,6 @@ def download_submission(db: Session, project_id: int, task_id: int, export_json:
                     2]
                 file = xform.getSubmissions(
                     odkid, xml_form_id, None, False, True)
-                print(file,'----file')
                 if not file:
                     json_data = None
                 else:
