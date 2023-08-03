@@ -23,9 +23,6 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
   const dispatch = CoreModules.useDispatch();
   // //dispatch function to perform redux state mutation
 
-  const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-  // //we use use-selector from redux to get all state of formCategory from createProject slice
-
   const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
@@ -34,11 +31,8 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
   }, []);
   // END
-  const selectExtractWaysList = ['Centroid', 'Polygon'];
-  const selectExtractWays = selectExtractWaysList.map((item) => ({ label: item, value: item }));
   const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
   const selectFormWays = selectFormWaysList.map((item) => ({ label: item, value: item }));
-  const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
   const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
   // //we use use-selector from redux to get all state of loginToken from login slice
 
@@ -244,7 +238,11 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
                   }}
                   // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
-                  {selectFormWays?.map((form) => <MenuItem value={form.value}>{form.label}</MenuItem>)}
+                  {selectFormWays?.map((form) => (
+                    <MenuItem key={form.value} value={form.value}>
+                      {form.label}
+                    </MenuItem>
+                  ))}
                 </Select>
                 {errors.form_ways && (
                   <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
