@@ -7,6 +7,7 @@ import { diffObject } from '../../utilfunctions/compareUtils.js';
 
 const UpdateForm = ({ projectId }) => {
   const dispatch = CoreModules.useDispatch();
+  const editProjectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.editProjectDetails);
   const [uploadForm, setUploadForm] = useState(null);
   const [selectedFormCategory, setSelectedFormCategory] = useState(null);
   const formUpdateLoading: any = CoreModules.useSelector<any>((state) => state.createproject.formUpdateLoading);
