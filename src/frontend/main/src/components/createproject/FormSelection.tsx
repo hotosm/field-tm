@@ -130,7 +130,17 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     }
   }, [generateQrSuccess]);
   useEffect(() => {
-    if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
+    if (generateQrSuccess && generateProjectLog?.status === 'FAILED') {
+      clearInterval(generateProjectLogIntervalCb);
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: `QR Generation Failed. ${generateProjectLog?.message}`,
+          variant: 'error',
+          duration: 10000,
+        }),
+      );
+    } else if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
       clearInterval(generateProjectLogIntervalCb);
       const encodedProjectId = environment.encode(projectDetailsResponse?.id);
       navigate(`/project_details/${encodedProjectId}`);
@@ -285,6 +295,15 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
                   <CoreModules.Stack
                     sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: { xs: '100%', md: '60%' }, pb: '2rem' }}
                   >
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                      <CoreModules.Typography component="h4">Status: </CoreModules.Typography>
+                      <CoreModules.Typography
+                        component="h4"
+                        sx={{ ml: 2, fontWeight: 'bold', borderRadius: '20px', border: '1px solid gray', p: 1 }}
+                      >
+                        {generateProjectLog.status}
+                      </CoreModules.Typography>
+                    </CoreModules.Stack>
                     <LoadingBar
                       title={'Task Progress'}
                       activeStep={generateProjectLog.progress}
