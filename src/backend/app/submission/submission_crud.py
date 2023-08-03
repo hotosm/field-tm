@@ -137,19 +137,7 @@ def create_zip_file(files, output_file_path):
     return output_file_path
 
 
-async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
-
-    # This file stores the submission data.
-    file_path = f"/tmp/{odk_id}_{form_id}.json"
-
-    # Get the submission data from ODK Central
-    file = xform.getSubmissions(odk_id, form_id, None, False, True)
-
-    if file is None:
-        return None, None
-
-    with open(file_path, "wb") as f:
-        f.write(file)
+async def convert_json_to_osm(file_path):
 
     jsonin = JsonDump()
     infile = Path(file_path)
@@ -189,7 +177,24 @@ async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
     jsonin.finishGeoJson()
     logger.info("Wrote OSM XML file: %r" % osmoutfile)
     logger.info("Wrote GeoJson file: %r" % jsonoutfile)
+    return osmoutfile, jsonoutfile
 
+
+async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
+
+    # This file stores the submission data.
+    file_path = f"/tmp/{odk_id}_{form_id}.json"
+
+    # Get the submission data from ODK Central
+    file = xform.getSubmissions(odk_id, form_id, None, False, True)
+
+    if file is None:
+        return None, None
+
+    with open(file_path, "wb") as f:
+        f.write(file)
+
+    osmoutfile, jsonoutfile = convert_json_to_osm(file_path)
     return osmoutfile, jsonoutfile
 
 
