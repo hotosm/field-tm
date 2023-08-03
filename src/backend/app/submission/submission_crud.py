@@ -194,7 +194,7 @@ async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
     with open(file_path, "wb") as f:
         f.write(file)
 
-    osmoutfile, jsonoutfile = convert_json_to_osm(file_path)
+    osmoutfile, jsonoutfile = await convert_json_to_osm(file_path)
     return osmoutfile, jsonoutfile
 
 
