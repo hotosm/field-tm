@@ -162,26 +162,26 @@ const TasksSubmission = () => {
         <CoreModules.Box sx={{ px: 25, py: 6 }}>
             <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', height: "calc(100vh - 190px)" }}>
                 <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', width: '51%' }}>
-                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1,justifyContent: 'center' }}>
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                         {/* Project Details SideBar Button for Creating Project */}
-                        {/* <CoreModules.Button
+                        <CoreModules.Button
                             sx={{width:'unset'}}
                             variant="contained"
                             color="error"
                         >
                             Monitoring
-                        </CoreModules.Button> */}
+                        </CoreModules.Button>
 
                         {/* END */}
 
                         {/* Upload Area SideBar Button for uploading Area page  */}
-                        {/* <CoreModules.Button
+                        <CoreModules.Button
                             sx={{width:'unset'}}
                             variant="contained"
                             color="error"
                         >
                             Convert
-                        </CoreModules.Button> */}
+                        </CoreModules.Button>
                         <CoreModules.LoadingButton
                             onClick={()=>handleDownload('csv')}
                             sx={{width:'unset'}}
