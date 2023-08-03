@@ -12,7 +12,6 @@ import { ProjectBuildingGeojsonService } from "../../api/SubmissionService";
 import environment from "fmtm/environment";
 import { getStyles } from "../MapComponent/OpenLayersComponent/helpers/styleUtils";
 import { ProjectActions } from "fmtm/ProjectSlice";
-import { ProjectById } from "../../api/Project";
 
 export const defaultStyles = {
   lineColor: "#000000",
@@ -132,52 +131,15 @@ const ProjectInfomap = () => {
     zoom: 4,
     maxZoom: 25,
   });
-  const state = CoreModules.useSelector((state) => state.project);
 
   useEffect(() => {
     return () => {
       dispatch(ProjectActions.SetProjectBuildingGeojson(null));
     };
   }, []);
-  useEffect(() => {
-    dispatch(ProjectActions.SetNewProjectTrigger());
-    if (
-      state.projectTaskBoundries.findIndex(
-        (project) => project.id == environment.decode(encodedId)
-      ) == -1
-    ) {
-      dispatch(ProjectActions.SetProjectTaskBoundries([]))
 
-      dispatch(
-        ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries
-        ),
-        state.projectTaskBoundries
-      );
-      // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
-
-    } else {
-      dispatch(ProjectActions.SetProjectTaskBoundries([]))
-      dispatch(
-        ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries
-        ),
-        state.projectTaskBoundries
-      );
-    }
-    if (Object.keys(state.projectInfo).length == 0) {
-      dispatch(ProjectActions.SetProjectInfo(projectInfo));
-    } else {
-      if (state.projectInfo.id != environment.decode(encodedId)) {
-        dispatch(ProjectActions.SetProjectInfo(projectInfo));
-      }
-    }
-  }, [params.id]);
   useEffect(() => {
-    if (!projectTaskBoundries) return
-    if ( projectTaskBoundries?.length<1) return
+    if (!projectTaskBoundries && projectTaskBoundries?.length>0) return
     const taskGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [
