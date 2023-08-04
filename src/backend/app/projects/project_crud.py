@@ -1156,12 +1156,13 @@ def generate_task_files(
     # Update those features and set task_id
     query = f'''UPDATE features
                 SET task_id={task_id}
-                WHERE id in (
-                
-                SELECT id
-                FROM features
-                WHERE project_id={project_id} and ST_Intersects(geometry, '{task.outline}'::Geometry)
-
+                WHERE id IN (
+                    SELECT id
+                    FROM features
+                    WHERE project_id={project_id}
+                    AND ST_IsValid(geometry)
+                    AND ST_IsValid('{task.outline}'::Geometry)
+                    AND ST_Intersects(geometry, '{task.outline}'::Geometry)
                 )'''
 
     result = db.execute(query)
