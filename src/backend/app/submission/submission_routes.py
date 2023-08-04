@@ -200,7 +200,8 @@ async def conflate_osm_date(
 
     odkf = OsmFile(outfile)
     osm = odkf.loadFile(osmoutfile)
-    odk_merge = OdkMerge(data_extracts_file,None)
-    data = odk_merge.conflateData(osm)
-
-    return data
+    if osm:
+        odk_merge = OdkMerge(data_extracts_file,None)
+        data = odk_merge.conflateData(osm)
+        return data
+    return []
