@@ -230,20 +230,15 @@ def create_odk_xform(
     title = os.path.basename(os.path.splitext(filespec)[0])
     # result = xform.createForm(project_id, title, filespec, True)
     # Pass odk credentials of project in xform
-    if odk_credentials:
-        url = odk_credentials.odk_central_url
-        user = odk_credentials.odk_central_user
-        pw = odk_credentials.odk_central_password
 
-    else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
-
+    if not odk_credentials:
+        odk_credentials = project_schemas.ODKCentral(
+            odk_central_url=settings.ODK_CENTRAL_URL,
+            odk_central_user=settings.ODK_CENTRAL_USER,
+            odk_central_password=settings.ODK_CENTRAL_PASSWD,
+        )
     try:
-        xform = OdkForm(url, user, pw)
+        xform = get_odk_form(odk_credentials)
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -386,7 +381,9 @@ def generate_updated_xform(
                     ] = extract
             if "data" in inst:
                 if "data" == inst:
-                    xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
+                    xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = id
+                    # xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
+
                 else:
                     xml["h:html"]["h:head"]["model"]["instance"][0]["data"]["@id"] = id
         except Exception:
