@@ -37,6 +37,7 @@ jobs:
         URL_SCHEME: "http"
         FRONTEND_MAIN_URL: "localhost:8080"
         FRONTEND_MAP_URL: "localhost:8081"
+      options: --user root
 
     # pytest needs a database
     services:
@@ -58,7 +59,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Run pytest
+      - name: Run pytest as appuser
         run: |
           cd src/backend
-          pytest
+          sudo -u appuser bash -c 'pytest'
