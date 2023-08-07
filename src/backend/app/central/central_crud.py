@@ -451,7 +451,7 @@ def create_qrcode(project_id: int,
 
     # Generate qr code using segno
     qrcode = segno.make(qr_data, micro=False)
-    qrcode.save(f"{name}.png", scale=5)
+    qrcode.save(f"/tmp/{name}_qr.png", scale=5)
     return qr_data
 
 
