@@ -285,6 +285,16 @@ def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = N
     return xforms
 
 
+def get_form_full_details(
+        odk_project_id: int,
+        form_id: str,
+        odk_central: project_schemas.ODKCentral
+    ):
+    form = get_odk_form(odk_central)
+    form_details = form.getFullDetails(odk_project_id, form_id)
+    return form_details.json()
+
+
 def list_task_submissions(odk_project_id:int, form_id: str, odk_central: project_schemas.ODKCentral = None):
     project = get_odk_form(odk_central)
     submissions = project.listSubmissions(odk_project_id, form_id)
@@ -441,7 +451,7 @@ def create_qrcode(project_id: int,
 
     # Generate qr code using segno
     qrcode = segno.make(qr_data, micro=False)
-    qrcode.save(f"{name}.png", scale=5)
+    qrcode.save(f"/tmp/{name}_qr.png", scale=5)
     return qr_data
 
 

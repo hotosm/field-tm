@@ -14,29 +14,32 @@ on:
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 
-env:
-  # using fmtm-db compose name fails as running FMTM outside docker, port map to localhost service instead
-  FMTM_DB_URL: postgresql+psycopg2://fmtm:fmtm@localhost:5432/fmtm
-  ODK_CENTRAL_URL: http://localhost:8383
-  ODK_CENTRAL_USER: odk
-  ODK_CENTRAL_PASSWD: odk
-  OSM_CLIENT_ID: test
-  OSM_CLIENT_SECRET: test
-  OSM_URL: https://www.openstreetmap.org
-  OSM_SCOPE: read_prefs
-  OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
-  OSM_SECRET_KEY: test
-  URL_SCHEME: "http"
-  FRONTEND_MAIN_URL: "localhost:8080"
-  FRONTEND_MAP_URL: "localhost:8081"
-
 permissions:
   contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    # pytest needs a valid reachable database service.
+
+    container:
+      image: ghcr.io/hotosm/fmtm/backend:ci
+      env:
+        FMTM_DB_URL: postgresql+psycopg2://fmtm:fmtm@fmtm-db:5432/fmtm
+        ODK_CENTRAL_URL: http://localhost:8383
+        ODK_CENTRAL_USER: odk
+        ODK_CENTRAL_PASSWD: odk
+        OSM_CLIENT_ID: test
+        OSM_CLIENT_SECRET: test
+        OSM_URL: https://www.openstreetmap.org
+        OSM_SCOPE: read_prefs
+        OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
+        OSM_SECRET_KEY: test
+        URL_SCHEME: "http"
+        FRONTEND_MAIN_URL: "localhost:8080"
+        FRONTEND_MAP_URL: "localhost:8081"
+      options: --user root
+
+    # pytest needs a database
     services:
       # Label used to access the postgres service container
       fmtm-db:
@@ -47,36 +50,16 @@ jobs:
           POSTGRES_PASSWORD: fmtm
           POSTGRES_DB: fmtm
           POSTGRES_USER: fmtm
-        ports:
-          # Opens tcp port 5432 on the host and service container,
-          # since we running pytest on actions machine, not in another service container
-          - 5432:5432
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Install dependencies
+      - name: Run pytest as appuser
         run: |
           cd src/backend
-          python -m pip install pdm==2.6.1
-          pdm export --dev > requirements-all.txt
-          pip install -r requirements-all.txt
-      - name: Run pytest
-        run: |
-          cd src/backend
-          pytest
+          gosu appuser pytest

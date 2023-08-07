@@ -26,22 +26,14 @@ from app.config import settings
 from app.db.database import Base, get_db
 from app.main import api
 
-db_name = settings.FMTM_DB_NAME
-user = settings.FMTM_DB_USER
-password = settings.FMTM_DB_PASSWORD
-
-SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@localhost/{db_name}"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.FMTM_DB_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
 Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture(scope="session")
 def db_engine():
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(settings.FMTM_DB_URL)
     if not database_exists:
         create_database(engine.url)
 
