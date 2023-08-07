@@ -92,7 +92,7 @@ RUN set -ex \
         "postgresql-client" \
         "libglib2.0-0" \
         "libspatialindex-c6" \
-        "libproj19" \
+        "libproj25" \
         "libgeos-c1v5" \
         "libgdal32" \
     && rm -rf /var/lib/apt/lists/*
