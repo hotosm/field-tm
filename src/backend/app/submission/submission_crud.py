@@ -328,6 +328,22 @@ def download_submission_for_project(db, project_id):
     return final_zip_file_path
 
 
+def get_all_submissions(db: Session, project_id):
+    project_info = project_crud.get_project(db, project_id)
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project_info.odk_central_url,
+        odk_central_user=project_info.odk_central_user,
+        odk_central_password=project_info.odk_central_password,
+    )
+
+    project = get_odk_project(odk_credentials)
+
+    submissions = project.getAllSubmissions(project_info.odkid)
+    return submissions
+
+
 def get_project_submission(db: Session, project_id: int):
     project_info = project_crud.get_project(db, project_id)
 
