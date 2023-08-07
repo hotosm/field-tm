@@ -161,7 +161,7 @@ async def conflate_osm_date(
     ):
 
     # Submission JSON
-    submission = submission_crud.get_project_submission(db, project_id)
+    submission = submission_crud.get_all_submissions(db, project_id)
 
     # Data extracta file
     data_extracts_file = "/tmp/data_extracts_file.geojson"
