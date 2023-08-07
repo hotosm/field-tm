@@ -59,7 +59,9 @@ jobs:
           context: src/backend
           target: prod
           push: true
-          tags: "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_name }}"
+          tags: |
+            "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-${{ github.ref_name }}"
+            "ghcr.io/hotosm/fmtm/backend:latest"
           build-args: |
             APP_VERSION=${{ env.API_VERSION }}
 

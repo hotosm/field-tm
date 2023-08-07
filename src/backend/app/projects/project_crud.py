@@ -1347,11 +1347,11 @@ def generate_appuser_files(
 
                 outline = json.loads(one.outline)
                 outline_geojson = pg.getFeatures(boundary=outline,
-                                                 filespec=outfile,
-                                                 polygon=extract_polygon,
-                                                 xlsfile=f'{category}.xls',
-                                                 category=category
-                                                 )
+                                                    filespec=outfile,
+                                                    polygon=extract_polygon,
+                                                    xlsfile=f'{category}.xls',
+                                                    category=category
+                                                    )
 
                 updated_outline_geojson = {
                     "type": "FeatureCollection",
@@ -1421,7 +1421,7 @@ def create_qrcode(
         project_id, token, project_name, odk_central_url
     )
     qrcode = segno.make(qrcode, micro=False)
-    image_name = f"{project_name}.png"
+    image_name = f"/tmp/{project_name}_qr.png"
     with open(image_name, "rb") as f:
         base64_data = b64encode(f.read()).decode()
     qr_code_text = base64.b64decode(base64_data)
