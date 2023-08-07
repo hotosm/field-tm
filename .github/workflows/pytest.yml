@@ -70,6 +70,10 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+      - name: Install GDAL
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgdal-dev
       - name: Install dependencies
         run: |
           cd src/backend
