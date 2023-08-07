@@ -29,6 +29,7 @@ export const ProjectById = (url, existingProjectList) => {
         );
         dispatch(
           ProjectActions.SetProjectInfo({id:resp.id,
+            outline_geojson: resp.outline_geojson,
             priority:resp.priority || 2,
             priority_str:resp.priority_str || "MEDIUM",
             title:resp.project_info?.[0]?.name,
@@ -38,6 +39,7 @@ export const ProjectById = (url, existingProjectList) => {
             total_tasks:resp.total_tasks,
             tasks_mapped:resp.tasks_mapped,
             tasks_validated:resp.tasks_validated,
+            xform_title:resp.xform_title,
             tasks_bad:resp.tasks_bad})
         );
       } catch (error) {
@@ -49,3 +51,33 @@ export const ProjectById = (url, existingProjectList) => {
     dispatch(ProjectActions.SetNewProjectTrigger());
   };
 };
+
+export const DownloadProjectForm = (url,payload) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:true}))
+
+      const fetchProjectForm = async (url,payload) => {
+          try {
+            let response;
+            if(payload=== 'form'){
+              response = await CoreModules.axios.get(url,{responseType : 'blob'});
+            }else{
+              response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+            }
+              var a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;
+              a.click();
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+            } finally{
+              dispatch(ProjectActions.SetDownloadProjectFormLoading({type:payload,loading:false}))
+          }
+      }
+      await fetchProjectForm(url,payload);
+  }
+}

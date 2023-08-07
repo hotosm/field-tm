@@ -139,7 +139,7 @@ const ProjectInfomap = () => {
   }, []);
 
   useEffect(() => {
-    if (!projectTaskBoundries) return
+    if (!projectTaskBoundries && projectTaskBoundries?.length>0) return
     const taskGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [

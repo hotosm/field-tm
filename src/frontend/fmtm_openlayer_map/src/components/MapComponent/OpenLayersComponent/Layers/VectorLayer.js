@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
 /* eslint-disable react/forbid-prop-types */
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'ol/proj';
 import Style from 'ol/style/Style';

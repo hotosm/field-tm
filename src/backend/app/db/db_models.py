@@ -527,6 +527,7 @@ class DbProject(Base):
     form_xls = Column(LargeBinary)           # XLSForm file if custom xls is uploaded
     data_extract_type = Column(String)       # Type of data extract (Polygon or Centroid)
     task_split_type = Column(String)         # Type of split (Grid or Feature)
+    hashtags = Column(ARRAY(String))         # Project hashtag
 
 # TODO: Add index on project geometry, tried to add in __table args__
 # Index("idx_geometry", DbProject.geometry, postgresql_using="gist")

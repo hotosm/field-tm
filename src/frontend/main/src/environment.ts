@@ -1,4 +1,6 @@
 export default {
+  main_url: process.env.FRONTEND_MAP_URL,
+  nodeEnv: process.env.NODE_ENV,
   baseApiUrl: process.env.API_URL,
   decode: (id: any) => {
     const decodeFromBase = window.atob(id);
@@ -30,11 +32,11 @@ export default {
     },
     {
       label: "LOCKED_FOR_VALIDATION",
-      action: [{key:"Confirm fully Mapped",value:"VALIDATED"},{key:"More Mapping Needed",value:"INVALIDATED"}],
+      action: [{ key: "Confirm fully Mapped", value: "VALIDATED" }, { key: "More Mapping Needed", value: "INVALIDATED" }],
     },
     { label: "VALIDATED", action: [] },
-    { label: "INVALIDATED", action: [{key:"Map Again",value:"LOCKED_FOR_MAPPING"}] },
-    { label: 'BAD', action: []},
+    { label: "INVALIDATED", action: [{ key: "Map Again", value: "LOCKED_FOR_MAPPING" }] },
+    { label: 'BAD', action: [] },
     // "SPLIT",
     // "ARCHIVED",
   ],
