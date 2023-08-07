@@ -16,7 +16,7 @@
 #
 ARG PYTHON_IMG_TAG=3.10
 
-FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bullseye as base
+FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm as base
 ARG APP_VERSION
 ARG PYTHON_IMG_TAG
 ARG MAINTAINER=admin@hotosm.org
