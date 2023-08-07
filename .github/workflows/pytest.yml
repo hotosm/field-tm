@@ -62,4 +62,4 @@ jobs:
       - name: Run pytest as appuser
         run: |
           cd src/backend
-          sudo -u appuser bash -c 'pytest'
+          gosu appuser pytest
