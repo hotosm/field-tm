@@ -23,9 +23,6 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
   const dispatch = CoreModules.useDispatch();
   // //dispatch function to perform redux state mutation
 
-  const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-  // //we use use-selector from redux to get all state of formCategory from createProject slice
-
   const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
@@ -34,11 +31,8 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
   }, []);
   // END
-  const selectExtractWaysList = ['Centroid', 'Polygon'];
-  const selectExtractWays = selectExtractWaysList.map((item) => ({ label: item, value: item }));
   const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
   const selectFormWays = selectFormWaysList.map((item) => ({ label: item, value: item }));
-  const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
   const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
   // //we use use-selector from redux to get all state of loginToken from login slice
 
@@ -64,7 +58,15 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     const newDividedTaskGeojson = JSON.stringify(dividedTaskGeojson);
     const parsedNewDividedTaskGeojson = JSON.parse(newDividedTaskGeojson);
     const exparsedNewDividedTaskGeojson = JSON.stringify(parsedNewDividedTaskGeojson);
-    var newUpdatedTaskGeojsonFile = new File([exparsedNewDividedTaskGeojson], "AOI.geojson", { type: "application/geo+json" })
+    var newUpdatedTaskGeojsonFile = new File([exparsedNewDividedTaskGeojson], 'AOI.geojson', {
+      type: 'application/geo+json',
+    });
+    const hashtags = projectDetails.hashtags;
+    const arrayHashtag = hashtags
+      .split('#')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
     // console.log(f,'file F');
     // setGeojsonFile(f);
     dispatch(
@@ -93,10 +95,11 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
           form_ways: projectDetails.form_ways,
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
+          hashtags: arrayHashtag,
         },
         newUpdatedTaskGeojsonFile,
         customFormFile,
-        dataExtractFile
+        dataExtractFile,
       ),
     );
     // navigate("/select-form", { replace: true, state: { values: values } });
@@ -107,7 +110,7 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
-      generateProjectLogIntervalCb = null
+      generateProjectLogIntervalCb = null;
       dispatch(CreateProjectActions.SetGenerateProjectLog(null));
     };
   }, []);
@@ -127,9 +130,19 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     }
   }, [generateQrSuccess]);
   useEffect(() => {
-    if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
+    if (generateQrSuccess && generateProjectLog?.status === 'FAILED') {
       clearInterval(generateProjectLogIntervalCb);
-      const encodedProjectId = environment.encode(projectDetailsResponse?.id)
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: `QR Generation Failed. ${generateProjectLog?.message}`,
+          variant: 'error',
+          duration: 10000,
+        }),
+      );
+    } else if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
+      clearInterval(generateProjectLogIntervalCb);
+      const encodedProjectId = environment.encode(projectDetailsResponse?.id);
       navigate(`/project_details/${encodedProjectId}`);
       dispatch(
         CommonActions.SetSnackBar({
@@ -233,10 +246,12 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
                       }),
                     );
                   }}
-                // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
+                  // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'form_ways', value: e.target.value }))}
                 >
                   {selectFormWays?.map((form) => (
-                    <MenuItem value={form.value}>{form.label}</MenuItem>
+                    <MenuItem key={form.value} value={form.value}>
+                      {form.label}
+                    </MenuItem>
                   ))}
                 </Select>
                 {errors.form_ways && (
@@ -258,13 +273,11 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
                   <CoreModules.Button variant="contained" component="label">
                     <CoreModules.Input
                       type="file"
-
                       value={customFormInputValue}
                       onChange={(e) => {
                         setCustomFormFile(e.target.files[0]);
                       }}
-                      inputProps={{ "accept": ".xml, .xls, .xlsx" }}
-
+                      inputProps={{ accept: '.xml, .xls, .xlsx' }}
                     />
                     <CoreModules.Typography component="h4">{customFormFile?.name}</CoreModules.Typography>
                   </CoreModules.Button>
@@ -282,6 +295,15 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
                   <CoreModules.Stack
                     sx={{ display: 'flex', flexDirection: 'col', gap: 2, width: { xs: '100%', md: '60%' }, pb: '2rem' }}
                   >
+                    <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                      <CoreModules.Typography component="h4">Status: </CoreModules.Typography>
+                      <CoreModules.Typography
+                        component="h4"
+                        sx={{ ml: 2, fontWeight: 'bold', borderRadius: '20px', border: '1px solid gray', p: 1 }}
+                      >
+                        {generateProjectLog.status}
+                      </CoreModules.Typography>
+                    </CoreModules.Stack>
                     <LoadingBar
                       title={'Task Progress'}
                       activeStep={generateProjectLog.progress}
@@ -341,7 +363,6 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
               >
                 Submit
               </CoreModules.LoadingButton>
-
             </CoreModules.Stack>
             {/* END */}
           </CoreModules.Stack>

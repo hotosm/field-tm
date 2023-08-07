@@ -1156,12 +1156,13 @@ def generate_task_files(
     # Update those features and set task_id
     query = f'''UPDATE features
                 SET task_id={task_id}
-                WHERE id in (
-                
-                SELECT id
-                FROM features
-                WHERE project_id={project_id} and ST_Intersects(geometry, '{task.outline}'::Geometry)
-
+                WHERE id IN (
+                    SELECT id
+                    FROM features
+                    WHERE project_id={project_id}
+                    AND ST_IsValid(geometry)
+                    AND ST_IsValid('{task.outline}'::Geometry)
+                    AND ST_Intersects(geometry, '{task.outline}'::Geometry)
                 )'''
 
     result = db.execute(query)
@@ -1388,9 +1389,12 @@ def generate_appuser_files(
             tasks_list = tasks_crud.get_task_lists(db, project_id)
 
             for task in tasks_list:
-                generate_task_files(db, project_id, task,
-                                    xlsform, form_type, odk_credentials)
-
+                try:
+                    generate_task_files(db, project_id, task,
+                                        xlsform, form_type, odk_credentials)
+                except Exception as e:
+                    logger.warning(str(e))
+                    continue
         # Update background task status to COMPLETED
         update_background_task_status_in_database(
             db, background_task_id, 4
