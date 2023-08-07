@@ -45,7 +45,8 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export --dev --no-default > requirements-dev.txt
+    && pdm export --dev --no-default --without-hashes \
+    > requirements-dev.txt
 
 
 
@@ -118,12 +119,24 @@ VOLUME /opt/app/images
 
 
 
+FROM build as osm-fieldwork-whl
+WORKDIR /repos
+RUN pip install pdm==2.6.1 \
+    && git clone https://github.com/hotosm/osm-fieldwork.git \
+    && pdm build --project=/repos/osm-fieldwork
+
+
+
 FROM runtime as debug-no-odk
-COPY --from=extract-deps \
-    /opt/python/requirements-dev.txt /opt/python/
-RUN pip install --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements-dev.txt
 USER appuser
+COPY --from=extract-deps --chown=appuser \
+    /opt/python/requirements-dev.txt /opt/python/
+COPY --from=osm-fieldwork-whl --chown=appuser \
+    /repos/osm-fieldwork/dist/*.whl /opt/
+RUN ls /opt/*.whl >> /opt/python/requirements-dev.txt \
+    && pip uninstall -y osm-fieldwork \
+    && pip install --user --upgrade --no-warn-script-location \
+    --no-cache-dir -r /opt/python/requirements-dev.txt
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
