@@ -23,23 +23,24 @@ import os
 import sys
 from typing import Union
 
+import sentry_sdk
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-# from ..osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms import xlsforms_path
 
 from .__version__ import __version__
 from .auth import auth_routes
 from .central import central_routes
 from .config import settings
 from .db.database import Base, engine, get_db
+from .organization import organization_routes
 from .projects import project_routes
 from .projects.project_crud import read_xlsforms
 from .submission import submission_routes
 from .tasks import tasks_routes
 from .users import user_routes
-from .organization import organization_routes
 
 # Env variables
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
@@ -56,6 +57,12 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+if not settings.DEBUG:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        traces_sample_rate=0.1,
+    )
 
 
 def get_application() -> FastAPI:
@@ -86,7 +93,6 @@ def get_application() -> FastAPI:
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organization_routes.router)
-
 
     return _app
 
@@ -122,7 +128,7 @@ async def startup_event():
     Base.metadata.create_all(bind=engine)
 
     # Read in XLSForms
-    # read_xlsforms(next(get_db()), xlsforms_path)
+    read_xlsforms(next(get_db()), xlsforms_path)
 
 
 @api.on_event("shutdown")

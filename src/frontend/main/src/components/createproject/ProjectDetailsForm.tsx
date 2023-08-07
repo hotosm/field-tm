@@ -11,6 +11,7 @@ import environment from '../../environment';
 import { MenuItem, Select } from '@mui/material';
 import CustomizedModal from '../../utilities/CustomizedModal';
 import OrganizationAddForm from '../organization/OrganizationAddForm';
+import { createPopup } from '../../utilfunctions/createPopup';
 
 const ProjectDetailsForm: React.FC = () => {
   const [openOrganizationModal, setOpenOrganizationModal] = useState(false);
@@ -36,15 +37,7 @@ const ProjectDetailsForm: React.FC = () => {
     // dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   }, []);
 
-  // useEffect(() => {
-  //     if (createProjectStep === 'select-form') {
-  //         navigate('/select-form');
-  //     }
-
-  // }, [projectDetails])
-
   const submission = () => {
-    // eslint-disable-next-line no-use-before-define
     // submitForm();
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
     dispatch(CreateProjectActions.SetCreateProjectFormStep('upload-area'));
@@ -56,6 +49,7 @@ const ProjectDetailsForm: React.FC = () => {
     submission,
     CreateProjectValidation,
   );
+
   const inputFormStyles = () => {
     return {
       style: {
@@ -73,14 +67,14 @@ const ProjectDetailsForm: React.FC = () => {
     dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
   };
   useEffect(() => {
-    window.addEventListener("focus", onFocus);
-    onFocus()
+    window.addEventListener('focus', onFocus);
+    onFocus();
     // Calls onFocus when the window first loads
     return () => {
-        window.removeEventListener("focus", onFocus);
-        // window.removeEventListener("blur", onBlur);
+      window.removeEventListener('focus', onFocus);
+      // window.removeEventListener("blur", onBlur);
     };
-}, []);
+  }, []);
   return (
     <CoreModules.Stack sx={{ width: { xs: '95%' }, marginLeft: { md: '215px !important' } }}>
       <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
@@ -139,21 +133,28 @@ const ProjectDetailsForm: React.FC = () => {
                 }}
               >
                 {organizationList?.map((org) => (
-                  <MenuItem value={org.value}>{org.label}</MenuItem>
+                  <MenuItem key={org.value} value={org.value}>
+                    {org.label}
+                  </MenuItem>
                 ))}
               </Select>
-              <a href="/createOrganization" target='_blank' rel='noreferrer'>
               <CoreModules.IconButton
-                  sx={{ width: 'auto' }}
-                  // disabled={qrcode == "" ? true : false}
-                  color="info"
-                  aria-label="download qrcode"
+                onClick={() => createPopup('Create Organization', 'createOrganization?popup=true')}
+                sx={{ width: 'auto' }}
+                // disabled={qrcode == "" ? true : false}
+                color="info"
+                aria-label="download qrcode"
               >
-                  <AssetModules.AddIcon
-                      sx={{ fontSize: 25, border: '1px solid', borderRadius: '20px', backgroundColor: defaultTheme.palette.success.main, color: 'white', }}
-                  />
+                <AssetModules.AddIcon
+                  sx={{
+                    fontSize: 25,
+                    border: '1px solid',
+                    borderRadius: '20px',
+                    backgroundColor: defaultTheme.palette.success.main,
+                    color: 'white',
+                  }}
+                />
               </CoreModules.IconButton>
-              </a>
             </CoreModules.Stack>
             {errors.organization && (
               <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
@@ -290,6 +291,37 @@ const ProjectDetailsForm: React.FC = () => {
                 handleCustomChange('name', e.target.value);
               }}
               helperText={errors.name}
+              FormHelperTextProps={inputFormStyles()}
+            />
+            {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
+          </CoreModules.FormControl>
+          {/* END */}
+
+          {/* Project Name Form Input For Create Project */}
+          <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
+            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
+              <CoreModules.FormLabel component="h3">Hashtag</CoreModules.FormLabel>
+            </CoreModules.Box>
+            <CoreModules.TextField
+              id="hashtags"
+              name="hashtags"
+              type="hashtags"
+              autoComplete="on"
+              label=""
+              variant="outlined"
+              inputProps={{ sx: { padding: '8.5px 14px' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'black',
+                  },
+                },
+              }}
+              value={values.hashtags}
+              onChange={(e) => {
+                handleCustomChange('hashtags', e.target.value);
+              }}
+              helperText={errors.odk_central_url}
               FormHelperTextProps={inputFormStyles()}
             />
             {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}

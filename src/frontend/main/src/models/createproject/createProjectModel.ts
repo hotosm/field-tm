@@ -1,5 +1,5 @@
 
-export interface CreateProjectDetailsModel {
+export interface ProjectDetailsModel {
     id: number;
     odkid: number;
     author: {
