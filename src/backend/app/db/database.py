@@ -24,9 +24,7 @@ from sqlalchemy.orm import sessionmaker
 
 from ..config import settings
 
-SQLALCHEMY_DATABASE_URL = settings.FMTM_DB_URL
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.FMTM_DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
