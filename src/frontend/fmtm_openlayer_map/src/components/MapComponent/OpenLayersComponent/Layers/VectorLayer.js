@@ -12,10 +12,12 @@ import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
 import {
+  Draw,
   Modify,
   Select,
   defaults as defaultInteractions,
 } from 'ol/interaction.js';
+
 
 const selectElement = 'singleselect';
 
@@ -48,6 +50,7 @@ const VectorLayer = ({
   mapOnClick,
   setStyle,
   onModify,
+  onDraw,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
 
@@ -69,22 +72,42 @@ const VectorLayer = ({
     modify.on('modifyend',function(e){
       var geoJSONFormat = new GeoJSON();
 
-      // Step 3: Convert features to GeoJSON
       var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
 
-      // Step 4: Log the GeoJSON string
-      console.log(geoJSONString,'geojsonString');
       onModify(geoJSONString);
-      // console.log(JSON.stringify(geoJSONString),'geojsonString Stringify');
     });
     map.addInteraction(modify);
     map.addInteraction(select);
 
-    // map.addInteraction(defaultInteractions().extend([select, modify]));
     return () => {
       // map.removeInteraction(defaultInteractions().extend([select, modify]))
     }
   }, [map,vectorLayer,onModify])
+  // Modify Feature
+  useEffect(() => {
+    if(!map) return;
+    if(!vectorLayer) return;
+    if(!onDraw) return;
+    const vectorLayerSource = vectorLayer.getSource();
+    const draw = new Draw({
+      source: vectorLayerSource,
+      type: 'Polygon',
+    });
+    draw.on('drawend',function(e){
+      var geoJSONFormat = new GeoJSON();
+
+      var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+      console.log(geoJSONString,'geojsonString');
+      onDraw(geoJSONString);
+    });
+    map.addInteraction(draw);
+
+    return () => {
+      // map.removeInteraction(defaultInteractions().extend([select, modify]))
+    }
+  }, [map,vectorLayer,onDraw])
+
+
   useEffect(() => {
     if (!map) return;
 

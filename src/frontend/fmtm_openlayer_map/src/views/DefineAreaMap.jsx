@@ -6,6 +6,21 @@ import { VectorLayer } from "../components/MapComponent/OpenLayersComponent/Laye
 import CoreModules from "fmtm/CoreModules";
 import { CreateProjectActions } from "fmtm/CreateProjectSlice";
 
+const testGeojson = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          
+        ],
+      },
+    },
+  ],}
+
 const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile }) => {
   const dispatch = CoreModules.useDispatch();
   const[dataExtractedGeojson, setDataExtractedGeojson] = useState(null);
@@ -57,6 +72,17 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
         }}
       >
         <LayerSwitcherControl />
+        <VectorLayer
+            geojson={testGeojson}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            onDraw={(geojson) => {}}
+            zoomToLayer
+          />
         {dividedTaskGeojson && (
           <VectorLayer
             geojson={dividedTaskGeojson}
@@ -71,9 +97,8 @@ const DefineAreaMap = ({ uploadedGeojson,setGeojsonFile,uploadedDataExtractFile 
               const parsedJSON = JSON.parse(modifiedGeojson)
               var f = new File([modifiedGeojson], "AOI.geojson", {type: "application/geo+json" })
               setGeojsonFile(f);
-
-
             }}
+            onDraw={(geojson) => {}}
             zoomToLayer
           />
         )}
