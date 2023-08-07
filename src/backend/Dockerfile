@@ -115,15 +115,16 @@ RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appu
     && chown -R appuser:appuser /opt /home/appuser
 # Add volume for persistent images
 VOLUME /opt/app/images
+# Change to non-root user
+USER appuser
 
 
 
 FROM runtime as debug-no-odk
-COPY --from=extract-deps \
+COPY --from=extract-deps --chown=appuser \
     /opt/python/requirements-dev.txt /opt/python/
-RUN pip install --no-warn-script-location \
+RUN pip install --user --no-warn-script-location \
     --no-cache-dir -r /opt/python/requirements-dev.txt
-USER appuser
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
@@ -141,11 +142,17 @@ USER appuser
 
 
 
+FROM debug-no-odk as ci
+# Pre-compile packages to .pyc (init speed gains)
+RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
+ENTRYPOINT [""]
+CMD [""]
+
+
+
 FROM runtime as prod
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
-# Change to non-root user after pre-compile
-USER appuser
 # Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "4", "--log-level", "error", "--no-access-log"]
