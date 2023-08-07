@@ -4,16 +4,15 @@ import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-// @ts-ignore  
+// @ts-ignore
 const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 
-const UploadArea: React.FC<any> = ({geojsonFile,setGeojsonFile,setInputValue,inputValue}:any) => {
+const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue, inputValue }: any) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
 
   const dispatch = CoreModules.useDispatch();
   // //dispatch function to perform redux state mutation
-
 
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   const onCreateProjectSubmission = () => {
@@ -22,7 +21,7 @@ const UploadArea: React.FC<any> = ({geojsonFile,setGeojsonFile,setInputValue,inp
     dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
     navigate('/define-tasks');
   };
- 
+
   return (
     <CoreModules.Stack
       sx={{
@@ -43,14 +42,14 @@ const UploadArea: React.FC<any> = ({geojsonFile,setGeojsonFile,setInputValue,inp
             <CoreModules.FormLabel>Upload GEOJSON</CoreModules.FormLabel>
             <CoreModules.Button variant="contained" component="label">
               <CoreModules.Input
-                sx={{color:'white'}}
+                sx={{ color: 'white' }}
                 type="file"
                 value={inputValue}
                 onChange={(e) => {
                   dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
                   setGeojsonFile(e.target.files[0]);
                 }}
-                inputProps={{ "accept":".geojson, .json" }}
+                inputProps={{ accept: '.geojson, .json' }}
               />
               <CoreModules.Typography component="h4">{geojsonFile?.name}</CoreModules.Typography>
             </CoreModules.Button>
@@ -94,7 +93,7 @@ const UploadArea: React.FC<any> = ({geojsonFile,setGeojsonFile,setInputValue,inp
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap uploadedGeojson={geojsonFile} />
+      <DefineAreaMap uploadedGeojson={geojsonFile} onDraw={(geojson) => {}} />
     </CoreModules.Stack>
   );
 };
