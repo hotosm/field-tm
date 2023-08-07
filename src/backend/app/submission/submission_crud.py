@@ -219,7 +219,7 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     tasks = [task_id] if task_id else tasks_crud.get_task_lists(db, project_id)
 
     # Create a new ZIP file for the extracted files
-    final_zip_file_path = f"{project_name}_{form_category}_osm.zip"
+    final_zip_file_path = f"/tmp/{project_name}_{form_category}_osm.zip"
 
     for task in tasks:
         xml_form_id = f"{project_name}_{form_category}_{task}".split("_")[2]
