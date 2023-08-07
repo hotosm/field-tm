@@ -157,12 +157,11 @@ async def task_features_count(
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
-        submission_list = central_crud.list_task_submissions(project.odkid, task, odk_credentials)
-
+        form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
         data.append({
             'task_id': task,
             'feature_count': feature_count['count'],
-            'submission_count': len(submission_list) if isinstance(submission_list, list) else 0
+            'submission_count': form_details['submissions'],
         })
 
     return data
