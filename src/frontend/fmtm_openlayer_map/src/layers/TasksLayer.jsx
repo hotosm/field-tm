@@ -1,7 +1,7 @@
+import React, { useEffect } from 'react';
 import { Vector as VectorLayer } from 'ol/layer.js';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source.js';
-import { useEffect } from 'react';
 import { geojsonObjectModel } from '../models/geojsonObjectModel';
 import MapStyles from '../hooks/MapStyles';
 import environment from "fmtm/environment";
@@ -18,7 +18,7 @@ const TasksLayer = (map, view, feature) => {
         if (state.projectTaskBoundries.length != 0 && map != undefined) {
 
             if (state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id)) != -1) {
-                geojsonObject=null;
+                geojsonObject = null;
                 const index = state.projectTaskBoundries.findIndex(project => project.id == environment.decode(params.id));
 
                 const styleFunction = function (feature) {
@@ -28,7 +28,7 @@ const TasksLayer = (map, view, feature) => {
                 };
 
                 geojsonObject = { ...geojsonObjectModel }
-                geojsonObject['features']= [];
+                geojsonObject['features'] = [];
                 state.projectTaskBoundries[index].taskBoundries.forEach((task) => {
                     geojsonObject['features'].push({
                         id: `${task.id}_${task.task_status_str}`,
@@ -37,10 +37,10 @@ const TasksLayer = (map, view, feature) => {
                         // properties: task.properties
                     })
                 })
-                console.log(geojsonObject,'geojsonObject');
-                console.log(state.projectTaskBoundries,'projectTaskBoundries');
+                console.log(geojsonObject, 'geojsonObject');
+                console.log(state.projectTaskBoundries, 'projectTaskBoundries');
                 const vectorSource = new VectorSource({
-                    features: new GeoJSON().readFeatures(geojsonObject,{        
+                    features: new GeoJSON().readFeatures(geojsonObject, {
                         featureProjection: get("EPSG:3857")
                     }),
                 });
@@ -76,7 +76,7 @@ const TasksLayer = (map, view, feature) => {
 
 
                 map.addLayer(vectorLayer)
-                window.vector =vectorLayer
+                window.vector = vectorLayer
                 window.testmap = map
                 map.on('loadend', function () {
                     map.getTargetElement().classList.remove('spinner');

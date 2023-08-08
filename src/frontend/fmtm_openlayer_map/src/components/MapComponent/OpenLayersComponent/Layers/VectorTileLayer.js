@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import React,{ useEffect, useMemo } from 'react';
 // import * as olExtent from 'ol/extent';
 import VectorTile from 'ol/layer/VectorTile';
 import MVT from 'ol/format/MVT';
