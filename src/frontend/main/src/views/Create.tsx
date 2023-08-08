@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import '../styles/login.css';
 import enviroment from '../environment';
 import CoreModules from '../shared/CoreModules';
 import { SignUpService } from '../api/LoginService';
-import { useCallback } from 'react';
 import { SingUpModel } from '../models/login/loginModel';
 /*
 Create a simple input element in React that calls a function when onFocusOut is triggered
