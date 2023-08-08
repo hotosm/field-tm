@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
-// import "../../node_modules/ol/ol.css";
 import CoreModules from '../shared/CoreModules';
 import UploadArea from '../components/createproject/UploadArea';
 import { useLocation, Link } from 'react-router-dom';
@@ -10,8 +9,6 @@ import DefineTasks from '../components/createproject/DefineTasks';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
 import DataExtract from '../components/createproject/DataExtract';
-import { createPopup } from '../utilfunctions/createPopup';
-
 
 const CreateProject: React.FC = () => {
   const [geojsonFile, setGeojsonFile] = useState(null);
@@ -35,8 +32,8 @@ const CreateProject: React.FC = () => {
       setGeojsonFile(null);
       setCustomFormFile(null);
       setDataExtractFile(null);
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div>
@@ -204,10 +201,37 @@ const CreateProject: React.FC = () => {
         {/* Showing Different Create Project Component When the url pathname changes */}
 
         {location.pathname === '/create-project' ? <ProjectDetailsForm /> : null}
-        {location.pathname === '/upload-area' ? <UploadArea inputValue={inputValue} setInputValue={setInputValue} geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
-        {location.pathname === '/define-tasks' ? <DefineTasks geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} /> : null}
-        {location.pathname === '/data-extract' ? <DataExtract geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} dataExtractFile={dataExtractFile} setDataExtractFile={setDataExtractFile} dataExtractFileValue={dataExtractFileValue} setDataExtractFileValue={setDataExtractFileValue} /> : null}
-        {location.pathname === '/select-form' ? <FormSelection geojsonFile={geojsonFile} customFormFile={customFormFile} setCustomFormFile={setCustomFormFile} customFormInputValue={customFormInputValue} setCustomFormInputValue={setCustomFormInputValue} dataExtractFile={dataExtractFile} /> : null}
+        {location.pathname === '/upload-area' ? (
+          <UploadArea
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            geojsonFile={geojsonFile}
+            setGeojsonFile={setGeojsonFile}
+          />
+        ) : null}
+        {location.pathname === '/define-tasks' ? (
+          <DefineTasks geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} />
+        ) : null}
+        {location.pathname === '/data-extract' ? (
+          <DataExtract
+            geojsonFile={geojsonFile}
+            setGeojsonFile={setGeojsonFile}
+            dataExtractFile={dataExtractFile}
+            setDataExtractFile={setDataExtractFile}
+            dataExtractFileValue={dataExtractFileValue}
+            setDataExtractFileValue={setDataExtractFileValue}
+          />
+        ) : null}
+        {location.pathname === '/select-form' ? (
+          <FormSelection
+            geojsonFile={geojsonFile}
+            customFormFile={customFormFile}
+            setCustomFormFile={setCustomFormFile}
+            customFormInputValue={customFormInputValue}
+            setCustomFormInputValue={setCustomFormInputValue}
+            dataExtractFile={dataExtractFile}
+          />
+        ) : null}
         {/* {location.pathname === "/basemap-selection" ? <BasemapSelection /> : null} */}
         {/* END */}
       </CoreModules.Stack>
