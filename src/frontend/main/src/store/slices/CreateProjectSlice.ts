@@ -24,6 +24,8 @@ const CreateProject = CoreModules.createSlice({
     taskSplittingGeojsonLoading: false,
     taskSplittingGeojson: null,
     updateBoundaryLoading: false,
+    drawnGeojson: null,
+    drawToggle: false,
   },
   reducers: {
     SetProjectDetails(state, action) {
@@ -92,6 +94,9 @@ const CreateProject = CoreModules.createSlice({
     SetDividedTaskGeojson(state, action) {
       state.dividedTaskGeojson = action.payload;
     },
+    SetDrawnGeojson(state, action) {
+      state.drawnGeojson = action.payload;
+    },
     SetDividedTaskFromGeojsonLoading(state, action) {
       state.dividedTaskLoading = action.payload;
     },
@@ -121,6 +126,9 @@ const CreateProject = CoreModules.createSlice({
     },
     SetEditProjectBoundaryServiceLoading(state, action) {
       state.updateBoundaryLoading = action.payload;
+    },
+    SetDrawToggle(state, action) {
+      state.drawToggle = action.payload;
     },
   },
 });

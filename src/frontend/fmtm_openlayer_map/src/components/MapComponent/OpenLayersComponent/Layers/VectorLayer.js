@@ -86,30 +86,41 @@ const VectorLayer = ({
   // Modify Feature
   useEffect(() => {
     if(!map) return;
-    if(!vectorLayer) return;
+    // if(!vectorLayer) return;
     if(!onDraw) return;
-    const vectorLayerSource = vectorLayer.getSource();
+    const source = new VectorSource({wrapX: false});
+
+    const vector = new OLVectorLayer({
+      source: source,
+    });
     const draw = new Draw({
-      source: vectorLayerSource,
+      source: source,
       type: 'Polygon',
     });
     draw.on('drawend',function(e){
-      var geoJSONFormat = new GeoJSON();
+      const feature = e.feature;
+      const geojsonFormat = new GeoJSON();
+      const newGeojson = geojsonFormat.writeFeature(feature,{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+      
+      // Call your function here with the GeoJSON as an argument
+      onDraw(newGeojson);
+      // var geoJSONFormat = new GeoJSON();
 
-      var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-      console.log(geoJSONString,'geojsonString');
-      onDraw(geoJSONString);
+      // var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+      // console.log(geoJSONString,'geojsonString');
+      // onDraw(geoJSONString);
     });
     map.addInteraction(draw);
 
     return () => {
-      // map.removeInteraction(defaultInteractions().extend([select, modify]))
+      map.removeInteraction(draw)
     }
   }, [map,vectorLayer,onDraw])
 
 
   useEffect(() => {
     if (!map) return;
+    if (!geojson) return;
 
     const vectorLyr = new OLVectorLayer({
       source: new VectorSource({
