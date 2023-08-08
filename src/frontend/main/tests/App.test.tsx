@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MainView from '../src/views/MainView';
-import { store } from '../src/store/Store.js';
+import { store } from '../src/store/Store';
 import { renderWithRouter } from '../src/utilfunctions/testUtils';
 import { Provider } from 'react-redux';
 

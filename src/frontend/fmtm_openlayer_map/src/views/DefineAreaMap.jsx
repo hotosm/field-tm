@@ -80,12 +80,12 @@ const DefineAreaMap = ({ uploadedGeojson, setGeojsonFile, uploadedDataExtractFil
               constrainResolution: true,
               duration: 2000,
             }}
-            onModify={(modifiedGeojson) => {
-              console.log(JSON.parse(modifiedGeojson));
-              const parsedJSON = JSON.parse(modifiedGeojson)
-              var f = new File([modifiedGeojson], "AOI.geojson", { type: "application/geo+json" })
-              setGeojsonFile(f);
-            }}
+            // onModify={(modifiedGeojson) => {
+            //   console.log(JSON.parse(modifiedGeojson));
+            //   const parsedJSON = JSON.parse(modifiedGeojson)
+            //   var f = new File([modifiedGeojson], "AOI.geojson", { type: "application/geo+json" })
+            //   setGeojsonFile(f);
+            // }}
             zoomToLayer
           />
         )}
