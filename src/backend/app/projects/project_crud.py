@@ -555,8 +555,9 @@ def get_osm_extracts(boundary: str):
     json_boundary = json.loads(boundary)
     
     if json_boundary.get("features", None) is not None:
-        query["geometry"] = json_boundary["features"][0]["geometry"]
-    
+        query["geometry"] = json_boundary
+        # query["geometry"] = json_boundary["features"][0]["geometry"]
+
     else:
         query["geometry"] = json_boundary
 
@@ -607,12 +608,12 @@ async def split_into_tasks(
 
     """Update the boundary polyon on the database."""
     # boundary_data = outline["features"][0]["geometry"]
-    if outline.get("features", None) is not None:
+    if outline['type'] == "Feature":
+        boundary_data = outline["geometry"]
+    elif outline.get("features", None) is not None:
         boundary_data = outline["features"][0]["geometry"]
-    
     else:
         boundary_data = outline
-        
     outline = shape(boundary_data)
 
     db_task = db_models.DbProjectAOI(
@@ -623,7 +624,11 @@ async def split_into_tasks(
     db.add(db_task)
     db.commit()
 
-    data = get_osm_extracts(boundary)
+    data = get_osm_extracts(json.dumps(boundary_data))
+
+    if not data:
+        return None
+
 
     for feature in data["features"]:
         # If the osm extracts contents do not have a title, provide an empty text for that.
