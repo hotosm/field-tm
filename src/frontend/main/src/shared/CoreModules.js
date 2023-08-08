@@ -59,12 +59,12 @@ import {
   useLocation,
   createBrowserRouter,
 } from 'react-router-dom';
-import { useSelector, useDispatch, Provider } from 'react-redux';
+import { Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import LoadingBar from '../components/createproject/LoadingBar';
 import { TaskActions } from '../store/slices/TaskSlice';
-
+import { useAppDispatch, useAppSelector } from '../types/reduxTypes';
 export default {
   Provider,
   PersistGate,
@@ -74,8 +74,6 @@ export default {
   CardContent,
   useNavigate,
   useParams,
-  useSelector,
-  useDispatch,
   Stack,
   Typography,
   Button,
@@ -136,4 +134,6 @@ export default {
   LoadingBar,
   TaskActions,
   LoadingButton,
+  useAppDispatch,
+  useAppSelector,
 };

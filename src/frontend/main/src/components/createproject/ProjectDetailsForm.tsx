@@ -16,21 +16,21 @@ import { createPopup } from '../../utilfunctions/createPopup';
 const ProjectDetailsForm: React.FC = () => {
   const [openOrganizationModal, setOpenOrganizationModal] = useState(false);
 
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  // // const state:any = useSelector<any>(state=>state.project.projectData)
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  // // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
   // // console.log('state main :',state)
 
   // const { type } = windowDimention();
   // //get window dimension
   const navigate = useNavigate();
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
+  const projectDetails: any = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
+  const organizationListData: any = CoreModules.useAppSelector((state) => state.createproject.organizationList);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {

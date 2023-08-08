@@ -11,17 +11,17 @@ import CoreModules from '../shared/CoreModules';
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
-  // const state:any = useSelector<any>(state=>state.project.projectData)
+  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
   // console.log('state main :',state)
 
   const { type } = windowDimention();
   //get window dimension
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
 
-  const stateHome = CoreModules.useSelector((state) => state.home);
+  const stateHome = CoreModules.useAppSelector((state) => state.home);
   //we use use selector from redux to get all state of home from home slice
 
   let cardsPerRow = new Array(
@@ -29,7 +29,7 @@ const Home = () => {
   ).fill(0);
   //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
-  const theme = CoreModules.useSelector((state) => state.theme.hotTheme);
+  const theme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   useEffect(() => {
     dispatch(HomeSummaryService(`${enviroment.baseApiUrl}/projects/summaries?skip=0&limit=100`));
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page

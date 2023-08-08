@@ -6,17 +6,17 @@ import { MenuItem } from '@mui/material';
 import { diffObject } from '../../utilfunctions/compareUtils.js';
 
 const UpdateForm = ({ projectId }) => {
-  const dispatch = CoreModules.useDispatch();
-  const editProjectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.editProjectDetails);
+  const dispatch = CoreModules.useAppDispatch();
+  const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
   const [uploadForm, setUploadForm] = useState(null);
   const [selectedFormCategory, setSelectedFormCategory] = useState(null);
-  const formUpdateLoading: any = CoreModules.useSelector<any>((state) => state.createproject.formUpdateLoading);
+  const formUpdateLoading: any = CoreModules.useAppSelector((state) => state.createproject.formUpdateLoading);
 
-  const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
-  const previousXform_title = CoreModules.useSelector((state: any) => state.project.projectInfo.xform_title);
+  const formCategoryList = CoreModules.useAppSelector((state) => state.createproject.formCategoryList);
+  const previousXform_title = CoreModules.useAppSelector((state) => state.project.projectInfo.xform_title);
   const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
 
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   //we use use selector from redux to get all state of defaultTheme from theme slice
 
   // Fetching form category list

@@ -137,4 +137,4 @@ const CreateProject = CoreModules.createSlice({
 });
 
 export const CreateProjectActions = CreateProject.actions;
-export default CreateProject;
+export default CreateProject.reducer;
