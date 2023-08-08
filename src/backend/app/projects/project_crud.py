@@ -1746,8 +1746,8 @@ def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
 
         if db_project_feature.geometry:
             app_project_feature.geometry = geometry_to_geojson(
-                db_project_feature.geometry, {
-                    id: db_project_feature.id}, db_project_feature.id
+                db_project_feature.geometry,
+                    db_project_feature.properties, db_project_feature.id
             )
 
         return app_project_feature
