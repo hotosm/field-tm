@@ -1,9 +1,9 @@
 /* eslint-disable consistent-return */
-import { useRef, useState, useEffect } from 'react';
-import Map from 'ol/Map';
-import { View } from 'ol';
-import * as olExtent from 'ol/extent';
-import VectorLayer from 'ol/layer/Vector';
+import React, { useRef, useState, useEffect } from "react";
+import Map from "ol/Map";
+import { View } from "ol";
+import * as olExtent from "ol/extent";
+import VectorLayer from "ol/layer/Vector";
 
 const defaultProps = {
   center: [0, 0],
@@ -19,7 +19,7 @@ const useOLMap = (props) => {
   const [map, setMap] = useState(null);
   const [renderComplete, setRenderComplete] = useState(null);
 
-  // Created a map instance on mount with all the settings coming from props 
+  // Created a map instance on mount with all the settings coming from props
   useEffect(() => {
     const options = {
       view: new View({
@@ -53,14 +53,14 @@ const useOLMap = (props) => {
         setTimeout(() => {
           setRenderComplete(true);
         }, 500);
-        map.un('rendercomplete', onRenderComplete);
+        map.un("rendercomplete", onRenderComplete);
       }
     }
-    map.on('rendercomplete', onRenderComplete);
+    map.on("rendercomplete", onRenderComplete);
 
     return () => {
       if (map) {
-        map.un('rendercomplete', onRenderComplete);
+        map.un("rendercomplete", onRenderComplete);
       }
     };
   }, [map]);

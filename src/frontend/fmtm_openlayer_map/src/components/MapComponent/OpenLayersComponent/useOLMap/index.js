@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-import { useRef, useState, useEffect } from 'react';
+import React,{ useRef, useState, useEffect } from 'react';
 import Map from 'ol/Map';
 import { View } from 'ol';
 import * as olExtent from 'ol/extent';

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import environment from "fmtm/environment";
 import ProjectTaskStatus from "../api/ProjectTaskStatus";
 import MapStyles from "../hooks/MapStyles";
 import CoreModules from "fmtm/CoreModules";
-import { useEffect } from "react";
 import { CommonActions } from "fmtm/CommonSlice";
 export default function Dialog({ taskId, feature, map, view }) {
   // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
