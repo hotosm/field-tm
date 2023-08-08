@@ -2,15 +2,15 @@ import HomeSlice from './slices/HomeSlice';
 import ThemeSlice from './slices/ThemeSlice';
 // import projectSlice from 'map/Project';
 import CoreModules from '../shared/CoreModules';
-import { persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE } from 'redux-persist';
+import { persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import ProjectSlice from './slices/ProjectSlice';
 import CreateProjectSlice from './slices/CreateProjectSlice';
 import CommonSlice from './slices/CommonSlice';
 import LoginSlice from './slices/LoginSlice';
-import OrganizationSlice from './slices/organizationSlice.ts';
-import SubmissionSlice from './slices/SubmissionSlice.ts';
-import TaskSlice from './slices/TaskSlice.ts';
+import OrganizationSlice from './slices/organizationSlice';
+import SubmissionSlice from './slices/SubmissionSlice';
+import TaskSlice from './slices/TaskSlice';
 import { persistReducer } from 'redux-persist';
 
 export default function persist(key, whitelist, reducer) {
@@ -23,6 +23,9 @@ export default function persist(key, whitelist, reducer) {
     reducer,
   );
 }
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 const reducers = CoreModules.combineReducers({
   project: persist('project', ['project', 'projectInfo'], ProjectSlice.reducer),
@@ -38,7 +41,7 @@ const reducers = CoreModules.combineReducers({
   task: TaskSlice.reducer,
 });
 
-export const store = CoreModules.configureStore({
+const store = CoreModules.configureStore({
   reducer: reducers,
   // middleware: [],
   middleware: CoreModules.getDefaultMiddleware({
@@ -46,4 +49,5 @@ export const store = CoreModules.configureStore({
   }),
 });
 
-export const persistor = persistStore(store);
+const persistor = persistStore(store);
+export { store, persistor };
