@@ -21,16 +21,16 @@ const DataExtract: React.FC<any> = ({
   setDataExtractFile,
   setDataExtractFileValue,
 }) => {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const formCategoryList = CoreModules.useSelector((state: any) => state.createproject.formCategoryList);
+  const formCategoryList = CoreModules.useAppSelector((state) => state.createproject.formCategoryList);
   // //we use use-selector from redux to get all state of formCategory from createProject slice
 
-  const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
+  const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
   // Fetching form category list

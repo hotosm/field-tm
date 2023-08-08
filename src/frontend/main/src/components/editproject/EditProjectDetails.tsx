@@ -1,36 +1,36 @@
-import React from 'react'
+import React from 'react';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 import useForm from '../../hooks/useForm';
 import EditProjectValidation from './validation/EditProjectDetailsValidation';
-import { diffObject } from '../../utilfunctions/compareUtils'
+import { diffObject } from '../../utilfunctions/compareUtils';
 import environment from '../../environment';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { PatchProjectDetails } from '../../api/CreateProjectService';
-const EditProjectDetails = ({projectId}) => {
-  const editProjectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.editProjectDetails);
+const EditProjectDetails = ({ projectId }) => {
+  const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
+  const organizationListData: any = CoreModules.useAppSelector((state) => state.createproject.organizationList);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
-  
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   // //we use use selector from redux to get all state of defaultTheme from theme slice
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
   const submission = () => {
     // eslint-disable-next-line no-use-before-define
     // submitForm();
-    const changedValues = diffObject(editProjectDetails,values);
+    const changedValues = diffObject(editProjectDetails, values);
     dispatch(CreateProjectActions.SetIndividualProjectDetails(values));
-    if(Object.keys(changedValues).length>0){
-      dispatch(PatchProjectDetails(`${environment.baseApiUrl}/projects/${projectId}`,changedValues));
+    if (Object.keys(changedValues).length > 0) {
+      dispatch(PatchProjectDetails(`${environment.baseApiUrl}/projects/${projectId}`, changedValues));
     }
   };
 
-  const { handleSubmit,handleChange, handleCustomChange, values, errors }: any = useForm(
+  const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
     editProjectDetails,
     submission,
     EditProjectValidation,
@@ -47,7 +47,7 @@ const EditProjectDetails = ({projectId}) => {
   };
   return (
     <CoreModules.Stack>
-       <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
+      <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
         <CoreModules.FormGroup>
           {/* Organization Dropdown For Edit Project */}
           {/* <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }} variant="outlined">
@@ -111,7 +111,6 @@ const EditProjectDetails = ({projectId}) => {
 
           {/* END */}
 
-         
           {/* Project Name Form Input For Create Project */}
           <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
@@ -224,8 +223,7 @@ const EditProjectDetails = ({projectId}) => {
         </CoreModules.FormGroup>
       </form>
     </CoreModules.Stack>
-  )
-}
+  );
+};
 
-
-export default EditProjectDetails
+export default EditProjectDetails;

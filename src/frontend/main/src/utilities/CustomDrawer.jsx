@@ -4,12 +4,12 @@ import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
-  const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
+  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.error['main']}`) : null;
   };
-  const token = CoreModules.useSelector((state) => state.login.loginToken);
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const onMouseLeave = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
@@ -116,7 +116,8 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
               {MenuItems.filter((menuItem) => menuItem.isActive).map((menuDetails, index) =>
                 menuDetails.isExternalLink ? (
                   <a
-                    target="_blank" rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     key={index}
                     href={menuDetails.ref}
                     style={{

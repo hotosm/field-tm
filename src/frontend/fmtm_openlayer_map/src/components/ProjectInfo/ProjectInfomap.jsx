@@ -103,23 +103,23 @@ const basicGeojsonTemplate = {
   features: [],
 };
 const ProjectInfomap = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const [taskBoundaries, setTaskBoundaries] = useState(null);
   const [buildingGeojson, setBuildingGeojson] = useState(null);
-  const projectTaskBoundries = CoreModules.useSelector(
+  const projectTaskBoundries = CoreModules.useAppSelector(
     (state) => state.project.projectTaskBoundries
   );
 
-  const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
+  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const federalWiseProjectCount = taskInfo?.map((task) => ({
     code: task.task_id,
     count: task.submission_count,
   }));
 
-  const projectBuildingGeojson = CoreModules.useSelector(
+  const projectBuildingGeojson = CoreModules.useAppSelector(
     (state) => state.project.projectBuildingGeojson
   );
-  const selectedTask = CoreModules.useSelector(
+  const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
   );
   const params = CoreModules.useParams();
@@ -139,7 +139,7 @@ const ProjectInfomap = () => {
   }, []);
 
   useEffect(() => {
-    if (!projectTaskBoundries && projectTaskBoundries?.length>0) return
+    if (!projectTaskBoundries && projectTaskBoundries?.length > 0) return;
     const taskGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [
@@ -162,7 +162,7 @@ const ProjectInfomap = () => {
     // setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
   }, [projectTaskBoundries]);
   useEffect(() => {
-    if (!projectBuildingGeojson) return
+    if (!projectBuildingGeojson) return;
     const taskBuildingGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [

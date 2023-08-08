@@ -6,13 +6,21 @@ import { VectorLayer } from "../components/MapComponent/OpenLayersComponent/Laye
 import CoreModules from "fmtm/CoreModules";
 import { CreateProjectActions } from "fmtm/CreateProjectSlice";
 
-
-const DefineAreaMap = ({ uploadedGeojson, setGeojsonFile, uploadedDataExtractFile, onDraw }) => {
-  const drawnGeojson = CoreModules.useSelector((state) => state.createproject.drawnGeojson);
-  const drawToggle = CoreModules.useSelector((state) => state.createproject.drawToggle);
-  const dispatch = CoreModules.useDispatch();
+const DefineAreaMap = ({
+  uploadedGeojson,
+  setGeojsonFile,
+  uploadedDataExtractFile,
+  onDraw,
+}) => {
+  const drawnGeojson = CoreModules.useAppSelector(
+    (state) => state.createproject.drawnGeojson
+  );
+  const drawToggle = CoreModules.useAppSelector(
+    (state) => state.createproject.drawToggle
+  );
+  const dispatch = CoreModules.useAppDispatch();
   const [dataExtractedGeojson, setDataExtractedGeojson] = useState(null);
-  const dividedTaskGeojson = CoreModules.useSelector(
+  const dividedTaskGeojson = CoreModules.useAppSelector(
     (state) => state.createproject.dividedTaskGeojson
   );
 
@@ -23,11 +31,8 @@ const DefineAreaMap = ({ uploadedGeojson, setGeojsonFile, uploadedDataExtractFil
     maxZoom: 25,
   });
 
-
-
   useEffect(() => {
     if (dividedTaskGeojson || onDraw) {
-
     } else if (uploadedGeojson) {
       const fileReader = new FileReader();
       fileReader.readAsText(uploadedGeojson, "UTF-8");
@@ -60,17 +65,19 @@ const DefineAreaMap = ({ uploadedGeojson, setGeojsonFile, uploadedDataExtractFil
         }}
       >
         <LayerSwitcherControl />
-        {drawToggle && <VectorLayer
-          geojson={drawnGeojson}
-          viewProperties={{
-            size: map?.getSize(),
-            padding: [50, 50, 50, 50],
-            constrainResolution: true,
-            duration: 2000,
-          }}
-          onDraw={onDraw}
-          zoomToLayer
-        />}
+        {drawToggle && (
+          <VectorLayer
+            geojson={drawnGeojson}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            onDraw={onDraw}
+            zoomToLayer
+          />
+        )}
         {dividedTaskGeojson && (
           <VectorLayer
             geojson={dividedTaskGeojson}
@@ -109,7 +116,7 @@ const DefineAreaMap = ({ uploadedGeojson, setGeojsonFile, uploadedDataExtractFil
               constrainResolution: true,
               duration: 2000,
             }}
-          // zoomToLayer
+            // zoomToLayer
           />
         )}
       </MapComponent>

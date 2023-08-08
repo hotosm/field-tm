@@ -32,7 +32,7 @@ function a11yProps(index) {
 }
 
 export default function BasicTabs({ listOfData }) {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const [value, setValue] = React.useState(0);
   const { type } = windowDimention();
   const variant: any = type == 's' ? 'fullWidth' : type == 'xs' ? 'fullWidth' : 'standard';

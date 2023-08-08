@@ -6,7 +6,7 @@ import CoreModules from 'fmtm/CoreModules';
 export default function MapStyles() {
 
 
-    const mapTheme = CoreModules.useSelector(state => state.theme.hotTheme)
+    const mapTheme = CoreModules.useAppSelector(state => state.theme.hotTheme)
     const [style, setStyle] = useState({})
 
     useEffect(() => {

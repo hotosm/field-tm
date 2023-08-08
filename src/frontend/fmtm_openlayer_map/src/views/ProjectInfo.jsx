@@ -8,7 +8,7 @@ import {
   fetchInfoTask,
   getDownloadProjectSubmission,
 } from "../api/task";
-import AssetModules from 'fmtm/AssetModules';
+import AssetModules from "fmtm/AssetModules";
 
 const boxStyles = {
   animation: "blink 1s infinite",
@@ -26,12 +26,12 @@ const boxStyles = {
 };
 
 const ProjectInfo = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const navigate = CoreModules.useNavigate();
   const [isMonitoring, setIsMonitoring] = useState(false);
 
-  const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
-  const selectedTask = CoreModules.useSelector(
+  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
   );
 
@@ -40,13 +40,13 @@ const ProjectInfo = () => {
   const decodedId = environment.decode(encodedId);
 
   const handleDownload = (downloadType) => {
-    if(downloadType === 'csv'){
+    if (downloadType === "csv") {
       dispatch(
         getDownloadProjectSubmission(
           `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&export_json=false`
         )
       );
-    }else if(downloadType === 'json'){
+    } else if (downloadType === "json") {
       dispatch(
         getDownloadProjectSubmission(
           `${environment.baseApiUrl}/submission/download?project_id=${decodedId}&export_json=true`
@@ -58,7 +58,11 @@ const ProjectInfo = () => {
   const handleConvert = () => {
     dispatch(
       fetchConvertToOsmDetails(
-        `${environment.baseApiUrl}/submission/convert-to-osm?project_id=${decodedId}&${selectedTask ?`task_id=${selectedTask}`:''}`
+        `${
+          environment.baseApiUrl
+        }/submission/convert-to-osm?project_id=${decodedId}&${
+          selectedTask ? `task_id=${selectedTask}` : ""
+        }`
       )
     );
   };
@@ -86,10 +90,12 @@ const ProjectInfo = () => {
     setIsMonitoring((prevState) => !prevState);
   };
 
-  const projectInfo = CoreModules.useSelector(
+  const projectInfo = CoreModules.useAppSelector(
     (state) => state.project.projectInfo
   );
-  const downloadSubmissionLoading = CoreModules.useSelector((state)=>state.task.downloadSubmissionLoading)
+  const downloadSubmissionLoading = CoreModules.useAppSelector(
+    (state) => state.task.downloadSubmissionLoading
+  );
 
   return (
     <>
@@ -104,18 +110,27 @@ const ProjectInfo = () => {
         }}
       >
         <CoreModules.Box>
-        <CoreModules.IconButton
-            sx={{display:'flex',justifyContent:'center', alignItems:'center', width:'80px',mb:2}}
+          <CoreModules.IconButton
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "80px",
+              mb: 2,
+            }}
             onClick={() => {
               navigate(-1);
               // setOpen(true);
             }}
             color="info"
           >
-            <AssetModules.ArrowBackIcon color='info' sx={{ fontSize: '30px' }} />
-          <CoreModules.Typography ml={2} variant="h1" >
-            Back
-          </CoreModules.Typography>
+            <AssetModules.ArrowBackIcon
+              color="info"
+              sx={{ fontSize: "30px" }}
+            />
+            <CoreModules.Typography ml={2} variant="h1">
+              Back
+            </CoreModules.Typography>
           </CoreModules.IconButton>
           <CoreModules.Typography variant="h1" color="#929db3">
             #{projectInfo?.id}
@@ -181,27 +196,32 @@ const ProjectInfo = () => {
               Convert
             </CoreModules.Button>
             <CoreModules.LoadingButton
-                onClick={()=>handleDownload('csv')}
-                sx={{width:'unset'}}
-                loading={downloadSubmissionLoading.type=== 'csv' && downloadSubmissionLoading.loading}
-                loadingPosition="end"
-                endIcon={<AssetModules.FileDownloadIcon />}
-                variant="contained"                            
-                color="error"
-                >
-            
-                CSV
+              onClick={() => handleDownload("csv")}
+              sx={{ width: "unset" }}
+              loading={
+                downloadSubmissionLoading.type === "csv" &&
+                downloadSubmissionLoading.loading
+              }
+              loadingPosition="end"
+              endIcon={<AssetModules.FileDownloadIcon />}
+              variant="contained"
+              color="error"
+            >
+              CSV
             </CoreModules.LoadingButton>
             <CoreModules.LoadingButton
-                onClick={()=>handleDownload('json')}
-                sx={{width:'unset'}}
-                loading={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
-                loadingPosition="end"
-                endIcon={<AssetModules.FileDownloadIcon />}
-                variant="contained"                            
-                color="error"
-                >
-                JSON
+              onClick={() => handleDownload("json")}
+              sx={{ width: "unset" }}
+              loading={
+                downloadSubmissionLoading.type === "json" &&
+                downloadSubmissionLoading.loading
+              }
+              loadingPosition="end"
+              endIcon={<AssetModules.FileDownloadIcon />}
+              variant="contained"
+              color="error"
+            >
+              JSON
             </CoreModules.LoadingButton>
           </CoreModules.Box>
           <CoreModules.Card>

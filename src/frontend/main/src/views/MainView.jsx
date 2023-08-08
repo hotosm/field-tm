@@ -8,11 +8,11 @@ import Loader from '../utilities/AppLoader';
 import MappingHeader from '../utilities/MappingHeader';
 
 const MainView = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const { windowSize } = windowDimention();
-  const checkTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
+  const checkTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const theme = CoreModules.createTheme(checkTheme);
-  const stateSnackBar = CoreModules.useSelector((state) => state.common.snackbar);
+  const stateSnackBar = CoreModules.useAppSelector((state) => state.common.snackbar);
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;

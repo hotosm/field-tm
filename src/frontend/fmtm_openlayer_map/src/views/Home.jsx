@@ -24,19 +24,23 @@ import AssetModules from "fmtm/AssetModules";
 
 import Overlay from "ol/Overlay";
 const Home = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
 
-  const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
-  const state = CoreModules.useSelector((state) => state.project);
+  const defaultTheme = CoreModules.useAppSelector(
+    (state) => state.theme.hotTheme
+  );
+  const state = CoreModules.useAppSelector((state) => state.project);
 
-  const projectInfo = CoreModules.useSelector(
+  const projectInfo = CoreModules.useAppSelector(
     (state) => state.home.selectedProject
   );
-  const stateDialog = CoreModules.useSelector(
+  const stateDialog = CoreModules.useAppSelector(
     (state) => state.home.dialogStatus
   );
-  const stateSnackBar = CoreModules.useSelector((state) => state.home.snackbar);
+  const stateSnackBar = CoreModules.useAppSelector(
+    (state) => state.home.snackbar
+  );
   const [taskId, setTaskId] = useState();
   const mapElement = useRef();
   const [map, setMap] = useState();
@@ -47,7 +51,9 @@ const Home = () => {
   const decodedId = environment.decode(encodedId);
   const { windowSize, type } = WindowDimension();
   const { y } = OnScroll(map, windowSize.width);
-  const downloadProjectFormLoading = CoreModules.useSelector((state) => state.project.downloadProjectFormLoading)
+  const downloadProjectFormLoading = CoreModules.useAppSelector(
+    (state) => state.project.downloadProjectFormLoading
+  );
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -72,7 +78,7 @@ const Home = () => {
         (project) => project.id == environment.decode(encodedId)
       ) == -1
     ) {
-      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+      dispatch(ProjectActions.SetProjectTaskBoundries([]));
 
       dispatch(
         ProjectById(
@@ -82,9 +88,8 @@ const Home = () => {
         state.projectTaskBoundries
       );
       // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
-
     } else {
-      dispatch(ProjectActions.SetProjectTaskBoundries([]))
+      dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
@@ -138,7 +143,6 @@ const Home = () => {
       source: new VectorSource(),
     });
 
-
     const view = new View({
       projection: "EPSG:3857",
       center: [0, 0],
@@ -156,14 +160,18 @@ const Home = () => {
           source: new OSM(),
           visible: true,
         }),
-        initalFeaturesLayer
+        initalFeaturesLayer,
       ],
       overlays: [overlay],
       view: view,
     });
     initialMap.on("click", function (event) {
       initialMap.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-        const status = feature.getId()?.toString()?.replace("_", ",")?.split(",")?.[1];
+        const status = feature
+          .getId()
+          ?.toString()
+          ?.replace("_", ",")
+          ?.split(",")?.[1];
         if (
           environment.tasksStatus.findIndex((data) => data.label == status) !=
           -1
@@ -206,18 +214,19 @@ const Home = () => {
   // }
   TasksLayer(map, mainView, featuresLayer);
 
-
   const handleDownload = (downloadType) => {
-    if (downloadType === 'form') {
+    if (downloadType === "form") {
       dispatch(
         DownloadProjectForm(
-          `${environment.baseApiUrl}/projects/download_form/${decodedId}/`, downloadType
+          `${environment.baseApiUrl}/projects/download_form/${decodedId}/`,
+          downloadType
         )
       );
-    } else if (downloadType === 'geojson') {
+    } else if (downloadType === "geojson") {
       dispatch(
         DownloadProjectForm(
-          `${environment.baseApiUrl}/projects/${decodedId}/download_tasks`, downloadType
+          `${environment.baseApiUrl}/projects/${decodedId}/download_tasks`,
+          downloadType
         )
       );
     }
@@ -324,33 +333,53 @@ const Home = () => {
           type={type}
         />
         <CoreModules.Stack direction={"row"} spacing={1}>
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', marginLeft: '1rem', gap: 6 }}>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              marginLeft: "1rem",
+              gap: 6,
+            }}
+          >
             <CoreModules.LoadingButton
-              onClick={() => handleDownload('form')}
-              sx={{ width: 'unset' }}
-              loading={downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading}
+              onClick={() => handleDownload("form")}
+              sx={{ width: "unset" }}
+              loading={
+                downloadProjectFormLoading.type === "form" &&
+                downloadProjectFormLoading.loading
+              }
               loadingPosition="end"
               endIcon={<AssetModules.FileDownloadIcon />}
               variant="contained"
               color="error"
             >
-
               Form
             </CoreModules.LoadingButton>
             <CoreModules.LoadingButton
-              onClick={() => handleDownload('geojson')}
-              sx={{ width: 'unset' }}
-              loading={downloadProjectFormLoading.type === 'geojson' && downloadProjectFormLoading.loading}
+              onClick={() => handleDownload("geojson")}
+              sx={{ width: "unset" }}
+              loading={
+                downloadProjectFormLoading.type === "geojson" &&
+                downloadProjectFormLoading.loading
+              }
               loadingPosition="end"
               endIcon={<AssetModules.FileDownloadIcon />}
               variant="contained"
               color="error"
             >
-
               Geojson
             </CoreModules.LoadingButton>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', width: '100%', }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "flex-end",
+              width: "100%",
+            }}
+          >
             <CoreModules.Link
               to={`/projectInfo/${encodedId}`}
               style={{
@@ -361,10 +390,7 @@ const Home = () => {
                 marginRight: "15px",
               }}
             >
-              <CoreModules.Button
-                variant="contained"
-                color="error"
-              >
+              <CoreModules.Button variant="contained" color="error">
                 ProjectInfo
               </CoreModules.Button>
             </CoreModules.Link>
@@ -378,31 +404,30 @@ const Home = () => {
                 marginRight: "15px",
               }}
             >
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-              >
+              <CoreModules.Button variant="outlined" color="error">
                 Edit Project
               </CoreModules.Button>
             </CoreModules.Link>
           </div>
         </CoreModules.Stack>
         {/* <ProjectMap /> */}
-        {params?.id && <OpenLayersMap
-          key={params.id}
-          defaultTheme={defaultTheme}
-          stateDialog={stateDialog}
-          params={params}
-          state={state}
-          taskId={taskId}
-          top={top}
-          featuresLayer={featuresLayer}
-          map={map}
-          mainView={mainView}
-          mapElement={mapElement}
-          environment={environment}
-          windowType={type}
-        />}
+        {params?.id && (
+          <OpenLayersMap
+            key={params.id}
+            defaultTheme={defaultTheme}
+            stateDialog={stateDialog}
+            params={params}
+            state={state}
+            taskId={taskId}
+            top={top}
+            featuresLayer={featuresLayer}
+            map={map}
+            mainView={mainView}
+            mapElement={mapElement}
+            environment={environment}
+            windowType={type}
+          />
+        )}
       </CoreModules.Stack>
 
       {/* project Details Tabs */}

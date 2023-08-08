@@ -9,7 +9,7 @@ import AssetModules from "fmtm/AssetModules";
 import { HomeActions } from "fmtm/HomeSlice";
 
 const TasksComponent = ({ type, task, defaultTheme }) => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const [open, setOpen] = useState(false);
   const params = CoreModules.useParams();
   const { loading, qrcode } = ProjectFilesById(
@@ -100,11 +100,16 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                     />
                   </CoreModules.IconButton>
                 </CoreModules.Stack>
-                <CoreModules.Button variant="contained"
+                <CoreModules.Button
+                  variant="contained"
                   color="error"
                   onClick={() => {
-                    document.location.href = 'intent://getodk.org/#Intent;scheme=app;package=org.odk.collect.android;end';
-                  }}>Go To ODK</CoreModules.Button>
+                    document.location.href =
+                      "intent://getodk.org/#Intent;scheme=app;package=org.odk.collect.android;end";
+                  }}
+                >
+                  Go To ODK
+                </CoreModules.Button>
                 <CoreModules.Stack
                   width={40}
                   height={40}
