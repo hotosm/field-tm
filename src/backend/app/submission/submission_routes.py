@@ -17,16 +17,14 @@
 #
 import os
 import json
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
+from ..projects import project_crud, project_schemas
 from fastapi.logger import logger as logger
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
-from .submission_crud import convert_json_to_osm
 from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
 from ..projects import project_crud
-
-
 from ..db import database
 from . import submission_crud
 
@@ -184,7 +182,7 @@ async def conflate_osm_date(
         f.write(json.dumps(submission))
 
     # Convert the submission to osm xml format
-    osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
+    osmoutfile, jsonoutfile = await submission_crud.convert_json_to_osm(jsoninfile)
 
     # Remove the extra closing </osm> tag from the end of the file
     with open(osmoutfile, 'r') as f:
@@ -193,7 +191,7 @@ async def conflate_osm_date(
         last_osm_index = osmoutfile_data.rfind('</osm>')
         # Remove the extra closing </osm> tag from the end
         processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
-    
+
     # Write the modified XML data back to the file
     with open(osmoutfile, 'w') as f:
         f.write(processed_xml_string)
@@ -205,3 +203,43 @@ async def conflate_osm_date(
         data = odk_merge.conflateData(osm)
         return data
     return []
+
+
+@router.get("/get_osm_xml/{project_id}")
+async def get_osm_xml(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+
+    # JSON FILE PATH
+    jsoninfile = "/tmp/json_infile.json"
+
+    # # Delete if these files already exist
+    if os.path.exists(jsoninfile):
+        os.remove(jsoninfile)
+
+    # Submission JSON
+    submission = submission_crud.get_all_submissions(db, project_id)
+
+    # Write the submission to a file
+    with open(jsoninfile, 'w') as f:
+        f.write(json.dumps(submission))
+
+    # Convert the submission to osm xml format
+    osmoutfile = await submission_crud.convert_json_to_osm_xml(jsoninfile)
+
+    # Remove the extra closing </osm> tag from the end of the file
+    with open(osmoutfile, 'r') as f:
+        osmoutfile_data = f.read()
+        # Find the last index of the closing </osm> tag
+        last_osm_index = osmoutfile_data.rfind('</osm>')
+        # Remove the extra closing </osm> tag from the end
+        processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
+
+    # Write the modified XML data back to the file
+    with open(osmoutfile, 'w') as f:
+        f.write(processed_xml_string)
+
+    # Create a plain XML response
+    response = Response(content=processed_xml_string, media_type="application/xml")
+    return response
