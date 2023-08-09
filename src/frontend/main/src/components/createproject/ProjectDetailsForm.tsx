@@ -9,13 +9,9 @@ import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { OrganisationService } from '../../api/CreateProjectService';
 import environment from '../../environment';
 import { MenuItem, Select } from '@mui/material';
-import CustomizedModal from '../../utilities/CustomizedModal';
-import OrganizationAddForm from '../organization/OrganizationAddForm';
 import { createPopup } from '../../utilfunctions/createPopup';
 
 const ProjectDetailsForm: React.FC = () => {
-  const [openOrganizationModal, setOpenOrganizationModal] = useState(false);
-
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
   // // const state:any = useSelector<any>(state=>state.project.projectData)
   // // console.log('state main :',state)
@@ -405,9 +401,6 @@ const ProjectDetailsForm: React.FC = () => {
           </CoreModules.Box>
         </CoreModules.FormGroup>
       </form>
-      <CustomizedModal isOpen={openOrganizationModal} toggleOpen={setOpenOrganizationModal}>
-        <OrganizationAddForm />
-      </CustomizedModal>
     </CoreModules.Stack>
   );
 };
