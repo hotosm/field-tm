@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { styled, Box, Theme } from '@mui/system';
 import Modal from '@mui/base/ModalUnstyled';
 
-export default function CustomizedModal({ children, isOpen, toggleOpen }) {
+export default function CustomizedModal({ style = defaultStyle, children, isOpen, toggleOpen }) {
   const handleClose = () => toggleOpen(false);
 
   return (
@@ -15,26 +15,15 @@ export default function CustomizedModal({ children, isOpen, toggleOpen }) {
         onClose={handleClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <Box sx={style}>
-          {React.Children.only(children)}
-        </Box>
+        <Box sx={style}>{React.Children.only(children)}</Box>
       </StyledModal>
-    </div >
+    </div>
   );
 }
 
-const Backdrop = React.forwardRef<
-  HTMLDivElement,
-  { open?: boolean; className: string }
->((props, ref) => {
+const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean; className: string }>((props, ref) => {
   const { open, className, ...other } = props;
-  return (
-    <div
-      className={clsx({ 'MuiBackdrop-open': open }, className)}
-      ref={ref}
-      {...other}
-    />
-  );
+  return <div className={clsx({ 'MuiBackdrop-open': open }, className)} ref={ref} {...other} />;
 });
 
 const StyledModal = styled(Modal)`
@@ -60,7 +49,7 @@ const StyledBackdrop = styled(Backdrop)`
   -webkit-tap-highlight-color: transparent;
 `;
 
-const style = (theme: Theme) => ({
+const defaultStyle = (theme: Theme) => ({
   width: '80%',
   height: '80%',
   bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
