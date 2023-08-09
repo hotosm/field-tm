@@ -113,9 +113,6 @@ const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue,
                 Next
               </CoreModules.Button>
             </CoreModules.Stack>
-            {/* <CustomizedModal isOpen={openTerminal} toggleOpen={setOpenTerminal}>
-                            
-                        </CustomizedModal> */}
           </CoreModules.Stack>
           {/* END */}
         </FormGroup>
