@@ -1,0 +1,54 @@
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+version: "3"
+
+networks:
+  x11:
+
+services:
+  josm:
+    image: "ghcr.io/hotosm/fmtm/josm:latest"
+    build:
+      context: josm
+    container_name: josm
+    environment:
+      - DISPLAY=josm-novnc:0.0
+    depends_on:
+      - josm-novnc
+    networks:
+      - fmtm-dev
+      - x11
+    ports:
+      - 8111:80
+    restart: unless-stopped
+
+  josm-novnc:
+    image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
+    build:
+      context: josm/novnc
+    container_name: josm_novnc
+    environment:
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=600
+      - RUN_XTERM=no
+      - RUN_FLUXBOX=no
+    ports:
+      - "8112:8080"
+    networks:
+      - x11
+    restart: unless-stopped
