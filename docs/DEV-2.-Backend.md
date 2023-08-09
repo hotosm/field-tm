@@ -155,6 +155,23 @@ Creating a new release during development may not always be feasible.
 
 > Note: this is useful for debugging features during active development.
 
+## Running JOSM in the dev stack
+
+- Run JOSM with FMTM:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.josm.yml \
+  up -d
+```
+
+This adds JOSM to the docker compose stack for local development.
+Access the JOSM Remote API: <http://localhost:8111>
+Access the JOSM GUI in browser: <http://localhost:8112>
+
+You can now call the JOSM API from FMTM and changes will be reflected in the GUI.
+
 ## Conclusion
 
 Running the FMTM project is easy with Docker. You can also run the
