@@ -24,7 +24,6 @@ volumes:
 
 networks:
   fmtm-dev:
-  x11:
 
 services:
   fmtm-db:
@@ -185,38 +184,6 @@ services:
       - central
     networks:
       - fmtm-dev
-    restart: unless-stopped
-
-  josm:
-    image: "ghcr.io/hotosm/fmtm/josm:latest"
-    build:
-      context: josm
-    container_name: josm
-    environment:
-      - DISPLAY=josm-novnc:0.0
-    depends_on:
-      - josm-novnc
-    networks:
-      - fmtm-dev
-      - x11
-    ports:
-      - 8111:80
-    restart: unless-stopped
-
-  josm-novnc:
-    image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
-    build:
-      context: josm/novnc
-    container_name: josm_novnc
-    environment:
-      - DISPLAY_WIDTH=1280
-      - DISPLAY_HEIGHT=600
-      - RUN_XTERM=no
-      - RUN_FLUXBOX=no
-    ports:
-      - "8112:8080"
-    networks:
-      - x11
     restart: unless-stopped
 
   pyxform:
