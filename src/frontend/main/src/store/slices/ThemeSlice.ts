@@ -79,6 +79,10 @@ const ThemeSlice = CoreModules.createSlice({
         //custom
         htmlFontSize: 18,
 
+        barlowCondensed: {
+          fontFamily: 'Barlow Condensed',
+          fontSize: '24px',
+        },
         caption: {
           fontFamily: 'BarlowBold',
           fontSize: 24,
@@ -116,6 +120,10 @@ const ThemeSlice = CoreModules.createSlice({
         },
         h4: {
           fontFamily: 'BarlowLight',
+          fontSize: 16,
+        },
+        p: {
+          fontFamily: 'Archivo',
           fontSize: 16,
         },
       },
