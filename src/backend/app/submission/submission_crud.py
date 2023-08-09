@@ -233,9 +233,6 @@ async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
     return osmoutfile, jsonoutfile
 
 
-async def get_osm_xml(db:Session, project_odk_id:int, odk_credentials: project_schemas.ODKCentral):
-    pass
-
 async def convert_to_osm(db: Session, project_id: int, task_id: int):
 
     project_info = project_crud.get_project(db, project_id)

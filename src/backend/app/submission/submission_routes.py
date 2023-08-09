@@ -191,7 +191,7 @@ async def conflate_osm_date(
         last_osm_index = osmoutfile_data.rfind('</osm>')
         # Remove the extra closing </osm> tag from the end
         processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
-
+    
     # Write the modified XML data back to the file
     with open(osmoutfile, 'w') as f:
         f.write(processed_xml_string)
