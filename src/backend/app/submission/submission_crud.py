@@ -97,7 +97,7 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
     else:
         # If task_id is provided, submission made to this particular task is returned.
         xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
-        submission_list = xform.listSubmissions(odkid, xml_form_id)
+        submission_list = xform.listSubmissionBasicInfo(odkid, xml_form_id)
         for x in submission_list:
             x["submitted_by"] = f"{project_name}_{form_category}_{task_id}"
         return submission_list
