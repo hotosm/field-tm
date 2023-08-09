@@ -137,6 +137,41 @@ def create_zip_file(files, output_file_path):
     return output_file_path
 
 
+async def convert_json_to_osm_xml(file_path):
+
+    jsonin = JsonDump()
+    infile = Path(file_path)
+
+    base = os.path.splitext(infile.name)[0]
+
+    osmoutfile = f"/tmp/{base}.osm"
+    jsonin.createOSM(osmoutfile)
+
+    data = jsonin.parse(infile.as_posix())
+
+    for entry in data:
+        feature = jsonin.createEntry(entry)
+        # Sometimes bad entries, usually from debugging XForm design, sneak in
+        if len(feature) == 0:
+            continue
+        if len(feature) > 0:
+            if "lat" not in feature["attrs"]:
+                if 'geometry' in feature['tags']:
+                    if type(feature['tags']['geometry']) == str:
+                        coords = list(feature['tags']['geometry'])
+                    else:
+                        coords = feature['tags']['geometry']['coordinates']
+                    feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
+                else:
+                    logger.warning("Bad record! %r" % feature)
+                    continue
+            jsonin.writeOSM(feature)
+
+    jsonin.finishOSM()
+    logger.info("Wrote OSM XML file: %r" % osmoutfile)
+    return osmoutfile
+
+
 async def convert_json_to_osm(file_path):
 
     jsonin = JsonDump()
@@ -339,6 +374,10 @@ def get_all_submissions(db: Session, project_id):
     )
 
     project = get_odk_project(odk_credentials)
+
+    #TODO: pass xform id list in getAllSubmissions. Next release of osm-fieldwork will support this.
+    # task_lists = tasks_crud.get_task_lists(db, project_id)
+    # submissions = project.getAllSubmissions(project_info.odkid, task_lists)
 
     submissions = project.getAllSubmissions(project_info.odkid)
     return submissions
