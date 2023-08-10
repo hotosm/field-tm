@@ -20,8 +20,6 @@ import json
 import os
 import uuid
 from typing import List, Optional
-import tempfile
-import inspect
 
 from fastapi import (
     APIRouter,
@@ -47,7 +45,7 @@ from ..db import database
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
 from . import utils
-# from ..models.enums import TILES_SOURCE
+from ..models.enums import TILES_SOURCE
 
 router = APIRouter(
     prefix="/projects",
@@ -831,7 +829,6 @@ async def download_task_boundaries(
 
     return Response(content = out, headers=headers)
 
-TILES_SOURCE = ["esri", "bing", "google", "oal", "topo"]
 
 @router.get("/tiles/{project_id}")
 async def get_project_tiles(
