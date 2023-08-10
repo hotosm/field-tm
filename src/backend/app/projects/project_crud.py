@@ -2091,12 +2091,11 @@ async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
         dump(features, jsonfile)
 
 
-
-async def get_project_tiles(db: Session, project_id: int):
+async def get_project_tiles(db: Session, project_id: int, source: str):
     """Get the tiles for a project"""
     zooms = [12,13,14,15,16,17,18,19]
     boundary = "/tmp/thamel.geojson"
-    source = "esri"
+    source = source
     base = f"/tmp/tiles/{source}tiles"
     outfile = "thamel.mbtiles"
 
