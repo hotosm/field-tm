@@ -17,6 +17,7 @@
 #
 
 import json
+import asyncio
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
@@ -148,20 +149,28 @@ async def task_features_count(
         odk_central_password = project.odk_central_password,
         )
 
-    data = []
-    for task in task_list:
-        
+    def process_task(task):
         feature_count_query = f"""
             select count(*) from features where project_id = {project_id} and task_id = {task}
         """
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
-        form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
-        data.append({
-            'task_id': task,
-            'feature_count': feature_count['count'],
-            'submission_count': form_details['submissions'],
-        })
+        submission_list = central_crud.list_task_submissions(
+            project.odkid, task, odk_credentials)
 
-    return data
+        # form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
+        return {
+            "task_id": task,
+            "feature_count": feature_count["count"],
+            # 'submission_count': form_details['submissions'],
+            "submission_count": len(submission_list)
+            if isinstance(submission_list, list)
+            else 0,
+        }
+
+    loop = asyncio.get_event_loop()
+    tasks = [loop.run_in_executor(None, process_task, task) for task in task_list]
+    processed_results = await asyncio.gather(*tasks)
+
+    return processed_results
