@@ -36,6 +36,7 @@ import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
@@ -2094,12 +2095,38 @@ async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
 async def get_project_tiles(db: Session, project_id: int, source: str):
     """Get the tiles for a project"""
     zooms = [12,13,14,15,16,17,18,19]
-    boundary = "/tmp/thamel.geojson"
     source = source
     base = f"/tmp/tiles/{source}tiles"
-    outfile = "thamel.mbtiles"
+    outfile = "/tmp/thamel.mbtiles"
 
-    basemap = basemapper.BaseMapper(boundary, base, source)
+
+    # Project Outline
+    query = f'''SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(feature)
+                )
+                FROM (
+                SELECT jsonb_build_object(
+                    'type', 'Feature',
+                    'id', id,
+                    'geometry', ST_AsGeoJSON(outline)::jsonb
+                ) AS feature
+                FROM projects
+                WHERE id={project_id}
+                ) features;'''
+
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    # Boundary
+    boundary_file = f"/tmp/{project_id}_boundary.geojson"
+
+    # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+    with open(boundary_file, "w") as jsonfile:
+        jsonfile.truncate(0)
+        dump(features, jsonfile)
+
+    basemap = basemapper.BaseMapper(boundary_file, base, source)
     outf = basemapper.DataFile(outfile, basemap.getFormat())
     suffix = os.path.splitext(outfile)[1]
     if suffix == ".mbtiles":
@@ -2112,4 +2139,4 @@ async def get_project_tiles(db: Session, project_id: int, source: str):
         else:
             logging.info("Only downloading tiles to %s!" % base)
 
-    return 'Processing'
+    return FileResponse(outfile, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})
