@@ -828,3 +828,23 @@ async def download_task_boundaries(
     }
 
     return Response(content = out, headers=headers)
+
+
+@router.get("/tiles/{project_id}")
+async def get_project_tiles(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    ):
+    """
+    Returns the tiles for a project.
+
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the tiles.
+    """
+
+    tiles = await project_crud.get_project_tiles(db, project_id)
+
+    return tiles
