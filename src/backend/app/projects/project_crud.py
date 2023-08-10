@@ -56,6 +56,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from osm_fieldwork.filter_data import FilterData
+from osm_fieldwork import basemapper
 
 from ..central import central_crud
 from ..config import settings
@@ -2088,3 +2089,28 @@ async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
     with open(outfile, "w") as jsonfile:
         jsonfile.truncate(0)
         dump(features, jsonfile)
+
+
+
+async def get_project_tiles(db: Session, project_id: int):
+    """Get the tiles for a project"""
+    zooms = [12,13,14,15,16,17,18,19]
+    boundary = "/tmp/thamel.geojson"
+    source = "esri"
+    base = f"/tmp/tiles/{source}tiles"
+    outfile = "thamel.mbtiles"
+
+    basemap = basemapper.BaseMapper(boundary, base, source)
+    outf = basemapper.DataFile(outfile, basemap.getFormat())
+    suffix = os.path.splitext(outfile)[1]
+    if suffix == ".mbtiles":
+        outf.addBounds(basemap.bbox)
+    for level in zooms:
+        basemap.getTiles(level)
+        if outfile:
+            # Create output database and specify image format, png, jpg, or tif
+            outf.writeTiles(basemap.tiles, base)
+        else:
+            logging.info("Only downloading tiles to %s!" % base)
+
+    return 'Processing'
