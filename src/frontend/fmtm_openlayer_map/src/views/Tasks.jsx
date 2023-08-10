@@ -298,7 +298,7 @@ const TasksSubmission = () => {
                 <CoreModules.Link
                   style={{ textDecoration: "auto" }}
                   className="submission-item"
-                  to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}
+                  to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.__id}`}
                 >
                   <CoreModules.Box
                     sx={{

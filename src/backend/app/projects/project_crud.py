@@ -2061,3 +2061,30 @@ async def update_odk_credentials(project_instance: project_schemas.BETAProjectUp
     db.commit()
     db.refresh(project_instance)
 
+
+async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
+
+    """Get the geojson of those features for this project"""
+
+    query = f'''SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(feature)
+                )
+                FROM (
+                SELECT jsonb_build_object(
+                    'type', 'Feature',
+                    'id', id,
+                    'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                    'properties', properties
+                ) AS feature
+                FROM features
+                WHERE project_id={project_id}
+                ) features;'''
+
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+    with open(outfile, "w") as jsonfile:
+        jsonfile.truncate(0)
+        dump(features, jsonfile)

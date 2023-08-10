@@ -3,7 +3,9 @@ import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
+
 import {
+  ConvertXMLToJOSM,
   fetchConvertToOsmDetails,
   fetchInfoTask,
   getDownloadProjectSubmission,
@@ -29,6 +31,7 @@ const ProjectInfo = () => {
   const dispatch = CoreModules.useAppDispatch();
   const navigate = CoreModules.useNavigate();
   const [isMonitoring, setIsMonitoring] = useState(false);
+  const themes = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const selectedTask = CoreModules.useAppSelector(
@@ -93,12 +96,66 @@ const ProjectInfo = () => {
   const projectInfo = CoreModules.useAppSelector(
     (state) => state.project.projectInfo
   );
+  const josmEditorError = CoreModules.useAppSelector(
+    (state) => state.task.josmEditorError
+  );
   const downloadSubmissionLoading = CoreModules.useAppSelector(
     (state) => state.task.downloadSubmissionLoading
   );
-
+  const uploadToJOSM = () => {
+    dispatch(
+      ConvertXMLToJOSM(
+        `${environment.baseApiUrl}/submission/get_osm_xml/${decodedId}`,
+        projectInfo.outline_geojson.bbox
+      )
+    );
+  };
+  const modalStyle = (theme) => ({
+    width: "30%",
+    height: "24%",
+    bgcolor: theme.palette.mode === "dark" ? "#0A1929" : "white",
+    border: "1px solid ",
+    padding: "16px 32px 24px 32px",
+  });
   return (
     <>
+      <CoreModules.CustomizedModal
+        isOpen={!!josmEditorError}
+        style={modalStyle}
+      >
+        <>
+          <h3
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            Connection with JOSM failed
+          </h3>
+          <p>
+            {" "}
+            Please verify if JOSM is running on your computer and the remote
+            control is enabled.
+          </p>
+          <CoreModules.Button
+            variant="contained"
+            color="error"
+            sx={{
+              width: "20%",
+              height: "20%",
+              p: 2,
+              display: "flex !important",
+              justifyContent: "center !important",
+              alignItems: "center !important",
+            }}
+            onClick={() => {
+              dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
+            }}
+          >
+            Close
+          </CoreModules.Button>
+        </>
+      </CoreModules.CustomizedModal>
       <CoreModules.Box
         sx={{
           px: 3,
@@ -140,6 +197,15 @@ const ProjectInfo = () => {
           </CoreModules.Typography>
         </CoreModules.Box>
         <CoreModules.Box sx={{ display: "flex", position: "relative" }}>
+          <CoreModules.LoadingButton
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{ width: "fit-content", height: "fit-content", mr: 2 }}
+            onClick={uploadToJOSM}
+          >
+            Upload to JOSM
+          </CoreModules.LoadingButton>
           <CoreModules.Button
             variant="outlined"
             color="error"

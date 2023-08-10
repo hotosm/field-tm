@@ -65,6 +65,8 @@ import { combineReducers } from 'redux';
 import LoadingBar from '../components/createproject/LoadingBar';
 import { TaskActions } from '../store/slices/TaskSlice';
 import { useAppDispatch, useAppSelector } from '../types/reduxTypes';
+import CustomizedModal from '../utilities/CustomizedModal';
+
 export default {
   Provider,
   PersistGate,
@@ -136,4 +138,5 @@ export default {
   LoadingButton,
   useAppDispatch,
   useAppSelector,
+  CustomizedModal,
 };

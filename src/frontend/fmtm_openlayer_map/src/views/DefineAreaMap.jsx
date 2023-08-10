@@ -32,7 +32,7 @@ const DefineAreaMap = ({
   });
 
   useEffect(() => {
-    if (dividedTaskGeojson || onDraw) {
+    if (dividedTaskGeojson) {
     } else if (uploadedGeojson) {
       const fileReader = new FileReader();
       fileReader.readAsText(uploadedGeojson, "UTF-8");
