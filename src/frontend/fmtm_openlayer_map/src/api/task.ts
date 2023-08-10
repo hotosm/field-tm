@@ -93,29 +93,35 @@ export const fetchConvertToOsmDetails: Function = (url: string) => {
   };
 };
 
-export const ConvertXMLToJOSM: Function = (url: string) => {
+export const ConvertXMLToJOSM: Function = (url: string, projectBbox) => {
   return async (dispatch) => {
     dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(true));
     const getConvertXMLToJOSM = async (url) => {
       try {
-        const params = {
-          url: url,
-        };
         // checkJOSMOpen - To check if JOSM Editor is Open Or Not.
         await CoreModules.axios.get(
           `http://127.0.0.1:8111/version?jsonp=checkJOSM`
         );
         //importToJosmEditor - To open JOSM Editor and add XML of Project Submission To JOSM.
-
         CoreModules.axios.get(
           `http://127.0.0.1:8111/imagery?title=osm&type=tms&url=https://tile.openstreetmap.org/%7Bzoom%7D/%7Bx%7D/%7By%7D.png`
-          //   `http://127.0.0.1:8111/imagery?title=osm&type=tms&min_zoom=4&max_zoom=14&url=https://tile.openstreetmap.org/%7Bzoom%7D/%7Bx%7D/%7By%7D.png`
         );
         await CoreModules.axios.get(`http://127.0.0.1:8111/import?url=${url}`);
-        // const getConvertXMLToJOSMResponse = await CoreModules.axios.get(url);
-        // const response: any = getConvertXMLToJOSMResponse.data;
+        // `http://127.0.0.1:8111/load_and_zoom?left=80.0580&right=88.2015&top=27.9268&bottom=26.3470`;
 
-        // dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(response[0].value[0]));
+        const loadAndZoomParams = {
+          left: projectBbox[0],
+          bottom: projectBbox[1],
+          right: projectBbox[2],
+          top: projectBbox[3],
+          changeset_comment: "fmtm",
+          // changeset_source: project.imagery ? project.imagery : '',
+          new_layer: "true",
+          layer_name: "OSM Data",
+        };
+        await CoreModules.axios.get(`http://127.0.0.1:8111/zoom`, {
+          params: loadAndZoomParams,
+        });
       } catch (error: any) {
         dispatch(CoreModules.TaskActions.SetJosmEditorError("JOSM Error"));
         // alert(error.response.data);
