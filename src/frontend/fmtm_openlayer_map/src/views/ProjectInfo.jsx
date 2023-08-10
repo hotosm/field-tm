@@ -105,7 +105,8 @@ const ProjectInfo = () => {
   const uploadToJOSM = () => {
     dispatch(
       ConvertXMLToJOSM(
-        `${environment.baseApiUrl}/submission/get_osm_xml/${decodedId}`
+        `${environment.baseApiUrl}/submission/get_osm_xml/${decodedId}`,
+        projectInfo.outline_geojson.bbox
       )
     );
   };
