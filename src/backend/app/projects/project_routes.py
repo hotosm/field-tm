@@ -31,7 +31,8 @@ from fastapi import (
     Form,
     HTTPException,
     UploadFile,
-    Response
+    Response,
+    Query
 )
 from fastapi.responses import FileResponse
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -46,6 +47,7 @@ from ..db import database
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
 from . import utils
+# from ..models.enums import TILES_SOURCE
 
 router = APIRouter(
     prefix="/projects",
@@ -829,11 +831,12 @@ async def download_task_boundaries(
 
     return Response(content = out, headers=headers)
 
+TILES_SOURCE = ["esri", "bing", "google", "oal", "topo"]
 
 @router.get("/tiles/{project_id}")
 async def get_project_tiles(
     project_id: int,
-    source: str,
+    source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
     db: Session = Depends(database.get_db),
     ):
     """
@@ -841,9 +844,10 @@ async def get_project_tiles(
 
     Args:
         project_id (int): The id of the project.
+        source (str): The selected source.
 
     Returns:
-        Response: The HTTP response object containing the tiles.
+        Response: The File response object containing the tiles.
     """
 
     tiles = await project_crud.get_project_tiles(db, project_id, source)
