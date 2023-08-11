@@ -11,9 +11,8 @@ import { InputLabel, MenuItem, Select } from '@mui/material';
 import DefineAreaMap from 'map/DefineAreaMap';
 import useForm from '../../hooks/useForm';
 import DefineTaskValidation from './validation/DefineTaskValidation';
+import { useAppSelector } from '../../types/reduxTypes';
 
-// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
-// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 const alogrithmList = [
   { id: 1, value: 'Divide on Square', label: 'Divide on Square' },
   { id: 2, value: 'Choose Area as Tasks', label: 'Choose Area as Tasks' },
@@ -33,7 +32,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
   const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
   const submission = () => {

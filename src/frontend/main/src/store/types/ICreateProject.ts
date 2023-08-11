@@ -1,85 +1,87 @@
-export interface ICreateProjectState {
-  editProjectDetails: IEditProjectDetails;
-  editProjectResponse?: IEditProjectResponse | null;
-  projectDetails: IProjectDetails;
-  projectDetailsResponse: IEditProjectResponse | null;
+export type CreateProjectStateTypes = {
+  editProjectDetails: EditProjectDetailsTypes;
+  editProjectResponse?: EditProjectResponseTypes | null;
+  projectDetails: ProjectDetailsTypes;
+  projectDetailsResponse: EditProjectResponseTypes | null;
   projectDetailsLoading: boolean;
-  projectArea: IProjectArea | null;
+  editProjectDetailsLoading: boolean;
+  projectArea: ProjectAreaTypes | null;
   projectAreaLoading: boolean;
-  formCategoryList: IFormCategoryList | [];
+  formCategoryList: FormCategoryListTypes | [];
+  formCategoryLoading: boolean;
   generateQrLoading: boolean;
-  organizationList: IOrganizationList[];
+  organizationList: OrganizationListTypes[];
   organizationListLoading: boolean;
-  generateQrSuccess: IGenerateQrSuccess | null;
+  generateQrSuccess: GenerateQrSuccessTypes | null;
   generateProjectLogLoading: boolean;
-  generateProjectLog: IGenerateProjectLog | null;
+  generateProjectLog: GenerateProjectLogTypes | null;
   createProjectStep: number;
   dividedTaskLoading: boolean;
   dividedTaskGeojson: string | null;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  taskSplittingGeojson: ITaskSplittingGeojson | null;
+  taskSplittingGeojson: TaskSplittingGeojsonTypes | null;
   updateBoundaryLoading: boolean;
-  drawnGeojson: IDrawnGeojson | null;
+  drawnGeojson: DrawnGeojsonTypes | null;
   drawToggle: boolean;
-}
-export interface IAuthor {
+};
+export type AuthorTypes = {
   username: string;
   id: number;
-}
+};
 
-export interface IGeometry {
+export type GeometryTypes = {
   type: string;
   coordinates: number[][][];
-}
+};
 
-export interface IGeoJSONFeature {
+export type GeoJSONFeatureTypes = {
   type: string;
-  geometry: IGeometry;
+  geometry: GeometryTypes;
   properties: Record<string, any>;
   id: string;
   bbox: null | number[];
-}
+};
 
-export interface IProjectTask {
+export type ProjectTaskTypes = {
   id: number;
   project_id: number;
   project_task_index: number;
   project_task_name: string;
-  outline_geojson: IGeoJSONFeature;
-  outline_centroid: IGeoJSONFeature;
+  outline_geojson: GeoJSONFeatureTypes;
+  outline_centroid: GeoJSONFeatureTypes;
   task_status: number;
   locked_by_uid: number | null;
   locked_by_username: string | null;
   task_history: any[];
   qr_code_base64: string;
   task_status_str: string;
-}
+};
 
-export interface IProjectInfo {
+export type ProjectInfoTypes = {
   name: string;
   short_description: string;
   description: string;
-}
+};
 
-interface IEditProjectResponse {
+type EditProjectResponseTypes = {
   id: number;
   odkid: number;
-  author: IAuthor;
-  project_info: IProjectInfo[];
+  author: AuthorTypes;
+  project_info: ProjectInfoTypes[];
   status: number;
-  outline_geojson: IGeoJSONFeature;
-  project_tasks: IProjectTask[];
+  outline_geojson: GeoJSONFeatureTypes;
+  project_tasks: ProjectTaskTypes[];
   xform_title: string;
   hashtags: string[];
-}
-export interface IEditProjectDetails {
+};
+export type EditProjectDetailsTypes = {
   name: string;
   description: string;
   short_description: string;
-}
+};
 
-export interface IProjectDetails {
+export type ProjectDetailsTypes = {
   dimension: number;
   no_of_buildings: number;
   odk_central_user?: string;
@@ -95,23 +97,23 @@ export interface IProjectDetails {
   data_extract_options?: string;
   data_extractWays?: string;
   form_ways?: string;
-}
+};
 
-export interface IProjectArea {
+export type ProjectAreaTypes = {
   // Define properties related to the project area here
-}
+};
 
-export interface IFormCategoryList {
+export type FormCategoryListTypes = {
   id: number;
   title: string;
-}
+};
 
-export interface IGenerateQrSuccess {
+export type GenerateQrSuccessTypes = {
   Message: string;
   task_id: string;
-}
+};
 
-export interface IOrganizationList {
+export type OrganizationListTypes = {
   logo: string;
   id: number;
   url: string;
@@ -119,21 +121,21 @@ export interface IOrganizationList {
   name: string;
   description: string;
   type: 1;
-}
+};
 
-export interface IGenerateProjectLog {
+export type GenerateProjectLogTypes = {
   status: string;
   message: string | null;
   progress: number;
   logs: string;
-}
+};
 
-export interface ITaskSplittingGeojson {
+export type TaskSplittingGeojsonTypes = {
   // Define properties related to the task splitting GeoJSON here
-}
+};
 
-export interface IDrawnGeojson {
+export type DrawnGeojsonTypes = {
   type: string;
   properties: null;
-  geometry: IGeometry;
-}
+  geometry: GeometryTypes;
+};
