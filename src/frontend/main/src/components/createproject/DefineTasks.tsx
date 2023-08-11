@@ -22,6 +22,7 @@ const alogrithmList = [
 const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const drawnGeojson = CoreModules.useSelector<any>((state) => state.createproject.drawnGeojson);
 
   // // const state:any = useSelector<any>(state=>state.project.projectData)
   // // console.log('state main :',state)
@@ -52,22 +53,53 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
   }: any = useForm(projectDetails, submission, DefineTaskValidation);
 
   const generateTasksOnMap = () => {
-    dispatch(
-      GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, {
-        geojson: geojsonFile,
-        dimension: formValues?.dimension,
-      }),
-    );
+    if (drawnGeojson) {
+      const drawnGeojsonString = JSON.stringify(drawnGeojson, null, 2);
+
+      const blob = new Blob([drawnGeojsonString], { type: 'application/json' });
+
+      // Create a file object from the Blob
+      const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
+      dispatch(
+        GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, {
+          geojson: drawnGeojsonFile,
+          dimension: formValues?.dimension,
+        }),
+      );
+    } else {
+      dispatch(
+        GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, {
+          geojson: geojsonFile,
+          dimension: formValues?.dimension,
+        }),
+      );
+    }
   };
 
   const generateTaskWithSplittingAlgorithm = () => {
-    dispatch(
-      TaskSplittingPreviewService(
-        `${enviroment.baseApiUrl}/projects/task_split`,
-        geojsonFile,
-        formValues?.no_of_buildings,
-      ),
-    );
+    if (drawnGeojson) {
+      const drawnGeojsonString = JSON.stringify(drawnGeojson, null, 2);
+
+      const blob = new Blob([drawnGeojsonString], { type: 'application/json' });
+
+      // Create a file object from the Blob
+      const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
+      dispatch(
+        TaskSplittingPreviewService(
+          `${enviroment.baseApiUrl}/projects/task_split`,
+          drawnGeojsonFile,
+          formValues?.no_of_buildings,
+        ),
+      );
+    } else {
+      dispatch(
+        TaskSplittingPreviewService(
+          `${enviroment.baseApiUrl}/projects/task_split`,
+          geojsonFile,
+          formValues?.no_of_buildings,
+        ),
+      );
+    }
   };
 
   // 'Use natural Boundary'

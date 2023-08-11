@@ -64,6 +64,7 @@ import { createSlice, configureStore, getDefaultMiddleware } from '@reduxjs/tool
 import { combineReducers } from 'redux';
 import LoadingBar from '../components/createproject/LoadingBar';
 import { TaskActions } from '../store/slices/TaskSlice';
+import CustomizedModal from '../utilities/CustomizedModal';
 
 export default {
   Provider,
@@ -136,4 +137,5 @@ export default {
   LoadingBar,
   TaskActions,
   LoadingButton,
+  CustomizedModal,
 };

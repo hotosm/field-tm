@@ -1,30 +1,35 @@
+import { ICreateProjectState } from 'store/types/ICreateProject';
 import CoreModules from '../../shared/CoreModules';
+
+export const initialState: ICreateProjectState = {
+  editProjectDetails: { name: '', description: '', short_description: '' },
+  editProjectResponse: null,
+  projectDetails: { dimension: 10, no_of_buildings: 5 },
+  projectDetailsResponse: null,
+  projectDetailsLoading: false,
+  projectArea: null,
+  projectAreaLoading: false,
+  formCategoryList: [],
+  generateQrLoading: false,
+  organizationList: [],
+  organizationListLoading: false,
+  generateQrSuccess: null,
+  generateProjectLogLoading: false,
+  generateProjectLog: null,
+  createProjectStep: 1,
+  dividedTaskLoading: false,
+  dividedTaskGeojson: null,
+  formUpdateLoading: false,
+  taskSplittingGeojsonLoading: false,
+  taskSplittingGeojson: null,
+  updateBoundaryLoading: false,
+  drawnGeojson: null,
+  drawToggle: false,
+};
 
 const CreateProject = CoreModules.createSlice({
   name: 'createproject',
-  initialState: {
-    editProjectDetails: { name: '', description: '', short_description: '' },
-    editProjectResponse: null,
-    projectDetails: { dimension: 10, no_of_buildings: 5 },
-    projectDetailsResponse: null,
-    projectDetailsLoading: false,
-    projectArea: null,
-    projectAreaLoading: false,
-    formCategoryList: [],
-    generateQrLoading: false,
-    organizationList: [],
-    organizationListLoading: false,
-    generateQrSuccess: null,
-    generateProjectLogLoading: false,
-    generateProjectLog: null,
-    createProjectStep: 1,
-    dividedTaskLoading: false,
-    dividedTaskGeojson: false,
-    formUpdateLoading: false,
-    taskSplittingGeojsonLoading: false,
-    taskSplittingGeojson: null,
-    updateBoundaryLoading: false,
-  },
+  initialState: initialState,
   reducers: {
     SetProjectDetails(state, action) {
       state.projectDetails = { ...state.projectDetails, [action.payload.key]: action.payload.value };
@@ -92,6 +97,9 @@ const CreateProject = CoreModules.createSlice({
     SetDividedTaskGeojson(state, action) {
       state.dividedTaskGeojson = action.payload;
     },
+    SetDrawnGeojson(state, action) {
+      state.drawnGeojson = action.payload;
+    },
     SetDividedTaskFromGeojsonLoading(state, action) {
       state.dividedTaskLoading = action.payload;
     },
@@ -121,6 +129,9 @@ const CreateProject = CoreModules.createSlice({
     },
     SetEditProjectBoundaryServiceLoading(state, action) {
       state.updateBoundaryLoading = action.payload;
+    },
+    SetDrawToggle(state, action) {
+      state.drawToggle = action.payload;
     },
   },
 });
