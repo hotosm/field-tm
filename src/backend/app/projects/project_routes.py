@@ -832,6 +832,7 @@ async def download_task_boundaries(
 
 @router.get("/tiles/{project_id}")
 async def get_project_tiles(
+    background_tasks: BackgroundTasks,
     project_id: int,
     source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
     db: Session = Depends(database.get_db),
@@ -847,6 +848,20 @@ async def get_project_tiles(
         Response: The File response object containing the tiles.
     """
 
-    tiles = await project_crud.get_project_tiles(db, project_id, source)
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
 
-    return tiles
+    # insert task and task ID into database
+    await project_crud.insert_background_task_into_database(
+        db, task_id=background_task_id
+    )
+
+    background_tasks.add_task(
+        project_crud.get_project_tiles,
+        db,
+        project_id,
+        source,
+        background_task_id
+    )
+
+    return {"Message": "Tile generation started"}
