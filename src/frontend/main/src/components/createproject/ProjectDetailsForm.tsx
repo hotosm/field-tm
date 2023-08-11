@@ -10,6 +10,7 @@ import { OrganisationService } from '../../api/CreateProjectService';
 import environment from '../../environment';
 import { MenuItem, Select } from '@mui/material';
 import { createPopup } from '../../utilfunctions/createPopup';
+import { useAppSelector } from '../../types/reduxTypes';
 
 const ProjectDetailsForm: React.FC = () => {
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -24,10 +25,10 @@ const ProjectDetailsForm: React.FC = () => {
   const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails: any = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = CoreModules.useAppSelector((state) => state.createproject.organizationList);
+  const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {

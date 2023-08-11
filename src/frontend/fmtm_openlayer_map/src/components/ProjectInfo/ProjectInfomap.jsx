@@ -116,7 +116,7 @@ const ProjectInfomap = () => {
     count: task.submission_count,
   }));
 
-  const projectBuildingGeojson = CoreModules.useAppSelector(
+  const projectBuildingGeojson = useAppSelector(
     (state) => state.project.projectBuildingGeojson
   );
   const selectedTask = CoreModules.useAppSelector(
