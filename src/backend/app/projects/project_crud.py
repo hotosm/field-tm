@@ -2099,10 +2099,21 @@ async def get_project_tiles(db: Session,
                             ):
     try:
         """Get the tiles for a project"""
+
         zooms = [12,13,14,15,16,17,18,19]
         source = source
         base = f"/tmp/tiles/{source}tiles"
-        outfile = "/tmp/thamel.mbtiles"
+        outfile = f"/tmp/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
+
+        tile_path_instance = db_models.DbTilesPath(
+            project_id = project_id,
+            task_id = str(background_task_id),
+            status = 1,
+            tile_source = source,
+            path = outfile
+        )
+        db.add(tile_path_instance)
+        db.commit()
 
 
         # Project Outline
@@ -2143,6 +2154,9 @@ async def get_project_tiles(db: Session,
                 outf.writeTiles(basemap.tiles, base)
             else:
                 logging.info("Only downloading tiles to %s!" % base)
+
+        tile_path_instance.status = 4
+        db.commit()
 
         # Update background task status to COMPLETED
         update_background_task_status_in_database(
