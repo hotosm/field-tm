@@ -2169,6 +2169,9 @@ async def get_project_tiles(db: Session,
         logger.error(f'Tiles generation process failed for project id {project_id}')
         logger.error(str(e))
 
+        tile_path_instance.status = 2
+        db.commit()
+
         # Update background task status to FAILED
         update_background_task_status_in_database(
             db, background_task_id, 2, str(e)
