@@ -139,7 +139,13 @@ const ProjectInfomap = () => {
   }, []);
 
   useEffect(() => {
-    if (!projectTaskBoundries && projectTaskBoundries?.length>0) return
+    if (
+      !projectTaskBoundries ||
+      projectTaskBoundries?.length < 1 ||
+      projectTaskBoundries?.[0]?.taskBoundries?.length < 1
+    ) {
+      return;
+    }
     const taskGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [
@@ -162,7 +168,7 @@ const ProjectInfomap = () => {
     // setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
   }, [projectTaskBoundries]);
   useEffect(() => {
-    if (!projectBuildingGeojson) return
+    if (!projectBuildingGeojson) return;
     const taskBuildingGeojsonFeatureCollection = {
       ...basicGeojsonTemplate,
       features: [

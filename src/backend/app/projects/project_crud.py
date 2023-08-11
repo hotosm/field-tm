@@ -555,8 +555,9 @@ def get_osm_extracts(boundary: str):
     json_boundary = json.loads(boundary)
     
     if json_boundary.get("features", None) is not None:
-        query["geometry"] = json_boundary["features"][0]["geometry"]
-    
+        query["geometry"] = json_boundary
+        # query["geometry"] = json_boundary["features"][0]["geometry"]
+
     else:
         query["geometry"] = json_boundary
 
@@ -607,12 +608,12 @@ async def split_into_tasks(
 
     """Update the boundary polyon on the database."""
     # boundary_data = outline["features"][0]["geometry"]
-    if outline.get("features", None) is not None:
+    if outline['type'] == "Feature":
+        boundary_data = outline["geometry"]
+    elif outline.get("features", None) is not None:
         boundary_data = outline["features"][0]["geometry"]
-    
     else:
         boundary_data = outline
-        
     outline = shape(boundary_data)
 
     db_task = db_models.DbProjectAOI(
@@ -623,7 +624,11 @@ async def split_into_tasks(
     db.add(db_task)
     db.commit()
 
-    data = get_osm_extracts(boundary)
+    data = get_osm_extracts(json.dumps(boundary_data))
+
+    if not data:
+        return None
+
 
     for feature in data["features"]:
         # If the osm extracts contents do not have a title, provide an empty text for that.
@@ -1746,8 +1751,8 @@ def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
 
         if db_project_feature.geometry:
             app_project_feature.geometry = geometry_to_geojson(
-                db_project_feature.geometry, {
-                    id: db_project_feature.id}, db_project_feature.id
+                db_project_feature.geometry,
+                    db_project_feature.properties, db_project_feature.id
             )
 
         return app_project_feature
@@ -2056,3 +2061,30 @@ async def update_odk_credentials(project_instance: project_schemas.BETAProjectUp
     db.commit()
     db.refresh(project_instance)
 
+
+async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
+
+    """Get the geojson of those features for this project"""
+
+    query = f'''SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(feature)
+                )
+                FROM (
+                SELECT jsonb_build_object(
+                    'type', 'Feature',
+                    'id', id,
+                    'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                    'properties', properties
+                ) AS feature
+                FROM features
+                WHERE project_id={project_id}
+                ) features;'''
+
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+    with open(outfile, "w") as jsonfile:
+        jsonfile.truncate(0)
+        dump(features, jsonfile)

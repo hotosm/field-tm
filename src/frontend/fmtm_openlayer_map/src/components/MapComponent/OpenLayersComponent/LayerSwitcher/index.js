@@ -7,7 +7,7 @@ import LayerTile from 'ol/layer/Tile';
 import SourceOSM from 'ol/source/OSM';
 import SourceStamen from 'ol/source/Stamen';
 import LayerSwitcher from 'ol-layerswitcher';
-import { useEffect } from 'react';
+import React,{ useEffect } from 'react';
 
 import { XYZ } from 'ol/source';
 

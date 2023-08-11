@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { store } from '../store/Store.js';
+import { store } from '../store/Store';
 import { BrowserRouter } from 'react-router-dom';
 import { act, render } from '@testing-library/react';
 export const renderWithRouter = (ui, { route = '/' } = {}) => {

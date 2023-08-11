@@ -153,7 +153,7 @@ module.exports = function (webpackEnv) {
           './LoginSlice': './src/store/slices/LoginSlice.ts',
           './ProjectSlice': './src/store/slices/ProjectSlice.ts',
           './CreateProjectSlice': './src/store/slices/CreateProjectSlice.ts',
-          './Store': './src/store/Store.js',
+          './Store': './src/store/Store.ts',
           './BasicCard': './src/utilities/BasicCard.tsx',
           './CustomizedMenus': './src/utilities/CustomizedMenus.tsx',
           './CustomizedSnackbar': './src/utilities/CustomizedSnackbar.jsx',
