@@ -20,8 +20,6 @@ import json
 import os
 import uuid
 from typing import List, Optional
-import tempfile
-import inspect
 
 from fastapi import (
     APIRouter,
@@ -31,7 +29,8 @@ from fastapi import (
     Form,
     HTTPException,
     UploadFile,
-    Response
+    Response,
+    Query
 )
 from fastapi.responses import FileResponse
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -46,6 +45,7 @@ from ..db import database
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
 from . import utils
+from ..models.enums import TILES_SOURCE
 
 router = APIRouter(
     prefix="/projects",
@@ -828,3 +828,40 @@ async def download_task_boundaries(
     }
 
     return Response(content = out, headers=headers)
+
+
+@router.get("/tiles/{project_id}")
+async def get_project_tiles(
+    background_tasks: BackgroundTasks,
+    project_id: int,
+    source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
+    db: Session = Depends(database.get_db),
+    ):
+    """
+    Returns the tiles for a project.
+
+    Args:
+        project_id (int): The id of the project.
+        source (str): The selected source.
+
+    Returns:
+        Response: The File response object containing the tiles.
+    """
+
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
+
+    # insert task and task ID into database
+    await project_crud.insert_background_task_into_database(
+        db, task_id=background_task_id
+    )
+
+    background_tasks.add_task(
+        project_crud.get_project_tiles,
+        db,
+        project_id,
+        source,
+        background_task_id
+    )
+
+    return {"Message": "Tile generation started"}
