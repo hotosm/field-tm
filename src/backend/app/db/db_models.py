@@ -640,5 +640,3 @@ class DbTilesPath(Base):
     tile_source = Column(String)
     background_task_id = Column(String)
     created_at = Column(DateTime, default=timestamp)
-    created_by_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
-    created_by = relationship(DbUser, backref="mbtiles_created")
