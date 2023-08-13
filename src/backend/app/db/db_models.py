@@ -638,7 +638,7 @@ class DbTilesPath(Base):
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
     path = Column(String)
     tile_source = Column(String)
-    task_id = Column(String)
+    background_task_id = Column(String)
     created_at = Column(DateTime, default=timestamp)
     created_by_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
     created_by = relationship(DbUser, backref="user_roles")
