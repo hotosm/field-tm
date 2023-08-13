@@ -634,9 +634,11 @@ class DbTilesPath(Base):
     __tablename__ = "mbtiles_path"
 
     id = Column(Integer, primary_key=True)
-    project_id = Column(String)
+    project_id = Column(Integer)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
     path = Column(String)
     tile_source = Column(String)
     task_id = Column(String)
     created_at = Column(DateTime, default=timestamp)
+    created_by_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    created_by = relationship(DbUser, backref="user_roles")
