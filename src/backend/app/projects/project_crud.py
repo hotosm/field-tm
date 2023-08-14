@@ -2178,4 +2178,26 @@ async def get_project_tiles(db: Session,
         )  # 2 is FAILED
 
 
-        # return FileResponse(outfile, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})
+async def get_mbtiles_list(db: Session, project_id: int):
+    try:
+        tiles_list = db.query(db_models.DbTilesPath.id, 
+                              db_models.DbTilesPath.project_id, 
+                              db_models.DbTilesPath.status,
+                              db_models.DbTilesPath.tile_source) \
+                    .filter(db_models.DbTilesPath.project_id == str(project_id)) \
+                    .all()
+        
+        processed_tiles_list = [
+            {
+                "id": x.id,
+                "project_id": x.project_id,
+                "status": x.status.name,
+                "tile_source": x.tile_source
+            }
+            for x in tiles_list
+        ]
+
+        return processed_tiles_list
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
