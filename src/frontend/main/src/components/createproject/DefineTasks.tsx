@@ -41,7 +41,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
       generateTasksOnMap();
     }
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
-    navigate('/data-extract');
+    navigate('/select-form');
   };
 
   const {
