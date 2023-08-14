@@ -283,6 +283,22 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
 
     if osmoutfile and jsonoutfile:
+
+        #FIXME: Need to fix this when generating osm file
+
+        # Remove the extra closing </osm> tag from the end of the file
+        with open(osmoutfile, 'r') as f:
+            osmoutfile_data = f.read()
+            # Find the last index of the closing </osm> tag
+            last_osm_index = osmoutfile_data.rfind('</osm>')
+            # Remove the extra closing </osm> tag from the end
+            processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
+
+        # Write the modified XML data back to the file
+        with open(osmoutfile, 'w') as f:
+            f.write(processed_xml_string)
+
+
         # Add the files to the ZIP file
         with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
             final_zip_file.write(osmoutfile)
