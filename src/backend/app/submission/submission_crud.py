@@ -375,11 +375,8 @@ def get_all_submissions(db: Session, project_id):
 
     project = get_odk_project(odk_credentials)
 
-    #TODO: pass xform id list in getAllSubmissions. Next release of osm-fieldwork will support this.
-    # task_lists = tasks_crud.get_task_lists(db, project_id)
-    # submissions = project.getAllSubmissions(project_info.odkid, task_lists)
-
-    submissions = project.getAllSubmissions(project_info.odkid)
+    task_lists = tasks_crud.get_task_lists(db, project_id)
+    submissions = project.getAllSubmissions(project_info.odkid, task_lists)
     return submissions
 
 
