@@ -28,9 +28,9 @@ const Organization = () => {
     setSearchKeyword(event.target.value);
   };
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
 
-  const oraganizationData: any = CoreModules.useSelector<any>((state) => state.organization.oraganizationData);
+  const oraganizationData: any = CoreModules.useAppSelector((state) => state.organization.oraganizationData);
   console.log(oraganizationData, 'oraganizationData');
   const filteredCardData = oraganizationData?.filter((data) =>
     data.name.toLowerCase().includes(searchKeyword.toLowerCase()),

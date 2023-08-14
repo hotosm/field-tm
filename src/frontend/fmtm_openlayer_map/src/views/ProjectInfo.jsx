@@ -28,13 +28,13 @@ const boxStyles = {
 };
 
 const ProjectInfo = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const navigate = CoreModules.useNavigate();
   const [isMonitoring, setIsMonitoring] = useState(false);
-  const themes = CoreModules.useSelector((state) => state.theme.hotTheme);
+  const themes = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
-  const taskInfo = CoreModules.useSelector((state) => state.task.taskInfo);
-  const selectedTask = CoreModules.useSelector(
+  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
   );
 
@@ -93,13 +93,13 @@ const ProjectInfo = () => {
     setIsMonitoring((prevState) => !prevState);
   };
 
-  const projectInfo = CoreModules.useSelector(
+  const projectInfo = CoreModules.useAppSelector(
     (state) => state.project.projectInfo
   );
-  const josmEditorError = CoreModules.useSelector(
+  const josmEditorError = CoreModules.useAppSelector(
     (state) => state.task.josmEditorError
   );
-  const downloadSubmissionLoading = CoreModules.useSelector(
+  const downloadSubmissionLoading = CoreModules.useAppSelector(
     (state) => state.task.downloadSubmissionLoading
   );
   const uploadToJOSM = () => {

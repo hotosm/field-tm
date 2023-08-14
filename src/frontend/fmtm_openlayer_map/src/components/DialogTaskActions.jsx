@@ -6,16 +6,16 @@ import CoreModules from "fmtm/CoreModules";
 import { CommonActions } from "fmtm/CommonSlice";
 export default function Dialog({ taskId, feature, map, view }) {
   // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
-  const projectData = CoreModules.useSelector(
+  const projectData = CoreModules.useAppSelector(
     (state) => state.project.projectTaskBoundries
   );
-  const token = CoreModules.useSelector((state) => state.login.loginToken);
-  const loading = CoreModules.useSelector((state) => state.common.loading)
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const loading = CoreModules.useAppSelector((state) => state.common.loading);
   const [list_of_task_status, set_list_of_task_status] = useState([]);
   const [task_status, set_task_status] = useState("READY");
 
   const geojsonStyles = MapStyles();
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const currentProjectId = environment.decode(params.id);
   const currentTaskId = environment.encode(taskId);
@@ -96,7 +96,9 @@ export default function Dialog({ taskId, feature, map, view }) {
       );
     }
   };
-  const checkIfTaskAssignedOrNot = currentStatus?.locked_by_username === token?.username || currentStatus?.locked_by_username === null;
+  const checkIfTaskAssignedOrNot =
+    currentStatus?.locked_by_username === token?.username ||
+    currentStatus?.locked_by_username === null;
 
   return (
     <CoreModules.Stack direction={"column"} spacing={2}>
@@ -124,37 +126,38 @@ export default function Dialog({ taskId, feature, map, view }) {
           // key={index}
           variant="contained"
           color="error"
-        // onClick={handleOnClick}
-        // disabled={loading} 
+          // onClick={handleOnClick}
+          // disabled={loading}
         >
           Task Submission
         </CoreModules.Button>
       </CoreModules.Link>
-      {checkIfTaskAssignedOrNot && list_of_task_status?.map((data, index) => {
-        return list_of_task_status?.length != 0 ? (
-          <CoreModules.Button
-            id={data.value}
-            key={index}
-            variant="contained"
-            color="error"
-            onClick={handleOnClick}
-            disabled={loading}
-          >
-            {data.key}
-          </CoreModules.Button>
-        ) : (
-          <CoreModules.Button
-            id={data.value}
-            key={index}
-            variant="contained"
-            color="error"
-            onClick={handleOnClick}
-            disabled={true}
-          >
-            {data.key}
-          </CoreModules.Button>
-        );
-      })}
+      {checkIfTaskAssignedOrNot &&
+        list_of_task_status?.map((data, index) => {
+          return list_of_task_status?.length != 0 ? (
+            <CoreModules.Button
+              id={data.value}
+              key={index}
+              variant="contained"
+              color="error"
+              onClick={handleOnClick}
+              disabled={loading}
+            >
+              {data.key}
+            </CoreModules.Button>
+          ) : (
+            <CoreModules.Button
+              id={data.value}
+              key={index}
+              variant="contained"
+              color="error"
+              onClick={handleOnClick}
+              disabled={true}
+            >
+              {data.key}
+            </CoreModules.Button>
+          );
+        })}
     </CoreModules.Stack>
   );
 }

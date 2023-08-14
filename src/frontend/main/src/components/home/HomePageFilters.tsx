@@ -3,12 +3,11 @@ import windowDimention from '../../hooks/WindowDimension';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 
-
 //Home Filter
 const HomePageFilters = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const { windowSize } = windowDimention();
   const searchableInnerStyle: any = {
     toolbar: {
@@ -113,8 +112,6 @@ const HomePageFilters = ({ onSearch }) => {
                 >
                     Filters
                 </CoreModules.Button> */}
-
-
       </CoreModules.Stack>
       {/* Create New Project Button  */}
       <CoreModules.Stack
@@ -163,7 +160,7 @@ const HomePageFilters = ({ onSearch }) => {
             color="error"
             startIcon={<AssetModules.AddIcon />}
             style={searchableInnerStyle.outlineBtn}
-          // disabled={token == null}
+            // disabled={token == null}
           >
             Create New Project
           </CoreModules.Button>

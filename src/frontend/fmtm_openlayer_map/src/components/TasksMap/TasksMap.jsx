@@ -14,8 +14,8 @@ const basicGeojsonTemplate = {
   features: [],
 };
 const TasksMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
-  // const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
-  // const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
+  // const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  // const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
 
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
@@ -24,7 +24,6 @@ const TasksMap = ({ projectTaskBoundries, projectBuildingGeojson }) => {
     maxZoom: 25,
   });
   console.log(projectTaskBoundries, "projectTaskBoundries");
-
 
   return (
     <div className="map-container" style={{ height: "100%" }}>

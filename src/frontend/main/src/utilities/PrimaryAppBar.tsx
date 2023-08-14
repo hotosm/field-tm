@@ -14,9 +14,9 @@ import environment from '../environment';
 export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
   const [brightness, setBrightness] = React.useState<boolean>(true);
-  const dispatch = CoreModules.useDispatch();
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  const token = CoreModules.useSelector<any>((state) => state.login.loginToken);
+  const dispatch = CoreModules.useAppDispatch();
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const handleOpenDrawer = () => {
     setOpen(true);
   };
@@ -168,24 +168,30 @@ export default function PrimaryAppBar() {
               </CoreModules.Link>
             ) : (
               <>
-                {environment.nodeEnv !== 'development' ? <CoreModules.Button
-                  className="btnLogin"
-                  style={appBarInnerStyles.btnLogin}
-                  color="info"
-                  onClick={() => createLoginWindow('/')}
-                >
-                  OSM Sign in
-                </CoreModules.Button> : null}
-                {process.env.NODE_ENV === 'development' ? <><CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
-                  <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
-                    Sign in
+                {environment.nodeEnv !== 'development' ? (
+                  <CoreModules.Button
+                    className="btnLogin"
+                    style={appBarInnerStyles.btnLogin}
+                    color="info"
+                    onClick={() => createLoginWindow('/')}
+                  >
+                    OSM Sign in
                   </CoreModules.Button>
-                </CoreModules.Link>
-                  <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
-                    <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
-                      Sign up
-                    </CoreModules.Button>
-                  </CoreModules.Link></> : null}
+                ) : null}
+                {process.env.NODE_ENV === 'development' ? (
+                  <>
+                    <CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
+                      <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
+                        Sign in
+                      </CoreModules.Button>
+                    </CoreModules.Link>
+                    <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
+                      <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
+                        Sign up
+                      </CoreModules.Button>
+                    </CoreModules.Link>
+                  </>
+                ) : null}
               </>
             )}
           </CoreModules.Stack>

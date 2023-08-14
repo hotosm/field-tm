@@ -7,7 +7,6 @@ import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
 import FormSelection from '../components/createproject/FormSelection';
 import DefineTasks from '../components/createproject/DefineTasks';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
-import { useDispatch } from 'react-redux';
 import DataExtract from '../components/createproject/DataExtract';
 
 const CreateProject: React.FC = () => {
@@ -17,7 +16,7 @@ const CreateProject: React.FC = () => {
   const [inputValue, setInputValue] = useState(null);
   const [dataExtractFile, setDataExtractFile] = useState(null);
   const [dataExtractFileValue, setDataExtractFileValue] = useState(null);
-  const dispatch = useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const location = useLocation();
   const boxSX = {
     'button:hover': {

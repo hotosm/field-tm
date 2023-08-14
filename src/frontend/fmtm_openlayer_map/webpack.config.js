@@ -2,25 +2,27 @@ const { EnvironmentPlugin } = require("webpack");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const path = require('path');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const path = require("path");
 const deps = require("./package.json").dependencies;
 module.exports = (webpackEnv) => {
-  const isEnvDevelopment = webpackEnv === 'development';
-  const isEnvProduction = webpackEnv === 'production';
+  const isEnvDevelopment = webpackEnv === "development";
+  const isEnvProduction = webpackEnv === "production";
   return {
-    stats: 'errors-warnings',
+    stats: "errors-warnings",
     cache: true,
-    mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+    mode: isEnvProduction ? "production" : isEnvDevelopment && "development",
     // Stop compilation early in production
     // bail: isEnvProduction,
-    devtool: isEnvProduction ? 'source-map' : isEnvDevelopment && 'eval-source-map',
+    devtool: isEnvProduction
+      ? "source-map"
+      : isEnvDevelopment && "eval-source-map",
     output: {
       publicPath: `${process.env.FRONTEND_MAP_URL}/`,
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].bundle.js",
-      clean:true
+      clean: true,
     },
     resolve: {
       extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
@@ -31,9 +33,10 @@ module.exports = (webpackEnv) => {
       port: `${new URL(process.env.FRONTEND_MAP_URL).port}`,
       historyApiFallback: true,
       allowedHosts: [`${process.env.FRONTEND_MAP_URL}`],
-      headers:{
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
       },
     },
 
@@ -41,7 +44,7 @@ module.exports = (webpackEnv) => {
       rules: [
         {
           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.ttf$/, /\.otf$/],
-          type: 'asset',
+          type: "asset",
           parser: {
             dataUrlCondition: {
               maxSize: 1000,
@@ -65,7 +68,6 @@ module.exports = (webpackEnv) => {
           use: {
             loader: "babel-loader",
           },
-
         },
       ],
     },
@@ -95,12 +97,12 @@ module.exports = (webpackEnv) => {
                 ecma: 5,
                 comments: false,
                 ascii__only: true,
-              }
+              },
             },
-          
+
             // Use multi-process parallel running to improve the build speed
             parallel: true,
-          
+
             // Enable file caching
             cache: true,
           },
@@ -135,6 +137,10 @@ module.exports = (webpackEnv) => {
             singleton: true,
             requiredVersion: deps["react-dom"],
           },
+          "react-redux": {
+            singleton: true,
+            version: deps["react-router-dom"],
+          },
         },
       }),
       new HtmlWebPackPlugin(
@@ -145,23 +151,25 @@ module.exports = (webpackEnv) => {
             template: "./src/index.html",
           },
           // Only for production
-          isEnvProduction ? {
-          minify: {
-            removeComments: true,
-            collapseWhitespace: true,
-            removeRedundantAttributes: true,
-            useShortDoctype: true,
-            removeEmptyAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            keepClosingSlash: true,
-            minifyJS: true,
-            minifyCSS: true,
-            minifyURLs: true
-          }
-        } : undefined
+          isEnvProduction
+            ? {
+                minify: {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeRedundantAttributes: true,
+                  useShortDoctype: true,
+                  removeEmptyAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  keepClosingSlash: true,
+                  minifyJS: true,
+                  minifyCSS: true,
+                  minifyURLs: true,
+                },
+              }
+            : undefined
         )
       ),
       new EnvironmentPlugin(["FRONTEND_MAIN_URL", "FRONTEND_MAP_URL"]),
     ],
-  }
+  };
 };

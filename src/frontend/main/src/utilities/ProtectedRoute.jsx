@@ -4,7 +4,7 @@ import CoreModules from '../shared/CoreModules';
 import { createLoginWindow } from '../utilfunctions/login';
 
 const ProtectedRoute = ({ children }) => {
-  const token = CoreModules.useSelector((state) => state.login.loginToken);
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   if (token == null) {
     if (process.env.NODE_ENV === 'development') {
       return <Navigate to="/login" replace />;

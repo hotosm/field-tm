@@ -4,10 +4,10 @@ import ProjectCard from "./ProjectCard";
 import environment from "fmtm/environment";
 
 const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const taskInfoData = Array.from(taskInfo);
-  const selectedTask = CoreModules.useSelector(
+  const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
   );
 

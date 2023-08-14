@@ -22,25 +22,25 @@ const basicGeojsonTemplate = {
 };
 
 const TasksSubmission = () => {
-  const dispatch = CoreModules.useDispatch();
-  const state = CoreModules.useSelector((state) => state.project);
-  const projectInfo = CoreModules.useSelector(
+  const dispatch = CoreModules.useAppDispatch();
+  const state = CoreModules.useAppSelector((state) => state.project);
+  const projectInfo = CoreModules.useAppSelector(
     (state) => state.home.selectedProject
   );
-  const projectSubmissionState = CoreModules.useSelector(
+  const projectSubmissionState = CoreModules.useAppSelector(
     (state) => state.project.projectSubmission
   );
-  const projectState = CoreModules.useSelector(
+  const projectState = CoreModules.useAppSelector(
     (state) => state.project.project
   );
-  // const projectTaskBoundries = CoreModules.useSelector((state) => state.project.projectTaskBoundries);
-  // const projectBuildingGeojson = CoreModules.useSelector((state) => state.project.projectBuildingGeojson);
+  // const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  // const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const params = CoreModules.useParams();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
   const encodedTaskId = params.taskId;
   const decodedTaskId = environment.decode(encodedTaskId);
-  // const theme = CoreModules.useSelector(state => state.theme.hotTheme)
+  // const theme = CoreModules.useAppSelector(state => state.theme.hotTheme)
   useEffect(() => {
     dispatch(
       ProjectSubmissionService(
@@ -97,10 +97,10 @@ const TasksSubmission = () => {
       }
     }
   }, [params.id]);
-  const projectTaskBoundries = CoreModules.useSelector(
+  const projectTaskBoundries = CoreModules.useAppSelector(
     (state) => state.project.projectTaskBoundries
   );
-  const projectBuildingGeojson = CoreModules.useSelector(
+  const projectBuildingGeojson = CoreModules.useAppSelector(
     (state) => state.project.projectBuildingGeojson
   );
   const [projectBoundaries, setProjectBoundaries] = useState(null);
@@ -195,7 +195,7 @@ const TasksSubmission = () => {
     }
   };
 
-  const downloadSubmissionLoading = CoreModules.useSelector(
+  const downloadSubmissionLoading = CoreModules.useAppSelector(
     (state) => state.task.downloadSubmissionLoading
   );
 
