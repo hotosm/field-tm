@@ -298,7 +298,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* Project Name Form Input For Create Project */}
           <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
-              <CoreModules.FormLabel component="h3">Hashtag</CoreModules.FormLabel>
+              <CoreModules.FormLabel component="h3">Tags</CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
               id="hashtags"
@@ -319,7 +319,7 @@ const ProjectDetailsForm: React.FC = () => {
               onChange={(e) => {
                 handleCustomChange('hashtags', e.target.value);
               }}
-              helperText={errors.odk_central_url}
+              helperText={errors.hashtags}
               FormHelperTextProps={inputFormStyles()}
             />
             {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}
