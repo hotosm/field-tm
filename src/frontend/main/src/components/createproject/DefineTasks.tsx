@@ -253,6 +253,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
                 <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
                   <CoreModules.TextField
                     id="no_of_buildings"
+                    disabled={taskSplittingGeojsonLoading}
                     label=""
                     type="number"
                     min="5"
