@@ -52,6 +52,7 @@ const TasksLayer = (map, view, feature) => {
         const vectorLayer = new VectorLayer({
           source: vectorSource,
           style: styleFunction,
+          zIndex: 10,
         });
         // Initialize variables to store the extent
         var minX = Infinity;
@@ -77,13 +78,12 @@ const TasksLayer = (map, view, feature) => {
           duration: 2000, // Animation duration in milliseconds
           padding: [50, 50, 50, 200], // Optional padding around the extent
         });
-
-        map.addLayer(vectorLayer);
-        window.vector = vectorLayer;
-        window.testmap = map;
-        map.on("loadend", function () {
-          map.getTargetElement().classList.remove("spinner");
-        });
+        setTimeout(() => {
+          map.addLayer(vectorLayer);
+          map.on("loadend", function () {
+            map.getTargetElement().classList.remove("spinner");
+          });
+        }, 3000);
       }
     }
   }, [state.newProjectTrigger, map]);

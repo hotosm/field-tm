@@ -21,6 +21,7 @@ import View from "ol/View";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
+// import MapboxVector from "ol/layer/MapboxVector.js";
 
 import Overlay from "ol/Overlay";
 const Home = () => {
@@ -148,7 +149,12 @@ const Home = () => {
       center: [0, 0],
       zoom: 1,
     });
-
+    // const mapboxBaseLayer = new MapboxVector({
+    //   styleUrl: "mapbox://styles/mapbox/bright-v9",
+    //   accessToken:
+    //     "pk.eyJ1IjoidmFydW4yNjYiLCJhIjoiY2xsNmU1ZWtrMGhoNjNkcWpqejhhb2IycyJ9.DiPTq9YEErGUHhgW4pINdg",
+    // });
+    // mapboxBaseLayer.setZIndex(0);
     const initialMap = new Map({
       target: mapElement.current,
       controls: new defaults({
@@ -156,11 +162,12 @@ const Home = () => {
         zoom: false,
       }),
       layers: [
+        initalFeaturesLayer,
+        // mapboxBaseLayer,
         new TileLayer({
           source: new OSM(),
           visible: true,
         }),
-        initalFeaturesLayer,
       ],
       overlays: [overlay],
       view: view,
@@ -212,6 +219,7 @@ const Home = () => {
   }, [map, y]);
   // if(map && mainView && featuresLayer){
   // }
+
   TasksLayer(map, mainView, featuresLayer);
 
   const handleDownload = (downloadType) => {

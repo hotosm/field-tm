@@ -116,7 +116,7 @@ const ProjectInfomap = () => {
     count: task.submission_count,
   }));
 
-  const projectBuildingGeojson = useAppSelector(
+  const projectBuildingGeojson = CoreModules.useAppSelector(
     (state) => state.project.projectBuildingGeojson
   );
   const selectedTask = CoreModules.useAppSelector(
@@ -234,7 +234,6 @@ const ProjectInfomap = () => {
         legendColorArray
       );
       stylex.fillColor = choroplethColor;
-      console.log(choroplethColor, "choroplethColor");
       return getStyles({
         style: stylex,
         feature,
