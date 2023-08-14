@@ -255,12 +255,6 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
-    # XML Form Id is a combination or project_name, category and task_id
-    xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
-
-    # Get the task lists of the project if task_id is not provided
-    tasks = [task_id] if task_id else tasks_crud.get_task_lists(db, project_id)
-
     # Create a new ZIP file for the extracted files
     final_zip_file_path = f"/tmp/{project_name}_{form_category}_osm.zip"
 
@@ -268,17 +262,47 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
     if os.path.exists(final_zip_file_path):
         os.remove(final_zip_file_path)
 
-    for task in tasks:
-        xml_form_id = f"{project_name}_{form_category}_{task}".split("_")[2]
+    # Submission JSON
+    if task_id:
+        submission = xform.getSubmissions(odkid, task_id, None, False, True)
+        submission = (json.loads(submission))['value']
+    else:
+        submission = get_all_submissions(db, project_id)
 
-        # Get the osm xml and geojson files for the task
-        osmoutfile, jsonoutfile = await convert_to_osm_for_task(odkid, xml_form_id, xform)
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
 
-        if osmoutfile and jsonoutfile:
-            # Add the files to the ZIP file
-            with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
-                final_zip_file.write(osmoutfile)
-                final_zip_file.write(jsonoutfile)
+    # JSON FILE PATH
+    jsoninfile = "/tmp/json_infile.json"
+
+    # Write the submission to a file
+    with open(jsoninfile, 'w') as f:
+        f.write(json.dumps(submission))
+
+    # Convert the submission to osm xml format
+    osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
+
+    if osmoutfile and jsonoutfile:
+
+        #FIXME: Need to fix this when generating osm file
+
+        # Remove the extra closing </osm> tag from the end of the file
+        with open(osmoutfile, 'r') as f:
+            osmoutfile_data = f.read()
+            # Find the last index of the closing </osm> tag
+            last_osm_index = osmoutfile_data.rfind('</osm>')
+            # Remove the extra closing </osm> tag from the end
+            processed_xml_string = osmoutfile_data[:last_osm_index] + osmoutfile_data[last_osm_index + len('</osm>'):]
+
+        # Write the modified XML data back to the file
+        with open(osmoutfile, 'w') as f:
+            f.write(processed_xml_string)
+
+
+        # Add the files to the ZIP file
+        with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
+            final_zip_file.write(osmoutfile)
+            final_zip_file.write(jsonoutfile)
 
     return FileResponse(final_zip_file_path)
 
