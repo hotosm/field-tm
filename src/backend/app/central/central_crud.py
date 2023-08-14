@@ -342,6 +342,32 @@ def download_submissions(
     return fixed.splitlines()
 
 
+async def test_form_validity(
+    xform_content: str,
+    form_type: str
+    ):
+    """
+        Validate an XForm.
+        Parameters:
+            xform_content: form to be tested
+            form_type: type of form (xls or xlsx)
+    """
+    try:
+        xlsform_path = f"/tmp/validate_form.{form_type}"
+        outfile = f"/tmp/outfile.xml"
+
+        with open(xlsform_path, "wb") as f:
+            f.write(xform_content)
+
+        xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
+        return {"message": "Your form is valid"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail={
+            "message": "Your form is invalid",
+            "possible_reason":str(e)
+        })
+
+
 def generate_updated_xform(
     xlsform: str,
     xform: str,
