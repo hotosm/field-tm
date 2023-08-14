@@ -10,8 +10,8 @@ import AssetModules from '../../shared/AssetModules';
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {
   const [shadowBox, setShadowBox] = React.useState(0);
-  const dispatch = CoreModules.useDispatch();
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const dispatch = CoreModules.useAppDispatch();
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   //use navigate hook for from react router dom for rounting purpose
   const navigate = CoreModules.useNavigate();
 
