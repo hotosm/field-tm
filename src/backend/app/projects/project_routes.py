@@ -883,3 +883,12 @@ async def tiles_list(
             Response: List of generated tiles for a project.
     """
     return await project_crud.get_mbtiles_list(db, project_id)
+
+
+@router.get("/download_tiles/")
+async def download_tiles(
+    tile_id:int,
+    db: Session = Depends(database.get_db)
+    ):
+    tiles_path = db.query(db_models.DbTilesPath).filter(db_models.DbTilesPath.id == str(tile_id)).first()
+    return FileResponse(tiles_path.path, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})
