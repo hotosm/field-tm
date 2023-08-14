@@ -78,12 +78,10 @@ const TasksLayer = (map, view, feature) => {
           duration: 2000, // Animation duration in milliseconds
           padding: [50, 50, 50, 200], // Optional padding around the extent
         });
-        setTimeout(() => {
-          map.addLayer(vectorLayer);
-          map.on("loadend", function () {
-            map.getTargetElement().classList.remove("spinner");
-          });
-        }, 3000);
+        map.addLayer(vectorLayer);
+        map.on("loadend", function () {
+          map.getTargetElement().classList.remove("spinner");
+        });
       }
     }
   }, [state.newProjectTrigger, map]);
