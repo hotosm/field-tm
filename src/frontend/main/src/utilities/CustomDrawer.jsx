@@ -3,7 +3,6 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
 
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -17,7 +16,6 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
   };
-
   const Drawerstyles = {
     list: {
       width: type == 'xs' ? size.width - 48 : type == 'sm' ? size.width - 48 : 350,
