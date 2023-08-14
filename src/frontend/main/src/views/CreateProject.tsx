@@ -28,6 +28,7 @@ const CreateProject: React.FC = () => {
       dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
       dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
+      dispatch(CreateProjectActions.SetDrawnGeojson(null));
       setGeojsonFile(null);
       setCustomFormFile(null);
       setDataExtractFile(null);
