@@ -628,3 +628,15 @@ class DbBuildings(Base):
     osm_id = Column(String)
     geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
     tags = Column(JSONB)
+
+
+class DbTilesPath(Base):
+    __tablename__ = "mbtiles_path"
+
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer)
+    status = Column(Enum(BackgroundTaskStatus), nullable=False)
+    path = Column(String)
+    tile_source = Column(String)
+    background_task_id = Column(String)
+    created_at = Column(DateTime, default=timestamp)

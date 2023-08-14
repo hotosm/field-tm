@@ -36,6 +36,7 @@ import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
@@ -56,6 +57,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from osm_fieldwork.filter_data import FilterData
+from osm_fieldwork import basemapper
 
 from ..central import central_crud
 from ..config import settings
@@ -2088,3 +2090,92 @@ async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
     with open(outfile, "w") as jsonfile:
         jsonfile.truncate(0)
         dump(features, jsonfile)
+
+
+async def get_project_tiles(db: Session, 
+                            project_id: int, 
+                            source: str,
+                            background_task_id: uuid.UUID,
+                            ):
+    try:
+        """Get the tiles for a project"""
+
+        zooms = [12,13,14,15,16,17,18,19]
+        source = source
+        base = f"/tmp/tiles/{source}tiles"
+        outfile = f"/tmp/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
+
+        tile_path_instance = db_models.DbTilesPath(
+            project_id = project_id,
+            background_task_id = str(background_task_id),
+            status = 1,
+            tile_source = source,
+            path = outfile
+        )
+        db.add(tile_path_instance)
+        db.commit()
+
+
+        # Project Outline
+        query = f'''SELECT jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', jsonb_agg(feature)
+                    )
+                    FROM (
+                    SELECT jsonb_build_object(
+                        'type', 'Feature',
+                        'id', id,
+                        'geometry', ST_AsGeoJSON(outline)::jsonb
+                    ) AS feature
+                    FROM projects
+                    WHERE id={project_id}
+                    ) features;'''
+
+        result = db.execute(query)
+        features = result.fetchone()[0]
+
+        # Boundary
+        boundary_file = f"/tmp/{project_id}_boundary.geojson"
+
+        # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
+        with open(boundary_file, "w") as jsonfile:
+            jsonfile.truncate(0)
+            dump(features, jsonfile)
+
+        basemap = basemapper.BaseMapper(boundary_file, base, source)
+        outf = basemapper.DataFile(outfile, basemap.getFormat())
+        suffix = os.path.splitext(outfile)[1]
+        if suffix == ".mbtiles":
+            outf.addBounds(basemap.bbox)
+        for level in zooms:
+            basemap.getTiles(level)
+            if outfile:
+                # Create output database and specify image format, png, jpg, or tif
+                outf.writeTiles(basemap.tiles, base)
+            else:
+                logging.info("Only downloading tiles to %s!" % base)
+
+        tile_path_instance.status = 4
+        db.commit()
+
+        # Update background task status to COMPLETED
+        update_background_task_status_in_database(
+            db, background_task_id, 4
+        )  # 4 is COMPLETED
+
+        logger.info(f"Tiles generation process completed for project id {project_id}")
+
+    except Exception as e:
+        logger.error(f'Tiles generation process failed for project id {project_id}')
+        logger.error(str(e))
+
+        tile_path_instance.status = 2
+        db.commit()
+
+        # Update background task status to FAILED
+        update_background_task_status_in_database(
+            db, background_task_id, 2, str(e)
+        )  # 2 is FAILED
+
+
+        # return FileResponse(outfile, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})
