@@ -3,6 +3,7 @@ import CoreModules from "fmtm/CoreModules";
 import ProjectInfoSidebar from "../components/ProjectInfo/ProjectInfoSidebar";
 import ProjectInfomap from "../components/ProjectInfo/ProjectInfomap";
 import environment from "fmtm/environment";
+import { ProjectActions } from "fmtm/ProjectSlice";
 
 import {
   ConvertXMLToJOSM,
@@ -11,6 +12,7 @@ import {
   getDownloadProjectSubmission,
 } from "../api/task";
 import AssetModules from "fmtm/AssetModules";
+import { ProjectById } from "../api/Project";
 
 const boxStyles = {
   animation: "blink 1s infinite",
@@ -37,6 +39,7 @@ const ProjectInfo = () => {
   const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
   );
+  const state = CoreModules.useAppSelector((state) => state.project);
 
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
@@ -57,7 +60,42 @@ const ProjectInfo = () => {
       );
     }
   };
+  //Fetch project for the first time
+  useEffect(() => {
+    dispatch(ProjectActions.SetNewProjectTrigger());
+    if (
+      state.projectTaskBoundries.findIndex(
+        (project) => project.id == environment.decode(encodedId)
+      ) == -1
+    ) {
+      dispatch(ProjectActions.SetProjectTaskBoundries([]));
 
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
+      // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+    } else {
+      dispatch(ProjectActions.SetProjectTaskBoundries([]));
+      dispatch(
+        ProjectById(
+          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          state.projectTaskBoundries
+        ),
+        state.projectTaskBoundries
+      );
+    }
+    if (Object.keys(state.projectInfo).length == 0) {
+      dispatch(ProjectActions.SetProjectInfo(projectInfo));
+    } else {
+      if (state.projectInfo.id != environment.decode(encodedId)) {
+        dispatch(ProjectActions.SetProjectInfo(projectInfo));
+      }
+    }
+  }, [params.id]);
   const handleConvert = () => {
     dispatch(
       fetchConvertToOsmDetails(

@@ -3,8 +3,10 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
+
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.error['main']}`) : null;
@@ -14,7 +16,6 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
   };
-
   const Drawerstyles = {
     list: {
       width: type == 'xs' ? size.width - 48 : type == 'sm' ? size.width - 48 : 350,
@@ -83,7 +84,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
   return (
     <div>
       <React.Fragment>
-        <SwipeableDrawer onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
+        <SwipeableDrawer swipeAreaWidth={0} onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
           <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
             <CoreModules.Stack sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
               <CoreModules.IconButton

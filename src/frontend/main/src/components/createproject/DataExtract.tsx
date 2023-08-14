@@ -54,7 +54,7 @@ const DataExtract: React.FC<any> = ({
   const submission = () => {
     // const previousValues = location.state.values;
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...values }));
-    navigate('/select-form');
+    navigate('/define-tasks');
     // navigate("/select-form", { replace: true, state: { values: values } });
   };
 

@@ -24,12 +24,12 @@ const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue,
   const onCreateProjectSubmission = () => {
     if (drawnGeojson) {
       dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-      navigate('/define-tasks');
+      navigate('/data-extract');
     } else if (!drawnGeojson && !geojsonFile) {
       return;
     } else {
       dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-      navigate('/define-tasks');
+      navigate('/data-extract');
     }
     // dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: fileUpload?.[0], areaGeojsonfileName: fileUpload?.name }));
   };
