@@ -1811,7 +1811,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
 
 
 async def insert_background_task_into_database(
-    db: Session, task_id: uuid.UUID, name: str = None
+    db: Session, task_id: uuid.UUID, name: str = None, project_id = None
 ):
     """Inserts a new task into the database
     Params:
@@ -1820,7 +1820,7 @@ async def insert_background_task_into_database(
         name: name of the task.
     """
     task = db_models.BackgroundTasks(
-        id=str(task_id), name=name, status=1
+        id=str(task_id), name=name, status=1, project_id=project_id
     )  # 1 = running
 
     db.add(task)
