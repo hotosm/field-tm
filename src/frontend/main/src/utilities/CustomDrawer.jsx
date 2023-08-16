@@ -3,18 +3,19 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
+
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
-  const defaultTheme = CoreModules.useSelector((state) => state.theme.hotTheme);
+  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.error['main']}`) : null;
   };
-  const token = CoreModules.useSelector((state) => state.login.loginToken);
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const onMouseLeave = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
     element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
   };
-
   const Drawerstyles = {
     list: {
       width: type == 'xs' ? size.width - 48 : type == 'sm' ? size.width - 48 : 350,
@@ -83,7 +84,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
   return (
     <div>
       <React.Fragment>
-        <SwipeableDrawer onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
+        <SwipeableDrawer swipeAreaWidth={0} onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
           <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
             <CoreModules.Stack sx={{ width: 50, borderRadius: '50%', marginLeft: '0.7%' }}>
               <CoreModules.IconButton
@@ -116,7 +117,8 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
               {MenuItems.filter((menuItem) => menuItem.isActive).map((menuDetails, index) =>
                 menuDetails.isExternalLink ? (
                   <a
-                    target="_blank" rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     key={index}
                     href={menuDetails.ref}
                     style={{

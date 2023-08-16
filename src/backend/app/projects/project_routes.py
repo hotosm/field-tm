@@ -41,7 +41,7 @@ from sqlalchemy.orm import Session
 import json
 
 from ..central import central_crud
-from ..db import database
+from ..db import database, db_models
 from . import project_crud, project_schemas
 from ..tasks import tasks_crud
 from . import utils
@@ -436,6 +436,27 @@ async def edit_project_boundary(
         "task_count": task_count
     }
 
+
+@router.post("/validate_form")
+async def validate_form(
+    form: UploadFile,
+    ):
+    """
+        Tests the validity of the xls form uploaded.
+
+        Parameters:
+            - form: The xls form to validate
+    """
+    file_name = os.path.splitext(form.filename)
+    file_ext = file_name[1]
+
+    allowed_extensions = [".xls", '.xlsx']
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+
+    await form.seek(0)
+    contents = await form.read()
+    return await central_crud.test_form_validity(contents, file_ext[1:])
 
 
 @router.post("/{project_id}/generate")
@@ -865,3 +886,30 @@ async def get_project_tiles(
     )
 
     return {"Message": "Tile generation started"}
+
+
+@router.get("/tiles_list/{project_id}/")
+async def tiles_list(
+    project_id: int,
+    db: Session = Depends(database.get_db)
+    ):
+
+    """
+        Returns the list of tiles for a project.
+
+        Parameters:
+            project_id: int
+
+        Returns:
+            Response: List of generated tiles for a project.
+    """
+    return await project_crud.get_mbtiles_list(db, project_id)
+
+
+@router.get("/download_tiles/")
+async def download_tiles(
+    tile_id:int,
+    db: Session = Depends(database.get_db)
+    ):
+    tiles_path = db.query(db_models.DbTilesPath).filter(db_models.DbTilesPath.id == str(tile_id)).first()
+    return FileResponse(tiles_path.path, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})

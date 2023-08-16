@@ -4,15 +4,14 @@ import useForm from '../../hooks/useForm';
 import OrganizationAddValidation from './Validation/OrganizationAddValidation';
 import { MenuItem, Select } from '@mui/material';
 import { OrganizationService } from '../../api/OrganizationService';
-import { useDispatch } from 'react-redux';
 import environment from '../../environment';
 
 const formData = {};
 const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
 const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
 const OrganizationAddForm = () => {
-  const dispatch = useDispatch();
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const dispatch = CoreModules.useAppDispatch();
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const submission = () => {
     // eslint-disable-next-line no-use-before-define
@@ -169,9 +168,7 @@ const OrganizationAddForm = () => {
                 // dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }))
               }}
             >
-              {organizationDataList?.map((org) => (
-                <MenuItem value={org.value}>{org.label}</MenuItem>
-              ))}
+              {organizationDataList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
             </Select>
           </CoreModules.Stack>
           {errors.type && (

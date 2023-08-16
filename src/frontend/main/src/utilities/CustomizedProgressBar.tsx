@@ -2,7 +2,7 @@ import React from 'react';
 import CoreModules from '../shared/CoreModules';
 
 const CustomizedProgressBar = ({ height, data }) => {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   return (
     <CoreModules.Stack
       direction={'row'}
@@ -13,7 +13,6 @@ const CustomizedProgressBar = ({ height, data }) => {
     >
       <CoreModules.Box
         sx={{
-        
           width: `${100 / (data.total_tasks / data.tasks_mapped)}%`,
           backgroundColor: defaultTheme.palette.info['main'],
         }}
@@ -23,7 +22,7 @@ const CustomizedProgressBar = ({ height, data }) => {
       <CoreModules.Box
         style={{
           width: `${100 / (data.total_tasks / data.tasks_validated)}%`,
-         
+
           backgroundColor: defaultTheme.palette.success['main'],
         }}
       >
@@ -33,7 +32,6 @@ const CustomizedProgressBar = ({ height, data }) => {
         sx={{
           width: `${100 / (data.total_tasks / data.tasks_bad)}%`,
           backgroundColor: defaultTheme.palette.error['main'],
-         
         }}
       >
         <div>&nbsp;</div>

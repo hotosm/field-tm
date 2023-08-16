@@ -10,23 +10,25 @@ import { OrganisationService } from '../../api/CreateProjectService';
 import environment from '../../environment';
 import { MenuItem, Select } from '@mui/material';
 import { createPopup } from '../../utilfunctions/createPopup';
+import { useAppSelector } from '../../types/reduxTypes';
 
 const ProjectDetailsForm: React.FC = () => {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  // // const state:any = useSelector<any>(state=>state.project.projectData)
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  // // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
+
   // // console.log('state main :',state)
 
   // const { type } = windowDimention();
   // //get window dimension
   const navigate = useNavigate();
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails: any = CoreModules.useSelector<any>((state) => state.createproject.projectDetails);
+  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = CoreModules.useSelector<any>((state) => state.createproject.organizationList);
+  const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {
@@ -296,7 +298,7 @@ const ProjectDetailsForm: React.FC = () => {
           {/* Project Name Form Input For Create Project */}
           <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
-              <CoreModules.FormLabel component="h3">Hashtag</CoreModules.FormLabel>
+              <CoreModules.FormLabel component="h3">Tags</CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
               id="hashtags"
@@ -317,7 +319,7 @@ const ProjectDetailsForm: React.FC = () => {
               onChange={(e) => {
                 handleCustomChange('hashtags', e.target.value);
               }}
-              helperText={errors.odk_central_url}
+              helperText={errors.hashtags}
               FormHelperTextProps={inputFormStyles()}
             />
             {/* <CoreModules.FormLabel component="h3" sx={{ display:'flex'}}>{errors.name} <CoreModules.FormLabel component="h4" sx={{color:'red'}}>*</CoreModules.FormLabel></CoreModules.FormLabel> */}

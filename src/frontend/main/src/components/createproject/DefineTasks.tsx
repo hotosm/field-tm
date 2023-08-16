@@ -11,9 +11,8 @@ import { InputLabel, MenuItem, Select } from '@mui/material';
 import DefineAreaMap from 'map/DefineAreaMap';
 import useForm from '../../hooks/useForm';
 import DefineTaskValidation from './validation/DefineTaskValidation';
+import { useAppSelector } from '../../types/reduxTypes';
 
-// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
-// const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 const alogrithmList = [
   { id: 1, value: 'Divide on Square', label: 'Divide on Square' },
   { id: 2, value: 'Choose Area as Tasks', label: 'Choose Area as Tasks' },
@@ -21,19 +20,19 @@ const alogrithmList = [
 ];
 const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
   const navigate = useNavigate();
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  const drawnGeojson = CoreModules.useSelector<any>((state) => state.createproject.drawnGeojson);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
 
-  // // const state:any = useSelector<any>(state=>state.project.projectData)
+  // // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
   // // console.log('state main :',state)
 
   // const { type } = windowDimention();
   // //get window dimension
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
   const submission = () => {
@@ -42,7 +41,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
       generateTasksOnMap();
     }
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
-    navigate('/data-extract');
+    navigate('/select-form');
   };
 
   const {
@@ -112,13 +111,13 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
       }, // or className: 'your-class'
     };
   };
-  const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
+  const dividedTaskGeojson = CoreModules.useAppSelector((state) => state.createproject.dividedTaskGeojson);
   const parsedTaskGeojsonCount =
     dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   const algorithmListData = alogrithmList;
-  const dividedTaskLoading = CoreModules.useSelector((state) => state.createproject.dividedTaskLoading);
-  const taskSplittingGeojsonLoading = CoreModules.useSelector(
+  const dividedTaskLoading = CoreModules.useAppSelector((state) => state.createproject.dividedTaskLoading);
+  const taskSplittingGeojsonLoading = CoreModules.useAppSelector(
     (state) => state.createproject.taskSplittingGeojsonLoading,
   );
 
@@ -254,6 +253,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
                 <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', width: '50%' }}>
                   <CoreModules.TextField
                     id="no_of_buildings"
+                    disabled={taskSplittingGeojsonLoading}
                     label=""
                     type="number"
                     min="5"

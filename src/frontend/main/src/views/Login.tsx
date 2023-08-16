@@ -11,11 +11,11 @@ Create a simple input element in React that calls a function when onFocusOut is 
 */
 
 const Login = () => {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const navigate = CoreModules.useNavigate();
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
-  const token: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+  const token: any = CoreModules.useAppSelector((state) => state.login.loginToken);
   // console.log(location.pathname,'and :',token);
   const initalUserForm = {
     username: '',

@@ -11,13 +11,13 @@ import UpdateForm from '../components/editproject/UpdateForm';
 import UpdateProjectArea from '../components/editproject/UpdateProjectArea';
 
 const EditProject: React.FC = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const [selectedTab, setSelectedTab] = useState('project-description');
   const params = CoreModules.useParams();
   const navigate = useNavigate();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const tabHover = {
     '&:hover': {

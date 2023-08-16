@@ -12,15 +12,15 @@ const DefineAreaMap = ({
   uploadedDataExtractFile,
   onDraw,
 }) => {
-  const drawnGeojson = CoreModules.useSelector(
+  const drawnGeojson = CoreModules.useAppSelector(
     (state) => state.createproject.drawnGeojson
   );
-  const drawToggle = CoreModules.useSelector(
+  const drawToggle = CoreModules.useAppSelector(
     (state) => state.createproject.drawToggle
   );
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const [dataExtractedGeojson, setDataExtractedGeojson] = useState(null);
-  const dividedTaskGeojson = CoreModules.useSelector(
+  const dividedTaskGeojson = CoreModules.useAppSelector(
     (state) => state.createproject.dividedTaskGeojson
   );
 

@@ -30,7 +30,8 @@ import {
   SettingsSuggest as SettingsSuggestIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-
+import LockPng from '../assets/images/lock.png';
+import RedLockPng from '../assets/images/red-lock.png';
 import { styled, alpha } from '@mui/material/styles';
 export default {
   ExitToAppIcon,
@@ -65,4 +66,6 @@ export default {
   KeyboardDoubleArrowDownIcon,
   SettingsSuggestIcon,
   ArrowBackIcon,
+  LockPng,
+  RedLockPng,
 };

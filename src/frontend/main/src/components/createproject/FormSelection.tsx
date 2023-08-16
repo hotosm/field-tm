@@ -12,18 +12,19 @@ import SelectFormValidation from './validation/SelectFormValidation';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import LoadingBar from './LoadingBar';
 import environment from '../../environment';
+import { useAppSelector } from '../../types/reduxTypes';
 
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb: any = null;
 
 const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, customFormInputValue, dataExtractFile }) => {
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   // //dispatch function to perform redux state mutation
 
-  const projectDetails = CoreModules.useSelector((state: any) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
   // Fetching form category list
@@ -33,19 +34,19 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
   // END
   const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
   const selectFormWays = selectFormWaysList.map((item) => ({ label: item, value: item }));
-  const userDetails: any = CoreModules.useSelector<any>((state) => state.login.loginToken);
+  const userDetails: any = CoreModules.useAppSelector((state) => state.login.loginToken);
   // //we use use-selector from redux to get all state of loginToken from login slice
 
-  const generateProjectLog: any = CoreModules.useSelector<any>((state) => state.createproject.generateProjectLog);
+  const generateProjectLog: any = CoreModules.useAppSelector((state) => state.createproject.generateProjectLog);
   // //we use use-selector from redux to get all state of loginToken from login slice
-  const generateQrSuccess: any = CoreModules.useSelector<any>((state) => state.createproject.generateQrSuccess);
+  const generateQrSuccess: any = CoreModules.useAppSelector((state) => state.createproject.generateQrSuccess);
   // //we use use-selector from redux to get all state of loginToken from login slice
-  const projectDetailsResponse = CoreModules.useSelector((state: any) => state.createproject.projectDetailsResponse);
+  const projectDetailsResponse = CoreModules.useAppSelector((state) => state.createproject.projectDetailsResponse);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-  const dividedTaskGeojson = CoreModules.useSelector((state) => state.createproject.dividedTaskGeojson);
+  const dividedTaskGeojson = CoreModules.useAppSelector((state) => state.createproject.dividedTaskGeojson);
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
-  const projectDetailsLoading = CoreModules.useSelector((state) => state.createproject.projectDetailsLoading);
+  const projectDetailsLoading = CoreModules.useAppSelector((state) => state.createproject.projectDetailsLoading);
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
 
   // Fetching form category list
