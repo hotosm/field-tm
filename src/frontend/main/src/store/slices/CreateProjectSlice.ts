@@ -1,15 +1,18 @@
-import { ICreateProjectState } from 'store/types/ICreateProject';
+import { CreateProjectStateTypes } from 'store/types/ICreateProject';
 import CoreModules from '../../shared/CoreModules';
+import { createSlice } from '@reduxjs/toolkit';
 
-export const initialState: ICreateProjectState = {
+export const initialState: CreateProjectStateTypes = {
   editProjectDetails: { name: '', description: '', short_description: '' },
   editProjectResponse: null,
   projectDetails: { dimension: 10, no_of_buildings: 5 },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
+  editProjectDetailsLoading: false,
   projectArea: null,
   projectAreaLoading: false,
   formCategoryList: [],
+  formCategoryLoading: false,
   generateQrLoading: false,
   organizationList: [],
   organizationListLoading: false,
@@ -27,7 +30,7 @@ export const initialState: ICreateProjectState = {
   drawToggle: false,
 };
 
-const CreateProject = CoreModules.createSlice({
+const CreateProject = createSlice({
   name: 'createproject',
   initialState: initialState,
   reducers: {
@@ -42,7 +45,7 @@ const CreateProject = CoreModules.createSlice({
     },
     ClearCreateProjectFormData(state) {
       // state.projectDetailsResponse = null
-      state.projectDetails = {};
+      state.projectDetails = { dimension: 10, no_of_buildings: 5 };
       state.projectArea = null;
     },
     UploadAreaLoading(state, action) {
@@ -137,4 +140,4 @@ const CreateProject = CoreModules.createSlice({
 });
 
 export const CreateProjectActions = CreateProject.actions;
-export default CreateProject;
+export default CreateProject.reducer;

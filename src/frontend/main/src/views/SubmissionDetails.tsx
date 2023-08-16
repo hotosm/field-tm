@@ -3,9 +3,8 @@ import React, { useEffect } from 'react';
 import environment from '../environment';
 import { SubmissionService } from '../api/Submission';
 
-
 const SubmissionDetails = () => {
-  const dispatch = CoreModules.useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
@@ -13,7 +12,7 @@ const SubmissionDetails = () => {
   const decodedTaskId = environment.decode(encodedTaskId);
   const paramsInstanceId = params.instanceId;
 
-  const submissionDetails = CoreModules.useSelector((state) => state.submission.submissionDetails);
+  const submissionDetails = CoreModules.useAppSelector((state) => state.submission.submissionDetails);
 
   useEffect(() => {
     dispatch(

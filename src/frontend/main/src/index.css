@@ -126,7 +126,7 @@ button {
 .legend-square {
   width: 20px;
   height: 20px;
-  background-color: red;
+  border:1px solid black;
 }
 
 .submission-item{

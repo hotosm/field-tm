@@ -7,7 +7,6 @@ import ProjectDetailsForm from '../components/createproject/ProjectDetailsForm';
 import FormSelection from '../components/createproject/FormSelection';
 import DefineTasks from '../components/createproject/DefineTasks';
 import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
-import { useDispatch } from 'react-redux';
 import DataExtract from '../components/createproject/DataExtract';
 
 const CreateProject: React.FC = () => {
@@ -17,7 +16,7 @@ const CreateProject: React.FC = () => {
   const [inputValue, setInputValue] = useState(null);
   const [dataExtractFile, setDataExtractFile] = useState(null);
   const [dataExtractFileValue, setDataExtractFileValue] = useState(null);
-  const dispatch = useDispatch();
+  const dispatch = CoreModules.useAppDispatch();
   const location = useLocation();
   const boxSX = {
     'button:hover': {
@@ -29,6 +28,7 @@ const CreateProject: React.FC = () => {
       dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ dimension: 10 }));
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
       dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
+      dispatch(CreateProjectActions.SetDrawnGeojson(null));
       setGeojsonFile(null);
       setCustomFormFile(null);
       setDataExtractFile(null);
@@ -76,18 +76,18 @@ const CreateProject: React.FC = () => {
           ></CoreModules.Box>
           <CoreModules.Box
             sx={{
-              height: location.pathname !== '/define-tasks' ? '8px' : '12px',
+              height: location.pathname !== '/data-extract' ? '8px' : '12px',
               width: '64px',
-              background: location.pathname !== '/define-tasks' ? '#68707F' : '#D73F3F',
+              background: location.pathname !== '/data-extract' ? '#68707F' : '#D73F3F',
               mx: '16px',
               borderRadius: '10px',
             }}
           ></CoreModules.Box>
           <CoreModules.Box
             sx={{
-              height: location.pathname !== '/data-extract' ? '8px' : '12px',
+              height: location.pathname !== '/define-tasks' ? '8px' : '12px',
               width: '64px',
-              background: location.pathname !== '/data-extract' ? '#68707F' : '#D73F3F',
+              background: location.pathname !== '/define-tasks' ? '#68707F' : '#D73F3F',
               mx: '16px',
               borderRadius: '10px',
             }}
@@ -147,18 +147,6 @@ const CreateProject: React.FC = () => {
           </Link>
           {/* END */}
 
-          {/* Define Tasks SideBar Button for define tasks page  */}
-          <Link to="/define-tasks">
-            <CoreModules.Button
-              sx={boxSX}
-              variant="contained"
-              color="error"
-              disabled={location.pathname !== '/define-tasks'}
-            >
-              Define Tasks
-            </CoreModules.Button>
-          </Link>
-          {/* END */}
           {/* Extract Data SideBar Button for extracting data page  */}
           <Link to="/data-extract">
             <CoreModules.Button
@@ -172,6 +160,18 @@ const CreateProject: React.FC = () => {
           </Link>
           {/* END */}
 
+          {/* Define Tasks SideBar Button for define tasks page  */}
+          <Link to="/define-tasks">
+            <CoreModules.Button
+              sx={boxSX}
+              variant="contained"
+              color="error"
+              disabled={location.pathname !== '/define-tasks'}
+            >
+              Define Tasks
+            </CoreModules.Button>
+          </Link>
+          {/* END */}
           {/* Upload Area SideBar Button for uploading Area page  */}
           <Link to="/select-form">
             <CoreModules.Button

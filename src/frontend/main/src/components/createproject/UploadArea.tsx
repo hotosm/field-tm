@@ -5,16 +5,15 @@ import FormGroup from '@mui/material/FormGroup';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import DrawSvg from '../createproject/DrawSvg';
-import { useDispatch } from 'react-redux';
 // @ts-ignore
 const DefineAreaMap = React.lazy(() => import('map/DefineAreaMap'));
 
 const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue, inputValue }: any) => {
   const navigate = useNavigate();
-  const defaultTheme: any = CoreModules.useSelector<any>((state) => state.theme.hotTheme);
-  const drawToggle = CoreModules.useSelector<any>((state) => state.createproject.drawToggle);
-  const drawnGeojson = CoreModules.useSelector<any>((state) => state.createproject.drawnGeojson);
-  const dispatch = CoreModules.useDispatch();
+  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const drawToggle = CoreModules.useAppSelector((state) => state.createproject.drawToggle);
+  const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
+  const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
 
   useEffect(() => {
@@ -25,12 +24,12 @@ const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue,
   const onCreateProjectSubmission = () => {
     if (drawnGeojson) {
       dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-      navigate('/define-tasks');
+      navigate('/data-extract');
     } else if (!drawnGeojson && !geojsonFile) {
       return;
     } else {
       dispatch(CreateProjectActions.SetCreateProjectFormStep('select-form'));
-      navigate('/define-tasks');
+      navigate('/data-extract');
     }
     // dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, areaGeojson: fileUpload?.[0], areaGeojsonfileName: fileUpload?.name }));
   };

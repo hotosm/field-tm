@@ -1,4 +1,3 @@
-
 interface ProjectValues {
   organization: string;
   name: string;
@@ -6,6 +5,7 @@ interface ProjectValues {
   id: string;
   short_description: string;
   description: string;
+  hashtags: string;
   odk_central_url: string;
   odk_central_user: string;
   odk_central_password: string;
@@ -17,6 +17,7 @@ interface ValidationErrors {
   id?: string;
   short_description?: string;
   description?: string;
+  hashtags?: string;
   odk_central_url?: string;
   odk_central_user?: string;
   odk_central_password?: string;
@@ -46,6 +47,9 @@ function CreateProjectValidation(values: ProjectValues) {
   }
   if (!values?.short_description) {
     errors.short_description = 'Short Description is Required.';
+  }
+  if (!values?.hashtags) {
+    errors.hashtags = 'Tags is Required.';
   }
   if (!values?.description) {
     errors.description = 'Description is Required.';

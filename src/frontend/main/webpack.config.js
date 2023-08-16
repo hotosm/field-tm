@@ -175,6 +175,10 @@ module.exports = function (webpackEnv) {
             requiredVersion: deps['react-dom'],
             // requiredVersion: deps["react-dom", "@material-ui/core", "@material-ui/icons"],
           },
+          'react-redux': {
+            singleton: true,
+            version: deps['react-router-dom'],
+          },
         },
       }),
       new HtmlWebPackPlugin(
