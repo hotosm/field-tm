@@ -16,6 +16,8 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+"""Auth routes, using OSM OAuth2 endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.logger import logger as log
 from fastapi.responses import JSONResponse
@@ -23,7 +25,7 @@ from sqlalchemy.orm import Session
 
 from ..db import database
 from ..db.db_models import DbUser
-from ..users import user_crud, user_schemas
+from ..users import user_crud
 from .osm import AuthUser, init_osm_auth, login_required
 
 router = APIRouter(
@@ -31,14 +33,6 @@ router = APIRouter(
     tags=["auth"],
     responses={404: {"description": "Not found"}},
 )
-
-
-@router.post("/login/")
-def login(user: user_schemas.UserIn, db: Session = Depends(database.get_db)):
-    """The Login API allows users to authenticate themselves with the application.
-    Username and password are passed and users information is obtained in the response.
-    """
-    return user_crud.verify_user(db, user)
 
 
 @router.get("/osm_login/")
