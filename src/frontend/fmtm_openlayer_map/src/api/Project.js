@@ -81,3 +81,42 @@ export const DownloadProjectForm = (url,payload) => {
       await fetchProjectForm(url,payload);
   }
 }
+export const GenerateProjectTiles = (url) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetGenerateProjectTilesLoading(true))
+
+      const generateProjectTiles = async (url) => {
+          try {
+              const response = await CoreModules.axios.get(url);
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+          }
+      }
+      await generateProjectTiles(url);
+  }
+}
+export const GetTilesList = (url) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetTilesListLoading(true))
+
+      const fetchTilesList = async (url) => {
+          try {
+              const response = await CoreModules.axios.get(url);
+              dispatch(
+                ProjectActions.SetTilesList(response.data)
+              );
+              dispatch(ProjectActions.SetTilesListLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetTilesListLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetTilesListLoading(false))
+          }
+      }
+      await fetchTilesList(url,);
+  }
+}
