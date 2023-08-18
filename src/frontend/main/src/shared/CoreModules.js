@@ -42,6 +42,12 @@ import {
   Tooltip,
   Breadcrumbs,
   CardMedia,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -139,4 +145,10 @@ export default {
   useAppDispatch,
   useAppSelector,
   CustomizedModal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 };

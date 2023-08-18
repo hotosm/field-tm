@@ -82,19 +82,19 @@ export const DownloadProjectForm = (url,payload) => {
   }
 }
 export const GenerateProjectTiles = (url) => {
-
+  
   return async (dispatch) => {
       dispatch(ProjectActions.SetGenerateProjectTilesLoading(true))
 
       const generateProjectTiles = async (url) => {
-          try {
-              const response = await CoreModules.axios.get(url);
+        try {
+          const response = await CoreModules.axios.get(url);
               dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
             } catch (error) {
               dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
             } finally{
               dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
-          }
+            }
       }
       await generateProjectTiles(url);
   }
@@ -115,8 +115,32 @@ export const GetTilesList = (url) => {
               dispatch(ProjectActions.SetTilesListLoading(false))
             } finally{
               dispatch(ProjectActions.SetTilesListLoading(false))
-          }
+            }
       }
       await fetchTilesList(url,);
+  }
+}
+export const DownloadTile = (url,payload) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:true}))
+
+      const getDownloadTile = async (url,payload) => {
+          try {
+              const response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+              var a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download=`${payload.title}_mbtiles.mbtiles`;
+              a.click();
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+            } finally{
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+          }
+      }
+      await getDownloadTile(url,payload);
   }
 }
