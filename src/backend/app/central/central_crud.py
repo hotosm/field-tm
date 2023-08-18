@@ -17,12 +17,12 @@
 #
 import base64
 import json
+import logging
 import os
 import pathlib
 import zlib
 
 # import osm_fieldwork
-
 # Qr code imports
 import segno
 import xmltodict
@@ -36,6 +36,8 @@ from sqlalchemy.orm import Session
 from ..config import settings
 from ..db import db_models
 from ..projects import project_schemas
+
+log = logging.getLogger(__name__)
 
 
 def get_odk_project(odk_central: project_schemas.ODKCentral = None):
@@ -125,15 +127,19 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
     project = get_odk_project(odk_central)
 
     try:
+        log.debug("Attempting ODKCentral project creation")
         result = project.createProject(name)
-        if result.get("code") == 401.2:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Could not authenticate to odk central.",
-            )
+
+        # Sometimes createProject returns a list if fails
+        if isinstance(result, dict):
+            if result.get("code") == 401.2:
+                raise HTTPException(
+                    status_code=500,
+                    detail="Could not authenticate to odk central.",
+                )
 
         logger.debug(f"ODKCentral response: {result}")
-        logger.info(f"Project {name} has been created on the ODK Central server.")
+        logger.info(f"Project {name} available on the ODK Central server.")
         return result
     except Exception as e:
         logger.error(e)
@@ -149,13 +155,17 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     try:
         project = get_odk_project(odk_central)
         result = project.deleteProject(project_id)
-        logger.info(f"Project {project_id} has been deleted from the ODK Central server.")
+        logger.info(
+            f"Project {project_id} has been deleted from the ODK Central server."
+        )
         return result
-    except Exception as e:
-        return 'Could not delete project from central odk'
+    except Exception:
+        return "Could not delete project from central odk"
 
 
-def create_appuser(project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None):
+def create_appuser(
+    project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None
+):
     """Create an app-user on a remote ODK Server.
     If odk credentials of the project are provided, use them to create an app user.
     """
@@ -186,8 +196,9 @@ def delete_app_user(
     return result
 
 
-def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_credentials: dict = None):
-
+def upload_xform_media(
+    project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
+):
     title = os.path.basename(os.path.splitext(filespec)[0])
 
     if odk_credentials:
@@ -215,16 +226,14 @@ def upload_xform_media(project_id: int, xform_id:str, filespec: str,    odk_cred
     return result
 
 
-
 def create_odk_xform(
-    project_id: int, 
-    xform_id: str, 
-    filespec: str, 
+    project_id: int,
+    xform_id: str,
+    filespec: str,
     odk_credentials: project_schemas.ODKCentral = None,
     create_draft: bool = False,
-    upload_media = True,
-    convert_to_draft_when_publishing = True
-
+    upload_media=True,
+    convert_to_draft_when_publishing=True,
 ):
     """Create an XForm on a remote ODK Central server."""
     title = os.path.basename(os.path.splitext(filespec)[0])
@@ -254,11 +263,9 @@ def create_odk_xform(
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     if upload_media:
-        result = xform.uploadMedia(project_id, 
-                                   title, 
-                                   data, 
-                                   convert_to_draft_when_publishing
-                                   )
+        result = xform.uploadMedia(
+            project_id, title, data, convert_to_draft_when_publishing
+        )
 
     result = xform.publishForm(project_id, title)
     return result
@@ -286,16 +293,16 @@ def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = N
 
 
 def get_form_full_details(
-        odk_project_id: int,
-        form_id: str,
-        odk_central: project_schemas.ODKCentral
-    ):
+    odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral
+):
     form = get_odk_form(odk_central)
     form_details = form.getFullDetails(odk_project_id, form_id)
     return form_details.json()
 
 
-def list_task_submissions(odk_project_id:int, form_id: str, odk_central: project_schemas.ODKCentral = None):
+def list_task_submissions(
+    odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral = None
+):
     project = get_odk_form(odk_central)
     submissions = project.listSubmissions(odk_project_id, form_id)
     return submissions
@@ -342,19 +349,15 @@ def download_submissions(
     return fixed.splitlines()
 
 
-async def test_form_validity(
-    xform_content: str,
-    form_type: str
-    ):
-    """
-        Validate an XForm.
-        Parameters:
-            xform_content: form to be tested
-            form_type: type of form (xls or xlsx)
+async def test_form_validity(xform_content: str, form_type: str):
+    """Validate an XForm.
+    Parameters:
+        xform_content: form to be tested
+        form_type: type of form (xls or xlsx).
     """
     try:
         xlsform_path = f"/tmp/validate_form.{form_type}"
-        outfile = f"/tmp/outfile.xml"
+        outfile = "/tmp/outfile.xml"
 
         with open(xlsform_path, "wb") as f:
             f.write(xform_content)
@@ -362,21 +365,21 @@ async def test_form_validity(
         xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
         return {"message": "Your form is valid"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail={
-            "message": "Your form is invalid",
-            "possible_reason":str(e)
-        })
+        raise HTTPException(
+            status_code=400,
+            detail={"message": "Your form is invalid", "possible_reason": str(e)},
+        )
 
 
 def generate_updated_xform(
     xlsform: str,
     xform: str,
-    form_type : str,
+    form_type: str,
 ):
     """Update the version in an XForm so it's unique."""
     name = os.path.basename(xform).replace(".xml", "")
     outfile = xform
-    if form_type != 'xml':
+    if form_type != "xml":
         try:
             xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
         except Exception as e:
@@ -486,11 +489,7 @@ def generate_updated_xform(
     return outfile
 
 
-def create_qrcode(project_id: int,
-                  token: str,
-                  name: str,
-                  odk_central_url: str = None
-                  ):
+def create_qrcode(project_id: int, token: str, name: str, odk_central_url: str = None):
     """Create the QR Code for an app-user."""
     if not odk_central_url:
         logger.debug("ODKCentral connection variables not set in function")
