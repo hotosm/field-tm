@@ -165,44 +165,6 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
                 ),
               )}
             </CoreModules.List>
-            <CoreModules.Stack sx={{ display: { xs: 'flex', md: 'none' } }}>
-              {token != null ? (
-                <CoreModules.Link style={{ textDecoration: 'none' }} to={'/'}>
-                  <CoreModules.Button
-                    onClick={onSignOut}
-                    variant="contained"
-                    color="error"
-                    startIcon={<AssetModules.ExitToAppIcon />}
-                    style={Drawerstyles.containedBtn}
-                  >
-                    Sign Out
-                  </CoreModules.Button>
-                </CoreModules.Link>
-              ) : (
-                <CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
-                  <CoreModules.Button
-                    onClick={onClose}
-                    variant="contained"
-                    color="error"
-                    startIcon={<AssetModules.LoginIcon />}
-                    style={Drawerstyles.containedBtn}
-                  >
-                    Sign in
-                  </CoreModules.Button>
-                </CoreModules.Link>
-              )}
-              <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
-                <CoreModules.Button
-                  onClick={onClose}
-                  variant="outlined"
-                  color="error"
-                  startIcon={<AssetModules.PersonIcon />}
-                  style={Drawerstyles.outlineBtn}
-                >
-                  Sign up
-                </CoreModules.Button>
-              </CoreModules.Link>
-            </CoreModules.Stack>
           </CoreModules.Stack>
         </SwipeableDrawer>
       </React.Fragment>
