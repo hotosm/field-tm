@@ -1,3 +1,4 @@
+import os
 from typing import Union
 
 from fastapi import Header
@@ -5,6 +6,10 @@ from osm_login_python.core import Auth
 from pydantic import BaseModel
 
 from ..config import settings
+
+if settings.DEBUG:
+    # Required as callback url is http during dev
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
 class AuthUser(BaseModel):

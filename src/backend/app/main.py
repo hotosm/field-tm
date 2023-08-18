@@ -19,7 +19,6 @@
 """Entrypoint for FastAPI app."""
 
 import logging
-import os
 import sys
 from typing import Union
 
@@ -41,9 +40,6 @@ from .projects.project_crud import read_xlsforms
 from .submission import submission_routes
 from .tasks import tasks_routes
 from .users import user_routes
-
-# Env variables
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = settings.OAUTHLIB_INSECURE_TRANSPORT
 
 # Logging
 logging.basicConfig(
