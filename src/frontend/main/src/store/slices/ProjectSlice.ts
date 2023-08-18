@@ -13,6 +13,10 @@ const ProjectSlice = createSlice({
     projectBuildingGeojsonLoading: false,
     projectBuildingGeojson: [],
     downloadProjectFormLoading: { type: 'form', loading: false },
+    generateProjectTilesLoading: false,
+    tilesList: [],
+    tilesListLoading: false,
+    downloadTilesLoading: false,
   },
   reducers: {
     SetProjectTaskBoundries(state, action) {
@@ -45,6 +49,18 @@ const ProjectSlice = createSlice({
     },
     SetDownloadProjectFormLoading(state, action) {
       state.downloadProjectFormLoading = action.payload;
+    },
+    SetGenerateProjectTilesLoading(state, action) {
+      state.generateProjectTilesLoading = action.payload;
+    },
+    SetTilesList(state, action) {
+      state.tilesList = action.payload;
+    },
+    SetTilesListLoading(state, action) {
+      state.tilesListLoading = action.payload;
+    },
+    SetDownloadTileLoading(state, action) {
+      state.downloadTilesLoading = action.payload;
     },
   },
 });

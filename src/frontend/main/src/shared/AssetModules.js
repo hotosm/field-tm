@@ -29,6 +29,7 @@ import {
   ExitToApp as ExitToAppIcon,
   SettingsSuggest as SettingsSuggestIcon,
   ArrowBack as ArrowBackIcon,
+  Bolt as BoltIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -68,4 +69,5 @@ export default {
   ArrowBackIcon,
   LockPng,
   RedLockPng,
+  BoltIcon,
 };
