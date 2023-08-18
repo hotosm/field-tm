@@ -25,10 +25,6 @@ class UserBase(BaseModel):
     username: str
 
 
-class UserIn(UserBase):
-    password: str
-
-
 class User(UserBase):
     id: int
 
@@ -42,10 +38,6 @@ class UserOut(UserBase):
 
     class Config:
         orm_mode = True
-
-
-class LoginResult(BaseModel):
-    user: UserOut
 
 
 class UserRole(BaseModel):
