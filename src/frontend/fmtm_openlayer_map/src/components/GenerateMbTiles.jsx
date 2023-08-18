@@ -128,7 +128,8 @@ const GenerateMbTiles = ({
               // setToggleGenerateModal(false);
               dispatch(
                 GenerateProjectTiles(
-                  `${environment.baseApiUrl}/projects/tiles/${decodedId}?source=${selectedTileSource}`
+                  `${environment.baseApiUrl}/projects/tiles/${decodedId}?source=${selectedTileSource}`,
+                  decodedId
                 )
               );
               // dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
@@ -155,7 +156,10 @@ const GenerateMbTiles = ({
             Refresh
           </CoreModules.LoadingButton>
         </div>
-        <CoreModules.TableContainer component={CoreModules.Paper}>
+        <CoreModules.TableContainer
+          component={CoreModules.Paper}
+          sx={{ height: "400px", overflowY: "scroll" }}
+        >
           <CoreModules.Table sx={{ minWidth: 650 }} aria-label="simple table">
             <CoreModules.TableHead>
               <CoreModules.TableRow>
@@ -187,12 +191,18 @@ const GenerateMbTiles = ({
                       color: environment.statusColors[list.status],
                     }}
                   >
-                    {list.status}
+                    {/* Changed Success Display to Completed */}
+                    {list.status === "SUCCESS" ? "COMPLETED" : list.status}
                   </CoreModules.TableCell>
                   <CoreModules.TableCell align="right">
-                    <AssetModules.FileDownloadIcon
-                      onClick={() => downloadMbTiles(list.id)}
-                    ></AssetModules.FileDownloadIcon>
+                    {list.status === "SUCCESS" ? (
+                      <AssetModules.FileDownloadIcon
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => downloadMbTiles(list.id)}
+                      ></AssetModules.FileDownloadIcon>
+                    ) : (
+                      <></>
+                    )}
                   </CoreModules.TableCell>
                 </CoreModules.TableRow>
               ))}

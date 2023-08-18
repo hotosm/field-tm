@@ -1,5 +1,6 @@
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CoreModules from "fmtm/CoreModules";
+import environment from 'fmtm/environment';
 export const ProjectById = (url, existingProjectList) => {
   return async (dispatch) => {
     // dispatch(HomeActions.HomeProjectLoading(true))
@@ -81,24 +82,6 @@ export const DownloadProjectForm = (url,payload) => {
       await fetchProjectForm(url,payload);
   }
 }
-export const GenerateProjectTiles = (url) => {
-  
-  return async (dispatch) => {
-      dispatch(ProjectActions.SetGenerateProjectTilesLoading(true))
-
-      const generateProjectTiles = async (url) => {
-        try {
-          const response = await CoreModules.axios.get(url);
-              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
-            } catch (error) {
-              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
-            } finally{
-              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
-            }
-      }
-      await generateProjectTiles(url);
-  }
-}
 export const GetTilesList = (url) => {
 
   return async (dispatch) => {
@@ -120,6 +103,26 @@ export const GetTilesList = (url) => {
       await fetchTilesList(url,);
   }
 }
+export const GenerateProjectTiles = (url,payload) => {
+  
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetGenerateProjectTilesLoading(true))
+
+      const generateProjectTiles = async (url,payload) => {
+        try {
+              const response = await CoreModules.axios.get(url);
+              dispatch(GetTilesList(`${environment.baseApiUrl}/projects/tiles_list/${payload}/`));
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            }
+      }
+      await generateProjectTiles(url,payload);
+  }
+}
+
 export const DownloadTile = (url,payload) => {
 
   return async (dispatch) => {
