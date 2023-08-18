@@ -533,7 +533,7 @@ async def generate_files(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id
+        db, task_id=background_task_id, project_id=project_id
     )
 
     background_tasks.add_task(
@@ -709,7 +709,7 @@ async def add_features(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id
+        db, task_id=background_task_id, project_id=project_id
     )
 
     background_tasks.add_task(
@@ -852,7 +852,7 @@ async def download_task_boundaries(
 
 
 @router.get("/tiles/{project_id}")
-async def get_project_tiles(
+async def generate_project_tiles(
     background_tasks: BackgroundTasks,
     project_id: int,
     source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
@@ -874,11 +874,11 @@ async def get_project_tiles(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id
+        db, task_id=background_task_id, project_id=project_id
     )
 
     background_tasks.add_task(
-        project_crud.get_project_tiles,
+        project_crud.generate_project_tiles,
         db,
         project_id,
         source,
