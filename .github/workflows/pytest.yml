@@ -32,7 +32,7 @@ jobs:
         OSM_CLIENT_SECRET: test
         OSM_URL: https://www.openstreetmap.org
         OSM_SCOPE: read_prefs
-        OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8000/auth/callback/
+        OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8080/osmauth/
         OSM_SECRET_KEY: test
         URL_SCHEME: "http"
         FRONTEND_MAIN_URL: "localhost:8080"
