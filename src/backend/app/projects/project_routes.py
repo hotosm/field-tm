@@ -852,7 +852,7 @@ async def download_task_boundaries(
 
 
 @router.get("/tiles/{project_id}")
-async def get_project_tiles(
+async def generate_project_tiles(
     background_tasks: BackgroundTasks,
     project_id: int,
     source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
@@ -878,7 +878,7 @@ async def get_project_tiles(
     )
 
     background_tasks.add_task(
-        project_crud.get_project_tiles,
+        project_crud.generate_project_tiles,
         db,
         project_id,
         source,
