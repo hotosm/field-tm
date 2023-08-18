@@ -192,7 +192,7 @@ echo "Please enter your OSM authentication details"
 read -e -p "Client ID: " OSM_CLIENT_ID
 read -e -p "Client Secret: " OSM_CLIENT_SECRET
 read -e -p "Secret Key: " OSM_SECRET_KEY
-echo "Login redirect URI (default http://127.0.0.1:8000/auth/callback/): "
+echo "Login redirect URI (default http://127.0.0.1:8080/osmauth/): "
 while true
 do
     read -e -p "Enter a URI, or nothing for default: " auth_redirect_uri
