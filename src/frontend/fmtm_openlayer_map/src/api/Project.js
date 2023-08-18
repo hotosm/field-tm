@@ -1,5 +1,6 @@
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CoreModules from "fmtm/CoreModules";
+import environment from 'fmtm/environment';
 export const ProjectById = (url, existingProjectList) => {
   return async (dispatch) => {
     // dispatch(HomeActions.HomeProjectLoading(true))
@@ -79,5 +80,70 @@ export const DownloadProjectForm = (url,payload) => {
           }
       }
       await fetchProjectForm(url,payload);
+  }
+}
+export const GetTilesList = (url) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetTilesListLoading(true))
+
+      const fetchTilesList = async (url) => {
+          try {
+              const response = await CoreModules.axios.get(url);
+              dispatch(
+                ProjectActions.SetTilesList(response.data)
+              );
+              dispatch(ProjectActions.SetTilesListLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetTilesListLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetTilesListLoading(false))
+            }
+      }
+      await fetchTilesList(url,);
+  }
+}
+export const GenerateProjectTiles = (url,payload) => {
+  
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetGenerateProjectTilesLoading(true))
+
+      const generateProjectTiles = async (url,payload) => {
+        try {
+              const response = await CoreModules.axios.get(url);
+              dispatch(GetTilesList(`${environment.baseApiUrl}/projects/tiles_list/${payload}/`));
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetGenerateProjectTilesLoading(false))
+            }
+      }
+      await generateProjectTiles(url,payload);
+  }
+}
+
+export const DownloadTile = (url,payload) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:true}))
+
+      const getDownloadTile = async (url,payload) => {
+          try {
+              const response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+              var a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download=`${payload.title}_mbtiles.mbtiles`;
+              a.click();
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+            } finally{
+              dispatch(ProjectActions.SetDownloadTileLoading({type:payload,loading:false}))
+          }
+      }
+      await getDownloadTile(url,payload);
   }
 }

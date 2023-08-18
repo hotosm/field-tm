@@ -2092,7 +2092,7 @@ async def get_extracted_data_from_db(db:Session, project_id:int, outfile:str):
         dump(features, jsonfile)
 
 
-def generate_project_tiles(db: Session, 
+def get_project_tiles(db: Session, 
                             project_id: int, 
                             source: str,
                             background_task_id: uuid.UUID,
