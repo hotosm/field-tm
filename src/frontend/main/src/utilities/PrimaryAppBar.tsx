@@ -9,7 +9,6 @@ import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import { createLoginWindow } from '../utilfunctions/login';
 import { useState } from 'react';
-import environment from '../environment';
 
 export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
