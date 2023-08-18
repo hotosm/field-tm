@@ -3,10 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 const TaskSlice = createSlice({
   name: 'task',
   initialState: {
-    taskLoading: true,
+    taskLoading: false,
     taskInfo: [],
     selectedTask: null,
-    projectBoundaryLoading: true,
+    projectBoundaryLoading: false,
     projectBoundary: [],
     convertToOsmLoading: null,
     convertToOsm: [],
