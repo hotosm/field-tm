@@ -400,37 +400,76 @@ def generate_updated_xform(
     tmp[1]
     id = tmp[2].split(".")[0]
     extract = f"jr://file/{name}.geojson"
-    xml = xmltodict.parse(str(data))
-    # First change the osm data extract file
-    index = 0
-    for inst in xml["h:html"]["h:head"]["model"]["instance"]:
-        try:
-            if "@src" in inst:
-                if (
-                    xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split(
-                        "."
-                    )[1]
-                    == "geojson"
-                ):
-                    xml["h:html"]["h:head"]["model"]["instance"][index][
-                        "@src"
-                    ] = extract
-            if "data" in inst:
-                if "data" == inst:
-                    xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = id
-                    # xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
 
-                else:
-                    xml["h:html"]["h:head"]["model"]["instance"][0]["data"]["@id"] = id
-        except Exception:
+    # # Parse the XML to geojson
+    # xml = xmltodict.parse(str(data))
+
+    # # First change the osm data extract file
+    # index = 0
+    # for inst in xml["h:html"]["h:head"]["model"]["instance"]:
+    #     try:
+    #         if "@src" in inst:
+    #             if (
+    #                 xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split(
+    #                     "."
+    #                 )[1]
+    #                 == "geojson"
+    #             ):
+    #                 xml["h:html"]["h:head"]["model"]["instance"][index][
+    #                     "@src"
+    #                 ] = extract
+
+    #         if "data" in inst:
+    #             print("data in inst")
+    #             if "data" == inst:
+    #                 print("Data = inst ", inst)
+    #                 xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = id
+    #                 # xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
+    #             else:
+    #                 xml["h:html"]["h:head"]["model"]["instance"][0]["data"]["@id"] = id
+    #     except Exception:
+    #         continue
+    #     index += 1
+    # xml["h:html"]["h:head"]["h:title"] = name
+
+    namespaces = {
+        "h": "http://www.w3.org/1999/xhtml",
+        "odk": "http://www.opendatakit.org/xforms",
+        "xforms": "http://www.w3.org/2002/xforms",
+    }
+
+    import xml.etree.ElementTree as ET
+
+    root = ET.fromstring(data)
+    head = root.find("h:head",namespaces)
+    model = head.find("xforms:model",namespaces)
+    instances = model.findall("xforms:instance",namespaces)
+
+    index = 0
+    data_tag_present = False
+    for inst in instances:
+        try:
+            if "src" in inst.attrib:
+                if (inst[index].attrib)["src"].split(".")[1] == "geojson":
+                    (inst['index'].attrib)["src"] = extract
+
+            # Looking for data tags
+            data_tags = inst.findall("xforms:data", namespaces)
+            if data_tags:
+                for dt in data_tags:
+                    dt.attrib["id"] = id
+                data_tag_present = True
+        except Exception as e:
             continue
         index += 1
-    xml["h:html"]["h:head"]["h:title"] = name
+
+    # Save the modified XML
+    newxml = ET.tostring(root)
 
     # write the updated XML file
     outxml = open(outfile, "w")
-    newxml = xmltodict.unparse(xml)
-    outxml.write(newxml)
+    # newxml = xmltodict.unparse(xml)
+    outxml.write(newxml.decode())
     outxml.close()
 
     # insert the new version
