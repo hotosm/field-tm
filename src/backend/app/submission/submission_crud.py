@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import asyncio
 import os
 import zipfile
 import concurrent.futures
@@ -137,6 +138,42 @@ def create_zip_file(files, output_file_path):
     return output_file_path
 
 
+# async def convert_json_to_osm_xml(file_path):
+
+#     jsonin = JsonDump()
+#     infile = Path(file_path)
+
+#     base = os.path.splitext(infile.name)[0]
+
+#     osmoutfile = f"/tmp/{base}.osm"
+#     jsonin.createOSM(osmoutfile)
+
+#     data = jsonin.parse(infile.as_posix())
+
+#     for entry in data:
+#         feature = jsonin.createEntry(entry)
+#         # Sometimes bad entries, usually from debugging XForm design, sneak in
+#         if len(feature) == 0:
+#             continue
+#         if len(feature) > 0:
+#             if "lat" not in feature["attrs"]:
+#                 if 'geometry' in feature['tags']:
+#                     if type(feature['tags']['geometry']) == str:
+#                         coords = list(feature['tags']['geometry'])
+#                     else:
+#                         coords = feature['tags']['geometry']['coordinates']
+#                     feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
+#                 else:
+#                     logger.warning("Bad record! %r" % feature)
+#                     continue
+#             jsonin.writeOSM(feature)
+
+#     jsonin.finishOSM()
+#     logger.info("Wrote OSM XML file: %r" % osmoutfile)
+#     return osmoutfile
+
+
+
 async def convert_json_to_osm_xml(file_path):
 
     jsonin = JsonDump()
@@ -149,11 +186,10 @@ async def convert_json_to_osm_xml(file_path):
 
     data = jsonin.parse(infile.as_posix())
 
-    for entry in data:
+    async def process_entry_async(entry):
         feature = jsonin.createEntry(entry)
-        # Sometimes bad entries, usually from debugging XForm design, sneak in
         if len(feature) == 0:
-            continue
+            return None
         if len(feature) > 0:
             if "lat" not in feature["attrs"]:
                 if 'geometry' in feature['tags']:
@@ -164,11 +200,21 @@ async def convert_json_to_osm_xml(file_path):
                     feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
                 else:
                     logger.warning("Bad record! %r" % feature)
-                    continue
-            jsonin.writeOSM(feature)
+                    return None
+            return feature
 
-    jsonin.finishOSM()
-    logger.info("Wrote OSM XML file: %r" % osmoutfile)
+    async def write_osm_async(features):
+        for feature in features:
+            if feature:
+                jsonin.writeOSM(feature)
+        jsonin.finishOSM()
+        logger.info("Wrote OSM XML file: %r" % osmoutfile)
+        return osmoutfile
+
+    data_processing_tasks = [process_entry_async(entry) for entry in data]
+    processed_features = await asyncio.gather(*data_processing_tasks)
+    await write_osm_async(processed_features)
+
     return osmoutfile
 
 
@@ -387,7 +433,7 @@ def download_submission_for_project(db, project_id):
     return final_zip_file_path
 
 
-def get_all_submissions(db: Session, project_id):
+async def get_all_submissions(db: Session, project_id):
     project_info = project_crud.get_project(db, project_id)
 
     # ODK Credentials
