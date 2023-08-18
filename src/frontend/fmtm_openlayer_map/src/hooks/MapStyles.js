@@ -22,7 +22,7 @@ function createIconStyle(iconSrc) {
     return new Style({
         image: new Icon({
             anchor: [0.5, 1],
-            scale:1.5,
+            scale:0.8,
             anchorXUnits: "fraction",
             anchorYUnits: "pixels",
             src: iconSrc,
