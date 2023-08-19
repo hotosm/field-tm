@@ -61,7 +61,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 1. [Login to OSM](https://www.openstreetmap.org/login) (_If you do not have an account yet, click the signup button at the top navigation bar to create one_). Click the drop down arrow on the extreme right of the navigation bar and select My Settings.
 
-2. Register your local fmtm backend app to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
+2. Register your FMTM instance to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8080/osmauth/`, For Production replace the URL as production API Url
 
 > Note: `127.0.0.1` is required instead of `localhost` due to OSM restrictions.
 
@@ -99,7 +99,7 @@ OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
 OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
 OSM_URL=https://www.openstreetmap.org
 OSM_SCOPE=read_prefs
-OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
+OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8080/osmauth/
 OSM_SECRET_KEY=<random_key_for_development>
 
 ### Database (optional) ###

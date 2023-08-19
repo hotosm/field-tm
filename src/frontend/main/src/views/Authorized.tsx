@@ -13,11 +13,17 @@ function Authorized() {
     const params = new URLSearchParams(location.search);
     let authCode = params.get('code');
     let state = params.get('state');
+
+    // First case: authCode is passed
+    // return to get user details
     if (authCode !== null) {
-      window.opener.authComplete(authCode, state);
+      window.opener.postMessage({ authCode, state }, '*');
       window.close();
       return;
     }
+
+    // Second case: not authCode is passed
+    // persist user details in state
     const id = params.get('id');
     const username = params.get('username');
     const sessionToken = params.get('session_token');
@@ -25,8 +31,7 @@ function Authorized() {
     dispatch(LoginActions.setAuthDetails(username, sessionToken, osm_oauth_token));
     dispatch(LoginActions.SetLoginToken({ username, id, sessionToken, osm_oauth_token }));
 
-    const redirectUrl =
-      params.get('redirect_to') && params.get('redirect_to') !== '/' ? params.get('redirect_to') : '/';
+    const redirectUrl = params.get('redirect_to') || '/';
     setIsReadyToRedirect(true);
     navigate(redirectUrl);
   }, [dispatch, location.search, navigate]);
