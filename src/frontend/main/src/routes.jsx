@@ -1,8 +1,9 @@
 import React, { Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  // Navigate,
+} from 'react-router-dom';
 import Home from './views/Home';
-import Login from './views/Login';
-import Create from './views/Create';
 import Tabbed from './views/Tabbed';
 import MainView from './views/MainView';
 import CreateProject from './views/CreateProject';
@@ -42,14 +43,6 @@ const routes = createBrowserRouter([
       {
         path: '/tabbed',
         element: <Tabbed />,
-      },
-      {
-        path: '/login',
-        element: <Login />,
-      },
-      {
-        path: '/signup',
-        element: <Create />,
       },
 
       {

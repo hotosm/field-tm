@@ -9,7 +9,6 @@ import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import { createLoginWindow } from '../utilfunctions/login';
 import { useState } from 'react';
-import environment from '../environment';
 
 export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -167,32 +166,14 @@ export default function PrimaryAppBar() {
                 </CoreModules.Button>
               </CoreModules.Link>
             ) : (
-              <>
-                {environment.nodeEnv !== 'development' ? (
-                  <CoreModules.Button
-                    className="btnLogin"
-                    style={appBarInnerStyles.btnLogin}
-                    color="info"
-                    onClick={() => createLoginWindow('/')}
-                  >
-                    OSM Sign in
-                  </CoreModules.Button>
-                ) : null}
-                {process.env.NODE_ENV === 'development' ? (
-                  <>
-                    <CoreModules.Link style={{ textDecoration: 'none' }} to={'/login'}>
-                      <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
-                        Sign in
-                      </CoreModules.Button>
-                    </CoreModules.Link>
-                    <CoreModules.Link style={{ textDecoration: 'none' }} to={'/signup'}>
-                      <CoreModules.Button className="btnLogin" style={appBarInnerStyles.btnLogin} color="info">
-                        Sign up
-                      </CoreModules.Button>
-                    </CoreModules.Link>
-                  </>
-                ) : null}
-              </>
+              <CoreModules.Button
+                className="btnLogin"
+                style={appBarInnerStyles.btnLogin}
+                color="info"
+                onClick={() => createLoginWindow('/')}
+              >
+                OSM Sign in
+              </CoreModules.Button>
             )}
           </CoreModules.Stack>
           <CoreModules.Stack>
