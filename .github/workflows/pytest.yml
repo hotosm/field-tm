@@ -29,9 +29,13 @@ jobs:
         ODK_CENTRAL_URL: https://central-proxy
         ODK_CENTRAL_USER: test@hotosm.org
         ODK_CENTRAL_PASSWD: odk
-        OSM_CLIENT_ID: ${{ env.OSM_TEST_CLIENT_ID }}
-        OSM_CLIENT_SECRET: ${{ env.OSM_TEST_CLIENT_SECRET }}
-        OSM_SECRET_KEY: ${{ env.OSM_TEST_SECRET_KEY }}
+        OSM_CLIENT_ID: test
+        OSM_CLIENT_SECRET: test
+        OSM_SECRET_KEY: test
+        # Fix why env. vars not working below
+        # OSM_CLIENT_ID: ${{ env.OSM_TEST_CLIENT_ID }}
+        # OSM_CLIENT_SECRET: ${{ env.OSM_TEST_CLIENT_SECRET }}
+        # OSM_SECRET_KEY: ${{ env.OSM_TEST_SECRET_KEY }}
         # FRONTEND_MAIN_URL: "ui-main:8080"
         # FRONTEND_MAP_URL: "ui-map:8081"
       options: --user root
