@@ -19,7 +19,7 @@
 """Tests for user / auth endpoints."""
 
 
-def dummy_test():
+def test_nothing():
     """Dummy test to stop exit code 5."""
     assert True
 
