@@ -616,7 +616,7 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int):
+async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool= False):
     project_id = uuid.uuid4()
 
     outline = json.loads(boundary)
@@ -639,34 +639,44 @@ async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int):
     db.add(db_task)
     db.commit()
 
-    data = get_osm_extracts(json.dumps(boundary_data))
+    if not has_data_extracts:
+        data = get_osm_extracts(json.dumps(boundary_data))
 
-    if not data:
-        return None
+        if not data:
+            return None
 
-    for feature in data["features"]:
-        # If the osm extracts contents do not have a title, provide an empty text for that.
-        feature_shape = shape(feature["geometry"])
+        for feature in data["features"]:
+            # If the osm extracts contents do not have a title, provide an empty text for that.
+            feature_shape = shape(feature["geometry"])
 
-        wkb_element = from_shape(feature_shape, srid=4326)
+            wkb_element = from_shape(feature_shape, srid=4326)
 
-        if feature["properties"].get("building") == "yes":
-            db_feature = db_models.DbBuildings(
-                project_id=project_id,
-                geom=wkb_element,
-                tags=feature["properties"]
-                # category="buildings"
-            )
-            db.add(db_feature)
-            db.commit()
+            if feature["properties"].get("building") == "yes":
+                db_feature = db_models.DbBuildings(
+                    project_id=project_id,
+                    geom=wkb_element,
+                    tags=feature["properties"]
+                    # category="buildings"
+                )
+                db.add(db_feature)
+                db.commit()
 
-        elif "highway" in feature["properties"]:
-            db_feature = db_models.DbOsmLines(
-                project_id=project_id, geom=wkb_element, tags=feature["properties"]
-            )
+            elif "highway" in feature["properties"]:
+                db_feature = db_models.DbOsmLines(
+                    project_id=project_id, geom=wkb_element, tags=feature["properties"]
+                )
 
-            db.add(db_feature)
-            db.commit()
+                db.add(db_feature)
+                db.commit()
+    else:
+        # Remove the polygons outside of the project AOI using a parameterized query
+        query = f"""
+                    DELETE FROM ways_poly
+                    WHERE NOT ST_Within(ST_Centroid(ways_poly.geom), (SELECT geom FROM project_aoi WHERE project_id = '{project_id}'));
+                """
+        result = db.execute(query)
+        db.commit()
+
 
     # Get the sql query from split_algorithm sql file
     with open("app/db/split_algorithm.sql", "r") as sql_file:
@@ -1819,41 +1829,83 @@ def update_background_task_status_in_database(
 
 
 def add_features_into_database(
-    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID
-):
+    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID, feature_type :str):
     """Inserts a new task into the database
     Params:
           db: database session
           project_id: id of the project
           features: features to be added.
     """
-    success = 0
-    failure = 0
-    for feature in features["features"]:
-        try:
-            feature_geometry = feature["geometry"]
-            feature_shape = shape(feature_geometry)
+    try:
+        success = 0
+        failure = 0
+        if feature_type == "buildings":
+            for feature in features["features"]:
+                try:
+                    feature_geometry = feature["geometry"]
+                    feature_shape = shape(feature_geometry)
 
-            wkb_element = from_shape(feature_shape, srid=4326)
-            feature_obj = db_models.DbFeatures(
-                project_id=project_id,
-                category_title="buildings",
-                geometry=wkb_element,
-                task_id=1,
-                properties=feature["properties"],
-            )
-            db.add(feature_obj)
-            db.commit()
-            success += 1
-        except Exception:
-            failure += 1
-            continue
+                    wkb_element = from_shape(feature_shape, srid=4326)
+                    feature_obj = db_models.DbFeatures(
+                        project_id=project_id,
+                        category_title="buildings",
+                        geometry=wkb_element,
+                        properties=feature["properties"],
+                    )
+                    db.add(feature_obj)
+                    db.commit()
 
-    update_background_task_status_in_database(
-        db, background_task_id, 4
-    )  # 4 is COMPLETED
+                    building_obj = db_models.DbBuildings(
+                        project_id = project_id,
+                        geom=wkb_element,
+                        tags=feature["properties"]
+                        )
+                    db.add(building_obj)
+                    db.commit()
 
-    return True
+                    success += 1
+                except Exception:
+                    failure += 1
+                    continue
+
+            update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
+
+        elif feature_type == "lines":
+            for feature in features["features"]:
+                try:
+                    feature_geometry = feature["geometry"]
+                    feature_shape = shape(feature_geometry)
+                    feature["properties"]["highway"]="yes"
+
+                    wkb_element = from_shape(feature_shape, srid=4326)
+                    db_feature = db_models.DbOsmLines(
+                        project_id=project_id,
+                        geom=wkb_element,
+                        tags=feature["properties"]
+                    )
+
+                    db.add(db_feature)
+                    db.commit()
+
+                    success += 1
+                except Exception:
+                    failure += 1
+                    continue
+
+            update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
+
+        return True
+    except Exception as e:
+        log.warning(str(e))
+
+        # Update background task status to FAILED
+        update_background_task_status_in_database(
+            db, background_task_id, 2, str(e)
+        )  # 2 is FAILED
 
 
 async def update_project_form(
