@@ -349,13 +349,14 @@ async def upload_multi_project_boundary(
 async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
+    has_data_extracts: bool = Form(False),
     db: Session = Depends(database.get_db),
 ):
     # read entire file
     await upload.seek(0)
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings)
+    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
 
     return result
 
@@ -691,6 +692,7 @@ async def add_features(
     background_tasks: BackgroundTasks,
     project_id: int,
     upload: UploadFile = File(...),
+    feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
 ):
     """Add features to a project.
@@ -727,6 +729,7 @@ async def add_features(
         project_id,
         features,
         background_task_id,
+        feature_type
     )
     return True
 
