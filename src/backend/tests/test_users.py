@@ -16,6 +16,14 @@
 # #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 # #
 
+"""Tests for user / auth endpoints."""
+
+
+def dummy_test():
+    """Dummy test to stop exit code 5."""
+    assert True
+
+
 # import pytest
 # from fastapi import status
 
