@@ -47,7 +47,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
       <CoreModules.Card
         sx={{
           width: "100%",
-          height: "50vh",
+          height: "80vh",
           p: 1,
           overflow: "hidden",
           overflowY: "auto",
@@ -128,7 +128,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           </div>
         )}
       </CoreModules.Card>
-      <CoreModules.Card
+      {/* <CoreModules.Card
         sx={{
           width: "100%",
           p: 2,
@@ -146,7 +146,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           },
         }}
       >
-        {/* <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
+        <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
           <CoreModules.Typography variant="h1">
             Api Listing
           </CoreModules.Typography>
@@ -163,8 +163,8 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           <ProjectCard />
           <ProjectCard />
           <ProjectCard />
-        </CoreModules.Box> */}
-      </CoreModules.Card>
+        </CoreModules.Box>
+      </CoreModules.Card> */}
     </CoreModules.Box>
   );
 };
