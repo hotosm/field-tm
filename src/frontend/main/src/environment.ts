@@ -13,31 +13,46 @@ export default {
   },
   tasksStatus: [
     {
-      label: "READY",
-      action: [{ key: "Start Mapping", value: "LOCKED_FOR_MAPPING" }],
+      label: 'READY',
+      action: [{ key: 'Start Mapping', value: 'LOCKED_FOR_MAPPING' }],
     },
     {
-      label: "LOCKED_FOR_MAPPING",
+      label: 'LOCKED_FOR_MAPPING',
       action: [
-        { key: "Mark as fully mapped", value: "MAPPED" },
-        { key: "Assign to someone else", value: "READY" },
+        { key: 'Mark as fully mapped', value: 'MAPPED' },
+        { key: 'Assign to someone else', value: 'READY' },
       ],
     },
     {
-      label: "MAPPED",
+      label: 'MAPPED',
       action: [
-        { key: "Start Validating", value: "LOCKED_FOR_VALIDATION" },
-        { key: "Return to Mapping", value: "LOCKED_FOR_MAPPING" },
+        { key: 'Start Validating', value: 'LOCKED_FOR_VALIDATION' },
+        { key: 'Return to Mapping', value: 'LOCKED_FOR_MAPPING' },
       ],
     },
     {
-      label: "LOCKED_FOR_VALIDATION",
-      action: [{ key: "Confirm fully Mapped", value: "VALIDATED" }, { key: "More Mapping Needed", value: "INVALIDATED" }],
+      label: 'LOCKED_FOR_VALIDATION',
+      action: [
+        { key: 'Confirm fully Mapped', value: 'VALIDATED' },
+        { key: 'More Mapping Needed', value: 'INVALIDATED' },
+      ],
     },
-    { label: "VALIDATED", action: [] },
-    { label: "INVALIDATED", action: [{ key: "Map Again", value: "LOCKED_FOR_MAPPING" }] },
+    { label: 'VALIDATED', action: [] },
+    { label: 'INVALIDATED', action: [{ key: 'Map Again', value: 'LOCKED_FOR_MAPPING' }] },
     { label: 'BAD', action: [] },
     // "SPLIT",
     // "ARCHIVED",
   ],
+  selectFormWays: [
+    { id: 1, label: 'esri', value: 'esri' },
+    { id: 2, label: 'bing', value: 'bing' },
+    { id: 3, label: 'google', value: 'google' },
+    { id: 4, label: 'topo', value: 'topo' },
+  ],
+  statusColors: {
+    PENDING: 'gray',
+    FAILED: 'red',
+    RECEIVED: 'green',
+    SUCCESS: 'green',
+  },
 };

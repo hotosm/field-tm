@@ -6,12 +6,8 @@ import { createLoginWindow } from '../utilfunctions/login';
 const ProtectedRoute = ({ children }) => {
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   if (token == null) {
-    if (process.env.NODE_ENV === 'development') {
-      return <Navigate to="/login" replace />;
-    } else {
-      createLoginWindow('/');
-      return <Navigate to="/" replace />;
-    }
+    createLoginWindow('/');
+    return <Navigate to="/" replace />;
   }
   return children;
 };

@@ -5,7 +5,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const initialState: CreateProjectStateTypes = {
   editProjectDetails: { name: '', description: '', short_description: '' },
   editProjectResponse: null,
-  projectDetails: { dimension: 10, no_of_buildings: 5 },
+  projectDetails: { dimension: 10, no_of_buildings: 5, hashtags: 'hotosm-fmtm ' },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
@@ -45,7 +45,7 @@ const CreateProject = createSlice({
     },
     ClearCreateProjectFormData(state) {
       // state.projectDetailsResponse = null
-      state.projectDetails = { dimension: 10, no_of_buildings: 5 };
+      state.projectDetails = { dimension: 10, no_of_buildings: 5, hashtags: 'hotosm-fmtm ' };
       state.projectArea = null;
     },
     UploadAreaLoading(state, action) {

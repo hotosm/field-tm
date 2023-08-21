@@ -586,6 +586,7 @@ class BackgroundTasks(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String)
+    project_id = Column(Integer, nullable=True)
     status = Column(Enum(BackgroundTaskStatus), nullable=False)
     message = Column(String)
 
