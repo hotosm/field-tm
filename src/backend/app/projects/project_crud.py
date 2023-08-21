@@ -1836,68 +1836,76 @@ def add_features_into_database(
           project_id: id of the project
           features: features to be added.
     """
-    success = 0
-    failure = 0
-    if feature_type == "buildings":
-        for feature in features["features"]:
-            try:
-                feature_geometry = feature["geometry"]
-                feature_shape = shape(feature_geometry)
+    try:
+        success = 0
+        failure = 0
+        if feature_type == "buildings":
+            for feature in features["features"]:
+                try:
+                    feature_geometry = feature["geometry"]
+                    feature_shape = shape(feature_geometry)
 
-                wkb_element = from_shape(feature_shape, srid=4326)
-                feature_obj = db_models.DbFeatures(
-                    project_id=project_id,
-                    category_title="buildings",
-                    geometry=wkb_element,
-                    properties=feature["properties"],
-                )
-                db.add(feature_obj)
-                db.commit()
-
-                building_obj = db_models.DbBuildings(
-                    project_id = project_id,
-                    geom=wkb_element,
-                    tags=feature["properties"]
+                    wkb_element = from_shape(feature_shape, srid=4326)
+                    feature_obj = db_models.DbFeatures(
+                        project_id=project_id,
+                        category_title="buildings",
+                        geometry=wkb_element,
+                        properties=feature["properties"],
                     )
-                db.add(building_obj)
-                db.commit()
+                    db.add(feature_obj)
+                    db.commit()
 
-                success += 1
-            except Exception:
-                failure += 1
-                continue
+                    building_obj = db_models.DbBuildings(
+                        project_id = project_id,
+                        geom=wkb_element,
+                        tags=feature["properties"]
+                        )
+                    db.add(building_obj)
+                    db.commit()
 
+                    success += 1
+                except Exception:
+                    failure += 1
+                    continue
+
+            update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
+
+        elif feature_type == "lines":
+            for feature in features["features"]:
+                try:
+                    feature_geometry = feature["geometry"]
+                    feature_shape = shape(feature_geometry)
+                    feature["properties"]["highway"]="yes"
+
+                    wkb_element = from_shape(feature_shape, srid=4326)
+                    db_feature = db_models.DbOsmLines(
+                        project_id=project_id,
+                        geom=wkb_element,
+                        tags=feature["properties"]
+                    )
+
+                    db.add(db_feature)
+                    db.commit()
+
+                    success += 1
+                except Exception:
+                    failure += 1
+                    continue
+
+            update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
+
+        return True
+    except Exception as e:
+        log.warning(str(e))
+
+        # Update background task status to FAILED
         update_background_task_status_in_database(
-            db, background_task_id, 4
-        )  # 4 is COMPLETED
-
-    elif feature_type == "lines":
-        for feature in features["features"]:
-            try:
-                feature_geometry = feature["geometry"]
-                feature_shape = shape(feature_geometry)
-                feature["properties"]["highway"]="yes"
-
-                wkb_element = from_shape(feature_shape, srid=4326)
-                db_feature = db_models.DbOsmLines(
-                    project_id=project_id,
-                    geom=wkb_element,
-                    tags=feature["properties"]
-                )
-
-                db.add(db_feature)
-                db.commit()
-
-                success += 1
-            except Exception:
-                failure += 1
-                continue
-
-        update_background_task_status_in_database(
-            db, background_task_id, 4
-        )  # 4 is COMPLETED
-
-    return True
+            db, background_task_id, 2, str(e)
+        )  # 2 is FAILED
 
 
 async def update_project_form(
