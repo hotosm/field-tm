@@ -1,21 +1,22 @@
 # Getting started with Field Mapping Tasking Manager
+
 - [Overview](#overview)
-    - [Introduction to Field Mapping Tasking Manager Web App](#introduction-to-field-mapping-tasking-manager-web-app)
-    - [Basic Tools used](#basic-tools-used)
+  - [Introduction to Field Mapping Tasking Manager Web App](#introduction-to-field-mapping-tasking-manager-web-app)
+  - [Basic Tools used](#basic-tools-used)
 - [Guide for Users](#guide-for-users)
-    - [Prerequisites](#prerequisites)
-    - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
-    - [Work on existing projects](#work-on-existing-projects)
-    - [Help and Support](#help-and-support)
-    - [A Thank you note for the users of FMTM](#thank-you)
- - [Guide for Developers](#guide-for-developers)
-    - [FMTM frontend](#fmtm-frontend)
-    - [FMTM backend](#fmtm-backend)
-    - [Prerequisites for Contribution](#prerequisites-for-contribution)
-    - [Development: Setup Your Local Environment](#setup-your-local-environment)
-    - [Verify Setup](#verify-setup)
-    - [Start Developing](#start-developing)
-    
+  - [Prerequisites](#prerequisites)
+  - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
+  - [Work on existing projects](#work-on-existing-projects)
+  - [Help and Support](#help-and-support)
+  - [A Thank you note for the users of FMTM](#thank-you)
+- [Guide for Developers](#guide-for-developers)
+  - [FMTM frontend](#fmtm-frontend)
+  - [FMTM backend](#fmtm-backend)
+  - [Prerequisites for Contribution](#prerequisites-for-contribution)
+  - [Development: Setup Your Local Environment](#setup-your-local-environment)
+  - [Verify Setup](#verify-setup)
+  - [Start Developing](#start-developing)
+
 # Overview
 
 ## Introduction to Field Mapping Tasking Manager Web App
@@ -52,14 +53,16 @@ The ODK Collect app connects to a back-end server (in this case ODK Central), wh
 An ODK Central server that functions as the back end for the field data collectors' ODK Collect apps on their Android phones. Devs must have access to an ODK Central server with a username and password granting admin credentials.
 
 [Here are the instructions for setting up an ODK Central server on Digital Ocean](https://docs.getodk.org/central-install-digital-ocean/) (it's very similar on AWS or whatever)
-   
-# Guide for Users 
+
+# Guide for Users
 
 ## Prerequisites
+
 - Stable internet connection.
 - Mapping Knowledge (Optional): While not mandatory, having some mapping knowledge can enhance your experience with FMTM. If you are new to mapping we suggest you to read [this](https://tasks.hotosm.org/learn/map)
 
 ## Steps to create a project in FMTM
+
 - Go to [fmtm](https://fmtm.hotosm.org/) .
 - If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
 - Click the '+ CREATE NEW PROJECT' button.
@@ -81,15 +84,17 @@ An ODK Central server that functions as the back end for the field data collecto
 
 - Click on Submit button.
 
- - __Please watch the video below for more details__:point_down:
- 
+- **Please watch the video below for more details**:point_down:
 
 <!-- <video src="https://github.com/hotosm/fmtm/assets/97789856/8b63d8b5-2d13-4e54-8ddb-c262b0745b4f" align="centre"> -->
 <!--        -->
-https://github.com/hotosm/fmtm/assets/97789856/8b63d8b5-2d13-4e54-8ddb-c262b0745b4f
+
+<https://github.com/hotosm/fmtm/assets/97789856/8b63d8b5-2d13-4e54-8ddb-c262b0745b4f>
 
 ## Work on existing projects
+
 If you donot want to create a new project and wish to work on an existing project then follow the steps below:
+
 - Go to [fmtm](https://fmtm.hotosm.org/) .
 - If you are new then on the top right cornor click on Sign up and create an account . Else , Sign in to your existing account .
 - Click the button **Explore Projects** .
@@ -100,11 +105,14 @@ If you donot want to create a new project and wish to work on an existing projec
 ![5](https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3)
 
 ## Help and Support
+
 If you encounter any issues or need assistance while using FMTM, you can access the following resources:
+
 - Check the [FAQs](https://github.com/hotosm/fmtm/wiki/FAQ) .
 - Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
 
-## Thank you 
+## Thank you
+
 We are excited to have you join our community of passionate mappers and volunteers. FMTM is a powerful platform developed by the Humanitarian OpenStreetMap Team (HOT) to facilitate mapping projects for disaster response, humanitarian efforts, and community development.
 
 With FMTM, you have the opportunity to make a real impact by mapping areas that are in need of support. Your contributions help create detailed and up-to-date maps that aid organizations and communities in their efforts to respond to crises, plan infrastructure, and improve the lives of people around the world.
@@ -129,9 +137,10 @@ _To in details about the frontend click [here](https://github.com/hotosm/fmtm/wi
 
 ### Field Mapper Web Interface (with mobile-friendly map view)
 
- Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
+Ideally with a link that opens ODK Collect directly from the browser, but if that's hard, the fallback is downloading a QR code and importing it into ODK Collect.
 
 ## FMTM backend
+
 _To in details about the backend click [here](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend) ._
 
 A backend that converts the project parameters entered by the Campaign Manager in the Manager Web Interface into a corresponding ODK Central project. Its functions include:
@@ -149,8 +158,6 @@ A backend that converts the project parameters entered by the Campaign Manager i
   - GeoJSON feature collections for each form (the buildings/amenities or whatever)
   - An App User for each form, which in turn corresponds to a single task. When the ODK Collect app on a user's phone is configured to function as that App User, they have access to _only_ the form and features/area of that task.
   - A set of QR Codes and/or configuration files/strings for ODK Collect, one for each App User
-
-
 
 ## Prerequisites for Contribution
 
@@ -233,7 +240,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users. To properly configure your 
 
 1. [Login to OSM](https://www.openstreetmap.org/login) (_If you do not have an account yet, click the signup button at the top navigation bar to create one_). Click the drop down arrow on the extreme right of the navigation bar and select My Settings.
 
-2. Register your local fmtm backend app to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8000/auth/callback/`, For Production replace the URL as production API Url
+2. Register your FMTM instance to OAuth 2 applications. Put your login redirect url as `http://127.0.0.1:8080/osmauth/`, For Production replace the URL as production API Url
 
 > Note: `127.0.0.1` is required instead of `localhost` due to OSM restrictions.
 
@@ -271,7 +278,7 @@ OSM_CLIENT_ID=`<OSM_CLIENT_ID_FROM_ABOVE>`
 OSM_CLIENT_SECRET=`<OSM_CLIENT_SECRET_FROM_ABOVE>`
 OSM_URL=https://www.openstreetmap.org
 OSM_SCOPE=read_prefs
-OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8000/auth/callback/
+OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8080/osmauth/
 OSM_SECRET_KEY=<random_key_for_development>
 
 ### Database (optional) ###
@@ -317,8 +324,8 @@ Once you have deployed, you will need to check that you can properly authenticat
 3. Check your access token: Select the `/auth/me/` endpoint and click `Try it out`.  
     Pass in the `access_token` you copied in the previous step into the `access-token` field and click `Execute`. You should get your osm id, username and profile picture id.
 
-
 ## Start Developing
+
 We look forward to seeing your creative solutions and the positive impact they bring to FMTM.
 Don't forget to review [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution) guidelines and our [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct) before contributing!
 

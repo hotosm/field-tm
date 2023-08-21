@@ -32,6 +32,7 @@ import {
   Task as TaskIcon,
   UploadFile as SubmissionIcon,
   PlaylistAddCheck as FeatureIcon,
+  Bolt as BoltIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -74,4 +75,5 @@ export default {
   TaskIcon,
   SubmissionIcon,
   FeatureIcon,
+  BoltIcon,
 };
