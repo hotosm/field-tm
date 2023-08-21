@@ -1829,8 +1829,7 @@ def update_background_task_status_in_database(
 
 
 def add_features_into_database(
-    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID
-):
+    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID, feature_type :str):
     """Inserts a new task into the database
     Params:
           db: database session
@@ -1839,29 +1838,64 @@ def add_features_into_database(
     """
     success = 0
     failure = 0
-    for feature in features["features"]:
-        try:
-            feature_geometry = feature["geometry"]
-            feature_shape = shape(feature_geometry)
+    if feature_type == "buildings":
+        for feature in features["features"]:
+            try:
+                feature_geometry = feature["geometry"]
+                feature_shape = shape(feature_geometry)
 
-            wkb_element = from_shape(feature_shape, srid=4326)
-            feature_obj = db_models.DbFeatures(
-                project_id=project_id,
-                category_title="buildings",
-                geometry=wkb_element,
-                task_id=1,
-                properties=feature["properties"],
-            )
-            db.add(feature_obj)
-            db.commit()
-            success += 1
-        except Exception:
-            failure += 1
-            continue
+                wkb_element = from_shape(feature_shape, srid=4326)
+                feature_obj = db_models.DbFeatures(
+                    project_id=project_id,
+                    category_title="buildings",
+                    geometry=wkb_element,
+                    properties=feature["properties"],
+                )
+                db.add(feature_obj)
+                db.commit()
 
-    update_background_task_status_in_database(
-        db, background_task_id, 4
-    )  # 4 is COMPLETED
+                building_obj = db_models.DbBuildings(
+                    project_id = project_id,
+                    geom=wkb_element,
+                    tags=feature["properties"]
+                    )
+                db.add(building_obj)
+                db.commit()
+
+                success += 1
+            except Exception:
+                failure += 1
+                continue
+
+        update_background_task_status_in_database(
+            db, background_task_id, 4
+        )  # 4 is COMPLETED
+
+    elif feature_type == "lines":
+        for feature in features["features"]:
+            try:
+                feature_geometry = feature["geometry"]
+                feature_shape = shape(feature_geometry)
+                feature["properties"]["highway"]="yes"
+
+                wkb_element = from_shape(feature_shape, srid=4326)
+                db_feature = db_models.DbOsmLines(
+                    project_id=project_id,
+                    geom=wkb_element,
+                    tags=feature["properties"]
+                )
+
+                db.add(db_feature)
+                db.commit()
+
+                success += 1
+            except Exception:
+                failure += 1
+                continue
+
+        update_background_task_status_in_database(
+            db, background_task_id, 4
+        )  # 4 is COMPLETED
 
     return True
 

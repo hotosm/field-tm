@@ -692,6 +692,7 @@ async def add_features(
     background_tasks: BackgroundTasks,
     project_id: int,
     upload: UploadFile = File(...),
+    feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
 ):
     """Add features to a project.
@@ -728,6 +729,7 @@ async def add_features(
         project_id,
         features,
         background_task_id,
+        feature_type
     )
     return True
 
