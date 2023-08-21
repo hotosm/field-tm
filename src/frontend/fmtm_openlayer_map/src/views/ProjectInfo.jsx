@@ -13,6 +13,7 @@ import {
 } from "../api/task";
 import AssetModules from "fmtm/AssetModules";
 import { ProjectById } from "../api/Project";
+import ProjectInfoCountCard from "../components/ProjectInfo/ProjectInfoCountCard";
 
 const boxStyles = {
   animation: "blink 1s infinite",
@@ -234,6 +235,9 @@ const ProjectInfo = () => {
             {projectInfo?.title}
           </CoreModules.Typography>
         </CoreModules.Box>
+
+        <ProjectInfoCountCard />
+
         <CoreModules.Box sx={{ display: "flex", position: "relative" }}>
           <CoreModules.LoadingButton
             variant="outlined"

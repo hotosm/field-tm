@@ -10,6 +10,7 @@ export const fetchInfoTask: Function = (url: string) => {
         const fetchTaskInfoDetailsResponse = await CoreModules.axios.get(url);
         const response = fetchTaskInfoDetailsResponse.data;
         dispatch(CommonActions.SetLoading(false));
+        dispatch(CoreModules.TaskActions.SetTaskLoading(false));
         dispatch(CoreModules.TaskActions.FetchTaskInfoDetails(response));
       } catch (error) {
         dispatch(CommonActions.SetLoading(false));
