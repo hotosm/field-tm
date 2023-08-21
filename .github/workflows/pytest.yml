@@ -24,38 +24,62 @@ jobs:
     container:
       image: ghcr.io/hotosm/fmtm/backend:ci
       env:
-        FMTM_DB_URL: postgresql+psycopg2://fmtm:fmtm@fmtm-db:5432/fmtm
-        ODK_CENTRAL_URL: http://localhost:8383
-        ODK_CENTRAL_USER: odk
+        ODK_CENTRAL_URL: https://central-proxy
+        ODK_CENTRAL_USER: test@hotosm.org
         ODK_CENTRAL_PASSWD: odk
-        OSM_CLIENT_ID: test
-        OSM_CLIENT_SECRET: test
-        OSM_URL: https://www.openstreetmap.org
-        OSM_SCOPE: read_prefs
-        OSM_LOGIN_REDIRECT_URI: http://127.0.0.1:8080/osmauth/
-        OSM_SECRET_KEY: test
-        URL_SCHEME: "http"
-        FRONTEND_MAIN_URL: "localhost:8080"
-        FRONTEND_MAP_URL: "localhost:8081"
+        OSM_CLIENT_ID: ${{ env.OSM_TEST_CLIENT_ID }}
+        OSM_CLIENT_SECRET: ${{ env.OSM_TEST_CLIENT_SECRET }}
+        OSM_SECRET_KEY: ${{ env.OSM_TEST_SECRET_KEY }}
+        # FRONTEND_MAIN_URL: "ui-main:8080"
+        # FRONTEND_MAP_URL: "ui-map:8081"
       options: --user root
 
-    # pytest needs a database
     services:
-      # Label used to access the postgres service container
+      # Start backend database
       fmtm-db:
-        # Uses dockerhub postgis image
         image: postgis/postgis:14-3.3-alpine
-        # Provide the password, initilized database for pytest user
         env:
           POSTGRES_PASSWORD: fmtm
           POSTGRES_DB: fmtm
           POSTGRES_USER: fmtm
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+      # Start ODK Central database
+      central-db:
+        image: "postgis/postgis:14-3.3-alpine"
+        env:
+          POSTGRES_PASSWORD: odk
+          POSTGRES_DB: odk
+          POSTGRES_USER: odk
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # Start ODK Central
+      central:
+        image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
+        env:
+          DOMAIN: local
+          SYSADMIN_EMAIL: test@hotosm.org
+          SYSADMIN_PASSWD: odk
+          HTTPS_PORT: 443
+          DB_HOST: central-db
+          DB_USER: odk
+          DB_PASSWORD: odk
+          DB_NAME: odk
+          SENTRY_ORG_SUBDOMAIN: o130137
+          SENTRY_KEY: 3cf75f54983e473da6bd07daddf0d2ee
+          SENTRY_PROJECT: 1298632
+
+      # Start proxy to access ODK Central
+      central-proxy:
+        image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
 
     steps:
       - uses: actions/checkout@v3
