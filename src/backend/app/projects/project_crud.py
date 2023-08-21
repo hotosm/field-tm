@@ -616,7 +616,7 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int):
+async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool= False):
     project_id = uuid.uuid4()
 
     outline = json.loads(boundary)
@@ -639,34 +639,44 @@ async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int):
     db.add(db_task)
     db.commit()
 
-    data = get_osm_extracts(json.dumps(boundary_data))
+    if not has_data_extracts:
+        data = get_osm_extracts(json.dumps(boundary_data))
 
-    if not data:
-        return None
+        if not data:
+            return None
 
-    for feature in data["features"]:
-        # If the osm extracts contents do not have a title, provide an empty text for that.
-        feature_shape = shape(feature["geometry"])
+        for feature in data["features"]:
+            # If the osm extracts contents do not have a title, provide an empty text for that.
+            feature_shape = shape(feature["geometry"])
 
-        wkb_element = from_shape(feature_shape, srid=4326)
+            wkb_element = from_shape(feature_shape, srid=4326)
 
-        if feature["properties"].get("building") == "yes":
-            db_feature = db_models.DbBuildings(
-                project_id=project_id,
-                geom=wkb_element,
-                tags=feature["properties"]
-                # category="buildings"
-            )
-            db.add(db_feature)
-            db.commit()
+            if feature["properties"].get("building") == "yes":
+                db_feature = db_models.DbBuildings(
+                    project_id=project_id,
+                    geom=wkb_element,
+                    tags=feature["properties"]
+                    # category="buildings"
+                )
+                db.add(db_feature)
+                db.commit()
 
-        elif "highway" in feature["properties"]:
-            db_feature = db_models.DbOsmLines(
-                project_id=project_id, geom=wkb_element, tags=feature["properties"]
-            )
+            elif "highway" in feature["properties"]:
+                db_feature = db_models.DbOsmLines(
+                    project_id=project_id, geom=wkb_element, tags=feature["properties"]
+                )
 
-            db.add(db_feature)
-            db.commit()
+                db.add(db_feature)
+                db.commit()
+    else:
+        # Remove the polygons outside of the project AOI using a parameterized query
+        query = f"""
+                    DELETE FROM ways_poly
+                    WHERE NOT ST_Within(ST_Centroid(ways_poly.geom), (SELECT geom FROM project_aoi WHERE project_id = '{project_id}'));
+                """
+        result = db.execute(query)
+        db.commit()
+
 
     # Get the sql query from split_algorithm sql file
     with open("app/db/split_algorithm.sql", "r") as sql_file:
