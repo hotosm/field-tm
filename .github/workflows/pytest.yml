@@ -20,6 +20,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
 
     container:
       image: ghcr.io/hotosm/fmtm/backend:ci
