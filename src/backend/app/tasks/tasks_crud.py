@@ -103,14 +103,14 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
     db_task = get_task(db, task_id, db_obj=True)
 
     if db_task:
-        if (
-            db_task.task_status
-            in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]
-        ) and user_id is not db_task.locked_by:
-            raise HTTPException(
-                status_code=401,
-                detail=f"User {user_id} with username {db_user.username} has not locked this task.",
-            )
+        if db_task.task_status in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]:
+            if not (
+                user_id is not db_task.locked_by                
+            ):
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"User {user_id} with username {db_user.username} has not locked this task.",
+                )
 
         if verify_valid_status_update(db_task.task_status, new_status):
             # update history prior to updating task

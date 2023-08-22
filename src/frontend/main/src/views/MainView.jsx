@@ -6,9 +6,11 @@ import CustomizedSnackbars from '../utilities/CustomizedSnackbar';
 import { CommonActions } from '../store/slices/CommonSlice';
 import Loader from '../utilities/AppLoader';
 import MappingHeader from '../utilities/MappingHeader';
+import { useSearchParams } from 'react-router-dom';
 
 const MainView = () => {
   const dispatch = CoreModules.useAppDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { windowSize } = windowDimention();
   const checkTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const theme = CoreModules.createTheme(checkTheme);
@@ -26,6 +28,9 @@ const MainView = () => {
       }),
     );
   };
+
+  const popupInParams = searchParams.get('popup');
+
   return (
     <CoreModules.ThemeProvider theme={theme}>
       <CustomizedSnackbars
@@ -40,11 +45,19 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            <MappingHeader />
-            <PrimaryAppBar />
+            {popupInParams !== 'true' && (
+              <div>
+                <MappingHeader />
+                <PrimaryAppBar />
+              </div>
+            )}
             <CoreModules.Stack
               className="mainview"
-              sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto', p: '1.3rem' }}
+              sx={{
+                height: popupInParams ? '100vh' : windowSize.width <= 599 ? '90vh' : '92vh',
+                overflow: 'auto',
+                p: '1.3rem',
+              }}
             >
               <CoreModules.Outlet />
               {/* Footer */}
