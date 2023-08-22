@@ -621,11 +621,7 @@ async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has
 
     outline = json.loads(boundary)
 
-    """Update the boundary polyon on the database."""
-    # boundary_data = outline["features"][0]["geometry"]
-    if outline["type"] == "Feature":
-        boundary_data = outline["geometry"]
-    elif outline.get("features", None) is not None:
+    if outline.get("features", None) is not None:
         boundary_data = outline["features"][0]["geometry"]
     else:
         boundary_data = outline
