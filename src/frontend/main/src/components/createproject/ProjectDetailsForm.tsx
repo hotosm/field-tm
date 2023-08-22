@@ -321,6 +321,9 @@ const ProjectDetailsForm: React.FC = () => {
           <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
               <CoreModules.FormLabel component="h3">Tags</CoreModules.FormLabel>
+              <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
+                *
+              </CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
               id="hashtags"

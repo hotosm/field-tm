@@ -64,5 +64,7 @@ RUN mkdir /etc/secrets sentry-versions \
 # Add entrypoint script to init user
 COPY ./init-user-and-start.sh ./
 RUN chmod +x ./init-user-and-start.sh
+CMD ["./wait-for-it.sh", "central-db:5432", \
+    "--", "./init-user-and-start.sh"]
 
 EXPOSE 8383
