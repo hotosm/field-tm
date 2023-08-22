@@ -3,16 +3,17 @@ import { createSlice } from '@reduxjs/toolkit';
 const TaskSlice = createSlice({
   name: 'task',
   initialState: {
-    taskLoading: true,
+    taskLoading: false,
     taskInfo: [],
     selectedTask: null,
-    projectBoundaryLoading: true,
+    projectBoundaryLoading: false,
     projectBoundary: [],
     convertToOsmLoading: null,
     convertToOsm: [],
     downloadSubmissionLoading: { type: '', loading: false },
     convertXMLToJOSMLoading: false,
     josmEditorError: null,
+    taskData: { feature_count: 0, submission_count: 0, task_count: 0 },
   },
   reducers: {
     SetTaskLoading(state, action) {
@@ -25,7 +26,20 @@ const TaskSlice = createSlice({
       state.convertToOsmLoading = action.payload;
     },
     FetchTaskInfoDetails(state, action) {
-      state.taskInfo = action.payload;
+      const taskInfo = action.payload;
+
+      state.taskInfo = taskInfo;
+
+      const featureSubmissionCount = taskInfo.reduce(
+        (accumulator, current) => {
+          accumulator.feature_count += current.feature_count;
+          accumulator.submission_count += current.submission_count;
+          return accumulator;
+        },
+        { feature_count: 0, submission_count: 0 },
+      );
+      const tasks = taskInfo.length;
+      state.taskData = { ...featureSubmissionCount, task_count: tasks };
     },
     SetSelectedTask(state, action) {
       state.selectedTask = action.payload;

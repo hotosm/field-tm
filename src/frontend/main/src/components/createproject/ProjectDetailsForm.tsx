@@ -73,6 +73,28 @@ const ProjectDetailsForm: React.FC = () => {
       // window.removeEventListener("blur", onBlur);
     };
   }, []);
+
+  const hashtagPrefix = 'hotosm-fmtm ';
+
+  // Checks if hashtag value starts with hotosm-fmtm'
+  const handleHashtagOnChange = (e) => {
+    let enteredText = e.target.value;
+    if (!enteredText.startsWith(hashtagPrefix)) {
+      handleCustomChange('hashtags', hashtagPrefix);
+      return;
+    }
+    handleCustomChange('hashtags', enteredText);
+  };
+
+  // Doesn't let the user to press 'Backspace' or 'Delete' if input value is 'hotosm-fmtm '
+  const handleHashtagKeyPress = (e) => {
+    if (
+      ((e.key === 'Backspace' || e.key === 'Delete') && values.hashtags === hashtagPrefix) ||
+      (e.ctrlKey && e.key === 'Backspace')
+    ) {
+      e.preventDefault();
+    }
+  };
   return (
     <CoreModules.Stack sx={{ width: { xs: '95%' }, marginLeft: { md: '215px !important' } }}>
       <form onSubmit={handleSubmit} style={{ paddingBottom: '4rem' }}>
@@ -299,6 +321,9 @@ const ProjectDetailsForm: React.FC = () => {
           <CoreModules.FormControl sx={{ mb: 0, width: { md: '50%', lg: '30%' } }}>
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row', pt: 0 }}>
               <CoreModules.FormLabel component="h3">Tags</CoreModules.FormLabel>
+              <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
+                *
+              </CoreModules.FormLabel>
             </CoreModules.Box>
             <CoreModules.TextField
               id="hashtags"
@@ -317,7 +342,10 @@ const ProjectDetailsForm: React.FC = () => {
               }}
               value={values.hashtags}
               onChange={(e) => {
-                handleCustomChange('hashtags', e.target.value);
+                handleHashtagOnChange(e);
+              }}
+              onKeyDown={(e) => {
+                handleHashtagKeyPress(e);
               }}
               helperText={errors.hashtags}
               FormHelperTextProps={inputFormStyles()}
