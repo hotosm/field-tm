@@ -61,7 +61,8 @@ const CreateOrganizationForm = () => {
       </CoreModules.Box>
       <CoreModules.Box
         sx={{
-          width: 600,
+          width: '85%',
+          maxWidth: 600,
           padding: 3,
           cursor: 'pointer',
           background: '#ffff',
