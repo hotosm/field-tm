@@ -20,7 +20,7 @@ your own cloud server.
 
 - Install
   Docker. [Here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04)
-  is a good tutorial for that; do steps 1 and 2.   At the time of
+  is a good tutorial for that; do steps 1 and 2. At the time of
   writing that consisted of:
 
       sudo apt update
@@ -34,7 +34,7 @@ your own cloud server.
 
 - Now install Docker Compose (as per [this
   tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04)). At
-  the     time of writing (the latest version of Docker Compose may
+  the time of writing (the latest version of Docker Compose may
   change, so the version number might be out of date, but the rest
   shouldn't change) this consisted of:
 
@@ -44,8 +44,7 @@ your own cloud server.
 
 ### Grab the FMTM code
 
-Clone the Git repo for the fmtm with `git clone
-https://github.com/hotosm/fmtm.git`. Step into the resulting directory
+Clone the Git repo for the fmtm with `git clone https://github.com/hotosm/fmtm.git`. Step into the resulting directory
 with `cd fmtm`.
 
 ### Set up the environment and utilities to launch
@@ -69,7 +68,7 @@ that file to contain the needful (it should look like this):
     OSM_CLIENT_SECRET=`<CHANGEME>`
     OSM_URL=https://www.openstreetmap.org
     OSM_SCOPE=read_prefs
-    OSM_LOGIN_REDIRECT_URI=`<YOUR_API_URL>`/auth/callback/
+    OSM_LOGIN_REDIRECT_URI=`<FRONTEND_URL>`/osmauth/
     OSM_SECRET_KEY=`<CHANGEME>`
 
     FMTM_DB_HOST=fmtm-db
@@ -88,3 +87,14 @@ Run the production docker-compose config:
 
 With any luck, this will launch the docker container where the project
 runs, and you can access the working website from the domain name!
+
+## Connecting to a remote database
+
+- A database may be located on a headless Linux server in the cloud.
+- To access the database via GUI tool such as PGAdmin, it is possible using port tunneling.
+
+```bash
+ssh username@server.domain -N -f -L 5430:localhost:5432
+```
+
+This will map port 5432 on the remote machine to port 5430 on your local machine.

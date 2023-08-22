@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "DEBUG"
 
-    URL_SCHEME: Optional[str]
+    URL_SCHEME: Optional[str] = "http"
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
@@ -108,11 +108,10 @@ class Settings(BaseSettings):
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
-    OSM_URL: AnyUrl
-    OSM_SCOPE: str
-    OSM_LOGIN_REDIRECT_URI: AnyUrl
     OSM_SECRET_KEY: str
-    OAUTHLIB_INSECURE_TRANSPORT: Optional[str] = 1
+    OSM_URL: AnyUrl = "https://www.openstreetmap.org"
+    OSM_SCOPE: str = "read_prefs"
+    OSM_LOGIN_REDIRECT_URI: AnyUrl = "http://127.0.0.1:8080/osmauth/"
 
     SENTRY_DSN: Optional[str]
 

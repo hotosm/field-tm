@@ -102,19 +102,13 @@ COPY --from=build \
     /root/.local \
     /home/appuser/.local
 WORKDIR /opt
-COPY . /opt/
-# ENTRYPOINT bash script to check db is ready
-ARG FMTM_DB_HOST
-RUN printf '#!/bin/bash\n\
-    set -eo pipefail\n\
-    while !</dev/tcp/${FMTM_DB_HOST:-fmtm-db}/5432; do sleep 1; done;\n\
-    exec "$@"'\
-    >> /docker-entrypoint.sh \
-    && chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY app/ /opt/app/
+COPY container-entrypoint.sh /
+ENTRYPOINT ["/container-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
-    && chown -R appuser:appuser /opt /home/appuser
+    && chown -R appuser:appuser /opt /home/appuser \
+    && chmod +x /container-entrypoint.sh
 # Add volume for persistent images
 VOLUME /opt/app/images
 # Change to non-root user
@@ -158,6 +152,7 @@ USER appuser
 
 
 FROM debug-no-odk as ci
+COPY --chown=appuser tests/ /opt/tests/
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Override entrypoint, as not possible in Github action

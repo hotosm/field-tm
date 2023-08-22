@@ -126,6 +126,13 @@ Example launch.json config for vscode:
 
 > Note: either port 5678 needs to be bound to your localhost (default), or the `host` parameter can be set to the container IP address.
 
+## Using the local version of ODK Central
+
+- During project creation a Central ODK URL must be provided.
+- If you set up FMTM with docker and have ODK Central running in a container, you can use the URL:
+  `https://central-proxy`
+- The credentials should be present in your `.env` file.
+
 ## Debugging osm-fieldwork
 
 `osm-fieldwork` is an integral package for much of the functionality in FMTM.
