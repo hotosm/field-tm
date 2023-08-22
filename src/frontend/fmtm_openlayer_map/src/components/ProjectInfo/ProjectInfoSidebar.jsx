@@ -2,6 +2,7 @@ import React from "react";
 import CoreModules from "fmtm/CoreModules";
 import ProjectCard from "./ProjectCard";
 import environment from "fmtm/environment";
+import ProjectInfoSidebarSkeleton from "./ProjectInfoSidebarSkeleton";
 
 const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
   const dispatch = CoreModules.useAppDispatch();
@@ -9,6 +10,9 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
   const taskInfoData = Array.from(taskInfo);
   const selectedTask = CoreModules.useAppSelector(
     (state) => state.task.selectedTask
+  );
+  const isTaskLoading = CoreModules.useAppSelector(
+    (state) => state.task.taskLoading
   );
 
   const encodedId = params.projectId;
@@ -43,7 +47,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
       <CoreModules.Card
         sx={{
           width: "100%",
-          height: "50vh",
+          height: "80vh",
           p: 1,
           overflow: "hidden",
           overflowY: "auto",
@@ -57,62 +61,74 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           },
         }}
       >
-        {taskInfoData?.map((task, index) => (
-          <CoreModules.CardContent
-            key={index}
-            sx={{
-              ...innerBoxStyles.boxStyle,
-              backgroundColor:
-                task.task_id === selectedTask ? "#F0FBFF" : "#FFFFFF",
-            }}
-            onClick={() => onTaskClick(task.task_id)}
-          >
-            <CoreModules.Box
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <CoreModules.Box sx={{ flex: 1 }}>
-                <CoreModules.Typography variant="h1" color="#929db3">
-                  #{task.task_id}
-                </CoreModules.Typography>
-              </CoreModules.Box>
-              <CoreModules.Link
-                to={`/project/${encodedId}/tasks/${environment.encode(
-                  task.task_id
-                )}`}
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  textDecoration: "none",
-                  marginRight: "5px",
+        {isTaskLoading ? (
+          <div>
+            {Array.from({ length: 5 }).map((i) => (
+              <div id={i}>
+                <ProjectInfoSidebarSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div>
+            {taskInfoData?.map((task, index) => (
+              <CoreModules.CardContent
+                key={index}
+                sx={{
+                  ...innerBoxStyles.boxStyle,
+                  backgroundColor:
+                    task.task_id === selectedTask ? "#F0FBFF" : "#FFFFFF",
                 }}
+                onClick={() => onTaskClick(task.task_id)}
               >
-                <CoreModules.Button
-                  variant="outlined"
-                  color="error"
-                  sx={{ width: "fit-content", height: "fit-content" }}
-                  size="small"
+                <CoreModules.Box
+                  sx={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  Go To Task Submissions
-                </CoreModules.Button>
-              </CoreModules.Link>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                sx={{ width: "fit-content", height: "fit-content" }}
-                size="small"
-              >
-                Zoom to Task
-              </CoreModules.Button>
-            </CoreModules.Box>
-            <CoreModules.LoadingBar
-              title="Task Progress"
-              totalSteps={task.feature_count}
-              activeStep={task.submission_count}
-            />
-          </CoreModules.CardContent>
-        ))}
+                  <CoreModules.Box sx={{ flex: 1 }}>
+                    <CoreModules.Typography variant="h1" color="#929db3">
+                      #{task.task_id}
+                    </CoreModules.Typography>
+                  </CoreModules.Box>
+                  <CoreModules.Link
+                    to={`/project/${encodedId}/tasks/${environment.encode(
+                      task.task_id
+                    )}`}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      textDecoration: "none",
+                      marginRight: "5px",
+                    }}
+                  >
+                    <CoreModules.Button
+                      variant="outlined"
+                      color="error"
+                      sx={{ width: "fit-content", height: "fit-content" }}
+                      size="small"
+                    >
+                      Go To Task Submissions
+                    </CoreModules.Button>
+                  </CoreModules.Link>
+                  <CoreModules.Button
+                    variant="outlined"
+                    color="error"
+                    sx={{ width: "fit-content", height: "fit-content" }}
+                    size="small"
+                  >
+                    Zoom to Task
+                  </CoreModules.Button>
+                </CoreModules.Box>
+                <CoreModules.LoadingBar
+                  title="Task Progress"
+                  totalSteps={task.feature_count}
+                  activeStep={task.submission_count}
+                />
+              </CoreModules.CardContent>
+            ))}
+          </div>
+        )}
       </CoreModules.Card>
-      <CoreModules.Card
+      {/* <CoreModules.Card
         sx={{
           width: "100%",
           p: 2,
@@ -130,7 +146,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           },
         }}
       >
-        {/* <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
+        <CoreModules.Box sx={{ borderBottom: "1px solid #F0F0F0" }}>
           <CoreModules.Typography variant="h1">
             Api Listing
           </CoreModules.Typography>
@@ -147,8 +163,8 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
           <ProjectCard />
           <ProjectCard />
           <ProjectCard />
-        </CoreModules.Box> */}
-      </CoreModules.Card>
+        </CoreModules.Box>
+      </CoreModules.Card> */}
     </CoreModules.Box>
   );
 };

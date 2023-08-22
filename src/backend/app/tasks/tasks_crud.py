@@ -17,20 +17,20 @@
 #
 
 import base64
+import logging
 from typing import List
 
 from fastapi import HTTPException
 from fastapi.logger import logger as logger
+from geoalchemy2.shape import from_shape
+from geojson import dump
+from osm_fieldwork.make_data_extract import PostgresClient
+from shapely.geometry import shape
 from sqlalchemy import column, select, table
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-from osm_fieldwork.make_data_extract import PostgresClient
-from geoalchemy2.shape import from_shape
-from shapely.geometry import shape
-from geojson import dump
-from ..projects import project_crud
-from ..central import central_crud
 
+from ..central import central_crud
 from ..db import db_models
 from ..db.postgis_utils import geometry_to_geojson, get_centroid
 from ..models.enums import (
@@ -38,8 +38,11 @@ from ..models.enums import (
     get_action_for_status_change,
     verify_valid_status_update,
 )
+from ..projects import project_crud
 from ..tasks import tasks_schemas
 from ..users import user_crud
+
+log = logging.getLogger(__name__)
 
 
 async def get_task_count_in_project(db: Session, project_id: int):
@@ -49,9 +52,7 @@ async def get_task_count_in_project(db: Session, project_id: int):
 
 
 def get_task_lists(db: Session, project_id: int):
-    """
-    Get a list of tasks for a project
-    """
+    """Get a list of tasks for a project."""
     query = f"""select id from tasks where project_id = {project_id}"""
     result = db.execute(query)
     tasks = [task[0] for task in result.fetchall()]
@@ -83,8 +84,7 @@ def get_tasks(
 
 
 def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(
-        db_models.DbTask.id == task_id).first()
+    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
     if db_obj:
         return db_task
     return convert_to_app_task(db_task)
@@ -103,14 +103,14 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
     db_task = get_task(db, task_id, db_obj=True)
 
     if db_task:
-        if (
-            db_task.task_status
-            in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]
-        ) and user_id is not db_task.locked_by:
-            raise HTTPException(
-                status_code=401,
-                detail=f"User {user_id} with username {db_user.username} has not locked this task.",
-            )
+        if db_task.task_status in [TaskStatus.LOCKED_FOR_MAPPING, TaskStatus.LOCKED_FOR_VALIDATION]:
+            if not (
+                user_id is not db_task.locked_by                
+            ):
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"User {user_id} with username {db_user.username} has not locked this task.",
+                )
 
         if verify_valid_status_update(db_task.task_status, new_status):
             # update history prior to updating task
@@ -211,8 +211,12 @@ def create_task_history_for_status_change(
 
 def convert_to_app_history(db_histories: List[db_models.DbTaskHistory]):
     if db_histories:
+        log.debug("Converting DB Histories to App Histories")
         app_histories: List[tasks_schemas.TaskHistoryBase] = []
         for db_history in db_histories:
+            log.debug(
+                f"History ID: {db_history.id} | " "Converting DB History to App History"
+            )
             app_history = db_history
             app_history.obj = db_history.action_text
             app_histories.append(app_history)
@@ -222,6 +226,13 @@ def convert_to_app_history(db_histories: List[db_models.DbTaskHistory]):
 
 def convert_to_app_task(db_task: db_models.DbTask):
     if db_task:
+        log.debug("")
+        log.debug(
+            f"Project ID {db_task.project_id} | Task ID "
+            f"{db_task.id} | Converting DB Task to App Task"
+        )
+        log.debug("")
+
         app_task: tasks_schemas.Task = db_task
         app_task.task_status_str = tasks_schemas.TaskStatusOption[
             app_task.task_status.name
@@ -233,13 +244,16 @@ def convert_to_app_task(db_task: db_models.DbTask):
                 "uid": db_task.id,
                 "name": db_task.project_task_name,
             }
+            log.debug("Converting task outline to geojson")
             app_task.outline_geojson = geometry_to_geojson(
-                db_task.outline, properties, db_task.id)
+                db_task.outline, properties, db_task.id
+            )
             app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
             app_task.locked_by_uid = db_task.lock_holder.id
             app_task.locked_by_username = db_task.lock_holder.username
+            log.debug("Task currently locked by user " f"{app_task.locked_by_username}")
 
         if db_task.qr_code:
             logger.debug(
@@ -251,8 +265,7 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.qr_code_base64 = ""
 
         if db_task.task_history:
-            app_task.task_history = convert_to_app_history(
-                db_task.task_history)
+            app_task.task_history = convert_to_app_history(db_task.task_history)
 
         return app_task
     else:
@@ -260,7 +273,11 @@ def convert_to_app_task(db_task: db_models.DbTask):
 
 
 def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
-    if db_tasks and len(db_tasks) > 0:
+    num_tasks = len(db_tasks)
+    log.debug(f"Number of tasks in project: {num_tasks}")
+
+    if db_tasks and num_tasks > 0:
+        log.debug("Converting DB Tasks to App Tasks")
         app_tasks = []
         for task in db_tasks:
             if task:
@@ -268,6 +285,7 @@ def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
         app_tasks_without_nones = [i for i in app_tasks if i is not None]
         return app_tasks_without_nones
     else:
+        log.debug("No tasks found, skipping DB -> App conversion")
         return []
 
 
@@ -278,8 +296,7 @@ def get_qr_codes_for_task(
     task = get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
-            logger.debug(
-                f"QR code found for task ID {task.id}. Converting to base64")
+            logger.debug(f"QR code found for task ID {task.id}. Converting to base64")
             qr_code = base64.b64encode(task.qr_code.image)
         else:
             logger.debug(f"QR code not found for task ID {task.id}.")
@@ -290,30 +307,27 @@ def get_qr_codes_for_task(
 
 
 async def get_task_by_id(db: Session, task_id: int):
-    task = (
-        db.query(db_models.DbTask)
-        .filter(db_models.DbTask.id == task_id)
-        .first()
-    )
-    print('Task ', task)
+    task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
+    print("Task ", task)
     return task
 
 
-async def update_task_files(db: Session,
-                            project_id: int,
-                            project_odk_id: int,
-                            project_name: str,
-                            task_id: int,
-                            category: str,
-                            task_boundary: str):
-
+async def update_task_files(
+    db: Session,
+    project_id: int,
+    project_odk_id: int,
+    project_name: str,
+    task_id: int,
+    category: str,
+    task_boundary: str,
+):
     # This file will store osm extracts
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
 
     # Update data extracts in the odk central
-    pg = PostgresClient('https://raw-data-api0.hotosm.org/v1', "underpass")
+    pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
 
-    category = 'buildings'
+    category = "buildings"
 
     # This file will store osm extracts
     outfile = f"/tmp/test_project_{category}.geojson"
@@ -324,32 +338,30 @@ async def update_task_files(db: Session,
     ).delete()
 
     # OSM Extracts
-    outline_geojson = pg.getFeatures(boundary=task_boundary,
-                                     filespec=outfile,
-                                     polygon=True,
-                                     xlsfile=f'{category}.xls',
-                                     category=category
-                                     )
+    outline_geojson = pg.getFeatures(
+        boundary=task_boundary,
+        filespec=outfile,
+        polygon=True,
+        xlsfile=f"{category}.xls",
+        category=category,
+    )
 
-    updated_outline_geojson = {
-        "type": "FeatureCollection",
-        "features": []}
+    updated_outline_geojson = {"type": "FeatureCollection", "features": []}
 
     # Collect feature mappings for bulk insert
     for feature in outline_geojson["features"]:
-
         # If the osm extracts contents do not have a title, provide an empty text for that.
         feature["properties"]["title"] = ""
 
-        feature_shape = shape(feature['geometry'])
+        feature_shape = shape(feature["geometry"])
 
         wkb_element = from_shape(feature_shape, srid=4326)
-        updated_outline_geojson['features'].append(feature)
+        updated_outline_geojson["features"].append(feature)
 
         db_feature = db_models.DbFeatures(
             project_id=project_id,
             geometry=wkb_element,
-            properties=feature["properties"]
+            properties=feature["properties"],
         )
         db.add(db_feature)
         db.commit()
@@ -360,18 +372,13 @@ async def update_task_files(db: Session,
         dump(updated_outline_geojson, jsonfile)
 
     # Update the osm extracts in the form.
-    central_crud.upload_xform_media(
-        project_odk_id, task_id, task_polygons, None)
+    central_crud.upload_xform_media(project_odk_id, task_id, task_polygons, None)
 
     return True
 
 
-async def edit_task_boundary(
-    db: Session,
-    task_id: int,
-    boundary: str
-):
-    geometry = boundary['features'][0]['geometry']
+async def edit_task_boundary(db: Session, task_id: int, boundary: str):
+    geometry = boundary["features"][0]["geometry"]
 
     """Update the boundary polyon on the database."""
     outline = shape(geometry)
@@ -390,6 +397,8 @@ async def edit_task_boundary(
     project_name = project.project_name_prefix
     odk_id = project.odkid
 
-    await update_task_files(db, project_id, odk_id, project_name, task_id, category, geometry)
+    await update_task_files(
+        db, project_id, odk_id, project_name, task_id, category, geometry
+    )
 
     return True

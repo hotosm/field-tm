@@ -10,20 +10,19 @@ body {
   margin-top: 20px;
 }
 
-.sweet-loading{
+.sweet-loading {
   position: absolute;
-  top: 50%;  
+  top: 50%;
   z-index: 5;
   transform: translate(-50%, -50%);
 }
 
-.notFound{
+.notFound {
   height: 93vh;
   overflow: auto;
 }
 
-.btnLogin,
-btnSignUp {
+.btnLogin {
   width: 100px;
 }
 
@@ -51,45 +50,37 @@ button {
 .content {
   height: 81vh;
   overflow: auto;
-  padding: 5px
+  padding: 5px;
 }
 
 @font-face {
-  font-family: "BarlowBold";
-  src: local("BarlowBold"),
-    url("./assets/fonts/Barlow/Barlow-Bold.ttf") format("truetype");
+  font-family: 'BarlowBold';
+  src: local('BarlowBold'), url('./assets/fonts/Barlow/Barlow-Bold.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "BarlowMedium";
-  src: local("BarlowMedium"),
-    url("./assets/fonts/Barlow/Barlow-Medium.ttf") format("truetype");
+  font-family: 'BarlowMedium';
+  src: local('BarlowMedium'), url('./assets/fonts/Barlow/Barlow-Medium.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "ArchivoBold";
-  src: local("ArchivoBold"),
-    url("./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf") format("truetype");
+  font-family: 'ArchivoBold';
+  src: local('ArchivoBold'), url('./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "ArchivoRegular";
-  src: local("ArchivoRegular"),
-    url("./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf") format("truetype");
+  font-family: 'ArchivoRegular';
+  src: local('ArchivoRegular'), url('./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "ArchivoMedium";
-  src: local("ArchivoMedium"),
-    url("./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf") format("truetype");
-
+  font-family: 'ArchivoMedium';
+  src: local('ArchivoMedium'), url('./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "ArchivoLight";
-  src: local("ArchivoLight"),
-    url("./assets/fonts/Archivo/Archivo/Archivo-Light.ttf") format("truetype");
-
+  font-family: 'ArchivoLight';
+  src: local('ArchivoLight'), url('./assets/fonts/Archivo/Archivo/Archivo-Light.ttf') format('truetype');
 }
 
 .swiper-button-next,
@@ -99,7 +90,7 @@ button {
   stroke: #44546a !important;
 }
 
-.legend-container{
+.legend-container {
   background-color: white;
   width: 14rem;
   padding: 7px;
@@ -126,14 +117,13 @@ button {
 .legend-square {
   width: 20px;
   height: 20px;
-  border:1px solid black;
+  border: 1px solid black;
 }
 
-.submission-item{
+.submission-item {
   text-decoration: none;
-  
 }
-.submission-item:hover{
+.submission-item:hover {
   background-color: rgba(215, 63, 62, 0.04);
   border: 1px solid #d73f3e;
   border-radius: 10px;

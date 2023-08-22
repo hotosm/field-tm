@@ -6,7 +6,12 @@ import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
 import OpenLayersMap from "../components/OpenLayersMap";
 import environment from "fmtm/environment";
-import { DownloadProjectForm, ProjectById } from "../api/Project";
+import {
+  DownloadProjectForm,
+  GenerateProjectTiles,
+  GetTilesList,
+  ProjectById,
+} from "../api/Project";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from "fmtm/CustomizedSnackbar";
 import { defaults } from "ol/control/defaults";
@@ -24,6 +29,7 @@ import AssetModules from "fmtm/AssetModules";
 // import MapboxVector from "ol/layer/MapboxVector.js";
 
 import Overlay from "ol/Overlay";
+import GenerateMbTiles from "../components/GenerateMbTiles";
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
@@ -43,6 +49,7 @@ const Home = () => {
     (state) => state.home.snackbar
   );
   const [taskId, setTaskId] = useState();
+  const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
   const mapElement = useRef();
   const [map, setMap] = useState();
   const [mainView, setView] = useState();
@@ -239,8 +246,16 @@ const Home = () => {
       );
     }
   };
+
   return (
     <CoreModules.Stack spacing={2}>
+      {/* Customized Modal For Generate Tiles */}
+      <GenerateMbTiles
+        toggleGenerateModal={toggleGenerateModal}
+        setToggleGenerateModal={setToggleGenerateModal}
+        projectInfo={state.projectInfo}
+      />
+
       {/* Home snackbar */}
       <CustomizedSnackbar
         duration={stateSnackBar.duration}
@@ -402,6 +417,15 @@ const Home = () => {
                 ProjectInfo
               </CoreModules.Button>
             </CoreModules.Link>
+            <CoreModules.Button
+              onClick={() => setToggleGenerateModal(true)}
+              variant="contained"
+              color="error"
+              sx={{ width: "200px", mr: "15px" }}
+              endIcon={<AssetModules.BoltIcon />}
+            >
+              Generate MbTiles
+            </CoreModules.Button>
             <CoreModules.Link
               to={`/edit-project/project-details/${encodedId}`}
               style={{

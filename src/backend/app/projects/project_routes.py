@@ -17,6 +17,7 @@
 #
 
 import json
+import logging
 import os
 import uuid
 from typing import List, Optional
@@ -28,24 +29,23 @@ from fastapi import (
     File,
     Form,
     HTTPException,
-    UploadFile,
+    Query,
     Response,
-    Query
+    UploadFile,
 )
-from fastapi.responses import FileResponse
-from osm_fieldwork.xlsforms import xlsforms_path
 from fastapi.logger import logger as logger
+from fastapi.responses import FileResponse
 from osm_fieldwork.make_data_extract import getChoices
+from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
-
-import json
 
 from ..central import central_crud
 from ..db import database, db_models
-from . import project_crud, project_schemas
-from ..tasks import tasks_crud
-from . import utils
 from ..models.enums import TILES_SOURCE
+from ..tasks import tasks_crud
+from . import project_crud, project_schemas, utils
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/projects",
@@ -80,9 +80,11 @@ async def read_project_summaries(
     db: Session = Depends(database.get_db),
 ):
     if hashtags:
-        hashtags = hashtags.split(',') # create list of hashtags
-        hashtags = list(filter(lambda hashtag: hashtag.startswith('#'), hashtags))  # filter hashtags that do start with #
-    
+        hashtags = hashtags.split(",")  # create list of hashtags
+        hashtags = list(
+            filter(lambda hashtag: hashtag.startswith("#"), hashtags)
+        )  # filter hashtags that do start with #
+
     projects = project_crud.get_project_summaries(db, user_id, skip, limit, hashtags)
     return projects
 
@@ -108,10 +110,10 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
 
     # Odk crendentials
     odk_credentials = project_schemas.ODKCentral(
-        odk_central_url = project.odk_central_url,
-        odk_central_user = project.odk_central_user,
-        odk_central_password = project.odk_central_password,
-        )
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
 
     central_crud.delete_odk_project(project.odkid, odk_credentials)
 
@@ -131,13 +133,14 @@ async def create_project(
     logger.debug(f"Creating project {project_info.project_info.name}")
 
     if project_info.odk_central.odk_central_url.endswith("/"):
-        project_info.odk_central.odk_central_url = project_info.odk_central.odk_central_url[:-1]
+        project_info.odk_central.odk_central_url = (
+            project_info.odk_central.odk_central_url[:-1]
+        )
 
     try:
         odkproject = central_crud.create_odk_project(
             project_info.project_info.name, project_info.odk_central
         )
-        logger.debug(f"ODKCentral return: {odkproject}")
     except Exception as e:
         logger.error(e)
         raise HTTPException(
@@ -161,17 +164,17 @@ async def update_odk_credentials(
     background_task: BackgroundTasks,
     odk_central_cred: project_schemas.ODKCentral,
     project_id: int,
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
 ):
-    """Update odk credential of a project"""
+    """Update odk credential of a project."""
     if odk_central_cred.odk_central_url.endswith("/"):
         odk_central_cred.odk_central_url = odk_central_cred.odk_central_url[:-1]
-    
+
     project_instance = project_crud.get_project(db, project_id)
-    
+
     if not project_instance:
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     try:
         odkproject = central_crud.create_odk_project(
             project_instance.project_info[0].name, odk_central_cred
@@ -182,22 +185,25 @@ async def update_odk_credentials(
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
         ) from e
-    
-    await project_crud.update_odk_credentials(project_instance, odk_central_cred, odkproject["id"], db)
-    
-    extract_polygon = True if project_instance.data_extract_type == 'polygon' else False
+
+    await project_crud.update_odk_credentials(
+        project_instance, odk_central_cred, odkproject["id"], db
+    )
+
+    extract_polygon = True if project_instance.data_extract_type == "polygon" else False
     project_id = project_instance.id
     contents = project_instance.form_xls if project_instance.form_xls else None
-    
-        
-    generate_response = await utils.generate_files(background_tasks=background_task, 
-                            project_id=project_id, 
-                            extract_polygon=extract_polygon, 
-                            upload=contents if contents else None, db=db)
-    
-    
+
+    generate_response = await utils.generate_files(
+        background_tasks=background_task,
+        project_id=project_id,
+        extract_polygon=extract_polygon,
+        upload=contents if contents else None,
+        db=db,
+    )
+
     return generate_response
-    
+
 
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
@@ -318,12 +324,15 @@ async def upload_multi_project_boundary(
     A success message indicating that the boundary was successfully uploaded.
     If the project ID does not exist in the database, an HTTP 428 error is raised.
     """
+    log.debug(
+        "Uploading project boundary multipolygon for " f"project ID: {project_id}"
+    )
     # read entire file
     await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
 
-    """Create tasks for each polygon """
+    log.debug("Creating tasks for each polygon in project")
     result = project_crud.update_multi_polygon_project_boundary(
         db, project_id, boundary
     )
@@ -340,14 +349,14 @@ async def upload_multi_project_boundary(
 async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
-    db: Session = Depends(database.get_db)
-    ):
-
+    has_data_extracts: bool = Form(False),
+    db: Session = Depends(database.get_db),
+):
     # read entire file
     await upload.seek(0)
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings)
+    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
 
     return result
 
@@ -359,8 +368,7 @@ async def upload_project_boundary(
     dimension: int = Form(500),
     db: Session = Depends(database.get_db),
 ):
-    """
-    Uploads the project boundary. The boundary is uploaded as a geojson file.
+    """Uploads the project boundary. The boundary is uploaded as a geojson file.
 
     Params:
     - project_id (int): The ID of the project to update.
@@ -371,7 +379,6 @@ async def upload_project_boundary(
     Returns:
     - Dict: A dictionary with a message, the project ID, and the number of tasks in the project.
     """
-
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
     file_ext = file_name[1]
@@ -395,9 +402,9 @@ async def upload_project_boundary(
     task_count = await tasks_crud.get_task_count_in_project(db, project_id)
 
     return {
-        "message": "Project Boundary Uploaded", 
+        "message": "Project Boundary Uploaded",
         "project_id": project_id,
-        "task_count": task_count
+        "task_count": task_count,
     }
 
 
@@ -406,9 +413,8 @@ async def edit_project_boundary(
     project_id: int,
     upload: UploadFile = File(...),
     dimension: int = Form(500),
-    db: Session = Depends(database.get_db)
-    ):
-
+    db: Session = Depends(database.get_db),
+):
     # Validating for .geojson File.
     file_name = os.path.splitext(upload.filename)
     file_ext = file_name[1]
@@ -431,26 +437,25 @@ async def edit_project_boundary(
     task_count = await tasks_crud.get_task_count_in_project(db, project_id)
 
     return {
-        "message": "Project Boundary Uploaded", 
+        "message": "Project Boundary Uploaded",
         "project_id": project_id,
-        "task_count": task_count
+        "task_count": task_count,
     }
 
 
 @router.post("/validate_form")
 async def validate_form(
     form: UploadFile,
-    ):
-    """
-        Tests the validity of the xls form uploaded.
+):
+    """Tests the validity of the xls form uploaded.
 
-        Parameters:
-            - form: The xls form to validate
+    Parameters:
+        - form: The xls form to validate
     """
     file_name = os.path.splitext(form.filename)
     file_ext = file_name[1]
 
-    allowed_extensions = [".xls", '.xlsx']
+    allowed_extensions = [".xls", ".xlsx"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
@@ -489,6 +494,7 @@ async def generate_files(
     Message (str): A success message containing the project ID.
 
     """
+    log.debug(f"Generating media files tasks for project: {project_id}")
     contents = None
     xform_title = None
 
@@ -498,14 +504,15 @@ async def generate_files(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
-    project.data_extract_type = 'polygon' if extract_polygon else 'centroid'
+    project.data_extract_type = "polygon" if extract_polygon else "centroid"
     db.commit()
 
     if upload:
+        log.debug("Validating uploaded XLS file")
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls", '.xlsx', '.xml']
+        allowed_extensions = [".xls", ".xlsx", ".xml"]
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
@@ -516,10 +523,11 @@ async def generate_files(
         db.commit()
 
     if data_extracts:
+        log.debug("Validating uploaded geojson file")
         # Validating for .geojson File.
         data_extracts_file_name = os.path.splitext(data_extracts.filename)
         extracts_file_ext = data_extracts_file_name[1]
-        if extracts_file_ext != '.geojson':
+        if extracts_file_ext != ".geojson":
             raise HTTPException(status_code=400, detail="Provide a valid geojson file")
         try:
             extracts_contents = await data_extracts.read()
@@ -527,15 +535,19 @@ async def generate_files(
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Provide a valid geojson file")
 
-
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
 
     # insert task and task ID into database
+    log.debug(
+        f"Creating background task ID {background_task_id} "
+        f"for project ID: {project_id}"
+    )
     await project_crud.insert_background_task_into_database(
         db, task_id=background_task_id, project_id=project_id
     )
 
+    log.debug(f"Submitting {background_task_id} to background tasks stack")
     background_tasks.add_task(
         project_crud.generate_appuser_files,
         db,
@@ -544,7 +556,7 @@ async def generate_files(
         contents,
         extracts_contents if data_extracts else None,
         xform_title,
-        file_ext[1:] if upload else 'xls',
+        file_ext[1:] if upload else "xls",
         background_task_id,
     )
 
@@ -556,8 +568,7 @@ async def update_project_form(
     project_id: int,
     form: Optional[UploadFile],
     db: Session = Depends(database.get_db),
-    ):
-
+):
     file_name = os.path.splitext(form.filename)
     file_ext = file_name[1]
     allowed_extensions = [".xls"]
@@ -566,11 +577,8 @@ async def update_project_form(
     contents = await form.read()
 
     form_updated = await project_crud.update_project_form(
-        db, 
-        project_id,  
-        contents,    # Form Contents
-        file_ext[1:] # File type
-        )
+        db, project_id, contents, file_ext[1:]  # Form Contents  # File type
+    )
 
     return form_updated
 
@@ -612,7 +620,9 @@ async def generate_log(
     """
     try:
         # Get the backgrund task status
-        task_status, task_message = await project_crud.get_background_task_status(uuid, db)
+        task_status, task_message = await project_crud.get_background_task_status(
+            uuid, db
+        )
         extract_completion_count = await project_crud.get_extract_completion_count(
             project_id, db
         )
@@ -623,7 +633,7 @@ async def generate_log(
             logs = "".join(last_100_lines)
             return {
                 "status": task_status.name,
-                "message":task_message,
+                "message": task_message,
                 "progress": extract_completion_count,
                 "logs": logs,
             }
@@ -682,6 +692,7 @@ async def add_features(
     background_tasks: BackgroundTasks,
     project_id: int,
     upload: UploadFile = File(...),
+    feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
 ):
     """Add features to a project.
@@ -718,14 +729,13 @@ async def add_features(
         project_id,
         features,
         background_task_id,
+        feature_type
     )
     return True
 
 
 @router.get("/download_form/{project_id}/")
-async def download_form(project_id: int, 
-                        db: Session = Depends(database.get_db)
-                        ):
+async def download_form(project_id: int, db: Session = Depends(database.get_db)):
     project = project_crud.get_project(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -751,8 +761,7 @@ async def update_project_category(
     category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
-    ):
-
+):
     contents = None
 
     project = project_crud.get_project(db, project_id)
@@ -764,14 +773,15 @@ async def update_project_category(
     current_category = project.xform_title
     if current_category == category:
         if not upload:
-            raise HTTPException(status_code=400, detail="Current category is same as new category")
-
+            raise HTTPException(
+                status_code=400, detail="Current category is same as new category"
+            )
 
     if upload:
         # Validating for .XLS File.
         file_name = os.path.splitext(upload.filename)
         file_ext = file_name[1]
-        allowed_extensions = [".xls", '.xlsx', '.xml']
+        allowed_extensions = [".xls", ".xlsx", ".xml"]
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
@@ -782,13 +792,9 @@ async def update_project_category(
     db.commit()
 
     # Update odk forms
-    form_updated = await project_crud.update_project_form(
-        db, 
-        project_id,  
-        file_ext[1:] if upload else 'xls',
-        upload    # Form
-        )
-
+    await project_crud.update_project_form(
+        db, project_id, file_ext[1:] if upload else "xls", upload  # Form
+    )
 
     return True
 
@@ -807,8 +813,7 @@ async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    """
-    Downloads the boundary of a project as a GeoJSON file.
+    """Downloads the boundary of a project as a GeoJSON file.
 
     Args:
         project_id (int): The id of the project.
@@ -816,23 +821,21 @@ async def download_project_boundary(
     Returns:
         Response: The HTTP response object containing the downloaded file.
     """
-
     out = project_crud.get_project_geometry(db, project_id)
     headers = {
         "Content-Disposition": "attachment; filename=project_outline.geojson",
         "Content-Type": "application/media",
     }
 
-    return Response(content = out, headers=headers)
+    return Response(content=out, headers=headers)
 
 
 @router.get("/{project_id}/download_tasks")
 async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
-    ):
-    """
-    Downloads the boundary of the tasks for a project as a GeoJSON file.
+):
+    """Downloads the boundary of the tasks for a project as a GeoJSON file.
 
     Args:
         project_id (int): The id of the project.
@@ -840,7 +843,6 @@ async def download_task_boundaries(
     Returns:
         Response: The HTTP response object containing the downloaded file.
     """
-
     out = project_crud.get_task_geometry(db, project_id)
 
     headers = {
@@ -848,18 +850,19 @@ async def download_task_boundaries(
         "Content-Type": "application/media",
     }
 
-    return Response(content = out, headers=headers)
+    return Response(content=out, headers=headers)
 
 
 @router.get("/tiles/{project_id}")
-async def get_project_tiles(
+async def generate_project_tiles(
     background_tasks: BackgroundTasks,
     project_id: int,
-    source: str = Query(..., description="Select a source for tiles", enum=TILES_SOURCE),
+    source: str = Query(
+        ..., description="Select a source for tiles", enum=TILES_SOURCE
+    ),
     db: Session = Depends(database.get_db),
-    ):
-    """
-    Returns the tiles for a project.
+):
+    """Returns the tiles for a project.
 
     Args:
         project_id (int): The id of the project.
@@ -868,7 +871,6 @@ async def get_project_tiles(
     Returns:
         Response: The File response object containing the tiles.
     """
-
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
 
@@ -878,38 +880,33 @@ async def get_project_tiles(
     )
 
     background_tasks.add_task(
-        project_crud.get_project_tiles,
-        db,
-        project_id,
-        source,
-        background_task_id
+        project_crud.get_project_tiles, db, project_id, source, background_task_id
     )
 
     return {"Message": "Tile generation started"}
 
 
 @router.get("/tiles_list/{project_id}/")
-async def tiles_list(
-    project_id: int,
-    db: Session = Depends(database.get_db)
-    ):
+async def tiles_list(project_id: int, db: Session = Depends(database.get_db)):
+    """Returns the list of tiles for a project.
 
-    """
-        Returns the list of tiles for a project.
+    Parameters:
+        project_id: int
 
-        Parameters:
-            project_id: int
-
-        Returns:
-            Response: List of generated tiles for a project.
+    Returns:
+        Response: List of generated tiles for a project.
     """
     return await project_crud.get_mbtiles_list(db, project_id)
 
 
 @router.get("/download_tiles/")
-async def download_tiles(
-    tile_id:int,
-    db: Session = Depends(database.get_db)
-    ):
-    tiles_path = db.query(db_models.DbTilesPath).filter(db_models.DbTilesPath.id == str(tile_id)).first()
-    return FileResponse(tiles_path.path, headers={"Content-Disposition": f"attachment; filename=tiles.mbtiles"})
+async def download_tiles(tile_id: int, db: Session = Depends(database.get_db)):
+    tiles_path = (
+        db.query(db_models.DbTilesPath)
+        .filter(db_models.DbTilesPath.id == str(tile_id))
+        .first()
+    )
+    return FileResponse(
+        tiles_path.path,
+        headers={"Content-Disposition": "attachment; filename=tiles.mbtiles"},
+    )
