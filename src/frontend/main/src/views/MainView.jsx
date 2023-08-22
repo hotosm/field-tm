@@ -44,7 +44,7 @@ const MainView = () => {
             <PrimaryAppBar />
             <CoreModules.Stack
               className="mainview"
-              sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto' }}
+              sx={{ height: windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto', p: '1.3rem' }}
             >
               <CoreModules.Outlet />
               {/* Footer */}
