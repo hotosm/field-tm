@@ -359,9 +359,15 @@ async def task_split(
     content_json = json.loads(content)
 
     results = []
-    for idx, _ in enumerate(content_json['features']):
+    feature_content_type = content_json.get("type")
+    if feature_content_type == "FeatureCollection":
+        feature_content = content_json["features"]
+    elif feature_content_type == "Feature":
+        feature_content = [content_json]
+
+    for idx, _ in enumerate(feature_content):
         _content = json.dumps(
-            {"features": [content_json['features'][idx]] })
+            {"features": [feature_content[idx]] })
 
         result = await project_crud.split_into_tasks(db, _content, no_of_buildings, has_data_extracts)
         results.append(result)
@@ -373,6 +379,7 @@ async def task_split(
             combined_geojson["features"].extend(geo["features"])
 
     return combined_geojson
+
 
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
