@@ -53,7 +53,11 @@ const MainView = () => {
             )}
             <CoreModules.Stack
               className="mainview"
-              sx={{ height: popupInParams ? '100vh' : windowSize.width <= 599 ? '90vh' : '92vh', overflow: 'auto' }}
+              sx={{
+                height: popupInParams ? '100vh' : windowSize.width <= 599 ? '90vh' : '92vh',
+                overflow: 'auto',
+                p: '1.3rem',
+              }}
             >
               <CoreModules.Outlet />
               {/* Footer */}
