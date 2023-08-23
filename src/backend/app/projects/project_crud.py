@@ -63,12 +63,10 @@ from . import project_schemas
 
 log = logging.getLogger(__name__)
 
-# --------------
-# ---- CRUD ----
-# --------------
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
+TILESDIR = "app/tiles"
 
 
 def get_projects(
@@ -1271,7 +1269,20 @@ def generate_appuser_files(
         - background_task_id: the task_id of the background task running this function.
     """
     try:
-        log.info(f"Starting generate_appuser_files for project {project_id}")
+        ## Logging ##
+        # create file handler
+        handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
+        handler.setLevel(logging.DEBUG)
+
+        # create formatter
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+
+        # add handler to logger
+        logger.addHandler(handler)
+        logger.info(f"Starting generate_appuser_files for project {project_id}")
 
         # Get the project table contents.
         project = table(
@@ -2103,8 +2114,8 @@ async def get_project_tiles(
 
         zooms = [12, 13, 14, 15, 16, 17, 18, 19]
         source = source
-        base = f"/tmp/tiles/{source}tiles"
-        outfile = f"/tmp/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
+        base = f"{TILESDIR}/{source}tiles"
+        outfile = f"{TILESDIR}/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
 
         tile_path_instance = db_models.DbTilesPath(
             project_id=project_id,
