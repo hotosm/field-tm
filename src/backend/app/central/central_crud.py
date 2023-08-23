@@ -453,8 +453,8 @@ def generate_updated_xform(
     for inst in instances:
         try:
             if "src" in inst.attrib:
-                if (inst[index].attrib)["src"].split(".")[1] == "geojson":
-                    (inst['index'].attrib)["src"] = extract
+                if (inst.attrib["src"].split("."))[1] == "geojson":
+                    (inst.attrib)["src"] = extract
 
             # Looking for data tags
             data_tags = inst.findall("xforms:data", namespaces)
