@@ -1271,7 +1271,20 @@ def generate_appuser_files(
         - background_task_id: the task_id of the background task running this function.
     """
     try:
-        log.info(f"Starting generate_appuser_files for project {project_id}")
+        ## Logging ##
+        # create file handler
+        handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
+        handler.setLevel(logging.DEBUG)
+
+        # create formatter
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        handler.setFormatter(formatter)
+
+        # add handler to logger
+        logger.addHandler(handler)
+        logger.info(f"Starting generate_appuser_files for project {project_id}")
 
         # Get the project table contents.
         project = table(
