@@ -313,7 +313,7 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
         submission = xform.getSubmissions(odkid, task_id, None, False, True)
         submission = (json.loads(submission))['value']
     else:
-        submission = get_all_submissions(db, project_id)
+        submission = await get_all_submissions(db, project_id)
 
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
