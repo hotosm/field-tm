@@ -2114,8 +2114,13 @@ async def get_project_tiles(
 
         zooms = [12, 13, 14, 15, 16, 17, 18, 19]
         source = source
-        base = f"{TILESDIR}/{source}tiles"
-        outfile = f"{TILESDIR}/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
+        tiles_path_id = uuid.uuid4()
+        tiles_dir = f"{TILESDIR}/{tiles_path_id}"
+        base = f"{tiles_dir}/{source}tiles"
+        outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
+        
+        if not os.path.exists(base):
+            os.makedirs(base)
 
         tile_path_instance = db_models.DbTilesPath(
             project_id=project_id,
