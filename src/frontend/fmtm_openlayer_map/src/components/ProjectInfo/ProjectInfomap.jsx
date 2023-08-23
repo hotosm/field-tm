@@ -12,6 +12,7 @@ import { ProjectBuildingGeojsonService } from "../../api/SubmissionService";
 import environment from "fmtm/environment";
 import { getStyles } from "../MapComponent/OpenLayersComponent/helpers/styleUtils";
 import { ProjectActions } from "fmtm/ProjectSlice";
+import { basicGeojsonTemplate } from "../../utilities/mapUtils";
 
 export const defaultStyles = {
   lineColor: "#000000",
@@ -98,10 +99,7 @@ const getChoroplethColor = (value, colorCodesOutput) => {
   });
   return toReturn;
 };
-const basicGeojsonTemplate = {
-  type: "FeatureCollection",
-  features: [],
-};
+
 const ProjectInfomap = () => {
   const dispatch = CoreModules.useAppDispatch();
   const [taskBoundaries, setTaskBoundaries] = useState(null);
