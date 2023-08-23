@@ -350,15 +350,35 @@ async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
     has_data_extracts: bool = Form(False),
-    db: Session = Depends(database.get_db),
-):
+    db: Session = Depends(database.get_db)
+    ):
+
     # read entire file
     await upload.seek(0)
     content = await upload.read()
+    content_json = json.loads(content)
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
+    results = []
+    feature_content_type = content_json.get("type")
+    if feature_content_type == "FeatureCollection":
+        feature_content = content_json["features"]
+    elif feature_content_type == "Feature":
+        feature_content = [content_json]
 
-    return result
+    for idx, _ in enumerate(feature_content):
+        _content = json.dumps(
+            {"features": [feature_content[idx]] })
+
+        result = await project_crud.split_into_tasks(db, _content, no_of_buildings, has_data_extracts)
+        results.append(result)
+
+    combined_geojson = {**content_json, "features": []}
+
+    for geo in results:
+        if geo.get("features", None):
+            combined_geojson["features"].extend(geo["features"])
+
+    return combined_geojson
 
 
 @router.post("/{project_id}/upload")
