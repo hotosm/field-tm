@@ -50,6 +50,19 @@ def get_organisations(
     return organizations
 
 
+@router.get("/{organization_id}")
+async def get_organization_detail(
+    organization_id: int,
+    db: Session = Depends(database.get_db)
+):
+    """Get API for fetching detail about a organiation based on id"""
+    organization = await organization_crud.get_organisation_by_id(db, organization_id)
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    return organization
+
+
 @router.post("/")
 async def create_organization(
     name: str = Form(),  # Required field for organization name
