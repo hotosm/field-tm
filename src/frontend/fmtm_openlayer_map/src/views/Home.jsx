@@ -6,12 +6,7 @@ import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
 import OpenLayersMap from "../components/OpenLayersMap";
 import environment from "fmtm/environment";
-import {
-  DownloadProjectForm,
-  GenerateProjectTiles,
-  GetTilesList,
-  ProjectById,
-} from "../api/Project";
+import { DownloadProjectForm, ProjectById } from "../api/Project";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from "fmtm/CustomizedSnackbar";
 import { defaults } from "ol/control/defaults";
@@ -26,10 +21,14 @@ import View from "ol/View";
 import { HomeActions } from "fmtm/HomeSlice";
 import CoreModules from "fmtm/CoreModules";
 import AssetModules from "fmtm/AssetModules";
-// import MapboxVector from "ol/layer/MapboxVector.js";
+import GeoJSON from "ol/format/GeoJSON";
 
 import Overlay from "ol/Overlay";
 import GenerateMbTiles from "../components/GenerateMbTiles";
+import { ProjectBuildingGeojsonService } from "../api/SubmissionService";
+import { get } from "ol/proj";
+import { buildingStyle, basicGeojsonTemplate } from "../utilities/mapUtils";
+
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
@@ -61,6 +60,9 @@ const Home = () => {
   const { y } = OnScroll(map, windowSize.width);
   const downloadProjectFormLoading = CoreModules.useAppSelector(
     (state) => state.project.downloadProjectFormLoading
+  );
+  const projectBuildingGeojson = CoreModules.useAppSelector(
+    (state) => state.project.projectBuildingGeojson
   );
 
   //snackbar handle close funtion
@@ -113,6 +115,9 @@ const Home = () => {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }
+    return () => {
+      dispatch(ProjectActions.SetProjectBuildingGeojson(null));
+    };
   }, [params.id]);
 
   useEffect(() => {
@@ -194,6 +199,15 @@ const Home = () => {
           const coordinate = event.coordinate;
           overlay.setPosition(coordinate);
           setFeaturesLayer(feature);
+          dispatch(
+            ProjectBuildingGeojsonService(
+              `${
+                environment.baseApiUrl
+              }/projects/${decodedId}/features?task_id=${
+                feature?.getId()?.split("_")?.[0]
+              }`
+            )
+          );
         }
       });
     });
@@ -224,8 +238,36 @@ const Home = () => {
       setTop(topX);
     }
   }, [map, y]);
-  // if(map && mainView && featuresLayer){
-  // }
+
+  useEffect(() => {
+    if (!map) return;
+    if (!projectBuildingGeojson) return;
+    const taskBuildingGeojsonFeatureCollection = {
+      ...basicGeojsonTemplate,
+      features: [
+        ...projectBuildingGeojson?.map((feature) => ({
+          ...feature.geometry,
+          id: feature.id,
+        })),
+      ],
+    };
+    const initalFeaturesLayer = new VectorLayer({
+      source: new VectorSource({
+        features: new GeoJSON().readFeatures(
+          taskBuildingGeojsonFeatureCollection,
+          {
+            featureProjection: get("EPSG:3857"),
+          }
+        ),
+      }),
+      style: buildingStyle,
+      declutter: true,
+    });
+    map.addLayer(initalFeaturesLayer);
+    return () => {
+      map.removeLayer(initalFeaturesLayer);
+    };
+  }, [map, projectBuildingGeojson]);
 
   TasksLayer(map, mainView, featuresLayer);
 
