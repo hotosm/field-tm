@@ -111,6 +111,7 @@ RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appu
     && chmod +x /container-entrypoint.sh
 # Add volume for persistent images
 VOLUME /opt/app/images
+VOLUME /opt/app/tiles
 # Change to non-root user
 USER appuser
 
