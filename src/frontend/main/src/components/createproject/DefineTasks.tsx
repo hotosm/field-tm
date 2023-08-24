@@ -18,7 +18,7 @@ const alogrithmList = [
   { id: 2, value: 'Choose Area as Tasks', label: 'Choose Area as Tasks' },
   { id: 3, value: 'Task Splitting Algorithm', label: 'Task Splitting Algorithm' },
 ];
-const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
+const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFile }) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
@@ -338,7 +338,11 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile} />
+      <DefineAreaMap
+        uploadedGeojson={geojsonFile}
+        setGeojsonFile={setGeojsonFile}
+        uploadedDataExtractFile={dataExtractFile}
+      />
     </CoreModules.Stack>
   );
 };
