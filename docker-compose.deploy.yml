@@ -20,6 +20,7 @@ version: "3"
 volumes:
   fmtm_db_data:
   fmtm_images:
+  fmtm_tiles:
   traefik-public-certificates:
 
 networks:
@@ -85,6 +86,7 @@ services:
     container_name: fmtm_api
     volumes:
       - fmtm_images:/opt/app/images
+      - fmtm_tiles:/opt/app/tiles
     depends_on:
       - fmtm-db
       - traefik
