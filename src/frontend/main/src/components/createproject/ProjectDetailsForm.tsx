@@ -146,10 +146,10 @@ const ProjectDetailsForm: React.FC = () => {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={values.organization || ''}
+                value={values.organisation_id || ''}
                 // label="Organization"
                 onChange={(e) => {
-                  handleCustomChange('organization', e.target.value);
+                  handleCustomChange('organisation_id', e.target.value);
                 }}
               >
                 {organizationList?.map((org) => (
@@ -176,9 +176,9 @@ const ProjectDetailsForm: React.FC = () => {
                 />
               </CoreModules.IconButton>
             </CoreModules.Stack>
-            {errors.organization && (
+            {errors.organisation_id && (
               <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                {errors.organization}
+                {errors.organisation_id}
               </CoreModules.FormLabel>
             )}
           </CoreModules.FormControl>

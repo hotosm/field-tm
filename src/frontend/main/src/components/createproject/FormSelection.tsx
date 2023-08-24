@@ -97,6 +97,7 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
           hashtags: arrayHashtag,
+          organisation_id: projectDetails.organization,
         },
         newUpdatedTaskGeojsonFile,
         customFormFile,
