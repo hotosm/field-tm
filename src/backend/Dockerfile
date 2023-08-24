@@ -107,11 +107,12 @@ COPY container-entrypoint.sh /
 ENTRYPOINT ["/container-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
+    && mkdir -p /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /container-entrypoint.sh
-# Add volume for persistent images
+# Add volumes for persistence
 VOLUME /opt/app/images
-VOLUME /opt/app/tiles
+VOLUME /opt/tiles
 # Change to non-root user
 USER appuser
 

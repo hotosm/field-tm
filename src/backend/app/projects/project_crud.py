@@ -66,7 +66,7 @@ log = logging.getLogger(__name__)
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
-TILESDIR = "/opt/app/tiles"
+TILESDIR = "/opt/tiles"
 
 
 def get_projects(
