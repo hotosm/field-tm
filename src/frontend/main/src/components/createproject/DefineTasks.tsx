@@ -316,7 +316,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
             }}
           >
             {/* Previous Button  */}
-            <Link to="/upload-area">
+            <Link to="/data-extract">
               <CoreModules.Button sx={{ width: '100px' }} variant="outlined" color="error">
                 Previous
               </CoreModules.Button>
