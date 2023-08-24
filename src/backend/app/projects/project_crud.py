@@ -270,6 +270,7 @@ def create_project_with_project_info(
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
     hashtags = project_metadata.hashtags
+    organisation_id = project_metadata.organisation_id
 
     # verify data coming in
     if not project_user:
@@ -282,7 +283,8 @@ def create_project_with_project_info(
         f"project_user: {project_user} | "
         f"project_info_1: {project_info_1} | "
         f"xform_title: {xform_title} | "
-        f"hashtags: {hashtags}"
+        f"hashtags: {hashtags}| "
+        f"organisation_id: {organisation_id}"
     )
 
     # Check / set credentials
@@ -326,7 +328,8 @@ def create_project_with_project_info(
         odk_central_url=url,
         odk_central_user=user,
         odk_central_password=pw,
-        hashtags=hashtags
+        hashtags=hashtags,
+        organisation_id=organisation_id,
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
