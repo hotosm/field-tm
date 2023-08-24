@@ -1182,7 +1182,7 @@ def generate_task_files(
                     WHERE project_id={project_id}
                     AND ST_IsValid(geometry)
                     AND ST_IsValid('{task.outline}'::Geometry)
-                    AND ST_Intersects(geometry, '{task.outline}'::Geometry)
+                    AND ST_Contains('{task.outline}'::Geometry, ST_Centroid(geometry))
                 )"""
 
     result = db.execute(query)
