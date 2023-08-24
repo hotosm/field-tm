@@ -2127,7 +2127,7 @@ async def get_project_tiles(
         os.makedirs(base)
 
     tile_path_instance = db_models.DbTilesPath(
-        project_id="",
+        project_id=project_id,
         background_task_id=str(background_task_id),
         status=1,
         tile_source=source,
