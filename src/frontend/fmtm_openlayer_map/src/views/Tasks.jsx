@@ -66,7 +66,8 @@ const TasksSubmission = () => {
           `${environment.baseApiUrl}/projects/${environment.decode(
             encodedProjectId
           )}`,
-          state.projectTaskBoundries
+          state.projectTaskBoundries,
+          environment.decode(encodedId)
         ),
         state.projectTaskBoundries
       );
@@ -84,7 +85,8 @@ const TasksSubmission = () => {
           `${environment.baseApiUrl}/projects/${environment.decode(
             encodedProjectId
           )}`,
-          state.projectTaskBoundries
+          state.projectTaskBoundries,
+          environment.decode(encodedId)
         ),
         state.projectTaskBoundries
       );
