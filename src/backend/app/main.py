@@ -15,7 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
 """Entrypoint for FastAPI app."""
 
 import logging
@@ -27,6 +26,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 
 from .__version__ import __version__
@@ -40,19 +40,6 @@ from .projects.project_crud import read_xlsforms
 from .submission import submission_routes
 from .tasks import tasks_routes
 from .users import user_routes
-
-# Logging
-logging.basicConfig(
-    level=settings.LOG_LEVEL,
-    format=(
-        "%(asctime)s.%(msecs)03d [%(levelname)s] "
-        "%(name)s | %(funcName)s:%(lineno)d | %(message)s"
-    ),
-    datefmt="%y-%m-%d %H:%M:%S",
-    stream=sys.stdout,
-)
-
-logger = logging.getLogger(__name__)
 
 if not settings.DEBUG:
     sentry_sdk.init(
@@ -74,6 +61,9 @@ def get_application() -> FastAPI:
         debug=settings.DEBUG,
     )
 
+    # Set custom logger
+    _app.logger = get_logger()
+
     _app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.EXTRA_CORS_ORIGINS,
@@ -91,6 +81,58 @@ def get_application() -> FastAPI:
     _app.include_router(organization_routes.router)
 
     return _app
+
+
+class InterceptHandler(logging.Handler):
+    """Intercept python standard lib logging."""
+
+    def emit(self, record):
+        """Retrieve context where the logging call occurred.
+
+        This happens to be in the 6th frame upward.
+        """
+        logger_opt = log.opt(depth=6, exception=record.exc_info)
+        logger_opt.log(record.levelno, record.getMessage())
+
+
+def get_logger():
+    """Override FastAPI logger with custom loguru."""
+    # Hook all other loggers into ours
+    logger_name_list = [name for name in logging.root.manager.loggerDict]
+    for logger_name in logger_name_list:
+        logging.getLogger(logger_name).setLevel(10)
+        logging.getLogger(logger_name).handlers = []
+        if logger_name == "sqlalchemy":
+            # Don't hook sqlalchemy, very verbose
+            continue
+        if "." not in logger_name:
+            logging.getLogger(logger_name).addHandler(InterceptHandler())
+
+    log.remove()
+    log.add(
+        sys.stderr,
+        level=settings.LOG_LEVEL,
+        format=(
+            "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} "
+            "| {name}:{function}:{line} | {message}"
+        ),
+        enqueue=True,  # Run async / non-blocking
+        colorize=True,
+        backtrace=True,  # More detailed tracebacks
+        catch=True,  # Prevent app crashes
+    )
+
+    # Only log to file in production
+    if not settings.DEBUG:
+        log.add(
+            "/opt/logs/fmtm.json",
+            level=settings.LOG_LEVEL,
+            enqueue=True,
+            serialize=True,  # JSON format
+            rotation="00:00",  # New file at midnight
+            retention="10 days",
+            # format=log_json_format, # JSON format func
+        )
 
 
 api = get_application()
@@ -119,8 +161,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @api.on_event("startup")
 async def startup_event():
     """Commands to run on server startup."""
-    logger.debug("Starting up FastAPI server.")
-    logger.debug("Connecting to DB with SQLAlchemy")
+    log.debug("Starting up FastAPI server.")
+    log.debug("Connecting to DB with SQLAlchemy")
     Base.metadata.create_all(bind=engine)
 
     # Read in XLSForms
@@ -130,7 +172,7 @@ async def startup_event():
 @api.on_event("shutdown")
 async def shutdown_event():
     """Commands to run on server shutdown."""
-    logger.debug("Shutting down FastAPI server.")
+    log.debug("Shutting down FastAPI server.")
 
 
 @api.get("/")
