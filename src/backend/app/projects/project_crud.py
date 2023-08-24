@@ -66,7 +66,7 @@ log = logging.getLogger(__name__)
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
-TILESDIR = "app/tiles"
+TILESDIR = "/opt/app/tiles"
 
 
 def get_projects(
@@ -614,7 +614,9 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool= False):
+async def split_into_tasks(
+    db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool = False
+):
     project_id = uuid.uuid4()
 
     outline = json.loads(boundary)
@@ -670,7 +672,6 @@ async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has
                 """
         result = db.execute(query)
         db.commit()
-
 
     # Get the sql query from split_algorithm sql file
     with open("app/db/split_algorithm.sql", "r") as sql_file:
@@ -1794,7 +1795,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
 
 
 async def insert_background_task_into_database(
-    db: Session, task_id: uuid.UUID, name: str = None, project_id = None
+    db: Session, task_id: uuid.UUID, name: str = None, project_id=None
 ):
     """Inserts a new task into the database
     Params:
@@ -1836,7 +1837,12 @@ def update_background_task_status_in_database(
 
 
 def add_features_into_database(
-    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID, feature_type :str):
+    db: Session,
+    project_id: int,
+    features: dict,
+    background_task_id: uuid.UUID,
+    feature_type: str,
+):
     """Inserts a new task into the database
     Params:
           db: database session
@@ -1863,10 +1869,10 @@ def add_features_into_database(
                     db.commit()
 
                     building_obj = db_models.DbBuildings(
-                        project_id = project_id,
+                        project_id=project_id,
                         geom=wkb_element,
-                        tags=feature["properties"]
-                        )
+                        tags=feature["properties"],
+                    )
                     db.add(building_obj)
                     db.commit()
 
@@ -1884,13 +1890,13 @@ def add_features_into_database(
                 try:
                     feature_geometry = feature["geometry"]
                     feature_shape = shape(feature_geometry)
-                    feature["properties"]["highway"]="yes"
+                    feature["properties"]["highway"] = "yes"
 
                     wkb_element = from_shape(feature_shape, srid=4326)
                     db_feature = db_models.DbOsmLines(
                         project_id=project_id,
                         geom=wkb_element,
-                        tags=feature["properties"]
+                        tags=feature["properties"],
                     )
 
                     db.add(db_feature)
@@ -2118,7 +2124,7 @@ async def get_project_tiles(
         tiles_dir = f"{TILESDIR}/{tiles_path_id}"
         base = f"{tiles_dir}/{source}tiles"
         outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
-        
+
         if not os.path.exists(base):
             os.makedirs(base)
 
