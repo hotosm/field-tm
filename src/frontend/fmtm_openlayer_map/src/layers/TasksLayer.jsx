@@ -38,7 +38,7 @@ const TasksLayer = (map, view, feature) => {
             id: `${task.id}_${task.task_status_str}`,
             type: task.outline_geojson.type,
             geometry: task.outline_geojson.geometry,
-            // properties: task.properties
+            properties: { centroid: task.bbox },
           });
         });
         console.log(geojsonObject, "geojsonObject");

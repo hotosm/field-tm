@@ -1,12 +1,13 @@
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CoreModules from "fmtm/CoreModules";
 import environment from 'fmtm/environment';
-export const ProjectById = (url, existingProjectList) => {
+export const ProjectById = (url, existingProjectList,projectId) => {
   return async (dispatch) => {
     // dispatch(HomeActions.HomeProjectLoading(true))
-    const fetchProjectById = async (url, existingProjectList) => {
+    const fetchProjectById = async (url, existingProjectList,) => {
       try {
         const project = await CoreModules.axios.get(url);
+        const taskBbox = await CoreModules.axios.get(`${environment.baseApiUrl}/tasks/point_on_surface?project_id=${projectId}`);
         const resp = project.data;
         console.log("loading :", project.data);
         const persistingValues = resp.project_tasks.map((data) => {
@@ -21,12 +22,17 @@ export const ProjectById = (url, existingProjectList) => {
             locked_by_username:data.locked_by_username,
           };
         });
-
-        // console.log("loading :", persistingValues);
+        // added centroid from another api to projecttaskboundries
+        const projectTaskBoundries =[{ id: resp.id, taskBoundries: persistingValues }]
+        const mergedBboxIntoTask = projectTaskBoundries[0].taskBoundries.map((projectTask) => {
+          const filteredTaskIdCentroid = taskBbox.data.find((task) => task.id === projectTask.id).point[0];
+          return {
+            ...projectTask,
+            bbox: filteredTaskIdCentroid,
+          };
+        });
         dispatch(
-          ProjectActions.SetProjectTaskBoundries([
-            { id: resp.id, taskBoundries: persistingValues },
-          ])
+          ProjectActions.SetProjectTaskBoundries([{ ...projectTaskBoundries[0], taskBoundries: mergedBboxIntoTask }])
         );
         dispatch(
           ProjectActions.SetProjectInfo({id:resp.id,
@@ -100,7 +106,7 @@ export const GetTilesList = (url) => {
               dispatch(ProjectActions.SetTilesListLoading(false))
             }
       }
-      await fetchTilesList(url,);
+      await fetchTilesList(url);
   }
 }
 export const GenerateProjectTiles = (url,payload) => {

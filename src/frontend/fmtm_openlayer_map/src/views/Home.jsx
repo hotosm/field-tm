@@ -93,7 +93,8 @@ const Home = () => {
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries
+          state.projectTaskBoundries,
+          environment.decode(encodedId)
         ),
         state.projectTaskBoundries
       );
@@ -103,7 +104,8 @@ const Home = () => {
       dispatch(
         ProjectById(
           `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries
+          state.projectTaskBoundries,
+          environment.decode(encodedId)
         ),
         state.projectTaskBoundries
       );
