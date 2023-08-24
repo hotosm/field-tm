@@ -18,8 +18,8 @@
 
 """Auth routes, using OSM OAuth2 endpoints."""
 
+from loguru import logger as log
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.logger import logger as log
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
