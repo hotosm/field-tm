@@ -2115,26 +2115,26 @@ async def get_project_tiles(
     source: str,
     background_task_id: uuid.UUID,
 ):
+    """Get the tiles for a project."""
+    zooms = [12, 13, 14, 15, 16, 17, 18, 19]
+    source = source
+    tiles_path_id = uuid.uuid4()
+    tiles_dir = f"{TILESDIR}/{tiles_path_id}"
+    base = f"{tiles_dir}/{source}tiles"
+    outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
+
+    if not os.path.exists(base):
+        os.makedirs(base)
+
+    tile_path_instance = db_models.DbTilesPath(
+        project_id="",
+        background_task_id=str(background_task_id),
+        status=1,
+        tile_source=source,
+        path=outfile,
+    )
+
     try:
-        """Get the tiles for a project"""
-
-        zooms = [12, 13, 14, 15, 16, 17, 18, 19]
-        source = source
-        tiles_path_id = uuid.uuid4()
-        tiles_dir = f"{TILESDIR}/{tiles_path_id}"
-        base = f"{tiles_dir}/{source}tiles"
-        outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
-
-        if not os.path.exists(base):
-            os.makedirs(base)
-
-        tile_path_instance = db_models.DbTilesPath(
-            project_id=project_id,
-            background_task_id=str(background_task_id),
-            status=1,
-            tile_source=source,
-            path=outfile,
-        )
         db.add(tile_path_instance)
         db.commit()
 
