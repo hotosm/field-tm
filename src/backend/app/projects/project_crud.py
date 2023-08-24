@@ -2109,7 +2109,7 @@ async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str)
         dump(features, jsonfile)
 
 
-async def get_project_tiles(
+def get_project_tiles(
     db: Session,
     project_id: int,
     source: str,
