@@ -45,7 +45,7 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export --dev --no-default --without-hashes \
+    && pdm export -G debug --no-default --without-hashes \
     > requirements-dev.txt
 
 
