@@ -42,7 +42,6 @@ dependencies = [
     "pyxform==1.12.0",
     "xmltodict==0.13.0",
     "python-multipart==0.0.5",
-    "python-json-logger==2.0.6",
     "SQLAlchemy-Utils==0.40.0",
     "bcrypt==4.0.1",
     "segno==1.5.2",
@@ -50,6 +49,7 @@ dependencies = [
     "sentry-sdk==1.9.6",
     "py-cpuinfo==9.0.0",
     "gdal==3.6.2",
+    "loguru>=0.7.0",
 ]
 requires-python = ">=3.10"
 readme = "../../README.md"
