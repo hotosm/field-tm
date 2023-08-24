@@ -20,6 +20,7 @@ version: "3"
 volumes:
   fmtm_db_data:
   fmtm_images:
+  fmtm_tiles:
 
 networks:
   fmtm-dev:
@@ -50,6 +51,7 @@ services:
     container_name: fmtm_api
     volumes:
       - fmtm_images:/opt/app/images
+      - fmtm_tiles:/opt/app/tiles
       - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
