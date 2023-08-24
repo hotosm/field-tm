@@ -19,7 +19,7 @@ import os
 import json
 from fastapi import APIRouter, Depends, HTTPException, Response
 from ..projects import project_crud, project_schemas
-from fastapi.logger import logger as logger
+from loguru import logger as log
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 from osm_fieldwork.odk_merge import OdkMerge

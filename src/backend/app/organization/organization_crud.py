@@ -15,11 +15,12 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
+
 import os
 import random
 import string
 from fastapi import HTTPException, File,UploadFile
-from fastapi.logger import logger as logger
 import re
 
 from sqlalchemy.orm import Session
@@ -112,7 +113,7 @@ async def create_organization(db: Session, name: str, description: str, url: str
         db.commit()
         db.refresh(db_organization)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail=f"Error creating organization: {e}"
         ) from e

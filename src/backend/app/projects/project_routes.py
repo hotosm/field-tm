@@ -15,9 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
 
 import json
-import logging
 import os
 import uuid
 from typing import List, Optional
@@ -33,7 +33,6 @@ from fastapi import (
     Response,
     UploadFile,
 )
-from fastapi.logger import logger as logger
 from fastapi.responses import FileResponse
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -45,7 +44,6 @@ from ..models.enums import TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
 
-log = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/projects",
@@ -130,7 +128,7 @@ async def create_project(
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
-    logger.debug(f"Creating project {project_info.project_info.name}")
+    log.debug(f"Creating project {project_info.project_info.name}")
 
     if project_info.odk_central.odk_central_url.endswith("/"):
         project_info.odk_central.odk_central_url = (
@@ -142,7 +140,7 @@ async def create_project(
             project_info.project_info.name, project_info.odk_central
         )
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
         ) from e
@@ -179,9 +177,9 @@ async def update_odk_credentials(
         odkproject = central_crud.create_odk_project(
             project_instance.project_info[0].name, odk_central_cred
         )
-        logger.debug(f"ODKCentral return after update: {odkproject}")
+        log.debug(f"ODKCentral return after update: {odkproject}")
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
         ) from e
@@ -658,7 +656,7 @@ async def generate_log(
                 "logs": logs,
             }
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         return "Error in generating log file"
 
 

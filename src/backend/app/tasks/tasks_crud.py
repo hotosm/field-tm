@@ -15,13 +15,12 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
 
 import base64
-import logging
 from typing import List
 
 from fastapi import HTTPException
-from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
 from osm_fieldwork.make_data_extract import PostgresClient
@@ -41,8 +40,6 @@ from ..models.enums import (
 from ..projects import project_crud
 from ..tasks import tasks_schemas
 from ..users import user_crud
-
-log = logging.getLogger(__name__)
 
 
 async def get_task_count_in_project(db: Session, project_id: int):
@@ -167,14 +164,14 @@ def update_qrcode(
         .where(text(where))
         .values(text(value))
     )
-    logger.info(str(sql))
+    log.info(str(sql))
     result = db.execute(sql)
     # There should only be one match
     if result.rowcount != 1:
-        logger.warning(str(sql))
+        log.warning(str(sql))
         return False
 
-    logger.info("/tasks/update_qr is partially implemented!")
+    log.info("/tasks/update_qr is partially implemented!")
 
 
 def create_task_history_for_status_change(
@@ -256,12 +253,12 @@ def convert_to_app_task(db_task: db_models.DbTask):
             log.debug("Task currently locked by user " f"{app_task.locked_by_username}")
 
         if db_task.qr_code:
-            logger.debug(
+            log.debug(
                 f"QR code found for task ID {db_task.id}. Converting to base64"
             )
             app_task.qr_code_base64 = base64.b64encode(db_task.qr_code.image)
         else:
-            logger.warning(f"No QR code found for task ID {db_task.id}")
+            log.warning(f"No QR code found for task ID {db_task.id}")
             app_task.qr_code_base64 = ""
 
         if db_task.task_history:
@@ -296,10 +293,10 @@ def get_qr_codes_for_task(
     task = get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
-            logger.debug(f"QR code found for task ID {task.id}. Converting to base64")
+            log.debug(f"QR code found for task ID {task.id}. Converting to base64")
             qr_code = base64.b64encode(task.qr_code.image)
         else:
-            logger.debug(f"QR code not found for task ID {task.id}.")
+            log.debug(f"QR code not found for task ID {task.id}.")
             qr_code = None
         return {"id": task_id, "qr_code": qr_code}
     else:

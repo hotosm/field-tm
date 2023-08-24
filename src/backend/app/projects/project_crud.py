@@ -15,12 +15,11 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
+from loguru import logger as log
 
 import base64
 import io
 import json
-import logging
 import os
 import time
 import uuid
@@ -39,7 +38,6 @@ import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import File, HTTPException, UploadFile
-from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
 from osm_fieldwork import basemapper
@@ -63,8 +61,6 @@ from ..db.postgis_utils import geometry_to_geojson, timestamp
 from ..tasks import tasks_crud
 from ..users import user_crud
 from . import project_schemas
-
-log = logging.getLogger(__name__)
 
 
 QR_CODES_DIR = "QR_codes/"
@@ -1282,20 +1278,7 @@ def generate_appuser_files(
         - background_task_id: the task_id of the background task running this function.
     """
     try:
-        ## Logging ##
-        # create file handler
-        handler = logging.FileHandler(f"/tmp/{project_id}_generate.log")
-        handler.setLevel(logging.DEBUG)
-
-        # create formatter
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        handler.setFormatter(formatter)
-
-        # add handler to logger
-        logger.addHandler(handler)
-        logger.info(f"Starting generate_appuser_files for project {project_id}")
+        log.info(f"Starting generate_appuser_files for project {project_id}")
 
         # Get the project table contents.
         project = table(
