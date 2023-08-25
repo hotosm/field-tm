@@ -22,7 +22,8 @@ interface ValidationErrors {
   odk_central_user?: string;
   odk_central_password?: string;
 }
-const regexForSymbol = /[-_]/g;
+
+const regexForSymbol = /_/g;
 
 function CreateProjectValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
@@ -43,7 +44,7 @@ function CreateProjectValidation(values: ProjectValues) {
     errors.name = 'Project Name is Required.';
   }
   if (values?.name && regexForSymbol.test(values.name)) {
-    errors.name = 'Project Name should not contain symbols.';
+    errors.name = 'Project Name should not contain - .';
   }
   if (!values?.short_description) {
     errors.short_description = 'Short Description is Required.';
