@@ -9,7 +9,7 @@ from fastapi import (
     HTTPException,
     UploadFile,
 )
-from fastapi.logger import logger as logger
+from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from ..db import database
