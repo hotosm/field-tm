@@ -56,7 +56,7 @@ class BETAProjectUpload(BaseModel):
     xform_title: Union[str, None]
     odk_central: ODKCentral
     hashtags: Union[List[str], None]
-    organisation_id: int
+    organisation_id: int = None
     # city: str
     # country: str
 
@@ -91,7 +91,7 @@ class ProjectBase(BaseModel):
     project_tasks: List[tasks_schemas.Task] = None
     xform_title: str = None
     hashtags: List[str] = None
-    organisation_id: int
+    organisation_id: int = None
 
     class Config:
         orm_mode = True
