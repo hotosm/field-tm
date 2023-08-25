@@ -1733,6 +1733,7 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         summary.num_contributors = (
             db_project.tasks_mapped + db_project.tasks_validated
         )  # TODO: get real number of contributors
+        summary.organisation_logo = db_project.organisation.logo if db_project.organisation else None
 
         return summary
     else:
