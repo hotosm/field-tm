@@ -1408,22 +1408,22 @@ def generate_appuser_files(
             # Creating app users and updating the role of that user.
             tasks_list = tasks_crud.get_task_lists(db, project_id)
 
-            info = get_cpu_info()
-            cores = info["count"]
-            with concurrent.futures.ThreadPoolExecutor(max_workers=cores) as executor:
-                futures = {executor.submit(generate_task_files_wrapper, project_id, task, xlsform, form_type, odk_credentials): task for task in tasks_list}
+            # info = get_cpu_info()
+            # cores = info["count"]
+            # with concurrent.futures.ThreadPoolExecutor(max_workers=cores) as executor:
+            #     futures = {executor.submit(generate_task_files_wrapper, project_id, task, xlsform, form_type, odk_credentials): task for task in tasks_list}
 
-                for future in concurrent.futures.as_completed(futures):
-                    log.debug(f"Waiting for thread to complete..")
+            #     for future in concurrent.futures.as_completed(futures):
+            #         log.debug(f"Waiting for thread to complete..")
 
-            # for task in tasks_list:
-            #     try:
-            #         generate_task_files(
-            #             db, project_id, task, xlsform, form_type, odk_credentials
-            #         )
-            #     except Exception as e:
-            #         log.warning(str(e))
-            #         continue
+            for task in tasks_list:
+                try:
+                    generate_task_files(
+                        db, project_id, task, xlsform, form_type, odk_credentials
+                    )
+                except Exception as e:
+                    log.warning(str(e))
+                    continue
         # # Update background task status to COMPLETED
         update_background_task_status_in_database(
             db, background_task_id, 4
