@@ -271,7 +271,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
                     }}
                     // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'no_of_buildings', value: e.target.value }))}
                     // helperText={errors.username}
-                    InputProps={{ inputProps: { min: 9 } }}
+                    InputProps={{ inputProps: { min: 5 } }}
                     FormHelperTextProps={inputFormStyles()}
                   />
                   {errors.no_of_buildings && (
