@@ -32,6 +32,7 @@ from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 
 from ..config import settings
 from ..db import db_models
@@ -365,10 +366,7 @@ async def test_form_validity(xform_content: str, form_type: str):
         xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
         return {"message": "Your form is valid"}
     except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail={"message": "Your form is invalid", "possible_reason": str(e)},
-        )
+        return JSONResponse(content={"message":"Your form is invalid", "possible_reason":str(e)}, status_code=400)
 
 
 def generate_updated_xform(
