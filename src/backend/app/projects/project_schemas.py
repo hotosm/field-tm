@@ -75,6 +75,7 @@ class ProjectSummary(BaseModel):
     tasks_bad: int = None
     hashtags: List[str] = None
     organisation_id: int = None
+    organisation_logo: str = None
 
     class Config:
         orm_mode = True
