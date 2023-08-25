@@ -1,5 +1,4 @@
 import { CreateProjectStateTypes } from 'store/types/ICreateProject';
-import CoreModules from '../../shared/CoreModules';
 import { createSlice } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
@@ -28,6 +27,8 @@ export const initialState: CreateProjectStateTypes = {
   updateBoundaryLoading: false,
   drawnGeojson: null,
   drawToggle: false,
+  validateCustomFormLoading: false,
+  validateCustomFormResponse: null,
 };
 
 const CreateProject = createSlice({
@@ -135,6 +136,12 @@ const CreateProject = createSlice({
     },
     SetDrawToggle(state, action) {
       state.drawToggle = action.payload;
+    },
+    ValidateCustomFormLoading(state, action) {
+      state.validateCustomFormLoading = action.payload;
+    },
+    ValidateCustomForm(state, action) {
+      state.validateCustomFormResponse = action.payload;
     },
   },
 });
