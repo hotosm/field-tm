@@ -97,6 +97,7 @@ export type ProjectDetailsTypes = {
   data_extract_options?: string;
   data_extractWays?: string;
   form_ways?: string;
+  organisation_id: number;
 };
 
 export type ProjectAreaTypes = {
