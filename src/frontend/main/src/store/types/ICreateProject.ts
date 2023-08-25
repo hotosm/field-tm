@@ -24,6 +24,11 @@ export type CreateProjectStateTypes = {
   updateBoundaryLoading: boolean;
   drawnGeojson: DrawnGeojsonTypes | null;
   drawToggle: boolean;
+  validateCustomFormLoading: boolean;
+  validateCustomFormResponse: ValidateCustomFormResponse | null;
+};
+export type ValidateCustomFormResponse = {
+  detail: { message: string; possible_reason: string };
 };
 export type AuthorTypes = {
   username: string;
@@ -97,7 +102,7 @@ export type ProjectDetailsTypes = {
   data_extract_options?: string;
   data_extractWays?: string;
   form_ways?: string;
-  organisation_id: number;
+  organisation_id?: number;
 };
 
 export type ProjectAreaTypes = {
