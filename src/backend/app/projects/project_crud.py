@@ -52,6 +52,9 @@ from sqlalchemy import and_, column, func, inspect, select, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from cpuinfo import get_cpu_info
+from ..db import database
+import concurrent.futures
 
 from ..central import central_crud
 from ..config import settings
@@ -1250,6 +1253,12 @@ def generate_task_files(
     return True
 
 
+
+def generate_task_files_wrapper(project_id, task, xlsform, form_type, odk_credentials):
+    for db in database.get_db():
+        generate_task_files(db, project_id, task, xlsform, form_type, odk_credentials)
+
+
 def generate_appuser_files(
     db: Session,
     project_id: int,
@@ -1399,15 +1408,23 @@ def generate_appuser_files(
             # Creating app users and updating the role of that user.
             tasks_list = tasks_crud.get_task_lists(db, project_id)
 
-            for task in tasks_list:
-                try:
-                    generate_task_files(
-                        db, project_id, task, xlsform, form_type, odk_credentials
-                    )
-                except Exception as e:
-                    log.warning(str(e))
-                    continue
-        # Update background task status to COMPLETED
+            info = get_cpu_info()
+            cores = info["count"]
+            with concurrent.futures.ThreadPoolExecutor(max_workers=cores) as executor:
+                futures = {executor.submit(generate_task_files_wrapper, project_id, task, xlsform, form_type, odk_credentials): task for task in tasks_list}
+
+                for future in concurrent.futures.as_completed(futures):
+                    log.debug(f"Waiting for thread to complete..")
+
+            # for task in tasks_list:
+            #     try:
+            #         generate_task_files(
+            #             db, project_id, task, xlsform, form_type, odk_credentials
+            #         )
+            #     except Exception as e:
+            #         log.warning(str(e))
+            #         continue
+        # # Update background task status to COMPLETED
         update_background_task_status_in_database(
             db, background_task_id, 4
         )  # 4 is COMPLETED
