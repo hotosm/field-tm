@@ -488,6 +488,7 @@ async def generate_files(
     project_id: int,
     extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
+    config_file: Optional[UploadFile] = File(None),
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
@@ -538,6 +539,16 @@ async def generate_files(
         contents = await upload.read()
 
         project.form_xls = contents
+
+        if config_file:
+            config_file_name = os.path.splitext(config_file.filename)
+            config_file_ext = config_file_name[1]     
+            if not config_file_ext == ".yaml":
+                raise HTTPException(status_code=400, detail="Provide a valid .yaml config file")
+            await config_file.seek(0)
+            config_file_contents = await config_file.read()
+            project.form_config_file = config_file_contents
+        
         db.commit()
 
     if data_extracts:
