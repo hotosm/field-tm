@@ -15,9 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
 
 import json
-import logging
 import os
 import uuid
 from typing import List, Optional
@@ -33,7 +33,6 @@ from fastapi import (
     Response,
     UploadFile,
 )
-from fastapi.logger import logger as logger
 from fastapi.responses import FileResponse
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
@@ -45,7 +44,6 @@ from ..models.enums import TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
 
-log = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/projects",
@@ -64,6 +62,44 @@ async def read_projects(
 ):
     projects = project_crud.get_projects(db, user_id, skip, limit)
     return projects
+
+
+@router.get("/{project_id}")
+async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
+    """Returns the project details.
+
+    Parameters:
+        project_id: int
+
+    Returns:
+        Response: Project details.
+    """
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, details={"Project not found"})
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
+
+    odk_details = await central_crud.get_project_full_details(project.odkid, odk_credentials)
+
+    # Features count
+    query = f"select count(*) from features where project_id={project_id} and task_id is not null"
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    return {
+        'id':project_id,
+        'name':odk_details['name'],
+        'createdAt':odk_details['createdAt'],
+        'tasks':odk_details['forms'],
+        'lastSubmission':odk_details['lastSubmission'],
+        'total_features':features
+    }
 
 
 @router.post("/near_me", response_model=project_schemas.ProjectSummary)
@@ -130,7 +166,7 @@ async def create_project(
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
-    logger.debug(f"Creating project {project_info.project_info.name}")
+    log.debug(f"Creating project {project_info.project_info.name}")
 
     if project_info.odk_central.odk_central_url.endswith("/"):
         project_info.odk_central.odk_central_url = (
@@ -142,7 +178,7 @@ async def create_project(
             project_info.project_info.name, project_info.odk_central
         )
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
         ) from e
@@ -179,9 +215,9 @@ async def update_odk_credentials(
         odkproject = central_crud.create_odk_project(
             project_instance.project_info[0].name, odk_central_cred
         )
-        logger.debug(f"ODKCentral return after update: {odkproject}")
+        log.debug(f"ODKCentral return after update: {odkproject}")
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail="Connection failed to central odk. "
         ) from e
@@ -350,15 +386,35 @@ async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
     has_data_extracts: bool = Form(False),
-    db: Session = Depends(database.get_db),
-):
+    db: Session = Depends(database.get_db)
+    ):
+
     # read entire file
     await upload.seek(0)
     content = await upload.read()
+    content_json = json.loads(content)
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
+    results = []
+    feature_content_type = content_json.get("type")
+    if feature_content_type == "FeatureCollection":
+        feature_content = content_json["features"]
+    elif feature_content_type == "Feature":
+        feature_content = [content_json]
 
-    return result
+    for idx, _ in enumerate(feature_content):
+        _content = json.dumps(
+            {"features": [feature_content[idx]] })
+
+        result = await project_crud.split_into_tasks(db, _content, no_of_buildings, has_data_extracts)
+        results.append(result)
+
+    combined_geojson = {**content_json, "features": []}
+
+    for geo in results:
+        if geo.get("features", None):
+            combined_geojson["features"].extend(geo["features"])
+
+    return combined_geojson
 
 
 @router.post("/{project_id}/upload")
@@ -470,6 +526,7 @@ async def generate_files(
     project_id: int,
     extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
+    config_file: Optional[UploadFile] = File(None),
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
@@ -520,6 +577,16 @@ async def generate_files(
         contents = await upload.read()
 
         project.form_xls = contents
+
+        if config_file:
+            config_file_name = os.path.splitext(config_file.filename)
+            config_file_ext = config_file_name[1]     
+            if not config_file_ext == ".yaml":
+                raise HTTPException(status_code=400, detail="Provide a valid .yaml config file")
+            await config_file.seek(0)
+            config_file_contents = await config_file.read()
+            project.form_config_file = config_file_contents
+        
         db.commit()
 
     if data_extracts:
@@ -638,7 +705,7 @@ async def generate_log(
                 "logs": logs,
             }
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         return "Error in generating log file"
 
 

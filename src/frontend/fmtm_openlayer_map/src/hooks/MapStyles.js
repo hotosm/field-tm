@@ -6,6 +6,7 @@ import CoreModules from 'fmtm/CoreModules';
 import AssetModules from 'fmtm/AssetModules';
 import {getCenter} from 'ol/extent';
 import Point from 'ol/geom/Point.js';
+import { transform } from 'ol/proj';
 
 function createPolygonStyle(fillColor, strokeColor) {
     return new Style({
@@ -29,9 +30,10 @@ function createIconStyle(iconSrc) {
         }),
         geometry: function (feature) {
             // return the coordinates of the centroid of the polygon
-            const coordinates = feature.getGeometry().getExtent();
-            const center = getCenter(coordinates);
-            return new Point(center);
+            // const coordinates = feature.getGeometry().getExtent();
+            // const center = getCenter(coordinates);
+            const convertedCenter = transform(feature.values_.centroid, 'EPSG:4326', 'EPSG:3857');
+            return new Point(convertedCenter);
           },
     });
 }

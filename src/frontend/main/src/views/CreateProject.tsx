@@ -210,7 +210,7 @@ const CreateProject: React.FC = () => {
           />
         ) : null}
         {location.pathname === '/define-tasks' ? (
-          <DefineTasks geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} />
+          <DefineTasks geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} dataExtractFile={dataExtractFile} />
         ) : null}
         {location.pathname === '/data-extract' ? (
           <DataExtract

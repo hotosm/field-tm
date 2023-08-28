@@ -15,12 +15,12 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
 
 import asyncio
 import os
 import zipfile
 import concurrent.futures
-import logging
 import threading
 import csv
 import io
@@ -28,7 +28,6 @@ import os
 import zipfile
 import json
 from datetime import datetime
-import logging
 from fastapi import HTTPException, Response
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -38,7 +37,6 @@ from ..tasks import tasks_crud
 from ..projects import project_crud, project_schemas
 from osm_fieldwork.json2osm import JsonDump
 from pathlib import Path
-from fastapi.logger import logger as logger
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -164,12 +162,12 @@ def create_zip_file(files, output_file_path):
 #                         coords = feature['tags']['geometry']['coordinates']
 #                     feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
 #                 else:
-#                     logger.warning("Bad record! %r" % feature)
+#                     log.warning("Bad record! %r" % feature)
 #                     continue
 #             jsonin.writeOSM(feature)
 
 #     jsonin.finishOSM()
-#     logger.info("Wrote OSM XML file: %r" % osmoutfile)
+#     log.info("Wrote OSM XML file: %r" % osmoutfile)
 #     return osmoutfile
 
 
@@ -199,7 +197,7 @@ async def convert_json_to_osm_xml(file_path):
                         coords = feature['tags']['geometry']['coordinates']
                     feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
                 else:
-                    logger.warning("Bad record! %r" % feature)
+                    log.warning("Bad record! %r" % feature)
                     return None
             return feature
 
@@ -208,7 +206,7 @@ async def convert_json_to_osm_xml(file_path):
             if feature:
                 jsonin.writeOSM(feature)
         jsonin.finishOSM()
-        logger.info("Wrote OSM XML file: %r" % osmoutfile)
+        log.info("Wrote OSM XML file: %r" % osmoutfile)
         return osmoutfile
 
     data_processing_tasks = [process_entry_async(entry) for entry in data]
@@ -249,15 +247,15 @@ async def convert_json_to_osm(file_path):
                         # del feature['tags']['geometry']
                     feature['attrs'] = {'lat': coords[1], 'lon': coords[0]}
                 else:
-                    logger.warning("Bad record! %r" % feature)
+                    log.warning("Bad record! %r" % feature)
                     continue
             jsonin.writeOSM(feature)
             jsonin.writeGeoJson(feature)
 
     jsonin.finishOSM()
     jsonin.finishGeoJson()
-    logger.info("Wrote OSM XML file: %r" % osmoutfile)
-    logger.info("Wrote GeoJson file: %r" % jsonoutfile)
+    log.info("Wrote OSM XML file: %r" % osmoutfile)
+    log.info("Wrote GeoJson file: %r" % jsonoutfile)
     return osmoutfile, jsonoutfile
 
 
@@ -313,7 +311,7 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
         submission = xform.getSubmissions(odkid, task_id, None, False, True)
         submission = (json.loads(submission))['value']
     else:
-        submission = get_all_submissions(db, project_id)
+        submission = await get_all_submissions(db, project_id)
 
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
@@ -379,7 +377,7 @@ def download_submission_for_project(db, project_id):
     xform = get_odk_form(odk_credentials)
 
     def download_submission_for_task(task_id):
-        logging.info(f"Thread {threading.current_thread().name} - Downloading submission for Task ID {task_id}")
+        log.info(f"Thread {threading.current_thread().name} - Downloading submission for Task ID {task_id}")
         xml_form_id = f"{project_name}_{form_category}_{task_id}".split("_")[2]
         file = xform.getSubmissionMedia(odkid, xml_form_id)
         file_path = f"{project_name}_{form_category}_submission_{task_id}.zip"
@@ -388,7 +386,7 @@ def download_submission_for_project(db, project_id):
         return file_path
 
     def extract_files(zip_file_path):
-        logging.info(f"Thread {threading.current_thread().name} - Extracting files from {zip_file_path}")
+        log.info(f"Thread {threading.current_thread().name} - Extracting files from {zip_file_path}")
         with zipfile.ZipFile(zip_file_path, "r") as zip_file:
             extract_dir = os.path.splitext(zip_file_path)[0]
             zip_file.extractall(extract_dir)
@@ -409,9 +407,9 @@ def download_submission_for_project(db, project_id):
             try:
                 file_path = future.result()
                 files.append(file_path)
-                logging.info(f"Thread {threading.current_thread().name} - Task {task_id} - Download completed.")
+                log.info(f"Thread {threading.current_thread().name} - Task {task_id} - Download completed.")
             except Exception as e:
-                logging.error(f"Thread {threading.current_thread().name} - Error occurred while downloading submission for task {task_id}: {e}")
+                log.error(f"Thread {threading.current_thread().name} - Error occurred while downloading submission for task {task_id}: {e}")
 
         # Extract files using thread pool
         extracted_files = []
@@ -420,9 +418,9 @@ def download_submission_for_project(db, project_id):
             file_path = futures[future]
             try:
                 extracted_files.extend(future.result())
-                logging.info(f"Thread {threading.current_thread().name} - Extracted files from {file_path}")
+                log.info(f"Thread {threading.current_thread().name} - Extracted files from {file_path}")
             except Exception as e:
-                logging.error(f"Thread {threading.current_thread().name} - Error occurred while extracting files from {file_path}: {e}")
+                log.error(f"Thread {threading.current_thread().name} - Error occurred while extracting files from {file_path}: {e}")
 
     # Create a new ZIP file for the extracted files
     final_zip_file_path = f"{project_name}_{form_category}_submissions_final.zip"

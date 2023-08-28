@@ -19,7 +19,9 @@ version: "3"
 
 volumes:
   fmtm_db_data:
+  fmtm_logs:
   fmtm_images:
+  fmtm_tiles:
   central_db_data:
 
 networks:
@@ -50,7 +52,9 @@ services:
         APP_VERSION: debug
     container_name: fmtm_api
     volumes:
+      - fmtm_logs:/opt/logs
       - fmtm_images:/opt/app/images
+      - fmtm_tiles:/opt/tiles
       - ./src/backend/app:/opt/app
       # - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.10/site-packages/osm_fieldwork
     depends_on:

@@ -15,22 +15,18 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
+
 import os
 import random
 import string
 from fastapi import HTTPException, File,UploadFile
-from fastapi.logger import logger as logger
 import re
 
 from sqlalchemy.orm import Session
-
 from ..db import db_models
 
 IMAGEDIR = "app/images/"
-
-# --------------
-# ---- CRUD ----
-# --------------
 
 
 def get_organisations(
@@ -117,7 +113,7 @@ async def create_organization(db: Session, name: str, description: str, url: str
         db.commit()
         db.refresh(db_organization)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=400, detail=f"Error creating organization: {e}"
         ) from e
@@ -140,3 +136,28 @@ async def get_organisation_by_id(db: Session, id: int):
         db.query(db_models.DbOrganisation).filter(db_models.DbOrganisation.id == id).first()
     )
     return db_organization
+
+
+async def update_organization_info(
+    db: Session, 
+    organization_id, name: str,
+    description: str,
+    url: str,
+    logo: UploadFile
+    ):
+    organization = await get_organisation_by_id(db, organization_id)
+    if not organization:
+        raise HTTPException(status_code=404, detail='Organization not found')
+    
+    if name:
+        organization.name = name
+    if description:
+        organization.description = description
+    if url:
+        organization.url = url
+    if logo:
+        organization.logo = await upload_image(db, logo) if logo else None
+
+    db.commit()
+    db.refresh(organization)
+    return organization

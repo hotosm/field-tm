@@ -2,7 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import enviroment from '../../environment';
 import CoreModules from '../../shared/CoreModules';
 import FormGroup from '@mui/material/FormGroup';
-import { CreateProjectService, FormCategoryService, GenerateProjectLog } from '../../api/CreateProjectService';
+import {
+  CreateProjectService,
+  FormCategoryService,
+  GenerateProjectLog,
+  ValidateCustomForm,
+} from '../../api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { Grid, InputLabel, MenuItem, Select } from '@mui/material';
@@ -92,11 +97,11 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
           xform_title: projectDetails.form_ways === 'Upload a Form' ? null : projectDetails.xform_title,
           dimension: projectDetails.dimension,
           splitting_algorithm: projectDetails.splitting_algorithm,
-          organization: projectDetails.organization,
           form_ways: projectDetails.form_ways,
           // "uploaded_form": projectDetails.uploaded_form,
           data_extractWays: projectDetails.data_extractWays,
           hashtags: arrayHashtag,
+          organisation_id: projectDetails.organisation_id,
         },
         newUpdatedTaskGeojsonFile,
         customFormFile,
@@ -198,6 +203,10 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
     JSON?.parse(dividedTaskGeojson)?.features?.length ||
     projectDetails?.areaGeojson?.features?.length;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
+
+  useEffect(() => {
+    dispatch(ValidateCustomForm(`${enviroment.baseApiUrl}/projects/validate_form`, customFormFile));
+  }, [customFormFile]);
 
   return (
     <CoreModules.Stack

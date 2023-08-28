@@ -18,7 +18,7 @@ const alogrithmList = [
   { id: 2, value: 'Choose Area as Tasks', label: 'Choose Area as Tasks' },
   { id: 3, value: 'Task Splitting Algorithm', label: 'Task Splitting Algorithm' },
 ];
-const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
+const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFile }) => {
   const navigate = useNavigate();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
@@ -271,7 +271,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
                     }}
                     // onChange={(e) => dispatch(CreateProjectActions.SetProjectDetails({ key: 'no_of_buildings', value: e.target.value }))}
                     // helperText={errors.username}
-                    InputProps={{ inputProps: { min: 9 } }}
+                    InputProps={{ inputProps: { min: 5 } }}
                     FormHelperTextProps={inputFormStyles()}
                   />
                   {errors.no_of_buildings && (
@@ -316,7 +316,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
             }}
           >
             {/* Previous Button  */}
-            <Link to="/upload-area">
+            <Link to="/data-extract">
               <CoreModules.Button sx={{ width: '100px' }} variant="outlined" color="error">
                 Previous
               </CoreModules.Button>
@@ -338,7 +338,11 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile }) => {
           {/* END */}
         </FormGroup>
       </form>
-      <DefineAreaMap uploadedGeojson={geojsonFile} setGeojsonFile={setGeojsonFile} />
+      <DefineAreaMap
+        uploadedGeojson={geojsonFile}
+        setGeojsonFile={setGeojsonFile}
+        uploadedDataExtractFile={dataExtractFile}
+      />
     </CoreModules.Stack>
   );
 };

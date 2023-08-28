@@ -5,7 +5,7 @@ import windowDimention from '../hooks/WindowDimension';
 import { HomeSummaryService } from '../api/HomeService';
 import enviroment from '../environment';
 import ProjectCardSkeleton from '../components/home/ProjectCardSkeleton';
-import SearchablesRow from '../components/home/HomePageFilters';
+import HomePageFilters from '../components/home/HomePageFilters';
 import CoreModules from '../shared/CoreModules';
 
 const Home = () => {
@@ -39,11 +39,17 @@ const Home = () => {
     setSearchQuery(query);
   };
 
-  const filteredProjectCards = stateHome.homeProjectSummary.filter((value) => value.title.includes(searchQuery));
+  const filteredProjectCards = stateHome.homeProjectSummary.filter((value) =>
+    value.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
-    <div style={{ padding: 7, flex: 1 }}>
-      <SearchablesRow onSearch={handleSearch} />
+    <div style={{ padding: 7, flex: 1, background: '#F5F5F5' }}>
+      <HomePageFilters
+        onSearch={handleSearch}
+        filteredProjectCount={filteredProjectCards?.length}
+        totalProjectCount={stateHome.homeProjectSummary.length}
+      />
       {stateHome.homeProjectLoading == false ? (
         filteredProjectCards.length > 0 ? (
           <CoreModules.Grid px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
