@@ -45,8 +45,8 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export --dev --no-default --without-hashes \
-    > requirements-dev.txt
+    && pdm export -G debug -G test --no-default \
+    --without-hashes > requirements-debug.txt
 
 
 
@@ -107,9 +107,12 @@ COPY container-entrypoint.sh /
 ENTRYPOINT ["/container-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
+    && mkdir -p /opt/logs /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /container-entrypoint.sh
-# Add volume for persistent images
+# Add volumes for persistence
+VOLUME /opt/logs
+VOLUME /opt/tiles
 VOLUME /opt/app/images
 # Change to non-root user
 USER appuser
@@ -127,17 +130,18 @@ RUN pip install pdm==2.6.1 \
 FROM runtime as debug-no-odk
 USER appuser
 COPY --from=extract-deps --chown=appuser \
-    /opt/python/requirements-dev.txt /opt/python/
+    /opt/python/requirements-debug.txt /opt/python/
 COPY --from=osm-fieldwork-whl --chown=appuser \
     /repos/osm-fieldwork/dist/*.whl /opt/
-RUN ls /opt/*.whl >> /opt/python/requirements-dev.txt \
+RUN ls /opt/*.whl >> /opt/python/requirements-debug.txt \
     && pip uninstall -y osm-fieldwork \
     && pip install --user --upgrade --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements-dev.txt
+    --no-cache-dir -r \
+    /opt/python/requirements-debug.txt
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
-    "--reload", "--log-level", "error", "--no-access-log"]
+    "--reload", "--log-level", "critical", "--no-access-log"]
 
 
 
@@ -166,4 +170,4 @@ FROM runtime as prod
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
-    "--workers", "4", "--log-level", "error", "--no-access-log"]
+    "--workers", "4", "--log-level", "critical", "--no-access-log"]

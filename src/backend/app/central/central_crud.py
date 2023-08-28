@@ -15,9 +15,10 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
+
 import base64
 import json
-import logging
 import os
 import pathlib
 import zlib
@@ -27,17 +28,15 @@ import zlib
 import segno
 import xmltodict
 from fastapi import HTTPException
-from fastapi.logger import logger as logger
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 
 from ..config import settings
 from ..db import db_models
 from ..projects import project_schemas
-
-log = logging.getLogger(__name__)
 
 
 def get_odk_project(odk_central: project_schemas.ODKCentral = None):
@@ -47,17 +46,17 @@ def get_odk_project(odk_central: project_schemas.ODKCentral = None):
         user = odk_central.odk_central_user
         pw = odk_central.odk_central_password
     else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
         pw = settings.ODK_CENTRAL_PASSWD
 
     try:
-        logger.debug(f"Connecting to ODKCentral: url={url} user={user}")
+        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         project = OdkProject(url, user, pw)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
         ) from e
@@ -73,17 +72,17 @@ def get_odk_form(odk_central: project_schemas.ODKCentral = None):
         pw = odk_central.odk_central_password
 
     else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
         pw = settings.ODK_CENTRAL_PASSWD
 
     try:
-        logger.debug(f"Connecting to ODKCentral: url={url} user={user}")
+        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         form = OdkForm(url, user, pw)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
         ) from e
@@ -98,17 +97,17 @@ def get_odk_app_user(odk_central: project_schemas.ODKCentral = None):
         user = odk_central.odk_central_user
         pw = odk_central.odk_central_password
     else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
         pw = settings.ODK_CENTRAL_PASSWD
 
     try:
-        logger.debug(f"Connecting to ODKCentral: url={url} user={user}")
+        log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         form = OdkAppUser(url, user, pw)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
         ) from e
@@ -138,11 +137,11 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
                     detail="Could not authenticate to odk central.",
                 )
 
-        logger.debug(f"ODKCentral response: {result}")
-        logger.info(f"Project {name} available on the ODK Central server.")
+        log.debug(f"ODKCentral response: {result}")
+        log.info(f"Project {name} available on the ODK Central server.")
         return result
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
         ) from e
@@ -155,7 +154,7 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     try:
         project = get_odk_project(odk_central)
         result = project.deleteProject(project_id)
-        logger.info(
+        log.info(
             f"Project {project_id} has been deleted from the ODK Central server."
         )
         return result
@@ -175,15 +174,15 @@ def create_appuser(
         pw = odk_credentials.odk_central_password
 
     else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
         pw = settings.ODK_CENTRAL_PASSWD
 
     app_user = OdkAppUser(url, user, pw)
     result = app_user.create(project_id, name)
-    logger.info(f"Created app user: {result.json()}")
+    log.info(f"Created app user: {result.json()}")
     return result
 
 
@@ -207,8 +206,8 @@ def upload_xform_media(
         pw = odk_credentials["odk_central_password"]
 
     else:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
         pw = settings.ODK_CENTRAL_PASSWD
@@ -216,7 +215,7 @@ def upload_xform_media(
     try:
         xform = OdkForm(url, user, pw)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
@@ -249,7 +248,7 @@ def create_odk_xform(
     try:
         xform = get_odk_form(odk_credentials)
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
@@ -300,6 +299,14 @@ def get_form_full_details(
     return form_details.json()
 
 
+async def get_project_full_details(
+    odk_project_id: int, odk_central: project_schemas.ODKCentral
+):
+    project = get_odk_project(odk_central)
+    project_details = project.getFullDetails(odk_project_id)
+    return project_details
+
+
 def list_task_submissions(
     odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral = None
 ):
@@ -330,7 +337,7 @@ def get_form_list(db: Session, skip: int, limit: int):
             .all()
         )
     except Exception as e:
-        logger.error(e)
+        log.error(e)
         raise HTTPException(e) from e
 
 
@@ -365,10 +372,7 @@ async def test_form_validity(xform_content: str, form_type: str):
         xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
         return {"message": "Your form is valid"}
     except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail={"message": "Your form is invalid", "possible_reason": str(e)},
-        )
+        return JSONResponse(content={"message":"Your form is invalid", "possible_reason":str(e)}, status_code=400)
 
 
 def generate_updated_xform(
@@ -383,11 +387,11 @@ def generate_updated_xform(
         try:
             xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
         except Exception as e:
-            logger.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
+            log.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
             raise HTTPException(status_code=400, detail=str(e)) from e
 
         if os.path.getsize(outfile) <= 0:
-            logger.warning(f"{outfile} is empty!")
+            log.warning(f"{outfile} is empty!")
             raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
 
         xls = open(outfile, "r")
@@ -453,8 +457,8 @@ def generate_updated_xform(
     for inst in instances:
         try:
             if "src" in inst.attrib:
-                if (inst[index].attrib)["src"].split(".")[1] == "geojson":
-                    (inst['index'].attrib)["src"] = extract
+                if (inst.attrib["src"].split("."))[1] == "geojson":
+                    (inst.attrib)["src"] = extract
 
             # Looking for data tags
             data_tags = inst.findall("xforms:data", namespaces)
@@ -492,8 +496,8 @@ def generate_updated_xform(
 def create_qrcode(project_id: int, token: str, name: str, odk_central_url: str = None):
     """Create the QR Code for an app-user."""
     if not odk_central_url:
-        logger.debug("ODKCentral connection variables not set in function")
-        logger.debug("Attempting extraction from environment variables")
+        log.debug("ODKCentral connection variables not set in function")
+        log.debug("Attempting extraction from environment variables")
         odk_central_url = settings.ODK_CENTRAL_URL
 
     # Qr code text json in the format acceptable by odk collect.
@@ -557,20 +561,20 @@ def convert_csv(
     csvin.createGeoJson(jsonoutfile)
 
     if len(data) == 0:
-        logger.debug("Parsing csv file %r" % filespec)
+        log.debug("Parsing csv file %r" % filespec)
         # The yaml file is in the package files for osm_fieldwork
         data = csvin.parse(filespec)
     else:
         csvdata = csvin.parse(filespec, data)
         for entry in csvdata:
-            logger.debug(f"Parsing csv data {entry}")
+            log.debug(f"Parsing csv data {entry}")
             if len(data) <= 1:
                 continue
             feature = csvin.createEntry(entry)
             # Sometimes bad entries, usually from debugging XForm design, sneak in
             if len(feature) > 0:
                 if "tags" not in feature:
-                    logger.warning("Bad record! %r" % feature)
+                    log.warning("Bad record! %r" % feature)
                 else:
                     if "lat" not in feature["attrs"]:
                         import epdb

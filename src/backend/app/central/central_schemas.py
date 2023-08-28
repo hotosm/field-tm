@@ -15,10 +15,10 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+from loguru import logger as log
 
 from enum import Enum
 
-from fastapi.logger import logger as logger
 from pydantic import BaseModel
 
 
@@ -32,13 +32,13 @@ class Central(CentralBase):
 
 
 class CentralOut(CentralBase):
-    logger.debug("Hello World!")
+    log.debug("Hello World!")
 
 
 class CentralFileType(BaseModel):
     filetype: Enum("FileType", ["xform", "extract", "zip", "xlsform", "all"])
-    logger.debug("Hello World!")
+    log.debug("Hello World!")
 
 
 class CentralDetails(CentralBase):
-    logger.debug("Hello World!")
+    log.debug("Hello World!")

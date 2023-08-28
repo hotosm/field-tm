@@ -271,7 +271,7 @@ const DataExtract: React.FC<any> = ({
             }}
           >
             {/* Previous Button  */}
-            <Link to="/define-tasks">
+            <Link to="/upload-area">
               <CoreModules.Button sx={{ px: '20px' }} variant="outlined" color="error">
                 Previous
               </CoreModules.Button>

@@ -15,12 +15,11 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
+from loguru import logger as log
 
 import base64
 import io
 import json
-import logging
 import os
 import time
 import uuid
@@ -39,7 +38,6 @@ import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import File, HTTPException, UploadFile
-from fastapi.logger import logger as logger
 from geoalchemy2.shape import from_shape
 from geojson import dump
 from osm_fieldwork import basemapper
@@ -52,6 +50,9 @@ from sqlalchemy import and_, column, func, inspect, select, table
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from cpuinfo import get_cpu_info
+from ..db import database
+import concurrent.futures
 
 from ..central import central_crud
 from ..config import settings
@@ -61,14 +62,10 @@ from ..tasks import tasks_crud
 from ..users import user_crud
 from . import project_schemas
 
-log = logging.getLogger(__name__)
-
-# --------------
-# ---- CRUD ----
-# --------------
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
+TILESDIR = "/opt/tiles"
 
 
 def get_projects(
@@ -272,6 +269,7 @@ def create_project_with_project_info(
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
     hashtags = project_metadata.hashtags
+    organisation_id = project_metadata.organisation_id
 
     # verify data coming in
     if not project_user:
@@ -284,7 +282,8 @@ def create_project_with_project_info(
         f"project_user: {project_user} | "
         f"project_info_1: {project_info_1} | "
         f"xform_title: {xform_title} | "
-        f"hashtags: {hashtags}"
+        f"hashtags: {hashtags}| "
+        f"organisation_id: {organisation_id}"
     )
 
     # Check / set credentials
@@ -328,7 +327,8 @@ def create_project_with_project_info(
         odk_central_url=url,
         odk_central_user=user,
         odk_central_password=pw,
-        hashtags=hashtags
+        hashtags=hashtags,
+        organisation_id=organisation_id,
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -616,16 +616,14 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool= False):
+async def split_into_tasks(
+    db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool = False
+):
     project_id = uuid.uuid4()
 
     outline = json.loads(boundary)
 
-    """Update the boundary polyon on the database."""
-    # boundary_data = outline["features"][0]["geometry"]
-    if outline["type"] == "Feature":
-        boundary_data = outline["geometry"]
-    elif outline.get("features", None) is not None:
+    if outline.get("features", None) is not None:
         boundary_data = outline["features"][0]["geometry"]
     else:
         boundary_data = outline
@@ -676,7 +674,6 @@ async def split_into_tasks(db: Session, boundary: str, no_of_buildings: int, has
                 """
         result = db.execute(query)
         db.commit()
-
 
     # Get the sql query from split_algorithm sql file
     with open("app/db/split_algorithm.sql", "r") as sql_file:
@@ -1188,7 +1185,7 @@ def generate_task_files(
                     WHERE project_id={project_id}
                     AND ST_IsValid(geometry)
                     AND ST_IsValid('{task.outline}'::Geometry)
-                    AND ST_Intersects(geometry, '{task.outline}'::Geometry)
+                    AND ST_Contains('{task.outline}'::Geometry, ST_Centroid(geometry))
                 )"""
 
     result = db.execute(query)
@@ -1250,6 +1247,12 @@ def generate_task_files(
     db.refresh(project)
 
     return True
+
+
+
+def generate_task_files_wrapper(project_id, task, xlsform, form_type, odk_credentials):
+    for db in database.get_db():
+        generate_task_files(db, project_id, task, xlsform, form_type, odk_credentials)
 
 
 def generate_appuser_files(
@@ -1388,6 +1391,14 @@ def generate_appuser_files(
             # Creating app users and updating the role of that user.
             tasks_list = tasks_crud.get_task_lists(db, project_id)
 
+            # info = get_cpu_info()
+            # cores = info["count"]
+            # with concurrent.futures.ThreadPoolExecutor(max_workers=cores) as executor:
+            #     futures = {executor.submit(generate_task_files_wrapper, project_id, task, xlsform, form_type, odk_credentials): task for task in tasks_list}
+
+            #     for future in concurrent.futures.as_completed(futures):
+            #         log.debug(f"Waiting for thread to complete..")
+
             for task in tasks_list:
                 try:
                     generate_task_files(
@@ -1396,7 +1407,7 @@ def generate_appuser_files(
                 except Exception as e:
                     log.warning(str(e))
                     continue
-        # Update background task status to COMPLETED
+        # # Update background task status to COMPLETED
         update_background_task_status_in_database(
             db, background_task_id, 4
         )  # 4 is COMPLETED
@@ -1705,6 +1716,7 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         summary.num_contributors = (
             db_project.tasks_mapped + db_project.tasks_validated
         )  # TODO: get real number of contributors
+        summary.organisation_logo = db_project.organisation.logo if db_project.organisation else None
 
         return summary
     else:
@@ -1787,7 +1799,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
 
 
 async def insert_background_task_into_database(
-    db: Session, task_id: uuid.UUID, name: str = None, project_id = None
+    db: Session, task_id: uuid.UUID, name: str = None, project_id=None
 ):
     """Inserts a new task into the database
     Params:
@@ -1829,7 +1841,12 @@ def update_background_task_status_in_database(
 
 
 def add_features_into_database(
-    db: Session, project_id: int, features: dict, background_task_id: uuid.UUID, feature_type :str):
+    db: Session,
+    project_id: int,
+    features: dict,
+    background_task_id: uuid.UUID,
+    feature_type: str,
+):
     """Inserts a new task into the database
     Params:
           db: database session
@@ -1856,10 +1873,10 @@ def add_features_into_database(
                     db.commit()
 
                     building_obj = db_models.DbBuildings(
-                        project_id = project_id,
+                        project_id=project_id,
                         geom=wkb_element,
-                        tags=feature["properties"]
-                        )
+                        tags=feature["properties"],
+                    )
                     db.add(building_obj)
                     db.commit()
 
@@ -1877,13 +1894,13 @@ def add_features_into_database(
                 try:
                     feature_geometry = feature["geometry"]
                     feature_shape = shape(feature_geometry)
-                    feature["properties"]["highway"]="yes"
+                    feature["properties"]["highway"] = "yes"
 
                     wkb_element = from_shape(feature_shape, srid=4326)
                     db_feature = db_models.DbOsmLines(
                         project_id=project_id,
                         geom=wkb_element,
-                        tags=feature["properties"]
+                        tags=feature["properties"],
                     )
 
                     db.add(db_feature)
@@ -2096,27 +2113,32 @@ async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str)
         dump(features, jsonfile)
 
 
-async def get_project_tiles(
+def get_project_tiles(
     db: Session,
     project_id: int,
     source: str,
     background_task_id: uuid.UUID,
 ):
+    """Get the tiles for a project."""
+    zooms = [12, 13, 14, 15, 16, 17, 18, 19]
+    source = source
+    tiles_path_id = uuid.uuid4()
+    tiles_dir = f"{TILESDIR}/{tiles_path_id}"
+    base = f"{tiles_dir}/{source}tiles"
+    outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
+
+    if not os.path.exists(base):
+        os.makedirs(base)
+
+    tile_path_instance = db_models.DbTilesPath(
+        project_id=project_id,
+        background_task_id=str(background_task_id),
+        status=1,
+        tile_source=source,
+        path=outfile,
+    )
+
     try:
-        """Get the tiles for a project"""
-
-        zooms = [12, 13, 14, 15, 16, 17, 18, 19]
-        source = source
-        base = f"/tmp/tiles/{source}tiles"
-        outfile = f"/tmp/{project_id}_{uuid.uuid4()}_tiles.mbtiles"
-
-        tile_path_instance = db_models.DbTilesPath(
-            project_id=project_id,
-            background_task_id=str(background_task_id),
-            status=1,
-            tile_source=source,
-            path=outfile,
-        )
         db.add(tile_path_instance)
         db.commit()
 

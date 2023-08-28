@@ -7,6 +7,7 @@ import {
 } from '../models/createproject/createProjectModel';
 import enviroment from '../environment';
 import { CommonActions } from '../store/slices/CommonSlice';
+import { ValidateCustomFormResponse } from 'store/types/ICreateProject';
 
 const CreateProjectService: Function = (
   url: string,
@@ -437,6 +438,47 @@ const EditProjectBoundaryService: Function = (url: string, geojsonUpload: any, d
   };
 };
 
+const ValidateCustomForm: Function = (url: string, formUpload: any) => {
+  return async (dispatch) => {
+    dispatch(CreateProjectActions.ValidateCustomFormLoading(true));
+
+    const validateCustomForm = async (url: any, formUpload: any) => {
+      try {
+        const formUploadFormData = new FormData();
+        formUploadFormData.append('form', formUpload);
+
+        const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
+        const resp: ValidateCustomFormResponse = getTaskSplittingResponse.data;
+        dispatch(CreateProjectActions.ValidateCustomForm(resp));
+        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: JSON.stringify(resp.message),
+            variant: 'success',
+            duration: 2000,
+          }),
+        );
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message:
+              JSON.stringify(`${error.response.data.message}, ${error.response.data.possible_reason}`) ||
+              'Something Went Wrong',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
+      } finally {
+        dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
+      }
+    };
+
+    await validateCustomForm(url, formUpload);
+  };
+};
 export {
   UploadAreaService,
   CreateProjectService,
@@ -451,4 +493,5 @@ export {
   PatchProjectDetails,
   PostFormUpdate,
   EditProjectBoundaryService,
+  ValidateCustomForm,
 };

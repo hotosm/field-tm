@@ -19,7 +19,7 @@ import os
 import json
 from fastapi import APIRouter, Depends, HTTPException, Response
 from ..projects import project_crud, project_schemas
-from fastapi.logger import logger as logger
+from loguru import logger as log
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 from osm_fieldwork.odk_merge import OdkMerge
@@ -210,9 +210,8 @@ async def get_osm_xml(
     project_id: int,
     db: Session = Depends(database.get_db),
     ):
-
     # JSON FILE PATH
-    jsoninfile = "/tmp/json_infile.json"
+    jsoninfile = f"/tmp/{project_id}_json_infile.json"
 
     # # Delete if these files already exist
     if os.path.exists(jsoninfile):
