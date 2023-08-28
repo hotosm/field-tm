@@ -172,9 +172,12 @@ def create_zip_file(files, output_file_path):
 
 
 
-async def convert_json_to_osm_xml(file_path):
+async def convert_json_to_osm_xml(
+        file_path,
+        yaml_file_path = None
+        ):
 
-    jsonin = JsonDump()
+    jsonin = JsonDump(yaml_file_path)
     infile = Path(file_path)
 
     base = os.path.splitext(infile.name)[0]
