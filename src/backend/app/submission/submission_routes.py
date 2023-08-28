@@ -210,10 +210,8 @@ async def get_osm_xml(
     project_id: int,
     db: Session = Depends(database.get_db),
     ):
-    project = project_crud.get_project(db, project_id)
-
     # JSON FILE PATH
-    jsoninfile = "/tmp/{project_id}_json_infile.json"
+    jsoninfile = f"/tmp/{project_id}_json_infile.json"
 
     # # Delete if these files already exist
     if os.path.exists(jsoninfile):
@@ -226,14 +224,8 @@ async def get_osm_xml(
     with open(jsoninfile, 'w') as f:
         f.write(json.dumps(submission))
 
-    # Yaml file path
-    if project.form_config_file is not None:
-        yaml_file = "/tmp/{project_id}_config_file.yaml"
-        with open(yaml_file, "wb") as f:
-            f.write(project.form_config_file)
-
     # Convert the submission to osm xml format
-    osmoutfile = await submission_crud.convert_json_to_osm_xml(jsoninfile, yaml_file)
+    osmoutfile = await submission_crud.convert_json_to_osm_xml(jsoninfile)
 
     # Remove the extra closing </osm> tag from the end of the file
     with open(osmoutfile, 'r') as f:
