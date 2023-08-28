@@ -64,6 +64,44 @@ async def read_projects(
     return projects
 
 
+@router.get("/{project_id}")
+async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
+    """Returns the project details.
+
+    Parameters:
+        project_id: int
+
+    Returns:
+        Response: Project details.
+    """
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, details={"Project not found"})
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
+
+    odk_details = await central_crud.get_project_full_details(project.odkid, odk_credentials)
+
+    # Features count
+    query = f"select count(*) from features where project_id={project_id} and task_id is not null"
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    return {
+        'id':project_id,
+        'name':odk_details['name'],
+        'createdAt':odk_details['createdAt'],
+        'tasks':odk_details['forms'],
+        'lastSubmission':odk_details['lastSubmission'],
+        'total_features':features
+    }
+
+
 @router.post("/near_me", response_model=project_schemas.ProjectSummary)
 def get_task(lat: float, long: float, user_id: int = None):
     return "Coming..."

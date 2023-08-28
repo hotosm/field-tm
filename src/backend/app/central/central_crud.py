@@ -299,6 +299,14 @@ def get_form_full_details(
     return form_details.json()
 
 
+async def get_project_full_details(
+    odk_project_id: int, odk_central: project_schemas.ODKCentral
+):
+    project = get_odk_project(odk_central)
+    project_details = project.getFullDetails(odk_project_id)
+    return project_details
+
+
 def list_task_submissions(
     odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral = None
 ):
