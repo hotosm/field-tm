@@ -210,9 +210,8 @@ async def get_osm_xml(
     project_id: int,
     db: Session = Depends(database.get_db),
     ):
-
     # JSON FILE PATH
-    jsoninfile = "/tmp/json_infile.json"
+    jsoninfile = f"/tmp/{project_id}_json_infile.json"
 
     # # Delete if these files already exist
     if os.path.exists(jsoninfile):
