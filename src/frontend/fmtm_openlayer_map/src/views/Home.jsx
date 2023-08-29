@@ -6,7 +6,11 @@ import MapDescriptionComponents from "../components/MapDescriptionComponents";
 import ActivitiesPanel from "../components/ActivitiesPanel";
 import OpenLayersMap from "../components/OpenLayersMap";
 import environment from "fmtm/environment";
-import { DownloadProjectForm, ProjectById } from "../api/Project";
+import {
+  DownloadDataExtract,
+  DownloadProjectForm,
+  ProjectById,
+} from "../api/Project";
 import { ProjectActions } from "fmtm/ProjectSlice";
 import CustomizedSnackbar from "fmtm/CustomizedSnackbar";
 import { defaults } from "ol/control/defaults";
@@ -60,6 +64,9 @@ const Home = () => {
   const { y } = OnScroll(map, windowSize.width);
   const downloadProjectFormLoading = CoreModules.useAppSelector(
     (state) => state.project.downloadProjectFormLoading
+  );
+  const downloadDataExtractLoading = CoreModules.useAppSelector(
+    (state) => state.project.downloadDataExtractLoading
   );
   const projectBuildingGeojson = CoreModules.useAppSelector(
     (state) => state.project.projectBuildingGeojson
@@ -290,6 +297,13 @@ const Home = () => {
       );
     }
   };
+  const onDataExtractDownload = () => {
+    dispatch(
+      DownloadDataExtract(
+        `${environment.baseApiUrl}/projects/features/download/?project_id=${decodedId}`
+      )
+    );
+  };
 
   return (
     <CoreModules.Stack spacing={2}>
@@ -436,7 +450,18 @@ const Home = () => {
               variant="contained"
               color="error"
             >
-              Geojson
+              Tasks
+            </CoreModules.LoadingButton>
+            <CoreModules.LoadingButton
+              onClick={() => onDataExtractDownload()}
+              sx={{ width: "unset" }}
+              loading={downloadDataExtractLoading}
+              loadingPosition="end"
+              endIcon={<AssetModules.FileDownloadIcon />}
+              variant="contained"
+              color="error"
+            >
+              Data Extract
             </CoreModules.LoadingButton>
           </div>
           <div
