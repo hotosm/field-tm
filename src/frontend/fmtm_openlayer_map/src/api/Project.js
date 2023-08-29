@@ -9,7 +9,6 @@ export const ProjectById = (url, existingProjectList,projectId) => {
         const project = await CoreModules.axios.get(url);
         const taskBbox = await CoreModules.axios.get(`${environment.baseApiUrl}/tasks/point_on_surface?project_id=${projectId}`);
         const resp = project.data;
-        console.log("loading :", project.data);
         const persistingValues = resp.project_tasks.map((data) => {
           return {
             id: data.id,
