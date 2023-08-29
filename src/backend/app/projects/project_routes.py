@@ -64,7 +64,7 @@ async def read_projects(
     return projects
 
 
-@router.get("/{project_id}/")
+@router.get("/project_details/{project_id}/")
 async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
     """Returns the project details.
 
@@ -918,6 +918,30 @@ async def download_task_boundaries(
     }
 
     return Response(content=out, headers=headers)
+
+
+@router.get("/features/download/")
+async def download_features(
+    project_id: int,
+    db: Session = Depends(database.get_db)
+):
+    """Downloads the features of a project as a GeoJSON file.
+    
+        Args:
+            project_id (int): The id of the project.
+    
+        Returns:
+            Response: The HTTP response object containing the downloaded file.
+    """
+
+    out = await project_crud.get_project_features_geojson(db, project_id)
+
+    headers = {
+        "Content-Disposition": "attachment; filename=project_features.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=json.dumps(out), headers=headers)
 
 
 @router.get("/tiles/{project_id}")
