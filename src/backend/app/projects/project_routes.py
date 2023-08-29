@@ -64,7 +64,7 @@ async def read_projects(
     return projects
 
 
-@router.get("/{project_id}")
+@router.get("/{project_id}/")
 async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
     """Returns the project details.
 
