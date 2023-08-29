@@ -20,6 +20,9 @@ const DataExtract: React.FC<any> = ({
   dataExtractFile,
   setDataExtractFile,
   setDataExtractFileValue,
+  lineExtractFile,
+  setLineExtractFile,
+  setLineExtractFileValue,
 }) => {
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const navigate = useNavigate();
@@ -181,27 +184,49 @@ const DataExtract: React.FC<any> = ({
                 )}
               </CoreModules.FormControl>
               {/* Area Geojson File Upload For Create Project */}
-              {values.data_extract_options === 'Upload Custom Data Extract' && (
-                <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
-                  <CoreModules.FormLabel>Upload Custom Data Extract </CoreModules.FormLabel>
-                  <CoreModules.Button variant="contained" component="label">
-                    <CoreModules.Input
-                      sx={{ color: 'white' }}
-                      type="file"
-                      value={setDataExtractFileValue}
-                      onChange={(e) => {
-                        setDataExtractFile(e.target.files[0]);
-                        handleCustomChange('data_extractFile', e.target.files[0]);
-                      }}
-                    />
-                    <CoreModules.Typography component="h4">{dataExtractFile?.name}</CoreModules.Typography>
-                  </CoreModules.Button>
-                  {errors.data_extractFile && (
-                    <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                      {errors.data_extractFile}
-                    </CoreModules.FormLabel>
-                  )}
-                </CoreModules.FormControl>
+              {values.data_extract_options === `Upload Custom Data Extract` && (
+                <>
+                  <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
+                    <CoreModules.FormLabel>Upload {values.xform_title} </CoreModules.FormLabel>
+                    <CoreModules.Button variant="contained" component="label">
+                      <CoreModules.Input
+                        sx={{ color: 'white' }}
+                        type="file"
+                        value={setDataExtractFileValue}
+                        onChange={(e) => {
+                          setDataExtractFile(e.target.files[0]);
+                          handleCustomChange('data_extractFile', e.target.files[0]);
+                        }}
+                      />
+                      <CoreModules.Typography component="h4">{dataExtractFile?.name}</CoreModules.Typography>
+                    </CoreModules.Button>
+                    {errors.data_extractFile && (
+                      <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                        {errors.data_extractFile}
+                      </CoreModules.FormLabel>
+                    )}
+                  </CoreModules.FormControl>
+                  <CoreModules.FormControl sx={{ mb: 3, width: '100%' }} variant="outlined">
+                    <CoreModules.FormLabel>Upload Lines </CoreModules.FormLabel>
+                    <CoreModules.Button variant="contained" component="label">
+                      <CoreModules.Input
+                        sx={{ color: 'white' }}
+                        type="file"
+                        value={setLineExtractFileValue}
+                        onChange={(e) => {
+                          setLineExtractFile(e.target.files[0]);
+                          handleCustomChange('line_extractFile', e.target.files[0]);
+                        }}
+                      />
+                      <CoreModules.Typography component="h4">{lineExtractFile?.name}</CoreModules.Typography>
+                    </CoreModules.Button>
+                    {errors.lineExtractFile && (
+                      <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
+                        {errors.lineExtractFile}
+                      </CoreModules.FormLabel>
+                    )}
+                  </CoreModules.FormControl>
+                </>
               )}
 
               {values.data_extract_options === 'Data Extract Ways' && (
@@ -257,6 +282,7 @@ const DataExtract: React.FC<any> = ({
                   uploadedGeojson={geojsonFile}
                   setGeojsonFile={setGeojsonFile}
                   uploadedDataExtractFile={dataExtractFile}
+                  uploadedLineExtractFile={lineExtractFile}
                 />
               </CoreModules.Stack>
             </Grid>
