@@ -615,83 +615,96 @@ def get_osm_extracts(boundary: str):
 
     return data
 
-
 async def split_into_tasks(
-    db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool = False
+    db: Session, boundary: str, no_of_buildings: int
 ):
+    """
+    Splits a project into tasks.
+    Args:
+        db (Session): A database session.
+        boundary (str): A GeoJSON string representing the boundary of the project to split into tasks.
+        no_of_buildings (int): The number of buildings to include in each task.
+    Returns:
+        Any: A GeoJSON object containing the tasks for the specified project.
+    """
     project_id = uuid.uuid4()
-
     outline = json.loads(boundary)
+    all_results = []
+    boundary_data = []
+    result = []
+    if outline['type'] == "FeatureCollection":
+        boundary_data.extend(feature["geometry"] for feature in outline["features"])
+        result.extend(
+            process_polygon(db, project_id, data, no_of_buildings)
+            for data in boundary_data
+            )
+        for inner_list in result:
+            all_results.extend(iter(inner_list))
 
-    if outline.get("features", None) is not None:
-        boundary_data = outline["features"][0]["geometry"]
+    elif outline['type'] == "GeometryCollection":
+        geometries = outline["geometries"]
+        boundary_data.extend(iter(geometries))
+        result.extend(
+            process_polygon(db, project_id, data, no_of_buildings)
+            for data in boundary_data
+            )
+        for inner_list in result:
+            all_results.extend(iter(inner_list))
+
+    elif outline['type'] == "Feature":
+        boundary_data = outline["geometry"]
+        result = process_polygon(db, project_id, boundary_data, no_of_buildings)
+        all_results.extend(iter(result))
     else:
         boundary_data = outline
-    outline = shape(boundary_data)
+        result = process_polygon(db, project_id, boundary_data, no_of_buildings)
+        all_results.extend(result)
+    return {
+        "type": "FeatureCollection",
+        "features": all_results,
+    }
 
+
+def process_polygon(db, project_id, boundary_data, no_of_buildings):
+    outline = shape(boundary_data)
     db_task = db_models.DbProjectAOI(
         project_id=project_id,
         geom=outline.wkt,
     )
-
     db.add(db_task)
     db.commit()
-
-    if not has_data_extracts:
-        data = get_osm_extracts(json.dumps(boundary_data))
-
-        if not data:
-            return None
-
-        for feature in data["features"]:
-            # If the osm extracts contents do not have a title, provide an empty text for that.
-            feature_shape = shape(feature["geometry"])
-
-            wkb_element = from_shape(feature_shape, srid=4326)
-
-            if feature["properties"].get("building") == "yes":
-                db_feature = db_models.DbBuildings(
-                    project_id=project_id,
-                    geom=wkb_element,
-                    tags=feature["properties"]
-                    # category="buildings"
-                )
-                db.add(db_feature)
-                db.commit()
-
-            elif "highway" in feature["properties"]:
-                db_feature = db_models.DbOsmLines(
-                    project_id=project_id, geom=wkb_element, tags=feature["properties"]
-                )
-
-                db.add(db_feature)
-                db.commit()
-    else:
-        # Remove the polygons outside of the project AOI using a parameterized query
-        query = f"""
-                    DELETE FROM ways_poly
-                    WHERE NOT ST_Within(ST_Centroid(ways_poly.geom), (SELECT geom FROM project_aoi WHERE project_id = '{project_id}'));
-                """
-        result = db.execute(query)
-        db.commit()
-
-    # Get the sql query from split_algorithm sql file
-    with open("app/db/split_algorithm.sql", "r") as sql_file:
+    data = get_osm_extracts(json.dumps(boundary_data))
+    if not data:
+        return None
+    for feature in data["features"]:
+        feature_shape = shape(feature['geometry'])
+        wkb_element = from_shape(feature_shape, srid=4326)
+        if feature['properties'].get('building') == 'yes':
+            db_feature = db_models.DbBuildings(
+                project_id=project_id,
+                geom=wkb_element,
+                tags=feature["properties"]
+            )
+            db.add(db_feature)
+        elif 'highway' in feature['properties']:
+            db_feature = db_models.DbOsmLines(
+                project_id=project_id,
+                geom=wkb_element,
+                tags=feature["properties"]
+            )
+            db.add(db_feature)
+    db.commit()
+    with open('app/db/split_algorithm.sql', 'r') as sql_file:
         query = sql_file.read()
-
-    # Execute the query with the parameter using the `params` parameter
-    result = db.execute(query, params={"num_buildings": no_of_buildings})
-
-    # result = db.execute(query)
-    data = result.fetchall()[0]
-    final_geojson = data["jsonb_build_object"]
-
+    result = db.execute(query, params={'num_buildings': no_of_buildings})
+    result = result.fetchall()
     db.query(db_models.DbBuildings).delete()
     db.query(db_models.DbOsmLines).delete()
     db.query(db_models.DbProjectAOI).delete()
     db.commit()
 
-    return final_geojson
+    return result[0][0]['features']
+
 
 
 # def update_project_boundary(
