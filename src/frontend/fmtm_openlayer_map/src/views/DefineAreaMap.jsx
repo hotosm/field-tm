@@ -10,6 +10,7 @@ const DefineAreaMap = ({
   uploadedGeojson,
   setGeojsonFile,
   uploadedDataExtractFile,
+  uploadedLineExtractFile,
   onDraw,
 }) => {
   const drawnGeojson = CoreModules.useAppSelector(
@@ -20,6 +21,7 @@ const DefineAreaMap = ({
   );
   const dispatch = CoreModules.useAppDispatch();
   const [dataExtractedGeojson, setDataExtractedGeojson] = useState(null);
+  const [lineExtractedGeojson, setLineExtractedGeojson] = useState(null);
   const dividedTaskGeojson = CoreModules.useAppSelector(
     (state) => state.createproject.dividedTaskGeojson
   );
@@ -53,6 +55,16 @@ const DefineAreaMap = ({
     } else {
     }
   }, [uploadedDataExtractFile]);
+  useEffect(() => {
+    if (uploadedLineExtractFile) {
+      const fileReader = new FileReader();
+      fileReader.readAsText(uploadedLineExtractFile, "UTF-8");
+      fileReader.onload = (e) => {
+        setLineExtractedGeojson(e.target.result);
+      };
+    } else {
+    }
+  }, [uploadedLineExtractFile]);
   return (
     <div className="map-container" style={{ height: "600px", width: "100%" }}>
       <MapComponent
@@ -99,6 +111,29 @@ const DefineAreaMap = ({
         {dataExtractedGeojson && (
           <VectorLayer
             geojson={dataExtractedGeojson}
+            // stylestyle={{
+            //     ...getStyles,
+            //     fillOpacity: 100,
+            //     lineColor: getStyles.fillColor,
+            //     lineThickness: 7,
+            //     lineOpacity: 40,
+            // }}
+            viewProperties={{
+              // easing: elastic,
+              // animate: true,
+              size: map?.getSize(),
+              // maxZoom: 15,
+              padding: [50, 50, 50, 50],
+              // duration: 900,
+              constrainResolution: true,
+              duration: 2000,
+            }}
+            // zoomToLayer
+          />
+        )}
+        {lineExtractedGeojson && (
+          <VectorLayer
+            geojson={lineExtractedGeojson}
             // stylestyle={{
             //     ...getStyles,
             //     fillOpacity: 100,

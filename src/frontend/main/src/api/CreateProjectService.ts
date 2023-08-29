@@ -15,6 +15,7 @@ const CreateProjectService: Function = (
   fileUpload: any,
   formUpload: any,
   dataExtractFile: any,
+  lineExtractFile: any,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
@@ -46,6 +47,22 @@ const CreateProjectService: Function = (
             duration: 2000,
           }),
         );
+        if (dataExtractFile) {
+          const dataExtractFormData = new FormData();
+          dataExtractFormData.append('upload', dataExtractFile);
+          const postDataExtract = await axios.post(
+            `${enviroment.baseApiUrl}/projects/add_features/?project_id=${resp.id}&feature_type=buildings`,
+            dataExtractFormData,
+          );
+        }
+        if (lineExtractFile) {
+          const lineExtractFormData = new FormData();
+          lineExtractFormData.append('upload', lineExtractFile);
+          const postLineExtract = await axios.post(
+            `${enviroment.baseApiUrl}/projects/add_features/?project_id=${resp.id}&feature_type=lines`,
+            lineExtractFormData,
+          );
+        }
         await dispatch(
           GenerateProjectQRService(
             `${enviroment.baseApiUrl}/projects/${resp.id}/generate`,
@@ -54,6 +71,7 @@ const CreateProjectService: Function = (
             dataExtractFile,
           ),
         );
+
         dispatch(CommonActions.SetLoading(false));
         dispatch(CreateProjectActions.CreateProjectLoading(true));
       } catch (error: any) {
