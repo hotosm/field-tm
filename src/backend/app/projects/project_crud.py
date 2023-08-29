@@ -1496,6 +1496,30 @@ def get_task_geometry(db: Session, project_id: int):
     return json.dumps(feature_collection)
 
 
+async def get_project_features_geojson(db:Session, project_id:int):
+
+    # Get the geojson of those features for this task.
+    query = f"""SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(feature)
+                )
+                FROM (
+                SELECT jsonb_build_object(
+                    'type', 'Feature',
+                    'id', id,
+                    'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                    'properties', properties
+                ) AS feature
+                FROM features
+                WHERE project_id={project_id}
+                ) features;
+            """
+
+    result = db.execute(query)
+    features = result.fetchone()[0]
+    return features
+
+
 def create_task_grid(db: Session, project_id: int, delta: int):
     try:
         # Query DB for project AOI
