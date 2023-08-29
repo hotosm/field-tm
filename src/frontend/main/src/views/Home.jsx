@@ -52,7 +52,7 @@ const Home = () => {
       />
       {stateHome.homeProjectLoading == false ? (
         filteredProjectCards.length > 0 ? (
-          <CoreModules.Grid px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 6, xl: 7 }}>
+          <CoreModules.Grid px={1} spacing={1.5} container columns={{ xs: 1, sm: 3, md: 4, lg: 5, xl: 6 }}>
             {filteredProjectCards.map((value, index) => (
               <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
                 <ExploreProjectCard data={value} key={index} />

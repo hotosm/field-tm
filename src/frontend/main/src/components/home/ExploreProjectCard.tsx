@@ -38,7 +38,7 @@ export default function ExploreProjectCard({ data }) {
       borderRadius: '0px',
     },
     card: {
-      border: `1px solid #e1e0e0`,
+      // border: `1px solid #e1e0e0`,
       marginLeft: '0.1%',
       marginRight: '0.1%',
       marginTop: '0.7%',
@@ -64,9 +64,10 @@ export default function ExploreProjectCard({ data }) {
         navigate(`/project_details/${environment.encode(data.id)}`);
       }}
       style={cardInnerStyles.card}
-      sx={{ boxShadow: 0, borderRadius: 0 }}
+      sx={{ boxShadow: 0 }}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
+      class="hover:fmtm-bg-red-50 hover:fmtm-scale-[102%] fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white"
     >
       <CoreModules.CardContent>
         {/*Id Number*/}
@@ -92,7 +93,7 @@ export default function ExploreProjectCard({ data }) {
 
         {/*Project Info and description*/}
         <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
-          <CoreModules.Typography
+          {/* <CoreModules.Typography
             ml={'2%'}
             mt={'5%'}
             variant="subtitle2"
@@ -109,33 +110,44 @@ export default function ExploreProjectCard({ data }) {
             }}
           >
             {data.title}
-          </CoreModules.Typography>
-
-          <CoreModules.Stack direction={'row'}>
-            <AssetModules.LocationOn color="error" style={cardInnerStyles.location.icon} />
-            <CoreModules.Typography mt={'7%'} variant="h2" color="info" gutterBottom>
-              {data.location_str}
-            </CoreModules.Typography>
-          </CoreModules.Stack>
-
-          <CoreModules.Typography
-            mt={'7%'}
-            ml={'2%'}
-            variant="h2"
-            color="info"
-            gutterBottom
-            sx={{
-              display: '-webkit-box',
-              '-webkit-line-clamp': 2,
-              '-webkit-box-orient': 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxHeight: '5em',
-              textTransform: 'capitalize',
-            }}
+          </CoreModules.Typography> */}
+          <p
+            className="fmtm-line-clamp-3 fmtm-text-xl fmtm-capitalize fmtm-font-bold fmtm-ml-[2%] fmtm-mt-[5%]"
+            title={data.title}
           >
-            {data.description}
-          </CoreModules.Typography>
+            {data.title}
+          </p>
+
+          <div className="fmtm-flex fmtm-items-start fmtm-mt-[1.63rem] fmtm-gap-2">
+            <CoreModules.Stack direction={'row'}>
+              <AssetModules.LocationOn color="error" style={cardInnerStyles.location.icon} />
+              <CoreModules.Typography mt={'7%'} variant="h2" color="info" gutterBottom>
+                {data.location_str}
+              </CoreModules.Typography>
+            </CoreModules.Stack>
+
+            <p className="fmtm-capitalize fmtm-line-clamp-2" title={data.description}>
+              {data.description}
+            </p>
+            {/* <CoreModules.Typography
+              // mt={'7%'}
+              ml={'2%'}
+              variant="h2"
+              color="info"
+              gutterBottom
+              sx={{
+                display: '-webkit-box',
+                '-webkit-line-clamp': 2,
+                '-webkit-box-orient': 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxHeight: '5em',
+                textTransform: 'capitalize',
+              }}
+            >
+              {data.description}
+            </CoreModules.Typography> */}
+          </div>
         </CoreModules.Stack>
         {/* <======End======> */}
 
