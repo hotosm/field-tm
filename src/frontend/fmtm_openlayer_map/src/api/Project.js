@@ -73,7 +73,7 @@ export const DownloadProjectForm = (url,payload) => {
                 responseType : 'blob',
               });
             }
-              var a = document.createElement("a");
+              const a = document.createElement("a");
               a.href = window.URL.createObjectURL(response.data);
               a.download=`Project_form.${payload=== 'form'? '.xls':'.geojson'}`;
               a.click();
@@ -85,6 +85,32 @@ export const DownloadProjectForm = (url,payload) => {
           }
       }
       await fetchProjectForm(url,payload);
+  }
+}
+export const DownloadDataExtract = (url,payload) => {
+
+  return async (dispatch) => {
+      dispatch(ProjectActions.SetDownloadDataExtractLoading(true))
+
+      const getDownloadExtract = async (url,payload) => {
+          try {
+            let response;
+         
+              response = await CoreModules.axios.get(url, {
+                responseType : 'blob',
+              });
+              const a = document.createElement("a");
+              a.href = window.URL.createObjectURL(response.data);
+              a.download=`Data_Extract.geojson`;
+              a.click();
+              dispatch(ProjectActions.SetDownloadDataExtractLoading(false))
+            } catch (error) {
+              dispatch(ProjectActions.SetDownloadDataExtractLoading(false))
+            } finally{
+              dispatch(ProjectActions.SetDownloadDataExtractLoading(false))
+          }
+      }
+      await getDownloadExtract(url,payload);
   }
 }
 export const GetTilesList = (url) => {
