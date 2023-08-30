@@ -747,7 +747,6 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
 @router.post("/add_features/")
 async def add_features(
     background_tasks: BackgroundTasks,
-    project_id: int,
     upload: UploadFile = File(...),
     feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
@@ -756,9 +755,9 @@ async def add_features(
 
     This endpoint allows you to add features to a project.
 
-    ## Request Body
-    - `project_id` (int): the project's id. Required.
-    - `upload` (file): Geojson files with the features. Required.
+    Request Body
+    - 'project_id' (int): the project's id. Required.
+    - 'upload' (file): Geojson files with the features. Required.
 
     """
     # Validating for .geojson File.
@@ -777,13 +776,12 @@ async def add_features(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+        db, task_id=background_task_id
     )
 
     background_tasks.add_task(
         project_crud.add_features_into_database,
         db,
-        project_id,
         features,
         background_task_id,
         feature_type

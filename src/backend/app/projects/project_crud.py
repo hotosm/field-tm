@@ -1879,7 +1879,6 @@ def update_background_task_status_in_database(
 
 def add_features_into_database(
     db: Session,
-    project_id: int,
     features: dict,
     background_task_id: uuid.UUID,
     feature_type: str,
@@ -1893,6 +1892,7 @@ def add_features_into_database(
     try:
         success = 0
         failure = 0
+        project_id = uuid.uuid4()
         if feature_type == "buildings":
             for feature in features["features"]:
                 try:
@@ -1900,15 +1900,6 @@ def add_features_into_database(
                     feature_shape = shape(feature_geometry)
 
                     wkb_element = from_shape(feature_shape, srid=4326)
-                    feature_obj = db_models.DbFeatures(
-                        project_id=project_id,
-                        category_title="buildings",
-                        geometry=wkb_element,
-                        properties=feature["properties"],
-                    )
-                    db.add(feature_obj)
-                    db.commit()
-
                     building_obj = db_models.DbBuildings(
                         project_id=project_id,
                         geom=wkb_element,
