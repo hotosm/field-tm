@@ -380,10 +380,12 @@ async def upload_multi_project_boundary(
 
     return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
+
 @router.post("/task_split")
 async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
+    has_data_extracts: bool = Form(False),
     db: Session = Depends(database.get_db)
     ):
     """
@@ -403,9 +405,10 @@ async def task_split(
     await upload.seek(0)
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings)
+    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
 
     return result
+
 
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
