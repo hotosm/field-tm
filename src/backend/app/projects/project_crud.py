@@ -665,7 +665,7 @@ async def split_into_tasks(
     }
 
 
-def process_polygon(db, project_id, boundary_data, no_of_buildings, has_data_extracts):
+def process_polygon(db:Session, project_id:uuid.UUID, boundary_data:str, no_of_buildings:int, has_data_extracts: bool):
     outline = shape(boundary_data)
     db_task = db_models.DbProjectAOI(
         project_id=project_id,
