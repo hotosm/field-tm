@@ -380,10 +380,12 @@ async def upload_multi_project_boundary(
 
     return {"message": "Project Boundary Uploaded", "project_id": f"{project_id}"}
 
+
 @router.post("/task_split")
 async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
+    has_data_extracts: bool = Form(False),
     db: Session = Depends(database.get_db)
     ):
     """
@@ -403,9 +405,10 @@ async def task_split(
     await upload.seek(0)
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings)
+    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
 
     return result
+
 
 @router.post("/{project_id}/upload")
 async def upload_project_boundary(
@@ -747,7 +750,6 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
 @router.post("/add_features/")
 async def add_features(
     background_tasks: BackgroundTasks,
-    project_id: int,
     upload: UploadFile = File(...),
     feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
@@ -756,9 +758,9 @@ async def add_features(
 
     This endpoint allows you to add features to a project.
 
-    ## Request Body
-    - `project_id` (int): the project's id. Required.
-    - `upload` (file): Geojson files with the features. Required.
+    Request Body
+    - 'project_id' (int): the project's id. Required.
+    - 'upload' (file): Geojson files with the features. Required.
 
     """
     # Validating for .geojson File.
@@ -777,13 +779,12 @@ async def add_features(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+        db, task_id=background_task_id
     )
 
     background_tasks.add_task(
         project_crud.add_features_into_database,
         db,
-        project_id,
         features,
         background_task_id,
         feature_type
