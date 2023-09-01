@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
-    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]]
+    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]] = None
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="after")
     @classmethod
@@ -91,7 +91,7 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         pg_url = PostgresDsn.build(
-            scheme="postgres",
+            scheme="postgresql",
             username=info.data.get("FMTM_DB_USER"),
             password=info.data.get("FMTM_DB_PASSWORD"),
             host=info.data.get("FMTM_DB_HOST"),
@@ -111,7 +111,7 @@ class Settings(BaseSettings):
     OSM_SCOPE: str = "read_prefs"
     OSM_LOGIN_REDIRECT_URI: AnyUrl = "http://127.0.0.1:8080/osmauth/"
 
-    SENTRY_DSN: Optional[str]
+    SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(
         case_sensitive=True, env_file=".env", extra=Extra.allow
