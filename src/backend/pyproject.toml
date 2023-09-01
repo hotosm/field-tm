@@ -41,6 +41,7 @@ dependencies = [
     "py-cpuinfo==9.0.0",
     "ogr2osm==1.1.2",
     "loguru>=0.7.0",
+    "gdal==3.6.2",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "../../README.md"
