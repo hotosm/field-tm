@@ -525,6 +525,8 @@ class DbProject(Base):
     extract_completed_count = Column(Integer, default=0)
 
     form_xls = Column(LargeBinary)           # XLSForm file if custom xls is uploaded
+    form_config_file = Column(LargeBinary)   # Yaml config file if custom xls is uploaded
+
     data_extract_type = Column(String)       # Type of data extract (Polygon or Centroid)
     task_split_type = Column(String)         # Type of split (Grid or Feature)
     hashtags = Column(ARRAY(String))         # Project hashtag

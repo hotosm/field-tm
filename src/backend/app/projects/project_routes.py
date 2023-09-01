@@ -64,6 +64,44 @@ async def read_projects(
     return projects
 
 
+@router.get("/project_details/{project_id}/")
+async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
+    """Returns the project details.
+
+    Parameters:
+        project_id: int
+
+    Returns:
+        Response: Project details.
+    """
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, details={"Project not found"})
+
+    # ODK Credentials
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
+
+    odk_details = await central_crud.get_project_full_details(project.odkid, odk_credentials)
+
+    # Features count
+    query = f"select count(*) from features where project_id={project_id} and task_id is not null"
+    result = db.execute(query)
+    features = result.fetchone()[0]
+
+    return {
+        'id':project_id,
+        'name':odk_details['name'],
+        'createdAt':odk_details['createdAt'],
+        'tasks':odk_details['forms'],
+        'lastSubmission':odk_details['lastSubmission'],
+        'total_features':features
+    }
+
+
 @router.post("/near_me", response_model=project_schemas.ProjectSummary)
 def get_task(lat: float, long: float, user_id: int = None):
     return "Coming..."
@@ -350,33 +388,26 @@ async def task_split(
     has_data_extracts: bool = Form(False),
     db: Session = Depends(database.get_db)
     ):
+    """
+    Split a task into subtasks.
+
+    Args:
+        upload (UploadFile): The file to split.
+        no_of_buildings (int, optional): The number of buildings per subtask. Defaults to 50.
+        db (Session, optional): The database session. Injected by FastAPI.
+
+    Returns:
+        The result of splitting the task into subtasks.
+        
+    """
 
     # read entire file
     await upload.seek(0)
     content = await upload.read()
-    content_json = json.loads(content)
 
-    results = []
-    feature_content_type = content_json.get("type")
-    if feature_content_type == "FeatureCollection":
-        feature_content = content_json["features"]
-    elif feature_content_type == "Feature":
-        feature_content = [content_json]
+    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
 
-    for idx, _ in enumerate(feature_content):
-        _content = json.dumps(
-            {"features": [feature_content[idx]] })
-
-        result = await project_crud.split_into_tasks(db, _content, no_of_buildings, has_data_extracts)
-        results.append(result)
-
-    combined_geojson = {**content_json, "features": []}
-
-    for geo in results:
-        if geo.get("features", None):
-            combined_geojson["features"].extend(geo["features"])
-
-    return combined_geojson
+    return result
 
 
 @router.post("/{project_id}/upload")
@@ -488,6 +519,7 @@ async def generate_files(
     project_id: int,
     extract_polygon: bool = Form(False),
     upload: Optional[UploadFile] = File(None),
+    config_file: Optional[UploadFile] = File(None),
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
@@ -538,6 +570,16 @@ async def generate_files(
         contents = await upload.read()
 
         project.form_xls = contents
+
+        if config_file:
+            config_file_name = os.path.splitext(config_file.filename)
+            config_file_ext = config_file_name[1]     
+            if not config_file_ext == ".yaml":
+                raise HTTPException(status_code=400, detail="Provide a valid .yaml config file")
+            await config_file.seek(0)
+            config_file_contents = await config_file.read()
+            project.form_config_file = config_file_contents
+        
         db.commit()
 
     if data_extracts:
@@ -708,7 +750,6 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
 @router.post("/add_features/")
 async def add_features(
     background_tasks: BackgroundTasks,
-    project_id: int,
     upload: UploadFile = File(...),
     feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
     db: Session = Depends(database.get_db),
@@ -717,9 +758,9 @@ async def add_features(
 
     This endpoint allows you to add features to a project.
 
-    ## Request Body
-    - `project_id` (int): the project's id. Required.
-    - `upload` (file): Geojson files with the features. Required.
+    Request Body
+    - 'project_id' (int): the project's id. Required.
+    - 'upload' (file): Geojson files with the features. Required.
 
     """
     # Validating for .geojson File.
@@ -738,13 +779,12 @@ async def add_features(
 
     # insert task and task ID into database
     await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+        db, task_id=background_task_id
     )
 
     background_tasks.add_task(
         project_crud.add_features_into_database,
         db,
-        project_id,
         features,
         background_task_id,
         feature_type
@@ -869,6 +909,30 @@ async def download_task_boundaries(
     }
 
     return Response(content=out, headers=headers)
+
+
+@router.get("/features/download/")
+async def download_features(
+    project_id: int,
+    db: Session = Depends(database.get_db)
+):
+    """Downloads the features of a project as a GeoJSON file.
+    
+        Args:
+            project_id (int): The id of the project.
+    
+        Returns:
+            Response: The HTTP response object containing the downloaded file.
+    """
+
+    out = await project_crud.get_project_features_geojson(db, project_id)
+
+    headers = {
+        "Content-Disposition": "attachment; filename=project_features.geojson",
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=json.dumps(out), headers=headers)
 
 
 @router.get("/tiles/{project_id}")

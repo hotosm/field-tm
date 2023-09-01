@@ -22,7 +22,14 @@ import { useAppSelector } from '../../types/reduxTypes';
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb: any = null;
 
-const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, customFormInputValue, dataExtractFile }) => {
+const FormSelection: React.FC<any> = ({
+  customFormFile,
+  setCustomFormFile,
+  customFormInputValue,
+  dataExtractFile,
+  lineExtractFile,
+  setLineExtractFile,
+}) => {
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const navigate = useNavigate();
 
@@ -106,6 +113,7 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
         newUpdatedTaskGeojsonFile,
         customFormFile,
         dataExtractFile,
+        lineExtractFile,
       ),
     );
     // navigate("/select-form", { replace: true, state: { values: values } });
@@ -205,7 +213,9 @@ const FormSelection: React.FC<any> = ({ customFormFile, setCustomFormFile, custo
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
 
   useEffect(() => {
-    dispatch(ValidateCustomForm(`${enviroment.baseApiUrl}/projects/validate_form`, customFormFile));
+    if (customFormFile) {
+      dispatch(ValidateCustomForm(`${enviroment.baseApiUrl}/projects/validate_form`, customFormFile));
+    }
   }, [customFormFile]);
 
   return (

@@ -67,7 +67,7 @@ const TasksSubmission = () => {
             encodedProjectId
           )}`,
           state.projectTaskBoundries,
-          environment.decode(encodedId)
+          environment.decode(encodedProjectId)
         ),
         state.projectTaskBoundries
       );
@@ -86,7 +86,7 @@ const TasksSubmission = () => {
             encodedProjectId
           )}`,
           state.projectTaskBoundries,
-          environment.decode(encodedId)
+          environment.decode(encodedProjectId)
         ),
         state.projectTaskBoundries
       );
@@ -300,7 +300,7 @@ const TasksSubmission = () => {
                 <CoreModules.Link
                   style={{ textDecoration: "auto" }}
                   className="submission-item"
-                  to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.__id}`}
+                  to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}
                 >
                   <CoreModules.Box
                     sx={{
