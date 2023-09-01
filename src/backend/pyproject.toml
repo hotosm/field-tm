@@ -41,9 +41,7 @@ dependencies = [
     "osm-fieldwork==0.3.6rc0",
     "sentry-sdk==1.30.0",
     "py-cpuinfo==9.0.0",
-    "ogr2osm==1.1.2",
     "loguru>=0.7.0",
-    "gdal==3.6.2",
     "osm-login-python @ git+https://github.com/spwoodcock/osm-login-python.git",
 ]
 requires-python = ">=3.10,<3.12"
