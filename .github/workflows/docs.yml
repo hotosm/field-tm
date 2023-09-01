@@ -1,0 +1,72 @@
+name: Publish Docs
+
+on:
+  push:
+    paths:
+      - docs/**
+      - src/**
+      - mkdocs.yml
+    branches: [main]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_doxygen:
+    name: Build Doxygen Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+
+      - name: Write cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache
+            docs/apidocs
+          key: doc-build-${{ env.cache_id }}
+
+      - name: Build Doxygen Docs
+        run: |
+          cd docs
+          doxygen
+
+  publish_docs:
+    name: Publish Docs
+    runs-on: ubuntu-latest
+    needs: [build_doxygen]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+
+      - name: Read cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache
+            docs/apidocs
+          key: doc-build-${{ env.cache_id }}
+          restore-keys: |
+            doc-build-
+
+      - name: Install PDM
+        run: |
+          python3 -m pip install pdm
+
+      - name: Publish
+        run: |
+          cd src/backend
+          pdm install -G docs --no-default
+          pdm run mkdocs gh-deploy --config-file=../../mkdocs.yml --force
