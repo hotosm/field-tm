@@ -5,12 +5,12 @@
     `psql -d fmtm -U fmtm -h localhost`
 
 **Option 2** (when running the database in Docker) use this command to access the
-PostgreSQL shell inside the fmtm-db-1 container and interact with the fmtm database 
+PostgreSQL shell inside the fmtm-db-1 container and interact with the fmtm database
 using the psql command-line interface:
 
     `docker exec -it fmtm-db-1 psql -U fmtm fmtm`
 
-And then connect to the database using this command : 
+And then connect to the database using this command :
 
     `\c fmtm`
 

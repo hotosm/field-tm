@@ -1,0 +1,90 @@
+name: Publish Docs
+
+on:
+  push:
+    paths:
+      - docs/**
+      - src/**
+      - mkdocs.yml
+    branches: [main]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_doxygen:
+    name: Build Doxygen Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+
+      - name: Write cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache
+            docs/apidocs
+            docs/openapi.json
+          key: doc-build-${{ env.cache_id }}
+
+      - name: Build Doxygen Docs
+        run: |
+          cd docs
+          doxygen
+
+  build_openapi_json:
+    name: Build OpenAPI
+    runs-on: ubuntu-latest
+    container: ghcr.io/hotosm/fmtm/backend:ci-main
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Read cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache
+            docs/apidocs
+            docs/openapi.json
+          key: doc-build-${{ env.cache_id }}
+          restore-keys: |
+            doc-build-
+
+      - name: Build OpenAPi JSON
+        run: |
+          cd src/backend
+          python ../../scripts/gen_openapi_json.py -o ../../docs/openapi.json
+
+  publish_docs:
+    name: Publish Docs
+    runs-on: ubuntu-latest
+    container: ghcr.io/hotosm/fmtm/backend:ci-main
+    needs: [build_doxygen, build_openapi_json]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Read cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .cache
+            docs/apidocs
+            docs/openapi.json
+          key: doc-build-${{ env.cache_id }}
+          restore-keys: |
+            doc-build-
+
+      - name: Publish
+        run: |
+          cd src/backend
+          mkdocs gh-deploy --config-file=../../mkdocs.yml --force

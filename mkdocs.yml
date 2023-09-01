@@ -1,0 +1,77 @@
+site_name: FMTM
+site_description: A project to provide tools for Open Mapping campaigns.
+# strict: true
+site_url: "https://www.hotosm.org"
+
+repo_name: "hotosm/fmtm"
+repo_url: "https://github.com/hotosm/fmtm/"
+edit_uri: "edit/main/docs/"
+
+extra:
+  social:
+    - icon: "fontawesome/brands/github"
+      link: "https://github.com/hotosm/"
+    - icon: "fontawesome/brands/twitter"
+      link: "https://twitter.com/hotosm"
+    - icon: "fontawesome/solid/globe"
+      link: "https://www.hotosm.org"
+
+theme:
+  name: material
+  palette:
+    primary: custom
+
+extra_css:
+  - css/extra.css
+
+markdown_extensions:
+  - tables
+  - toc:
+      permalink: true
+      title: Page contents
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.extra
+  - pymdownx.emoji:
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+  - exclude:
+      glob:
+        - plugins/*
+        - __pycache__/*
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+
+nav:
+  - Get Started:
+      - About: About.md
+      - Installation: INSTALL.md
+      - Contribution Guidelines: CONTRIBUTING.md
+      - Documentation Contribution: Guide-On-Improving-Documentation.md
+      - Code of Conduct: CODE_OF_CONDUCT.md
+      - FAQ: FAQ.md
+  - User Manuals:
+      - Project Managers: User-Manual-For-Project-Managers.md
+  - Dev:
+      - Setup: dev/Setup.md
+      - Backend: dev/Backend.md
+      - Frontend: dev/Frontend.md
+      - Production Deployment: dev/Production.md
+      - Docker Tips: dev/Docker-Tips.md
+      - Database Tips: dev/Database-Tips.md
+  - API: swagger/index.html
+  - Class Hierarchy: apidocs/html/inherits.html
