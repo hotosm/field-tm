@@ -1162,8 +1162,9 @@ def generate_task_files(
     xlsform: str,
     form_type: str,
     odk_credentials: project_schemas.ODKCentral,
-    project_log: any
 ):
+    project_log = log.bind(task="create_project", project_id=project_id)
+
     project_log.info(f"Generating files for task {task_id}")
     project = get_project(db, project_id)
     odk_id = project.odkid
@@ -1438,7 +1439,7 @@ def generate_appuser_files(
             for task in tasks_list:
                 try:
                     generate_task_files(
-                        db, project_id, task, xlsform, form_type, odk_credentials, project_log
+                        db, project_id, task, xlsform, form_type, odk_credentials,
                     )
                 except Exception as e:
                     log.warning(str(e))

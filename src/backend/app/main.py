@@ -134,11 +134,15 @@ def get_logger():
             # format=log_json_format, # JSON format func
         )
 
-        log.add("/opt/logs/create_project.json", 
-                enqueue=True,
-                serialize=True,
-                filter=lambda record: "task" in record["extra"] and record["extra"]["task"] == "create_project"
-                )
+        log.add(
+            "/opt/logs/create_project.json",
+            level=settings.LOG_LEVEL,
+            enqueue=True,
+            serialize=True,
+            rotation="00:00",
+            retention="10 days",
+            filter=lambda record: record["extra"]["task"] == "create_project",
+        )
 
 api = get_application()
 
