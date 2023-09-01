@@ -49,6 +49,7 @@ dependencies = [
     "sentry-sdk==1.9.6",
     "py-cpuinfo==9.0.0",
     "gdal==3.6.2",
+    "ogr2osm==1.1.2",
     "loguru>=0.7.0",
 ]
 requires-python = ">=3.10"
