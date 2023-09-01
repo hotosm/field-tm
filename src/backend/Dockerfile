@@ -100,13 +100,15 @@ RUN set -ex \
         "libgeos-c1v5" \
         "libgdal32" \
     && rm -rf /var/lib/apt/lists/*
+COPY container-entrypoint.sh /
+ENTRYPOINT ["/container-entrypoint.sh"]
+# Copy Python deps from build to runtime
 COPY --from=build \
     /root/.local \
     /home/appuser/.local
 WORKDIR /opt
+# Add app code
 COPY app/ /opt/app/
-COPY container-entrypoint.sh /
-ENTRYPOINT ["/container-entrypoint.sh"]
 # Add non-root user, permissions
 RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
@@ -121,26 +123,14 @@ USER appuser
 
 
 
-FROM build as osm-fieldwork-whl
-WORKDIR /repos
-RUN pip install pdm==2.6.1 \
-    && git clone https://github.com/hotosm/osm-fieldwork.git \
-    && pdm build --project=/repos/osm-fieldwork
-
-
-
 FROM runtime as debug-no-odk
 USER appuser
 COPY --from=extract-deps --chown=appuser \
     /opt/python/requirements-debug.txt /opt/python/
-COPY --from=osm-fieldwork-whl --chown=appuser \
-    /repos/osm-fieldwork/dist/*.whl /opt/
-RUN ls /opt/*.whl >> /opt/python/requirements-debug.txt \
-    && pip uninstall -y osm-fieldwork \
-    && pip install --user --upgrade --no-warn-script-location \
+RUN pip install --user --upgrade --no-warn-script-location \
     --no-cache-dir -r \
     /opt/python/requirements-debug.txt \
-    && rm /opt/*.whl && rm -r /opt/python
+    && rm -r /opt/python
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
