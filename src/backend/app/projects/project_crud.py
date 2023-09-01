@@ -2270,3 +2270,16 @@ async def get_mbtiles_list(db: Session, project_id: int):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+async def convert_geojson_to_osm(geojson_file: str):
+    try:
+        osm_filename = "/tmp/task_outline.osm"
+        ogr2osm_command = f"ogr2osm -f -o {osm_filename} {geojson_file}"
+        os.system(ogr2osm_command)
+
+        return osm_filename
+    except Exception as e:
+        return {
+            "error": f"Conversion failed. Error details: {str(e)}"
+        }
