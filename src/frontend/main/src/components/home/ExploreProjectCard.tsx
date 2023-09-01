@@ -38,7 +38,7 @@ export default function ExploreProjectCard({ data }) {
       borderRadius: '0px',
     },
     card: {
-      border: `1px solid #e1e0e0`,
+      // border: `1px solid #e1e0e0`,
       marginLeft: '0.1%',
       marginRight: '0.1%',
       marginTop: '0.7%',
@@ -50,7 +50,6 @@ export default function ExploreProjectCard({ data }) {
 
     location: {
       icon: {
-        marginTop: '7%',
         fontSize: 22,
       },
     },
@@ -64,19 +63,33 @@ export default function ExploreProjectCard({ data }) {
         navigate(`/project_details/${environment.encode(data.id)}`);
       }}
       style={cardInnerStyles.card}
-      sx={{ boxShadow: 0, borderRadius: 0 }}
+      sx={{ boxShadow: 0 }}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
+      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-h-[22.5rem]"
     >
-      <CoreModules.CardContent>
-        {/*Id Number*/}
-        <CoreModules.Typography variant="h4" position={'absolute'} right={7} top={5} gutterBottom>
-          #{data.id}
-        </CoreModules.Typography>
-        {/* <======End======> */}
+      <CoreModules.CardContent className="fmtm-h-full" style={{ padding: '16px' }}>
+        <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
+          <div>
+            <div className="fmtm-flex fmtm-justify-between">
+              {data.organisation_logo ? (
+                <CoreModules.CardMedia
+                  component="img"
+                  src={`${environment.baseApiUrl}/images/${data.organisation_logo}`}
+                  sx={{ width: '50px', height: 50 }}
+                />
+              ) : (
+                <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
+              )}
 
-        {/*Priority Button and Image*/}
-        <div>
+              {/*Id Number*/}
+              <CoreModules.Typography variant="h4" right={7} top={5} gutterBottom>
+                #{data.id}
+              </CoreModules.Typography>
+              {/* <======End======> */}
+            </div>
+            {/*Priority Button and Image*/}
+            {/* <div>
           <CoreModules.Button
             size="small"
             variant="outlined"
@@ -87,86 +100,66 @@ export default function ExploreProjectCard({ data }) {
             {data.priority_str}
           </CoreModules.Button>
           <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
+          </div> */}
+            {/* <======End======> */}
+
+            {/*Project Info and description*/}
+            <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
+              <p
+                className="fmtm-line-clamp-3 fmtm-text-xl fmtm-capitalize fmtm-font-bold fmtm-ml-[2%] fmtm-mt-[5%]"
+                title={data.title}
+              >
+                {data.title}
+              </p>
+
+              <p
+                className="fmtm-capitalize fmtm-line-clamp-2 fmtm-ml-[2%] fmtm-mt-[5%] fmtm-text-[#7A7676]"
+                title={data.description}
+              >
+                {data.description}
+              </p>
+
+              <div className="fmtm-flex fmtm-items-start fmtm-mt-[1.63rem] fmtm-gap-2">
+                <AssetModules.LocationOn color="error" style={cardInnerStyles.location.icon} />
+                <p className="fmtm-capitalize fmtm-line-clamp-1 fmtm-text-[#7A7676]" title={data.description}>
+                  {data.description}
+                </p>
+              </div>
+            </CoreModules.Stack>
+            {/* <======End======> */}
+          </div>
+
+          <div>
+            {/* Contributors */}
+            <CoreModules.Stack direction={'row'}>
+              <CoreModules.Typography
+                mt={'7%'}
+                ml={'2%'}
+                variant="h2"
+                fontSize={defaultTheme.typography.subtitle1.fontSize}
+                fontWeight={'bold'}
+                color="info"
+              >
+                {data.num_contributors}
+              </CoreModules.Typography>
+
+              <CoreModules.Typography
+                mt={'8%'}
+                ml={'2%'}
+                variant="h2"
+                fontSize={defaultTheme.typography.htmlFontSize}
+                color="info"
+              >
+                contributors
+              </CoreModules.Typography>
+            </CoreModules.Stack>
+            {/* <======End======> */}
+
+            {/* Contribution Progress Bar */}
+            <CustomizedProgressBar data={data} height={7} />
+            {/* <======End======> */}
+          </div>
         </div>
-        {/* <======End======> */}
-
-        {/*Project Info and description*/}
-        <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
-          <CoreModules.Typography
-            ml={'2%'}
-            mt={'5%'}
-            variant="subtitle2"
-            color="info"
-            gutterBottom
-            sx={{
-              display: '-webkit-box',
-              '-webkit-line-clamp': 2,
-              '-webkit-box-orient': 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxHeight: '5em',
-              textTransform: 'capitalize',
-            }}
-          >
-            {data.title}
-          </CoreModules.Typography>
-
-          <CoreModules.Stack direction={'row'}>
-            <AssetModules.LocationOn color="error" style={cardInnerStyles.location.icon} />
-            <CoreModules.Typography mt={'7%'} variant="h2" color="info" gutterBottom>
-              {data.location_str}
-            </CoreModules.Typography>
-          </CoreModules.Stack>
-
-          <CoreModules.Typography
-            mt={'7%'}
-            ml={'2%'}
-            variant="h2"
-            color="info"
-            gutterBottom
-            sx={{
-              display: '-webkit-box',
-              '-webkit-line-clamp': 2,
-              '-webkit-box-orient': 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxHeight: '5em',
-              textTransform: 'capitalize',
-            }}
-          >
-            {data.description}
-          </CoreModules.Typography>
-        </CoreModules.Stack>
-        {/* <======End======> */}
-
-        {/* Contributors */}
-        <CoreModules.Stack direction={'row'}>
-          <CoreModules.Typography
-            mt={'7%'}
-            ml={'2%'}
-            variant="h2"
-            fontSize={defaultTheme.typography.subtitle1.fontSize}
-            fontWeight={'bold'}
-            color="info"
-          >
-            {data.num_contributors}
-          </CoreModules.Typography>
-
-          <CoreModules.Typography
-            mt={'8%'}
-            ml={'2%'}
-            variant="h2"
-            fontSize={defaultTheme.typography.htmlFontSize}
-            color="info"
-          >
-            contributors
-          </CoreModules.Typography>
-        </CoreModules.Stack>
-        {/* <======End======> */}
-
-        {/* Contribution Progress Bar */}
-        <CustomizedProgressBar data={data} height={7} />
-        {/* <======End======> */}
       </CoreModules.CardContent>
     </CoreModules.Card>
   );

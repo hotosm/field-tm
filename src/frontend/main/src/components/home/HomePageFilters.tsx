@@ -114,7 +114,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
             </button>
           </CoreModules.Link>
         </div>
-        <div className="fmtm-mt-3">
+        <div className="fmtm-mt-3 fmtm-flex fmtm-items-center fmtm-gap-1">
           <div className=" fmtm-border-[#E7E2E2] fmtm-border-2 fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-p-2 fmtm-items-center">
             <input
               type="search"
@@ -124,11 +124,34 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
             ></input>
             <i className="material-icons">search</i>
           </div>
+          <AssetModules.FilterAltIcon
+            sx={{
+              fontSize: 25,
+              color: '#9B9999',
+              cursor: 'pointer',
+            }}
+          />
         </div>
-        <div className="fmtm-mt-6 fmtm-mb-1">
+        <div className="fmtm-mt-6 fmtm-mb-1 fmtm-flex fmtm-items-center fmtm-justify-between">
           <p className="fmtm-text-[#A8A6A6]">
             showing {filteredProjectCount} of {totalProjectCount} projects
           </p>
+          <div className="fmtm-flex fmtm-gap-1">
+            <AssetModules.WindowIcon
+              sx={{
+                fontSize: 25,
+                color: '#555555',
+                cursor: 'pointer',
+              }}
+            />
+            <AssetModules.ListViewIcon
+              sx={{
+                fontSize: 25,
+                color: '#555555',
+                cursor: 'pointer',
+              }}
+            />
+          </div>
         </div>
       </div>
       {/* <CoreModules.Stack
