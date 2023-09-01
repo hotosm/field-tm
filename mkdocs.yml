@@ -73,4 +73,5 @@ nav:
       - Production Deployment: dev/Production.md
       - Docker Tips: dev/Docker-Tips.md
       - Database Tips: dev/Database-Tips.md
+  - API: swagger/index.html
   - Class Hierarchy: apidocs/html/inherits.html
