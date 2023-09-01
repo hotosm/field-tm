@@ -21,7 +21,6 @@ from functools import lru_cache
 from typing import Any, Optional, Union
 
 from pydantic import AnyUrl, Extra, FieldValidationInfo, PostgresDsn, field_validator
-from pydantic_core import Url
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -36,13 +35,13 @@ class Settings(BaseSettings):
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
-    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]] = None
+    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]] = []
 
-    @field_validator("EXTRA_CORS_ORIGINS", mode="after")
+    @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
         cls,
-        val: Union[str, list[Url]],
+        val: Union[str, list[AnyUrl]],
         info: FieldValidationInfo,
     ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
