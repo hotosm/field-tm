@@ -44,6 +44,7 @@ from osm_fieldwork import basemapper
 from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.json2osm import json2osm
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import and_, column, func, inspect, select, table
@@ -2286,13 +2287,5 @@ async def get_mbtiles_list(db: Session, project_id: int):
 
 
 async def convert_geojson_to_osm(geojson_file: str):
-    try:
-        osm_filename = "/tmp/task_outline.osm"
-        ogr2osm_command = f"ogr2osm -f -o {osm_filename} {geojson_file}"
-        os.system(ogr2osm_command)
-
-        return osm_filename
-    except Exception as e:
-        return {
-            "error": f"Conversion failed. Error details: {str(e)}"
-        }
+    """Convert a GeoJSON file to OSM format."""
+    return json2osm(geojson_file)
