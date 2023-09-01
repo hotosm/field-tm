@@ -24,11 +24,12 @@ authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
 dependencies = [
+    "uvicorn==0.23.2",
     "fastapi==0.103.0",
     "pydantic>=2.3.0",
     "pydantic-settings>=2.0.3",
     "geojson-pydantic==1.0.0",
-    "uvicorn==0.23.2",
+    "python-multipart>=0.0.6",
     "psycopg2==2.9.7",
     "geoalchemy2==0.14.1",
     "geojson==3.0.1",
