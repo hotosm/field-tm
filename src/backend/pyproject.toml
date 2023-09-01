@@ -82,6 +82,7 @@ docs = [
     "mkdocs-material>=9.2.6",
     "mkdocstrings-python>=1.6.0",
     "mkdocs-exclude>=1.0.2",
+    "python-dotenv>=1.0.0",
 ]
 
 [tool.black]
