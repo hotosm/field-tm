@@ -21,7 +21,8 @@
 from functools import lru_cache
 from typing import Any, Optional, Union
 
-from pydantic import AnyUrl, BaseSettings, PostgresDsn, validator
+from pydantic import AnyUrl, Extra, FieldValidationInfo, PostgresDsn, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -37,10 +38,13 @@ class Settings(BaseSettings):
 
     EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]]
 
-    @validator("EXTRA_CORS_ORIGINS", pre=True)
+    @field_validator("EXTRA_CORS_ORIGINS", mode="after")
+    @classmethod
     def assemble_cors_origins(
-        cls, val: Union[str, list[AnyUrl]], values: dict
-    ) -> list[str]:
+        cls,
+        val: Union[str, list[AnyUrl]],
+        info: FieldValidationInfo,
+    ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
 
         By default, the provided frontend URLs are included in the origins list.
@@ -49,9 +53,9 @@ class Settings(BaseSettings):
         default_origins = []
 
         # Build default origins from env vars
-        url_scheme = values.get("URL_SCHEME")
-        main_url = values.get("FRONTEND_MAIN_URL")
-        map_url = values.get("FRONTEND_MAP_URL")
+        url_scheme = info.data.get("URL_SCHEME")
+        main_url = info.data.get("URL_SCHEME")
+        map_url = info.data.get("URL_SCHEME")
         if url_scheme and main_url and map_url:
             default_origins = [
                 f"{url_scheme}://{main_url}",
@@ -78,26 +82,23 @@ class Settings(BaseSettings):
     FMTM_DB_PASSWORD: Optional[str] = "fmtm"
     FMTM_DB_NAME: Optional[str] = "fmtm"
 
-    FMTM_DB_URL: Optional[PostgresDsn]
+    FMTM_DB_URL: Optional[PostgresDsn] = None
 
-    @validator("FMTM_DB_URL", pre=True)
-    def assemble_db_connection(cls, v: str, values: dict[str, Any]) -> Any:
+    @field_validator("FMTM_DB_URL", mode="after")
+    @classmethod
+    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):
             return v
-        if not (user := values.get("FMTM_DB_USER")):
-            raise ValueError("FMTM_DB_USER is not present in the environment")
-        if not (password := values.get("FMTM_DB_PASSWORD")):
-            raise ValueError("FMTM_DB_PASSWORD is not present in the environment")
-        if not (host := values.get("FMTM_DB_HOST")):
-            raise ValueError("FMTM_DB_HOST is not present in the environment")
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=user,
-            password=password,
-            host=host,
-            path=f"/{values.get('FMTM_DB_NAME') or ''}",
+        pg_url = PostgresDsn.build(
+            scheme="postgres",
+            username=info.data.get("FMTM_DB_USER"),
+            password=info.data.get("FMTM_DB_PASSWORD"),
+            host=info.data.get("FMTM_DB_HOST"),
+            path=info.data.get("FMTM_DB_NAME", ""),
         )
+        # Convert Url type to string
+        return str(pg_url)
 
     ODK_CENTRAL_URL: Optional[AnyUrl]
     ODK_CENTRAL_USER: Optional[str]
@@ -112,11 +113,9 @@ class Settings(BaseSettings):
 
     SENTRY_DSN: Optional[str]
 
-    class Config:
-        """Pydantic settings config."""
-
-        case_sensitive = True
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        case_sensitive=True, env_file=".env", extra=Extra.allow
+    )
 
 
 @lru_cache
