@@ -1162,7 +1162,9 @@ def generate_task_files(
     xlsform: str,
     form_type: str,
     odk_credentials: project_schemas.ODKCentral,
+    project_log: any
 ):
+    project_log.info(f"Generating files for task {task_id}")
     project = get_project(db, project_id)
     odk_id = project.odkid
     project_name = project.project_name_prefix
@@ -1170,14 +1172,16 @@ def generate_task_files(
     name = f"{project_name}_{category}_{task_id}"
 
     # Create an app user for the task
+    project_log.info(f"Creating app user for task {task_id}")
     appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
 
     # If app user could not be created, raise an exception.
     if not appuser:
-        log.error(f"Couldn't create appuser for project {project_id}")
+        project_log.error(f"Couldn't create appuser for project")
         return False
 
     # prefix should be sent instead of name
+    project_log.info(f"Creating qr code for task {task_id}")
     create_qr = create_qrcode(
         db,
         odk_id,
@@ -1238,11 +1242,14 @@ def generate_task_files(
         jsonfile.truncate(0)  # clear the contents of the file
         dump(features, jsonfile)
 
+    project_log.info(f"Generating xform for task {task_id}")
     outfile = central_crud.generate_updated_xform(xlsform, xform, form_type)
 
     # Create an odk xform
+    project_log.info(f"Uploading media in {task_id}")
     result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials)
 
+    project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
     try:
         # Pass odk credentials
@@ -1302,7 +1309,9 @@ def generate_appuser_files(
         - background_task_id: the task_id of the background task running this function.
     """
     try:
-        log.info(f"Starting generate_appuser_files for project {project_id}")
+        project_log = log.bind(task="create_project", project_id=project_id)
+        
+        project_log.info(f"Starting generate_appuser_files for project {project_id}")
 
         # Get the project table contents.
         project = table(
@@ -1364,9 +1373,12 @@ def generate_appuser_files(
 
             # Data Extracts
             if extracts_contents is not None:
+                project_log.info(f"Uploading data extracts")
                 upload_custom_data_extracts(db, project_id, extracts_contents)
 
             else:
+                project_log.info(f"Extracting Data from OSM")
+
                 # OSM Extracts for whole project
                 pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
                 # This file will store osm extracts
@@ -1426,7 +1438,7 @@ def generate_appuser_files(
             for task in tasks_list:
                 try:
                     generate_task_files(
-                        db, project_id, task, xlsform, form_type, odk_credentials
+                        db, project_id, task, xlsform, form_type, odk_credentials, project_log
                     )
                 except Exception as e:
                     log.warning(str(e))

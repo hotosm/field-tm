@@ -687,10 +687,12 @@ async def generate_log(
             project_id, db
         )
 
-        with open(f"/tmp/{project_id}_generate.log", "r") as f:
-            lines = f.readlines()
-            last_100_lines = lines[-50:]
-            logs = "".join(last_100_lines)
+        with open("/opt/logs/create_project.json", "r") as log_file:
+            logs = [json.loads(line) for line in log_file]
+            
+            filtered_logs = [log.get("record",{}).get("message",None) for log in logs if log.get("record", {}).get("extra", {}).get("project_id") == project_id]
+
+            logs = "\n".join(filtered_logs)
             return {
                 "status": task_status.name,
                 "message": task_message,
