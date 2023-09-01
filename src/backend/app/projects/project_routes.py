@@ -691,8 +691,9 @@ async def generate_log(
             logs = [json.loads(line) for line in log_file]
             
             filtered_logs = [log.get("record",{}).get("message",None) for log in logs if log.get("record", {}).get("extra", {}).get("project_id") == project_id]
+            last_50_logs = filtered_logs[-50:]
 
-            logs = "\n".join(filtered_logs)
+            logs = "\n".join(last_50_logs)
             return {
                 "status": task_status.name,
                 "message": task_message,
