@@ -24,7 +24,7 @@ jobs:
       name: ${{ github.ref_name }}
 
     container:
-      image: ghcr.io/hotosm/fmtm/backend:ci
+      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}
       env:
         ODK_CENTRAL_URL: https://central-proxy
         ODK_CENTRAL_USER: test@hotosm.org
