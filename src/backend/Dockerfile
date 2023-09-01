@@ -45,8 +45,8 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export -G debug -G test --no-default \
-    --without-hashes > requirements-debug.txt
+    && pdm export -G debug -G test -G docs --no-default \
+    --without-hashes > requirements-all.txt
 
 
 
@@ -130,14 +130,14 @@ RUN pip install pdm==2.6.1 \
 FROM runtime as debug-no-odk
 USER appuser
 COPY --from=extract-deps --chown=appuser \
-    /opt/python/requirements-debug.txt /opt/python/
+    /opt/python/requirements-all.txt /opt/python/
 COPY --from=osm-fieldwork-whl --chown=appuser \
     /repos/osm-fieldwork/dist/*.whl /opt/
-RUN ls /opt/*.whl >> /opt/python/requirements-debug.txt \
+RUN ls /opt/*.whl >> /opt/python/requirements-all.txt \
     && pip uninstall -y osm-fieldwork \
     && pip install --user --upgrade --no-warn-script-location \
     --no-cache-dir -r \
-    /opt/python/requirements-debug.txt
+    /opt/python/requirements-all.txt
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", \
