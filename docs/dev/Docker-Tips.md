@@ -9,7 +9,7 @@ project and deploys the containers specified in the
 `docker-compose.yml` file. The scripts in the `Dockerfile` are used to
 set up the environment and dependencies for each container.
 
-### For example, let's say that we have the following `docker-compose.yml` file:
+### For example, let's say that we have the following `docker-compose.yml` file
 
     version: "3"
     services:
@@ -34,7 +34,6 @@ set up the environment and dependencies for each container.
         API_URL: http://api:8000
         ports:
         - "3000:3000"
-
 
 In this file, we have three containers: `db`, `api`, and `web`. For
 each container, we specify the `image` or `build` to use, any
