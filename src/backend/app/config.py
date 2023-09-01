@@ -15,13 +15,13 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
 """Config file for Pydantic and FastAPI, using environment variables."""
 
 from functools import lru_cache
 from typing import Any, Optional, Union
 
 from pydantic import AnyUrl, Extra, FieldValidationInfo, PostgresDsn, field_validator
+from pydantic_core import Url
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(
         cls,
-        val: Union[str, list[AnyUrl]],
+        val: Union[str, list[Url]],
         info: FieldValidationInfo,
     ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
