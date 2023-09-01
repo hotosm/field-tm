@@ -28,16 +28,10 @@ class UserBase(BaseModel):
 class User(UserBase):
     id: int
 
-    class Config:
-        orm_mode = True
-
 
 class UserOut(UserBase):
     id: int
     role: str
-
-    class Config:
-        orm_mode = True
 
 
 class UserRole(BaseModel):
