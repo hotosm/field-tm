@@ -992,3 +992,33 @@ async def download_tiles(tile_id: int, db: Session = Depends(database.get_db)):
         tiles_path.path,
         headers={"Content-Disposition": "attachment; filename=tiles.mbtiles"},
     )
+
+@router.get("/{project_id}/download_osm")
+async def download_task_boundary_osm(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Downloads the boundary of a task as a OSM file.
+
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+    out = project_crud.get_task_geometry(db, project_id)
+    file_path = "/tmp/task_boundary.geojson"
+
+    # Write the response content to the file
+    with open(file_path, "w") as f:
+        f.write(out)
+    result = await project_crud.convert_geojson_to_osm(file_path)
+    with open(result, "r") as f:
+        content = f.read()
+
+    headers = {
+        "Content-Disposition": "attachment; filename=task_outline.osm",
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=content, headers=headers)
