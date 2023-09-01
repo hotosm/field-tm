@@ -6,7 +6,7 @@ groups = ["default", "debug", "dev", "test"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:cc6812797e2bff73f22b4dca750ac8b6cf4a87e84794f6d389acc638d6346c73"
+content_hash = "sha256:70ad1b6fa0d85db75b8bbbcd4b6b2f91d8ba3e43f0957e3ef05963953dd52900"
 
 [[package]]
 name = "annotated-types"
@@ -410,11 +410,11 @@ files = [
 
 [[package]]
 name = "gdal"
-version = "3.7.1.1"
+version = "3.6.2"
 requires_python = ">=3.6.0"
 summary = ""
 files = [
-    {file = "GDAL-3.7.1.1.tar.gz", hash = "sha256:d16c6dab28eda6c4b1a571e6dc3e3b0fd824a0a6c1cc1947fc7dcb580c9999de"},
+    {file = "GDAL-3.6.2.tar.gz", hash = "sha256:a167cde1813707d91a938dad1a22f280f5ad28c45980d42e948fb8c59f890f5a"},
 ]
 
 [[package]]
