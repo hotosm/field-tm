@@ -66,13 +66,21 @@ export default function ExploreProjectCard({ data }) {
       sx={{ boxShadow: 0 }}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
-      class="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-h-[22.5rem]"
+      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-h-[22.5rem]"
     >
       <CoreModules.CardContent className="fmtm-h-full" style={{ padding: '16px' }}>
         <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
           <div>
             <div className="fmtm-flex fmtm-justify-between">
-              <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
+              {data.organisation_logo ? (
+                <CoreModules.CardMedia
+                  component="img"
+                  src={`${environment.baseApiUrl}/images/${data.organisation_logo}`}
+                  sx={{ width: '50px', height: 50 }}
+                />
+              ) : (
+                <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
+              )}
 
               {/*Id Number*/}
               <CoreModules.Typography variant="h4" right={7} top={5} gutterBottom>
