@@ -42,6 +42,9 @@ module.exports = {
           900: '#212121',
         },
       },
+      fontFamily: {
+        archivo: ['ArchivoRegular'],
+      },
     },
   },
   plugins: [],

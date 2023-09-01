@@ -33,6 +33,9 @@ import {
   UploadFile as SubmissionIcon,
   PlaylistAddCheck as FeatureIcon,
   Bolt as BoltIcon,
+  Window as WindowIcon,
+  FormatListBulleted as ListViewIcon,
+  FilterAlt as FilterAltIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -76,4 +79,7 @@ export default {
   SubmissionIcon,
   FeatureIcon,
   BoltIcon,
+  WindowIcon,
+  ListViewIcon,
+  FilterAltIcon,
 };
