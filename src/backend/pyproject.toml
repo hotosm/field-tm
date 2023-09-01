@@ -29,7 +29,7 @@ dependencies = [
     "geojson-pydantic==0.4.3",
     "uvicorn==0.19.0",
     "fastapi-sqlalchemy==0.2.1",
-    "psycopg2==2.9.3",
+    "psycopg2==2.9.7",
     "geoalchemy2==0.12.5",
     "alembic==1.8.1",
     "sqlmodel==0.0.8",
