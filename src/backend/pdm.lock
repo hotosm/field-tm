@@ -6,7 +6,7 @@ groups = ["default", "debug", "dev", "test"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:70ad1b6fa0d85db75b8bbbcd4b6b2f91d8ba3e43f0957e3ef05963953dd52900"
+content_hash = "sha256:90b83f92d6325ece7c15d79b5baed7e02604ab4cf29f1c14cca57267b001b1fa"
 
 [[package]]
 name = "annotated-types"
@@ -634,6 +634,16 @@ files = [
 ]
 
 [[package]]
+name = "itsdangerous"
+version = "2.1.2"
+requires_python = ">=3.7"
+summary = "Safely pass data to untrusted environments and back."
+files = [
+    {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
+    {file = "itsdangerous-2.1.2.tar.gz", hash = "sha256:5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"},
+]
+
+[[package]]
 name = "jedi"
 version = "0.19.0"
 requires_python = ">=3.6"
@@ -936,6 +946,16 @@ files = [
 ]
 
 [[package]]
+name = "oauthlib"
+version = "3.2.2"
+requires_python = ">=3.6"
+summary = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+files = [
+    {file = "oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca"},
+    {file = "oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918"},
+]
+
+[[package]]
 name = "ogr2osm"
 version = "1.1.2"
 requires_python = ">=3.7"
@@ -995,6 +1015,18 @@ files = [
 ]
 files = [
     {file = "OSMPythonTools-0.3.5.tar.gz", hash = "sha256:13ff721f760fdad5dd78b4d1461d286b78bba96ee151a7301ee8c11a0c258be9"},
+]
+
+[[package]]
+name = "osm-login-python"
+version = "0.0.4"
+git = "https://github.com/spwoodcock/osm-login-python.git"
+revision = "2687688715b7053f90ec17e93ef64865830cf6e8"
+summary = "Use OSM Token exchange with OAuth2.0 for python projects"
+dependencies = [
+    "itsdangerous~=2.1.2",
+    "pydantic~=2.3.0",
+    "requests-oauthlib~=1.3.1",
 ]
 
 [[package]]
@@ -1553,6 +1585,20 @@ files = [
 files = [
     {file = "requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6"},
     {file = "requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06"},
+]
+
+[[package]]
+name = "requests-oauthlib"
+version = "1.3.1"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+summary = "OAuthlib authentication support for Requests."
+dependencies = [
+    "oauthlib>=3.0.0",
+    "requests>=2.0.0",
+]
+files = [
+    {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
+    {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
 ]
 
 [[package]]
