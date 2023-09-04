@@ -3,12 +3,16 @@ import windowDimention from '../../hooks/WindowDimension';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 import Switch from './Switch';
+import { HomeActions } from '../../store/slices/HomeSlice';
 
 //Home Filter
 const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = CoreModules.useAppDispatch();
 
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const showMapStatus: boolean = CoreModules.useAppSelector((state) => state.home.showMapStatus);
+
   const { windowSize } = windowDimention();
   const searchableInnerStyle: any = {
     toolbar: {
@@ -136,7 +140,10 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
           </div>
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <p>Show Map</p>
-            <Switch />
+            <Switch
+              checked={showMapStatus}
+              onCheckedChange={() => dispatch(HomeActions.SetShowMapStatus(!showMapStatus))}
+            />
           </div>
         </div>
         <div className="fmtm-mt-6 fmtm-mb-1 fmtm-flex fmtm-items-center fmtm-justify-between">
