@@ -1,0 +1,57 @@
+name: Build CI Img
+
+on:
+  # Push includes PR merge
+  push:
+    branches:
+      - main
+      - staging
+      - development
+    paths:
+      # Workflow is triggered only if deps change
+      - "src/backend/pyproject.toml"
+      - "src/backend/Dockerfile"
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  GIT_BRANCH: ${{ github.ref_name }}
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract api version
+        id: extract_api_version
+        run: |
+          cd src/backend
+          echo "API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')" >> $GITHUB_ENV
+
+      - name: Build image
+        uses: docker/build-push-action@v4
+        with:
+          context: src/backend
+          target: ci
+          push: true
+          tags: |
+            "ghcr.io/hotosm/fmtm/backend:${{ env.API_VERSION }}-ci-${{ github.ref_name }}"
+            "ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}"
+          build-args: |
+            API_VERSION=${{ env.API_VERSION }}
