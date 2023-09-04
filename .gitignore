@@ -72,4 +72,6 @@ src/frontend/node_modules
 
 # pdm
 **/.pdm.toml
+**/pdm.toml
+**/.pdm-python
 **/__pypackages__

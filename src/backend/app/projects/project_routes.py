@@ -687,10 +687,13 @@ async def generate_log(
             project_id, db
         )
 
-        with open(f"/tmp/{project_id}_generate.log", "r") as f:
-            lines = f.readlines()
-            last_100_lines = lines[-50:]
-            logs = "".join(last_100_lines)
+        with open("/opt/logs/create_project.json", "r") as log_file:
+            logs = [json.loads(line) for line in log_file]
+            
+            filtered_logs = [log.get("record",{}).get("message",None) for log in logs if log.get("record", {}).get("extra", {}).get("project_id") == project_id]
+            last_50_logs = filtered_logs[-50:]
+
+            logs = "\n".join(last_50_logs)
             return {
                 "status": task_status.name,
                 "message": task_message,
@@ -992,3 +995,31 @@ async def download_tiles(tile_id: int, db: Session = Depends(database.get_db)):
         tiles_path.path,
         headers={"Content-Disposition": "attachment; filename=tiles.mbtiles"},
     )
+
+
+@router.get("/boundary_in_osm/{project_id}/")
+async def download_task_boundary_osm(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Downloads the boundary of a task as a OSM file.
+
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+    out = project_crud.get_task_geometry(db, project_id)
+    file_path = f"/tmp/{project_id}_task_boundary.geojson"
+
+    # Write the response content to the file
+    with open(file_path, "w") as f:
+        f.write(out)
+    result = await project_crud.convert_geojson_to_osm(file_path)
+
+    with open(result, "r") as f:
+        content = f.read()
+
+    response = Response(content=content, media_type="application/xml")
+    return response
