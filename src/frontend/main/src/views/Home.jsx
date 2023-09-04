@@ -61,13 +61,6 @@ const Home = () => {
             <div>
               <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
                 <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
-                  {/* <CoreModules.Grid px={1} spacing={1.5} container columns={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 3 }}>
-                {filteredProjectCards.map((value, index) => (
-                  <CoreModules.Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={index}>
-                    <ExploreProjectCard data={value} key={index} />
-                  </CoreModules.Grid>
-                ))}
-              </CoreModules.Grid> */}
                   <div
                     className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
                       !showMapStatus
@@ -76,9 +69,7 @@ const Home = () => {
                     }`}
                   >
                     {filteredProjectCards.map((value, index) => (
-                      <div key={index}>
-                        <ExploreProjectCard data={value} key={index} />
-                      </div>
+                      <ExploreProjectCard data={value} key={index} />
                     ))}
                   </div>
                 </div>
@@ -117,7 +108,7 @@ const Home = () => {
       </CoreModules.Stack> */}
       </div>
 
-      <div className="fmtm-flex fmtm-gap-2 fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
+      <div className="fmtm-flex fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
         <div>1-5 of 10 </div>
         <AssetModules.ArrowLeftIcon
           sx={{
