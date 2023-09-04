@@ -50,6 +50,7 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.11.1",
+    "@radix-ui/react-switch": "^1.0.3",
     "@reduxjs/toolkit": "^1.9.1",
     "@sentry/react": "^7.59.3",
     "@testing-library/jest-dom": "^5.17.0",
@@ -58,6 +59,8 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "axios": "^1.2.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
     "env-cmd": "^10.1.0",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
@@ -73,7 +76,9 @@
     "react-router-dom": "^6.6.0",
     "react-spinners": "^0.13.8",
     "redux": "^4.2.0",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "jest": {
     "testEnvironment": "jsdom",
