@@ -1238,6 +1238,8 @@ def generate_task_files(
     result = db.execute(query)
     features = result.fetchone()[0]
 
+    upload_media = False if features['features'] is None else True
+
     # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
     with open(extracts, "w") as jsonfile:
         jsonfile.truncate(0)  # clear the contents of the file
@@ -1246,9 +1248,11 @@ def generate_task_files(
     project_log.info(f"Generating xform for task {task_id}")
     outfile = central_crud.generate_updated_xform(xlsform, xform, form_type)
 
+
     # Create an odk xform
     project_log.info(f"Uploading media in {task_id}")
-    result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials)
+    result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials, False, upload_media)
+    # result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials)
 
     project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
