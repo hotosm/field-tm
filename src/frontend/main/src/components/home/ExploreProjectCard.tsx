@@ -76,7 +76,7 @@ export default function ExploreProjectCard({ data }) {
                 <CoreModules.CardMedia
                   component="img"
                   src={`${environment.baseApiUrl}/images/${data.organisation_logo}`}
-                  sx={{ width: '50px', height: 50 }}
+                  sx={{ width: 50, height: 50 }}
                 />
               ) : (
                 <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />

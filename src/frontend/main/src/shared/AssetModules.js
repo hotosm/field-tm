@@ -36,6 +36,8 @@ import {
   Window as WindowIcon,
   FormatListBulleted as ListViewIcon,
   FilterAlt as FilterAltIcon,
+  ArrowLeft as ArrowLeftIcon,
+  ArrowRight as ArrowRightIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -82,4 +84,6 @@ export default {
   WindowIcon,
   ListViewIcon,
   FilterAltIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
 };

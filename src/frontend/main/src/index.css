@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   font-family: Arial, Helvetica, sans-serif;
   overflow: hidden;
@@ -60,32 +59,44 @@ button {
 
 @font-face {
   font-family: 'BarlowBold';
-  src: local('BarlowBold'), url('./assets/fonts/Barlow/Barlow-Bold.ttf') format('truetype');
+  src:
+    local('BarlowBold'),
+    url('./assets/fonts/Barlow/Barlow-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'BarlowMedium';
-  src: local('BarlowMedium'), url('./assets/fonts/Barlow/Barlow-Medium.ttf') format('truetype');
+  src:
+    local('BarlowMedium'),
+    url('./assets/fonts/Barlow/Barlow-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoBold';
-  src: local('ArchivoBold'), url('./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf') format('truetype');
+  src:
+    local('ArchivoBold'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoRegular';
-  src: local('ArchivoRegular'), url('./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf') format('truetype');
+  src:
+    local('ArchivoRegular'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoMedium';
-  src: local('ArchivoMedium'), url('./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf') format('truetype');
+  src:
+    local('ArchivoMedium'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoLight';
-  src: local('ArchivoLight'), url('./assets/fonts/Archivo/Archivo/Archivo-Light.ttf') format('truetype');
+  src:
+    local('ArchivoLight'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Light.ttf') format('truetype');
 }
 
 .swiper-button-next,
@@ -132,4 +143,35 @@ button {
   background-color: rgba(215, 63, 62, 0.04);
   border: 1px solid #d73f3e;
   border-radius: 10px;
+}
+
+@layer utilities {
+  @variants responsive {
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: transparent;
+      margin-block: 6px;
+    }
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: #bdbdbd;
+      border-radius: 100vh;
+      padding-inline: 4px;
+    }
+    .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #bdbdbd;
+    }
+  }
 }
