@@ -32,6 +32,8 @@ jobs:
         OSM_CLIENT_ID: ${{ vars.OSM_CLIENT_ID }}
         OSM_CLIENT_SECRET: ${{ vars.OSM_CLIENT_SECRET }}
         OSM_SECRET_KEY: ${{ vars.OSM_SECRET_KEY }}
+        FRONTEND_MAIN_URL: ${{ vars.FRONTEND_MAIN_URL }}
+        FRONTEND_MAP_URL: ${{ vars.FRONTEND_MAP_URL }}
       options: --user root
 
     services:
