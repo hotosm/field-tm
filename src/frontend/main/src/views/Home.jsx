@@ -7,6 +7,7 @@ import enviroment from '../environment';
 import ProjectCardSkeleton from '../components/home/ProjectCardSkeleton';
 import HomePageFilters from '../components/home/HomePageFilters';
 import CoreModules from '../shared/CoreModules';
+import AssetModules from '../shared/AssetModules';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,7 +84,7 @@ const Home = () => {
                 </div>
                 {/* fmtm-w-[41.8rem] */}
                 {showMapStatus && (
-                  <div className="fmtm-order-first lg:fmtm-order-last lg:fmtm-w-[50%] fmtm-h-[33rem] fmtm-bg-gray-300 fmtm-mx-2 fmtm-mb-2"></div>
+                  <div className="lg:fmtm-order-last lg:fmtm-w-[50%] fmtm-h-[33rem] fmtm-bg-gray-300 fmtm-mx-4 fmtm-mb-2"></div>
                 )}
               </div>
             </div>
@@ -116,9 +117,27 @@ const Home = () => {
       </CoreModules.Stack> */}
       </div>
 
-      <div className="fmtm-flex fmtm-gap-2 fmtm-justify-end fmtm-pr-2 fmtm-py-1">
-        <p>1-5 of 10 : : Jump to </p>
-        <input type="text" className="fmtm-w-10 fmtm-rounded-md fmtm-border-[1px] fmtm-border-[#E7E2E2]" />
+      <div className="fmtm-flex fmtm-gap-2 fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
+        <div>1-5 of 10 </div>
+        <AssetModules.ArrowLeftIcon
+          sx={{
+            fontSize: 25,
+            color: '#555555',
+            cursor: 'pointer',
+          }}
+        />
+        <AssetModules.ArrowRightIcon
+          sx={{
+            fontSize: 25,
+            color: '#555555',
+            cursor: 'pointer',
+          }}
+        />
+        <div>Jump to</div>
+        <input
+          type="number"
+          className="fmtm-w-10 fmtm-rounded-md fmtm-border-[1px] fmtm-border-[#E7E2E2] fmtm-outline-none"
+        />
       </div>
     </div>
   );
