@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import windowDimention from '../../hooks/WindowDimension';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
+import Switch from './Switch';
 
 //Home Filter
 const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) => {
@@ -114,23 +115,29 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
             </button>
           </CoreModules.Link>
         </div>
-        <div className="fmtm-mt-3 fmtm-flex fmtm-items-center fmtm-gap-1">
-          <div className=" fmtm-border-[#E7E2E2] fmtm-border-2 fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-p-2 fmtm-items-center">
-            <input
-              type="search"
-              className="fmtm-h-7 fmtm-p-2"
-              placeholder="Search Projects"
-              onChange={(e) => onSearch(e.target.value)}
-            ></input>
-            <i className="material-icons">search</i>
+        <div className="fmtm-flex fmtm-justify-between">
+          <div className="fmtm-mt-3 fmtm-flex fmtm-items-center fmtm-gap-1">
+            <div className=" fmtm-border-[#E7E2E2] fmtm-border-2 fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-p-2 fmtm-items-center">
+              <input
+                type="search"
+                className="fmtm-h-7 fmtm-p-2"
+                placeholder="Search Projects"
+                onChange={(e) => onSearch(e.target.value)}
+              ></input>
+              <i className="material-icons">search</i>
+            </div>
+            <AssetModules.FilterAltIcon
+              sx={{
+                fontSize: 25,
+                color: '#9B9999',
+                cursor: 'pointer',
+              }}
+            />
           </div>
-          <AssetModules.FilterAltIcon
-            sx={{
-              fontSize: 25,
-              color: '#9B9999',
-              cursor: 'pointer',
-            }}
-          />
+          <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+            <p>Show Map</p>
+            <Switch />
+          </div>
         </div>
         <div className="fmtm-mt-6 fmtm-mb-1 fmtm-flex fmtm-items-center fmtm-justify-between">
           <p className="fmtm-text-[#A8A6A6]">
