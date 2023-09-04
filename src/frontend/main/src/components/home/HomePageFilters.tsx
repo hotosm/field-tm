@@ -150,7 +150,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
           <p className="fmtm-text-[#A8A6A6]">
             showing {filteredProjectCount} of {totalProjectCount} projects
           </p>
-          <div className="fmtm-flex fmtm-gap-1">
+          {/* <div className="fmtm-flex fmtm-gap-1">
             <AssetModules.WindowIcon
               sx={{
                 fontSize: 25,
@@ -165,7 +165,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
                 cursor: 'pointer',
               }}
             />
-          </div>
+          </div> */}
         </div>
       </div>
       {/* <CoreModules.Stack
