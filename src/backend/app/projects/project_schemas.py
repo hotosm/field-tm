@@ -50,9 +50,16 @@ class BETAProjectUpload(BaseModel):
     xform_title: Union[str, None]
     odk_central: ODKCentral
     hashtags: Union[List[str], None]
-    organisation_id: int = None
+    organisation_id: Optional[int]
     # city: str
     # country: str
+
+
+class Feature(BaseModel):
+    id: int
+    project_id: int
+    task_id: Optional[int]
+    geometry: Optional[Feature]
 
 
 class ProjectSummary(BaseModel):
@@ -79,11 +86,11 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     # location_str: str
-    outline_geojson: Feature = None
-    project_tasks: List[tasks_schemas.Task] = None
-    xform_title: str = None
-    hashtags: List[str] = None
-    organisation_id: int = None
+    # outline_geojson: Optional[Feature]
+    project_tasks: Optional[List[tasks_schemas.Task]]
+    xform_title: Optional[str]
+    hashtags: Optional[List[str]]
+    organisation_id: Optional[int]
 
 
 class ProjectOut(ProjectBase):
@@ -91,8 +98,3 @@ class ProjectOut(ProjectBase):
 
 
 
-class Feature(BaseModel):
-    id: int
-    project_id: int
-    task_id: int = None
-    geometry: Feature
