@@ -8,6 +8,7 @@ import ProjectCardSkeleton from '../components/home/ProjectCardSkeleton';
 import HomePageFilters from '../components/home/HomePageFilters';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
+import ProjectListMap from '../components/home/ProjectListMap';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +76,7 @@ const Home = () => {
                 </div>
                 {/* fmtm-w-[41.8rem] */}
                 {showMapStatus && (
-                  <div className="lg:fmtm-order-last lg:fmtm-w-[50%] fmtm-h-[33rem] fmtm-bg-gray-300 fmtm-mx-4 fmtm-mb-2"></div>
+                  <ProjectListMap/>
                 )}
               </div>
             </div>
