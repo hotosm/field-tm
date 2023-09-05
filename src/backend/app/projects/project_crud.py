@@ -44,7 +44,7 @@ from osm_fieldwork import basemapper
 from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
-from osm_fieldwork.json2osm import json2osm
+from osm_fieldwork import json2osm
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import and_, column, func, inspect, select, table
