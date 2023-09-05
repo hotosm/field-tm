@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from typing import List, Union
+from typing import List, Union, Optional
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
@@ -59,17 +59,17 @@ class ProjectSummary(BaseModel):
     id: int = -1
     priority: ProjectPriority = ProjectPriority.MEDIUM
     priority_str: str = priority.name
-    title: str = None
-    location_str: str = None
-    description: str = None
-    num_contributors: int = None
-    total_tasks: int = None
-    tasks_mapped: int = None
-    tasks_validated: int = None
-    tasks_bad: int = None
-    hashtags: List[str] = None
-    organisation_id: int = None
-    organisation_logo: str = None
+    title: Optional[str]
+    location_str: Optional[str]
+    description: Optional[str]
+    total_tasks: Optional[int]
+    tasks_mapped: Optional[int]
+    num_contributors: Optional[int]
+    tasks_validated: Optional[int]
+    tasks_bad: Optional[int]
+    hashtags: Optional[List[str]]
+    organisation_id: Optional[int]
+    organisation_logo: Optional[str]
 
 
 class ProjectBase(BaseModel):
