@@ -97,8 +97,8 @@ async def get_point_on_surface(
             GROUP BY id; """)
 
     result = db.execute(query)
-    result = result.fetchall()
-    return result
+    result_dict_list = [{"id": row[0], "point": row[1]} for row in result.fetchall()]
+    return result_dict_list
 
 
 @router.post("/near_me", response_model=tasks_schemas.TaskOut)
