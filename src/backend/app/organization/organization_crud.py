@@ -22,7 +22,7 @@ import random
 import string
 from fastapi import HTTPException, File,UploadFile
 import re
-
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from ..db import db_models
 
@@ -44,15 +44,12 @@ def generate_slug(text: str) -> str:
 
 
 async def get_organisation_by_name(db: Session, name: str):
-
-    # Construct the SQL query with the case-insensitive search
-    query = f"SELECT * FROM organisations WHERE LOWER(name) LIKE LOWER('%{name}%') LIMIT 1"
-
-    # Execute the query and retrieve the result
-    result = db.execute(query)
-
-    # Fetch the first row of the result
-    db_organisation = result.fetchone()
+    # Use SQLAlchemy's query-building capabilities
+    db_organisation = (
+        db.query(db_models.DbOrganisation)
+        .filter(func.lower(db_models.DbOrganisation.name).like(func.lower(f'%{name}%')))
+        .first()
+    )
     return db_organisation
 
 
