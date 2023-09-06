@@ -174,6 +174,7 @@ def create_zip_file(files, output_file_path):
 
 async def convert_json_to_osm_xml(file_path):
 
+    # TODO refactor to simply use json2osm(file_path)
     jsonin = JsonDump()
     infile = Path(file_path)
 
@@ -218,6 +219,7 @@ async def convert_json_to_osm_xml(file_path):
 
 async def convert_json_to_osm(file_path):
 
+    # TODO refactor to simply use json2osm(file_path)
     jsonin = JsonDump()
     infile = Path(file_path)
 

@@ -31,17 +31,11 @@ class ODKCentral(BaseModel):
     odk_central_user: str
     odk_central_password: str
 
-    class Config:
-        orm_mode = True
-
 
 class ProjectInfo(BaseModel):
     name: str
     short_description: str
     description: str
-
-    class Config:
-        orm_mode = True
 
 
 class ProjectUpdate(BaseModel):
@@ -77,9 +71,6 @@ class ProjectSummary(BaseModel):
     organisation_id: int = None
     organisation_logo: str = None
 
-    class Config:
-        orm_mode = True
-
 
 class ProjectBase(BaseModel):
     id: int
@@ -94,9 +85,6 @@ class ProjectBase(BaseModel):
     hashtags: List[str] = None
     organisation_id: int = None
 
-    class Config:
-        orm_mode = True
-
 
 class ProjectOut(ProjectBase):
     pass
@@ -108,6 +96,3 @@ class Feature(BaseModel):
     project_id: int
     task_id: int = None
     geometry: Feature
-
-    class Config:
-        orm_mode = True
