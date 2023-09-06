@@ -178,9 +178,9 @@ async def task_features_count(
         )
 
     def process_task(task):
-        feature_count_query = f"""
-            select count(*) from features where project_id = {project_id} and task_id = {task}
-        """
+        feature_count_query = text(f"""
+            select count(*)from features where project_id = {project_id} and task_id = {task}
+        """)
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
@@ -190,7 +190,7 @@ async def task_features_count(
         # form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
         return {
             "task_id": task,
-            "feature_count": feature_count["count"],
+            "feature_count": feature_count[0],
             # 'submission_count': form_details['submissions'],
             "submission_count": len(submission_list)
             if isinstance(submission_list, list)
