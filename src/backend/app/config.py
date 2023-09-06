@@ -99,9 +99,9 @@ class Settings(BaseSettings):
         # Convert Url type to string
         return str(pg_url)
 
-    ODK_CENTRAL_URL: Optional[AnyUrl]
-    ODK_CENTRAL_USER: Optional[str]
-    ODK_CENTRAL_PASSWD: Optional[str]
+    ODK_CENTRAL_URL: Optional[AnyUrl] = None
+    ODK_CENTRAL_USER: Optional[str] = ""
+    ODK_CENTRAL_PASSWD: Optional[str] = ""
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
