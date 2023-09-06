@@ -29,6 +29,7 @@ from ..users import user_schemas
 from . import tasks_crud, tasks_schemas
 from ..projects import project_crud, project_schemas
 from ..central import central_crud
+from sqlalchemy.sql import text
 
 
 router = APIRouter(
@@ -89,16 +90,15 @@ async def get_point_on_surface(
         List[Tuple[int, str]]: A list of tuples containing the task ID and the centroid as a string.
     """
 
-    query = f"""
+    query = text(f"""
             SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_PointOnSurface(outline)), ST_Y(ST_PointOnSurface(outline))]) AS point
             FROM tasks
             WHERE project_id = {project_id}
-            GROUP BY id;
-            """
+            GROUP BY id; """)
 
     result = db.execute(query)
-    result = result.fetchall()
-    return result
+    result_dict_list = [{"id": row[0], "point": row[1]} for row in result.fetchall()]
+    return result_dict_list
 
 
 @router.post("/near_me", response_model=tasks_schemas.TaskOut)
@@ -178,9 +178,9 @@ async def task_features_count(
         )
 
     def process_task(task):
-        feature_count_query = f"""
-            select count(*) from features where project_id = {project_id} and task_id = {task}
-        """
+        feature_count_query = text(f"""
+            select count(*)from features where project_id = {project_id} and task_id = {task}
+        """)
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
@@ -190,7 +190,7 @@ async def task_features_count(
         # form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
         return {
             "task_id": task,
-            "feature_count": feature_count["count"],
+            "feature_count": feature_count[0],
             # 'submission_count': form_details['submissions'],
             "submission_count": len(submission_list)
             if isinstance(submission_list, list)

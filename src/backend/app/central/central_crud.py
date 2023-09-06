@@ -330,12 +330,23 @@ def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = 
 def get_form_list(db: Session, skip: int, limit: int):
     """Returns the list of id and title of xforms from the database."""
     try:
-        return (
+        forms =  (
             db.query(db_models.DbXForm.id, db_models.DbXForm.title)
             .offset(skip)
             .limit(limit)
             .all()
         )
+    
+        result_dict = []
+        for form in forms:
+            form_dict = {
+                'id': form[0],         # Assuming the first element is the ID
+                'title': form[1]       # Assuming the second element is the title
+            }
+            result_dict.append(form_dict)
+        
+        return result_dict
+
     except Exception as e:
         log.error(e)
         raise HTTPException(e) from e

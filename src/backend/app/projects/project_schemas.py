@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from typing import List, Union
+from typing import List, Union, Optional
 
 from geojson_pydantic import Feature
 from pydantic import BaseModel
@@ -50,26 +50,33 @@ class BETAProjectUpload(BaseModel):
     xform_title: Union[str, None]
     odk_central: ODKCentral
     hashtags: Union[List[str], None]
-    organisation_id: int = None
+    organisation_id: Optional[int] = None
     # city: str
     # country: str
+
+
+class Feature(BaseModel):
+    id: int
+    project_id: int
+    task_id: Optional[int] = None
+    geometry: Optional[Feature] = None
 
 
 class ProjectSummary(BaseModel):
     id: int = -1
     priority: ProjectPriority = ProjectPriority.MEDIUM
     priority_str: str = priority.name
-    title: str = None
-    location_str: str = None
-    description: str = None
-    num_contributors: int = None
-    total_tasks: int = None
-    tasks_mapped: int = None
-    tasks_validated: int = None
-    tasks_bad: int = None
-    hashtags: List[str] = None
-    organisation_id: int = None
-    organisation_logo: str = None
+    title: Optional[str] = None
+    location_str: Optional[str] = None
+    description: Optional[str] = None
+    total_tasks: Optional[int] = None
+    tasks_mapped: Optional[int] = None
+    num_contributors: Optional[int] = None
+    tasks_validated: Optional[int] = None
+    tasks_bad: Optional[int] = None
+    hashtags: Optional[List[str]] = None
+    organisation_id: Optional[int] = None
+    organisation_logo: Optional[str] = None
 
 
 class ProjectBase(BaseModel):
@@ -79,11 +86,11 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     # location_str: str
-    outline_geojson: Feature = None
-    project_tasks: List[tasks_schemas.Task] = None
-    xform_title: str = None
-    hashtags: List[str] = None
-    organisation_id: int = None
+    # outline_geojson: Optional[Feature]
+    project_tasks: Optional[List[tasks_schemas.Task]]
+    xform_title: Optional[str] = None
+    hashtags: Optional[List[str]] = None
+    organisation_id: Optional[int] = None
 
 
 class ProjectOut(ProjectBase):
@@ -91,8 +98,3 @@ class ProjectOut(ProjectBase):
 
 
 
-class Feature(BaseModel):
-    id: int
-    project_id: int
-    task_id: int = None
-    geometry: Feature
