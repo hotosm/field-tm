@@ -37,6 +37,7 @@ import requests
 import segno
 import shapely.wkb as wkblib
 import sqlalchemy
+import pkg_resources
 from fastapi import File, HTTPException, UploadFile
 from geoalchemy2.shape import from_shape
 from geojson import dump
@@ -1044,9 +1045,15 @@ def read_xlsforms(
 ):
     """Read the list of XLSForms from the disk."""
     xlsforms = list()
+    package_name = "osm_fieldwork"
     for xls in os.listdir(directory):
         if xls.endswith(".xls") or xls.endswith(".xlsx"):
-            xlsforms.append(xls)
+            file_name = xls.split(".")[0]
+            yaml_file_name = f"data_models/{file_name}.yaml"
+            if pkg_resources.resource_exists(package_name,yaml_file_name):
+                xlsforms.append(xls)
+            else:
+                continue
     log.info(xls)
     inspect(db_models.DbXForm)
     forms = table(
