@@ -44,6 +44,7 @@ from osm_fieldwork import basemapper
 from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.json2osm import json2osm
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from sqlalchemy import and_, column, func, inspect, select, table
@@ -1238,6 +1239,8 @@ def generate_task_files(
     result = db.execute(query)
     features = result.fetchone()[0]
 
+    upload_media = False if features['features'] is None else True
+
     # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
     with open(extracts, "w") as jsonfile:
         jsonfile.truncate(0)  # clear the contents of the file
@@ -1246,9 +1249,11 @@ def generate_task_files(
     project_log.info(f"Generating xform for task {task_id}")
     outfile = central_crud.generate_updated_xform(xlsform, xform, form_type)
 
+
     # Create an odk xform
     project_log.info(f"Uploading media in {task_id}")
-    result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials)
+    result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials, False, upload_media)
+    # result = central_crud.create_odk_xform(odk_id, task_id, outfile, odk_credentials)
 
     project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
@@ -2286,13 +2291,5 @@ async def get_mbtiles_list(db: Session, project_id: int):
 
 
 async def convert_geojson_to_osm(geojson_file: str):
-    try:
-        osm_filename = "/tmp/task_outline.osm"
-        ogr2osm_command = f"ogr2osm -f -o {osm_filename} {geojson_file}"
-        os.system(ogr2osm_command)
-
-        return osm_filename
-    except Exception as e:
-        return {
-            "error": f"Conversion failed. Error details: {str(e)}"
-        }
+    """Convert a GeoJSON file to OSM format."""
+    return json2osm(geojson_file)

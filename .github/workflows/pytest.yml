@@ -21,23 +21,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref_name }}
+      name: test
 
     container:
-      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}
+      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.base_ref || github.ref_name }}
       env:
-        ODK_CENTRAL_URL: https://central-proxy
-        ODK_CENTRAL_USER: test@hotosm.org
-        ODK_CENTRAL_PASSWD: odk
-        OSM_CLIENT_ID: test
-        OSM_CLIENT_SECRET: test
-        OSM_SECRET_KEY: test
-        # Fix why env. vars not working below
-        # OSM_CLIENT_ID: ${{ env.OSM_TEST_CLIENT_ID }}
-        # OSM_CLIENT_SECRET: ${{ env.OSM_TEST_CLIENT_SECRET }}
-        # OSM_SECRET_KEY: ${{ env.OSM_TEST_SECRET_KEY }}
-        # FRONTEND_MAIN_URL: "ui-main:8080"
-        # FRONTEND_MAP_URL: "ui-map:8081"
+        ODK_CENTRAL_URL: ${{ vars.ODK_CENTRAL_URL }}
+        ODK_CENTRAL_USER: ${{ vars.ODK_CENTRAL_USER }}
+        ODK_CENTRAL_PASSWD: ${{ vars.ODK_CENTRAL_PASSWD }}
+        OSM_CLIENT_ID: ${{ vars.OSM_CLIENT_ID }}
+        OSM_CLIENT_SECRET: ${{ vars.OSM_CLIENT_SECRET }}
+        OSM_SECRET_KEY: ${{ vars.OSM_SECRET_KEY }}
+        FRONTEND_MAIN_URL: ${{ vars.FRONTEND_MAIN_URL }}
+        FRONTEND_MAP_URL: ${{ vars.FRONTEND_MAP_URL }}
       options: --user root
 
     services:
