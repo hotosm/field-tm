@@ -700,15 +700,15 @@ def process_polygon(db:Session, project_id:uuid.UUID, boundary_data:str, no_of_b
         db.commit()
     else:
         # Remove the polygons outside of the project AOI using a parameterized query
-        query = f"""
+        query = text(f"""
                     DELETE FROM ways_poly
                     WHERE NOT ST_Within(ST_Centroid(ways_poly.geom), (SELECT geom FROM project_aoi WHERE project_id = '{project_id}'));
-                """
+                """)
         result = db.execute(query)
         db.commit()
     with open('app/db/split_algorithm.sql', 'r') as sql_file:
         query = sql_file.read()
-    result = db.execute(query, params={'num_buildings': no_of_buildings})
+    result = db.execute(text(query), params={'num_buildings': no_of_buildings})
     result = result.fetchall()
     db.query(db_models.DbBuildings).delete()
     db.query(db_models.DbOsmLines).delete()
