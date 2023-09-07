@@ -88,6 +88,11 @@ jobs:
           restore-keys: |
             doc-build-
 
+      - name: Install Git
+        run: |
+          apt-get update
+          apt-get install -y git --no-install-recommends
+
       - name: Publish
         run: |
           chmod -R 777 .
