@@ -58,10 +58,10 @@ const Home = () => {
           totalProjectCount={stateHome.homeProjectSummary.length}
         />
         {stateHome.homeProjectLoading == false ? (
-          filteredProjectCards.length > 0 ? (
-            <div>
-              <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
-                <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
+          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
+            <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
+              {filteredProjectCards.length > 0 ? (
+                <div>
                   <div
                     className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
                       !showMapStatus
@@ -74,17 +74,21 @@ const Home = () => {
                     ))}
                   </div>
                 </div>
-                {/* fmtm-w-[41.8rem] */}
-                {showMapStatus && (
-                  <ProjectListMap/>
-                )}
-              </div>
+              ) : (
+                <CoreModules.Typography
+                  variant="h2"
+                  color="error"
+                  sx={{ p: 2, textAlign: 'center' }}
+                  className="fmtm-h-full fmtm-flex fmtm-justify-center fmtm-items-center"
+                >
+                  No projects found.
+                </CoreModules.Typography>
+              )}
             </div>
-          ) : (
-            <CoreModules.Typography variant="h2" color="error" sx={{ p: 2, textAlign: 'center' }}>
-              No projects found.
-            </CoreModules.Typography>
-          )
+            {showMapStatus && (
+              <ProjectListMap/>
+            )}
+          </div>
         ) : (
           <CoreModules.Stack
             sx={{

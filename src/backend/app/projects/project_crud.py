@@ -37,6 +37,7 @@ import requests
 import segno
 import shapely.wkb as wkblib
 import sqlalchemy
+import pkg_resources
 from fastapi import File, HTTPException, UploadFile
 from geoalchemy2.shape import from_shape
 from geojson import dump
@@ -700,15 +701,15 @@ def process_polygon(db:Session, project_id:uuid.UUID, boundary_data:str, no_of_b
         db.commit()
     else:
         # Remove the polygons outside of the project AOI using a parameterized query
-        query = f"""
+        query = text(f"""
                     DELETE FROM ways_poly
                     WHERE NOT ST_Within(ST_Centroid(ways_poly.geom), (SELECT geom FROM project_aoi WHERE project_id = '{project_id}'));
-                """
+                """)
         result = db.execute(query)
         db.commit()
     with open('app/db/split_algorithm.sql', 'r') as sql_file:
         query = sql_file.read()
-    result = db.execute(query, params={'num_buildings': no_of_buildings})
+    result = db.execute(text(query), params={'num_buildings': no_of_buildings})
     result = result.fetchall()
     db.query(db_models.DbBuildings).delete()
     db.query(db_models.DbOsmLines).delete()
@@ -1044,9 +1045,15 @@ def read_xlsforms(
 ):
     """Read the list of XLSForms from the disk."""
     xlsforms = list()
+    package_name = "osm_fieldwork"
     for xls in os.listdir(directory):
         if xls.endswith(".xls") or xls.endswith(".xlsx"):
-            xlsforms.append(xls)
+            file_name = xls.split(".")[0]
+            yaml_file_name = f"data_models/{file_name}.yaml"
+            if pkg_resources.resource_exists(package_name,yaml_file_name):
+                xlsforms.append(xls)
+            else:
+                continue
     log.info(xls)
     inspect(db_models.DbXForm)
     forms = table(
