@@ -165,8 +165,6 @@ async def task_features_count(
     db: Session = Depends(database.get_db),
     ):
 
-    task_list = tasks_crud.get_task_lists(db, project_id)
-
     # Get the project object.
     project = project_crud.get_project(db, project_id)
 
@@ -177,28 +175,22 @@ async def task_features_count(
         odk_central_password = project.odk_central_password,
         )
 
-    def process_task(task):
-        feature_count_query = text(f"""
-            select count(*)from features where project_id = {project_id} and task_id = {task}
-        """)
+    odk_details = central_crud.list_odk_xforms(project.odkid, odk_credentials, True)
+
+    # Assemble the final data list
+    data = []
+    for x in odk_details:
+        feature_count_query = f"""
+            select count(*) from features where project_id = {project_id} and task_id = {x['xmlFormId']}
+        """
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
-        submission_list = central_crud.list_task_submissions(
-            project.odkid, task, odk_credentials)
+        data.append({
+            'task_id': x['xmlFormId'],
+            'submission_count': x['submissions'],
+            'last_submission': x['lastSubmission'],
+            'feature_count': feature_count['count']
+        })
 
-        # form_details = central_crud.get_form_full_details(project.odkid, task, odk_credentials)
-        return {
-            "task_id": task,
-            "feature_count": feature_count[0],
-            # 'submission_count': form_details['submissions'],
-            "submission_count": len(submission_list)
-            if isinstance(submission_list, list)
-            else 0,
-        }
-
-    loop = asyncio.get_event_loop()
-    tasks = [loop.run_in_executor(None, process_task, task) for task in task_list]
-    processed_results = await asyncio.gather(*tasks)
-
-    return processed_results
+    return data
