@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
-    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]] = []
+    EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
