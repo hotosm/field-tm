@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
-    EXTRA_CORS_ORIGINS: Optional[Union[str, list[AnyUrl]]] = []
+    EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
@@ -53,8 +53,8 @@ class Settings(BaseSettings):
 
         # Build default origins from env vars
         url_scheme = info.data.get("URL_SCHEME")
-        main_url = info.data.get("URL_SCHEME")
-        map_url = info.data.get("URL_SCHEME")
+        main_url = info.data.get("FRONTEND_MAIN_URL")
+        map_url = info.data.get("FRONTEND_MAP_URL")
         if url_scheme and main_url and map_url:
             default_origins = [
                 f"{url_scheme}://{main_url}",
@@ -99,9 +99,9 @@ class Settings(BaseSettings):
         # Convert Url type to string
         return str(pg_url)
 
-    ODK_CENTRAL_URL: Optional[AnyUrl]
-    ODK_CENTRAL_USER: Optional[str]
-    ODK_CENTRAL_PASSWD: Optional[str]
+    ODK_CENTRAL_URL: Optional[AnyUrl] = None
+    ODK_CENTRAL_USER: Optional[str] = ""
+    ODK_CENTRAL_PASSWD: Optional[str] = ""
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
