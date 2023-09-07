@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
 /* eslint-disable react/forbid-prop-types */
-import React,{ useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'ol/proj';
 import Style from 'ol/style/Style';
@@ -11,13 +11,7 @@ import { Vector as VectorSource } from 'ol/source';
 import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
-import {
-  Draw,
-  Modify,
-  Select,
-  defaults as defaultInteractions,
-} from 'ol/interaction.js';
-
+import { Draw, Modify, Select, defaults as defaultInteractions } from 'ol/interaction.js';
 
 const selectElement = 'singleselect';
 
@@ -58,21 +52,24 @@ const VectorLayer = ({
 
   // Modify Feature
   useEffect(() => {
-    if(!map) return;
-    if(!vectorLayer) return;
-    if(!onModify) return;
+    if (!map) return;
+    if (!vectorLayer) return;
+    if (!onModify) return;
     const select = new Select({
       wrapX: false,
     });
     const vectorLayerSource = vectorLayer.getSource();
     const modify = new Modify({
       // features: select.getFeatures(),
-      source:vectorLayerSource
+      source: vectorLayerSource,
     });
-    modify.on('modifyend',function(e){
+    modify.on('modifyend', function (e) {
       var geoJSONFormat = new GeoJSON();
 
-      var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+      var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(), {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
 
       onModify(geoJSONString);
     });
@@ -81,14 +78,14 @@ const VectorLayer = ({
 
     return () => {
       // map.removeInteraction(defaultInteractions().extend([select, modify]))
-    }
-  }, [map,vectorLayer,onModify])
+    };
+  }, [map, vectorLayer, onModify]);
   // Modify Feature
   useEffect(() => {
-    if(!map) return;
+    if (!map) return;
     // if(!vectorLayer) return;
-    if(!onDraw) return;
-    const source = new VectorSource({wrapX: false});
+    if (!onDraw) return;
+    const source = new VectorSource({ wrapX: false });
 
     const vector = new OLVectorLayer({
       source: source,
@@ -97,11 +94,14 @@ const VectorLayer = ({
       source: source,
       type: 'Polygon',
     });
-    draw.on('drawend',function(e){
+    draw.on('drawend', function (e) {
       const feature = e.feature;
       const geojsonFormat = new GeoJSON();
-      const newGeojson = geojsonFormat.writeFeature(feature,{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-      
+      const newGeojson = geojsonFormat.writeFeature(feature, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
+
       // Call your function here with the GeoJSON as an argument
       onDraw(newGeojson);
       // var geoJSONFormat = new GeoJSON();
@@ -113,10 +113,9 @@ const VectorLayer = ({
     map.addInteraction(draw);
 
     return () => {
-      map.removeInteraction(draw)
-    }
-  }, [map,vectorLayer,onDraw])
-
+      map.removeInteraction(draw);
+    };
+  }, [map, vectorLayer, onDraw]);
 
   useEffect(() => {
     if (!map) return;
@@ -132,13 +131,12 @@ const VectorLayer = ({
     });
     map.on('click', (evt) => {
       var pixel = evt.pixel;
-      const feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-       
-        if (layer === vectorLyr) {  
+      const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+        if (layer === vectorLyr) {
           return feature;
         }
       });
-      
+
       // Perform an action if a feature is found
       if (feature) {
         // Do something with the feature
@@ -163,7 +161,6 @@ const VectorLayer = ({
     if (!map || !vectorLayer || !visibleOnMap || !setStyle) return;
     vectorLayer.setStyle(setStyle);
   }, [map, setStyle, vectorLayer, visibleOnMap]);
-
 
   useEffect(() => {
     if (!vectorLayer || !style.visibleOnMap) return;
@@ -191,65 +188,63 @@ const VectorLayer = ({
     });
   }, [vectorLayer, properties]);
 
-  
-
-// style on hover
-useEffect(() => {
-  if (!map) return null;
-  if (!vectorLayer) return null;
-  if (!hoverEffect) return null;
-  const selectionLayer = new OLVectorLayer({
-    map,
-    renderMode: 'vector',
-    source: vectorLayer.getSource(),
-    // eslint-disable-next-line consistent-return
-    style: (feature) => {
-      if (feature.getId() in selection) {
-        return selectedCountry;
-      }
-      // return stylex;
-    },
-  });
-  function pointerMovefn(event) {
-    vectorLayer.getFeatures(event.pixel).then((features) => {
-      if (!features.length) {
-        selection = {};
-        selectionLayer.changed();
-        return;
-      }
-      const feature = features[0];
-      if (!feature) {
-        return;
-      }
-      const fid = feature.getId();
-      if (selectElement.startsWith('singleselect')) {
-        selection = {};
-      }
-      // add selected feature to lookup
-      selection[fid] = feature;
-
-      selectionLayer.changed();
+  // style on hover
+  useEffect(() => {
+    if (!map) return null;
+    if (!vectorLayer) return null;
+    if (!hoverEffect) return null;
+    const selectionLayer = new OLVectorLayer({
+      map,
+      renderMode: 'vector',
+      source: vectorLayer.getSource(),
+      // eslint-disable-next-line consistent-return
+      style: (feature) => {
+        if (feature.getId() in selection) {
+          return selectedCountry;
+        }
+        // return stylex;
+      },
     });
-  }
-  map.on('pointermove', pointerMovefn);
-  return () => {
-    map.un('pointermove', pointerMovefn);
-  };
-}, [vectorLayer]);
+    function pointerMovefn(event) {
+      vectorLayer.getFeatures(event.pixel).then((features) => {
+        console.log(selection, 'selection');
+        if (!features.length) {
+          selection = {};
+          hoverEffect(undefined, vectorLayer);
+
+          selectionLayer.changed();
+          return;
+        }
+        const feature = features[0];
+        if (!feature) {
+          return;
+        }
+        const fid = feature.getId();
+        if (selectElement.startsWith('singleselect')) {
+          selection = {};
+        }
+        // add selected feature to lookup
+        selection[fid] = feature;
+        hoverEffect(selection[fid]);
+
+        selectionLayer.changed();
+      });
+    }
+    map.on('pointermove', pointerMovefn);
+    return () => {
+      map.un('pointermove', pointerMovefn);
+    };
+  }, [vectorLayer]);
   return null;
 };
-
-
-
-
 
 VectorLayer.defaultProps = {
   zIndex: 0,
   style: { ...defaultStyles },
   zoomToLayer: false,
   viewProperties: layerViewProperties,
-  mapOnClick:()=>{},
-  onModify:null,
+  mapOnClick: () => {},
+  onModify: null,
 };
 
 VectorLayer.propTypes = {
@@ -258,8 +253,8 @@ VectorLayer.propTypes = {
   zIndex: PropTypes.number,
   zoomToLayer: PropTypes.bool,
   viewProperties: PropTypes.object,
-  mapOnClick:PropTypes.func,
-  onModify:PropTypes.func,
+  mapOnClick: PropTypes.func,
+  onModify: PropTypes.func,
   // Context: PropTypes.object.isRequired,
 };
 
