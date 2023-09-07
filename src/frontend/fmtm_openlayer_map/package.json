@@ -39,7 +39,7 @@
   "dependencies": {
     "css-minimizer-webpack-plugin": "^5.0.0",
     "env-cmd": "^10.1.0",
-    "ol": "^7.2.2",
+    "ol": "^7.5.2",
     "ol-layerswitcher": "^4.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
