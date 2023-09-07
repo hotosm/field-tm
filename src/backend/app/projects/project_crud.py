@@ -2233,7 +2233,7 @@ def get_project_tiles(
             jsonfile.truncate(0)
             dump(features, jsonfile)
 
-        basemap = basemapper.BaseMapper(boundary_file, base, source)
+        basemap = basemapper.BaseMapper(boundary_file, base, source, False)
         outf = basemapper.DataFile(outfile, basemap.getFormat())
         suffix = os.path.splitext(outfile)[1]
         if suffix == ".mbtiles":
