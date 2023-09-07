@@ -62,6 +62,7 @@ jobs:
 
       - name: Build OpenAPi JSON
         run: |
+          chmod -R 777 .
           gosu appuser python scripts/gen_openapi_json.py -o docs/openapi.json
 
   publish_docs:
@@ -89,4 +90,5 @@ jobs:
 
       - name: Publish
         run: |
+          chmod -R 777 .
           gosu appuser mkdocs gh-deploy --force
