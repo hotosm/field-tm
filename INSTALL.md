@@ -1,4 +1,4 @@
-> NOTE: This is an installation guide to quickly get the fmtm app up and running. For a detailed guide on how to install the fmtm app using different methods and contributing, checkout the [docs](./docs)
+> NOTE: This is an installation guide to quickly get the fmtm app up and running. For a detailed guide on how to install the fmtm app using different methods and contributing, checkout the [dev docs](https://hotosm.github.io/fmtm/dev/Setup/)
 
 # Table of Contents
 
