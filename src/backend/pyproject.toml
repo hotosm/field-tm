@@ -39,11 +39,11 @@ dependencies = [
     "xmltodict==0.13.0",
     "SQLAlchemy-Utils==0.41.1",
     "segno==1.5.2",
-    "osm-fieldwork==0.3.6rc0",
+    "osm-fieldwork==0.3.6rc1",
     "sentry-sdk==1.30.0",
     "py-cpuinfo==9.0.0",
     "loguru>=0.7.0",
-    "osm-login-python @ git+https://github.com/spwoodcock/osm-login-python.git",
+    "osm-login-python>=1.0.0",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "../../README.md"

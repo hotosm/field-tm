@@ -139,16 +139,7 @@ Example launch.json config for vscode:
 
 Creating a new release during development may not always be feasible.
 
-**Via Dockerfile**
-
-- The debug stages in the backend Dockerfile install the latest osm-fieldwork repo `main` branch.
-- To re-build, run: `docker compose build api --no-cache`.
-
-> Note: this is useful to debug functionality not yet released in a stable version on PyPi.
-
-**Via Bind-Mount**
-
-- Alternatively, a development version of osm-fieldwork can be mounted into the FMTM container.
+- A development version of osm-fieldwork can be mounted into the FMTM container via bind mount.
 - Clone the osm-fieldwork repo to the same root directory as FMTM.
 - Uncomment the line in docker-compose.yml
 
