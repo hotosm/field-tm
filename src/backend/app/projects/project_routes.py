@@ -1024,6 +1024,7 @@ async def download_task_boundary_osm(
     response = Response(content=content, media_type="application/xml")
     return response
 
+from sqlalchemy.sql import text
 
 @router.get("/centroid/")
 async def project_centroid(
@@ -1040,11 +1041,11 @@ async def project_centroid(
         List[Tuple[int, str]]: A list of tuples containing the task ID and the centroid as a string.
     """
 
-    query = f"""SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_Centroid(outline)), ST_Y(ST_Centroid(outline))]) AS centroid
+    query = text(f"""SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_Centroid(outline)), ST_Y(ST_Centroid(outline))]) AS centroid
             FROM projects
             WHERE {f"id={project_id}" if project_id else "1=1"}
-            GROUP BY id;"""
+            GROUP BY id;""")
 
     result = db.execute(query)
-    result = result.fetchall()
-    return result
+    result_dict_list = [{"id": row[0], "centroid": row[1]} for row in result.fetchall()]
+    return result_dict_list
