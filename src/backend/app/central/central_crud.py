@@ -283,10 +283,11 @@ def delete_odk_xform(
     return result
 
 
-def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None):
+# def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None):
+def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None, metadata:bool = False):
     """List all XForms in an ODK Central project."""
     project = get_odk_project(odk_central)
-    xforms = project.listForms(project_id)
+    xforms = project.listForms(project_id, metadata)
     # FIXME: make sure it's a valid project id
     return xforms
 
