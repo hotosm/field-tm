@@ -85,9 +85,7 @@ const Home = () => {
                 </CoreModules.Typography>
               )}
             </div>
-            {showMapStatus && (
-              <ProjectListMap/>
-            )}
+            {showMapStatus && <ProjectListMap />}
           </div>
         ) : (
           <CoreModules.Stack
