@@ -53,8 +53,8 @@ class Settings(BaseSettings):
 
         # Build default origins from env vars
         url_scheme = info.data.get("URL_SCHEME")
-        main_url = info.data.get("URL_SCHEME")
-        map_url = info.data.get("URL_SCHEME")
+        main_url = info.data.get("FRONTEND_MAIN_URL")
+        map_url = info.data.get("FRONTEND_MAP_URL")
         if url_scheme and main_url and map_url:
             default_origins = [
                 f"{url_scheme}://{main_url}",
