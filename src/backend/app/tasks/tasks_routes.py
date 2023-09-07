@@ -180,9 +180,9 @@ async def task_features_count(
     # Assemble the final data list
     data = []
     for x in odk_details:
-        feature_count_query = f"""
+        feature_count_query = text(f"""
             select count(*) from features where project_id = {project_id} and task_id = {x['xmlFormId']}
-        """
+        """)
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
@@ -190,7 +190,7 @@ async def task_features_count(
             'task_id': x['xmlFormId'],
             'submission_count': x['submissions'],
             'last_submission': x['lastSubmission'],
-            'feature_count': feature_count['count']
+            'feature_count': feature_count[0]
         })
 
     return data
