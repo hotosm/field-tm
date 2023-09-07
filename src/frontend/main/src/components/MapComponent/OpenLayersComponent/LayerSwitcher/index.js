@@ -5,7 +5,6 @@ import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerGroup from 'ol/layer/Group';
 import LayerTile from 'ol/layer/Tile';
 import SourceOSM from 'ol/source/OSM';
-import SourceStamen from 'ol/source/Stamen';
 import LayerSwitcher from 'ol-layerswitcher';
 import React,{ useEffect } from 'react';
 
@@ -127,14 +126,6 @@ const monochromeMidNight = (visible = false) =>
     }),
   });
 
-const watercolor = new LayerTile({
-  title: 'Water color',
-  type: 'base',
-  visible: false,
-  source: new SourceStamen({
-    layer: 'watercolor',
-  }),
-});
 
 const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
   useEffect(() => {
