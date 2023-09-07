@@ -1,4 +1,4 @@
-![](images/hot_logo.png)
+![](https://github.com/hotosm/fmtm/blob/main/images/hot_logo.png?raw=true)
 
 # Field Mapping Tasking Manager (FMTM)
 
