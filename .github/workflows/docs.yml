@@ -41,7 +41,9 @@ jobs:
   build_openapi_json:
     name: Build OpenAPI
     runs-on: ubuntu-latest
-    container: ghcr.io/hotosm/fmtm/backend:ci-main
+    container:
+      image: ghcr.io/hotosm/fmtm/backend:ci-main
+      options: --user root
 
     steps:
       - name: Checkout repository
@@ -60,13 +62,14 @@ jobs:
 
       - name: Build OpenAPi JSON
         run: |
-          cd src/backend
-          python ../../scripts/gen_openapi_json.py -o ../../docs/openapi.json
+          gosu appuser python scripts/gen_openapi_json.py -o docs/openapi.json
 
   publish_docs:
     name: Publish Docs
     runs-on: ubuntu-latest
-    container: ghcr.io/hotosm/fmtm/backend:ci-main
+    container:
+      image: ghcr.io/hotosm/fmtm/backend:ci-main
+      options: --user root
     needs: [build_doxygen, build_openapi_json]
 
     steps:
@@ -86,5 +89,4 @@ jobs:
 
       - name: Publish
         run: |
-          cd src/backend
-          mkdocs gh-deploy --config-file=../../mkdocs.yml --force
+          gosu appuser mkdocs gh-deploy --force
