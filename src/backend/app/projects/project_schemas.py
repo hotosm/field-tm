@@ -50,7 +50,7 @@ class BETAProjectUpload(BaseModel):
     xform_title: Union[str, None]
     odk_central: ODKCentral
     hashtags: Union[List[str], None]
-    organisation_id: Optional[int]
+    organisation_id: Optional[int] = None
     # city: str
     # country: str
 
@@ -58,25 +58,25 @@ class BETAProjectUpload(BaseModel):
 class Feature(BaseModel):
     id: int
     project_id: int
-    task_id: Optional[int]
-    geometry: Optional[Feature]
+    task_id: Optional[int] = None
+    geometry: Optional[Feature] = None
 
 
 class ProjectSummary(BaseModel):
     id: int = -1
     priority: ProjectPriority = ProjectPriority.MEDIUM
     priority_str: str = priority.name
-    title: Optional[str]
-    location_str: Optional[str]
-    description: Optional[str]
-    total_tasks: Optional[int]
-    tasks_mapped: Optional[int]
-    num_contributors: Optional[int]
-    tasks_validated: Optional[int]
-    tasks_bad: Optional[int]
-    hashtags: Optional[List[str]]
-    organisation_id: Optional[int]
-    organisation_logo: Optional[str]
+    title: Optional[str] = None
+    location_str: Optional[str] = None
+    description: Optional[str] = None
+    total_tasks: Optional[int] = None
+    tasks_mapped: Optional[int] = None
+    num_contributors: Optional[int] = None
+    tasks_validated: Optional[int] = None
+    tasks_bad: Optional[int] = None
+    hashtags: Optional[List[str]] = None
+    organisation_id: Optional[int] = None
+    organisation_logo: Optional[str] = None
 
 
 class ProjectBase(BaseModel):
@@ -88,9 +88,9 @@ class ProjectBase(BaseModel):
     # location_str: str
     # outline_geojson: Optional[Feature]
     project_tasks: Optional[List[tasks_schemas.Task]]
-    xform_title: Optional[str]
-    hashtags: Optional[List[str]]
-    organisation_id: Optional[int]
+    xform_title: Optional[str] = None
+    hashtags: Optional[List[str]] = None
+    organisation_id: Optional[int] = None
 
 
 class ProjectOut(ProjectBase):
