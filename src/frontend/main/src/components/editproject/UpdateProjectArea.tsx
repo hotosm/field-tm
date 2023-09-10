@@ -34,12 +34,12 @@ const UpdateProjectArea = ({ projectId }) => {
     };
   }, [uploadAOI]);
 
-  useEffect(() => {
-    if (!outline_geojson) return;
-    setGeojsonAOI(outline_geojson);
-    if (!dividedTaskGeojson) return;
-    setGeojsonAOI(dividedTaskGeojson);
-  }, [dividedTaskGeojson, outline_geojson]);
+  // useEffect(() => {
+  //   if (!outline_geojson) return;
+  //   setGeojsonAOI(outline_geojson);
+  //   if (!dividedTaskGeojson) return;
+  //   setGeojsonAOI(dividedTaskGeojson);
+  // }, [dividedTaskGeojson, outline_geojson]);
 
   const generateTasksOnMap = () => {
     dispatch(
