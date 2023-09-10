@@ -323,15 +323,21 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
   };
 };
 
-const TaskSplittingPreviewService: Function = (url: string, fileUpload: any, no_of_buildings: string) => {
+const TaskSplittingPreviewService: Function = (
+  url: string,
+  fileUpload: any,
+  no_of_buildings: string,
+  isCustomDataExtract: boolean,
+) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
 
-    const getTaskSplittingGeojson = async (url, fileUpload) => {
+    const getTaskSplittingGeojson = async (url, fileUpload, isCustomDataExtract) => {
       try {
         const taskSplittingFileFormData = new FormData();
         taskSplittingFileFormData.append('upload', fileUpload);
         taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
+        taskSplittingFileFormData.append('has_data_extracts', isCustomDataExtract);
 
         const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
         const resp: OrganisationListModel = getTaskSplittingResponse.data;
@@ -344,7 +350,7 @@ const TaskSplittingPreviewService: Function = (url: string, fileUpload: any, no_
       }
     };
 
-    await getTaskSplittingGeojson(url, fileUpload);
+    await getTaskSplittingGeojson(url, fileUpload, isCustomDataExtract);
   };
 };
 const PatchProjectDetails: Function = (url: string, payload: any) => {
