@@ -75,3 +75,6 @@ src/frontend/node_modules
 **/pdm.toml
 **/.pdm-python
 **/__pypackages__
+
+# mkdocs
+site
