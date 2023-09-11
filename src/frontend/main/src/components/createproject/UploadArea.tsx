@@ -119,7 +119,7 @@ const UploadArea: React.FC<any> = ({ geojsonFile, setGeojsonFile, setInputValue,
       <DefineAreaMap
         uploadedGeojson={geojsonFile}
         onDraw={(geojson) => {
-          dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
+          dispatch(CreateProjectActions.SetDividedTaskGeojson(JSON.parse(geojson)));
         }}
       />
     </CoreModules.Stack>
