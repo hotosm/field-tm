@@ -18,7 +18,7 @@
 
 from typing import List, Union, Optional
 
-from geojson_pydantic import Feature
+from geojson_pydantic import Feature as GeojsonFeature
 from pydantic import BaseModel
 
 from ..models.enums import ProjectPriority, ProjectStatus
@@ -39,9 +39,9 @@ class ProjectInfo(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    name: Union[str, None]
-    short_description: Union[str, None]
-    description: Union[str, None]
+    name: Optional[str] = None
+    short_description: Optional[str] = None
+    description: Optional[str] = None
 
 
 class BETAProjectUpload(BaseModel):
@@ -49,7 +49,7 @@ class BETAProjectUpload(BaseModel):
     project_info: ProjectInfo
     xform_title: Union[str, None]
     odk_central: ODKCentral
-    hashtags: Union[List[str], None]
+    hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
     # city: str
     # country: str
@@ -59,7 +59,7 @@ class Feature(BaseModel):
     id: int
     project_id: int
     task_id: Optional[int] = None
-    geometry: Optional[Feature] = None
+    geometry: Optional[GeojsonFeature] = None
 
 
 class ProjectSummary(BaseModel):
@@ -86,7 +86,7 @@ class ProjectBase(BaseModel):
     project_info: List[ProjectInfo]
     status: ProjectStatus
     # location_str: str
-    # outline_geojson: Optional[Feature]
+    outline_geojson: Optional[GeojsonFeature] = None
     project_tasks: Optional[List[tasks_schemas.Task]]
     xform_title: Optional[str] = None
     hashtags: Optional[List[str]] = None
