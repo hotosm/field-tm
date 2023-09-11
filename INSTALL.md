@@ -229,5 +229,3 @@ This is the easiest way to manage multiple frontends at once.
    - **Map:** <http://127.0.0.1:8081>
 
 That's it, you have successfully set up the frontend!!
-
-> NOTE: For a detailed guide, installation tips and other installation methods, check out the [docs folder](./docs)
