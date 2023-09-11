@@ -160,7 +160,7 @@ Creating a new release during development may not always be feasible.
 ```bash
 docker compose \
   -f docker-compose.yml \
-  -f docker-compose.josm.yml \
+  -f josm/docker-compose.yml \
   up -d
 ```
 

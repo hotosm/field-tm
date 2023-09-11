@@ -25,6 +25,7 @@ volumes:
 
 networks:
   fmtm-dev:
+    name: fmtm-dev
 
 services:
   fmtm-db:
