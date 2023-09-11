@@ -22,6 +22,8 @@ from loguru import logger as log
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from ..config import settings
+
 
 from ..db import database
 from ..db.db_models import DbUser
@@ -66,7 +68,8 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     - access_token (string)
     """
     print("Call back api requested", request.url)
-    access_token = osm_auth.callback(str(request.url))
+    
+    access_token = osm_auth.callback(str(request.url).replace('http',settings.URL_SCHEME))
     log.debug(f"Access token returned: {access_token}")
     return JSONResponse(content={"access_token": access_token}, status_code=200)
 
