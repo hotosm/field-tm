@@ -79,7 +79,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
                   backgroundColor:
                     task.task_id === selectedTask ? "#F0FBFF" : "#FFFFFF",
                 }}
-                onClick={() => onTaskClick(task.task_id)}
+                onClick={() => onTaskClick(+task.task_id)}
               >
                 <CoreModules.Box
                   sx={{ display: "flex", justifyContent: "space-between" }}
