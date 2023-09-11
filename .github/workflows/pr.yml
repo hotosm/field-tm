@@ -11,15 +11,6 @@ on:
 
 jobs:
   pytest:
-    runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref_name }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: PyTest
-        uses: ./.github/workflows/reusable/pytest.yml
-
-      - name: Frontend Tests
-        uses: ./.github/workflows/reusable/frontend_test.yml
+    uses: ./.github/workflows/reusable/pytest.yml
+  frontend-tests:
+    uses: ./.github/workflows/reusable/frontend_tests.yml
