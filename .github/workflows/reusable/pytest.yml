@@ -1,6 +1,9 @@
 name: pytest
 
-on: [workflow_call]
+on:
+  workflow_call:
+    paths:
+      - src/backend/**
 
 permissions:
   contents: read
