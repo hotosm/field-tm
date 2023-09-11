@@ -394,8 +394,6 @@ def download_submission_for_project(db, project_id):
             zip_file.extractall(extract_dir)
             return [os.path.join(extract_dir, f) for f in zip_file.namelist()]
 
-    # Set up logging configuration
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(threadName)s] %(message)s")
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         task_list = [x.id for x in project_tasks]
