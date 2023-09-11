@@ -141,7 +141,8 @@ def get_logger():
             serialize=True,
             rotation="00:00",
             retention="10 days",
-            filter=lambda record: record["extra"]["task"] == "create_project",
+            # filter=lambda record: record["extra"]["task"] == "create_project",
+            filter=lambda record: "task" in record["extra"] and record["extra"]["task"] == "create_project"
         )
 
 api = get_application()
