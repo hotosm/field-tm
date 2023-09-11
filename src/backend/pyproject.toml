@@ -43,7 +43,7 @@ dependencies = [
     "sentry-sdk==1.30.0",
     "py-cpuinfo==9.0.0",
     "loguru>=0.7.0",
-    "osm-login-python>=1.0.0",
+    "osm-login-python @ git+https://github.com/spwoodcock/osm-login-python@build/pep631-support",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "../../README.md"

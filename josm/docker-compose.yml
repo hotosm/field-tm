@@ -24,7 +24,7 @@ services:
   josm:
     image: "ghcr.io/hotosm/fmtm/josm:latest"
     build:
-      context: josm
+      context: .
     container_name: josm
     environment:
       - DISPLAY=josm-novnc:0.0
@@ -40,7 +40,7 @@ services:
   josm-novnc:
     image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
     build:
-      context: josm/novnc
+      context: novnc
     container_name: josm_novnc
     environment:
       - DISPLAY_WIDTH=1280
