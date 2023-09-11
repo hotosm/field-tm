@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "DEBUG"
 
-    URL_SCHEME: Optional[str] = "http"
+    URL_SCHEME: Optional[str] = "https"
     FRONTEND_MAIN_URL: Optional[str]
     FRONTEND_MAP_URL: Optional[str]
 
