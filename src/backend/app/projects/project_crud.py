@@ -581,7 +581,7 @@ def get_osm_extracts(boundary: str):
     else:
         query["geometry"] = json_boundary
 
-    base_url = "https://raw-data-api0.hotosm.org/v1"
+    base_url = settings.UNDERPASS_API_URL
     query_url = f"{base_url}/snapshot/"
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
@@ -1394,7 +1394,7 @@ def generate_appuser_files(
                 project_log.info(f"Extracting Data from OSM")
 
                 # OSM Extracts for whole project
-                pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
+                pg = PostgresClient(settings.UNDERPASS_API_URL, "underpass")
                 # This file will store osm extracts
                 outfile = f"/tmp/{prefix}_{xform_title}.geojson"
 
@@ -2019,7 +2019,7 @@ async def update_project_form(
     db.commit()
 
     # OSM Extracts for whole project
-    pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
+    pg = PostgresClient(settings.UNDERPASS_API_URL, "underpass")
     outfile = (
         f"/tmp/{project_title}_{category}.geojson"  # This file will store osm extracts
     )

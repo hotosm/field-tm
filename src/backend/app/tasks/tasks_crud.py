@@ -40,6 +40,7 @@ from ..models.enums import (
 from ..projects import project_crud
 from ..tasks import tasks_schemas
 from ..users import user_crud
+from app.config import settings
 
 
 async def get_task_count_in_project(db: Session, project_id: int):
@@ -330,7 +331,7 @@ async def update_task_files(
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
 
     # Update data extracts in the odk central
-    pg = PostgresClient("https://raw-data-api0.hotosm.org/v1", "underpass")
+    pg = PostgresClient(settings.UNDERPASS_API_URL, "underpass")
 
     category = "buildings"
 
