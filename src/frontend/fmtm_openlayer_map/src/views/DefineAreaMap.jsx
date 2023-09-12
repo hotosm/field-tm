@@ -53,6 +53,7 @@ const DefineAreaMap = ({
         setDataExtractedGeojson(e.target.result);
       };
     } else {
+      setDataExtractedGeojson(null);
     }
   }, [uploadedDataExtractFile]);
   useEffect(() => {
@@ -63,6 +64,7 @@ const DefineAreaMap = ({
         setLineExtractedGeojson(e.target.result);
       };
     } else {
+      setLineExtractedGeojson(null);
     }
   }, [uploadedLineExtractFile]);
   return (
@@ -128,7 +130,7 @@ const DefineAreaMap = ({
               constrainResolution: true,
               duration: 2000,
             }}
-            // zoomToLayer
+            zoomToLayer
           />
         )}
         {lineExtractedGeojson && (
@@ -151,7 +153,7 @@ const DefineAreaMap = ({
               constrainResolution: true,
               duration: 2000,
             }}
-            // zoomToLayer
+            zoomToLayer
           />
         )}
       </MapComponent>

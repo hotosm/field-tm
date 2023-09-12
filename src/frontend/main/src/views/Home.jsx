@@ -111,7 +111,7 @@ const Home = () => {
       </CoreModules.Stack> */}
       </div>
 
-      <div className="fmtm-flex fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
+      {/* <div className="fmtm-flex fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
         <div>1-5 of 10 </div>
         <AssetModules.ArrowLeftIcon
           sx={{
@@ -132,7 +132,7 @@ const Home = () => {
           type="number"
           className="fmtm-w-10 fmtm-rounded-md fmtm-border-[1px] fmtm-border-[#E7E2E2] fmtm-outline-none"
         />
-      </div>
+      </div> */}
     </div>
   );
 };

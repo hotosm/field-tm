@@ -76,6 +76,14 @@ const DataExtract: React.FC<any> = ({
     submission,
     DataExtractValidation,
   );
+  useEffect(() => {
+    if (values.data_extract_options === 'Data Extract Ways') {
+      setDataExtractFile(null);
+      setDataExtractFileValue(null);
+      setLineExtractFile(null);
+      setLineExtractFileValue(null);
+    }
+  }, [values.data_extract_options]);
 
   return (
     <CoreModules.Stack
