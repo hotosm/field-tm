@@ -1,11 +1,9 @@
 name: Frontend Tests
 
 on:
-  push:
+  workflow_call:
     paths:
-      - "src/frontend/**" # Trigger the workflow only when files within srv/frontend change
-      - ".github/workflows/**" # Also trigger if github workflow changes
-  workflow_dispatch:
+      - src/frontend/**
 
 jobs:
   test:
@@ -13,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v2

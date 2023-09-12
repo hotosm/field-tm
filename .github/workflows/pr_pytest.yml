@@ -1,0 +1,24 @@
+name: PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+      - development
+    paths:
+      - src/backend/**
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: PyTest
+        uses: ./.github/workflows/reusable/pytest.yml
