@@ -110,6 +110,7 @@ class Settings(BaseSettings):
     OSM_SCOPE: str = "read_prefs"
     OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:8080/osmauth/"
 
+    UNDERPASS_API_URL: str = "https://raw-data-api0.hotosm.org/v1"
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(

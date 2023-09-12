@@ -1,18 +1,9 @@
 name: pytest
 
 on:
-  # Run tests on all pushed branches
-  push:
-    branches:
-      - "*"
-  # Run tests on PR, prior to merge to main & development.
-  pull_request:
-    branches:
-      - main
-      - staging
-      - development
-  # Allow manual trigger (workflow_dispatch)
-  workflow_dispatch:
+  workflow_call:
+    paths:
+      - src/backend/**
 
 permissions:
   contents: read

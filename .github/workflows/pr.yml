@@ -1,0 +1,16 @@
+name: PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+      - development
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    uses: ./.github/workflows/reusable/pytest.yml
+  frontend-tests:
+    uses: ./.github/workflows/reusable/frontend_tests.yml
