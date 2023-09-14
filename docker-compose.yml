@@ -83,7 +83,6 @@ services:
         APP_NAME: main
         API_URL: ${URL_SCHEME}://${API_URL}
         FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -93,35 +92,8 @@ services:
     environment:
       - API_URL=${URL_SCHEME}://${API_URL}
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8080:8080"
-    networks:
-      - fmtm-dev
-    restart: unless-stopped
-
-  ui-map:
-    image: "ghcr.io/hotosm/fmtm/frontend/map:debug"
-    build:
-      context: src/frontend
-      dockerfile: debug.dockerfile
-      args:
-        APP_NAME: fmtm_openlayer_map
-        API_URL: ${URL_SCHEME}://${API_URL}
-        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
-    container_name: fmtm_map
-    depends_on:
-      - api
-    volumes:
-      - ./src/frontend/fmtm_openlayer_map:/app
-      - /app/node_modules/
-    environment:
-      - API_URL=${URL_SCHEME}://${API_URL}
-      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
-    ports:
-      - "8081:8081"
     networks:
       - fmtm-dev
     restart: unless-stopped

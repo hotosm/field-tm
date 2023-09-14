@@ -44,6 +44,17 @@ const LoadingBar = ({ activeStep, totalSteps, title }) => {
               borderRadius: '20%',
             }}
           >
+            {/* <div className="fmtm-relative fmtm-mx-2 fmtm-my-3 fmtm-h-5 fmtm-rounded-full fmtm-bg-gray-200">
+              <div
+                className="fmtm-h-full fmtm-rounded-full fmtm-bg-blue-500"
+                style={{ width: '50%' }}
+                // style={{ width: calculateProgress(totalSteps, activeStep) }}
+              >
+                <span className="fmtm-absolute fmtm-inset-0 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-text-xs fmtm-font-semibold fmtm-text-black">
+                  {completedPercentage}%
+                </span>
+              </div>
+            </div> */}
             <LinearProgress
               variant="determinate"
               value={completedPercentage}

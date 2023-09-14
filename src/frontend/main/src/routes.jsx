@@ -14,12 +14,12 @@ import Organization from './views/Organization';
 import CreateOrganization from './views/CreateOrganization';
 import Authorized from './views/Authorized';
 import SubmissionDetails from './views/SubmissionDetails';
-import ProjectDetails from 'map/ProjectDetails';
+import ProjectDetails from './views/ProjectDetails';
 
-// const ProjectDetails = React.lazy(() => import('map/ProjectDetails'));
-const Submissions = React.lazy(() => import('map/Submissions'));
-const Tasks = React.lazy(() => import('map/Tasks'));
-const ProjectInfo = React.lazy(() => import('map/ProjectInfo'));
+// const ProjectDetails = React.lazy(() => import('./views/ProjectDetails'));
+const Submissions = React.lazy(() => import('./views/Submissions'));
+const Tasks = React.lazy(() => import('./views/Tasks'));
+const ProjectInfo = React.lazy(() => import('./views/ProjectInfo'));
 
 const routes = createBrowserRouter([
   {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import enviroment from '../../environment';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules.js';
@@ -8,7 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 //@ts-ignore
-import DefineAreaMap from 'map/DefineAreaMap';
+import DefineAreaMap from '../../views/DefineAreaMap';
 import useForm from '../../hooks/useForm';
 import DefineTaskValidation from './validation/DefineTaskValidation';
 import { useAppSelector } from '../../types/reduxTypes';

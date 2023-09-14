@@ -270,7 +270,6 @@ ODK_CENTRAL_PASSWD=`<password_of_central_user>`
 URL_SCHEME=http
 API_URL=127.0.0.1:8000
 FRONTEND_MAIN_URL=localhost:8080
-FRONTEND_MAP_URL=localhost:8081
 # API_PREFIX=/api
 
 ### OSM ###

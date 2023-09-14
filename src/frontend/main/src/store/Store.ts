@@ -1,6 +1,5 @@
 import HomeSlice from './slices/HomeSlice';
 import ThemeSlice from './slices/ThemeSlice';
-// import projectSlice from 'map/Project';
 import { persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import ProjectSlice from './slices/ProjectSlice';
