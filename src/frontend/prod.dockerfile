@@ -12,7 +12,7 @@ LABEL org.hotosm.fmtm.app-name="${APP_NAME}" \
       org.hotosm.fmtm.app-version="${APP_VERSION}" \
       org.hotosm.fmtm.maintainer="${MAINTAINER}" \
       org.hotosm.fmtm.api-url="${API_URL}" \
-      org.hotosm.fmtm.main-url="${FRONTEND_MAIN_URL}" \
+      org.hotosm.fmtm.main-url="${FRONTEND_MAIN_URL}"
 
 WORKDIR /app
 COPY ./${APP_NAME}/package*.json ./
