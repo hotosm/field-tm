@@ -51,7 +51,6 @@ jobs:
         run: |
           cd src/frontend
           echo "FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)" >> $GITHUB_ENV
-          echo "FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)" >> $GITHUB_ENV
 
       - name: Build and push backend
         uses: docker/build-push-action@v4
@@ -77,21 +76,6 @@ jobs:
             APP_VERSION=${{ env.FRONTEND_MAIN_VERSION }}
             API_URL=${{ env.URL_SCHEME }}://${{ env.API_URL }}
             FRONTEND_MAIN_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAIN_URL }}
-            FRONTEND_MAP_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAP_URL }}
-
-      - name: Build and push frontend map
-        uses: docker/build-push-action@v4
-        with:
-          context: src/frontend
-          file: src/frontend/prod.dockerfile
-          push: true
-          tags: "ghcr.io/hotosm/fmtm/frontend/map:${{ env.FRONTEND_MAP_VERSION }}-${{ github.ref_name }}"
-          build-args: |
-            APP_NAME=fmtm_openlayer_map
-            APP_VERSION=${{ env.FRONTEND_MAP_VERSION }}
-            API_URL=${{ env.URL_SCHEME }}://${{ env.API_URL }}
-            FRONTEND_MAIN_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAIN_URL }}
-            FRONTEND_MAP_URL=${{ env.URL_SCHEME }}://${{ env.FRONTEND_MAP_URL }}
 
   deploy-containers:
     runs-on: ubuntu-latest
@@ -114,14 +98,12 @@ jobs:
         run: |
           cd src/frontend
           echo "FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)" >> $GITHUB_OUTPUT
-          echo "FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)" >> $GITHUB_OUTPUT
 
       - name: Environment to .env
         run: |
           echo "${{ secrets.DOTENV }}" > .env
           echo "API_VERSION=${{ steps.extract_api_version.outputs.API_VERSION }}" >> .env
           echo "FRONTEND_MAIN_VERSION=${{ steps.extract_frontend_versions.outputs.FRONTEND_MAIN_VERSION }}" >> .env
-          echo "FRONTEND_MAP_VERSION=${{ steps.extract_frontend_versions.outputs.FRONTEND_MAP_VERSION }}" >> .env
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:

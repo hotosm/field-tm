@@ -140,47 +140,6 @@ module.exports = function (webpackEnv) {
         filename: 'static/css/[name].[contenthash:8].css',
         chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
-      new ModuleFederationPlugin({
-        name: 'fmtm',
-        filename: 'remoteEntry.js',
-        remotes: {
-          map: `fmtm_openlayer_map@${process.env.FRONTEND_MAP_URL}/remoteEntry.js`,
-        },
-        exposes: {
-          './ThemeSlice': './src/store/slices/ThemeSlice.ts',
-          './HomeSlice': './src/store/slices/HomeSlice.ts',
-          './CommonSlice': './src/store/slices/CommonSlice.ts',
-          './LoginSlice': './src/store/slices/LoginSlice.ts',
-          './ProjectSlice': './src/store/slices/ProjectSlice.ts',
-          './CreateProjectSlice': './src/store/slices/CreateProjectSlice.ts',
-          './Store': './src/store/Store.ts',
-          './BasicCard': './src/utilities/BasicCard.tsx',
-          './CustomizedMenus': './src/utilities/CustomizedMenus.tsx',
-          './CustomizedSnackbar': './src/utilities/CustomizedSnackbar.jsx',
-          './PrimaryAppBar': './src/utilities/PrimaryAppBar.tsx',
-          './environment': './src/environment.ts',
-          './WindowDimension': './src/hooks/WindowDimension.tsx',
-          './OnScroll': './src/hooks/OnScroll.tsx',
-          './CoreModules': './src/shared/CoreModules.js',
-          './AssetModules': './src/shared/AssetModules.js',
-        },
-        shared: {
-          ...deps,
-          react: {
-            singleton: true,
-            requiredVersion: deps.react,
-          },
-          'react-dom': {
-            singleton: true,
-            requiredVersion: deps['react-dom'],
-            // requiredVersion: deps["react-dom", "@material-ui/core", "@material-ui/icons"],
-          },
-          'react-redux': {
-            singleton: true,
-            version: deps['react-router-dom'],
-          },
-        },
-      }),
       new HtmlWebPackPlugin(
         Object.assign(
           {},
@@ -209,7 +168,7 @@ module.exports = function (webpackEnv) {
         ),
       ),
 
-      new EnvironmentPlugin(['API_URL', 'FRONTEND_MAIN_URL', 'FRONTEND_MAP_URL']),
+      new EnvironmentPlugin(['API_URL', 'FRONTEND_MAIN_URL']),
     ],
   };
 };

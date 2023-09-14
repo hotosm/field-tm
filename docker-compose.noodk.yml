@@ -76,7 +76,6 @@ services:
         APP_NAME: main
         API_URL: ${URL_SCHEME}://${API_URL}
         FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -86,7 +85,6 @@ services:
     environment:
       - API_URL=${URL_SCHEME}://${API_URL}
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8081:8081"
     networks:
@@ -102,7 +100,6 @@ services:
         APP_NAME: fmtm_openlayer_map
         API_URL: ${URL_SCHEME}://${API_URL}
         FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_map
     depends_on:
       - api
@@ -112,7 +109,6 @@ services:
     environment:
       - API_URL=${URL_SCHEME}://${API_URL}
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     ports:
       - "8082:8082"
     networks:

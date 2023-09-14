@@ -165,28 +165,6 @@ do
     fi
 done
 
-# FRONTEND MAP
-echo
-echo "Enter the FMTM Map Frontend URL."
-echo "If you have a valid domain name, enter it here."
-while true
-do
-    read -e -p "Enter d for default 127.0.0.1:8080, else your IP/domain: " frontend_map_url
-    
-    if [ "$frontend_map_url" != "d" ]
-    then
-        echo "Using $FRONTEND_MAP_URL"
-        break
-    elif [ "$api_url" = "" ]
-    then
-        echo "Invalid input!"
-    else 
-        echo "Using $FRONTEND_MAP_URL"
-        FRONTEND_MAP_URL="frontend_map_url"
-        break
-    fi
-done
-
 echo
 echo "Please enter your OSM authentication details"
 read -e -p "Client ID: " OSM_CLIENT_ID
@@ -226,7 +204,6 @@ echo "### FMTM ###"
 echo "URL_SCHEME=${URL_SCHEME}" >> "${DOTENV_NAME}"
 echo "API_URL=${API_URL}" >> "${DOTENV_NAME}"
 echo "FRONTEND_MAIN_URL=${FRONTEND_MAIN_URL}" >> "${DOTENV_NAME}"
-echo "FRONTEND_MAP_URL=${FRONTEND_MAP_URL}" >> "${DOTENV_NAME}"
 
 echo "### OSM ###"
 echo "OSM_CLIENT_ID=${OSM_CLIENT_ID}" >> "${DOTENV_NAME}"

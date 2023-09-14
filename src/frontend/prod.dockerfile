@@ -7,15 +7,12 @@ ARG API_URL
 ENV API_URL="${API_URL}"
 ARG FRONTEND_MAIN_URL
 ENV FRONTEND_MAIN_URL="${FRONTEND_MAIN_URL}"
-ARG FRONTEND_MAP_URL
-ENV FRONTEND_MAP_URL="${FRONTEND_MAP_URL}"
 
 LABEL org.hotosm.fmtm.app-name="${APP_NAME}" \
       org.hotosm.fmtm.app-version="${APP_VERSION}" \
       org.hotosm.fmtm.maintainer="${MAINTAINER}" \
       org.hotosm.fmtm.api-url="${API_URL}" \
       org.hotosm.fmtm.main-url="${FRONTEND_MAIN_URL}" \
-      org.hotosm.fmtm.fmtm_openlayer_map-url="${FRONTEND_MAP_URL}"
 
 WORKDIR /app
 COPY ./${APP_NAME}/package*.json ./

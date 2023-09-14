@@ -115,7 +115,6 @@ services:
         APP_VERSION: ${FRONTEND_MAIN_VERSION}
         API_URL: ${URL_SCHEME}://${API_URL}
         FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
     container_name: fmtm_main
     depends_on:
       - api
@@ -126,7 +125,6 @@ services:
       - BROTLI=true
       - API_URL=${URL_SCHEME}://${API_URL}
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -135,34 +133,3 @@ services:
       - "traefik.http.routers.ui-main.rule=Host(`${FRONTEND_MAIN_URL}`)"
       - "traefik.http.services.ui-main-svc.loadbalancer.server.port=8080"
       - "traefik.http.routers.ui-main.service=ui-main-svc"
-
-  ui-map:
-    image: "ghcr.io/hotosm/fmtm/frontend/map:${FRONTEND_MAP_VERSION}-${GIT_BRANCH}"
-    build:
-      context: src/frontend
-      dockerfile: prod.dockerfile
-      args:
-        APP_NAME: fmtm_openlayer_map
-        APP_VERSION: ${FRONTEND_MAP_VERSION}
-        API_URL: ${URL_SCHEME}://${API_URL}
-        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-        FRONTEND_MAP_URL: ${URL_SCHEME}://${FRONTEND_MAP_URL}
-    container_name: fmtm_map
-    depends_on:
-      - api
-      - traefik
-    networks:
-      - fmtm-net
-    environment:
-      - BROTLI=true
-      - API_URL=${URL_SCHEME}://${API_URL}
-      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-      - FRONTEND_MAP_URL=${URL_SCHEME}://${FRONTEND_MAP_URL}
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ui-map.tls=true"
-      - "traefik.http.routers.ui-map.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui-map.rule=Host(`${FRONTEND_MAP_URL}`)"
-      - "traefik.http.services.ui-map-svc.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui-map.service=ui-map-svc"

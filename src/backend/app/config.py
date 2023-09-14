@@ -33,7 +33,6 @@ class Settings(BaseSettings):
 
     URL_SCHEME: Optional[str] = "http"
     FRONTEND_MAIN_URL: Optional[str]
-    FRONTEND_MAP_URL: Optional[str]
 
     EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
 
@@ -54,11 +53,9 @@ class Settings(BaseSettings):
         # Build default origins from env vars
         url_scheme = info.data.get("URL_SCHEME")
         main_url = info.data.get("FRONTEND_MAIN_URL")
-        map_url = info.data.get("FRONTEND_MAP_URL")
-        if url_scheme and main_url and map_url:
+        if url_scheme and main_url:
             default_origins = [
                 f"{url_scheme}://{main_url}",
-                f"{url_scheme}://{map_url}",
             ]
 
         if val is None:

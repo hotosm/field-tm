@@ -60,7 +60,6 @@ that file to contain the needful (it should look like this):
     # FMTM
     API_URL=https://fmtm-api.hotosm.org
     FRONTEND_MAIN_URL=https://fmtm.hotosm.org
-    FRONTEND_MAP_URL=https://map.fmtm.hotosm.org
     # API_PREFIX=/api
 
     # OSM

@@ -1,5 +1,4 @@
 export default {
-  main_url: process.env.FRONTEND_MAP_URL,
   nodeEnv: process.env.NODE_ENV,
   baseApiUrl: process.env.API_URL,
   decode: (id: any) => {
