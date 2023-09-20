@@ -23,7 +23,7 @@ COPY ${APP_NAME}/ .
 RUN npm run build
 
 
-FROM docker.io/devforth/spa-to-http:1.0.3
+FROM docker.io/devforth/spa-to-http:1.0.3 as prod
 WORKDIR /app
 # Add non-root user, permissions
 RUN adduser -D -u 900 -h /home/appuser appuser
