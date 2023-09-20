@@ -79,22 +79,22 @@ jobs:
           docker network create fmtm
 
           docker pull "postgis/postgis:14-3.3-alpine"
-          docker run --rm -d
-            --name=fmtm-db
-            --network=fmtm
-            -e POSTGRES_USER=fmtm
-            -e POSTGRES_PASSWORD=fmtm
-            -e POSTGRES_DB=fmtm
+          docker run --rm -d \
+            --name=fmtm-db \
+            --network=fmtm \
+            -e POSTGRES_USER=fmtm \
+            -e POSTGRES_PASSWORD=fmtm \
+            -e POSTGRES_DB=fmtm \
             "postgis/postgis:14-3.3-alpine"
 
           docker pull "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
-          docker run --rm -d
-            --network=fmtm
-            -v 8080:8080
-            -e FRONTEND_MAIN_URL="http://test.com"
-            -e OSM_CLIENT_ID="test"
-            -e OSM_CLIENT_SECRET="test"
-            -e OSM_SECRET_KEY="test"
+          docker run --rm -d \
+            --network=fmtm \
+            -v 8080:8080 \
+            -e FRONTEND_MAIN_URL="http://test.com" \
+            -e OSM_CLIENT_ID="test" \
+            -e OSM_CLIENT_SECRET="test" \
+            -e OSM_SECRET_KEY="test" \
             "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
 
           # Check the exit status of curl and exit the job if it fails
