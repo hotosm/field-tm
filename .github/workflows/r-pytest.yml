@@ -19,7 +19,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment || test }}
+      name: ${{ inputs.environment || 'test' }}
 
     container:
       image: ghcr.io/hotosm/fmtm/backend:${{ inputs.image_tag }}

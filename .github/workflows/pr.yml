@@ -14,5 +14,5 @@ jobs:
     uses: ./.github/workflows/r-pytest.yml
     with:
       image_tag: ci-${{ github.base_ref }}
-  frontend-main-tests:
+  frontend-tests:
     uses: ./.github/workflows/r-frontend_tests.yml
