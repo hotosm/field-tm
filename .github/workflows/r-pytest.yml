@@ -24,10 +24,10 @@ jobs:
       env:
         ODK_CENTRAL_URL: ${{ vars.ODK_CENTRAL_URL }}
         ODK_CENTRAL_USER: ${{ vars.ODK_CENTRAL_USER }}
-        ODK_CENTRAL_PASSWD: ${{ vars.ODK_CENTRAL_PASSWD }}
-        OSM_CLIENT_ID: ${{ vars.OSM_CLIENT_ID }}
-        OSM_CLIENT_SECRET: ${{ vars.OSM_CLIENT_SECRET }}
-        OSM_SECRET_KEY: ${{ vars.OSM_SECRET_KEY }}
+        ODK_CENTRAL_PASSWD: ${{ secret.ODK_CENTRAL_PASSWD }}
+        OSM_CLIENT_ID: ${{ secret.OSM_CLIENT_ID }}
+        OSM_CLIENT_SECRET: ${{ secret.OSM_CLIENT_SECRET }}
+        OSM_SECRET_KEY: ${{ secret.OSM_SECRET_KEY }}
         FRONTEND_MAIN_URL: ${{ vars.FRONTEND_MAIN_URL }}
       options: --user root
 
