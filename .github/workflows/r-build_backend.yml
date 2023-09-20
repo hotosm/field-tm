@@ -2,8 +2,6 @@ name: Build Backend Imgs
 
 on:
   workflow_call:
-    paths:
-      - src/backend/**
     inputs:
       api_version:
         required: true

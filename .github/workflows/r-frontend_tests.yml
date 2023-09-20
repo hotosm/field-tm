@@ -2,8 +2,6 @@ name: Frontend Tests
 
 on:
   workflow_call:
-    paths:
-      - src/frontend/**
 
 jobs:
   test:
