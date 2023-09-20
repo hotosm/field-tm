@@ -13,6 +13,10 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
+env:
+  # Required to inject into docker-compose.deploy.yml
+  GIT_BRANCH: ${{ github.ref_name }}
+
 jobs:
   pytest:
     uses: ./.github/workflows/r-pytest.yml
