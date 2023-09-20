@@ -4,6 +4,13 @@ on:
   workflow_call:
     paths:
       - src/backend/**
+    inputs:
+      image_tag:
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -12,10 +19,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment:
-      name: test
+      name: ${{ inputs.environment || test }}
 
     container:
-      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.base_ref || github.ref_name }}
+      image: ghcr.io/hotosm/fmtm/backend:${{ inputs.image_tag }}
       env:
         ODK_CENTRAL_URL: ${{ vars.ODK_CENTRAL_URL }}
         ODK_CENTRAL_USER: ${{ vars.ODK_CENTRAL_USER }}
@@ -29,7 +36,7 @@ jobs:
     services:
       # Start backend database
       fmtm-db:
-        image: postgis/postgis:14-3.3-alpine
+        image: "postgis/postgis:14-3.3-alpine"
         env:
           POSTGRES_PASSWORD: fmtm
           POSTGRES_DB: fmtm

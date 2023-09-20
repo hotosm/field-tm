@@ -11,6 +11,8 @@ on:
 
 jobs:
   pytest:
-    uses: ./.github/workflows/reusable/pytest.yml
-  frontend-tests:
-    uses: ./.github/workflows/reusable/frontend_tests.yml
+    uses: ./.github/workflows/r-pytest.yml
+    with:
+      image_tag: ci-${{ github.base_ref }}
+  frontend-main-tests:
+    uses: ./.github/workflows/r-frontend_tests.yml

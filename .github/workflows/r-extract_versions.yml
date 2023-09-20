@@ -1,0 +1,42 @@
+name: Extract Versions
+
+on:
+  workflow_call:
+    outputs:
+      api_version:
+        description: "Backend API Version"
+        value: ${{ jobs.extract-versions.outputs.api_version }}
+      frontend_main_version:
+        description: "Frontend Main Version"
+        value: ${{ jobs.extract-versions.outputs.frontend_main_version }}
+      frontend_map_version:
+        description: "Frontend Map Version"
+        value: ${{ jobs.extract-versions.outputs.frontend_map_version }}
+
+jobs:
+  extract-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      api_version: ${{ steps.extract_api_version.outputs.api_version }}
+      frontend_main_version: ${{ steps.extract_frontend_versions.outputs.frontend_main_version }}
+      frontend_map_version: ${{ steps.extract_frontend_versions.outputs.frontend_map_version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract api version
+        id: extract_api_version
+        run: |
+          cd src/backend
+          API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')
+          echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Extract frontend versions
+        id: extract_frontend_versions
+        run: |
+          cd src/frontend
+          FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)
+          FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)
+          echo "frontend_main_version=${FRONTEND_MAIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "frontend_map_version=${FRONTEND_MAP_VERSION}" >> $GITHUB_OUTPUT

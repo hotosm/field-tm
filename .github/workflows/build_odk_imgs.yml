@@ -4,19 +4,12 @@ on:
   # Push includes PR merge
   push:
     branches:
-      - main
-      - staging
       - development
-      - "*-development-*"
     paths:
       # Workflow is triggered only if odkcentral dir changes
       - "odkcentral/**"
   # Allow manual trigger
   workflow_dispatch:
-
-env:
-  REGISTRY: ghcr.io
-  ODK_CENTRAL_VERSION: v2023.2.1
 
 jobs:
   build-and-push-images:
@@ -32,7 +25,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,13 +34,17 @@ jobs:
         with:
           context: odkcentral/api
           push: true
-          tags: "ghcr.io/hotosm/fmtm/odkcentral:${{ env.ODK_CENTRAL_VERSION }}"
+          tags: |
+            "ghcr.io/hotosm/fmtm/odkcentral:${{ vars.ODK_CENTRAL_VERSION }}"
+            "ghcr.io/hotosm/fmtm/odkcentral:latest"
           build-args: |
-            ODK_CENTRAL_VERSION=${{ env.ODK_CENTRAL_VERSION }}
+            ODK_CENTRAL_VERSION=${{ vars.ODK_CENTRAL_VERSION }}
 
       - name: Build and push odkcentral proxy
         uses: docker/build-push-action@v4
         with:
           context: odkcentral/proxy
           push: true
-          tags: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
+          tags: |
+            "ghcr.io/hotosm/fmtm/odkcentral-proxy:${{ vars.ODK_CENTRAL_VERSION }}"
+            "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
