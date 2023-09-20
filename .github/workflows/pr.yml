@@ -6,6 +6,9 @@ on:
       - main
       - staging
       - development
+    # Workflow is triggered only if src changes
+    paths:
+      - src/**
   # Allow manual trigger (workflow_dispatch)
   workflow_dispatch:
 

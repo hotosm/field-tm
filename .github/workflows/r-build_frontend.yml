@@ -2,8 +2,6 @@ name: Build Frontend Imgs
 
 on:
   workflow_call:
-    paths:
-      - src/frontend/**
     inputs:
       environment:
         required: true
