@@ -13,10 +13,6 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
-env:
-  # Required to inject into docker-compose.deploy.yml
-  GIT_BRANCH: ${{ github.ref_name }}
-
 jobs:
   pytest:
     uses: ./.github/workflows/r-pytest.yml
@@ -67,10 +63,12 @@ jobs:
 
       - name: Environment to .env
         env:
+          GIT_BRANCH: ${{ github.ref_name }}
           API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
           FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
+          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
           echo "API_VERSION=${API_VERSION}" >> .env
           echo "FRONTEND_MAIN_VERSION=${FRONTEND_MAIN_VERSION}" >> .env
 
@@ -107,10 +105,12 @@ jobs:
 
       - name: Environment to .env
         env:
+          GIT_BRANCH: ${{ github.ref_name }}
           API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
           FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
+          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
           echo "API_VERSION=${API_VERSION}" >> .env
           echo "FRONTEND_MAIN_VERSION=${FRONTEND_MAIN_VERSION}" >> .env
 
