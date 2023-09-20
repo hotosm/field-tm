@@ -53,6 +53,7 @@ jobs:
   smoke-test-backend:
     runs-on: ubuntu-latest
     needs:
+      - extract-versions
       - backend-build
     environment:
       name: ${{ github.ref_name }}
@@ -80,6 +81,7 @@ jobs:
   smoke-test-frontend:
     runs-on: ubuntu-latest
     needs:
+      - extract-versions
       - frontend-main-build
     environment:
       name: ${{ github.ref_name }}
@@ -94,6 +96,7 @@ jobs:
   deploy-containers:
     runs-on: ubuntu-latest
     needs:
+      - extract-versions
       - smoke-test-backend
       - smoke-test-frontend
     environment:
