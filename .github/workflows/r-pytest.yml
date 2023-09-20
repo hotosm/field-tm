@@ -18,16 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment || 'test' }}
+    env:
+      ODK_CENTRAL_PASSWD: ${{ secrets.ODK_CENTRAL_PASSWD }}
+      OSM_CLIENT_ID: ${{ secrets.OSM_CLIENT_ID }}
+      OSM_CLIENT_SECRET: ${{ secrets.OSM_CLIENT_SECRET }}
+      OSM_SECRET_KEY: ${{ secrets.OSM_SECRET_KEY }}
 
     container:
       image: ghcr.io/hotosm/fmtm/backend:${{ inputs.image_tag }}
       env:
         ODK_CENTRAL_URL: ${{ vars.ODK_CENTRAL_URL }}
         ODK_CENTRAL_USER: ${{ vars.ODK_CENTRAL_USER }}
-        ODK_CENTRAL_PASSWD: ${{ secrets.ODK_CENTRAL_PASSWD }}
-        OSM_CLIENT_ID: ${{ secrets.OSM_CLIENT_ID }}
-        OSM_CLIENT_SECRET: ${{ secrets.OSM_CLIENT_SECRET }}
-        OSM_SECRET_KEY: ${{ secrets.OSM_SECRET_KEY }}
+        ODK_CENTRAL_PASSWD: ${{ env.ODK_CENTRAL_PASSWD }}
+        OSM_CLIENT_ID: ${{ env.OSM_CLIENT_ID }}
+        OSM_CLIENT_SECRET: ${{ env.OSM_CLIENT_SECRET }}
+        OSM_SECRET_KEY: ${{ env.OSM_SECRET_KEY }}
         FRONTEND_MAIN_URL: ${{ vars.FRONTEND_MAIN_URL }}
       options: --user root
 
@@ -62,17 +67,9 @@ jobs:
       central:
         image: "ghcr.io/hotosm/fmtm/odkcentral:v2023.2.1"
         env:
-          DOMAIN: local
-          SYSADMIN_EMAIL: test@hotosm.org
-          SYSADMIN_PASSWD: odk
-          HTTPS_PORT: 443
+          SYSADMIN_EMAIL: ${{ vars.ODK_CENTRAL_USER }}
+          SYSADMIN_PASSWD: ${{ secrets.ODK_CENTRAL_PASSWD }}
           DB_HOST: central-db
-          DB_USER: odk
-          DB_PASSWORD: odk
-          DB_NAME: odk
-          SENTRY_ORG_SUBDOMAIN: o130137
-          SENTRY_KEY: 3cf75f54983e473da6bd07daddf0d2ee
-          SENTRY_PROJECT: 1298632
 
       # Start proxy to access ODK Central
       central-proxy:
