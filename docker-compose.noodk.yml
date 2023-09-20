@@ -90,27 +90,3 @@ services:
     networks:
       - fmtm-dev
     restart: unless-stopped
-
-  ui-map:
-    image: "ghcr.io/hotosm/fmtm/frontend/map:debug"
-    build:
-      context: src/frontend
-      dockerfile: debug.dockerfile
-      args:
-        APP_NAME: fmtm_openlayer_map
-        API_URL: ${URL_SCHEME}://${API_URL}
-        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
-    container_name: fmtm_map
-    depends_on:
-      - api
-    volumes:
-      - ./src/frontend/fmtm_openlayer_map:/app
-      - /app/node_modules/
-    environment:
-      - API_URL=${URL_SCHEME}://${API_URL}
-      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-    ports:
-      - "8082:8082"
-    networks:
-      - fmtm-dev
-    restart: unless-stopped
