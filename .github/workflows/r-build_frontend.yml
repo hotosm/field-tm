@@ -48,7 +48,6 @@ jobs:
           push: true
           tags: ${{ inputs.image_tags }}
           build-args: |
-            APP_NAME=${{ inputs.name }}
             APP_VERSION=${{ inputs.app_version }}
             API_URL=${{ vars.URL_SCHEME }}://${{ vars.API_URL }}
             FRONTEND_MAIN_URL=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}

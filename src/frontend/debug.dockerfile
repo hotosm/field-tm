@@ -1,11 +1,10 @@
 FROM docker.io/node:18
-ARG APP_NAME
 ARG API_URL
 ENV API_URL="${API_URL}"
 ARG FRONTEND_MAIN_URL
 ENV FRONTEND_MAIN_URL="${FRONTEND_MAIN_URL}"
 WORKDIR /app
-COPY ./${APP_NAME}/package*.json ./
+COPY main/package*.json ./
 RUN npm install
 ENV NODE_ENV development
 ENTRYPOINT ["npm", "run", "start:live"]
