@@ -111,7 +111,6 @@ services:
       context: src/frontend
       dockerfile: prod.dockerfile
       args:
-        APP_NAME: main
         APP_VERSION: ${FRONTEND_MAIN_VERSION}
         API_URL: ${URL_SCHEME}://${API_URL}
         FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
