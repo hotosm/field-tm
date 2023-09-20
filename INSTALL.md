@@ -16,7 +16,6 @@
 3. [Setting up the Frontend](#setting-up-the-frontend)
 
    - [Fork and Clone the FMTM repository](#fork-and-clone-the-fmtm-repository-1)
-   - [The Microfrontend configuration](#the-microfrontend-configuration)
    - [Start the Frontends with Docker](#start-the-frontends-with-docker)
 
 # 1. Software Requirements <a name="software-requirements"></a>
@@ -191,40 +190,14 @@ Clone the forked repository to your local machine using the following command:
 
 Make sure to replace `<your-username>` with your GitHub username.
 
-## The Microfrontend configuration
-
-The FMTM frontend is built using a microfrontend architecture, divided into modules that can be developed, tested, and deployed independently.
-
-Webpack remote modules are used to achieve this, dynamically loading code from other microfrontend applications.
-
-In theory, this should improve the performance and scalability of the application.
-However, great care should be taken with watching dependency versions across modules, to prevent loading more js content than is required.
-
-List of current microfrontend modules:
-
-- **main**:
-  - Description: The main frontend, displays projects and tasks.
-  - Location: src/frontend/main
-  - Port: 8080.
-- **fmtm_openlayers_map**:
-  - Description: The map component, displays tasks on a map.
-  - Location: src/frontend/fmtm_openlayers_map
-  - Port: 8081.
-
-## Start the Frontends with Docker
-
-This is the easiest way to manage multiple frontends at once.
-
-### Starting the Frontend Containers
+## Start the Frontend with Docker
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
-3. From the command line run: `docker compose build ui-main ui-map`
-   This is essential, as the development containers for the frontend are different to production.
-4. Once everything is built, from the command line run: `docker compose up -d ui-main ui-map`
+3. From the command line run: `docker compose build ui-main`
+   This is essential, as the development container for the frontend is different to production.
+4. Once everything is built, from the command line run: `docker compose up -d ui-main`
 
-5. If everything goes well you should now be able to **navigate to the project in your browser:**
-   - **Main:** <http://127.0.0.1:8080>
-   - **Map:** <http://127.0.0.1:8081>
+5. If everything goes well you should now be able to **navigate to the project in your browser:** <http://127.0.0.1:8080>
 
 That's it, you have successfully set up the frontend!!
