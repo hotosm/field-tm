@@ -19,13 +19,13 @@ jobs:
     with:
       image_tag: ci-${{ github.ref_name }}
 
-  frontend-main-tests:
+  frontend-tests:
     uses: ./.github/workflows/r-frontend_tests.yml
 
   extract-versions:
     needs:
       - pytest
-      - frontend-main-tests
+      - frontend-tests
     uses: ./.github/workflows/r-extract_versions.yml
 
   backend-build:
@@ -49,18 +49,6 @@ jobs:
       image_tags: |
         "ghcr.io/hotosm/fmtm/frontend/main:${{ needs.extract-versions.outputs.frontend_main_version }}-${{ github.ref_name }}"
         "ghcr.io/hotosm/fmtm/frontend/main:latest"
-
-  frontend-map-build:
-    uses: ./.github/workflows/r-build_frontend.yml
-    needs: extract-versions
-    with:
-      environment: ${{ github.ref_name }}
-      name: fmtm_openlayer_map
-      app_version: ${{ needs.extract-versions.outputs.frontend_map_version }}
-      build_target: prod
-      image_tags: |
-        "ghcr.io/hotosm/fmtm/frontend/map:${{ needs.extract-versions.outputs.frontend_map_version }}-${{ github.ref_name }}"
-        "ghcr.io/hotosm/fmtm/frontend/map:latest"
 
   smoke-test-backend:
     runs-on: ubuntu-latest
@@ -90,11 +78,27 @@ jobs:
           docker compose --file docker-compose.deploy.yml pull api
           docker compose --file docker-compose.deploy.yml up api --exit-code-from api
 
+  smoke-test-frontend:
+    runs-on: ubuntu-latest
+    needs:
+      - extract-versions
+      - frontend-main-build
+    environment:
+      name: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Frontend smoke test
+        run: echo "Not implemented"
+
   deploy-containers:
     runs-on: ubuntu-latest
     needs:
       - extract-versions
       - smoke-test-backend
+      - smoke-test-frontend
     environment:
       name: ${{ github.ref_name }}
 
