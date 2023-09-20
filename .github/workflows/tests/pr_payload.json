@@ -1,0 +1,10 @@
+{
+  "pull_request": {
+    "head": {
+      "ref": "feat/some-new-thing"
+    },
+    "base": {
+      "ref": "development"
+    }
+  }
+}

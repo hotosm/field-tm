@@ -1,0 +1,36 @@
+name: Frontend Tests
+
+on:
+  workflow_call:
+    paths:
+      - src/frontend/**
+
+jobs:
+  test:
+    name: Run Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            src/frontend/main/node_modules
+            src/frontend/fmtm_openlayer_map/node_modules
+          keys: node-modules-${{ env.cache_id }}
+          restore-keys: |
+            node-modules-
+
+      - name: Test Frontend Main
+        run: |
+          cd src/frontend/main
+          npm ci --only-dev
+          npm run test

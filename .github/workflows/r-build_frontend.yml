@@ -1,0 +1,57 @@
+name: Build Frontend Imgs
+
+on:
+  workflow_call:
+    paths:
+      - src/frontend/**
+    inputs:
+      environment:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      app_version:
+        required: true
+        type: string
+      build_target:
+        required: true
+        type: string
+      image_tags:
+        required: true
+        type: string
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: src/frontend
+          file: src/frontend/prod.dockerfile
+          target: ${{ inputs.build_target }}
+          push: true
+          tags: ${{ inputs.image_tags }}
+          build-args: |
+            APP_NAME=${{ inputs.name }}
+            APP_VERSION=${{ inputs.app_version }}
+            API_URL=${{ vars.URL_SCHEME }}://${{ vars.API_URL }}
+            FRONTEND_MAIN_URL=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}
+            FRONTEND_MAP_URL=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAP_URL }}
