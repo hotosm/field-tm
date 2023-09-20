@@ -22,7 +22,6 @@ jobs:
         with:
           path: |
             src/frontend/main/node_modules
-            src/frontend/fmtm_openlayer_map/node_modules
           keys: node-modules-${{ env.cache_id }}
           restore-keys: |
             node-modules-

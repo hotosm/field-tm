@@ -65,12 +65,10 @@ jobs:
         env:
           API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
           FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
-          FRONTEND_MAP_VERSION: ${{ needs.extract-versions.outputs.frontend_map_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
           echo "API_VERSION=${API_VERSION}" >> .env
           echo "FRONTEND_MAIN_VERSION=${FRONTEND_MAIN_VERSION}" >> .env
-          echo "FRONTEND_MAP_VERSION=${FRONTEND_MAP_VERSION}" >> .env
 
       - name: Backend smoke test
         run: |
@@ -107,12 +105,10 @@ jobs:
         env:
           API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
           FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
-          FRONTEND_MAP_VERSION: ${{ needs.extract-versions.outputs.frontend_map_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
           echo "API_VERSION=${API_VERSION}" >> .env
           echo "FRONTEND_MAIN_VERSION=${FRONTEND_MAIN_VERSION}" >> .env
-          echo "FRONTEND_MAP_VERSION=${FRONTEND_MAP_VERSION}" >> .env
 
       - uses: webfactory/ssh-agent@v0.7.0
         with:

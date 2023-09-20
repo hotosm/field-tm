@@ -9,17 +9,13 @@ on:
       frontend_main_version:
         description: "Frontend Main Version"
         value: ${{ jobs.extract-versions.outputs.frontend_main_version }}
-      frontend_map_version:
-        description: "Frontend Map Version"
-        value: ${{ jobs.extract-versions.outputs.frontend_map_version }}
 
 jobs:
   extract-versions:
     runs-on: ubuntu-latest
     outputs:
       api_version: ${{ steps.extract_api_version.outputs.api_version }}
-      frontend_main_version: ${{ steps.extract_frontend_versions.outputs.frontend_main_version }}
-      frontend_map_version: ${{ steps.extract_frontend_versions.outputs.frontend_map_version }}
+      frontend_main_version: ${{ steps.extract_frontend_version.outputs.frontend_main_version }}
 
     steps:
       - name: Checkout repository
@@ -33,10 +29,8 @@ jobs:
           echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Extract frontend versions
-        id: extract_frontend_versions
+        id: extract_frontend_version
         run: |
           cd src/frontend
           FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)
-          FRONTEND_MAP_VERSION=$(jq -r '.version' fmtm_openlayer_map/package.json)
           echo "frontend_main_version=${FRONTEND_MAIN_VERSION}" >> $GITHUB_OUTPUT
-          echo "frontend_map_version=${FRONTEND_MAP_VERSION}" >> $GITHUB_OUTPUT
