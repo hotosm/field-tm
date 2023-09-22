@@ -17,20 +17,18 @@
 #
 
 import json
-import asyncio
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
-
-from ..db import database
-from ..models.enums import TaskStatus
-from ..users import user_schemas
-from . import tasks_crud, tasks_schemas
-from ..projects import project_crud, project_schemas
-from ..central import central_crud
 from sqlalchemy.sql import text
 
+from ..central import central_crud
+from ..db import database
+from ..models.enums import TaskStatus
+from ..projects import project_crud, project_schemas
+from ..users import user_schemas
+from . import tasks_crud, tasks_schemas
 
 router = APIRouter(
     prefix="/tasks",
@@ -45,13 +43,13 @@ async def read_task_list(
     project_id: int,
     limit: int = 1000,
     db: Session = Depends(database.get_db),
-    ):
+):
     tasks = tasks_crud.get_tasks(db, project_id, limit)
     if tasks:
         return tasks
     else:
         raise HTTPException(status_code=404, detail="Tasks not found")
-    
+
 
 @router.get("/", response_model=List[tasks_schemas.TaskOut])
 async def read_tasks(
@@ -75,13 +73,8 @@ async def read_tasks(
 
 
 @router.get("/point_on_surface")
-async def get_point_on_surface(
-    project_id:int,
-    db: Session = Depends(database.get_db)
-    ):
-
-    """
-    Get a point on the surface of the geometry for each task of the project.
+async def get_point_on_surface(project_id: int, db: Session = Depends(database.get_db)):
+    """Get a point on the surface of the geometry for each task of the project.
 
     Parameters:
         project_id (int): The ID of the project.
@@ -89,12 +82,13 @@ async def get_point_on_surface(
     Returns:
         List[Tuple[int, str]]: A list of tuples containing the task ID and the centroid as a string.
     """
-
-    query = text(f"""
+    query = text(
+        f"""
             SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_PointOnSurface(outline)), ST_Y(ST_PointOnSurface(outline))]) AS point
             FROM tasks
             WHERE project_id = {project_id}
-            GROUP BY id; """)
+            GROUP BY id; """
+    )
 
     result = db.execute(query)
     result_dict_list = [{"id": row[0], "point": row[1]} for row in result.fetchall()]
@@ -148,13 +142,12 @@ async def edit_task_boundary(
     task_id: int,
     boundary: UploadFile = File(...),
     db: Session = Depends(database.get_db),
-    ):
-
+):
     # read entire file
     content = await boundary.read()
     boundary_json = json.loads(content)
 
-    edit_boundary = await tasks_crud.edit_task_boundary(db, task_id, boundary_json)    
+    edit_boundary = await tasks_crud.edit_task_boundary(db, task_id, boundary_json)
 
     return edit_boundary
 
@@ -163,34 +156,37 @@ async def edit_task_boundary(
 async def task_features_count(
     project_id: int,
     db: Session = Depends(database.get_db),
-    ):
-
+):
     # Get the project object.
     project = project_crud.get_project(db, project_id)
 
     # ODK Credentials
     odk_credentials = project_schemas.ODKCentral(
-        odk_central_url = project.odk_central_url,
-        odk_central_user = project.odk_central_user,
-        odk_central_password = project.odk_central_password,
-        )
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
 
     odk_details = central_crud.list_odk_xforms(project.odkid, odk_credentials, True)
 
     # Assemble the final data list
     data = []
     for x in odk_details:
-        feature_count_query = text(f"""
+        feature_count_query = text(
+            f"""
             select count(*) from features where project_id = {project_id} and task_id = {x['xmlFormId']}
-        """)
+        """
+        )
         result = db.execute(feature_count_query)
         feature_count = result.fetchone()
 
-        data.append({
-            'task_id': x['xmlFormId'],
-            'submission_count': x['submissions'],
-            'last_submission': x['lastSubmission'],
-            'feature_count': feature_count[0]
-        })
+        data.append(
+            {
+                "task_id": x["xmlFormId"],
+                "submission_count": x["submissions"],
+                "last_submission": x["lastSubmission"],
+                "feature_count": feature_count[0],
+            }
+        )
 
     return data

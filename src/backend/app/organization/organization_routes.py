@@ -16,7 +16,6 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from typing import Union,Optional
 
 from fastapi import (
     APIRouter,
@@ -26,7 +25,6 @@ from fastapi import (
     HTTPException,
     UploadFile,
 )
-from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from ..db import database
@@ -43,7 +41,6 @@ router = APIRouter(
 @router.get("/")
 def get_organisations(
     db: Session = Depends(database.get_db),
-
 ):
     """Get api for fetching organization list."""
     organizations = organization_crud.get_organisations(db)
@@ -52,10 +49,9 @@ def get_organisations(
 
 @router.get("/{organization_id}")
 async def get_organization_detail(
-    organization_id: int,
-    db: Session = Depends(database.get_db)
+    organization_id: int, db: Session = Depends(database.get_db)
 ):
-    """Get API for fetching detail about a organiation based on id"""
+    """Get API for fetching detail about a organiation based on id."""
     organization = await organization_crud.get_organisation_by_id(db, organization_id)
     if not organization:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -71,8 +67,7 @@ async def create_organization(
     logo: UploadFile = File(None),  # Optional field for organization logo
     db: Session = Depends(database.get_db),  # Dependency for database session
 ):
-    """
-    Create an organization with the given details.
+    """Create an organization with the given details.
 
     Parameters:
         name (str): The name of the organization. Required.
@@ -86,7 +81,9 @@ async def create_organization(
     """
     # Check if the organization with the same already exists
     if await organization_crud.get_organisation_by_name(db, name=name):
-        raise HTTPException(status_code=400, detail=f"Organization already exists with the name {name}")
+        raise HTTPException(
+            status_code=400, detail=f"Organization already exists with the name {name}"
+        )
 
     await organization_crud.create_organization(db, name, description, url, logo)
 
@@ -95,27 +92,27 @@ async def create_organization(
 
 @router.patch("/{organization_id}/")
 async def update_organization(
-    organization_id: int, 
+    organization_id: int,
     name: str = Form(None),
     description: str = Form(None),
     url: str = Form(None),
     logo: UploadFile = File(None),
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
 ):
-    """PUT API to update the details of an organization"""
+    """PUT API to update the details of an organization."""
     try:
-        organization = await organization_crud.update_organization_info(db, organization_id, name, description, url, logo)
+        organization = await organization_crud.update_organization_info(
+            db, organization_id, name, description, url, logo
+        )
         return organization
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error updating organization: {e}")
 
 
-
 @router.delete("/{organization_id}")
 async def delete_organisations(
     organization_id: int, db: Session = Depends(database.get_db)
-    ):
-
+):
     organization = await organization_crud.get_organisation_by_id(db, organization_id)
 
     if not organization:

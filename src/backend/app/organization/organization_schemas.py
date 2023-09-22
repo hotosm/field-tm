@@ -18,7 +18,6 @@
 from pydantic import BaseModel
 
 
-
 class Organisation(BaseModel):
     # id: int
     slug: str

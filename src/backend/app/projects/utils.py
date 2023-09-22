@@ -9,11 +9,11 @@ from fastapi import (
     HTTPException,
     UploadFile,
 )
-from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from ..db import database
 from . import project_crud
+
 
 async def generate_files(
     background_tasks: BackgroundTasks,
@@ -52,11 +52,11 @@ async def generate_files(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
-    project.data_extract_type = 'polygon' if extract_polygon else 'centroid'
+    project.data_extract_type = "polygon" if extract_polygon else "centroid"
     db.commit()
 
     if upload:
-        file_ext = 'xls'
+        file_ext = "xls"
         contents = upload
 
     # generate a unique task ID using uuid
@@ -75,7 +75,7 @@ async def generate_files(
         contents,
         None,
         xform_title,
-        file_ext if upload else 'xls',
+        file_ext if upload else "xls",
         background_task_id,
     )
 

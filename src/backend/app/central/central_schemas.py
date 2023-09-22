@@ -15,10 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from loguru import logger as log
-
 from enum import Enum
 
+from loguru import logger as log
 from pydantic import BaseModel
 
 

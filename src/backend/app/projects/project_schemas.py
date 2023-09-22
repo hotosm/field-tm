@@ -16,7 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from geojson_pydantic import Feature as GeojsonFeature
 from pydantic import BaseModel
@@ -95,6 +95,3 @@ class ProjectBase(BaseModel):
 
 class ProjectOut(ProjectBase):
     pass
-
-
-

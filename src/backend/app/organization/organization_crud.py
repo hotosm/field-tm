@@ -15,15 +15,16 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from loguru import logger as log
-
 import os
 import random
-import string
-from fastapi import HTTPException, File,UploadFile
 import re
+import string
+
+from fastapi import HTTPException, UploadFile
+from loguru import logger as log
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+
 from ..db import db_models
 
 IMAGEDIR = "app/images/"
@@ -35,11 +36,12 @@ def get_organisations(
     db_organisation = db.query(db_models.DbOrganisation).all()
     return db_organisation
 
+
 def generate_slug(text: str) -> str:
     # Remove special characters and replace spaces with hyphens
-    slug = re.sub(r'[^\w\s-]', '', text).strip().lower().replace(' ', '-')
+    slug = re.sub(r"[^\w\s-]", "", text).strip().lower().replace(" ", "-")
     # Remove consecutive hyphens
-    slug = re.sub(r'[-\s]+', '-', slug)
+    slug = re.sub(r"[-\s]+", "-", slug)
     return slug
 
 
@@ -47,7 +49,7 @@ async def get_organisation_by_name(db: Session, name: str):
     # Use SQLAlchemy's query-building capabilities
     db_organisation = (
         db.query(db_models.DbOrganisation)
-        .filter(func.lower(db_models.DbOrganisation.name).like(func.lower(f'%{name}%')))
+        .filter(func.lower(db_models.DbOrganisation.name).like(func.lower(f"%{name}%")))
         .first()
     )
     return db_organisation
@@ -58,9 +60,8 @@ async def upload_image(db: Session, file: UploadFile(None)):
     filename = file.filename
     file_path = f"{IMAGEDIR}{filename}"
     while os.path.exists(file_path):
-
         # Generate a random character
-        random_char = ''.join(random.choices(string.ascii_letters + string.digits, k=3))
+        random_char = "".join(random.choices(string.ascii_letters + string.digits, k=3))
 
         # Add the random character to the filename
         logo_name, extension = os.path.splitext(filename)
@@ -77,9 +78,10 @@ async def upload_image(db: Session, file: UploadFile(None)):
     return filename
 
 
-async def create_organization(db: Session, name: str, description: str, url: str, logo: UploadFile(None)):
-    """
-    Creates a new organization with the given name, description, url, type, and logo.
+async def create_organization(
+    db: Session, name: str, description: str, url: str, logo: UploadFile(None)
+):
+    """Creates a new organization with the given name, description, url, type, and logo.
     Saves the logo file to the app/images folder.
 
     Args:
@@ -93,7 +95,6 @@ async def create_organization(db: Session, name: str, description: str, url: str
     Returns:
         bool: True if organization was created successfully
     """
-
     # create new organization
     try:
         logo_name = await upload_image(db, logo) if logo else None
@@ -103,7 +104,7 @@ async def create_organization(db: Session, name: str, description: str, url: str
             slug=generate_slug(name),
             description=description,
             url=url,
-            logo=logo_name
+            logo=logo_name,
         )
 
         db.add(db_organization)
@@ -119,8 +120,7 @@ async def create_organization(db: Session, name: str, description: str, url: str
 
 
 async def get_organisation_by_id(db: Session, id: int):
-    """
-    Get an organization by its id.
+    """Get an organization by its id.
 
     Args:
         db (Session): database session
@@ -130,22 +130,25 @@ async def get_organisation_by_id(db: Session, id: int):
         DbOrganisation: organization with the given id
     """
     db_organization = (
-        db.query(db_models.DbOrganisation).filter(db_models.DbOrganisation.id == id).first()
+        db.query(db_models.DbOrganisation)
+        .filter(db_models.DbOrganisation.id == id)
+        .first()
     )
     return db_organization
 
 
 async def update_organization_info(
-    db: Session, 
-    organization_id, name: str,
+    db: Session,
+    organization_id,
+    name: str,
     description: str,
     url: str,
-    logo: UploadFile
-    ):
+    logo: UploadFile,
+):
     organization = await get_organisation_by_id(db, organization_id)
     if not organization:
-        raise HTTPException(status_code=404, detail='Organization not found')
-    
+        raise HTTPException(status_code=404, detail="Organization not found")
+
     if name:
         organization.name = name
     if description:
