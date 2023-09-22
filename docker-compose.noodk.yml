@@ -80,7 +80,7 @@ services:
     depends_on:
       - api
     volumes:
-      - ./src/frontend/main:/app
+      - ./src/frontend:/app
       - /app/node_modules/
     environment:
       - API_URL=${URL_SCHEME}://${API_URL}

@@ -15,8 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from loguru import logger as log
-
 import base64
 import json
 import os
@@ -26,13 +24,13 @@ import zlib
 # import osm_fieldwork
 # Qr code imports
 import segno
-import xmltodict
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
 
 from ..config import settings
 from ..db import db_models
@@ -154,9 +152,7 @@ def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral 
     try:
         project = get_odk_project(odk_central)
         result = project.deleteProject(project_id)
-        log.info(
-            f"Project {project_id} has been deleted from the ODK Central server."
-        )
+        log.info(f"Project {project_id} has been deleted from the ODK Central server.")
         return result
     except Exception:
         return "Could not delete project from central odk"
@@ -284,7 +280,11 @@ def delete_odk_xform(
 
 
 # def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None):
-def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None, metadata:bool = False):
+def list_odk_xforms(
+    project_id: int,
+    odk_central: project_schemas.ODKCentral = None,
+    metadata: bool = False,
+):
     """List all XForms in an ODK Central project."""
     project = get_odk_project(odk_central)
     xforms = project.listForms(project_id, metadata)
@@ -331,21 +331,21 @@ def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = 
 def get_form_list(db: Session, skip: int, limit: int):
     """Returns the list of id and title of xforms from the database."""
     try:
-        forms =  (
+        forms = (
             db.query(db_models.DbXForm.id, db_models.DbXForm.title)
             .offset(skip)
             .limit(limit)
             .all()
         )
-    
+
         result_dict = []
         for form in forms:
             form_dict = {
-                'id': form[0],         # Assuming the first element is the ID
-                'title': form[1]       # Assuming the second element is the title
+                "id": form[0],  # Assuming the first element is the ID
+                "title": form[1],  # Assuming the second element is the title
             }
             result_dict.append(form_dict)
-        
+
         return result_dict
 
     except Exception as e:
@@ -384,7 +384,10 @@ async def test_form_validity(xform_content: str, form_type: str):
         xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
         return {"message": "Your form is valid"}
     except Exception as e:
-        return JSONResponse(content={"message":"Your form is invalid", "possible_reason":str(e)}, status_code=400)
+        return JSONResponse(
+            content={"message": "Your form is invalid", "possible_reason": str(e)},
+            status_code=400,
+        )
 
 
 def generate_updated_xform(
@@ -460,12 +463,11 @@ def generate_updated_xform(
     import xml.etree.ElementTree as ET
 
     root = ET.fromstring(data)
-    head = root.find("h:head",namespaces)
-    model = head.find("xforms:model",namespaces)
-    instances = model.findall("xforms:instance",namespaces)
+    head = root.find("h:head", namespaces)
+    model = head.find("xforms:model", namespaces)
+    instances = model.findall("xforms:instance", namespaces)
 
     index = 0
-    data_tag_present = False
     for inst in instances:
         try:
             if "src" in inst.attrib:
@@ -477,8 +479,7 @@ def generate_updated_xform(
             if data_tags:
                 for dt in data_tags:
                     dt.attrib["id"] = id
-                data_tag_present = True
-        except Exception as e:
+        except Exception:
             continue
         index += 1
 

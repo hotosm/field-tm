@@ -15,8 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from loguru import logger as log
-
 import json
 import os
 import uuid
@@ -34,6 +32,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import FileResponse
+from loguru import logger as log
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
@@ -43,7 +42,6 @@ from ..db import database, db_models
 from ..models.enums import TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
-
 
 router = APIRouter(
     prefix="/projects",
@@ -85,7 +83,9 @@ async def get_projet_details(project_id: int, db: Session = Depends(database.get
         odk_central_password=project.odk_central_password,
     )
 
-    odk_details = await central_crud.get_project_full_details(project.odkid, odk_credentials)
+    odk_details = await central_crud.get_project_full_details(
+        project.odkid, odk_credentials
+    )
 
     # Features count
     query = f"select count(*) from features where project_id={project_id} and task_id is not null"
@@ -93,12 +93,12 @@ async def get_projet_details(project_id: int, db: Session = Depends(database.get
     features = result.fetchone()[0]
 
     return {
-        'id':project_id,
-        'name':odk_details['name'],
-        'createdAt':odk_details['createdAt'],
-        'tasks':odk_details['forms'],
-        'lastSubmission':odk_details['lastSubmission'],
-        'total_features':features
+        "id": project_id,
+        "name": odk_details["name"],
+        "createdAt": odk_details["createdAt"],
+        "tasks": odk_details["forms"],
+        "lastSubmission": odk_details["lastSubmission"],
+        "total_features": features,
     }
 
 
@@ -386,10 +386,9 @@ async def task_split(
     upload: UploadFile = File(...),
     no_of_buildings: int = Form(50),
     has_data_extracts: bool = Form(False),
-    db: Session = Depends(database.get_db)
-    ):
-    """
-    Split a task into subtasks.
+    db: Session = Depends(database.get_db),
+):
+    """Split a task into subtasks.
 
     Args:
         upload (UploadFile): The file to split.
@@ -398,14 +397,15 @@ async def task_split(
 
     Returns:
         The result of splitting the task into subtasks.
-        
-    """
 
+    """
     # read entire file
     await upload.seek(0)
     content = await upload.read()
 
-    result = await project_crud.split_into_tasks(db, content, no_of_buildings, has_data_extracts)
+    result = await project_crud.split_into_tasks(
+        db, content, no_of_buildings, has_data_extracts
+    )
 
     return result
 
@@ -573,13 +573,15 @@ async def generate_files(
 
         if config_file:
             config_file_name = os.path.splitext(config_file.filename)
-            config_file_ext = config_file_name[1]     
+            config_file_ext = config_file_name[1]
             if not config_file_ext == ".yaml":
-                raise HTTPException(status_code=400, detail="Provide a valid .yaml config file")
+                raise HTTPException(
+                    status_code=400, detail="Provide a valid .yaml config file"
+                )
             await config_file.seek(0)
             config_file_contents = await config_file.read()
             project.form_config_file = config_file_contents
-        
+
         db.commit()
 
     if data_extracts:
@@ -689,8 +691,13 @@ async def generate_log(
 
         with open("/opt/logs/create_project.json", "r") as log_file:
             logs = [json.loads(line) for line in log_file]
-            
-            filtered_logs = [log.get("record",{}).get("message",None) for log in logs if log.get("record", {}).get("extra", {}).get("project_id") == project_id]
+
+            filtered_logs = [
+                log.get("record", {}).get("message", None)
+                for log in logs
+                if log.get("record", {}).get("extra", {}).get("project_id")
+                == project_id
+            ]
             last_50_logs = filtered_logs[-50:]
 
             logs = "\n".join(last_50_logs)
@@ -754,7 +761,9 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
 async def add_features(
     background_tasks: BackgroundTasks,
     upload: UploadFile = File(...),
-    feature_type: str = Query(..., description="Select feature type ", enum=["buildings","lines"]),
+    feature_type: str = Query(
+        ..., description="Select feature type ", enum=["buildings", "lines"]
+    ),
     db: Session = Depends(database.get_db),
 ):
     """Add features to a project.
@@ -790,7 +799,7 @@ async def add_features(
         db,
         features,
         background_task_id,
-        feature_type
+        feature_type,
     )
     return True
 
@@ -915,19 +924,15 @@ async def download_task_boundaries(
 
 
 @router.get("/features/download/")
-async def download_features(
-    project_id: int,
-    db: Session = Depends(database.get_db)
-):
+async def download_features(project_id: int, db: Session = Depends(database.get_db)):
     """Downloads the features of a project as a GeoJSON file.
-    
-        Args:
-            project_id (int): The id of the project.
-    
-        Returns:
-            Response: The HTTP response object containing the downloaded file.
-    """
 
+    Args:
+        project_id (int): The id of the project.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
     out = await project_crud.get_project_features_geojson(db, project_id)
 
     headers = {
@@ -1024,15 +1029,16 @@ async def download_task_boundary_osm(
     response = Response(content=content, media_type="application/xml")
     return response
 
+
 from sqlalchemy.sql import text
+
 
 @router.get("/centroid/")
 async def project_centroid(
-                        project_id:int = None,
-                        db: Session = Depends(database.get_db),
-                        ):
-    """
-    Get a centroid of each projects.
+    project_id: int = None,
+    db: Session = Depends(database.get_db),
+):
+    """Get a centroid of each projects.
 
     Parameters:
         project_id (int): The ID of the project.
@@ -1040,11 +1046,12 @@ async def project_centroid(
     Returns:
         List[Tuple[int, str]]: A list of tuples containing the task ID and the centroid as a string.
     """
-
-    query = text(f"""SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_Centroid(outline)), ST_Y(ST_Centroid(outline))]) AS centroid
+    query = text(
+        f"""SELECT id, ARRAY_AGG(ARRAY[ST_X(ST_Centroid(outline)), ST_Y(ST_Centroid(outline))]) AS centroid
             FROM projects
             WHERE {f"id={project_id}" if project_id else "1=1"}
-            GROUP BY id;""")
+            GROUP BY id;"""
+    )
 
     result = db.execute(query)
     result_dict_list = [{"id": row[0], "centroid": row[1]} for row in result.fetchall()]

@@ -15,12 +15,11 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from loguru import logger as log
-
 import json
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from loguru import logger as log
 from sqlalchemy import (
     column,
     select,
