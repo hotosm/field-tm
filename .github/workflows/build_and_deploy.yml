@@ -47,8 +47,8 @@ jobs:
       app_version: ${{ needs.extract-versions.outputs.frontend_main_version }}
       build_target: prod
       image_tags: |
-        "ghcr.io/hotosm/fmtm/frontend/main:${{ needs.extract-versions.outputs.frontend_main_version }}-${{ github.ref_name }}"
-        "ghcr.io/hotosm/fmtm/frontend/main:latest"
+        "ghcr.io/hotosm/fmtm/frontend:${{ needs.extract-versions.outputs.frontend_main_version }}-${{ github.ref_name }}"
+        "ghcr.io/hotosm/fmtm/frontend:latest"
 
   smoke-test-backend:
     runs-on: ubuntu-latest

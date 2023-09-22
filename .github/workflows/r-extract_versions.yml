@@ -7,7 +7,7 @@ on:
         description: "Backend API Version"
         value: ${{ jobs.extract-versions.outputs.api_version }}
       frontend_main_version:
-        description: "Frontend Main Version"
+        description: "Frontend Version"
         value: ${{ jobs.extract-versions.outputs.frontend_main_version }}
 
 jobs:
@@ -32,5 +32,5 @@ jobs:
         id: extract_frontend_version
         run: |
           cd src/frontend
-          FRONTEND_MAIN_VERSION=$(jq -r '.version' main/package.json)
+          FRONTEND_MAIN_VERSION=$(jq -r '.version' package.json)
           echo "frontend_main_version=${FRONTEND_MAIN_VERSION}" >> $GITHUB_OUTPUT

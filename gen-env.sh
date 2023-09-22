@@ -143,9 +143,9 @@ do
     fi
 done
 
-# FRONTEND MAIN
+# FRONTEND
 echo
-echo "Enter the FMTM Main Frontend URL."
+echo "Enter the FMTM Frontend URL."
 echo "If you have a valid domain name, enter it here."
 while true
 do
