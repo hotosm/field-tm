@@ -32,7 +32,7 @@ For details on how to run the API first, please see: [DEV 2. Backend](https://gi
 
 Run the frontend with hot-reloading: `npm run start:live`
 
-The frontend should now be accessible at: <<<<<<<<<http://127.0.0.1:<PORT_NUMBER>>>>>>>>>>.
+The frontend should now be accessible at: `http://127.0.0.1:<PORT_NUMBER>`
 
 ## Frontend Tips
 
