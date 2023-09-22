@@ -21,13 +21,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            src/frontend/main/node_modules
+            src/frontend/node_modules
           keys: node-modules-${{ env.cache_id }}
           restore-keys: |
             node-modules-
 
-      - name: Test Frontend Main
+      - name: Test Frontend
         run: |
-          cd src/frontend/main
+          cd src/frontend
           npm ci --only-dev
           npm run test

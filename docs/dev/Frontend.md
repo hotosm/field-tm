@@ -22,17 +22,17 @@ For details on how to run the API first, please see: [DEV 2. Backend](https://gi
 
 ### 2A: Navigate to the frontend subdirectory
 
-This should like be `src/frontend/main`.
+`cd src/frontend`
 
 ### 2B: Install dependencies
 
-Install the dependencies by running the following command: `npm install`
+`npm install`
 
 ### 2C. Run the project
 
 Run the frontend with hot-reloading: `npm run start:live`
 
-The frontend should now be accessible at: <<<<<<<<http://127.0.0.1:<PORT_NUMBER>>>>>>>>>.
+The frontend should now be accessible at: <<<<<<<<<http://127.0.0.1:<PORT_NUMBER>>>>>>>>>>.
 
 ## Frontend Tips
 
