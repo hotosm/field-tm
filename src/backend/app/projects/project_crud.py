@@ -481,10 +481,20 @@ async def preview_tasks(boundary: str, dimension: int):
         )
 
     """ Apply the lambda function to each coordinate in its geometry ro remove the z-dimension - if it exists"""
+    multi_polygons = []
     for feature in features:
         list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
+        if feature["geometry"]["type"] == "MultiPolygon":
+            multi_polygons.append(Polygon(feature["geometry"]["coordinates"][0][0]))
+    
 
-    boundary = shape(features[0]["geometry"])
+    """Update the boundary polyon on the database."""
+    if multi_polygons:
+        boundary = multi_polygons[0]
+        for geom in multi_polygons[1:]:
+            boundary = boundary.union(geom)
+    else:
+        boundary = shape(features[0]["geometry"])
 
     minx, miny, maxx, maxy = boundary.bounds
 
@@ -833,15 +843,20 @@ def update_project_boundary(
         )
 
     """ Apply the lambda function to each coordinate in its geometry """
+    multi_polygons = []
     for feature in features:
         list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
+        if feature["geometry"]["type"] == "MultiPolygon":
+            multi_polygons.append(Polygon(feature["geometry"]["coordinates"][0][0]))
+    
 
     """Update the boundary polyon on the database."""
-    outline = shape(features[0]["geometry"])
-
-    # If the outline is a multipolygon, use the first polygon
-    if isinstance(outline, MultiPolygon):
-        outline = outline.geoms[0]
+    if multi_polygons:
+        outline = multi_polygons[0]
+        for geom in multi_polygons[1:]:
+            outline = outline.union(geom)
+    else:
+        outline = shape(features[0]["geometry"])
 
     db_project.outline = outline.wkt
     db_project.centroid = outline.centroid.wkt
@@ -1144,26 +1159,45 @@ def upload_custom_data_extracts(
 
     for feature in features_data["features"]:
         feature_shape = shape(feature["geometry"])
-
-        if not (shape(project_geojson).contains(feature_shape)):
-            continue
+        if isinstance(feature_shape, MultiPolygon):
+            wkb_element = from_shape(Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326)
+        else:
+            wkb_element = from_shape(feature_shape, srid=4326)
 
         # If the osm extracts contents do not have a title, provide an empty text for that.
         feature["properties"]["title"] = ""
+        properties = flatten_dict(feature["properties"])
 
-        feature_shape = shape(feature["geometry"])
-
-        wkb_element = from_shape(feature_shape, srid=4326)
-        feature_mapping = {
-            "project_id": project_id,
-            "geometry": wkb_element,
-            "properties": feature["properties"],
-        }
-        featuree = db_models.DbFeatures(**feature_mapping)
-        db.add(featuree)
-        db.commit()
+        db_feature =  db_models.DbFeatures(
+            project_id=project_id,
+            geometry = wkb_element,
+            properties=properties
+        )
+        db.add(db_feature)
+    db.commit()
 
     return True
+
+def flatten_dict(d, parent_key='', sep='_'):
+    """
+    Recursively flattens a nested dictionary into a single-level dictionary.
+    
+    Args:
+        d (dict): The input dictionary.
+        parent_key (str): The parent key (used for recursion).
+        sep (str): The separator character to use in flattened keys.
+    
+    Returns:
+        dict: The flattened dictionary.
+    """
+    items = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(flatten_dict(v, new_key, sep=sep))
+        else:
+            items[new_key] = v
+    return items
 
 
 def generate_task_files(
