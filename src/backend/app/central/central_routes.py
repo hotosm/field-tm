@@ -72,14 +72,12 @@ async def create_appuser(
 
 @router.get("/list-forms")
 async def get_form_lists(
-    db: Session = Depends(database.get_db),
-    skip: int = 0,
-    limit: int = 100
+    db: Session = Depends(database.get_db), skip: int = 0, limit: int = 100
 ):
     """This function retrieves a list of XForms from a database,
     with the option to skip a certain number of records and limit the number of records returned.
 
-    
+
     Parameters:
     skip:int: the number of records to skip before starting to retrieve records. Defaults to 0 if not provided.
     limit:int: the maximum number of records to retrieve. Defaults to 10 if not provided.
@@ -99,7 +97,11 @@ async def download_submissions(
 ):
     """Download the submissions data from Central."""
     project = table(
-        "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+        "projects",
+        column("project_name_prefix"),
+        column("xform_title"),
+        column("id"),
+        column("odkid"),
     )
     where = f"id={project_id}"
     sql = select(project).where(text(where))
@@ -132,10 +134,14 @@ async def list_submissions(
     project_id: int,
     xml_form_id: str = None,
     db: Session = Depends(database.get_db),
-    ):
+):
     try:
         project = table(
-            "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid")
+            "projects",
+            column("project_name_prefix"),
+            column("xform_title"),
+            column("id"),
+            column("odkid"),
         )
         where = f"id={project_id}"
         sql = select(project).where(text(where))
@@ -151,7 +157,9 @@ async def list_submissions(
 
             for xform in xforms:
                 try:
-                    data = central_crud.download_submissions(first.odkid, xform["xml_form_id"], None, False)
+                    data = central_crud.download_submissions(
+                        first.odkid, xform["xml_form_id"], None, False
+                    )
                 except Exception:
                     continue
                 if len(submissions) == 0:
@@ -177,7 +185,7 @@ async def list_submissions(
 async def get_submission(
     project_id: int,
     xmlFormId: str = None,
-    submission_id: str=None,
+    submission_id: str = None,
     db: Session = Depends(database.get_db),
 ):
     """This api returns the submission json.
@@ -194,8 +202,14 @@ async def get_submission(
     try:
         """Download the submissions data from Central."""
         project = table(
-            "projects", column("project_name_prefix"), column("xform_title"), column("id"), column("odkid"),
-            column("odk_central_url"), column("odk_central_user"), column("odk_central_password")
+            "projects",
+            column("project_name_prefix"),
+            column("xform_title"),
+            column("id"),
+            column("odkid"),
+            column("odk_central_url"),
+            column("odk_central_user"),
+            column("odk_central_password"),
         )
         where = f"id={project_id}"
         sql = select(project).where(text(where))
@@ -206,19 +220,17 @@ async def get_submission(
 
         # ODK Credentials
         odk_credentials = project_schemas.ODKCentral(
-            odk_central_url = first.odk_central_url,
-            odk_central_user = first.odk_central_user,
-            odk_central_password = first.odk_central_password,
-            )
+            odk_central_url=first.odk_central_url,
+            odk_central_user=first.odk_central_user,
+            odk_central_password=first.odk_central_password,
+        )
 
         submissions = list()
 
         if xmlFormId and submission_id:
-            data = central_crud.download_submissions(first.odkid, 
-                                                     xmlFormId, 
-                                                     submission_id, 
-                                                     True, 
-                                                     odk_credentials)
+            data = central_crud.download_submissions(
+                first.odkid, xmlFormId, submission_id, True, odk_credentials
+            )
             if len(submissions) == 0:
                 submissions.append(json.loads(data[0]))
             if len(data) >= 2:
@@ -230,11 +242,13 @@ async def get_submission(
                 xforms = central_crud.list_odk_xforms(first.odkid)
                 for xform in xforms:
                     try:
-                        data = central_crud.download_submissions(first.odkid, 
-                                                                 xform["xml_form_id"], 
-                                                                 None, 
-                                                                 True, 
-                                                                 odk_credentials)
+                        data = central_crud.download_submissions(
+                            first.odkid,
+                            xform["xml_form_id"],
+                            None,
+                            True,
+                            odk_credentials,
+                        )
                     except Exception:
                         continue
                     if len(submissions) == 0:
@@ -249,7 +263,6 @@ async def get_submission(
                 if len(data) >= 2:
                     for entry in range(1, len(data)):
                         submissions.append(json.loads(data[entry]))
-
 
         return submissions
     except Exception as e:

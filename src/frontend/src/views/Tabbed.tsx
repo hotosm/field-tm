@@ -33,7 +33,9 @@ const grey = {
 };
 
 const Tab = styled(TabUnstyled)`
-  font-family: IBM Plex Sans, sans-serif;
+  font-family:
+    IBM Plex Sans,
+    sans-serif;
   color: #fff;
   cursor: pointer;
   font-size: 0.875rem;
