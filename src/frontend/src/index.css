@@ -59,32 +59,44 @@ button {
 
 @font-face {
   font-family: 'BarlowBold';
-  src: local('BarlowBold'), url('./assets/fonts/Barlow/Barlow-Bold.ttf') format('truetype');
+  src:
+    local('BarlowBold'),
+    url('./assets/fonts/Barlow/Barlow-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'BarlowMedium';
-  src: local('BarlowMedium'), url('./assets/fonts/Barlow/Barlow-Medium.ttf') format('truetype');
+  src:
+    local('BarlowMedium'),
+    url('./assets/fonts/Barlow/Barlow-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoBold';
-  src: local('ArchivoBold'), url('./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf') format('truetype');
+  src:
+    local('ArchivoBold'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoRegular';
-  src: local('ArchivoRegular'), url('./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf') format('truetype');
+  src:
+    local('ArchivoRegular'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoMedium';
-  src: local('ArchivoMedium'), url('./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf') format('truetype');
+  src:
+    local('ArchivoMedium'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'ArchivoLight';
-  src: local('ArchivoLight'), url('./assets/fonts/Archivo/Archivo/Archivo-Light.ttf') format('truetype');
+  src:
+    local('ArchivoLight'),
+    url('./assets/fonts/Archivo/Archivo/Archivo-Light.ttf') format('truetype');
 }
 
 .swiper-button-next,

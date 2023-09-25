@@ -486,7 +486,6 @@ async def preview_tasks(boundary: str, dimension: int):
         list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
         if feature["geometry"]["type"] == "MultiPolygon":
             multi_polygons.append(Polygon(feature["geometry"]["coordinates"][0][0]))
-    
 
     """Update the boundary polyon on the database."""
     if multi_polygons:
@@ -848,7 +847,6 @@ def update_project_boundary(
         list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
         if feature["geometry"]["type"] == "MultiPolygon":
             multi_polygons.append(Polygon(feature["geometry"]["coordinates"][0][0]))
-    
 
     """Update the boundary polyon on the database."""
     if multi_polygons:
@@ -1141,7 +1139,7 @@ def upload_custom_data_extracts(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    project_geojson = json.loads(db.query(func.ST_AsGeoJSON(project.outline)).scalar())
+    json.loads(db.query(func.ST_AsGeoJSON(project.outline)).scalar())
 
     features_data = json.loads(contents)
 
@@ -1160,7 +1158,9 @@ def upload_custom_data_extracts(
     for feature in features_data["features"]:
         feature_shape = shape(feature["geometry"])
         if isinstance(feature_shape, MultiPolygon):
-            wkb_element = from_shape(Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326)
+            wkb_element = from_shape(
+                Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326
+            )
         else:
             wkb_element = from_shape(feature_shape, srid=4326)
 
@@ -1168,25 +1168,23 @@ def upload_custom_data_extracts(
         feature["properties"]["title"] = ""
         properties = flatten_dict(feature["properties"])
 
-        db_feature =  db_models.DbFeatures(
-            project_id=project_id,
-            geometry = wkb_element,
-            properties=properties
+        db_feature = db_models.DbFeatures(
+            project_id=project_id, geometry=wkb_element, properties=properties
         )
         db.add(db_feature)
     db.commit()
 
     return True
 
-def flatten_dict(d, parent_key='', sep='_'):
-    """
-    Recursively flattens a nested dictionary into a single-level dictionary.
-    
+
+def flatten_dict(d, parent_key="", sep="_"):
+    """Recursively flattens a nested dictionary into a single-level dictionary.
+
     Args:
         d (dict): The input dictionary.
         parent_key (str): The parent key (used for recursion).
         sep (str): The separator character to use in flattened keys.
-    
+
     Returns:
         dict: The flattened dictionary.
     """
@@ -2141,7 +2139,7 @@ async def update_project_form(
             f"""UPDATE features
                     SET task_id={task}
                     WHERE id in (
-                    
+
                     SELECT id
                     FROM features
                     WHERE project_id={project_id} and ST_Intersects(geometry, '{task_obj.outline}'::Geometry)
