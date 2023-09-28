@@ -1,0 +1,59 @@
+name: Extract Project Variables
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The GitHub environment to extract vars from."
+        required: false
+        type: string
+        default: ""
+    outputs:
+      api_version:
+        description: "Backend API Version."
+        value: ${{ jobs.extract-vars.outputs.api_version }}
+      frontend_main_version:
+        description: "Frontend Version."
+        value: ${{ jobs.extract-vars.outputs.frontend_main_version }}
+      api_url:
+        description: "URL to access the backend API."
+        value: ${{ jobs.extract-vars.outputs.api_url }}
+      frontend_main_url:
+        description: "URL to access the main frontend."
+        value: ${{ jobs.extract-vars.outputs.frontend_main_url }}
+
+jobs:
+  extract-vars:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    outputs:
+      api_version: ${{ steps.extract_api_version.outputs.api_version }}
+      frontend_main_version: ${{ steps.extract_frontend_version.outputs.frontend_main_version }}
+      api_url: ${{ steps.get_env_vars.outputs.api_url }}
+      frontend_main_url: ${{ steps.get_env_vars.outputs.frontend_main_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract api version
+        id: extract_api_version
+        run: |
+          cd src/backend
+          API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')
+          echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Extract frontend versions
+        id: extract_frontend_version
+        run: |
+          cd src/frontend
+          FRONTEND_MAIN_VERSION=$(jq -r '.version' package.json)
+          echo "frontend_main_version=${FRONTEND_MAIN_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Get environment vars
+        id: get_env_vars
+        run: |
+          echo "api_url: ${{ vars.URL_SCHEME }}://${{ vars.API_URL }}"
+          echo "api_url=${{ vars.URL_SCHEME }}://${{ vars.API_URL }} >> $GITHUB_OUTPUT"
+          echo "frontend_main_url: ${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}"
+          echo "frontend_main_url=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }} >> $GITHUB_OUTPUT"

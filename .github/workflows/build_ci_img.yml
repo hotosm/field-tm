@@ -15,15 +15,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  extract-versions:
-    uses: ./.github/workflows/r-extract_versions.yml
+  extract-vars:
+    uses: ./.github/workflows/r-extract_vars.yml
 
   backend-ci-build:
-    uses: ./.github/workflows/r-build_backend.yml
-    needs: [extract-versions]
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    needs: [extract-vars]
     with:
-      api_version: ${{ needs.extract-versions.outputs.api_version }}
+      context: src/backend
       build_target: ci
       image_tags: |
-        "ghcr.io/hotosm/fmtm/backend:${{ needs.extract-versions.outputs.api_version }}-ci-${{ github.ref_name }}"
+        "ghcr.io/hotosm/fmtm/backend:${{ needs.extract-vars.outputs.api_version }}-ci-${{ github.ref_name }}"
         "ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}"
+      build_args: |
+        APP_VERSION=${{ needs.extract-vars.outputs.api_version }}
