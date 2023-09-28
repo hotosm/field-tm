@@ -35,6 +35,7 @@ jobs:
     needs: [extract-vars]
     with:
       context: src/backend
+      dockerfile: src/backend/Dockerfile
       build_target: prod
       image_tags: |
         "ghcr.io/hotosm/fmtm/backend:${{ needs.extract-vars.outputs.api_version }}-${{ github.ref_name }}"
