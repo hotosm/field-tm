@@ -49,3 +49,4 @@ jobs:
         docs/apidocs
         docs/openapi.json
       cache_key: ${{ needs.get_cache_key.outputs.cache_key }}
+      pyproject_dir: "src/backend"
