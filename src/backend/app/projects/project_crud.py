@@ -404,16 +404,16 @@ def update_multi_polygon_project_boundary(
                     0
                 ]
 
-            def remove_z_dimension(coord):
-                """Helper to remove z dimension.
+            # def remove_z_dimension(coord):
+            #     """Helper to remove z dimension.
 
-                To be used in lambda, to remove z dimension from
-                each coordinate in the feature's geometry.
-                """
-                return coord.pop() if len(coord) == 3 else None
+            #     To be used in lambda, to remove z dimension from
+            #     each coordinate in the feature's geometry.
+            #     """
+            #     return coord.pop() if len(coord) == 3 else None
 
-            # Apply the lambda function to each coordinate in its geometry
-            list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
+            # # Apply the lambda function to each coordinate in its geometry
+            # list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
 
             db_task = db_models.DbTask(
                 project_id=project_id,
@@ -2484,8 +2484,6 @@ def generate_appuser_files_for_janakpur(
             # This file will store xml contents of an xls form.
             xform = f"/tmp/{name}.xml"
 
-            print("XFORM = ", xform)
-
             buildings_extracts = (
                 f"/tmp/buildings_{name}.geojson"  # This file will store osm extracts
             )
@@ -2546,7 +2544,7 @@ def generate_appuser_files_for_janakpur(
                             'properties', properties
                         ) AS feature
                         FROM features
-                        WHERE project_id={project_id} and task_id={task_id} and category_title='highways'
+                        WHERE project_id={project_id} and category_title='highways'
                         ) features;"""
             )
             highway_result = db.execute(highway_query)

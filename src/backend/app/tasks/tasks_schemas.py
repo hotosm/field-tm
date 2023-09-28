@@ -63,7 +63,7 @@ class TaskBase(BaseModel):
     project_task_index: int
     project_task_name: str
     outline_geojson: Feature
-    outline_centroid: Feature
+    # outline_centroid: Feature
     # initial_feature_count: int
     task_status: TaskStatus
     locked_by_uid: int = None
