@@ -1056,3 +1056,93 @@ async def project_centroid(
     result = db.execute(query)
     result_dict_list = [{"id": row[0], "centroid": row[1]} for row in result.fetchall()]
     return result_dict_list
+
+
+@router.post("/{project_id}/generate_files_for_janakpur")
+async def generate_files_janakpur(
+    background_tasks: BackgroundTasks,
+    project_id: int,
+    buildings_file: UploadFile,
+    roads_file: UploadFile,
+    form: UploadFile,
+    db: Session = Depends(database.get_db),
+):
+    """Generate required media files tasks in the project based on the provided params."""
+    log.debug(f"Generating media files tasks for project: {project_id}")
+    xform_title = None
+
+    project = project_crud.get_project(db, project_id)
+    if not project:
+        raise HTTPException(
+            status_code=428, detail=f"Project with id {project_id} does not exist"
+        )
+
+    project.data_extract_type = "polygon"
+    db.commit()
+
+    if form:
+        log.debug("Validating uploaded XLS file")
+        # Validating for .XLS File.
+        file_name = os.path.splitext(form.filename)
+        file_ext = file_name[1]
+        allowed_extensions = [".xls", ".xlsx", ".xml"]
+        if file_ext not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+        xform_title = file_name[0]
+        await form.seek(0)
+        contents = await form.read()
+        project.form_xls = contents
+        db.commit()
+
+    if buildings_file:
+        log.debug("Validating uploaded buildings geojson file")
+        # Validating for .geojson File.
+        data_extracts_file_name = os.path.splitext(buildings_file.filename)
+        extracts_file_ext = data_extracts_file_name[1]
+        if extracts_file_ext != ".geojson":
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+        try:
+            buildings_extracts_contents = await buildings_file.read()
+            json.loads(buildings_extracts_contents)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+
+    if roads_file:
+        log.debug("Validating uploaded roads geojson file")
+        # Validating for .geojson File.
+        road_extracts_file_name = os.path.splitext(roads_file.filename)
+        road_extracts_file_ext = road_extracts_file_name[1]
+        if road_extracts_file_ext != ".geojson":
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+        try:
+            road_extracts_contents = await roads_file.read()
+            json.loads(road_extracts_contents)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+
+    # generate a unique task ID using uuid
+    background_task_id = uuid.uuid4()
+
+    # insert task and task ID into database
+    log.debug(
+        f"Creating background task ID {background_task_id} "
+        f"for project ID: {project_id}"
+    )
+    await project_crud.insert_background_task_into_database(
+        db, task_id=background_task_id, project_id=project_id
+    )
+
+    log.debug(f"Submitting {background_task_id} to background tasks stack")
+    background_tasks.add_task(
+        project_crud.generate_appuser_files_for_janakpur,
+        db,
+        project_id,
+        contents,
+        buildings_extracts_contents if buildings_file else None,
+        road_extracts_contents if roads_file else None,
+        xform_title,
+        file_ext[1:] if form else "xls",
+        background_task_id,
+    )
+
+    return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
