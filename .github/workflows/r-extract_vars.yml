@@ -54,6 +54,6 @@ jobs:
         id: get_env_vars
         run: |
           echo "api_url: ${{ vars.URL_SCHEME }}://${{ vars.API_URL }}"
-          echo "api_url=${{ vars.URL_SCHEME }}://${{ vars.API_URL }} >> $GITHUB_OUTPUT"
+          echo "api_url=${{ vars.URL_SCHEME }}://${{ vars.API_URL }}" >> $GITHUB_OUTPUT
           echo "frontend_main_url: ${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}"
-          echo "frontend_main_url=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }} >> $GITHUB_OUTPUT"
+          echo "frontend_main_url=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}" >> $GITHUB_OUTPUT
