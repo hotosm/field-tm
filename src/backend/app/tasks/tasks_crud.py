@@ -32,7 +32,7 @@ from app.config import settings
 
 from ..central import central_crud
 from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson, get_centroid
+from ..db.postgis_utils import geometry_to_geojson
 from ..models.enums import (
     TaskStatus,
     get_action_for_status_change,
@@ -257,7 +257,7 @@ def convert_to_app_task(db_task: db_models.DbTask):
             app_task.outline_geojson = geometry_to_geojson(
                 db_task.outline, properties, db_task.id
             )
-            app_task.outline_centroid = get_centroid(db_task.outline)
+            # app_task.outline_centroid = get_centroid(db_task.outline)
 
         if db_task.lock_holder:
             app_task.locked_by_uid = db_task.lock_holder.id
