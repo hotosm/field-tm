@@ -16,6 +16,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     with:
       context: odkcentral/api
+      dockerfile: odkcentral/api/Dockerfile
       image_tags: |
         "ghcr.io/hotosm/fmtm/odkcentral:${{ vars.ODK_CENTRAL_VERSION }}"
         "ghcr.io/hotosm/fmtm/odkcentral:latest"
@@ -26,6 +27,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     with:
       context: odkcentral/proxy
+      dockerfile: odkcentral/proxy/Dockerfile
       image_tags: |
         "ghcr.io/hotosm/fmtm/odkcentral-proxy:${{ vars.ODK_CENTRAL_VERSION }}"
         "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
