@@ -31,7 +31,7 @@ jobs:
       environment: ${{ github.ref_name }}
 
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     needs: [extract-vars]
     with:
       context: src/backend
@@ -43,7 +43,7 @@ jobs:
         APP_VERSION=${{ needs.extract-vars.outputs.api_version }}
 
   frontend-main-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     needs: [extract-vars]
     with:
       context: src/frontend

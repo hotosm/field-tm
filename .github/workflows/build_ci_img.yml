@@ -19,7 +19,7 @@ jobs:
     uses: ./.github/workflows/r-extract_vars.yml
 
   backend-ci-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     needs: [extract-vars]
     with:
       context: src/backend

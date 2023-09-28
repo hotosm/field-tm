@@ -10,4 +10,4 @@ on:
 
 jobs:
   publish-docs-to-wiki:
-    uses: hotosm/gh-workflows/.github/workflows/wiki.yml
+    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@main
