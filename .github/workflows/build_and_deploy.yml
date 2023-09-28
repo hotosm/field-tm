@@ -22,38 +22,45 @@ jobs:
   frontend-tests:
     uses: ./.github/workflows/r-frontend_tests.yml
 
-  extract-versions:
+  extract-vars:
     needs:
       - pytest
       - frontend-tests
-    uses: ./.github/workflows/r-extract_versions.yml
-
-  backend-build:
-    uses: ./.github/workflows/r-build_backend.yml
-    needs: extract-versions
-    with:
-      api_version: ${{ needs.extract-versions.outputs.api_version }}
-      build_target: prod
-      image_tags: |
-        "ghcr.io/hotosm/fmtm/backend:${{ needs.extract-versions.outputs.api_version }}-${{ github.ref_name }}"
-        "ghcr.io/hotosm/fmtm/backend:latest"
-
-  frontend-main-build:
-    uses: ./.github/workflows/r-build_frontend.yml
-    needs: extract-versions
+    uses: ./.github/workflows/r-extract_vars.yml
     with:
       environment: ${{ github.ref_name }}
-      name: main
-      app_version: ${{ needs.extract-versions.outputs.frontend_main_version }}
+
+  backend-build:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    needs: [extract-vars]
+    with:
+      context: src/backend
       build_target: prod
       image_tags: |
-        "ghcr.io/hotosm/fmtm/frontend:${{ needs.extract-versions.outputs.frontend_main_version }}-${{ github.ref_name }}"
+        "ghcr.io/hotosm/fmtm/backend:${{ needs.extract-vars.outputs.api_version }}-${{ github.ref_name }}"
+        "ghcr.io/hotosm/fmtm/backend:latest"
+      build_args: |
+        APP_VERSION=${{ needs.extract-vars.outputs.api_version }}
+
+  frontend-main-build:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    needs: [extract-vars]
+    with:
+      context: src/frontend
+      dockerfile: src/frontend/prod.dockerfile
+      build_target: prod
+      image_tags: |
+        "ghcr.io/hotosm/fmtm/frontend:${{ needs.extract-vars.outputs.frontend_main_version }}-${{ github.ref_name }}"
         "ghcr.io/hotosm/fmtm/frontend:latest"
+      build_args: |
+        APP_VERSION=${{ needs.extract-vars.outputs.frontend_main_version }}
+        API_URL=${{ needs.extract-vars.outputs.api_url }}
+        FRONTEND_MAIN_URL=${{ needs.extract-vars.outputs.frontend_main_url }}
 
   smoke-test-backend:
     runs-on: ubuntu-latest
     needs:
-      - extract-versions
+      - extract-vars
       - backend-build
     environment:
       name: ${{ github.ref_name }}
@@ -65,8 +72,8 @@ jobs:
       - name: Environment to .env
         env:
           GIT_BRANCH: ${{ github.ref_name }}
-          API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
-          FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
+          API_VERSION: ${{ needs.extract-vars.outputs.api_version }}
+          FRONTEND_MAIN_VERSION: ${{ needs.extract-vars.outputs.frontend_main_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
           echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
@@ -109,7 +116,7 @@ jobs:
   smoke-test-frontend:
     runs-on: ubuntu-latest
     needs:
-      - extract-versions
+      - extract-vars
       - frontend-main-build
     environment:
       name: ${{ github.ref_name }}
@@ -124,7 +131,7 @@ jobs:
   deploy-containers:
     runs-on: ubuntu-latest
     needs:
-      - extract-versions
+      - extract-vars
       - smoke-test-backend
       - smoke-test-frontend
     environment:
@@ -137,8 +144,8 @@ jobs:
       - name: Environment to .env
         env:
           GIT_BRANCH: ${{ github.ref_name }}
-          API_VERSION: ${{ needs.extract-versions.outputs.api_version }}
-          FRONTEND_MAIN_VERSION: ${{ needs.extract-versions.outputs.frontend_main_version }}
+          API_VERSION: ${{ needs.extract-vars.outputs.api_version }}
+          FRONTEND_MAIN_VERSION: ${{ needs.extract-vars.outputs.frontend_main_version }}
         run: |
           echo "${{ secrets.DOTENV }}" > .env
           echo "GIT_BRANCH=${GIT_BRANCH}" >> .env

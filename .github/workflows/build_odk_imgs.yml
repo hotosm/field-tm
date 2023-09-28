@@ -12,39 +12,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push-images:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+  build-odkcentral:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    with:
+      context: odkcentral/api
+      image_tags: |
+        "ghcr.io/hotosm/fmtm/odkcentral:${{ vars.ODK_CENTRAL_VERSION }}"
+        "ghcr.io/hotosm/fmtm/odkcentral:latest"
+      build_args: |
+        ODK_CENTRAL_VERSION=${{ vars.ODK_CENTRAL_VERSION }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push odkcentral api
-        uses: docker/build-push-action@v4
-        with:
-          context: odkcentral/api
-          push: true
-          tags: |
-            "ghcr.io/hotosm/fmtm/odkcentral:${{ vars.ODK_CENTRAL_VERSION }}"
-            "ghcr.io/hotosm/fmtm/odkcentral:latest"
-          build-args: |
-            ODK_CENTRAL_VERSION=${{ vars.ODK_CENTRAL_VERSION }}
-
-      - name: Build and push odkcentral proxy
-        uses: docker/build-push-action@v4
-        with:
-          context: odkcentral/proxy
-          push: true
-          tags: |
-            "ghcr.io/hotosm/fmtm/odkcentral-proxy:${{ vars.ODK_CENTRAL_VERSION }}"
-            "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
+  build-proxy:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml
+    with:
+      context: odkcentral/proxy
+      image_tags: |
+        "ghcr.io/hotosm/fmtm/odkcentral-proxy:${{ vars.ODK_CENTRAL_VERSION }}"
+        "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
