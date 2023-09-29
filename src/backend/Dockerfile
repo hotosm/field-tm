@@ -148,6 +148,14 @@ USER appuser
 
 
 FROM debug-no-odk as ci
+USER root
+RUN set -ex \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install \
+    -y --no-install-recommends \
+        "git" \
+    && rm -rf /var/lib/apt/lists/*
+USER appuser
 COPY --from=extract-deps --chown=appuser \
     /opt/python/requirements-ci.txt /opt/python/
 RUN pip install --user --upgrade --no-warn-script-location \
