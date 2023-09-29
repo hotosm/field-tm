@@ -149,6 +149,7 @@ USER appuser
 FROM debug-no-odk as ci
 # Run all ci as root
 USER root
+ENV PATH="/root/.local/bin:$PATH"
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
