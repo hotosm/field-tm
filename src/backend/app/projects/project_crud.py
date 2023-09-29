@@ -46,7 +46,14 @@ from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
 from shapely import wkt
-from shapely.geometry import MultiPolygon, Polygon, mapping, shape
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    MultiPolygon,
+    Polygon,
+    mapping,
+    shape,
+)
 from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -1160,6 +1167,10 @@ def upload_custom_data_extracts(
         if isinstance(feature_shape, MultiPolygon):
             wkb_element = from_shape(
                 Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326
+            )
+        elif isinstance(feature_shape, MultiLineString):
+            wkb_element = from_shape(
+                LineString(feature["geometry"]["coordinates"][0]), srid=4326
             )
         else:
             wkb_element = from_shape(feature_shape, srid=4326)
