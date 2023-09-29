@@ -11,3 +11,5 @@ on:
 jobs:
   publish-docs-to-wiki:
     uses: hotosm/gh-workflows/.github/workflows/wiki.yml@main
+    with:
+      homepage_path: "index.md"
