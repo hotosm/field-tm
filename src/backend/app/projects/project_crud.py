@@ -46,7 +46,14 @@ from osm_fieldwork.make_data_extract import PostgresClient
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
 from shapely import wkt
-from shapely.geometry import MultiPolygon, Polygon, mapping, shape
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    MultiPolygon,
+    Polygon,
+    mapping,
+    shape,
+)
 from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -84,7 +91,7 @@ def get_projects(
         db_projects = (
             db.query(db_models.DbProject)
             .filter(and_(*filters))
-            .order_by(db_models.DbProject.id.asc())
+            .order_by(db_models.DbProject.id.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -93,7 +100,7 @@ def get_projects(
     else:
         db_projects = (
             db.query(db_models.DbProject)
-            .order_by(db_models.DbProject.id.asc())
+            .order_by(db_models.DbProject.id.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -404,16 +411,16 @@ def update_multi_polygon_project_boundary(
                     0
                 ]
 
-            def remove_z_dimension(coord):
-                """Helper to remove z dimension.
+            # def remove_z_dimension(coord):
+            #     """Helper to remove z dimension.
 
-                To be used in lambda, to remove z dimension from
-                each coordinate in the feature's geometry.
-                """
-                return coord.pop() if len(coord) == 3 else None
+            #     To be used in lambda, to remove z dimension from
+            #     each coordinate in the feature's geometry.
+            #     """
+            #     return coord.pop() if len(coord) == 3 else None
 
-            # Apply the lambda function to each coordinate in its geometry
-            list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
+            # # Apply the lambda function to each coordinate in its geometry
+            # list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
 
             db_task = db_models.DbTask(
                 project_id=project_id,
@@ -1160,6 +1167,10 @@ def upload_custom_data_extracts(
         if isinstance(feature_shape, MultiPolygon):
             wkb_element = from_shape(
                 Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326
+            )
+        elif isinstance(feature_shape, MultiLineString):
+            wkb_element = from_shape(
+                LineString(feature["geometry"]["coordinates"][0]), srid=4326
             )
         else:
             wkb_element = from_shape(feature_shape, srid=4326)
@@ -2484,8 +2495,6 @@ def generate_appuser_files_for_janakpur(
             # This file will store xml contents of an xls form.
             xform = f"/tmp/{name}.xml"
 
-            print("XFORM = ", xform)
-
             buildings_extracts = (
                 f"/tmp/buildings_{name}.geojson"  # This file will store osm extracts
             )
@@ -2546,7 +2555,7 @@ def generate_appuser_files_for_janakpur(
                             'properties', properties
                         ) AS feature
                         FROM features
-                        WHERE project_id={project_id} and task_id={task_id} and category_title='highways'
+                        WHERE project_id={project_id} and category_title='highways'
                         ) features;"""
             )
             highway_result = db.execute(highway_query)
