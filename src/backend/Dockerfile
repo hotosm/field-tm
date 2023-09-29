@@ -90,7 +90,6 @@ RUN set -ex \
     -y --no-install-recommends \
         "nano" \
         "curl" \
-        "gosu" \
         "libpcre3" \
         "mime-support" \
         "postgresql-client" \
@@ -153,6 +152,7 @@ RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
     -y --no-install-recommends \
+        "gosu" \
         "git" \
     && rm -rf /var/lib/apt/lists/*
 USER appuser
@@ -168,6 +168,8 @@ RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)
 # Override entrypoint, as not possible in Github action
 ENTRYPOINT [""]
 CMD [""]
+# User root required, use `gosu appuser` in the container
+USER root
 
 
 
