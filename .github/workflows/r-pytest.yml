@@ -34,7 +34,6 @@ jobs:
         OSM_CLIENT_SECRET: ${{ env.OSM_CLIENT_SECRET }}
         OSM_SECRET_KEY: ${{ env.OSM_SECRET_KEY }}
         FRONTEND_MAIN_URL: ${{ vars.FRONTEND_MAIN_URL }}
-      options: --user root
 
     services:
       # Start backend database
