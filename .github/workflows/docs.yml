@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Set cache key
         id: set_cache_key
-        run: echo "cache_key=docs-build-$(date --utc '+%V')" >> $GITHUB_OUTPUT
+        run: echo "cache_key=docs-build-$(date --utc +'%Y-%m-%d_%H:%M:%S')" >> $GITHUB_OUTPUT
 
   build_doxygen:
     uses: hotosm/gh-workflows/.github/workflows/doxygen_build.yml@main
