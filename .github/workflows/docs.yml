@@ -32,7 +32,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/openapi_build.yml@main
     needs: [get_cache_key]
     with:
-      image: ghcr.io/hotosm/fmtm/backend:ci-main
+      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}
       example_env_file_path: ".env.example"
       cache_paths: |
         docs/openapi.json
@@ -45,8 +45,9 @@ jobs:
       - build_doxygen
       - build_openapi_json
     with:
+      image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}
+      prepend_command: "gosu appuser"
       cache_paths: |
         docs/apidocs
         docs/openapi.json
       cache_key: ${{ needs.get_cache_key.outputs.cache_key }}
-      pyproject_dir: "src/backend"
