@@ -30,7 +30,7 @@ const Button = ({ btnText, btnType, type, onClick, className, count, dataTip, ic
     <button
       type={type ? 'submit' : 'button'}
       onClick={onClick}
-      className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-4 ${btnStyle(btnType, className)}`}
+      className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 ${btnStyle(btnType, className)}`}
       title={dataTip}
     >
       <p className="fmtm-whitespace-nowrap">{btnText}</p>
@@ -39,7 +39,7 @@ const Button = ({ btnText, btnType, type, onClick, className, count, dataTip, ic
           {count}
         </p>
       )}
-      {icon && icon}
+      <div>{icon && icon}</div>
     </button>
   </div>
 );
