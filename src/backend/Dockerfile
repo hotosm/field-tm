@@ -147,6 +147,7 @@ USER appuser
 
 
 FROM debug-no-odk as ci
+# Run all ci as root
 USER root
 RUN set -ex \
     && apt-get update \
@@ -155,21 +156,18 @@ RUN set -ex \
         "gosu" \
         "git" \
     && rm -rf /var/lib/apt/lists/*
-USER appuser
-COPY --from=extract-deps --chown=appuser \
+RUN mv /home/appuser/.local /root/.local
+COPY --from=extract-deps \
     /opt/python/requirements-ci.txt /opt/python/
 RUN pip install --user --upgrade --no-warn-script-location \
     --no-cache-dir -r \
     /opt/python/requirements-ci.txt \
     && rm -r /opt/python
-COPY --chown=appuser tests/ /opt/tests/
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Override entrypoint, as not possible in Github action
 ENTRYPOINT [""]
 CMD [""]
-# User root required, use `gosu appuser` in the container
-USER root
 
 
 
