@@ -84,7 +84,7 @@ def get_projects(
         db_projects = (
             db.query(db_models.DbProject)
             .filter(and_(*filters))
-            .order_by(db_models.DbProject.id.asc())
+            .order_by(db_models.DbProject.id.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -93,7 +93,7 @@ def get_projects(
     else:
         db_projects = (
             db.query(db_models.DbProject)
-            .order_by(db_models.DbProject.id.asc())
+            .order_by(db_models.DbProject.id.desc())
             .offset(skip)
             .limit(limit)
             .all()
