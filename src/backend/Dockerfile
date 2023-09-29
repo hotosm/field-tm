@@ -108,7 +108,7 @@ WORKDIR /opt
 # Add app code
 COPY app/ /opt/app/
 # Add non-root user, permissions
-RUN useradd -r -u 900 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
+RUN useradd -r -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /container-entrypoint.sh
