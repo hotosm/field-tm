@@ -75,7 +75,7 @@ jobs:
         image: "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run pytest as appuser
         run: |
           cd src/backend
