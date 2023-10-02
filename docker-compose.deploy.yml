@@ -40,7 +40,7 @@ services:
       - 443:443
     networks:
       - fmtm-net
-    restart: unless-stopped
+    restart: "unless-stopped"
     command:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
@@ -75,7 +75,7 @@ services:
       - "5433:5432"
     networks:
       - fmtm-net
-    restart: unless-stopped
+    restart: "unless-stopped"
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
@@ -96,7 +96,7 @@ services:
       - .env
     networks:
       - fmtm-net
-    restart: unless-stopped
+    restart: "unless-stopped"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.tls=true"
@@ -104,6 +104,18 @@ services:
       - "traefik.http.routers.api.rule=Host(`${API_URL}`)"
       - "traefik.http.services.api-svc.loadbalancer.server.port=8000"
       - "traefik.http.routers.api.service=api-svc"
+
+  migrations:
+    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
+    container_name: fmtm_migrations
+    depends_on:
+      - api
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
 
   ui-main:
     image: "ghcr.io/hotosm/fmtm/frontend:${FRONTEND_MAIN_VERSION}-${GIT_BRANCH}"
@@ -124,7 +136,7 @@ services:
       - BROTLI=true
       - API_URL=${URL_SCHEME}://${API_URL}
       - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
-    restart: unless-stopped
+    restart: "unless-stopped"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui-main.tls=true"

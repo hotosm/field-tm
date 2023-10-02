@@ -107,6 +107,8 @@ COPY --from=build \
 WORKDIR /opt
 # Add app code
 COPY app/ /opt/app/
+COPY migrations/ /opt/migrations/
+COPY alembic.ini /opt/
 # Add non-root user, permissions
 RUN useradd -r -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
@@ -122,7 +124,6 @@ USER appuser
 
 
 FROM runtime as debug-no-odk
-USER appuser
 COPY --from=extract-deps --chown=appuser \
     /opt/python/requirements-debug.txt /opt/python/
 RUN pip install --user --upgrade --no-warn-script-location \
@@ -146,7 +147,7 @@ USER appuser
 
 
 
-FROM debug-no-odk as ci
+FROM runtime as ci
 # Run all ci as root
 USER root
 ENV PATH="/root/.local/bin:$PATH"

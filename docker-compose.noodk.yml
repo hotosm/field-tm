@@ -41,7 +41,7 @@ services:
       - "5433:5432"
     networks:
       - fmtm-dev
-    restart: unless-stopped
+    restart: "unless-stopped"
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:debug"
@@ -65,7 +65,19 @@ services:
       - "5678:5678"
     networks:
       - fmtm-dev
-    restart: unless-stopped
+    restart: "unless-stopped"
+
+  migrations:
+    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
+    container_name: fmtm_migrations
+    depends_on:
+      - api
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
 
   ui-main:
     image: "ghcr.io/hotosm/fmtm/frontend:debug"
@@ -89,4 +101,4 @@ services:
       - "8081:8081"
     networks:
       - fmtm-dev
-    restart: unless-stopped
+    restart: "unless-stopped"

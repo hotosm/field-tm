@@ -41,7 +41,7 @@ from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
     relationship,
 )
 
-from ..models.enums import (
+from app.models.enums import (
     BackgroundTaskStatus,
     MappingLevel,
     MappingPermission,
@@ -55,6 +55,7 @@ from ..models.enums import (
     UserRole,
     ValidationPermission,
 )
+
 from .database import Base, FmtmMetadata
 from .postgis_utils import timestamp
 

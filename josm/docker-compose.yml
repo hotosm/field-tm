@@ -35,7 +35,7 @@ services:
       - x11
     ports:
       - 8111:80
-    restart: unless-stopped
+    restart: "unless-stopped"
 
   josm-novnc:
     image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
@@ -51,4 +51,4 @@ services:
       - "8112:8080"
     networks:
       - x11
-    restart: unless-stopped
+    restart: "unless-stopped"
