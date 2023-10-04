@@ -88,6 +88,24 @@ The API should now be accessible at: <http://127.0.0.1:8000/docs>
 
 To add authentication to an endpoint, import `login_required` from `auth` module, you can use it as a decorator or use fastapi `Depends(login_required)` on endpoints.
 
+### Database Migration
+
+#### Creating Migration Files
+
+- Exec into the API container: `docker compose exec api bash`.
+- Run the command to generate migrations: `alembic revision`.
+- The migration file should be generated under `src/backend/migrations/versions`.
+- Commit the file to the repo.
+
+#### Applying Migrations
+
+- Should occur automatically as part of the docker compose stack (migration service).
+- To run manually:
+
+```bash
+alembic upgrade head
+```
+
 ## Backend Debugging
 
 - The `docker-compose.yml` builds FMTM using the `debug-with-odk` target in the Dockerfile.

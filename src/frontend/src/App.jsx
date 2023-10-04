@@ -57,7 +57,7 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('app'),
 );
-if (process.env.NODE_ENV === 'production') {
+if (environment.nodeEnv === 'production') {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
@@ -71,7 +71,7 @@ if (process.env.NODE_ENV === 'production') {
     });
   }
 }
-// if (process.env.NODE_ENV === 'development') {
+// if (environment.nodeEnv === 'development') {
 //   navigator.serviceWorker.getRegistrations().then(function (registrations) {
 //     for (let registration of registrations) {
 //       registration.unregister();

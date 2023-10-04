@@ -47,7 +47,7 @@ function InputTextField({
         {required && <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>}
       </div>
       <div
-        className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-h-[1.8rem] fmtm-w-full fmtm-justify-between fmtm-flex fmtm-items-center fmtm-overflow-hidden`}
+        className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-h-[2.3rem] fmtm-w-full fmtm-justify-between fmtm-flex fmtm-items-center fmtm-overflow-hidden fmtm-rounded-md`}
       >
         <input
           id={id}

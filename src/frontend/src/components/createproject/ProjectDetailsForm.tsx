@@ -48,6 +48,15 @@ const ProjectDetailsForm: React.FC = () => {
     CreateProjectValidation,
   );
 
+  // Inject ODK vars if NODE_ENV=development (local dev)
+  useEffect(() => {
+    if (environment.nodeEnv === 'development') {
+      handleCustomChange('odk_central_url', environment.odkCentralUrl);
+      handleCustomChange('odk_central_user', environment.odkCentralUser);
+      handleCustomChange('odk_central_password', environment.odkCentralPass);
+    }
+  }, []);
+
   const inputFormStyles = () => {
     return {
       style: {

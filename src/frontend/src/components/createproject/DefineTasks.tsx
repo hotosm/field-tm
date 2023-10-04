@@ -114,8 +114,7 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
     };
   };
   const dividedTaskGeojson = CoreModules.useAppSelector((state) => state.createproject.dividedTaskGeojson);
-  const parsedTaskGeojsonCount =
-    dividedTaskGeojson?.features?.length || JSON?.parse(dividedTaskGeojson)?.features?.length;
+  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || 1;
   // // passing payloads for creating project from form whenever user clicks submit on upload area passing previous project details form aswell
   const algorithmListData = alogrithmList;
   const dividedTaskLoading = CoreModules.useAppSelector((state) => state.createproject.dividedTaskLoading);

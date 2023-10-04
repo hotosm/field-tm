@@ -92,8 +92,8 @@ const FormSelection: React.FC<any> = ({
             description: projectDetails.description,
           },
           author: {
-            username: userDetails.username,
-            id: userDetails.id,
+            username: userDetails?.username || 'svcfmtm',
+            id: userDetails?.id || 20386219,
           },
           odk_central: {
             odk_central_url: projectDetails.odk_central_url,

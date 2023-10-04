@@ -18,6 +18,7 @@ const ProjectSlice = createSlice({
     tilesListLoading: false,
     downloadTilesLoading: false,
     downloadDataExtractLoading: false,
+    taskModalStatus: false,
   },
   reducers: {
     SetProjectTaskBoundries(state, action) {
@@ -65,6 +66,9 @@ const ProjectSlice = createSlice({
     },
     SetDownloadDataExtractLoading(state, action) {
       state.downloadDataExtractLoading = action.payload;
+    },
+    ToggleTaskModalStatus(state, action) {
+      state.taskModalStatus = action.payload;
     },
   },
 });

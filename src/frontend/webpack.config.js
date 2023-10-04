@@ -167,8 +167,15 @@ module.exports = function (webpackEnv) {
             : undefined,
         ),
       ),
-
-      new EnvironmentPlugin(['API_URL', 'FRONTEND_MAIN_URL']),
+      // Load in required environment variables
+      new EnvironmentPlugin({
+        NODE_ENV: 'development',
+        API_URL: '',
+        FRONTEND_MAIN_URL: '',
+        ODK_CENTRAL_URL: '',
+        ODK_CENTRAL_USER: '',
+        ODK_CENTRAL_PASSWD: '',
+      }),
     ],
   };
 };

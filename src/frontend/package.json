@@ -52,6 +52,7 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.11.1",
+    "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-select": "^1.2.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@reduxjs/toolkit": "^1.9.1",

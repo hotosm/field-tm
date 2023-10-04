@@ -11,14 +11,7 @@ import Button from '../../components/common/Button';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import AssetModules from '../../shared/AssetModules.js';
 import { createPopup } from '../../utilfunctions/createPopup';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../components/common/Select';
+import { CustomSelect } from '../../components/common/Select';
 import { OrganisationService } from '../../api/CreateProjectService';
 import environment from '../../environment';
 
@@ -34,7 +27,7 @@ const ProjectDetailsForm = ({ flag }) => {
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 2 }));
-    navigate('/upload-area');
+    navigate('/new-upload-area');
   };
 
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
@@ -163,32 +156,19 @@ const ProjectDetailsForm = ({ flag }) => {
           </div>
           <div className="md:fmtm-w-[50%] fmtm-flex fmtm-flex-col fmtm-gap-6">
             <div>
-              <div className="fmtm-flex fmtm-gap-1">
-                <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">Organization Name</p>
-                <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>
-              </div>
-              <div className="fmtm-flex fmtm-items-end ">
-                <div className="fmtm-w-[25rem]">
-                  <Select
-                    value={values?.organisation_id?.toString()}
-                    onValueChange={(value) => handleCustomChange('organisation_id', parseInt(value))}
-                  >
-                    <SelectTrigger className="">
-                      <SelectValue placeholder="Select an Organization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {organizationList?.map((org) => (
-                          <SelectItem key={org.value} value={org?.value?.toString()}>
-                            {org.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="fmtm-flex fmtm-items-center ">
+                <CustomSelect
+                  title="Organization Name"
+                  placeholder="Organization Name"
+                  data={organizationList}
+                  dataKey="value"
+                  value={values.organisation_id?.toString()}
+                  valueKey="value"
+                  label="label"
+                  onValueChange={(value) => handleCustomChange('organisation_id', value && +value)}
+                />
                 <AssetModules.AddIcon
-                  className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5"
+                  className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-4"
                   onClick={() => createPopup('Create Organization', 'createOrganization?popup=true')}
                 />
               </div>

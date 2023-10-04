@@ -194,9 +194,9 @@ Make sure to replace `<your-username>` with your GitHub username.
 
 1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
-3. From the command line run: `docker compose build ui-main`
+3. From the command line run: `docker compose build ui`
    This is essential, as the development container for the frontend is different to production.
-4. Once everything is built, from the command line run: `docker compose up -d ui-main`
+4. Once everything is built, from the command line run: `docker compose up -d ui`
 
 5. If everything goes well you should now be able to **navigate to the project in your browser:** <http://127.0.0.1:8080>
 
