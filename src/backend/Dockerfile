@@ -98,8 +98,8 @@ RUN set -ex \
         "libproj25" \
         "libgeos-c1v5" \
     && rm -rf /var/lib/apt/lists/*
-COPY container-entrypoint.sh /
-ENTRYPOINT ["/container-entrypoint.sh"]
+COPY *-entrypoint.sh /
+ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
 COPY --from=build \
     /root/.local \
@@ -113,7 +113,7 @@ COPY alembic.ini /opt/
 RUN useradd -r -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
-    && chmod +x /container-entrypoint.sh
+    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh
 # Add volumes for persistence
 VOLUME /opt/logs
 VOLUME /opt/tiles

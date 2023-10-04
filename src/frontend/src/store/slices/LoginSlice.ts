@@ -3,8 +3,8 @@ import storage from 'redux-persist/lib/storage';
 const LoginSlice = CoreModules.createSlice({
   name: 'login',
   initialState: {
-    loginToken: null,
-    authDetails: null,
+    loginToken: { id: 20386219, username: 'svcfmtm' },
+    authDetails: { id: 20386219, username: 'svcfmtm' },
   },
   reducers: {
     SetLoginToken(state, action) {

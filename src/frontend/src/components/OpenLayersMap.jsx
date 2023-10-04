@@ -16,6 +16,10 @@ import { transform } from 'ol/proj';
 import { Icon, Style } from 'ol/style';
 import LocationImage from '../assets/images/location.png';
 import AssetModules from '../shared/AssetModules';
+import { Modal } from '../components/common/Modal';
+import Button from './common/Button';
+import { ProjectActions } from '../store/slices/ProjectSlice';
+import TaskSectionModal from './ProjectDetails/TaskSectionPopup';
 let currentLocationLayer = null;
 const OpenLayersMap = ({
   defaultTheme,
@@ -33,6 +37,8 @@ const OpenLayersMap = ({
 }) => {
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
   const [currentLocLayer, setCurrentLocLayer] = useState(null);
+  const dispatch = CoreModules.useAppDispatch();
+  const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   function elastic(t) {
     return Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1;
   }
@@ -284,14 +290,16 @@ const OpenLayersMap = ({
   }, [map, currentLocLayer]);
 
   return (
-    <CoreModules.Stack spacing={1} p={2.5} direction={'column'}>
+    <CoreModules.Stack spacing={1} direction={'column'} className="fmtm-px-0 sm:fmtm-px-[1rem] fmtm-py-[1rem]">
       <CoreModules.Stack
-        style={{ border: `4px solid ${defaultTheme.palette.error.main}` }}
+        id="project-details-map"
+        // style={{ border: `4px solid ${defaultTheme.palette.error.main}` }}
         justifyContent={'center'}
         height={608}
+        className="fmtm-border-y-[4px] sm:fmtm-border-x-[4px] fmtm-border-primaryRed"
       >
         <div ref={mapElement} id="map_container"></div>
-        <div id="popup" className="ol-popup">
+        {/* <div id="popup" className="ol-popup">
           <a href="#" id="popup-closer" className="ol-popup-closer"></a>
           {featuresLayer != undefined && (
             <CoreModules.Stack>
@@ -299,7 +307,22 @@ const OpenLayersMap = ({
               <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={windowType} />
             </CoreModules.Stack>
           )}
-        </div>
+        </div> */}
+        {/* {featuresLayer != undefined && (
+          <div>
+            <Modal
+              title={<p></p>}
+              description={
+                <div>
+                  <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
+                  <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={windowType} />
+                </div>
+              }
+              open={taskModalStatus}
+              onOpenChange={(value) => dispatch(ProjectActions.ToggleTaskModalStatus(value))}
+            />
+          </div>
+        )} */}
       </CoreModules.Stack>
     </CoreModules.Stack>
   );

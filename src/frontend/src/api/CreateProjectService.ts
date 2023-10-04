@@ -341,8 +341,12 @@ const TaskSplittingPreviewService: Function = (
 
         const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
         const resp: OrganisationListModel = getTaskSplittingResponse.data;
+        if (resp?.features && resp?.features.length < 1) {
+          // Don't update geometry if splitting failed
+          // TODO display error to user, perhaps there is not osm data here?
+          return;
+        }
         dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
-        dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       } catch (error) {
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       } finally {

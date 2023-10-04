@@ -164,6 +164,6 @@ jobs:
       - name: Deploy
         run: |
           docker compose --file docker-compose.deploy.yml pull
-          docker compose --file docker-compose.deploy.yml up --detach
+          docker compose --file docker-compose.deploy.yml up --detach --remove-orphans
         env:
           DOCKER_HOST: ${{ vars.DOCKER_HOST }}

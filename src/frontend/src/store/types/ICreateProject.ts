@@ -26,6 +26,9 @@ export type CreateProjectStateTypes = {
   drawToggle: boolean;
   validateCustomFormLoading: boolean;
   validateCustomFormResponse: ValidateCustomFormResponse | null;
+  uploadAreaSelection: string | null;
+  totalAreaSelection: string | null;
+  splitTasksSelection: string | null;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -102,7 +105,7 @@ export type ProjectDetailsTypes = {
   data_extract_options?: string;
   data_extractWays?: string;
   form_ways?: string;
-  organisation_id?: number;
+  organisation_id?: number | null;
 };
 
 export type ProjectAreaTypes = {

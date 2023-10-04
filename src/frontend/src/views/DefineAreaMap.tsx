@@ -38,6 +38,9 @@ const DefineAreaMap = ({
     } else {
       dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
     }
+    return () => {
+      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
+    };
   }, [uploadedGeojson]);
   useEffect(() => {
     if (uploadedDataExtractFile) {

@@ -28,6 +28,12 @@ import GenerateMbTiles from '../components/GenerateMbTiles';
 import { ProjectBuildingGeojsonService } from '../api/SubmissionService';
 import { get } from 'ol/proj';
 import { buildingStyle, basicGeojsonTemplate } from '../utilities/mapUtils';
+import Button from '../../src/components/common/Button';
+import Accordion from '../../src/components/common/Accordion';
+import MapLegends from '../components/MapLegends';
+import TaskSectionPopup from '../components/ProjectDetails/TaskSectionPopup';
+import DialogTaskActions from '../components/DialogTaskActions';
+import QrcodeComponent from '../components/QrcodeComponent';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -53,6 +59,7 @@ const Home = () => {
   const downloadProjectFormLoading = CoreModules.useAppSelector((state) => state.project.downloadProjectFormLoading);
   const downloadDataExtractLoading = CoreModules.useAppSelector((state) => state.project.downloadDataExtractLoading);
   const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
+  const [toggleAction, setToggleAction] = useState(false);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -108,36 +115,36 @@ const Home = () => {
   }, [params.id]);
 
   useEffect(() => {
-    const container = document.getElementById('popup');
-    const closer = document.getElementById('popup-closer');
+    // const container = document.getElementById('popup');
+    // const closer = document.getElementById('popup-closer');
 
-    const overlay = new Overlay({
-      element: container,
-      autoPan: {
-        animation: {
-          duration: 250,
-        },
-      },
-    });
+    // const overlay = new Overlay({
+    //   element: container,
+    //   autoPan: {
+    //     animation: {
+    //       duration: 250,
+    //     },
+    //   },
+    // });
     /**
      * Function to setPosition of Popup to Undefined so that the popup closes
      */
-    function handleClickOutside(event) {
-      if (container && !container.contains(event.target)) {
-        overlay.setPosition(undefined);
-        closer.blur();
-      }
-    }
+    // function handleClickOutside(event) {
+    //   if (container && !container.contains(event.target)) {
+    //     overlay.setPosition(undefined);
+    //     closer.blur();
+    //   }
+    // }
     // Bind the event listener for outside click and trigger handleClickOutside
     // document.addEventListener("mousedown", handleClickOutside);
 
-    closer.style.textDecoration = 'none';
-    closer.style.color = defaultTheme.palette.info['main'];
-    closer.onclick = function () {
-      overlay.setPosition(undefined);
-      closer.blur();
-      return false;
-    };
+    // closer.style.textDecoration = 'none';
+    // closer.style.color = defaultTheme.palette.info['main'];
+    // closer.onclick = function () {
+    //   overlay.setPosition(undefined);
+    //   closer.blur();
+    //   return false;
+    // };
 
     const initalFeaturesLayer = new VectorLayer({
       source: new VectorSource(),
@@ -168,7 +175,7 @@ const Home = () => {
           visible: true,
         }),
       ],
-      overlays: [overlay],
+      // overlays: [overlay],
       view: view,
     });
     initialMap.on('click', function (event) {
@@ -177,8 +184,12 @@ const Home = () => {
         if (environment.tasksStatus.findIndex((data) => data.label == status) != -1) {
           setTaskId(feature?.getId()?.split('_')?.[0]);
           const coordinate = event.coordinate;
-          overlay.setPosition(coordinate);
+          // overlay.setPosition(coordinate);
           setFeaturesLayer(feature);
+          dispatch(ProjectActions.ToggleTaskModalStatus(true));
+          document.querySelector('#project-details-map').scrollIntoView({
+            behavior: 'smooth',
+          });
           dispatch(
             ProjectBuildingGeojsonService(
               `${environment.baseApiUrl}/projects/${decodedId}/features?task_id=${feature?.getId()?.split('_')?.[0]}`,
@@ -195,12 +206,13 @@ const Home = () => {
     setMap(initialMap);
     setView(view);
     setFeaturesLayer(initalFeaturesLayer);
+    dispatch(ProjectActions.ToggleTaskModalStatus(false));
 
     return () => {
       /**
        * Removed handleClickOutside Eventlistener on unmount
        */
-      document.removeEventListener('mousedown', handleClickOutside);
+      // document.removeEventListener('mousedown', handleClickOutside);
       mapElement.current = null;
       setFeaturesLayer();
       setView();
@@ -343,17 +355,33 @@ const Home = () => {
       {/* Center description and map */}
       <CoreModules.Stack direction={'column'} spacing={1}>
         <MapDescriptionComponents defaultTheme={defaultTheme} state={state} type={type} />
-        <CoreModules.Stack direction={'row'} spacing={1}>
+        <div>
           <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              marginLeft: '1rem',
-              gap: 6,
-            }}
+            className={`fmtm-flex fmtm-gap-5 fmtm-py-4 sm:fmtm-hidden fmtm-justify-between  fmtm-items-center fmtm-mx-7 fmtm-mb-2 ${
+              toggleAction ? 'fmtm-border-b-[#929DB3] fmtm-border-b-[1px]' : ''
+            }`}
           >
+            <p className="fmtm-text-xl fmtm-italic">Project Options</p>
+            <div
+              className={
+                'fmtm-rounded-full fmtm-shadow-gray-400 fmtm-w-8 fmtm-h-8 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-shadow-lg fmtm-cursor-pointer'
+              }
+              onClick={() => setToggleAction(!toggleAction)}
+            >
+              <AssetModules.ArrowRightIcon
+                color=""
+                style={{ fontSize: 32 }}
+                className={`${toggleAction ? 'fmtm-rotate-90' : ''}`}
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-6 lg:fmtm-gap-0 fmtm-px-3 sm:fmtm-px-0 ${
+            toggleAction ? '' : 'fmtm-hidden sm:fmtm-flex'
+          }`}
+        >
+          <div className="fmtm-w-full fmtm-flex fmtm-flex-col fmtm-items-start sm:fmtm-flex-row  sm:fmtm-justify-center lg:fmtm-justify-start sm:fmtm-items-center fmtm-gap-6 fmtm-ml-4">
             <CoreModules.LoadingButton
               onClick={() => handleDownload('form')}
               sx={{ width: 'unset' }}
@@ -384,18 +412,12 @@ const Home = () => {
               endIcon={<AssetModules.FileDownloadIcon />}
               variant="contained"
               color="error"
+              className="fmtm-truncate"
             >
               Data Extract
             </CoreModules.LoadingButton>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-              width: '100%',
-            }}
-          >
+          <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full fmtm-ml-4 fmtm-gap-6">
             <CoreModules.Link
               to={`/projectInfo/${encodedId}`}
               style={{
@@ -405,6 +427,7 @@ const Home = () => {
                 textDecoration: 'none',
                 marginRight: '15px',
               }}
+              className="fmtm-w-fit"
             >
               <CoreModules.Button variant="contained" color="error">
                 ProjectInfo
@@ -416,6 +439,7 @@ const Home = () => {
               color="error"
               sx={{ width: '200px', mr: '15px' }}
               endIcon={<AssetModules.BoltIcon />}
+              className="fmtm-truncate"
             >
               Generate MbTiles
             </CoreModules.Button>
@@ -428,13 +452,28 @@ const Home = () => {
                 textDecoration: 'none',
                 marginRight: '15px',
               }}
+              className="fmtm-w-fit"
             >
-              <CoreModules.Button variant="outlined" color="error">
+              <CoreModules.Button variant="outlined" color="error" className="fmtm-truncate">
                 Edit Project
               </CoreModules.Button>
             </CoreModules.Link>
           </div>
-        </CoreModules.Stack>
+          <div className="fmtm-px-1 sm:fmtm-hidden">
+            <Accordion
+              collapsed={true}
+              disableHeaderClickToggle
+              onToggle={() => {}}
+              header={<div className="fmtm-text-[#2C3038] fmtm-font-bold fmtm-text-xl">Map Legends</div>}
+              body={
+                <div className="fmtm-mt-4">
+                  <MapLegends defaultTheme={defaultTheme} />
+                </div>
+              }
+            />
+          </div>
+        </div>
+
         {/* <ProjectMap /> */}
         {params?.id && (
           <OpenLayersMap
@@ -468,6 +507,16 @@ const Home = () => {
           states={state}
         />
       </CoreModules.Stack>
+      {featuresLayer != undefined && (
+        <TaskSectionPopup
+          body={
+            <div>
+              <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
+              <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={type} />
+            </div>
+          }
+        />
+      )}
     </CoreModules.Stack>
   );
 };

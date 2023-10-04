@@ -67,7 +67,7 @@ class DbUser(Base):
 
     id = Column(BigInteger, primary_key=True, index=True)
     username = Column(String, unique=True)
-    role = Column(Enum(UserRole), default=UserRole.MAPPER, nullable=False)
+    role = Column(Enum(UserRole), default=UserRole.MAPPER)
 
     name = Column(String)
     city = Column(String)
@@ -77,11 +77,12 @@ class DbUser(Base):
     is_expert = Column(Boolean, default=False)
 
     mapping_level = Column(
-        Enum(MappingLevel), default=MappingLevel.BEGINNER, nullable=False
+        Enum(MappingLevel),
+        default=MappingLevel.BEGINNER,
     )
-    tasks_mapped = Column(Integer, default=0, nullable=False)
-    tasks_validated = Column(Integer, default=0, nullable=False)
-    tasks_invalidated = Column(Integer, default=0, nullable=False)
+    tasks_mapped = Column(Integer, default=0)
+    tasks_validated = Column(Integer, default=0)
+    tasks_invalidated = Column(Integer, default=0)
     projects_mapped = Column(ARRAY(Integer))
 
     # mentions_notifications = Column(Boolean, default=True, nullable=False)
@@ -396,7 +397,10 @@ class DbProject(Base):
 
     # PROJECT CREATION
     author_id = Column(
-        BigInteger, ForeignKey("users.id", name="fk_users"), nullable=False
+        BigInteger,
+        ForeignKey("users.id", name="fk_users"),
+        nullable=False,
+        server_default="20386219",
     )
     author = relationship(DbUser)
     created = Column(DateTime, default=timestamp, nullable=False)

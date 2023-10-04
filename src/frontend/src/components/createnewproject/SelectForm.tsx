@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import Button from '../../components/common/Button';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../components/common/Select';
+import { CustomSelect } from '../../components/common/Select';
 import { useNavigate } from 'react-router-dom';
 
 const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
@@ -36,62 +29,21 @@ const SelectForm = ({ flag }) => {
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
         <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between">
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-8">
-              <div>
-                <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">Select form category</p>
-                <div className="fmtm-flex fmtm-items-end ">
-                  <div className="fmtm-w-[14rem]">
-                    <Select
-                    // value={values.value}
-                    // onValueChange={(value) => handleCustomChange('organisation_id', value)}
-                    >
-                      <SelectTrigger className="">
-                        <SelectValue placeholder="Select form category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {selectFormWays?.map((formWay) => (
-                            <SelectItem key={formWay.value} value={formWay.value}>
-                              {formWay.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">Select form</p>
-                <div className="fmtm-flex fmtm-items-end ">
-                  <div className="fmtm-w-[14rem]">
-                    <Select
-                    // value={values.value}
-                    // onValueChange={(value) => handleCustomChange('organisation_id', value)}
-                    >
-                      <SelectTrigger className="">
-                        <SelectValue placeholder="Select form" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {selectFormWays?.map((formWay) => (
-                            <SelectItem key={formWay.value} value={formWay.value}>
-                              {formWay.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CustomSelect
+              title="Select Form"
+              placeholder="Select Form"
+              data={selectFormWays}
+              dataKey="value"
+              valueKey="value"
+              label="label"
+              onValueChange={(value) => console.log(value)}
+            />
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
               <Button
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(4, '/define-tasks')}
+                onClick={() => toggleStep(4, '/new-define-tasks')}
                 className="fmtm-font-bold"
               />
               <Button

@@ -6,10 +6,11 @@ import CustomizedSnackbars from '../utilities/CustomizedSnackbar';
 import { CommonActions } from '../store/slices/CommonSlice';
 import Loader from '../utilities/AppLoader';
 import MappingHeader from '../utilities/MappingHeader';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const MainView = () => {
   const dispatch = CoreModules.useAppDispatch();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { windowSize } = windowDimention();
   const checkTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -52,11 +53,13 @@ const MainView = () => {
               </div>
             )}
             <CoreModules.Stack
-              className="mainview"
+              className={`mainview fmtm-py-[1.3rem] ${
+                location.pathname.includes('project_details') ? 'fmtm-px-0 sm:fmtm-px-[1.3rem]' : 'fmtm-px-[1.3rem]'
+              }`}
               sx={{
                 height: popupInParams ? '100vh' : windowSize.width <= 599 ? '90vh' : '92vh',
                 overflow: 'auto',
-                p: '1.3rem',
+                // p: '1.3rem',
               }}
             >
               <CoreModules.Outlet />

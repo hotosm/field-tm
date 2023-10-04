@@ -12,6 +12,7 @@ import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
 import { Draw, Modify, Select, defaults as defaultInteractions } from 'ol/interaction.js';
+import { getArea } from 'ol/sphere';
 
 const selectElement = 'singleselect';
 
@@ -80,6 +81,17 @@ const VectorLayer = ({
       // map.removeInteraction(defaultInteractions().extend([select, modify]))
     };
   }, [map, vectorLayer, onModify]);
+
+  const formatArea = function (polygon) {
+    const area = getArea(polygon);
+    let output;
+    if (area > 10000) {
+      output = Math.round((area / 1000000) * 100) / 100 + ' km\xB2';
+    } else {
+      output = Math.round(area * 100) / 100 + ' m\xB2';
+    }
+    return output;
+  };
   // Modify Feature
   useEffect(() => {
     if (!map) return;
@@ -102,8 +114,11 @@ const VectorLayer = ({
         featureProjection: 'EPSG:3857',
       });
 
+      const geometry = feature.getGeometry();
+      const area = formatArea(geometry);
+
       // Call your function here with the GeoJSON as an argument
-      onDraw(newGeojson);
+      onDraw(newGeojson, area);
       // var geoJSONFormat = new GeoJSON();
 
       // var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
@@ -146,6 +161,10 @@ const VectorLayer = ({
       }
     });
     setVectorLayer(vectorLyr);
+    return () => {
+      setVectorLayer(null);
+      map.un('click', () => {});
+    };
   }, [map, geojson]);
 
   useEffect(() => {

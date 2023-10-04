@@ -4,7 +4,18 @@ import { createSlice } from '@reduxjs/toolkit';
 export const initialState: CreateProjectStateTypes = {
   editProjectDetails: { name: '', description: '', short_description: '' },
   editProjectResponse: null,
-  projectDetails: { dimension: 10, no_of_buildings: 5, hashtags: '#FMTM ' },
+  projectDetails: {
+    dimension: 10,
+    no_of_buildings: 5,
+    hashtags: '#FMTM ',
+    name: '',
+    short_description: '',
+    odk_central_url: '',
+    odk_central_user: '',
+    odk_central_password: '',
+    description: '',
+    organisation_id: null,
+  },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
@@ -29,6 +40,9 @@ export const initialState: CreateProjectStateTypes = {
   drawToggle: false,
   validateCustomFormLoading: false,
   validateCustomFormResponse: null,
+  uploadAreaSelection: null,
+  totalAreaSelection: null,
+  splitTasksSelection: null,
 };
 
 const CreateProject = createSlice({
@@ -142,6 +156,15 @@ const CreateProject = createSlice({
     },
     ValidateCustomForm(state, action) {
       state.validateCustomFormResponse = action.payload;
+    },
+    SetUploadAreaSelection(state, action) {
+      state.uploadAreaSelection = action.payload;
+    },
+    SetTotalAreaSelection(state, action) {
+      state.totalAreaSelection = action.payload;
+    },
+    SetSplitTasksSelection(state, action) {
+      state.splitTasksSelection = action.payload;
     },
   },
 });

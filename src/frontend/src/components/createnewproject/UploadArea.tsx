@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import Button from '../../components/common/Button';
 import { useDispatch } from 'react-redux';
@@ -6,6 +6,10 @@ import RadioButton from '../../components/common/RadioButton';
 import AssetModules from '../../shared/AssetModules.js';
 import DrawSvg from './DrawSvg';
 import { useNavigate } from 'react-router-dom';
+import CoreModules from '../../shared/CoreModules';
+import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+// @ts-ignore
+const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
 
 const uploadAreaOptions = [
   {
@@ -22,24 +26,49 @@ const uploadAreaOptions = [
   },
 ];
 
-const UploadArea = ({ flag }) => {
+const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const geojsonFileRef: any = useRef(null);
 
-  const [uploadOption, setUloadOption] = useState('');
+  const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
+  const uploadAreaSelection = CoreModules.useAppSelector((state) => state.createproject.uploadAreaSelection);
+  const drawToggle = CoreModules.useAppSelector((state) => state.createproject.drawToggle);
+  const totalAreaSelection = CoreModules.useAppSelector((state) => state.createproject.totalAreaSelection);
 
   const toggleStep = (step, url) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
 
-  const [selectedFileName, setSelectedFileName] = useState('');
-
   const changeFileHandler = (event) => {
     const { files } = event.target;
-    setSelectedFileName(files[0].name);
+    setGeojsonFile(files[0]);
   };
+
+  const onCreateProjectSubmission = () => {
+    if (!drawnGeojson && !geojsonFile) {
+      return;
+    } else {
+      toggleStep(3, '/new-select-form');
+    }
+  };
+
+  useEffect(() => {
+    setGeojsonFile(null);
+    dispatch(CreateProjectActions.SetDrawnGeojson(null));
+    dispatch(CreateProjectActions.SetTotalAreaSelection(null));
+  }, [uploadAreaSelection]);
+
+  const resetFile = () => {
+    if (geojsonFileRef.current) {
+      geojsonFileRef.current.value = '';
+    }
+    setGeojsonFile(null);
+    dispatch(CreateProjectActions.SetDrawnGeojson(null));
+    dispatch(CreateProjectActions.SetTotalAreaSelection(null));
+  };
+
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -58,43 +87,55 @@ const UploadArea = ({ flag }) => {
                 topic="Select one of the option to upload area"
                 options={uploadAreaOptions}
                 direction="row"
-                onChangeData={(value) => setUloadOption(value)}
+                onChangeData={(value) => {
+                  dispatch(CreateProjectActions.SetUploadAreaSelection(value));
+                  if (value === 'draw') {
+                    dispatch(CreateProjectActions.SetDrawToggle(!drawToggle));
+                  } else {
+                    dispatch(CreateProjectActions.SetDrawToggle(false));
+                  }
+                }}
+                value={uploadAreaSelection}
               />
-              {uploadOption === 'draw' && (
+              {uploadAreaSelection === 'draw' && (
                 <div>
                   <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-3">Draw a polygon on the map to plot the area</p>
                   <Button
                     btnText="Click to Reset"
                     btnType="primary"
                     type="button"
-                    onClick={() => console.log('reset')}
+                    onClick={() => resetFile()}
                     className=""
                   />
                   <p className="fmtm-text-gray-700 fmtm-pt-8">
-                    Total Area: <span className="fmtm-font-bold">234 sq.km</span>
+                    Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
                   </p>
                 </div>
               )}
-              {uploadOption === 'upload_file' && (
+              {uploadAreaSelection === 'upload_file' && (
                 <div className="fmtm-mt-5 fmtm-pb-3">
                   <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
-                    <div
-                      role="button"
-                      onClick={() => fileInputRef?.current?.click()}
-                      className="fmtm-bg-primaryRed fmtm-px-4 fmtm-py-1 fmtm-text-white fmtm-rounded-md"
+                    <label
+                      id="file-input"
+                      className="fmtm-bg-primaryRed fmtm-text-white fmtm-px-4 fmtm-py-1 fmtm-rounded-md fmtm-cursor-pointer"
                     >
-                      <label id="file-input">
-                        <p>Select a file</p>
-                        <input ref={fileInputRef} type="file" className="fmtm-hidden" onChange={changeFileHandler} />
-                      </label>
-                    </div>
+                      <p>Select a file</p>
+                      <input
+                        id="upload-area-geojson-file"
+                        ref={geojsonFileRef}
+                        type="file"
+                        className="fmtm-hidden"
+                        onChange={changeFileHandler}
+                        accept=".geojson, .json"
+                      />
+                    </label>
                     <div className="fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-slate-100 fmtm-duration-300 fmtm-cursor-pointer">
-                      <AssetModules.ReplayIcon className="fmtm-text-gray-600" onClick={() => setSelectedFileName('')} />
+                      <AssetModules.ReplayIcon className="fmtm-text-gray-600" onClick={() => resetFile()} />
                     </div>
                   </div>
-                  {selectedFileName && (
+                  {geojsonFile && (
                     <div className="fmtm-mt-2">
-                      <p>{selectedFileName}</p>
+                      <p>{geojsonFile?.name}</p>
                     </div>
                   )}
                   <p className="fmtm-text-gray-700 fmtm-mt-3">
@@ -111,19 +152,29 @@ const UploadArea = ({ flag }) => {
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(1, '/create-project')}
+                onClick={() => toggleStep(1, '/new-create-project')}
                 className="fmtm-font-bold"
               />
               <Button
                 btnText="NEXT"
                 btnType="primary"
                 type="button"
-                onClick={() => toggleStep(3, '/data-extract')}
+                onClick={() => onCreateProjectSubmission()}
                 className="fmtm-font-bold"
               />
             </div>
           </div>
-          <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full"></div>
+          <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
+            <DefineAreaMap
+              uploadedGeojson={geojsonFile}
+              onDraw={(geojson, area) => {
+                // dispatch(CreateProjectActions.SetDividedTaskGeojson(JSON.parse(geojson)));
+                dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
+                // setGeojsonFile(JSON.parse(geojson));
+                dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

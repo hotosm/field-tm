@@ -107,4 +107,48 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator };
+interface ICustomSelect {
+  title: string;
+  placeholder: string;
+  data: any;
+  dataKey: string;
+  value?: string;
+  valueKey: string;
+  label: string;
+  onValueChange: (value: string | null | number) => void;
+}
+
+export const CustomSelect = ({
+  title,
+  placeholder,
+  data,
+  dataKey,
+  value,
+  valueKey,
+  label,
+  onValueChange,
+}: ICustomSelect) => {
+  return (
+    <div className="">
+      <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">{title}</p>
+      <div className="fmtm-flex fmtm-items-end ">
+        <div className="fmtm-w-[14rem] ">
+          <Select value={value} onValueChange={(value) => onValueChange(value)}>
+            <SelectTrigger className="">
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup className="fmtm-max-h-72 fmtm-overflow-y-auto">
+                {data?.map((item) => (
+                  <SelectItem key={item[dataKey]} value={item[valueKey].toString()}>
+                    {item[label]}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+};
