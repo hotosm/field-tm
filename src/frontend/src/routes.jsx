@@ -30,15 +30,27 @@ const routes = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Home />,
+        element: (
+          <ErrorBoundary>
+            <Home />
+          </ErrorBoundary>
+        ),
       },
       {
         path: '/organization',
-        element: <Organization />,
+        element: (
+          <ErrorBoundary>
+            <Organization />
+          </ErrorBoundary>
+        ),
       },
       {
         path: '/createOrganization',
-        element: <CreateOrganization />,
+        element: (
+          <ErrorBoundary>
+            <CreateOrganization />
+          </ErrorBoundary>
+        ),
       },
       // {
       //     path: '/explore',
@@ -46,7 +58,11 @@ const routes = createBrowserRouter([
       // },
       {
         path: '/tabbed',
-        element: <Tabbed />,
+        element: (
+          <ErrorBoundary>
+            <Tabbed />
+          </ErrorBoundary>
+        ),
       },
 
       {
@@ -54,7 +70,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div></div>}>
-              <ProjectInfo />{' '}
+              <ErrorBoundary>
+                <ProjectInfo />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -65,7 +83,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div></div>}>
-              <Tasks />
+              <ErrorBoundary>
+                <Tasks />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -80,7 +100,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div></div>}>
-              <SubmissionDetails />
+              <ErrorBoundary>
+                <SubmissionDetails />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -90,7 +112,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div></div>}>
-              <Submissions />
+              <ErrorBoundary>
+                <Submissions />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -113,7 +137,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -123,7 +149,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -133,7 +161,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -143,7 +173,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -153,7 +185,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -163,7 +197,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateProject />
+              <ErrorBoundary>
+                <CreateProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -173,7 +209,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -183,7 +221,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -193,7 +233,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -203,7 +245,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -213,7 +257,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -223,7 +269,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <CreateNewProject />
+              <ErrorBoundary>
+                <CreateNewProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -233,7 +281,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -243,7 +293,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -253,7 +305,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -263,7 +317,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -273,7 +329,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -283,7 +341,9 @@ const routes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
-              <EditProject />
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>
         ),
@@ -292,7 +352,9 @@ const routes = createBrowserRouter([
         path: '/osmauth/',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
-            <Authorized />
+            <ErrorBoundary>
+              <Authorized />
+            </ErrorBoundary>
           </Suspense>
         ),
       },
