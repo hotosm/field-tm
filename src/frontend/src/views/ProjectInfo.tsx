@@ -169,13 +169,13 @@ const ProjectInfo = () => {
       </CoreModules.CustomizedModal>
       <CoreModules.Box
         sx={{
-          px: 3,
           py: 1,
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
+        className="fmtm-gap-3"
       >
         <CoreModules.Box>
           <CoreModules.IconButton
@@ -202,16 +202,17 @@ const ProjectInfo = () => {
           </CoreModules.Typography>
           <CoreModules.Typography variant="subtitle1">{projectInfo?.title}</CoreModules.Typography>
         </CoreModules.Box>
-
-        <ProjectInfoCountCard />
-
-        <CoreModules.Box sx={{ display: 'flex', position: 'relative' }}>
+        <div className="fmtm-hidden lg:fmtm-block">
+          <ProjectInfoCountCard />
+        </div>
+        <CoreModules.Box className="fmtm-flex fmtm-flex-col fmtm-items-end xl:fmtm-flex-row fmtm-relative fmtm-gap-3">
           <CoreModules.LoadingButton
             variant="outlined"
             color="error"
             size="small"
-            sx={{ width: 'fit-content', height: 'fit-content', mr: 2 }}
+            sx={{ width: 'fit-content', height: 'fit-content' }}
             onClick={uploadToJOSM}
+            className="fmtm-truncate"
           >
             Upload to JOSM
           </CoreModules.LoadingButton>
@@ -227,27 +228,31 @@ const ProjectInfo = () => {
                 background: isMonitoring ? 'green' : 'red',
                 width: '15px',
                 height: '15px',
-                mr: 1,
                 borderRadius: '50%',
                 ...(isMonitoring && boxStyles),
               }}
             />
-            Monitoring
+            <span className="fmtm-ml-1">Monitoring</span>
           </CoreModules.Button>
         </CoreModules.Box>
       </CoreModules.Box>
-      <CoreModules.Box sx={{ display: 'flex', pb: 2, height: '80vh' }}>
+
+      <div className="fmtm-w-full fmtm-flex fmtm-justify-center fmtm-my-5 lg:fmtm-hidden">
+        <ProjectInfoCountCard />
+      </div>
+      <CoreModules.Box className="fmtm-flex fmtm-flex-col md:fmtm-flex-row fmtm-pb-2 fmtm-h-[80vh] fmtm-gap-4">
         {/* Project Info side bar */}
-        <ProjectInfoSidebar projectId={projectInfo?.id} projectName={projectInfo?.title} taskInfo={taskInfo} />
+        <div className="fmtm-order-2 md:fmtm-order-1 fmtm-w-full md:fmtm-w-[60%]">
+          <ProjectInfoSidebar projectId={projectInfo?.id} projectName={projectInfo?.title} taskInfo={taskInfo} />
+        </div>
         <CoreModules.Box
           sx={{
             boxSizing: 'content-box',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            gap: 1,
-            px: 2,
           }}
+          className="fmtm-order-1 md:fmtm-order-2"
         >
           <ProjectInfomap />
           <CoreModules.Box
@@ -257,6 +262,7 @@ const ProjectInfo = () => {
               justifyContent: 'center',
               gap: 2,
             }}
+            className="fmtm-mt-4"
           >
             <CoreModules.Button variant="outlined" color="error" sx={{ width: 'fit-content' }} onClick={handleConvert}>
               Convert

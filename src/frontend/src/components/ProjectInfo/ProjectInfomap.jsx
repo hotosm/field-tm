@@ -239,13 +239,13 @@ const ProjectInfomap = () => {
         flexDirection: 'column',
         width: '100%',
         gap: 2,
-        height: '70vh',
       }}
+      className="fmtm-h-[35vh] md:fmtm-h-[70vh]"
     >
       <MapComponent
         ref={mapRef}
         mapInstance={map}
-        className="map naxatw-relative naxatw-min-h-full naxatw-w-full"
+        className="map"
         style={{
           height: '100%',
           width: '100%',

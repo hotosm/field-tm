@@ -20,6 +20,7 @@ import { Modal } from '../components/common/Modal';
 import Button from './common/Button';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import TaskSectionModal from './ProjectDetails/TaskSectionPopup';
+import VectorLayer from 'ol/layer/Vector';
 let currentLocationLayer = null;
 const OpenLayersMap = ({
   defaultTheme,
@@ -56,6 +57,7 @@ const OpenLayersMap = ({
           let actualZoom = map.getView().getZoom();
           map.getView().setZoom(actualZoom - 1);
         } else if (e.target.id == 'defaultPosition') {
+          setToggleCurrentLoc(!toggleCurrentLoc);
           const sourceProjection = 'EPSG:4326'; // The current projection of the coordinates
           const targetProjection = 'EPSG:3857'; // The desired projection
           // Create a style for the marker
@@ -67,41 +69,59 @@ const OpenLayersMap = ({
             }),
           });
           if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition((position) => {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-              const convertedCoordinates = transform([lng, lat], sourceProjection, targetProjection);
-              const positionFeature = new ol.Feature(new Point(convertedCoordinates));
-              const positionLayer = new Vector({
-                source: new VectorSource({
-                  features: [positionFeature],
-                }),
+            if (!toggleCurrentLoc) {
+              navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const convertedCoordinates = transform([lng, lat], sourceProjection, targetProjection);
+                const positionFeature = new ol.Feature(new Point(convertedCoordinates));
+                const positionLayer = new Vector({
+                  source: new VectorSource({
+                    features: [positionFeature],
+                  }),
+                });
+                positionFeature.setStyle(markerStyle);
+                setCurrentLocLayer(positionLayer);
               });
-              positionFeature.setStyle(markerStyle);
-              setCurrentLocLayer(positionLayer);
-            });
+            } else {
+              setCurrentLocLayer(null);
+            }
           }
-          setToggleCurrentLoc(!toggleCurrentLoc);
+          // setToggleCurrentLoc(!toggleCurrentLoc);
 
           // map.getView().setZoom(15);
         } else if (e.target.id == 'taskBoundries') {
-          if (state.projectTaskBoundries.length != 0 && map != undefined) {
-            if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(params.id)) != -1) {
-              const index = state.projectTaskBoundries.findIndex(
-                (project) => project.id == environment.decode(params.id),
-              );
-              const centroid =
-                state.projectTaskBoundries[index].taskBoundries[
-                  state.projectTaskBoundries[index].taskBoundries.length - 1
-                ].outline_centroid.geometry.coordinates;
-
-              mainView.animate({
-                center: centroid,
-                duration: 2000,
-                easing: elastic,
-              });
+          const layers = map.getAllLayers();
+          let extent;
+          layers.map((layer) => {
+            if (layer instanceof VectorLayer) {
+              const layerName = layer.getProperties().name;
+              if (layerName === 'project-area') {
+                extent = layer.getSource().getExtent();
+              }
             }
-          }
+          });
+          map.getView().fit(extent, {
+            padding: [10, 10, 10, 10],
+          });
+
+          // if (state.projectTaskBoundries.length != 0 && map != undefined) {
+          //   if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(params.id)) != -1) {
+          //     const index = state.projectTaskBoundries.findIndex(
+          //       (project) => project.id == environment.decode(params.id),
+          //     );
+          //     const centroid =
+          //       state.projectTaskBoundries[index].taskBoundries[
+          //         state.projectTaskBoundries[index].taskBoundries.length - 1
+          //       ].outline_centroid.geometry.coordinates;
+
+          //     mainView.animate({
+          //       center: centroid,
+          //       duration: 2000,
+          //       easing: elastic,
+          //     });
+          //   }
+          // }
 
           map.getTargetElement().classList.remove('spinner');
         }
@@ -123,15 +143,27 @@ const OpenLayersMap = ({
           img.id = `${elmnt}`;
           img.addEventListener('click', handleOnClick, false);
           btn.appendChild(img);
+          btn.style.display = 'flex';
+          btn.style.alignItems = 'center';
+          btn.style.justifyContent = 'center';
+
+          if (!toggleCurrentLoc) {
+            btn.style.backgroundColor = 'white';
+          } else {
+            btn.style.backgroundColor = '#E6E6E6';
+          }
         } else if (elmnt == 'taskBoundries') {
           let img = document.createElement('img');
           img.src = gridIcon;
           img.id = `${elmnt}`;
           img.addEventListener('click', handleOnClick, false);
           btn.appendChild(img);
+          btn.style.display = 'flex';
+          btn.style.alignItems = 'center';
+          btn.style.justifyContent = 'center';
         }
         btn.id = `${elmnt}`;
-        btn.style.backgroundColor = 'white';
+        // btn.style.backgroundColor = 'white';
         btn.style.boxShadow = `0 2px 2px 0 ${defaultTheme.palette.info['main']}`;
         btn.style.width = '40px';
         btn.style.height = '40px';
@@ -274,7 +306,7 @@ const OpenLayersMap = ({
 
       map.addControl(controlx);
     }
-  }, [map]);
+  }, [map, toggleCurrentLoc]);
 
   useEffect(() => {
     if (!map) return;

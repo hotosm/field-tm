@@ -43,7 +43,7 @@ export const ProjectById = (url, existingProjectList, projectId) => {
             priority_str: resp.priority_str || 'MEDIUM',
             title: resp.project_info?.[0]?.name,
             location_str: resp.location_str,
-            description: resp.description,
+            description: resp.project_info[0]?.description,
             num_contributors: resp.num_contributors,
             total_tasks: resp.total_tasks,
             tasks_mapped: resp.tasks_mapped,
