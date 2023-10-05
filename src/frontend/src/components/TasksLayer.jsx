@@ -48,6 +48,8 @@ const TasksLayer = (map, view, feature) => {
           style: styleFunction,
           zIndex: 10,
         });
+        vectorLayer.setProperties({ name: 'project-area' });
+
         // Initialize variables to store the extent
         var minX = Infinity;
         var minY = Infinity;

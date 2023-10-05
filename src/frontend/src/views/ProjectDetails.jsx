@@ -41,6 +41,7 @@ const Home = () => {
 
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useAppSelector((state) => state.project);
+  const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
 
   const projectInfo = CoreModules.useAppSelector((state) => state.home.selectedProject);
   const stateDialog = CoreModules.useAppSelector((state) => state.home.dialogStatus);
@@ -221,11 +222,30 @@ const Home = () => {
   }, [params.id]);
 
   useEffect(() => {
-    if (map != undefined) {
-      const topX = map.getTargetElement().getBoundingClientRect().y;
-      setTop(topX);
-    }
-  }, [map, y]);
+    if (!map) return;
+    map.on('click', function (event) {
+      map.forEachFeatureAtPixel(event.pixel, function (feature) {
+        let extent = feature.getGeometry().getExtent();
+        if (windowSize.width < 768) {
+          map.getView().fit(extent, {
+            padding: [10, 20, 300, 20],
+          });
+        } else {
+          map.getView().fit(extent, {
+            padding: [20, 350, 50, 10],
+          });
+        }
+      });
+    });
+    return () => {};
+  }, [taskModalStatus, windowSize.width]);
+
+  // useEffect(() => {
+  //   if (map != undefined) {
+  //     const topX = map.getTargetElement().getBoundingClientRect().y;
+  //     setTop(topX);
+  //   }
+  // }, [map, y]);
 
   useEffect(() => {
     if (!map) return;

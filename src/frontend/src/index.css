@@ -112,6 +112,9 @@ button {
   padding: 7px;
   margin: 250px 10px;
   border-radius: 4px;
+  @media only screen and (max-width: 640px) {
+    display: none;
+  }
 }
 
 .legend {

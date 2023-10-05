@@ -11,69 +11,48 @@ const ProjectInfoCountCard = () => {
     {
       count: taskData.task_count,
       title: 'Total Tasks',
-      icon: <AssetModules.TaskIcon sx={{ color: '#d73f3e', fontSize: '50px' }} />,
+      icon: <AssetModules.TaskIcon sx={{ color: '#d73f3e', fontSize: { xs: '35px', xl: '50px' } }} />,
     },
     {
       count: taskData.submission_count,
       title: 'Total Submissions',
-      icon: <AssetModules.SubmissionIcon sx={{ color: '#d73f3e', fontSize: '50px' }} />,
+      icon: <AssetModules.SubmissionIcon sx={{ color: '#d73f3e', fontSize: { xs: '35px', xl: '50px' } }} />,
     },
     {
       count: taskData.feature_count,
       title: 'Total Features',
-      icon: <AssetModules.FeatureIcon sx={{ color: '#d73f3e', fontSize: '50px' }} />,
+      icon: <AssetModules.FeatureIcon sx={{ color: '#d73f3e', fontSize: { xs: '35px', xl: '50px' } }} />,
     },
   ];
   return (
-    <CoreModules.Box>
-      <div>
-        {isTaskLoading ? (
-          <ProjectInfoCountSkeleton />
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'auto auto auto',
-              gap: '20px',
-            }}
-          >
-            {totalTaskInfoCount.map((taskInfo) => (
-              <div>
-                <CoreModules.Card>
-                  <div
+    <div className="scrollbar fmtm-overflow-x-scroll sm:fmtm-overflow-x-hidden">
+      {isTaskLoading ? (
+        <ProjectInfoCountSkeleton />
+      ) : (
+        <div className="fmtm-flex fmtm-gap-5 fmtm-w-full fmtm-p-[2px]">
+          {totalTaskInfoCount.map((taskInfo, i) => (
+            <div key={i}>
+              <CoreModules.Card>
+                <div className="fmtm-w-fit xl:fmtm-gap-0 fmtm-p-4 xl:fmtm-min-w-[15.62rem]">
+                  <h1
                     style={{
-                      gap: '0px',
-                      padding: '15px',
-                      minWidth: '250px',
+                      color: '#d73f3e',
+                      margin: '0px',
                     }}
                   >
-                    <h1
-                      style={{
-                        color: '#d73f3e',
-                        margin: '0px',
-                      }}
-                    >
-                      {taskInfo.count}
-                    </h1>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        lineHeight: '15px',
-                      }}
-                    >
-                      <p style={{ fontSize: '20px' }}>{taskInfo.title}</p>
-                      {taskInfo.icon}
-                    </div>
+                    {taskInfo.count}
+                  </h1>
+                  <div className="fmtm-flex fmtm-items-center fmtm-justify-between fmtm-leading-4 fmtm-gap-4">
+                    <p className="fmtm-text-lg xl:fmtm-text-xl">{taskInfo.title}</p>
+                    {taskInfo.icon}
                   </div>
-                </CoreModules.Card>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </CoreModules.Box>
+                </div>
+              </CoreModules.Card>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

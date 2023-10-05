@@ -24,7 +24,7 @@ const TaskSectionPopup = ({ body }) => {
       >
         <AssetModules.CloseIcon />
       </div>
-      <div className="fmtm-bg-[#fbfbfb] fmtm-p-5 fmtm-rounded-t-2xl fmtm-shadow-[-20px_0px_60px_25px_rgba(0,0,0,0.2)]  md:fmtm-rounded-t-none md:fmtm-rounded-l-2xl fmtm-duration-1000">
+      <div className="fmtm-bg-[#fbfbfb] fmtm-p-5 fmtm-rounded-t-2xl fmtm-shadow-[-20px_0px_60px_25px_rgba(0,0,0,0.2)]  md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl">
         {body}
       </div>
     </div>

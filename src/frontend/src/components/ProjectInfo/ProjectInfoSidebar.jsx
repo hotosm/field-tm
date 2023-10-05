@@ -35,32 +35,17 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        background: '#F0F0F0',
-        width: '60%',
+        background: 'white',
+        width: '100%',
         gap: 2,
       }}
+      className="fmtm-mb-5"
     >
-      <CoreModules.Card
-        sx={{
-          width: '100%',
-          height: '80vh',
-          p: 1,
-          overflow: 'hidden',
-          overflowY: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '0.6em',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,.1)',
-            outline: '1px solid #F0F0F0',
-            borderRadius: '25px',
-          },
-        }}
-      >
+      <div className="fmtm-w-full md:fmtm-h-[80vh] fmtm-p-1 fmtm-overflow-x-hidden fmtm-overflow-y-scroll scrollbar fmtm-bg-white fmtm-border-[1px] fmtm-border-gray-200 fmtm-shadow-sm fmtm-rounded-md">
         {isTaskLoading ? (
           <div>
             {Array.from({ length: 5 }).map((i) => (
-              <div id={i}>
+              <div id={i} key={i}>
                 <ProjectInfoSidebarSkeleton />
               </div>
             ))}
@@ -76,38 +61,41 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
                 }}
                 onClick={() => onTaskClick(+task.task_id)}
               >
-                <CoreModules.Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <CoreModules.Box className="fmtm-flex fmtm-justify-between">
                   <CoreModules.Box sx={{ flex: 1 }}>
                     <CoreModules.Typography variant="h1" color="#929db3">
                       #{task.task_id}
                     </CoreModules.Typography>
                   </CoreModules.Box>
-                  <CoreModules.Link
-                    to={`/project/${encodedId}/tasks/${environment.encode(task.task_id)}`}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      textDecoration: 'none',
-                      marginRight: '5px',
-                    }}
-                  >
+                  <div className="fmtm-flex fmtm-gap-2 fmtm-items-end fmtm-flex-col sm:fmtm-flex-row md:fmtm-flex-col lg:fmtm-flex-row">
+                    <CoreModules.Link
+                      to={`/project/${encodedId}/tasks/${environment.encode(task.task_id)}`}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <CoreModules.Button
+                        variant="outlined"
+                        color="error"
+                        sx={{ width: 'fit-content', height: 'fit-content' }}
+                        size="small"
+                        className="fmtm-truncate"
+                      >
+                        Go To Task Submissions
+                      </CoreModules.Button>
+                    </CoreModules.Link>
                     <CoreModules.Button
                       variant="outlined"
                       color="error"
                       sx={{ width: 'fit-content', height: 'fit-content' }}
                       size="small"
+                      className="fmtm-truncate"
                     >
-                      Go To Task Submissions
+                      Zoom to Task
                     </CoreModules.Button>
-                  </CoreModules.Link>
-                  <CoreModules.Button
-                    variant="outlined"
-                    color="error"
-                    sx={{ width: 'fit-content', height: 'fit-content' }}
-                    size="small"
-                  >
-                    Zoom to Task
-                  </CoreModules.Button>
+                  </div>
                 </CoreModules.Box>
                 <CoreModules.LoadingBar
                   title="Task Progress"
@@ -118,7 +106,7 @@ const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
             ))}
           </div>
         )}
-      </CoreModules.Card>
+      </div>
       {/* <CoreModules.Card
         sx={{
           width: "100%",
