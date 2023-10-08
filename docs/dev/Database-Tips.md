@@ -1,122 +1,196 @@
-# Access the database (psql)
+# Database Tips
 
-**Option 1** (when the docker container is running) use this command to access it through the local psql using the below command:
+## Access the database (psql)
 
-    `psql -d fmtm -U fmtm -h localhost`
+### Option 1
 
-**Option 2** (when running the database in Docker) use this command to access the
-PostgreSQL shell inside the fmtm-db-1 container and interact with the fmtm database
-using the psql command-line interface:
+Access the database container using psql on your local machine:
 
-    `docker exec -it fmtm-db-1 psql -U fmtm fmtm`
+```bash
+psql -d fmtm -U fmtm -h localhost
+```
 
-And then connect to the database using this command :
+### Option 2
 
-    `\c fmtm`
+Access a PostgreSQL shell inside the fmtm_db container:
 
-## To access the fmtm database using psql, follow the instructions below
+```bash
+docker exec -it fmtm_db psql -U fmtm fmtm
+```
 
-### A few helpful psql commands
+And then connect to the database using this command:
 
-- Open a terminal window and run the following command:
+```bash
+\c fmtm
+```
 
-        docker exec -it fmtm-db-1 psql -U fmtm fmtm
-
-  This will open the psql command-line interface and connect you to the fmtm database.
-
-- Once connected to the fmtm database, you can switch to a different database using the command:
-
-        \c dbname
-
-  Replace "dbname" with the name of the database you want to switch to. forexample `\c fmtm`
+## A few helpful psql commands
 
 - You can list all the databases using the command:
 
-        \l
+```bash
+\l
+```
 
 - To list all the schemas of the currently connected database, use the command:
 
-        \dn
+```bash
+\dn
+```
 
 - To list all the functions in the current database, use the command:
 
-        \df
+```bash
+\df
+```
 
 - To list all the views in the current database, use the command:
 
-        \dv
+```bash
+\dv
+```
 
 - To list all the users and roles, use the command:
 
-        \du
+```bash
+\du
+```
 
 - To list all the tables in the current database, use the command:
 
-        \dt
+```bash
+\dt
+```
 
 - To describe a table, use the command:
 
-        \d table_name
+```bash
+\d table_name
+```
 
-  Replace "table_name" with the name of the table you want to describe.
+Replace "table_name" with the name of the table you want to describe.
 
 - To execute the last command again, use the command:
 
-        \g
+```bash
+\g
+```
 
 - To view your command history, use the command:
 
-        \s
+```bash
+\s
+```
 
 - To save your command history to a file, use the command:
 
-        \s filename
+```bash
+\s filename
+```
 
-  Replace "filename" with the name of the file you want to save the command history to.
+Replace "filename" with the name of the file you
+want to save the command history to.
 
 - To execute commands from a file, use the command:
 
-        \i filename
+```bash
+\i filename
+```
 
-  Replace "filename" with the name of the file containing the commands you want to execute.
+Replace "filename" with the name of the file
+containing the commands you want to execute.
 
 - To view a list of all psql commands, use the command:
 
-        \?
+```bash
+\?
+```
 
 - To view help for a specific command, use the command:
 
-        \h command_name
+```bash
+\h command_name
+```
 
-  Replace "command_name" with the name of the command you want help with.
+Replace "command_name" with the name of the command you want help with.
 
 - To exit psql, use the command:
 
-        \q
+```bash
+\q
+```
 
 **Note:** If you make a change, don't forget to commit the change!
 
-# Migrations
+## Migrations
 
-Migrations are a way to manage changes to the database schema over time. We haven't yet implemented migrations in fmtm, but if you need to drop all tables, you can use the following commands while connected to the fmtm database:
+- Migrations are a way to manage changes to the database schema over time.
+- They are handled automatically by a management script when FMTM starts up.
+- Individual SQL migration scripts are placed in the `src/backend/migrations` dir.
+  - These should be idempotent, i.e. can run over and over without causing errors.
+  - There should also be a commented out SQL script for how to revert the migration.
+  - Scripts should be named sequentially,
+    i.e. the first is 001-some-migration.sql,
+    then they increment by one.
+  - Example `000-remove-user-password.sql`:
 
-If you need to drop all tables, connect to fmtm and...
+```bash
+-- ## Migration to remove password field from public.users (replaced with OSM OAuth)
 
-    drop table mapping_issue_categories cascade;
-    drop table organisation_managers cascade;
-    drop table organisations  cascade;
-    drop table project_allowed_users cascade;
-    drop table project_chat cascade;
-    drop table project_info cascade;
-    drop table project_teams cascade;
-    drop table projects cascade;
-    drop table task_history cascade;
-    drop table task_invalidation_history cascade;
-    drop table task_mapping_issues cascade;
-    drop table tasks cascade;
-    drop table teams cascade;
-    drop table user_licenses cascade;
-    drop table users cascade;
-    drop table x_form cascade;
 
-**Note:** Remember to use caution when dropping tables, as this will permanently delete all data in those tables. If you make any changes to the database, be sure to commit them to ensure that they are saved.
+-- ## Apply Migration
+-- Start a transaction
+BEGIN;
+-- Drop the 'password' column if it exists
+ALTER TABLE IF EXISTS public.users
+DROP COLUMN IF EXISTS password;
+-- Commit the transaction
+COMMIT;
+
+
+-- ## Revert Migration (comment above, uncomment below)
+-- -- Start a transaction
+-- BEGIN;
+-- -- Add the 'password' column back if it doesn't exist
+-- ALTER TABLE public.users
+-- ADD COLUMN IF NOT EXISTS password character varying;
+-- -- Commit the transaction
+-- COMMIT;
+```
+
+- When the docker compose stack starts,
+  an additional container starts up and runs a bash script once.
+- The script generates a _table_ called `migrations`,
+  which simply tracks the script name and execution date.
+- The `migrations` _directory_ is scanned for new files,
+  and if there is no record in the database of being applied,
+  the migration is applied.
+
+### Running Migrations Manually
+
+If for any reason you need to run migrations manually,
+there are a few options:
+
+#### Restart the migrations container
+
+```bash
+docker compose restart migrations
+```
+
+#### Run the migration script in docker
+
+This runs inside the backend container:
+
+```bash
+docker compose exec api bash /migrate-entrypoint.sh`
+```
+
+#### Run the migration script directly
+
+Make sure you have the 4 env vars for the database
+connection set on your machine,
+then run the migration script directly:
+
+```bash
+bash src/backend/migrate-entrypoint.sh
+```

@@ -10,4 +10,3 @@
 !pyproject.toml
 !pdm.lock
 !migrations
-!alembic.ini

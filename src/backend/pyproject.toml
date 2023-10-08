@@ -34,7 +34,6 @@ dependencies = [
     "SQLAlchemy-Utils==0.41.1",
     "psycopg2==2.9.7",
     "geoalchemy2==0.14.1",
-    "alembic>=1.12.0",
     "geojson==3.0.1",
     "shapely==2.0.1",
     "pyxform==1.12.1",

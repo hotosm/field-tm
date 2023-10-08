@@ -58,6 +58,7 @@ services:
       - ./src/backend/app:/opt/app
     depends_on:
       - fmtm-db
+      - migrations
     env_file:
       - .env
     ports:
@@ -71,13 +72,12 @@ services:
     image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
     container_name: fmtm_migrations
     depends_on:
-      - api
+      - fmtm-db
     env_file:
       - .env
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
-    command: ["alembic", "upgrade", "head"]
     restart: "on-failure:3"
 
   ui:
