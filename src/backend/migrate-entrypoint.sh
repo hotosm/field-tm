@@ -60,8 +60,9 @@ create_db_schema_if_missing() {
     table_exists=$(psql -t "$db_url" -c "
         SELECT EXISTS (SELECT 1 FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'projects');
-    ")
-    
+    " | tr -d '[:space:]')  # Remove all whitespace and formatting characters
+    echo "Debug: return from table_exists query: $table_exists"
+
     if [ "$table_exists" = "t" ]; then
         echo "Data exists in the database. Skipping schema creation."
         return 0
