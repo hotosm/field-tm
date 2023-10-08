@@ -6,7 +6,7 @@ groups = ["default", "test", "dev", "docs", "debug"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:a21cddc4d65e0a7fe73dbb45b768c4df300795ea87c5305831b767c1370661a3"
+content_hash = "sha256:6eabd1ba34cd32c2f3851c31a8a9ecee954e1f8b759361cc9da9923da4641141"
 
 [[package]]
 name = "annotated-types"
@@ -991,13 +991,15 @@ files = [
 name = "osm-login-python"
 version = "1.0.1"
 requires_python = ">=3.9"
-git = "https://github.com/hotosm/osm-login-python"
-revision = "a396d081bfc31afc949108508e2184ef7763d954"
 summary = "Use OSM Token exchange with OAuth2.0 for python projects."
 dependencies = [
     "itsdangerous~=2.1.2",
     "pydantic>=2.0.1",
     "requests-oauthlib~=1.3.1",
+]
+files = [
+    {file = "osm-login-python-1.0.1.tar.gz", hash = "sha256:d00e6318e22d7c363ddb552a62397351ad15bb1090e3d21ddde7a1de466343a8"},
+    {file = "osm_login_python-1.0.1-py3-none-any.whl", hash = "sha256:6e69200b6d1e97f46337643a030e093dde7490ba11b5a85598e74630cde601d0"},
 ]
 
 [[package]]
@@ -1482,7 +1484,7 @@ files = [
 name = "questionary"
 version = "2.0.1"
 requires_python = ">=3.8"
-summary = "Python library to build pretty command line user prompts â­�ï¸�"
+summary = "Python library to build pretty command line user prompts ⭐️"
 dependencies = [
     "prompt-toolkit<=3.0.36,>=2.0",
 ]
