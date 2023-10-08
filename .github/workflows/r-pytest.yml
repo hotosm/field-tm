@@ -77,6 +77,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run pytest
-        run: |
-          cd src/backend
-          pytest
+        working-directory: src/backend
+        run: pytest

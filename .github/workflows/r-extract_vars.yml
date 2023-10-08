@@ -38,15 +38,15 @@ jobs:
 
       - name: Extract api version
         id: extract_api_version
+        working-directory: src/backend
         run: |
-          cd src/backend
           API_VERSION=$(python -c 'from app.__version__ import __version__; print(__version__)')
           echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Extract frontend versions
         id: extract_frontend_version
+        working-directory: src/frontend
         run: |
-          cd src/frontend
           FRONTEND_MAIN_VERSION=$(jq -r '.version' package.json)
           echo "frontend_main_version=${FRONTEND_MAIN_VERSION}" >> $GITHUB_OUTPUT
 
