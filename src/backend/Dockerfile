@@ -108,7 +108,6 @@ WORKDIR /opt
 # Add app code
 COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
-COPY alembic.ini /opt/
 # Add non-root user, permissions
 RUN useradd -r -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
@@ -150,23 +149,24 @@ USER appuser
 FROM runtime as ci
 # Run all ci as root
 USER root
-ENV PATH="/root/.local/bin:$PATH"
-RUN set -ex \
+ARG PYTHON_IMG_TAG
+COPY --from=extract-deps \
+    /opt/python/requirements-ci.txt /opt/python/
+RUN mv /home/appuser/.local/bin/* /usr/local/bin/ \
+    && mv /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages/* \
+    /usr/local/lib/python${PYTHON_IMG_TAG}/site-packages/ \
+    && set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
     -y --no-install-recommends \
-        "gosu" \
         "git" \
-    && rm -rf /var/lib/apt/lists/*
-RUN mv /home/appuser/.local /root/.local
-COPY --from=extract-deps \
-    /opt/python/requirements-ci.txt /opt/python/
-RUN pip install --user --upgrade --no-warn-script-location \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --upgrade --no-warn-script-location \
     --no-cache-dir -r \
     /opt/python/requirements-ci.txt \
-    && rm -r /opt/python
-# Pre-compile packages to .pyc (init speed gains)
-RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
+    && rm -r /opt/python \
+    # Pre-compile packages to .pyc (init speed gains)
+    && python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Override entrypoint, as not possible in Github action
 ENTRYPOINT [""]
 CMD [""]

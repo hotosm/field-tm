@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""SQLAlchemy database models for interacting with Postgresql."""
 
 from geoalchemy2 import Geometry
 from sqlalchemy import (
@@ -100,9 +101,6 @@ class DbUser(Base):
     # Represents the date the user last had one of their tasks validated
     last_validation_date = Column(DateTime, default=timestamp)
 
-    # TODO: This changes to use Oath
-    password = Column(String)
-
 
 # Secondary table defining many-to-many relationship between organisations and managers
 organisation_managers = Table(
@@ -158,7 +156,8 @@ class DbTeam(Base):
     organisation = relationship(DbOrganisation, backref="teams")
 
 
-# Secondary table defining many-to-many join for private projects that only defined users can map on
+# Secondary table defining many-to-many join for
+# private projects that only defined users can map on
 project_allowed_users = Table(
     "project_allowed_users",
     FmtmMetadata,
@@ -168,6 +167,8 @@ project_allowed_users = Table(
 
 
 class DbProjectTeams(Base):
+    """Link table between teams and projects."""
+
     __tablename__ = "project_teams"
     team_id = Column(Integer, ForeignKey("teams.id"), primary_key=True)
     project_id = Column(Integer, ForeignKey("projects.id"), primary_key=True)
@@ -231,7 +232,10 @@ class DbXForm(Base):
 
 
 class DbTaskInvalidationHistory(Base):
-    """Describes the most recent history of task invalidation and subsequent validation."""
+    """Information on task invalidation.
+
+    Describes the most recent history of task invalidation and subsequent validation.
+    """
 
     __tablename__ = "task_invalidation_history"
     id = Column(Integer, primary_key=True)
@@ -265,9 +269,10 @@ class DbTaskInvalidationHistory(Base):
 
 
 class DbTaskMappingIssue(Base):
-    """Describes an issue (along with an occurrence count) with a
-    task mapping that contributed to invalidation of the task
-    .
+    """Describes mapping issues.
+
+    An issue (along with an occurrence count) with a
+    task mapping that contributed to invalidation of the task.
     """
 
     __tablename__ = "task_mapping_issues"
@@ -382,7 +387,8 @@ class DbTask(Base):
     # y = Column(Integer)
     # zoom = Column(Integer)
     # extra_properties = Column(Unicode)
-    # # Tasks need to be split differently if created from an arbitrary grid or were clipped to the edge of the AOI
+    # # Tasks need to be split differently if created from an arbitrary grid
+    # or were clipped to the edge of the AOI
     # is_square = Column(Boolean, default=False)
 
 
@@ -439,6 +445,7 @@ class DbProject(Base):
 
     @property
     def tasks_mapped(self):
+        """Get the number of tasks mapped for a project."""
         return (
             object_session(self)
             .query(DbTask)
@@ -449,6 +456,7 @@ class DbProject(Base):
 
     @property
     def tasks_validated(self):
+        """Get the number of tasks validated for a project."""
         return (
             object_session(self)
             .query(DbTask)
@@ -459,6 +467,7 @@ class DbProject(Base):
 
     @property
     def tasks_bad(self):
+        """Get the number of tasks marked bad for a project."""
         return (
             object_session(self)
             .query(DbTask)
@@ -590,6 +599,8 @@ class DbFeatures(Base):
 
 
 class BackgroundTasks(Base):
+    """Table managing long running background tasks."""
+
     __tablename__ = "background_tasks"
 
     id = Column(String, primary_key=True)
@@ -600,6 +611,8 @@ class BackgroundTasks(Base):
 
 
 class DbUserRoles(Base):
+    """Fine grained user control for projects, described by roles."""
+
     __tablename__ = "user_roles"
 
     user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
@@ -612,6 +625,8 @@ class DbUserRoles(Base):
 
 
 class DbProjectAOI(Base):
+    """The AOI geometry for a project."""
+
     __tablename__ = "project_aoi"
 
     id = Column(Integer, primary_key=True)
@@ -621,6 +636,8 @@ class DbProjectAOI(Base):
 
 
 class DbOsmLines(Base):
+    """Associated OSM ways for a project."""
+
     __tablename__ = "ways_line"
 
     id = Column(Integer, primary_key=True)
@@ -630,6 +647,8 @@ class DbOsmLines(Base):
 
 
 class DbBuildings(Base):
+    """Associated OSM buildings for a project."""
+
     __tablename__ = "ways_poly"
 
     id = Column(Integer, primary_key=True)
@@ -640,6 +659,8 @@ class DbBuildings(Base):
 
 
 class DbTilesPath(Base):
+    """Keeping track of mbtile basemaps for a project."""
+
     __tablename__ = "mbtiles_path"
 
     id = Column(Integer, primary_key=True)
