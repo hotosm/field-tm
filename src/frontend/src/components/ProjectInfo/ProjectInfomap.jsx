@@ -197,7 +197,9 @@ const ProjectInfomap = () => {
     });
 
     dispatch(
-      ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${decodedId}/features?task_id=${selectedTask}`),
+      ProjectBuildingGeojsonService(
+        `${import.meta.env.API_URL}/projects/${decodedId}/features?task_id=${selectedTask}`,
+      ),
     );
   }, [selectedTask]);
 

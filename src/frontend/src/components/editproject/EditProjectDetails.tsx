@@ -26,7 +26,7 @@ const EditProjectDetails = ({ projectId }) => {
     const changedValues = diffObject(editProjectDetails, values);
     dispatch(CreateProjectActions.SetIndividualProjectDetails(values));
     if (Object.keys(changedValues).length > 0) {
-      dispatch(PatchProjectDetails(`${environment.baseApiUrl}/projects/${projectId}`, changedValues));
+      dispatch(PatchProjectDetails(`${import.meta.env.API_URL}/projects/${projectId}`, changedValues));
     }
   };
 

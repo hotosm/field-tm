@@ -21,7 +21,7 @@ const UpdateForm = ({ projectId }) => {
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${environment.baseApiUrl}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
   }, []);
 
   const onSubmit = () => {
@@ -29,7 +29,7 @@ const UpdateForm = ({ projectId }) => {
     console.log(diffPayload, 'diffPayload');
 
     dispatch(
-      PostFormUpdate(`${environment.baseApiUrl}/projects/update_category`, {
+      PostFormUpdate(`${import.meta.env.API_URL}/projects/update_category`, {
         ...(Object.keys(diffPayload).length > 0 ? diffPayload : { category: selectedFormCategory }),
         project_id: projectId,
         upload: uploadForm,

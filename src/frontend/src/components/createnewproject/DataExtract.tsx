@@ -55,7 +55,7 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
   };
 
   useEffect(() => {
-    dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
   }, []);
 
   const resetFile = () => {
@@ -64,7 +64,7 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
   };
 
   useEffect(() => {
-    dispatch(FormCategoryService(`${enviroment.baseApiUrl}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
   }, []);
 
   return (

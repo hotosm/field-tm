@@ -6,7 +6,7 @@ import environment from '../environment';
 
 const ProtectedRoute = ({ children }) => {
   // Bypass check if NODE_ENV=development (local dev)
-  if (environment.nodeEnv === 'development') {
+  if (import.meta.env.MODE === 'development') {
     return children;
   }
 

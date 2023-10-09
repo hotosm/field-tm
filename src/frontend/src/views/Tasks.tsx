@@ -35,12 +35,12 @@ const TasksSubmission = () => {
   useEffect(() => {
     dispatch(
       ProjectSubmissionService(
-        `${environment.baseApiUrl}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
+        `${import.meta.env.API_URL}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
       ),
     );
     dispatch(
       ProjectBuildingGeojsonService(
-        `${environment.baseApiUrl}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
+        `${import.meta.env.API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
       ),
     );
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
@@ -50,7 +50,7 @@ const TasksSubmission = () => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedProjectId)) == -1) {
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedProjectId),
         ),
@@ -58,14 +58,14 @@ const TasksSubmission = () => {
       );
       dispatch(
         ProjectBuildingGeojsonService(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}/features`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
         ),
       );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedProjectId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedProjectId),
         ),
@@ -156,13 +156,17 @@ const TasksSubmission = () => {
     if (downloadType === 'csv') {
       dispatch(
         getDownloadProjectSubmission(
-          `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=false`,
+          `${
+            import.meta.env.API_URL
+          }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=false`,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
         getDownloadProjectSubmission(
-          `${environment.baseApiUrl}/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=true`,
+          `${
+            import.meta.env.API_URL
+          }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=true`,
         ),
       );
     }

@@ -23,8 +23,8 @@ const Submissions = () => {
   const decodedId = environment.decode(encodedId);
   // const theme = CoreModules.useAppSelector(state => state.theme.hotTheme)
   useEffect(() => {
-    dispatch(ProjectSubmissionService(`${environment.baseApiUrl}/submission/?project_id=${decodedId}`));
-    dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${decodedId}/features`));
+    dispatch(ProjectSubmissionService(`${import.meta.env.API_URL}/submission/?project_id=${decodedId}`));
+    dispatch(ProjectBuildingGeojsonService(`${import.meta.env.API_URL}/projects/${decodedId}/features`));
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
 
@@ -33,7 +33,7 @@ const Submissions = () => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
@@ -43,7 +43,7 @@ const Submissions = () => {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
@@ -80,7 +80,7 @@ const Submissions = () => {
             <CoreModules.Button variant="contained" color="error">
               Convert
             </CoreModules.Button>
-            <a href={`${environment.baseApiUrl}/submission/download?project_id=${decodedId}`} download>
+            <a href={`${import.meta.env.API_URL}/submission/download?project_id=${decodedId}`} download>
               <CoreModules.Button variant="contained" color="error">
                 Download CSV
               </CoreModules.Button>

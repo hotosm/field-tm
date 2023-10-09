@@ -12,7 +12,7 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
   const [open, setOpen] = useState(false);
   const params = CoreModules.useParams();
   const { loading, qrcode } = ProjectFilesById(
-    `${environment.baseApiUrl}/projects/${environment.decode(params.id)}`,
+    `${import.meta.env.API_URL}/projects/${environment.decode(params.id)}`,
     task,
   );
 
