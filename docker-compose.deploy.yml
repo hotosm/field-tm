@@ -125,8 +125,7 @@ services:
       dockerfile: prod.dockerfile
       args:
         APP_VERSION: ${FRONTEND_MAIN_VERSION}
-        API_URL: ${URL_SCHEME}://${API_URL}
-        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        VITE_API_URL: ${URL_SCHEME}://${API_URL}
     container_name: fmtm
     depends_on:
       - api
@@ -135,8 +134,6 @@ services:
       - fmtm-net
     environment:
       - BROTLI=true
-      - API_URL=${URL_SCHEME}://${API_URL}
-      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
     restart: "unless-stopped"
     labels:
       - "traefik.enable=true"
