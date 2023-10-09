@@ -6,7 +6,7 @@ groups = ["default", "test", "dev", "docs", "debug"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:6eabd1ba34cd32c2f3851c31a8a9ecee954e1f8b759361cc9da9923da4641141"
+content_hash = "sha256:d85711d1981b4b7eb6e610952f0fb5111dbd65be9eb1c2834cc22d16a0a129b7"
 
 [[package]]
 name = "annotated-types"
@@ -956,7 +956,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.3.6rc1"
+version = "0.3.6"
 requires_python = ">=3.10"
 summary = "Processing field data from OpenDataKit to OpenStreetMap format."
 dependencies = [
@@ -968,6 +968,7 @@ dependencies = [
     "haversine>=2.8.0",
     "levenshtein>=0.21.1",
     "mercantile>=1.2.1",
+    "osm-rawdata==0.1.3",
     "overpy>=0.6",
     "pandas>=2.0.3",
     "progress>=1.6",
@@ -983,8 +984,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.3.6rc1.tar.gz", hash = "sha256:e3d2ad2e4ebc88055ee4529cc724af44f860ff9b638a2e618c306c80a0bba7e1"},
-    {file = "osm_fieldwork-0.3.6rc1-py3-none-any.whl", hash = "sha256:def14e0244cec02df5e2936371f09c8202a53a5e1e737ecba89ee70f3fa8ea11"},
+    {file = "osm-fieldwork-0.3.6.tar.gz", hash = "sha256:f1825cc74b936aebd0baa748b2765f97147abfa8700a4ecf35e2bde4d41cec03"},
+    {file = "osm_fieldwork-0.3.6-py3-none-any.whl", hash = "sha256:78056edaa30a9b31004b84a929beda32884bb6ff5d7dbd3a913bef452cdee922"},
 ]
 
 [[package]]
@@ -1000,6 +1001,27 @@ dependencies = [
 files = [
     {file = "osm-login-python-1.0.1.tar.gz", hash = "sha256:d00e6318e22d7c363ddb552a62397351ad15bb1090e3d21ddde7a1de466343a8"},
     {file = "osm_login_python-1.0.1-py3-none-any.whl", hash = "sha256:6e69200b6d1e97f46337643a030e093dde7490ba11b5a85598e74630cde601d0"},
+]
+
+[[package]]
+name = "osm-rawdata"
+version = "0.1.3"
+requires_python = ">=3.10"
+summary = "Make data extracts from OSM data."
+dependencies = [
+    "GeoAlchemy2>=0.12.5",
+    "PyYAML>=6.0.1",
+    "SQLAlchemy-Utils>=0.41.1",
+    "geojson>=2.5.0",
+    "psycopg2>=2.9.9",
+    "pyarrow>=1.24.2",
+    "requests>=2.28.2",
+    "shapely>=2.0.1",
+    "sqlalchemy>=1.4.41",
+]
+files = [
+    {file = "osm-rawdata-0.1.3.tar.gz", hash = "sha256:4ebca28fd1f164ba012bb47e2799aaa211f1799e85b85b2fd73de21090c8c46e"},
+    {file = "osm_rawdata-0.1.3-py3-none-any.whl", hash = "sha256:44c2c350a2b51fa491a51d05e9498c056c8cacbdca804dc4d9dec9b7ac0d0d4e"},
 ]
 
 [[package]]
@@ -1158,15 +1180,15 @@ files = [
 
 [[package]]
 name = "psycopg2"
-version = "2.9.7"
-requires_python = ">=3.6"
+version = "2.9.9"
+requires_python = ">=3.7"
 summary = "psycopg2 - Python-PostgreSQL Database Adapter"
 files = [
-    {file = "psycopg2-2.9.7-cp310-cp310-win32.whl", hash = "sha256:1a6a2d609bce44f78af4556bea0c62a5e7f05c23e5ea9c599e07678995609084"},
-    {file = "psycopg2-2.9.7-cp310-cp310-win_amd64.whl", hash = "sha256:b22ed9c66da2589a664e0f1ca2465c29b75aaab36fa209d4fb916025fb9119e5"},
-    {file = "psycopg2-2.9.7-cp311-cp311-win32.whl", hash = "sha256:44d93a0109dfdf22fe399b419bcd7fa589d86895d3931b01fb321d74dadc68f1"},
-    {file = "psycopg2-2.9.7-cp311-cp311-win_amd64.whl", hash = "sha256:91e81a8333a0037babfc9fe6d11e997a9d4dac0f38c43074886b0d9dead94fe9"},
-    {file = "psycopg2-2.9.7.tar.gz", hash = "sha256:f00cc35bd7119f1fed17b85bd1007855194dde2cbd8de01ab8ebb17487440ad8"},
+    {file = "psycopg2-2.9.9-cp310-cp310-win32.whl", hash = "sha256:38a8dcc6856f569068b47de286b472b7c473ac7977243593a288ebce0dc89516"},
+    {file = "psycopg2-2.9.9-cp310-cp310-win_amd64.whl", hash = "sha256:426f9f29bde126913a20a96ff8ce7d73fd8a216cfb323b1f04da402d452853c3"},
+    {file = "psycopg2-2.9.9-cp311-cp311-win32.whl", hash = "sha256:ade01303ccf7ae12c356a5e10911c9e1c51136003a9a1d92f7aa9d010fb98372"},
+    {file = "psycopg2-2.9.9-cp311-cp311-win_amd64.whl", hash = "sha256:121081ea2e76729acfb0673ff33755e8703d45e926e416cb59bae3a86c6a4981"},
+    {file = "psycopg2-2.9.9.tar.gz", hash = "sha256:d1454bde93fb1e224166811694d600e746430c006fbb031ea06ecc2ea41bf156"},
 ]
 
 [[package]]
@@ -1194,6 +1216,32 @@ summary = "Get CPU info with pure Python"
 files = [
     {file = "py-cpuinfo-9.0.0.tar.gz", hash = "sha256:3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3f49690"},
     {file = "py_cpuinfo-9.0.0-py3-none-any.whl", hash = "sha256:859625bc251f64e21f077d099d4162689c762b5d6a4c3c97553d56241c9674d5"},
+]
+
+[[package]]
+name = "pyarrow"
+version = "13.0.0"
+requires_python = ">=3.8"
+summary = "Python library for Apache Arrow"
+dependencies = [
+    "numpy>=1.16.6",
+]
+files = [
+    {file = "pyarrow-13.0.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:1afcc2c33f31f6fb25c92d50a86b7a9f076d38acbcb6f9e74349636109550148"},
+    {file = "pyarrow-13.0.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:70fa38cdc66b2fc1349a082987f2b499d51d072faaa6b600f71931150de2e0e3"},
+    {file = "pyarrow-13.0.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cd57b13a6466822498238877892a9b287b0a58c2e81e4bdb0b596dbb151cbb73"},
+    {file = "pyarrow-13.0.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f8ce69f7bf01de2e2764e14df45b8404fc6f1a5ed9871e8e08a12169f87b7a26"},
+    {file = "pyarrow-13.0.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:588f0d2da6cf1b1680974d63be09a6530fd1bd825dc87f76e162404779a157dc"},
+    {file = "pyarrow-13.0.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:6241afd72b628787b4abea39e238e3ff9f34165273fad306c7acf780dd850956"},
+    {file = "pyarrow-13.0.0-cp310-cp310-win_amd64.whl", hash = "sha256:fda7857e35993673fcda603c07d43889fca60a5b254052a462653f8656c64f44"},
+    {file = "pyarrow-13.0.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:aac0ae0146a9bfa5e12d87dda89d9ef7c57a96210b899459fc2f785303dcbb67"},
+    {file = "pyarrow-13.0.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d7759994217c86c161c6a8060509cfdf782b952163569606bb373828afdd82e8"},
+    {file = "pyarrow-13.0.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:868a073fd0ff6468ae7d869b5fc1f54de5c4255b37f44fb890385eb68b68f95d"},
+    {file = "pyarrow-13.0.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:51be67e29f3cfcde263a113c28e96aa04362ed8229cb7c6e5f5c719003659d33"},
+    {file = "pyarrow-13.0.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:d1b4e7176443d12610874bb84d0060bf080f000ea9ed7c84b2801df851320295"},
+    {file = "pyarrow-13.0.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:69b6f9a089d116a82c3ed819eea8fe67dae6105f0d81eaf0fdd5e60d0c6e0944"},
+    {file = "pyarrow-13.0.0-cp311-cp311-win_amd64.whl", hash = "sha256:ab1268db81aeb241200e321e220e7cd769762f386f92f61b898352dd27e402ce"},
+    {file = "pyarrow-13.0.0.tar.gz", hash = "sha256:83333726e83ed44b0ac94d8d7a21bbdee4a05029c3b1e8db58a863eec8fd8a33"},
 ]
 
 [[package]]
