@@ -41,7 +41,7 @@ const FormSelection: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
   }, []);
   // END
   const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
@@ -63,7 +63,7 @@ const FormSelection: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
   }, []);
   // END
 
@@ -84,7 +84,7 @@ const FormSelection: React.FC<any> = ({
     // setGeojsonFile(f);
     dispatch(
       CreateProjectService(
-        `${import.meta.env.API_URL}/projects/create_project`,
+        `${import.meta.env.VITE_API_URL}/projects/create_project`,
         {
           project_info: {
             name: projectDetails.name,
@@ -121,7 +121,7 @@ const FormSelection: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
       generateProjectLogIntervalCb = null;
@@ -135,7 +135,7 @@ const FormSelection: React.FC<any> = ({
     if (generateQrSuccess) {
       if (generateProjectLogIntervalCb === null) {
         dispatch(
-          GenerateProjectLog(`${import.meta.env.API_URL}/projects/generate-log/`, {
+          GenerateProjectLog(`${import.meta.env.VITE_API_URL}/projects/generate-log/`, {
             project_id: projectDetailsResponse?.id,
             uuid: generateQrSuccess.task_id,
           }),
@@ -172,7 +172,7 @@ const FormSelection: React.FC<any> = ({
       if (generateProjectLogIntervalCb === null) {
         generateProjectLogIntervalCb = setInterval(() => {
           dispatch(
-            GenerateProjectLog(`${import.meta.env.API_URL}/projects/generate-log/`, {
+            GenerateProjectLog(`${import.meta.env.VITE_API_URL}/projects/generate-log/`, {
               project_id: projectDetailsResponse?.id,
               uuid: generateQrSuccess.task_id,
             }),
@@ -214,7 +214,7 @@ const FormSelection: React.FC<any> = ({
 
   useEffect(() => {
     if (customFormFile) {
-      dispatch(ValidateCustomForm(`${import.meta.env.API_URL}/projects/validate_form`, customFormFile));
+      dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate_form`, customFormFile));
     }
   }, [customFormFile]);
 

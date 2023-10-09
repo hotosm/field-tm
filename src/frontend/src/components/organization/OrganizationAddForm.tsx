@@ -16,7 +16,7 @@ const OrganizationAddForm = () => {
   const submission = () => {
     // eslint-disable-next-line no-use-before-define
     // submitForm();
-    dispatch(OrganizationService(`${import.meta.env.API_URL}/organization/`, values));
+    dispatch(OrganizationService(`${import.meta.env.VITE_API_URL}/organization/`, values));
     // navigate("/select-form", { replace: true, state: { values: values } });
   };
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(

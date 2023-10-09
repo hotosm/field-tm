@@ -35,12 +35,12 @@ const TasksSubmission = () => {
   useEffect(() => {
     dispatch(
       ProjectSubmissionService(
-        `${import.meta.env.API_URL}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
+        `${import.meta.env.VITE_API_URL}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
       ),
     );
     dispatch(
       ProjectBuildingGeojsonService(
-        `${import.meta.env.API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
+        `${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
       ),
     );
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
@@ -50,7 +50,7 @@ const TasksSubmission = () => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedProjectId)) == -1) {
       dispatch(
         ProjectById(
-          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}`,
+          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedProjectId),
         ),
@@ -58,14 +58,14 @@ const TasksSubmission = () => {
       );
       dispatch(
         ProjectBuildingGeojsonService(
-          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
+          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
         ),
       );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
-          `${import.meta.env.API_URL}/projects/${environment.decode(encodedProjectId)}`,
+          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedProjectId),
         ),
@@ -157,7 +157,7 @@ const TasksSubmission = () => {
       dispatch(
         getDownloadProjectSubmission(
           `${
-            import.meta.env.API_URL
+            import.meta.env.VITE_API_URL
           }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=false`,
         ),
       );
@@ -165,7 +165,7 @@ const TasksSubmission = () => {
       dispatch(
         getDownloadProjectSubmission(
           `${
-            import.meta.env.API_URL
+            import.meta.env.VITE_API_URL
           }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=true`,
         ),
       );

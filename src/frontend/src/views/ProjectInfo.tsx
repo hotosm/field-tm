@@ -43,13 +43,13 @@ const ProjectInfo = () => {
     if (downloadType === 'csv') {
       dispatch(
         getDownloadProjectSubmission(
-          `${import.meta.env.API_URL}/submission/download?project_id=${decodedId}&export_json=false`,
+          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}&export_json=false`,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
         getDownloadProjectSubmission(
-          `${import.meta.env.API_URL}/submission/download?project_id=${decodedId}&export_json=true`,
+          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}&export_json=true`,
         ),
       );
     }
@@ -62,18 +62,18 @@ const ProjectInfo = () => {
 
       dispatch(
         ProjectById(
-          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
         state.projectTaskBoundries,
       );
-      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}/features`))
+      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
-          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
@@ -91,7 +91,7 @@ const ProjectInfo = () => {
   const handleConvert = () => {
     dispatch(
       fetchConvertToOsmDetails(
-        `${import.meta.env.API_URL}/submission/convert-to-osm?project_id=${decodedId}&${
+        `${import.meta.env.VITE_API_URL}/submission/convert-to-osm?project_id=${decodedId}&${
           selectedTask ? `task_id=${selectedTask}` : ''
         }`,
       ),
@@ -100,7 +100,7 @@ const ProjectInfo = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(fetchInfoTask(`${import.meta.env.API_URL}/tasks/tasks-features/?project_id=${decodedId}`));
+      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/tasks-features/?project_id=${decodedId}`));
     };
     fetchData();
     let interval;
@@ -123,7 +123,7 @@ const ProjectInfo = () => {
   const uploadToJOSM = () => {
     dispatch(
       ConvertXMLToJOSM(
-        `${import.meta.env.API_URL}/submission/get_osm_xml/${decodedId}`,
+        `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${decodedId}`,
         projectInfo.outline_geojson.bbox,
       ),
     );

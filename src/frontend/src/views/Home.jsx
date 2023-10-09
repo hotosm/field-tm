@@ -32,10 +32,10 @@ const Home = () => {
   ).fill(0);
   //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
-  console.log(import.meta.env.API_URL);
+  console.log(import.meta.env.VITE_API_URL);
   const theme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   useEffect(() => {
-    dispatch(HomeSummaryService(`${import.meta.env.API_URL}/projects/summaries?skip=0&limit=100`));
+    dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?skip=0&limit=100`));
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
 
