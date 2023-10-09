@@ -27,7 +27,8 @@
     "noImplicitReturns": true,
     "strictPropertyInitialization": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["@testing-library/jest-dom"]
   },
   "include": [
     // ".eslintrc.cjs",

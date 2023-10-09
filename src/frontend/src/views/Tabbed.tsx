@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { styled } from '@mui/system';
-import TabsUnstyled from '@mui/base/TabsUnstyled';
-import TabsListUnstyled from '@mui/base/TabsListUnstyled';
-import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
-import { buttonUnstyledClasses } from '@mui/base/ButtonUnstyled';
-import TabUnstyled, { tabUnstyledClasses } from '@mui/base/TabUnstyled';
+import { Tabs as TabsUnstyled } from '@mui/base/Tabs';
+import { TabsList as TabsListUnstyled } from '@mui/base/TabsList';
+import { TabPanel as TabPanelUnstyled } from '@mui/base/TabPanel';
+import { buttonClasses as buttonUnstyledClasses } from '@mui/base/Button';
+import { Tab as TabUnstyled, tabClasses as tabUnstyledClasses } from '@mui/base/Tab';
 
 const blue = {
   50: '#F0F7FF',
