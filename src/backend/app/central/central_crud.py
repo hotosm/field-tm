@@ -279,7 +279,6 @@ def delete_odk_xform(
     return result
 
 
-# def list_odk_xforms(project_id: int, odk_central: project_schemas.ODKCentral = None):
 def list_odk_xforms(
     project_id: int,
     odk_central: project_schemas.ODKCentral = None,
