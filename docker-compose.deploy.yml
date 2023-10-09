@@ -134,6 +134,7 @@ services:
       - fmtm-net
     environment:
       - BROTLI=true
+      - VITE_API_URL=${URL_SCHEME}://${API_URL}
     restart: "unless-stopped"
     labels:
       - "traefik.enable=true"
