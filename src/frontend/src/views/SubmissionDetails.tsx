@@ -18,7 +18,7 @@ const SubmissionDetails = () => {
     dispatch(
       SubmissionService(
         `${
-          import.meta.env.API_URL
+          import.meta.env.VITE_API_URL
         }/central/submission?project_id=${decodedProjectId}&xmlFormId=${decodedTaskId}&submission_id=${paramsInstanceId}`,
       ),
     );

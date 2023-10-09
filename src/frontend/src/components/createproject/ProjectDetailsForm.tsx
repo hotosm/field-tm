@@ -32,7 +32,7 @@ const ProjectDetailsForm: React.FC = () => {
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {
-    // dispatch(OrganisationService(`${import.meta.env.API_URL}/organization/`));
+    // dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
   }, []);
 
   const submission = () => {
@@ -51,9 +51,9 @@ const ProjectDetailsForm: React.FC = () => {
   // Inject ODK vars if NODE_ENV=development (local dev)
   useEffect(() => {
     if (import.meta.env.MODE === 'development') {
-      handleCustomChange('odk_central_url', import.meta.env.ODK_CENTRAL_URL);
-      handleCustomChange('odk_central_user', import.meta.env.ODK_CENTRAL_USER);
-      handleCustomChange('odk_central_password', import.meta.env.ODK_CENTRAL_PASSWD);
+      handleCustomChange('odk_central_url', import.meta.env.VITE_ODK_CENTRAL_URL);
+      handleCustomChange('odk_central_user', import.meta.env.VITE_ODK_CENTRAL_USER);
+      handleCustomChange('odk_central_password', import.meta.env.VITE_ODK_CENTRAL_PASSWD);
     }
   }, []);
 
@@ -71,7 +71,7 @@ const ProjectDetailsForm: React.FC = () => {
 
   // User has switched back to the tab
   const onFocus = () => {
-    dispatch(OrganisationService(`${import.meta.env.API_URL}/organization/`));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
   };
   useEffect(() => {
     window.addEventListener('focus', onFocus);

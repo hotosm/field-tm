@@ -198,7 +198,7 @@ const ProjectInfomap = () => {
 
     dispatch(
       ProjectBuildingGeojsonService(
-        `${import.meta.env.API_URL}/projects/${decodedId}/features?task_id=${selectedTask}`,
+        `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${selectedTask}`,
       ),
     );
   }, [selectedTask]);

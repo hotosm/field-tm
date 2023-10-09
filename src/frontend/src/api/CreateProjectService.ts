@@ -29,15 +29,17 @@ const CreateProjectService: Function = (
 
         if (payload.splitting_algorithm === 'Choose Area as Tasks') {
           await dispatch(
-            UploadAreaService(`${import.meta.env.API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
           );
         } else if (payload.splitting_algorithm === 'Use natural Boundary') {
-          await dispatch(UploadAreaService(`${import.meta.env.API_URL}/projects/task_split/${resp.id}/`, fileUpload));
+          await dispatch(
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/task_split/${resp.id}/`, fileUpload),
+          );
         } else {
           await dispatch(
-            UploadAreaService(`${import.meta.env.API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
           );
-          // await dispatch(UploadAreaService(`${import.meta.env.API_URL}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
+          // await dispatch(UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
         }
         dispatch(
           CommonActions.SetSnackBar({
@@ -51,7 +53,7 @@ const CreateProjectService: Function = (
           const dataExtractFormData = new FormData();
           dataExtractFormData.append('upload', dataExtractFile);
           const postDataExtract = await axios.post(
-            `${import.meta.env.API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=buildings`,
+            `${import.meta.env.VITE_API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=buildings`,
             dataExtractFormData,
           );
         }
@@ -59,13 +61,13 @@ const CreateProjectService: Function = (
           const lineExtractFormData = new FormData();
           lineExtractFormData.append('upload', lineExtractFile);
           const postLineExtract = await axios.post(
-            `${import.meta.env.API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=lines`,
+            `${import.meta.env.VITE_API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=lines`,
             lineExtractFormData,
           );
         }
         await dispatch(
           GenerateProjectQRService(
-            `${import.meta.env.API_URL}/projects/${resp.id}/generate`,
+            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/generate`,
             payload,
             formUpload,
             dataExtractFile,

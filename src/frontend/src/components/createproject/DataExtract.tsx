@@ -39,7 +39,7 @@ const DataExtract: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
   }, []);
   // END
   const selectExtractWaysList = ['Centroid', 'Polygon'];
@@ -51,7 +51,7 @@ const DataExtract: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
   }, []);
   // END
 
@@ -64,7 +64,7 @@ const DataExtract: React.FC<any> = ({
 
   // Fetching form category list
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
     return () => {
       clearInterval(generateProjectLogIntervalCb);
       dispatch(CreateProjectActions.SetGenerateProjectLog(null));
