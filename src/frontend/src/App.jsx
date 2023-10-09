@@ -27,10 +27,10 @@ console.error = function filterWarnings(msg, ...args) {
 };
 
 {
-  environment.nodeEnv !== 'development'
+  import.meta.env.MODE !== 'development'
     ? Sentry.init({
         dsn:
-          environment.main_url === 'fmtm.hotosm.org'
+          import.meta.env.BASE_URL === 'fmtm.hotosm.org'
             ? 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928'
             : 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
         integrations: [
@@ -57,7 +57,7 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('app'),
 );
-if (environment.nodeEnv === 'production') {
+if (import.meta.env.MODE === 'production') {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
@@ -71,7 +71,7 @@ if (environment.nodeEnv === 'production') {
     });
   }
 }
-// if (environment.nodeEnv === 'development') {
+// if (import.meta.env.MODE === 'development') {
 //   navigator.serviceWorker.getRegistrations().then(function (registrations) {
 //     for (let registration of registrations) {
 //       registration.unregister();

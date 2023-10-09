@@ -11,7 +11,7 @@ export const HomeSummaryService: Function = (url: string) => {
       try {
         const fetchHomeData = await axios.get(url);
         const resp: any = fetchHomeData.data;
-        const fetchProjectCentroid = await axios.get(`${environment.baseApiUrl}/projects/centroid/`);
+        const fetchProjectCentroid = await axios.get(`${import.meta.env.API_URL}/projects/centroid/`);
         const projectCentroidResp: any = fetchProjectCentroid.data;
         const addedProjectCentroidOnSummary = resp.map((project) => {
           const findProjectId = projectCentroidResp.find((payload) => payload.id === project.id);

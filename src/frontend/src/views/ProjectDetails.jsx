@@ -85,18 +85,18 @@ const Home = () => {
 
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
         state.projectTaskBoundries,
       );
-      // dispatch(ProjectBuildingGeojsonService(`${environment.baseApiUrl}/projects/${environment.decode(encodedId)}/features`))
+      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(
         ProjectById(
-          `${environment.baseApiUrl}/projects/${environment.decode(encodedId)}`,
+          `${import.meta.env.API_URL}/projects/${environment.decode(encodedId)}`,
           state.projectTaskBoundries,
           environment.decode(encodedId),
         ),
@@ -193,7 +193,7 @@ const Home = () => {
           });
           dispatch(
             ProjectBuildingGeojsonService(
-              `${environment.baseApiUrl}/projects/${decodedId}/features?task_id=${feature?.getId()?.split('_')?.[0]}`,
+              `${import.meta.env.API_URL}/projects/${decodedId}/features?task_id=${feature?.getId()?.split('_')?.[0]}`,
             ),
           );
         }
@@ -278,13 +278,13 @@ const Home = () => {
 
   const handleDownload = (downloadType) => {
     if (downloadType === 'form') {
-      dispatch(DownloadProjectForm(`${environment.baseApiUrl}/projects/download_form/${decodedId}/`, downloadType));
+      dispatch(DownloadProjectForm(`${import.meta.env.API_URL}/projects/download_form/${decodedId}/`, downloadType));
     } else if (downloadType === 'geojson') {
-      dispatch(DownloadProjectForm(`${environment.baseApiUrl}/projects/${decodedId}/download_tasks`, downloadType));
+      dispatch(DownloadProjectForm(`${import.meta.env.API_URL}/projects/${decodedId}/download_tasks`, downloadType));
     }
   };
   const onDataExtractDownload = () => {
-    dispatch(DownloadDataExtract(`${environment.baseApiUrl}/projects/features/download/?project_id=${decodedId}`));
+    dispatch(DownloadDataExtract(`${import.meta.env.API_URL}/projects/features/download/?project_id=${decodedId}`));
   };
 
   return (

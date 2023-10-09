@@ -8,7 +8,7 @@ export const ProjectById = (url, existingProjectList, projectId) => {
       try {
         const project = await CoreModules.axios.get(url);
         const taskBbox = await CoreModules.axios.get(
-          `${environment.baseApiUrl}/tasks/point_on_surface?project_id=${projectId}`,
+          `${import.meta.env.API_URL}/tasks/point_on_surface?project_id=${projectId}`,
         );
         const resp = project.data;
         const persistingValues = resp.project_tasks.map((data) => {
@@ -140,7 +140,7 @@ export const GenerateProjectTiles = (url, payload) => {
     const generateProjectTiles = async (url, payload) => {
       try {
         const response = await CoreModules.axios.get(url);
-        dispatch(GetTilesList(`${environment.baseApiUrl}/projects/tiles_list/${payload}/`));
+        dispatch(GetTilesList(`${import.meta.env.API_URL}/projects/tiles_list/${payload}/`));
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
       } catch (error) {
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));

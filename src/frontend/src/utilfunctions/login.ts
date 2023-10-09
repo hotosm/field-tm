@@ -2,7 +2,7 @@ import environment from '../environment';
 import { createPopup } from './createPopup';
 
 export const createLoginWindow = (redirectTo) => {
-  fetch(`${environment.baseApiUrl}/auth/osm_login/`)
+  fetch(`${import.meta.env.API_URL}/auth/osm_login/`)
     .then((resp) => resp.json())
     .then((resp) => {
       const popup = createPopup('OSM auth', resp.login_url);
@@ -24,12 +24,12 @@ export const createLoginWindow = (redirectTo) => {
 
           const authCode = event.data.authCode;
           const state = event.data.state;
-          const callback_url = `${environment.baseApiUrl}/auth/callback/?code=${authCode}&state=${state}`;
+          const callback_url = `${import.meta.env.API_URL}/auth/callback/?code=${authCode}&state=${state}`;
 
           fetch(callback_url)
             .then((resp) => resp.json())
             .then((res) => {
-              fetch(`${environment.baseApiUrl}/auth/me/`, {
+              fetch(`${import.meta.env.API_URL}/auth/me/`, {
                 headers: {
                   'access-token': res.access_token.access_token,
                 },

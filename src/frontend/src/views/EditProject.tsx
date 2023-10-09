@@ -26,10 +26,10 @@ const EditProject: React.FC = () => {
     },
   };
   useEffect(() => {
-    dispatch(OrganisationService(`${environment.baseApiUrl}/organization/`));
+    dispatch(OrganisationService(`${import.meta.env.API_URL}/organization/`));
 
     if (decodedProjectId) {
-      dispatch(GetIndividualProjectDetails(`${environment.baseApiUrl}/projects/${decodedProjectId}`));
+      dispatch(GetIndividualProjectDetails(`${import.meta.env.API_URL}/projects/${decodedProjectId}`));
     }
   }, [decodedProjectId]);
 

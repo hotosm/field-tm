@@ -17,7 +17,7 @@ const MappingHeader = () => {
 
   return (
     <CoreModules.Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', fontSize: '14px' }}>
-      {environment.nodeEnv === 'development' ? (
+      {import.meta.env.MODE === 'development' ? (
         <div>
           <input type="checkbox" onChange={onToggleOutline}></input>
           <p>Toggle Outline</p>

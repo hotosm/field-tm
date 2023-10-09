@@ -23,10 +23,10 @@ const GenerateMbTiles = ({ setToggleGenerateModal, toggleGenerateModal, projectI
   });
   console.log(projectInfo, 'projectInfo');
   const downloadMbTiles = (tileId) => {
-    dispatch(DownloadTile(`${environment.baseApiUrl}/projects/download_tiles/?tile_id=${tileId}`, projectInfo));
+    dispatch(DownloadTile(`${import.meta.env.API_URL}/projects/download_tiles/?tile_id=${tileId}`, projectInfo));
   };
   const getTilesList = () => {
-    dispatch(GetTilesList(`${environment.baseApiUrl}/projects/tiles_list/${decodedId}/`));
+    dispatch(GetTilesList(`${import.meta.env.API_URL}/projects/tiles_list/${decodedId}/`));
   };
   useEffect(() => {
     //Only fetch tiles list when modal is open
@@ -105,7 +105,7 @@ const GenerateMbTiles = ({ setToggleGenerateModal, toggleGenerateModal, projectI
               // setToggleGenerateModal(false);
               dispatch(
                 GenerateProjectTiles(
-                  `${environment.baseApiUrl}/projects/tiles/${decodedId}?source=${selectedTileSource}`,
+                  `${import.meta.env.API_URL}/projects/tiles/${decodedId}?source=${selectedTileSource}`,
                   decodedId,
                 ),
               );

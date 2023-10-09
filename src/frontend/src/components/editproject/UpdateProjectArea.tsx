@@ -41,7 +41,7 @@ const UpdateProjectArea = ({ projectId }) => {
 
   const generateTasksOnMap = () => {
     dispatch(
-      GetDividedTaskFromGeojson(`${enviroment.baseApiUrl}/projects/preview_tasks/`, {
+      GetDividedTaskFromGeojson(`${import.meta.env.API_URL}/projects/preview_tasks/`, {
         geojson: uploadAOI,
         dimension: projectBoundaryDetails?.dimension,
       }),
@@ -51,7 +51,7 @@ const UpdateProjectArea = ({ projectId }) => {
     e.preventDefault();
     dispatch(
       EditProjectBoundaryService(
-        `${enviroment.baseApiUrl}/projects/edit_project_boundary/${projectId}/`,
+        `${import.meta.env.API_URL}/projects/edit_project_boundary/${projectId}/`,
         uploadAOI,
         projectBoundaryDetails?.dimension,
       ),
