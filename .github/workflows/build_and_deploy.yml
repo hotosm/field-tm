@@ -54,7 +54,7 @@ jobs:
         "ghcr.io/hotosm/fmtm/frontend:latest"
       build_args: |
         APP_VERSION=${{ needs.extract-vars.outputs.frontend_main_version }}
-        API_URL=${{ needs.extract-vars.outputs.api_url }}
+        VITE_API_URL=${{ needs.extract-vars.outputs.api_url }}
 
   smoke-test-backend:
     runs-on: ubuntu-latest
