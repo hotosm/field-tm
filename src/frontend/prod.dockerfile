@@ -2,16 +2,13 @@ FROM docker.io/node:18 as builder
 ARG MAINTAINER=admin@hotosm.org
 
 ARG APP_VERSION
-ARG API_URL
-ENV API_URL="${API_URL}"
-ARG FRONTEND_MAIN_URL
-ENV FRONTEND_MAIN_URL="${FRONTEND_MAIN_URL}"
+ARG VITE_API_URL
+ENV VITE_API_URL="${VITE_API_URL}"
 
 LABEL org.hotosm.fmtm.app-name="fmtm-frontend" \
       org.hotosm.fmtm.app-version="${APP_VERSION}" \
       org.hotosm.fmtm.maintainer="${MAINTAINER}" \
-      org.hotosm.fmtm.api-url="${API_URL}" \
-      org.hotosm.fmtm.main-url="${FRONTEND_MAIN_URL}"
+      org.hotosm.fmtm.api-url="${VITE_API_URL}"
 
 WORKDIR /app
 COPY ./package*.json ./

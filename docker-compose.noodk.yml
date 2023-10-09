@@ -86,9 +86,7 @@ services:
       context: src/frontend
       dockerfile: debug.dockerfile
       args:
-        APP_VERSION: ${FRONTEND_MAIN_VERSION}
-        API_URL: ${URL_SCHEME}://${API_URL}
-        FRONTEND_MAIN_URL: ${URL_SCHEME}://${FRONTEND_MAIN_URL}
+        VITE_API_URL: ${URL_SCHEME}://${API_URL}
     container_name: fmtm
     depends_on:
       - api
@@ -96,8 +94,10 @@ services:
       - ./src/frontend:/app
       - /app/node_modules/
     environment:
-      - API_URL=${URL_SCHEME}://${API_URL}
-      - FRONTEND_MAIN_URL=${URL_SCHEME}://${FRONTEND_MAIN_URL}
+      - VITE_API_URL=${URL_SCHEME}://${API_URL}
+      - VITE_ODK_CENTRAL_URL=${ODK_CENTRAL_URL}
+      - VITE_ODK_CENTRAL_USER=${ODK_CENTRAL_USER}
+      - VITE_ODK_CENTRAL_PASSWD=${ODK_CENTRAL_PASSWD}
     ports:
       - "8081:8081"
     networks:
