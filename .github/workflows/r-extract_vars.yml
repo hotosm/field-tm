@@ -18,9 +18,6 @@ on:
       api_url:
         description: "URL to access the backend API."
         value: ${{ jobs.extract-vars.outputs.api_url }}
-      frontend_main_url:
-        description: "URL to access the main frontend."
-        value: ${{ jobs.extract-vars.outputs.frontend_main_url }}
 
 jobs:
   extract-vars:
@@ -30,7 +27,6 @@ jobs:
       api_version: ${{ steps.extract_api_version.outputs.api_version }}
       frontend_main_version: ${{ steps.extract_frontend_version.outputs.frontend_main_version }}
       api_url: ${{ steps.get_env_vars.outputs.api_url }}
-      frontend_main_url: ${{ steps.get_env_vars.outputs.frontend_main_url }}
 
     steps:
       - name: Checkout repository
@@ -55,5 +51,3 @@ jobs:
         run: |
           echo "api_url: ${{ vars.URL_SCHEME }}://${{ vars.API_URL }}"
           echo "api_url=${{ vars.URL_SCHEME }}://${{ vars.API_URL }}" >> $GITHUB_OUTPUT
-          echo "frontend_main_url: ${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}"
-          echo "frontend_main_url=${{ vars.URL_SCHEME }}://${{ vars.FRONTEND_MAIN_URL }}" >> $GITHUB_OUTPUT
