@@ -5,6 +5,9 @@ ARG FRONTEND_MAIN_URL
 ENV FRONTEND_MAIN_URL="${FRONTEND_MAIN_URL}"
 WORKDIR /app
 COPY ./package*.json ./
-RUN npm install
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN pnpm install
 ENV NODE_ENV development
 ENTRYPOINT ["npm", "run", "start:live"]

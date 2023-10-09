@@ -1,9 +1,9 @@
 export default {
-  nodeEnv: process.env.NODE_ENV,
-  baseApiUrl: process.env.API_URL,
-  odkCentralUrl: process.env.ODK_CENTRAL_URL,
-  odkCentralUser: process.env.ODK_CENTRAL_USER,
-  odkCentralPass: process.env.ODK_CENTRAL_PASSWD,
+  nodeEnv: import.meta.env.NODE_ENV,
+  baseApiUrl: import.meta.env.API_URL,
+  odkCentralUrl: import.meta.env.ODK_CENTRAL_URL,
+  odkCentralUser: import.meta.env.ODK_CENTRAL_USER,
+  odkCentralPass: import.meta.env.ODK_CENTRAL_PASSWD,
   decode: (id: any) => {
     const decodeFromBase = window.atob(id);
     const binary = decodeFromBase;

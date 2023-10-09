@@ -28,7 +28,7 @@ The FMTM web app is a Python/Flask/Leaflet app that serves as a frontend for the
 The FMTM codebase consists of:
 
 - An API backend in FastAPI (code in: `src/backend`)
-- A frontend website (soon to be a PWA) in react (code in: `src/frontend`)
+- A frontend website in React (code in: `src/frontend`)
 
 ### Manager Web Interface (with PC browser-friendlymap view)
 

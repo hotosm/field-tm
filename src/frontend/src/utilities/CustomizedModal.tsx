@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { styled, Box, Theme } from '@mui/system';
-import Modal from '@mui/base/ModalUnstyled';
+import { Modal } from '@mui/base/Modal';
 
 export default function CustomizedModal({ style = defaultStyle, children, isOpen, toggleOpen }) {
   const handleClose = () => toggleOpen(false);
