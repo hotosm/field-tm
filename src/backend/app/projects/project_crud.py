@@ -2119,7 +2119,7 @@ async def update_project_form(
     db.commit()
 
     # OSM Extracts for whole project
-    pg = PostgresClient(settings.UNDERPASS_API_URL, "underpass")
+    pg = PostgresClient("underpass")
     outfile = (
         f"/tmp/{project_title}_{category}.geojson"  # This file will store osm extracts
     )

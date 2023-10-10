@@ -22,13 +22,11 @@ from fastapi import HTTPException
 from geoalchemy2.shape import from_shape
 from geojson import dump
 from loguru import logger as log
-from osm_fieldwork.make_data_extract import PostgresClient
+from osm_rawdata.postgres import PostgresClient
 from shapely.geometry import shape
 from sqlalchemy import column, select, table
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-
-from app.config import settings
 
 from ..central import central_crud
 from ..db import db_models
@@ -332,7 +330,7 @@ async def update_task_files(
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
 
     # Update data extracts in the odk central
-    pg = PostgresClient(settings.UNDERPASS_API_URL, "underpass")
+    pg = PostgresClient("underpass")
 
     category = "buildings"
 
