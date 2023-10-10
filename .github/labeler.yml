@@ -8,7 +8,10 @@
   - "docker-*.yml"
   - "**/Dockerfile"
   - "**/*.dockerfile"
+  - "**/*entrypoint.sh"
   - "josm/**/*"
+"migration":
+  - "src/backend/migrations/**/*"
 "documentation":
   - "docs/**/*"
   - "images/**/*"
