@@ -1,0 +1,19 @@
+"frontend":
+  - "src/frontend/**/*"
+"backend":
+  - "src/backend/**/*"
+"devops":
+  - ".github/**/*"
+  - "scripts/**/*"
+  - "docker-*.yml"
+  - "**/Dockerfile"
+  - "**/*.dockerfile"
+  - "josm/**/*"
+"documentation":
+  - "docs/**/*"
+  - "images/**/*"
+  - "mkdocs.yml"
+  - "README.md"
+  - "INSTALL.md"
+"ODK":
+  - "odkcentral/**/*"
