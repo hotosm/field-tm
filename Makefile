@@ -19,13 +19,14 @@
 # All python source files
 # MDS := $(wildcard ./docs/*.md)
 MDS := \
-	docs/DEV-1.-Getting-Started.md \
-	docs/DEV-2.-Backend.md \
-	docs/DEV-3.-Frontend.md \
-	docs/DEV-4.-Database-Tips.md \
-	docs/DEV-5.-Docker-Tips.md \
-	docs/DEV-6.-Production-Deployment.md \
-	docs/User-Manual-For-Project-Managers.md
+	docs/dev/Backend.md \
+	docs/dev/Database-Tips.md \
+	docs/dev/Deployment-Flow.md \
+	docs/dev/Docker-Tips.md \
+	docs/dev/Frontend.md \
+	docs/dev/Production.md \
+	docs/dev/Setup.md \
+	docs/dev/Troubleshooting.md \
 
 PDFS := $(MDS:.md=.pdf)
 

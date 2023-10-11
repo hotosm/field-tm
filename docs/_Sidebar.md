@@ -24,4 +24,6 @@
 
 [6. Production Deployment](https://github.com/hotosm/fmtm/wiki/dev/Production)
 
-[7. Troubleshooting](https://github.com/hotosm/fmtm/wiki/dev/Troubleshooting)
+[7. Deployment Flow](https://github.com/hotosm/fmtm/wiki/dev/Deployment-Flow)
+
+[8. Troubleshooting](https://github.com/hotosm/fmtm/wiki/dev/Troubleshooting)
