@@ -24,18 +24,32 @@
       "contributions": ["maintenance", "mentoring", "code", "review", "ideas"]
     },
     {
+      "login": "spwoodcock",
+      "name": "Sam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78538841?v=4",
+      "profile": "https://github.com/spwoodcock",
+      "contributions": ["code", "review", "infra", "ideas", "maintenance"]
+    },
+    {
+      "login": "varun2948",
+      "name": "Deepak Pradhan (Varun)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/37866666?v=4",
+      "profile": "https://github.com/varun2948",
+      "contributions": ["code", "ideas", "maintenance"]
+    },
+    {
+      "login": "nrjadkry",
+      "name": "Niraj Adhikari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41701707?v=4",
+      "profile": "https://github.com/nrjadkry",
+      "contributions": ["code", "ideas", "maintenance"]
+    },
+    {
       "login": "krtonga",
       "name": "krtonga",
       "avatar_url": "https://avatars.githubusercontent.com/u/7307817?v=4",
       "profile": "https://github.com/krtonga",
       "contributions": ["code", "doc", "tool", "ideas"]
-    },
-    {
-      "login": "spwoodcock",
-      "name": "Sam",
-      "avatar_url": "https://avatars.githubusercontent.com/u/78538841?v=4",
-      "profile": "https://github.com/spwoodcock",
-      "contributions": ["code", "review", "infra", "ideas"]
     },
     {
       "login": "petya-kangalova",
@@ -45,10 +59,31 @@
       "contributions": ["doc", "eventOrganizing", "ideas"]
     },
     {
+      "login": "Sujanadh",
+      "name": "Sujan Adhikari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/109404840?v=4",
+      "profile": "https://github.com/Sujanadh",
+      "contributions": ["code"]
+    },
+    {
       "login": "Mudi-business",
       "name": "Mohamed Bakari Mohamed",
       "avatar_url": "https://avatars.githubusercontent.com/u/52991565?v=4",
       "profile": "http://zanrevenue.org",
+      "contributions": ["code"]
+    },
+    {
+      "login": "NSUWAL123",
+      "name": "Nishit Suwal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/81785002?v=4",
+      "profile": "https://github.com/NSUWAL123",
+      "contributions": ["code"]
+    },
+    {
+      "login": "biomassives",
+      "name": "G. Willson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
+      "profile": "https://www.scdhub.org",
       "contributions": ["code"]
     },
     {
@@ -64,13 +99,6 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/97789856?v=4",
       "profile": "https://github.com/neelimagoogly",
       "contributions": ["doc"]
-    },
-    {
-      "login": "biomassives",
-      "name": "G. Willson",
-      "avatar_url": "https://avatars.githubusercontent.com/u/4379874?v=4",
-      "profile": "https://www.scdhub.org",
-      "contributions": ["code"]
     },
     {
       "login": "Ndacyayisenga-droid",
