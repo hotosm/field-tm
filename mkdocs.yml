@@ -72,6 +72,7 @@ nav:
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
       - Production Deployment: dev/Production.md
+      - Deployment Flow: dev/Deployment-Flow.md
       - Docker Tips: dev/Docker-Tips.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
