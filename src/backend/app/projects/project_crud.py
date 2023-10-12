@@ -402,7 +402,10 @@ def update_multi_polygon_project_boundary(
             return False
 
         # Update the boundary polyon on the database.
-        polygons = boundary["features"]
+        if boundary["type"] == "Feature":
+            polygons = [boundary]
+        else:
+            polygons = boundary["features"]
         log.debug(f"Processing {len(polygons)} task geometries")
         for polygon in polygons:
             # If the polygon is a MultiPolygon, convert it to a Polygon
@@ -769,7 +772,6 @@ def split_polygon_into_tasks(
         )
         return []
 
-    features = json.loads(features)
     log.debug(f"Project {project_id} split into {len(features)} tasks")
     return features
 
