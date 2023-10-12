@@ -3,12 +3,14 @@ import { useOLMap } from '../MapComponent/OpenLayersComponent';
 import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import { ClusterLayer } from '../MapComponent/OpenLayersComponent/Layers';
 import CoreModules from '../../shared/CoreModules';
 import { geojsonObjectModel } from '../../constants/geojsonObjectModal';
 import { defaultStyles, getStyles } from '../MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MarkerIcon from '../../assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
 import environment from '../../environment';
+import { Style, Text, Icon, Fill } from 'ol/style';
 
 type HomeProjectSummaryType = {
   features: { geometry: any; properties: any; type: any }[];
@@ -21,20 +23,39 @@ type HomeProjectSummaryType = {
   };
 };
 
-const projectGeojsonLayerStyle = {
-  ...defaultStyles,
-  fillOpacity: 0,
-  lineColor: '#ffffff',
-  labelFontSize: 20,
-  lineThickness: 7,
-  lineOpacity: 40,
-  showLabel: true,
-  labelField: 'project_id',
-  labelOffsetY: 35,
-  labelFontWeight: 'bold',
-  labelMaxResolution: 10000,
-  icon: { scale: [0.09, 0.09], url: MarkerIcon },
+// const projectGeojsonLayerStyle = {
+//   ...defaultStyles,
+//   fillOpacity: 0,
+//   lineColor: '#ffffff',
+//   labelFontSize: 20,
+//   lineThickness: 7,
+//   lineOpacity: 40,
+//   showLabel: true,
+//   labelField: 'project_id',
+//   labelOffsetY: 35,
+//   labelFontWeight: 'bold',
+//   labelMaxResolution: 10000,
+//   icon: { scale: [0.09, 0.09], url: MarkerIcon },
+// };
+
+const getIndividualStyle = (featureProperty) => {
+  const style = new Style({
+    image: new Icon({
+      src: MarkerIcon,
+      scale: 0.08,
+    }),
+    text: new Text({
+      text: featureProperty?.project_id,
+      fill: new Fill({
+        color: 'black',
+      }),
+      offsetY: 35,
+      font: '20px Times New Roman',
+    }),
+  });
+  return style;
 };
+
 const ProjectListMap = () => {
   const navigate = useNavigate();
 
@@ -67,7 +88,6 @@ const ProjectListMap = () => {
   }, [homeProjectSummary]);
 
   const projectClickOnMap = (properties: any) => {
-    console.log(properties);
     const encodedProjectId = environment.encode(properties.id);
     navigate(`/project_details/${encodedProjectId}`);
   };
@@ -85,7 +105,7 @@ const ProjectListMap = () => {
           }}
         >
           <LayerSwitcherControl visible={'outdoors'} />
-          {projectGeojson && projectGeojson?.features?.length > 0 && (
+          {/* {projectGeojson && projectGeojson?.features?.length > 0 && (
             <VectorLayer
               geojson={projectGeojson}
               style={projectGeojsonLayerStyle}
@@ -123,8 +143,23 @@ const ProjectListMap = () => {
               //   // selectedFeature.setStyle();
               // }}
             />
+          )} */}
+          {projectGeojson && projectGeojson?.features?.length > 0 && (
+            <ClusterLayer
+              map={map}
+              source={projectGeojson}
+              zIndex={100}
+              visibleOnMap={true}
+              style={{
+                ...defaultStyles,
+                background_color: '#D73F37',
+                color: '#eb9f9f',
+                opacity: 90,
+              }}
+              mapOnClick={projectClickOnMap}
+              getIndividualStyle={getIndividualStyle}
+            />
           )}
-          {/* )} */}
         </MapComponent>
       </div>
     </div>
