@@ -59,6 +59,7 @@ def get_application() -> FastAPI:
             "url": "https://raw.githubusercontent.com/hotosm/fmtm/main/LICENSE",
         },
         debug=settings.DEBUG,
+        root_path=settings.API_PREFIX,
     )
 
     # Set custom logger
