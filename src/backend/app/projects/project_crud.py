@@ -402,7 +402,7 @@ def update_multi_polygon_project_boundary(
             return False
 
         # Update the boundary polyon on the database.
-        if boundary["type"]=="Feature":
+        if boundary["type"] == "Feature":
             polygons = [boundary]
         else:
             polygons = boundary["features"]
