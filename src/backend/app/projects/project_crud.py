@@ -772,7 +772,6 @@ def split_polygon_into_tasks(
         )
         return []
 
-    features = json.loads(features)
     log.debug(f"Project {project_id} split into {len(features)} tasks")
     return features
 
