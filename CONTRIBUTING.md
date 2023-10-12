@@ -16,7 +16,15 @@ Right now, we are in the process of building the prototype. We warmly welcome yo
 
 Create pull requests (PRs) for changes that you think are needed. We would really appreciate your help!
 
-In fact, we are specifically looking for input from developers with **Python skills** and **familiarity with Fast API**.
+Skills with the following would be beneficial:
+- Python
+- FastAPI
+- Javascript
+- React
+- Docker
+- CI/CD workflows
+
+Our latest task board can be found [here](https://github.com/orgs/hotosm/projects/22).
 
 ## Report bugs and suggest improvements
 

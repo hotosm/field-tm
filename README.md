@@ -22,12 +22,14 @@
 
 🕮 [Documentation](https://hotosm.github.io/fmtm/)
 
-A project to provide tools for Open Mapping campaigns
+🎯 [Task Board](https://github.com/orgs/hotosm/projects/22)
+
+A project to provide tools for Open Mapping campaigns.
 
 While we have pretty good field mapping applications,
 we don’t have great tools to coordinate field mapping.
 However, we have most of the elements needed to create a field mapping-oriented
-version of the HOT Tasking Manager,
+version of the [HOT Tasking Manager](https://tasks.hotosm.org),
 which allows people to select specific areas and
 complete tasks in a coordinated, organized fashion.
 
@@ -68,7 +70,7 @@ To aid future diaster response, we would really welcome developer
 
 ## How to contribute
 
-👍🎉We are actively looking for contributors for this project- from design,
+👍🎉We are actively looking for contributors for this project - from design,
 user testing and both front and backend developers.
 We have a specific request for volunteer developers at the moment!
 ![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
@@ -206,7 +208,7 @@ A computer-screen-optimized web app that allows Campaign Managers to:
 
 - Click on Submit button.
 
-#### FMTM back end
+#### FMTM Backend
 
 A back end that converts the project parameters entered by the Campaign Manager in
 the Manager Web Interface into a corresponding ODK Central project.
