@@ -66,7 +66,7 @@ const Home = () => {
                     className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
                       !showMapStatus
                         ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
-                        : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[33rem] lg:fmtm-overflow-y-scroll lg:scrollbar fmtm-pr-1'
+                        : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[33rem] lg:fmtm-overflow-y-scroll lg:scrollbar'
                     }`}
                   >
                     {filteredProjectCards.map((value, index) => (

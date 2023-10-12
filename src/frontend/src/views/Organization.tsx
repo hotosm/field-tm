@@ -6,11 +6,6 @@ import { OrganizationDataService } from '../api/OrganizationService';
 
 const Organization = () => {
   const cardStyle = {
-    width: {
-      xs: 350,
-      sm: 440,
-      lg: 862,
-    },
     padding: 2,
     display: 'flex',
     flexDirection: 'row',
@@ -42,17 +37,17 @@ const Organization = () => {
 
   return (
     <CoreModules.Box
-      sx={{ display: 'flex', flexDirection: 'column', background: '#f0efef', flex: 1, gap: 2, paddingLeft: '4.5%' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#f0efef',
+        flex: 1,
+        gap: 2,
+      }}
+      className="fmtm-px-[4.5%]"
     >
-      <CoreModules.Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingTop: '2%',
-          gap: 2,
-        }}
-      >
-        <CoreModules.Typography variant="condensed">MANAGE ORGANIZATIONS</CoreModules.Typography>
+      <CoreModules.Box className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-items-center fmtm-pt-5 fmtm-gap-2 sm:fmtm-gap-4">
+        <h1 className="fmtm-text-[1.5rem] lg:fmtm-text-[2.25rem] fmtm-font-bold">MANAGE ORGANIZATIONS</h1>
         <CoreModules.Link to={'/createOrganization'}>
           <CoreModules.Button
             variant="outlined"
@@ -111,17 +106,10 @@ const Organization = () => {
               </CoreModules.InputAdornment>
             ),
           }}
-          sx={{ width: '20%' }}
+          className="fmtm-min-w-[14rem] lg:fmtm-w-[20%]"
         />
       </CoreModules.Box>
-      <CoreModules.Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          sm: { flexWrap: 'nowrap' },
-          gap: 2,
-        }}
-      >
+      <CoreModules.Box className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-5">
         {filteredCardData?.map((data, index) => (
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.CardMedia
@@ -134,19 +122,18 @@ const Organization = () => {
               sx={{ width: '150px' }}
             />
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <CoreModules.Typography variant="subtitle1" sx={{ textTransform: 'uppercase' }}>
+              <CoreModules.Typography
+                variant="subtitle1"
+                sx={{ textTransform: 'uppercase' }}
+                className="fmtm-line-clamp-1"
+                title={data.name}
+              >
                 {data.name}
               </CoreModules.Typography>
               <CoreModules.Typography
                 variant="subtitle3"
-                sx={{
-                  display: '-webkit-box',
-                  '-webkit-line-clamp': 2,
-                  '-webkit-box-orient': 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxHeight: '4.5em',
-                }}
+                title={data.description}
+                className="fmtm-max-h-[4.5em] fmtm-line-clamp-2"
               >
                 {data.description}
               </CoreModules.Typography>
