@@ -9,6 +9,7 @@ import { ConvertXMLToJOSM, fetchConvertToOsmDetails, fetchInfoTask, getDownloadP
 import AssetModules from '../shared/AssetModules';
 import { ProjectById } from '../api/Project';
 import ProjectInfoCountCard from '../components/ProjectInfo/ProjectInfoCountCard';
+import { CommonActions } from '../store/slices/CommonSlice';
 
 const boxStyles = {
   animation: 'blink 1s infinite',
@@ -98,19 +99,62 @@ const ProjectInfo = () => {
     );
   };
 
+  // useEffect(() => {
+  //   const fetchData = () => {
+  //     dispatch(fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`));
+  //   };
+  //   fetchData();
+  //   let interval;
+  //   if (isMonitoring) {
+  //     interval = setInterval(fetchData, 3000);
+  //   } else {
+  //     clearInterval(interval);
+  //   }
+
+  //   return () => clearInterval(interval);
+  // }, [dispatch, isMonitoring]);
+
   useEffect(() => {
     const fetchData = () => {
       dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/tasks-features/?project_id=${decodedId}`));
     };
     fetchData();
-    let interval;
-    if (isMonitoring) {
-      interval = setInterval(fetchData, 3000);
-    } else {
-      clearInterval(interval);
-    }
+  }, []);
 
-    return () => clearInterval(interval);
+  useEffect(() => {
+    let isFetching = false; // Flag to track whether an API call is in progress
+    const fetchInfoTask = async (url) => {
+      if (!isFetching) {
+        isFetching = true; // Set the flag to true to indicate an API call is in progress
+        dispatch(CoreModules.TaskActions.SetTaskLoading(true));
+        dispatch(CommonActions.SetLoading(true));
+        try {
+          const fetchTaskInfoDetailsResponse = await CoreModules.axios.get(url);
+          dispatch(CommonActions.SetLoading(false));
+          dispatch(CoreModules.TaskActions.SetTaskLoading(false));
+          dispatch(CoreModules.TaskActions.FetchTaskInfoDetails(fetchTaskInfoDetailsResponse.data));
+        } catch (error) {
+          dispatch(CommonActions.SetLoading(false));
+          dispatch(CoreModules.TaskActions.SetTaskLoading(false));
+        } finally {
+          isFetching = false; // Reset the flag after the API call is completed
+        }
+      }
+    };
+
+    const url = `${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`;
+
+    let timeout;
+    const fetchData = () => {
+      fetchInfoTask(url);
+      timeout = setTimeout(fetchData, 3000); // Call fetchData again after 3 seconds
+    };
+
+    if (isMonitoring) {
+      fetchData(); // Initial call to start fetching data
+    }
+    // Cleanup: Clear any pending setTimeout when component is unmounted
+    return () => clearTimeout(timeout);
   }, [dispatch, isMonitoring]);
 
   const handleMonitoring = () => {

@@ -106,7 +106,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
 
       {/* Create New Project Button  */}
       <div className="fmtm-px-4 fmtm-py-3 ">
-        <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
+        <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-items-center fmtm-gap-4">
           <h5 className="fmtm-text-2xl">PROJECTS</h5>
           <CoreModules.Link
             to={'/create-project'}
@@ -114,17 +114,17 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
               textDecoration: 'none',
             }}
           >
-            <button className="fmtm-bg-primaryRed fmtm-px-4 fmtm-py-2 fmtm-rounded fmtm-w-auto fmtm-text-white fmtm-uppercase">
+            <button className="fmtm-bg-primaryRed fmtm-text-sm sm:fmtm-text-[1rem] fmtm-px-4 fmtm-py-2 fmtm-rounded fmtm-w-auto fmtm-text-white fmtm-uppercase">
               + Create New Project{' '}
             </button>
           </CoreModules.Link>
         </div>
-        <div className="fmtm-flex fmtm-justify-between">
+        <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 sm:fmtm-flex-row sm:fmtm-justify-between">
           <div className="fmtm-mt-3 fmtm-flex fmtm-items-center fmtm-gap-1">
-            <div className=" fmtm-border-[#E7E2E2] fmtm-border-2 fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-p-2 fmtm-items-center">
+            <div className=" fmtm-border-[#E7E2E2] fmtm-border-2 sm:fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-p-2 fmtm-items-center">
               <input
                 type="search"
-                className="fmtm-h-7 fmtm-p-2"
+                className="fmtm-h-7 fmtm-p-2 fmtm-w-full fmtm-outline-none"
                 placeholder="Search Projects"
                 onChange={(e) => onSearch(e.target.value)}
               ></input>
