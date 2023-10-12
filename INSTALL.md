@@ -22,8 +22,8 @@
 
 Before you can install and use this application, you will need to have the following software installed and configured on your system
 
-- Git(or any other Terminal)
-- Docker
+- [Git(or any other Terminal)](https://git-scm.com/)
+- [Docker](https://docs.docker.com/)
 
 To install Git, please follow the instructions on the official Git website:
 
