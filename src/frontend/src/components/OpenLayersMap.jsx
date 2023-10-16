@@ -21,6 +21,8 @@ import Button from './common/Button';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import TaskSectionModal from './ProjectDetails/TaskSectionPopup';
 import VectorLayer from 'ol/layer/Vector';
+import WindowDimension from '../hooks/WindowDimension';
+
 let currentLocationLayer = null;
 const OpenLayersMap = ({
   defaultTheme,
@@ -40,6 +42,8 @@ const OpenLayersMap = ({
   const [currentLocLayer, setCurrentLocLayer] = useState(null);
   const dispatch = CoreModules.useAppDispatch();
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
+  const { windowSize } = WindowDimension();
+
   function elastic(t) {
     return Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1;
   }
@@ -177,7 +181,9 @@ const OpenLayersMap = ({
         btnDiv.className = 'ol-unselectable ol-control';
         index == 0
           ? (btnDiv.style.top = `${(btnsPosition = btnsPosition + 2)}%`)
-          : (btnDiv.style.top = `${(btnsPosition = btnsPosition + 9)}%`);
+          : windowSize.width >= 640
+          ? (btnDiv.style.top = `${(btnsPosition = btnsPosition + 9)}%`)
+          : (btnDiv.style.top = `${(btnsPosition = btnsPosition + 6)}%`);
         btnDiv.appendChild(btn);
         var control = new Control({
           element: btnDiv,
@@ -322,13 +328,17 @@ const OpenLayersMap = ({
   }, [map, currentLocLayer]);
 
   return (
-    <CoreModules.Stack spacing={1} direction={'column'} className="fmtm-px-0 sm:fmtm-px-[1rem] fmtm-py-[1rem]">
+    <CoreModules.Stack spacing={1} direction={'column'} className="fmtm-px-0 sm:fmtm-px-[1rem] sm:fmtm-py-[1rem]">
       <CoreModules.Stack
         id="project-details-map"
         // style={{ border: `4px solid ${defaultTheme.palette.error.main}` }}
         justifyContent={'center'}
-        height={608}
-        className="fmtm-border-y-[4px] sm:fmtm-border-x-[4px] fmtm-border-primaryRed"
+        // height={608}
+        className={`${
+          windowSize.width <= 640
+            ? 'fmtm-h-[100vh]'
+            : 'fmtm-border-y-[4px] sm:fmtm-border-x-[4px] fmtm-border-primaryRed fmtm-h-[608px]'
+        }`}
       >
         <div ref={mapElement} id="map_container"></div>
         {/* <div id="popup" className="ol-popup">

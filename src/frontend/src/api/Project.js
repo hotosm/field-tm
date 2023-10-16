@@ -44,6 +44,7 @@ export const ProjectById = (url, existingProjectList, projectId) => {
             title: resp.project_info?.[0]?.name,
             location_str: resp.location_str,
             description: resp.project_info[0]?.description,
+            short_description: resp.project_info[0]?.short_description,
             num_contributors: resp.num_contributors,
             total_tasks: resp.total_tasks,
             tasks_mapped: resp.tasks_mapped,

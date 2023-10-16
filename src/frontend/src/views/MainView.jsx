@@ -46,18 +46,28 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams !== 'true' && (
+            {popupInParams === 'true' || (location.pathname.includes('project_details') && windowSize.width <= 640) ? (
+              <div></div>
+            ) : (
               <div>
                 <MappingHeader />
                 <PrimaryAppBar />
               </div>
             )}
             <CoreModules.Stack
-              className={`mainview fmtm-py-[1.3rem] ${
-                location.pathname.includes('project_details') ? 'fmtm-px-0 sm:fmtm-px-[1.3rem]' : 'fmtm-px-[1.3rem]'
+              className={`mainview ${
+                location.pathname.includes('project_details')
+                  ? 'fmtm-px-0 sm:fmtm-px-[1.3rem] sm:fmtm-py-[1.3rem]'
+                  : 'fmtm-px-[1.3rem] fmtm-py-[1.3rem]'
               }`}
               sx={{
-                height: popupInParams ? '100vh' : windowSize.width <= 599 ? '90vh' : '92vh',
+                height: popupInParams
+                  ? '100vh'
+                  : location.pathname.includes('project_details') && windowSize.width <= 640
+                  ? '100vh'
+                  : windowSize.width <= 599
+                  ? '90vh'
+                  : '92vh',
                 overflow: 'auto',
                 // p: '1.3rem',
               }}
