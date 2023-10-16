@@ -43,6 +43,9 @@ import {
   Settings as SettingsIcon,
   DriveFolderUpload as DriveFolderUploadIcon,
   KeyboardArrowUp as KeyboardArrowUpIcon,
+  Info as InfoIcon,
+  MoreVert as MoreVertIcon,
+  LocationOn as LocationOnIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -96,4 +99,7 @@ export default {
   SettingsIcon,
   DriveFolderUploadIcon,
   KeyboardArrowUpIcon,
+  InfoIcon,
+  MoreVertIcon,
+  LocationOnIcon,
 };

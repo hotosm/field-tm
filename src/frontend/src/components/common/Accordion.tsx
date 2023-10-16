@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import AssetModules from '../../shared/AssetModules';
 
+interface IAccordion {
+  collapsed?: boolean;
+  header: any;
+  body: any;
+  className?: string;
+  onToggle: any;
+  description?: string;
+  disableHeaderClickToggle?: boolean;
+}
+
 export default function Accordion({
   collapsed: isCollapsed,
   header,
@@ -9,7 +19,7 @@ export default function Accordion({
   onToggle,
   description,
   disableHeaderClickToggle,
-}) {
+}: IAccordion) {
   const [collapsed, setCollapsed] = useState(isCollapsed);
 
   useEffect(() => {

@@ -114,7 +114,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   }, [taskDisplay, state, searchText]);
 
   return (
-    <CoreModules.Stack p={2.5} width={'100%'} spacing={2}>
+    <CoreModules.Stack width={'100%'} spacing={2} className="sm:fmtm-p-4">
       <CoreModules.Typography
         variant="h1"
         fontSize={defaultTheme.typography.htmlFontSize}
