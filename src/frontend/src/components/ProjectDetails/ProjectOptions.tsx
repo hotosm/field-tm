@@ -1,10 +1,8 @@
-import Accordion from '../../components/common/Accordion';
 import React, { useState } from 'react';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 import environment from '../../environment';
 import { DownloadDataExtract, DownloadProjectForm } from '../../api/Project';
-import MapLegends from '../../components/MapLegends';
 
 const ProjectOptions = ({ setToggleGenerateModal }) => {
   const dispatch = CoreModules.useAppDispatch();
@@ -13,7 +11,6 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
   const [toggleAction, setToggleAction] = useState(false);
   const downloadProjectFormLoading = CoreModules.useAppSelector((state) => state.project.downloadProjectFormLoading);
   const downloadDataExtractLoading = CoreModules.useAppSelector((state) => state.project.downloadDataExtractLoading);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const encodedId = params.id;
   const decodedId = environment.decode(encodedId);
@@ -35,8 +32,8 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
     );
   };
   return (
-    <div className="fmtm-mt-4">
-      <div>
+    <div className="sm:fmtm-mt-4">
+      {/* <div>
         <div
           className={`fmtm-flex fmtm-gap-5 fmtm-py-4 sm:fmtm-hidden fmtm-justify-between  fmtm-items-center fmtm-mx-4 sm:fmtm-mx-7 fmtm-mb-2 ${
             toggleAction ? 'fmtm-border-b-[#929DB3] fmtm-border-b-[1px]' : ''
@@ -56,13 +53,20 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
             />
           </div>
         </div>
-      </div>
-      <div
+      </div> */}
+      {/* <div
         className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-6 lg:fmtm-gap-0 fmtm-px-3 sm:fmtm-px-0 ${
           toggleAction ? '' : 'fmtm-hidden sm:fmtm-flex'
         }`}
+      > */}
+      <div className="fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2 fmtm-mb-4 sm:fmtm-hidden">
+        <AssetModules.ListViewIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '35px' }} />
+        <p className="fmtm-text-2xl">Project Options</p>
+      </div>
+      <div
+        className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-6 lg:fmtm-gap-0 fmtm-px-3 sm:fmtm-px-0 sm:fmtm-flex`}
       >
-        <div className="fmtm-w-full fmtm-flex fmtm-flex-col fmtm-items-start sm:fmtm-flex-row  sm:fmtm-justify-center lg:fmtm-justify-start sm:fmtm-items-center fmtm-gap-6 fmtm-ml-2 sm:fmtm-ml-4">
+        <div className="fmtm-w-full fmtm-flex fmtm-flex-col fmtm-items-start sm:fmtm-flex-row  sm:fmtm-justify-center lg:fmtm-justify-start sm:fmtm-items-center fmtm-gap-6  sm:fmtm-ml-4">
           <CoreModules.LoadingButton
             onClick={() => handleDownload('form')}
             sx={{ width: 'unset' }}
@@ -98,7 +102,7 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
             Data Extract
           </CoreModules.LoadingButton>
         </div>
-        <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full fmtm-ml-2 sm:fmtm-ml-4 fmtm-gap-6">
+        <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full sm:fmtm-ml-4 fmtm-gap-6">
           <CoreModules.Link
             to={`/projectInfo/${encodedId}`}
             style={{
@@ -139,19 +143,6 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
               Edit Project
             </CoreModules.Button>
           </CoreModules.Link>
-        </div>
-        <div className="fmtm-px-1 sm:fmtm-hidden">
-          <Accordion
-            collapsed={true}
-            disableHeaderClickToggle
-            onToggle={() => {}}
-            header={<div className="fmtm-text-[#2C3038] fmtm-font-bold fmtm-text-xl">Map Legends</div>}
-            body={
-              <div className="fmtm-mt-4">
-                <MapLegends defaultTheme={defaultTheme} />
-              </div>
-            }
-          />
         </div>
       </div>
     </div>
