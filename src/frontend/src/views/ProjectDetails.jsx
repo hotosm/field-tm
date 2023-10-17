@@ -423,10 +423,20 @@ const Home = () => {
                 <img src={FmtmLogo} alt="Hot Fmtm Logo" className="fmtm-ml-2 fmtm-z-10 fmtm-w-[5.2rem]" />
               </div>
             )}
+            {mobileFooterSelection === 'mapLegend' && (
+              <BottomSheet
+                body={
+                  <div className="fmtm-mb-[12vh]">
+                    <MapLegends defaultTheme={defaultTheme} />
+                  </div>
+                }
+                onClose={() => dispatch(ProjectActions.SetMobileFooterSelection('explore'))}
+              />
+            )}
             {mobileFooterSelection === 'others' && (
               <BottomSheet
                 body={
-                  <div className="fmtm-mb-[10vh]">
+                  <div className="fmtm-mb-[12vh]">
                     <ProjectOptions setToggleGenerateModal={setToggleGenerateModal} />
                   </div>
                 }

@@ -63,7 +63,7 @@ const BottomSheet = ({ body, onClose }) => {
     sheetHeight = parseInt(sheetContentRef.current.style.height);
     setCurrSheetHeight(sheetHeight);
 
-    sheetHeight < 25 ? hideBottomSheet() : sheetHeight > 75 ? updateSheetHeight(100) : updateSheetHeight(50);
+    sheetHeight < 25 ? hideBottomSheet() : sheetHeight > 75 ? updateSheetHeight(93) : updateSheetHeight(50);
   };
 
   useEffect(() => {
