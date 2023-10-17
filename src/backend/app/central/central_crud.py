@@ -23,7 +23,6 @@ import zlib
 
 # import osm_fieldwork
 # Qr code imports
-import segno
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from loguru import logger as log
@@ -162,6 +161,7 @@ def create_appuser(
     project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None
 ):
     """Create an app-user on a remote ODK Server.
+
     If odk credentials of the project are provided, use them to create an app user.
     """
     if odk_credentials:
@@ -177,8 +177,13 @@ def create_appuser(
         pw = settings.ODK_CENTRAL_PASSWD
 
     app_user = OdkAppUser(url, user, pw)
+
+    log.debug(
+        "ODKCentral: attempting user creation: name: " f"{name} | project: {project_id}"
+    )
     result = app_user.create(project_id, name)
-    log.info(f"Created app user: {result.json()}")
+
+    log.debug(f"ODKCentral response: {result.json()}")
     return result
 
 
@@ -422,6 +427,8 @@ def generate_updated_xform(
     """Update the version in an XForm so it's unique."""
     name = os.path.basename(xform).replace(".xml", "")
     outfile = xform
+
+    log.debug(f"Reading xlsform: {xlsform}")
     if form_type != "xml":
         try:
             xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
@@ -553,10 +560,6 @@ def create_qrcode(project_id: int, token: str, name: str, odk_central_url: str =
     qr_data = base64.b64encode(
         zlib.compress(json.dumps(qr_code_setting).encode("utf-8"))
     )
-
-    # Generate qr code using segno
-    qrcode = segno.make(qr_data, micro=False)
-    qrcode.save(f"/tmp/{name}_qr.png", scale=5)
     return qr_data
 
 
@@ -689,7 +692,7 @@ def generate_updated_xform_for_janakpur(
     """Update the version in an XForm so it's unique."""
     name = os.path.basename(xform).replace(".xml", "")
 
-    print("Name in form = ", name)
+    log.debug(f"Name in form = {name}")
 
     outfile = xform
     if form_type != "xml":

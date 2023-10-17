@@ -11,37 +11,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  get_cache_key:
-    runs-on: ubuntu-latest
-    outputs:
-      cache_key: ${{ steps.set_cache_key.outputs.cache_key }}
-    steps:
-      - name: Set cache key
-        id: set_cache_key
-        run: echo "cache_key=docs-build-$(date --utc +'%Y-%m-%d_%H:%M:%S')" >> $GITHUB_OUTPUT
-
   build_doxygen:
     uses: hotosm/gh-workflows/.github/workflows/doxygen_build.yml@main
-    needs: [get_cache_key]
     with:
       cache_paths: |
         docs/apidocs
-      cache_key: ${{ needs.get_cache_key.outputs.cache_key }}
+        docs/openapi.json
+      cache_key: docs-build
 
   build_openapi_json:
     uses: hotosm/gh-workflows/.github/workflows/openapi_build.yml@main
-    needs: [get_cache_key]
     with:
       image: ghcr.io/hotosm/fmtm/backend:ci-${{ github.ref_name }}
       example_env_file_path: ".env.example"
       cache_paths: |
+        docs/apidocs
         docs/openapi.json
-      cache_key: ${{ needs.get_cache_key.outputs.cache_key }}
+      cache_key: docs-build
 
   publish_docs:
     uses: hotosm/gh-workflows/.github/workflows/mkdocs_build.yml@main
     needs:
-      - get_cache_key
       - build_doxygen
       - build_openapi_json
     with:
@@ -49,4 +39,4 @@ jobs:
       cache_paths: |
         docs/apidocs
         docs/openapi.json
-      cache_key: ${{ needs.get_cache_key.outputs.cache_key }}
+      cache_key: docs-build

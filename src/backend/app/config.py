@@ -20,7 +20,7 @@
 from functools import lru_cache
 from typing import Any, Optional, Union
 
-from pydantic import Extra, FieldValidationInfo, PostgresDsn, field_validator
+from pydantic import FieldValidationInfo, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "FMTM"
     DEBUG: bool = False
-    LOG_LEVEL: str = "DEBUG"
+    LOG_LEVEL: str = "INFO"
 
     URL_SCHEME: Optional[str] = "http"
     FRONTEND_MAIN_URL: Optional[str]
@@ -94,7 +94,7 @@ class Settings(BaseSettings):
             path=info.data.get("FMTM_DB_NAME", ""),
         )
         # Convert Url type to string
-        return str(pg_url)
+        return pg_url
 
     ODK_CENTRAL_URL: Optional[str] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
@@ -111,7 +111,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(
-        case_sensitive=True, env_file=".env", extra=Extra.allow
+        case_sensitive=True, env_file=".env", extra="allow"
     )
 
 
@@ -120,7 +120,7 @@ def get_settings():
     """Cache settings when accessed throughout app."""
     _settings = Settings()
     if _settings.DEBUG:
-        print(f"Loaded settings: {_settings.dict()}")
+        print(f"Loaded settings: {_settings.model_dump()}")
     return _settings
 
 
