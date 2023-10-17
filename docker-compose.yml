@@ -45,12 +45,12 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:debug"
+    image: "ghcr.io/hotosm/fmtm/backend:${API_TAG_OVERRIDE:-debug}"
     build:
       context: src/backend
       target: debug-with-odk
       args:
-        APP_VERSION: debug
+        APP_VERSION: "debug"
     container_name: fmtm_api
     # Uncomment these to debug with a terminal debugger like pdb
     # Then `docker attach fmtm_api` to debug
@@ -60,7 +60,9 @@ services:
       - fmtm_logs:/opt/logs
       - fmtm_images:/opt/app/images
       - fmtm_tiles:/opt/tiles
+      - ./src/backend/pyproject.toml:/opt/pyproject.toml
       - ./src/backend/app:/opt/app
+      - ./src/backend/tests:/opt/tests
       # - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.10/site-packages/osm_fieldwork
     depends_on:
       - fmtm-db
@@ -76,7 +78,7 @@ services:
     restart: "unless-stopped"
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:debug"
+    image: "ghcr.io/hotosm/fmtm/backend:${API_TAG_OVERRIDE:-debug}"
     container_name: fmtm_migrations
     depends_on:
       - fmtm-db
@@ -140,7 +142,7 @@ services:
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
       - HTTPS_PORT=${HTTPS_PORT:-443}
-      - DB_HOST=${CENTRAL_DB_HOST:-postgres14}
+      - DB_HOST=${CENTRAL_DB_HOST:-central-db}
       - DB_USER=${CENTRAL_DB_USER:-odk}
       - DB_PASSWORD=${CENTRAL_DB_PASSWORD:-odk}
       - DB_NAME=${CENTRAL_DB_NAME:-odk}

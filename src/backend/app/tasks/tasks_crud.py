@@ -238,7 +238,6 @@ def convert_to_app_task(db_task: db_models.DbTask):
             f"Project ID {db_task.project_id} | Task ID "
             f"{db_task.id} | Converting DB Task to App Task"
         )
-        log.debug("")
 
         app_task: tasks_schemas.Task = db_task
         app_task.task_status_str = tasks_schemas.TaskStatusOption[
