@@ -5,7 +5,6 @@ import {
   FormCategoryListModel,
   OrganisationListModel,
 } from '../models/createproject/createProjectModel';
-import enviroment from '../environment';
 import { CommonActions } from '../store/slices/CommonSlice';
 import { ValidateCustomFormResponse } from 'store/types/ICreateProject';
 
@@ -27,7 +26,7 @@ const CreateProjectService: Function = (
         const resp: ProjectDetailsModel = postNewProjectDetails.data;
         await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
-        if (payload.splitting_algorithm === 'Choose Area as Tasks') {
+        if (payload.splitting_algorithm === 'choose_area_as_task') {
           await dispatch(
             UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
           );
@@ -163,7 +162,7 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
       try {
         const isPolygon = payload.data_extractWays === 'Polygon';
         const generateApiFormData = new FormData();
-        if (payload.form_ways === 'Upload a Custom Form') {
+        if (payload.form_ways === 'custom_form') {
           generateApiFormData.append('extract_polygon', isPolygon.toString());
           generateApiFormData.append('upload', formUpload);
           if (dataExtractFile) {
@@ -171,7 +170,6 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
           }
         } else {
           generateApiFormData.append('extract_polygon', isPolygon.toString());
-          generateApiFormData.append('upload', '');
           if (dataExtractFile) {
             generateApiFormData.append('data_extracts', dataExtractFile);
           }
@@ -184,7 +182,6 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
         const resp: string = postNewProjectDetails.data;
         await dispatch(CreateProjectActions.GenerateProjectQRLoading(false));
         dispatch(CommonActions.SetLoading(false));
-        await dispatch(CreateProjectActions.ClearCreateProjectFormData());
         await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp));
       } catch (error: any) {
         dispatch(CommonActions.SetLoading(false));

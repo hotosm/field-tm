@@ -1,18 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import enviroment from '../../environment';
-import { FormCategoryService } from '../../api/CreateProjectService';
-import CoreModules from '../../shared/CoreModules.js';
+import React, { useEffect } from 'react';
 import Button from '../../components/common/Button';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '../../store/slices/CommonSlice';
 import RadioButton from '../../components/common/RadioButton';
 import { useNavigate } from 'react-router-dom';
-import { CustomSelect } from '../../components/common/Select';
 import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
 import useForm from '../../hooks/useForm';
 import { useAppSelector } from '../../types/reduxTypes';
-import DataExtractValidation from './validation/DataExtractValidation';
+import { FormCategoryService } from '../../api/CreateProjectService';
 import FileInputComponent from '../../components/common/FileInputComponent';
+import DataExtractValidation from './validation/DataExtractValidation';
+import NewDefineAreaMap from '../../views/NewDefineAreaMap';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Use OSM data extract' },
@@ -25,18 +23,19 @@ const osmFeatureTypeOptions = [
   { name: 'osm_feature_type', value: 'polygon', label: 'Polygon' },
 ];
 
-const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
+const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygonUpload, setCustomPolygonUpload }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const customFileRef: any = useRef();
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
-  const formCategoryList = CoreModules.useAppSelector((state) => state.createproject.formCategoryList);
+  const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
+  const buildingGeojson = useAppSelector((state) => state.createproject.buildingGeojson);
+  const lineGeojson = useAppSelector((state) => state.createproject.lineGeojson);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
-    dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 3 }));
-    navigate('/new-upload-area');
+    dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 5 }));
+    navigate('/split-tasks');
   };
   const {
     handleSubmit,
@@ -49,18 +48,37 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
-  const changeFileHandler = (event) => {
+  const changeFileHandler = (event, setFileUploadToState, fileType) => {
     const { files } = event.target;
-    setCustomFormFile(files[0]);
+    setFileUploadToState(files[0]);
+    convertFileToGeojson(files[0], fileType);
   };
 
-  useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
-  }, []);
-
-  const resetFile = () => {
-    customFileRef.current.value = '';
-    setCustomFormFile(null);
+  const resetFile = (setFileUploadToState) => {
+    setFileUploadToState(null);
+  };
+  const convertFileToGeojson = async (file, fileType) => {
+    if (!file) return;
+    const fileReader = new FileReader();
+    const fileLoaded = await new Promise((resolve) => {
+      fileReader.onload = (e) => resolve(e.target.result);
+      fileReader.readAsText(file, 'UTF-8');
+    });
+    const parsedJSON = JSON.parse(fileLoaded);
+    let geojsonConversion;
+    if (parsedJSON.type === 'FeatureCollection') {
+      geojsonConversion = parsedJSON;
+    } else {
+      geojsonConversion = {
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', properties: null, geometry: parsedJSON }],
+      };
+    }
+    if (fileType === 'building') {
+      dispatch(CreateProjectActions.SetBuildingGeojson(geojsonConversion));
+    } else if (fileType === 'line') {
+      dispatch(CreateProjectActions.SetLineGeojson(geojsonConversion));
+    }
   };
 
   useEffect(() => {
@@ -106,6 +124,7 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
                 onChangeData={(value) => {
                   handleCustomChange('dataExtractWays', value);
                 }}
+                errorMsg={errors.dataExtractWays}
               />
               {formValues.dataExtractWays === 'osm_data_extract' && (
                 <div className="fmtm-mt-6">
@@ -117,22 +136,35 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
                     onChangeData={(value) => {
                       handleCustomChange('dataExtractFeatureType', value);
                     }}
+                    errorMsg={errors.dataExtractFeatureType}
                   />
                 </div>
               )}
               {formValues.dataExtractWays === 'custom_data_extract' && (
                 <>
                   <FileInputComponent
-                    customFileRef={customFileRef}
-                    onChange={changeFileHandler}
-                    onResetFile={resetFile}
-                    customFormFile={customFormFile}
+                    onChange={(e) => {
+                      changeFileHandler(e, setCustomPolygonUpload, 'building');
+                      handleCustomChange('customPolygonUpload', e.target.files[0]);
+                    }}
+                    onResetFile={() => resetFile(setCustomPolygonUpload)}
+                    customFile={customPolygonUpload}
+                    btnText="Upload a Polygon"
+                    accept=".geojson,.json"
+                    fileDescription="*The supported file formats are .geojson, .json"
+                    errorMsg={errors.customPolygonUpload}
                   />
                   <FileInputComponent
-                    customFileRef={customFileRef}
-                    onChange={changeFileHandler}
-                    onResetFile={resetFile}
-                    customFormFile={customFormFile}
+                    onChange={(e) => {
+                      changeFileHandler(e, setCustomLineUpload, 'line');
+                      handleCustomChange('customLineUpload', e.target.files[0]);
+                    }}
+                    onResetFile={() => resetFile(setCustomLineUpload)}
+                    customFile={customLineUpload}
+                    btnText="Upload a Line"
+                    accept=".geojson,.json"
+                    fileDescription="*The supported file formats are .geojson, .json"
+                    errorMsg={errors.setCustomLineUpload}
                   />
                 </>
               )}
@@ -142,13 +174,19 @@ const DataExtract = ({ flag, customFormFile, setCustomFormFile }) => {
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(2, '/new-upload-area')}
+                onClick={() => toggleStep(2, '/upload-area')}
                 className="fmtm-font-bold"
               />
               <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
             </div>
           </form>
-          <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full"></div>
+          <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
+            <NewDefineAreaMap
+              uploadedOrDrawnGeojsonFile={drawnGeojson}
+              buildingExtractedGeojson={buildingGeojson}
+              lineExtractedGeojson={lineGeojson}
+            />
+          </div>
         </div>
       </div>
     </div>

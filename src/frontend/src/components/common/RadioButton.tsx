@@ -13,9 +13,10 @@ interface RadioButtonProps {
   direction: 'row' | 'column';
   onChangeData: (value: string) => void;
   value: string;
+  errorMsg?: string;
 }
 
-const RadioButton: React.FC<RadioButtonProps> = ({ topic, options, direction, onChangeData, value }) => (
+const RadioButton: React.FC<RadioButtonProps> = ({ topic, options, direction, onChangeData, value, errorMsg }) => (
   <div>
     <div>
       <p className="fmtm-text-xl fmtm-font-[600] fmtm-mb-3">{topic}</p>
@@ -45,6 +46,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({ topic, options, direction, on
           </div>
         );
       })}
+      {errorMsg && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errorMsg}</p>}
     </div>
   </div>
 );

@@ -34,7 +34,9 @@ const StepSwitcher = ({ data, flag }) => {
                 </div>
                 <div className="fmtm-flex fmtm-items-center">
                   <div
-                    className={`lg:fmtm-w-7 lg:fmtm-h-7 xl:fmtm-w-9 xl:fmtm-h-9 fmtm-rounded-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-[0.15rem] fmtm-border-primaryRed hover:fmtm-cursor-pointer  ${
+                    className={`${
+                      currentStep.step === index ? 'currentstep-pointer' : ''
+                    } lg:fmtm-w-7 lg:fmtm-h-7 xl:fmtm-w-9 xl:fmtm-h-9 fmtm-rounded-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-[0.15rem] fmtm-border-primaryRed hover:fmtm-cursor-pointer  ${
                       currentStep.step >= index ? 'fmtm-bg-primaryRed' : 'fmtm-bg-transparent'
                     }`}
                     onClick={() => toggleStep(step)}

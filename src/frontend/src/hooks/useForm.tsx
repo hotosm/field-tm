@@ -18,7 +18,16 @@ const useForm = (initialState, callback, validate) => {
   const handleAllValues = (value) => {
     setValues(value);
   };
-
+  const checkValidationOnly = (formValues) => {
+    const x = validate(formValues);
+    console.log(x, 'x');
+    console.log(formValues, 'values');
+    if (Object.keys(x)?.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
     // setErrors(validate(values));
@@ -63,6 +72,7 @@ const useForm = (initialState, callback, validate) => {
     handleAllValues,
     setValues,
     setErrors,
+    checkValidationOnly,
   };
 };
 

@@ -1,4 +1,4 @@
-import { CreateProjectStateTypes } from 'store/types/ICreateProject';
+import { CreateProjectStateTypes } from '../types/ICreateProject';
 import { createSlice } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {
@@ -43,6 +43,9 @@ export const initialState: CreateProjectStateTypes = {
   uploadAreaSelection: null,
   totalAreaSelection: null,
   splitTasksSelection: null,
+  buildingGeojson: null,
+  lineGeojson: null,
+  createProjectValidations: {},
 };
 
 const CreateProject = createSlice({
@@ -60,8 +63,27 @@ const CreateProject = createSlice({
     },
     ClearCreateProjectFormData(state) {
       // state.projectDetailsResponse = null
-      state.projectDetails = { dimension: 10, no_of_buildings: 5, hashtags: 'hotosm-fmtm ' };
+      state.projectDetails = {
+        dimension: 10,
+        no_of_buildings: 5,
+        hashtags: '#FMTM ',
+        name: '',
+        short_description: '',
+        odk_central_url: '',
+        odk_central_user: '',
+        odk_central_password: '',
+        description: '',
+        organisation_id: null,
+      };
       state.projectArea = null;
+      state.totalAreaSelection = null;
+      state.splitTasksSelection = null;
+      state.buildingGeojson = null;
+      state.lineGeojson = null;
+      state.taskSplittingGeojson = null;
+      state.drawnGeojson = null;
+      state.generateProjectLog = null;
+      state.generateProjectLogLoading = false;
     },
     UploadAreaLoading(state, action) {
       state.projectAreaLoading = action.payload;
@@ -143,6 +165,7 @@ const CreateProject = createSlice({
     },
     GetTaskSplittingPreview(state, action) {
       state.dividedTaskGeojson = action.payload;
+      // state.drawnGeojson = action.payload;
       state.taskSplittingGeojson = action.payload;
     },
     SetEditProjectBoundaryServiceLoading(state, action) {
@@ -165,6 +188,18 @@ const CreateProject = createSlice({
     },
     SetSplitTasksSelection(state, action) {
       state.splitTasksSelection = action.payload;
+    },
+    SetBuildingGeojson(state, action) {
+      state.buildingGeojson = action.payload;
+    },
+    SetLineGeojson(state, action) {
+      state.lineGeojson = action.payload;
+    },
+    SetCreateProjectValidations(state, action) {
+      state.createProjectValidations = {
+        ...state.createProjectValidations,
+        [action.payload.key]: action.payload.value,
+      };
     },
   },
 });
