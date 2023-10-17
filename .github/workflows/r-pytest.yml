@@ -53,7 +53,8 @@ jobs:
             ${{ needs.cache-img-postgis.outputs.cache_path }}
             ${{ needs.cache-img-odk.outputs.cache_path }}
             ${{ needs.cache-img-odk-proxy-cache.outputs.cache_path }}
-          key: |
+          key: img-
+          restore-keys: |
             ${{ needs.cache-img-postgis.outputs.cache_key }}
             ${{ needs.cache-img-odk.outputs.cache_key }}
             ${{ needs.cache-img-odk-proxy-cache.outputs.cache_key }}
