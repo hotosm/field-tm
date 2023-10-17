@@ -18,6 +18,7 @@ jobs:
     uses: ./.github/workflows/r-pytest.yml
     with:
       image_tag: ci-${{ github.ref_name }}
+    secrets: inherit
 
   frontend-tests:
     uses: ./.github/workflows/r-frontend_tests.yml
