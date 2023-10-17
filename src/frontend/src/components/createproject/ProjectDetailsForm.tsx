@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import windowDimention from '../../hooks/WindowDimension';
+import React, { useEffect } from 'react';
 import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 import { useNavigate } from 'react-router-dom';
@@ -14,22 +13,17 @@ import { useAppSelector } from '../../types/reduxTypes';
 
 const ProjectDetailsForm: React.FC = () => {
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  // // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
 
-  // // console.log('state main :',state)
-
-  // const { type } = windowDimention();
-  // //get window dimension
   const navigate = useNavigate();
 
   const dispatch = CoreModules.useAppDispatch();
-  // //dispatch function to perform redux state mutation
+  //dispatch function to perform redux state mutation
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
-  // //we use use selector from redux to get all state of projectDetails from createProject slice
+  //we use use selector from redux to get all state of projectDetails from createProject slice
 
   const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
-  // //we use use selector from redux to get all state of projectDetails from createProject slice
+  //we use use selector from redux to get all state of projectDetails from createProject slice
 
   useEffect(() => {
     // dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));

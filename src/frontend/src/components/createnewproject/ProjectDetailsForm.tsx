@@ -13,7 +13,6 @@ import AssetModules from '../../shared/AssetModules.js';
 import { createPopup } from '../../utilfunctions/createPopup';
 import { CustomSelect } from '../../components/common/Select';
 import { OrganisationService } from '../../api/CreateProjectService';
-import environment from '../../environment';
 
 const ProjectDetailsForm = ({ flag }) => {
   const dispatch = useDispatch();
@@ -27,10 +26,10 @@ const ProjectDetailsForm = ({ flag }) => {
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 2 }));
-    navigate('/new-upload-area');
+    navigate('/upload-area');
   };
 
-  const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
+  const { handleSubmit, handleCustomChange, values, errors, checkValidationOnly }: any = useForm(
     projectDetails,
     submission,
     CreateProjectValidation,
@@ -39,12 +38,16 @@ const ProjectDetailsForm = ({ flag }) => {
   const onFocus = () => {
     dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
   };
+
   useEffect(() => {
     window.addEventListener('focus', onFocus);
     onFocus();
     // Calls onFocus when the window first loads
     return () => {
       window.removeEventListener('focus', onFocus);
+      // dispatch(
+      //   CreateProjectActions.SetCreateProjectValidations({ key: 'projectDetails', value: checkValidationOnly() }),
+      // );
     };
   }, []);
 

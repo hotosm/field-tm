@@ -37,23 +37,12 @@ const DataExtract: React.FC<any> = ({
   const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-  // Fetching form category list
-  useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
-  }, []);
-  // END
   const selectExtractWaysList = ['Centroid', 'Polygon'];
   const selectExtractWays = selectExtractWaysList.map((item) => ({ label: item, value: item }));
   const dataExtractOptionsList = ['Data Extract Ways', 'Upload Custom Data Extract'];
   const dataExtractOptions = dataExtractOptionsList.map((item) => ({ label: item, value: item }));
   const formCategoryData = formCategoryList.map((item) => ({ label: item.title, value: item.title }));
   // //we use use-selector from redux to get state of dividedTaskGeojson from createProject slice
-
-  // Fetching form category list
-  useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
-  }, []);
-  // END
 
   const submission = () => {
     // const previousValues = location.state.values;

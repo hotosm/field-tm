@@ -1,44 +1,51 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import AssetModules from '../../shared/AssetModules.js';
 
-const FileInputComponent = ({ customFileRef, customFormFile, onChange, onResetFile }) => {
-  const changeFileHandler = (event) => {
-    // handle file change logic here
-  };
-
-  const resetFile = () => {
-    // reset file logic here
-  };
-
+const FileInputComponent = ({
+  accept = '.geojson, .json',
+  customFile,
+  onChange,
+  onResetFile,
+  btnText = 'Select File',
+  fileDescription = '*The supported file formats are zipped shapefile, geojson or kml files.',
+  errorMsg,
+}) => {
+  const customFileRef = useRef<any>(null);
   return (
-    <div className="fmtm-mt-6 fmtm-pb-3">
-      <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
+    <div className="fmtm-mt-3 fmtm-pb-3">
+      <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
         <label
           id="file-input"
-          className="fmtm-bg-primaryRed fmtm-text-white fmtm-px-4 fmtm-py-1 fmtm-rounded-md fmtm-cursor-pointer"
+          className="fmtm-bg-primaryRed hover:fmtm-bg-red-900 fmtm-text-white fmtm-px-4 fmtm-py-1 fmtm-rounded-md fmtm-cursor-pointer"
         >
-          <p>Select a Building file</p>
+          <p>{btnText}</p>
           <input
             id="data-extract-custom-file"
             ref={customFileRef}
             type="file"
             className="fmtm-hidden"
             onChange={onChange}
-            accept=".geojson, .json"
+            accept={accept}
           />
         </label>
         <div className="fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-slate-100 fmtm-duration-300 fmtm-cursor-pointer">
-          <AssetModules.ReplayIcon className="fmtm-text-gray-600" onClick={onResetFile} />
+          <AssetModules.ReplayIcon
+            className="fmtm-text-gray-600"
+            onClick={() => {
+              onResetFile();
+              customFileRef.current.value = '';
+            }}
+          />
         </div>
       </div>
-      {customFormFile && (
-        <div className="fmtm-mt-2">
-          <p>{customFormFile?.name}</p>
+      {errorMsg && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errorMsg}</p>}
+
+      {customFile && (
+        <div className="">
+          <p>{customFile?.name}</p>
         </div>
       )}
-      <p className="fmtm-text-gray-700 fmtm-mt-10">
-        *The supported file formats are zipped shapefile, geojson or kml files.
-      </p>
+      <p className="fmtm-text-gray-700 fmtm-mt-5">{fileDescription}</p>
     </div>
   );
 };

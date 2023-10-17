@@ -116,6 +116,7 @@ interface ICustomSelect {
   valueKey: string;
   label: string;
   onValueChange: (value: string | null | number) => void;
+  errorMsg: string;
 }
 
 export const CustomSelect = ({
@@ -127,6 +128,7 @@ export const CustomSelect = ({
   valueKey,
   label,
   onValueChange,
+  errorMsg,
 }: ICustomSelect) => {
   return (
     <div className="">
@@ -149,6 +151,7 @@ export const CustomSelect = ({
           </Select>
         </div>
       </div>
+      {errorMsg && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errorMsg}</p>}
     </div>
   );
 };

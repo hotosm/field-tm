@@ -29,6 +29,9 @@ export type CreateProjectStateTypes = {
   uploadAreaSelection: string | null;
   totalAreaSelection: string | null;
   splitTasksSelection: string | null;
+  buildingGeojson: null;
+  lineGeojson: null;
+  createProjectValidations: {};
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };

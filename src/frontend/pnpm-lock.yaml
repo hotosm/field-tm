@@ -29,6 +29,9 @@ dependencies:
   '@radix-ui/react-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@17.0.21)(@types/react@17.0.67)(react-dom@17.0.2)(react@17.0.2)
+  '@radix-ui/react-progress':
+    specifier: ^1.0.3
+    version: 1.0.3(@types/react-dom@17.0.21)(@types/react@17.0.67)(react-dom@17.0.2)(react@17.0.2)
   '@radix-ui/react-select':
     specifier: ^1.2.2
     version: 1.2.2(@types/react-dom@17.0.21)(@types/react@17.0.67)(react-dom@17.0.2)(react@17.0.2)
@@ -71,6 +74,9 @@ dependencies:
   eslint-plugin-prettier:
     specifier: ^5.0.0
     version: 5.0.0(eslint-config-prettier@8.10.0)(eslint@8.51.0)(prettier@3.0.3)
+  geojson-validation:
+    specifier: ^1.0.2
+    version: 1.0.2
   install:
     specifier: ^0.13.0
     version: 0.13.0
@@ -2713,6 +2719,29 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.1
       '@radix-ui/react-slot': 1.0.2(@types/react@17.0.67)(react@17.0.2)
+      '@types/react': 17.0.67
+      '@types/react-dom': 17.0.21
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
+    dev: false
+
+  /@radix-ui/react-progress@1.0.3(@types/react-dom@17.0.21)(@types/react@17.0.67)(react-dom@17.0.2)(react@17.0.2):
+    resolution:
+      { integrity: sha512-5G6Om/tYSxjSeEdrb1VfKkfZfn/1IlPWd731h2RfPuSbIfNUgfqAwbKfJCg/PP6nuUCTrYzalwHSpSinoWoCag== }
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.1
+      '@radix-ui/react-context': 1.0.1(@types/react@17.0.67)(react@17.0.2)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@17.0.21)(@types/react@17.0.67)(react-dom@17.0.2)(react@17.0.2)
       '@types/react': 17.0.67
       '@types/react-dom': 17.0.21
       react: 17.0.2
@@ -5409,6 +5438,12 @@ packages:
       { integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg== }
     engines: { node: '>=6.9.0' }
     dev: true
+
+  /geojson-validation@1.0.2:
+    resolution:
+      { integrity: sha512-K5jrJ4wFvORn2pRKeg181LL0QPYuEKn2KHPvfH1m2QtFlAXFLKdseqt0XwBM3ELOY7kNM1fglRQ6ZwUQZ5S00A== }
+    hasBin: true
+    dev: false
 
   /geotiff@2.0.7:
     resolution:

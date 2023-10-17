@@ -13,6 +13,7 @@ import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
 import { Draw, Modify, Select, defaults as defaultInteractions } from 'ol/interaction.js';
 import { getArea } from 'ol/sphere';
+import { valid } from 'geojson-validation';
 
 const selectElement = 'singleselect';
 
@@ -135,6 +136,7 @@ const VectorLayer = ({
   useEffect(() => {
     if (!map) return;
     if (!geojson) return;
+    if (!valid(geojson)) return;
 
     const vectorLyr = new OLVectorLayer({
       source: new VectorSource({

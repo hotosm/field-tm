@@ -1,20 +1,25 @@
 interface ProjectValues {
-  xform_title: string;
-  form_ways: string;
+  formCategorySelection: string;
+  formWays: string;
+  customFormUpload: File | null;
 }
 interface ValidationErrors {
-  xform_title?: string;
-  form_ways?: string;
+  formCategorySelection?: string;
+  formWays?: string;
+  customFormUpload?: string;
 }
 
 function SelectFormValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
-  if (!values?.xform_title) {
-    errors.xform_title = 'Form Category is Required.';
+  if (!values?.formCategorySelection) {
+    errors.formCategorySelection = 'Form Category is Required.';
   }
-  if (!values?.form_ways) {
-    errors.form_ways = 'Form Selection is Required.';
+  if (!values?.formWays) {
+    errors.formWays = 'Form Selection is Required.';
+  }
+  if (values?.formWays === 'custom_form' && !values?.customFormUpload) {
+    errors.customFormUpload = 'Form needs to be Uploaded.';
   }
 
   console.log(errors);

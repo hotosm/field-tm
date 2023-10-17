@@ -70,10 +70,14 @@ const TasksLayer = (map, view, feature) => {
         // The extent of the vector layer
         var extent = [minX, minY, maxX, maxY];
 
-        map.getView().fit(extent, {
-          duration: 2000, // Animation duration in milliseconds
-          padding: [50, 50, 50, 200], // Optional padding around the extent
-        });
+        // Checking if Taskboundaries exist if doesn't exist dont throw error window
+        const checkForInfinity = extent.some((ext) => ext === Infinity);
+        if (!checkForInfinity) {
+          map.getView().fit(extent, {
+            duration: 2000, // Animation duration in milliseconds
+            padding: [50, 50, 50, 200], // Optional padding around the extent
+          });
+        }
         map.addLayer(vectorLayer);
         map.on('loadend', function () {
           map.getTargetElement().classList.remove('spinner');

@@ -33,7 +33,7 @@ interface IModalProps {
   title: React.FC<any>;
   description: React.FC<any>;
   open: boolean;
-  onOpenChange: () => {};
+  onOpenChange: (boolean) => void;
 }
 
 const DialogContent = React.forwardRef<
