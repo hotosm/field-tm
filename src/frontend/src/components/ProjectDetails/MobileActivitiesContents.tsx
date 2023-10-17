@@ -8,7 +8,7 @@ const MobileActivitiesContents = ({ map, mainView, mapDivPostion }) => {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   return (
-    <div className="fmtm-w-full fmtm-bg-white fmtm-mb-[10vh]">
+    <div className="fmtm-w-full fmtm-bg-white fmtm-mb-[12vh]">
       <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
         <ActivitiesPanel
           params={params}
