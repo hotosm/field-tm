@@ -11,8 +11,11 @@ LABEL org.hotosm.fmtm.app-name="fmtm-frontend" \
       org.hotosm.fmtm.api-url="${VITE_API_URL}"
 
 WORKDIR /app
-COPY ./package*.json ./
-RUN npm install
+COPY ./package.json ./pnpm-lock.yaml ./
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN pnpm install
 
 ENV NODE_ENV production
 COPY . .
