@@ -46,6 +46,7 @@ dependencies = [
     "osm-login-python==1.0.1",
     "osm-fieldwork==0.3.6",
     "osm-rawdata==0.1.3",
+    "minio>=7.1.17",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "../../README.md"

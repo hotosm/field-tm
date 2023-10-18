@@ -78,6 +78,8 @@ jobs:
           OSM_CLIENT_ID: "${{ secrets.OSM_CLIENT_ID }}"
           OSM_CLIENT_SECRET: "${{ secrets.OSM_CLIENT_SECRET }}"
           OSM_SECRET_KEY: "${{ secrets.OSM_SECRET_KEY }}"
+          S3_ACCESS_KEY: "fmtm"
+          S3_SECRET_KEY: "somelongpassword"
         run: |
           echo "DEBUG=${DEBUG}" >> .env
           echo "LOG_LEVEL=${LOG_LEVEL}" >> .env
@@ -89,6 +91,8 @@ jobs:
           echo "OSM_CLIENT_ID=${OSM_CLIENT_ID}" >> .env
           echo "OSM_CLIENT_SECRET=${OSM_CLIENT_SECRET}" >> .env
           echo "OSM_SECRET_KEY=${OSM_SECRET_KEY}" >> .env
+          echo "S3_ACCESS_KEY=${S3_ACCESS_KEY}" >> .env
+          echo "S3_SECRET_KEY=${S3_SECRET_KEY}" >> .env
 
       - name: Run PyTest
         run: |

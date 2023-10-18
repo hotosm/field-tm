@@ -70,6 +70,11 @@ that file to contain the needful (it should look like this):
     OSM_LOGIN_REDIRECT_URI=`<FRONTEND_URL>`/osmauth/
     OSM_SECRET_KEY=`<CHANGEME>`
 
+    ### S3 File Storage ###
+    S3_ENDPOINT="http://s3:9000"
+    S3_ACCESS_KEY=`<CHANGEME>`
+    S3_SECRET_KEY=`<CHANGEME>`
+
     FMTM_DB_HOST=fmtm-db
     FMTM_DB_USER=fmtm
     FMTM_DB_PASSWORD=`<CHANGEME>`

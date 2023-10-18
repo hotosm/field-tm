@@ -280,6 +280,11 @@ OSM_SCOPE=read_prefs
 OSM_LOGIN_REDIRECT_URI=http://127.0.0.1:8080/osmauth/
 OSM_SECRET_KEY=<random_key_for_development>
 
+### S3 File Storage ###
+S3_ENDPOINT="http://s3:9000"
+S3_ACCESS_KEY=`<a_long_access_key>`
+S3_SECRET_KEY=`<a_long_secret_key>`
+
 ### Database (optional) ###
 CENTRAL_DB_HOST=central-db
 CENTRAL_DB_USER=odk
