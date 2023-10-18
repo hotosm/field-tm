@@ -163,7 +163,7 @@ jobs:
 
       - name: Deploy
         run: |
-          docker compose --file "docker-compose.${GIT_BRANCH}.yml" pull
-          docker compose --file "docker-compose.${GIT_BRANCH}.yml" up --detach --remove-orphans
+          docker compose --file "docker-compose.${{ github.ref_name }}.yml" pull
+          docker compose --file "docker-compose.${{ github.ref_name }}.yml" up --detach --remove-orphans
         env:
           DOCKER_HOST: ${{ vars.DOCKER_HOST }}
