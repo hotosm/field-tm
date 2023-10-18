@@ -18,6 +18,11 @@ For details on how to run the API first, please see: [DEV 2. Backend](https://gi
 
 5. If everything goes well you should now be able to **navigate to the project in your browser:** <http://127.0.0.1:8080>
 
+> Note: during development, if you rebuild the frontend, then
+> run 'docker compose up -d', the node_modules directory may
+> not be updated. To solve this, use the flag:
+> --renew-anon-volumes on docker compose up.
+
 ## 2. Start the Frontend locally
 
 ### 2A: Navigate to the frontend subdirectory
