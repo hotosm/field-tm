@@ -69,6 +69,7 @@ temp_webmaps/Naivasha
 
 # node
 src/frontend/node_modules
+package-lock.json
 
 # pdm
 **/.pdm.toml
