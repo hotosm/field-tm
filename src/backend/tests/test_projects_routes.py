@@ -8,7 +8,8 @@ import pytest
 from fastapi import FastAPI
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
-from shapely import Polygon
+from shapely import Polygon, wkb
+from shapely.geometry import shape
 
 from app.central.central_crud import create_odk_project
 from app.db import db_models
@@ -139,6 +140,18 @@ def test_generate_appuser_files(db, project):
         db, project_id, boundary_geojson, 500
     )
     assert boundary_created is True
+    # Check updated locations
+    db_project = project_crud.get_project_by_id(db, project_id)
+    # Outline
+    project_outline = db_project.outline.data.tobytes()
+    file_outline = shape(boundary_geojson)
+    assert wkb.loads(project_outline).wkt == file_outline.wkt
+    # Centroid
+    project_centroid = wkb.loads(db_project.centroid.data.tobytes()).wkt
+    file_centroid = file_outline.centroid.wkt
+    assert project_centroid == file_centroid
+    # Location string
+    assert db_project.location_str == "Zurich,Switzerland"
 
     # Load data extracts
     data_extracts_file = f"{test_data_path}/building_footprint.zip"
