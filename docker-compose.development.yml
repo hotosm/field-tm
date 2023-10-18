@@ -152,7 +152,7 @@ services:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
       MINIO_VOLUMES: "/mnt/data"
-      MINIO_BROWSER: off
+      MINIO_BROWSER: "off"
     volumes:
       - fmtm_data:/mnt/data
     networks:
