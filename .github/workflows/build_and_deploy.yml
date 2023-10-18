@@ -102,6 +102,8 @@ jobs:
           #   -e OSM_CLIENT_ID="test" \
           #   -e OSM_CLIENT_SECRET="test" \
           #   -e OSM_SECRET_KEY="test" \
+          #   -e S3_ACCESS_KEY="fmtm" \
+          #   -e S3_SECRET_KEY="somelongpassword" \
           #   "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
 
           # # First wait 10 seconds for API

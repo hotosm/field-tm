@@ -18,11 +18,12 @@
 version: "3"
 
 volumes:
+  fmtm_data:
   fmtm_db_data:
+  central_db_data:
   fmtm_logs:
   fmtm_images:
   fmtm_tiles:
-  central_db_data:
 
 networks:
   fmtm-dev:
@@ -67,6 +68,7 @@ services:
     depends_on:
       - fmtm-db
       - migrations
+      - s3
       - central-proxy
     env_file:
       - .env
@@ -179,4 +181,21 @@ services:
       - central
     networks:
       - fmtm-dev
+    restart: "unless-stopped"
+
+  s3:
+    image: "docker.io/minio/minio:RELEASE.2023-10-07T15-07-38Z"
+    container_name: fmtm_s3
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
+      MINIO_VOLUMES: "/mnt/data"
+      MINIO_BROWSER: off
+    volumes:
+      - fmtm_data:/mnt/data
+    ports:
+      - 9000:9000
+    networks:
+      - fmtm-dev
+    command: minio server # --console-address ":9090"
     restart: "unless-stopped"
