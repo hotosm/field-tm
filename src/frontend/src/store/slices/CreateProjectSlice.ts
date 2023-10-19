@@ -46,6 +46,7 @@ export const initialState: CreateProjectStateTypes = {
   buildingGeojson: null,
   lineGeojson: null,
   createProjectValidations: {},
+  isUnsavedChanges: false,
 };
 
 const CreateProject = createSlice({
@@ -84,6 +85,7 @@ const CreateProject = createSlice({
       state.drawnGeojson = null;
       state.generateProjectLog = null;
       state.generateProjectLogLoading = false;
+      state.isUnsavedChanges = false;
     },
     UploadAreaLoading(state, action) {
       state.projectAreaLoading = action.payload;
@@ -200,6 +202,9 @@ const CreateProject = createSlice({
         ...state.createProjectValidations,
         [action.payload.key]: action.payload.value,
       };
+    },
+    SetIsUnsavedChanges(state, action) {
+      state.isUnsavedChanges = action.payload;
     },
   },
 });

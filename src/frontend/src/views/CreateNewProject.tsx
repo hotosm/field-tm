@@ -10,16 +10,17 @@ import SelectForm from '../components/createnewproject/SelectForm';
 import { useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '.././store/slices/CommonSlice';
-
+import { useAppSelector } from '../types/reduxTypes';
+import Prompt from '../hooks/Prompt';
 const CreateNewProject = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
+  const isUnsavedChanges = useAppSelector((state) => state.createproject.isUnsavedChanges);
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customLineUpload, setCustomLineUpload] = useState(null);
   const [customPolygonUpload, setCustomPolygonUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
-
   useEffect(() => {
     switch (location.pathname) {
       case '/create-project':
@@ -86,6 +87,8 @@ const CreateNewProject = () => {
   return (
     <div>
       <CreateProjectHeader />
+      <Prompt when={isUnsavedChanges} message="Are you sure you want to leave, you have unsaved changes?" />
+
       <div className="fmtm-min-h-[72vh] fmtm-bg-gray-100 fmtm-box-border fmtm-border-[1px] fmtm-border-t-white fmtm-border-t-[0px]">
         <div className=" fmtm-w-full">
           <div>

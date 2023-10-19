@@ -62,6 +62,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   };
 
   const submission = () => {
+    dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
+
     const blob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], { type: 'application/json' });
 
     // Create a file object from the Blob
