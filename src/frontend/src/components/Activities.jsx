@@ -25,7 +25,7 @@ const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, pa
         <CoreModules.Typography variant="h2" style={{ wordWrap: 'break-word' }}>
           {history.action_text}
         </CoreModules.Typography>
-        <CoreModules.Stack direction={'row-reverse'}>
+        {/* <CoreModules.Stack direction={'row-reverse'}>
           <IconButtonCard
             element={
               <CoreModules.IconButton
@@ -52,7 +52,7 @@ const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, pa
               </CoreModules.IconButton>
             }
           />
-        </CoreModules.Stack>
+        </CoreModules.Stack> */}
       </CoreModules.Stack>
 
       <CoreModules.Divider color="lightgray" />
