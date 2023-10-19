@@ -67,15 +67,17 @@ fmtm-env
 temp_webmaps/local_only
 temp_webmaps/Naivasha
 
-# node
-src/frontend/node_modules
-package-lock.json
+# node & pnpm
+**/**/node_modules
+**/**/package-lock.json
+**/**/yarn.lock
+**/**/.pnpm-store
 
 # pdm
-**/.pdm.toml
-**/pdm.toml
-**/.pdm-python
-**/__pypackages__
+**/**/.pdm.toml
+**/**/pdm.toml
+**/**/.pdm-python
+**/**/__pypackages__
 
 # mkdocs
 site
