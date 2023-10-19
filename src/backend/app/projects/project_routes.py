@@ -42,6 +42,7 @@ from ..db import database, db_models
 from ..models.enums import TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
+from .project_crud import check_crs
 
 router = APIRouter(
     prefix="/projects",
@@ -368,6 +369,9 @@ async def upload_multi_project_boundary(
     content = await upload.read()
     boundary = json.loads(content)
 
+    # Validatiing Coordinate Reference System
+    check_crs(boundary)
+
     log.debug("Creating tasks for each polygon in project")
     result = project_crud.update_multi_polygon_project_boundary(
         db, project_id, boundary
@@ -409,9 +413,13 @@ async def task_split(
     # read entire file
     await upload.seek(0)
     content = await upload.read()
+    boundary = json.loads(content)
+
+    # Validatiing Coordinate Reference System
+    check_crs(boundary)
 
     result = await project_crud.split_into_tasks(
-        db, content, no_of_buildings, has_data_extracts
+        db, boundary, no_of_buildings, has_data_extracts
     )
 
     return result
@@ -446,6 +454,9 @@ async def upload_project_boundary(
     await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
+
+    # Validatiing Coordinate Reference System
+    check_crs(boundary)
 
     # update project boundary and dimension
     result = project_crud.update_project_boundary(db, project_id, boundary, dimension)
@@ -482,6 +493,9 @@ async def edit_project_boundary(
     await upload.seek(0)
     content = await upload.read()
     boundary = json.loads(content)
+
+    # Validatiing Coordinate Reference System
+    check_crs(boundary)
 
     result = project_crud.update_project_boundary(db, project_id, boundary, dimension)
     if not result:
@@ -760,6 +774,9 @@ async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(50
     content = await upload.read()
     boundary = json.loads(content)
 
+    # Validatiing Coordinate Reference System
+    check_crs(boundary)
+
     result = await project_crud.preview_tasks(boundary, dimension)
     return result
 
@@ -792,6 +809,9 @@ async def add_features(
     # read entire file
     content = await upload.read()
     features = json.loads(content)
+
+    # Validatiing Coordinate Reference System
+    check_crs(features)
 
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()

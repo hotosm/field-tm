@@ -30,6 +30,7 @@ import geoalchemy2
 import geojson
 import numpy as np
 import pkg_resources
+import pyproj
 import requests
 import segno
 import shapely.wkb as wkblib
@@ -54,6 +55,7 @@ from shapely.geometry import (
     mapping,
     shape,
 )
+from shapely.ops import transform
 from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -632,7 +634,7 @@ def get_osm_extracts(boundary: str):
 
 
 async def split_into_tasks(
-    db: Session, boundary: str, no_of_buildings: int, has_data_extracts: bool
+    db: Session, outline: str, no_of_buildings: int, has_data_extracts: bool
 ):
     """Splits a project into tasks.
 
@@ -645,7 +647,6 @@ async def split_into_tasks(
         Any: A GeoJSON object containing the tasks for the specified project.
     """
     project_id = uuid.uuid4()
-    outline = json.loads(boundary)
     all_results = []
     boundary_data = []
     result = []
@@ -1791,6 +1792,7 @@ def get_outline_from_geojson_file_in_zip(
         with zip.open(filename) as file:
             data = file.read()
             json_dump = json.loads(data)
+            check_crs(json_dump)  # Validatiing Coordinate Reference System
             feature_collection = geojson.FeatureCollection(json_dump)
             feature = feature_collection["features"][feature_index]
             geom = feature["geometry"]
@@ -2711,3 +2713,71 @@ def update_project_location_info(
     longitude, latitude = geometry.x, geometry.y
     address = get_address_from_lat_lon(latitude, longitude)
     db_project.location_str = address if address is not None else ""
+
+
+def convert_geojson_to_epsg4326(input_geojson):
+    source_crs = pyproj.CRS(
+        input_geojson.get("crs", {}).get("properties", {}).get("name", "EPSG:4326")
+    )
+    transformer = pyproj.Transformer.from_crs(source_crs, "EPSG:4326", always_xy=True)
+
+    # Convert the coordinates to EPSG:4326
+    transformed_features = []
+    for feature in input_geojson.get("features", []):
+        geom = shape(feature.get("geometry", {}))
+        transformed_geom = transform(transformer.transform, geom)
+        transformed_feature = {
+            "type": "Feature",
+            "geometry": transformed_geom.__geo_interface__,
+            "properties": feature.get("properties", {}),
+        }
+        transformed_features.append(transformed_feature)
+
+    # Create a new GeoJSON with EPSG:4326
+    output_geojson = {"type": "FeatureCollection", "features": transformed_features}
+
+    return output_geojson
+
+
+def check_crs(input_geojson: dict):
+    log.debug("validating coordinate reference system")
+
+    def is_valid_crs(crs_name):
+        valid_crs_list = [
+            "urn:ogc:def:crs:OGC:1.3:CRS84",
+            "urn:ogc:def:crs:EPSG::4326",
+            "WGS 84",
+        ]
+        return crs_name in valid_crs_list
+
+    def is_valid_coordinate(coord):
+        return -180 <= coord[0] <= 180 and -90 <= coord[1] <= 90
+
+    error_message = "ERROR: Unsupported coordinate system, it is recommended to use a GeoJSON file in WGS84(EPSG 4326) standard."
+    if "crs" in input_geojson:
+        crs = input_geojson["crs"]["properties"]["name"]
+        if not is_valid_crs(crs):
+            log.error(error_message)
+            raise HTTPException(status_code=400, detail=error_message)
+        return
+
+    if input_geojson["type"] == "FeatureCollection":
+        coordinates = input_geojson["features"][0]["geometry"]["coordinates"]
+    elif input_geojson["type"] == "Feature":
+        coordinates = input_geojson["geometry"]["coordinates"]
+    geometry_type = (
+        input_geojson["features"][0]["geometry"]["type"]
+        if input_geojson["type"] == "FeatureCollection"
+        else input_geojson["geometry"]["type"]
+    )
+
+    if geometry_type == "MultiPolygon":
+        first_coordinate = coordinates[0][0][
+            0
+        ]  # Get the first coordinate from the first point
+    else:
+        first_coordinate = coordinates[0][0]
+
+    if not is_valid_coordinate(first_coordinate):
+        log.error(error_message)
+        raise HTTPException(status_code=400, detail=error_message)
