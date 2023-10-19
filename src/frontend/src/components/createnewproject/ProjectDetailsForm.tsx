@@ -29,7 +29,7 @@ const ProjectDetailsForm = ({ flag }) => {
     navigate('/upload-area');
   };
 
-  const { handleSubmit, handleCustomChange, values, errors, checkValidationOnly }: any = useForm(
+  const { handleSubmit, handleChange, handleCustomChange, values, errors, checkValidationOnly }: any = useForm(
     projectDetails,
     submission,
     CreateProjectValidation,
@@ -72,7 +72,10 @@ const ProjectDetailsForm = ({ flag }) => {
       e.preventDefault();
     }
   };
-
+  const handleInputChanges = (e) => {
+    handleChange(e);
+    dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
+  };
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
       <div className="fmtm-bg-white xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -92,45 +95,50 @@ const ProjectDetailsForm = ({ flag }) => {
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 md:fmtm-w-[50%]">
             <InputTextField
               id="name"
+              name="name"
               label="Project Name"
               value={values?.name}
-              onChange={(e) => handleCustomChange('name', e.target.value)}
+              onChange={handleInputChanges}
               fieldType="text"
               required
               errorMsg={errors.name}
             />
             <TextArea
               id="short_description"
+              name="short_description"
               label="Short Description"
               rows={3}
               value={values?.short_description}
-              onChange={(e) => handleCustomChange('short_description', e.target.value)}
+              onChange={handleInputChanges}
               required
               errorMsg={errors.short_description}
             />
             <InputTextField
               id="odk_central_url"
+              name="odk_central_url"
               label="ODK Central URL"
               value={values?.odk_central_url}
-              onChange={(e) => handleCustomChange('odk_central_url', e.target.value)}
+              onChange={handleChange}
               fieldType="text"
               required
               errorMsg={errors.odk_central_url}
             />
             <InputTextField
               id="odk_central_user"
+              name="odk_central_user"
               label="Central ODK Email/Username"
               value={values?.odk_central_user}
-              onChange={(e) => handleCustomChange('odk_central_user', e.target.value)}
+              onChange={handleChange}
               fieldType="text"
               required
               errorMsg={errors.odk_central_user}
             />
             <InputTextField
               id="odk_central_password"
+              name="odk_central_password"
               label="Central ODK Password"
               value={values?.odk_central_password}
-              onChange={(e) => handleCustomChange('odk_central_password', e.target.value)}
+              onChange={handleChange}
               fieldType="password"
               required
               errorMsg={errors.odk_central_password}
