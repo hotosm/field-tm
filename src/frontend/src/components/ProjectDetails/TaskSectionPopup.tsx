@@ -9,7 +9,7 @@ const TaskSectionPopup = ({ body }) => {
 
   return (
     <div
-      className={`fmtm-z-[3000]  fmtm-duration-1000  ${
+      className={`fmtm-duration-1000 fmtm-z-[10002] ${
         taskModalStatus
           ? 'fmtm-bottom-0 fmtm-right-0 md:fmtm-bottom-[calc(20vh)] fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-[25rem]'
           : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(50vh)] md:fmtm-left-[calc(100vw)] fmtm-w-[100vw]'

@@ -91,7 +91,7 @@ const MobileFooter = () => {
     );
   };
   return (
-    <div className="fmtm-absolute fmtm-bottom-0 sm:fmtm-hidden fmtm-w-full fmtm-border-t-[1px]">
+    <div className="fmtm-absolute fmtm-bottom-0 sm:fmtm-hidden fmtm-w-full fmtm-border-t-[1px] fmtm-z-[10001]">
       <div
         className={`fmtm-w-full fmtm-grid fmtm-grid-cols-5 fmtm-bg-white  fmtm-pb-16 fmtm-pt-2 fmtm-gap-5 fmtm-px-2`}
       >

@@ -89,8 +89,8 @@ const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatu
     //     );
     //   })}
     // </CoreModules.Stack>
-    <div>
-      <div className="fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2 fmtm-mb-4">
+    <div className="fmtm-py-0 sm:fmtm-py-3">
+      <div className="sm:fmtm-hidden fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2 fmtm-mb-4">
         <AssetModules.LegendToggleIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '35px' }} />
         <p className="fmtm-text-2xl">Map Legend</p>
       </div>

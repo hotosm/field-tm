@@ -203,7 +203,7 @@ const ProjectInfomap = () => {
     );
   }, [selectedTask]);
 
-  const taskOnSelect = (properties) => {
+  const taskOnSelect = (properties, feature) => {
     dispatch(CoreModules.TaskActions.SetSelectedTask(properties.uid));
   };
 
