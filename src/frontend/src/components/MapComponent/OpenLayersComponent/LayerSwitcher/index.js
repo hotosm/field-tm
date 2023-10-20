@@ -7,8 +7,8 @@ import LayerTile from 'ol/layer/Tile';
 import SourceOSM from 'ol/source/OSM';
 import LayerSwitcher from 'ol-layerswitcher';
 import React, { useEffect } from 'react';
-
 import { XYZ } from 'ol/source';
+import { useLocation } from 'react-router-dom';
 
 // const mapboxOutdoors = new MapboxVector({
 //   styleUrl: 'mapbox://styles/geovation/ckpicg3of094w17nyqyd2ziie',
@@ -146,6 +146,33 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
       map.removeLayer(baseMaps);
     };
   }, [map, visible]);
+
+  const location = useLocation();
+  if (location.pathname.includes('project_details')) {
+    const olZoom = document.querySelector('.ol-zoom');
+    const layerSwitcher = document.querySelector('.layer-switcher');
+
+    if (olZoom) {
+      olZoom.style.display = 'none';
+    }
+
+    if (layerSwitcher) {
+      layerSwitcher.style.right = '19px';
+      layerSwitcher.style.top = '250px';
+      layerSwitcher.style.zIndex = '1000';
+
+      const layerSwitcherButton = layerSwitcher.querySelector('button');
+      if (layerSwitcherButton) {
+        layerSwitcherButton.style.width = '40px';
+        layerSwitcherButton.style.height = '40px';
+      }
+
+      layerSwitcher.style.backgroundColor = 'white';
+      layerSwitcher.style.display = 'flex';
+      layerSwitcher.style.justifyContent = 'center';
+      layerSwitcher.style.alignItems = 'center';
+    }
+  }
 
   return null;
 };

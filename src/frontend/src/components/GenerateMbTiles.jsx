@@ -21,7 +21,6 @@ const GenerateMbTiles = ({ setToggleGenerateModal, toggleGenerateModal, projectI
     border: '1px solid ',
     padding: '16px 32px 24px 32px',
   });
-  console.log(projectInfo, 'projectInfo');
   const downloadMbTiles = (tileId) => {
     dispatch(DownloadTile(`${import.meta.env.VITE_API_URL}/projects/download_tiles/?tile_id=${tileId}`, projectInfo));
   };

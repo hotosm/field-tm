@@ -47,6 +47,8 @@ const VectorLayer = ({
   setStyle,
   onModify,
   onDraw,
+  getTaskStatusStyle,
+  layerProperties,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
 
@@ -157,9 +159,8 @@ const VectorLayer = ({
       // Perform an action if a feature is found
       if (feature) {
         // Do something with the feature
-        console.log('Clicked feature:', feature.getProperties());
         // dispatch()
-        mapOnClick(feature.getProperties());
+        mapOnClick(feature.getProperties(), feature);
       }
     });
     setVectorLayer(vectorLyr);
@@ -182,6 +183,11 @@ const VectorLayer = ({
     if (!map || !vectorLayer || !visibleOnMap || !setStyle) return;
     vectorLayer.setStyle(setStyle);
   }, [map, setStyle, vectorLayer, visibleOnMap]);
+
+  useEffect(() => {
+    if (!map || !vectorLayer || !getTaskStatusStyle) return;
+    vectorLayer.setStyle((feature) => getTaskStatusStyle(feature));
+  }, [map, vectorLayer, getTaskStatusStyle]);
 
   useEffect(() => {
     if (!vectorLayer || !style.visibleOnMap) return;
@@ -208,6 +214,11 @@ const VectorLayer = ({
       feat.setProperties(properties);
     });
   }, [vectorLayer, properties]);
+
+  useEffect(() => {
+    if (!map || !vectorLayer || !layerProperties) return;
+    vectorLayer.setProperties(layerProperties);
+  }, [map, vectorLayer, layerProperties]);
 
   // style on hover
   useEffect(() => {

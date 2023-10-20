@@ -32,7 +32,7 @@ export default function Accordion({
         <div
           className={`fmtm-flex fmtm-items-center fmtm-justify-between
             fmtm-w-full fmtm-font-bold fmtm-gap-3 fmtm-cursor-pointer fmtm-text-2xl fmtm-py-2  fmtm-border-[#929DB3] ${
-              collapsed ? 'fmtm-border-b-[1px]' : 'fmtm-border-b-[2px]'
+              collapsed ? 'fmtm-border-b-[0px]' : 'fmtm-border-b-[2px]'
             }`}
           onClick={() => {
             if (disableHeaderClickToggle) return;

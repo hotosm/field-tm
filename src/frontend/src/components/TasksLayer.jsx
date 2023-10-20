@@ -35,8 +35,6 @@ const TasksLayer = (map, view, feature) => {
             properties: { centroid: task.bbox },
           });
         });
-        console.log(geojsonObject, 'geojsonObject');
-        console.log(state.projectTaskBoundries, 'projectTaskBoundries');
         const vectorSource = new VectorSource({
           features: new GeoJSON().readFeatures(geojsonObject, {
             featureProjection: get('EPSG:3857'),
