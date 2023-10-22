@@ -20,7 +20,7 @@
 from functools import lru_cache
 from typing import Any, Optional, Union
 
-from pydantic import FieldValidationInfo, PostgresDsn, field_validator
+from pydantic import PostgresDsn, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     def assemble_cors_origins(
         cls,
         val: Union[str, list[str]],
-        info: FieldValidationInfo,
+        info: ValidationInfo,
     ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
 
@@ -82,7 +82,7 @@ class Settings(BaseSettings):
 
     @field_validator("FMTM_DB_URL", mode="after")
     @classmethod
-    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
         """Build Postgres connection from environment variables."""
         if isinstance(v, str):
             return v

@@ -1,0 +1,25 @@
+name: Build Tag & Release Images
+
+on:
+  # Any tag push
+  push:
+    tags:
+      - "*"
+  # All releases
+  release:
+    types: [published]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  backend-build:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
+    with:
+      context: src/backend
+      build_target: prod
+      image_name: ghcr.io/${{ github.repository }}/backend
+      build_args: |
+        APP_VERSION=${{ github.ref_name }}
+        COMMIT_REF=${{ github.sha }}
+
+# Frontend is not built as build variables are required

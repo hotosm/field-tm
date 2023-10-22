@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-ARG node_version=16.19.1
+ARG node_version=18
 
 
 
@@ -24,8 +24,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         "jq" \
     && rm -rf /var/lib/apt/lists/*
-ARG ODK_CENTRAL_VERSION=${ODK_CENTRAL_VERSION}
-RUN git clone --depth 1 --branch ${ODK_CENTRAL_VERSION} \
+ARG ODK_CENTRAL_TAG
+RUN git clone --depth 1 --branch ${ODK_CENTRAL_TAG} \
     "https://github.com/getodk/central.git" \
     && cd central && git submodule update --init
 
@@ -35,36 +35,38 @@ FROM docker.io/node:${node_version}
 
 WORKDIR /usr/odk
 
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODENAME=\K\w+' /etc/os-release)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list && \
-  curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg && \
-  apt-get update && \
-  apt-get install -y cron gettext postgresql-client-14
-
 COPY --from=repo central/files/service/crontab /etc/cron.d/odk
-
-COPY --from=repo central/server/package*.json ./
-
-RUN npm clean-install --omit=dev --legacy-peer-deps --no-audit --fund=false --update-notifier=false
-RUN npm install pm2@5.2.2 -g
-
-COPY --from=repo central/server/ ./
 COPY --from=repo central/files/service/scripts/ ./
-COPY --from=repo central/files/service/pm2.config.js ./
-
 COPY --from=repo central/files/service/config.json.template /usr/share/odk/
 COPY --from=repo central/files/service/odk-cmd /usr/bin/
+# Add entrypoint script to init user
+COPY init-user-and-start.sh /
+# package.json must be added and installed prior to final COPY
+COPY --from=repo central/server/package*.json ./
 
-# Required to start via entrypoint
-RUN mkdir /etc/secrets sentry-versions \
+# Install system deps
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODENAME=\K\w+' /etc/os-release)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list && \
+    curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg && \
+    apt-get update && \
+    apt-get install -y cron wait-for-it gettext postgresql-client-14 netcat-traditional \
+    # Install node_modules
+    && npm clean-install --omit=dev --legacy-peer-deps --no-audit \
+        --fund=false --update-notifier=false \
+    # Required to start via entrypoint
+    && mkdir /etc/secrets sentry-versions \
     && echo 'jhs9udhy987gyds98gfyds98f' > /etc/secrets/enketo-api-key \
     && echo '1' > sentry-versions/server \
     && echo '1' > sentry-versions/central \
-    && echo '1' > sentry-versions/client
+    && echo '1' > sentry-versions/client \
+    # Set entrypoint executable
+    && chmod +x /init-user-and-start.sh
 
-# Add entrypoint script to init user
-COPY ./init-user-and-start.sh ./
-RUN chmod +x ./init-user-and-start.sh
-CMD ["./wait-for-it.sh", "central-db:5432", \
-    "--", "./init-user-and-start.sh"]
+# Add remaining files after deps installed
+COPY --from=repo central/server/ ./
 
+ENTRYPOINT ["/init-user-and-start.sh"]
 EXPOSE 8383
+
+# Add Healthcheck
+HEALTHCHECK --start-period=10s --interval=5s --retries=10 \
+    CMD nc -z localhost 8383 || exit 1

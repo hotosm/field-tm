@@ -17,15 +17,15 @@ jobs:
     with:
       context: odkcentral/api
       image_tags: |
-        "ghcr.io/hotosm/fmtm/odkcentral:${{ vars.ODK_CENTRAL_VERSION }}"
-        "ghcr.io/hotosm/fmtm/odkcentral:latest"
+        "ghcr.io/${{ github.repository }}/odkcentral:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral:latest"
       build_args: |
-        ODK_CENTRAL_VERSION=${{ vars.ODK_CENTRAL_VERSION }}
+        ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
 
   build-proxy:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     with:
       context: odkcentral/proxy
       image_tags: |
-        "ghcr.io/hotosm/fmtm/odkcentral-proxy:${{ vars.ODK_CENTRAL_VERSION }}"
-        "ghcr.io/hotosm/fmtm/odkcentral-proxy:latest"
+        "ghcr.io/${{ github.repository }}/odkcentral-proxy:${{ vars.ODK_CENTRAL_TAG }}"
+        "ghcr.io/${{ github.repository }}/odkcentral-proxy:latest"

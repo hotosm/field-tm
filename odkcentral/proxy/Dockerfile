@@ -23,3 +23,6 @@ RUN rm -rf ./* /etc/nginx/conf.d/default.conf /etc/nginx/nginx.conf
 COPY . /etc/nginx
 RUN cat /etc/nginx/central.crt /etc/nginx/ca.crt \
     >> /etc/nginx/central-fullchain.crt
+# Add Healthcheck
+HEALTHCHECK --start-period=5s --interval=5s --retries=8 \
+    CMD nc -z localhost 443 || exit 1
