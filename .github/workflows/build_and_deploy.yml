@@ -35,6 +35,7 @@ jobs:
 
   backend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
+    needs: [pytest]
     with:
       context: src/backend
       build_target: prod
@@ -45,6 +46,7 @@ jobs:
 
   frontend-main-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
+    needs: [frontend-tests]
     with:
       context: src/frontend
       dockerfile: prod.dockerfile
