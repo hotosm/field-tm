@@ -63,7 +63,7 @@ services:
       - "traefik.http.routers.http_catchall.middlewares=https_redirect"
 
   fmtm-db:
-    image: "postgis/postgis:14-3.3-alpine"
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.3-alpine}"
     container_name: fmtm_db
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
@@ -78,12 +78,7 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
-    build:
-      context: src/backend
-      target: prod
-      args:
-        APP_VERSION: ${API_VERSION}
+    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     container_name: fmtm_api
     volumes:
       - fmtm_logs:/opt/logs
@@ -107,7 +102,7 @@ services:
       - "traefik.http.routers.api.service=api-svc"
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     container_name: fmtm_migrations
     depends_on:
       - fmtm-db
@@ -119,7 +114,7 @@ services:
     restart: "on-failure:3"
 
   ui:
-    image: "ghcr.io/hotosm/fmtm/frontend:${FRONTEND_MAIN_VERSION}-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH}"
     build:
       context: src/frontend
       dockerfile: prod.dockerfile

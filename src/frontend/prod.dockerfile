@@ -2,11 +2,13 @@ FROM docker.io/node:18 as builder
 ARG MAINTAINER=admin@hotosm.org
 
 ARG APP_VERSION
+ARG COMMIT_REF
 ARG VITE_API_URL
 ENV VITE_API_URL="${VITE_API_URL}"
 
 LABEL org.hotosm.fmtm.app-name="fmtm-frontend" \
       org.hotosm.fmtm.app-version="${APP_VERSION}" \
+      org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
       org.hotosm.fmtm.maintainer="${MAINTAINER}" \
       org.hotosm.fmtm.api-url="${VITE_API_URL}"
 

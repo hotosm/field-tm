@@ -11,8 +11,13 @@ set -e
 # GITHUB_TOKEN=input
 # Feed to act using -s flag: -s GITHUB_TOKEN=input_personal_access_token
 
-# PR
-act pull_request -W .github/workflows/pr_test.yml \
+# PR Test Backend
+act pull_request -W .github/workflows/pr_test_backend.yml \
+    -e .github/workflows/tests/pr_payload.json \
+    --var-file=.env --secret-file=.env
+
+# PR Test Frontend
+act pull_request -W .github/workflows/pr_test_frontend.yml \
     -e .github/workflows/tests/pr_payload.json \
     --var-file=.env --secret-file=.env
 

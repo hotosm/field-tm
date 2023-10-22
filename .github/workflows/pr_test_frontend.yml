@@ -1,0 +1,19 @@
+name: PR Tests Frontend
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+      - development
+    # Workflow is triggered only if src/frontend changes
+    paths:
+      - src/frontend/**
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
+
+jobs:
+  frontend-tests:
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@main
+    with:
+      working_dir: src/frontend

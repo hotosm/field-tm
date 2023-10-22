@@ -30,7 +30,7 @@ networks:
 
 services:
   fmtm-db:
-    image: "postgis/postgis:14-3.3-alpine"
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.3-alpine}"
     container_name: fmtm_db
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
@@ -70,14 +70,14 @@ services:
     restart: "unless-stopped"
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${API_VERSION}-${GIT_BRANCH}"
+    image: "ghcr.io/hotosm/fmtm/backend:debug"
     container_name: fmtm_migrations
     depends_on:
       - fmtm-db
     env_file:
       - .env
     networks:
-      - fmtm-net
+      - fmtm-dev
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:3"
 
@@ -106,7 +106,7 @@ services:
     restart: "unless-stopped"
 
   s3:
-    image: "docker.io/minio/minio:RELEASE.2023-10-07T15-07-38Z"
+    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2023-10-07T15-07-38Z}"
     container_name: fmtm_s3
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
@@ -121,3 +121,9 @@ services:
       - fmtm-dev
     command: minio server # --console-address ":9090"
     restart: "unless-stopped"
+    healthcheck:
+      test: curl --fail http://localhost:9000/minio/health/live || exit 1
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 3

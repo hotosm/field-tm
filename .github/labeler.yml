@@ -9,7 +9,6 @@
   - "**/Dockerfile"
   - "**/*.dockerfile"
   - "**/*entrypoint.sh"
-  - "josm/**/*"
 "migration":
   - "src/backend/migrations/**/*"
 "documentation":
@@ -20,3 +19,5 @@
   - "INSTALL.md"
 "ODK":
   - "odkcentral/**/*"
+"contrib":
+  - "contrib/**/*"

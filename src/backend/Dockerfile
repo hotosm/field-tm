@@ -18,9 +18,11 @@ ARG PYTHON_IMG_TAG=3.10
 
 FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm as base
 ARG APP_VERSION
+ARG COMMIT_REF
 ARG PYTHON_IMG_TAG
 ARG MAINTAINER=admin@hotosm.org
 LABEL org.hotosm.fmtm.app-version="${APP_VERSION}" \
+      org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
       org.hotosm.fmtm.python-img-tag="${PYTHON_IMG_TAG}" \
       org.hotosm.fmtm.maintainer="${MAINTAINER}" \
       org.hotosm.fmtm.api-port="8000"
@@ -120,6 +122,9 @@ VOLUME /opt/tiles
 VOLUME /opt/app/images
 # Change to non-root user
 USER appuser
+# Add Healthcheck
+HEALTHCHECK --start-period=10s --interval=5s --retries=8 --timeout=5s \
+    CMD curl --fail http://localhost:8000 || exit 1
 
 
 
