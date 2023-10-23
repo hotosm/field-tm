@@ -14,6 +14,6 @@ on:
 
 jobs:
   frontend-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@main
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@1.0.0
     with:
       working_dir: src/frontend
