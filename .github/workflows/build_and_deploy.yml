@@ -97,7 +97,9 @@ jobs:
 
       - name: Backend smoke test
         run: |
-          docker compose up -d api --wait --wait-timeout 60
+          docker compose up -d api \
+            --wait --wait-timeout 60
+            --exit-code-from api
 
   smoke-test-frontend:
     runs-on: ubuntu-latest
