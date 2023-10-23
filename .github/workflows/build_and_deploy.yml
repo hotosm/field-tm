@@ -1,6 +1,6 @@
 # Workflow for build and auto-deploy of branches
 
-name: Build and Deploy
+name: 🔧 Build and Deploy
 
 on:
   # Push includes PR merge

@@ -1,4 +1,4 @@
-name: PR Tests Frontend
+name: 🧪 PR Tests Frontend
 
 on:
   pull_request:
