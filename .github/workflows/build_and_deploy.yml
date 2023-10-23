@@ -97,9 +97,13 @@ jobs:
 
       - name: Backend smoke test
         run: |
-          docker compose up -d api \
-            --wait --wait-timeout 60
-            --exit-code-from api
+          # Migrate db first, so api works
+          docker compose up -d migrations
+
+          # Run without migrations (give exit code 0)
+          docker compose up -d \
+            --no-deps --wait --wait-timeout 60 \
+            central-db central central-proxy s3 api
 
   smoke-test-frontend:
     runs-on: ubuntu-latest
