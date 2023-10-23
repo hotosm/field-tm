@@ -13,7 +13,7 @@ import { HomeActions } from '../store/slices/HomeSlice';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import FmtmLogo from '../assets/images/hotLog.png';
-import GenerateMbTiles from '../components/GenerateMbTiles';
+import GenerateBasemap from '../components/GenerateBasemap';
 import { ProjectBuildingGeojsonService } from '../api/SubmissionService';
 import TaskSectionPopup from '../components/ProjectDetails/TaskSectionPopup';
 import DialogTaskActions from '../components/DialogTaskActions';
@@ -190,7 +190,7 @@ const Home = () => {
     <div>
       {/* Customized Modal For Generate Tiles */}
       <div>
-        <GenerateMbTiles
+        <GenerateBasemap
           toggleGenerateModal={toggleGenerateModal}
           setToggleGenerateModal={setToggleGenerateModal}
           projectInfo={state.projectInfo}
