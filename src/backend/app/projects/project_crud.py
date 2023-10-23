@@ -39,7 +39,7 @@ from fastapi import File, HTTPException, UploadFile
 from geoalchemy2.shape import from_shape
 from geojson import dump
 from loguru import logger as log
-from osm_fieldwork import basemapper
+from osm_fieldwork.basemapper import create_basemap_file
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.filter_data import FilterData
 from osm_fieldwork.json2osm import json2osm
@@ -2300,19 +2300,25 @@ async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str)
 def get_project_tiles(
     db: Session,
     project_id: int,
-    source: str,
     background_task_id: uuid.UUID,
+    source: str,
+    output_format: str = "mbtiles",
+    tms: str = None,
 ):
-    """Get the tiles for a project."""
-    zooms = [12, 13, 14, 15, 16, 17, 18, 19]
-    source = source
+    """Get the tiles for a project.
+
+    Args:
+        project_id (int): ID of project to create tiles for.
+        background_task_id (uuid.UUID): UUID of background task to track.
+        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
+        output_format (str, optional): Default "mbtiles".
+            Other options: "pmtiles", "sqlite3".
+        tms (str, optional): Default None. Custom TMS provider URL.
+    """
+    zooms = "12-19"
     tiles_path_id = uuid.uuid4()
     tiles_dir = f"{TILESDIR}/{tiles_path_id}"
-    base = f"{tiles_dir}/{source}tiles"
-    outfile = f"{tiles_dir}/{project_id}_{source}tiles.mbtiles"
-
-    if not os.path.exists(base):
-        os.makedirs(base)
+    outfile = f"{tiles_dir}/{project_id}_{source}tiles.{output_format}"
 
     tile_path_instance = db_models.DbTilesPath(
         project_id=project_id,
@@ -2327,45 +2333,45 @@ def get_project_tiles(
         db.commit()
 
         # Project Outline
+        log.debug(f"Getting bbox for project: {project_id}")
         query = text(
-            f"""SELECT jsonb_build_object(
-                    'type', 'FeatureCollection',
-                    'features', jsonb_agg(feature)
-                    )
-                    FROM (
-                    SELECT jsonb_build_object(
-                        'type', 'Feature',
-                        'id', id,
-                        'geometry', ST_AsGeoJSON(outline)::jsonb
-                    ) AS feature
-                    FROM projects
-                    WHERE id={project_id}
-                    ) features;"""
+            f"""SELECT ST_XMin(ST_Envelope(outline)) AS min_lon,
+                        ST_YMin(ST_Envelope(outline)) AS min_lat,
+                        ST_XMax(ST_Envelope(outline)) AS max_lon,
+                        ST_YMax(ST_Envelope(outline)) AS max_lat
+                FROM projects
+                WHERE id = {project_id};"""
         )
 
         result = db.execute(query)
-        features = result.fetchone()[0]
+        project_bbox = result.fetchone()
+        log.debug(f"Extracted project bbox: {project_bbox}")
 
-        # Boundary
-        boundary_file = f"/tmp/{project_id}_boundary.geojson"
+        if project_bbox:
+            min_lon, min_lat, max_lon, max_lat = project_bbox
+        else:
+            log.error(f"Failed to get bbox from project: {project_id}")
 
-        # Update outfile containing osm extracts with the new geojson contents containing title in the properties.
-        with open(boundary_file, "w") as jsonfile:
-            jsonfile.truncate(0)
-            dump(features, jsonfile)
-
-        basemap = basemapper.BaseMapper(boundary_file, base, source, False)
-        outf = basemapper.DataFile(outfile, basemap.getFormat())
-        suffix = os.path.splitext(outfile)[1]
-        if suffix == ".mbtiles":
-            outf.addBounds(basemap.bbox)
-        for level in zooms:
-            basemap.getTiles(level)
-            if outfile:
-                # Create output database and specify image format, png, jpg, or tif
-                outf.writeTiles(basemap.tiles, base)
-            else:
-                log.info("Only downloading tiles to %s!" % base)
+        log.debug(
+            "Creating basemap with params: "
+            f"boundary={min_lon},{min_lat},{max_lon},{max_lat} | "
+            f"outfile={outfile} | "
+            f"zooms={zooms} | "
+            f"outdir={tiles_dir} | "
+            f"source={source} | "
+            f"xy={False} | "
+            f"tms={tms}"
+        )
+        create_basemap_file(
+            boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
+            outfile=outfile,
+            zooms=zooms,
+            outdir=tiles_dir,
+            source=source,
+            xy=False,
+            tms=tms,
+        )
+        log.info(f"Basemap created for project ID {project_id}: {outfile}")
 
         tile_path_instance.status = 4
         db.commit()

@@ -24,8 +24,7 @@ import AssetModules from '../shared/AssetModules';
 import GeoJSON from 'ol/format/GeoJSON';
 import FmtmLogo from '../assets/images/hotLog.png';
 
-import Overlay from 'ol/Overlay';
-import GenerateMbTiles from '../components/GenerateMbTiles';
+import GenerateBasemap from '../components/GenerateBasemap';
 import { ProjectBuildingGeojsonService } from '../api/SubmissionService';
 import { get } from 'ol/proj';
 import { buildingStyle, basicGeojsonTemplate } from '../utilities/mapUtils';
@@ -287,7 +286,7 @@ const Home = () => {
     <div>
       {/* Customized Modal For Generate Tiles */}
       <div>
-        <GenerateMbTiles
+        <GenerateBasemap
           toggleGenerateModal={toggleGenerateModal}
           setToggleGenerateModal={setToggleGenerateModal}
           projectInfo={state.projectInfo}

@@ -97,7 +97,7 @@ services:
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:3"
     healthcheck:
-      test: []  # Set the health check test to an empty value to disable it
+      test: [] # Set the health check test to an empty value to disable it
 
   ui:
     image: "ghcr.io/hotosm/fmtm/frontend:debug"

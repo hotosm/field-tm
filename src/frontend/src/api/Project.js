@@ -162,9 +162,13 @@ export const DownloadTile = (url, payload) => {
         const response = await CoreModules.axios.get(url, {
           responseType: 'blob',
         });
+
+        // Get filename from content-disposition header
+        const filename = response.headers['content-disposition'].split('filename=')[1];
+
         var a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = `${payload.title}_mbtiles.mbtiles`;
+        a.download = filename;
         a.click();
         dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: false }));
       } catch (error) {
