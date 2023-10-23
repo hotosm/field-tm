@@ -76,5 +76,5 @@ nav:
       - Docker Tips: dev/Docker-Tips.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
-  - API: swagger/index.html
+  - API: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
   - Class Hierarchy: apidocs/html/inherits.html
