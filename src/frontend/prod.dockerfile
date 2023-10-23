@@ -21,7 +21,7 @@ RUN pnpm install
 
 ENV NODE_ENV production
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 
 FROM docker.io/devforth/spa-to-http:1.0.3 as prod
