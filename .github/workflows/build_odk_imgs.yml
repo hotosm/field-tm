@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-odkcentral:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.0.0
     with:
       context: odkcentral/api
       image_tags: |
@@ -23,7 +23,7 @@ jobs:
         ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
 
   build-proxy:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.0.0
     with:
       context: odkcentral/proxy
       image_tags: |

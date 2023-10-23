@@ -10,6 +10,6 @@ on:
 
 jobs:
   publish-docs-to-wiki:
-    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@main
+    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@1.0.0
     with:
       homepage_path: "index.md"
