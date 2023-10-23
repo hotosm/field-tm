@@ -18,9 +18,6 @@ jobs:
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}
       docker_compose_service: api
       cache_extra_imgs: |
         "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"

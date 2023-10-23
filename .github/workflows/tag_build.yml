@@ -18,8 +18,4 @@ jobs:
       context: src/backend
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}
-
 # Frontend is not built as build variables are required
