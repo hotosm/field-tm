@@ -18,6 +18,7 @@
 import json
 import os
 import uuid
+from pathlib import Path
 from typing import List, Optional
 
 from fastapi import (
@@ -39,7 +40,7 @@ from sqlalchemy.orm import Session
 
 from ..central import central_crud
 from ..db import database, db_models
-from ..models.enums import TILES_SOURCE
+from ..models.enums import TILES_FORMATS, TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
 from .project_crud import check_crs
@@ -977,16 +978,25 @@ async def generate_project_tiles(
     source: str = Query(
         ..., description="Select a source for tiles", enum=TILES_SOURCE
     ),
+    format: str = Query(
+        "mbtiles", description="Select an output format", enum=TILES_FORMATS
+    ),
+    tms: str = Query(
+        None,
+        description="Provide a custom TMS URL, optional",
+    ),
     db: Session = Depends(database.get_db),
 ):
-    """Returns the tiles for a project.
+    """Returns basemap tiles for a project.
 
     Args:
-        project_id (int): The id of the project.
-        source (str): The selected source.
+        project_id (int): ID of project to create tiles for.
+        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
+        format (str, optional): Default "mbtiles". Other options: "pmtiles", "sqlite3".
+        tms (str, optional): Default None. Custom TMS provider URL.
 
     Returns:
-        Response: The File response object containing the tiles.
+        str: Success message that tile generation started.
     """
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
@@ -997,7 +1007,13 @@ async def generate_project_tiles(
     )
 
     background_tasks.add_task(
-        project_crud.get_project_tiles, db, project_id, source, background_task_id
+        project_crud.get_project_tiles,
+        db,
+        project_id,
+        background_task_id,
+        source,
+        format,
+        tms,
     )
 
     return {"Message": "Tile generation started"}
@@ -1018,14 +1034,24 @@ async def tiles_list(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.get("/download_tiles/")
 async def download_tiles(tile_id: int, db: Session = Depends(database.get_db)):
+    log.debug("Getting tile archive path from DB")
     tiles_path = (
         db.query(db_models.DbTilesPath)
         .filter(db_models.DbTilesPath.id == str(tile_id))
         .first()
     )
+    log.info(f"User requested download for tiles: {tiles_path.path}")
+
+    project_id = tiles_path.project_id
+    project_name = project_crud.get_project(db, project_id).project_name_prefix
+    filename = Path(tiles_path.path).name.replace(
+        f"{project_id}_", f"{project_name.replace(' ', '_')}_"
+    )
+    log.debug(f"Sending tile archive to user: {filename}")
+
     return FileResponse(
         tiles_path.path,
-        headers={"Content-Disposition": "attachment; filename=tiles.mbtiles"},
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

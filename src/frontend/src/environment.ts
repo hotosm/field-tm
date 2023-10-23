@@ -40,11 +40,17 @@ export default {
     // "SPLIT",
     // "ARCHIVED",
   ],
-  selectFormWays: [
-    { id: 1, label: 'esri', value: 'esri' },
-    { id: 2, label: 'bing', value: 'bing' },
-    { id: 3, label: 'google', value: 'google' },
-    { id: 4, label: 'topo', value: 'topo' },
+  baseMapProviders: [
+    { id: 1, label: 'ESRI', value: 'esri' },
+    { id: 2, label: 'Bing', value: 'bing' },
+    { id: 3, label: 'Google', value: 'google' },
+    { id: 4, label: 'Topo', value: 'topo' },
+    { id: 5, label: 'Custom TMS', value: 'tms' },
+  ],
+  tileOutputFormats: [
+    { id: 1, label: 'MBTiles', value: 'mbtiles' },
+    { id: 2, label: 'OSMAnd', value: 'sqlite3' },
+    { id: 3, label: 'PMTiles', value: 'pmtiles' },
   ],
   statusColors: {
     PENDING: 'gray',
