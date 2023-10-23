@@ -44,7 +44,7 @@ jobs:
         APP_VERSION=${{ github.ref_name }}
         COMMIT_REF=${{ github.sha }}
 
-  frontend-main-build:
+  frontend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
     needs: [frontend-tests]
     with:
@@ -59,8 +59,7 @@ jobs:
 
   smoke-test-backend:
     runs-on: ubuntu-latest
-    needs:
-      - backend-build
+    needs: [backend-build]
     environment:
       name: ${{ github.ref_name }}
 
@@ -86,7 +85,13 @@ jobs:
           echo "${SECRETS_CONTEXT}" | to_envs >> $GITHUB_ENV
 
       - name: Create .env file
-        run: env > .env
+        run: |
+          # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+          curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+          chmod +x envsubst
+
+          ./envsubst < .env.example > .env
+          "GIT_BRANCH=${GIT_BRANCH}" >> .env
 
       - name: Backend smoke test
         run: |
@@ -94,8 +99,7 @@ jobs:
 
   smoke-test-frontend:
     runs-on: ubuntu-latest
-    needs:
-      - frontend-main-build
+    needs: [frontend-build]
     environment:
       name: ${{ github.ref_name }}
 
