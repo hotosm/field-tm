@@ -46,7 +46,6 @@ jobs:
       dockerfile: prod.dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/frontend
-      environment: ${{ github.ref_name }}
 
   smoke-test-backend:
     runs-on: ubuntu-latest
