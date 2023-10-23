@@ -22,6 +22,3 @@ jobs:
       build_target: ci
       image_tags: |
         "ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}"
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}

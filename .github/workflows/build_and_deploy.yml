@@ -21,9 +21,6 @@ jobs:
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}
       docker_compose_service: api
       tag_override: ci-${{ github.ref_name }}
     secrets: inherit
@@ -40,9 +37,6 @@ jobs:
       context: src/backend
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}
 
   frontend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@main
@@ -52,10 +46,7 @@ jobs:
       dockerfile: prod.dockerfile
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/frontend
-      build_args: |
-        APP_VERSION=${{ github.ref_name }}
-        COMMIT_REF=${{ github.sha }}
-        VITE_API_URL=${{ vars.URL_SCHEME }}://${{ vars.API_URL }}"
+      environment: ${{ github.ref_name }}
 
   smoke-test-backend:
     runs-on: ubuntu-latest
