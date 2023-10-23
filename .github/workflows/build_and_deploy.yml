@@ -74,8 +74,13 @@ jobs:
           VARS_CONTEXT: ${{ toJson(vars) }}
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          to_envs() { jq -r "to_entries[] | \"\(.key)=\(.value)\""; }
+          # Random delimeter string for security
+          delim=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
+          # Parse JSON with multiline strings, using delimeter (Github specific)
+          to_envs() { jq -r "to_entries[] | \"\(.key)<<$delim\n\(.value)\n$delim\n\""; }
+
+          # Set all vars
           echo "GIT_BRANCH=${GIT_BRANCH}" >> $GITHUB_ENV
           echo "${VARS_CONTEXT}" | to_envs >> $GITHUB_ENV
           echo "${SECRETS_CONTEXT}" | to_envs >> $GITHUB_ENV
