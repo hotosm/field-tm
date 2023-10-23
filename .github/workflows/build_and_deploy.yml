@@ -87,11 +87,12 @@ jobs:
       - name: Create .env file
         run: |
           # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+          echo "Downloading envsubst"
           curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
           chmod +x envsubst
 
           ./envsubst < .env.example > .env
-          "GIT_BRANCH=${GIT_BRANCH}" >> .env
+          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
 
       - name: Backend smoke test
         run: |
