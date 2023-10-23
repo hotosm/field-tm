@@ -1,4 +1,4 @@
-name: Build Tag & Release Images
+name: 🔧 Build Tag & Release Images
 
 on:
   # Any tag push

@@ -1,4 +1,4 @@
-name: PR Label
+name: 🏷️ PR Label
 
 on:
   pull_request_target:

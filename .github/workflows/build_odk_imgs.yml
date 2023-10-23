@@ -1,4 +1,4 @@
-name: Build ODK Images
+name: 🔧 Build ODK Images
 
 on:
   # Push includes PR merge

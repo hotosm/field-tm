@@ -1,4 +1,4 @@
-name: Publish Docs to Wiki
+name: 🕮 Publish Docs to Wiki
 
 on:
   push:

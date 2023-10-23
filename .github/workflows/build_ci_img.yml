@@ -1,4 +1,4 @@
-name: Build CI Img
+name: 🔧 Build CI Img
 
 on:
   # Push includes PR merge
