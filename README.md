@@ -20,7 +20,7 @@
 
 <!-- markdownlint-restore -->
 
-🕮 [Documentation](https://hotosm.github.io/fmtm/)
+📖 [Documentation](https://hotosm.github.io/fmtm/)
 
 🎯 [Task Board](https://github.com/orgs/hotosm/projects/22)
 

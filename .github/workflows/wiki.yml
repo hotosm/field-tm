@@ -1,4 +1,4 @@
-name: 🕮 Publish Docs to Wiki
+name: 📖 Publish Docs to Wiki
 
 on:
   push:
@@ -10,6 +10,6 @@ on:
 
 jobs:
   publish-docs-to-wiki:
-    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@1.0.0
+    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@1.0.1
     with:
       homepage_path: "index.md"
