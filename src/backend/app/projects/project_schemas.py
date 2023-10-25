@@ -57,8 +57,6 @@ class BETAProjectUpload(BaseModel):
 
 class Feature(BaseModel):
     id: int
-    project_id: int
-    task_id: Optional[int] = None
     geometry: Optional[GeojsonFeature] = None
 
 
