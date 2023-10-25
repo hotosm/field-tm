@@ -685,25 +685,6 @@ def get_project_features(
         feature(json): JSON object containing a list of features
     """
     features = project_crud.get_project_features(db, project_id, task_id)
-    # Simplify the geojson to send (strip project_id & task_id to reduce size)
-    # TODO coordinate with frontend to remove the first level geometry key
-    # Only return geojson with properties:
-    # {'type': 'feature', 'geometry': {...}, 'properties': {...}}
-    features = [
-        {
-            "id": feature["id"],
-            "geometry": {
-                "id": feature["geometry"]["id"],
-                "type": feature["geometry"]["type"],
-                "geometry": feature["geometry"]["geometry"],
-                "properties": {
-                    "id": feature["geometry"]["properties"]["id"],
-                    "building": feature["geometry"]["properties"]["building"],
-                },
-            },
-        }
-        for feature in features
-    ]
     return features
 
 
