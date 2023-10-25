@@ -673,16 +673,16 @@ def get_project_features(
     task_id: int = None,
     db: Session = Depends(database.get_db),
 ):
-    """Get api for fetching all the features of a project.
+    """Fetch all the features for a project.
 
-    This endpoint allows you to get all the features of a project.
+    The features are generated from raw-data-api
 
-    ## Request Body
-    - `project_id` (int): the project's id. Required.
+    Args:
+        project_id (int): The project id.
+        task_id (int): The task id.
 
-    ## Response
-    - Returns a JSON object containing a list of features.
-
+    Returns:
+        feature(json): JSON object containing a list of features
     """
     features = project_crud.get_project_features(db, project_id, task_id)
     return features

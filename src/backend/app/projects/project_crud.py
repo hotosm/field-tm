@@ -576,6 +576,12 @@ async def preview_tasks(boundary: str, dimension: int):
 
 
 def get_osm_extracts(boundary: str):
+    """Request an extract from raw-data-api and extract the file contents.
+
+    - The query is posted to raw-data-api and job initiated for fetching the extract.
+    - The status of the job is polled every few seconds, until 'SUCCESS' is returned.
+    - The resulting zip file is downloaded, extracted, and data returned.
+    """
     # Filters for osm extracts
     query = {
         "filters": {
@@ -587,19 +593,27 @@ def get_osm_extracts(boundary: str):
         }
     }
 
+    # Boundary to extract data for
     json_boundary = json.loads(boundary)
-
     if json_boundary.get("features", None) is not None:
         query["geometry"] = json_boundary
         # query["geometry"] = json_boundary["features"][0]["geometry"]
-
     else:
         query["geometry"] = json_boundary
 
+    # Filename to generate
+    query["fileName"] = "extract"
+    # File format to generate
+    query["outputType"] = "geojson"
+    extract_filename = f'{query["fileName"]}.{query["outputType"]}'
+    log.debug(f"Setting data extract file name to: {extract_filename}")
+
+    log.debug(f"Query for raw data api: {query}")
     base_url = settings.UNDERPASS_API_URL
     query_url = f"{base_url}/snapshot/"
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
+    # Send the request to raw data api
     result = requests.post(query_url, data=json.dumps(query), headers=headers)
 
     if result.status_code == 200:
@@ -607,23 +621,26 @@ def get_osm_extracts(boundary: str):
     else:
         return False
 
+    # Check status of task (PENDING, or SUCCESS)
     task_url = f"{base_url}/tasks/status/{task_id}"
-    # extracts = requests.get(task_url)
     while True:
         result = requests.get(task_url, headers=headers)
         if result.json()["status"] == "PENDING":
-            time.sleep(1)
+            # Wait 2 seconds before polling again
+            time.sleep(2)
         elif result.json()["status"] == "SUCCESS":
             break
 
+    # TODO update code to generate fgb file format
+    # then input the download_url directly into our database
+    # (no need to download the file and extract)
     zip_url = result.json()["result"]["download_url"]
-    zip_url
     result = requests.get(zip_url, headers=headers)
     # result.content
     fp = BytesIO(result.content)
     zfp = zipfile.ZipFile(fp, "r")
-    zfp.extract("Export.geojson", "/tmp/")
-    data = json.loads(zfp.read("Export.geojson"))
+    zfp.extract(extract_filename, "/tmp/")
+    data = json.loads(zfp.read(extract_filename))
 
     for feature in data["features"]:
         properties = feature["properties"]
@@ -721,6 +738,10 @@ def split_polygon_into_tasks(
     db.add(db_task)
     db.commit()
 
+    # Get the data extract from raw-data-api
+    # Input into DbBuildings and DbOsmLines
+    # TODO update to use flatgeobuf file directly
+    # No need to store in our database
     if not has_data_extracts:
         data = get_osm_extracts(json.dumps(boundary_data))
         if not data:
@@ -1655,7 +1676,7 @@ def get_task_geometry(db: Session, project_id: int):
 
 
 async def get_project_features_geojson(db: Session, project_id: int):
-    # Get the geojson of those features for this task.
+    """Get a geojson of all features for a task."""
     query = text(
         f"""SELECT jsonb_build_object(
                 'type', 'FeatureCollection',
@@ -1676,6 +1697,25 @@ async def get_project_features_geojson(db: Session, project_id: int):
 
     result = db.execute(query)
     features = result.fetchone()[0]
+    # Simplify the geojson to send (strip project_id & task_id to reduce size)
+    # TODO coordinate with frontend to remove the first level geometry key
+    # Only return geojson with properties:
+    # {'type': 'feature', 'geometry': {...}, 'properties': {...}}
+    features = [
+        {
+            "id": feature["id"],
+            "geometry": {
+                "id": feature["geometry"]["id"],
+                "type": feature["geometry"]["type"],
+                "geometry": feature["geometry"]["geometry"],
+                "properties": {
+                    "id": feature["geometry"]["properties"]["id"],
+                    "building": feature["geometry"]["properties"]["building"],
+                },
+            },
+        }
+        for feature in features
+    ]
     return features
 
 
