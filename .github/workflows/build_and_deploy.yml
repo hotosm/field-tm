@@ -27,12 +27,12 @@ jobs:
     secrets: inherit
 
   frontend-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@1.0.1
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@1.1.1
     with:
       working_dir: src/frontend
 
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.0.1
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.1
     needs: [pytest]
     with:
       context: src/backend
@@ -40,7 +40,7 @@ jobs:
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.0.1
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.1
     needs: [frontend-tests]
     with:
       context: src/frontend
@@ -116,7 +116,7 @@ jobs:
     needs:
       - smoke-test-backend
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy.yml@1.0.1
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy.yml@1.1.1
     with:
       environment: ${{ github.ref_name }}
       docker_compose_file: "docker-compose.${{ github.ref_name }}.yml"
