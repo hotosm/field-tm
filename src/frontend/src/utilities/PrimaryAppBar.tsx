@@ -66,6 +66,7 @@ export default function PrimaryAppBar() {
         size={windowSize}
         type={type}
         onSignOut={handleOnSignOut}
+        setOpen={setOpen}
       />
       <CoreModules.AppBar
         position="static"
