@@ -186,6 +186,12 @@ const Home = () => {
     fillOpacity: '0',
   };
 
+  useEffect(() => {
+    if (mobileFooterSelection !== 'explore') {
+      setToggleGenerateModal(false);
+    }
+  }, [mobileFooterSelection]);
+
   return (
     <div>
       {/* Customized Modal For Generate Tiles */}
