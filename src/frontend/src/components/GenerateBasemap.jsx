@@ -206,8 +206,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
         <CoreModules.Grid item xs={12}>
           <CoreModules.TableContainer
             component={CoreModules.Paper}
-            sx={{ maxHeight: '45vh', overflowY: 'auto' }}
-            className="scrollbar"
+            className="scrollbar fmtm-overflow-y-auto fmtm-max-h-[38vh] lg:fmtm-max-h-[45vh]"
           >
             <CoreModules.Table sx={{ minWidth: 650 }} aria-label="simple table">
               <CoreModules.TableHead>
