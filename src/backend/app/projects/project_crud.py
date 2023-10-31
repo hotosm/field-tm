@@ -1524,9 +1524,13 @@ def generate_appuser_files(
                 boundary = {"type": "Feature", "properties": {}, "geometry": outline}
                 data_extract = pg.execQuery(boundary)
                 filter = FilterData(xlsform)
-                filtered_data_extract = filter.cleanData(data_extract)
 
                 updated_data_extract = {"type": "FeatureCollection", "features": []}
+                filtered_data_extract = (
+                    filter.cleanData(data_extract)
+                    if data_extract
+                    else updated_data_extract
+                )
 
                 # Collect feature mappings for bulk insert
                 feature_mappings = []
