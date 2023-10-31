@@ -130,13 +130,6 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
               ></input>
               <i className="material-icons">search</i>
             </div>
-            <AssetModules.FilterAltIcon
-              sx={{
-                fontSize: 25,
-                color: '#9B9999',
-                cursor: 'pointer',
-              }}
-            />
           </div>
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <p>Show Map</p>
@@ -148,7 +141,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
         </div>
         <div className="fmtm-mt-6 fmtm-mb-1 fmtm-flex fmtm-items-center fmtm-justify-between">
           <p className="fmtm-text-[#A8A6A6]">
-            showing {filteredProjectCount} of {totalProjectCount} projects
+            Showing {filteredProjectCount} {filteredProjectCount > 1 ? 'projects' : 'project'}
           </p>
           {/* <div className="fmtm-flex fmtm-gap-1">
             <AssetModules.WindowIcon
