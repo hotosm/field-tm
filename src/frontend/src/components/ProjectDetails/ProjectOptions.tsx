@@ -3,6 +3,7 @@ import CoreModules from '../../shared/CoreModules';
 import AssetModules from '../../shared/AssetModules';
 import environment from '../../environment';
 import { DownloadDataExtract, DownloadProjectForm } from '../../api/Project';
+import { ProjectActions } from '../../store/slices/ProjectSlice';
 
 const ProjectOptions = ({ setToggleGenerateModal }) => {
   const dispatch = CoreModules.useAppDispatch();
@@ -119,7 +120,10 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
             </CoreModules.Button>
           </CoreModules.Link>
           <CoreModules.Button
-            onClick={() => setToggleGenerateModal(true)}
+            onClick={() => {
+              setToggleGenerateModal(true);
+              dispatch(ProjectActions.SetMobileFooterSelection('explore'));
+            }}
             variant="contained"
             color="error"
             sx={{ width: '200px', mr: '15px' }}
