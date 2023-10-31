@@ -94,7 +94,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
             odk_central_password: projectDetails.odk_central_password,
           },
           // dont send xform_title if upload custom form is selected
-          xform_title: projectDetails.formWays === 'custom_form' ? null : projectDetails.formCategorySelection,
+          xform_title: projectDetails.formCategorySelection,
           dimension: projectDetails.dimension,
           splitting_algorithm: splitTasksSelection,
           form_ways: projectDetails.formWays,
@@ -136,10 +136,10 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         }),
       );
     } else if (splitTasksSelection === 'task_splitting_algorithm') {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(drawnGeojsonFile);
-      a.download = 'test.json';
-      a.click();
+      // const a = document.createElement('a');
+      // a.href = URL.createObjectURL(drawnGeojsonFile);
+      // a.download = 'test.json';
+      // a.click();
       dispatch(
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task_split`,
