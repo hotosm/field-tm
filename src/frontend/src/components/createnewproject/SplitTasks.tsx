@@ -136,10 +136,10 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         }),
       );
     } else if (splitTasksSelection === 'task_splitting_algorithm') {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(drawnGeojsonFile);
-      a.download = 'test.json';
-      a.click();
+      // const a = document.createElement('a');
+      // a.href = URL.createObjectURL(drawnGeojsonFile);
+      // a.download = 'test.json';
+      // a.click();
       dispatch(
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task_split`,
