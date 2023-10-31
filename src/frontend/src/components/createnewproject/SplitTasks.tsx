@@ -94,7 +94,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
             odk_central_password: projectDetails.odk_central_password,
           },
           // dont send xform_title if upload custom form is selected
-          xform_title: projectDetails.formWays === 'custom_form' ? null : projectDetails.formCategorySelection,
+          xform_title: projectDetails.formCategorySelection,
           dimension: projectDetails.dimension,
           splitting_algorithm: splitTasksSelection,
           form_ways: projectDetails.formWays,
