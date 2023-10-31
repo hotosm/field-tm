@@ -18,10 +18,11 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
   const modalStyle = (theme) => ({
     width: '90vw', // Responsive modal width using vw
-    height: '95vh',
+    height: '90vh',
     bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
     border: '1px solid ',
     padding: '16px 32px 24px 32px',
+    maxWidth: '1000px',
   });
   const downloadBasemap = (tileId) => {
     dispatch(DownloadTile(`${import.meta.env.VITE_API_URL}/projects/download_tiles/?tile_id=${tileId}`, projectInfo));
@@ -203,35 +204,70 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
         {/* Table Content */}
         <CoreModules.Grid item xs={12}>
-          <CoreModules.TableContainer component={CoreModules.Paper} sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
+          <CoreModules.TableContainer
+            component={CoreModules.Paper}
+            sx={{ maxHeight: '45vh', overflowY: 'auto' }}
+            className="scrollbar"
+          >
             <CoreModules.Table sx={{ minWidth: 650 }} aria-label="simple table">
               <CoreModules.TableHead>
                 <CoreModules.TableRow>
-                  <CoreModules.TableCell>Id</CoreModules.TableCell>
-                  <CoreModules.TableCell align="right">Source</CoreModules.TableCell>
-                  <CoreModules.TableCell align="right">Status</CoreModules.TableCell>
-                  <CoreModules.TableCell align="right"></CoreModules.TableCell>
+                  {/* <CoreModules.TableCell>Id</CoreModules.TableCell> */}
+                  <CoreModules.TableCell>S.N.</CoreModules.TableCell>
+                  <CoreModules.TableCell align="center">Source</CoreModules.TableCell>
+                  <CoreModules.TableCell align="center">Status</CoreModules.TableCell>
+                  <CoreModules.TableCell align="center"></CoreModules.TableCell>
                 </CoreModules.TableRow>
               </CoreModules.TableHead>
               <CoreModules.TableBody>
-                {tilesList.map((list) => (
+                {tilesList.map((list, i) => (
                   <CoreModules.TableRow key={list.name}>
-                    <CoreModules.TableCell component="th" scope="row">
+                    {/* <CoreModules.TableCell component="th" scope="row">
                       {list.id}
+                    </CoreModules.TableCell> */}
+                    <CoreModules.TableCell component="th" scope="row">
+                      {i + 1}
                     </CoreModules.TableCell>
-                    <CoreModules.TableCell align="right">{list.tile_source}</CoreModules.TableCell>
-                    <CoreModules.TableCell align="right" sx={{ color: environment.statusColors[list.status] }}>
-                      {list.status === 'SUCCESS' ? 'COMPLETED' : list.status}
+                    <CoreModules.TableCell align="center">
+                      <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
+                        {list.tile_source}
+                      </div>
                     </CoreModules.TableCell>
-                    <CoreModules.TableCell align="right">
+                    <CoreModules.TableCell align="center" sx={{ color: environment.statusColors[list.status] }}>
+                      {/* {list.status === 'SUCCESS' ? 'COMPLETED' : list.status} */}
                       {list.status === 'SUCCESS' ? (
-                        <AssetModules.FileDownloadIcon
-                          sx={{ cursor: 'pointer' }}
-                          onClick={() => downloadBasemap(list.id)}
-                        ></AssetModules.FileDownloadIcon>
+                        <div className="fmtm-bg-green-50 fmtm-text-green-700 fmtm-border-green-700 fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
+                          COMPLETED
+                        </div>
                       ) : (
-                        <></>
+                        <div
+                          className={`${
+                            list.status === 'PENDING'
+                              ? 'fmtm-bg-yellow-50 fmtm-text-yellow-500 fmtm-border-yellow-500'
+                              : 'fmtm-bg-red-50 fmtm-text-red-500 fmtm-border-red-500'
+                          }  fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto`}
+                        >
+                          {list.status}
+                        </div>
                       )}
+                    </CoreModules.TableCell>
+                    <CoreModules.TableCell align="center">
+                      <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
+                        {list.status === 'SUCCESS' ? (
+                          <AssetModules.FileDownloadIcon
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() => downloadBasemap(list.id)}
+                            className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
+                          ></AssetModules.FileDownloadIcon>
+                        ) : (
+                          <></>
+                        )}
+                        <AssetModules.DeleteIcon
+                          sx={{ cursor: 'pointer' }}
+                          onClick={() => {}}
+                          className="fmtm-text-red-500 hover:fmtm-text-red-700"
+                        ></AssetModules.DeleteIcon>
+                      </div>
                     </CoreModules.TableCell>
                   </CoreModules.TableRow>
                 ))}
