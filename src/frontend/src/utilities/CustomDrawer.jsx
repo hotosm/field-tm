@@ -3,9 +3,13 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
+import { createLoginWindow } from '../utilfunctions/login';
+import { LoginActions } from '../store/slices/LoginSlice';
+import { ProjectActions } from '../store/slices/ProjectSlice';
 
-export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut }) {
+export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut, setOpen }) {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const dispatch = CoreModules.useAppDispatch();
 
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
@@ -81,6 +85,12 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     },
   ];
 
+  const handleOnSignOut = () => {
+    setOpen(false);
+    dispatch(LoginActions.signOut(null));
+    dispatch(ProjectActions.clearProjects([]));
+  };
+
   return (
     <div>
       <React.Fragment>
@@ -144,14 +154,11 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
                   <NavLink
                     key={index}
                     to={menuDetails.ref}
-                    style={{
-                      textDecoration: 'inherit',
-                      color: 'inherit',
-                      fontFamily: 'inherit',
-                      fontSize: '1.01587rem',
-                      background: '#000000',
-                      opacity: 0.8,
-                    }}
+                    className={`fmtm-no-underline fmtm-text-inherit fmtm-opacity-80 ${
+                      menuDetails.name === 'Explore Projects' || menuDetails.name === 'Manage Organizations'
+                        ? 'lg:fmtm-hidden'
+                        : ''
+                    }`}
                   >
                     <CoreModules.ListItem
                       id={index.toString()}
@@ -164,6 +171,23 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
                   </NavLink>
                 ),
               )}
+              <div className="fmtm-ml-4 fmtm-mt-2 lg:fmtm-hidden">
+                {token != null ? (
+                  <div
+                    className="fmtm-text-[#d73e3e] hover:fmtm-text-[#d73e3e] fmtm-cursor-pointer fmtm-opacity-80"
+                    onClick={handleOnSignOut}
+                  >
+                    Sign Out
+                  </div>
+                ) : (
+                  <div
+                    className="fmtm-text-[#44546a] hover:fmtm-text-[#d73e3e] fmtm-cursor-pointer fmtm-opacity-80"
+                    onClick={() => createLoginWindow('/')}
+                  >
+                    Sign In
+                  </div>
+                )}
+              </div>
             </CoreModules.List>
           </CoreModules.Stack>
         </SwipeableDrawer>

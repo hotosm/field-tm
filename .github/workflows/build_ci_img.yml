@@ -22,3 +22,14 @@ jobs:
       build_target: ci
       image_tags: |
         "ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}"
+
+  invalidate-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete CI Img Cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete image-cache-${{ runner.os }} -R \
+            ${{ github.repository }} -B ${{ github.ref_name }} --confirm
