@@ -48,6 +48,7 @@ import {
   LocationOn as LocationOnIcon,
   CropFree as CropFreeIcon,
   LegendToggle as LegendToggleIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -106,4 +107,5 @@ export default {
   LocationOnIcon,
   CropFreeIcon,
   LegendToggleIcon,
+  DeleteIcon,
 };
