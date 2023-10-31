@@ -18,7 +18,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
   const modalStyle = (theme) => ({
     width: '90vw', // Responsive modal width using vw
-    height: '90vh',
+    // height: '90vh',
     bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
     border: '1px solid ',
     padding: '16px 32px 24px 32px',
@@ -206,7 +206,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
         <CoreModules.Grid item xs={12}>
           <CoreModules.TableContainer
             component={CoreModules.Paper}
-            className="scrollbar fmtm-overflow-y-auto fmtm-max-h-[38vh] lg:fmtm-max-h-[45vh]"
+            className="scrollbar fmtm-overflow-y-auto fmtm-max-h-[38vh] lg:fmtm-max-h-[45vh] sm:fmtm-mb-5"
           >
             <CoreModules.Table sx={{ minWidth: 650 }} aria-label="simple table">
               <CoreModules.TableHead>
@@ -254,7 +254,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                       <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
                         {list.status === 'SUCCESS' ? (
                           <AssetModules.FileDownloadIcon
-                            sx={{ cursor: 'pointer' }}
+                            sx={{ cursor: 'pointer', fontSize: '22px' }}
                             onClick={() => downloadBasemap(list.id)}
                             className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
                           ></AssetModules.FileDownloadIcon>
@@ -262,7 +262,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                           <></>
                         )}
                         <AssetModules.DeleteIcon
-                          sx={{ cursor: 'pointer' }}
+                          sx={{ cursor: 'pointer', fontSize: '22px' }}
                           onClick={() => {}}
                           className="fmtm-text-red-500 hover:fmtm-text-red-700"
                         ></AssetModules.DeleteIcon>
