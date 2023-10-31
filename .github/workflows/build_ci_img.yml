@@ -30,5 +30,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh extension install actions/gh-actions-cache
           gh actions-cache delete image-cache-${{ runner.os }} -R \
             ${{ github.repository }} -B ${{ github.ref_name }} --confirm
