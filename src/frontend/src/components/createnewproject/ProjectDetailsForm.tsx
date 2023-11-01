@@ -166,8 +166,8 @@ const ProjectDetailsForm = ({ flag }) => {
             </div>
           </div>
           <div className="md:fmtm-w-[50%] fmtm-flex fmtm-flex-col fmtm-gap-6">
-            <div>
-              <div className="fmtm-flex fmtm-items-center ">
+            <div className="">
+              <div className="fmtm-flex fmtm-items-center fmtm-max-w-[18rem]">
                 <CustomSelect
                   title="Organization Name"
                   placeholder="Organization Name"
@@ -179,7 +179,7 @@ const ProjectDetailsForm = ({ flag }) => {
                   onValueChange={(value) => handleCustomChange('organisation_id', value && +value)}
                 />
                 <AssetModules.AddIcon
-                  className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-4"
+                  className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-9"
                   onClick={() => createPopup('Create Organization', 'createOrganization?popup=true')}
                 />
               </div>
