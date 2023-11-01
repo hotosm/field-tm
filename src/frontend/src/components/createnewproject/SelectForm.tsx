@@ -85,7 +85,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
             onSubmit={handleSubmit}
             className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between"
           >
-            <div className="">
+            <div className="fmtm-w-[13.35rem]">
               <CustomSelect
                 title="Select form category"
                 placeholder="Select form category"
