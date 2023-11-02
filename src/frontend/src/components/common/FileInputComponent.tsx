@@ -28,15 +28,17 @@ const FileInputComponent = ({
             accept={accept}
           />
         </label>
-        <div className="fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-slate-100 fmtm-duration-300 fmtm-cursor-pointer">
-          <AssetModules.ReplayIcon
-            className="fmtm-text-gray-600"
-            onClick={() => {
-              onResetFile();
-              customFileRef.current.value = '';
-            }}
-          />
-        </div>
+        {customFile && (
+          <div className="fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-slate-100 fmtm-duration-300 fmtm-cursor-pointer">
+            <AssetModules.ReplayIcon
+              className="fmtm-text-gray-600"
+              onClick={() => {
+                onResetFile();
+                customFileRef.current.value = '';
+              }}
+            />
+          </div>
+        )}
       </div>
       {errorMsg && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errorMsg}</p>}
 

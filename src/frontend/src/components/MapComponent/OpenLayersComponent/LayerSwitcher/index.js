@@ -148,31 +148,31 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
   }, [map, visible]);
 
   const location = useLocation();
-  if (location.pathname.includes('project_details')) {
-    const olZoom = document.querySelector('.ol-zoom');
+  useEffect(() => {
     const layerSwitcher = document.querySelector('.layer-switcher');
-
-    if (olZoom) {
-      olZoom.style.display = 'none';
-    }
-
     if (layerSwitcher) {
-      layerSwitcher.style.right = '19px';
-      layerSwitcher.style.top = '250px';
-      layerSwitcher.style.zIndex = '1000';
-
       const layerSwitcherButton = layerSwitcher.querySelector('button');
       if (layerSwitcherButton) {
-        layerSwitcherButton.style.width = '40px';
-        layerSwitcherButton.style.height = '40px';
+        layerSwitcherButton.style.width = '38px';
+        layerSwitcherButton.style.height = '38px';
       }
-
       layerSwitcher.style.backgroundColor = 'white';
       layerSwitcher.style.display = 'flex';
       layerSwitcher.style.justifyContent = 'center';
       layerSwitcher.style.alignItems = 'center';
     }
-  }
+    if (location.pathname.includes('project_details')) {
+      const olZoom = document.querySelector('.ol-zoom');
+      if (olZoom) {
+        olZoom.style.display = 'none';
+      }
+      if (layerSwitcher) {
+        layerSwitcher.style.right = '19px';
+        layerSwitcher.style.top = '250px';
+        layerSwitcher.style.zIndex = '1000';
+      }
+    }
+  }, [map]);
 
   return null;
 };
