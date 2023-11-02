@@ -65,11 +65,11 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
   //   }
   // };
 
-  useEffect(() => {
-    setGeojsonFile(null);
-    dispatch(CreateProjectActions.SetDrawnGeojson(null));
-    dispatch(CreateProjectActions.SetTotalAreaSelection(null));
-  }, [uploadAreaSelection]);
+  // useEffect(() => {
+  //   setGeojsonFile(null);
+  //   dispatch(CreateProjectActions.SetDrawnGeojson(null));
+  //   dispatch(CreateProjectActions.SetTotalAreaSelection(null));
+  // }, [uploadAreaSelection]);
   const convertFileToGeojson = async (file) => {
     if (!file) return;
     const fileReader = new FileReader();
@@ -97,10 +97,14 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
     handleCustomChange('uploadedAreaFile', files[0].name);
     setGeojsonFile(files[0]);
     convertFileToGeojson(files[0]);
+    handleCustomChange('drawnGeojson', null);
+    dispatch(CreateProjectActions.SetTotalAreaSelection(null));
   };
 
   const resetFile = () => {
     setGeojsonFile(null);
+    handleCustomChange('uploadedAreaFile', null);
+    handleCustomChange('drawnGeojson', null);
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
   };
@@ -140,15 +144,16 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
               />
               {uploadAreaSelection === 'draw' && (
                 <div>
-                  <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-3">Draw a polygon on the map to plot the area</p>
+                  <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-5">Draw a polygon on the map to plot the area</p>
                   <Button
                     btnText="Click to Reset"
                     btnType="primary"
                     type="button"
                     onClick={() => resetFile()}
                     className=""
+                    disabled={drawnGeojson && !geojsonFile ? false : true}
                   />
-                  <p className="fmtm-text-gray-700 fmtm-pt-8">
+                  <p className="fmtm-text-gray-700 fmtm-mt-5">
                     Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
                   </p>
                   {errors.drawnGeojson && (
@@ -161,8 +166,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
                   customFile={geojsonFile}
                   onChange={changeFileHandler}
                   onResetFile={resetFile}
-                  accept="*.geojson, *.json"
-                  fileDescription="*The supported file formats are zipped shapefile, geojson or kml files."
+                  accept=".geojson, .json"
+                  fileDescription="*The supported file format is geojson file."
                   btnText="Upload a Geojson"
                   errorMsg={errors.uploadedAreaFile}
                 />
@@ -219,6 +224,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
                 handleCustomChange('drawnGeojson', geojson);
                 dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+                setGeojsonFile(null);
               }}
             />
           </div>

@@ -36,7 +36,7 @@ const Button = ({ btnText, btnType, type, onClick, disabled, className, count, d
       type={type === 'submit' ? 'submit' : 'button'}
       onClick={onClick}
       className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 ${btnStyle(
-        isLoading ? 'disabled' : btnType,
+        isLoading || disabled ? 'disabled' : btnType,
         className,
       )}`}
       disabled={disabled || isLoading}

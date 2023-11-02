@@ -81,46 +81,45 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
       </div>
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
         <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
-          <form
-            onSubmit={handleSubmit}
-            className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between"
-          >
-            <div className="fmtm-w-[13.35rem]">
-              <CustomSelect
-                title="Select form category"
-                placeholder="Select form category"
-                data={formCategoryList}
-                dataKey="id"
-                valueKey="title"
-                label="title"
-                value={formValues.formCategorySelection}
-                onValueChange={(value) => {
-                  handleCustomChange('formCategorySelection', value);
+          <form onSubmit={handleSubmit} className="fmtm-flex fmtm-flex-col lg:fmtm-w-[40%] fmtm-justify-between">
+            <div className="fmtm-flex fmtm-flex-col  fmtm-gap-6">
+              <div className="fmtm-w-[13.35rem]">
+                <CustomSelect
+                  title="Select form category"
+                  placeholder="Select form category"
+                  data={formCategoryList}
+                  dataKey="id"
+                  valueKey="title"
+                  label="title"
+                  value={formValues.formCategorySelection}
+                  onValueChange={(value) => {
+                    handleCustomChange('formCategorySelection', value);
+                  }}
+                  errorMsg={errors.formCategorySelection}
+                />
+              </div>
+              <RadioButton
+                topic="You may choose to use Existing form or upload your own xlsx form"
+                options={osmFeatureTypeOptions}
+                direction="column"
+                value={formValues.formWays}
+                onChangeData={(value) => {
+                  handleCustomChange('formWays', value);
                 }}
-                errorMsg={errors.formCategorySelection}
+                errorMsg={errors.formWays}
               />
+              {formValues.formWays === 'custom_form' ? (
+                <FileInputComponent
+                  onChange={changeFileHandler}
+                  onResetFile={resetFile}
+                  customFile={customFormFile}
+                  btnText="Select a Form"
+                  accept=".xlsx"
+                  fileDescription="*The supported file formats are .xlsx, .xls"
+                  errorMsg={errors.customFormUpload}
+                />
+              ) : null}
             </div>
-            <RadioButton
-              topic="You may choose to use Existing form or upload your own xlsx form"
-              options={osmFeatureTypeOptions}
-              direction="column"
-              value={formValues.formWays}
-              onChangeData={(value) => {
-                handleCustomChange('formWays', value);
-              }}
-              errorMsg={errors.formWays}
-            />
-            {formValues.formWays === 'custom_form' ? (
-              <FileInputComponent
-                onChange={changeFileHandler}
-                onResetFile={resetFile}
-                customFile={customFormFile}
-                btnText="Select a Form"
-                accept=".xlsx"
-                fileDescription="*The supported file formats are .xlsx, .xls"
-                errorMsg={errors.customFormUpload}
-              />
-            ) : null}
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
               <Button
                 btnText="PREVIOUS"

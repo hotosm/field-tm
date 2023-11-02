@@ -19,7 +19,7 @@ interface RadioButtonProps {
 const RadioButton: React.FC<RadioButtonProps> = ({ topic, options, direction, onChangeData, value, errorMsg }) => (
   <div>
     <div>
-      <p className="fmtm-text-xl fmtm-font-[600] fmtm-mb-3">{topic}</p>
+      <p className="fmtm-text-base fmtm-font-[600] fmtm-mb-2">{topic}</p>
     </div>
     <div className={`fmtm-flex ${direction === 'column' ? 'fmtm-flex-col' : 'fmtm-flex-wrap fmtm-gap-x-16'}`}>
       {options.map((option) => {
@@ -38,7 +38,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({ topic, options, direction, on
             />
             <label
               htmlFor={option.value}
-              className="fmtm-text-lg fmtm-bg-white fmtm-text-gray-500 fmtm-mb-1 fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2"
+              className="fmtm-text-base fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2"
             >
               <p>{option.label}</p>
               <div>{option.icon && option.icon}</div>
