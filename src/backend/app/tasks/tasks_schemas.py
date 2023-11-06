@@ -79,6 +79,7 @@ class Task(TaskBase):
 
 
 class TaskOut(TaskBase):
+    qr_code_base64: str
     task_status_str: TaskStatusOption
     pass
 
