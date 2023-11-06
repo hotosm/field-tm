@@ -81,12 +81,16 @@ const ProjectDetailsForm = ({ flag }) => {
       <div className="fmtm-bg-white xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
         <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Project Details</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>Fill in your project basic information such as name, description, hashtag, etc. </span>
-          <span>To complete the first step, you will need the account credentials of ODK central server.</span>{' '}
-          <span>Here are the instructions for setting up a Central ODK Server on Digital Ocean.</span>
+          <span>
+            Fill in your project basic information such as name, description, hashtag, etc. This captures essential
+            information about your project.
+          </span>
+          <span>To complete the first step, you will need the login credentials of ODK Central Server.</span>{' '}
+          <span>
+            Here are the instructions for setting up a Central ODK Server on Digital Ocean, if you haven’t already.
+          </span>
         </p>
       </div>
-
       <form
         className="xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar"
         onSubmit={handleSubmit}

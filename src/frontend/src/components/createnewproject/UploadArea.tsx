@@ -114,11 +114,15 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
         <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Upload Area</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>Fill in your project basic information such as name, description, hashtag, etc. </span>
-          <span>To complete the first step, you will need the account credentials of ODK central server.</span>{' '}
-          <span>Here are the instructions for setting up a Central ODK Server on Digital Ocean.</span>
+          <span>You can choose to upload the AOI. Note: The file upload only supports .geojson format. </span>
+          <div>
+            <p>You may also draw a freehand polygon on map interface.</p>{' '}
+            <p>Click on the reset button to redraw the AOI.</p>
+          </div>
+          <span>The total area of the AOI is also calculated and displayed on the screen.</span>
         </p>
       </div>
+
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
         <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
           <form
