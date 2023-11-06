@@ -48,14 +48,7 @@ const TasksSubmission = () => {
   //Fetch project for the first time
   useEffect(() => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedProjectId)) == -1) {
-      dispatch(
-        ProjectById(
-          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}`,
-          state.projectTaskBoundries,
-          environment.decode(encodedProjectId),
-        ),
-        state.projectTaskBoundries,
-      );
+      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));
       dispatch(
         ProjectBuildingGeojsonService(
           `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
@@ -63,14 +56,7 @@ const TasksSubmission = () => {
       );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(
-        ProjectById(
-          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}`,
-          state.projectTaskBoundries,
-          environment.decode(encodedProjectId),
-        ),
-        state.projectTaskBoundries,
-      );
+      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
