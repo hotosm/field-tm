@@ -112,6 +112,12 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
   };
 
+  useEffect(() => {
+    if (splitTasksSelection === 'choose_area_as_task') {
+      dispatch(CreateProjectActions.SetDividedTaskGeojson(null));
+    }
+  }, [splitTasksSelection]);
+
   const {
     handleSubmit,
     handleCustomChange,
@@ -228,7 +234,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     ));
   };
 
-  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || drawnGeojson?.features?.length;
+  const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || drawnGeojson?.features?.length || 1;
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
   return (
     <>
@@ -299,7 +305,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                       )}
                     </>
                   )}
-                  {formValues.splitTaskOption === 'task_splitting_algorithm' && (
+                  {splitTasksSelection === 'task_splitting_algorithm' && (
                     <>
                       <div className="fmtm-mt-6 fmtm-flex fmtm-items-center fmtm-gap-4">
                         <p className="fmtm-text-gray-500">Average number of buildings per task: </p>
