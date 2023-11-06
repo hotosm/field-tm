@@ -19,11 +19,19 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
   const handleDownload = (downloadType) => {
     if (downloadType === 'form') {
       dispatch(
-        DownloadProjectForm(`${import.meta.env.VITE_API_URL}/projects/download_form/${decodedId}/`, downloadType),
+        DownloadProjectForm(
+          `${import.meta.env.VITE_API_URL}/projects/download_form/${decodedId}/`,
+          downloadType,
+          decodedId,
+        ),
       );
     } else if (downloadType === 'geojson') {
       dispatch(
-        DownloadProjectForm(`${import.meta.env.VITE_API_URL}/projects/${decodedId}/download_tasks`, downloadType),
+        DownloadProjectForm(
+          `${import.meta.env.VITE_API_URL}/projects/${decodedId}/download_tasks`,
+          downloadType,
+          decodedId,
+        ),
       );
     }
   };

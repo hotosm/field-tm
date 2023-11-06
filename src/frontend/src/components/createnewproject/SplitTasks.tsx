@@ -255,7 +255,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
             </p>
             <div className="fmtm-flex fmtm-justify-center fmtm-gap-6 fmtm-pt-5  ">
               {/* <Button btnText="CANCEL" btnType="secondary"></Button> */}
-              <Button btnText="PROCEED" onClick={() => setToggleStatus(false)} btnType="primary"></Button>
+              <Button
+                btnText="PROCEED"
+                onClick={() => navigate(`/project_details/${environment.encode(projectDetailsResponse?.id)}`)}
+                btnType="primary"
+              ></Button>
             </div>
           </div>
         }

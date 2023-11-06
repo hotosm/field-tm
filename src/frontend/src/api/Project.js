@@ -63,11 +63,11 @@ export const ProjectById = (url, existingProjectList, projectId) => {
   };
 };
 
-export const DownloadProjectForm = (url, payload) => {
+export const DownloadProjectForm = (url, payload, projectId) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: true }));
 
-    const fetchProjectForm = async (url, payload) => {
+    const fetchProjectForm = async (url, payload, projectId) => {
       try {
         let response;
         if (payload === 'form') {
@@ -79,7 +79,7 @@ export const DownloadProjectForm = (url, payload) => {
         }
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = `Project_form.${payload === 'form' ? '.xls' : '.geojson'}`;
+        a.download = `${payload === 'form' ? `project_form_${projectId}.xls` : `task_polygons_${projectId}.geojson`}`;
         a.click();
         dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: false }));
       } catch (error) {
@@ -88,7 +88,7 @@ export const DownloadProjectForm = (url, payload) => {
         dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: false }));
       }
     };
-    await fetchProjectForm(url, payload);
+    await fetchProjectForm(url, payload, projectId);
   };
 };
 export const DownloadDataExtract = (url, payload) => {
