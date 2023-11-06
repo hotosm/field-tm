@@ -13,8 +13,8 @@ export const ProjectFilesById = (url, taskId) => {
           cancelToken: source.token,
         });
         const resp = fileJson.data;
-        const taskIndex = resp.project_tasks.findIndex((task) => task.id == taskId);
-        const getQrcodeByIndex = resp.project_tasks[taskIndex].qr_code_base64;
+        const taskIndex = resp.findIndex((task) => task.id == taskId);
+        const getQrcodeByIndex = resp[taskIndex].qr_code_base64;
         setQrcode(getQrcodeByIndex);
         setLoading(false);
       } catch (error) {
@@ -34,6 +34,5 @@ export const ProjectFilesById = (url, taskId) => {
 
     return cleanUp;
   }, [taskId]);
-
   return { loading, qrcode };
 };

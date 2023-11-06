@@ -1,17 +1,21 @@
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import CoreModules from '../shared/CoreModules';
 import environment from '../environment';
-export const ProjectById = (url, existingProjectList, projectId) => {
+
+export const ProjectById = (existingProjectList, projectId) => {
   return async (dispatch) => {
-    // dispatch(HomeActions.HomeProjectLoading(true))
-    const fetchProjectById = async (url, existingProjectList) => {
+    const fetchProjectById = async (projectId, existingProjectList) => {
       try {
-        const project = await CoreModules.axios.get(url);
+        const project = await CoreModules.axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}`);
+        const taskList = await CoreModules.axios.get(
+          `${import.meta.env.VITE_API_URL}/tasks/task-list?project_id=${projectId}`,
+        );
         const taskBbox = await CoreModules.axios.get(
           `${import.meta.env.VITE_API_URL}/tasks/point_on_surface?project_id=${projectId}`,
         );
-        const resp = project.data;
-        const persistingValues = resp.project_tasks.map((data) => {
+        const projectResp = project.data;
+        const taskListResp = taskList.data;
+        const persistingValues = taskListResp.map((data) => {
           return {
             id: data.id,
             project_task_name: data.project_task_name,
@@ -24,7 +28,7 @@ export const ProjectById = (url, existingProjectList, projectId) => {
           };
         });
         // added centroid from another api to projecttaskboundries
-        const projectTaskBoundries = [{ id: resp.id, taskBoundries: persistingValues }];
+        const projectTaskBoundries = [{ id: projectResp.id, taskBoundries: persistingValues }];
         const mergedBboxIntoTask = projectTaskBoundries[0].taskBoundries.map((projectTask) => {
           const filteredTaskIdCentroid = taskBbox.data.find((task) => task.id === projectTask.id).point[0];
           return {
@@ -37,20 +41,20 @@ export const ProjectById = (url, existingProjectList, projectId) => {
         );
         dispatch(
           ProjectActions.SetProjectInfo({
-            id: resp.id,
-            outline_geojson: resp.outline_geojson,
-            priority: resp.priority || 2,
-            priority_str: resp.priority_str || 'MEDIUM',
-            title: resp.project_info?.[0]?.name,
-            location_str: resp.location_str,
-            description: resp.project_info[0]?.description,
-            short_description: resp.project_info[0]?.short_description,
-            num_contributors: resp.num_contributors,
-            total_tasks: resp.total_tasks,
-            tasks_mapped: resp.tasks_mapped,
-            tasks_validated: resp.tasks_validated,
-            xform_title: resp.xform_title,
-            tasks_bad: resp.tasks_bad,
+            id: projectResp.id,
+            outline_geojson: projectResp.outline_geojson,
+            priority: projectResp.priority || 2,
+            priority_str: projectResp.priority_str || 'MEDIUM',
+            title: projectResp.project_info?.[0]?.name,
+            location_str: projectResp.location_str,
+            description: projectResp.project_info[0]?.description,
+            short_description: projectResp.project_info[0]?.short_description,
+            num_contributors: projectResp.num_contributors,
+            total_tasks: projectResp.total_tasks,
+            tasks_mapped: projectResp.tasks_mapped,
+            tasks_validated: projectResp.tasks_validated,
+            xform_title: projectResp.xform_title,
+            tasks_bad: projectResp.tasks_bad,
           }),
         );
       } catch (error) {
@@ -58,7 +62,7 @@ export const ProjectById = (url, existingProjectList, projectId) => {
       }
     };
 
-    await fetchProjectById(url, existingProjectList);
+    await fetchProjectById(projectId, existingProjectList);
     dispatch(ProjectActions.SetNewProjectTrigger());
   };
 };

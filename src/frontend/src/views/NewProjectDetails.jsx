@@ -77,26 +77,11 @@ const Home = () => {
     dispatch(ProjectActions.SetNewProjectTrigger());
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-
-      dispatch(
-        ProjectById(
-          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries,
-          environment.decode(encodedId),
-        ),
-        state.projectTaskBoundries,
-      );
+      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
       // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(
-        ProjectById(
-          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}`,
-          state.projectTaskBoundries,
-          environment.decode(encodedId),
-        ),
-        state.projectTaskBoundries,
-      );
+      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
     }
     if (Object.keys(state.projectInfo)?.length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));

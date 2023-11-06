@@ -11,8 +11,9 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
   const dispatch = CoreModules.useAppDispatch();
   const [open, setOpen] = useState(false);
   const params = CoreModules.useParams();
+
   const { loading, qrcode } = ProjectFilesById(
-    `${import.meta.env.VITE_API_URL}/projects/${environment.decode(params.id)}`,
+    `${import.meta.env.VITE_API_URL}/tasks/task-list?project_id=${environment.decode(params.id)}`,
     task,
   );
 
