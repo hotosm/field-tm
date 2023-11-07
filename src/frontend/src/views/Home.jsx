@@ -15,6 +15,7 @@ const Home = () => {
 
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const showMapStatus = CoreModules.useAppSelector((state) => state.home.showMapStatus);
+  const homeProjectPagination = CoreModules.useAppSelector((state) => state.home.homeProjectPagination);
   // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
   // console.log('state main :',state)
 
@@ -34,7 +35,8 @@ const Home = () => {
 
   const theme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   useEffect(() => {
-    dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?skip=0&limit=100`));
+    // dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?skip=0&limit=100`));
+    dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?page=1&results_per_page=12`));
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
 
@@ -62,16 +64,39 @@ const Home = () => {
             <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
               {filteredProjectCards.length > 0 ? (
                 <div>
-                  <div
-                    className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
-                      !showMapStatus
-                        ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
-                        : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[33rem] lg:fmtm-overflow-y-scroll lg:scrollbar'
-                    }`}
-                  >
-                    {filteredProjectCards.map((value, index) => (
-                      <ExploreProjectCard data={value} key={index} />
-                    ))}
+                  <div>
+                    <div
+                      className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
+                        !showMapStatus
+                          ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
+                          : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[33rem] lg:fmtm-overflow-y-scroll lg:scrollbar'
+                      }`}
+                    >
+                      {filteredProjectCards.map((value, index) => (
+                        <ExploreProjectCard data={value} key={index} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="fmtm-flex fmtm-justify-center fmtm-mt-5">
+                    <CoreModules.Pagination
+                      page={homeProjectPagination?.page}
+                      count={homeProjectPagination?.pages}
+                      shape="rounded"
+                      size={type === 'xs' ? 'small' : 'large'}
+                      sx={{
+                        '.Mui-selected': {
+                          background: 'rgb(216,73,55) !important',
+                          color: 'white',
+                        },
+                      }}
+                      onChange={(e, page) => {
+                        dispatch(
+                          HomeSummaryService(
+                            `${import.meta.env.VITE_API_URL}/projects/summaries?page=${page}&results_per_page=12`,
+                          ),
+                        );
+                      }}
+                    />
                   </div>
                 </div>
               ) : (

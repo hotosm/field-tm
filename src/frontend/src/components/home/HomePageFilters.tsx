@@ -12,6 +12,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
 
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const showMapStatus: boolean = CoreModules.useAppSelector((state) => state.home.showMapStatus);
+  const homeProjectPagination = CoreModules.useAppSelector((state) => state.home.homeProjectPagination);
 
   const { windowSize } = windowDimention();
   const searchableInnerStyle: any = {
@@ -141,7 +142,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) 
         </div>
         <div className="fmtm-mt-6 fmtm-mb-1 fmtm-flex fmtm-items-center fmtm-justify-between">
           <p className="fmtm-text-[#A8A6A6]">
-            Showing {filteredProjectCount} {filteredProjectCount > 1 ? 'projects' : 'project'}
+            Showing {filteredProjectCount} of {homeProjectPagination.total} projects
           </p>
           {/* <div className="fmtm-flex fmtm-gap-1">
             <AssetModules.WindowIcon
