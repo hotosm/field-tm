@@ -34,8 +34,12 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 from loguru import logger as log
+from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
+from osm_rawdata.postgres import PostgresClient
+from shapely.geometry import mapping, shape
+from shapely.ops import unary_union
 from sqlalchemy.orm import Session
 
 from ..central import central_crud
@@ -641,8 +645,10 @@ async def generate_files(
         try:
             extracts_contents = await data_extracts.read()
             json.loads(extracts_contents)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
+        except json.JSONDecodeError as e:
+            raise HTTPException(
+                status_code=400, detail="Provide a valid geojson file"
+            ) from e
 
     # generate a unique task ID using uuid
     background_task_id = uuid.uuid4()
@@ -670,6 +676,49 @@ async def generate_files(
     )
 
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
+
+
+@router.post("/view_data_extracts/")
+async def get_data_extracts(
+    aoi: UploadFile,
+    category: Optional[str] = Form(...),
+):
+    try:
+        # read entire file
+        await aoi.seek(0)
+        aoi_content = await aoi.read()
+        boundary = json.loads(aoi_content)
+
+        # Validatiing Coordinate Reference System
+        check_crs(boundary)
+        xlsform = f"{xlsforms_path}/{category}.xls"
+        config_path = f"{data_models_path}/{category}.yaml"
+
+        if boundary["type"] == "FeatureCollection":
+            # Convert each feature into a Shapely geometry
+            geometries = [
+                shape(feature["geometry"]) for feature in boundary["features"]
+            ]
+            updated_geometry = unary_union(geometries)
+        else:
+            updated_geometry = shape(boundary["geometry"])
+
+        # Convert the merged MultiPolygon to a single Polygon using convex hull
+        merged_polygon = updated_geometry.convex_hull
+
+        # Convert the merged polygon back to a GeoJSON-like dictionary
+        boundary = {
+            "type": "Feature",
+            "geometry": mapping(merged_polygon),
+            "properties": {},
+        }
+
+        # # OSM Extracts using raw data api
+        pg = PostgresClient("underpass", config_path)
+        data_extract = pg.execQuery(boundary)
+        return data_extract
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/update-form/{project_id}")
