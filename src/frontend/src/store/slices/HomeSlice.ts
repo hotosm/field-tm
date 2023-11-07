@@ -14,6 +14,7 @@ const HomeSlice = CoreModules.createSlice({
     },
     showMapStatus: true,
     projectCentroidLoading: false,
+    homeProjectPagination: {},
   },
   reducers: {
     SetHomeProjectSummary(state, action) {
@@ -39,6 +40,9 @@ const HomeSlice = CoreModules.createSlice({
     },
     SetProjectCentroid(state, action) {
       state.homeProjectSummary = action.payload;
+    },
+    SetHomeProjectPagination(state, action) {
+      state.homeProjectPagination = action.payload;
     },
   },
 });

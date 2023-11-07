@@ -10,7 +10,9 @@ export const HomeSummaryService: Function = (url: string) => {
     const fetchHomeSummaries = async (url) => {
       try {
         const fetchHomeData = await axios.get(url);
-        const resp: any = fetchHomeData.data;
+        const resp: any = fetchHomeData.data.results;
+        const paginationResp = fetchHomeData.data.pagination;
+        dispatch(HomeActions.SetHomeProjectPagination(paginationResp));
         const fetchProjectCentroid = await axios.get(`${import.meta.env.VITE_API_URL}/projects/centroid/`);
         const projectCentroidResp: any = fetchProjectCentroid.data;
         const addedProjectCentroidOnSummary = resp.map((project) => {
