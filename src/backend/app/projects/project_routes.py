@@ -109,12 +109,12 @@ def get_task(lat: float, long: float, user_id: int = None):
     return "Coming..."
 
 
-@router.get("/summaries", response_model=List[project_schemas.ProjectSummary])
+@router.get("/summaries", response_model=project_schemas.PaginatedProjectSummaries)
 async def read_project_summaries(
     user_id: int = None,
     hashtags: str = None,
-    skip: int = 0,
-    limit: int = 100,
+    page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
+    results_per_page: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
 ):
     if hashtags:
@@ -123,8 +123,33 @@ async def read_project_summaries(
             filter(lambda hashtag: hashtag.startswith("#"), hashtags)
         )  # filter hashtags that do start with #
 
+    skip = (page - 1) * results_per_page
+    limit = results_per_page
+
+    total_projects = db.query(db_models.DbProject).count()
+    hasNext = (page * results_per_page) < total_projects
+    hasPrev = page > 1
+    total_pages = (total_projects + results_per_page - 1) // results_per_page
+
     projects = project_crud.get_project_summaries(db, user_id, skip, limit, hashtags)
-    return projects
+    project_summaries = [
+        project_schemas.ProjectSummary.from_db_project(project) for project in projects
+    ]
+
+    response = project_schemas.PaginatedProjectSummaries(
+        results=project_summaries,
+        pagination=project_schemas.PaginationInfo(
+            hasNext=hasNext,
+            hasPrev=hasPrev,
+            nextNum=page + 1 if hasNext else None,
+            page=page,
+            pages=total_pages,
+            prevNum=page - 1 if hasPrev else None,
+            perPage=results_per_page,
+            total=total_projects,
+        ),
+    )
+    return response
 
 
 @router.get("/{project_id}", response_model=project_schemas.ProjectOut)

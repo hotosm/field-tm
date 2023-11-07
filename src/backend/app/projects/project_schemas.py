@@ -21,6 +21,7 @@ from typing import List, Optional, Union
 from geojson_pydantic import Feature as GeojsonFeature
 from pydantic import BaseModel
 
+from ..db import db_models
 from ..models.enums import ProjectPriority, ProjectStatus
 from ..tasks import tasks_schemas
 from ..users.user_schemas import User
@@ -75,6 +76,45 @@ class ProjectSummary(BaseModel):
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
     organisation_logo: Optional[str] = None
+
+    @classmethod
+    def from_db_project(
+        cls,
+        project: db_models.DbProject,
+    ) -> "ProjectSummary":
+        priority = project.priority
+        return cls(
+            id=project.id,
+            priority=priority,
+            priority_str=priority.name,
+            title=project.title,
+            location_str=project.location_str,
+            description=project.description,
+            total_tasks=project.total_tasks,
+            tasks_mapped=project.tasks_mapped,
+            num_contributors=project.num_contributors,
+            tasks_validated=project.tasks_validated,
+            tasks_bad=project.tasks_bad,
+            hashtags=project.hashtags,
+            organisation_id=project.organisation_id,
+            organisation_logo=project.organisation_logo,
+        )
+
+
+class PaginationInfo(BaseModel):
+    hasNext: bool
+    hasPrev: bool
+    nextNum: Optional[int]
+    page: int
+    pages: int
+    prevNum: Optional[int]
+    perPage: int
+    total: int
+
+
+class PaginatedProjectSummaries(BaseModel):
+    results: List[ProjectSummary]
+    pagination: PaginationInfo
 
 
 class ProjectBase(BaseModel):
