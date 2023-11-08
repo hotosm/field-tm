@@ -19,7 +19,7 @@ jobs:
       image_tags: |
         "ghcr.io/${{ github.repository }}/odkcentral:${{ vars.ODK_CENTRAL_TAG }}"
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
-      build_args: |
+      extra_build_args: |
         ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
 
   build-proxy:
