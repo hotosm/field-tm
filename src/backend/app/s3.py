@@ -1,10 +1,12 @@
 """Initialise the S3 buckets for FMTM to function."""
 
+import json
 import sys
 from io import BytesIO
 
 from loguru import logger as log
 from minio import Minio
+from minio.commonconfig import CopySource
 
 from app.config import settings
 
@@ -82,11 +84,70 @@ def get_obj_from_bucket(bucket_name: str, s3_path: str) -> BytesIO:
         response.release_conn()
 
 
-def create_bucket_if_not_exists(client: Minio, bucket_name: str):
+def copy_obj_bucket_to_bucket(
+    source_bucket: str, source_path: str, dest_bucket: str, dest_path: str
+) -> BytesIO:
+    """Copy an object from one bucket to another, without downloading.
+
+    Occurs entirely on the server side.
+    The buckets must be hosted in the same Minio instance.
+
+    Args:
+        source_bucket (str): The name of the source S3 bucket.
+        source_path (str): The path to the source S3 object in the source bucket.
+        dest_bucket (str): The name of the destination S3 bucket.
+        dest_path (str): The path to the destination S3 object
+            in the destination bucket.
+
+    Returns:
+        bool: True if the object was successfully copied, False if there was a failure.
+    """
+    client = s3_client()
+
+    try:
+        log.error(
+            f"Copying {source_path} from bucket {source_bucket} "
+            f"to {dest_path} on bucket {dest_bucket}"
+        )
+        client.copy_object(
+            dest_bucket,
+            dest_path,
+            CopySource(source_bucket, source_path),
+        )
+
+    except Exception as e:
+        log.error(e)
+        log.error(f"Failed to copy object {source_path} to new bucket: {dest_bucket}")
+        return False
+
+    return True
+
+
+def create_bucket_if_not_exists(client: Minio, bucket_name: str, is_public: bool):
     """Checks if a bucket exits, else creates it."""
     if not client.bucket_exists(bucket_name):
         log.info(f"Creating S3 bucket: {bucket_name}")
         client.make_bucket(bucket_name)
+        if is_public:
+            log.info("Setting public (anonymous) download policy")
+            policy = policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "*"},
+                        "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                        "Resource": f"arn:aws:s3:::{bucket_name}",
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"AWS": "*"},
+                        "Action": "s3:GetObject",
+                        "Resource": f"arn:aws:s3:::{bucket_name}/*",
+                    },
+                ],
+            }
+            client.set_bucket_policy(bucket_name, json.dumps(policy))
     else:
         log.debug(f"S3 bucket already exists: {bucket_name}")
 
