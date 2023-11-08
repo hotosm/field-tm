@@ -25,6 +25,7 @@ MDS := \
 	docs/dev/Docker-Tips.md \
 	docs/dev/Frontend.md \
 	docs/dev/Production.md \
+	docs/dev/Version-Control.md \
 	docs/dev/Setup.md \
 	docs/dev/Troubleshooting.md \
 
