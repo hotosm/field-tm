@@ -111,7 +111,6 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: str
     S3_SECRET_KEY: str
     S3_BUCKET_NAME_BASEMAPS: str = "basemaps"
-    S3_BUCKET_NAME_OVERLAYS: str = "overlays"
 
     UNDERPASS_API_URL: str = "https://raw-data-api0.hotosm.org/v1"
     SENTRY_DSN: Optional[str] = None
