@@ -1,1 +1,465 @@
 # Changelog
+
+## 0.1.0 (2023-11-08)
+
+### Feat
+
+- api to get data extracts for the given aoi and category (#960)
+- added Pagination info in the project summary (#959)
+- selection of basemap output formats, TMS input, mobile UI (#896)
+- add Minio to backend compose stack & CI (#908)
+- addressing of project using Nominatim (#913)
+- new UI for create project (#918)
+- backend tests for project endpoints (#900)
+- add map clustering on main page (#905)
+- returned required media name in a response of form validity (#871)
+- remove microfrontend (#831)
+- data extract custom
+- map integration on project list map
+- project centroid api integration on project summary
+- package changes of ol and added to main
+- added alchemy text on centroid api
+- map Component added to main
+- add script to generate openapi.json
+-  Added a new function to perform the conversion of task_boundary from GeoJSON to .osm format.
+- download button for data extract on project details fix Add option to download the data extract fix #779
+- api for download data extract
+- added download data extract loading
+- Enhance GeoJSON Handling and Support for Multiple Formats during task spliting
+- added custom road extract
+- use loguru stdout + json file logging
+- form validation added on custom form
+- added organisation_id on create project frontend
+- organisation Id  on create project api
+- added api to centroid logo
+- added projectId on projectbyid
+- Tailwindcss integrated
+- added mbtiles ui and functionality
+- scale reduced on map icon
+- order change define task and data extract
+- typescript integration
+- api to test the validity of custom form uploaded
+- tile generation process moved into fastapi background task
+- josm zoom and load added
+- bounds in geometry_to_geojson
+- josm zoom and load added
+- bounds in geometry_to_geojson
+- get all submissions
+- submission json of a project
+- Draw AOI
+- added react on import
+- draw in progress
+- Login signup handled for local docker
+- Log Status added on UI
+- edit form with form category WIP
+- HashTag Project Create
+- login osm added
+- removed serviceworker in development
+- app on scheme of intent for redirect to odk collect app
+- webpack changes for pwa
+- added manifest.json for pwa
+- integrated serviceworker for pwa
+- workbox config on webpack
+- added workbox for pwa
+- data extracts on the update project form
+- organization another page redirect
+- popup changed to another file
+- changed head title
+- fmtm dev and prod domain to tracepropagationtargets
+- sentry setup for production but dev dsn missing
+- removed glitchtip test button ui
+- integrated sentry alternative glitchtip
+- update project boundary added constant
+- added outline_geojson on project info
+- added EditProject Area on Webpack exposes
+- fix task_status to String
+- refactored typescript files
+- download form of project
+- forgot password route removed
+- eslint prettier setup
+- new tsconfig setup
+- added back icon on EditProject
+- added ArrowBackIcon on assetmodules
+- backbutton on projectinfo page
+- edit project details
+- added outline css to debug
+- slice for edit project
+- edit project validation
+- edit project sidebarContent constant
+- added patch for project details
+- added nodeenv on environment
+- Added Edit Project button
+- current location trigger
+- create organization button on create project
+- osm auth login completed
+- Improved Auto-Fill for ODK Central URL and Username Fields Resolve #566
+- added slice for uploading area geojson
+- added editproject component
+- set individual project details to slices
+- changed name of modal from create to default
+- individual project detail api
+- routes added for project edit
+- data extract step added
+- accept extension on input of upload area
+- added validation for dataextract step
+- data Extract step added on create project page
+- added input file accept extension
+- Data Extract Step added with functionality changes
+- Added Route For Data Extract Step
+- Modify AOI feature
+- redirected to project specific detail page after project creation
+- project creating loading
+- generate task loader and disable handled
+- organization logo required field removed
+- projection switched to EPSG:3857
+- implemented api logic for loading button of download
+- csv and json loader added with style changes
+- added mui/lab loadingbutton on coremodules
+- added mui/lab package
+- fixed project info download submission
+- condition for empty file submission api
+- form issue fixes on geojson upload
+- added padding on map layers
+- added task locking and disabled showing option to change task status
+- osm auth fix
+- package changes
+- osm auth fix 1
+- removed org type from backend
+- implemented new tab on sidebar
+- Tasks Page For Submission
+- env generation script for easier first setup
+- progress bar integrated
+- fixed form issues
+- submission json api
+- download submission to an individual submission
+- exception in creating a project in odk central
+- added osm extracts into fmtm db
+- submission points api
+- generate app user files is moved in background task
+- dynamic project id based submission
+- download submission api
+- avatar png added for submission by
+- added submission page on webpack to expose
+- form-list api, app users list api
+- basic typescript config will add more config
+- category removed from generate api . Category is taken from project table, of from form itself
+- list submission for the project api created
+- organization dropdown create project
+- route added for basemap selection
+- basemap selection page added
+- removed user input field and added central odk input field
+- added type on Validation of Create project
+- custom pagination function
+- prettier added
+- endpoint to get the qr code by task created
+- endpoint to list the xforms
+- end point to upload multi polygon file to create a task for each polygon in the file
+- missing validation on upload geojson
+- put and patch api for project informations
+- add endpoint load-test-data for local zip import
+- add test_data_path for test data dir
+- replace backend dotenv config with Pydantic BaseSettings
+- add config file for fastapi/pydantic env settings
+- removed listProjects during backend init, partial list central projects endpoint
+- add root_path option to FastAPI for serving behind proxy subpath
+
+### Fix
+
+- ads qr code to task list (#970)
+- create new project ux tweaks (#969)
+- create new project ui/ux improvements (#955)
+- align new organization button, replace total projects text (#947)
+- signin / out buttons on mobile (#939)
+- basemap modal closes menu (#938)
+- replace iterative approach for task feats, edit schema
+- move simplify features to get_project_features endpoint (#933)
+- simplify project features response & prep for flatgeobuf osm extracts (#932)
+- warning message before project creation action is cancelled (#924)
+- removed icon from activities
+- inform user if GeoJSON CRS is not EPSG:4326 (#919)
+- allow specifying API_PREFIX if behind proxy
+- optimise mobile UI - project info, home, organisation (#903)
+- feature count in task features count api (#904)
+- solved tasking splitting issue
+- issue when single feature polygon uploaded to upload multi polygon api
+- trim whitespace on schema check prior to migrate (#886)
+- solved unsupported multi-linestring custom feature issue in odk … (#865)
+- set underpass api url via env var
+- remove data extract on different dropdown selection
+- edit project symbol changes on regex
+- commented pagination for future
+- create project single AOI
+- outline geojson of project in project details api (#825)
+- project info on click
+- callback url
+- logs filters for project creation
+- raw sql query in tasks feature
+- remove pydantic Url in favour of str (#814)
+- tiles generation
+- map_url and main_url in config file
+- cors origin error
+- task split algorithm
+- updated category based on the available yaml file
+- pydantic defaults for ODK_CENTRAL vars (#806)
+- import error in json2osm
+- list forms api
+- import error in json2osm
+- upload media if the task has zero features, do not upload media
+- validate EXTRA_CORS_URLS before model validation
+- refactor pydantic v2 Config class (no orm_mode)
+- set default vals for all settingss pydantic v2
+- typing for pydantic validator Url
+- pydantic v1 BaseSettings --> v2 pydantic_settings
+- removed project detail from lazy loading white screen
+- Add support for Doxygen API output
+- Fix import path for read_xlsforms
+- Read in all the xlsforms at startup time
+- project name validation fix Project name should accept other characters too. #754
+- submission detail page
+- organization_id added on create project
+- minimum 5 of splitting algorithm
+- Project name should accept other characters too. #754
+- organization_id none case handled
+- task  splitted is not shown in map, although the number of tasks are determined and generated  #750
+- previous button wrong route issue
+- project_id added in the tile_instance
+- set tile_path_instance outside try, ref before assign
+- set tile download dir to volume path
+- task status updated issue
+- only set OAUTHLIB_INSECURE_TRANSPORT in DEBUG mode
+- questions order in odk collect
+- Generate mbtiles ux
+- removed async from background mbtiles task
+- project info page not showing projectarea
+- removed drawn geojson on route change
+- hashtag validation create project
+- Color Changes of Tasks and Lock added
+- user with existing username in osm login
+- submission detail page undefined
+- user with existing username in osm login
+- submission detail page undefined
+- if osm is None, return None
+- coonvert to osm function updated if the submission is not present
+- tasks features api
+- Draw AOI bug fix
+- create project value change on edit
+- task aplit algrithm for gojson type feature
+- features api
+- remove SQLALCHEMY_DB_URL in favour of FMTM_DB_URL
+- check for valid geometry in task generate
+- central api create odk form
+- task aplit algorithm, seek to the first object of in memory file
+- upload geojson type Polygon
+- update category api
+- workbox webpack fix for loop
+- submission logic to download json file of task changed
+- task-features api with undefined issue
+- seek for in memory file used in multipolygon upload
+- upload boundary, seek(0) used for in memory file
+- go to odk temp fix
+- intent
+- pwa fixes for icon
+- merge conflicts
+- data Cleaning fix
+-  removed api listing static content
+- projects can be filter based on user_id and hashtags present in the project
+- filtering by hashtags check if project hashtags overlap with requested hashtags
+- task spliting for geojson with polygons instead of features
+- download task geometries
+- download project outline
+- merge xlsforms import from main --> development
+- multi polygon
+- merge conflict
+- generate_appuser_files json loads the one.outline instead of eval
+- generate files
+- width on Update form adjusted
+- removed prefix from project patch put api
+- organization list not populating
+- merge conflicts
+- query to split algorithm
+- osm extracts function
+- osm auth login
+- osm auth test 5
+- osm auth test 2
+- osm auth login test fix 1
+- removed unused import
+- removed organization actions
+- removed unwanted code on define area map
+- removed unwanted constant
+- Global View of map - Create Project : Initially the global map should be displayed by default. resolve#461
+- custom file upload not showing switching step
+- using favicon.ico instead of favicon.png for better cross browser support including firefox
+- project detail metadata not showing
+- legend fix on mobile view
+- task wise submission export download
+- file extension passed in generate files
+- download json and csv submission
+- changed default dimension number to 10
+- debug routes import error
+- deleting projectd. Passed odk credentials
+- task list
+- upload multi polygon fix
+- removed project details data after page changes
+- form file is required handled
+- add missing fmtm_images volume def to prod compose
+- task_feature_count api submission count
+- osm-fieldwork version issue
+- osm login
+- osm auth login fix
+- osm auth fix
+- osm auth fix
+- osm auth login fix
+- osm login test
+- osm login test 2
+- osm auth with json response added on /me/
+- osm auth fix 4
+- json response on osm callback url
+- osm auth fix
+- osm auth fix
+- osm auth login fix
+- osm authlogin test 1
+- error on Project info page
+- osm-fieldwork import
+- osm-fieldwork imports
+- Fixes Create Project Section : The input file name has design issues. #452
+- Create Project Section - Upload Area subsection : Alignment of the map elements need to be maintained.  #451
+- handle click outside issue
+- organization post
+- adjusted map page of home
+- merge conflict
+- link fix on hotosm.org
+- remove lorem ipsum
+- typo
+- style chnaged
+- ExlploreProjectCard style changed
+- get_user in create project
+- indentatio n fixes
+- remove Multiple feature api
+- init submission xforms with OdkForm(odk_central)
+- load test data endpoint
+- references to central_crud global project/task
+- linting errors for backend
+- pydantic settings default DEBUG type bool
+- odkcentral api user init script variables
+- bug on select form upload
+- create project custom form issue
+- centroid extracts outside project area
+- imports
+- category error for custom form in generate osm data
+- xlsfile params in osm extracts
+- data extract ways for create project
+- osm extracts upload
+- form issue on create project
+- osm 6
+- osm auth 5
+- osm auth 3
+- Osm test 2
+- osmauth fix 1
+- continue loop only in extractPolygon type
+- upload custom xlsfrm in generate app files api
+- Multipolygon type in divide into square
+- logger error
+- changed tsx to jsx on openlayer map module
+- task list api
+- optional chaining operator added on dialogtaskactions.jsx
+- multipolygon issue in creating boundary
+- project details form dropdown changed from rsuite to material ui
+- removed project persist (causing issue)
+- changed outdir file to dist and tsconfig replaced
+- removed project id from upload xlsform
+- removed xform_title from generate appuser
+- osm_extracts in upload media
+- qr code generate url
+- added missed slash in the server url
+- odk collect QR read
+- generate working qr code
+- adding odk server credentials to the projects table
+- Change shapely from 1.8.5 to 2.0.1 to get the centroid function instad of the attribute
+- removed console log
+- all usages of odkconvert are now osm-fieldwork
+- login response issue
+- merge conflict
+- port binding for pytest workflow.
+- check for None type in cors origin validation
+- make BACKEND_CORS_ORIGINS optional, rename to EXTRA_CORS_ORIGINS
+- bug fix on project details
+- prettier fixes
+- linting
+- project summary api
+- merge conflict and instructions removed from load_test_data function
+- get_users throwing an error when no users in db
+- osm login
+- revert self --> cls in pydantic base settings, ignore N805
+- osm auth routes, json encode responses
+- add init file to test data dir to make discoverable
+- include task_status_str in status update response
+- remove symlinked frontend prod dockerfiles, builds failing
+- missed dockerfile for odkcentral in compose prod
+- QR insert w/ project zip upload, QR base64 w/ get project tasks
+- /central/appuser endpoint, return qr code
+- add fmtm.hotosm.org to backend cors origins (until configurable)
+- fmtm network for traefik in prod deploy
+- revert pytest run from src dir, run from root
+- add pytest to requirements-dev and lock all versions
+- add API_URL to frontend env in docker-compose
+- update imports to odkconvert using pip pkg
+- manually create StrEnum,IntEnum in python 3.11 (allow >3.9)
+
+### Refactor
+
+- update changelog path for commitizen
+- change version 0.1.0 --> 0.0.0 prior to first bump
+- add package.json to version control files
+- remove S3_BUCKET_NAME_OVERLAYS (handled by raw-data-api)
+- update final refs to GenerateMbTiles --> GenerateBasemap
+- remove package-lock.json (not used)
+- remove make_data_extract replace with osm-rawdata (#891)
+- remove console.log for import.meta.env
+- update refs to frontend/main --> frontend
+- use full links to hotosm logo in readme
+- remove ogr2osm in code
+- replace all instances of standard logging
+- add additional defaults to backend settings
+- remove api login/signup endpoints
+- remove manual login/logout from frontend
+- remove NODE_ENV check for login buttons
+- use postMessage OSM login, avoid CORS devserver
+- additional logs during proj creation
+- revert ports on debug compose config
+- add init file to backend images dir
+- odk init script to trigger workflow
+- move backend files back to /app after rebase
+- move backend out of /app prior to rebase
+- lint and format all markdown files
+- run pre-commit hooks on backend
+- move app backend server files to app dir
+- move backend code out of app dir for rebase
+- add additional logging to odkcentral connection
+- update __version__.py path in pyproject.toml
+- remove FMTM_TEST_DB_NAME, DB_URL --> FMTM_DB_URL
+- ignore osm-fieldwork local dir
+- remove tests dir in root (under src dirs)
+- run pre-commit hooks on backend files
+- move backend files to app dir
+- change useless root api path to redirect to /docs
+- move osm auth init to separate file, use Depends
+- move debug data import logic to crud, routes call method
+- remove read_xlsforms from project routes, moved to app start
+- move test data into backend directory, bundle in dockerfile
+- rename quay images in compose
+- remove logs dir clutter
+- remove learn_fastapi clutter
+- remove odkcentral api and proxy into separate dir
+- add log during central create_appuser return
+- temp add additional frontend hosts to api cors origins
+- remove unused frontend dockerfiles and compose
+- remove redundant flask tests (demo frontend)
+- remove custom traefik image, set via command & labels in compose
+- add image names to docker-compose file (github container reg)
+- add default for db .env vars, not required for dev setup
+- remove src/web demo flask app
+- remove demo flask app from prod docker-compose
+- removed LOCAL_DB_URL env var
+- cleanup .env example, remove config.py for flask demo
+- remove submodules (wiki --> docs, odkconvert --> pip pkg)
+- remove odkconvert from repo (install instead)

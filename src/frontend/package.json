@@ -1,6 +1,6 @@
 {
   "name": "fmtm",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "build": "vite build",
     "build:dev": "vite build --mode development",
