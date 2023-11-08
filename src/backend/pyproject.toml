@@ -122,3 +122,5 @@ version_files = [
     "app/__version__.py",
     "../frontend/package.json:version",
 ]
+changelog_file = "../../CHANGELOG.md"
+update_changelog_on_bump = true

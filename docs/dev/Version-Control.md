@@ -23,7 +23,7 @@ Bump the version:
 
 ```bash
 cd src/backend
-cz bump --check-consistency --changelog
+cz bump --check-consistency
 git push
 git push --tag
 ```
