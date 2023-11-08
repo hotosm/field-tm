@@ -1,10 +1,6 @@
 name: 🔧 Build Tag & Release Images
 
 on:
-  # Any tag push
-  push:
-    tags:
-      - "*"
   # All releases
   release:
     types: [published]
