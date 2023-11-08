@@ -32,6 +32,7 @@ repos:
             --ignore-unknown,
             --no-error-on-unmatched-pattern,
             "!chart/**",
+            "!CHANGELOG.md",
             "!src/frontend/pnpm-lock.yaml",
           ]
 
