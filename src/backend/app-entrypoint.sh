@@ -47,5 +47,9 @@ wait_for_s3 &
 # Wait until checks complete
 wait
 
-create_s3_buckets
+# Skip init S3 if env var passed
+if [ -n "$SKIP_S3_INIT" ]; then
+    create_s3_buckets
+fi
+
 exec "$@"
