@@ -94,13 +94,13 @@ jobs:
           # Migrate db first, so api works
           docker compose up migrations --exit-code-from migrations
 
-          # Run without migrations (give exit code 0), or api
+          # Run without migrations (avoid exit code 0)
           docker compose up --detach \
             --no-deps --wait --wait-timeout 60 \
-            central-db central central-proxy s3
+            central-db central central-proxy s3 api
 
-          # Start api attached to view logs
-          docker compose up --no-deps api
+          # View logs afterwards
+          docker compose logs api
 
   smoke-test-frontend:
     runs-on: ubuntu-latest
