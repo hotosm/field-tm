@@ -13,7 +13,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
-      target: certs-init-main
+      build_target: certs-init-main
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:certs-init-main"
 
@@ -21,7 +21,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
-      target: certs-init-development
+      build_target: certs-init-development
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:certs-init-development"
         "ghcr.io/${{ github.repository }}/proxy:certs-init-staging"
@@ -30,7 +30,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
-      target: main
+      build_target: main
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:main"
 
@@ -38,7 +38,7 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
-      target: development
+      build_target: development
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:development"
         "ghcr.io/${{ github.repository }}/proxy:staging"
