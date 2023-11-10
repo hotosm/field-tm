@@ -167,16 +167,22 @@ EOF
 }
 
 add_vars_to_bashrc() {
+    # DOCKER_HOST must be added to the top of bashrc, as running non-interactively
+    # Most distros exit .bashrc execution is non-interactive
+    
     heading_echo "Adding rootless DOCKER_HOST to bashrc"
 
     user_id=$(id -u)
-    docker_host_var="export DOCKER_HOST=unix:///run/user/$user_id//docker.sock"
+    docker_host_var="export DOCKER_HOST=unix:///run/user/$user_id/docker.sock"
     dc_alias_cmd="alias dc='docker compose'"
 
-    # Check if DOCKER_HOST is already defined
+    # Create a temporary file
+    tmpfile=$(mktemp)
+
+    # Check if DOCKER_HOST is already defined in user's .bashrc
     if ! grep -q "$docker_host_var" ~/.bashrc; then
         echo "Adding rootless DOCKER_HOST var to ~/.bashrc."
-        echo "$docker_host_var" >> ~/.bashrc
+        echo "$docker_host_var" >> "$tmpfile"
     fi
 
     echo "Done"
@@ -184,11 +190,19 @@ add_vars_to_bashrc() {
 
     heading_echo "Adding dc='docker compose' alias"
 
-    # Check if the alias already exists
+    # Check if the alias already exists in user's .bashrc
     if ! grep -q "$dc_alias_cmd" ~/.bashrc; then
         echo "Adding 'dc' alias to ~/.bashrc."
-        echo "$dc_alias_cmd" >> ~/.bashrc
+        echo "$dc_alias_cmd" >> "$tmpfile"
     fi
+
+    # Append the rest of the original .bashrc to the temporary file
+    if [ -e ~/.bashrc ]; then
+        grep -v -e "$docker_host_var" -e "$dc_alias_cmd" ~/.bashrc >> "$tmpfile"
+    fi
+
+    # Replace the original .bashrc with the modified file
+    mv "$tmpfile" ~/.bashrc
 
     echo "Done"
 }

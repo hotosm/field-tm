@@ -299,24 +299,31 @@ echo "Done"
 
 
 add_vars_to_bashrc() {
+    # DOCKER_HOST must be added to the top of bashrc, as running non-interactively
+    # Most distros exit .bashrc execution is non-interactive
+
     heading_echo "Adding DOCKER_HOST and 'dc' alias to bashrc"
 
     user_id=$(id -u)
     docker_host_var="export DOCKER_HOST=unix:///run/user/$user_id/docker.sock"
     dc_alias_cmd="alias dc='docker compose'"
 
+    # Create temporary files for root and user bashrc
+    tmpfile_root=$(mktemp)
+    tmpfile_user=$(mktemp)
+
     if [ "$RUN_AS_ROOT" = true ]; then
         # Check if DOCKER_HOST is already defined in /root/.bashrc
         if ! sudo grep -q "$docker_host_var" /root/.bashrc; then
             echo "Adding DOCKER_HOST var to /root/.bashrc."
-            echo "$docker_host_var" | sudo tee -a /root/.bashrc > /dev/null
+            echo "$docker_host_var" | sudo tee -a "$tmpfile_root" > /dev/null
             echo
         fi
 
         # Check if the 'dc' alias already exists in /root/.bashrc
         if ! sudo grep -q "$dc_alias_cmd" /root/.bashrc; then
             echo "Adding 'dc' alias to /root/.bashrc."
-            echo "$dc_alias_cmd" | sudo tee -a /root/.bashrc > /dev/null
+            echo "$dc_alias_cmd" | sudo tee -a "$tmpfile_root" > /dev/null
             echo
         fi
     fi
@@ -324,15 +331,33 @@ add_vars_to_bashrc() {
     # Check if DOCKER_HOST is already defined in ~/.bashrc
     if ! grep -q "$docker_host_var" ~/.bashrc; then
         echo "Adding DOCKER_HOST var to ~/.bashrc."
-        echo "$docker_host_var" >> ~/.bashrc
+        echo "$docker_host_var" | tee -a "$tmpfile_user" > /dev/null
         echo
     fi
 
     # Check if the 'dc' alias already exists in ~/.bashrc
     if ! grep -q "$dc_alias_cmd" ~/.bashrc; then
         echo "Adding 'dc' alias to ~/.bashrc."
-        echo "$dc_alias_cmd" >> ~/.bashrc
+        echo "$dc_alias_cmd" | tee -a "$tmpfile_user" > /dev/null
         echo
+    fi
+
+    # Append the rest of the original .bashrc to the temporary file
+    if [ -e ~/.bashrc ]; then
+        grep -v -e "$docker_host_var" -e "$dc_alias_cmd" ~/.bashrc >> "$tmpfile_user"
+    fi
+    # Replace the original .bashrc with the modified file
+    mv "$tmpfile_user" ~/.bashrc
+
+    # If RUN_AS_ROOT is true, replace /root/.bashrc with the modified file
+    if [ "$RUN_AS_ROOT" = true ]; then
+        # Append the rest of the original /root/.bashrc to the temporary file
+        if [ -e /root/.bashrc ]; then
+            grep -v -e "$docker_host_var" -e "$dc_alias_cmd" /root/.bashrc >> "$tmpfile_root"
+        fi
+
+        # Replace the original /root/.bashrc with the modified file
+        sudo mv "$tmpfile_root" /root/.bashrc
     fi
 
     echo "Setting DOCKER_HOST for the current session."
