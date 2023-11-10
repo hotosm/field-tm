@@ -16,6 +16,8 @@ jobs:
       build_target: certs-init-main
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:certs-init-main"
+      extra_build_args: |
+        NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-cert-init-dev:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
@@ -25,6 +27,8 @@ jobs:
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:certs-init-development"
         "ghcr.io/${{ github.repository }}/proxy:certs-init-staging"
+      extra_build_args: |
+        NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-proxy-main:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
@@ -33,6 +37,8 @@ jobs:
       build_target: main
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:main"
+      extra_build_args: |
+        NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-proxy-dev:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
@@ -42,3 +48,5 @@ jobs:
       image_tags: |
         "ghcr.io/${{ github.repository }}/proxy:development"
         "ghcr.io/${{ github.repository }}/proxy:staging"
+      extra_build_args: |
+        NGINX_TAG=${{ vars.NGINX_TAG }}
