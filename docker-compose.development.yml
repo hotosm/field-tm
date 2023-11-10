@@ -67,7 +67,7 @@ services:
       - certbot_data:/var/www/certbot
     environment:
       FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-${VITE_API_URL:-api.${FMTM_DOMAIN}}}
+      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
       FMTM_ODK_DOMAIN: ${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
       FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
       FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
@@ -107,7 +107,7 @@ services:
       dockerfile: prod.dockerfile
       args:
         APP_VERSION: ${GIT_BRANCH}
-        VITE_API_URL: ${VITE_API_URL:-https://api.${FMTM_DOMAIN}}
+        VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
     container_name: fmtm-ui-${GIT_BRANCH}
     volumes:
       - fmtm_frontend:/frontend
@@ -264,7 +264,7 @@ services:
       - certbot_data:/var/www/certbot
     environment:
       FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-${VITE_API_URL:-api.${FMTM_DOMAIN}}}
+      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
       FMTM_ODK_DOMAIN: ${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
       FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
       FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
