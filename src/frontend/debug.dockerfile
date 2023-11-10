@@ -1,6 +1,4 @@
-FROM docker.io/node:18
-ARG VITE_API_URL
-ENV VITE_API_URL="${VITE_API_URL}"
+FROM docker.io/node:18-slim
 WORKDIR /app
 COPY ./package.json ./pnpm-lock.yaml ./
 ENV PNPM_HOME="/pnpm"

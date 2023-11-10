@@ -122,13 +122,23 @@ backup_db() {
     PGPASSWORD="$FMTM_DB_PASSWORD" psql --host "$FMTM_DB_HOST" \
         --username "$FMTM_DB_USER" "$FMTM_DB_NAME" -c "VACUUM ANALYZE;"
 
-    pretty_echo "Dumping current database to backup file."
+    pretty_echo "Dumping current database to backup file: $db_backup_file"
     PGPASSWORD="$FMTM_DB_PASSWORD" pg_dump --verbose --format c \
         --file "${db_backup_file}" \
         --host "$FMTM_DB_HOST" --username "$FMTM_DB_USER" "$FMTM_DB_NAME"
 
+    echo "gzipping file --> ${db_backup_file}.gz"
     gzip "$db_backup_file"
-    pretty_echo "Backup complete: $db_backup_file.gz"
+    db_backup_file="${db_backup_file}.gz"
+
+    BUCKET_NAME="fmtm-db-backups"
+    echo "Uploading to S3 bucket ${BUCKET_NAME}"
+    mc alias set s3 $S3_ENDPOINT $S3_ACCESS_KEY $S3_SECRET_KEY
+    mc mb "s3/${BUCKET_NAME}" --ignore-existing
+    mc anonymous set download "s3/${BUCKET_NAME}"
+    mc cp "${db_backup_file}" s3/${BUCKET_NAME}/pre-migrate/
+
+    pretty_echo "Backup complete: $db_backup_file to bucket ${BUCKET_NAME}/pre-migrate/"
 }
 
 execute_migrations() {

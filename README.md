@@ -139,9 +139,18 @@ or inform the field mappers that they need to fix it. They need to:
 - Merge good-quality data into OSM (probably from JOSM).
 - Mark areas as completed and merged.
 
-## Info for developers
+## Install
 
-The basic setup here is:
+To install for a quick test, or on a production instance,
+use the convenience script:
+
+```bash
+curl -fsSL https://get.fmtm.dev | bash
+```
+
+## Info For Developers
+
+A breakdown of the components:
 
 ### ODK Collect
 
@@ -154,7 +163,7 @@ to become OSM tags associated with those features).
 The ODK Collect app connects to a back-end server (in this case ODK Central),
 which provides the features to be mapped and the survey form definitions.
 
-### ODK Central server
+### ODK Central Server
 
 An ODK Central server functions as the back end for the field data collectors.
 ODK Collect is an application that can be downloaded on Android phones.

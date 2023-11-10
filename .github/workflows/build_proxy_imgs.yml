@@ -1,0 +1,45 @@
+name: 🔧 Build Proxy Images
+
+on:
+  # Trigger on schedule
+  schedule:
+    # Run midnight 1st and 15th of every month (must be single quote)
+    # prettier-ignore
+    - cron: '0 0 * * 1,15'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  build-cert-init-main:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    with:
+      context: nginx
+      target: certs-init-main
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/proxy:certs-init-main"
+
+  build-cert-init-dev:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    with:
+      context: nginx
+      target: certs-init-development
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/proxy:certs-init-development"
+        "ghcr.io/${{ github.repository }}/proxy:certs-init-staging"
+
+  build-proxy-main:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    with:
+      context: nginx
+      target: main
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/proxy:main"
+
+  build-proxy-dev:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    with:
+      context: nginx
+      target: development
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/proxy:development"
+        "ghcr.io/${{ github.repository }}/proxy:staging"

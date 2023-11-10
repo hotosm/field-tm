@@ -117,7 +117,7 @@ const Organization = () => {
               src={
                 data.logo
                   ? `${import.meta.env.VITE_API_URL}/images/${data.logo}`
-                  : 'http://localhost:8080/d907cf67fe587072a592.png'
+                  : 'http://localhost:7051/d907cf67fe587072a592.png'
               }
               sx={{ width: '150px' }}
             />

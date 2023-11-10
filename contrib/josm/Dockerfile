@@ -16,8 +16,7 @@
 #
 
 FROM docker.io/debian:bookworm as base
-ARG MAINTAINER=admin@hotosm.org
-LABEL org.hotosm.fmtm.maintainer="${MAINTAINER}" \
+LABEL org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
       org.hotosm.fmtm.josm-port="8111" \
       org.hotosm.fmtm.nginx-port="80"
 RUN set -ex \

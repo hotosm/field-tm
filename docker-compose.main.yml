@@ -18,100 +18,112 @@
 version: "3"
 
 volumes:
+  fmtm_frontend:
+    name: fmtm-frontend-${GIT_BRANCH}
   fmtm_db_data:
+    name: fmtm-db-data-${GIT_BRANCH}
   fmtm_logs:
+    name: fmtm-logs-${GIT_BRANCH}
   fmtm_images:
+    name: fmtm-images-${GIT_BRANCH}
   fmtm_tiles:
-  traefik-public-certificates:
+    name: fmtm-tiles-${GIT_BRANCH}
+  certs:
+    name: fmtm-certs-${GIT_BRANCH}
+  certbot_data:
+    name: fmtm-certbot-data-${GIT_BRANCH}
 
 networks:
   fmtm-net:
     name: fmtm-${GIT_BRANCH}
 
 services:
-  traefik:
-    image: "docker.io/traefik:v2.8"
-    container_name: fmtm_proxy
+  proxy:
+    image: "ghcr.io/hotosm/fmtm/proxy:${GIT_BRANCH}"
+    container_name: fmtm-${GIT_BRANCH}
+    depends_on:
+      api:
+        condition: service_started
+      certbot:
+        condition: service_completed_successfully
+      ui:
+        condition: service_completed_successfully
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "traefik-public-certificates:/certificates"
+      - fmtm_frontend:/usr/share/nginx/html/fmtm/
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
+    environment:
+      FMTM_DOMAIN: ${FMTM_DOMAIN}
+      FMTM_API_DOMAIN: ${VITE_API_URL:-api.${FMTM_DOMAIN}}
+      FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
     ports:
       - 80:80
       - 443:443
     networks:
       - fmtm-net
     restart: "unless-stopped"
-    command:
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.email=admin@hotosm.org"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
-      ## Enable below for staging tests
-      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=fmtm-${GIT_BRANCH}"
-      - "traefik.api.dashboard=false"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
-      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`) && !PathPrefix(`/.well-known/acme-challenge/`)"
-      - "traefik.http.routers.http_catchall.entrypoints=web"
-      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+
+  api:
+    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    container_name: fmtm-api-${GIT_BRANCH}
+    volumes:
+      - fmtm_logs:/opt/logs
+      - fmtm_images:/opt/app/images
+      - fmtm_tiles:/opt/tiles
+    depends_on:
+      fmtm-db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
+  ui:
+    # This service simply builds the frontend to a volume
+    # accessible to the proxy, then shuts down
+    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-main}"
+    build:
+      context: src/frontend
+      dockerfile: prod.dockerfile
+      args:
+        APP_VERSION: ${GIT_BRANCH}
+        VITE_API_URL: ${VITE_API_URL:-https://api.${FMTM_DOMAIN}}
+    container_name: fmtm-ui-${GIT_BRANCH}
+    volumes:
+      - fmtm_frontend:/frontend
+    network_mode: none
+    restart: "on-failure:2"
 
   fmtm-db:
-    image: "postgis/postgis:${POSTGIS_TAG:-14-3.3-alpine}"
-    container_name: fmtm_db
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    container_name: fmtm-db-${GIT_BRANCH}
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${FMTM_DB_USER:-fmtm}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD:-fmtm}
-      - POSTGRES_DB=${FMTM_DB_NAME:-fmtm}
+      - POSTGRES_USER=${FMTM_DB_USER}
+      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
+      - POSTGRES_DB=${FMTM_DB_NAME}
     ports:
       - "5433:5432"
     networks:
       - fmtm-net
     restart: "unless-stopped"
     healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER:-fmtm} -d ${FMTM_DB_NAME:-fmtm}
+      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
       start_period: 5s
       interval: 10s
       timeout: 5s
       retries: 3
 
-  api:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm_api
-    volumes:
-      - fmtm_logs:/opt/logs
-      - fmtm_images:/opt/app/images
-      - fmtm_tiles:/opt/tiles
-    depends_on:
-      - fmtm-db
-      - migrations
-      - traefik
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.api.rule=Host(`${API_URL}`)"
-      - "traefik.http.services.api-svc.loadbalancer.server.port=8000"
-      - "traefik.http.routers.api.service=api-svc"
-
   migrations:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm_migrations
+    container_name: fmtm-migrations-${GIT_BRANCH}
     depends_on:
-      - fmtm-db
+      fmtm-db:
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -119,27 +131,39 @@ services:
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:3"
 
-  ui:
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH}"
-    build:
-      context: src/frontend
-      dockerfile: prod.dockerfile
-      args:
-        VITE_API_URL: ${URL_SCHEME}://${API_URL}
-    container_name: fmtm
+  backups:
+    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    container_name: fmtm-backups-${GIT_BRANCH}
     depends_on:
-      - api
-      - traefik
+      fmtm-db:
+        condition: service_healthy
+    env_file:
+      - .env
     networks:
       - fmtm-net
+    entrypoint: ["/backup-entrypoint.sh"]
+    restart: "on-failure:3"
+    healthcheck:
+      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  certbot:
+    image: "ghcr.io/hotosm/fmtm/proxy:certs-init-main"
+    container_name: fmtm-cert-renew-${GIT_BRANCH}
+    volumes:
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
     environment:
-      - BROTLI=true
-      - VITE_API_URL=${URL_SCHEME}://${API_URL}
-    restart: "unless-stopped"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ui-main.tls=true"
-      - "traefik.http.routers.ui-main.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.ui-main.rule=Host(`${FRONTEND_MAIN_URL}`)"
-      - "traefik.http.services.ui-main-svc.loadbalancer.server.port=8080"
-      - "traefik.http.routers.ui-main.service=ui-main-svc"
+      FMTM_DOMAIN: ${FMTM_DOMAIN}
+      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-${VITE_API_URL:-api.${FMTM_DOMAIN}}}
+      FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
+      CERT_EMAIL: ${CERT_EMAIL}
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - fmtm-net
+    restart: "on-failure:2"

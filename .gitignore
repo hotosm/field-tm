@@ -57,7 +57,7 @@ db.sqlite3
 .DS_Store
 
 # ignore settings
-.env
+**/*.env
 
 # ignore python environments
 venv
@@ -81,3 +81,6 @@ temp_webmaps/Naivasha
 
 # mkdocs
 site
+
+# Bash install script
+envsubst

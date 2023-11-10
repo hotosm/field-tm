@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [react(), VitePWA({ registerType: 'autoUpdate' })],
   server: {
-    port: 8080,
+    port: 7051,
     host: '0.0.0.0',
     watch: {
       usePolling: true,

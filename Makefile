@@ -22,7 +22,6 @@ MDS := \
 	docs/dev/Backend.md \
 	docs/dev/Database-Tips.md \
 	docs/dev/Deployment-Flow.md \
-	docs/dev/Docker-Tips.md \
 	docs/dev/Frontend.md \
 	docs/dev/Production.md \
 	docs/dev/Version-Control.md \

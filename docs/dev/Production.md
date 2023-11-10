@@ -49,56 +49,125 @@ with `cd fmtm`.
 
 ### Set up the environment and utilities to launch
 
-Create the env file from the example with `cp .env.example .env`. Edit
-that file to contain the needful (it should look like this):
+Create the env file interactively with:
 
-    # ODK Central
-    ODK_CENTRAL_URL=https://central-proxy
-    ODK_CENTRAL_USER=`<CHANGEME>`
-    ODK_CENTRAL_PASSWD=`<CHANGEME>`
+```bash
+bash scripts/gen-env.sh
+```
 
-    # FMTM
-    API_URL=https://fmtm-api.hotosm.org
-    FRONTEND_MAIN_URL=https://fmtm.hotosm.org
-    # API_PREFIX=/api
+OR
 
-    # OSM
-    OSM_CLIENT_ID=`<CHANGEME>`
-    OSM_CLIENT_SECRET=`<CHANGEME>`
-    OSM_URL=https://www.openstreetmap.org
-    OSM_SCOPE=read_prefs
-    OSM_LOGIN_REDIRECT_URI=`<FRONTEND_URL>`/osmauth/
-    OSM_SECRET_KEY=`<CHANGEME>`
+```bash
+cp .env.example .env
 
-    ### S3 File Storage ###
-    S3_ENDPOINT="http://s3:9000"
-    S3_ACCESS_KEY=`<CHANGEME>`
-    S3_SECRET_KEY=`<CHANGEME>`
+# Then edit values manually
+```
 
-    FMTM_DB_HOST=fmtm-db
-    FMTM_DB_USER=fmtm
-    FMTM_DB_PASSWORD=`<CHANGEME>`
-    FMTM_DB_NAME=fmtm
+Main variables of note to update:
 
-> Note: It is also possible to use the API_PREFIX variable if the api is served under, e.g. /api on the domain.
+```dotenv
+ODK_CENTRAL_USER=`<CHANGEME>`
+ODK_CENTRAL_PASSWD=`<CHANGEME>`
 
-> Note: You must have an existing version of ODKCentral running, to provide the URL and credentials here.
+CERT_EMAIL=`<EMAIL_ADDRESS_TO_GENERATE_CERT_FOR>`
+OSM_CLIENT_ID=`<CHANGEME>`
+OSM_CLIENT_SECRET=`<CHANGEME>`
+
+S3_ACCESS_KEY=`<CHANGEME>`
+S3_SECRET_KEY=`<CHANGEME>`
+```
+
+> Note: If extra cors origins are required for testing, the variable
+> `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
+> <http://fmtm.localhost:7050,http://some.other.domain>
+
+#### API_PREFIX
+
+It is also possible to use the API_PREFIX variable if the api
+is served under, e.g. /api on the domain.
+However, this isn't the recommended approach, and testing is minimal.
+
+#### VITE_API_URL
+
+By default, the API URL for the frontend to use is:
+
+`api.${FMTM_DOMAIN}`
+
+If you wish to change this and use another domain,
+then add the environment variable during the
+frontend build:
+
+`VITE_API_URL=some.other.domain.org`
+
+> Note: this is only used for the **frontend** build.
+
+#### ODK\_ Variables
+
+These can point to an externally hosted instance of ODK Central.
+
+Or ODK Central can be started as part of the FMTM docker compose
+stack, and variables should be set accordingly.
+
+#### Other Domains
+
+If you run FMTM with ODK and Minio (S3) included, then the
+domains will default to:
+
+```
+${FMTM_DOMAIN} --> Frontend
+api.${FMTM_DOMAIN} --> Backend
+odk.${FMTM_DOMAIN} --> ODK Central
+s3.${FMTM_DOMAIN} --> S3 / Minio
+```
+
+These defaults can be overriden with respective environment variables:
+
+```
+FMTM_API_DOMAIN (defaults to the value of VITE_API_URL if provided)
+FMTM_ODK_DOMAIN
+FMTM_S3_DOMAIN
+```
+
+### Start the Compose Stack
 
 Run the production docker-compose config:
-`docker compose -f docker-compose.prod.yml up -d`
+`docker compose -f docker-compose.main.yml up -d`
 
-> Note: The images should be built already on Quay. If they don't exist, use the `--build` flag during run.
+> Note: The images should be built already on Github.
 
 With any luck, this will launch the docker container where the project
 runs, and you can access the working website from the domain name!
 
-## Connecting to a remote database
+### Connecting to a remote database
 
 - A database may be located on a headless Linux server in the cloud.
 - To access the database via GUI tool such as PGAdmin, it is possible using port tunneling.
 
 ```bash
-ssh username@server.domain -N -f -L 5430:localhost:5432
+ssh username@server.domain -N -f -L {local_port}:localhost:{remote_port}
+
+# Example
+ssh root@fmtm.hotosm.org -N -f -L 5430:localhost:5433
 ```
 
 This will map port 5432 on the remote machine to port 5430 on your local machine.
+
+## Manual Database Backups
+
+```bash
+GIT_BRANCH=development
+backup_filename="fmtm-db-backup-$(date +'%Y-%m-%d').sql.gz"
+echo $backup_filename
+
+docker exec -i -e PGPASSWORD=PASSWORD_HERE fmtm-db-${GIT_BRANCH} pg_dump --verbose --format c -U fmtm fmtm | gzip -9 > "$backup_filename"
+```
+
+## Manual Database Restores
+
+```bash
+# On a different machine (else change the container name)
+GIT_BRANCH=development
+backup_filename=fmtm-db-backup-XXXX-XX-XX-sql.gz
+
+cat "$backup_filename" | gunzip | docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE fmtm-db-${GIT_BRANCH} pg_restore --verbose -U fmtm -d fmtm
+```

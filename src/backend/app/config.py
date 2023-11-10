@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
 
-    URL_SCHEME: Optional[str] = "http"
-    FRONTEND_MAIN_URL: Optional[str]
+    FMTM_DOMAIN: Optional[str]
+    FMTM_DEV_PORT: Optional[str] = "7050"
 
     EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
 
@@ -51,11 +51,13 @@ class Settings(BaseSettings):
         default_origins = []
 
         # Build default origins from env vars
-        url_scheme = info.data.get("URL_SCHEME")
-        main_url = info.data.get("FRONTEND_MAIN_URL")
-        if url_scheme and main_url:
+        url_scheme = "http" if info.data.get("DEBUG") else "https"
+        local_server_port = (
+            f":{info.data.get('FMTM_DEV_PORT')}" if info.data.get("DEBUG") else ""
+        )
+        if frontend_domain := info.data.get("FMTM_DOMAIN"):
             default_origins = [
-                f"{url_scheme}://{main_url}",
+                f"{url_scheme}://{frontend_domain}{local_server_port}",
             ]
 
         if val is None:
@@ -105,7 +107,7 @@ class Settings(BaseSettings):
     OSM_SECRET_KEY: str
     OSM_URL: str = "https://www.openstreetmap.org"
     OSM_SCOPE: str = "read_prefs"
-    OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:8080/osmauth/"
+    OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth/"
 
     S3_ENDPOINT: str = "http://s3:9000"
     S3_ACCESS_KEY: str
