@@ -3,9 +3,8 @@ name: 🔧 Build Proxy Images
 on:
   # Trigger on schedule
   schedule:
-    # Run midnight 1st and 15th of every month (must be single quote)
-    # prettier-ignore
-    - cron: '0 0 * * 1,15'
+    # Run 2:00 on 1st and 15th of every month
+    - cron: "0 2 1,15 * *"
   # Allow manual trigger
   workflow_dispatch:
 
