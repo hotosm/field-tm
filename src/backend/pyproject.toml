@@ -45,7 +45,7 @@ dependencies = [
     "loguru>=0.7.0",
     "osm-login-python==1.0.1",
     "osm-fieldwork==0.3.7",
-    "osm-rawdata==0.1.4",
+    "osm-rawdata==0.1.5",
     "minio>=7.1.17",
     "pyproj>=3.6.1",
 ]
