@@ -29,5 +29,5 @@ jobs:
       image_tags: |
         "ghcr.io/${{ github.repository }}/odkcentral-ui:${{ vars.ODK_CENTRAL_TAG }}"
         "ghcr.io/${{ github.repository }}/odkcentral-ui:latest"
-      build_args: |
+      extra_build_args: |
         ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
