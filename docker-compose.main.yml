@@ -19,28 +19,28 @@ version: "3"
 
 volumes:
   fmtm_frontend:
-    name: fmtm-frontend-${GIT_BRANCH}
+    name: fmtm-frontend-main
   fmtm_db_data:
-    name: fmtm-db-data-${GIT_BRANCH}
+    name: fmtm-db-data-main
   fmtm_logs:
-    name: fmtm-logs-${GIT_BRANCH}
+    name: fmtm-logs-main
   fmtm_images:
-    name: fmtm-images-${GIT_BRANCH}
+    name: fmtm-images-main
   fmtm_tiles:
-    name: fmtm-tiles-${GIT_BRANCH}
+    name: fmtm-tiles-main
   certs:
-    name: fmtm-certs-${GIT_BRANCH}
+    name: fmtm-certs-main
   certbot_data:
-    name: fmtm-certbot-data-${GIT_BRANCH}
+    name: fmtm-certbot-data-main
 
 networks:
   fmtm-net:
-    name: fmtm-${GIT_BRANCH}
+    name: fmtm-main
 
 services:
   proxy:
-    image: "ghcr.io/hotosm/fmtm/proxy:${GIT_BRANCH}"
-    container_name: fmtm-${GIT_BRANCH}
+    image: "ghcr.io/hotosm/fmtm/proxy:main${FMTM_SCRIPT_DOMAIN:+-plus-script}"
+    container_name: fmtm-main
     depends_on:
       api:
         condition: service_started
@@ -64,8 +64,8 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-api-${GIT_BRANCH}
+    image: "ghcr.io/hotosm/fmtm/backend:main"
+    container_name: fmtm-api-main
     volumes:
       - fmtm_logs:/opt/logs
       - fmtm_images:/opt/app/images
@@ -89,9 +89,9 @@ services:
       context: src/frontend
       dockerfile: prod.dockerfile
       args:
-        APP_VERSION: ${GIT_BRANCH}
+        APP_VERSION: main
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-    container_name: fmtm-ui-${GIT_BRANCH}
+    container_name: fmtm-ui-main
     volumes:
       - fmtm_frontend:/frontend
     network_mode: none
@@ -99,7 +99,7 @@ services:
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
-    container_name: fmtm-db-${GIT_BRANCH}
+    container_name: fmtm-db-main
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -119,8 +119,8 @@ services:
       retries: 3
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-migrations-${GIT_BRANCH}
+    image: "ghcr.io/hotosm/fmtm/backend:main"
+    container_name: fmtm-migrations-main
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -132,8 +132,8 @@ services:
     restart: "on-failure:3"
 
   backups:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-backups-${GIT_BRANCH}
+    image: "ghcr.io/hotosm/fmtm/backend:main"
+    container_name: fmtm-backups-main
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -152,7 +152,7 @@ services:
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-main"
-    container_name: fmtm-cert-renew-${GIT_BRANCH}
+    container_name: fmtm-cert-renew-main
     volumes:
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot

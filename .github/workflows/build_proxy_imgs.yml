@@ -40,6 +40,16 @@ jobs:
       extra_build_args: |
         NGINX_TAG=${{ vars.NGINX_TAG }}
 
+  build-proxy-main-plus-script:
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    with:
+      context: nginx
+      build_target: main-plus-script
+      image_tags: |
+        "ghcr.io/${{ github.repository }}/proxy:main-plus-script"
+      extra_build_args: |
+        NGINX_TAG=${{ vars.NGINX_TAG }}
+
   build-proxy-dev:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
