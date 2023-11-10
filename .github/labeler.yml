@@ -1,10 +1,12 @@
 "frontend":
-  - "src/frontend/**/*"
+  - any: ["src/frontend/**/*", "!src/frontend/public/install-fmtm.sh"]
 "backend":
   - "src/backend/**/*"
 "devops":
   - ".github/**/*"
+  - "nginx/**/*"
   - "scripts/**/*"
+  - "src/frontend/public/install-fmtm.sh"
   - "docker-*.yml"
   - "**/Dockerfile"
   - "**/*.dockerfile"

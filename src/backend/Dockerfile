@@ -15,16 +15,20 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 ARG PYTHON_IMG_TAG=3.10
+ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2023-10-25T06-33-25Z}
+FROM docker.io/minio/minio:${MINIO_TAG} as minio
+
+
 
 FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm as base
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG PYTHON_IMG_TAG
-ARG MAINTAINER=admin@hotosm.org
-LABEL org.hotosm.fmtm.app-version="${APP_VERSION}" \
+LABEL org.hotosm.fmtm.app-name="backend" \
+      org.hotosm.fmtm.app-version="${APP_VERSION}" \
       org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
       org.hotosm.fmtm.python-img-tag="${PYTHON_IMG_TAG}" \
-      org.hotosm.fmtm.maintainer="${MAINTAINER}" \
+      org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
       org.hotosm.fmtm.api-port="8000"
 RUN set -ex \
     && apt-get update \
@@ -92,7 +96,6 @@ RUN set -ex \
     -y --no-install-recommends \
         "nano" \
         "curl" \
-        "wait-for-it" \
         "libpcre3" \
         "mime-support" \
         "postgresql-client" \
@@ -101,6 +104,8 @@ RUN set -ex \
         "libproj25" \
         "libgeos-c1v5" \
     && rm -rf /var/lib/apt/lists/*
+# Copy minio mc client
+COPY --from=minio /opt/bin/mc /usr/local/bin/
 COPY *-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
@@ -112,10 +117,10 @@ WORKDIR /opt
 COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
 # Add non-root user, permissions
-RUN useradd -r -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
+RUN useradd -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
-    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh
+    && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
 # Add volumes for persistence
 VOLUME /opt/logs
 VOLUME /opt/tiles
@@ -145,7 +150,7 @@ CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
 FROM debug-no-odk as debug-with-odk
 USER root
 # Add the SSL cert for debug odkcentral
-COPY --from=ghcr.io/hotosm/fmtm/odkcentral-proxy:latest \
+COPY --from=ghcr.io/hotosm/fmtm/proxy:debug \
     /etc/nginx/central-fullchain.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 USER appuser
@@ -175,8 +180,8 @@ RUN mv /home/appuser/.local/bin/* /usr/local/bin/ \
     # Pre-compile packages to .pyc (init speed gains)
     && python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Override entrypoint, as not possible in Github action
-ENTRYPOINT [""]
-CMD [""]
+ENTRYPOINT []
+CMD ["sleep", "infinity"]
 
 
 

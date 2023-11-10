@@ -1,16 +1,7 @@
 FROM docker.io/node:18 as builder
-ARG MAINTAINER=admin@hotosm.org
 
-ARG APP_VERSION
-ARG COMMIT_REF
 ARG VITE_API_URL
 ENV VITE_API_URL="${VITE_API_URL}"
-
-LABEL org.hotosm.fmtm.app-name="fmtm-frontend" \
-      org.hotosm.fmtm.app-version="${APP_VERSION}" \
-      org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
-      org.hotosm.fmtm.maintainer="${MAINTAINER}" \
-      org.hotosm.fmtm.api-url="${VITE_API_URL}"
 
 WORKDIR /app
 COPY ./package.json ./pnpm-lock.yaml ./
@@ -24,9 +15,19 @@ COPY . .
 RUN pnpm run build
 
 
-FROM docker.io/devforth/spa-to-http:1.0.3 as prod
+
+FROM docker.io/rclone/rclone:1.64 as prod
+ARG APP_VERSION
+ARG COMMIT_REF
+ARG VITE_API_URL
+LABEL org.hotosm.fmtm.app-name="frontend" \
+      org.hotosm.fmtm.app-version="${APP_VERSION}" \
+      org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
+      org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
+      org.hotosm.fmtm.api-url="${VITE_API_URL}"
+VOLUME /frontend
+COPY container-entrypoint.sh /
+RUN chmod +x /container-entrypoint.sh
+ENTRYPOINT ["/container-entrypoint.sh"]
 WORKDIR /app
-# Add non-root user, permissions
-RUN adduser -D -u 900 -h /home/appuser appuser
-USER appuser
-COPY --from=builder --chown=appuser:appuser /app/dist .
+COPY --from=builder /app/dist .

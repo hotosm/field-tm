@@ -9,10 +9,10 @@
     "start:live": "vite dev",
     "test": "vitest tests/"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "author": {
-    "name": "Jack Herrington",
-    "email": "jherr@pobox.com"
+    "name": "HOTOSM",
+    "email": "sysadmin@hotosm.org"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.3",

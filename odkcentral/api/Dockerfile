@@ -20,10 +20,6 @@ ARG node_version=18
 
 
 FROM docker.io/bitnami/git:2 as repo
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        "jq" \
-    && rm -rf /var/lib/apt/lists/*
 ARG ODK_CENTRAL_TAG
 RUN git clone --depth 1 --branch ${ODK_CENTRAL_TAG} \
     "https://github.com/getodk/central.git" \
@@ -31,7 +27,7 @@ RUN git clone --depth 1 --branch ${ODK_CENTRAL_TAG} \
 
 
 
-FROM docker.io/node:${node_version}
+FROM docker.io/node:${node_version}-slim
 
 WORKDIR /usr/odk
 
@@ -45,10 +41,16 @@ COPY init-user-and-start.sh /
 COPY --from=repo central/server/package*.json ./
 
 # Install system deps
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODENAME=\K\w+' /etc/os-release)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list && \
-    curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg && \
-    apt-get update && \
-    apt-get install -y cron wait-for-it gettext postgresql-client-14 netcat-traditional \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        gpg \
+        cron \
+        wait-for-it \
+        gettext \
+        postgresql-client \
+        netcat-traditional \
+    && rm -rf /var/lib/apt/lists/* \
     # Install node_modules
     && npm clean-install --omit=dev --legacy-peer-deps --no-audit \
         --fund=false --update-notifier=false \

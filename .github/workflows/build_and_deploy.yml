@@ -17,12 +17,13 @@ on:
 
 jobs:
   pytest:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@1.2.1
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
+      pre_command: docker compose up -d proxy
       compose_service: api
-      compose_command: wait-for-it fmtm-db:5432 --strict -- wait-for-it central:8383 --strict --timeout=30 -- pytest
+      compose_command: pytest
       tag_override: ci-${{ github.ref_name }}
     secrets: inherit
 
@@ -124,7 +125,7 @@ jobs:
     needs:
       - smoke-test-backend
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy.yml@1.1.3
     with:
       environment: ${{ github.ref_name }}
       docker_compose_file: "docker-compose.${{ github.ref_name }}.yml"

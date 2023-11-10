@@ -69,7 +69,7 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     Returns:
         access_token(string): The access token provided by the login URL request.
     """
-    print("Call back api requested", request.url)
+    log.debug(f"Callback url requested: {request.url}")
 
     # Enforce https callback url
     callback_url = str(request.url).replace("http://", "https://")

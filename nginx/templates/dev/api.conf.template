@@ -15,27 +15,26 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-upstream centralapi {
-    server central:8383;
+
+upstream backend {
+    server api:8000 max_fails=1 fail_timeout=2s;
+    keepalive 32;
 }
 
 server {
-    listen 80;
-    server_name localhost;
-    return 301 https://$host:$request_uri;
-}
+    # Default handler for port 80
+    listen 80 reuseport;
+    server_name api.fmtm.localhost;
 
-server {
-    listen 443 ssl;
-    server_name localhost;
+    # Max upload size 1GB
+    client_max_body_size 1G;
 
-    ssl_certificate /etc/nginx/central-fullchain.crt;
-    ssl_certificate_key /etc/nginx/central.key;
-
-    error_page 497 https://$host:$server_port$request_uri;
+    # Response headers (note: Access-Control-Allow-Origin already set by FastAPI, not required)
 
     location / {
-        proxy_pass http://centralapi;
+        proxy_read_timeout 40s;
+        proxy_connect_timeout 20s;
+
         # Requests headers
         proxy_set_header Host                $http_host;
         proxy_set_header X-Real-IP           $remote_addr;
@@ -44,5 +43,18 @@ server {
         proxy_set_header X-Forwarded-Host    $http_host;
         proxy_set_header X-Forwarded-Server  $http_host;
         proxy_set_header X-Forwarded-Port    $server_port;
+
+        # Disable buffer to temp files, tweak buffer for memory
+        proxy_max_temp_file_size 0;
+        proxy_buffer_size 64k;
+        proxy_buffers 8 64k;
+        proxy_busy_buffers_size 64k;
+
+        proxy_pass http://backend;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
     }
 }

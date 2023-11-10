@@ -12,10 +12,12 @@ psql -d fmtm -U fmtm -h localhost
 
 ### Option 2
 
-Access a PostgreSQL shell inside the fmtm_db container:
+Access a PostgreSQL shell inside the fmtm-db container:
 
 ```bash
-docker exec -it fmtm_db psql -U fmtm fmtm
+GIT_BRANCH=development
+
+docker exec -it fmtm-db-${GIT_BRANCH} psql -U fmtm fmtm
 ```
 
 And then connect to the database using this command:

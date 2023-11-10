@@ -1,0 +1,75 @@
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+version: "3"
+
+volumes:
+  fmtm_data:
+  fmtm_db_data:
+  fmtm_logs:
+  fmtm_images:
+  fmtm_tiles:
+  central_db_data:
+  certs:
+
+networks:
+  fmtm-net:
+    name: fmtm-${GIT_BRANCH}
+
+services:
+  proxy:
+    extends:
+      file: docker-compose.development.yml
+      service: proxy
+  api:
+    extends:
+      file: docker-compose.development.yml
+      service: api
+  ui:
+    extends:
+      file: docker-compose.development.yml
+      service: ui
+    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-staging}"
+  central:
+    extends:
+      file: docker-compose.development.yml
+      service: central
+  s3:
+    extends:
+      file: docker-compose.development.yml
+      service: s3
+  fmtm-db:
+    extends:
+      file: docker-compose.development.yml
+      service: fmtm-db
+  central-db:
+    extends:
+      file: docker-compose.development.yml
+      service: central-db
+  migrations:
+    extends:
+      file: docker-compose.development.yml
+      service: migrations
+  backups:
+    extends:
+      file: docker-compose.development.yml
+      service: backups
+  certbot:
+    extends:
+      file: docker-compose.development.yml
+      service: certbot
+    image: "ghcr.io/hotosm/fmtm/proxy:certs-init-staging"
