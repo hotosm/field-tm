@@ -87,20 +87,6 @@ It is also possible to use the API_PREFIX variable if the api
 is served under, e.g. /api on the domain.
 However, this isn't the recommended approach, and testing is minimal.
 
-#### VITE_API_URL
-
-By default, the API URL for the frontend to use is:
-
-`api.${FMTM_DOMAIN}`
-
-If you wish to change this and use another domain,
-then add the environment variable during the
-frontend build:
-
-`VITE_API_URL=some.other.domain.org`
-
-> Note: this is only used for the **frontend** build.
-
 #### ODK\_ Variables
 
 These can point to an externally hosted instance of ODK Central.
@@ -123,7 +109,7 @@ s3.${FMTM_DOMAIN} --> S3 / Minio
 These defaults can be overriden with respective environment variables:
 
 ```
-FMTM_API_DOMAIN (defaults to the value of VITE_API_URL if provided)
+FMTM_API_DOMAIN
 FMTM_ODK_DOMAIN
 FMTM_S3_DOMAIN
 ```
