@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-cert-init-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
       target: certs-init-main
@@ -19,7 +19,7 @@ jobs:
         "ghcr.io/${{ github.repository }}/proxy:certs-init-main"
 
   build-cert-init-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
       target: certs-init-development
@@ -28,7 +28,7 @@ jobs:
         "ghcr.io/${{ github.repository }}/proxy:certs-init-staging"
 
   build-proxy-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
       target: main
@@ -36,7 +36,7 @@ jobs:
         "ghcr.io/${{ github.repository }}/proxy:main"
 
   build-proxy-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.1.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
     with:
       context: nginx
       target: development
