@@ -48,6 +48,7 @@ RUN apt-get update && \
         cron \
         wait-for-it \
         gettext \
+        procps \
         postgresql-client \
         netcat-traditional \
     && rm -rf /var/lib/apt/lists/* \
