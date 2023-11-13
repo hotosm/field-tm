@@ -64,10 +64,10 @@ const MainView = () => {
                 height: popupInParams
                   ? '100vh'
                   : location.pathname.includes('project_details') && windowSize.width <= 640
-                  ? '100vh'
-                  : windowSize.width <= 599
-                  ? '90vh'
-                  : '92vh',
+                    ? '100vh'
+                    : windowSize.width <= 599
+                      ? '90vh'
+                      : '92vh',
                 overflow: 'auto',
                 // p: '1.3rem',
               }}
