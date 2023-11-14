@@ -143,16 +143,6 @@ def get_project_summaries(
     return convert_to_project_summaries(db_projects)
 
 
-def get_project_by_id_w_all_tasks(db: Session, project_id: int):
-    db_project = (
-        db.query(db_models.DbProject)
-        .filter(db_models.DbProject.id == project_id)
-        .first()
-    )
-
-    return convert_to_app_project(db_project)
-
-
 def get_project(db: Session, project_id: int):
     db_project = (
         db.query(db_models.DbProject)
