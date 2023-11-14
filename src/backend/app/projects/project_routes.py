@@ -89,7 +89,7 @@ async def get_projet_details(project_id: int, db: Session = Depends(database.get
         odk_central_password=project.odk_central_password,
     )
 
-    odk_details = await central_crud.get_project_full_details(
+    odk_details = await central_crud.get_odk_project_full_details(
         project.odkid, odk_credentials
     )
 
