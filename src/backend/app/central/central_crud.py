@@ -301,7 +301,7 @@ def get_form_full_details(
 ):
     form = get_odk_form(odk_central)
     form_details = form.getFullDetails(odk_project_id, form_id)
-    return form_details.json()
+    return form_details
 
 
 async def get_project_full_details(
