@@ -431,6 +431,7 @@ class DbProject(Base):
     # GEOMETRY
     outline = Column(Geometry("POLYGON", srid=4326))
     # geometry = Column(Geometry("POLYGON", srid=4326, from_text='ST_GeomFromWkt'))
+    # TODO add outline_geojson as computed @property
 
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
