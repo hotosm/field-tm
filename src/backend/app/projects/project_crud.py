@@ -331,7 +331,7 @@ def create_project_with_project_info(
     # create new project
     db_project = db_models.DbProject(
         author=db_user,
-        odkid=project_id,
+        odkid=odk_project_id,
         project_name_prefix=project_info_1.name,
         xform_title=xform_title,
         odk_central_url=url,
