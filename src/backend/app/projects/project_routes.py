@@ -656,16 +656,12 @@ async def generate_files(
                 status_code=400, detail="Provide a valid geojson file"
             ) from e
 
-    # generate a unique task ID using uuid
-    background_task_id = uuid.uuid4()
-
-    # insert task and task ID into database
+    # Create task in db and return uuid
     log.debug(
-        f"Creating background task ID {background_task_id} "
-        f"for project ID: {project_id}"
+        f"Creating export background task for project ID: {project_id}"
     )
-    await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, project_id=project_id
     )
 
     log.debug(f"Submitting {background_task_id} to background tasks stack")
@@ -901,12 +897,10 @@ async def add_features(
     # Validatiing Coordinate Reference System
     check_crs(features)
 
-    # generate a unique task ID using uuid
-    background_task_id = uuid.uuid4()
-
-    # insert task and task ID into database
-    await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id
+    # Create task in db and return uuid
+    log.debug("Creating add_features background task")
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db
     )
 
     background_tasks.add_task(
@@ -1085,12 +1079,13 @@ async def generate_project_tiles(
     Returns:
         str: Success message that tile generation started.
     """
-    # generate a unique task ID using uuid
-    background_task_id = uuid.uuid4()
-
-    # insert task and task ID into database
-    await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+    # Create task in db and return uuid
+    log.debug(
+        "Creating generate_project_tiles background task "
+        f"for project ID: {project_id}"
+    )
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, project_id=project_id
     )
 
     background_tasks.add_task(
@@ -1260,16 +1255,13 @@ async def generate_files_janakpur(
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Provide a valid geojson file")
 
-    # generate a unique task ID using uuid
-    background_task_id = uuid.uuid4()
-
-    # insert task and task ID into database
+    # Create task in db and return uuid
     log.debug(
-        f"Creating background task ID {background_task_id} "
-        f"for project ID: {project_id}"
+        "Creating generate_files_for_janakpur"
+        f"background task for project ID: {project_id}"
     )
-    await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, project_id=project_id
     )
 
     log.debug(f"Submitting {background_task_id} to background tasks stack")
