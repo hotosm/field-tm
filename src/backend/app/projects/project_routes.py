@@ -1278,3 +1278,22 @@ async def generate_files_janakpur(
     )
 
     return {"Message": project_id, "task_id": background_task_id}
+
+
+@router.get("/task-status/{uuid}", response_model=project_schemas.BackgroundTaskStatus)
+async def get_task_status(
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(database.get_db),
+):
+    """Get the background task status by passing the task UUID."""
+    # Get the backgrund task status
+    task_status, task_message = await project_crud.get_background_task_status(
+        uuid, db
+    )
+    return project_schemas.BackgroundTaskStatus(
+        status=task_status.name,
+        message=task_message or None,
+        # progress=some_func_to_get_progress,
+    )
+
+
