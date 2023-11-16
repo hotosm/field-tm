@@ -2034,7 +2034,6 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
     if not task:
         log.warning(f"No background task with found with UUID: {task_id}")
         raise HTTPException(status_code=404, detail="Task not found")
-
     return task.status, task.message
 
 
