@@ -666,9 +666,9 @@ set_external_s3() {
         yellow_echo "The bucket should be public."
         echo
         echo "Please enter the bucket name."
-        read -e -p "S3 Bucket Name: " S3_BUCKET_NAME_BASEMAPS
+        read -e -p "S3 Bucket Name: " S3_BUCKET_NAME
         echo
-        export S3_BUCKET_NAME_BASEMAPS=${S3_BUCKET_NAME_BASEMAPS}
+        export S3_BUCKET_NAME=${S3_BUCKET_NAME}
     fi
 }
 

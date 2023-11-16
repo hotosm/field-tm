@@ -192,9 +192,7 @@ def startup_init_buckets():
 
     # Init S3 Buckets
     client = s3_client()
-    create_bucket_if_not_exists(
-        client, settings.S3_BUCKET_NAME_BASEMAPS, is_public=True
-    )
+    create_bucket_if_not_exists(client, settings.S3_BUCKET_NAME, is_public=True)
 
 
 if __name__ == "__main__":
