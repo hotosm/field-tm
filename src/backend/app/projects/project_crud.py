@@ -2031,6 +2031,10 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
         .filter(db_models.BackgroundTasks.id == str(task_id))
         .first()
     )
+    if not task:
+        log.warning(f"No background task with found with UUID: {task_id}")
+        raise HTTPException(status_code=404, detail="Task not found")
+    
     return task.status, task.message
 
 
@@ -2046,6 +2050,8 @@ async def insert_background_task_into_database(
     Return:
         task_id(uuid.uuid4): The background task uuid for tracking.
     """
+    task_id = uuid.uuid4()
+
     task = db_models.BackgroundTasks(
         id=str(task_id), name=name, status=1, project_id=project_id
     )  # 1 = running
@@ -2054,7 +2060,7 @@ async def insert_background_task_into_database(
     db.commit()
     db.refresh(task)
 
-    return True
+    return task_id
 
 
 def update_background_task_status_in_database(
