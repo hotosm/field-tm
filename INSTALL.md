@@ -133,6 +133,10 @@ host operating system.
 You will need to [Install Docker](https://docs.docker.com/engine/install/)
 and ensure that it is running on your local machine.
 
+You will also need [Docker Compose](https://docs.docker.com/compose/install).
+This is Docker Compose V2, the official Docker CLI plugin.
+i.e. `docker compose` commands, not `docker-compose` (the old tool).
+
 Then from the command line, navigate to the top level directory of the FMTM project.
 
 #### Select the install type
