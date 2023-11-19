@@ -77,15 +77,29 @@ S3_ACCESS_KEY=`<CHANGEME>`
 S3_SECRET_KEY=`<CHANGEME>`
 ```
 
-> Note: If extra cors origins are required for testing, the variable
+#### EXTRA_CORS_ORIGINS
+
+> If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
 > <http://fmtm.localhost:7050,http://some.other.domain>
 
 #### API_PREFIX
 
-It is also possible to use the API_PREFIX variable if the api
-is served under, e.g. /api on the domain.
-However, this isn't the recommended approach, and testing is minimal.
+> It is also possible to use the API_PREFIX variable if the api
+> is served under, e.g. /api on the domain.
+> However, this isn't the recommended approach, and testing is minimal.
+
+#### S3_ACCESS_KEY & S3_SECRET_KEY
+
+> In most circumstances these variables should be provided
+> to authenticate with your S3 provider.
+> However, some providers (such as AWS), allow for
+> `instance profiles` to be attached to your server,
+> with required permissions preconfigured.
+> By default connections made from the EC2 instance
+> with attached `instance profile` will be automatically
+> authenticated. S3_ACCESS_KEY and S3_SECRET_KEY should
+> be set to blank strings in this case `=""`.
 
 #### ODK\_ Variables
 
