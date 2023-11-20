@@ -15,6 +15,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
   const [selectedTileSource, setSelectedTileSource] = useState(null);
   const [selectedOutputFormat, setSelectedOutputFormat] = useState(null);
   const [tmsUrl, setTmsUrl] = useState('');
+  const [error, setError] = useState([]);
 
   const modalStyle = (theme) => ({
     width: '90vw', // Responsive modal width using vw
@@ -49,6 +50,35 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
   const handleTmsUrlChange = (e) => {
     setTmsUrl(e.target.value);
+  };
+
+  const generateProjectTilesValidation = () => {
+    const currentError = [];
+    if (!selectedTileSource) {
+      currentError.push('selectedTileSource');
+    }
+    if (!selectedOutputFormat) {
+      currentError.push('selectedOutputFormat');
+    }
+    if (!tmsUrl && selectedTileSource === 'tms') {
+      currentError.push('tmsUrl');
+    }
+    setError(currentError);
+    return currentError;
+  };
+
+  const generateProjectTiles = () => {
+    const currentErrors = generateProjectTilesValidation();
+    if (currentErrors.length === 0) {
+      dispatch(
+        GenerateProjectTiles(
+          `${
+            import.meta.env.VITE_API_URL
+          }/projects/tiles/${decodedId}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
+          decodedId,
+        ),
+      );
+    }
   };
 
   return (
@@ -105,6 +135,9 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                 ))}
               </CoreModules.Select>
             </CoreModules.FormControl>
+            {error.includes('selectedOutputFormat') && (
+              <p className="fmtm-text-sm fmtm-text-red-500">Output Format is Required.</p>
+            )}
           </CoreModules.Grid>
 
           {/* Tile Source Dropdown or TMS URL Input */}
@@ -140,6 +173,9 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                 ))}
               </CoreModules.Select>
             </CoreModules.FormControl>
+            {error.includes('selectedTileSource') && (
+              <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
+            )}
           </CoreModules.Grid>
           {selectedTileSource === 'tms' && (
             <CoreModules.Grid item xs={12} sm={12} md={4}>
@@ -165,6 +201,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                   onChange={handleTmsUrlChange}
                 />
               </CoreModules.FormControl>
+              {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>}
             </CoreModules.Grid>
           )}
           <CoreModules.Grid item xs={12} sm={12} md={selectedTileSource === 'tms' ? 12 : 4}>
@@ -175,23 +212,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
                   variant="contained"
                   loading={generateProjectTilesLoading}
                   color="error"
-                  onClick={() => {
-                    // Check if 'tms' is selected and tmsUrl is not empty
-                    if (selectedTileSource === 'tms' && !tmsUrl) {
-                      // Handle error, TMS URL is required
-                      console.log('TMS URL is required');
-                      return;
-                    }
-
-                    dispatch(
-                      GenerateProjectTiles(
-                        `${
-                          import.meta.env.VITE_API_URL
-                        }/projects/tiles/${decodedId}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
-                        decodedId,
-                      ),
-                    );
-                  }}
+                  onClick={() => generateProjectTiles()}
                 >
                   Generate
                 </CoreModules.LoadingButton>
