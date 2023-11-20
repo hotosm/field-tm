@@ -304,7 +304,7 @@ def get_form_full_details(
     return form_details
 
 
-async def get_odk_project_full_details(
+def get_odk_project_full_details(
     odk_project_id: int, odk_central: project_schemas.ODKCentral
 ):
     project = get_odk_project(odk_central)
