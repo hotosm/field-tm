@@ -89,12 +89,15 @@ async def get_projet_details(project_id: int, db: Session = Depends(database.get
         odk_central_password=project.odk_central_password,
     )
 
-    odk_details = await central_crud.get_odk_project_full_details(
+    odk_details = central_crud.get_odk_project_full_details(
         project.odkid, odk_credentials
     )
 
     # Features count
-    query = f"select count(*) from features where project_id={project_id} and task_id is not null"
+    query = text(
+        "select count(*) from features where "
+        f"project_id={project_id} and task_id is not null"
+    )
     result = db.execute(query)
     features = result.fetchone()[0]
 
@@ -208,15 +211,9 @@ async def create_project(
             project_info.odk_central.odk_central_url[:-1]
         )
 
-    try:
-        odkproject = central_crud.create_odk_project(
-            project_info.project_info.name, project_info.odk_central
-        )
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=400, detail="Connection failed to central odk. "
-        ) from e
+    odkproject = central_crud.create_odk_project(
+        project_info.project_info.name, project_info.odk_central
+    )
 
     # TODO check token against user or use token instead of passing user
     # project_info.project_name_prefix = project_info.project_info.name
@@ -331,34 +328,6 @@ async def project_partial_update(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.post("/beta/{project_id}/upload")
-async def upload_project_boundary_with_zip(
-    project_id: int,
-    project_name_prefix: str,
-    task_type_prefix: str,
-    upload: UploadFile,
-    db: Session = Depends(database.get_db),
-):
-    r"""Upload a ZIP with task geojson polygons and QR codes for an existing project.
-
-    {PROJECT_NAME}/\n
-    ├─ {PROJECT_NAME}.geojson\n
-    ├─ {PROJECT_NAME}_polygons.geojson\n
-    ├─ geojson/\n
-    │  ├─ {PROJECT_NAME}_TASK_TYPE__{TASK_NUM}.geojson\n
-    ├─ QR_codes/\n
-    │  ├─ {PROJECT_NAME}_{TASK_TYPE}__{TASK_NUM}.png\n
-    """
-    # TODO: consider replacing with this: https://stackoverflow.com/questions/73442335/how-to-upload-a-large-file-%e2%89%a53gb-to-fastapi-backend/73443824#73443824
-    project = project_crud.update_project_with_zip(
-        db, project_id, project_name_prefix, task_type_prefix, upload
-    )
-    if project:
-        return project
-
-    return {"Message": "Uploading project ZIP failed"}
-
-
 @router.post("/upload_xlsform")
 async def upload_custom_xls(
     upload: UploadFile = File(...),
@@ -428,7 +397,7 @@ async def upload_multi_project_boundary(
 
 @router.post("/task_split")
 async def task_split(
-    upload: UploadFile = File(...),
+    project_geojson: UploadFile = File(...),
     no_of_buildings: int = Form(50),
     has_data_extracts: bool = Form(False),
     db: Session = Depends(database.get_db),
@@ -436,7 +405,7 @@ async def task_split(
     """Split a task into subtasks.
 
     Args:
-        upload (UploadFile): The file to split.
+        project_geojson (UploadFile): The file to split.
         no_of_buildings (int, optional): The number of buildings per subtask. Defaults to 50.
         db (Session, optional): The database session. Injected by FastAPI.
 
@@ -445,8 +414,8 @@ async def task_split(
 
     """
     # read entire file
-    await upload.seek(0)
-    content = await upload.read()
+    await project_geojson.seek(0)
+    content = await project_geojson.read()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -573,12 +542,13 @@ async def generate_files(
     background_tasks: BackgroundTasks,
     project_id: int,
     extract_polygon: bool = Form(False),
-    upload: Optional[UploadFile] = File(None),
-    config_file: Optional[UploadFile] = File(None),
+    xls_form_upload: Optional[UploadFile] = File(None),
+    xls_form_config_file: Optional[UploadFile] = File(None),
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    """Generate additional content for the project to function.
+    """
+    Generate additional content for the project to function.
 
     QR codes,
 
@@ -588,21 +558,18 @@ async def generate_files(
     Some of the other functionality of this api includes converting a xls file provided by the user to the xform,
     generates osm data extracts and uploads it to the form.
 
-
-    Parameters:
-
-    project_id (int): The ID of the project for which files are being generated. This is a required field.
-    polygon (bool): A boolean flag indicating whether the polygon is extracted or not.
-
-    upload (UploadFile): An uploaded file that is used as input for generating the files.
-        This is not a required field. A file should be provided if user wants to upload a custom xls form.
+    Args:
+        project_id (int): The ID of the project for which files are being generated.
+        polygon (bool): A boolean flag indicating whether the polygon
+            is extracted or not.
+        xls_form_upload (UploadFile, optional): A custom XLSForm to use in the project.
+            A file should be provided if user wants to upload a custom xls form.
 
     Returns:
-    Message (str): A success message containing the project ID.
-
+        json (JSONResponse): A success message containing the project ID.
     """
     log.debug(f"Generating media files tasks for project: {project_id}")
-    contents = None
+    custom_xls_form = None
     xform_title = None
 
     project = project_crud.get_project(db, project_id)
@@ -614,29 +581,29 @@ async def generate_files(
     project.data_extract_type = "polygon" if extract_polygon else "centroid"
     db.commit()
 
-    if upload:
-        log.debug("Validating uploaded XLS file")
+    if xls_form_upload:
+        log.debug("Validating uploaded XLS form")
         # Validating for .XLS File.
-        file_name = os.path.splitext(upload.filename)
+        file_name = os.path.splitext(xls_form_upload.filename)
         file_ext = file_name[1]
         allowed_extensions = [".xls", ".xlsx", ".xml"]
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
-        await upload.seek(0)
-        contents = await upload.read()
+        await xls_form_upload.seek(0)
+        custom_xls_form = await xls_form_upload.read()
 
-        project.form_xls = contents
+        project.form_xls = custom_xls_form
 
-        if config_file:
-            config_file_name = os.path.splitext(config_file.filename)
+        if xls_form_config_file:
+            config_file_name = os.path.splitext(xls_form_config_file.filename)
             config_file_ext = config_file_name[1]
             if not config_file_ext == ".yaml":
                 raise HTTPException(
                     status_code=400, detail="Provide a valid .yaml config file"
                 )
-            await config_file.seek(0)
-            config_file_contents = await config_file.read()
+            await xls_form_config_file.seek(0)
+            config_file_contents = await xls_form_config_file.read()
             project.form_config_file = config_file_contents
 
         db.commit()
@@ -668,10 +635,10 @@ async def generate_files(
         db,
         project_id,
         extract_polygon,
-        contents,
+        custom_xls_form,
         extracts_contents if data_extracts else None,
         xform_title,
-        file_ext[1:] if upload else "xls",
+        file_ext[1:] if xls_form_upload else "xls",
         background_task_id,
     )
 
@@ -845,15 +812,15 @@ async def preview_tasks(
 
     """
     # Validating for .geojson File.
-    file_name = os.path.splitext(upload.filename)
+    file_name = os.path.splitext(project_geojson.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
-    await upload.seek(0)
-    content = await upload.read()
+    await project_geojson.seek(0)
+    content = await project_geojson.read()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System

@@ -121,7 +121,7 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
     const postUploadArea = async (url, filePayload, payload) => {
       try {
         const areaFormData = new FormData();
-        areaFormData.append('upload', filePayload);
+        areaFormData.append('project_geojson', filePayload);
         if (payload?.dimension) {
           areaFormData.append('dimension', payload?.dimension);
         }
@@ -275,7 +275,7 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
     const getDividedTaskFromGeojson = async (url, payload) => {
       try {
         const dividedTaskFormData = new FormData();
-        dividedTaskFormData.append('upload', payload.geojson);
+        dividedTaskFormData.append('project_geojson', payload.geojson);
         dividedTaskFormData.append('dimension', payload.dimension);
         const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
         const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
@@ -334,7 +334,7 @@ const TaskSplittingPreviewService: Function = (
     const getTaskSplittingGeojson = async (url, fileUpload, isCustomDataExtract) => {
       try {
         const taskSplittingFileFormData = new FormData();
-        taskSplittingFileFormData.append('upload', fileUpload);
+        taskSplittingFileFormData.append('project_geojson', fileUpload);
         taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
         taskSplittingFileFormData.append('has_data_extracts', isCustomDataExtract);
 
@@ -437,7 +437,7 @@ const EditProjectBoundaryService: Function = (url: string, geojsonUpload: any, d
     const postFormUpdate = async (url, geojsonUpload, dimension) => {
       try {
         const editBoundaryFormData = new FormData();
-        editBoundaryFormData.append('upload', geojsonUpload);
+        editBoundaryFormData.append('project_geojson', geojsonUpload);
         if (dimension) {
           editBoundaryFormData.append('dimension', dimension);
         }
