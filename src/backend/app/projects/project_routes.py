@@ -248,7 +248,7 @@ async def update_odk_credentials(
 
     try:
         odkproject = central_crud.create_odk_project(
-            project_instance.project_info[0].name, odk_central_cred
+            project_instance.project_info.name, odk_central_cred
         )
         log.debug(f"ODKCentral return after update: {odkproject}")
     except Exception as e:
@@ -657,9 +657,7 @@ async def generate_files(
             ) from e
 
     # Create task in db and return uuid
-    log.debug(
-        f"Creating export background task for project ID: {project_id}"
-    )
+    log.debug(f"Creating export background task for project ID: {project_id}")
     background_task_id = await project_crud.insert_background_task_into_database(
         db, project_id=project_id
     )
@@ -899,9 +897,7 @@ async def add_features(
 
     # Create task in db and return uuid
     log.debug("Creating add_features background task")
-    background_task_id = await project_crud.insert_background_task_into_database(
-        db
-    )
+    background_task_id = await project_crud.insert_background_task_into_database(db)
 
     background_tasks.add_task(
         project_crud.add_features_into_database,
@@ -1287,13 +1283,9 @@ async def get_task_status(
 ):
     """Get the background task status by passing the task UUID."""
     # Get the backgrund task status
-    task_status, task_message = await project_crud.get_background_task_status(
-        uuid, db
-    )
+    task_status, task_message = await project_crud.get_background_task_status(uuid, db)
     return project_schemas.BackgroundTaskStatus(
         status=task_status.name,
         message=task_message or None,
         # progress=some_func_to_get_progress,
     )
-
-

@@ -13,7 +13,7 @@ export interface ProjectDetailsModel {
     description: string;
     instructions: string;
     per_task_instructions: string;
-  }[];
+  };
   status: number;
   xform_title: string;
   location_str: string;
