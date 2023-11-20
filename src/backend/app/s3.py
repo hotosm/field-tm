@@ -3,6 +3,7 @@
 import json
 import sys
 from io import BytesIO
+from typing import Any
 
 from loguru import logger as log
 from minio import Minio
@@ -36,16 +37,31 @@ def add_file_to_bucket(bucket_name: str, file_path: str, s3_path: str):
     client.fput_object(bucket_name, file_path, s3_path)
 
 
-def add_obj_to_bucket(bucket_name: str, file_obj: BytesIO, s3_path: str):
+def add_obj_to_bucket(
+    bucket_name: str,
+    file_obj: BytesIO,
+    s3_path: str,
+    content_type: str = "application/octet-stream",
+    **kwargs: dict[str, Any],
+):
     """Upload a BytesIO object to an S3 bucket.
 
     Args:
         bucket_name (str): The name of the S3 bucket.
         file_obj (BytesIO): A BytesIO object containing the data to be uploaded.
         s3_path (str): The path in the S3 bucket where the data will be stored.
+        content_type (str, optional): The content type of the uploaded file.
+            Default application/octet-stream.
+        kwargs (dict[str, Any]): Any other arguments to pass to client.put_object.
+
     """
     client = s3_client()
-    result = client.put_object(bucket_name, file_obj, s3_path)
+    # Set BytesIO object to start, prior to .read()
+    file_obj.seek(0)
+
+    result = client.put_object(
+        bucket_name, s3_path, file_obj, file_obj.getbuffer().nbytes, **kwargs
+    )
     log.debug(
         f"Created {result.object_name} object; etag: {result.etag}, "
         f"version-id: {result.version_id}"
