@@ -81,6 +81,7 @@ def get_projects(
     limit: int = 100,
     db_objects: bool = False,
     hashtags: List[str] = None,
+    search: str = None,
 ):
     filters = []
     if user_id:
@@ -88,6 +89,9 @@ def get_projects(
 
     if hashtags:
         filters.append(db_models.DbProject.hashtags.op("&&")(hashtags))
+
+    if search:
+        filters.append(db_models.DbProject.project_name_prefix.ilike(f"%{search}%"))
 
     if len(filters) > 0:
         db_projects = (
@@ -113,7 +117,12 @@ def get_projects(
 
 
 def get_project_summaries(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, hashtags: str = None
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    hashtags: str = None,
+    search: str = None,
 ):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
@@ -130,7 +139,7 @@ def get_project_summaries(
     #         .filter(
     #         db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
 
-    db_projects = get_projects(db, user_id, skip, limit, True, hashtags)
+    db_projects = get_projects(db, user_id, skip, limit, True, hashtags, search)
     return convert_to_project_summaries(db_projects)
 
 
