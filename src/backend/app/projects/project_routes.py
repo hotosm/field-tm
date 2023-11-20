@@ -120,6 +120,7 @@ async def read_project_summaries(
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
+    search: str = None,
 ):
     if hashtags:
         hashtags = hashtags.split(",")  # create list of hashtags
@@ -135,7 +136,7 @@ async def read_project_summaries(
     hasPrev = page > 1
     total_pages = (total_projects + results_per_page - 1) // results_per_page
 
-    projects = project_crud.get_project_summaries(db, user_id, skip, limit, hashtags)
+    projects = project_crud.get_project_summaries(db, user_id, skip, limit, hashtags, search)
     project_summaries = [
         project_schemas.ProjectSummary.from_db_project(project) for project in projects
     ]
