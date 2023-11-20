@@ -184,7 +184,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(2, '/upload-area')}
+                onClick={() => toggleStep(3, '/select-form')}
                 className="fmtm-font-bold"
               />
               <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />

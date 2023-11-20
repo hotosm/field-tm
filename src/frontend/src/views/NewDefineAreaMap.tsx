@@ -48,7 +48,7 @@ const NewDefineAreaMap = ({
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
               constrainResolution: true,
-              duration: 2000,
+              duration: 500,
             }}
             zoomToLayer
           />
@@ -60,7 +60,7 @@ const NewDefineAreaMap = ({
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
               constrainResolution: true,
-              duration: 2000,
+              duration: 500,
             }}
             onDraw={onDraw}
             zoomToLayer
@@ -85,7 +85,7 @@ const NewDefineAreaMap = ({
               padding: [50, 50, 50, 50],
               // duration: 900,
               constrainResolution: true,
-              duration: 2000,
+              duration: 500,
             }}
             zoomToLayer
           />
@@ -108,7 +108,7 @@ const NewDefineAreaMap = ({
               padding: [50, 50, 50, 50],
               // duration: 900,
               constrainResolution: true,
-              duration: 2000,
+              duration: 500,
             }}
             zoomToLayer
           />
