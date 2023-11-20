@@ -410,7 +410,7 @@ class DbProject(Base):
         nullable=False,
         server_default="20386219",
     )
-    author = relationship(DbUser)
+    author = relationship(DbUser, uselist=False, backref="user")
     created = Column(DateTime, default=timestamp, nullable=False)
     task_creation_mode = Column(
         Enum(TaskCreationMode), default=TaskCreationMode.UPLOAD, nullable=False
@@ -424,7 +424,10 @@ class DbProject(Base):
     project_name_prefix = Column(String)
     task_type_prefix = Column(String)
     project_info = relationship(
-        DbProjectInfo, cascade="all, delete, delete-orphan", backref="project"
+        DbProjectInfo,
+        cascade="all, delete, delete-orphan",
+        uselist=False,
+        backref="project",
     )
     location_str = Column(String)
 
@@ -480,7 +483,9 @@ class DbProject(Base):
         )
 
     # XFORM DETAILS
-    odk_central_src = Column(String, default="")  # TODO Add HOTs as default
+    # TODO This field was probably replaced by odk_central_url
+    # TODO remove in a migration
+    odk_central_src = Column(String, default="")
     xform_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
     xform = relationship(DbXForm)
 
