@@ -19,7 +19,7 @@
 
 import logging
 import sys
-from typing import Union
+from typing import Optional
 
 import sentry_sdk
 from fastapi import FastAPI, Request
@@ -191,7 +191,7 @@ def home():
 
 
 @api.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
+def read_item(item_id: int, q: Optional[str] = None):
     """Get item IDs."""
     return {"item_id": item_id, "q": q}
 
