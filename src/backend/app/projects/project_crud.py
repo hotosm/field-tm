@@ -81,7 +81,7 @@ def get_projects(
     limit: int = 100,
     db_objects: bool = False,
     hashtags: List[str] = None,
-    search:str = None,
+    search: str = None,
 ):
     filters = []
     if user_id:
@@ -117,7 +117,12 @@ def get_projects(
 
 
 def get_project_summaries(
-    db: Session, user_id: int, skip: int = 0, limit: int = 100, hashtags: str = None, search: str = None,
+    db: Session,
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    hashtags: str = None,
+    search: str = None,
 ):
     # TODO: Just get summaries, something like:
     #     db_projects = db.query(db_models.DbProject).with_entities(
