@@ -110,9 +110,29 @@ class Settings(BaseSettings):
     OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth/"
 
     S3_ENDPOINT: str = "http://s3:9000"
-    S3_ACCESS_KEY: str
-    S3_SECRET_KEY: str
+    S3_ACCESS_KEY: Optional[str] = ""
+    S3_SECRET_KEY: Optional[str] = ""
     S3_BUCKET_NAME: str = "fmtm-data"
+    S3_DOWNLOAD_ROOT: Optional[str] = None
+
+    @field_validator("S3_DOWNLOAD_ROOT", mode="before")
+    @classmethod
+    def configure_s3_download_root(cls, v: Optional[str], info: ValidationInfo) -> str:
+        """Set S3_DOWNLOAD_ROOT for dev setup.
+
+        This is required, as normally S3_DOWNLOAD_ROOT is the same
+        as S3_ENDPOINT, but for development we use the docker compose
+        service name for S3_ENDPOINT instead.
+        """
+        # If set manually, pass through
+        if isinstance(v, str):
+            return v
+        # For dev setup
+        dev_port = info.data.get("FMTM_DEV_PORT")
+        if s3_endpoint := info.data.get("S3_ENDPOINT") == "http://s3:9000":
+            return f"http://s3.fmtm.localhost:{dev_port}"
+        # Else set to value of S3_ENDPOINT
+        return s3_endpoint
 
     UNDERPASS_API_URL: str = "https://raw-data-api0.hotosm.org/v1"
     SENTRY_DSN: Optional[str] = None
