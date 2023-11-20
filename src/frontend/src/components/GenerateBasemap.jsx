@@ -15,6 +15,7 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
   const [selectedTileSource, setSelectedTileSource] = useState(null);
   const [selectedOutputFormat, setSelectedOutputFormat] = useState(null);
   const [tmsUrl, setTmsUrl] = useState('');
+  const [error, setError] = useState([]);
 
   const modalStyle = (theme) => ({
     width: '90vw', // Responsive modal width using vw
@@ -51,6 +52,35 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
     setTmsUrl(e.target.value);
   };
 
+  const generateProjectTilesValidation = () => {
+    const currentError = [];
+    if (!selectedTileSource) {
+      currentError.push('selectedTileSource');
+    }
+    if (!selectedOutputFormat) {
+      currentError.push('selectedOutputFormat');
+    }
+    if (!tmsUrl && selectedTileSource === 'tms') {
+      currentError.push('tmsUrl');
+    }
+    setError(currentError);
+    return currentError;
+  };
+
+  const generateProjectTiles = () => {
+    const currentErrors = generateProjectTilesValidation();
+    if (currentErrors.length === 0) {
+      dispatch(
+        GenerateProjectTiles(
+          `${
+            import.meta.env.VITE_API_URL
+          }/projects/tiles/${decodedId}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
+          decodedId,
+        ),
+      );
+    }
+  };
+
   return (
     <CoreModules.CustomizedModal
       isOpen={!!toggleGenerateModal}
@@ -69,137 +99,140 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
           </CoreModules.IconButton>
         </CoreModules.Grid>
 
-        {/* Output Format Dropdown */}
-        <CoreModules.Grid item xs={12} sm={6}>
-          <CoreModules.FormControl fullWidth>
-            <CoreModules.InputLabel
-              id="output-format"
-              sx={{
-                '&.Mui-focused': {
-                  color: defaultTheme.palette.black,
-                },
-              }}
-            >
-              Select Output Format
-            </CoreModules.InputLabel>
-            <CoreModules.Select
-              labelId="output-format"
-              id="output_format"
-              value={selectedOutputFormat}
-              label="Form Selection"
-              fullWidth
-              sx={{
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  border: '2px solid black',
-                },
-              }}
-              onChange={(e) => {
-                setSelectedOutputFormat(e.target.value);
-              }}
-            >
-              {environment.tileOutputFormats?.map((form) => (
-                <CoreModules.MenuItem key={form.value} value={form.value}>
-                  {form.label}
-                </CoreModules.MenuItem>
-              ))}
-            </CoreModules.Select>
-          </CoreModules.FormControl>
-        </CoreModules.Grid>
+        <CoreModules.Grid container spacing={2} className="fmtm-px-4 fmtm-mb-4">
+          {/* Output Format Dropdown */}
+          <CoreModules.Grid item xs={12} sm={6} md={4}>
+            <CoreModules.FormControl fullWidth>
+              <CoreModules.InputLabel
+                id="output-format"
+                sx={{
+                  '&.Mui-focused': {
+                    color: defaultTheme.palette.black,
+                  },
+                }}
+              >
+                Select Output Format
+              </CoreModules.InputLabel>
+              <CoreModules.Select
+                labelId="output-format"
+                id="output_format"
+                value={selectedOutputFormat}
+                label="Select Output Format"
+                fullWidth
+                sx={{
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '2px solid black',
+                  },
+                }}
+                onChange={(e) => {
+                  setSelectedOutputFormat(e.target.value);
+                }}
+              >
+                {environment.tileOutputFormats?.map((form) => (
+                  <CoreModules.MenuItem key={form.value} value={form.value}>
+                    {form.label}
+                  </CoreModules.MenuItem>
+                ))}
+              </CoreModules.Select>
+            </CoreModules.FormControl>
+            {error.includes('selectedOutputFormat') && (
+              <p className="fmtm-text-sm fmtm-text-red-500">Output Format is Required.</p>
+            )}
+          </CoreModules.Grid>
 
-        {/* Tile Source Dropdown or TMS URL Input */}
-        <CoreModules.Grid item xs={12} sm={6}>
-          <CoreModules.FormControl fullWidth>
-            <CoreModules.InputLabel
-              id="tile-source"
-              sx={{
-                '&.Mui-focused': {
-                  color: defaultTheme.palette.black,
-                },
-              }}
-            >
-              Select Tile Source
-            </CoreModules.InputLabel>
-            <CoreModules.Select
-              labelId="tile-source"
-              id="tile_source"
-              value={selectedTileSource}
-              label="Form Selection"
-              fullWidth
-              sx={{
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  border: '2px solid black',
-                },
-              }}
-              onChange={handleTileSourceChange}
-            >
-              {environment.baseMapProviders?.map((form) => (
-                <CoreModules.MenuItem key={form.value} value={form.value}>
-                  {form.label}
-                </CoreModules.MenuItem>
-              ))}
-            </CoreModules.Select>
-            {selectedTileSource === 'tms' && (
-              <CoreModules.FormControl>
+          {/* Tile Source Dropdown or TMS URL Input */}
+          <CoreModules.Grid item xs={12} sm={6} md={4}>
+            <CoreModules.FormControl fullWidth>
+              <CoreModules.InputLabel
+                id="tile-source"
+                sx={{
+                  '&.Mui-focused': {
+                    color: defaultTheme.palette.black,
+                  },
+                }}
+              >
+                Select Tile Source
+              </CoreModules.InputLabel>
+              <CoreModules.Select
+                labelId="tile-source"
+                id="tile_source"
+                value={selectedTileSource}
+                label="Select Tile Source"
+                fullWidth
+                sx={{
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '2px solid black',
+                  },
+                }}
+                onChange={handleTileSourceChange}
+              >
+                {environment.baseMapProviders?.map((form) => (
+                  <CoreModules.MenuItem key={form.value} value={form.value}>
+                    {form.label}
+                  </CoreModules.MenuItem>
+                ))}
+              </CoreModules.Select>
+            </CoreModules.FormControl>
+            {error.includes('selectedTileSource') && (
+              <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
+            )}
+          </CoreModules.Grid>
+          {selectedTileSource === 'tms' && (
+            <CoreModules.Grid item xs={12} sm={12} md={4}>
+              <CoreModules.FormControl fullWidth>
                 <CoreModules.TextField
-                  labelId="tms_url-label"
+                  // labelId="tms_url-label"
                   id="tms_url"
+                  variant="outlined"
                   value={tmsUrl}
                   label="Enter Tile Source"
                   fullWidth
+                  color="black"
                   sx={{
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      border: '2px solid black',
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'black',
+                      },
+                    },
+                    '&.Mui-focused .MuiFormLabel-root-MuiInputLabel-root': {
+                      color: 'black',
                     },
                   }}
                   onChange={handleTmsUrlChange}
                 />
               </CoreModules.FormControl>
-            )}
-          </CoreModules.FormControl>
-        </CoreModules.Grid>
+              {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>}
+            </CoreModules.Grid>
+          )}
+          <CoreModules.Grid item xs={12} sm={12} md={selectedTileSource === 'tms' ? 12 : 4}>
+            <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-center sm:fmtm-justify-end fmtm-mr-4 fmtm-gap-4 fmtm-h-full">
+              {/* Generate Button */}
+              <div>
+                <CoreModules.LoadingButton
+                  variant="contained"
+                  loading={generateProjectTilesLoading}
+                  color="error"
+                  onClick={() => generateProjectTiles()}
+                >
+                  Generate
+                </CoreModules.LoadingButton>
+              </div>
 
-        {/* Generate Button */}
-        <CoreModules.Grid item xs={12} sm={6}>
-          <CoreModules.LoadingButton
-            variant="contained"
-            loading={generateProjectTilesLoading}
-            color="error"
-            fullWidth
-            onClick={() => {
-              // Check if 'tms' is selected and tmsUrl is not empty
-              if (selectedTileSource === 'tms' && !tmsUrl) {
-                // Handle error, TMS URL is required
-                console.log('TMS URL is required');
-                return;
-              }
-
-              dispatch(
-                GenerateProjectTiles(
-                  `${
-                    import.meta.env.VITE_API_URL
-                  }/projects/tiles/${decodedId}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
-                  decodedId,
-                ),
-              );
-            }}
-          >
-            Generate
-          </CoreModules.LoadingButton>
-        </CoreModules.Grid>
-
-        {/* Refresh Button */}
-        <CoreModules.Grid item xs={12} sm={6}>
-          <CoreModules.LoadingButton
-            variant="outlined"
-            loading={generateProjectTilesLoading}
-            color="error"
-            fullWidth
-            onClick={() => {
-              getTilesList();
-            }}
-          >
-            Refresh
-          </CoreModules.LoadingButton>
+              {/* Refresh Button */}
+              <div>
+                <CoreModules.LoadingButton
+                  variant="outlined"
+                  loading={generateProjectTilesLoading}
+                  color="error"
+                  onClick={() => {
+                    getTilesList();
+                  }}
+                >
+                  Refresh
+                </CoreModules.LoadingButton>
+              </div>
+            </div>
+          </CoreModules.Grid>
         </CoreModules.Grid>
 
         {/* Table Content */}
