@@ -223,12 +223,12 @@ def update_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpload, project_id
 ):
     user = project_metadata.author
-    project_info_1 = project_metadata.project_info
+    project_info = project_metadata.project_info
 
     # verify data coming in
     if not user:
         raise HTTPException("No user passed in")
-    if not project_info_1:
+    if not project_info:
         raise HTTPException("No project info passed in")
 
     # get db user
@@ -246,19 +246,19 @@ def update_project_info(
         )
 
     # Project meta informations
-    project_info_1 = project_metadata.project_info
+    project_info = project_metadata.project_info
 
     # Update author of the project
     db_project.author = db_user
-    db_project.project_name_prefix = project_info_1.name
+    db_project.project_name_prefix = project_info.name
 
     # get project info
     db_project_info = get_project_info_by_id(db, project_id)
 
     # Update projects meta informations (name, descriptions)
-    db_project_info.name = project_info_1.name
-    db_project_info.short_description = project_info_1.short_description
-    db_project_info.description = project_info_1.description
+    db_project_info.name = project_info.name
+    db_project_info.short_description = project_info.short_description
+    db_project_info.description = project_info.description
 
     db.commit()
     db.refresh(db_project)
@@ -270,7 +270,7 @@ def create_project_with_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpload, odk_project_id: int
 ):
     project_user = project_metadata.author
-    project_info_1 = project_metadata.project_info
+    project_info = project_metadata.project_info
     xform_title = project_metadata.xform_title
     odk_credentials = project_metadata.odk_central
     hashtags = project_metadata.hashtags
@@ -290,7 +290,7 @@ def create_project_with_project_info(
     log.debug(
         "Creating project in FMTM database with vars: "
         f"project_user: {project_user} | "
-        f"project_info_1: {project_info_1} | "
+        f"project_info: {project_info} | "
         f"xform_title: {xform_title} | "
         f"hashtags: {hashtags}| "
         f"organisation_id: {organisation_id}"
@@ -332,7 +332,7 @@ def create_project_with_project_info(
     db_project = db_models.DbProject(
         author=db_user,
         odkid=odk_project_id,
-        project_name_prefix=project_info_1.name,
+        project_name_prefix=project_info.name,
         xform_title=xform_title,
         odk_central_url=url,
         odk_central_user=user,
@@ -350,9 +350,9 @@ def create_project_with_project_info(
     # add project info (project id needed to create project info)
     db_project_info = db_models.DbProjectInfo(
         project=db_project,
-        name=project_info_1.name,
-        short_description=project_info_1.short_description,
-        description=project_info_1.description,
+        name=project_info.name,
+        short_description=project_info.short_description,
+        description=project_info.description,
     )
     db.add(db_project_info)
 
@@ -2034,7 +2034,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
     if not task:
         log.warning(f"No background task with found with UUID: {task_id}")
         raise HTTPException(status_code=404, detail="Task not found")
-    
+
     return task.status, task.message
 
 

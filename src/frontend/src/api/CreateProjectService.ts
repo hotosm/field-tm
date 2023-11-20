@@ -303,9 +303,9 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
         const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline_geojson, id: 1 }] };
         const modifiedResponse = {
           ...resp,
-          name: resp.project_info?.[0].name,
-          description: resp.project_info?.[0].description,
-          short_description: resp.project_info?.[0].short_description,
+          name: resp.project_info?.name,
+          description: resp.project_info?.description,
+          short_description: resp.project_info?.short_description,
           outline_geojson: formattedOutlineGeojson,
         };
 
