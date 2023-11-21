@@ -30,6 +30,7 @@ from sqlalchemy import (
     Index,
     Integer,
     LargeBinary,
+    SmallInteger,
     String,
     Table,
     UniqueConstraint,
@@ -51,6 +52,7 @@ from app.models.enums import (
     ProjectStatus,
     TaskAction,
     TaskCreationMode,
+    TaskSplitType,
     TaskStatus,
     TeamVisibility,
     UserRole,
@@ -542,7 +544,11 @@ class DbProject(Base):
     form_config_file = Column(LargeBinary)  # Yaml config file if custom xls is uploaded
 
     data_extract_type = Column(String)  # Type of data extract (Polygon or Centroid)
-    task_split_type = Column(String)  # Type of split (Grid or Feature)
+    # Options: divide on square, manual upload, task splitting algo
+    task_split_type = Column(Enum(TaskSplitType), nullable=True)
+    task_split_dimension = Column(SmallInteger, nullable=True)
+    task_num_buildings = Column(SmallInteger, nullable=True)
+
     hashtags = Column(ARRAY(String))  # Project hashtag
 
 
