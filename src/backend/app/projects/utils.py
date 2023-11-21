@@ -59,12 +59,12 @@ async def generate_files(
         file_ext = "xls"
         contents = upload
 
-    # generate a unique task ID using uuid
-    background_task_id = uuid.uuid4()
-
-    # insert task and task ID into database
-    await project_crud.insert_background_task_into_database(
-        db, task_id=background_task_id, project_id=project_id
+    # Create task in db and return uuid
+    log.debug(
+        f"Creating generate_files background task for project ID: {project_id}"
+    )
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, project_id=project_id
     )
 
     background_tasks.add_task(

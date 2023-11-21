@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Optional
 
 from fastapi import Header
 from osm_login_python.core import Auth
@@ -15,7 +15,7 @@ if settings.DEBUG:
 class AuthUser(BaseModel):
     id: int
     username: str
-    img_url: Union[str, None]
+    img_url: Optional[str]
 
 
 def init_osm_auth():

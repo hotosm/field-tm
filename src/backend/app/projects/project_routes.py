@@ -19,7 +19,7 @@ import json
 import os
 import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from fastapi import (
     APIRouter,
@@ -32,7 +32,7 @@ from fastapi import (
     Response,
     UploadFile,
 )
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
@@ -578,7 +578,9 @@ async def generate_files(
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    """Generate required media files tasks in the project based on the provided params.
+    """Generate additional content for the project to function.
+
+    QR codes,
 
     Accepts a project ID, category, custom form flag, and an uploaded file as inputs.
     The generated files are associated with the project ID and stored in the database.
@@ -679,7 +681,10 @@ async def generate_files(
         background_task_id,
     )
 
-    return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
+    return JSONResponse(
+        status_code=200,
+        content={"Message": f"{project_id}", "task_id": f"{background_task_id}"},
+    )
 
 
 @router.post("/view_data_extracts/")
@@ -831,7 +836,9 @@ async def get_categories():
 
 
 @router.post("/preview_tasks/")
-async def preview_tasks(upload: UploadFile = File(...), dimension: int = Form(500)):
+async def preview_tasks(
+    project_geojson: UploadFile = File(...), dimension: int = Form(500)
+):
     """Preview tasks for a project.
 
     This endpoint allows you to preview tasks for a project.
@@ -1277,5 +1284,7 @@ async def generate_files_janakpur(
         file_ext[1:] if form else "xls",
         background_task_id,
     )
+
+    return {"Message": project_id, "task_id": background_task_id}
 
     return {"Message": f"{project_id}", "task_id": f"{background_task_id}"}
