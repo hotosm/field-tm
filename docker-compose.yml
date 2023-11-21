@@ -92,8 +92,8 @@ services:
         condition: service_started
     env_file:
       - .env
-    # ports:
-    #   - "7052:8000"
+    ports:
+      - "7052:8000"
     #   - "5678:5678" # Debugger port
     networks:
       - fmtm-net
