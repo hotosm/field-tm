@@ -28,8 +28,9 @@ function Authorized() {
     const username = params.get('username');
     const sessionToken = params.get('session_token');
     const osm_oauth_token = params.get('osm_oauth_token');
+    const picture = params.get('picture');
     dispatch(LoginActions.setAuthDetails(username, sessionToken, osm_oauth_token));
-    dispatch(LoginActions.SetLoginToken({ username, id, sessionToken, osm_oauth_token }));
+    dispatch(LoginActions.SetLoginToken({ username, id, sessionToken, osm_oauth_token, picture }));
 
     const redirectUrl = params.get('redirect_to') || '/';
     setIsReadyToRedirect(true);
