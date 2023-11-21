@@ -12,6 +12,7 @@ import { useAppSelector } from '../../types/reduxTypes';
 import UploadAreaValidation from './validation/UploadAreaValidation';
 import FileInputComponent from '../common/FileInputComponent';
 import NewDefineAreaMap from '../../views/NewDefineAreaMap';
+import { checkWGS84Projection } from '../../utilfunctions/checkWGS84Projection.js';
 // @ts-ignore
 const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
 
@@ -34,6 +35,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // const [uploadAreaFile, setUploadAreaFile] = useState(null);
+  const [isGeojsonWGS84, setIsGeojsonWG84] = useState(true);
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
@@ -65,11 +67,6 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
   //   }
   // };
 
-  // useEffect(() => {
-  //   setGeojsonFile(null);
-  //   dispatch(CreateProjectActions.SetDrawnGeojson(null));
-  //   dispatch(CreateProjectActions.SetTotalAreaSelection(null));
-  // }, [uploadAreaSelection]);
   const convertFileToGeojson = async (file) => {
     if (!file) return;
     const fileReader = new FileReader();
@@ -101,6 +98,33 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
   };
 
+  useEffect(() => {
+    const isWGS84 = () => {
+      if (uploadAreaSelection === 'upload_file') {
+        const isWGS84Projection = checkWGS84Projection(drawnGeojson);
+        setIsGeojsonWG84(isWGS84Projection);
+        return isWGS84Projection;
+      }
+      setIsGeojsonWG84(true);
+      return true;
+    };
+    if (!isWGS84() && drawnGeojson) {
+      showSpatialError();
+    }
+    return () => {};
+  }, [drawnGeojson]);
+
+  const showSpatialError = () => {
+    dispatch(
+      CommonActions.SetSnackBar({
+        open: true,
+        message: 'Invalid spatial reference system. Please only import WGS84 (EPSG: 4326).',
+        variant: 'error',
+        duration: 6000,
+      }),
+    );
+  };
+
   const resetFile = () => {
     setGeojsonFile(null);
     handleCustomChange('uploadedAreaFile', null);
@@ -122,11 +146,17 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
           <span>The total area of the AOI is also calculated and displayed on the screen.</span>
         </p>
       </div>
-
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
         <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
           <form
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!isGeojsonWGS84 && drawnGeojson) {
+                showSpatialError();
+              } else {
+                handleSubmit(e);
+              }
+            }}
             className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between"
           >
             <div>
