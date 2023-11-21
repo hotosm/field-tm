@@ -350,7 +350,7 @@ async def upload_custom_xls(
 @router.post("/{project_id}/upload_multi_polygon")
 async def upload_multi_project_boundary(
     project_id: int,
-    upload: UploadFile = File(...),
+    project_geojson: UploadFile = File(...),
     db: Session = Depends(database.get_db),
 ):
     """This API allows for the uploading of a multi-polygon project boundary
@@ -368,8 +368,8 @@ async def upload_multi_project_boundary(
         "Uploading project boundary multipolygon for " f"project ID: {project_id}"
     )
     # read entire file
-    await upload.seek(0)
-    content = await upload.read()
+    await project_geojson.seek(0)
+    content = await project_geojson.read()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
