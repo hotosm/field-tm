@@ -128,7 +128,16 @@ export default function PrimaryAppBar() {
           {/* position changed */}
           {token != null && (
             <CoreModules.Stack direction={'row'} spacing={1} justifyContent="center" alignItems="center">
-              <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }} />
+              {token['picture'] !== 'null' && token['picture'] ? (
+                <CoreModules.Stack
+                  className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
+                  sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }}
+                >
+                  <img src={token['picture']} alt="Profile Picture" />
+                </CoreModules.Stack>
+              ) : (
+                <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }} />
+              )}
               <CoreModules.Typography
                 variant="typography"
                 color={'info'}
@@ -158,7 +167,7 @@ export default function PrimaryAppBar() {
             {token != null ? (
               <CoreModules.Link style={{ textDecoration: 'none' }} to={'/'}>
                 <CoreModules.Button
-                  className="btnLogin"
+                  className="btnLogin fmtm-truncate"
                   style={appBarInnerStyles.btnLogin}
                   color="error"
                   onClick={handleOnSignOut}
@@ -168,12 +177,12 @@ export default function PrimaryAppBar() {
               </CoreModules.Link>
             ) : (
               <CoreModules.Button
-                className="btnLogin"
+                className="btnLogin fmtm-truncate"
                 style={appBarInnerStyles.btnLogin}
                 color="info"
                 onClick={() => createLoginWindow('/')}
               >
-                OSM Sign in
+                Sign in
               </CoreModules.Button>
             )}
           </CoreModules.Stack>

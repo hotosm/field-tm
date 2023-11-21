@@ -108,21 +108,36 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
               </CoreModules.IconButton>
             </CoreModules.Stack>
 
-            <CoreModules.Divider color={'info'} />
+            <CoreModules.Divider color={'info'} sx={{ display: { xs: 'block', md: 'none' } }} />
             {token != null && (
-              <CoreModules.Stack direction={'row'} justifyContent={'center'} ml={'3%'} spacing={1}>
-                <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'block', md: 'none' }, mt: '1%' }} />
+              <CoreModules.Stack
+                direction={'row'}
+                className="fmtm-justify-center fmtm-items-center fmtm-my-2"
+                ml={'3%'}
+                spacing={1}
+              >
+                {token['picture'] !== 'null' && token['picture'] ? (
+                  <CoreModules.Stack
+                    className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
+                    sx={{ display: { xs: 'block', md: 'none' }, mt: '3%' }}
+                  >
+                    <img src={token['picture']} alt="Profile Picture" />
+                  </CoreModules.Stack>
+                ) : (
+                  <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'block', md: 'none' }, mt: '1%' }} />
+                )}
                 <CoreModules.Typography
                   variant="subtitle2"
                   color={'info'}
                   noWrap
                   sx={{ display: { xs: 'block', md: 'none' } }}
+                  className="fmtm-w-fit"
                 >
                   {token['username']}
                 </CoreModules.Typography>
               </CoreModules.Stack>
             )}
-            <CoreModules.Divider color={'info'} />
+            <CoreModules.Divider color={'info'} sx={{ display: { xs: 'block', md: 'none' } }} />
             <CoreModules.List sx={Drawerstyles.list} component="nav" aria-label="mailStack folders">
               {MenuItems.filter((menuItem) => menuItem.isActive).map((menuDetails, index) =>
                 menuDetails.isExternalLink ? (
