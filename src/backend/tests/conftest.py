@@ -34,7 +34,7 @@ from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbUser
 from app.main import api, get_application
 from app.projects import project_crud
-from app.projects.project_schemas import BETAProjectUpload, ODKCentral, ProjectInfo
+from app.projects.project_schemas import ProjectUpload, ODKCentral, ProjectInfo
 from app.users.user_schemas import User
 
 engine = create_engine(settings.FMTM_DB_URL.unicode_string())
@@ -105,7 +105,7 @@ def organization(db):
 
 @pytest.fixture(scope="function")
 def project(db, user, organization):
-    project_metadata = BETAProjectUpload(
+    project_metadata = ProjectUpload(
         author=User(username=user.username, id=user.id),
         project_info=ProjectInfo(
             name="test project",

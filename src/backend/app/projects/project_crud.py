@@ -23,7 +23,7 @@ import uuid
 import zipfile
 from io import BytesIO
 from json import dumps, loads
-from typing import List
+from typing import List, Optional
 from zipfile import ZipFile
 
 import geoalchemy2
@@ -230,7 +230,7 @@ def partial_update_project_info(
 
 
 def update_project_info(
-    db: Session, project_metadata: project_schemas.BETAProjectUpload, project_id
+    db: Session, project_metadata: project_schemas.ProjectUpload, project_id
 ):
     user = project_metadata.author
     project_info_1 = project_metadata.project_info
@@ -277,7 +277,7 @@ def update_project_info(
 
 
 def create_project_with_project_info(
-    db: Session, project_metadata: project_schemas.BETAProjectUpload, project_id
+    db: Session, project_metadata: project_schemas.ProjectUpload, odk_project_id: int
 ):
     project_user = project_metadata.author
     project_info_1 = project_metadata.project_info
@@ -291,9 +291,11 @@ def create_project_with_project_info(
 
     # verify data coming in
     if not project_user:
-        raise HTTPException("No user passed in")
-    if not project_info_1:
-        raise HTTPException("No project info passed in")
+        raise HTTPException("User details are missing")
+    if not project_info:
+        raise HTTPException("Project info is missing")
+    if not odk_project_id:
+        raise HTTPException("ODK Central project id is missing")
 
     log.debug(
         "Creating project in FMTM database with vars: "
@@ -1433,11 +1435,11 @@ def generate_appuser_files(
     db: Session,
     project_id: int,
     extract_polygon: bool,
-    upload: str,
+    custom_xls_form: str,
     extracts_contents: str,
     category: str,
     form_type: str,
-    background_task_id: uuid.UUID,
+    background_task_id: Optional[uuid.UUID] = None,
 ):
     """Generate the files for each appuser.
     QR code, new XForm, and the OSM data extract.
@@ -1446,7 +1448,7 @@ def generate_appuser_files(
         - db: the database session
         - project_id: Project ID
         - extract_polygon: boolean to determine if we should extract the polygon
-        - upload: the xls file to upload if we have a custom form
+        - custom_xls_form: the xls file to upload if we have a custom form
         - category: the category of the project
         - form_type: weather the form is xls, xlsx or xml
         - background_task_id: the task_id of the background task running this function.
@@ -1503,9 +1505,9 @@ def generate_appuser_files(
             xform_title = one.xform_title if one.xform_title else None
 
             category = xform_title
-            if upload:
+            if custom_xls_form:
                 xlsform = f"/tmp/{category}.{form_type}"
-                contents = upload
+                contents = custom_xls_form
                 with open(xlsform, "wb") as f:
                     f.write(contents)
             else:
@@ -1599,18 +1601,25 @@ def generate_appuser_files(
                 except Exception as e:
                     log.warning(str(e))
                     continue
-        # # Update background task status to COMPLETED
-        update_background_task_status_in_database(
-            db, background_task_id, 4
-        )  # 4 is COMPLETED
+
+        # Update background task status to COMPLETED
+        if background_task_id:
+            update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
 
     except Exception as e:
         log.warning(str(e))
 
         # Update background task status to FAILED
-        update_background_task_status_in_database(
-            db, background_task_id, 2, str(e)
-        )  # 2 is FAILED
+        if background_task_id:
+            update_background_task_status_in_database(
+                db, background_task_id, 2, str(e)
+            )  # 2 is FAILED
+
+        else:
+            # Raise original error if not running in background
+            raise e
 
 
 def create_qrcode(
@@ -1943,15 +1952,10 @@ def convert_to_project_summary(db_project: db_models.DbProject):
     if db_project:
         summary: project_schemas.ProjectSummary = db_project
 
-        if db_project.project_info and len(db_project.project_info) > 0:
-            default_project_info = next(
-                (x for x in db_project.project_info),
-                None,
-            )
-            # default_project_info = project_schemas.ProjectInfo
+        if db_project.project_info:
             summary.location_str = db_project.location_str
-            summary.title = default_project_info.name
-            summary.description = default_project_info.short_description
+            summary.title = db_project.project_info.name
+            summary.description = db_project.project_info.short_description
 
         summary.num_contributors = (
             db_project.tasks_mapped + db_project.tasks_validated
@@ -2041,13 +2045,16 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
 
 
 async def insert_background_task_into_database(
-    db: Session, task_id: uuid.UUID, name: str = None, project_id=None
-):
+    db: Session, name: str = None, project_id = None
+) -> uuid.uuid4:
     """Inserts a new task into the database
     Params:
         db: database session
-        task_id: uuid of the task
         name: name of the task.
+        project_id: associated project id
+
+    Return:
+        task_id(uuid.uuid4): The background task uuid for tracking.
     """
     task = db_models.BackgroundTasks(
         id=str(task_id), name=name, status=1, project_id=project_id
@@ -2310,7 +2317,7 @@ async def update_project_form(
 
 
 async def update_odk_credentials(
-    project_instance: project_schemas.BETAProjectUpload,
+    project_instance: project_schemas.ProjectUpload,
     odk_central_cred: project_schemas.ODKCentral,
     odkid: int,
     db: Session,

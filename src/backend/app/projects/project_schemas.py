@@ -20,12 +20,13 @@ import uuid
 from typing import List, Optional, Union
 
 from geojson_pydantic import Feature as GeojsonFeature
-from pydantic import BaseModel
+from geoalchemy2.elements import WKBElement
+from pydantic import BaseModel, ConfigDict, Field
 
-from ..db import db_models
-from ..models.enums import ProjectPriority, ProjectStatus, TaskSplitType
-from ..tasks import tasks_schemas
-from ..users.user_schemas import User
+from app.db import db_models
+from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
+from app.tasks import tasks_schemas
+from app.users.user_schemas import User
 
 
 class ODKCentral(BaseModel):
@@ -46,10 +47,10 @@ class ProjectUpdate(BaseModel):
     description: Optional[str] = None
 
 
-class BETAProjectUpload(BaseModel):
+class ProjectUpload(BaseModel):
     author: User
     project_info: ProjectInfo
-    xform_title: Union[str, None]
+    xform_title: Optional[str]
     odk_central: ODKCentral
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
@@ -126,7 +127,7 @@ class ProjectBase(BaseModel):
     id: int
     odkid: int
     author: User
-    project_info: List[ProjectInfo]
+    project_info: ProjectInfo
     status: ProjectStatus
     # location_str: str
     outline_geojson: Optional[GeojsonFeature] = None
@@ -139,3 +140,8 @@ class ProjectBase(BaseModel):
 class ProjectOut(ProjectBase):
     project_uuid: uuid.UUID
     pass
+
+
+class BackgroundTaskStatus(BaseModel):
+    status: str
+    message: str
