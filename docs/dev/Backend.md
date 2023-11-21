@@ -184,7 +184,7 @@ Example launch.json config for vscode:
 To run the backend tests locally, run:
 
 ```bash
-docker compose run api pytest
+docker compose run --rm api pytest
 ```
 
 ## Using the local version of ODK Central
