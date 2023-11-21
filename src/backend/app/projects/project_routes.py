@@ -163,6 +163,7 @@ async def read_project_summaries(
 async def read_project(project_id: int, db: Session = Depends(database.get_db)):
     project = project_crud.get_project_by_id(db, project_id)
     if project:
+        project.project_uuid = uuid.uuid4()
         return project
     else:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -222,8 +223,8 @@ async def create_project(
     project = project_crud.create_project_with_project_info(
         db, project_info, odkproject["id"]
     )
-
     if project:
+        project.project_uuid = uuid.uuid4()
         return project
     else:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -800,8 +801,10 @@ async def generate_log(
             last_50_logs = filtered_logs[-50:]
 
             logs = "\n".join(last_50_logs)
+            task_count = project_crud.get_tasks_count(db, project_id)
             return {
                 "status": task_status.name,
+                "total_tasks": task_count,
                 "message": task_message,
                 "progress": extract_completion_count,
                 "logs": logs,

@@ -16,6 +16,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+import uuid
 from typing import List, Optional, Union
 
 from geojson_pydantic import Feature as GeojsonFeature
@@ -136,4 +137,5 @@ class ProjectBase(BaseModel):
 
 
 class ProjectOut(ProjectBase):
+    project_uuid: uuid.UUID
     pass
