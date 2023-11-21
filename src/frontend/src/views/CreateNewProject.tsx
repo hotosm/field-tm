@@ -17,6 +17,7 @@ const CreateNewProject = () => {
   const dispatch = useDispatch();
 
   const isUnsavedChanges = useAppSelector((state) => state.createproject.isUnsavedChanges);
+  const canSwitchCreateProjectSteps = useAppSelector((state) => state.createproject.canSwitchCreateProjectSteps);
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customLineUpload, setCustomLineUpload] = useState(null);
   const [customPolygonUpload, setCustomPolygonUpload] = useState(null);
@@ -92,7 +93,7 @@ const CreateNewProject = () => {
       <div className="fmtm-min-h-[72vh] fmtm-bg-gray-100 fmtm-box-border fmtm-border-[1px] fmtm-border-t-white fmtm-border-t-[0px]">
         <div className=" fmtm-w-full">
           <div>
-            <StepSwitcher data={createProjectSteps} flag={'create_project'} />
+            <StepSwitcher data={createProjectSteps} flag={'create_project'} switchSteps={canSwitchCreateProjectSteps} />
           </div>
         </div>
         <div className="fmtm-mx-5 fmtm-mb-5">{(() => getCreateProjectContent())()}</div>
