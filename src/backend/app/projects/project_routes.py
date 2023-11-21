@@ -197,7 +197,7 @@ async def delete_project(project_id: int, db: Session = Depends(database.get_db)
 
 @router.post("/create_project", response_model=project_schemas.ProjectOut)
 async def create_project(
-    project_info: project_schemas.BETAProjectUpload,
+    project_info: project_schemas.ProjectUpload,
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database."""
@@ -279,7 +279,7 @@ async def update_odk_credentials(
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
 async def update_project(
     id: int,
-    project_info: project_schemas.BETAProjectUpload,
+    project_info: project_schemas.ProjectUpload,
     db: Session = Depends(database.get_db),
 ):
     """Update an existing project by ID.
