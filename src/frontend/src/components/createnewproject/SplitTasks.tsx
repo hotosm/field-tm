@@ -110,6 +110,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       ),
     );
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
+    dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(true));
   };
 
   useEffect(() => {
@@ -197,6 +198,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
       navigate(`/project_details/${encodedProjectId}`);
       dispatch(CreateProjectActions.ClearCreateProjectFormData());
+      dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
     }
     if (generateQrSuccess && generateProjectLog?.status === 'PENDING') {
       if (generateProjectLogIntervalCb === null) {

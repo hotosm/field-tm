@@ -4,7 +4,7 @@ import { CommonActions } from '../../store/slices/CommonSlice';
 import CoreModules from '../../shared/CoreModules.js';
 import { useNavigate } from 'react-router-dom';
 
-const StepSwitcher = ({ data, flag }) => {
+const StepSwitcher = ({ data, flag, switchSteps }) => {
   interface IIndividualStep {
     url: string;
     step: number;
@@ -39,7 +39,11 @@ const StepSwitcher = ({ data, flag }) => {
                     } lg:fmtm-w-7 lg:fmtm-h-7 xl:fmtm-w-9 xl:fmtm-h-9 fmtm-rounded-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-border-[0.15rem] fmtm-border-primaryRed hover:fmtm-cursor-pointer  ${
                       currentStep.step >= index ? 'fmtm-bg-primaryRed' : 'fmtm-bg-transparent'
                     }`}
-                    onClick={() => toggleStep(step)}
+                    onClick={() => {
+                      if (switchSteps) {
+                        toggleStep(step);
+                      }
+                    }}
                   >
                     <AssetModules.DoneIcon
                       className={`${

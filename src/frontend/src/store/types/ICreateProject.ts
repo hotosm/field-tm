@@ -33,6 +33,7 @@ export type CreateProjectStateTypes = {
   lineGeojson: null;
   createProjectValidations: {};
   isUnsavedChanges: boolean;
+  canSwitchCreateProjectSteps: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };

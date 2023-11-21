@@ -47,6 +47,7 @@ export const initialState: CreateProjectStateTypes = {
   lineGeojson: null,
   createProjectValidations: {},
   isUnsavedChanges: false,
+  canSwitchCreateProjectSteps: false,
 };
 
 const CreateProject = createSlice({
@@ -205,6 +206,9 @@ const CreateProject = createSlice({
     },
     SetIsUnsavedChanges(state, action) {
       state.isUnsavedChanges = action.payload;
+    },
+    SetCanSwitchCreateProjectSteps(state, action) {
+      state.canSwitchCreateProjectSteps = action.payload;
     },
   },
 });
