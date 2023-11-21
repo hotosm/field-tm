@@ -210,7 +210,7 @@ services:
       - "5434:5432"
     networks:
       - fmtm-net
-    restart: "on-failure:3"
+    restart: "unless-stopped"
     healthcheck:
       test: pg_isready -U ${CENTRAL_DB_USER} -d ${CENTRAL_DB_NAME}
       start_period: 5s
