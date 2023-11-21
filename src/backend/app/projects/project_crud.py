@@ -36,7 +36,7 @@ import segno
 import shapely.wkb as wkblib
 import sqlalchemy
 from fastapi import File, HTTPException, UploadFile
-from geoalchemy2.shape import from_shape
+from geoalchemy2.shape import from_shape, to_shape
 from geojson import dump
 from loguru import logger as log
 from osm_fieldwork.basemapper import create_basemap_file
@@ -1673,15 +1673,16 @@ def get_task_geometry(db: Session, project_id: int):
     Returns:
         str: A geojson of the task boundaries
     """
-    tasks = table("tasks", column("outline"), column("project_id"), column("id"))
-    where = f"project_id={project_id}"
-    sql = select(geoalchemy2.functions.ST_AsGeoJSON(tasks.c.outline)).where(text(where))
-    result = db.execute(sql)
-
+    db_tasks = tasks_crud.get_tasks(db, project_id, None)
     features = []
-    for row in result:
-        geometry = json.loads(row[0])
-        feature = {"type": "Feature", "geometry": geometry, "properties": {}}
+    for task in db_tasks:
+        geom = to_shape(task.outline)
+        # Convert the shapely geometry object to GeoJSON
+        geometry = geom.__geo_interface__
+        properties = {
+            "task_id": task.id,
+        }
+        feature = {"type": "Feature", "geometry": geometry, "properties": properties}
         features.append(feature)
 
     feature_collection = {"type": "FeatureCollection", "features": features}
@@ -1689,6 +1690,12 @@ def get_task_geometry(db: Session, project_id: int):
 
 
 async def get_project_features_geojson(db: Session, project_id: int):
+    db_features = (
+        db.query(db_models.DbFeatures)
+        .filter(db_models.DbFeatures.project_id == project_id)
+        .all()
+    )
+
     """Get a geojson of all features for a task."""
     query = text(
         f"""SELECT jsonb_build_object(
@@ -1710,6 +1717,14 @@ async def get_project_features_geojson(db: Session, project_id: int):
 
     result = db.execute(query)
     features = result.fetchone()[0]
+
+    # Create mapping feat_id:task_id
+    task_feature_mapping = {feat.id: feat.task_id for feat in db_features}
+
+    for feature in features["features"]:
+        if (feat_id := feature["id"]) in task_feature_mapping:
+            feature["properties"]["task_id"] = task_feature_mapping[feat_id]
+
     return features
 
 
