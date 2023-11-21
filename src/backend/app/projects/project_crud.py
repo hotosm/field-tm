@@ -2842,3 +2842,13 @@ def check_crs(input_geojson: dict):
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
         raise HTTPException(status_code=400, detail=error_message)
+
+
+def get_tasks_count(db: Session, project_id: int):
+    db_task = (
+        db.query(db_models.DbProject)
+        .filter(db_models.DbProject.id == project_id)
+        .first()
+    )
+    task_count = len(db_task.tasks)
+    return task_count
