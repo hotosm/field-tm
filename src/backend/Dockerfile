@@ -133,21 +133,7 @@ HEALTHCHECK --start-period=10s --interval=5s --retries=20 --timeout=5s \
 
 
 
-FROM runtime as debug-no-odk
-COPY --from=extract-deps --chown=appuser \
-    /opt/python/requirements-debug.txt /opt/python/
-RUN pip install --user --upgrade --no-warn-script-location \
-    --no-cache-dir -r \
-    /opt/python/requirements-debug.txt \
-    && rm -r /opt/python
-CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
-    "-m", "uvicorn", "app.main:api", \
-    "--host", "0.0.0.0", "--port", "8000", \
-    "--reload", "--log-level", "critical", "--no-access-log"]
-
-
-
-FROM debug-no-odk as debug-with-odk
+FROM runtime as add-odk-certs
 USER root
 # Add the SSL cert for debug odkcentral
 COPY --from=ghcr.io/hotosm/fmtm/proxy:debug \
@@ -157,7 +143,24 @@ USER appuser
 
 
 
-FROM debug-with-odk as ci
+FROM add-odk-certs as debug
+COPY --from=extract-deps --chown=appuser \
+    /opt/python/requirements-debug.txt \
+    /opt/python/requirements-ci.txt \
+    /opt/python/
+RUN pip install --user --upgrade --no-warn-script-location \
+    --no-cache-dir \
+    -r /opt/python/requirements-debug.txt \
+    -r /opt/python/requirements-ci.txt \
+    && rm -r /opt/python
+CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
+    "-m", "uvicorn", "app.main:api", \
+    "--host", "0.0.0.0", "--port", "8000", \
+    "--reload", "--log-level", "critical", "--no-access-log"]
+
+
+
+FROM add-odk-certs as ci
 # Run all ci as root
 USER root
 ARG PYTHON_IMG_TAG

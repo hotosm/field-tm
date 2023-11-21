@@ -64,7 +64,7 @@ services:
     image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
     build:
       context: src/backend
-      target: debug-with-odk
+      target: debug
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
     container_name: fmtm-api
