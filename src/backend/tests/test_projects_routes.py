@@ -184,7 +184,7 @@ def test_generate_appuser_files(db, project):
         "db": db,
         "project_id": project_id,
         "extract_polygon": True,
-        "upload": xlsform_file,
+        "custom_xls_form": xlsform_file,
         "extracts_contents": data_extracts,
         "category": "buildings",
         "form_type": "example_form_type",
