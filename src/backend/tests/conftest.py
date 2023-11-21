@@ -142,7 +142,7 @@ def project(db, user, organization):
     # Create FMTM Project
     try:
         new_project = project_crud.create_project_with_project_info(
-            db, project_metadata, project_id=odkproject["id"]
+            db, project_metadata, odkproject["id"]
         )
         log.debug(f"Project returned: {new_project.__dict__}")
         assert new_project is not None
