@@ -42,22 +42,12 @@ from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 from sqlalchemy.orm import Session
 
-from app.config import settings
 from ..central import central_crud
 from ..db import database, db_models
 from ..models.enums import TILES_FORMATS, TILES_SOURCE
 from ..tasks import tasks_crud
 from . import project_crud, project_schemas, utils
 from .project_crud import check_crs
-from app.auth.osm import AuthUser, login_required
-
-from app.projects.project_export import (
-    export_project_by_id,
-    export_project_by_id_with_odk,
-    import_fmtm_project,
-    import_fmtm_project_with_odk,
-    load_zip_in_memory,
-)
 
 router = APIRouter(
     prefix="/projects",
@@ -1296,5 +1286,3 @@ async def generate_files_janakpur(
     )
 
     return {"Message": project_id, "task_id": background_task_id}
-
-
