@@ -217,7 +217,7 @@ async def get_osm_xml(
         os.remove(jsoninfile)
 
     # Submission JSON
-    submission = await submission_crud.get_all_submissions(db, project_id)
+    submission = submission_crud.get_all_submissions(db, project_id)
 
     # Write the submission to a file
     with open(jsoninfile, "w") as f:

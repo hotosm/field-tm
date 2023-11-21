@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional
 
 from fastapi import (
@@ -60,9 +59,7 @@ async def generate_files(
         contents = upload
 
     # Create task in db and return uuid
-    log.debug(
-        f"Creating generate_files background task for project ID: {project_id}"
-    )
+    log.debug(f"Creating generate_files background task for project ID: {project_id}")
     background_task_id = await project_crud.insert_background_task_into_database(
         db, project_id=project_id
     )

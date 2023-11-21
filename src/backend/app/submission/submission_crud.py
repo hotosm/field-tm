@@ -304,7 +304,7 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
         submission = xform.getSubmissions(odkid, task_id, None, False, True)
         submission = (json.loads(submission))["value"]
     else:
-        submission = await get_all_submissions(db, project_id)
+        submission = get_all_submissions(db, project_id)
 
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
@@ -438,7 +438,7 @@ def download_submission_for_project(db, project_id):
     return final_zip_file_path
 
 
-async def get_all_submissions(db: Session, project_id):
+def get_all_submissions(db: Session, project_id):
     project_info = project_crud.get_project(db, project_id)
 
     # ODK Credentials

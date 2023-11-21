@@ -17,11 +17,10 @@
 #
 
 import uuid
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from geojson_pydantic import Feature as GeojsonFeature
-from geoalchemy2.elements import WKBElement
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
 from app.db import db_models
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
