@@ -134,7 +134,7 @@ class Settings(BaseSettings):
         # Else set to value of S3_ENDPOINT
         return s3_endpoint
 
-    UNDERPASS_API_URL: str = "https://raw-data-api0.hotosm.org/v1"
+    UNDERPASS_API_URL: str = "https://api-prod.raw-data.hotosm.org/v1/"
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(
