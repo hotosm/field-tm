@@ -484,7 +484,7 @@ def update_multi_polygon_project_boundary(
         raise HTTPException(e) from e
 
 
-async def preview_tasks(boundary: str, dimension: int):
+def preview_tasks(boundary: str, dimension: int):
     """Preview tasks by returning a list of task objects."""
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
 
@@ -667,7 +667,7 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-async def split_into_tasks(
+def split_into_tasks(
     db: Session, outline: str, no_of_buildings: int, has_data_extracts: bool
 ):
     """Splits a project into tasks.
@@ -2045,7 +2045,7 @@ async def get_background_task_status(task_id: uuid.UUID, db: Session):
 
 
 async def insert_background_task_into_database(
-    db: Session, name: str = None, project_id = None
+    db: Session, name: str = None, project_id=None
 ) -> uuid.uuid4:
     """Inserts a new task into the database
     Params:

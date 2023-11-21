@@ -34,7 +34,7 @@ from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbUser
 from app.main import api, get_application
 from app.projects import project_crud
-from app.projects.project_schemas import ProjectUpload, ODKCentral, ProjectInfo
+from app.projects.project_schemas import ODKCentral, ProjectInfo, ProjectUpload
 from app.users.user_schemas import User
 
 engine = create_engine(settings.FMTM_DB_URL.unicode_string())
