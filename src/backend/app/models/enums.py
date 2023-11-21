@@ -223,3 +223,11 @@ class BackgroundTaskStatus(IntEnum, Enum):
 
 TILES_SOURCE = ["esri", "bing", "google", "topo"]
 TILES_FORMATS = ["mbtiles", "sqlitedb", "sqlite3", "sqlite", "pmtiles"]
+
+
+class TaskSplitType(IntEnum, Enum):
+    """Enum describing task splitting type."""
+
+    DIVIDE_ON_SQUARE = 0
+    CHOOSE_AREA_AS_TASK = 1
+    TASK_SPLITTING_ALGORITHM = 2
