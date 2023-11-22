@@ -100,6 +100,70 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
         </CoreModules.Grid>
 
         <CoreModules.Grid container spacing={2} className="fmtm-px-4 fmtm-mb-4">
+          {/* Tile Source Dropdown or TMS URL Input */}
+          <CoreModules.Grid item xs={12} sm={6} md={4}>
+            <CoreModules.FormControl fullWidth>
+              <CoreModules.InputLabel
+                id="tile-source"
+                sx={{
+                  '&.Mui-focused': {
+                    color: defaultTheme.palette.black,
+                  },
+                }}
+              >
+                Select Tile Source
+              </CoreModules.InputLabel>
+              <CoreModules.Select
+                labelId="tile-source"
+                id="tile_source"
+                value={selectedTileSource}
+                label="Select Tile Source"
+                fullWidth
+                sx={{
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: '2px solid black',
+                  },
+                }}
+                onChange={handleTileSourceChange}
+              >
+                {environment.baseMapProviders?.map((form) => (
+                  <CoreModules.MenuItem key={form.value} value={form.value}>
+                    {form.label}
+                  </CoreModules.MenuItem>
+                ))}
+              </CoreModules.Select>
+            </CoreModules.FormControl>
+            {error.includes('selectedTileSource') && (
+              <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
+            )}
+          </CoreModules.Grid>
+          {selectedTileSource === 'tms' && (
+            <CoreModules.Grid item xs={12} sm={6} md={4}>
+              <CoreModules.FormControl fullWidth>
+                <CoreModules.TextField
+                  // labelId="tms_url-label"
+                  id="tms_url"
+                  variant="outlined"
+                  value={tmsUrl}
+                  label="Enter TMS URL"
+                  fullWidth
+                  color="black"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'black',
+                      },
+                    },
+                    '&.Mui-focused .MuiFormLabel-root-MuiInputLabel-root': {
+                      color: 'black',
+                    },
+                  }}
+                  onChange={handleTmsUrlChange}
+                />
+              </CoreModules.FormControl>
+              {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">TMS URL is Required.</p>}
+            </CoreModules.Grid>
+          )}
           {/* Output Format Dropdown */}
           <CoreModules.Grid item xs={12} sm={6} md={4}>
             <CoreModules.FormControl fullWidth>
@@ -139,72 +203,12 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
               <p className="fmtm-text-sm fmtm-text-red-500">Output Format is Required.</p>
             )}
           </CoreModules.Grid>
-
-          {/* Tile Source Dropdown or TMS URL Input */}
-          <CoreModules.Grid item xs={12} sm={6} md={4}>
-            <CoreModules.FormControl fullWidth>
-              <CoreModules.InputLabel
-                id="tile-source"
-                sx={{
-                  '&.Mui-focused': {
-                    color: defaultTheme.palette.black,
-                  },
-                }}
-              >
-                Select Tile Source
-              </CoreModules.InputLabel>
-              <CoreModules.Select
-                labelId="tile-source"
-                id="tile_source"
-                value={selectedTileSource}
-                label="Select Tile Source"
-                fullWidth
-                sx={{
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: '2px solid black',
-                  },
-                }}
-                onChange={handleTileSourceChange}
-              >
-                {environment.baseMapProviders?.map((form) => (
-                  <CoreModules.MenuItem key={form.value} value={form.value}>
-                    {form.label}
-                  </CoreModules.MenuItem>
-                ))}
-              </CoreModules.Select>
-            </CoreModules.FormControl>
-            {error.includes('selectedTileSource') && (
-              <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
-            )}
-          </CoreModules.Grid>
-          {selectedTileSource === 'tms' && (
-            <CoreModules.Grid item xs={12} sm={12} md={4}>
-              <CoreModules.FormControl fullWidth>
-                <CoreModules.TextField
-                  // labelId="tms_url-label"
-                  id="tms_url"
-                  variant="outlined"
-                  value={tmsUrl}
-                  label="Enter Tile Source"
-                  fullWidth
-                  color="black"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'black',
-                      },
-                    },
-                    '&.Mui-focused .MuiFormLabel-root-MuiInputLabel-root': {
-                      color: 'black',
-                    },
-                  }}
-                  onChange={handleTmsUrlChange}
-                />
-              </CoreModules.FormControl>
-              {error.includes('tmsUrl') && <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>}
-            </CoreModules.Grid>
-          )}
-          <CoreModules.Grid item xs={12} sm={12} md={selectedTileSource === 'tms' ? 12 : 4}>
+          <CoreModules.Grid
+            item
+            xs={12}
+            sm={selectedTileSource === 'tms' ? 6 : 12}
+            md={selectedTileSource === 'tms' ? 12 : 4}
+          >
             <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-center sm:fmtm-justify-end fmtm-mr-4 fmtm-gap-4 fmtm-h-full">
               {/* Generate Button */}
               <div>
