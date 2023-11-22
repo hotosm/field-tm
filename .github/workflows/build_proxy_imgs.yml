@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-cert-init-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.3.1
     with:
       context: nginx
       build_target: certs-init-main
@@ -20,7 +20,7 @@ jobs:
         NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-cert-init-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.3.1
     with:
       context: nginx
       build_target: certs-init-development
@@ -31,7 +31,7 @@ jobs:
         NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-proxy-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.3.1
     with:
       context: nginx
       build_target: main
@@ -41,7 +41,7 @@ jobs:
         NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-proxy-main-plus-script:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.3.1
     with:
       context: nginx
       build_target: main-plus-script
@@ -51,7 +51,7 @@ jobs:
         NGINX_TAG=${{ vars.NGINX_TAG }}
 
   build-proxy-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.2.2
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.3.1
     with:
       context: nginx
       build_target: development
