@@ -260,6 +260,12 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile }) => {
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));
                 setGeojsonFile(null);
               }}
+              onModify={(geojson, area) => {
+                handleCustomChange('drawnGeojson', geojson);
+                dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
+                dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+                setGeojsonFile(null);
+              }}
             />
           </div>
         </div>

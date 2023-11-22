@@ -20,6 +20,7 @@ const NewDefineAreaMap = ({
   buildingExtractedGeojson,
   lineExtractedGeojson,
   onDraw,
+  onModify,
 }: NewDefineAreaMapProps) => {
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
@@ -63,6 +64,7 @@ const NewDefineAreaMap = ({
               duration: 500,
             }}
             onDraw={onDraw}
+            onModify={onModify}
             zoomToLayer
           />
         )}
