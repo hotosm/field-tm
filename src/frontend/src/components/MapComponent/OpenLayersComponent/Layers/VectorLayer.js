@@ -4,16 +4,16 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'ol/proj';
-import Style from 'ol/style/Style';
-import Stroke from 'ol/style/Stroke';
+import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source';
 import OLVectorLayer from 'ol/layer/Vector';
 import { defaultStyles, getStyles } from '../helpers/styleUtils';
 import { isExtentValid } from '../helpers/layerUtils';
-import { Draw, Modify, Select, defaults as defaultInteractions } from 'ol/interaction.js';
+import { Draw, Modify, Snap, Select, defaults as defaultInteractions } from 'ol/interaction.js';
 import { getArea } from 'ol/sphere';
 import { valid } from 'geojson-validation';
+import MultiPoint from 'ol/geom/MultiPoint.js';
 
 const selectElement = 'singleselect';
 
@@ -95,7 +95,7 @@ const VectorLayer = ({
     }
     return output;
   };
-  // Modify Feature
+  // Draw Feature
   useEffect(() => {
     if (!map) return;
     // if(!vectorLayer) return;
@@ -105,10 +105,12 @@ const VectorLayer = ({
     const vector = new OLVectorLayer({
       source: source,
     });
+
     const draw = new Draw({
       source: source,
       type: 'Polygon',
     });
+
     draw.on('drawend', function (e) {
       const feature = e.feature;
       const geojsonFormat = new GeoJSON();
@@ -122,16 +124,14 @@ const VectorLayer = ({
 
       // Call your function here with the GeoJSON as an argument
       onDraw(newGeojson, area);
-      // var geoJSONFormat = new GeoJSON();
 
       // var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
       // console.log(geoJSONString,'geojsonString');
       // onDraw(geoJSONString);
     });
     map.addInteraction(draw);
-
     return () => {
-      map.removeInteraction(draw);
+      // map.removeInteraction(snap);
     };
   }, [map, vectorLayer, onDraw]);
 
@@ -191,7 +191,22 @@ const VectorLayer = ({
 
   useEffect(() => {
     if (!vectorLayer || !style.visibleOnMap) return;
-    vectorLayer.setStyle((feature, resolution) => getStyles({ style, feature, resolution }));
+    vectorLayer.setStyle((feature, resolution) => [
+      new Style({
+        image: new CircleStyle({
+          radius: 5,
+          fill: new Fill({
+            color: 'orange',
+          }),
+        }),
+        geometry: function (feature) {
+          // return the coordinates of the first ring of the polygon
+          const coordinates = feature.getGeometry().getCoordinates()[0];
+          return new MultiPoint(coordinates);
+        },
+      }),
+      getStyles({ style, feature, resolution }),
+    ]);
   }, [vectorLayer, style]);
 
   useEffect(() => {
