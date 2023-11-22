@@ -67,13 +67,13 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     },
     {
       name: 'Learn',
-      ref: 'https://github.com/hotosm/fmtm/wiki',
+      ref: 'https://hotosm.github.io/fmtm',
       isExternalLink: true,
       isActive: true,
     },
     {
       name: 'About',
-      ref: 'https://github.com/hotosm/fmtm/wiki',
+      ref: 'https://hotosm.github.io/fmtm/About/',
       isExternalLink: true,
       isActive: true,
     },

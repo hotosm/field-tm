@@ -65,8 +65,8 @@ Now with over 500,000 volunteer mappers,
 the Tasking Manager is a go-to resource
 for volunteers to contribute to the development of OSM.
 
-To aid future diaster response, we would really welcome developer
-[contributions](https://github.com/hotosm/fmtm/wiki/Contribution).
+To aid future diaster response, we would reallywelcome developer
+[contributions](https://hotosm.github.io/fmtm/CONTRIBUTING).
 
 ## How to contribute
 
@@ -74,9 +74,10 @@ To aid future diaster response, we would really welcome developer
 user testing and both front and backend developers.
 We have a specific request for volunteer developers at the moment!
 ![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
+
 Please take a look at our
-[Wiki pages](https://github.com/hotosm/fmtm/wiki/Home/90b86d34ddd42f0eafd03ea7e6d443eb37db2df6)
-and [contributor guidance](https://github.com/hotosm/fmtm/wiki/Contribution)
+[Documentation](https://hotosm.github.io/fmtm)
+and [contributor guidance](https://hotosm.github.io/fmtm/CONTRIBUTING/)
 for more details!
 Reach out to us if any questions! 👍🎉
 
