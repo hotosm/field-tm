@@ -17,7 +17,6 @@
 #
 from enum import Enum
 
-from loguru import logger as log
 from pydantic import BaseModel
 
 

@@ -19,8 +19,8 @@
 
 import logging
 import sys
-from typing import Optional
 from contextlib import asynccontextmanager
+from typing import Optional
 
 import sentry_sdk
 from fastapi import FastAPI, Request

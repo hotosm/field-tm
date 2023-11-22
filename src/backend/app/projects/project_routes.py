@@ -368,8 +368,7 @@ async def upload_multi_project_boundary(
         "Uploading project boundary multipolygon for " f"project ID: {project_id}"
     )
     # read entire file
-    await project_geojson.seek(0)
-    content = await project_geojson.read()
+    content = await project_geojson.getvalue()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -414,8 +413,7 @@ async def task_split(
 
     """
     # read entire file
-    await project_geojson.seek(0)
-    content = await project_geojson.read()
+    content = await project_geojson.getvalue()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -454,8 +452,7 @@ async def upload_project_boundary(
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
-    await upload.seek(0)
-    content = await upload.read()
+    content = await upload.getvalue()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -493,8 +490,7 @@ async def edit_project_boundary(
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
-    await upload.seek(0)
-    content = await upload.read()
+    content = await upload.getvalue()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -532,8 +528,7 @@ async def validate_form(
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
-    await form.seek(0)
-    contents = await form.read()
+    contents = await form.getvalue()
     return await central_crud.test_form_validity(contents, file_ext[1:])
 
 
@@ -547,8 +542,7 @@ async def generate_files(
     data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
-    """
-    Generate additional content for the project to function.
+    """Generate additional content for the project to function.
 
     QR codes,
 
@@ -590,8 +584,7 @@ async def generate_files(
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
-        await xls_form_upload.seek(0)
-        custom_xls_form = await xls_form_upload.read()
+        custom_xls_form = await xls_form_upload.getvalue()
 
         project.form_xls = custom_xls_form
 
@@ -602,8 +595,7 @@ async def generate_files(
                 raise HTTPException(
                     status_code=400, detail="Provide a valid .yaml config file"
                 )
-            await xls_form_config_file.seek(0)
-            config_file_contents = await xls_form_config_file.read()
+            config_file_contents = await xls_form_config_file.getvalue()
             project.form_config_file = config_file_contents
 
         db.commit()
@@ -655,8 +647,7 @@ async def get_data_extracts(
 ):
     try:
         # read entire file
-        await aoi.seek(0)
-        aoi_content = await aoi.read()
+        aoi_content = await aoi.getvalue()
         boundary = json.loads(aoi_content)
 
         # Validatiing Coordinate Reference System
@@ -819,8 +810,7 @@ async def preview_tasks(
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
-    await project_geojson.seek(0)
-    content = await project_geojson.read()
+    content = await project_geojson.getvalue()
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
@@ -1187,8 +1177,7 @@ async def generate_files_janakpur(
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
         xform_title = file_name[0]
-        await form.seek(0)
-        contents = await form.read()
+        contents = await form.getvalue()
         project.form_xls = contents
         db.commit()
 
