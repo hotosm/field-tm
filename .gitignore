@@ -84,3 +84,6 @@ site
 
 # Bash install script
 envsubst
+
+# Scripts
+**/openapi.json
