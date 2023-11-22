@@ -187,7 +187,7 @@ Click on "Next" to proceed.
 
 If you encounter any issues or need assistance while using FMTM, you can access the following resources:
 
-- Check the [FAQs](https://github.com/hotosm/fmtm/wiki/FAQ) .
+- Check the [FAQs](https://hotosm.github.io/fmtm/FAQ) .
 - Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
 
 ## Thank you

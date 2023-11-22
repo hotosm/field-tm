@@ -79,4 +79,5 @@ Validators review the data collected by field mappers and assess its quality. If
 
 # Info for developers
 
-For this visit the [Getting Started Page](https://github.com/hotosm/fmtm/wiki/DEV-1.-Getting-Started).
+For this visit the
+[Getting Started Page](https://hotosm.github.io/fmtm/dev/Setup/).

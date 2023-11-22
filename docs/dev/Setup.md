@@ -1,4 +1,4 @@
-# Getting started with Field Mapping Tasking Manager
+# Getting Started with Field Mapping Tasking Manager
 
 - [Overview](#overview)
   - [Introduction to Field Mapping Tasking Manager Web App](#introduction-to-field-mapping-tasking-manager-web-app)
@@ -108,7 +108,7 @@ If you donot want to create a new project and wish to work on an existing projec
 
 If you encounter any issues or need assistance while using FMTM, you can access the following resources:
 
-- Check the [FAQs](https://github.com/hotosm/fmtm/wiki/FAQ) .
+- Check the [FAQs](https://hotosm.github.io/fmtm/FAQ/) .
 - Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
 
 ## Thank you
@@ -133,7 +133,8 @@ The FMTM Team
 
 ## FMTM frontend
 
-_To in details about the frontend click [here](https://github.com/hotosm/fmtm/wiki/DEV-3.-Frontend) ._
+_To view details about the frontend click
+[here](https://hotosm.github.io/fmtm/dev/Frontend/)_
 
 ### Field Mapper Web Interface (with mobile-friendly map view)
 
@@ -141,7 +142,8 @@ Ideally with a link that opens ODK Collect directly from the browser, but if tha
 
 ## FMTM backend
 
-_To in details about the backend click [here](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend) ._
+_To in details about the backend click
+[here](https://hotosm.github.io/fmtm/dev/backend/)_
 
 A backend that converts the project parameters entered by the Campaign Manager in the Manager Web Interface into a corresponding ODK Central project. Its functions include:
 
@@ -163,7 +165,12 @@ A backend that converts the project parameters entered by the Campaign Manager i
 
 ### 1. Review documentation
 
-Don't forget to review the [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution) guidelines and our [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct) before contributing!
+Don't forget to review the
+[Contribution](https://hotosm.github.io/fmtm/CONTRIBUTING/)
+guidelines and our
+[Code of Conduct](https://hotosm.github.io/fmtm/CODE_OF_CONDUCT/)
+before contributing!
+
 Here are the steps to contribute to the frontend of Field Mapping Tasking Manager:
 
 ### 2. Fork the repository
@@ -270,7 +277,7 @@ bash scripts/gen-env.sh
 
 ### Check Deployment
 
-For details on how to run this project locally for development, please look at: [DEV 2. Backend](https://github.com/hotosm/fmtm/wiki/DEV-2.-Backend)
+For details on how to run this project locally for development, please look at: [Backend Docs](https://hotosm.github.io/fmtm/dev/Backend)
 
 ### Check Authentication
 
@@ -297,8 +304,11 @@ Once you have deployed, you will need to check that you can properly authenticat
 
 ## Start Developing
 
-We look forward to seeing your creative solutions and the positive impact they bring to FMTM.
-Don't forget to review [Contribution](https://github.com/hotosm/fmtm/wiki/Contribution) guidelines and our [Code of Conduct](https://github.com/hotosm/fmtm/wiki/Code-of-Conduct) before contributing!
+Don't forget to review the
+[Contribution](https://hotosm.github.io/fmtm/CONTRIBUTING/)
+guidelines and our
+[Code of Conduct](https://hotosm.github.io/fmtm/CODE_OF_CONDUCT/)
+before contributing!
 
 Happy coding!
 
