@@ -1,8 +1,39 @@
 # Installation
 
-## Easy Way
+## Software Requirements
 
-Use the provided bash script:
+It is recommended to run FMTM on a Linux-based machine.
+
+> This includes MacOS, but some [tools must be
+> substituted](#alternative-operating-systems).
+>
+> For Windows users, the easiest option is to use [Windows Subsystem for
+> Linux](#alternative-operating-systems)
+
+Before you can install and use this application, you will need to have
+the following software installed and configured on your system:
+
+> If running Debian/Ubuntu, the install script below does this for you.
+
+[Git](https://git-scm.com/) to clone the FMTM repository.
+
+[Docker](https://docs.docker.com/engine/install/)
+to run FMTM inside containers.
+
+[Docker Compose](https://docs.docker.com/compose/install)
+for easy orchestration of the FMTM services.
+
+> This is Docker Compose V2, the official Docker CLI plugin.
+>
+> i.e. `docker compose` commands, not `docker-compose` (the old tool).
+
+## Easy Install
+
+On a Linux-based machine with `bash` installed, run the script:
+
+> Note: it is best to run this script as a user other than root.
+>
+> However, if you run as root, a user svcfmtm will be created for you.
 
 ```bash
 # Option A) If you already cloned the repo
@@ -16,65 +47,30 @@ bash install.sh
 # Then follow the prompts
 ```
 
-> Note: it is best to run this script as a user other than root.
->
-> However, if you run as root, a user svcfmtm will be created for you.
-
-## Manual Way
+## Manual Install
 
 If more details are required, check out the
 [dev docs](https://hotosm.github.io/fmtm/dev/Setup/)
 
 ### Table of Contents
 
-1. [Software Requirements](#software-requirements)
+1. [Clone the FMTM repository](#clone-the-fmtm-repository)
+2. [Development: Setup Your Local Environment](#setup-your-local-environment)
+3. [Start the API with Docker](#start-the-api-with-docker)
+4. [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
+5. [Import Test Data (Optional)](#import-test-data-optional)
+6. [Check Authentication (Optional)](#check-authentication-optional)
 
-2. [Setting up FMTM](#setting-up-fmtm)
+### Clone the FMTM repository
 
-   - [Fork and Clone the FMTM repository](#fork-and-clone-the-fmtm-repository)
-   - [Development: Setup Your Local Environment](#setup-your-local-environment)
-   - [Start the API with Docker](#start-the-api-with-docker)
-   - [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
-   - [Import Test Data (Optional)](#import-test-data-optional)
-   - [Check Authentication (Optional)](#check-authentication-optional)
-
-## Software Requirements
-
-Before you can install and use this application,
-you will need to have the following software
-installed and configured on your system:
-
-- [Git](https://git-scm.com/)
-- [Docker](https://docs.docker.com/)
-
-To install Git, please follow the instructions on the
-[official Git website](https://git-scm.com/downloads)
-
-To install Docker, please follow the instructions on the
-[official Docker website](https://docs.docker.com/engine/install/)
-
-## Setting up FMTM
-
-### Fork and Clone the FMTM repository
-
-#### 1. Fork the repository
-
-Forking creates a copy of the repository in your own GitHub account.
-Go to the [Field Mapping Tasking Manager repository](https://github.com/hotosm/fmtm)
-and click the "Fork" button in the top right corner of the page.
-
-#### 2. Clone the forked repository
-
-Clone the forked repository to your local machine using the following command:
+Clone the repository to your local machine using the following command:
 
 ```bash
-git clone https://github.com/<your-username>/fmtm.git
+git clone https://github.com/hotosm/fmtm.git
 
 # If you wish to deploy for production, change to the main branch
 git checkout main
 ```
-
-Make sure to replace `<your-username>` with your GitHub username.
 
 ### Setup Your Local Environment
 
@@ -127,17 +123,6 @@ This is the easiest way to get started with FMTM.
 
 Docker runs each service inside **containers**, fully isolated from your
 host operating system.
-
-#### Prerequisite
-
-You will need to [Install Docker](https://docs.docker.com/engine/install/)
-and ensure that it is running on your local machine.
-
-You will also need [Docker Compose](https://docs.docker.com/compose/install).
-This is Docker Compose V2, the official Docker CLI plugin.
-i.e. `docker compose` commands, not `docker-compose` (the old tool).
-
-Then from the command line, navigate to the top level directory of the FMTM project.
 
 #### Select the install type
 
@@ -247,3 +232,61 @@ Once you have deployed, you will need to check that you can properly authenticat
    redirect URL in the openstreetmap.org settings.
 
 That's it, you have successfully set up FMTM!!
+
+## Alternative Operating Systems
+
+### Windows
+
+Windows Subsystem for Linux (WSL) can be used to run Docker.
+
+This will run a Linux machine inside Windows very efficiently.
+
+To install follow the
+[official instructions](https://learn.microsoft.com/en-us/windows/wsl/install).
+
+Then continue with the FMTM [installation](#software-requirements).
+
+### MacOS
+
+[Colima](https://github.com/abiosoft/colima) is recommended
+to run `docker` and `docker compose` commands.
+
+Install colima, docker, docker compose using brew:
+
+```sh
+brew install colima
+brew install docker docker-compose
+```
+
+Then configure the docker compose plugin to work on MacOS:
+
+```sh
+mkdir -p ~/.docker/cli-plugins
+
+ln -sfn $(brew --prefix)/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+```
+
+Run Colima:
+
+```sh
+colima start
+```
+
+Then continue with the FMTM [installation](#software-requirements).
+
+### A Note on Docker Desktop
+
+While in theory FMTM should run using Docker-Desktop, it has not
+been tested.
+
+The authors opinion is that the official Linux Docker Daemon
+should be installed in WSL or MacOS, instead of using Docker Desktop.
+
+> Colima is a wrapper to run the Docker Daemon.
+
+Although Docker Desktop may have a user friendly GUI, it simply
+runs docker commands inside a Linux virtual machine underneath.
+
+It is often easier and more flexible to do this yourself.
+Plus it gives you access to all other other tools available
+in a Linux operating system!

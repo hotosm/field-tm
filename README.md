@@ -146,7 +146,8 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```bash
-curl -fsSL https://get.fmtm.dev | bash
+curl -L https://get.fmtm.dev -o install.sh
+bash install.sh
 ```
 
 ## Info For Developers
