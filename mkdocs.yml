@@ -1,7 +1,7 @@
 site_name: FMTM
 site_description: A project to provide tools for Open Mapping campaigns.
 # strict: true
-site_url: "https://www.hotosm.org"
+site_url: "https://hotosm.github.io/fmtm/"
 
 repo_name: "hotosm/fmtm"
 repo_url: "https://github.com/hotosm/fmtm/"
