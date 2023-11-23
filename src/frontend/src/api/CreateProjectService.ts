@@ -7,6 +7,7 @@ import {
 } from '../models/createproject/createProjectModel';
 import { CommonActions } from '../store/slices/CommonSlice';
 import { ValidateCustomFormResponse } from 'store/types/ICreateProject';
+import { task_split_type } from '../types/enums';
 
 const CreateProjectService: Function = (
   url: string,
@@ -26,7 +27,7 @@ const CreateProjectService: Function = (
         const resp: ProjectDetailsModel = postNewProjectDetails.data;
         await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
-        if (payload.splitting_algorithm === 'choose_area_as_task') {
+        if (payload.task_split_type === task_split_type['choose_area_as_task']) {
           await dispatch(
             UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
           );
