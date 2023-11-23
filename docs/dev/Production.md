@@ -114,7 +114,15 @@ pg_dump --verbose --format c -U odk odk | \
 gzip -9 > "$backup_filename"
 ```
 
+> Note: if you are dumping to import into a pre-existing
+> database, you should also include the --clean flag.
+>
+> This will drop the existing tables prior to import,
+> and should prevent conflicts.
+
 ## Manual Database Restores
+
+The restore should be as easy as:
 
 ```bash
 # On a different machine (else change the container name)
@@ -131,4 +139,41 @@ cat "$backup_filename" | gunzip | \
 docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE \
 fmtm-central-db-${GIT_BRANCH} \
 pg_restore --verbose -U odk -d odk
+```
+
+However, in some cases you may have existing data
+in the database (i.e. if you started the docker
+compose stack & the API ran the migrations!).
+
+In this case you can import into a fresh db, before
+attaching to the FMTM containers:
+
+```bash
+export GIT_BRANCH=development
+
+# Shut down the running database & delete the data
+docker compose -f docker-compose.$GIT_BRANCH.yml down -v
+
+# First, ensure you have a suitable .env with database vars
+# Start the databases only
+docker compose -f docker-compose.$GIT_BRANCH.yml up -d fmtm-db central-db
+
+# (Optional) restore odk central from the backup
+backup_filename=fmtm-central-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
+
+cat "$backup_filename" | gunzip | \
+docker exec -i \
+fmtm-central-db-${GIT_BRANCH} \
+pg_restore --verbose -U odk -d odk
+
+# Restore fmtm from the backup
+backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
+
+cat "$backup_filename" | gunzip | \
+docker exec -i \
+fmtm-db-${GIT_BRANCH} \
+pg_restore --verbose -U fmtm -d fmtm
+
+# Run the entire docker compose stack
+docker compose -f docker-compose.$GIT_BRANCH.yml up -d
 ```
