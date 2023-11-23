@@ -18,13 +18,26 @@
 version: "3"
 
 volumes:
-  fmtm_data:
+  fmtm_frontend:
+    name: fmtm-frontend-${GIT_BRANCH}
   fmtm_db_data:
+    name: fmtm-db-data-${GIT_BRANCH}
+  fmtm_data:
+    name: fmtm-s3-data-${GIT_BRANCH}
   fmtm_logs:
+    name: fmtm-logs-${GIT_BRANCH}
   fmtm_images:
+    name: fmtm-images-${GIT_BRANCH}
   fmtm_tiles:
-  central_db_data:
+    name: fmtm-tiles-${GIT_BRANCH}
   certs:
+    name: fmtm-certs-${GIT_BRANCH}
+  certbot_data:
+    name: fmtm-certbot-data-${GIT_BRANCH}
+  central_db_data:
+    name: fmtm-central-db-data-${GIT_BRANCH}
+  central_frontend:
+    name: fmtm-central-frontend-${GIT_BRANCH}
 
 networks:
   fmtm-net:
@@ -48,6 +61,10 @@ services:
     extends:
       file: docker-compose.development.yml
       service: central
+  central-ui:
+    extends:
+      file: docker-compose.development.yml
+      service: central-ui
   s3:
     extends:
       file: docker-compose.development.yml
