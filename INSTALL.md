@@ -274,6 +274,10 @@ colima start
 
 Then continue with the FMTM [installation](#software-requirements).
 
+> Note: only tagged backend images are multi-architecture, supporting
+> MacOS. The regular images for fast continuous deployment are not:
+> `backend:development`, `backend:staging`, `backend:main`.
+
 ### A Note on Docker Desktop
 
 While in theory FMTM should run using Docker-Desktop, it has not
