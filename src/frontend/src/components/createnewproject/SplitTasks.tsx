@@ -264,17 +264,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
               <ProgressBar totalSteps={totalSteps} currentStep={generateProjectLog?.progress} />
             </div>
             <p className="fmtm-text-base">
-              You may click Proceed button whilst the process runs in the background. Click Cancel to terminate the
-              process.
+              Please stay on this page until the process is complete. Your changes might be lost if you cancel the
+              pop-up.
             </p>
-            <div className="fmtm-flex fmtm-justify-center fmtm-gap-6 fmtm-pt-5  ">
-              {/* <Button btnText="CANCEL" btnType="secondary"></Button> */}
-              <Button
-                btnText="PROCEED"
-                onClick={() => navigate(`/project_details/${environment.encode(projectDetailsResponse?.id)}`)}
-                btnType="primary"
-              ></Button>
-            </div>
           </div>
         }
         open={toggleStatus}
