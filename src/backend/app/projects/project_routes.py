@@ -123,7 +123,6 @@ async def read_project_summaries(
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
-    search: str = None,
 ):
     if hashtags:
         hashtags = hashtags.split(",")  # create list of hashtags
@@ -131,16 +130,16 @@ async def read_project_summaries(
             filter(lambda hashtag: hashtag.startswith("#"), hashtags)
         )  # filter hashtags that do start with #
 
+    total_projects = db.query(db_models.DbProject).count()
     skip = (page - 1) * results_per_page
     limit = results_per_page
 
-    total_projects = db.query(db_models.DbProject).count()
-    hasNext = (page * results_per_page) < total_projects
-    hasPrev = page > 1
-    total_pages = (total_projects + results_per_page - 1) // results_per_page
+    project_count, projects = project_crud.get_project_summaries(
+        db, user_id, skip, limit, hashtags, None
+    )
 
-    projects = project_crud.get_project_summaries(
-        db, user_id, skip, limit, hashtags, search
+    pagination = project_crud.get_pagintaion(
+        page, project_count, results_per_page, total_projects
     )
     project_summaries = [
         project_schemas.ProjectSummary.from_db_project(project) for project in projects
@@ -148,16 +147,46 @@ async def read_project_summaries(
 
     response = project_schemas.PaginatedProjectSummaries(
         results=project_summaries,
-        pagination=project_schemas.PaginationInfo(
-            hasNext=hasNext,
-            hasPrev=hasPrev,
-            nextNum=page + 1 if hasNext else None,
-            page=page,
-            pages=total_pages,
-            prevNum=page - 1 if hasPrev else None,
-            perPage=results_per_page,
-            total=total_projects,
-        ),
+        pagination=pagination,
+    )
+    return response
+
+
+@router.get(
+    "/search_projects", response_model=project_schemas.PaginatedProjectSummaries
+)
+async def search_project(
+    search: str,
+    user_id: int = None,
+    hashtags: str = None,
+    page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
+    results_per_page: int = Query(13, le=100),
+    db: Session = Depends(database.get_db),
+):
+    if hashtags:
+        hashtags = hashtags.split(",")  # create list of hashtags
+        hashtags = list(
+            filter(lambda hashtag: hashtag.startswith("#"), hashtags)
+        )  # filter hashtags that do start with #
+
+    total_projects = db.query(db_models.DbProject).count()
+    skip = (page - 1) * results_per_page
+    limit = results_per_page
+
+    project_count, projects = project_crud.get_project_summaries(
+        db, user_id, skip, limit, hashtags, search
+    )
+
+    pagination = project_crud.get_pagintaion(
+        page, project_count, results_per_page, total_projects
+    )
+    project_summaries = [
+        project_schemas.ProjectSummary.from_db_project(project) for project in projects
+    ]
+
+    response = project_schemas.PaginatedProjectSummaries(
+        results=project_summaries,
+        pagination=pagination,
     )
     return response
 
