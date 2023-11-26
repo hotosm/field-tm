@@ -12,6 +12,8 @@ import ProjectListMap from '../components/home/ProjectListMap';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [paginationPage, setPaginationPage] = useState(1);
 
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const showMapStatus = CoreModules.useAppSelector((state) => state.home.showMapStatus);
@@ -27,6 +29,7 @@ const Home = () => {
 
   const stateHome = CoreModules.useAppSelector((state) => state.home);
   //we use use selector from redux to get all state of home from home slice
+  const filteredProjectCards = stateHome.homeProjectSummary;
 
   let cardsPerRow = new Array(
     type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1,
@@ -34,19 +37,43 @@ const Home = () => {
   //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
   const theme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  useEffect(() => {
-    // dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?skip=0&limit=100`));
-    dispatch(HomeSummaryService(`${import.meta.env.VITE_API_URL}/projects/summaries?page=1&results_per_page=12`));
-    //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
-  }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
-  const filteredProjectCards = stateHome.homeProjectSummary.filter((value) =>
-    value.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, 500]);
+
+  useEffect(() => {
+    if (debouncedSearch) {
+      dispatch(
+        HomeSummaryService(
+          `${
+            import.meta.env.VITE_API_URL
+          }/projects/search_projects?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
+        ),
+      );
+    }
+  }, [debouncedSearch, paginationPage]);
+
+  useEffect(() => {
+    setPaginationPage(1);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (!debouncedSearch) {
+      dispatch(
+        HomeSummaryService(
+          `${import.meta.env.VITE_API_URL}/projects/summaries?page=${paginationPage}&results_per_page=12`,
+        ),
+      );
+    }
+  }, [paginationPage, debouncedSearch]);
 
   return (
     <div
@@ -90,11 +117,7 @@ const Home = () => {
                         },
                       }}
                       onChange={(e, page) => {
-                        dispatch(
-                          HomeSummaryService(
-                            `${import.meta.env.VITE_API_URL}/projects/summaries?page=${page}&results_per_page=12`,
-                          ),
-                        );
+                        setPaginationPage(page);
                       }}
                     />
                   </div>
