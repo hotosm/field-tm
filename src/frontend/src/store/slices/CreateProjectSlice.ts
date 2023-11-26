@@ -87,6 +87,9 @@ const CreateProject = createSlice({
       state.generateProjectLog = null;
       state.generateProjectLogLoading = false;
       state.isUnsavedChanges = false;
+      state.uploadAreaSelection = null;
+      state.dividedTaskGeojson = null;
+      state.dividedTaskLoading = false;
     },
     UploadAreaLoading(state, action) {
       state.projectAreaLoading = action.payload;
