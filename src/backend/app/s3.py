@@ -33,6 +33,10 @@ def add_file_to_bucket(bucket_name: str, file_path: str, s3_path: str):
         file_path (str): The path to the file on the local filesystem.
         s3_path (str): The path in the S3 bucket where the file will be stored.
     """
+    # Ensure s3_path starts with a forward slash
+    if not s3_path.startswith("/"):
+        s3_path = f"/{s3_path}"
+
     client = s3_client()
     client.fput_object(bucket_name, file_path, s3_path)
 
@@ -55,6 +59,10 @@ def add_obj_to_bucket(
         kwargs (dict[str, Any]): Any other arguments to pass to client.put_object.
 
     """
+    # Ensure s3_path starts with a forward slash
+    if not s3_path.startswith("/"):
+        s3_path = f"/{s3_path}"
+
     client = s3_client()
     # Set BytesIO object to start, prior to .read()
     file_obj.seek(0)
@@ -77,6 +85,10 @@ def get_file_from_bucket(bucket_name: str, s3_path: str, file_path: str):
         file_path (str): The path on the local filesystem where the S3
             file will be saved.
     """
+    # Ensure s3_path starts with a forward slash
+    if not s3_path.startswith("/"):
+        s3_path = f"/{s3_path}"
+
     client = s3_client()
     client.fget_object(bucket_name, s3_path, file_path)
 
@@ -91,6 +103,10 @@ def get_obj_from_bucket(bucket_name: str, s3_path: str) -> BytesIO:
     Returns:
         BytesIO: A BytesIO object containing the content of the downloaded S3 object.
     """
+    # Ensure s3_path starts with a forward slash
+    if not s3_path.startswith("/"):
+        s3_path = f"/{s3_path}"
+
     client = s3_client()
     try:
         response = client.get_object(bucket_name, s3_path)
