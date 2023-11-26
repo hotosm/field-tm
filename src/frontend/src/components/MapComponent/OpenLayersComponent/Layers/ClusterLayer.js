@@ -9,6 +9,8 @@ import { Cluster, OSM as OSMSource } from 'ol/source';
 import { Text, Circle, Icon } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import { hexToRgba } from '../../../MapComponent/OpenLayersComponent/helpers/styleUtils';
+import SelectCluster from 'ol-ext/interaction/SelectCluster';
+import MarkerIcon from '../../../../assets/images/red_marker.png';
 
 function setAsyncStyle(style, feature, getIndividualStyle) {
   const styleCache = {};
@@ -161,6 +163,56 @@ const ClusterLayer = ({
   }, [map, vectorLayer, visibleOnMap]);
 
   useEffect(() => () => map && map.removeLayer(vectorLayer), [map, vectorLayer]);
+
+  useEffect(() => {
+    if (!map) return;
+    // Select interaction to spread cluster out and select features
+    const selectCluster = new SelectCluster({
+      selectCluster: false, // disable cluster selection
+      circleMaxObjects: 20,
+      pointRadius: 40,
+      spiral: true,
+      animate: true,
+      autoClose: true,
+      // Feature style when springs apart
+      featureStyle: clusterSingleFeatureStyle,
+    });
+    map.addInteraction(selectCluster);
+
+    function clusterSingleFeatureStyle(clusterMember) {
+      // Call for expandedFeatures pass a resolution instead
+      const isExpandedFeature = clusterMember.get('selectclusterfeature');
+
+      if (isExpandedFeature) {
+        const feature = clusterMember.getProperties().features[0];
+        const featureProperty = feature?.getProperties();
+        console.log(featureProperty, 'featureProperty');
+        console.log(feature, 'isExpandedFeature');
+        const style = new Style({
+          image: new Icon({
+            src: MarkerIcon,
+            scale: 0.06,
+          }),
+          text: new Text({
+            text: featureProperty?.project_id,
+            fill: new Fill({
+              color: 'black',
+            }),
+            offsetY: 25,
+            font: '15px Times New Roman',
+          }),
+        });
+        return style;
+        fillColor = '#96bfff';
+      } else {
+        return;
+      }
+    }
+
+    return () => {
+      map.removeInteraction(selectCluster);
+    };
+  }, [map]);
 
   return null;
 };
