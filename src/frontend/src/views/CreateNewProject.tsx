@@ -7,7 +7,7 @@ import UploadArea from '../components/createnewproject/UploadArea';
 import DataExtract from '../components/createnewproject/DataExtract';
 import SplitTasks from '../components/createnewproject/SplitTasks';
 import SelectForm from '../components/createnewproject/SelectForm';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '.././store/slices/CommonSlice';
 import { useAppSelector } from '../types/reduxTypes';
@@ -15,13 +15,23 @@ import Prompt from '../hooks/Prompt';
 const CreateNewProject = () => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const isUnsavedChanges = useAppSelector((state) => state.createproject.isUnsavedChanges);
   const canSwitchCreateProjectSteps = useAppSelector((state) => state.createproject.canSwitchCreateProjectSteps);
+  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customLineUpload, setCustomLineUpload] = useState(null);
   const [customPolygonUpload, setCustomPolygonUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
+
+  useEffect(() => {
+    if (location.pathname !== '/create-project' && !projectDetails.name && !projectDetails.odk_central_url) {
+      dispatch(CommonActions.SetCurrentStepFormStep({ flag: 'create_project', step: 1 }));
+      navigate('/create-project');
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     switch (location.pathname) {
       case '/create-project':
