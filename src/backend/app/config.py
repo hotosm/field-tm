@@ -140,7 +140,7 @@ class Settings(BaseSettings):
         else:
             fmtm_domain = info.data.get("FMTM_DOMAIN")
             # Local dev
-            if s3_endpoint == "http://s3:9000":
+            if info.data.get("DEBUG"):
                 dev_port = info.data.get("FMTM_DEV_PORT")
                 return f"http://s3.{fmtm_domain}:{dev_port}"
             return f"https://s3.{fmtm_domain}"
