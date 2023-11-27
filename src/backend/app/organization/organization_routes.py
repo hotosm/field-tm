@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-
+"""Routes for organization management."""
 
 from fastapi import (
     APIRouter,
@@ -25,6 +25,7 @@ from fastapi import (
     HTTPException,
     UploadFile,
 )
+from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from ..db import database
@@ -77,7 +78,8 @@ async def create_organization(
         db (Session): The database session. Dependency.
 
     Returns:
-        dict: A dictionary with a message indicating successful creation of the organization.
+        dict: A dictionary with a message indicating successful creation
+            of the organization.
     """
     # Check if the organization with the same already exists
     if await organization_crud.get_organisation_by_name(db, name=name):
@@ -106,13 +108,17 @@ async def update_organization(
         )
         return organization
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error updating organization: {e}")
+        log.exception(e)
+        raise HTTPException(
+            status_code=400, detail="Error updating organization."
+        ) from e
 
 
 @router.delete("/{organization_id}")
 async def delete_organisations(
     organization_id: int, db: Session = Depends(database.get_db)
 ):
+    """Delete an organization."""
     organization = await organization_crud.get_organisation_by_id(db, organization_id)
 
     if not organization:
