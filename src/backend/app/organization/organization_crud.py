@@ -74,7 +74,7 @@ async def upload_logo_to_s3(
         logo_file(UploadFile): The logo image uploaded to FastAPI.
 
     Returns:
-        logo_path(str): The file path in S3.
+        logo_url(str): The S3 URL for the logo file.
     """
     logo_path = f"/{db_org.id}/logo.png"
 
@@ -88,7 +88,9 @@ async def upload_logo_to_s3(
         content_type=logo_file.content_type,
     )
 
-    return logo_path
+    logo_url = f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}{logo_path}"
+
+    return logo_url
 
 
 async def create_organization(
@@ -124,12 +126,8 @@ async def create_organization(
         # Refresh to get the assigned org id
         db.refresh(db_organization)
 
-        logo_path = await upload_logo_to_s3(db_organization, logo)
-
         # Update the logo field in the database with the correct path
-        db_organization.logo = (
-            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}{logo_path}"
-        )
+        db_organization.logo = await upload_logo_to_s3(db_organization, logo)
         db.commit()
 
     except Exception as e:
