@@ -125,7 +125,7 @@ class Settings(BaseSettings):
         service name for S3_ENDPOINT instead.
         """
         # If set manually, pass through
-        if isinstance(v, str):
+        if isinstance(v, str) and v != "":
             return v
         # For dev setup
         dev_port = info.data.get("FMTM_DEV_PORT")
