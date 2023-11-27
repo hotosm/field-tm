@@ -217,6 +217,47 @@ Creating a new release during development may not always be feasible.
 
 > Note: this is useful for debugging features during active development.
 
+## Accessing S3 Files use s3fs
+
+The s3fs tool allows you to mount an S3 bucket on your filesystem,
+to browse like any other directory.
+
+Install:
+
+```bash
+sudo apt update
+sudo apt install s3fs
+```
+
+Create a credentials file:
+
+```bash
+# Replace ACCESS_KEY_ID and SECRET_ACCESS_KEY
+echo ACCESS_KEY_ID:SECRET_ACCESS_KEY > ${HOME}/.passwd-s3fs
+chmod 600 ${HOME}/.passwd-s3fs
+```
+
+Mount your bucket:
+
+> If you wish for this to be permanent, see below.
+
+```bash
+sudo mkdir /mnt/fmtm/local
+sudo chown $(whoami):$(whoami) /mnt/fmtm/local
+s3fs fmtm-data /mnt/fmtm/local \
+  -o passwd_file=/home/$(whoami)/s3-creds/fmtm-local \
+  -o url=http://s3.fmtm.localhost:7050 \
+  -o use_path_request_style
+```
+
+Access the files like a directory under: `/mnt/fmtm/local`.
+
+To mount permanently, add the following to `/etc/fstab`:
+
+`fmtm-local /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
+use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
+url=http://s3.fmtm.localhost:7050 0 0`
+
 ## Running JOSM in the dev stack
 
 - Run JOSM with FMTM:
