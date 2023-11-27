@@ -118,21 +118,32 @@ class Settings(BaseSettings):
     @field_validator("S3_DOWNLOAD_ROOT", mode="before")
     @classmethod
     def configure_s3_download_root(cls, v: Optional[str], info: ValidationInfo) -> str:
-        """Set S3_DOWNLOAD_ROOT for dev setup.
+        """Set S3_DOWNLOAD_ROOT for S3 downloads.
 
-        This is required, as normally S3_DOWNLOAD_ROOT is the same
-        as S3_ENDPOINT, but for development we use the docker compose
-        service name for S3_ENDPOINT instead.
+        This is required, when we use a containerised S3 service.
+        The S3_ENDPOINT is a docker compose service name and not
+        resolvable outside of the stack.
+
+        S3_DOWNLOAD_ROOT is equal to S3_ENDPOINT if a public S3 instance
+        is used (e.g. AWS S3).
         """
         # If set manually, pass through
-        if isinstance(v, str) and v != "":
+        if v and isinstance(v, str):
             return v
-        # For dev setup
-        dev_port = info.data.get("FMTM_DEV_PORT")
-        if s3_endpoint := info.data.get("S3_ENDPOINT") == "http://s3:9000":
-            return f"http://s3.fmtm.localhost:{dev_port}"
-        # Else set to value of S3_ENDPOINT
-        return s3_endpoint
+
+        # Externally hosted S3
+        s3_endpoint = info.data.get("S3_ENDPOINT")
+        if s3_endpoint.startswith("https://"):
+            return s3_endpoint
+
+        # Containerised S3
+        else:
+            fmtm_domain = info.data.get("FMTM_DOMAIN")
+            # Local dev
+            if s3_endpoint == "http://s3:9000":
+                dev_port = info.data.get("FMTM_DEV_PORT")
+                return f"http://s3.{fmtm_domain}:{dev_port}"
+            return f"https://s3.{fmtm_domain}"
 
     UNDERPASS_API_URL: str = "https://api-prod.raw-data.hotosm.org/v1/"
     SENTRY_DSN: Optional[str] = None
