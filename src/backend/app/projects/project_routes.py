@@ -1273,3 +1273,29 @@ async def get_task_status(
         message=task_message or None,
         # progress=some_func_to_get_progress,
     )
+
+
+from ..static import data_path
+
+
+@router.post("/templates")
+async def get_template_file(
+    file_type: str = Query(
+        ..., enum=["data_extracts", "form"], description="Choose file type"
+    )
+):
+    """Get template file.
+
+    Args: file_type: Type of template file.
+
+    returns: Requested file as a FileResponse.
+    """
+    file_type_paths = {
+        "data_extracts": f"{data_path}/template/template.geojson",
+        "form": f"{data_path}/template/template.xls",
+    }
+    file_path = file_type_paths.get(file_type)
+    filename = file_path.split("/")[-1]
+    return FileResponse(
+        file_path, media_type="application/octet-stream", filename=filename
+    )
