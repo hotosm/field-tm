@@ -20,7 +20,6 @@
 import logging
 import sys
 from contextlib import asynccontextmanager
-from typing import Optional
 
 import sentry_sdk
 from fastapi import FastAPI, Request
@@ -52,7 +51,7 @@ if not settings.DEBUG:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup events."""
+    """FastAPI startup/shutdown event."""
     log.debug("Starting up FastAPI server.")
     log.debug("Reading XLSForms from DB.")
     await read_xlsforms(next(get_db()), xlsforms_path)
@@ -208,16 +207,3 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def home():
     """Redirect home to docs."""
     return RedirectResponse("/docs")
-
-
-@api.get("/items/{item_id}")
-async def read_item(item_id: int, q: Optional[str] = None):
-    """Get item IDs."""
-    return {"item_id": item_id, "q": q}
-
-
-@api.get("/images/{image_filename}")
-async def get_images(image_filename: str):
-    """Download image files."""
-    path = f"./app/images/{image_filename}"
-    return FileResponse(path)
