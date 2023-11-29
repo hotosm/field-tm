@@ -15,7 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-from typing import List
+"""Logic for user routes."""
+
 
 from sqlalchemy.orm import Session
 
@@ -27,52 +28,25 @@ from . import user_schemas
 # --------------
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    db_users = db.query(db_models.DbUser).offset(skip).limit(limit).all()
-    return convert_to_app_user(db_users) if db_users else []
+async def get_users(db: Session, skip: int = 0, limit: int = 100):
+    """Get all users."""
+    return db.query(db_models.DbUser).offset(skip).limit(limit).all()
 
 
-def get_user(db: Session, user_id: int, db_obj: bool = False):
-    db_user = db.query(db_models.DbUser).filter(db_models.DbUser.id == user_id).first()
-    if db_obj:
-        return db_user
-    return convert_to_app_user(db_user)
+async def get_user(db: Session, user_id: int):
+    """Get a single user by user id."""
+    return db.query(db_models.DbUser).filter(db_models.DbUser.id == user_id).first()
 
 
-def get_user_by_username(db: Session, username: str):
-    db_user = (
+async def get_user_by_username(db: Session, username: str):
+    """Get a single user by username."""
+    return (
         db.query(db_models.DbUser).filter(db_models.DbUser.username == username).first()
     )
-    return convert_to_app_user(db_user)
 
 
-# --------------------
-# ---- CONVERTERS ----
-# --------------------
-
-
-# TODO: write tests for these
-def convert_to_app_user(db_user: db_models.DbUser):
-    if db_user:
-        app_user: user_schemas.User = db_user
-        return app_user
-    else:
-        return None
-
-
-def convert_to_app_users(db_users: List[db_models.DbUser]):
-    if db_users and len(db_users) > 0:
-        app_users = []
-        for user in db_users:
-            if user:
-                app_users.append(convert_to_app_user(user))
-        app_users_without_nones = [i for i in app_users if i is not None]
-        return app_users_without_nones
-    else:
-        return []
-
-
-def get_user_role_by_user_id(db: Session, user_id: int):
+async def get_user_role_by_user_id(db: Session, user_id: int):
+    """Return the user role for a given user ID."""
     db_user_role = (
         db.query(db_models.DbUserRoles)
         .filter(db_models.DbUserRoles.user_id == user_id)
@@ -84,6 +58,7 @@ def get_user_role_by_user_id(db: Session, user_id: int):
 
 
 async def create_user_roles(user_role: user_schemas.UserRoles, db: Session):
+    """Assign a user a role."""
     db_user_role = db_models.DbUserRoles(
         user_id=user_role.user_id,
         role=user_role.role,
@@ -95,8 +70,3 @@ async def create_user_roles(user_role: user_schemas.UserRoles, db: Session):
     db.commit()
     db.refresh(db_user_role)
     return db_user_role
-
-
-def get_user_by_id(db: Session, user_id: int):
-    db_user = db.query(db_models.DbUser).filter(db_models.DbUser.id == user_id).first()
-    return db_user

@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Configuration and fixtures for PyTest."""
 
 import logging
 import os
@@ -32,7 +33,7 @@ from app.central import central_crud
 from app.config import settings
 from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbUser
-from app.main import api, get_application
+from app.main import get_application
 from app.projects import project_crud
 from app.projects.project_schemas import ODKCentral, ProjectInfo, ProjectUpload
 from app.users.user_schemas import User
@@ -51,12 +52,13 @@ def pytest_configure(config):
 
 @pytest.fixture(autouse=True)
 def app() -> Generator[FastAPI, Any, None]:
-    """Create a fresh database on each test case."""
+    """Get the FastAPI test server."""
     yield get_application()
 
 
 @pytest.fixture(scope="session")
 def db_engine():
+    """The SQLAlchemy database engine to init."""
     engine = create_engine(settings.FMTM_DB_URL.unicode_string())
     if not database_exists:
         create_database(engine.url)
@@ -67,6 +69,7 @@ def db_engine():
 
 @pytest.fixture(scope="function")
 def db(db_engine):
+    """Database session using db_engine."""
     connection = db_engine.connect()
 
     # begin a non-ORM transaction
@@ -83,6 +86,7 @@ def db(db_engine):
 
 @pytest.fixture(scope="function")
 def user(db):
+    """A test user."""
     db_user = DbUser(id=100, username="test_user")
     db.add(db_user)
     db.commit()
@@ -91,6 +95,7 @@ def user(db):
 
 @pytest.fixture(scope="function")
 def organization(db):
+    """A test organisation."""
     db_org = DbOrganisation(
         name="test_org_qwerty",
         slug="test_qwerty",
@@ -104,7 +109,8 @@ def organization(db):
 
 
 @pytest.fixture(scope="function")
-def project(db, user, organization):
+async def project(db, user, organization):
+    """A test project, using the test user and org."""
     project_metadata = ProjectUpload(
         author=User(username=user.username, id=user.id),
         project_info=ProjectInfo(
@@ -136,17 +142,18 @@ def project(db, user, organization):
         log.debug(f"ODK project returned: {odkproject}")
         assert odkproject is not None
     except Exception as e:
-        log.error(e)
+        log.exception(e)
         pytest.fail(f"Test failed with exception: {str(e)}")
 
     # Create FMTM Project
     try:
-        new_project = project_crud.create_project_with_project_info(
+        new_project = await project_crud.create_project_with_project_info(
             db, project_metadata, odkproject["id"]
         )
         log.debug(f"Project returned: {new_project.__dict__}")
         assert new_project is not None
     except Exception as e:
+        log.exception(e)
         pytest.fail(f"Test failed with exception: {str(e)}")
 
     return new_project
@@ -174,8 +181,9 @@ def project(db, user, organization):
 
 
 @pytest.fixture(scope="function")
-def client(db):
-    api.dependency_overrides[get_db] = lambda: db
+def client(app, db):
+    """The FastAPI test server."""
+    app.dependency_overrides[get_db] = lambda: db
 
-    with TestClient(api) as c:
+    with TestClient(app) as c:
         yield c

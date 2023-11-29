@@ -74,7 +74,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
       state[index].taskBoundries.forEach((task) => {
         taskHistories = taskHistories.concat(
           task.task_history.map((history) => {
-            return { ...history, taskId: task.id, status: task.task_status_str };
+            return { ...history, taskId: task.id, status: task.task_status };
           }),
         );
       });

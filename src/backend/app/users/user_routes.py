@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Endpoints for users and role."""
 
 from typing import List
 
@@ -34,61 +35,93 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[user_schemas.UserOut])
-def get_users(
-    username: str = "",
+async def get_users(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(database.get_db),
 ):
-    users = user_crud.get_users(db, skip=skip, limit=limit)
+    """Get all user details."""
+    users = await user_crud.get_users(db, skip=skip, limit=limit)
+
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+
     return users
-    # TODO error thrown when no users are in db
 
 
 @router.get("/{id}", response_model=user_schemas.UserOut)
-async def get_user_by_id(id: int, db: Session = Depends(database.get_db)):
-    user = user_crud.get_user(db, user_id=id)
-    if user:
-        user.role = user.role.name
-        return user
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
+async def get_user_by_identifier(id: str, db: Session = Depends(database.get_db)):
+    """Get a single users details.
+
+    The OSM ID should be used.
+    If this is not known, the endpoint falls back to searching
+    for the username.
+    """
+    user = None
+    # Search by ID
+    try:
+        osm_id = int(id)
+        user = await user_crud.get_user(db, user_id=osm_id)
+    except ValueError:
+        # Skip if not a valid integer
+        pass
+
+    if not user:
+        # Search by Username
+        user = await user_crud.get_user_by_username(db, username=id)
+
+        # No user found
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+    return user
 
 
 @router.post("/user-role")
 async def create_user_role(
     user_role: user_schemas.UserRoles, db: Session = Depends(database.get_db)
 ):
-    """This api creates a new role for the user.
-    The role can be Admin, Organization Admin, Field Admin, Mapper, Validator or Read Only.
+    """Create a new user role.
 
-    Request Parameters:
+    # FIXME is this endpoint really necessary?
+
+    The role can be:
+        - Admin
+        - Organization Admin
+        - Field Admin
+        - Mapper
+        - Validator
+        - Read Only
+
+    The request param `user_role` is a json of user_id, organization_id,
+    project_id, user_role:
         user_id (required): ID of the user for whom the role is being created
-        organization_id (optional): ID of the organization for which the user is being assigned a role
-        project_id (optional): ID of the project for which the user is being assigned a role
-        role (required): Role being assigned to the user
+        organization_id (optional): ID of the organization for which the
+            user is being assigned a role
+        project_id (optional): ID of the project for which the user is
+            being assigned a role
+        user_role (required): Role being assigned to the user
 
     Response:
         Status Code 200 (OK): If the role is successfully created
         Status Code 400 (Bad Request): If the user is already assigned a role
     """
-    existing_user_role = user_crud.get_user_role_by_user_id(
+    existing_user_role = await user_crud.get_user_role_by_user_id(
         db, user_id=user_role.user_id
     )
     if existing_user_role is not None:
         raise HTTPException(status_code=400, detail="User is already assigned a role")
 
-    user = user_crud.get_user(db, user_id=user_role.user_id)
+    user = await user_crud.get_user(db, user_id=user_role.user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
-    print("Hellooo")
 
     return await user_crud.create_user_roles(user_role, db)
 
 
 @router.get("/user-role-options/")
 async def get_user_roles():
+    """Check for available user role options."""
     user_roles = {}
     for role in UserRoleEnum:
         user_roles[role.name] = role.value

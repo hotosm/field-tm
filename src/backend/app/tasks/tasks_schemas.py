@@ -15,74 +15,121 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Pydantic schemas for FMTM task areas."""
 
 
-import enum
+import base64
 from datetime import datetime
-from typing import List
+from typing import Any, List, Optional
 
 from geojson_pydantic import Feature
-from pydantic import BaseModel
+from loguru import logger as log
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
+from pydantic.functional_validators import field_validator
 
-from ..models.enums import TaskStatus
-
-
-def get_task_status_strings():
-    names = [option.name for option in TaskStatus]
-    options = {names[i]: names[i] for i in range(len(names))}
-    return enum.Enum("TaskStatusOptions", options)
-
-
-# Dynamically creates String Enums for API based on Task Status options
-TaskStatusOption = get_task_status_strings()
+from app.db.postgis_utils import geometry_to_geojson, get_centroid
+from app.models.enums import TaskStatus
 
 
 class TaskHistoryBase(BaseModel):
+    """Task mapping history."""
+
     id: int
     action_text: str
     action_date: datetime
 
 
 class TaskHistoryOut(TaskHistoryBase):
+    """Task mapping history display."""
+
     pass
 
 
-class TaskBasicInfo(BaseModel):
-    id: int
-    project_id: int
-    project_task_index: int
-    task_status: TaskStatus
-    locked_by_uid: int = None
-    locked_by_username: str = None
-    task_history: List[TaskHistoryBase]
-
-
 class TaskBase(BaseModel):
+    """Core fields for a Task."""
+
+    model_config = ConfigDict(
+        use_enum_values=True,
+        validate_default=True,
+    )
+
+    # Excluded
+    lock_holder: Any = Field(exclude=True)
+    outline: Any = Field(exclude=True)
+    qr_code: Any = Field(exclude=True)
+
     id: int
     project_id: int
     project_task_index: int
     project_task_name: str
-    outline_geojson: Feature
-    # outline_centroid: Feature
-    # initial_feature_count: int
+    outline_geojson: Optional[Feature] = None
+    outline_centroid: Optional[Feature] = None
+    initial_feature_count: Optional[int] = None
     task_status: TaskStatus
-    locked_by_uid: int = None
-    locked_by_username: str = None
-    task_history: List[TaskHistoryBase]
+    locked_by_uid: Optional[int] = None
+    locked_by_username: Optional[str] = None
+    task_history: Optional[List[TaskHistoryBase]] = None
+
+    @field_validator("outline_geojson", mode="before")
+    @classmethod
+    def get_geojson_from_outline(cls, v: Any, info: ValidationInfo) -> str:
+        """Get outline_geojson from Shapely geom."""
+        if outline := info.data.get("outline"):
+            properties = {
+                "fid": info.data.get("project_task_index"),
+                "uid": info.data.get("id"),
+                "name": info.data.get("project_task_name"),
+            }
+            log.debug("Converting task outline to geojson")
+            return geometry_to_geojson(outline, properties, info.data.get("id"))
+        return None
+
+    @field_validator("outline_centroid", mode="before")
+    @classmethod
+    def get_centroid_from_outline(cls, v: Any, info: ValidationInfo) -> str:
+        """Get outline_centroid from Shapely geom."""
+        if outline := info.data.get("outline"):
+            properties = {
+                "fid": info.data.get("project_task_index"),
+                "uid": info.data.get("id"),
+                "name": info.data.get("project_task_name"),
+            }
+            log.debug("Converting task outline to geojson")
+            return get_centroid(outline, properties, info.data.get("id"))
+        return None
+
+    @field_validator("locked_by_uid", mode="before")
+    @classmethod
+    def get_lock_uid(cls, v: int, info: ValidationInfo) -> str:
+        """Get lock uid from lock_holder details."""
+        if lock_holder := info.data.get("lock_holder"):
+            return lock_holder.get("id")
+        return None
+
+    @field_validator("locked_by_username", mode="before")
+    @classmethod
+    def get_lock_username(cls, v: str, info: ValidationInfo) -> str:
+        """Get lock username from lock_holder details."""
+        if lock_holder := info.data.get("lock_holder"):
+            return lock_holder.get("username")
+        return None
 
 
 class Task(TaskBase):
-    # geometry_geojson: str
-    qr_code_base64: str
-    task_status_str: TaskStatusOption
-    pass
+    """Task details plus base64 QR codes."""
 
+    qr_code_base64: Optional[str] = None
 
-class TaskOut(TaskBase):
-    qr_code_base64: str
-    task_status_str: TaskStatusOption
-    pass
-
-
-class TaskDetails(TaskBase):
-    pass
+    @field_validator("qr_code_base64", mode="before")
+    @classmethod
+    def get_qrcode_base64(cls, v: Any, info: ValidationInfo) -> str:
+        """Get base64 encoded qrcode."""
+        if qr_code := info.data.get("qr_code"):
+            log.debug(
+                f"QR code found for task ID {info.data.get('id')}. "
+                "Converting to base64"
+            )
+            return base64.b64encode(qr_code.image)
+        else:
+            log.warning(f"No QR code found for task ID {info.data.get('id')}")
+            return ""

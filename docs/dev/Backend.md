@@ -254,9 +254,11 @@ Access the files like a directory under: `/mnt/fmtm/local`.
 
 To mount permanently, add the following to `/etc/fstab`:
 
-`fmtm-local /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
-use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
+`fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
+use_path_request_style,passwd_file=/home/USERNAME/s3-creds/fmtm-local,\
 url=http://s3.fmtm.localhost:7050 0 0`
+
+> Note: you should replace USERNAME with your linux username.
 
 ## Running JOSM in the dev stack
 

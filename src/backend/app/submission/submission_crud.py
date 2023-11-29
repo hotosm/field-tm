@@ -15,7 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-import asyncio
 import concurrent.futures
 import csv
 import io
@@ -23,8 +22,10 @@ import json
 import os
 import threading
 import zipfile
+from asyncio import gather
 from pathlib import Path
 
+from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Response
 from fastapi.responses import FileResponse
 from loguru import logger as log
@@ -33,7 +34,6 @@ from sqlalchemy.orm import Session
 
 from ..central.central_crud import get_odk_form, get_odk_project
 from ..projects import project_crud, project_schemas
-from ..tasks import tasks_crud
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -41,7 +41,8 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
     This function takes project_id and task_id as a parameter.
     If task_id is provided, it returns all the submission made to that particular task, else all the submission made in the projects are returned.
     """
-    project_info = project_crud.get_project(db, project_id)
+    get_project_sync = async_to_sync(project_crud.get_project)
+    project_info = get_project_sync(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -98,8 +99,8 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
         return submission_list
 
 
-def get_forms_of_project(db: Session, project_id: int):
-    project_info = project_crud.get_project_by_id(db, project_id)
+async def get_forms_of_project(db: Session, project_id: int):
+    project_info = await project_crud.get_project_by_id(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -112,8 +113,8 @@ def get_forms_of_project(db: Session, project_id: int):
     return result
 
 
-def list_app_users_or_project(db: Session, project_id: int):
-    project_info = project_crud.get_project_by_id(db, project_id)
+async def list_app_users_or_project(db: Session, project_id: int):
+    project_info = await project_crud.get_project_by_id(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -123,13 +124,6 @@ def list_app_users_or_project(db: Session, project_id: int):
     project = get_odk_project()
     result = project.listAppUsers(odkid)
     return result
-
-
-def create_zip_file(files, output_file_path):
-    with zipfile.ZipFile(output_file_path, mode="w") as zip_file:
-        for file_path in files:
-            zip_file.write(file_path)
-    return output_file_path
 
 
 # async def convert_json_to_osm_xml(file_path):
@@ -205,7 +199,7 @@ async def convert_json_to_osm_xml(file_path):
         return osmoutfile
 
     data_processing_tasks = [process_entry_async(entry) for entry in data]
-    processed_features = await asyncio.gather(*data_processing_tasks)
+    processed_features = await gather(*data_processing_tasks)
     await write_osm_async(processed_features)
 
     return osmoutfile
@@ -267,12 +261,14 @@ async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
     with open(file_path, "wb") as f:
         f.write(file)
 
-    osmoutfile, jsonoutfile = await convert_json_to_osm(file_path)
+    convert_json_to_osm_sync = async_to_sync(convert_json_to_osm)
+    osmoutfile, jsonoutfile = convert_json_to_osm_sync(file_path)
     return osmoutfile, jsonoutfile
 
 
-async def convert_to_osm(db: Session, project_id: int, task_id: int):
-    project_info = project_crud.get_project(db, project_id)
+def convert_to_osm(db: Session, project_id: int, task_id: int):
+    get_project_sync = async_to_sync(project_crud.get_project)
+    project_info = get_project_sync(db, project_id)
 
     # Return exception if project is not found
     if not project_info:
@@ -317,7 +313,8 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
         f.write(json.dumps(submission))
 
     # Convert the submission to osm xml format
-    osmoutfile, jsonoutfile = await convert_json_to_osm(jsoninfile)
+    convert_json_to_osm_sync = async_to_sync(convert_json_to_osm)
+    osmoutfile, jsonoutfile = convert_json_to_osm_sync(jsoninfile)
 
     if osmoutfile and jsonoutfile:
         # FIXME: Need to fix this when generating osm file
@@ -346,9 +343,10 @@ async def convert_to_osm(db: Session, project_id: int, task_id: int):
 
 
 def download_submission_for_project(db, project_id):
-    print("Download submission for a project")
+    log.info(f"Downloading all submissions for a project {project_id}")
 
-    project_info = project_crud.get_project(db, project_id)
+    get_project_sync = async_to_sync(project_crud.get_project)
+    project_info = get_project_sync(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -439,7 +437,8 @@ def download_submission_for_project(db, project_id):
 
 
 def get_all_submissions(db: Session, project_id):
-    project_info = project_crud.get_project(db, project_id)
+    get_project_sync = async_to_sync(project_crud.get_project)
+    project_info = get_project_sync(db, project_id)
 
     # ODK Credentials
     odk_credentials = project_schemas.ODKCentral(
@@ -450,13 +449,15 @@ def get_all_submissions(db: Session, project_id):
 
     project = get_odk_project(odk_credentials)
 
-    task_lists = tasks_crud.get_task_lists(db, project_id)
+    get_task_lists_sync = async_to_sync(get_task_lists)
+    task_lists = get_task_lists_sync(db, project_id)
     submissions = project.getAllSubmissions(project_info.odkid, task_lists)
     return submissions
 
 
 def get_project_submission(db: Session, project_id: int):
-    project_info = project_crud.get_project(db, project_id)
+    get_project_sync = async_to_sync(project_crud.get_project)
+    project_info = get_project_sync(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -494,8 +495,10 @@ def get_project_submission(db: Session, project_id: int):
     return submissions
 
 
-def download_submission(db: Session, project_id: int, task_id: int, export_json: bool):
-    project_info = project_crud.get_project(db, project_id)
+async def download_submission(
+    db: Session, project_id: int, task_id: int, export_json: bool
+):
+    project_info = await project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -600,13 +603,13 @@ def download_submission(db: Session, project_id: int, task_id: int, export_json:
         return Response(content=response_content, headers=headers)
 
 
-def get_submission_points(db: Session, project_id: int, task_id: int = None):
+async def get_submission_points(db: Session, project_id: int, task_id: int = None):
     """Gets the submission points of project.
     This function takes project_id and task_id as a parameter.
     If task_id is provided, it returns all the submission points made to that particular task,
         else all the submission points made in the projects are returned.
     """
-    project_info = project_crud.get_project_by_id(db, project_id)
+    project_info = await project_crud.get_project_by_id(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:
@@ -667,7 +670,7 @@ def get_submission_points(db: Session, project_id: int, task_id: int = None):
 
 
 async def get_submission_count_of_a_project(db: Session, project_id: int):
-    project_info = project_crud.get_project(db, project_id)
+    project_info = await project_crud.get_project(db, project_id)
 
     # Return empty list if project is not found
     if not project_info:

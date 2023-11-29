@@ -39,7 +39,7 @@ const FormSelection: React.FC<any> = ({
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   // //we use use-selector from redux to get all state of projectDetails from createProject slice
 
-  const selectFormWaysList = ['Use Existing Form', 'Upload a Custom Form'];
+  const selectFormWaysList = ['Use Existing Category', 'Upload a Custom Form'];
   const selectFormWays = selectFormWaysList.map((item) => ({ label: item, value: item }));
   const userDetails: any = CoreModules.useAppSelector((state) => state.login.loginToken);
   // //we use use-selector from redux to get all state of loginToken from login slice

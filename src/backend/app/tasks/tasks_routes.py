@@ -38,20 +38,19 @@ router = APIRouter(
 )
 
 
-@router.get("/task-list", response_model=List[tasks_schemas.TaskOut])
+@router.get("/task-list", response_model=List[tasks_schemas.Task])
 async def read_task_list(
     project_id: int,
     limit: int = 1000,
     db: Session = Depends(database.get_db),
 ):
-    tasks = tasks_crud.get_tasks(db, project_id, limit)
-    if tasks:
-        return tasks
-    else:
+    tasks = await tasks_crud.get_tasks(db, project_id, limit)
+    if not tasks:
         raise HTTPException(status_code=404, detail="Tasks not found")
+    return tasks
 
 
-@router.get("/", response_model=List[tasks_schemas.TaskOut])
+@router.get("/", response_model=List[tasks_schemas.Task])
 async def read_tasks(
     project_id: int,
     user_id: int = None,
@@ -65,11 +64,10 @@ async def read_tasks(
             detail="Please provide either user_id OR task_id, not both.",
         )
 
-    tasks = tasks_crud.get_tasks(db, project_id, user_id, skip, limit)
-    if tasks:
-        return tasks
-    else:
+    tasks = await tasks_crud.get_tasks(db, project_id, user_id, skip, limit)
+    if not tasks:
         raise HTTPException(status_code=404, detail="Tasks not found")
+    return tasks
 
 
 @router.get("/point_on_surface")
@@ -95,38 +93,36 @@ async def get_point_on_surface(project_id: int, db: Session = Depends(database.g
     return result_dict_list
 
 
-@router.post("/near_me", response_model=tasks_schemas.TaskOut)
-def get_task(lat: float, long: float, project_id: int = None, user_id: int = None):
+@router.post("/near_me", response_model=tasks_schemas.Task)
+async def get_tasks_near_me(
+    lat: float, long: float, project_id: int = None, user_id: int = None
+):
     """Get tasks near the requesting user."""
     return "Coming..."
 
 
-@router.get("/{task_id}", response_model=tasks_schemas.TaskOut)
+@router.get("/{task_id}", response_model=tasks_schemas.Task)
 async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
-    task = tasks_crud.get_task(db, task_id)
-    if task:
-        return task
-    else:
+    task = await tasks_crud.get_task(db, task_id)
+    if not task:
         raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 
-@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskOut)
+@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.Task)
 async def update_task_status(
     user: user_schemas.User,
     task_id: int,
-    new_status: tasks_schemas.TaskStatusOption,
+    new_status: TaskStatus,
     db: Session = Depends(database.get_db),
 ):
     # TODO verify logged in user
     user_id = user.id
 
-    task = tasks_crud.update_task_status(
-        db, user_id, task_id, TaskStatus[new_status.name]
-    )
-    if task:
-        return task
-    else:
+    task = await tasks_crud.update_task_status(db, user_id, task_id, new_status)
+    if not task:
         raise HTTPException(status_code=404, detail="Task status could not be updated.")
+    return task
 
 
 @router.post("/task-qr-code/{task_id}")
@@ -134,7 +130,7 @@ async def get_qr_code_list(
     task_id: int,
     db: Session = Depends(database.get_db),
 ):
-    return tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
+    return await tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
 
 
 @router.post("/edit-task-boundary")
@@ -158,7 +154,7 @@ async def task_features_count(
     db: Session = Depends(database.get_db),
 ):
     # Get the project object.
-    project = project_crud.get_project(db, project_id)
+    project = await project_crud.get_project(db, project_id)
 
     # ODK Credentials
     odk_credentials = project_schemas.ODKCentral(

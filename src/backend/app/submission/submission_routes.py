@@ -19,6 +19,7 @@ import json
 import os
 
 from fastapi import APIRouter, Depends, Response
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
@@ -68,7 +69,7 @@ async def list_forms(
 
     Returns the list of forms details provided by the central api.
     """
-    return submission_crud.get_forms_of_project(db, project_id)
+    return await submission_crud.get_forms_of_project(db, project_id)
 
 
 @router.get("/list-app-users")
@@ -84,7 +85,7 @@ async def list_app_users(
 
     Returns the list of forms details provided by the central api.
     """
-    return submission_crud.list_app_users_or_project(db, project_id)
+    return await submission_crud.list_app_users_or_project(db, project_id)
 
 
 @router.get("/download")
@@ -106,7 +107,9 @@ async def download_submission(
         file = submission_crud.download_submission_for_project(db, project_id)
         return FileResponse(file)
 
-    return submission_crud.download_submission(db, project_id, task_id, export_json)
+    return await submission_crud.download_submission(
+        db, project_id, task_id, export_json
+    )
 
 
 @router.get("/submission-points")
@@ -121,7 +124,7 @@ async def submission_points(
     project_id: The ID of the project. This endpoint returns the submission points of this project.
     task_id: The task_id of the project. This endpoint returns the submission points of this task.
     """
-    return submission_crud.get_submission_points(db, project_id, task_id)
+    return await submission_crud.get_submission_points(db, project_id, task_id)
 
 
 @router.get("/convert-to-osm")
@@ -138,7 +141,11 @@ async def convert_to_osm(
     If task_id is not provided, this endpoint converts the submission of the whole project.
 
     """
-    return await submission_crud.convert_to_osm(db, project_id, task_id)
+    # NOTE runs in separate thread using run_in_threadpool
+    converted = await run_in_threadpool(
+        lambda: submission_crud.convert_to_osm(db, project_id, task_id)
+    )
+    return converted
 
 
 @router.get("/get-submission-count/{project_id}")
@@ -154,8 +161,11 @@ async def conflate_osm_date(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
-    # Submission JSON
-    submission = submission_crud.get_all_submissions(db, project_id)
+    # All Submissions JSON
+    # NOTE runs in separate thread using run_in_threadpool
+    submission = await run_in_threadpool(
+        lambda: submission_crud.get_all_submissions(db, project_id)
+    )
 
     # Data extracta file
     data_extracts_file = "/tmp/data_extracts_file.geojson"
@@ -216,8 +226,11 @@ async def get_osm_xml(
     if os.path.exists(jsoninfile):
         os.remove(jsoninfile)
 
-    # Submission JSON
-    submission = submission_crud.get_all_submissions(db, project_id)
+    # All Submissions JSON
+    # NOTE runs in separate thread using run_in_threadpool
+    submission = await run_in_threadpool(
+        lambda: submission_crud.get_all_submissions(db, project_id)
+    )
 
     # Write the submission to a file
     with open(jsoninfile, "w") as f:

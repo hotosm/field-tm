@@ -15,31 +15,44 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Pydantic models for Users and Roles."""
 
 from typing import Optional
 
 from pydantic import BaseModel
 
+from app.models.enums import UserRole
+
 
 class UserBase(BaseModel):
+    """Username only."""
+
     username: str
 
 
 class User(UserBase):
+    """User with ID."""
+
     id: int
 
 
 class UserOut(UserBase):
+    """User with ID and role."""
+
     id: int
-    role: str
+    role: UserRole
 
 
 class UserRole(BaseModel):
-    role: str
+    """User role only."""
+
+    role: UserRole
 
 
 class UserRoles(BaseModel):
+    """User details with role, org, and associated project."""
+
     user_id: int
     organization_id: Optional[int] = None
     project_id: Optional[int] = None
-    role: str
+    role: UserRole

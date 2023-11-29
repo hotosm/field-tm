@@ -1,11 +1,30 @@
+# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+"""Tests for project routes."""
+
 import json
 import os
 import uuid
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, wait
 from unittest.mock import Mock, patch
 
 import pytest
-from fastapi import FastAPI
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
 from shapely import Polygon, wkb
@@ -21,21 +40,9 @@ odk_central_url = os.getenv("ODK_CENTRAL_URL")
 odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = os.getenv("ODK_CENTRAL_PASSWD")
 
-app = FastAPI()
 
-
-class MockSession:
-    def add(self, item):
-        pass
-
-    def commit(self):
-        pass
-
-    def refresh(self, item):
-        pass
-
-
-def test_create_project(client, organization, user):
+async def test_create_project(client, organization, user):
+    """Test project creation endpoint."""
     project_data = {
         "author": {"username": user.username, "id": user.id},
         "project_info": {
@@ -61,7 +68,8 @@ def test_create_project(client, organization, user):
     assert "id" in response_data
 
 
-def test_create_odk_project():
+async def test_create_odk_project():
+    """Test creating an odk central project."""
     mock_project = Mock()
     mock_project.createProject.return_value = {"status": "success"}
 
@@ -72,7 +80,8 @@ def test_create_odk_project():
     mock_project.createProject.assert_called_once_with("Test Project")
 
 
-def test_convert_to_app_project():
+async def test_convert_to_app_project():
+    """Test conversion ot app project."""
     polygon = Polygon(
         [
             (85.924707758, 26.727727503),
@@ -91,7 +100,7 @@ def test_convert_to_app_project():
         outline=wkb_outline,
     )
 
-    result = project_crud.convert_to_app_project(mock_db_project)
+    result = await project_crud.convert_to_app_project(mock_db_project)
 
     assert result is not None
     assert isinstance(result, db_models.DbProject)
@@ -102,12 +111,14 @@ def test_convert_to_app_project():
     assert isinstance(result.project_tasks, list)
 
 
-def test_create_project_with_project_info(db, project):
+async def test_create_project_with_project_info(db, project):
+    """Test creating a project with all project info."""
     assert isinstance(project.id, int)
     assert isinstance(project.project_name_prefix, str)
 
 
-def test_generate_appuser_files(db, project):
+async def test_generate_appuser_files(db, project):
+    """Test generate all appuser files (during creation)."""
     odk_credentials = {
         "odk_central_url": odk_central_url,
         "odk_central_user": odk_central_user,
@@ -136,12 +147,12 @@ def test_generate_appuser_files(db, project):
         )
     )
     log.debug(f"Creating project boundary: {boundary_geojson}")
-    boundary_created = project_crud.update_project_boundary(
+    boundary_created = await project_crud.update_project_boundary(
         db, project_id, boundary_geojson, 500
     )
     assert boundary_created is True
     # Check updated locations
-    db_project = project_crud.get_project_by_id(db, project_id)
+    db_project = await project_crud.get_project_by_id(db, project_id)
     # Outline
     project_outline = db_project.outline.data.tobytes()
     file_outline = shape(boundary_geojson)
@@ -160,24 +171,40 @@ def test_generate_appuser_files(db, project):
 
     # Upload data extracts
     log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_uploaded = project_crud.upload_custom_data_extracts(
+    data_extract_uploaded = await project_crud.upload_custom_data_extracts(
         db, project_id, data_extracts
     )
     assert data_extract_uploaded is True
 
     # Get project tasks list
-    task_list = tasks_crud.get_task_lists(db, project_id)
+    task_list = await tasks_crud.get_task_lists(db, project_id)
     assert isinstance(task_list, list)
 
     # Provide custom xlsform file path
     xlsform_file = f"{test_data_path}/buildings.xls"
 
-    # Generate project task files
-    for task in task_list:
-        task_list = project_crud.generate_task_files(
-            db, project_id, task, xlsform_file, "xls", odk_credentials
-        )
-    assert task_list is True
+    # Generate project task files using threadpool
+    with ThreadPoolExecutor() as executor:
+        # Submit tasks to the thread pool
+        futures = [
+            executor.submit(
+                project_crud.generate_task_files,
+                db,
+                project_id,
+                task,
+                xlsform_file,
+                "xls",
+                odk_credentials,
+            )
+            for task in task_list
+        ]
+
+        # Wait for all tasks to complete
+        wait(futures)
+
+        # Check the results, assuming generate_task_files returns a boolean
+        results = [future.result() for future in futures]
+        assert all(results)
 
     # Generate appuser files
     test_data = {
@@ -190,9 +217,14 @@ def test_generate_appuser_files(db, project):
         "form_type": "example_form_type",
         "background_task_id": uuid.uuid4(),
     }
-    result = project_crud.generate_appuser_files(**test_data)
+    # Generate appuser using threadpool
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(project_crud.generate_appuser_files, **test_data)
+        result = future.result()
+
     assert result is None
 
 
 if __name__ == "__main__":
+    """Main func if file invoked directly."""
     pytest.main()
