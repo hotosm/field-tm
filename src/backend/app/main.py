@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
     # Startup events
     log.debug("Starting up FastAPI server.")
     log.debug("Reading XLSForms from DB.")
-    read_xlsforms(next(get_db()), xlsforms_path)
+    await read_xlsforms(next(get_db()), xlsforms_path)
 
     yield
 

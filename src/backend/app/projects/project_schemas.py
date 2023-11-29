@@ -137,10 +137,9 @@ class ProjectBase(BaseModel):
 
 
 class ProjectOut(ProjectBase):
-    project_uuid: uuid.UUID
-    pass
+    project_uuid: uuid.UUID = uuid.uuid4()
 
 
 class BackgroundTaskStatus(BaseModel):
     status: str
-    message: str
+    message: Optional[str] = None

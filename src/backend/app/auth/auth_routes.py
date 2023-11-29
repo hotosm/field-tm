@@ -36,7 +36,7 @@ router = APIRouter(
 
 
 @router.get("/osm_login/")
-def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
+async def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
     """Get Login URL for OSM Oauth Application.
 
     The application must be registered on openstreetmap.org.
@@ -56,7 +56,7 @@ def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
 
 
 @router.get("/callback/")
-def callback(request: Request, osm_auth=Depends(init_osm_auth)):
+async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     """Performs token exchange between OpenStreetMap and Export tool API.
 
     Core will use Oauth secret key from configuration while deserializing token,
@@ -81,7 +81,7 @@ def callback(request: Request, osm_auth=Depends(init_osm_auth)):
 
 
 @router.get("/me/", response_model=AuthUser)
-def my_data(
+async def my_data(
     db: Session = Depends(database.get_db),
     user_data: AuthUser = Depends(login_required),
 ):
@@ -95,9 +95,11 @@ def my_data(
         user_data(dict): The dict of user data.
     """
     # Save user info in User table
-    user = user_crud.get_user_by_id(db, user_data["id"])
+    user = await user_crud.get_user_by_id(db, user_data["id"])
     if not user:
-        user_by_username = user_crud.get_user_by_username(db, user_data["username"])
+        user_by_username = await user_crud.get_user_by_username(
+            db, user_data["username"]
+        )
         if user_by_username:
             raise HTTPException(
                 status_code=400,
@@ -107,6 +109,7 @@ def my_data(
                 ),
             )
 
+        # Add user to database
         db_user = DbUser(id=user_data["id"], username=user_data["username"])
         db.add(db_user)
         db.commit()

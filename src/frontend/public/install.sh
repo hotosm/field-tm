@@ -115,10 +115,6 @@ check_user_not_root() {
         fi
 
         echo
-        yellow_echo "Enable login linger for user svcfmtm (docker if logged out)."
-        loginctl enable-linger svcfmtm
-
-        echo
         yellow_echo "Temporarily adding to sudoers list."
         echo "svcfmtm ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/fmtm-sudoers >/dev/null
 
@@ -394,6 +390,10 @@ install_docker() {
         restart_docker_rootless
         update_docker_ps_format
         add_vars_to_bashrc
+        # Enable docker daemon to remain after ssh disconnect
+        echo
+        yellow_echo "Enable login linger for user $(whoami) (docker daemon on ssh disconnect)."
+        loginctl enable-linger "$(whoami)"
     else
         heading_echo "Docker is Required. Aborting." "red"
         exit 1
