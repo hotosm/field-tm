@@ -49,9 +49,9 @@ const VectorLayer = ({
   onDraw,
   getTaskStatusStyle,
   layerProperties,
+  rotation,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
-
   useEffect(() => () => map && vectorLayer && map.removeLayer(vectorLayer), [map, vectorLayer]);
 
   // Modify Feature
@@ -282,6 +282,23 @@ const VectorLayer = ({
       map.un('pointermove', pointerMovefn);
     };
   }, [vectorLayer]);
+
+  // ROTATE ICON IMAGE ACCORDING TO ORIENTATION
+  useEffect(() => {
+    if (!map) return;
+    if (typeof rotation === 'number') {
+      const mapRotation = map.getView().getRotation();
+      setStyle?.getImage().setRotation(rotation);
+    }
+  }, [rotation, map, geojson]);
+
+  // ROTATE MAP ACCORDING TO ORIENTATION
+  // useEffect(() => {
+  //   if (!map) return;
+  //   if (rotation) {
+  //     map.getView().setRotation(rotation);
+  //   }
+  // }, [rotation, map]);
   return null;
 };
 

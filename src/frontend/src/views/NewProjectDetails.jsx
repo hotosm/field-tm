@@ -34,6 +34,11 @@ import getTaskStatusStyle from '../utilfunctions/getTaskStatusStyle';
 import { defaultStyles } from '../components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MapLegends from '../components/MapLegends';
 import Accordion from '../components/common/Accordion';
+import { Geolocation } from '@capacitor/geolocation';
+import { Icon, Style } from 'ol/style';
+import { Motion } from '@capacitor/motion';
+import locationArc from '../assets/images/locationArc.png';
+import { CommonActions } from '../store/slices/CommonSlice';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -47,6 +52,9 @@ const Home = () => {
   const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
   const [taskBuildingGeojson, setTaskBuildingGeojson] = useState(null);
   const [initialFeaturesLayer, setInitialFeaturesLayer] = useState(null);
+  const [currentCoordinate, setCurrentCoordinate] = useState({ latitude: null, longitude: null });
+  const [positionGeojson, setPositionGeojson] = useState(null);
+  const [deviceRotation, setDeviceRotation] = useState(0);
 
   const encodedId = params.id;
   const decodedId = environment.decode(encodedId);
@@ -57,6 +65,7 @@ const Home = () => {
   const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -176,6 +185,83 @@ const Home = () => {
       setToggleGenerateModal(false);
     }
   }, [mobileFooterSelection]);
+
+  const handlePositionChange = (position) => {
+    setCurrentCoordinate({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    });
+
+    const geojson = {
+      type: 'Point',
+      coordinates: [position.coords.longitude, position.coords.latitude],
+    };
+    setPositionGeojson(geojson);
+  };
+
+  useEffect(async () => {
+    if (geolocationStatus) {
+      const checkPermission = await Geolocation.checkPermissions();
+      if (checkPermission.location === 'denied') {
+        await Geolocation.requestPermissions(['location']);
+      }
+    }
+  }, [geolocationStatus]);
+
+  useEffect(() => {
+    if (geolocationStatus) {
+      const getCurrentPosition = async () => {
+        try {
+          const position = await Geolocation.getCurrentPosition();
+          handlePositionChange(position);
+          // Watch for position changes
+          const watchId = Geolocation.watchPosition({ enableHighAccuracy: true }, handlePositionChange);
+          // Clean up the watchPosition when the component unmounts
+          return () => {
+            Geolocation.clearWatch({ id: watchId });
+          };
+        } catch (error) {
+          dispatch(
+            CommonActions.SetSnackBar({
+              open: true,
+              message: `Error getting current position. Please ensure location permissions has been granted.`,
+              variant: 'error',
+              duration: 2000,
+            }),
+          );
+          dispatch(ProjectActions.ToggleGeolocationStatus(false));
+
+          console.error('Error getting current position:', error);
+        }
+      };
+
+      getCurrentPosition();
+    }
+  }, [geolocationStatus]);
+
+  const locationArcStyle = new Style({
+    image: new Icon({
+      src: locationArc,
+    }),
+  });
+
+  const startOrientation = async () => {
+    const handler = await Motion.addListener('orientation', (event) => {
+      var alphaRad = event?.alpha * (Math.PI / 180);
+      var betaRad = event?.beta * (Math.PI / 180);
+      var gammaRad = event?.gamma * (Math.PI / 180);
+
+      setDeviceRotation(alphaRad + betaRad + gammaRad);
+    });
+  };
+
+  useEffect(() => {
+    // Cleanup when the component unmounts
+    if (geolocationStatus) {
+      startOrientation();
+    }
+    return () => {};
+  }, [geolocationStatus]);
 
   return (
     <div>
@@ -320,6 +406,22 @@ const Home = () => {
                   zIndex={5}
                 />
               )}
+              {geolocationStatus && currentCoordinate?.latitude && currentCoordinate?.longitude && (
+                <VectorLayer
+                  map={map}
+                  geojson={positionGeojson}
+                  setStyle={locationArcStyle}
+                  viewProperties={{
+                    size: map?.getSize(),
+                    padding: [50, 50, 50, 50],
+                    constrainResolution: true,
+                    duration: 2000,
+                  }}
+                  zIndex={5}
+                  rotation={deviceRotation}
+                />
+              )}
+              <div className="fmtm-top-28 fmtm-left-5">{window.DeviceMotionEvent}</div>
               <div className="fmtm-hidden sm:fmtm-block fmtm-absolute fmtm-bottom-5 fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
                   body={<MapLegends defaultTheme={defaultTheme} />}
