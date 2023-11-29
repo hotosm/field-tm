@@ -26,22 +26,23 @@ import sentry_sdk
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 
-from .__version__ import __version__
-from .auth import auth_routes
-from .central import central_routes
-from .config import settings
-from .db.database import get_db
-from .organization import organization_routes
-from .projects import project_routes
-from .projects.project_crud import read_xlsforms
-from .submission import submission_routes
-from .tasks import tasks_routes
-from .users import user_routes
+from app.__version__ import __version__
+from app.auth import auth_routes
+from app.central import central_routes
+from app.config import settings
+from app.db.database import get_db
+from app.organization import organization_routes
+from app.projects import project_routes
+from app.projects.project_crud import read_xlsforms
+from app.submission import submission_routes
+from app.tasks import tasks_routes
+from app.users import user_routes
 
+# Add sentry tracing only in prod
 if not settings.DEBUG:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
@@ -51,7 +52,7 @@ if not settings.DEBUG:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup events
+    """Startup events."""
     log.debug("Starting up FastAPI server.")
     log.debug("Reading XLSForms from DB.")
     await read_xlsforms(next(get_db()), xlsforms_path)
@@ -163,6 +164,24 @@ def get_logger():
 
 
 api = get_application()
+
+
+# Add endpoint profiler to check for bottlenecks
+if settings.DEBUG:
+    from pyinstrument import Profiler
+
+    @api.middleware("http")
+    async def profile_request(request: Request, call_next):
+        """Calculate the execution time for routes."""
+        profiling = request.query_params.get("profile", False)
+        if profiling:
+            profiler = Profiler(interval=0.001, async_mode="enabled")
+            profiler.start()
+            await call_next(request)
+            profiler.stop()
+            return HTMLResponse(profiler.output_html())
+        else:
+            return await call_next(request)
 
 
 @api.exception_handler(RequestValidationError)

@@ -75,6 +75,7 @@ test = [
 debug = [
     "ipdb>=0.13.13",
     "debugpy>=1.6.7.post1",
+    "pyinstrument>=4.6.1",
 ]
 docs = [
     "mkdocs>=1.5.2",
