@@ -124,7 +124,6 @@ RUN useradd -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuse
 # Add volumes for persistence
 VOLUME /opt/logs
 VOLUME /opt/tiles
-VOLUME /opt/app/images
 # Change to non-root user
 USER appuser
 # Add Healthcheck

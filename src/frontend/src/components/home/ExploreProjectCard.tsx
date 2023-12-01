@@ -73,11 +73,7 @@ export default function ExploreProjectCard({ data }) {
           <div>
             <div className="fmtm-flex fmtm-justify-between">
               {data.organisation_logo ? (
-                <CoreModules.CardMedia
-                  component="img"
-                  src={`${import.meta.env.VITE_API_URL}/images/${data.organisation_logo}`}
-                  sx={{ width: 50, height: 50 }}
-                />
+                <CoreModules.CardMedia component="img" src={data.organisation_logo} sx={{ width: 50, height: 50 }} />
               ) : (
                 <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
               )}

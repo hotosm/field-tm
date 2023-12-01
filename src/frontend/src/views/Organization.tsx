@@ -114,11 +114,7 @@ const Organization = () => {
           <CoreModules.Card key={index} sx={cardStyle}>
             <CoreModules.CardMedia
               component="img"
-              src={
-                data.logo
-                  ? `${import.meta.env.VITE_API_URL}/images/${data.logo}`
-                  : 'http://localhost:7051/d907cf67fe587072a592.png'
-              }
+              src={data.logo ? data.logo : 'http://localhost:7051/d907cf67fe587072a592.png'}
               sx={{ width: '150px' }}
             />
             <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""PostGIS and geometry handling helper funcs."""
 
 import datetime
 
@@ -25,11 +26,15 @@ from shapely.geometry import mapping
 
 
 def timestamp():
-    """Used in SQL Alchemy models to ensure we refresh timestamp when new models initialised."""
+    """Get the current time.
+
+    Used to insert a current timestamp into Pydantic models.
+    """
     return datetime.datetime.utcnow()
 
 
 def geometry_to_geojson(geometry: Geometry, properties: str = {}, id: int = None):
+    """Convert SQLAlchemy geometry to GeoJSON."""
     if geometry:
         shape = to_shape(geometry)
         geojson = {
@@ -40,9 +45,11 @@ def geometry_to_geojson(geometry: Geometry, properties: str = {}, id: int = None
             # "bbox": shape.bounds,
         }
         return Feature(**geojson)
+    return {}
 
 
-def get_centroid(geometry: Geometry, properties: str = {}):
+def get_centroid(geometry: Geometry, properties: str = {}, id: int = None):
+    """Convert SQLAlchemy geometry to Centroid GeoJSON."""
     if geometry:
         shape = to_shape(geometry)
         point = shape.centroid
@@ -50,5 +57,7 @@ def get_centroid(geometry: Geometry, properties: str = {}):
             "type": "Feature",
             "geometry": mapping(point),
             "properties": properties,
+            "id": id,
         }
         return Feature(**geojson)
+    return {}

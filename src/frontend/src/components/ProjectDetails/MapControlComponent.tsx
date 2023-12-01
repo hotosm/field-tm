@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AssetModules from '../../shared/AssetModules';
-import { transform } from 'ol/proj';
-import * as ol from 'ol';
-import { Point } from 'ol/geom';
-import Vector from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import { Style } from 'ol/style';
-import { Icon } from 'ol/style';
-import LocationImage from '../../assets/images/location.png';
 import VectorLayer from 'ol/layer/Vector';
+import CoreModules from '../../shared/CoreModules.js';
+import { ProjectActions } from '../../store/slices/ProjectSlice';
 
 const MapControlComponent = ({ map }) => {
   const btnList = [
@@ -29,20 +23,9 @@ const MapControlComponent = ({ map }) => {
       icon: <AssetModules.CropFreeIcon />,
     },
   ];
+  const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
-  const [currentLocLayer, setCurrentLocLayer] = useState(null);
-  useEffect(() => {
-    if (!map) return;
-    if (!currentLocLayer) return;
-    map.addLayer(currentLocLayer);
-    map.getView().fit(currentLocLayer.getSource().getExtent(), {
-      maxZoom: 18,
-      duration: 500,
-    });
-    return () => {
-      map.removeLayer(currentLocLayer);
-    };
-  }, [map, currentLocLayer]);
+  const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
   const handleOnClick = (btnId) => {
     if (btnId === 'add') {
       const actualZoom = map.getView().getZoom();
@@ -52,34 +35,7 @@ const MapControlComponent = ({ map }) => {
       map.getView().setZoom(actualZoom - 1);
     } else if (btnId === 'currentLocation') {
       setToggleCurrentLoc(!toggleCurrentLoc);
-      const sourceProjection = 'EPSG:4326'; // The current projection of the coordinates
-      const targetProjection = 'EPSG:3857'; // The desired projection
-      var markerStyle = new Style({
-        image: new Icon({
-          src: LocationImage, // Path to your marker icon image
-          anchor: [0.5, 1], // Anchor point of the marker icon (center bottom)
-          scale: 2, // Scale factor for the marker icon
-        }),
-      });
-      if ('geolocation' in navigator) {
-        if (!toggleCurrentLoc) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const convertedCoordinates = transform([lng, lat], sourceProjection, targetProjection);
-            const positionFeature = new ol.Feature(new Point(convertedCoordinates));
-            const positionLayer = new Vector({
-              source: new VectorSource({
-                features: [positionFeature],
-              }),
-            });
-            positionFeature.setStyle(markerStyle);
-            setCurrentLocLayer(positionLayer);
-          });
-        } else {
-          setCurrentLocLayer(null);
-        }
-      }
+      dispatch(ProjectActions.ToggleGeolocationStatus(!geolocationStatus));
     } else if (btnId === 'taskBoundries') {
       const layers = map.getAllLayers();
       let extent;

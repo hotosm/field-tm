@@ -32,7 +32,7 @@ export default function Dialog({ taskId, feature, map, view }) {
         })[0],
       };
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
-        (data) => data.label == currentStatus.task_status_str,
+        (data) => data.label == currentStatus.task_status,
       );
       const tasksStatus =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';

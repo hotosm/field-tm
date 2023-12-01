@@ -16,7 +16,6 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 import base64
-from typing import List
 
 from fastapi import HTTPException
 from geoalchemy2.shape import from_shape
@@ -24,20 +23,17 @@ from geojson import dump
 from loguru import logger as log
 from osm_rawdata.postgres import PostgresClient
 from shapely.geometry import shape
-from sqlalchemy import column, select, table
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from ..central import central_crud
 from ..db import db_models
-from ..db.postgis_utils import geometry_to_geojson
 from ..models.enums import (
     TaskStatus,
     get_action_for_status_change,
     verify_valid_status_update,
 )
 from ..projects import project_crud
-from ..tasks import tasks_schemas
 from ..users import user_crud
 
 
@@ -47,7 +43,7 @@ async def get_task_count_in_project(db: Session, project_id: int):
     return result.fetchone()[0]
 
 
-def get_task_lists(db: Session, project_id: int):
+async def get_task_lists(db: Session, project_id: int):
     """Get a list of tasks for a project."""
     query = text(
         """
@@ -65,7 +61,7 @@ def get_task_lists(db: Session, project_id: int):
     return task_ids
 
 
-def get_tasks(
+async def get_tasks(
     db: Session, project_id: int, user_id: int, skip: int = 0, limit: int = 1000
 ):
     if project_id:
@@ -86,67 +82,81 @@ def get_tasks(
         )
     else:
         db_tasks = db.query(db_models.DbTask).offset(skip).limit(limit).all()
-    return convert_to_app_tasks(db_tasks)
+    return db_tasks
 
 
-def get_task(db: Session, task_id: int, db_obj: bool = False):
-    db_task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
-    if db_obj:
-        return db_task
-    return convert_to_app_task(db_task)
+async def get_task(db: Session, task_id: int):
+    return db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
 
 
-def update_task_status(db: Session, user_id: int, task_id: int, new_status: TaskStatus):
+async def update_task_status(
+    db: Session, user_id: int, task_id: int, new_status: TaskStatus
+):
+    log.debug(f"Updating task ID {task_id} to status {new_status}")
     if not user_id:
+        log.error(f"User id is not present: {user_id}")
         raise HTTPException(status_code=400, detail="User id required.")
 
-    db_user = user_crud.get_user(db, user_id, db_obj=True)
+    db_user = await user_crud.get_user(db, user_id)
     if not db_user:
-        raise HTTPException(
-            status_code=400, detail=f"User with id {user_id} does not exist."
-        )
+        msg = f"User with id {user_id} does not exist."
+        log.error(msg)
+        raise HTTPException(status_code=400, detail=msg)
 
-    db_task = get_task(db, task_id, db_obj=True)
+    db_task = await get_task(db, task_id)
+    log.debug(f"Returned task from db: {db_task}")
 
     if db_task:
         if db_task.task_status in [
             TaskStatus.LOCKED_FOR_MAPPING,
             TaskStatus.LOCKED_FOR_VALIDATION,
         ]:
+            log.debug(f"Task {task_id} currently locked")
             if not (user_id is not db_task.locked_by):
+                msg = (
+                    f"User {user_id} with username {db_user.username} "
+                    "has not locked this task."
+                )
+                log.error(msg)
                 raise HTTPException(
                     status_code=401,
-                    detail=f"User {user_id} with username {db_user.username} has not locked this task.",
+                    detail=msg,
                 )
 
-        if verify_valid_status_update(db_task.task_status, new_status):
-            # update history prior to updating task
-            update_history = create_task_history_for_status_change(
-                db_task, new_status, db_user
+        if not verify_valid_status_update(db_task.task_status, new_status):
+            msg = f"{new_status} is not a valid task status"
+            log.error(msg)
+            raise HTTPException(
+                status_code=422,
+                detail=msg,
             )
-            db.add(update_history)
 
-            db_task.task_status = new_status
+        # update history prior to updating task
+        update_history = await create_task_history_for_status_change(
+            db_task, new_status, db_user
+        )
+        db.add(update_history)
 
-            if new_status in [
-                TaskStatus.LOCKED_FOR_MAPPING,
-                TaskStatus.LOCKED_FOR_VALIDATION,
-            ]:
-                db_task.locked_by = db_user.id
-            else:
-                db_task.locked_by = None
+        db_task.task_status = new_status
 
-            if new_status == TaskStatus.MAPPED:
-                db_task.mapped_by = db_user.id
-            if new_status == TaskStatus.VALIDATED:
-                db_task.validated_by = db_user.id
-            if new_status == TaskStatus.INVALIDATED:
-                db_task.mapped_by = None
+        if new_status in [
+            TaskStatus.LOCKED_FOR_MAPPING,
+            TaskStatus.LOCKED_FOR_VALIDATION,
+        ]:
+            db_task.locked_by = db_user.id
+        else:
+            db_task.locked_by = None
 
-            db.commit()
-            db.refresh(db_task)
+        if new_status == TaskStatus.MAPPED:
+            db_task.mapped_by = db_user.id
+        if new_status == TaskStatus.VALIDATED:
+            db_task.validated_by = db_user.id
+        if new_status == TaskStatus.INVALIDATED:
+            db_task.mapped_by = None
 
-            return convert_to_app_task(db_task)
+        db.commit()
+        db.refresh(db_task)
+        return db_task
 
     else:
         raise HTTPException(
@@ -160,38 +170,17 @@ def update_task_status(db: Session, user_id: int, task_id: int, new_status: Task
 # ---------------------------
 
 
-def update_qrcode(
-    db: Session,
-    task_id: int,
-    qr_id: int,
-    project_id: int,
-):
-    task = table("tasks", column("qr_code_id"), column("id"))
-    where = f"task.c.id={task_id}"
-    value = {"qr_code_id": qr_id}
-    sql = select(
-        geoalchemy2.functions.update(task.c.qr_code_id)
-        .where(text(where))
-        .values(text(value))
-    )
-    log.info(str(sql))
-    result = db.execute(sql)
-    # There should only be one match
-    if result.rowcount != 1:
-        log.warning(str(sql))
-        return False
-
-    log.info("/tasks/update_qr is partially implemented!")
-
-
-def create_task_history_for_status_change(
+async def create_task_history_for_status_change(
     db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser
 ):
+    msg = f"Status changed from {db_task.task_status.name} to {new_status.name} by: {db_user.username}"
+    log.info(msg)
+
     new_task_history = db_models.DbTaskHistory(
         project_id=db_task.project_id,
         task_id=db_task.id,
         action=get_action_for_status_change(new_status),
-        action_text=f"Status changed from {db_task.task_status.name} to {new_status.name} by: {db_user.username}",
+        action_text=msg,
         actioned_by=db_user,
         user_id=db_user.id,
     )
@@ -216,88 +205,11 @@ def create_task_history_for_status_change(
 # TODO: write tests for these
 
 
-def convert_to_app_history(db_histories: List[db_models.DbTaskHistory]):
-    if db_histories:
-        log.debug("Converting DB Histories to App Histories")
-        app_histories: List[tasks_schemas.TaskHistoryBase] = []
-        for db_history in db_histories:
-            log.debug(
-                f"History ID: {db_history.id} | " "Converting DB History to App History"
-            )
-            app_history = db_history
-            app_history.obj = db_history.action_text
-            app_histories.append(app_history)
-        return app_histories
-    return []
-
-
-def convert_to_app_task(db_task: db_models.DbTask):
-    if db_task:
-        log.debug("")
-        log.debug(
-            f"Project ID {db_task.project_id} | Task ID "
-            f"{db_task.id} | Converting DB Task to App Task"
-        )
-
-        app_task: tasks_schemas.Task = db_task
-        app_task.task_status_str = tasks_schemas.TaskStatusOption[
-            app_task.task_status.name
-        ]
-
-        if db_task.outline:
-            properties = {
-                "fid": db_task.project_task_index,
-                "uid": db_task.id,
-                "name": db_task.project_task_name,
-            }
-            log.debug("Converting task outline to geojson")
-            app_task.outline_geojson = geometry_to_geojson(
-                db_task.outline, properties, db_task.id
-            )
-            # app_task.outline_centroid = get_centroid(db_task.outline)
-
-        if db_task.lock_holder:
-            app_task.locked_by_uid = db_task.lock_holder.id
-            app_task.locked_by_username = db_task.lock_holder.username
-            log.debug("Task currently locked by user " f"{app_task.locked_by_username}")
-
-        if db_task.qr_code:
-            log.debug(f"QR code found for task ID {db_task.id}. Converting to base64")
-            app_task.qr_code_base64 = base64.b64encode(db_task.qr_code.image)
-        else:
-            log.warning(f"No QR code found for task ID {db_task.id}")
-            app_task.qr_code_base64 = ""
-
-        if db_task.task_history:
-            app_task.task_history = convert_to_app_history(db_task.task_history)
-
-        return app_task
-    else:
-        return None
-
-
-def convert_to_app_tasks(db_tasks: List[db_models.DbTask]):
-    num_tasks = len(db_tasks)
-    log.debug(f"Number of tasks in project: {num_tasks}")
-
-    if db_tasks and num_tasks > 0:
-        log.debug("Converting DB Tasks to App Tasks")
-        app_tasks = []
-        for task in db_tasks:
-            if task:
-                app_tasks.append(convert_to_app_task(task))
-        app_tasks_without_nones = [i for i in app_tasks if i is not None]
-        return app_tasks_without_nones
-    else:
-        log.debug("No tasks found, skipping DB -> App conversion")
-        return []
-
-
-def get_qr_codes_for_task(
+async def get_qr_codes_for_task(
     db: Session,
     task_id: int,
 ):
-    task = get_task(db=db, task_id=task_id)
+    task = await get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
             log.debug(f"QR code found for task ID {task.id}. Converting to base64")
@@ -382,9 +294,8 @@ async def update_task_files(
 
 
 async def edit_task_boundary(db: Session, task_id: int, boundary: str):
-    geometry = boundary["features"][0]["geometry"]
-
     """Update the boundary polyon on the database."""
+    geometry = boundary["features"][0]["geometry"]
     outline = shape(geometry)
 
     task = await get_task_by_id(db, task_id)
@@ -396,7 +307,7 @@ async def edit_task_boundary(db: Session, task_id: int, boundary: str):
 
     # Get category, project_name
     project_id = task.project_id
-    project = project_crud.get_project(db, project_id)
+    project = await project_crud.get_project(db, project_id)
     category = project.xform_title
     project_name = project.project_name_prefix
     odk_id = project.odkid

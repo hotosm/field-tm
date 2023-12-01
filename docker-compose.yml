@@ -74,7 +74,6 @@ services:
     # tty: true
     volumes:
       - fmtm_logs:/opt/logs
-      - fmtm_images:/opt/app/images
       - fmtm_tiles:/opt/tiles
       - ./src/backend/pyproject.toml:/opt/pyproject.toml
       - ./src/backend/app:/opt/app

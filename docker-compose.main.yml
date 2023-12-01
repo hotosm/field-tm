@@ -68,7 +68,6 @@ services:
     container_name: fmtm-api-main
     volumes:
       - fmtm_logs:/opt/logs
-      - fmtm_images:/opt/app/images
       - fmtm_tiles:/opt/tiles
     depends_on:
       fmtm-db:

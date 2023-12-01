@@ -18,6 +18,7 @@
 import json
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from loguru import logger as log
 from sqlalchemy import (
@@ -44,7 +45,8 @@ router = APIRouter(
 async def list_projects():
     """List projects in Central."""
     # TODO update for option to pass credentials by user
-    projects = central_crud.list_odk_projects()
+    # NOTE runs in separate thread using run_in_threadpool
+    projects = await run_in_threadpool(lambda: central_crud.list_odk_projects())
     if projects is None:
         return {"message": "No projects found"}
     return JSONResponse(content={"projects": projects})
@@ -58,8 +60,7 @@ async def create_appuser(
 ):
     """Create an appuser in Central."""
     appuser = central_crud.create_appuser(project_id, name=name)
-    # tasks = tasks_crud.update_qrcode(db, task_id, qrcode['id'])
-    return project_crud.create_qrcode(db, project_id, appuser.get("token"), name)
+    return await project_crud.create_qrcode(db, project_id, appuser.get("token"), name)
 
 
 # @router.get("/list_submissions")
@@ -86,7 +87,8 @@ async def get_form_lists(
     Returns:
     A list of dictionary containing the id and title of each XForm record retrieved from the database.
     """
-    forms = central_crud.get_form_list(db, skip, limit)
+    # NOTE runs in separate thread using run_in_threadpool
+    forms = await run_in_threadpool(lambda: central_crud.get_form_list(db, skip, limit))
     return forms
 
 
@@ -116,6 +118,8 @@ async def download_submissions(
     xforms = central_crud.list_odk_xforms(first.odkid)
     submissions = list()
     for xform in xforms:
+        # FIXME this should be optimised via async or threadpool
+        # FIXME very expensive opteration to run blocking in parallel
         data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
         # An empty submissions only has the CSV headers
         # headers = data[0]

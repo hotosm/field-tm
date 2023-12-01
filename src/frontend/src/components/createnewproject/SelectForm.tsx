@@ -14,7 +14,7 @@ import { FormCategoryService, ValidateCustomForm } from '../../api/CreateProject
 import NewDefineAreaMap from '../../views/NewDefineAreaMap';
 
 const osmFeatureTypeOptions = [
-  { name: 'form_ways', value: 'existing_form', label: 'Use Existing Form' },
+  { name: 'form_ways', value: 'existing_form', label: 'Use Existing Category' },
   { name: 'form_ways', value: 'custom_form', label: 'Upload a Custom Form' },
 ];
 // @ts-ignore
@@ -74,8 +74,15 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
         <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Select Form</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>You may choose to either use the default XLS form defined in FMTM or upload a custom XLS form.</span>
-          <span>You may learn more about XLSforms here.</span>{' '}
+          <span>You may choose an existing category or upload a custom XLS form.</span>
+          <span>
+            {' '}
+            You may learn more about XLSforms{' '}
+            <a href="https://hotosm.github.io/osm-fieldwork/about/xlsforms/" target="_">
+              here
+            </a>
+            .
+          </span>{' '}
         </p>
       </div>
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
@@ -98,7 +105,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 />
               </div>
               <RadioButton
-                topic="You may choose to use Existing form or upload your own xlsx form"
+                topic="You may choose to use existing category or upload your own xlsx form"
                 options={osmFeatureTypeOptions}
                 direction="column"
                 value={formValues.formWays}
