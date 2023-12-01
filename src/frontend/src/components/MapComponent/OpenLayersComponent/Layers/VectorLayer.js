@@ -190,7 +190,7 @@ const VectorLayer = ({
   }, [map, vectorLayer, getTaskStatusStyle]);
 
   useEffect(() => {
-    if (!vectorLayer || !style.visibleOnMap) return;
+    if (!vectorLayer || !style.visibleOnMap || setStyle) return;
     vectorLayer.setStyle((feature, resolution) => [
       new Style({
         image: new CircleStyle({
@@ -207,7 +207,7 @@ const VectorLayer = ({
       }),
       getStyles({ style, feature, resolution }),
     ]);
-  }, [vectorLayer, style]);
+  }, [vectorLayer, style, setStyle]);
 
   useEffect(() => {
     if (!vectorLayer) return;
