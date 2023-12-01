@@ -34,6 +34,7 @@ export type CreateProjectStateTypes = {
   createProjectValidations: {};
   isUnsavedChanges: boolean;
   canSwitchCreateProjectSteps: boolean;
+  isTasksGenerated: {};
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
