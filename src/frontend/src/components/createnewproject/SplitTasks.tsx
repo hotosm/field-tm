@@ -39,6 +39,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   const navigate = useNavigate();
 
   const [toggleStatus, setToggleStatus] = useState(false);
+  const [taskGenerationStatus, setTaskGenerationStatus] = useState(false);
 
   const divRef = useRef(null);
   const splitTasksSelection = CoreModules.useAppSelector((state) => state.createproject.splitTasksSelection);
@@ -60,11 +61,29 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   const taskSplittingGeojsonLoading = CoreModules.useAppSelector(
     (state) => state.createproject.taskSplittingGeojsonLoading,
   );
+  const isTasksGenerated = CoreModules.useAppSelector((state) => state.createproject.isTasksGenerated);
 
   const toggleStep = (step, url) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
+
+  const checkTasksGeneration = () => {
+    if (!isTasksGenerated.divide_on_square && splitTasksSelection === task_split_type['divide_on_square']) {
+      setTaskGenerationStatus(false);
+    } else if (
+      !isTasksGenerated.task_splitting_algorithm &&
+      splitTasksSelection === task_split_type['task_splitting_algorithm']
+    ) {
+      setTaskGenerationStatus(false);
+    } else {
+      setTaskGenerationStatus(true);
+    }
+  };
+
+  useEffect(() => {
+    checkTasksGeneration();
+  }, [splitTasksSelection, isTasksGenerated]);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
@@ -300,6 +319,12 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                     onChangeData={(value) => {
                       handleCustomChange('task_split_type', parseInt(value));
                       dispatch(CreateProjectActions.SetSplitTasksSelection(parseInt(value)));
+                      if (task_split_type['choose_area_as_task'] === parseInt(value)) {
+                        dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: false }));
+                        dispatch(
+                          CreateProjectActions.SetIsTasksGenerated({ key: 'task_splitting_algorithm', value: false }),
+                        );
+                      }
                     }}
                     errorMsg={errors.task_split_type}
                   />
@@ -382,6 +407,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                     btnType="primary"
                     type="submit"
                     className="fmtm-font-bold"
+                    disabled={taskGenerationStatus ? false : true}
                   />
                 </div>
               </div>

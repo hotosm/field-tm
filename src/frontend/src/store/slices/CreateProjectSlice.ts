@@ -48,6 +48,7 @@ export const initialState: CreateProjectStateTypes = {
   createProjectValidations: {},
   isUnsavedChanges: false,
   canSwitchCreateProjectSteps: false,
+  isTasksGenerated: { divide_on_square: false, task_splitting_algorithm: false },
 };
 
 const CreateProject = createSlice({
@@ -212,6 +213,12 @@ const CreateProject = createSlice({
     },
     SetCanSwitchCreateProjectSteps(state, action) {
       state.canSwitchCreateProjectSteps = action.payload;
+    },
+    SetIsTasksGenerated(state, action) {
+      state.isTasksGenerated = {
+        ...state.isTasksGenerated,
+        [action.payload.key]: action.payload.value,
+      };
     },
   },
 });
