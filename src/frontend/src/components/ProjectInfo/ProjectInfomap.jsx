@@ -13,6 +13,8 @@ import environment from '../../environment';
 import { getStyles } from '../MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { ProjectActions } from '../../store/slices/ProjectSlice';
 import { basicGeojsonTemplate } from '../../utilities/mapUtils';
+import ProjectInfoMapLegend from './ProjectInfoMapLegend';
+import Accordion from '../common/Accordion';
 
 export const defaultStyles = {
   lineColor: '#000000',
@@ -68,7 +70,6 @@ const colorCodes = {
 function colorRange(data, noOfRange) {
   if (data?.length === 0) return [];
   const actualCodes = [{ min: 0, max: 0, color: '#605f5e' }];
-  console.log(data, 'data');
   const maxVal = Math.max(...data?.map((d) => d.count));
   const maxValue = maxVal <= noOfRange ? 10 : maxVal;
   // const minValue = Math.min(...data?.map((d) => d.count)) 0;
@@ -114,6 +115,7 @@ const ProjectInfomap = () => {
 
   const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const selectedTask = CoreModules.useAppSelector((state) => state.task.selectedTask);
+  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
@@ -272,6 +274,19 @@ const ProjectInfomap = () => {
             zIndex={5}
           />
         )}
+        <div className="fmtm-absolute fmtm-bottom-2 fmtm-left-2 sm:fmtm-bottom-5 sm:fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
+          <Accordion
+            body={<ProjectInfoMapLegend defaultTheme={defaultTheme} />}
+            header={
+              <p className="fmtm-text-lg fmtm-font-normal fmtm-my-auto fmtm-mb-[0.35rem] fmtm-ml-2">
+                No. of Submissions
+              </p>
+            }
+            onToggle={() => {}}
+            className="fmtm-py-0 !fmtm-pb-0 fmtm-rounded-lg hover:fmtm-bg-gray-50"
+            collapsed={true}
+          />
+        </div>
         {buildingGeojson && <VectorLayer key={buildingGeojson} geojson={buildingGeojson} zIndex={15} />}
       </MapComponent>
     </CoreModules.Box>
