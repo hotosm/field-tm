@@ -53,7 +53,7 @@ def get_odk_project(odk_central: project_schemas.ODKCentral = None):
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         project = OdkProject(url, user, pw)
     except Exception as e:
-        log.error(e)
+        log.exception(e)
         raise HTTPException(
             status_code=500, detail=f"Error creating project on ODK Central: {e}"
         ) from e
@@ -144,7 +144,9 @@ def create_odk_project(name: str, odk_central: project_schemas.ODKCentral = None
         ) from e
 
 
-def delete_odk_project(project_id: int, odk_central: project_schemas.ODKCentral = None):
+async def delete_odk_project(
+    project_id: int, odk_central: project_schemas.ODKCentral = None
+):
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
     # odkid in the projects table
@@ -537,7 +539,9 @@ def generate_updated_xform(
     return outfile
 
 
-def create_qrcode(project_id: int, token: str, name: str, odk_central_url: str = None):
+async def create_qrcode(
+    project_id: int, token: str, name: str, odk_central_url: str = None
+):
     """Create the QR Code for an app-user."""
     if not odk_central_url:
         log.debug("ODKCentral connection variables not set in function")

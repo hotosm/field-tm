@@ -29,7 +29,7 @@ const TasksLayer = (map, view, feature) => {
         geojsonObject['features'] = [];
         state.projectTaskBoundries[index].taskBoundries.forEach((task) => {
           geojsonObject['features'].push({
-            id: `${task.id}_${task.task_status_str}`,
+            id: `${task.id}_${task.task_status}`,
             type: task.outline_geojson.type,
             geometry: task.outline_geojson.geometry,
             properties: { centroid: task.bbox },

@@ -42,6 +42,8 @@
     "vitest": "^0.34.6"
   },
   "dependencies": {
+    "@capacitor/geolocation": "^5.0.6",
+    "@capacitor/motion": "^5.0.6",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/base": "5.0.0-beta.18",

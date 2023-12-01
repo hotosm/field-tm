@@ -48,6 +48,7 @@ dependencies = [
     "osm-rawdata==0.1.5",
     "minio>=7.1.17",
     "pyproj>=3.6.1",
+    "asgiref>=3.7.2",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "../../README.md"
@@ -69,6 +70,8 @@ dev = [
 test = [
     "pytest>=7.2.2",
     "httpx>=0.23.3",
+    "pytest-asyncio>=0.21.1",
+    "pyinstrument>=4.6.1",
 ]
 debug = [
     "ipdb>=0.13.13",
@@ -113,6 +116,7 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
+asyncio_mode="auto"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

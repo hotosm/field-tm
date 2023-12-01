@@ -15,12 +15,16 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Logic for FMTM project routes."""
+
 import io
 import json
 import os
 import time
 import uuid
 import zipfile
+from asyncio import gather
+from concurrent.futures import ThreadPoolExecutor, wait
 from io import BytesIO
 from json import dumps, loads
 from typing import List, Optional
@@ -35,6 +39,7 @@ import requests
 import segno
 import shapely.wkb as wkblib
 import sqlalchemy
+from asgiref.sync import async_to_sync
 from fastapi import File, HTTPException, UploadFile
 from geoalchemy2.shape import from_shape, to_shape
 from geojson import dump
@@ -61,25 +66,25 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from ..central import central_crud
-from ..config import settings
-from ..db import database, db_models
-from ..db.postgis_utils import geometry_to_geojson, timestamp
-from ..tasks import tasks_crud
-from ..users import user_crud
-from . import project_schemas
+from app.central import central_crud
+from app.config import settings
+from app.db import db_models
+from app.db.database import get_db
+from app.db.postgis_utils import geometry_to_geojson, timestamp
+from app.projects import project_schemas
+from app.tasks import tasks_crud
+from app.users import user_crud
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
 TILESDIR = "/opt/tiles"
 
 
-def get_projects(
+async def get_projects(
     db: Session,
     user_id: int,
     skip: int = 0,
     limit: int = 100,
-    db_objects: bool = False,
     hashtags: List[str] = None,
     search: str = None,
 ):
@@ -113,12 +118,10 @@ def get_projects(
             .all()
         )
         project_count = db.query(db_models.DbProject).count()
-    if db_objects:
-        return project_count, db_projects
-    return project_count, convert_to_app_projects(db_projects)
+    return project_count, await convert_to_app_projects(db_projects)
 
 
-def get_project_summaries(
+async def get_project_summaries(
     db: Session,
     user_id: int,
     skip: int = 0,
@@ -126,28 +129,13 @@ def get_project_summaries(
     hashtags: str = None,
     search: str = None,
 ):
-    # TODO: Just get summaries, something like:
-    #     db_projects = db.query(db_models.DbProject).with_entities(
-    #         db_models.DbProject.id,
-    #         db_models.DbProject.priority,
-    #         db_models.DbProject.total_tasks,
-    #         db_models.DbProject.tasks_mapped,
-    #         db_models.DbProject.tasks_validated,
-    #         db_models.DbProject.tasks_bad_imagery,
-    #     ).join(db_models.DbProject.project_info) \
-    #         .with_entities(
-    #             db_models.DbProjectInfo.name,
-    #             db_models.DbProjectInfo.short_description) \
-    #         .filter(
-    #         db_models.DbProject.author_id == user_id).offset(skip).limit(limit).all()
-
-    project_count, db_projects = get_projects(
-        db, user_id, skip, limit, True, hashtags, search
+    project_count, db_projects = await get_projects(
+        db, user_id, skip, limit, hashtags, search
     )
-    return project_count, convert_to_project_summaries(db_projects)
+    return project_count, await convert_to_project_summaries(db_projects)
 
 
-def get_project(db: Session, project_id: int):
+async def get_project(db: Session, project_id: int):
     db_project = (
         db.query(db_models.DbProject)
         .filter(db_models.DbProject.id == project_id)
@@ -156,27 +144,27 @@ def get_project(db: Session, project_id: int):
     return db_project
 
 
-def get_project_by_id(db: Session, project_id: int):
+async def get_project_by_id(db: Session, project_id: int):
     db_project = (
         db.query(db_models.DbProject)
         .filter(db_models.DbProject.id == project_id)
         .order_by(db_models.DbProject.id)
         .first()
     )
-    return convert_to_app_project(db_project)
+    return await convert_to_app_project(db_project)
 
 
-def get_project_info_by_id(db: Session, project_id: int):
+async def get_project_info_by_id(db: Session, project_id: int):
     db_project_info = (
         db.query(db_models.DbProjectInfo)
         .filter(db_models.DbProjectInfo.project_id == project_id)
         .order_by(db_models.DbProjectInfo.project_id)
         .first()
     )
-    return convert_to_app_project_info(db_project_info)
+    return await convert_to_app_project_info(db_project_info)
 
 
-def delete_project_by_id(db: Session, project_id: int):
+async def delete_project_by_id(db: Session, project_id: int):
     try:
         db_project = (
             db.query(db_models.DbProject)
@@ -193,11 +181,11 @@ def delete_project_by_id(db: Session, project_id: int):
     return f"Project {project_id} deleted"
 
 
-def partial_update_project_info(
+async def partial_update_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpdate, project_id
 ):
     # Get the project from db
-    db_project = get_project_by_id(db, project_id)
+    db_project = await get_project_by_id(db, project_id)
 
     # Raise an exception if project is not found.
     if not db_project:
@@ -206,7 +194,7 @@ def partial_update_project_info(
         ) from None
 
     # Get project info
-    db_project_info = get_project_info_by_id(db, project_id)
+    db_project_info = await get_project_info_by_id(db, project_id)
 
     # Update project informations
     if project_metadata.name:
@@ -220,10 +208,10 @@ def partial_update_project_info(
     db.commit()
     db.refresh(db_project)
 
-    return convert_to_app_project(db_project)
+    return await convert_to_app_project(db_project)
 
 
-def update_project_info(
+async def update_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpload, project_id
 ):
     user = project_metadata.author
@@ -236,14 +224,14 @@ def update_project_info(
         raise HTTPException("No project info passed in")
 
     # get db user
-    db_user = user_crud.get_user(db, user.id)
+    db_user = await user_crud.get_user(db, user.id)
     if not db_user:
         raise HTTPException(
             status_code=400, detail=f"User {user.username} does not exist"
         )
 
     # verify project exists in db
-    db_project = get_project_by_id(db, project_id)
+    db_project = await get_project_by_id(db, project_id)
     if not db_project:
         raise HTTPException(
             status_code=428, detail=f"Project with id {project_id} does not exist"
@@ -257,7 +245,7 @@ def update_project_info(
     db_project.project_name_prefix = project_info.name
 
     # get project info
-    db_project_info = get_project_info_by_id(db, project_id)
+    db_project_info = await get_project_info_by_id(db, project_id)
 
     # Update projects meta informations (name, descriptions)
     db_project_info.name = project_info.name
@@ -267,10 +255,10 @@ def update_project_info(
     db.commit()
     db.refresh(db_project)
 
-    return convert_to_app_project(db_project)
+    return await convert_to_app_project(db_project)
 
 
-def create_project_with_project_info(
+async def create_project_with_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpload, odk_project_id: int
 ):
     project_user = project_metadata.author
@@ -316,7 +304,7 @@ def create_project_with_project_info(
     # get db user
     # TODO: get this from logged in user / request instead,
     # return 403 (forbidden) if not authorized
-    db_user = user_crud.get_user(db, project_user.id)
+    db_user = await user_crud.get_user(db, project_user.id)
     if not db_user:
         raise HTTPException(
             status_code=400, detail=f"User {project_user.username} does not exist"
@@ -363,10 +351,10 @@ def create_project_with_project_info(
     db.commit()
     db.refresh(db_project)
 
-    return convert_to_app_project(db_project)
+    return await convert_to_app_project(db_project)
 
 
-def upload_xlsform(
+async def upload_xlsform(
     db: Session,
     xlsform: str,
     name: str,
@@ -390,10 +378,11 @@ def upload_xlsform(
         db.commit()
         return True
     except Exception as e:
+        log.error(e)
         raise HTTPException(status=400, detail={"message": str(e)}) from e
 
 
-def update_multi_polygon_project_boundary(
+async def update_multi_polygon_project_boundary(
     db: Session,
     project_id: int,
     boundary: str,
@@ -407,7 +396,7 @@ def update_multi_polygon_project_boundary(
             boundary = json.loads(boundary)
 
         # verify project exists in db
-        db_project = get_project_by_id(db, project_id)
+        db_project = await get_project_by_id(db, project_id)
         if not db_project:
             log.error(f"Project {project_id} doesn't exist!")
             return False
@@ -466,7 +455,7 @@ def update_multi_polygon_project_boundary(
         result = db.execute(query)
         data = result.fetchone()
 
-        update_project_location_info(db_project, data[0])
+        await update_project_location_info(db_project, data[0])
 
         db.commit()
         db.refresh(db_project)
@@ -478,7 +467,7 @@ def update_multi_polygon_project_boundary(
         raise HTTPException(e) from e
 
 
-def preview_tasks(boundary: str, dimension: int):
+async def preview_tasks(boundary: str, dimension: int):
     """Preview tasks by returning a list of task objects."""
     """Use a lambda function to remove the "z" dimension from each coordinate in the feature's geometry """
 
@@ -586,7 +575,7 @@ def preview_tasks(boundary: str, dimension: int):
     return collection
 
 
-def get_osm_extracts(boundary: str):
+async def get_osm_extracts(boundary: str):
     """Request an extract from raw-data-api and extract the file contents.
 
     - The query is posted to raw-data-api and job initiated for fetching the extract.
@@ -661,8 +650,8 @@ def get_osm_extracts(boundary: str):
     return data
 
 
-def split_into_tasks(
-    db: Session, outline: str, no_of_buildings: int, has_data_extracts: bool
+async def split_into_tasks(
+    db: Session, project_geojson: str, no_of_buildings: int, has_data_extracts: bool
 ):
     """Splits a project into tasks.
 
@@ -675,53 +664,53 @@ def split_into_tasks(
         Any: A GeoJSON object containing the tasks for the specified project.
     """
     project_id = uuid.uuid4()
-    all_results = []
-    boundary_data = []
-    result = []
+    boundary_geoms = []
+    split_geom_geojson = []
 
-    if outline["type"] == "FeatureCollection":
+    async def split_multi_geom_into_tasks():
+        # Use asyncio.gather to concurrently process the async generator
+        split_poly = [
+            split_polygon_into_tasks(
+                db, project_id, data, no_of_buildings, has_data_extracts
+            )
+            for data in boundary_geoms
+        ]
+
+        # Use asyncio.gather with list to collect results from the async generator
+        return (
+            item for sublist in await gather(*split_poly) for item in sublist if sublist
+        )
+
+    if project_geojson["type"] == "FeatureCollection":
         log.debug("Project boundary GeoJSON = FeatureCollection")
-        boundary_data.extend(feature["geometry"] for feature in outline["features"])
-        result.extend(
-            split_polygon_into_tasks(
-                db, project_id, data, no_of_buildings, has_data_extracts
-            )
-            for data in boundary_data
+        boundary_geoms.extend(
+            feature["geometry"] for feature in project_geojson["features"]
         )
+        geoms = await split_multi_geom_into_tasks()
+        split_geom_geojson.extend(geoms)
 
-        for inner_list in result:
-            if inner_list:
-                all_results.extend(iter(inner_list))
-
-    elif outline["type"] == "GeometryCollection":
+    elif project_geojson["type"] == "GeometryCollection":
         log.debug("Project boundary GeoJSON = GeometryCollection")
-        geometries = outline["geometries"]
-        boundary_data.extend(iter(geometries))
-        result.extend(
-            split_polygon_into_tasks(
-                db, project_id, data, no_of_buildings, has_data_extracts
-            )
-            for data in boundary_data
-        )
-        for inner_list in result:
-            if inner_list:
-                all_results.extend(iter(inner_list))
+        geometries = project_geojson["geometries"]
+        boundary_geoms.extend(iter(geometries))
+        geoms = await split_multi_geom_into_tasks()
+        split_geom_geojson.extend(geoms)
 
-    elif outline["type"] == "Feature":
+    elif project_geojson["type"] == "Feature":
         log.debug("Project boundary GeoJSON = Feature")
-        boundary_data = outline["geometry"]
-        result = split_polygon_into_tasks(
+        boundary_geoms = project_geojson["geometry"]
+        geom = await split_polygon_into_tasks(
             db, project_id, boundary_data, no_of_buildings, has_data_extracts
         )
-        all_results.extend(iter(result))
+        split_geom_geojson.extend(geom)
 
-    elif outline["type"] == "Polygon":
+    elif project_geojson["type"] == "Polygon":
         log.debug("Project boundary GeoJSON = Polygon")
-        boundary_data = outline
-        result = split_polygon_into_tasks(
+        boundary_geoms = project_geojson
+        geom = await split_polygon_into_tasks(
             db, project_id, boundary_data, no_of_buildings, has_data_extracts
         )
-        all_results.extend(result)
+        split_geom_geojson.extend(geom)
 
     else:
         log.error(
@@ -730,11 +719,11 @@ def split_into_tasks(
         )
     return {
         "type": "FeatureCollection",
-        "features": all_results,
+        "features": split_geom_geojson,
     }
 
 
-def split_polygon_into_tasks(
+async def split_polygon_into_tasks(
     db: Session,
     project_id: uuid.UUID,
     boundary_data: str,
@@ -754,7 +743,7 @@ def split_polygon_into_tasks(
     # TODO update to use flatgeobuf file directly
     # No need to store in our database
     if not has_data_extracts:
-        data = get_osm_extracts(json.dumps(boundary_data))
+        data = await get_osm_extracts(json.dumps(boundary_data))
         if not data:
             return None
         for feature in data["features"]:
@@ -807,11 +796,11 @@ def split_polygon_into_tasks(
     return features
 
 
-# def update_project_boundary(
+# async def update_project_boundary(
 #     db: Session, project_id: int, boundary: str, dimension: int
 # ):
 #     # verify project exists in db
-#     db_project = get_project_by_id(db, project_id)
+#     db_project = await get_project_by_id(db, project_id)
 #     if not db_project:
 #         log.error(f"Project {project_id} doesn't exist!")
 #         return False
@@ -879,11 +868,11 @@ def split_polygon_into_tasks(
 #     return True
 
 
-def update_project_boundary(
+async def update_project_boundary(
     db: Session, project_id: int, boundary: str, dimension: int
 ):
     # verify project exists in db
-    db_project = get_project_by_id(db, project_id)
+    db_project = await get_project_by_id(db, project_id)
     if not db_project:
         log.error(f"Project {project_id} doesn't exist!")
         return False
@@ -931,13 +920,13 @@ def update_project_boundary(
     else:
         outline = shape(features[0]["geometry"])
 
-    update_project_location_info(db_project, outline.wkt)
+    await update_project_location_info(db_project, outline.wkt)
 
     db.commit()
     db.refresh(db_project)
     log.debug("Added project boundary!")
 
-    result = create_task_grid(db, project_id=project_id, delta=dimension)
+    result = await create_task_grid(db, project_id=project_id, delta=dimension)
 
     # Delete features from the project
     db.query(db_models.DbFeatures).filter(
@@ -971,7 +960,7 @@ def update_project_boundary(
     return True
 
 
-def update_project_with_zip(
+async def update_project_with_zip(
     db: Session,
     project_id: int,
     project_name_prefix: str,
@@ -1029,7 +1018,7 @@ def update_project_with_zip(
             )
 
         # verify project exists in db
-        db_project = get_project_by_id(db, project_id)
+        db_project = await get_project_by_id(db, project_id)
         if not db_project:
             raise HTTPException(
                 status_code=428, detail=f"Project with id {project_id} does not exist"
@@ -1040,13 +1029,13 @@ def update_project_with_zip(
         db_project.task_type_prefix = task_type_prefix
 
         # generate outline from file and add to project
-        outline_shape = get_outline_from_geojson_file_in_zip(
+        outline_shape = await get_outline_from_geojson_file_in_zip(
             zip, outline_filename, f"Could not generate Shape from {outline_filename}"
         )
-        update_project_location_info(db_project, outline_shape.wkt)
+        await update_project_location_info(db_project, outline_shape.wkt)
 
         # get all task outlines from file
-        project_tasks_feature_collection = get_json_from_zip(
+        project_tasks_feature_collection = await get_json_from_zip(
             zip,
             task_outlines_filename,
             f"Could not generate FeatureCollection from {task_outlines_filename}",
@@ -1063,7 +1052,7 @@ def update_project_with_zip(
                 qr_filename = (
                     f"{project_name_prefix}_{task_type_prefix}__{task_name}.png"
                 )
-                db_qr = get_dbqrcode_from_file(
+                db_qr = await get_dbqrcode_from_file(
                     zip,
                     QR_CODES_DIR + qr_filename,
                     f"QRCode for task {task_name} does not exist. File should be in {qr_filename}",
@@ -1071,7 +1060,7 @@ def update_project_with_zip(
                 db.add(db_qr)
 
                 # save outline
-                task_outline_shape = get_shape_from_json_str(
+                task_outline_shape = await get_shape_from_json_str(
                     feature,
                     f"Could not create task outline for {task_name} using {feature}",
                 )
@@ -1080,7 +1069,7 @@ def update_project_with_zip(
                 task_geojson_filename = (
                     f"{project_name_prefix}_{task_type_prefix}__{task_name}.geojson"
                 )
-                task_geojson = get_json_from_zip(
+                task_geojson = await get_json_from_zip(
                     zip,
                     TASK_GEOJSON_DIR + task_geojson_filename,
                     f"Geojson for task {task_name} does not exist",
@@ -1128,7 +1117,7 @@ def update_project_with_zip(
 # ---------------------------
 
 
-def read_xlsforms(
+async def read_xlsforms(
     db: Session,
     directory: str,
 ):
@@ -1171,7 +1160,7 @@ def read_xlsforms(
     return xlsforms
 
 
-def get_odk_id_for_project(db: Session, project_id: int):
+async def get_odk_id_for_project(db: Session, project_id: int):
     """Get the odk project id for the fmtm project id."""
     project = table(
         "projects",
@@ -1191,7 +1180,7 @@ def get_odk_id_for_project(db: Session, project_id: int):
     return project_info.odkid
 
 
-def upload_custom_data_extracts(
+async def upload_custom_data_extracts(
     db: Session,
     project_id: int,
     contents: str,
@@ -1207,7 +1196,7 @@ def upload_custom_data_extracts(
     Returns:
         bool: True if the upload is successful.
     """
-    project = get_project(db, project_id)
+    project = await get_project(db, project_id)
     log.debug(f"Uploading custom data extract for project: {project}")
 
     if not project:
@@ -1281,6 +1270,7 @@ def flatten_dict(d, parent_key="", sep="_"):
     return items
 
 
+# NOTE defined as non-async to run in separate thread
 def generate_task_files(
     db: Session,
     project_id: int,
@@ -1292,7 +1282,10 @@ def generate_task_files(
     project_log = log.bind(task="create_project", project_id=project_id)
 
     project_log.info(f"Generating files for task {task_id}")
-    project = get_project(db, project_id)
+
+    get_project_sync = async_to_sync(get_project)
+    project = get_project_sync(db, project_id)
+
     odk_id = project.odkid
     project_name = project.project_name_prefix
     category = project.xform_title
@@ -1309,7 +1302,8 @@ def generate_task_files(
 
     # prefix should be sent instead of name
     project_log.info(f"Creating qr code for task {task_id}")
-    create_qr = create_qrcode(
+    create_qr_sync = async_to_sync(create_qrcode)
+    qr_code = create_qr_sync(
         db,
         odk_id,
         appuser.json()["token"],
@@ -1317,8 +1311,9 @@ def generate_task_files(
         odk_credentials.odk_central_url,
     )
 
-    task = tasks_crud.get_task(db, task_id)
-    task.qr_code_id = create_qr["qr_code_id"]
+    get_task_sync = async_to_sync(tasks_crud.get_task)
+    task = get_task_sync(db, task_id)
+    task.qr_code_id = qr_code["qr_code_id"]
     db.commit()
     db.refresh(task)
 
@@ -1411,7 +1406,7 @@ def generate_task_files(
             projectId=odk_id, xform=xform_id, actorId=appuser.json()["id"]
         )
     except Exception as e:
-        log.warning(str(e))
+        log.exception(e)
 
     project.extract_completed_count += 1
     db.commit()
@@ -1420,11 +1415,7 @@ def generate_task_files(
     return True
 
 
-def generate_task_files_wrapper(project_id, task, xlsform, form_type, odk_credentials):
-    for db in database.get_db():
-        generate_task_files(db, project_id, task, xlsform, form_type, odk_credentials)
-
-
+# NOTE defined as non-async to run in separate thread
 def generate_appuser_files(
     db: Session,
     project_id: int,
@@ -1436,6 +1427,7 @@ def generate_appuser_files(
     background_task_id: Optional[uuid.UUID] = None,
 ):
     """Generate the files for each appuser.
+
     QR code, new XForm, and the OSM data extract.
 
     Parameters:
@@ -1510,7 +1502,8 @@ def generate_appuser_files(
             # Data Extracts
             if extracts_contents is not None:
                 project_log.info("Uploading data extracts")
-                upload_custom_data_extracts(db, project_id, extracts_contents)
+                upload_extract_sync = async_to_sync(upload_custom_data_extracts)
+                upload_extract_sync(db, project_id, extracts_contents)
 
             else:
                 project = (
@@ -1572,20 +1565,20 @@ def generate_appuser_files(
 
             # Generating QR Code, XForm and uploading OSM Extracts to the form.
             # Creating app users and updating the role of that user.
-            tasks_list = tasks_crud.get_task_lists(db, project_id)
+            get_task_lists_sync = async_to_sync(tasks_crud.get_task_lists)
+            tasks_list = get_task_lists_sync(db, project_id)
 
-            # info = get_cpu_info()
-            # cores = info["count"]
-            # with concurrent.futures.ThreadPoolExecutor(max_workers=cores) as executor:
-            #     futures = {executor.submit(generate_task_files_wrapper, project_id, task, xlsform, form_type, odk_credentials): task for task in tasks_list}
+            # Run with expensive task via threadpool
+            def wrap_generate_task_files(task):
+                """Func to wrap and return errors from thread.
 
-            #     for future in concurrent.futures.as_completed(futures):
-            #         log.debug(f"Waiting for thread to complete..")
-
-            for task in tasks_list:
+                Also passes it's own database session for thread safety.
+                If we pass a single db session to multiple threads,
+                there may be inconsistencies or errors.
+                """
                 try:
                     generate_task_files(
-                        db,
+                        next(get_db()),
                         project_id,
                         task,
                         xlsform,
@@ -1593,30 +1586,40 @@ def generate_appuser_files(
                         odk_credentials,
                     )
                 except Exception as e:
-                    log.warning(str(e))
-                    continue
+                    log.exception(str(e))
 
-        # Update background task status to COMPLETED
+            # Use a ThreadPoolExecutor to run the synchronous code in threads
+            with ThreadPoolExecutor() as executor:
+                # Submit tasks to the thread pool
+                futures = [
+                    executor.submit(wrap_generate_task_files, task)
+                    for task in tasks_list
+                ]
+                # Wait for all tasks to complete
+                wait(futures)
+
         if background_task_id:
-            update_background_task_status_in_database(
-                db, background_task_id, 4
-            )  # 4 is COMPLETED
+            # Update background task status to COMPLETED
+            update_bg_task_sync = async_to_sync(
+                update_background_task_status_in_database
+            )
+            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
 
     except Exception as e:
         log.warning(str(e))
 
-        # Update background task status to FAILED
         if background_task_id:
-            update_background_task_status_in_database(
-                db, background_task_id, 2, str(e)
-            )  # 2 is FAILED
-
+            # Update background task status to FAILED
+            update_bg_task_sync = async_to_sync(
+                update_background_task_status_in_database
+            )
+            update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
         else:
             # Raise original error if not running in background
             raise e
 
 
-def create_qrcode(
+async def create_qrcode(
     db: Session,
     odk_id: int,
     token: str,
@@ -1625,7 +1628,7 @@ def create_qrcode(
 ):
     # Make QR code for an app_user.
     log.debug(f"Generating base64 encoded QR settings for token: {token}")
-    qrcode_data = central_crud.create_qrcode(
+    qrcode_data = await central_crud.create_qrcode(
         odk_id, token, project_name, odk_central_url
     )
 
@@ -1648,7 +1651,7 @@ def create_qrcode(
     return {"data": qrcode, "id": rows + 1, "qr_code_id": qrdb.id}
 
 
-def get_project_geometry(db: Session, project_id: int):
+async def get_project_geometry(db: Session, project_id: int):
     """Retrieves the geometry of a project.
 
     Args:
@@ -1672,7 +1675,7 @@ def get_project_geometry(db: Session, project_id: int):
     return json.dumps(row)
 
 
-def get_task_geometry(db: Session, project_id: int):
+async def get_task_geometry(db: Session, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
     Args:
@@ -1682,7 +1685,7 @@ def get_task_geometry(db: Session, project_id: int):
     Returns:
         str: A geojson of the task boundaries
     """
-    db_tasks = tasks_crud.get_tasks(db, project_id, None)
+    db_tasks = await tasks_crud.get_tasks(db, project_id, None)
     features = []
     for task in db_tasks:
         geom = to_shape(task.outline)
@@ -1737,7 +1740,7 @@ async def get_project_features_geojson(db: Session, project_id: int):
     return features
 
 
-def create_task_grid(db: Session, project_id: int, delta: int):
+async def create_task_grid(db: Session, project_id: int, delta: int):
     try:
         # Query DB for project AOI
         projects = table("projects", column("outline"), column("id"))
@@ -1831,10 +1834,10 @@ def create_task_grid(db: Session, project_id: int, delta: int):
 
         return out
     except Exception as e:
-        log.error(e)
+        log.exception(e)
 
 
-def get_json_from_zip(zip, filename: str, error_detail: str):
+async def get_json_from_zip(zip, filename: str, error_detail: str):
     try:
         with zip.open(filename) as file:
             data = file.read()
@@ -1843,7 +1846,7 @@ def get_json_from_zip(zip, filename: str, error_detail: str):
         raise HTTPException(status_code=400, detail=f"{error_detail} ----- Error: {e}")
 
 
-def get_outline_from_geojson_file_in_zip(
+async def get_outline_from_geojson_file_in_zip(
     zip, filename: str, error_detail: str, feature_index: int = 0
 ):
     try:
@@ -1864,7 +1867,7 @@ def get_outline_from_geojson_file_in_zip(
         ) from e
 
 
-def get_shape_from_json_str(feature: str, error_detail: str):
+async def get_shape_from_json_str(feature: str, error_detail: str):
     try:
         geom = feature["geometry"]
         return shape(geom)
@@ -1876,7 +1879,7 @@ def get_shape_from_json_str(feature: str, error_detail: str):
         ) from e
 
 
-def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
+async def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
     try:
         with zip.open(qr_filename) as qr_file:
             binary_qrcode = qr_file.read()
@@ -1903,26 +1906,28 @@ def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
 # TODO: write tests for these
 
 
-def convert_to_app_project(db_project: db_models.DbProject):
-    if db_project:
-        log.debug("Converting db project to app project")
-        app_project: project_schemas.Project = db_project
-
-        if db_project.outline:
-            log.debug("Converting project outline to geojson")
-            app_project.outline_geojson = geometry_to_geojson(
-                db_project.outline, {"id": db_project.id}, db_project.id
-            )
-
-        app_project.project_tasks = tasks_crud.convert_to_app_tasks(db_project.tasks)
-
-        return app_project
-    else:
+async def convert_to_app_project(db_project: db_models.DbProject):
+    # TODO refactor login to Pydantic models
+    if not db_project:
         log.debug("convert_to_app_project called, but no project provided")
         return None
 
+    log.debug("Converting db project to app project")
+    app_project: project_schemas.Project = db_project
 
-def convert_to_app_project_info(db_project_info: db_models.DbProjectInfo):
+    if db_project.outline:
+        log.debug("Converting project outline to geojson")
+        app_project.outline_geojson = geometry_to_geojson(
+            db_project.outline, {"id": db_project.id}, db_project.id
+        )
+
+    app_project.project_tasks = db_project.tasks
+
+    return app_project
+
+
+async def convert_to_app_project_info(db_project_info: db_models.DbProjectInfo):
+    # TODO refactor login to Pydantic models
     if db_project_info:
         app_project_info: project_schemas.ProjectInfo = db_project_info
         return app_project_info
@@ -1930,19 +1935,25 @@ def convert_to_app_project_info(db_project_info: db_models.DbProjectInfo):
         return None
 
 
-def convert_to_app_projects(db_projects: List[db_models.DbProject]):
+async def convert_to_app_projects(
+    db_projects: List[db_models.DbProject],
+) -> List[project_schemas.ProjectOut]:
+    # TODO refactor login to Pydantic models
     if db_projects and len(db_projects) > 0:
-        app_projects = []
-        for project in db_projects:
-            if project:
-                app_projects.append(convert_to_app_project(project))
-        app_projects_without_nones = [i for i in app_projects if i is not None]
-        return app_projects_without_nones
+
+        async def convert_project(project):
+            return await convert_to_app_project(project)
+
+        app_projects = await gather(
+            *[convert_project(project) for project in db_projects]
+        )
+        return [project for project in app_projects if project is not None]
     else:
         return []
 
 
-def convert_to_project_summary(db_project: db_models.DbProject):
+async def convert_to_project_summary(db_project: db_models.DbProject):
+    # TODO refactor login to Pydantic models
     if db_project:
         summary: project_schemas.ProjectSummary = db_project
 
@@ -1963,19 +1974,25 @@ def convert_to_project_summary(db_project: db_models.DbProject):
         return None
 
 
-def convert_to_project_summaries(db_projects: List[db_models.DbProject]):
+async def convert_to_project_summaries(
+    db_projects: List[db_models.DbProject],
+) -> List[project_schemas.ProjectSummary]:
+    # TODO refactor login to Pydantic models
     if db_projects and len(db_projects) > 0:
-        project_summaries = []
-        for project in db_projects:
-            if project:
-                project_summaries.append(convert_to_project_summary(project))
-        app_projects_without_nones = [i for i in project_summaries if i is not None]
-        return app_projects_without_nones
+
+        async def convert_summary(project):
+            return await convert_to_project_summary(project)
+
+        project_summaries = await gather(
+            *[convert_summary(project) for project in db_projects]
+        )
+        return [summary for summary in project_summaries if summary is not None]
     else:
         return []
 
 
-def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
+async def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
+    # TODO refactor login to Pydantic models
     if db_project_feature:
         app_project_feature: project_schemas.Feature = db_project_feature
 
@@ -1991,18 +2008,24 @@ def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
         return None
 
 
-def convert_to_project_features(db_project_features: List[db_models.DbFeatures]):
+async def convert_to_project_features(
+    db_project_features: List[db_models.DbFeatures],
+) -> List[project_schemas.Feature]:
+    # TODO refactor login to Pydantic models
     if db_project_features and len(db_project_features) > 0:
-        app_project_features = []
-        for project_feature in db_project_features:
-            if project_feature:
-                app_project_features.append(convert_to_project_feature(project_feature))
-        return app_project_features
+
+        async def convert_feature(project_feature):
+            return await convert_to_project_feature(project_feature)
+
+        app_project_features = await gather(
+            *[convert_feature(feature) for feature in db_project_features]
+        )
+        return [feature for feature in app_project_features if feature is not None]
     else:
         return []
 
 
-def get_project_features(db: Session, project_id: int, task_id: int = None):
+async def get_project_features(db: Session, project_id: int, task_id: int = None):
     if task_id:
         features = (
             db.query(db_models.DbFeatures)
@@ -2016,7 +2039,7 @@ def get_project_features(db: Session, project_id: int, task_id: int = None):
             .filter(db_models.DbFeatures.project_id == project_id)
             .all()
         )
-    return convert_to_project_features(features)
+    return await convert_to_project_features(features)
 
 
 async def get_extract_completion_count(project_id: int, db: Session):
@@ -2066,7 +2089,7 @@ async def insert_background_task_into_database(
     return task_id
 
 
-def update_background_task_status_in_database(
+async def update_background_task_status_in_database(
     db: Session, task_id: uuid.UUID, status: int, message: str = None
 ):
     """Updates the status of a task in the database
@@ -2088,14 +2111,16 @@ def update_background_task_status_in_database(
     return True
 
 
-def add_features_into_database(
+# NOTE defined as non-async to run in separate thread
+def add_custom_extract_to_db(
     db: Session,
     features: dict,
     background_task_id: uuid.UUID,
     feature_type: str,
 ):
-    """Inserts a new task into the database
-    Params:
+    """Insert geojson features into db for a project.
+
+    Args:
           db: database session
           project_id: id of the project
           features: features to be added.
@@ -2124,9 +2149,10 @@ def add_features_into_database(
                     failure += 1
                     continue
 
-            update_background_task_status_in_database(
-                db, background_task_id, 4
-            )  # 4 is COMPLETED
+            update_bg_task_sync = async_to_sync(
+                update_background_task_status_in_database
+            )
+            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
 
         elif feature_type == "lines":
             for feature in features["features"]:
@@ -2150,24 +2176,23 @@ def add_features_into_database(
                     failure += 1
                     continue
 
-            update_background_task_status_in_database(
-                db, background_task_id, 4
-            )  # 4 is COMPLETED
+            update_bg_task_sync = async_to_sync(
+                update_background_task_status_in_database
+            )
+            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
 
         return True
     except Exception as e:
         log.warning(str(e))
 
-        # Update background task status to FAILED
-        update_background_task_status_in_database(
-            db, background_task_id, 2, str(e)
-        )  # 2 is FAILED
+        update_bg_task_sync = async_to_sync(update_background_task_status_in_database)
+        update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
 
 
 async def update_project_form(
     db: Session, project_id: int, form_type: str, form: UploadFile = File(None)
 ):
-    project = get_project(db, project_id)
+    project = await get_project(db, project_id)
     category = project.xform_title
     project_title = project.project_name_prefix
     odk_id = project.odkid
@@ -2254,10 +2279,10 @@ async def update_project_form(
         db.add(db_feature)
         db.commit()
 
-    tasks_list = tasks_crud.get_task_lists(db, project_id)
+    tasks_list = await tasks_crud.get_task_lists(db, project_id)
 
     for task in tasks_list:
-        task_obj = tasks_crud.get_task(db, task)
+        task_obj = await tasks_crud.get_task(db, task)
 
         # Get the features for this task.
         # Postgis query to filter task inside this task outline and of this project
@@ -2315,7 +2340,7 @@ async def update_project_form(
     return True
 
 
-async def update_odk_credentials(
+async def update_odk_credentials_in_db(
     project_instance: project_schemas.ProjectUpload,
     odk_central_cred: project_schemas.ODKCentral,
     odkid: int,
@@ -2358,6 +2383,7 @@ async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str)
         dump(features, jsonfile)
 
 
+# NOTE defined as non-async to run in separate thread
 def get_project_tiles(
     db: Session,
     project_id: int,
@@ -2438,23 +2464,21 @@ def get_project_tiles(
         db.commit()
 
         # Update background task status to COMPLETED
-        update_background_task_status_in_database(
-            db, background_task_id, 4
-        )  # 4 is COMPLETED
+        update_bg_task_sync = async_to_sync(update_background_task_status_in_database)
+        update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
 
         log.info(f"Tiles generation process completed for project id {project_id}")
 
     except Exception as e:
-        log.error(f"Tiles generation process failed for project id {project_id}")
         log.error(str(e))
+        log.error(f"Tiles generation process failed for project id {project_id}")
 
         tile_path_instance.status = 2
         db.commit()
 
         # Update background task status to FAILED
-        update_background_task_status_in_database(
-            db, background_task_id, 2, str(e)
-        )  # 2 is FAILED
+        update_bg_task_sync = async_to_sync(update_background_task_status_in_database)
+        update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
 
 
 async def get_mbtiles_list(db: Session, project_id: int):
@@ -2483,6 +2507,7 @@ async def get_mbtiles_list(db: Session, project_id: int):
         return processed_tiles_list
 
     except Exception as e:
+        log.error(e)
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -2491,7 +2516,7 @@ async def convert_geojson_to_osm(geojson_file: str):
     return json2osm(geojson_file)
 
 
-def get_address_from_lat_lon(latitude, longitude):
+async def get_address_from_lat_lon(latitude, longitude):
     """Get address using Nominatim, using lat,lon."""
     base_url = "https://nominatim.openstreetmap.org/reverse"
 
@@ -2516,7 +2541,7 @@ def get_address_from_lat_lon(latitude, longitude):
         return "Address not found."
 
 
-def update_project_location_info(
+async def update_project_location_info(
     db_project: sqlalchemy.orm.declarative_base, project_boundary: str
 ):
     """Update project boundary, centroid, address.
@@ -2530,7 +2555,7 @@ def update_project_location_info(
     db_project.centroid = centroid
     geometry = wkt.loads(centroid)
     longitude, latitude = geometry.x, geometry.y
-    address = get_address_from_lat_lon(latitude, longitude)
+    address = await get_address_from_lat_lon(latitude, longitude)
     db_project.location_str = address if address is not None else ""
 
 
@@ -2602,7 +2627,7 @@ def check_crs(input_geojson: dict):
         raise HTTPException(status_code=400, detail=error_message)
 
 
-def get_tasks_count(db: Session, project_id: int):
+async def get_tasks_count(db: Session, project_id: int):
     db_task = (
         db.query(db_models.DbProject)
         .filter(db_models.DbProject.id == project_id)
@@ -2612,7 +2637,7 @@ def get_tasks_count(db: Session, project_id: int):
     return task_count
 
 
-def get_pagintaion(page: int, count: int, results_per_page: int, total: int):
+async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     total_pages = (count + results_per_page - 1) // results_per_page
     hasNext = (page * results_per_page) < count
     hasPrev = page > 1

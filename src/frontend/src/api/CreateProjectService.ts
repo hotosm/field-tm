@@ -53,7 +53,9 @@ const CreateProjectService: Function = (
           const dataExtractFormData = new FormData();
           dataExtractFormData.append('upload', dataExtractFile);
           const postDataExtract = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=buildings`,
+            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${
+              resp.id
+            }&feature_type=buildings`,
             dataExtractFormData,
           );
         }
@@ -61,7 +63,7 @@ const CreateProjectService: Function = (
           const lineExtractFormData = new FormData();
           lineExtractFormData.append('upload', lineExtractFile);
           const postLineExtract = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/add_features/?project_id=${resp.id}&feature_type=lines`,
+            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}&feature_type=lines`,
             lineExtractFormData,
           );
         }

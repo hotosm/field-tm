@@ -148,7 +148,7 @@ def copy_obj_bucket_to_bucket(
         )
 
     except Exception as e:
-        log.error(e)
+        log.exception(e)
         log.error(f"Failed to copy object {source_path} to new bucket: {dest_bucket}")
         return False
 
