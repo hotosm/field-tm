@@ -1193,7 +1193,7 @@ async def get_task_status(
 from ..static import data_path
 
 
-@router.post("/templates")
+@router.get("/templates/")
 async def get_template_file(
     file_type: str = Query(
         ..., enum=["data_extracts", "form"], description="Choose file type"
