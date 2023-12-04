@@ -700,7 +700,7 @@ async def split_into_tasks(
         log.debug("Project boundary GeoJSON = Feature")
         boundary_geoms = project_geojson["geometry"]
         geom = await split_polygon_into_tasks(
-            db, project_id, boundary_data, no_of_buildings, has_data_extracts
+            db, project_id, boundary_geoms, no_of_buildings, has_data_extracts
         )
         split_geom_geojson.extend(geom)
 
@@ -708,7 +708,7 @@ async def split_into_tasks(
         log.debug("Project boundary GeoJSON = Polygon")
         boundary_geoms = project_geojson
         geom = await split_polygon_into_tasks(
-            db, project_id, boundary_data, no_of_buildings, has_data_extracts
+            db, project_id, boundary_geoms, no_of_buildings, has_data_extracts
         )
         split_geom_geojson.extend(geom)
 
