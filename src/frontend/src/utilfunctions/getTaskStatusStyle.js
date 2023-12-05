@@ -2,6 +2,7 @@ import { Fill, Icon, Stroke, Style } from 'ol/style';
 import { transform } from 'ol/proj';
 import { Point } from 'ol/geom';
 import AssetModules from '../shared/AssetModules';
+import { task_priority_str } from '../types/enums';
 
 function createPolygonStyle(fillColor, strokeColor) {
   return new Style({
@@ -34,7 +35,7 @@ const strokeColor = 'rgb(0,0,0,0.5)';
 
 const getTaskStatusStyle = (feature, mapTheme) => {
   let id = feature.getId().toString().replace('_', ',');
-  const status = id.split(',')[1];
+  const status = task_priority_str[id.split(',')[1]];
   const lockedPolygonStyle = createPolygonStyle(mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb, strokeColor);
   const lockedValidationStyle = createPolygonStyle(
     mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
