@@ -4,13 +4,15 @@ import ProjectTaskStatus from '../api/ProjectTaskStatus';
 import MapStyles from '../hooks/MapStyles';
 import CoreModules from '../shared/CoreModules';
 import { CommonActions } from '../store/slices/CommonSlice';
+import { task_priority_str } from '../types/enums';
+
 export default function Dialog({ taskId, feature, map, view }) {
   // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const loading = CoreModules.useAppSelector((state) => state.common.loading);
   const [list_of_task_status, set_list_of_task_status] = useState([]);
-  const [task_status, set_task_status] = useState('READY');
+  const [task_status, set_task_status] = useState(task_priority_str['READY']);
 
   const geojsonStyles = MapStyles();
   const dispatch = CoreModules.useAppDispatch();
@@ -32,11 +34,11 @@ export default function Dialog({ taskId, feature, map, view }) {
         })[0],
       };
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
-        (data) => data.label == currentStatus.task_status,
+        (data) => data.label == task_priority_str[currentStatus.task_status],
       );
       const tasksStatus =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
-      set_task_status(tasksStatus);
+      set_task_status(task_priority_str[tasksStatus]);
       const tasksStatusList =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['action'] : [];
 
@@ -49,7 +51,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   // });
 
   const handleOnClick = (event) => {
-    const status = event.target.id;
+    const status = task_priority_str[event.target.id];
     const body = token != null ? { ...token } : {};
     const geoStyle = geojsonStyles[status];
     if (event.target.id != undefined) {
@@ -100,7 +102,8 @@ export default function Dialog({ taskId, feature, map, view }) {
       </CoreModules.Stack>
       <CoreModules.Stack direction={'row'} pl={1}>
         <CoreModules.Typography variant="h3">
-          {`STATUS : ${task_status?.toString()?.replaceAll('_', ' ')}`}
+          {/* {`STATUS : ${task_status?.toString()?.replaceAll('_', ' ')}`} */}
+          {`STATUS : ${task_priority_str[task_status]}`}
         </CoreModules.Typography>
       </CoreModules.Stack>
       <CoreModules.Link
