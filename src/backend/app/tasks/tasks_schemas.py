@@ -103,7 +103,7 @@ class TaskBase(BaseModel):
     def get_lock_uid(cls, v: int, info: ValidationInfo) -> str:
         """Get lock uid from lock_holder details."""
         if lock_holder := info.data.get("lock_holder"):
-            return lock_holder.get("id")
+            return lock_holder.id
         return None
 
     @field_validator("locked_by_username", mode="before")
@@ -111,7 +111,7 @@ class TaskBase(BaseModel):
     def get_lock_username(cls, v: str, info: ValidationInfo) -> str:
         """Get lock username from lock_holder details."""
         if lock_holder := info.data.get("lock_holder"):
-            return lock_holder.get("username")
+            return lock_holder.username
         return None
 
 
