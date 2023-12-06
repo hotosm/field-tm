@@ -24,7 +24,7 @@ const btnStyle = (btnType, className) => {
     case 'other':
       return `fmtm-py-1 fmtm-px-5 fmtm-bg-red-500 fmtm-text-white fmtm-rounded-lg hover:fmtm-bg-red-600`;
     case 'disabled':
-      return `fmtm-py-1 fmtm-px-5 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed`;
+      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed`;
 
     default:
       return 'fmtm-primary';
