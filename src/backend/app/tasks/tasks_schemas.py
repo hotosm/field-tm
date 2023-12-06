@@ -24,7 +24,7 @@ from typing import Any, List, Optional
 
 from geojson_pydantic import Feature
 from loguru import logger as log
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, validator
 from pydantic.functional_validators import field_validator
 
 from app.db.postgis_utils import geometry_to_geojson, get_centroid
@@ -69,6 +69,17 @@ class TaskBase(BaseModel):
     locked_by_uid: Optional[int] = None
     locked_by_username: Optional[str] = None
     task_history: Optional[List[TaskHistoryBase]] = None
+
+    @validator("task_status", pre=False, always=True)
+    def get_enum_name(cls, value, values):
+        if isinstance(value, int):
+            try:
+                return TaskStatus(value).name
+            except ValueError as e:
+                raise ValueError(
+                    f"Invalid integer value for task_status: {value}"
+                ) from e
+        return value
 
     @field_validator("outline_geojson", mode="before")
     @classmethod
