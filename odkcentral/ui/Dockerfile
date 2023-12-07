@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-ARG node_version=18
+ARG node_version=18.17
 
 
 
