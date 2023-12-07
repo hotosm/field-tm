@@ -114,11 +114,10 @@ export default function ExploreProjectCard({ data }) {
               >
                 {data.description}
               </p>
-
               <div className="fmtm-flex fmtm-items-start fmtm-mt-[1.63rem] fmtm-gap-2">
                 <AssetModules.LocationOn color="error" style={cardInnerStyles.location.icon} />
-                <p className="fmtm-capitalize fmtm-line-clamp-1 fmtm-text-[#7A7676]" title={data.description}>
-                  {data.description}
+                <p className="fmtm-capitalize fmtm-line-clamp-1 fmtm-text-[#7A7676]" title={data?.location_str}>
+                  {data?.location_str}
                 </p>
               </div>
             </CoreModules.Stack>
