@@ -95,7 +95,7 @@ async def my_data(
         user_data(dict): The dict of user data.
     """
     # Save user info in User table
-    user = await user_crud.get_user_by_id(db, user_data["id"])
+    user = await user_crud.get_user(db, user_data["id"])
     if not user:
         user_by_username = await user_crud.get_user_by_username(
             db, user_data["username"]
