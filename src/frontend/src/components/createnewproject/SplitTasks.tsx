@@ -374,6 +374,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                           onClick={generateTaskBasedOnSelection}
                           className=""
                           icon={<AssetModules.SettingsIcon className="fmtm-text-white" />}
+                          disabled={formValues?.average_buildings_per_task ? false : true}
                         />
                         {/* <Button
                         btnText="Stop generating"
