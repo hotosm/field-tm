@@ -21,7 +21,9 @@ jobs:
         "ghcr.io/${{ github.repository }}/odkcentral:latest"
       extra_build_args: |
         ODK_CENTRAL_TAG=${{ vars.ODK_CENTRAL_TAG }}
-      multi_arch: true
+      # odkcentral backend npm install fails on ARM64
+      # uncomment once fixed
+      # multi_arch: true
 
   build-odkcentral-ui:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.4.0
