@@ -43,8 +43,8 @@ async def get_task_count_in_project(db: Session, project_id: int):
     return result.fetchone()[0]
 
 
-async def get_task_lists(db: Session, project_id: int):
-    """Get a list of tasks for a project."""
+async def get_task_id_list(db: Session, project_id: int) -> list[int]:
+    """Get a list of tasks id for a project."""
     query = text(
         """
         SELECT id

@@ -79,6 +79,8 @@ services:
       - ./src/backend/app:/opt/app
       - ./src/backend/tests:/opt/tests
       # - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.10/site-packages/osm_fieldwork
+      # - ../osm-rawdata/osm_rawdata:/home/appuser/.local/lib/python3.10/site-packages/osm_rawdata
+      # - ../fmtm-splitter/fmtm_splitter:/home/appuser/.local/lib/python3.10/site-packages/fmtm_splitter
     depends_on:
       fmtm-db:
         condition: service_healthy

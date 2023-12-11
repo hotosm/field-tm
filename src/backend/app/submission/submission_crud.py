@@ -449,8 +449,8 @@ def get_all_submissions(db: Session, project_id):
 
     project = get_odk_project(odk_credentials)
 
-    get_task_lists_sync = async_to_sync(get_task_lists)
-    task_lists = get_task_lists_sync(db, project_id)
+    get_task_id_list_sync = async_to_sync(get_task_id_list)
+    task_lists = get_task_id_list_sync(db, project_id)
     submissions = project.getAllSubmissions(project_info.odkid, task_lists)
     return submissions
 

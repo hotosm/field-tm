@@ -15,11 +15,13 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Logic for interaction with ODK Central & data."""
+
 import base64
 import json
 import os
-import pathlib
 import zlib
+from xml.etree import ElementTree
 
 # import osm_fieldwork
 # Qr code imports
@@ -201,6 +203,7 @@ def delete_app_user(
 def upload_xform_media(
     project_id: int, xform_id: str, filespec: str, odk_credentials: dict = None
 ):
+    """Upload and publish an XForm on ODKCentral."""
     title = os.path.basename(os.path.splitext(filespec)[0])
 
     if odk_credentials:
@@ -301,6 +304,7 @@ def list_odk_xforms(
 def get_form_full_details(
     odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral
 ):
+    """Get additional metadata for ODK Form."""
     form = get_odk_form(odk_central)
     form_details = form.getFullDetails(odk_project_id, form_id)
     return form_details
@@ -309,21 +313,14 @@ def get_form_full_details(
 def get_odk_project_full_details(
     odk_project_id: int, odk_central: project_schemas.ODKCentral
 ):
+    """Get additional metadata for ODK project."""
     project = get_odk_project(odk_central)
     project_details = project.getFullDetails(odk_project_id)
     return project_details
 
 
-def list_task_submissions(
-    odk_project_id: int, form_id: str, odk_central: project_schemas.ODKCentral = None
-):
-    project = get_odk_form(odk_central)
-    submissions = project.listSubmissions(odk_project_id, form_id)
-    return submissions
-
-
 def list_submissions(project_id: int, odk_central: project_schemas.ODKCentral = None):
-    """List submissions from a remote ODK server."""
+    """List all submissions for a project, aggregated from associated users."""
     project = get_odk_project(odk_central)
     xform = get_odk_form(odk_central)
     submissions = list()
@@ -366,7 +363,7 @@ def download_submissions(
     get_json: bool = True,
     odk_central: project_schemas.ODKCentral = None,
 ):
-    """Download submissions from a remote ODK server."""
+    """Download all submissions for an XForm."""
     xform = get_odk_form(odk_central)
     # FIXME: should probably filter by timestamps or status value
     data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
@@ -376,9 +373,10 @@ def download_submissions(
 
 async def test_form_validity(xform_content: str, form_type: str):
     """Validate an XForm.
-    Parameters:
-        xform_content: form to be tested
-        form_type: type of form (xls or xlsx).
+
+    Args:
+        xform_content (str): form to be tested
+        form_type (str): type of form (xls or xlsx).
     """
     try:
         xlsform_path = f"/tmp/validate_form.{form_type}"
@@ -395,12 +393,10 @@ async def test_form_validity(xform_content: str, form_type: str):
             "xforms": "http://www.w3.org/2002/xforms",
         }
 
-        import xml.etree.ElementTree as ET
-
         with open(outfile, "r") as xml:
             data = xml.read()
 
-        root = ET.fromstring(data)
+        root = ElementTree.fromstring(data)
         instances = root.findall(".//xforms:instance[@src]", namespaces)
 
         geojson_list = []
@@ -465,7 +461,8 @@ def generate_updated_xform(
     #     try:
     #         if "@src" in inst:
     #             if (
-    #                 xml["h:html"]["h:head"]["model"]["instance"][index]["@src"].split(
+    #                 xml["h:html"]["h:head"]["model"]["instance"][index] \
+    #                 ["@src"].split(
     #                     "."
     #                 )[1]
     #                 == "geojson"
@@ -478,10 +475,13 @@ def generate_updated_xform(
     #             print("data in inst")
     #             if "data" == inst:
     #                 print("Data = inst ", inst)
-    #                 xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = id
-    #                 # xml["h:html"]["h:head"]["model"]["instance"]["data"]["@id"] = xform
+    #                 xml["h:html"]["h:head"]["model"]["instance"]["data"] \
+    #                 ["@id"] = id
+    #                 # xml["h:html"]["h:head"]["model"]["instance"]["data"] \
+    #                 # ["@id"] = xform
     #             else:
-    #                 xml["h:html"]["h:head"]["model"]["instance"][0]["data"]["@id"] = id
+    #                 xml["h:html"]["h:head"]["model"]["instance"][0]["data"] \
+    #                 ["@id"] = id
     #     except Exception:
     #         continue
     #     index += 1
@@ -493,9 +493,7 @@ def generate_updated_xform(
         "xforms": "http://www.w3.org/2002/xforms",
     }
 
-    import xml.etree.ElementTree as ET
-
-    root = ET.fromstring(data)
+    root = ElementTree.fromstring(data)
     head = root.find("h:head", namespaces)
     model = head.find("xforms:model", namespaces)
     instances = model.findall("xforms:instance", namespaces)
@@ -517,7 +515,7 @@ def generate_updated_xform(
         index += 1
 
     # Save the modified XML
-    newxml = ET.tostring(root)
+    newxml = ElementTree.tostring(root)
 
     # write the updated XML file
     outxml = open(outfile, "w")
@@ -595,7 +593,6 @@ def convert_csv(
     data: bytes,
 ):
     """Convert ODK CSV to OSM XML and GeoJson."""
-    pathlib.Path(osm_fieldwork.__file__).resolve().parent
     csvin = CSVDump("/xforms.yaml")
 
     osmoutfile = f"{filespec}.osm"

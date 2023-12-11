@@ -159,7 +159,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                     }}
                     onResetFile={() => resetFile(setCustomPolygonUpload)}
                     customFile={customPolygonUpload}
-                    btnText="Upload a Polygon"
+                    btnText="Upload Polygons"
                     accept=".geojson,.json"
                     fileDescription="*The supported file formats are .geojson, .json"
                     errorMsg={errors.customPolygonUpload}
@@ -171,7 +171,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                     }}
                     onResetFile={() => resetFile(setCustomLineUpload)}
                     customFile={customLineUpload}
-                    btnText="Upload a Line"
+                    btnText="Upload Lines"
                     accept=".geojson,.json"
                     fileDescription="*The supported file formats are .geojson, .json"
                     errorMsg={errors.setCustomLineUpload}

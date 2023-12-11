@@ -166,9 +166,11 @@ ARG PYTHON_IMG_TAG
 COPY --from=extract-deps \
     /opt/python/requirements-ci.txt /opt/python/
 # Copy packages from user to root dirs (run ci as root)
-RUN mv /home/appuser/.local/bin/* /usr/local/bin/ \
-    && mv /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages/* \
+RUN cp -r /home/appuser/.local/bin/* /usr/local/bin/ \
+    && cp -r /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages/* \
     /usr/local/lib/python${PYTHON_IMG_TAG}/site-packages/ \
+    && rm -rf /home/appuser/.local/bin \
+    && rm -rf /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages \
     && set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \

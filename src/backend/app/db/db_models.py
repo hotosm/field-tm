@@ -636,40 +636,6 @@ class DbUserRoles(Base):
     role = Column(Enum(UserRole), nullable=False)
 
 
-class DbProjectAOI(Base):
-    """The AOI geometry for a project."""
-
-    __tablename__ = "project_aoi"
-
-    id = Column(Integer, primary_key=True)
-    project_id = Column(String)
-    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    tags = Column(JSONB)
-
-
-class DbOsmLines(Base):
-    """Associated OSM ways for a project."""
-
-    __tablename__ = "ways_line"
-
-    id = Column(Integer, primary_key=True)
-    project_id = Column(String)
-    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    tags = Column(JSONB)
-
-
-class DbBuildings(Base):
-    """Associated OSM buildings for a project."""
-
-    __tablename__ = "ways_poly"
-
-    id = Column(Integer, primary_key=True)
-    project_id = Column(String)
-    osm_id = Column(String)
-    geom = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
-    tags = Column(JSONB)
-
-
 class DbTilesPath(Base):
     """Keeping track of mbtile basemaps for a project."""
 

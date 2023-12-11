@@ -24,6 +24,7 @@ const CreateNewProject = () => {
   const [customLineUpload, setCustomLineUpload] = useState(null);
   const [customPolygonUpload, setCustomPolygonUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
+  const [dataExtractFile] = useState(null);
 
   useEffect(() => {
     if (location.pathname !== '/create-project' && !projectDetails.name && !projectDetails.odk_central_url) {
@@ -89,6 +90,7 @@ const CreateNewProject = () => {
             customLineUpload={customLineUpload}
             customPolygonUpload={customPolygonUpload}
             customFormFile={customFormFile}
+            dataExtractFile={dataExtractFile}
           />
         );
       default:

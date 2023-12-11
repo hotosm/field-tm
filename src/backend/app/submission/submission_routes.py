@@ -157,7 +157,7 @@ async def get_submission_count(
 
 
 @router.post("/conflate_data")
-async def conflate_osm_date(
+async def conflate_osm_data(
     project_id: int,
     db: Session = Depends(database.get_db),
 ):
