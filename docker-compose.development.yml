@@ -162,11 +162,12 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
       MINIO_VOLUMES: "/mnt/data"
       MINIO_BROWSER: "off"
+      # MINIO_CONSOLE_ADDRESS: ":9090"
     volumes:
       - fmtm_data:/mnt/data
     networks:
       - fmtm-net
-    command: minio server # --console-address ":9090"
+    command: minio server
     restart: "unless-stopped"
     healthcheck:
       test: curl --fail http://localhost:9000/minio/health/live || exit 1
@@ -231,29 +232,6 @@ services:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:3"
-
-  backups:
-    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-backups-${GIT_BRANCH}
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-      central-db:
-        condition: service_healthy
-      s3:
-        condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    entrypoint: ["/backup-entrypoint.sh"]
-    restart: "on-failure:3"
-    healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
-      start_period: 5s
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
