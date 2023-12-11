@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 // import '../styles/home.css'
-import '../../node_modules/ol/ol.css';
 import CoreModules from '../shared/CoreModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '../assets/images/avatar.png';

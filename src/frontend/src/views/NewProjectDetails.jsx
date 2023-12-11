@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '../hooks/WindowDimension';
 import MapDescriptionComponents from '../components/MapDescriptionComponents';

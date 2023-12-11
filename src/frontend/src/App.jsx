@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { RouterProvider } from 'react-router-dom';
 import { store, persistor } from './store/Store';
@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 import routes from './routes';
 import { PersistGate } from 'redux-persist/integration/react';
 import './index.css';
+import 'ol/ol.css';
 import 'react-loading-skeleton/dist/skeleton.css';
-import * as Sentry from '@sentry/react';
 import environment from './environment';
 
 // Added Fix of Console Error of MUI Issue
@@ -26,9 +26,16 @@ console.error = function filterWarnings(msg, ...args) {
   }
 };
 
-{
-  import.meta.env.MODE !== 'development'
-    ? Sentry.init({
+const SentryInit = () => {
+  useEffect(() => {
+    if (import.meta.env.MODE === 'development') {
+      return;
+    }
+    console.log('Adding Sentry');
+
+    import('@sentry/react').then((Sentry) => {
+      // Init Sentry
+      Sentry.init({
         dsn:
           import.meta.env.BASE_URL === 'fmtm.hotosm.org'
             ? 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928'
@@ -45,18 +52,67 @@ console.error = function filterWarnings(msg, ...args) {
         // Session Replay
         replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
         replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-      })
-    : null;
-}
+      });
+    });
 
+    return () => {};
+  }, []);
+
+  return null; // Renders nothing
+};
+
+// Matomo Tracking Component
+const MatomoTrackingInit = () => {
+  useEffect(() => {
+    if (import.meta.env.MODE === 'development' || import.meta.env.BASE_URL !== 'fmtm.hotosm.org') {
+      return;
+    }
+    // Set matomo tracking id
+    window.site_id = environment.mamotoTrackingId;
+
+    // Create optout-form div for banner
+    const optoutDiv = document.createElement('div');
+    optoutDiv.id = 'optout-form'; // Set an ID if needed
+    document.body.appendChild(optoutDiv);
+
+    // Load CDN script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.hotosm.org/tracking-v3.js';
+    document.body.appendChild(script);
+    // Manually trigger DOMContentLoaded, that script hooks
+    // https://github.com/hotosm/matomo-tracking/blob/9b95230cb5f0bf2a902f00379152f3af9204c641/tracking-v3.js#L125
+    script.onload = () => {
+      optoutDiv.dispatchEvent(
+        new Event('DOMContentLoaded', {
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    };
+
+    // Cleanup on unmount
+    return () => {
+      document.body.removeChild(optoutDiv);
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  return null; // Renders nothing
+};
+
+// The main App render
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <RouterProvider router={routes} />
+      <MatomoTrackingInit />
+      <SentryInit />
     </PersistGate>
   </Provider>,
   document.getElementById('app'),
 );
+
+// Register service worker
 if (import.meta.env.MODE === 'production') {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

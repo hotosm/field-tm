@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 // import '../styles/home.css'
-import '../../node_modules/ol/ol.css';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
