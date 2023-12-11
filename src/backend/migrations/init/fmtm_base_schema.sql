@@ -172,41 +172,6 @@ CREATE TABLE public.background_tasks (
 ALTER TABLE public.background_tasks OWNER TO fmtm;
 
 
-CREATE TABLE public.buildings (
-    id integer,
-    project_id character varying,
-    osm_id character varying,
-    geom public.geometry(Polygon,4326),
-    tags jsonb,
-    polyid bigint
-);
-ALTER TABLE public.buildings OWNER TO fmtm;
-
-
-CREATE TABLE public.clusteredbuildings (
-    id integer,
-    project_id character varying,
-    osm_id character varying,
-    geom public.geometry(Polygon,4326),
-    tags jsonb,
-    polyid bigint,
-    numfeatures bigint,
-    cid integer,
-    clusteruid text
-);
-ALTER TABLE public.clusteredbuildings OWNER TO fmtm;
-
-
-CREATE TABLE public.dumpedpoints (
-    osm_id character varying,
-    polyid bigint,
-    cid integer,
-    clusteruid text,
-    geom public.geometry(Point,4326)
-);
-ALTER TABLE public.dumpedpoints OWNER TO fmtm;
-
-
 CREATE TABLE public.features (
     id integer NOT NULL,
     project_id integer,
@@ -243,20 +208,6 @@ CREATE SEQUENCE public.licenses_id_seq
     CACHE 1;
 ALTER TABLE public.licenses_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.licenses_id_seq OWNED BY public.licenses.id;
-
-
-CREATE TABLE public.lowfeaturecountpolygons (
-    polyid bigint NOT NULL,
-    geom public.geometry(Polygon,4326),
-    geog public.geography(Geometry,4326),
-    numfeatures bigint,
-    area double precision,
-    n_polyid bigint,
-    n_area double precision,
-    n_numfeatures bigint,
-    sharedbound double precision
-);
-ALTER TABLE public.lowfeaturecountpolygons OWNER TO fmtm;
 
 
 CREATE TABLE public.mapping_issue_categories (
@@ -338,24 +289,6 @@ CREATE TABLE public.project_allowed_users (
     user_id bigint
 );
 ALTER TABLE public.project_allowed_users OWNER TO fmtm;
-
-
-CREATE TABLE public.project_aoi (
-    id integer NOT NULL,
-    project_id character varying,
-    geom public.geometry(Geometry,4326),
-    tags jsonb
-);
-ALTER TABLE public.project_aoi OWNER TO fmtm;
-CREATE SEQUENCE public.project_aoi_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.project_aoi_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.project_aoi_id_seq OWNED BY public.project_aoi.id;
 
 
 CREATE TABLE public.project_chat (
@@ -468,16 +401,6 @@ ALTER TABLE public.qr_code_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.qr_code_id_seq OWNED BY public.qr_code.id;
 
 
-CREATE TABLE public.splitpolygons (
-    polyid bigint NOT NULL,
-    geom public.geometry(Polygon,4326),
-    geog public.geography(Geometry,4326),
-    numfeatures bigint,
-    area double precision
-);
-ALTER TABLE public.splitpolygons OWNER TO fmtm;
-
-
 CREATE TABLE public.task_history (
     id integer NOT NULL,
     project_id integer,
@@ -542,13 +465,6 @@ CREATE SEQUENCE public.task_mapping_issues_id_seq
     CACHE 1;
 ALTER TABLE public.task_mapping_issues_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.task_mapping_issues_id_seq OWNED BY public.task_mapping_issues.id;
-
-
-CREATE TABLE public.taskpolygons (
-    geom public.geometry,
-    clusteruid text
-);
-ALTER TABLE public.taskpolygons OWNER TO fmtm;
 
 
 CREATE TABLE public.tasks (
@@ -643,51 +559,6 @@ CREATE SEQUENCE public.users_id_seq
 ALTER TABLE public.users_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
-
-CREATE TABLE public.voronois (
-    clusteruid text,
-    geom public.geometry
-);
-ALTER TABLE public.voronois OWNER TO fmtm;
-
-
-CREATE TABLE public.ways_line (
-    id integer NOT NULL,
-    project_id character varying,
-    geom public.geometry(Geometry,4326),
-    tags jsonb
-);
-ALTER TABLE public.ways_line OWNER TO fmtm;
-CREATE SEQUENCE public.ways_line_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.ways_line_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.ways_line_id_seq OWNED BY public.ways_line.id;
-
-
-CREATE TABLE public.ways_poly (
-    id integer NOT NULL,
-    project_id character varying,
-    osm_id character varying,
-    geom public.geometry(Geometry,4326),
-    tags jsonb
-);
-ALTER TABLE public.ways_poly OWNER TO fmtm;
-CREATE SEQUENCE public.ways_poly_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.ways_poly_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.ways_poly_id_seq OWNED BY public.ways_poly.id;
-
-
 CREATE TABLE public.xlsforms (
     id integer NOT NULL,
     title character varying,
@@ -715,7 +586,6 @@ ALTER TABLE ONLY public.licenses ALTER COLUMN id SET DEFAULT nextval('public.lic
 ALTER TABLE ONLY public.mapping_issue_categories ALTER COLUMN id SET DEFAULT nextval('public.mapping_issue_categories_id_seq'::regclass);
 ALTER TABLE ONLY public.mbtiles_path ALTER COLUMN id SET DEFAULT nextval('public.mbtiles_path_id_seq'::regclass);
 ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval('public.organisations_id_seq'::regclass);
-ALTER TABLE ONLY public.project_aoi ALTER COLUMN id SET DEFAULT nextval('public.project_aoi_id_seq'::regclass);
 ALTER TABLE ONLY public.project_chat ALTER COLUMN id SET DEFAULT nextval('public.project_chat_id_seq'::regclass);
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
 ALTER TABLE ONLY public.qr_code ALTER COLUMN id SET DEFAULT nextval('public.qr_code_id_seq'::regclass);
@@ -725,8 +595,6 @@ ALTER TABLE ONLY public.task_mapping_issues ALTER COLUMN id SET DEFAULT nextval(
 ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
 ALTER TABLE ONLY public.teams ALTER COLUMN id SET DEFAULT nextval('public.teams_id_seq'::regclass);
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
-ALTER TABLE ONLY public.ways_line ALTER COLUMN id SET DEFAULT nextval('public.ways_line_id_seq'::regclass);
-ALTER TABLE ONLY public.ways_poly ALTER COLUMN id SET DEFAULT nextval('public.ways_poly_id_seq'::regclass);
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval('public.xlsforms_id_seq'::regclass);
 
 
@@ -746,9 +614,6 @@ ALTER TABLE ONLY public.licenses
 
 ALTER TABLE ONLY public.licenses
     ADD CONSTRAINT licenses_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.lowfeaturecountpolygons
-    ADD CONSTRAINT lowfeaturecountpolygons_pkey PRIMARY KEY (polyid);
 
 ALTER TABLE ONLY public.mapping_issue_categories
     ADD CONSTRAINT mapping_issue_categories_name_key UNIQUE (name);
@@ -770,9 +635,6 @@ ALTER TABLE ONLY public.organisations
 
 ALTER TABLE ONLY public.organisations
     ADD CONSTRAINT organisations_slug_key UNIQUE (slug);
-
-ALTER TABLE ONLY public.project_aoi
-    ADD CONSTRAINT project_aoi_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.project_chat
     ADD CONSTRAINT project_chat_pkey PRIMARY KEY (id);
@@ -816,12 +678,6 @@ ALTER TABLE ONLY public.users
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
 
-ALTER TABLE ONLY public.ways_line
-    ADD CONSTRAINT ways_line_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.ways_poly
-    ADD CONSTRAINT ways_poly_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.xlsforms
     ADD CONSTRAINT xlsforms_pkey PRIMARY KEY (id);
 
@@ -831,25 +687,17 @@ ALTER TABLE ONLY public.xlsforms
 
 -- Indexing
 
-CREATE INDEX buildings_idx ON public.buildings USING gist (geom);
-CREATE INDEX clusteredbuildings_idx ON public.clusteredbuildings USING gist (geom);
-CREATE INDEX dumpedpoints_idx ON public.dumpedpoints USING gist (geom);
 CREATE INDEX idx_features_composite ON public.features USING btree (task_id, project_id);
 CREATE INDEX idx_features_geometry ON public.features USING gist (geometry);
 CREATE INDEX idx_geometry ON public.projects USING gist (outline);
-CREATE INDEX idx_lowfeaturecountpolygons_geog ON public.lowfeaturecountpolygons USING gist (geog);
-CREATE INDEX idx_project_aoi_geom ON public.project_aoi USING gist (geom);
 CREATE INDEX idx_projects_centroid ON public.projects USING gist (centroid);
 CREATE INDEX idx_projects_outline ON public.projects USING gist (outline);
-CREATE INDEX idx_splitpolygons_geog ON public.splitpolygons USING gist (geog);
 CREATE INDEX idx_task_history_composite ON public.task_history USING btree (task_id, project_id);
 CREATE INDEX idx_task_history_project_id_user_id ON public.task_history USING btree (user_id, project_id);
 CREATE INDEX idx_task_validation_history_composite ON public.task_invalidation_history USING btree (task_id, project_id);
 CREATE INDEX idx_task_validation_mapper_status_composite ON public.task_invalidation_history USING btree (mapper_id, is_closed);
 CREATE INDEX idx_task_validation_validator_status_composite ON public.task_invalidation_history USING btree (invalidator_id, is_closed);
 CREATE INDEX idx_tasks_outline ON public.tasks USING gist (outline);
-CREATE INDEX idx_ways_line_geom ON public.ways_line USING gist (geom);
-CREATE INDEX idx_ways_poly_geom ON public.ways_poly USING gist (geom);
 CREATE INDEX ix_project_chat_project_id ON public.project_chat USING btree (project_id);
 CREATE INDEX ix_projects_mapper_level ON public.projects USING btree (mapper_level);
 CREATE INDEX ix_projects_organisation_id ON public.projects USING btree (organisation_id);
@@ -862,11 +710,7 @@ CREATE INDEX ix_tasks_project_id ON public.tasks USING btree (project_id);
 CREATE INDEX ix_tasks_qr_code_id ON public.tasks USING btree (qr_code_id);
 CREATE INDEX ix_tasks_validated_by ON public.tasks USING btree (validated_by);
 CREATE INDEX ix_users_id ON public.users USING btree (id);
-CREATE INDEX lowfeaturecountpolygons_idx ON public.lowfeaturecountpolygons USING gist (geom);
-CREATE INDEX splitpolygons_idx ON public.splitpolygons USING gist (geom);
-CREATE INDEX taskpolygons_idx ON public.taskpolygons USING gist (geom);
 CREATE INDEX textsearch_idx ON public.project_info USING btree (text_searchable);
-CREATE INDEX voronois_idx ON public.voronois USING gist (geom);
 
 
 -- Foreign keys

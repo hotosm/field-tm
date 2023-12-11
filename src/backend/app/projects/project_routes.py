@@ -23,6 +23,7 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
+import geojson
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -405,29 +406,37 @@ async def upload_multi_project_boundary(
 async def task_split(
     project_geojson: UploadFile = File(...),
     no_of_buildings: int = Form(50),
-    has_data_extracts: bool = Form(False),
+    custom_data_extract: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
     """Split a task into subtasks.
 
     Args:
-        project_geojson (UploadFile): The file to split.
-        no_of_buildings (int, optional): The number of buildings per subtask. Defaults to 50.
+        project_geojson (UploadFile): The geojson to split.
+            Should be a FeatureCollection.
+        no_of_buildings (int, optional): The number of buildings per subtask.
+            Defaults to 50.
         db (Session, optional): The database session. Injected by FastAPI.
 
     Returns:
         The result of splitting the task into subtasks.
 
     """
-    # read entire file
-    content = await project_geojson.read()
-    boundary = json.loads(content)
-
+    # read project boundary
+    boundary = geojson.loads(await project_geojson.read())
     # Validatiing Coordinate Reference System
     check_crs(boundary)
 
-    result = await project_crud.split_into_tasks(
-        db, boundary, no_of_buildings, has_data_extracts
+    # read custom data extract
+    if custom_data_extract:
+        custom_data_extract = geojson.loads(await custom_data_extract.read())
+        check_crs(custom_data_extract)
+
+    result = await project_crud.split_geojson_into_tasks(
+        db,
+        boundary,
+        no_of_buildings,
+        custom_data_extract,
     )
 
     return result
@@ -754,9 +763,11 @@ async def generate_log(
         task_status, task_message = await project_crud.get_background_task_status(
             uuid, db
         )
-        extract_completion_count = await project_crud.get_extract_completion_count(
-            project_id, db
-        )
+        extract_completion_count = (
+            db.query(db_models.DbProject)
+            .filter(db_models.DbProject.id == project_id)
+            .first()
+        ).extract_completed_count
 
         with open("/opt/logs/create_project.json", "r") as log_file:
             logs = [json.loads(line) for line in log_file]
@@ -799,20 +810,13 @@ async def get_categories():
     return categories
 
 
-@router.post("/preview_tasks/")
-async def preview_tasks(
-    project_geojson: UploadFile = File(...), dimension: int = Form(500)
+@router.post("/preview_split_by_square/")
+async def preview_split_by_square(
+    project_geojson: UploadFile = File(...), dimension: int = Form(100)
 ):
-    """Preview tasks for a project.
+    """Preview splitting by square.
 
-    This endpoint allows you to preview tasks for a project.
-
-    ## Request Body
-    - `project_id` (int): the project's id. Required.
-
-    ## Response
-    - Returns a JSON object containing a list of tasks.
-
+    TODO update to use a response_model
     """
     # Validating for .geojson File.
     file_name = os.path.splitext(project_geojson.filename)
@@ -823,12 +827,12 @@ async def preview_tasks(
 
     # read entire file
     content = await project_geojson.read()
-    boundary = json.loads(content)
+    boundary = geojson.loads(content)
 
     # Validatiing Coordinate Reference System
     check_crs(boundary)
 
-    result = await project_crud.preview_tasks(boundary, dimension)
+    result = await project_crud.preview_split_by_square(boundary, dimension)
     return result
 
 

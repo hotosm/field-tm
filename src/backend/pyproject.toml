@@ -24,38 +24,37 @@ authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
 dependencies = [
-    "uvicorn>=0.23.2",
-    "fastapi>=0.103.0",
-    "pydantic>=2.3.0",
-    "pydantic-settings>=2.0.3",
-    "geojson-pydantic>=1.0.0",
-    "python-multipart>=0.0.6",
-    "sqlalchemy>=2.0.21",
-    "SQLAlchemy-Utils>=0.41.1",
-    "psycopg2>=2.9.7",
-    "geoalchemy2>=0.14.1",
-    "geojson>=3.0.1",
-    "shapely>=2.0.1",
-    "pyxform>=1.12.1",
-    "qrcode>=7.4.2",
-    "xmltodict>=0.13.0",
-    "segno>=1.5.2",
-    "sentry-sdk>=1.30.0",
-    "py-cpuinfo>=9.0.0",
-    "loguru>=0.7.0",
+    "uvicorn==0.24.0",
+    "fastapi==0.104.1",
+    "pydantic==2.5.2",
+    "pydantic-settings==2.1.0",
+    "geojson-pydantic==1.0.1",
+    "python-multipart==0.0.6",
+    "sqlalchemy==2.0.23",
+    "SQLAlchemy-Utils==0.41.1",
+    "psycopg2==2.9.9",
+    "geoalchemy2==0.14.2",
+    "geojson==3.1.0",
+    "shapely==2.0.2",
+    "pyxform==1.12.2",
+    "segno==1.6.0",
+    "sentry-sdk==1.38.0",
+    "py-cpuinfo==9.0.0",
+    "loguru==0.7.2",
+    "minio==7.2.0",
+    "pyproj==3.6.1",
+    "asgiref==3.7.2",
     "osm-login-python==1.0.1",
-    "osm-fieldwork==0.3.7",
-    "osm-rawdata==0.1.5",
-    "minio>=7.1.17",
-    "pyproj>=3.6.1",
-    "asgiref>=3.7.2",
+    "osm-fieldwork==0.4.0",
+    "osm-rawdata==0.1.7",
+    "fmtm-splitter==0.2.4",
 ]
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10"
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}
 
 [build-system]
-requires = ["pdm-pep517>=1.0.0"]
+requires = ["pdm-pep517==1.1.4"]
 build-backend = "pdm.pep517.api"
 
 [tool.pdm]
@@ -63,26 +62,26 @@ source-includes = ["../../CHANGELOG.md", "../../LICENSE", "../../README.md"]
 version = {from = "app/__version__.py"}
 [tool.pdm.dev-dependencies]
 dev = [
-    "pre-commit>=3.3.3",
-    "black>=23.7.0",
-    "commitizen>=3.6.0",
+    "pre-commit>=3.5.0",
+    "black>=23.11.0",
+    "commitizen>=3.13.0",
 ]
 test = [
-    "pytest>=7.2.2",
-    "httpx>=0.23.3",
-    "pytest-asyncio>=0.21.1",
-    "pyinstrument>=4.6.1",
+    "pytest==7.4.3",
+    "httpx==0.25.2",
+    "pytest-asyncio==0.23.2",
+    "pyinstrument==4.6.1",
 ]
 debug = [
     "ipdb>=0.13.13",
-    "debugpy>=1.6.7.post1",
+    "debugpy>=1.8.0",
 ]
 docs = [
-    "mkdocs>=1.5.2",
-    "mkdocs-material>=9.2.6",
-    "mkdocstrings-python>=1.6.0",
-    "mkdocs-exclude>=1.0.2",
-    "python-dotenv>=1.0.0",
+    "mkdocs==1.5.3",
+    "mkdocs-material==9.4.14",
+    "mkdocstrings-python==1.7.5",
+    "mkdocs-exclude==1.0.2",
+    "python-dotenv==1.0.0",
 ]
 
 [tool.black]

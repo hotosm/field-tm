@@ -17,14 +17,15 @@
 #
 """Tests for project routes."""
 
+import functools
 import json
 import os
 import uuid
 import zipfile
-from concurrent.futures import ThreadPoolExecutor, wait
 from unittest.mock import Mock, patch
 
 import pytest
+from fastapi.concurrency import run_in_threadpool
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
 from shapely import Polygon, wkb
@@ -177,51 +178,42 @@ async def test_generate_appuser_files(db, project):
     assert data_extract_uploaded is True
 
     # Get project tasks list
-    task_list = await tasks_crud.get_task_lists(db, project_id)
-    assert isinstance(task_list, list)
+    task_ids = await tasks_crud.get_task_id_list(db, project_id)
+    assert isinstance(task_ids, list)
 
     # Provide custom xlsform file path
     xlsform_file = f"{test_data_path}/buildings.xls"
 
-    # Generate project task files using threadpool
-    with ThreadPoolExecutor() as executor:
-        # Submit tasks to the thread pool
-        futures = [
-            executor.submit(
+    for task_id in task_ids:
+        # NOTE avoid the lambda function for run_in_threadpool
+        # functools.partial captures the loop variable task_id in a
+        # way that is safe for use within asynchronous code
+        success = await run_in_threadpool(
+            functools.partial(
                 project_crud.generate_task_files,
                 db,
                 project_id,
-                task,
+                task_id,
                 xlsform_file,
-                "xls",
+                "building",
                 odk_credentials,
             )
-            for task in task_list
-        ]
-
-        # Wait for all tasks to complete
-        wait(futures)
-
-        # Check the results, assuming generate_task_files returns a boolean
-        results = [future.result() for future in futures]
-        assert all(results)
+        )
+        assert success
 
     # Generate appuser files
-    test_data = {
-        "db": db,
-        "project_id": project_id,
-        "extract_polygon": True,
-        "custom_xls_form": xlsform_file,
-        "extracts_contents": data_extracts,
-        "category": "buildings",
-        "form_type": "example_form_type",
-        "background_task_id": uuid.uuid4(),
-    }
-    # Generate appuser using threadpool
-    with ThreadPoolExecutor() as executor:
-        future = executor.submit(project_crud.generate_appuser_files, **test_data)
-        result = future.result()
-
+    result = await run_in_threadpool(
+        lambda: project_crud.generate_appuser_files(
+            db,
+            project_id,
+            extract_polygon=True,
+            custom_xls_form=xlsform_file,
+            extracts_contents=data_extracts,
+            category="buildings",
+            form_type="example_form_type",
+            background_task_id=uuid.uuid4(),
+        )
+    )
     assert result is None
 
 
