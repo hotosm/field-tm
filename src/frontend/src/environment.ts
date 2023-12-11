@@ -8,7 +8,7 @@ export default {
     const desimaal = (dec >>> 0).toString(2);
     return window.btoa(desimaal);
   },
-  mamotoTrackingId: 28,
+  matomoTrackingId: 28,
   tasksStatus: [
     {
       label: 'READY',

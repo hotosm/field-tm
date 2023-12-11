@@ -68,7 +68,7 @@ const MatomoTrackingInit = () => {
       return;
     }
     // Set matomo tracking id
-    window.site_id = environment.mamotoTrackingId;
+    window.site_id = environment.matomoTrackingId;
 
     // Create optout-form div for banner
     const optoutDiv = document.createElement('div');
