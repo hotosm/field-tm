@@ -45,6 +45,8 @@ from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 from sqlalchemy.orm import Session
 
+from app.auth.osm import AuthUser, login_required
+
 from ..central import central_crud
 from ..db import database, db_models
 from ..models.enums import TILES_FORMATS, TILES_SOURCE
@@ -205,7 +207,11 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 
 @router.delete("/delete/{project_id}")
-async def delete_project(project_id: int, db: Session = Depends(database.get_db)):
+async def delete_project(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    user_data: AuthUser = Depends(login_required),
+):
     """Delete a project from ODK Central and the local database."""
     # FIXME: should check for error
 
