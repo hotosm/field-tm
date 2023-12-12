@@ -43,11 +43,20 @@ URLs defined in the docker-compose file and your env file.
 > Note: the database host `fmtm-db` is automatically
 > resolved by docker compose to the database container IP.
 
+#### Bundled ODK Central
+
 - FMTM uses ODK Central to store ODK data.
 - To facilitate faster development, the Docker setup includes a Central server.
 - The credentials are provided via the `.env` file.
 
-> Note: Alternatively, you may use an external Central server and user in the `.env`.
+> Alternatively, you may provide credentials to an external Central server
+> in the `.env`.
+
+To run the local development setup without ODK Central (use external server):
+
+```bash
+dc --profile no-odk up -d
+```
 
 ### 1B: Import Test Data
 
