@@ -21,7 +21,10 @@
 
 ## Introduction to Field Mapping Tasking Manager Web App
 
-The FMTM web app is a Python/Flask/Leaflet app that serves as a frontend for the ODK Central server, using the [ODK Central API](https://odkcentral.docs.apiary.io/#) to allocate specific areas/features to individual mappers, and receive their data submissions.
+The FMTM web app is an app that serves as a frontend for the
+ODK Central server, using the
+[ODK Central API](https://odkcentral.docs.apiary.io/#) to allocate specific
+areas/features to individual mappers, and receive their data submissions.
 
 ![1](https://github.com/hotosm/fmtm/assets/97789856/305be31a-96b4-42df-96fc-6968e9bd4e5f)
 
@@ -44,7 +47,11 @@ A computer-screen-optimized web app that allows Campaign Managers to:
 
 ### [ODK Collect](https://docs.getodk.org/collect-intro/)
 
-A mobile data collection tool that functions on almost all Android phones. Field mappers use ODK Collect to select features such as buildings or amenities, and fill out forms with survey questions to collect attributes or data about those features (normally at least some of these attributes are intended to become OSM tags associated with those features).
+A mobile data collection tool that functions on almost all Android phones.
+Field mappers use ODK Collect to select features such as buildings or amenities,
+and fill out forms with survey questions to collect attributes or data about
+those features (normally at least some of these attributes are intended to
+become OSM tags associated with those features).
 
 The ODK Collect app connects to a back-end server (in this case ODK Central), which provides the features to be mapped and the survey form definitions.
 
@@ -313,11 +320,3 @@ before contributing!
 Happy coding!
 
 The FMTM Developer Team
-
-## Note
-
-To run the local development setup without ODK Central (use external server):
-
-```bash
-dc --profile no-odk up -d
-```
