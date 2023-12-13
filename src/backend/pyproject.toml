@@ -44,6 +44,7 @@ dependencies = [
     "minio==7.2.0",
     "pyproj==3.6.1",
     "asgiref==3.7.2",
+    "sozipfile==0.3.2",
     "osm-login-python==1.0.1",
     "osm-fieldwork==0.4.0",
     "osm-rawdata==0.1.7",

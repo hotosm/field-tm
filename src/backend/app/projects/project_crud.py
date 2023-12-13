@@ -22,12 +22,10 @@ import json
 import os
 import time
 import uuid
-import zipfile
 from asyncio import gather
 from concurrent.futures import ThreadPoolExecutor, wait
 from io import BytesIO
 from typing import List, Optional, Union
-from zipfile import ZipFile
 
 import geoalchemy2
 import geojson
@@ -35,6 +33,7 @@ import pkg_resources
 import requests
 import segno
 import shapely.wkb as wkblib
+import sozipfile.sozipfile as zipfile
 import sqlalchemy
 from asgiref.sync import async_to_sync
 from fastapi import File, HTTPException, UploadFile
@@ -764,7 +763,7 @@ async def update_project_with_zip(
             detail=f"File must be a zip. Uploaded file was {uploaded_zip.content_type}",
         )
 
-    with ZipFile(io.BytesIO(uploaded_zip.file.read()), "r") as zip:
+    with zipfile.ZipFile(io.BytesIO(uploaded_zip.file.read()), "r") as zip:
         # verify valid zip file
         bad_file = zip.testzip()
         if bad_file:

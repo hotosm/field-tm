@@ -17,16 +17,19 @@
 #
 import json
 import os
+from typing import Optional
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
 
-from ..db import database
-from ..projects import project_crud
+from app.config import settings
+from app.db import database
+from app.projects import project_crud, project_schemas
+
 from . import submission_crud
 
 router = APIRouter(
@@ -104,7 +107,7 @@ async def download_submission(
 
     """
     if not (task_id or export_json):
-        file = submission_crud.download_submission_for_project(db, project_id)
+        file = submission_crud.gather_all_submission_csvs(db, project_id)
         return FileResponse(file)
 
     return await submission_crud.download_submission(
@@ -164,7 +167,7 @@ async def conflate_osm_data(
     # All Submissions JSON
     # NOTE runs in separate thread using run_in_threadpool
     submission = await run_in_threadpool(
-        lambda: submission_crud.get_all_submissions(db, project_id)
+        lambda: submission_crud.get_all_submissions_json(db, project_id)
     )
 
     # Data extracta file
@@ -214,6 +217,51 @@ async def conflate_osm_data(
     return []
 
 
+@router.post("/download-submission")
+async def download_submission_json(
+    background_tasks: BackgroundTasks,
+    project_id: int,
+    background_task_id: Optional[str] = None,
+    db: Session = Depends(database.get_db),
+):
+    # Get Project
+    project = await project_crud.get_project(db, project_id)
+
+    # Return existing export if complete
+    if background_task_id:
+        # Get the backgrund task status
+        task_status, task_message = await project_crud.get_background_task_status(
+            background_task_id, db
+        )
+
+        if task_status != 4:
+            return project_schemas.BackgroundTaskStatus(
+                status=task_status.name, message=task_message or ""
+            )
+
+        bucket_root = f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
+        return JSONResponse(
+            status_code=200,
+            content=f"{bucket_root}/{project.organisation_id}/{project_id}/submission.zip",
+        )
+
+    # Create task in db and return uuid
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, "sync_submission", project_id
+    )
+
+    background_tasks.add_task(
+        submission_crud.update_submission_in_s3, db, project_id, background_task_id
+    )
+    return JSONResponse(
+        status_code=200,
+        content={
+            "Message": "Submission update process initiated",
+            "task_id": str(background_task_id),
+        },
+    )
+
+
 @router.get("/get_osm_xml/{project_id}")
 async def get_osm_xml(
     project_id: int,
@@ -229,7 +277,7 @@ async def get_osm_xml(
     # All Submissions JSON
     # NOTE runs in separate thread using run_in_threadpool
     submission = await run_in_threadpool(
-        lambda: submission_crud.get_all_submissions(db, project_id)
+        lambda: submission_crud.get_all_submissions_json(db, project_id)
     )
 
     # Write the submission to a file

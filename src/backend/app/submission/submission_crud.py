@@ -21,10 +21,13 @@ import io
 import json
 import os
 import threading
-import zipfile
+import uuid
 from asyncio import gather
+from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 
+import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Response
 from fastapi.responses import FileResponse
@@ -32,8 +35,11 @@ from loguru import logger as log
 from osm_fieldwork.json2osm import JsonDump
 from sqlalchemy.orm import Session
 
-from ..central.central_crud import get_odk_form, get_odk_project
-from ..projects import project_crud, project_schemas
+from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
+from app.config import settings
+from app.projects import project_crud, project_schemas
+from app.s3 import add_obj_to_bucket, get_obj_from_bucket
+from app.tasks import tasks_crud
 
 
 def get_submission_of_project(db: Session, project_id: int, task_id: int = None):
@@ -300,7 +306,7 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
         submission = xform.getSubmissions(odkid, task_id, None, False, True)
         submission = (json.loads(submission))["value"]
     else:
-        submission = get_all_submissions(db, project_id)
+        submission = get_all_submissions_json(db, project_id)
 
     if not submission:
         raise HTTPException(status_code=404, detail="Submission not found")
@@ -342,8 +348,12 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
     return FileResponse(final_zip_file_path)
 
 
-def download_submission_for_project(db, project_id):
-    log.info(f"Downloading all submissions for a project {project_id}")
+def gather_all_submission_csvs(db, project_id):
+    """Gather all of the submission CSVs for a project.
+
+    Generate a single zip with all submissions.
+    """
+    log.info(f"Downloading all CSV submissions for project {project_id}")
 
     get_project_sync = async_to_sync(project_crud.get_project)
     project_info = get_project_sync(db, project_id)
@@ -436,7 +446,103 @@ def download_submission_for_project(db, project_id):
     return final_zip_file_path
 
 
-def get_all_submissions(db: Session, project_id):
+def update_submission_in_s3(
+    db: Session, project_id: int, background_task_id: uuid.UUID
+):
+    try:
+        # Get Project
+        get_project_sync = async_to_sync(project_crud.get_project)
+        project = get_project_sync(db, project_id)
+
+        # Gather metadata
+        odk_credentials = project_schemas.ODKCentral(
+            odk_central_url=project.odk_central_url,
+            odk_central_user=project.odk_central_user,
+            odk_central_password=project.odk_central_password,
+        )
+        odk_forms = list_odk_xforms(project.odkid, odk_credentials, True)
+
+        # Get latest submission date
+        valid_datetimes = [
+            form["lastSubmission"]
+            for form in odk_forms
+            if form["lastSubmission"] is not None
+        ]
+        last_submission = max(
+            valid_datetimes, key=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")
+        )
+
+        # Check if the file already exists in s3
+        s3_project_path = f"/{project.organisation_id}/{project_id}"
+        metadata_s3_path = f"/{s3_project_path}/submissions.meta.json"
+        try:
+            # Get the last submission date from the metadata
+            file = get_obj_from_bucket(settings.S3_BUCKET_NAME, metadata_s3_path)
+            zip_file_last_submission = (json.loads(file.getvalue()))["last_submission"]
+            if last_submission <= zip_file_last_submission:
+                # Update background task status to COMPLETED
+                update_bg_task_sync = async_to_sync(
+                    project_crud.update_background_task_status_in_database
+                )
+                update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
+                return
+
+        except Exception as e:
+            log.warning(str(e))
+            pass
+
+        # Zip file is outdated, regenerate
+        metadata = {
+            "last_submission": last_submission,
+        }
+
+        # Get submissions from ODK Central
+        submissions = get_all_submissions_json(db, project_id)
+
+        submissions_zip = BytesIO()
+        # Create a sozipfile with metadata and submissions
+        with zipfile.ZipFile(
+            submissions_zip,
+            "w",
+            compression=zipfile.ZIP_DEFLATED,
+            chunk_size=zipfile.SOZIP_DEFAULT_CHUNK_SIZE,
+        ) as myzip:
+            myzip.writestr("submissions.json", json.dumps(submissions))
+
+        # Add zipfile to the s3 bucket
+        add_obj_to_bucket(
+            settings.S3_BUCKET_NAME,
+            submissions_zip,
+            f"/{s3_project_path}/submission.zip",
+        )
+
+        # Upload metadata to s3
+        metadata_obj = BytesIO(json.dumps(metadata).encode())
+        add_obj_to_bucket(
+            settings.S3_BUCKET_NAME,
+            metadata_obj,
+            metadata_s3_path,
+        )
+
+        # Update background task status to COMPLETED
+        update_bg_task_sync = async_to_sync(
+            project_crud.update_background_task_status_in_database
+        )
+        update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
+
+        return True
+
+    except Exception as e:
+        log.warning(str(e))
+        # Update background task status to FAILED
+        update_bg_task_sync = async_to_sync(
+            project_crud.update_background_task_status_in_database
+        )
+        update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
+
+
+def get_all_submissions_json(db: Session, project_id):
+    """Get all submissions for a project in JSON format."""
     get_project_sync = async_to_sync(project_crud.get_project)
     project_info = get_project_sync(db, project_id)
 
@@ -449,9 +555,9 @@ def get_all_submissions(db: Session, project_id):
 
     project = get_odk_project(odk_credentials)
 
-    get_task_id_list_sync = async_to_sync(get_task_id_list)
-    task_lists = get_task_id_list_sync(db, project_id)
-    submissions = project.getAllSubmissions(project_info.odkid, task_lists)
+    get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
+    task_list = get_task_id_list_sync(db, project_id)
+    submissions = project.getAllSubmissions(project_info.odkid, task_list)
     return submissions
 
 
