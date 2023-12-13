@@ -21,8 +21,11 @@ import datetime
 
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
+from geojson import FeatureCollection
 from geojson_pydantic import Feature
 from shapely.geometry import mapping
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 
 def timestamp():
@@ -61,3 +64,36 @@ def get_centroid(geometry: Geometry, properties: str = {}, id: int = None):
         }
         return Feature(**geojson)
     return {}
+
+
+def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection):
+    """From a given FeatureCollection, return a memory flatgeobuf obj."""
+    sql = f"""
+        DROP TABLE IF EXISTS public.temp_features CASCADE;
+
+        CREATE TABLE IF NOT EXISTS public.temp_features(
+            id serial PRIMARY KEY,
+            geom geometry
+        );
+
+        WITH data AS (SELECT '{geojson}'::json AS fc)
+        INSERT INTO public.temp_features (geom)
+        SELECT
+            ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom
+        FROM (
+            SELECT json_array_elements(fc->'features') AS feat
+            FROM data
+        ) AS f;
+
+        WITH thegeom AS
+        (SELECT * FROM public.temp_features)
+        SELECT ST_AsFlatGeobuf(thegeom.*)
+        FROM thegeom;
+    """
+    # Run the SQL
+    result = db.execute(text(sql))
+    # Get a memoryview object, then extract to Bytes
+    flatgeobuf = result.fetchone()[0].tobytes()
+    # Cleanup table
+    db.execute(text("DROP TABLE IF EXISTS public.temp_features CASCADE;"))
+    return flatgeobuf

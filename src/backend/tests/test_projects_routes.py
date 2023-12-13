@@ -21,10 +21,10 @@ import functools
 import json
 import os
 import uuid
-import zipfile
 from unittest.mock import Mock, patch
 
 import pytest
+import sozipfile.sozipfile as zipfile
 from fastapi.concurrency import run_in_threadpool
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
