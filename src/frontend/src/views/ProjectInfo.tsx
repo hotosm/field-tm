@@ -5,7 +5,13 @@ import ProjectInfomap from '../components/ProjectInfo/ProjectInfomap';
 import environment from '../environment';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 
-import { ConvertXMLToJOSM, fetchConvertToOsmDetails, fetchInfoTask, getDownloadProjectSubmission } from '../api/task';
+import {
+  ConvertXMLToJOSM,
+  fetchConvertToOsmDetails,
+  fetchInfoTask,
+  getDownloadProjectSubmission,
+  getDownloadProjectSubmissionJson,
+} from '../api/task';
 import AssetModules from '../shared/AssetModules';
 import { ProjectById } from '../api/Project';
 import ProjectInfoCountCard from '../components/ProjectInfo/ProjectInfoCountCard';
@@ -49,8 +55,8 @@ const ProjectInfo = () => {
       );
     } else if (downloadType === 'json') {
       dispatch(
-        getDownloadProjectSubmission(
-          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}&export_json=true`,
+        getDownloadProjectSubmissionJson(
+          `${import.meta.env.VITE_API_URL}/submission/download-submission?project_id=${decodedId}`,
         ),
       );
     }
