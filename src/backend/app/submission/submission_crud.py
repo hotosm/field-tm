@@ -468,9 +468,14 @@ def update_submission_in_s3(
             for form in odk_forms
             if form["lastSubmission"] is not None
         ]
-        last_submission = max(
-            valid_datetimes, key=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")
-        ) if valid_datetimes else None
+        last_submission = (
+            max(
+                valid_datetimes,
+                key=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ"),
+            )
+            if valid_datetimes
+            else None
+        )
 
         # Check if the file already exists in s3
         s3_project_path = f"/{project.organisation_id}/{project_id}"
