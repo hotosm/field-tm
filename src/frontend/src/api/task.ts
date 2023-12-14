@@ -68,6 +68,90 @@ export const getDownloadProjectSubmission: Function = (url: string) => {
   };
 };
 
+export const getDownloadProjectSubmissionJson: Function = (url: string) => {
+  return async (dispatch) => {
+    dispatch(
+      CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+        type: 'json',
+        loading: true,
+      }),
+    );
+
+    const getProjectSubmission = async (url: string) => {
+      try {
+        const response = await CoreModules.axios.post(url);
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: response.data.Message,
+            variant: 'success',
+            duration: 3000,
+          }),
+        );
+
+        const checkStatus = async () => {
+          let statusResponse;
+          do {
+            const submissionResponse = await CoreModules.axios.post(
+              `${url}&background_task_id=${response.data.task_id}`,
+            );
+            statusResponse = submissionResponse.data;
+            if (statusResponse.status === 'PENDING') {
+              await new Promise((resolve) => setTimeout(resolve, 2000));
+            }
+          } while (statusResponse.status === 'PENDING');
+          return statusResponse;
+        };
+        const finalStatus = await checkStatus();
+        if (finalStatus.status === 'FAILED') {
+          dispatch(
+            CommonActions.SetSnackBar({
+              open: true,
+              message: finalStatus.message,
+              variant: 'error',
+              duration: 3000,
+            }),
+          );
+          return;
+        }
+        var a = document.createElement('a');
+        a.href = finalStatus;
+        a.download = 'Submissions';
+        a.click();
+        dispatch(
+          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+            type: 'json',
+            loading: false,
+          }),
+        );
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Something went wrong.',
+            variant: 'error',
+            duration: 3000,
+          }),
+        );
+        dispatch(
+          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+            type: 'json',
+            loading: false,
+          }),
+        );
+      } finally {
+        dispatch(
+          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+            type: 'json',
+            loading: false,
+          }),
+        );
+      }
+    };
+    await getProjectSubmission(url);
+  };
+};
+
 export const fetchConvertToOsmDetails: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(true));
