@@ -470,7 +470,7 @@ def update_submission_in_s3(
         ]
         last_submission = max(
             valid_datetimes, key=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")
-        )
+        ) if valid_datetimes else None
 
         # Check if the file already exists in s3
         s3_project_path = f"/{project.organisation_id}/{project_id}"
