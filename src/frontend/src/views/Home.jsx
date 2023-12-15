@@ -80,14 +80,14 @@ const Home = () => {
       style={{ padding: 7, flex: 1, background: '#F5F5F5' }}
       className="fmtm-flex fmtm-flex-col fmtm-justify-between"
     >
-      <div>
+      <div className="fmtm-h-full">
         <HomePageFilters
           onSearch={handleSearch}
           filteredProjectCount={filteredProjectCards?.length}
           totalProjectCount={stateHome.homeProjectSummary.length}
         />
         {stateHome.homeProjectLoading == false ? (
-          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
+          <div style={{ height: 'calc(100% - 174px)' }} className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
             <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
               {filteredProjectCards.length > 0 ? (
                 <div>
@@ -96,7 +96,7 @@ const Home = () => {
                       className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
                         !showMapStatus
                           ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
-                          : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[33rem] lg:fmtm-overflow-y-scroll lg:scrollbar'
+                          : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[75vh] lg:fmtm-overflow-y-scroll lg:scrollbar'
                       }`}
                     >
                       {filteredProjectCards.map((value, index) => (

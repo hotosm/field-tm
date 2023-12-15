@@ -151,7 +151,7 @@ export default function PrimaryAppBar() {
 
           <CoreModules.Stack sx={{ flexGrow: 1 }} />
 
-          <CoreModules.Stack>
+          {/* <CoreModules.Stack>
             <CoreModules.IconButton
               size="large"
               aria-label="show more"
@@ -161,7 +161,7 @@ export default function PrimaryAppBar() {
             >
               {brightness != true ? <AssetModules.LightModeIcon /> : <AssetModules.DarkModeIcon />}
             </CoreModules.IconButton>
-          </CoreModules.Stack>
+          </CoreModules.Stack> */}
 
           <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex', xs: 'none' } }}>
             {token != null ? (

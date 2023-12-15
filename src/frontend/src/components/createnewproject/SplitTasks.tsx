@@ -381,7 +381,12 @@ const SplitTasks = ({
                           onClick={generateTaskBasedOnSelection}
                           className=""
                           icon={<AssetModules.SettingsIcon className="fmtm-text-white" />}
-                          disabled={formValues?.average_buildings_per_task ? false : true}
+                          disabled={
+                            splitTasksSelection === task_split_type['task_splitting_algorithm'] &&
+                            !formValues?.average_buildings_per_task
+                              ? true
+                              : false
+                          }
                         />
                         {/* <Button
                         btnText="Stop generating"

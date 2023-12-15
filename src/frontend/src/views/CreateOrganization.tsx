@@ -48,17 +48,11 @@ const CreateOrganizationForm = () => {
 
   return (
     <CoreModules.Box
-      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start', background: '#f0efef', flex: 1, gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#f0efef', flex: 1, gap: 3 }}
     >
-      <CoreModules.Box
-        sx={{
-          paddingTop: '2%',
-          justifyContent: 'flex-start',
-          marginLeft: '7.5%',
-        }}
-      >
-        <CoreModules.Typography variant="condensed">CREATE NEW ORGANIZATION</CoreModules.Typography>
-      </CoreModules.Box>
+      <div className="fmtm-pt-[5%] sm:fmtm-pt-[2%] fmtm-w-full fmtm-flex fmtm-justify-center">
+        <h1 className="fmtm-text-xl sm:fmtm-text-2xl md:fmtm-text-4xl fmtm-font-bold">CREATE NEW ORGANIZATION</h1>
+      </div>
       <CoreModules.Box
         sx={{
           width: '85%',
@@ -66,7 +60,6 @@ const CreateOrganizationForm = () => {
           padding: 3,
           cursor: 'pointer',
           background: '#ffff',
-          marginLeft: '7.5%',
           borderRadius: 2,
         }}
       >
