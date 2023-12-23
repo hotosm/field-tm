@@ -1216,3 +1216,21 @@ async def get_template_file(
     return FileResponse(
         file_path, media_type="application/octet-stream", filename=filename
     )
+
+
+@router.get("/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard)
+async def project_dashboard(
+    project_id: int, db: Session = Depends(database.get_db)
+):
+    """
+    Get the project dashboard details.
+
+    Args:
+        project_id (int): The ID of the project.
+        db (Session): The database session.
+
+    Returns:
+        ProjectDashboard: The project dashboard details.
+    """
+
+    return await project_crud.get_dashboard_detail(project_id, db)
