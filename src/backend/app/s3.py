@@ -108,12 +108,16 @@ def get_obj_from_bucket(bucket_name: str, s3_path: str) -> BytesIO:
         s3_path = f"/{s3_path}"
 
     client = s3_client()
+    response = None
     try:
         response = client.get_object(bucket_name, s3_path)
         return BytesIO(response.read())
+    except Exception as e:
+        raise ValueError(str(e))
     finally:
-        response.close()
-        response.release_conn()
+        if response:
+            response.close()
+            response.release_conn()
 
 
 def copy_obj_bucket_to_bucket(
