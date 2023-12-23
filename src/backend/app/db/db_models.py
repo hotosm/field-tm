@@ -70,6 +70,7 @@ class DbUser(Base):
 
     id = Column(BigInteger, primary_key=True, index=True)
     username = Column(String, unique=True)
+    profile_img = Column(String)
     role = Column(Enum(UserRole), default=UserRole.MAPPER)
 
     name = Column(String)

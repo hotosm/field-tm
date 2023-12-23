@@ -23,11 +23,11 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from ..central import central_crud
-from ..db import database
-from ..models.enums import TaskStatus
-from ..projects import project_crud, project_schemas
-from ..users import user_schemas
+from app.central import central_crud
+from app.db import database
+from app.models.enums import TaskStatus
+from app.projects import project_crud, project_schemas
+from app.users import user_schemas
 from . import tasks_crud, tasks_schemas
 
 router = APIRouter(
@@ -37,17 +37,17 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
-@router.get("/task-list", response_model=List[tasks_schemas.Task])
+@router.get("/task-list", response_model=List[tasks_schemas.ReadTask])
 async def read_task_list(
     project_id: int,
     limit: int = 1000,
     db: Session = Depends(database.get_db),
 ):
     tasks = await tasks_crud.get_tasks(db, project_id, limit)
+    updated_tasks = await tasks_crud.update_task_history(tasks, db)
     if not tasks:
         raise HTTPException(status_code=404, detail="Tasks not found")
-    return tasks
+    return updated_tasks
 
 
 @router.get("/", response_model=List[tasks_schemas.Task])
@@ -109,7 +109,7 @@ async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
     return task
 
 
-@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.Task)
+@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.ReadTask)
 async def update_task_status(
     user: user_schemas.User,
     task_id: int,
@@ -120,9 +120,10 @@ async def update_task_status(
     user_id = user.id
 
     task = await tasks_crud.update_task_status(db, user_id, task_id, new_status)
+    updated_task = await tasks_crud.update_task_history(task, db)
     if not task:
         raise HTTPException(status_code=404, detail="Task status could not be updated.")
-    return task
+    return updated_task
 
 
 @router.post("/task-qr-code/{task_id}")

@@ -41,8 +41,9 @@ class TaskHistoryBase(BaseModel):
 
 class TaskHistoryOut(TaskHistoryBase):
     """Task mapping history display."""
-
-    pass
+    status: str
+    username: str
+    profile_img: Optional[str]
 
 
 class TaskBase(BaseModel):
@@ -144,3 +145,8 @@ class Task(TaskBase):
         else:
             log.warning(f"No QR code found for task ID {info.data.get('id')}")
             return ""
+
+class ReadTask(Task):
+    """Task details plus updated task history."""
+
+    task_history: Optional[List[TaskHistoryOut]] = None
