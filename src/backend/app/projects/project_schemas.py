@@ -18,6 +18,7 @@
 
 import uuid
 from datetime import datetime
+from dateutil import parser
 from typing import List, Optional
 
 from geojson_pydantic import Feature as GeojsonFeature
@@ -166,8 +167,10 @@ class ProjectDashboard(BaseModel):
         if value is None:
             return None
 
+        last_active = parser.parse(value).replace(tzinfo=None)
         current_date = datetime.now()
-        time_difference = current_date - datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+
+        time_difference = current_date - last_active
 
         days_difference = time_difference.days
 
@@ -178,4 +181,4 @@ class ProjectDashboard(BaseModel):
         elif days_difference < 7:
             return f'{days_difference} day{"s" if days_difference > 1 else ""} ago'
         else:
-            return value.strftime("%d %b %Y")
+            return last_active.strftime("%d %b %Y")
