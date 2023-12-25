@@ -178,4 +178,5 @@ class ProjectDashboard(BaseModel):
         elif days_difference < 7:
             return f'{days_difference} day{"s" if days_difference > 1 else ""} ago'
         else:
-            return value.strftime("%d %b %Y")
+            value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+            return datetime.strftime(value, "%d %b %Y")
