@@ -197,7 +197,7 @@ A computer-screen-optimized web app that allows Campaign Managers to:
 
 #### Steps to create a project in FMTM
 
-- Go to [fmtm](https://fmtm.hotosm.org/) .
+- Go to [fmtm]([(https://dev.fmtm.hotosm.org/)]) .
 - If you are new then on the top right cornor click on Sign up and create an account.
   Else, Sign in to your existing account .
 - Click the '+ CREATE NEW PROJECT' button.
