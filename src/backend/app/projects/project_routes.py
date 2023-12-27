@@ -1234,3 +1234,16 @@ async def project_dashboard(
     """
 
     return await project_crud.get_dashboard_detail(project_id, db)
+
+@router.get("/contributors/{project_id}")
+async def get_contributors(project_id: int, db: Session = Depends(database.get_db)):
+    """Get contributors of a project.
+
+    Args:
+        project_id (int): ID of project.
+
+    Returns:
+        list[project_schemas.ProjectUser]: List of project users.
+    """
+    project_users = await project_crud.get_project_users(db, project_id)
+    return project_users
