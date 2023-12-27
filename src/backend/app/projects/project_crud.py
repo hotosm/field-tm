@@ -2398,9 +2398,11 @@ async def get_dashboard_detail(project_id: int, db: Session):
 
     s3_project_path = f"/{project.organisation_id}/{project_id}"
     s3_submission_path = f"/{s3_project_path}/submissions.meta.json"
-    
-    file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
-    project.last_active = (json.loads(file.getvalue()))["last_submission"]
+    try:
+        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
+        project.last_active = (json.loads(file.getvalue()))["last_submission"]
+    except ValueError:
+        pass
 
     contributors = db.query(db_models.DbTaskHistory).filter(db_models.DbTaskHistory.project_id==project_id).all()
     unique_user_ids = {user.user_id for user in contributors if user.user_id is not None}
