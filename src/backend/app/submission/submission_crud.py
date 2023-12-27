@@ -26,6 +26,8 @@ from asyncio import gather
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
+from collections import Counter
+from datetime import datetime, timedelta
 
 import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
@@ -817,3 +819,61 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
                 files.extend(json_data_value)
 
     return len(files)
+
+
+async def get_submissions_by_date(db: Session, project_id: int, days: int, planned_task: int):
+    """
+    Get submissions by date.
+
+    Fetches the submissions for a given project within a specified number of days.
+
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+        days (int): The number of days to consider for fetching submissions.
+
+    Returns:
+        dict: A dictionary containing the submission counts for each date.
+
+    Examples:
+        # Fetch submissions for project with ID 1 within the last 7 days
+        submissions = await get_submissions_by_date(db, 1, 7)
+    """
+    
+    project = await project_crud.get_project(db, project_id)
+    s3_project_path = f"/{project.organisation_id}/{project_id}"
+    s3_submission_path = f"/{s3_project_path}/submission.zip"
+
+    try:
+        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
+    except ValueError as e:
+        return []
+
+    with zipfile.ZipFile(file, "r") as zip_ref:
+        with zip_ref.open("submissions.json") as file_in_zip:
+            content = file_in_zip.read()
+
+    content = json.loads(content)
+    end_dates = [datetime.fromisoformat(entry["end"].split('+')[0]) for entry in content if entry.get("end")]
+
+    dates = [date.strftime('%m/%d') for date in end_dates if datetime.now() - date <= timedelta(days=days)]
+
+    submission_counts = Counter(sorted(dates))
+
+    response = [
+        {"date": key, "count": value} 
+        for key, value in submission_counts.items()
+        ]
+    if planned_task:
+        count_dict = {}
+        cummulative_count = 0
+        for date, count in submission_counts.items():
+            cummulative_count += count
+            count_dict[date] = cummulative_count
+        response = [
+            {"date": key, "count": count_dict[key], "planned": planned_task}
+            for key, value in submission_counts.items()
+        ]
+
+    return response
+
