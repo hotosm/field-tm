@@ -30,7 +30,7 @@ from app.config import settings
 from app.db import database
 from app.projects import project_crud, project_schemas
 
-from . import submission_crud
+from app.submission import submission_crud
 
 router = APIRouter(
     prefix="/submission",
@@ -305,3 +305,31 @@ async def get_osm_xml(
     # Create a plain XML response
     response = Response(content=processed_xml_string, media_type="application/xml")
     return response
+
+
+@router.get("/submission_page/{project_id}")
+async def get_submission_page(
+    project_id: int,
+    days: int,
+    background_tasks: BackgroundTasks,
+    planned_task: Optional[int] = None,
+    db: Session = Depends(database.get_db),
+):
+    """
+    This api returns the submission page of a project.
+    It takes one parameter: project_id.
+    project_id: The ID of the project. This endpoint returns the submission page of this project.
+    """
+    
+    data = await submission_crud.get_submissions_by_date(db, project_id, days, planned_task)
+
+    # Update submission cache in the background
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, "sync_submission", project_id
+    )
+
+    background_tasks.add_task(
+        submission_crud.update_submission_in_s3, db, project_id, background_task_id
+    )
+
+    return data
