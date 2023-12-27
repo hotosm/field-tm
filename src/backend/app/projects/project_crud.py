@@ -2414,3 +2414,51 @@ async def get_dashboard_detail(project_id: int, db: Session):
     project.total_tasks = await tasks_crud.get_task_count_in_project(db, project_id)
 
     return project
+
+async def get_project_users(db:Session, project_id:int):
+    """
+    Get the users and their contributions for a project.
+
+    Args:
+        db (Session): The database session.
+        project_id (int): The ID of the project.
+
+    Returns:
+        List[Dict[str, Union[str, int]]]: A list of dictionaries containing the username and the number of contributions made by each user for the specified project.
+    """
+
+    contributors = db.query(db_models.DbTaskHistory).filter(db_models.DbTaskHistory.project_id==project_id).all()
+    unique_user_ids = {user.user_id for user in contributors if user.user_id is not None}
+    response = []
+
+    for user_id in unique_user_ids:
+        contributions = count_user_contributions(db, user_id, project_id)
+        db_user = await user_crud.get_user(db, user_id)
+        response.append({"user":db_user.username, "contributions":contributions})
+    
+    response = sorted(response, key=lambda x: x["contributions"], reverse=True)
+    return response
+
+def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:
+    """
+    Count contributions for a specific user.
+
+    Args:
+        db (Session): The database session.
+        user_id (int): The ID of the user.
+        project_id (int): The ID of the project.
+
+    Returns:
+        int: The number of contributions made by the user for the specified project.
+    """
+
+    contributions_count = (
+        db.query(func.count(db_models.DbTaskHistory.user_id))
+        .filter(
+            db_models.DbTaskHistory.user_id == user_id,
+            db_models.DbTaskHistory.project_id == project_id
+        )
+        .scalar()
+    )
+
+    return contributions_count
