@@ -117,6 +117,7 @@ interface ICustomSelect {
   label: string;
   onValueChange: (value: string | null | number) => void;
   errorMsg: string;
+  className: string;
 }
 
 export const CustomSelect = ({
@@ -129,12 +130,13 @@ export const CustomSelect = ({
   label,
   onValueChange,
   errorMsg,
+  className,
 }: ICustomSelect) => {
   return (
-    <div className="fmtm-w-full">
-      <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">{title}</p>
+    <div className={`fmtm-w-full`}>
+      {title && <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold ">{title}</p>}
       <div className="fmtm-flex fmtm-items-end ">
-        <div className="fmtm-w-full">
+        <div className={`fmtm-w-full ${className}`}>
           <Select value={value} onValueChange={(value) => onValueChange(value)}>
             <SelectTrigger className="">
               <SelectValue placeholder={placeholder} />
