@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '../hooks/WindowDimension';
 import MapDescriptionComponents from '../components/MapDescriptionComponents';
-import ActivitiesPanel from '../components/ActivitiesPanel';
+import ActivitiesPanel from '../components/ProjectDetailsV2/ActivitiesPanel';
 import environment from '../environment';
-import { ProjectById } from '../api/Project';
+import { ProjectById, GetProjectDashboard } from '../api/Project';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import CustomizedSnackbar from '../utilities/CustomizedSnackbar';
 import OnScroll from '../hooks/OnScroll';
@@ -14,18 +15,18 @@ import AssetModules from '../shared/AssetModules';
 import FmtmLogo from '../assets/images/hotLog.png';
 import GenerateBasemap from '../components/GenerateBasemap';
 import { ProjectBuildingGeojsonService } from '../api/SubmissionService';
-import TaskSectionPopup from '../components/ProjectDetails/TaskSectionPopup';
+import TaskSectionPopup from '../components/ProjectDetailsV2/TaskSectionPopup';
 import DialogTaskActions from '../components/DialogTaskActions';
 import QrcodeComponent from '../components/QrcodeComponent';
-import MobileFooter from '../components/ProjectDetails/MobileFooter';
-import MobileActivitiesContents from '../components/ProjectDetails/MobileActivitiesContents';
+import MobileFooter from '../components/ProjectDetailsV2/MobileFooter';
+import MobileActivitiesContents from '../components/ProjectDetailsV2/MobileActivitiesContents';
 import BottomSheet from '../components/common/BottomSheet';
-import MobileProjectInfoContent from '../components/ProjectDetails/MobileProjectInfoContent';
+import MobileProjectInfoContent from '../components/ProjectDetailsV2/MobileProjectInfoContent';
 import { useNavigate } from 'react-router-dom';
 import ProjectOptions from '../components/ProjectDetails/ProjectOptions';
 import { MapContainer as MapComponent, useOLMap } from '../components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '../components/MapComponent/OpenLayersComponent/LayerSwitcher/index';
-import MapControlComponent from '../components/ProjectDetails/MapControlComponent';
+import MapControlComponent from '../components/ProjectDetailsV2/MapControlComponent';
 import { VectorLayer } from '../components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '../constants/geojsonObjectModal';
 import { basicGeojsonTemplate } from '../utilities/mapUtils';
@@ -38,6 +39,8 @@ import { Icon, Style } from 'ol/style';
 import { Motion } from '@capacitor/motion';
 import locationArc from '../assets/images/locationArc.png';
 import { CommonActions } from '../store/slices/CommonSlice';
+import Button from '../components/common/Button';
+import ProjectInfo from '../components/ProjectDetailsV2/ProjectInfo';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -54,6 +57,7 @@ const Home = () => {
   const [currentCoordinate, setCurrentCoordinate] = useState({ latitude: null, longitude: null });
   const [positionGeojson, setPositionGeojson] = useState(null);
   const [deviceRotation, setDeviceRotation] = useState(0);
+  const [viewState, setViewState] = useState('project_info');
 
   const encodedId = params.id;
   const decodedId = environment.decode(encodedId);
@@ -65,6 +69,7 @@ const Home = () => {
   const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
+  const projectDetailsLoading = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -86,7 +91,6 @@ const Home = () => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
-      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
@@ -106,7 +110,6 @@ const Home = () => {
   const { mapRef, map } = useOLMap({
     center: [0, 0],
     zoom: 4,
-    // maxZoom: 17,
   });
 
   const { y } = OnScroll(map, windowSize.width);
@@ -146,6 +149,10 @@ const Home = () => {
 
     setTaskBuildingGeojson(taskBuildingGeojsonFeatureCollection);
   }, [map, projectBuildingGeojson]);
+
+  useEffect(() => {
+    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
+  }, []);
 
   // TasksLayer(map, mainView, featuresLayer);
   const projectClickOnMap = (properties, feature) => {
@@ -229,8 +236,6 @@ const Home = () => {
             }),
           );
           dispatch(ProjectActions.ToggleGeolocationStatus(false));
-
-          console.error('Error getting current position:', error);
         }
       };
 
@@ -263,7 +268,7 @@ const Home = () => {
   }, [geolocationStatus]);
 
   return (
-    <div>
+    <div className="fmtm-bg-[#F5F5F5] fmtm-h-[100vh] sm:fmtm-h-[90vh]">
       {/* Customized Modal For Generate Tiles */}
       <div>
         <GenerateBasemap
@@ -282,101 +287,90 @@ const Home = () => {
         />
       </div>
 
-      {/* Top project details heading medium dimension*/}
-      {windowSize.width >= 640 && (
-        <div className="fmtm-relative">
-          <CoreModules.Stack
-            sx={{ display: { md: 'flex', xs: 'none' } }}
-            direction="column"
-            justifyContent="center"
-            spacing={5}
-            alignItems={'center'}
-          >
-            <CoreModules.Stack
-              direction={'row'}
-              p={2}
-              spacing={2}
-              divider={
-                <CoreModules.Divider
-                  sx={{ backgroundColor: defaultTheme.palette.grey['main'] }}
-                  orientation="vertical"
-                  flexItem
-                />
-              }
+      <div className="fmtm-flex fmtm-h-full sm:fmtm-p-6 fmtm-gap-6">
+        <div className="fmtm-w-[22rem] fmtm-h-full sm:fmtm-block fmtm-hidden">
+          <div className="fmtm-flex fmtm-justify-between fmtm-items-center fmtm-mb-4">
+            {projectDetailsLoading ? (
+              <div className="fmtm-flex fmtm-gap-1 fmtm-items-center">
+                <p>#</p>
+                <CoreModules.Skeleton className="!fmtm-w-[50px] fmtm-h-[20px]" />
+              </div>
+            ) : (
+              <p className="fmtm-text-lg fmtm-font-archivo">{`#${state.projectInfo.id}`}</p>
+            )}
+            <p
+              className="fmtm-text-sm fmtm-text-primaryRed hover:fmtm-cursor-pointer hover:fmtm-text-red-700"
+              onClick={() => navigate(`/projectInfo/${encodedId}`)}
             >
-              <CoreModules.Stack direction={'row'} justifyContent={'center'}>
-                <AssetModules.LocationOn color="error" style={{ fontSize: 22 }} />
-                <CoreModules.Typography variant="h1">{state.projectInfo.title}</CoreModules.Typography>
-              </CoreModules.Stack>
-
-              <CoreModules.Stack>
-                <CoreModules.Typography variant="h4" fontSize={defaultTheme.typography.fontSize}>
-                  {`#${state.projectInfo.id}`}
-                </CoreModules.Typography>
-              </CoreModules.Stack>
-
-              <CoreModules.Stack mt={'5%'}>
-                <CoreModules.Typography
-                  variant="h4"
-                  fontSize={defaultTheme.typography.fontSize}
-                  color={defaultTheme.palette.warning['main']}
-                >
-                  {state.projectInfo.priority_str}
-                </CoreModules.Typography>
-              </CoreModules.Stack>
-            </CoreModules.Stack>
-          </CoreModules.Stack>
-          {/* project Details Title */}
-          <CoreModules.Stack sx={{ display: { xs: 'flex', md: 'none' } }} spacing={2}>
-            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
-              <AssetModules.LocationOn color="error" style={{ marginTop: '1.5%', fontSize: 22 }} />
-              <CoreModules.Typography variant="caption">{state.projectInfo.title}</CoreModules.Typography>
-            </CoreModules.Stack>
-
-            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
-              <CoreModules.Typography variant="h1" fontSize={defaultTheme.typography.fontSize}>
-                {`#${state.projectInfo.id}`}
-              </CoreModules.Typography>
-            </CoreModules.Stack>
-
-            <CoreModules.Stack direction={'row'} justifyContent={'center'}>
-              <CoreModules.Typography
-                variant="h1"
-                fontSize={defaultTheme.typography.fontSize}
-                color={defaultTheme.palette.warning['main']}
-              >
-                {state.projectInfo.priority_str}
-              </CoreModules.Typography>
-            </CoreModules.Stack>
-          </CoreModules.Stack>
-          <button
-            className="fmtm-absolute fmtm-right-0 fmtm-top-0 fmtm-w-fit fmtm-bg-yellow-500 fmtm-text-white fmtm-px-2 fmtm-py-1 fmtm-text-sm hover:fmtm-bg-yellow-600"
-            onClick={() => navigate(`/newproject_details/${params?.id}`)}
-          >
-            New UI
-          </button>
-        </div>
-      )}
-
-      {/* Center description and map */}
-      <CoreModules.Stack direction={'column'} spacing={1}>
-        {windowSize.width >= 640 && (
-          <div>
-            <MapDescriptionComponents defaultTheme={defaultTheme} state={state} type={type} />
-            <ProjectOptions setToggleGenerateModal={setToggleGenerateModal} />
+              View Submissions <AssetModules.LaunchIcon style={{ fontSize: '14px' }} />
+            </p>
           </div>
-        )}
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
+            {projectDetailsLoading ? (
+              <CoreModules.Skeleton className="!fmtm-w-[250px] fmtm-h-[25px]" />
+            ) : (
+              <div className="fmtm-relative">
+                <p
+                  className="fmtm-text-xl fmtm-font-archivo fmtm-line-clamp-3 fmtm-mr-4"
+                  title={state.projectInfo.title}
+                >
+                  {state.projectInfo.title}
+                </p>
 
-        {/* <ProjectMap /> */}
+                <div title="Edit Project">
+                  <AssetModules.EditIcon
+                    className="fmtm-absolute fmtm-bottom-2 fmtm-right-0 fmtm-text-primaryRed hover:fmtm-cursor-pointer hover:fmtm-text-red-700"
+                    style={{ fontSize: '18px' }}
+                    onClick={() => navigate(`/edit-project/project-details/${encodedId}`)}
+                  />
+                </div>
+              </div>
+            )}
+            <div className="fmtm-w-full fmtm-h-1 fmtm-bg-white"></div>
+            <div className="fmtm-flex fmtm-w-full">
+              <button
+                className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                  viewState === 'project_info'
+                    ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                    : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                } fmtm-py-1`}
+                onClick={() => setViewState('project_info')}
+              >
+                Project Info
+              </button>
+              <button
+                className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                  viewState !== 'project_info'
+                    ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                    : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                } fmtm-py-1`}
+                onClick={() => setViewState('task_activity')}
+              >
+                Task Activity
+              </button>
+            </div>
+            {viewState === 'project_info' ? (
+              <ProjectInfo />
+            ) : (
+              <ActivitiesPanel
+                params={params}
+                state={state.projectTaskBoundries}
+                defaultTheme={defaultTheme}
+                map={map}
+                view={mainView}
+                mapDivPostion={y}
+                states={state}
+              />
+            )}
+          </div>
+        </div>
         {params?.id && (
-          <div className="fmtm-relative sm:fmtm-static">
+          <div className="fmtm-relative sm:fmtm-static fmtm-flex-grow fmtm-h-full sm:fmtm-rounded-2xl fmtm-overflow-hidden">
             <MapComponent
               ref={mapRef}
               mapInstance={map}
               className={`map naxatw-relative naxatw-min-h-full naxatw-w-full ${
-                windowSize.width <= 640
-                  ? 'fmtm-h-[100vh]'
-                  : 'fmtm-border-y-[4px] sm:fmtm-border-x-[4px] fmtm-border-primaryRed fmtm-h-[608px]'
+                windowSize.width <= 640 ? 'fmtm-h-[100vh]' : 'fmtm-h-full'
               }`}
             >
               <LayerSwitcherControl visible={'outdoors'} />
@@ -490,23 +484,7 @@ const Home = () => {
             <MobileFooter />
           </div>
         )}
-      </CoreModules.Stack>
-
-      {windowSize.width >= 640 && (
-        <div>
-          <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <ActivitiesPanel
-              params={params}
-              state={state.projectTaskBoundries}
-              defaultTheme={defaultTheme}
-              map={map}
-              view={mainView}
-              mapDivPostion={y}
-              states={state}
-            />
-          </CoreModules.Stack>
-        </div>
-      )}
+      </div>
       {featuresLayer != undefined && (
         <TaskSectionPopup
           body={

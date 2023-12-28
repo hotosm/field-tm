@@ -6,6 +6,7 @@ export const ProjectById = (existingProjectList, projectId) => {
   return async (dispatch) => {
     const fetchProjectById = async (projectId, existingProjectList) => {
       try {
+        dispatch(ProjectActions.SetProjectDetialsLoading(true));
         const project = await CoreModules.axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}`);
         const taskList = await CoreModules.axios.get(
           `${import.meta.env.VITE_API_URL}/tasks/task-list?project_id=${projectId}`,
@@ -57,6 +58,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             tasks_bad: projectResp.tasks_bad,
           }),
         );
+        dispatch(ProjectActions.SetProjectDetialsLoading(false));
       } catch (error) {
         // console.log('error :', error)
       }
@@ -182,5 +184,23 @@ export const DownloadTile = (url, payload) => {
       }
     };
     await getDownloadTile(url, payload);
+  };
+};
+
+export const GetProjectDashboard = (url) => {
+  return async (dispatch) => {
+    const getProjectDashboard = async (url) => {
+      try {
+        dispatch(ProjectActions.SetProjectDashboardLoading(true));
+        const response = await CoreModules.axios.get(url);
+        dispatch(ProjectActions.SetProjectDashboardDetail(response.data));
+        dispatch(ProjectActions.SetProjectDashboardLoading(false));
+      } catch (error) {
+        dispatch(ProjectActions.SetProjectDashboardLoading(false));
+      } finally {
+        dispatch(ProjectActions.SetProjectDashboardLoading(false));
+      }
+    };
+    await getProjectDashboard(url);
   };
 };
