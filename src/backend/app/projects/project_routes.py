@@ -198,7 +198,7 @@ async def search_project(
     return response
 
 
-@router.get("/{project_id}", response_model=project_schemas.ProjectOut)
+@router.get("/{project_id}", response_model=project_schemas.ReadProject)
 async def read_project(project_id: int, db: Session = Depends(database.get_db)):
     project = await project_crud.get_project_by_id(db, project_id)
     if not project:

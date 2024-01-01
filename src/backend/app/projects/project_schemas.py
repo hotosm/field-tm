@@ -130,7 +130,7 @@ class ProjectBase(BaseModel):
     author: User
     project_info: ProjectInfo
     status: ProjectStatus
-    location_str: str
+    # location_str: str
     outline_geojson: Optional[GeojsonFeature] = None
     project_tasks: Optional[List[tasks_schemas.Task]]
     xform_title: Optional[str] = None
@@ -140,6 +140,10 @@ class ProjectBase(BaseModel):
 
 class ProjectOut(ProjectBase):
     project_uuid: uuid.UUID = uuid.uuid4()
+
+class ReadProject(ProjectBase):
+    project_uuid: uuid.UUID = uuid.uuid4()
+    location_str: str
 
 
 class BackgroundTaskStatus(BaseModel):
