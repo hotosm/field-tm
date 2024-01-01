@@ -24,7 +24,7 @@ from typing import Any, List, Optional
 
 from geojson_pydantic import Feature
 from loguru import logger as log
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_validators import field_validator
 
 from app.db.postgis_utils import geometry_to_geojson, get_centroid
@@ -71,7 +71,7 @@ class TaskBase(BaseModel):
     locked_by_username: Optional[str] = None
     task_history: Optional[List[TaskHistoryBase]] = None
 
-    @validator("task_status", pre=False, always=True)
+    @field_validator("task_status", mode="before")
     def get_enum_name(cls, value, values):
         if isinstance(value, int):
             try:
