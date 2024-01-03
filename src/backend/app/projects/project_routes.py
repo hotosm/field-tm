@@ -46,6 +46,7 @@ from shapely.ops import unary_union
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser, login_required
+from app.submission import submission_crud
 
 from ..central import central_crud
 from ..db import database, db_models
@@ -1220,7 +1221,9 @@ async def get_template_file(
 
 @router.get("/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard)
 async def project_dashboard(
-    project_id: int, db: Session = Depends(database.get_db)
+    project_id: int, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(database.get_db)
 ):
     """
     Get the project dashboard details.
@@ -1232,8 +1235,15 @@ async def project_dashboard(
     Returns:
         ProjectDashboard: The project dashboard details.
     """
+    data = await project_crud.get_dashboard_detail(project_id, db)
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, "sync_submission", project_id
+    )
 
-    return await project_crud.get_dashboard_detail(project_id, db)
+    background_tasks.add_task(
+        submission_crud.update_submission_in_s3, db, project_id, background_task_id
+    )
+    return data
 
 @router.get("/contributors/{project_id}")
 async def get_contributors(project_id: int, db: Session = Depends(database.get_db)):
