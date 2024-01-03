@@ -29,6 +29,8 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import database
 from app.projects import project_crud, project_schemas
+from app.central import central_crud
+from app.tasks import tasks_crud
 
 from app.submission import submission_crud
 
@@ -333,3 +335,23 @@ async def get_submission_page(
     )
 
     return data
+
+
+@router.get("/submission_form_fields/{project_id}")
+async def get_submission_form_fields(project_id: int, db: Session = Depends(database.get_db)):
+    """
+    Retrieves the submission form for a specific project.
+
+    Args:
+        project_id (int): The ID of the project.
+        db (Session, optional): The database session. Defaults to Depends(database.get_db).
+
+    Returns:
+        Any: The response from the submission form API.
+    """
+
+    project = await project_crud.get_project(db, project_id)
+    task_list = await tasks_crud.get_task_id_list(db, project_id)
+    odk_form = central_crud.get_odk_form(project)
+    response = odk_form.form_fields(project.odkid, str(task_list[0]))
+    return response
