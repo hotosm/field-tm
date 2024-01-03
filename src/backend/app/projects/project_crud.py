@@ -2397,21 +2397,32 @@ async def get_dashboard_detail(project_id: int, db: Session):
     db_organization = await organization_crud.get_organisation_by_id(db, project.organisation_id)
 
     s3_project_path = f"/{project.organisation_id}/{project_id}"
-    s3_submission_path = f"/{s3_project_path}/submissions.meta.json"
+    s3_submission_path = f"/{s3_project_path}/submission.zip"
+    s3_submission_meta_path = f"/{s3_project_path}/submissions.meta.json"
+
     try:
-        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
-        project.last_active = (json.loads(file.getvalue()))["last_submission"]
+        submission = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
+        with zipfile.ZipFile(submission, "r") as zip_ref:
+            with zip_ref.open("submissions.json") as file_in_zip:
+                content = file_in_zip.read()
+        content = json.loads(content)
+        project.total_submission = len(content)
+        submission_meta = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_meta_path)
+        project.last_active = (json.loads(submission_meta.getvalue()))["last_submission"]
     except ValueError:
+        project.total_submission = 0
         pass
 
-    contributors = db.query(db_models.DbTaskHistory).filter(db_models.DbTaskHistory.project_id==project_id).all()
-    unique_user_ids = {user.user_id for user in contributors if user.user_id is not None}
+    contributors = db.query(
+        db_models.DbTaskHistory.user_id
+        ).filter(
+        db_models.DbTaskHistory.project_id == project_id,
+        db_models.DbTaskHistory.user_id.isnot(None)
+        ).distinct().count()
 
-    project.organization = db_organization.name
-    project.organization_logo = db_organization.logo
-    project.total_contributors = len(unique_user_ids)
-    project.total_submission = await submission_crud.get_submission_count_of_a_project(db, project_id)
     project.total_tasks = await tasks_crud.get_task_count_in_project(db, project_id)
+    project.organization, project.organization_logo = db_organization.name, db_organization.logo
+    project.total_contributors = contributors
 
     return project
 

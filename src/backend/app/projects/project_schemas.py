@@ -154,11 +154,11 @@ class BackgroundTaskStatus(BaseModel):
 class ProjectDashboard(BaseModel):
     project_name_prefix: str
     organization: str
-    organization_logo: Optional[str] = None
     total_tasks: int
-    total_submission: int
-    total_contributors: int
     created: datetime
+    organization_logo: Optional[str] = None
+    total_submission: Optional[int] = None
+    total_contributors: Optional[int] = None
     last_active: Optional[str] = None
 
     @field_validator("created", mode="before")
