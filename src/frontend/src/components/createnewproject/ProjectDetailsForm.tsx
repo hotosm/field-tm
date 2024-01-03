@@ -76,6 +76,7 @@ const ProjectDetailsForm = ({ flag }) => {
     handleChange(e);
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
   };
+
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
       <div className="fmtm-bg-white xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -86,9 +87,18 @@ const ProjectDetailsForm = ({ flag }) => {
             information about your project.
           </span>
           <span>To complete the first step, you will need the login credentials of ODK Central Server.</span>{' '}
-          <span>
-            Here are the instructions for setting up a Central ODK Server on Digital Ocean, if you haven’t already.
-          </span>
+          <div className="fmtm-flex fmtm-flex-col">
+            <span>
+              Here are the instructions for setting up a Central ODK Server on Digital Ocean, if you haven’t already.
+            </span>
+            <a
+              href="https://docs.getodk.org/central-install-digital-ocean/"
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+              target="_"
+            >
+              https://docs.getodk.org/central-install-digital-ocean/
+            </a>
+          </div>
         </p>
       </div>
       <form
