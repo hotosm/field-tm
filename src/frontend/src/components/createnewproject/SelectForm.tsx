@@ -39,6 +39,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
     errors,
   }: any = useForm(projectDetails, submission, SelectFormValidation);
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
+  const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
 
   /**
    * Function to handle the change event of a file input.
@@ -95,9 +96,9 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
             <div className="fmtm-flex fmtm-flex-col  fmtm-gap-6">
               <div className="">
                 <CustomSelect
-                  title="Select the most suitable category that defines your survey"
-                  placeholder="Form category"
-                  data={formCategoryList}
+                  title="Select form category"
+                  placeholder="Select form category"
+                  data={sortedFormCategoryList}
                   dataKey="id"
                   valueKey="title"
                   label="title"

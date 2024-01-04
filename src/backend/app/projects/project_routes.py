@@ -37,12 +37,8 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse, JSONResponse
 from loguru import logger as log
-from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
-from osm_rawdata.postgres import PostgresClient
-from shapely.geometry import mapping, shape
-from shapely.ops import unary_union
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser, login_required
@@ -284,7 +280,7 @@ async def update_odk_credentials(
         project, odk_central_cred, odkproject["id"], db
     )
 
-    return JSONResponse(status_code=200, message={"success": True})
+    return JSONResponse(status_code=200, content={"success": True})
 
 
 @router.put("/{id}", response_model=project_schemas.ProjectOut)
@@ -412,14 +408,16 @@ async def upload_multi_project_boundary(
 @router.post("/task_split")
 async def task_split(
     project_geojson: UploadFile = File(...),
+    extract_geojson: UploadFile = File(...),
     no_of_buildings: int = Form(50),
-    custom_data_extract: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
 ):
     """Split a task into subtasks.
 
     Args:
         project_geojson (UploadFile): The geojson to split.
+            Should be a FeatureCollection.
+        extract_geojson (UploadFile): Data extract geojson containing osm features.
             Should be a FeatureCollection.
         no_of_buildings (int, optional): The number of buildings per subtask.
             Defaults to 50.
@@ -430,23 +428,20 @@ async def task_split(
 
     """
     # read project boundary
-    boundary = geojson.loads(await project_geojson.read())
-    # Validatiing Coordinate Reference System
-    check_crs(boundary)
+    parsed_boundary = geojson.loads(await project_geojson.read())
+    # Validatiing Coordinate Reference Systems
+    check_crs(parsed_boundary)
 
-    # read custom data extract
-    if custom_data_extract:
-        custom_data_extract = geojson.loads(await custom_data_extract.read())
-        check_crs(custom_data_extract)
+    # read data extract
+    parsed_extract = geojson.loads(await extract_geojson.read())
+    check_crs(parsed_extract)
 
-    result = await project_crud.split_geojson_into_tasks(
+    return await project_crud.split_geojson_into_tasks(
         db,
-        boundary,
+        parsed_boundary,
+        parsed_extract,
         no_of_buildings,
-        custom_data_extract,
     )
-
-    return result
 
 
 @router.post("/{project_id}/upload")
@@ -667,49 +662,6 @@ async def generate_files(
     )
 
 
-@router.post("/view_data_extracts/")
-async def get_data_extracts(
-    aoi: UploadFile,
-    category: Optional[str] = Form(...),
-):
-    try:
-        # read entire file
-        aoi_content = await aoi.read()
-        boundary = json.loads(aoi_content)
-
-        # Validatiing Coordinate Reference System
-        check_crs(boundary)
-        xlsform = f"{xlsforms_path}/{category}.xls"
-        config_path = f"{data_models_path}/{category}.yaml"
-
-        if boundary["type"] == "FeatureCollection":
-            # Convert each feature into a Shapely geometry
-            geometries = [
-                shape(feature["geometry"]) for feature in boundary["features"]
-            ]
-            updated_geometry = unary_union(geometries)
-        else:
-            updated_geometry = shape(boundary["geometry"])
-
-        # Convert the merged MultiPolygon to a single Polygon using convex hull
-        merged_polygon = updated_geometry.convex_hull
-
-        # Convert the merged polygon back to a GeoJSON-like dictionary
-        boundary = {
-            "type": "Feature",
-            "geometry": mapping(merged_polygon),
-            "properties": {},
-        }
-
-        # # OSM Extracts using raw data api
-        pg = PostgresClient("underpass", config_path)
-        data_extract = pg.execQuery(boundary)
-        return data_extract
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-
 @router.post("/update-form/{project_id}")
 async def update_project_form(
     project_id: int,
@@ -811,6 +763,7 @@ async def get_categories():
     - Returns a JSON object containing a list of categories and their respoective forms.
 
     """
+    # FIXME update to use osm-rawdata
     categories = (
         getChoices()
     )  # categories are fetched from osm_fieldwork.make_data_extracts.getChoices()
@@ -843,56 +796,55 @@ async def preview_split_by_square(
     return result
 
 
+@router.post("/get_data_extract/")
+async def get_data_extract(
+    geojson_file: UploadFile = File(...),
+    project_id: int = Query(None, description="Project ID"),
+    db: Session = Depends(database.get_db),
+):
+    """Get the data extract for a given project AOI.
+
+    Use for both generating a new data extract and for getting
+    and existing extract.
+    """
+    boundary_geojson = json.loads(await geojson_file.read())
+
+    fgb_url = await project_crud.get_data_extract_url(
+        db,
+        boundary_geojson,
+        project_id,
+    )
+    return JSONResponse(status_code=200, content={"url": fgb_url})
+
+
 @router.post("/upload_custom_extract/")
 async def upload_custom_extract(
     background_tasks: BackgroundTasks,
-    geojson: UploadFile = File(...),
-    feature_type: str = Query(
-        ..., description="Select feature type ", enum=["buildings", "lines"]
-    ),
+    custom_extract_file: UploadFile = File(...),
+    project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
 ):
-    """Upload a custom data extract for a project.
-
-    FIXME
-    Should this endpoint use upload_custom_data_extract
-    instead of a new function upload_custom_extract?
-    Are we duplicating code?
-    FIXME
-
-    Add osm data extract features to a project.
+    """Upload a custom data extract for a project as fgb in S3.
 
     Request Body
-    - 'project_id' (int): the project's id. Required.
-    - 'geojson' (file): Geojson files with the features. Required.
+    - 'custom_extract_file' (file): Geojson files with the features. Required.
 
+    Query Params:
+    - 'project_id' (int): the project's id. Required.
     """
     # Validating for .geojson File.
-    file_name = os.path.splitext(geojson.filename)
+    file_name = os.path.splitext(custom_extract_file.filename)
     file_ext = file_name[1]
     allowed_extensions = [".geojson", ".json"]
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
 
     # read entire file
-    content = await geojson.read()
-    features = json.loads(content)
+    geojson_str = await custom_extract_file.read()
 
-    # Validatiing Coordinate Reference System
-    check_crs(features)
-
-    # Create task in db and return uuid
     log.debug("Creating upload_custom_extract background task")
-    background_task_id = await project_crud.insert_background_task_into_database(db)
-
-    background_tasks.add_task(
-        project_crud.add_custom_extract_to_db,
-        db,
-        features,
-        background_task_id,
-        feature_type,
-    )
-    return True
+    fgb_url = await project_crud.upload_custom_data_extract(db, project_id, geojson_str)
+    return JSONResponse(status_code=200, content={"url": fgb_url})
 
 
 @router.get("/download_form/{project_id}/")
@@ -957,7 +909,7 @@ async def update_project_category(
         db, project_id, file_ext[1:] if upload else "xls", upload  # Form
     )
 
-    return True
+    return JSONResponse(status_code=200, content={"success": True})
 
 
 @router.get("/download_template/")

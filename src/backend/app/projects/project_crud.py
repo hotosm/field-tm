@@ -24,12 +24,12 @@ import time
 import uuid
 from asyncio import gather
 from concurrent.futures import ThreadPoolExecutor, wait
+from importlib.resources import files as pkg_files
 from io import BytesIO
 from typing import List, Optional, Union
 
 import geoalchemy2
 import geojson
-import pkg_resources
 import requests
 import segno
 import shapely.wkb as wkblib
@@ -40,7 +40,7 @@ from fastapi import File, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geoalchemy2.shape import from_shape, to_shape
-from geojson import Feature, FeatureCollection
+from geojson.feature import Feature, FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.basemapper import create_basemap_file
 from osm_fieldwork.data_models import data_models_path
@@ -49,15 +49,13 @@ from osm_fieldwork.json2osm import json2osm
 from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_rawdata.postgres import PostgresClient
-from shapely import wkt
+from shapely import to_geojson, wkt
 from shapely.geometry import (
-    LineString,
-    MultiLineString,
-    MultiPolygon,
     Polygon,
     shape,
 )
-from sqlalchemy import and_, column, func, inspect, select, table, text
+from shapely.ops import unary_union
+from sqlalchemy import and_, column, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -65,13 +63,12 @@ from app.central import central_crud
 from app.config import settings
 from app.db import db_models
 from app.db.database import get_db
-from app.db.postgis_utils import geometry_to_geojson, timestamp
+from app.db.postgis_utils import geojson_to_flatgeobuf, geometry_to_geojson, timestamp
+from app.organization import organization_crud
 from app.projects import project_schemas
+from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
 from app.users import user_crud
-from app.submission import submission_crud
-from app.s3 import get_obj_from_bucket
-from app.organization import organization_crud
 
 QR_CODES_DIR = "QR_codes/"
 TASK_GEOJSON_DIR = "geojson/"
@@ -268,6 +265,8 @@ async def create_project_with_project_info(
     db: Session, project_metadata: project_schemas.ProjectUpload, odk_project_id: int
 ):
     """Create a new project, including all associated info."""
+    # FIXME the ProjectUpload model should be converted to the db model directly
+    # FIXME we don't need to extract each variable and pass manually
     project_user = project_metadata.author
     project_info = project_metadata.project_info
     xform_title = project_metadata.xform_title
@@ -277,6 +276,7 @@ async def create_project_with_project_info(
     task_split_type = project_metadata.task_split_type
     task_split_dimension = project_metadata.task_split_dimension
     task_num_buildings = project_metadata.task_num_buildings
+    data_extract_type = project_metadata.task_num_buildings
 
     # verify data coming in
     if not project_user:
@@ -341,6 +341,7 @@ async def create_project_with_project_info(
         task_split_type=task_split_type,
         task_split_dimension=task_split_dimension,
         task_num_buildings=task_num_buildings,
+        data_extract_type=data_extract_type,
         # country=[project_metadata.country],
         # location_str=f"{project_metadata.city}, {project_metadata.country}",
     )
@@ -533,18 +534,83 @@ async def preview_split_by_square(boundary: str, meters: int):
     )
 
 
-async def get_osm_extracts(boundary: str) -> dict:
+async def get_data_extract_from_osm_rawdata(
+    aoi: UploadFile,
+    category: str,
+):
+    """Get data extract using OSM RawData module.
+
+    Filters by a specific category.
+    """
+    try:
+        # read entire file
+        aoi_content = await aoi.read()
+        boundary = json.loads(aoi_content)
+
+        # Validatiing Coordinate Reference System
+        check_crs(boundary)
+
+        # Get pre-configured filter for category
+        config_path = f"{data_models_path}/{category}.yaml"
+
+        if boundary["type"] == "FeatureCollection":
+            # Convert each feature into a Shapely geometry
+            geometries = [
+                shape(feature["geometry"]) for feature in boundary["features"]
+            ]
+            updated_geometry = unary_union(geometries)
+        else:
+            updated_geometry = shape(boundary["geometry"])
+
+        # Convert the merged MultiPolygon to a single Polygon using convex hull
+        merged_polygon = updated_geometry.convex_hull
+
+        # Convert the merged polygon back to a GeoJSON-like dictionary
+        boundary = {
+            "type": "Feature",
+            "geometry": to_geojson(merged_polygon),
+            "properties": {},
+        }
+
+        # # OSM Extracts using raw data api
+        pg = PostgresClient("underpass", config_path)
+        data_extract = pg.execQuery(boundary)
+        return data_extract
+    except Exception as e:
+        log.error(e)
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+async def get_data_extract_url(
+    db: Session,
+    aoi: Union[FeatureCollection, Feature, dict],
+    project_id: Optional[int] = None,
+) -> str:
     """Request an extract from raw-data-api and extract the file contents.
 
     - The query is posted to raw-data-api and job initiated for fetching the extract.
     - The status of the job is polled every few seconds, until 'SUCCESS' is returned.
-    - The resulting zip file is downloaded, extracted, and data returned.
-    """
-    # TODO update to use flatgeobuf file directly
-    # bind zip off
-    # fmtm-dev-project-xxx-extract
-    # FMTM/dev/xxx/fmtm-project-xxx-extract.flatgeobuf
+    - The resulting flatgeobuf file is streamed in the frontend.
 
+    Returns:
+        str: the URL for the flatgeobuf data extract.
+    """
+    if project_id:
+        db_project = await get_project_by_id(db, project_id)
+        if not db_project:
+            log.error(f"Project {project_id} doesn't exist!")
+            return False
+
+        # TODO update db field data_extract_type --> data_extract_url
+        fgb_url = db_project.data_extract_type
+
+        # If extract already exists, return url to it
+        if fgb_url:
+            return fgb_url
+
+    # FIXME replace below with get_data_extract_from_osm_rawdata
+
+    # Data extract does not exist, continue to create
     # Filters for osm extracts
     query = {
         "filters": {
@@ -556,22 +622,28 @@ async def get_osm_extracts(boundary: str) -> dict:
         }
     }
 
-    # Boundary to extract data for
-    aoi = geojson.loads(boundary)
-    # Get first geom only from a FeatureCollection
-    # TODO perhaps add extra code for merging multiple geoms into one?
-    if isinstance(aoi, FeatureCollection):
-        aoi = aoi.get("features")[0]
-    if isinstance(aoi, Feature):
-        aoi = aoi.get("geometry")
-    query["geometry"] = aoi
+    if geom_type := aoi.get("type") == "FeatureCollection":
+        # Convert each feature into a Shapely geometry
+        geometries = [
+            shape(feature.get("geometry")) for feature in aoi.get("features", [])
+        ]
+        merged_geom = unary_union(geometries)
+    elif geom_type := aoi.get("type") == "Feature":
+        merged_geom = shape(aoi.get("geometry"))
+    else:
+        merged_geom = shape(aoi)
+    # Convert the merged geoms to a single Polygon GeoJSON using convex hull
+    query["geometry"] = json.loads(to_geojson(merged_geom.convex_hull))
 
     # Filename to generate
-    query["fileName"] = "extract"
-    # File format to generate
-    query["outputType"] = "geojson"
-    extract_filename = f'{query["fileName"]}.{query["outputType"]}'
-    log.debug(f"Setting data extract file name to: {extract_filename}")
+    # query["fileName"] = f"fmtm-project-{project_id}-extract"
+    query["fileName"] = "fmtm-extract"
+    # Output to flatgeobuf format
+    query["outputType"] = "fgb"
+    # Generate without zipping
+    query["bind_zip"] = False
+    # Optional authentication
+    # headers["access-token"] = settings.OSM_SVC_ACCOUNT_TOKEN
 
     log.debug(f"Query for raw data api: {query}")
     base_url = settings.UNDERPASS_API_URL
@@ -600,55 +672,30 @@ async def get_osm_extracts(boundary: str) -> dict:
         elif result.json()["status"] == "SUCCESS":
             break
 
-    # TODO update code to generate fgb file format
-    # then input the download_url directly into our database
-    # (no need to download the file and extract)
-    zip_url = result.json()["result"]["download_url"]
-    result = requests.get(zip_url, headers=headers)
-    # result.content
-    fp = BytesIO(result.content)
-    zfp = zipfile.ZipFile(fp, "r")
-    zfp.extract(extract_filename, "/tmp/")
-    data = geojson.loads(zfp.read(extract_filename))
-    return data
+    fgb_url = result.json()["result"]["download_url"]
+    return fgb_url
 
 
 async def split_geojson_into_tasks(
     db: Session,
     project_geojson: Union[dict, FeatureCollection],
+    extract_geojson: Union[dict, FeatureCollection],
     no_of_buildings: int,
-    custom_data_extract: Optional[str] = None,
 ):
     """Splits a project into tasks.
 
     Args:
         db (Session): A database session.
-        project_geojson (str): A GeoJSON string representing the boundary of
-            the project to split into tasks.
+        project_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
+            boundary.
+        extract_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
+            boundary osm data extract (features).
         no_of_buildings (int): The number of buildings to include in each task.
-        custom_data_extract (str, optional): A GeoJSON string containing a
-            custom data extract.
 
     Returns:
         Any: A GeoJSON object containing the tasks for the specified project.
     """
-    # NOTE this is a temp id used interally for task splitting
-    # NOTE it's not the FMTM project id
-    aoi_id = uuid.uuid4()
-
-    if custom_data_extract:
-        # TODO upload to s3 and get url
-        extract_geojson = await {}
-    else:
-        # Generate a new data extract in raw-data-api
-        extract_geojson = await get_osm_extracts(json.dumps(project_geojson))
-        if status_code := extract_geojson.get("status_code", None):
-            raise HTTPException(
-                status_code=status_code,
-                detail=(f"Failed to get data extract for reason: {extract_geojson}"),
-            )
-
-    log.debug(f"STARTED task splitting with id: {aoi_id}")
+    log.debug("STARTED task splitting using provided boundary and data extract")
     features = await run_in_threadpool(
         lambda: split_by_sql(
             project_geojson,
@@ -657,7 +704,7 @@ async def split_geojson_into_tasks(
             osm_extract=extract_geojson,
         )
     )
-    log.debug(f"COMPLETE task splitting with id: {aoi_id}")
+    log.debug("COMPLETE task splitting")
     return features
 
 
@@ -925,11 +972,12 @@ async def read_xlsforms(
     """Read the list of XLSForms from the disk."""
     xlsforms = list()
     package_name = "osm_fieldwork"
+    package_files = pkg_files(package_name)
     for xls in os.listdir(directory):
         if xls.endswith(".xls") or xls.endswith(".xlsx"):
             file_name = xls.split(".")[0]
             yaml_file_name = f"data_models/{file_name}.yaml"
-            if pkg_resources.resource_exists(package_name, yaml_file_name):
+            if package_files.joinpath(yaml_file_name).is_file():
                 xlsforms.append(xls)
             else:
                 continue
@@ -981,23 +1029,20 @@ async def get_odk_id_for_project(db: Session, project_id: int):
     return project_info.odkid
 
 
-async def upload_custom_data_extracts(
+async def upload_custom_data_extract(
     db: Session,
     project_id: int,
-    contents: str,
-    category: str = "buildings",
-):
-    """Uploads custom data extracts to the database.
+    geojson_str: str,
+) -> str:
+    """Uploads custom data extracts to S3.
 
     Args:
-        db (Session): The database session object.
+        db (Session): SQLAlchemy database session.
         project_id (int): The ID of the project.
-        contents (str): The custom data extracts contents.
-        category (str, optional): The category assigned to the custom data extract.
-            Defaults to 'buildings'.
+        geojson_str (str): The custom data extracts contents.
 
     Returns:
-        bool: True if the upload is successful.
+        str: URL to fgb file in S3.
     """
     project = await get_project(db, project_id)
     log.debug(f"Uploading custom data extract for project: {project}")
@@ -1005,13 +1050,22 @@ async def upload_custom_data_extracts(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    project_geojson = db.query(func.ST_AsGeoJSON(project.outline)).scalar()
-    log.debug(f"Generated project geojson: {project_geojson}")
-    json.loads(project_geojson)
+    log.debug("Parsing geojson file")
+    geojson_parsed = geojson.loads(geojson_str)
+    if isinstance(geojson_parsed, FeatureCollection):
+        log.debug("Already in FeatureCollection format, skipping reparse")
+        featcol = geojson_parsed
+    elif isinstance(geojson_parsed, Feature):
+        log.debug("Converting Feature to FeatureCollection")
+        featcol = FeatureCollection(geojson_parsed)
+    else:
+        log.debug("Converting geometry to FeatureCollection")
+        featcol = FeatureCollection[Feature(geometry=geojson_parsed)]
 
-    features_data = json.loads(contents)
+    # Validating Coordinate Reference System
+    check_crs(featcol)
 
-    # # Data Cleaning
+    # FIXME use osm-fieldwork filter/clean data
     # cleaned = FilterData()
     # models = xlsforms_path.replace("xlsforms", "data_models")
     # xlsfile = f"{category}.xls"  # FIXME: for custom form
@@ -1022,35 +1076,43 @@ async def upload_custom_data_extracts(
     #     title, extract = cleaned.parse(f"{file}x")
     # # Remove anything in the data extract not in the choices sheet.
     # cleaned_data = cleaned.cleanData(features_data)
-
-    for feature in features_data["features"]:
-        feature_shape = shape(feature["geometry"])
-        if isinstance(feature_shape, MultiPolygon):
-            wkb_element = from_shape(
-                Polygon(feature["geometry"]["coordinates"][0][0]), srid=4326
-            )
-        elif isinstance(feature_shape, MultiLineString):
-            wkb_element = from_shape(
-                LineString(feature["geometry"]["coordinates"][0]), srid=4326
-            )
-        else:
-            wkb_element = from_shape(feature_shape, srid=4326)
-
-        # If the osm extracts contents do not have a title,
-        # provide an empty text for that.
-        feature["properties"]["title"] = ""
-        properties = flatten_dict(feature["properties"])
-
-        db_feature = db_models.DbFeatures(
-            project_id=project_id,
-            geometry=wkb_element,
-            properties=properties,
-            category_title=category,
+    feature_type = featcol.get("features", [])[-1].get("geometry", {}).get("type")
+    if feature_type not in ["Polygon", "Polyline"]:
+        msg = (
+            "Extract does not contain valid geometry types, from 'Polygon' "
+            "and 'Polyline'"
         )
-        db.add(db_feature)
+        log.error(msg)
+        raise HTTPException(status_code=404, detail=msg)
+    features_filtered = [
+        feature
+        for feature in featcol.get("features", [])
+        if feature.get("geometry", {}).get("type", "") == feature_type
+    ]
+    featcol_filtered = FeatureCollection(features_filtered)
+
+    log.debug(
+        "Generating fgb object from geojson with "
+        f"{len(featcol_filtered.get('features', []))} features"
+    )
+    fgb_obj = BytesIO(await geojson_to_flatgeobuf(db, featcol_filtered))
+    s3_fgb_path = f"/{project.organisation_id}/{project_id}/custom_extract.fgb"
+
+    log.debug(f"Uploading fgb to S3 path: {s3_fgb_path}")
+    add_obj_to_bucket(
+        settings.S3_BUCKET_NAME,
+        fgb_obj,
+        s3_fgb_path,
+        content_type="application/octet-stream",
+    )
+
+    # Add url to database
+    s3_fgb_url = f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}{s3_fgb_path}"
+    log.debug(f"Commiting extract S3 path to database: {s3_fgb_url}")
+    project.data_extract_type = s3_fgb_url
     db.commit()
 
-    return True
+    return s3_fgb_url
 
 
 def flatten_dict(d, parent_key="", sep="_"):
@@ -1241,6 +1303,7 @@ def generate_appuser_files(
         - project_id: Project ID
         - extract_polygon: boolean to determine if we should extract the polygon
         - custom_xls_form: the xls file to upload if we have a custom form
+        - extracts_contents: the custom data extract
         - category: the category of the project
         - form_type: weather the form is xls, xlsx or xml
         - background_task_id: the task_id of the background task running this function.
@@ -1308,7 +1371,7 @@ def generate_appuser_files(
             # Data Extracts
             if extracts_contents is not None:
                 project_log.info("Uploading data extracts")
-                upload_extract_sync = async_to_sync(upload_custom_data_extracts)
+                upload_extract_sync = async_to_sync(upload_custom_data_extract)
                 upload_extract_sync(db, project_id, extracts_contents)
 
             else:
@@ -1571,7 +1634,7 @@ async def get_outline_from_geojson_file_in_zip(
             data = file.read()
             json_dump = json.loads(data)
             check_crs(json_dump)  # Validatiing Coordinate Reference System
-            feature_collection = geojson.FeatureCollection(json_dump)
+            feature_collection = FeatureCollection(json_dump)
             feature = feature_collection["features"][feature_index]
             geom = feature["geometry"]
             shape_from_geom = shape(geom)
@@ -1847,86 +1910,6 @@ async def update_background_task_status_in_database(
     db.commit()
 
     return True
-
-
-# TODO update to store extracts in S3 instead, not db
-# TODO convert geojson to fgb and upload
-def add_custom_extract_to_db(
-    db: Session,
-    features: dict,
-    background_task_id: uuid.UUID,
-    feature_type: str,
-):
-    """Insert geojson features into db for a project.
-
-    Args:
-        db: database session.
-        features: features to be added.
-        background_task_id (uuid.UUID): Task ID for database.
-        feature_type (str): feature type category in OSM.
-    """
-    try:
-        success = 0
-        failure = 0
-        project_id = uuid.uuid4()
-        if feature_type == "buildings":
-            for feature in features["features"]:
-                try:
-                    feature_geometry = feature["geometry"]
-                    feature_shape = shape(feature_geometry)
-
-                    wkb_element = from_shape(feature_shape, srid=4326)
-                    building_obj = db_models.DbBuildings(
-                        project_id=project_id,
-                        geom=wkb_element,
-                        tags=feature["properties"],
-                    )
-                    db.add(building_obj)
-                    db.commit()
-
-                    success += 1
-                except Exception:
-                    failure += 1
-                    continue
-
-            update_bg_task_sync = async_to_sync(
-                update_background_task_status_in_database
-            )
-            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
-
-        elif feature_type == "lines":
-            for feature in features["features"]:
-                try:
-                    feature_geometry = feature["geometry"]
-                    feature_shape = shape(feature_geometry)
-                    feature["properties"]["highway"] = "yes"
-
-                    wkb_element = from_shape(feature_shape, srid=4326)
-                    db_feature = db_models.DbOsmLines(
-                        project_id=project_id,
-                        geom=wkb_element,
-                        tags=feature["properties"],
-                    )
-
-                    db.add(db_feature)
-                    db.commit()
-
-                    success += 1
-                except Exception:
-                    failure += 1
-                    continue
-
-            update_bg_task_sync = async_to_sync(
-                update_background_task_status_in_database
-            )
-            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
-
-        return True
-    except Exception as e:
-        log.warning(str(e))
-
-        update_bg_task_sync = async_to_sync(update_background_task_status_in_database)
-        update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
 
 
 async def update_project_form(
@@ -2324,6 +2307,8 @@ def check_crs(input_geojson: Union[dict, FeatureCollection]):
         return crs_name in valid_crs_list
 
     def is_valid_coordinate(coord):
+        if coord is None:
+            return False
         return -180 <= coord[0] <= 180 and -90 <= coord[1] <= 90
 
     error_message = (
@@ -2337,22 +2322,25 @@ def check_crs(input_geojson: Union[dict, FeatureCollection]):
             raise HTTPException(status_code=400, detail=error_message)
         return
 
-    if input_geojson["type"] == "FeatureCollection":
-        coordinates = input_geojson["features"][0]["geometry"]["coordinates"]
-    elif input_geojson["type"] == "Feature":
-        coordinates = input_geojson["geometry"]["coordinates"]
-    geometry_type = (
-        input_geojson["features"][0]["geometry"]["type"]
-        if input_geojson["type"] == "FeatureCollection"
-        else input_geojson["geometry"]["type"]
-    )
+    if input_geojson_type := input_geojson.get("type") == "FeatureCollection":
+        features = input_geojson.get("features", [])
+        coordinates = (
+            features[-1].get("geometry", {}).get("coordinates", []) if features else []
+        )
+    elif input_geojson_type := input_geojson.get("type") == "Feature":
+        coordinates = input_geojson.get("geometry", {}).get("coordinates", [])
 
+    geometry_type = (
+        features[0].get("geometry", {}).get("type")
+        if input_geojson_type == "FeatureCollection" and features
+        else input_geojson.get("geometry", {}).get("type", "")
+    )
     if geometry_type == "MultiPolygon":
-        first_coordinate = coordinates[0][0][
-            0
-        ]  # Get the first coordinate from the first point
+        first_coordinate = (
+            coordinates[0][0][0] if coordinates and coordinates[0] else None
+        )
     else:
-        first_coordinate = coordinates[0][0]
+        first_coordinate = coordinates[0][0] if coordinates else None
 
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
@@ -2392,9 +2380,10 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
 
 async def get_dashboard_detail(project_id: int, db: Session):
     """Get project details for project dashboard."""
-
     project = await get_project(db, project_id)
-    db_organization = await organization_crud.get_organisation_by_id(db, project.organisation_id)
+    db_organization = await organization_crud.get_organisation_by_id(
+        db, project.organisation_id
+    )
 
     s3_project_path = f"/{project.organisation_id}/{project_id}"
     s3_submission_path = f"/{s3_project_path}/submission.zip"
@@ -2407,28 +2396,38 @@ async def get_dashboard_detail(project_id: int, db: Session):
                 content = file_in_zip.read()
         content = json.loads(content)
         project.total_submission = len(content)
-        submission_meta = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_meta_path)
-        project.last_active = (json.loads(submission_meta.getvalue()))["last_submission"]
+        submission_meta = get_obj_from_bucket(
+            settings.S3_BUCKET_NAME, s3_submission_meta_path
+        )
+        project.last_active = (json.loads(submission_meta.getvalue()))[
+            "last_submission"
+        ]
     except ValueError:
         project.total_submission = 0
         pass
 
-    contributors = db.query(
-        db_models.DbTaskHistory.user_id
-        ).filter(
-        db_models.DbTaskHistory.project_id == project_id,
-        db_models.DbTaskHistory.user_id.isnot(None)
-        ).distinct().count()
+    contributors = (
+        db.query(db_models.DbTaskHistory.user_id)
+        .filter(
+            db_models.DbTaskHistory.project_id == project_id,
+            db_models.DbTaskHistory.user_id.isnot(None),
+        )
+        .distinct()
+        .count()
+    )
 
     project.total_tasks = await tasks_crud.get_task_count_in_project(db, project_id)
-    project.organization, project.organization_logo = db_organization.name, db_organization.logo
+    project.organization, project.organization_logo = (
+        db_organization.name,
+        db_organization.logo,
+    )
     project.total_contributors = contributors
 
     return project
 
-async def get_project_users(db:Session, project_id:int):
-    """
-    Get the users and their contributions for a project.
+
+async def get_project_users(db: Session, project_id: int):
+    """Get the users and their contributions for a project.
 
     Args:
         db (Session): The database session.
@@ -2437,22 +2436,27 @@ async def get_project_users(db:Session, project_id:int):
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing the username and the number of contributions made by each user for the specified project.
     """
-
-    contributors = db.query(db_models.DbTaskHistory).filter(db_models.DbTaskHistory.project_id==project_id).all()
-    unique_user_ids = {user.user_id for user in contributors if user.user_id is not None}
+    contributors = (
+        db.query(db_models.DbTaskHistory)
+        .filter(db_models.DbTaskHistory.project_id == project_id)
+        .all()
+    )
+    unique_user_ids = {
+        user.user_id for user in contributors if user.user_id is not None
+    }
     response = []
 
     for user_id in unique_user_ids:
         contributions = count_user_contributions(db, user_id, project_id)
         db_user = await user_crud.get_user(db, user_id)
-        response.append({"user":db_user.username, "contributions":contributions})
-    
+        response.append({"user": db_user.username, "contributions": contributions})
+
     response = sorted(response, key=lambda x: x["contributions"], reverse=True)
     return response
 
+
 def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:
-    """
-    Count contributions for a specific user.
+    """Count contributions for a specific user.
 
     Args:
         db (Session): The database session.
@@ -2462,12 +2466,11 @@ def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:
     Returns:
         int: The number of contributions made by the user for the specified project.
     """
-
     contributions_count = (
         db.query(func.count(db_models.DbTaskHistory.user_id))
         .filter(
             db_models.DbTaskHistory.user_id == user_id,
-            db_models.DbTaskHistory.project_id == project_id
+            db_models.DbTaskHistory.project_id == project_id,
         )
         .scalar()
     )

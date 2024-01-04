@@ -54,41 +54,31 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
   const generateTasksOnMap = () => {
     if (drawnGeojson) {
       const drawnGeojsonString = JSON.stringify(drawnGeojson, null, 2);
-
-      const blob = new Blob([drawnGeojsonString], { type: 'application/json' });
-
+      const projectAreaBlob = new Blob([drawnGeojsonString], { type: 'application/json' });
       // Create a file object from the Blob
-      const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
-      dispatch(
-        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
-          geojson: drawnGeojsonFile,
-          dimension: formValues?.dimension,
-        }),
-      );
-    } else {
-      dispatch(
-        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
-          geojson: geojsonFile,
-          dimension: formValues?.dimension,
-        }),
-      );
+      geojsonFile = new File([projectAreaBlob], 'data.json', { type: 'application/json' });
     }
+    dispatch(
+      GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
+        geojson: geojsonFile,
+        dimension: formValues?.dimension,
+      }),
+    );
   };
 
   const generateTaskWithSplittingAlgorithm = () => {
     if (drawnGeojson) {
       const drawnGeojsonString = JSON.stringify(drawnGeojson, null, 2);
-
-      const blob = new Blob([drawnGeojsonString], { type: 'application/json' });
+      const projectAreaBlob = new Blob([drawnGeojsonString], { type: 'application/json' });
 
       // Create a file object from the Blob
-      const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
+      const drawnGeojsonFile = new File([projectAreaBlob], 'data.json', { type: 'application/json' });
       dispatch(
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task_split`,
           drawnGeojsonFile,
-          formValues?.no_of_buildings,
           dataExtractFile,
+          formValues?.no_of_buildings,
         ),
       );
     } else {
@@ -96,8 +86,8 @@ const DefineTasks: React.FC<any> = ({ geojsonFile, setGeojsonFile, dataExtractFi
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task_split`,
           geojsonFile,
-          formValues?.no_of_buildings,
           dataExtractFile,
+          formValues?.no_of_buildings,
         ),
       );
     }

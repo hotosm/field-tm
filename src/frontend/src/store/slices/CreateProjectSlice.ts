@@ -43,8 +43,7 @@ export const initialState: CreateProjectStateTypes = {
   uploadAreaSelection: null,
   totalAreaSelection: null,
   splitTasksSelection: null,
-  buildingGeojson: null,
-  lineGeojson: null,
+  dataExtractGeojson: null,
   createProjectValidations: {},
   isUnsavedChanges: false,
   canSwitchCreateProjectSteps: false,
@@ -81,8 +80,7 @@ const CreateProject = createSlice({
       state.projectArea = null;
       state.totalAreaSelection = null;
       state.splitTasksSelection = null;
-      state.buildingGeojson = null;
-      state.lineGeojson = null;
+      state.dataExtractGeojson = null;
       state.taskSplittingGeojson = null;
       state.drawnGeojson = null;
       state.generateProjectLog = null;
@@ -196,11 +194,8 @@ const CreateProject = createSlice({
     SetSplitTasksSelection(state, action) {
       state.splitTasksSelection = action.payload;
     },
-    SetBuildingGeojson(state, action) {
-      state.buildingGeojson = action.payload;
-    },
-    SetLineGeojson(state, action) {
-      state.lineGeojson = action.payload;
+    setDataExtractGeojson(state, action) {
+      state.dataExtractGeojson = action.payload;
     },
     SetCreateProjectValidations(state, action) {
       state.createProjectValidations = {

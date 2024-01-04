@@ -29,8 +29,7 @@ export type CreateProjectStateTypes = {
   uploadAreaSelection: string | null;
   totalAreaSelection: string | null;
   splitTasksSelection: string | null;
-  buildingGeojson: null;
-  lineGeojson: null;
+  dataExtractGeojson: null;
   createProjectValidations: {};
   isUnsavedChanges: boolean;
   canSwitchCreateProjectSteps: boolean;
@@ -96,6 +95,7 @@ export type EditProjectDetailsTypes = {
 };
 
 export type ProjectDetailsTypes = {
+  data_extract_type: string;
   task_split_dimension: number;
   task_num_buildings: number;
   no_of_buildings: number;

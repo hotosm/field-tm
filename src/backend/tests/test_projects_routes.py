@@ -24,6 +24,7 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
+import requests
 import sozipfile.sozipfile as zipfile
 from fastapi.concurrency import run_in_threadpool
 from geoalchemy2.elements import WKBElement
@@ -172,10 +173,16 @@ async def test_generate_appuser_files(db, project):
 
     # Upload data extracts
     log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_uploaded = await project_crud.upload_custom_data_extracts(
-        db, project_id, data_extracts
+    data_extract_s3_path = await project_crud.upload_custom_data_extract(
+        db,
+        project_id,
+        data_extracts,
     )
-    assert data_extract_uploaded is True
+    assert data_extract_s3_path is not None
+    # Test url, but first sub alias for docker network
+    internal_file_path = f"http://s3:9000{data_extract_s3_path.split('7050')[1]}"
+    response = requests.head(internal_file_path, allow_redirects=True)
+    assert response.status_code < 400
 
     # Get project tasks list
     task_ids = await tasks_crud.get_task_id_list(db, project_id)
