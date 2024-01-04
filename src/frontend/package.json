@@ -67,6 +67,7 @@
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "flatgeobuf": "^3.27.1",
     "geojson-validation": "^1.0.2",
     "install": "^0.13.0",
     "lucide-react": "^0.276.0",

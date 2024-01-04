@@ -58,6 +58,7 @@ class ProjectUpload(BaseModel):
     task_split_type: Optional[TaskSplitType] = None
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
+    data_extract_type: Optional[str] = None
 
     # city: str
     # country: str

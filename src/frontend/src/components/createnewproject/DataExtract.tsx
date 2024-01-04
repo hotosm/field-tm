@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { geojson as fgbGeojson } from 'flatgeobuf';
 import React, { useEffect } from 'react';
 import Button from '../../components/common/Button';
 import { useDispatch } from 'react-redux';
@@ -29,13 +31,48 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
-  const buildingGeojson = useAppSelector((state) => state.createproject.buildingGeojson);
-  const lineGeojson = useAppSelector((state) => state.createproject.lineGeojson);
+  const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
 
-  const submission = () => {
+  const submission = async () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 5 }));
+
+    // First go to next page, to not block UX
     navigate('/split-tasks');
+
+    // Get OSM data extract if required
+    if (formValues.dataExtractWays === 'osm_data_extract') {
+      // Create a file object from the project area Blob
+      const projectAreaBlob = new Blob([JSON.stringify(drawnGeojson)], { type: 'application/json' });
+      const drawnGeojsonFile = new File([projectAreaBlob], 'outline.json', { type: 'application/json' });
+
+      // Create form and POST endpoint
+      const dataExtractRequestFormData = new FormData();
+      dataExtractRequestFormData.append('geojson_file', drawnGeojsonFile);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/projects/get_data_extract/`,
+          dataExtractRequestFormData,
+        );
+
+        const fgbUrl = response.data.url;
+        // Append url to project data
+        dispatch(
+          CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, data_extract_type: fgbUrl }),
+        );
+
+        // Extract fgb and set geojson to map
+        const fgbFile = await fetch(fgbUrl);
+        const binaryData = await fgbFile.arrayBuffer();
+        const uint8ArrayData = new Uint8Array(binaryData);
+        // Deserialize the binary data
+        const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
+        dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
+      } catch (error) {
+        // TODO add error message for user
+        console.error('Error getting data extract:', error);
+      }
+    }
   };
   const {
     handleSubmit,
@@ -48,37 +85,60 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
-  const changeFileHandler = (event, setFileUploadToState, fileType) => {
-    const { files } = event.target;
-    setFileUploadToState(files[0]);
-    convertFileToGeojson(files[0], fileType);
-  };
 
-  const resetFile = (setFileUploadToState) => {
-    setFileUploadToState(null);
-  };
-  const convertFileToGeojson = async (file, fileType) => {
+  const convertFileToFeatureCol = async (file) => {
     if (!file) return;
+    // Parse file as JSON
     const fileReader = new FileReader();
     const fileLoaded = await new Promise((resolve) => {
       fileReader.onload = (e) => resolve(e.target.result);
       fileReader.readAsText(file, 'UTF-8');
     });
     const parsedJSON = JSON.parse(fileLoaded);
+
+    // Convert to FeatureCollection
     let geojsonConversion;
     if (parsedJSON.type === 'FeatureCollection') {
       geojsonConversion = parsedJSON;
+    } else if (parsedJSON.type === 'Feature') {
+      geojsonConversion = {
+        type: 'FeatureCollection',
+        features: [parsedJSON],
+      };
     } else {
       geojsonConversion = {
         type: 'FeatureCollection',
         features: [{ type: 'Feature', properties: null, geometry: parsedJSON }],
       };
     }
-    if (fileType === 'building') {
-      dispatch(CreateProjectActions.SetBuildingGeojson(geojsonConversion));
-    } else if (fileType === 'line') {
-      dispatch(CreateProjectActions.SetLineGeojson(geojsonConversion));
+    return geojsonConversion;
+  };
+
+  const changeFileHandler = async (event, setDataExtractToState) => {
+    const { files } = event.target;
+    const uploadedFile = files[0];
+    const fileType = uploadedFile.name.split('.').pop();
+
+    // Handle geojson and fgb types, return featurecollection geojson
+    let extractFeatCol;
+    if (['json', 'geojson'].includes(fileType)) {
+      // Set to state immediately for splitting
+      setDataExtractToState(uploadedFile);
+      extractFeatCol = await convertFileToFeatureCol(uploadedFile);
+    } else if (['fgb'].includes(fileType)) {
+      const arrayBuffer = new Uint8Array(await uploadedFile.arrayBuffer());
+      extractFeatCol = fgbGeojson.deserialize(arrayBuffer);
+      // Set converted geojson to state for splitting
+      const geojsonFile = new File([extractFeatCol], 'custom_extract.geojson', { type: 'application/json' });
+      setDataExtractToState(geojsonFile);
     }
+
+    // View on map
+    dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
+  };
+
+  const resetFile = (setDataExtractToState) => {
+    setDataExtractToState(null);
   };
 
   useEffect(() => {
@@ -112,20 +172,6 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
             className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between"
           >
             <div>
-              {/* <div className="fmtm-mb-5">
-                <CustomSelect
-                  title="Select form category"
-                  placeholder="Select form category"
-                  data={formCategoryList}
-                  dataKey="id"
-                  valueKey="id"
-                  label="title"
-                  value={formValues.formCategorySelection}
-                  onValueChange={(value) => {
-                    handleCustomChange('formCategorySelection', value);
-                  }}
-                />
-              </div> */}
               <RadioButton
                 topic="You may choose to use OSM data or upload your own data extract"
                 options={dataExtractOptions}
@@ -154,27 +200,27 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                 <>
                   <FileInputComponent
                     onChange={(e) => {
-                      changeFileHandler(e, setCustomPolygonUpload, 'building');
+                      changeFileHandler(e, setCustomPolygonUpload);
                       handleCustomChange('customPolygonUpload', e.target.files[0]);
                     }}
                     onResetFile={() => resetFile(setCustomPolygonUpload)}
                     customFile={customPolygonUpload}
                     btnText="Upload Polygons"
-                    accept=".geojson,.json"
-                    fileDescription="*The supported file formats are .geojson, .json"
+                    accept=".geojson,.json,.fgb"
+                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
                     errorMsg={errors.customPolygonUpload}
                   />
                   <FileInputComponent
                     onChange={(e) => {
-                      changeFileHandler(e, setCustomLineUpload, 'line');
+                      changeFileHandler(e, setCustomLineUpload);
                       handleCustomChange('customLineUpload', e.target.files[0]);
                     }}
                     onResetFile={() => resetFile(setCustomLineUpload)}
                     customFile={customLineUpload}
                     btnText="Upload Lines"
-                    accept=".geojson,.json"
-                    fileDescription="*The supported file formats are .geojson, .json"
-                    errorMsg={errors.setCustomLineUpload}
+                    accept=".geojson,.json,.fgb"
+                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
+                    errorMsg={errors.customLineUpload}
                   />
                 </>
               )}
@@ -191,11 +237,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
-            <NewDefineAreaMap
-              uploadedOrDrawnGeojsonFile={drawnGeojson}
-              buildingExtractedGeojson={buildingGeojson}
-              lineExtractedGeojson={lineGeojson}
-            />
+            <NewDefineAreaMap uploadedOrDrawnGeojsonFile={drawnGeojson} buildingExtractedGeojson={dataExtractGeojson} />
           </div>
         </div>
       </div>

@@ -104,7 +104,7 @@ const getChoroplethColor = (value, colorCodesOutput) => {
 const ProjectInfomap = () => {
   const dispatch = CoreModules.useAppDispatch();
   const [taskBoundaries, setTaskBoundaries] = useState(null);
-  const [buildingGeojson, setBuildingGeojson] = useState(null);
+  const [dataExtractGeojson, setDataExtractGeojson] = useState(null);
   const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
 
   const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
@@ -159,7 +159,7 @@ const ProjectInfomap = () => {
     //     })),
     //   ],
     // };
-    // setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
+    // setDataExtractGeojson(taskBuildingGeojsonFeatureCollection);
   }, [projectTaskBoundries]);
   useEffect(() => {
     if (!projectBuildingGeojson) return;
@@ -172,7 +172,7 @@ const ProjectInfomap = () => {
         })),
       ],
     };
-    setBuildingGeojson(taskBuildingGeojsonFeatureCollection);
+    setDataExtractGeojson(taskBuildingGeojsonFeatureCollection);
   }, [projectBuildingGeojson]);
 
   useEffect(() => {
@@ -287,7 +287,7 @@ const ProjectInfomap = () => {
             collapsed={true}
           />
         </div>
-        {buildingGeojson && <VectorLayer key={buildingGeojson} geojson={buildingGeojson} zIndex={15} />}
+        {dataExtractGeojson && <VectorLayer key={dataExtractGeojson} geojson={dataExtractGeojson} zIndex={15} />}
       </MapComponent>
     </CoreModules.Box>
   );

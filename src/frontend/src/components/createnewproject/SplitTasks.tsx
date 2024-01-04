@@ -34,15 +34,7 @@ const alogrithmList = [
 ];
 let generateProjectLogIntervalCb: any = null;
 
-const SplitTasks = ({
-  flag,
-  geojsonFile,
-  setGeojsonFile,
-  customLineUpload,
-  customPolygonUpload,
-  customFormFile,
-  dataExtractFile,
-}) => {
+const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, customPolygonUpload, customFormFile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -53,8 +45,7 @@ const SplitTasks = ({
   const splitTasksSelection = CoreModules.useAppSelector((state) => state.createproject.splitTasksSelection);
   const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
   const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
-  const buildingGeojson = useAppSelector((state) => state.createproject.buildingGeojson);
-  const lineGeojson = useAppSelector((state) => state.createproject.lineGeojson);
+  const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const userDetails: any = CoreModules.useAppSelector((state) => state.login.loginToken);
 
   const generateQrSuccess: any = CoreModules.useAppSelector((state) => state.createproject.generateQrSuccess);
@@ -96,10 +87,11 @@ const SplitTasks = ({
   const submission = () => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
 
-    const blob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], { type: 'application/json' });
-
+    const projectAreaBlob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], {
+      type: 'application/json',
+    });
     // Create a file object from the Blob
-    const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
+    const drawnGeojsonFile = new File([projectAreaBlob], 'data.json', { type: 'application/json' });
 
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     const hashtags = projectDetails.hashtags;
@@ -131,6 +123,7 @@ const SplitTasks = ({
       data_extractWays: projectDetails.data_extractWays,
       hashtags: arrayHashtag,
       organisation_id: projectDetails.organisation_id,
+      data_extract_type: projectDetails.data_extract_type,
     };
     if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {
       projectData = { ...projectData, task_num_buildings: projectDetails.average_buildings_per_task };
@@ -170,10 +163,14 @@ const SplitTasks = ({
 
     e.preventDefault();
     e.stopPropagation();
-    const blob = new Blob([JSON.stringify(drawnGeojson)], { type: 'application/json' });
+    // Create a file object from the project area Blob
+    const projectAreaBlob = new Blob([JSON.stringify(drawnGeojson)], { type: 'application/json' });
+    const drawnGeojsonFile = new File([projectAreaBlob], 'outline.json', { type: 'application/json' });
 
-    // Create a file object from the Blob
-    const drawnGeojsonFile = new File([blob], 'data.json', { type: 'application/json' });
+    // Create a file object from the data extract Blob
+    const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
+    const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
+
     if (splitTasksSelection === task_split_type['divide_on_square']) {
       dispatch(
         GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
@@ -190,8 +187,8 @@ const SplitTasks = ({
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task_split`,
           drawnGeojsonFile,
-          formValues?.average_buildings_per_task,
           dataExtractFile,
+          formValues?.average_buildings_per_task,
         ),
       );
     }
@@ -428,8 +425,7 @@ const SplitTasks = ({
                 <NewDefineAreaMap
                   splittedGeojson={dividedTaskGeojson}
                   uploadedOrDrawnGeojsonFile={drawnGeojson}
-                  buildingExtractedGeojson={buildingGeojson}
-                  lineExtractedGeojson={lineGeojson}
+                  buildingExtractedGeojson={dataExtractGeojson}
                 />
               </div>
               {generateProjectLog ? (

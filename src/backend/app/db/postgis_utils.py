@@ -66,8 +66,16 @@ def get_centroid(geometry: Geometry, properties: str = {}, id: int = None):
     return {}
 
 
-def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection):
-    """From a given FeatureCollection, return a memory flatgeobuf obj."""
+async def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection) -> bytes:
+    """From a given FeatureCollection, return a memory flatgeobuf obj.
+
+    Args:
+        db (Session): SQLAlchemy db session.
+        geojson (FeatureCollection): a geojson.FeatureCollection object.
+
+    Returns:
+        flatgeobuf (bytes): a Python bytes representation of a flatgeobuf file.
+    """
     sql = f"""
         DROP TABLE IF EXISTS public.temp_features CASCADE;
 
@@ -93,7 +101,13 @@ def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection):
     # Run the SQL
     result = db.execute(text(sql))
     # Get a memoryview object, then extract to Bytes
-    flatgeobuf = result.fetchone()[0].tobytes()
+    flatgeobuf = result.fetchone()[0]
+
     # Cleanup table
     db.execute(text("DROP TABLE IF EXISTS public.temp_features CASCADE;"))
-    return flatgeobuf
+
+    if flatgeobuf:
+        return flatgeobuf.tobytes()
+
+    # Nothing returned (either no features passed, or failed)
+    return None

@@ -27,11 +27,13 @@ function DataExtractValidation(values: ProjectValues) {
   if (values.dataExtractWays && values.dataExtractWays === 'osm_data_extract' && !values.dataExtractFeatureType) {
     errors.dataExtractFeatureType = 'OSM Feature Type is Required.';
   }
-  if (values.dataExtractWays && values.dataExtractWays === 'custom_data_extract' && !values.customPolygonUpload) {
-    errors.customPolygonUpload = 'Custom Polygon is Required.';
-  }
-  if (values.dataExtractWays && values.dataExtractWays === 'custom_data_extract' && !values.customLineUpload) {
-    errors.customLineUpload = 'Custom Line is required';
+  if (
+    values.dataExtractWays &&
+    values.dataExtractWays === 'custom_data_extract' &&
+    !values.customPolygonUpload &&
+    !values.customLineUpload
+  ) {
+    errors.customPolygonUpload = 'A GeoJSON file is required.';
   }
 
   console.log(errors);

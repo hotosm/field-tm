@@ -127,7 +127,8 @@ async def create_organization(
         db.refresh(db_organization)
 
         # Update the logo field in the database with the correct path
-        db_organization.logo = await upload_logo_to_s3(db_organization, logo)
+        if logo:
+            db_organization.logo = await upload_logo_to_s3(db_organization, logo)
         db.commit()
 
     except Exception as e:

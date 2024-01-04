@@ -51,19 +51,17 @@ const CreateProjectService: Function = (
         );
         if (dataExtractFile) {
           const dataExtractFormData = new FormData();
-          dataExtractFormData.append('upload', dataExtractFile);
-          const postDataExtract = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${
-              resp.id
-            }&feature_type=buildings`,
+          dataExtractFormData.append('custom_extract_file', dataExtractFile);
+          await axios.post(
+            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}`,
             dataExtractFormData,
           );
         }
         if (lineExtractFile) {
           const lineExtractFormData = new FormData();
-          lineExtractFormData.append('upload', lineExtractFile);
-          const postLineExtract = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}&feature_type=lines`,
+          lineExtractFormData.append('custom_extract_file', lineExtractFile);
+          await axios.post(
+            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}`,
             lineExtractFormData,
           );
         }
@@ -330,8 +328,8 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
 const TaskSplittingPreviewService: Function = (
   url: string,
   fileUpload: any,
-  no_of_buildings: string,
   dataExtractFile: any,
+  no_of_buildings: string,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
@@ -340,10 +338,8 @@ const TaskSplittingPreviewService: Function = (
       try {
         const taskSplittingFileFormData = new FormData();
         taskSplittingFileFormData.append('project_geojson', fileUpload);
+        taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
         taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
-        if (dataExtractFile) {
-          taskSplittingFileFormData.append('custom_data_extract', dataExtractFile);
-        }
 
         const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
         const resp: OrganisationListModel = getTaskSplittingResponse.data;
