@@ -33,6 +33,7 @@ from shapely import Polygon, wkb
 from shapely.geometry import shape
 
 from app.central.central_crud import create_odk_project
+from app.config import settings
 from app.db import db_models
 from app.projects import project_crud, project_schemas
 from app.tasks import tasks_crud
@@ -179,8 +180,11 @@ async def test_generate_appuser_files(db, project):
         data_extracts,
     )
     assert data_extract_s3_path is not None
-    # Test url, but first sub alias for docker network
-    internal_file_path = f"http://s3:9000{data_extract_s3_path.split('7050')[1]}"
+    # Test url, but first sub localhost url with docker network for backend connection
+    internal_file_path = (
+        f"{settings.S3_ENDPOINT}"
+        f"{data_extract_s3_path.split(settings.FMTM_DEV_PORT)[1]}"
+    )
     response = requests.head(internal_file_path, allow_redirects=True)
     assert response.status_code < 400
 
