@@ -105,7 +105,7 @@ RUN set -ex \
         "libgeos-c1v5" \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
-COPY --from=minio /opt/bin/mc /usr/local/bin/
+COPY --from=minio /usr/bin/mc /usr/local/bin/
 COPY *-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
