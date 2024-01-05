@@ -1,11 +1,13 @@
 #!/bin/bash
 
+NGINX_TAG="${NGINX_TAG:-1.25.3}"
+
 # Dev certs init
 echo "Building proxy:certs-init-development"
 docker build nginx \
     --tag "ghcr.io/hotosm/fmtm/proxy:certs-init-development" \
     --target certs-init-development \
-    --build-arg NGINX_TAG="${NGINX_TAG:-1.25.2}"
+    --build-arg NGINX_TAG="${NGINX_TAG}"
 
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
@@ -25,7 +27,7 @@ echo "Building proxy:certs-init-main"
 docker build nginx \
     --tag "ghcr.io/hotosm/fmtm/proxy:certs-init-main" \
     --target certs-init-main \
-    --build-arg NGINX_TAG="${NGINX_TAG:-1.25.2}"
+    --build-arg NGINX_TAG="${NGINX_TAG}"
 
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:certs-init-main"
@@ -36,7 +38,7 @@ echo "Building proxy:development"
 docker build nginx \
     --tag "ghcr.io/hotosm/fmtm/proxy:development" \
     --target development \
-    --build-arg NGINX_TAG="${NGINX_TAG:-1.25.2}"
+    --build-arg NGINX_TAG="${NGINX_TAG}"
 
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:development"
@@ -56,7 +58,7 @@ echo "Building proxy:main"
 docker build nginx \
     --tag "ghcr.io/hotosm/fmtm/proxy:main" \
     --target main \
-    --build-arg NGINX_TAG="${NGINX_TAG:-1.25.2}"
+    --build-arg NGINX_TAG="${NGINX_TAG}"
 
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:main"
@@ -67,7 +69,7 @@ echo "Building proxy:main-plus-script"
 docker build nginx \
     --tag "ghcr.io/hotosm/fmtm/proxy:main-plus-script" \
     --target main-plus-script \
-    --build-arg NGINX_TAG="${NGINX_TAG:-1.25.2}"
+    --build-arg NGINX_TAG="${NGINX_TAG}"
 
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:main-plus-script"
