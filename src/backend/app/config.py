@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
 
-    FMTM_DOMAIN: Optional[str]
+    FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = "7050"
 
     EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
