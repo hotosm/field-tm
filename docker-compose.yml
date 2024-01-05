@@ -37,7 +37,7 @@ services:
       context: nginx
       target: debug
       args:
-        NGINX_TAG: "${NGINX_TAG:-1.25.2}"
+        NGINX_TAG: "${NGINX_TAG:-1.25.3}"
     container_name: fmtm
     depends_on:
       api:
@@ -125,11 +125,11 @@ services:
 
   central:
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2023.4.0}"
+    image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2023.5.0}"
     build:
       context: odkcentral/api
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.4.0}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.5.0}
     container_name: fmtm-central
     depends_on:
       central-db:
@@ -165,11 +165,11 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     profiles: ["", "central"]
-    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2023.4.0}"
+    image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2023.5.0}"
     build:
       context: odkcentral/ui
       args:
-        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.4.0}
+        ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.5.0}
     container_name: fmtm-central-ui
     volumes:
       - central_frontend:/frontend
@@ -177,7 +177,7 @@ services:
     restart: "on-failure:2"
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2023-10-25T06-33-25Z}"
+    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2024-01-01T16-36-33Z}"
     container_name: fmtm-s3
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
@@ -195,11 +195,11 @@ services:
     command: minio server
     restart: "unless-stopped"
     healthcheck:
-      test: curl --fail http://localhost:9000/minio/health/live || exit 1
-      start_period: 5s
+      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
       interval: 5s
-      timeout: 5s
       retries: 3
+      start_period: 5s
+      timeout: 5s
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
