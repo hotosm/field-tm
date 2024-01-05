@@ -11,10 +11,17 @@ set -e
 # GITHUB_TOKEN=input
 # Feed to act using -s flag: -s GITHUB_TOKEN=input_personal_access_token
 
-# PR Test Backend
-act pull_request -W .github/workflows/pr_test_backend.yml \
+# Run backend PyTest manually
+docker compose build api
+act pull_request -W .github/workflows/tests/pytest.yml \
     -e .github/workflows/tests/pr_payload.json \
     --var-file=.env --secret-file=.env
+
+# # PR Test Backend
+# Includes image build, which fails due to registry auth
+# act pull_request -W .github/workflows/pr_test_backend.yml \
+#     -e .github/workflows/tests/pr_payload.json \
+#     --var-file=.env --secret-file=.env
 
 # PR Test Frontend
 act pull_request -W .github/workflows/pr_test_frontend.yml \
