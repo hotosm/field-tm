@@ -1,6 +1,7 @@
 import { ProjectActions } from '../store/slices/ProjectSlice';
 import CoreModules from '../shared/CoreModules';
 import environment from '../environment';
+import {task_priority_str} from '../types/enums'
 
 export const ProjectById = (existingProjectList, projectId) => {
   return async (dispatch) => {
@@ -20,7 +21,7 @@ export const ProjectById = (existingProjectList, projectId) => {
           return {
             id: data.id,
             project_task_name: data.project_task_name,
-            task_status: data.task_status,
+            task_status: task_priority_str[data.task_status],
             outline_geojson: data.outline_geojson,
             outline_centroid: data.outline_centroid,
             task_history: data.task_history,

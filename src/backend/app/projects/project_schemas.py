@@ -28,6 +28,7 @@ from app.db import db_models
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
 from app.tasks import tasks_schemas
 from app.users.user_schemas import User
+from pydantic.functional_validators import field_validator
 
 
 class ODKCentral(BaseModel):
