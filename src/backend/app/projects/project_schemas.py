@@ -18,11 +18,12 @@
 
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from dateutil import parser
 from geojson_pydantic import Feature as GeojsonFeature
 from pydantic import BaseModel
+from pydantic.functional_serializers import field_serializer
 
 from app.db import db_models
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
@@ -162,10 +163,10 @@ class ProjectDashboard(BaseModel):
     organization_logo: Optional[str] = None
     total_submission: Optional[int] = None
     total_contributors: Optional[int] = None
-    last_active: Optional[str] = None
+    last_active: Optional[Union[str, datetime]] = None
 
-    @field_validator("last_active", mode="before")
-    def get_last_active(cls, value, values):
+    @field_serializer("last_active")
+    def get_last_active(self, value, values):
         if value is None:
             return None
 
