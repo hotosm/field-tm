@@ -3,6 +3,8 @@ import { easeIn, easeOut } from 'ol/easing';
 import { HomeActions } from '../store/slices/HomeSlice';
 import CoreModules from '../shared/CoreModules';
 import { CommonActions } from '../store/slices/CommonSlice';
+import {task_priority_str} from '../types/enums'
+
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
   return async (dispatch) => {
     const index = existingData.findIndex((project) => project.id == currentProjectId);
@@ -14,7 +16,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         const findIndexForUpdation = existingData[index].taskBoundries.findIndex((obj) => obj.id == response.data.id);
 
         let project_tasks = [...existingData[index].taskBoundries];
-        project_tasks[findIndexForUpdation] = { ...response.data };
+        project_tasks[findIndexForUpdation] = { ...response.data, task_status: task_priority_str[response.data.task_status] };
 
         let updatedProject = [...existingData];
         const finalProjectOBJ = {

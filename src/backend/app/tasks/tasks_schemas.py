@@ -102,17 +102,17 @@ class TaskBase(BaseModel):
         return None
 
     @field_serializer("locked_by_uid")
-    def get_lock_uid(self, value: int, info: ValidationInfo) -> str:
+    def get_locked_by_uid(self, value: str) -> str:
         """Get lock uid from lock_holder details."""
-        if lock_holder := info.data.get("lock_holder"):
-            return lock_holder.id
+        if self.lock_holder:
+            return self.lock_holder.id
         return None
 
     @field_serializer("locked_by_username")
-    def get_lock_username(self, value: str, info: ValidationInfo) -> str:
+    def get_locked_by_username(self, value: str) -> str:
         """Get lock username from lock_holder details."""
-        if lock_holder := info.data.get("lock_holder"):
-            return lock_holder.username
+        if self.lock_holder:
+            return self.lock_holder.username
         return None
 
 
