@@ -147,7 +147,7 @@ class ProjectOut(ProjectBase):
 
 class ReadProject(ProjectBase):
     project_uuid: uuid.UUID = uuid.uuid4()
-    location_str: str
+    location_str: Optional[str] =None
 
 
 class BackgroundTaskStatus(BaseModel):
