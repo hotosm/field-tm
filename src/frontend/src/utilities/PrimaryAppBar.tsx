@@ -5,9 +5,10 @@ import CustomizedImage from '../utilities/CustomizedImage';
 import { ThemeActions } from '../store/slices/ThemeSlice';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
+import { CommonActions } from '../store/slices/CommonSlice';
 import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
-import { createLoginWindow } from '../utilfunctions/login';
+import { createLoginWindow, revokeCookie } from '../utilfunctions/login';
 import { useState } from 'react';
 
 export default function PrimaryAppBar() {
@@ -47,10 +48,22 @@ export default function PrimaryAppBar() {
     },
   };
 
-  const handleOnSignOut = () => {
+  const handleOnSignOut = async () => {
     setOpen(false);
-    dispatch(LoginActions.signOut(null));
-    dispatch(ProjectActions.clearProjects([]));
+    try {
+      await revokeCookie();
+      dispatch(LoginActions.signOut(null));
+      dispatch(ProjectActions.clearProjects([]));
+    } catch {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'Failed to sign out.',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+    }
   };
 
   const { type, windowSize } = windowDimention();
