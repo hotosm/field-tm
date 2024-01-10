@@ -67,7 +67,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
         const uint8ArrayData = new Uint8Array(binaryData);
         // Deserialize the binary data
         const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
-        dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
+        await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
       } catch (error) {
         // TODO add error message for user
         console.error('Error getting data extract:', error);
@@ -134,7 +134,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
     }
 
     // View on map
-    dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
+    await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
   };
 
   const resetFile = (setDataExtractToState) => {
