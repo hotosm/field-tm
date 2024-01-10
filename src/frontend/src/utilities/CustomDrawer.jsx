@@ -3,7 +3,8 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import { NavLink } from 'react-router-dom';
-import { createLoginWindow } from '../utilfunctions/login';
+import { createLoginWindow, revokeCookie } from '../utilfunctions/login';
+import { CommonActions } from '../store/slices/CommonSlice';
 import { LoginActions } from '../store/slices/LoginSlice';
 import { ProjectActions } from '../store/slices/ProjectSlice';
 
@@ -85,10 +86,22 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     },
   ];
 
-  const handleOnSignOut = () => {
+  const handleOnSignOut = async () => {
     setOpen(false);
-    dispatch(LoginActions.signOut(null));
-    dispatch(ProjectActions.clearProjects([]));
+    try {
+      await revokeCookie();
+      dispatch(LoginActions.signOut(null));
+      dispatch(ProjectActions.clearProjects([]));
+    } catch {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'Failed to sign out.',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+    }
   };
 
   return (
