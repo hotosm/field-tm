@@ -434,6 +434,7 @@ async def task_split(
 
     # read data extract
     parsed_extract = geojson.loads(await extract_geojson.read())
+
     check_crs(parsed_extract)
 
     return await project_crud.split_geojson_into_tasks(
