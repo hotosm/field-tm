@@ -95,7 +95,6 @@ class Settings(BaseSettings):
             host=info.data.get("FMTM_DB_HOST"),
             path=info.data.get("FMTM_DB_NAME", ""),
         )
-        # Convert Url type to string
         return pg_url
 
     ODK_CENTRAL_URL: Optional[str] = ""
