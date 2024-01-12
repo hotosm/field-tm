@@ -29,7 +29,6 @@ from app.db import db_models
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
 from app.tasks import tasks_schemas
 from app.users.user_schemas import User
-from pydantic.functional_validators import field_validator
 
 
 class ODKCentral(BaseModel):
@@ -147,7 +146,7 @@ class ProjectOut(ProjectBase):
 
 class ReadProject(ProjectBase):
     project_uuid: uuid.UUID = uuid.uuid4()
-    location_str: Optional[str] =None
+    location_str: Optional[str] = None
 
 
 class BackgroundTaskStatus(BaseModel):

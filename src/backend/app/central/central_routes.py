@@ -261,7 +261,9 @@ async def get_submission(
                         for entry in range(1, len(data)):
                             submissions.append(json.loads(data[entry]))
             else:
-                data = central_crud.download_submissions(first.odkid, xmlFormId, None, True, odk_credentials)
+                data = central_crud.download_submissions(
+                    first.odkid, xmlFormId, None, True, odk_credentials
+                )
                 submissions.append(json.loads(data[0]))
                 if len(data) >= 2:
                     for entry in range(1, len(data)):

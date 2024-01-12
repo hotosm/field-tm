@@ -1172,14 +1172,15 @@ async def get_template_file(
     )
 
 
-@router.get("/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard)
+@router.get(
+    "/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard
+)
 async def project_dashboard(
-    project_id: int, 
+    project_id: int,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
 ):
-    """
-    Get the project dashboard details.
+    """Get the project dashboard details.
 
     Args:
         project_id (int): The ID of the project.
@@ -1197,6 +1198,7 @@ async def project_dashboard(
         submission_crud.update_submission_in_s3, db, project_id, background_task_id
     )
     return data
+
 
 @router.get("/contributors/{project_id}")
 async def get_contributors(project_id: int, db: Session = Depends(database.get_db)):

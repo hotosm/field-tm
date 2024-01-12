@@ -26,13 +26,12 @@ from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
 
+from app.central import central_crud
 from app.config import settings
 from app.db import database
 from app.projects import project_crud, project_schemas
-from app.central import central_crud
-from app.tasks import tasks_crud
-
 from app.submission import submission_crud
+from app.tasks import tasks_crud
 
 router = APIRouter(
     prefix="/submission",
@@ -317,13 +316,13 @@ async def get_submission_page(
     planned_task: Optional[int] = None,
     db: Session = Depends(database.get_db),
 ):
-    """
-    This api returns the submission page of a project.
+    """This api returns the submission page of a project.
     It takes one parameter: project_id.
     project_id: The ID of the project. This endpoint returns the submission page of this project.
     """
-    
-    data = await submission_crud.get_submissions_by_date(db, project_id, days, planned_task)
+    data = await submission_crud.get_submissions_by_date(
+        db, project_id, days, planned_task
+    )
 
     # Update submission cache in the background
     background_task_id = await project_crud.insert_background_task_into_database(
@@ -338,9 +337,10 @@ async def get_submission_page(
 
 
 @router.get("/submission_form_fields/{project_id}")
-async def get_submission_form_fields(project_id: int, db: Session = Depends(database.get_db)):
-    """
-    Retrieves the submission form for a specific project.
+async def get_submission_form_fields(
+    project_id: int, db: Session = Depends(database.get_db)
+):
+    """Retrieves the submission form for a specific project.
 
     Args:
         project_id (int): The ID of the project.
@@ -349,7 +349,6 @@ async def get_submission_form_fields(project_id: int, db: Session = Depends(data
     Returns:
         Any: The response from the submission form API.
     """
-
     project = await project_crud.get_project(db, project_id)
     task_list = await tasks_crud.get_task_id_list(db, project_id)
     odk_form = central_crud.get_odk_form(project)
