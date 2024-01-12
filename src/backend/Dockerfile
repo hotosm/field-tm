@@ -53,7 +53,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN pdm export --prod > requirements.txt \
     && pdm export -G debug --no-default \
     --without-hashes > requirements-debug.txt \
-    && pdm export -G test -G docs --no-default \
+    && pdm export -G test -G docs -G dev --no-default \
     --without-hashes > requirements-ci.txt
 
 
