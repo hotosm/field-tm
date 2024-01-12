@@ -31,7 +31,7 @@ services:
     depends_on:
       - josm-novnc
     networks:
-      - fmtm-dev
+      - fmtm-net
       - x11
     ports:
       - 8111:80
