@@ -28,6 +28,7 @@ from app.db import database
 from app.models.enums import TaskStatus
 from app.projects import project_crud, project_schemas
 from app.users import user_schemas
+
 from . import tasks_crud, tasks_schemas
 
 router = APIRouter(
@@ -36,6 +37,7 @@ router = APIRouter(
     dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
+
 
 @router.get("/task-list", response_model=List[tasks_schemas.ReadTask])
 async def read_task_list(
@@ -109,7 +111,9 @@ async def read_tasks(task_id: int, db: Session = Depends(database.get_db)):
     return task
 
 
-@router.post("/{task_id}/new_status/{new_status}", response_model=tasks_schemas.ReadTask)
+@router.post(
+    "/{task_id}/new_status/{new_status}", response_model=tasks_schemas.ReadTask
+)
 async def update_task_status(
     user: user_schemas.User,
     task_id: int,

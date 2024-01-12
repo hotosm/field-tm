@@ -2336,15 +2336,13 @@ def check_crs(input_geojson: Union[dict, FeatureCollection]):
         else input_geojson.get("geometry", {}).get("type", "")
     )
     if geometry_type == "MultiPolygon":
-        first_coordinate = (
-            coordinates[0][0] if coordinates and coordinates[0] else None
-        )
+        first_coordinate = coordinates[0][0] if coordinates and coordinates[0] else None
     elif geometry_type == "Point":
         first_coordinate = coordinates if coordinates else None
 
     elif geometry_type == "LineString":
         first_coordinate = coordinates[0] if coordinates else None
-    
+
     else:
         first_coordinate = coordinates[0][0] if coordinates else None
 
