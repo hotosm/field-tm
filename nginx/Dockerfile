@@ -102,7 +102,6 @@ COPY container-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 COPY templates/cert-init/fmtm.conf.template \
      templates/cert-init/api.conf.template \
-     templates/cert-init/script.conf.template \
      /etc/nginx/templates/
 
 
@@ -118,13 +117,6 @@ FROM base as main
 # API & Frontend only
 COPY templates/fmtm.conf.template \
      templates/api.conf.template \
-     /etc/nginx/templates/
-
-
-
-FROM main as main-plus-script
-# Add install script
-COPY templates/script.conf.template \
      /etc/nginx/templates/
 
 

@@ -63,14 +63,3 @@ docker build nginx \
 if [[ -n "$PUSH_IMGS" ]]; then
     docker push "ghcr.io/hotosm/fmtm/proxy:main"
 fi
-
-# Main plus script proxy
-echo "Building proxy:main-plus-script"
-docker build nginx \
-    --tag "ghcr.io/hotosm/fmtm/proxy:main-plus-script" \
-    --target main-plus-script \
-    --build-arg NGINX_TAG="${NGINX_TAG}"
-
-if [[ -n "$PUSH_IMGS" ]]; then
-    docker push "ghcr.io/hotosm/fmtm/proxy:main-plus-script"
-fi
