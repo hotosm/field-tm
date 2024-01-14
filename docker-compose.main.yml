@@ -39,7 +39,7 @@ networks:
 
 services:
   proxy:
-    image: "ghcr.io/hotosm/fmtm/proxy:main${FMTM_SCRIPT_DOMAIN:+-plus-script}"
+    image: "ghcr.io/hotosm/fmtm/proxy:main"
     container_name: fmtm-main
     depends_on:
       api:
@@ -55,7 +55,6 @@ services:
     environment:
       FMTM_DOMAIN: ${FMTM_DOMAIN}
       FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
     ports:
       - 80:80
       - 443:443
@@ -158,7 +157,6 @@ services:
     environment:
       FMTM_DOMAIN: ${FMTM_DOMAIN}
       FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_SCRIPT_DOMAIN: ${FMTM_SCRIPT_DOMAIN:-_}
       CERT_EMAIL: ${CERT_EMAIL}
     ports:
       - 80:80
