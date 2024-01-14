@@ -36,13 +36,8 @@ On a Linux-based machine with `bash` installed, run the script:
 > However, if you run as root, a user svcfmtm will be created for you.
 
 ```bash
-# Option A) If you already cloned the repo
-bash src/frontend/public/install.sh
-
-# Option B) Download the script & run
 curl -L https://get.fmtm.dev -o install.sh
 bash install.sh
-# Alternative URL: https://fmtm.hotosm.org/install.sh
 
 # Then follow the prompts
 ```
