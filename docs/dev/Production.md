@@ -19,7 +19,6 @@ your own cloud server.
 ```bash
 curl -L https://get.fmtm.dev -o install.sh
 bash install.sh
-# Alternative URL: https://fmtm.hotosm.org/install.sh
 
 # Then follow the prompts
 ```
