@@ -11,6 +11,7 @@
   - "**/Dockerfile"
   - "**/*.dockerfile"
   - "**/*entrypoint.sh"
+  - "Justfile"
 "migration":
   - "src/backend/migrations/**/*"
 "documentation":
