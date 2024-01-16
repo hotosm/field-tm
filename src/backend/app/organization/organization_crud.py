@@ -17,16 +17,20 @@
 #
 """Logic for organization management."""
 
-import re
 from io import BytesIO
 
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, Response, UploadFile
 from loguru import logger as log
-from sqlalchemy import func
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import db_models
+from app.models.enums import HTTPStatus
+from app.organization.organization_deps import (
+    get_organization_by_name,
+)
+from app.organization.organization_schemas import OrganisationEdit, OrganisationIn
 from app.s3 import add_obj_to_bucket
 
 
@@ -34,31 +38,7 @@ def get_organisations(
     db: Session,
 ):
     """Get all orgs."""
-    db_organisation = db.query(db_models.DbOrganisation).all()
-    return db_organisation
-
-
-def generate_slug(text: str) -> str:
-    """Sanitise the organization name for use in a URL."""
-    # Remove special characters and replace spaces with hyphens
-    slug = re.sub(r"[^\w\s-]", "", text).strip().lower().replace(" ", "-")
-    # Remove consecutive hyphens
-    slug = re.sub(r"[-\s]+", "-", slug)
-    return slug
-
-
-async def get_organisation_by_name(db: Session, name: str):
-    """Get org by name.
-
-    This function is used to check if a org exists with the same name.
-    """
-    # Use SQLAlchemy's query-building capabilities
-    db_organisation = (
-        db.query(db_models.DbOrganisation)
-        .filter(func.lower(db_models.DbOrganisation.name).like(func.lower(f"%{name}%")))
-        .first()
-    )
-    return db_organisation
+    return db.query(db_models.DbOrganisation).all()
 
 
 async def upload_logo_to_s3(
@@ -94,32 +74,33 @@ async def upload_logo_to_s3(
 
 
 async def create_organization(
-    db: Session, name: str, description: str, url: str, logo: UploadFile(None)
-):
+    db: Session, org_model: OrganisationIn, logo: UploadFile(None)
+) -> db_models.DbOrganisation:
     """Creates a new organization with the given name, description, url, type, and logo.
 
     Saves the logo file S3 bucket under /{org_id}/logo.png.
 
     Args:
         db (Session): database session
-        name (str): name of the organization
-        description (str): description of the organization
-        url (str): url of the organization
-        type (int): type of the organization
+        org_model (OrganisationIn): Pydantic model for organization input.
         logo (UploadFile, optional): logo file of the organization.
             Defaults to File(...).
 
     Returns:
-        bool: True if organization was created successfully
+        DbOrganization: SQLAlchemy Organization model.
     """
+    if await get_organization_by_name(db, org_name=org_model.name):
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail=f"Organization already exists with the name {org_model.name}",
+        )
+
+    # Required to check if exists on error
+    db_organization = None
+
     try:
         # Create new organization without logo set
-        db_organization = db_models.DbOrganisation(
-            name=name,
-            slug=generate_slug(name),
-            description=description,
-            url=url,
-        )
+        db_organization = db_models.DbOrganisation(**org_model.dict())
 
         db.add(db_organization)
         db.commit()
@@ -145,49 +126,63 @@ async def create_organization(
             status_code=400, detail=f"Error creating organization: {e}"
         ) from e
 
-    return True
-
-
-async def get_organisation_by_id(db: Session, id: int):
-    """Get an organization by its id.
-
-    Args:
-        db (Session): database session
-        id (int): id of the organization
-
-    Returns:
-        DbOrganisation: organization with the given id
-    """
-    db_organization = (
-        db.query(db_models.DbOrganisation)
-        .filter(db_models.DbOrganisation.id == id)
-        .first()
-    )
     return db_organization
 
 
-async def update_organization_info(
+async def update_organization(
     db: Session,
-    organization_id,
-    name: str,
-    description: str,
-    url: str,
-    logo: UploadFile,
-):
-    """Update an existing organisation database entry."""
-    organization = await get_organisation_by_id(db, organization_id)
-    if not organization:
-        raise HTTPException(status_code=404, detail="Organization not found")
+    organization: db_models.DbOrganisation,
+    values: OrganisationEdit,
+    logo: UploadFile(None),
+) -> db_models.DbOrganisation:
+    """Update an existing organisation database entry.
 
-    if name:
-        organization.name = name
-    if description:
-        organization.description = description
-    if url:
-        organization.url = url
+    Args:
+        db (Session): database session
+        organization (DbOrganisation): Editing database model.
+        values (OrganisationEdit): Pydantic model for organization edit.
+        logo (UploadFile, optional): logo file of the organization.
+            Defaults to File(...).
+
+    Returns:
+        DbOrganization: SQLAlchemy Organization model.
+    """
+    if not (updated_fields := values.dict(exclude_none=True)):
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=f"No values were provided to update organization {organization.id}",
+        )
+
+    update_cmd = (
+        update(db_models.DbOrganisation)
+        .where(db_models.DbOrganisation.id == organization.id)
+        .values(**updated_fields)
+    )
+    db.execute(update_cmd)
+
     if logo:
         organization.logo = await upload_logo_to_s3(organization, logo)
 
     db.commit()
     db.refresh(organization)
+
     return organization
+
+
+async def delete_organization(
+    db: Session,
+    organization: db_models.DbOrganisation,
+) -> Response:
+    """Delete an existing organisation database entry.
+
+    Args:
+        db (Session): database session
+        organization (DbOrganisation): Database model to delete.
+
+    Returns:
+        bool: If deletion was successful.
+    """
+    db.delete(organization)
+    db.commit()
+
+    return Response(status_code=HTTPStatus.NO_CONTENT)
