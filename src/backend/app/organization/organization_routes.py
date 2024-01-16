@@ -21,15 +21,14 @@ from fastapi import (
     APIRouter,
     Depends,
     File,
-    Form,
-    HTTPException,
     UploadFile,
 )
-from loguru import logger as log
 from sqlalchemy.orm import Session
 
-from ..db import database
-from . import organization_crud
+from app.db import database
+from app.db.db_models import DbOrganisation
+from app.organization import organization_crud, organization_schemas
+from app.organization.organization_deps import org_exists
 
 router = APIRouter(
     prefix="/organization",
@@ -39,91 +38,50 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("/", response_model=list[organization_schemas.OrganisationOut])
 def get_organisations(
     db: Session = Depends(database.get_db),
-):
-    """Get api for fetching organization list."""
-    organizations = organization_crud.get_organisations(db)
-    return organizations
+) -> list[organization_schemas.OrganisationOut]:
+    """Get a list of all organizations."""
+    return organization_crud.get_organisations(db)
 
 
-@router.get("/{organization_id}")
+@router.get("/{org_id}", response_model=organization_schemas.OrganisationOut)
 async def get_organization_detail(
-    organization_id: int, db: Session = Depends(database.get_db)
+    organization: DbOrganisation = Depends(org_exists),
+    db: Session = Depends(database.get_db),
 ):
-    """Get API for fetching detail about a organiation based on id."""
-    organization = await organization_crud.get_organisation_by_id(db, organization_id)
-    if not organization:
-        raise HTTPException(status_code=404, detail="Organization not found")
-
+    """Get a specific organization by id or name."""
     return organization
 
 
-@router.post("/")
+@router.post("/", response_model=organization_schemas.OrganisationOut)
 async def create_organization(
-    name: str = Form(),  # Required field for organization name
-    description: str = Form(None),  # Optional field for organization description
-    url: str = Form(None),  # Optional field for organization URL
-    logo: UploadFile = File(None),  # Optional field for organization logo
-    db: Session = Depends(database.get_db),  # Dependency for database session
-):
-    """Create an organization with the given details.
-
-    Parameters:
-        name (str): The name of the organization. Required.
-        description (str): The description of the organization. Optional.
-        url (str): The URL of the organization. Optional.
-        logo (UploadFile): The logo of the organization. Optional.
-        db (Session): The database session. Dependency.
-
-    Returns:
-        dict: A dictionary with a message indicating successful creation
-            of the organization.
-    """
-    # Check if the organization with the same already exists
-    if await organization_crud.get_organisation_by_name(db, name=name):
-        raise HTTPException(
-            status_code=400, detail=f"Organization already exists with the name {name}"
-        )
-
-    await organization_crud.create_organization(db, name, description, url, logo)
-
-    return {"Message": "Organization Created Successfully."}
-
-
-@router.patch("/{organization_id}/")
-async def update_organization(
-    organization_id: int,
-    name: str = Form(None),
-    description: str = Form(None),
-    url: str = Form(None),
+    org: organization_schemas.OrganisationIn = Depends(),
     logo: UploadFile = File(None),
     db: Session = Depends(database.get_db),
+) -> organization_schemas.OrganisationOut:
+    """Create an organization with the given details."""
+    return await organization_crud.create_organization(db, org, logo)
+
+
+@router.patch("/{org_id}/", response_model=organization_schemas.OrganisationOut)
+async def update_organization(
+    new_values: organization_schemas.OrganisationEdit = Depends(),
+    logo: UploadFile = File(None),
+    organization: DbOrganisation = Depends(org_exists),
+    db: Session = Depends(database.get_db),
 ):
-    """PUT API to update the details of an organization."""
-    try:
-        organization = await organization_crud.update_organization_info(
-            db, organization_id, name, description, url, logo
-        )
-        return organization
-    except Exception as e:
-        log.exception(e)
-        raise HTTPException(
-            status_code=400, detail="Error updating organization."
-        ) from e
+    """Partial update for an existing organization."""
+    return await organization_crud.update_organization(
+        db, organization, new_values, logo
+    )
 
 
-@router.delete("/{organization_id}")
+@router.delete("/{org_id}")
 async def delete_organisations(
-    organization_id: int, db: Session = Depends(database.get_db)
+    organization: DbOrganisation = Depends(org_exists),
+    db: Session = Depends(database.get_db),
 ):
     """Delete an organization."""
-    organization = await organization_crud.get_organisation_by_id(db, organization_id)
-
-    if not organization:
-        raise HTTPException(status_code=404, detail="Organization not found")
-
-    db.delete(organization)
-    db.commit()
-    return {"Message": "Organization Deleted Successfully."}
+    return await organization_crud.delete_organization(db, organization)
