@@ -169,7 +169,7 @@ EOF
 add_vars_to_bashrc() {
     # DOCKER_HOST must be added to the top of bashrc, as running non-interactively
     # Most distros exit .bashrc execution is non-interactive
-    
+
     heading_echo "Adding rootless DOCKER_HOST to bashrc"
 
     user_id=$(id -u)
@@ -221,6 +221,6 @@ install_docker() {
     add_vars_to_bashrc
 }
 
-check_user_not_root
+check_user_not_root "$@"
 trap cleanup_and_exit INT
 install_docker

@@ -7,7 +7,7 @@ wait_for_db() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if </dev/tcp/${FMTM_DB_HOST:-fmtm-db}/5432; then
+        if </dev/tcp/"${FMTM_DB_HOST:-fmtm-db}"/5432; then
             echo "Database is available."
             return 0  # Database is available, exit successfully
         fi
@@ -24,7 +24,7 @@ wait_for_s3() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if curl --silent -I ${S3_ENDPOINT:-http://s3:9000} >/dev/null; then
+        if curl --silent -I "${S3_ENDPOINT:-http://s3:9000}" >/dev/null; then
             echo "S3 is available."
             return 0  # S3 is available, exit successfully
         fi

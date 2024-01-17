@@ -1,4 +1,7 @@
-# see https://gist.github.com/alexanderjulo/4073388
+"""Language and country codes for reference.
+
+see https://gist.github.com/alexanderjulo/4073388
+"""
 
 languages = [
     ("aa", "Afar"),
@@ -34,7 +37,10 @@ languages = [
     ("zh", "Chinese"),
     (
         "cu",
-        "Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic",
+        (
+            "Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; "
+            "Old Church Slavonic",
+        ),
     ),
     ("cv", "Chuvash"),
     ("kw", "Cornish"),

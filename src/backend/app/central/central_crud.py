@@ -33,9 +33,9 @@ from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
 from sqlalchemy.orm import Session
 
-from ..config import settings
-from ..db import db_models
-from ..projects import project_schemas
+from app.config import settings
+from app.db import db_models
+from app.projects import project_schemas
 
 
 def get_odk_project(odk_central: project_schemas.ODKCentral = None):

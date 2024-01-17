@@ -1,6 +1,6 @@
-## :question: Frequently Asked Questions :question
+# ❓ Frequently Asked Questions ❓
 
-### For Users
+## For Users
 
 Q: What is FMTM?
 
@@ -8,7 +8,7 @@ Q: What is FMTM?
 application that facilitates remote monitoring of field activities for
 humanitarian organizations.
 
-<hr></hr>
+---
 
 **Q:** Do I need to create an account to use the FMTM Web App?
 
@@ -16,7 +16,7 @@ humanitarian organizations.
 creating an account allows you to contribute to mapping projects and
 access additional features.
 
-<hr></hr>
+---
 
 **Q:** How do I browse and select mapping projects on the FMTM Web App?
 
@@ -25,7 +25,7 @@ clicking on the "Projects" tab and selecting a project of
 interest. You can view project details, tasks, and mapping data on the
 project page.
 
-<hr></hr>
+---
 
 **Q:** How do I contribute to a mapping project on the FMTM Web App?
 
@@ -34,7 +34,7 @@ create an account, select a project of interest, and choose a task to
 work on. You can then use the mapping tools provided to complete the
 task.
 
-<hr></hr>
+---
 
 **Q:** Can I work on multiple mapping tasks at the same time on the FMTM Web App?
 
@@ -42,7 +42,7 @@ task.
 FMTM Web App, as long as you can commit the necessary time and effort
 to each task.
 
-<hr></hr>
+---
 
 **Q:** How do I know if my mapping work on the FMTM Web App is accurate?
 
@@ -50,7 +50,7 @@ to each task.
 review and validate the mapping work. This helps to ensure the
 accuracy of the mapping data.
 
-<hr></hr>
+---
 
 **Q:** Can I provide feedback on a mapping project on the FMTM Web App?
 
@@ -58,7 +58,7 @@ accuracy of the mapping data.
 App by leaving a comment on the project page or contacting the project
 manager.
 
-<hr></hr>
+---
 
 **Q:** How do I download mapping data from a project on the FMTM Web App?
 
@@ -66,7 +66,7 @@ manager.
 can select the project of interest and click on the "Export" button on
 the project page.
 
-<hr></hr>
+---
 
 **Q:** Can I use the mapping data from the FMTM Web App for my own research or projects?
 
@@ -75,9 +75,9 @@ available for use, but it is important to check the specific project
 requirements and licenses before using the data for your own research
 or projects.
 
-<hr></hr>
+---
 
-### For Contributors
+## For Contributors
 
 **Q:** What is the Field Mapping Tasking Manager (FMTM)?
 
@@ -85,14 +85,14 @@ or projects.
 allows contributors to participate in mapping projects related to
 humanitarian and development work.
 
-<hr></hr>
+---
 
 **Q:** How can I become a contributor to the FMTM?
 
 **A:** To become a contributor to the FMTM, you can create an account on
 the platform and join a mapping project.
 
-<hr></hr>
+---
 
 **Q:** Who can contribute to FMTM?
 
@@ -100,7 +100,7 @@ the platform and join a mapping project.
 contributions from developers, designers, and other contributors are
 always welcome.
 
-<hr></hr>
+---
 
 **Q:** What kind of contributions can I make to FMTM?
 
@@ -126,7 +126,7 @@ Translation: If you are fluent in a language other than English, you
 can contribute by translating the application or its documentation
 into your language.
 
-<hr></hr>
+---
 
 **Q:** What technologies are used in FMTM?
 
@@ -134,7 +134,7 @@ into your language.
 Postgres, Redis, Celery, and Vue.js. The codebase is written in
 Python, HTML, CSS, and JavaScript.
 
-<hr></hr>
+---
 
 **Q:** How do I set up FMTM locally?
 
@@ -142,7 +142,7 @@ Python, HTML, CSS, and JavaScript.
 and Node.js installed on your system. You can follow the instructions
 in the README file of the FMTM repository to set up the project.
 
-<hr></hr>
+---
 
 **Q:** How can I report a bug or suggest a new feature for FMTM?
 
@@ -151,7 +151,7 @@ the FMTM repository on GitHub. Be sure to provide as much detail as
 possible, including steps to reproduce the bug, screenshots, or
 mockups for new features.
 
-<hr></hr>
+---
 
 **Q:** How can I contribute to FMTM if I'm new to open source or web development?
 
@@ -163,7 +163,7 @@ issues labeled as "good first issue." Additionally, you can join the
 FMTM community on Slack to connect with other contributors and get
 help with your contributions.
 
-<hr></hr>
+---
 
 **Q:** What are the benefits of contributing to the FMTM?
 
@@ -171,7 +171,7 @@ help with your contributions.
 humanitarian and development work, while also developing your mapping
 skills and knowledge.
 
-<hr></hr>
+---
 
 **Q:** Do I need to have prior mapping experience to contribute to the FMTM?
 
@@ -179,7 +179,7 @@ skills and knowledge.
 FMTM. The platform provides training and resources to help new
 contributors get started.
 
-<hr></hr>
+---
 
 **Q:** How do I know which mapping project to join?
 
@@ -188,7 +188,7 @@ location, the organization sponsoring the project, and the mapping
 goals. Review the project information and choose a project that
 interests you.
 
-<hr></hr>
+---
 
 **Q:** Can I work on multiple mapping projects at the same time?
 
@@ -196,7 +196,7 @@ interests you.
 time. However, it is important to ensure that you can commit the
 necessary time and effort to each project.
 
-<hr></hr>
+---
 
 **Q:** How do I get feedback on my mapping work?
 
@@ -204,7 +204,7 @@ necessary time and effort to each project.
 review and provide feedback on mapping work. You can also contact
 project managers or experienced contributors for additional feedback.
 
-<hr></hr>
+---
 
 **Q:** How can I improve my mapping skills?
 
@@ -212,7 +212,7 @@ project managers or experienced contributors for additional feedback.
 mapping skills. You can also join mapping communities and forums to
 connect with other contributors and learn from their experiences.
 
-<hr></hr>
+---
 
 **Q:** Can I use the mapping data for my own research or projects?
 

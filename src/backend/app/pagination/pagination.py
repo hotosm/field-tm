@@ -1,8 +1,11 @@
+"""Logic for API pagination."""
+
 import math
 from typing import List
 
 
 def get_pages_nav(total_pages, current_page):
+    """Get page position (prev / next pages)."""
     next_page = None
     prev_page = None
     if current_page + 1 <= total_pages:
@@ -13,6 +16,7 @@ def get_pages_nav(total_pages, current_page):
 
 
 def paginate_data(data: List[dict], page_no: int, page_size: int, total_content: int):
+    """Generate pagination JSON."""
     total_pages = math.ceil(total_content / page_size)
     next_page, prev_page = get_pages_nav(total_pages, page_no)
 

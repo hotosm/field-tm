@@ -113,7 +113,7 @@ def get_obj_from_bucket(bucket_name: str, s3_path: str) -> BytesIO:
         response = client.get_object(bucket_name, s3_path)
         return BytesIO(response.read())
     except Exception as e:
-        raise ValueError(str(e))
+        raise ValueError(str(e)) from e
     finally:
         if response:
             response.close()

@@ -27,7 +27,6 @@ check_os() {
         source /etc/os-release
         case "$ID" in
         debian)
-            IS_DEBIAN=true
             echo "Current OS is ${PRETTY_NAME}."
             ;;
         ubuntu)

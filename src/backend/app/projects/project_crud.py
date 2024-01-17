@@ -163,22 +163,16 @@ async def get_project_info_by_id(db: Session, project_id: int):
     return await convert_to_app_project_info(db_project_info)
 
 
-async def delete_project_by_id(db: Session, project_id: int):
+async def delete_one_project(db: Session, db_project: db_models.DbProject) -> None:
     """Delete a project by id."""
     try:
-        db_project = (
-            db.query(db_models.DbProject)
-            .filter(db_models.DbProject.id == project_id)
-            .order_by(db_models.DbProject.id)
-            .first()
-        )
-        if db_project:
-            db.delete(db_project)
-            db.commit()
+        project_id = db_project.id
+        db.delete(db_project)
+        db.commit()
+        log.info(f"Deleted project with ID: {project_id}")
     except Exception as e:
         log.exception(e)
         raise HTTPException(e) from e
-    return f"Project {project_id} deleted"
 
 
 async def partial_update_project_info(
@@ -2070,22 +2064,6 @@ async def update_project_form(
     return True
 
 
-async def update_odk_credentials_in_db(
-    project_instance: project_schemas.ProjectUpload,
-    odk_central_cred: project_schemas.ODKCentral,
-    odkid: int,
-    db: Session,
-):
-    """Update odk credentials for a project."""
-    project_instance.odkid = odkid
-    project_instance.odk_central_url = odk_central_cred.odk_central_url
-    project_instance.odk_central_user = odk_central_cred.odk_central_user
-    project_instance.odk_central_password = odk_central_cred.odk_central_password
-
-    db.commit()
-    db.refresh(project_instance)
-
-
 async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str):
     """Get the geojson of those features for this project."""
     query = text(
@@ -2364,17 +2342,17 @@ async def get_tasks_count(db: Session, project_id: int):
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     """Pagination result for splash page."""
     total_pages = (count + results_per_page - 1) // results_per_page
-    hasNext = (page * results_per_page) < count  # noqa: N806
-    hasPrev = page > 1  # noqa: N806
+    has_next = (page * results_per_page) < count  # noqa: N806
+    has_prev = page > 1  # noqa: N806
 
     pagination = project_schemas.PaginationInfo(
-        hasNext=hasNext,
-        hasPrev=hasPrev,
-        nextNum=page + 1 if hasNext else None,
+        has_next=has_next,
+        has_prev=has_prev,
+        next_num=page + 1 if has_next else None,
         page=page,
         pages=total_pages,
-        prevNum=page - 1 if hasPrev else None,
-        perPage=results_per_page,
+        prev_num=page - 1 if has_prev else None,
+        per_page=results_per_page,
         total=total,
     )
 

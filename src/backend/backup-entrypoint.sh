@@ -64,7 +64,7 @@ wait_for_db() {
     local retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if </dev/tcp/${db_host}/5432; then
+        if </dev/tcp/"${db_host}"/5432; then
             echo "Database is available."
             return 0  # Database is available, exit successfully
         fi
@@ -81,7 +81,8 @@ backup_db() {
     local db_user="$2"
     local db_name="$3"
     local db_password="$4"
-    local db_backup_file="$HOME/${db_name}_$(date +'%Y%m%d%H%M%S').dump"
+    local db_backup_file
+    db_backup_file="$HOME/${db_name}_$(date +'%Y%m%d%H%M%S').dump"
 
     echo "Running VACUUM ANALYZE on the database."
     PGPASSWORD="$db_password" psql --host "$db_host" \
@@ -99,7 +100,7 @@ backup_db() {
 
     BUCKET_NAME="fmtm-db-backups"
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
-    mc alias set s3 $S3_ENDPOINT $S3_ACCESS_KEY $S3_SECRET_KEY
+    mc alias set s3 "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
     mc mb "s3/${BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BUCKET_NAME}"
     mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/${db_name}/"
@@ -118,18 +119,18 @@ sleep 600
 while true; do
     pretty_echo "### Backup FMTM $(date +%Y-%m-%d_%H:%M:%S) ###"
     check_fmtm_db_vars_present
-    wait_for_db ${FMTM_DB_HOST:-"fmtm-db"}
-    backup_db ${FMTM_DB_HOST:-"fmtm-db"} ${FMTM_DB_USER:-"fmtm"} \
-        ${FMTM_DB_NAME:-"fmtm"} ${FMTM_DB_PASSWORD}
+    wait_for_db "${FMTM_DB_HOST:-fmtm-db}"
+    backup_db "${FMTM_DB_HOST:-fmtm-db}" "${FMTM_DB_USER:-fmtm}" \
+        "${FMTM_DB_NAME:-fmtm}" "${FMTM_DB_PASSWORD}"
     pretty_echo "### Backup FMTM Complete ###"
 
     # Only run ODK Central DB Backups if variables set
     if [ -n "${CENTRAL_DB_HOST}" ]; then
         pretty_echo "### Backup ODK Central $(date +%Y-%m-%d_%H:%M:%S) ###"
         check_central_db_vars_present
-        wait_for_db ${CENTRAL_DB_HOST:-"central-db"}
-        backup_db ${CENTRAL_DB_HOST:-"central-db"} ${CENTRAL_DB_USER:-"odk"} \
-            ${CENTRAL_DB_NAME:-"odk"} ${CENTRAL_DB_PASSWORD}
+        wait_for_db "${CENTRAL_DB_HOST:-central-db}"
+        backup_db "${CENTRAL_DB_HOST:-central-db}" "${CENTRAL_DB_USER:-odk}" \
+            "${CENTRAL_DB_NAME:-odk}" "${CENTRAL_DB_PASSWORD}"
         pretty_echo "### Backup ODK Central Complete ###"
     fi
 

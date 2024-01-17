@@ -15,6 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Logic for FMTM tasks."""
+
 import base64
 from typing import List
 
@@ -40,6 +42,7 @@ from app.users import user_crud
 
 
 async def get_task_count_in_project(db: Session, project_id: int):
+    """Get task count for a project."""
     query = text(f"""select count(*) from tasks where project_id = {project_id}""")
     result = db.execute(query)
     return result.fetchone()[0]
@@ -66,6 +69,7 @@ async def get_task_id_list(db: Session, project_id: int) -> list[int]:
 async def get_tasks(
     db: Session, project_id: int, user_id: int, skip: int = 0, limit: int = 1000
 ):
+    """Get task details for a project."""
     if project_id:
         db_tasks = (
             db.query(db_models.DbTask)
@@ -88,12 +92,15 @@ async def get_tasks(
 
 
 async def get_task(db: Session, task_id: int):
+    """Get details for a specific task ID."""
+    log.debug(f"Getting task with ID '{task_id}' from database")
     return db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
 
 
 async def update_task_status(
     db: Session, user_id: int, task_id: int, new_status: TaskStatus
 ):
+    """Update the status of a task."""
     log.debug(f"Updating task ID {task_id} to status {new_status}")
     if not user_id:
         log.error(f"User id is not present: {user_id}")
@@ -163,7 +170,10 @@ async def update_task_status(
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"Not a valid status update: {db_task.task_status.name} to {new_status.name}",
+            detail=(
+                f"Not a valid status update: "
+                f"{db_task.task_status.name} to {new_status.name}"
+            ),
         )
 
 
@@ -175,7 +185,11 @@ async def update_task_status(
 async def create_task_history_for_status_change(
     db_task: db_models.DbTask, new_status: TaskStatus, db_user: db_models.DbUser
 ):
-    msg = f"Status changed from {db_task.task_status.name} to {new_status.name} by: {db_user.username}"
+    """Append task status change to task history."""
+    msg = (
+        f"Status changed from {db_task.task_status.name} "
+        f"to {new_status.name} by: {db_user.username}"
+    )
     log.info(msg)
 
     new_task_history = db_models.DbTaskHistory(
@@ -211,6 +225,7 @@ async def get_qr_codes_for_task(
     db: Session,
     task_id: int,
 ):
+    """Get the ODK Collect QR code for a task area."""
     task = await get_task(db=db, task_id=task_id)
     if task:
         if task.qr_code:
@@ -224,12 +239,6 @@ async def get_qr_codes_for_task(
         raise HTTPException(status_code=400, detail="Task does not exist")
 
 
-async def get_task_by_id(db: Session, task_id: int):
-    task = db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
-    print("Task ", task)
-    return task
-
-
 async def update_task_files(
     db: Session,
     project_id: int,
@@ -239,6 +248,7 @@ async def update_task_files(
     category: str,
     task_boundary: str,
 ):
+    """Update associated files for a task."""
     # This file will store osm extracts
     task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
 
@@ -268,7 +278,8 @@ async def update_task_files(
 
     # Collect feature mappings for bulk insert
     for feature in outline_geojson["features"]:
-        # If the osm extracts contents do not have a title, provide an empty text for that.
+        # If the osm extracts contents do not have a title,
+        # provide an empty text for that
         feature["properties"]["title"] = ""
 
         feature_shape = shape(feature["geometry"])
@@ -284,7 +295,8 @@ async def update_task_files(
         db.add(db_feature)
         db.commit()
 
-    # Update task_polygons file containing osm extracts with the new geojson contents containing title in the properties.
+    # Update task_polygons file containing osm extracts with the new
+    # geojson contents containing title in the properties.
     with open(task_polygons, "w") as jsonfile:
         jsonfile.truncate(0)  # clear the contents of the file
         dump(updated_outline_geojson, jsonfile)
@@ -300,7 +312,7 @@ async def edit_task_boundary(db: Session, task_id: int, boundary: str):
     geometry = boundary["features"][0]["geometry"]
     outline = shape(geometry)
 
-    task = await get_task_by_id(db, task_id)
+    task = await get_task(db, task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
@@ -324,6 +336,8 @@ async def edit_task_boundary(db: Session, task_id: int, boundary: str):
 async def update_task_history(
     tasks: List[tasks_schemas.TaskBase], db: Session = Depends(database.get_db)
 ):
+    """Update task history with username and user profile image."""
+
     def process_history_entry(history_entry):
         status = history_entry.action_text.split()
         history_entry.status = status[5]

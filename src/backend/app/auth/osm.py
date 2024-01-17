@@ -61,6 +61,13 @@ async def login_required(
     request: Request, access_token: str = Header(None)
 ) -> AuthUser:
     """Dependency to inject into endpoints requiring login."""
+    if settings.DEBUG:
+        return {
+            "id": 20386219,
+            "username": "svcfmtm",
+            "img_url": None,
+        }
+
     osm_auth = await init_osm_auth()
 
     # Attempt extract from cookie if access token not passed

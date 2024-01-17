@@ -8,7 +8,7 @@ repos:
 
   # Autoformat: Python code
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 23.12.1
     hooks:
       - id: black
         files: ^src/backend/(?:.*/)*.*$
@@ -16,7 +16,7 @@ repos:
 
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.1.6"
+    rev: "v0.1.13"
     hooks:
       - id: ruff
         files: ^src/backend/(?:.*/)*.*$
@@ -33,12 +33,53 @@ repos:
             --no-error-on-unmatched-pattern,
             "!chart/**",
             "!CHANGELOG.md",
+            "!CONTRIBUTING.md",
+            "!LICENSE.md",
             "!src/frontend/pnpm-lock.yaml",
           ]
 
+  # # Lint: Dockerfile (disabled until binary is bundled)
+  # - repo: https://github.com/hadolint/hadolint.git
+  #   rev: v2.12.1-beta
+  #   hooks:
+  #     - id: hadolint
+  #       args:
+  #         [
+  #           "--ignore=DL3008",
+  #           "--ignore=DL3013",
+  #           "--ignore=DL3018",
+  #           "--ignore=DL3059",
+  #         ]
+
+  # Lint: Bash scripts
+  - repo: https://github.com/openstack-dev/bashate.git
+    rev: 2.1.1
+    hooks:
+      - id: bashate
+        files: ^(?!.*(?:^|/)contrib(?:/|$)).*$
+
+  # Lint: Shell scripts
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        files: ^(?!.*(?:^|/)contrib(?:/|$)).*$
+        args: ["-x", "--exclude=SC2317,SC2188,SC2143"]
+
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.37.0
+    rev: v0.38.0
     hooks:
       - id: markdownlint
-        args: [--fix, --ignore, CHANGELOG.md, --ignore, .github]
+        args:
+          [
+            --fix,
+            --disable,
+            MD033,
+            --ignore,
+            LICENSE.md,
+            --ignore,
+            CHANGELOG.md,
+            --ignore,
+            .github,
+          ]
