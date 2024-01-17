@@ -55,7 +55,7 @@ from shapely.geometry import (
     shape,
 )
 from shapely.ops import unary_union
-from sqlalchemy import and_, column, inspect, select, table, text
+from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -147,7 +147,6 @@ async def get_project_by_id(db: Session, project_id: int):
     db_project = (
         db.query(db_models.DbProject)
         .filter(db_models.DbProject.id == project_id)
-        .order_by(db_models.DbProject.id)
         .first()
     )
     return await convert_to_app_project(db_project)
@@ -578,7 +577,7 @@ async def get_data_extract_from_osm_rawdata(
         return data_extract
     except Exception as e:
         log.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 async def get_data_extract_url(
@@ -628,7 +627,7 @@ async def get_data_extract_url(
             shape(feature.get("geometry")) for feature in aoi.get("features", [])
         ]
         merged_geom = unary_union(geometries)
-    elif geom_type := aoi.get("type") == "Feature":
+    elif geom_type == aoi.get("type") == "Feature":
         merged_geom = shape(aoi.get("geometry"))
     else:
         merged_geom = shape(aoi)
@@ -2438,7 +2437,9 @@ async def get_project_users(db: Session, project_id: int):
         project_id (int): The ID of the project.
 
     Returns:
-        List[Dict[str, Union[str, int]]]: A list of dictionaries containing the username and the number of contributions made by each user for the specified project.
+        List[Dict[str, Union[str, int]]]: A list of dictionaries containing
+            the username and the number of contributions made by each user
+            for the specified project.
     """
     contributors = (
         db.query(db_models.DbTaskHistory)
@@ -2468,7 +2469,8 @@ def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:
         project_id (int): The ID of the project.
 
     Returns:
-        int: The number of contributions made by the user for the specified project.
+        int: The number of contributions made by the user for the specified
+            project.
     """
     contributions_count = (
         db.query(func.count(db_models.DbTaskHistory.user_id))

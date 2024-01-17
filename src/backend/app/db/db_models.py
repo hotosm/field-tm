@@ -49,6 +49,7 @@ from app.models.enums import (
     MappingPermission,
     OrganisationType,
     ProjectPriority,
+    ProjectRole,
     ProjectStatus,
     TaskAction,
     TaskCreationMode,
@@ -624,17 +625,18 @@ class BackgroundTasks(Base):
 
 
 class DbUserRoles(Base):
-    """Fine grained user control for projects, described by roles."""
+    """Fine grained user access for projects, described by roles."""
 
     __tablename__ = "user_roles"
 
+    # Table has composite PK on (user_id and project_id)
     user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
     user = relationship(DbUser, backref="user_roles")
-    organization_id = Column(Integer, ForeignKey("organisations.id"))
-    organization = relationship(DbOrganisation, backref="user_roles")
-    project_id = Column(Integer, ForeignKey("projects.id"))
+    project_id = Column(
+        Integer, ForeignKey("projects.id"), index=True, primary_key=True
+    )
     project = relationship(DbProject, backref="user_roles")
-    role = Column(Enum(UserRole), nullable=False)
+    role = Column(Enum(ProjectRole), default=UserRole.MAPPER)
 
 
 class DbTilesPath(Base):

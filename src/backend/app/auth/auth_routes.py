@@ -162,9 +162,13 @@ async def my_data(
         )
         db.add(db_user)
         db.commit()
+        # Append role
+        user_data["role"] = db_user.role
     else:
         if user_data.get("img_url"):
             user.profile_img = user_data["img_url"]
             db.commit()
+        # Append role
+        user_data["role"] = user.role
 
     return JSONResponse(content={"user_data": user_data}, status_code=200)

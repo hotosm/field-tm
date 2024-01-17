@@ -121,7 +121,7 @@ async def update_task_status(
                 )
                 log.error(msg)
                 raise HTTPException(
-                    status_code=401,
+                    status_code=403,
                     detail=msg,
                 )
 

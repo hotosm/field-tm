@@ -129,14 +129,21 @@ CREATE TYPE public.teamvisibility AS ENUM (
 ALTER TYPE public.teamvisibility OWNER TO fmtm;
 
 CREATE TYPE public.userrole AS ENUM (
+    'READ_ONLY',
     'MAPPER',
-    'ADMIN',
-    'VALIDATOR',
-    'FIELD_ADMIN',
-    'ORGANIZATION_ADMIN',
-    'READ_ONLY'
+    'ADMIN'
 );
 ALTER TYPE public.userrole OWNER TO fmtm;
+
+CREATE TYPE public.projectrole as ENUM (
+    'MAPPER',
+    'VALIDATOR',
+    'FIELD_MANAGER',
+    'ASSOCIATE_PROJECT_MANAGER',
+    'PROJECT_MANAGER',
+    'ORGANIZATION_ADMIN'
+);
+ALTER TYPE public.projectrole OWNER TO fmtm;
 
 CREATE TYPE public.validationpermission AS ENUM (
     'ANY',
@@ -523,9 +530,8 @@ ALTER TABLE public.user_licenses OWNER TO fmtm;
 
 CREATE TABLE public.user_roles (
     user_id bigint NOT NULL,
-    organization_id integer,
-    project_id integer,
-    role public.userrole NOT NULL
+    project_id integer NOT NULL,
+    role public.projectrole NOT NULL
 );
 ALTER TABLE public.user_roles OWNER TO fmtm;
 
@@ -670,7 +676,7 @@ ALTER TABLE ONLY public.teams
     ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.user_roles
-    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id);
+    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, project_id);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
@@ -819,9 +825,6 @@ ALTER TABLE ONLY public.user_licenses
 
 ALTER TABLE ONLY public.user_licenses
     ADD CONSTRAINT user_licenses_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
-
-ALTER TABLE ONLY public.user_roles
-    ADD CONSTRAINT user_roles_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organisations(id);
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT user_roles_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id);

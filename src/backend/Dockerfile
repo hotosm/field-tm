@@ -154,7 +154,7 @@ RUN pip install --user --upgrade --no-warn-script-location \
     && rm -r /opt/python
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
-    "--host", "0.0.0.0", "--port", "8000", \
+    "--host", "0.0.0.0", "--port", "8000", "--workers", "4", \
     "--reload", "--log-level", "critical", "--no-access-log"]
 
 
