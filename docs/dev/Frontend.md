@@ -11,13 +11,17 @@ For details on how to run the API first, please see:
 
 ### 1B: Starting the Frontend Containers
 
-1. You will need to [Install Docker](https://docs.docker.com/engine/install/) and ensure that it is running on your local machine.
+1. You will need to [Install Docker](https://docs.docker.com/engine/install/)
+   and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory of the FMTM project.
 3. From the command line run: `docker compose build ui`
-   This is essential, as the development container for the frontend is different to production.
+   This is essential, as the development container for the frontend is
+   different to production.
 4. Once everything is built, from the command line run: `docker compose up -d ui`
 
-5. If everything goes well you should now be able to **navigate to the project in your browser:** <http://fmtm.localhost:7050>
+5. If everything goes well you should now be able to
+   **navigate to the project in your browser:**
+   [http://fmtm.localhost:7050](http://fmtm.localhost:7050)
 
 > Note: during development, if you rebuild the frontend, then
 > run 'docker compose up -d', the node_modules directory may
@@ -42,7 +46,8 @@ The frontend should now be accessible at: `http://127.0.0.1:<PORT_NUMBER>`
 
 ## Frontend Tips
 
-The frontend is built with React and Typescript. Here are some tips on how to work with the frontend:
+The frontend is built with React and Typescript. Here are some tips on how to
+work with the frontend:
 
 ### Adding Environment Variables
 

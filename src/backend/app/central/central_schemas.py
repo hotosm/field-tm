@@ -15,28 +15,40 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
+"""Schemas for returned ODK Central objects."""
+
 from enum import Enum
 
 from pydantic import BaseModel
 
 
 class CentralBase(BaseModel):
+    """ODK Central return."""
+
     central_url: str
 
 
 class Central(CentralBase):
+    """ODK Central return, with extras."""
+
     geometry_geojson: str
     # qr_code_binary: bytes
 
 
 class CentralOut(CentralBase):
+    """ODK Central output."""
+
     pass
 
 
 class CentralFileType(BaseModel):
+    """ODK Central file return."""
+
     filetype: Enum("FileType", ["xform", "extract", "zip", "xlsform", "all"])
     pass
 
 
 class CentralDetails(CentralBase):
+    """ODK Central details."""
+
     pass

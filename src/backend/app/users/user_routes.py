@@ -22,9 +22,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from ..db import database
-from ..models.enums import UserRole as UserRoleEnum
-from . import user_crud, user_schemas
+from app.db import database
+from app.models.enums import UserRole as UserRoleEnum
+from app.users import user_crud, user_schemas
 
 router = APIRouter(
     prefix="/users",

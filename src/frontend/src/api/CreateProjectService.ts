@@ -29,7 +29,7 @@ const CreateProjectService: Function = (
 
         if (payload.task_split_type === task_split_type['choose_area_as_task']) {
           await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/custom_task_boundaries`, fileUpload),
           );
         } else if (payload.splitting_algorithm === 'Use natural Boundary') {
           await dispatch(
@@ -37,7 +37,7 @@ const CreateProjectService: Function = (
           );
         } else {
           await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload_multi_polygon`, fileUpload),
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/custom_task_boundaries`, fileUpload),
           );
           // await dispatch(UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
         }

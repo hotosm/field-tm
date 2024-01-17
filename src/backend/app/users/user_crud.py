@@ -20,8 +20,8 @@
 
 from sqlalchemy.orm import Session
 
-from ..db import db_models
-from . import user_schemas
+from app.db import db_models
+from app.users import user_schemas
 
 # --------------
 # ---- CRUD ----

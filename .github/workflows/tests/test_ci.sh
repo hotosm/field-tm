@@ -7,7 +7,7 @@ set -e
 ########################################
 
 # TODO read personal access token
-# read -p
+# read -erp
 # GITHUB_TOKEN=input
 # Feed to act using -s flag: -s GITHUB_TOKEN=input_personal_access_token
 

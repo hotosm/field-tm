@@ -12,7 +12,7 @@ cleanup_and_exit() {
 trap cleanup_and_exit INT
 
 # Prompt the user for input and set the BRANCH_NAME variable
-read -p "Enter the environment (dev/staging/prod): " ENVIRONMENT
+read -erp "Enter the environment (dev/staging/prod): " ENVIRONMENT
 
 case "$ENVIRONMENT" in
     dev)

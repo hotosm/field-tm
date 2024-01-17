@@ -133,6 +133,7 @@ async def my_data(
     """Read access token and get user details from OSM.
 
     Args:
+        request: The HTTP request (automatically included variable).
         db: The db session.
         user_data: User data provided by osm-login-python Auth.
 

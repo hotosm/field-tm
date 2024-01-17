@@ -71,6 +71,12 @@ async def test_create_project(client, organization, user):
     assert "id" in response_data
 
 
+async def test_delete_project(client, project):
+    """Test deleting a FMTM project, plus ODK Central project."""
+    response = client.delete(f"/projects/{project.id}")
+    assert response.status_code == 204
+
+
 async def test_create_odk_project():
     """Test creating an odk central project."""
     mock_project = Mock()

@@ -44,7 +44,7 @@ wait_for_db() {
     retry_interval=5
 
     for ((i = 0; i < max_retries; i++)); do
-        if </dev/tcp/${FMTM_DB_HOST:-fmtm-db}/5432; then
+        if </dev/tcp/"${FMTM_DB_HOST:-fmtm-db}"/5432; then
             echo "Database is available."
             return 0  # Database is available, exit successfully
         fi
@@ -133,10 +133,10 @@ backup_db() {
 
     BUCKET_NAME="fmtm-db-backups"
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
-    mc alias set s3 $S3_ENDPOINT $S3_ACCESS_KEY $S3_SECRET_KEY
+    mc alias set s3 "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
     mc mb "s3/${BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BUCKET_NAME}"
-    mc cp "${db_backup_file}" s3/${BUCKET_NAME}/pre-migrate/
+    mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/pre-migrate/"
 
     pretty_echo "Backup complete: $db_backup_file to bucket ${BUCKET_NAME}/pre-migrate/"
 }

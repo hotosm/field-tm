@@ -27,8 +27,8 @@ done
 
 # Check if the timeout was reached
 if [ $timeout -eq 0 ]; then
-  echo "NGINX did not start within the timeout."
-  exit 1
+    echo "NGINX did not start within the timeout."
+    exit 1
 fi
 
 # Check if FMTM_DOMAIN is set
@@ -63,7 +63,7 @@ if [ -n "${FMTM_S3_DOMAIN}" ]; then
 fi
 
 # Run certbot with the constructed arguments
-echo "Running command: certbot --non-interactive certonly ${certbot_args[@]}"
+echo "Running command: certbot --non-interactive certonly ${certbot_args[*]}"
 certbot --non-interactive certonly "${certbot_args[@]}"
 echo "Certificate generated under: /etc/letsencrypt/live/${FMTM_DOMAIN}/"
 

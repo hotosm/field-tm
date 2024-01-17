@@ -1,6 +1,6 @@
-## 📖 History
+# 📖 History
 
-### How was FMTM born?
+## How was FMTM born?
 
 It started as Ivan's idea to build FMTM (Ivan Gayton is Senior Humanitarian
 Advisor at Humanitarian OpenStreetMap Team) which then became a collaborative
@@ -10,24 +10,25 @@ volunteers interested in the project.
 
 HOT uses ODK heavily, but most of the data never makes it into OSM because all
 the data processing is manual and slow, so it doesn't get done.
-<img align="right" width="300px" src="https://github.com/hotosm/osm-fieldwork/assets/97789856/afc791c7-6cc9-4496-aa93-ab02733f30b8"/>
+
+<img
+  align="right"
+  width="300px"
+  src="https://github.com/hotosm/osm-fieldwork/assets/97789856/afc791c7-6cc9-4496-aa93-ab02733f30b8"
+  alt="fmtm-splash"
+/>
 
 Ivan Gayton(Senior Humanitarian Advisor at Humanitarian OpenStreetMap Team)
 heard about what Rob was working on and goes "That's the missing piece I
 needed!". He'd been wanting to build FMTM for years, but lacked the ability to
 process the data.
-A [webinar](https://www.youtube.com/watch?v=GiLKRZpbtrc&ab_channel=HumanitarianOpenStreetMapTeam) then took place in September 2022
+A [webinar][1] then took place in September 2022
 that showcased the high interest from the community and the need for
 collaborative field mapping that really kicked off the starting point for
 building the Field Mapping Tasking Manager. It was Ivan who got HOT interested
 enough to direct some resources to his idea, so FMTM was born.
 
-**\_Want to know about OSM-fieldwork project ?**
-Click [here](https://github.com/hotosm/osm-fieldwork/wiki)
-<br>
-<br>
-<br>
-<br>
+**Want to know about OSM-fieldwork project?** click [here][2]
 
 ## A project to provide tools for Open Mapping campaigns
 
@@ -51,19 +52,19 @@ analytics and reporting features, allowing users to gain insights into mapping
 campaigns and adjust their strategies accordingly.
 
 Background and description of the project and idea are
-[here](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/):
+[here][3]:
 please have a look at this blog if you haven't yet!
 
-# How to contribute
+## How to contribute
 
 The FMTM project is open source and community-driven, welcoming contributions
 from designers, user testers, and both front-end and back-end developers. If
 you're interested in getting involved, please see our
-[contributor guidelines](https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md)
+[contributor guidelines][4]
 for more information. We welcome questions and feedback, so don't hesitate
 to reach out to us. 👍🎉
 
-# Using OpenDataKit's Select From Map feature
+## Using OpenDataKit's Select From Map feature
 
 OpenDataKit's Select From Map feature is a useful tool for field mappers to
 collect data in a well-structured questionnaire format. The tool was
@@ -80,21 +81,26 @@ floors, construction material, or any number of useful attributes in a
 well-structured questionnaire format
 
 To prepare the appropriate map files for ODK, we are taking our inspiration from
-the [HOT Tasking Manager](https://tasks.hotosm.org/), which allows remote
+the [HOT Tasking Manager][5], which allows remote
 mappers to choose well-defined small "task" areas, ensuring full coverage
 of the project area and no unintended duplication of tasks.
 
-# Users
+## Users
 
 There are three main user roles for using ODK's Select From Map feature:
 campaign managers, field mappers, and validators.
 
-## Campaign managers
+### Campaign managers
 
 Campaign managers select an Area of Interest (AOI) and organize field mappers
 to go out and collect data. They need to:
 
-<img align="right" width="400px" src="https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3"/>
+<img
+  align="right"
+  width="400px"
+  src="https://github.com/hotosm/fmtm/assets/97789856/9343a4bc-462c-44af-af93-8a67907837b3"
+  alt="campaign-managers"
+/>
 
 - Select an AOI polygon by creating a GeoJSON or by tracing a polygon
   in a Web map
@@ -107,7 +113,7 @@ to go out and collect data. They need to:
 - See the status of tasks (open, "checked out", completed but not validated,
   requires to rework, validated, etc) in the Web browser on their computer
 
-## Field mappers
+### Field mappers
 
 Field mappers select (or are allocated) individual tasks within a project AOI
 and use ODK Collect to gather data in those areas. They need to:
@@ -116,7 +122,7 @@ and use ODK Collect to gather data in those areas. They need to:
 - Choose an area and launch ODK Collect with the form corresponding to their
   allocated area pre-loaded
 
-## Validators
+### Validators
 
 Validators review the data collected by field mappers and assess its quality.
 If the data is good, the validators merge the portion of the data that
@@ -132,7 +138,13 @@ that they need to fix it. They need to:
 - Merge good-quality data into OSM (probably from JOSM).
 - Mark areas as completed and merged.
 
-# Info for developers
+## Info for developers
 
-For this visit the
-[Getting Started Page](https://hotosm.github.io/fmtm/dev/Setup/).
+For this visit the [Getting Started Page][6]
+
+[1]: https://www.youtube.com/watch?v=GiLKRZpbtrc&\ab_channel=HumanitarianOpenStreetMapTeam
+[2]: https://github.com/hotosm/osm-fieldwork/wiki
+[3]: https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk
+[4]: https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md
+[5]: https://tasks.hotosm.org/
+[6]: https://hotosm.github.io/fmtm/dev/Setup/
