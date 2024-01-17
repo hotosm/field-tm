@@ -74,8 +74,10 @@ const VectorLayer = ({
         dataProjection: 'EPSG:4326',
         featureProjection: 'EPSG:3857',
       });
+      const geometry = vectorLayer.getSource().getFeatures()?.[0].getGeometry();
+      const area = formatArea(geometry);
 
-      onModify(geoJSONString);
+      onModify(geoJSONString, area);
     });
     map.addInteraction(modify);
     map.addInteraction(select);
@@ -191,22 +193,26 @@ const VectorLayer = ({
 
   useEffect(() => {
     if (!vectorLayer || !style.visibleOnMap || setStyle) return;
-    vectorLayer.setStyle((feature, resolution) => [
-      new Style({
-        image: new CircleStyle({
-          radius: 5,
-          fill: new Fill({
-            color: 'orange',
-          }),
-        }),
-        geometry: function (feature) {
-          // return the coordinates of the first ring of the polygon
-          const coordinates = feature.getGeometry().getCoordinates()[0];
-          return new MultiPoint(coordinates);
-        },
-      }),
-      getStyles({ style, feature, resolution }),
-    ]);
+    vectorLayer.setStyle((feature, resolution) => {
+      return onModify
+        ? [
+            new Style({
+              image: new CircleStyle({
+                radius: 5,
+                fill: new Fill({
+                  color: 'orange',
+                }),
+              }),
+              geometry: function (feature) {
+                // return the coordinates of the first ring of the polygon
+                const coordinates = feature.getGeometry().getCoordinates()[0];
+                return new MultiPoint(coordinates);
+              },
+            }),
+            getStyles({ style, feature, resolution }),
+          ]
+        : [getStyles({ style, feature, resolution })];
+    });
   }, [vectorLayer, style, setStyle]);
 
   useEffect(() => {
@@ -254,7 +260,6 @@ const VectorLayer = ({
     });
     function pointerMovefn(event) {
       vectorLayer.getFeatures(event.pixel).then((features) => {
-        console.log(selection, 'selection');
         if (!features.length) {
           selection = {};
           hoverEffect(undefined, vectorLayer);

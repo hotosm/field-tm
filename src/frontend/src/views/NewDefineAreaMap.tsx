@@ -7,11 +7,12 @@ import { GeoJSONFeatureTypes } from '../store/types/ICreateProject';
 
 type NewDefineAreaMapProps = {
   drawToggle?: boolean;
-  splittedGeojson: GeoJSONFeatureTypes;
+  splittedGeojson: GeoJSONFeatureTypes | null;
   uploadedOrDrawnGeojsonFile: GeoJSONFeatureTypes;
   buildingExtractedGeojson?: GeoJSONFeatureTypes;
   lineExtractedGeojson?: GeoJSONFeatureTypes;
-  onDraw?: () => void;
+  onDraw?: (geojson: any, area: number) => void;
+  onModify?: (geojson: any, area?: number) => void;
 };
 const NewDefineAreaMap = ({
   drawToggle,
@@ -51,7 +52,7 @@ const NewDefineAreaMap = ({
               constrainResolution: true,
               duration: 500,
             }}
-            zoomToLayer
+            onModify={onModify}
           />
         )}
         {isDrawOrGeojsonFile && !splittedGeojson && (

@@ -12,6 +12,7 @@ interface IButton {
   icon?: React.ReactNode;
   isLoading?: boolean;
   disabled?: boolean;
+  loadingText?: string;
 }
 
 const btnStyle = (btnType, className) => {
@@ -24,13 +25,25 @@ const btnStyle = (btnType, className) => {
     case 'other':
       return `fmtm-py-1 fmtm-px-5 fmtm-bg-red-500 fmtm-text-white fmtm-rounded-lg hover:fmtm-bg-red-600`;
     case 'disabled':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed`;
+      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed ${className}`;
 
     default:
       return 'fmtm-primary';
   }
 };
-const Button = ({ btnText, btnType, type, onClick, disabled, className, count, dataTip, icon, isLoading }: IButton) => (
+const Button = ({
+  btnText,
+  btnType,
+  type,
+  onClick,
+  disabled,
+  className,
+  count,
+  dataTip,
+  icon,
+  isLoading,
+  loadingText,
+}: IButton) => (
   <div className="fmtm-w-fit">
     <button
       type={type === 'submit' ? 'submit' : 'button'}
@@ -44,7 +57,7 @@ const Button = ({ btnText, btnType, type, onClick, disabled, className, count, d
     >
       {isLoading ? (
         <>
-          {type === 'submit' ? 'Submitting...' : 'Loading...'}
+          {type === 'submit' ? 'Submitting...' : loadingText ? loadingText : 'Loading...'}
           <Loader2 className="fmtm-mr-2 fmtm-h-6 fmtm-w-6 fmtm-animate-spin" />
         </>
       ) : (
