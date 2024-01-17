@@ -25,10 +25,6 @@ const ProjectDetailsForm: React.FC = () => {
   const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
   //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  useEffect(() => {
-    // dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
-  }, []);
-
   const submission = () => {
     // submitForm();
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));

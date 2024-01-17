@@ -24,9 +24,10 @@ from typing import Optional
 from fastapi import Header, HTTPException, Request
 from loguru import logger as log
 from osm_login_python.core import Auth
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.config import settings
+from app.models.enums import UserRole
 
 if settings.DEBUG:
     # Required as callback url is http during dev
@@ -34,12 +35,18 @@ if settings.DEBUG:
 
 
 class AuthUser(BaseModel):
+    """The user model returned from OSM OAuth2."""
+
+    model_config = ConfigDict(use_enum_values=True)
+
     id: int
     username: str
     img_url: Optional[str]
+    role: Optional[UserRole]
 
 
-def init_osm_auth():
+async def init_osm_auth():
+    """Initialise Auth object from osm-login-python."""
     return Auth(
         osm_url=settings.OSM_URL,
         client_id=settings.OSM_CLIENT_ID,
@@ -50,8 +57,11 @@ def init_osm_auth():
     )
 
 
-def login_required(request: Request, access_token: str = Header(None)):
-    osm_auth = init_osm_auth()
+async def login_required(
+    request: Request, access_token: str = Header(None)
+) -> AuthUser:
+    """Dependency to inject into endpoints requiring login."""
+    osm_auth = await init_osm_auth()
 
     # Attempt extract from cookie if access token not passed
     if not access_token:
@@ -62,4 +72,11 @@ def login_required(request: Request, access_token: str = Header(None)):
     if not access_token:
         raise HTTPException(status_code=401, detail="No access token provided")
 
-    return osm_auth.deserialize_access_token(access_token)
+    try:
+        osm_user = osm_auth.deserialize_access_token(access_token)
+    except ValueError as e:
+        log.error(e)
+        log.error("Failed to deserialise access token")
+        raise HTTPException(status_code=401, detail="Access token not valid") from e
+
+    return osm_user
