@@ -48,6 +48,7 @@ export const initialState: CreateProjectStateTypes = {
   isUnsavedChanges: false,
   canSwitchCreateProjectSteps: false,
   isTasksGenerated: { divide_on_square: false, task_splitting_algorithm: false },
+  isFgbFetching: false,
 };
 
 const CreateProject = createSlice({
@@ -214,6 +215,15 @@ const CreateProject = createSlice({
         ...state.isTasksGenerated,
         [action.payload.key]: action.payload.value,
       };
+    },
+    SetFgbFetchingStatus(state, action) {
+      state.isFgbFetching = action.payload;
+    },
+    ClearProjectStepState(state) {
+      state.dividedTaskGeojson = null;
+      state.splitTasksSelection = null;
+      state.dataExtractGeojson = null;
+      state.projectDetails = { ...state.projectDetails, customLineUpload: null, customPolygonUpload: null };
     },
   },
 });

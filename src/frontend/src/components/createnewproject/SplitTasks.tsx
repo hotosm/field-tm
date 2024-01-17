@@ -61,6 +61,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     (state) => state.createproject.taskSplittingGeojsonLoading,
   );
   const isTasksGenerated = CoreModules.useAppSelector((state) => state.createproject.isTasksGenerated);
+  const isFgbFetching = CoreModules.useAppSelector((state) => state.createproject.isFgbFetching);
 
   const toggleStep = (step, url) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
@@ -130,7 +131,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     } else {
       projectData = { ...projectData, task_split_dimension: projectDetails.dimension };
     }
-    console.log(projectData, 'projectData');
     dispatch(
       CreateProjectService(
         `${import.meta.env.VITE_API_URL}/projects/create_project`,
@@ -379,8 +379,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                           className=""
                           icon={<AssetModules.SettingsIcon className="fmtm-text-white" />}
                           disabled={
-                            splitTasksSelection === task_split_type['task_splitting_algorithm'] &&
-                            !formValues?.average_buildings_per_task
+                            (splitTasksSelection === task_split_type['task_splitting_algorithm'] &&
+                              !formValues?.average_buildings_per_task) ||
+                            isFgbFetching
                               ? true
                               : false
                           }
@@ -426,6 +427,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                   splittedGeojson={dividedTaskGeojson}
                   uploadedOrDrawnGeojsonFile={drawnGeojson}
                   buildingExtractedGeojson={dataExtractGeojson}
+                  onModify={(geojson) => {
+                    handleCustomChange('drawnGeojson', geojson);
+                    dispatch(CreateProjectActions.SetDividedTaskGeojson(JSON.parse(geojson)));
+                    setGeojsonFile(null);
+                  }}
                 />
               </div>
               {generateProjectLog ? (

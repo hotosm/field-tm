@@ -352,6 +352,14 @@ const TaskSplittingPreviewService: Function = (
         dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'task_splitting_algorithm', value: true }));
         dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
       } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Task generation failed. Please try again',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
       } finally {
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));

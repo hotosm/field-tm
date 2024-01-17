@@ -61,7 +61,15 @@ const CreateNewProject = () => {
       case '/create-project':
         return <ProjectDetailsForm flag="create_project" />;
       case '/upload-area':
-        return <UploadArea flag="create_project" geojsonFile={geojsonFile} setGeojsonFile={setGeojsonFile} />;
+        return (
+          <UploadArea
+            flag="create_project"
+            geojsonFile={geojsonFile}
+            setGeojsonFile={setGeojsonFile}
+            setCustomLineUpload={setCustomLineUpload}
+            setCustomPolygonUpload={setCustomPolygonUpload}
+          />
+        );
       case '/select-form':
         return (
           <SelectForm
