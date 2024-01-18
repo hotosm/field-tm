@@ -6,7 +6,7 @@ import ProjectSlice from './slices/ProjectSlice';
 import CreateProjectReducer from './slices/CreateProjectSlice';
 import CommonSlice from './slices/CommonSlice';
 import LoginSlice from './slices/LoginSlice';
-import OrganizationSlice from './slices/organizationSlice';
+import OrganisationSlice from './slices/organisationSlice';
 import SubmissionSlice from './slices/SubmissionSlice';
 import TaskSlice from './slices/TaskSlice';
 import { persistReducer } from 'redux-persist';
@@ -31,7 +31,7 @@ const rootReducer = combineReducers({
   theme: ThemeSlice.reducer,
   createproject: CreateProjectReducer,
   // createproject: persist('createproject', ['projectDetails', 'projectInfo'], CreateProjectReducer),
-  organization: OrganizationSlice.reducer,
+  organisation: OrganisationSlice.reducer,
   // added common slice in order to handle all the common things like snackbar etc
   common: CommonSlice.reducer,
   submission: SubmissionSlice.reducer,

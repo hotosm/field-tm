@@ -49,7 +49,7 @@ from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_crud import check_crs
 from app.static import data_path
-from app.submission import submission_crud
+from app.submissions import submission_crud
 from app.tasks import tasks_crud
 
 router = APIRouter(

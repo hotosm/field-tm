@@ -87,12 +87,12 @@ const ProjectInfo = () => {
             <div className="fmtm-w-10 fmtm-h-10 fmtm-overflow-hidden fmtm-rounded-full fmtm-bg-white fmtm-flex fmtm-justify-center fmtm-items-center">
               <img
                 src={
-                  projectDashboardDetail?.organization_logo ? projectDashboardDetail?.organization_logo : ProjectIcon
+                  projectDashboardDetail?.organisation_logo ? projectDashboardDetail?.organisation_logo : ProjectIcon
                 }
                 alt="Organization Photo"
               />
             </div>
-            <p className="fmtm-text-center fmtm-text-[#706E6E]">{projectDashboardDetail?.organization}</p>
+            <p className="fmtm-text-center fmtm-text-[#706E6E]">{projectDashboardDetail?.organisation}</p>
           </div>
         )}
       </div>

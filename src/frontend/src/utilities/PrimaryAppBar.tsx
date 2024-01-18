@@ -115,7 +115,7 @@ export default function PrimaryAppBar() {
                 onClick={() => setActiveTab(0)}
               />
             </CoreModules.Link>
-            <CoreModules.Link to={'/organization'} style={{ color: defaultTheme.palette.black }}>
+            <CoreModules.Link to={'/organisation'} style={{ color: defaultTheme.palette.black }}>
               <CoreModules.Tab
                 label="MANAGE ORGANIZATIONS"
                 sx={{

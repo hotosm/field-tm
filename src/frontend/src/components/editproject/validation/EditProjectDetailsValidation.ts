@@ -1,5 +1,5 @@
 interface ProjectValues {
-  organization: string;
+  organisation: string;
   name: string;
   username: string;
   id: string;
@@ -10,7 +10,7 @@ interface ProjectValues {
   // odk_central_password: string;
 }
 interface ValidationErrors {
-  organization?: string;
+  organisation?: string;
   name?: string;
   username?: string;
   id?: string;
@@ -25,8 +25,8 @@ const regexForSymbol = /_/g;
 function EditProjectValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
-  // if (!values?.organization) {
-  //   errors.organization = 'Organization is Required.';
+  // if (!values?.organisation) {
+  //   errors.organisation = 'Organization is Required.';
   // }
   // if (!values?.odk_central_url) {
   //   errors.odk_central_url = 'ODK Central Url is Required.';

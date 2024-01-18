@@ -19,9 +19,9 @@ const ProjectDetailsForm = ({ flag }) => {
   const navigate = useNavigate();
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
-  const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
+  const organisationListData: any = useAppSelector((state) => state.createproject.organisationList);
 
-  const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
+  const organisationList = organisationListData.map((item) => ({ label: item.name, value: item.id }));
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
@@ -36,7 +36,7 @@ const ProjectDetailsForm = ({ flag }) => {
   );
 
   const onFocus = () => {
-    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
   };
 
   useEffect(() => {
@@ -185,7 +185,7 @@ const ProjectDetailsForm = ({ flag }) => {
                 <CustomSelect
                   title="Organization Name"
                   placeholder="Organization Name"
-                  data={organizationList}
+                  data={organisationList}
                   dataKey="value"
                   value={values.organisation_id?.toString()}
                   valueKey="value"
@@ -194,7 +194,7 @@ const ProjectDetailsForm = ({ flag }) => {
                 />
                 <AssetModules.AddIcon
                   className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-9"
-                  onClick={() => createPopup('Create Organization', 'createOrganization?popup=true')}
+                  onClick={() => createPopup('Create Organization', 'createOrganisation?popup=true')}
                 />
               </div>
               {errors.organisation_id && (

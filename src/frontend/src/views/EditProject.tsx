@@ -26,7 +26,7 @@ const EditProject: React.FC = () => {
     },
   };
   useEffect(() => {
-    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
 
     if (decodedProjectId) {
       dispatch(GetIndividualProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}`));

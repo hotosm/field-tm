@@ -69,7 +69,7 @@ async def org_admin(
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
 ) -> AuthUser:
-    """Organization admin with full permission for projects in an organization."""
+    """Organisation admin with full permission for projects in an organisation."""
     if project and org_id:
         log.error("Both org_id and project_id cannot be passed at the same time")
         raise HTTPException(
@@ -89,10 +89,10 @@ async def org_admin(
     )
 
     if not org_admin:
-        log.error(f"User ID {user_id} is not an admin for organization {org_id}")
+        log.error(f"User ID {user_id} is not an admin for organisation {org_id}")
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN,
-            detail="User is not organization admin",
+            detail="User is not organisation admin",
         )
 
     return user_data

@@ -1,4 +1,4 @@
-interface OrganizationValues {
+interface OrganisationValues {
   logo: string;
   name: string;
   description: string;
@@ -22,7 +22,7 @@ function isValidUrl(url: string) {
   }
 }
 
-function OrganizationAddValidation(values: OrganizationValues) {
+function OrganisationAddValidation(values: OrganisationValues) {
   const errors: ValidationErrors = {};
 
   // if (!values?.logo) {
@@ -43,4 +43,4 @@ function OrganizationAddValidation(values: OrganizationValues) {
   return errors;
 }
 
-export default OrganizationAddValidation;
+export default OrganisationAddValidation;

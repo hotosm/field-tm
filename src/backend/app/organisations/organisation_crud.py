@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Logic for organization management."""
+"""Logic for organisation management."""
 
 from io import BytesIO
 
@@ -27,10 +27,10 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import db_models
 from app.models.enums import HTTPStatus
-from app.organization.organization_deps import (
-    get_organization_by_name,
+from app.organisations.organisation_deps import (
+    get_organisation_by_name,
 )
-from app.organization.organization_schemas import OrganisationEdit, OrganisationIn
+from app.organisations.organisation_schemas import OrganisationEdit, OrganisationIn
 from app.s3 import add_obj_to_bucket
 
 
@@ -50,7 +50,7 @@ async def upload_logo_to_s3(
     so it should not matter if a .jpg is renamed .png.
 
     Args:
-        db_org(db_models.DbOrganisation): The organization database object.
+        db_org(db_models.DbOrganisation): The organisation database object.
         logo_file(UploadFile): The logo image uploaded to FastAPI.
 
     Returns:
@@ -73,65 +73,65 @@ async def upload_logo_to_s3(
     return logo_url
 
 
-async def create_organization(
+async def create_organisation(
     db: Session, org_model: OrganisationIn, logo: UploadFile(None)
 ) -> db_models.DbOrganisation:
-    """Creates a new organization with the given name, description, url, type, and logo.
+    """Creates a new organisation with the given name, description, url, type, and logo.
 
     Saves the logo file S3 bucket under /{org_id}/logo.png.
 
     Args:
         db (Session): database session
-        org_model (OrganisationIn): Pydantic model for organization input.
-        logo (UploadFile, optional): logo file of the organization.
+        org_model (OrganisationIn): Pydantic model for organisation input.
+        logo (UploadFile, optional): logo file of the organisation.
             Defaults to File(...).
 
     Returns:
-        DbOrganization: SQLAlchemy Organization model.
+        DbOrganisation: SQLAlchemy Organisation model.
     """
-    if await get_organization_by_name(db, org_name=org_model.name):
+    if await get_organisation_by_name(db, org_name=org_model.name):
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail=f"Organization already exists with the name {org_model.name}",
+            detail=f"Organisation already exists with the name {org_model.name}",
         )
 
     # Required to check if exists on error
-    db_organization = None
+    db_organisation = None
 
     try:
-        # Create new organization without logo set
-        db_organization = db_models.DbOrganisation(**org_model.dict())
+        # Create new organisation without logo set
+        db_organisation = db_models.DbOrganisation(**org_model.dict())
 
-        db.add(db_organization)
+        db.add(db_organisation)
         db.commit()
         # Refresh to get the assigned org id
-        db.refresh(db_organization)
+        db.refresh(db_organisation)
 
         # Update the logo field in the database with the correct path
         if logo:
-            db_organization.logo = await upload_logo_to_s3(db_organization, logo)
+            db_organisation.logo = await upload_logo_to_s3(db_organisation, logo)
         db.commit()
 
     except Exception as e:
         log.exception(e)
-        log.debug("Rolling back changes to db organization")
+        log.debug("Rolling back changes to db organisation")
         # Rollback any changes
         db.rollback()
-        # Delete the failed organization entry
-        if db_organization:
-            log.debug(f"Deleting created organisation ID {db_organization.id}")
-            db.delete(db_organization)
+        # Delete the failed organisation entry
+        if db_organisation:
+            log.debug(f"Deleting created organisation ID {db_organisation.id}")
+            db.delete(db_organisation)
             db.commit()
         raise HTTPException(
-            status_code=400, detail=f"Error creating organization: {e}"
+            status_code=400, detail=f"Error creating organisation: {e}"
         ) from e
 
-    return db_organization
+    return db_organisation
 
 
-async def update_organization(
+async def update_organisation(
     db: Session,
-    organization: db_models.DbOrganisation,
+    organisation: db_models.DbOrganisation,
     values: OrganisationEdit,
     logo: UploadFile(None),
 ) -> db_models.DbOrganisation:
@@ -139,50 +139,50 @@ async def update_organization(
 
     Args:
         db (Session): database session
-        organization (DbOrganisation): Editing database model.
-        values (OrganisationEdit): Pydantic model for organization edit.
-        logo (UploadFile, optional): logo file of the organization.
+        organisation (DbOrganisation): Editing database model.
+        values (OrganisationEdit): Pydantic model for organisation edit.
+        logo (UploadFile, optional): logo file of the organisation.
             Defaults to File(...).
 
     Returns:
-        DbOrganization: SQLAlchemy Organization model.
+        DbOrganisation: SQLAlchemy Organisation model.
     """
     if not (updated_fields := values.dict(exclude_none=True)):
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=f"No values were provided to update organization {organization.id}",
+            detail=f"No values were provided to update organisation {organisation.id}",
         )
 
     update_cmd = (
         update(db_models.DbOrganisation)
-        .where(db_models.DbOrganisation.id == organization.id)
+        .where(db_models.DbOrganisation.id == organisation.id)
         .values(**updated_fields)
     )
     db.execute(update_cmd)
 
     if logo:
-        organization.logo = await upload_logo_to_s3(organization, logo)
+        organisation.logo = await upload_logo_to_s3(organisation, logo)
 
     db.commit()
-    db.refresh(organization)
+    db.refresh(organisation)
 
-    return organization
+    return organisation
 
 
-async def delete_organization(
+async def delete_organisation(
     db: Session,
-    organization: db_models.DbOrganisation,
+    organisation: db_models.DbOrganisation,
 ) -> Response:
     """Delete an existing organisation database entry.
 
     Args:
         db (Session): database session
-        organization (DbOrganisation): Database model to delete.
+        organisation (DbOrganisation): Database model to delete.
 
     Returns:
         bool: If deletion was successful.
     """
-    db.delete(organization)
+    db.delete(organisation)
     db.commit()
 
     return Response(status_code=HTTPStatus.NO_CONTENT)

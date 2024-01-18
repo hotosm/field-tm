@@ -10,8 +10,8 @@ export type CreateProjectStateTypes = {
   formCategoryList: FormCategoryListTypes | [];
   formCategoryLoading: boolean;
   generateQrLoading: boolean;
-  organizationList: OrganizationListTypes[];
-  organizationListLoading: boolean;
+  organisationList: OrganisationListTypes[];
+  organisationListLoading: boolean;
   generateQrSuccess: GenerateQrSuccessTypes | null;
   generateProjectLogLoading: boolean;
   generateProjectLog: GenerateProjectLogTypes | null;
@@ -102,7 +102,7 @@ export type ProjectDetailsTypes = {
   no_of_buildings: number;
   odk_central_user?: string;
   odk_central_password?: string;
-  organization?: number;
+  organisation?: number;
   odk_central_url?: string;
   name?: string;
   hashtags?: string;
@@ -130,7 +130,7 @@ export type GenerateQrSuccessTypes = {
   task_id: string;
 };
 
-export type OrganizationListTypes = {
+export type OrganisationListTypes = {
   logo: string;
   id: number;
   url: string;

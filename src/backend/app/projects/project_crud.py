@@ -64,7 +64,7 @@ from app.config import settings
 from app.db import db_models
 from app.db.database import get_db
 from app.db.postgis_utils import geojson_to_flatgeobuf, geometry_to_geojson, timestamp
-from app.organization import organization_crud
+from app.organisations import organisation_crud
 from app.projects import project_schemas
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
@@ -2362,7 +2362,7 @@ async def get_pagination(page: int, count: int, results_per_page: int, total: in
 async def get_dashboard_detail(project_id: int, db: Session):
     """Get project details for project dashboard."""
     project = await get_project(db, project_id)
-    db_organization = await organization_crud.get_organisation_by_id(
+    db_organisation = await organisation_crud.get_organisation_by_id(
         db, project.organisation_id
     )
 
@@ -2398,9 +2398,9 @@ async def get_dashboard_detail(project_id: int, db: Session):
     )
 
     project.total_tasks = await tasks_crud.get_task_count_in_project(db, project_id)
-    project.organization, project.organization_logo = (
-        db_organization.name,
-        db_organization.logo,
+    project.organisation, project.organisation_logo = (
+        db_organisation.name,
+        db_organisation.logo,
     )
     project.total_contributors = contributors
 
