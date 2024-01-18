@@ -83,6 +83,7 @@ docs = [
     "mkdocstrings-python==1.7.5",
     "mkdocs-exclude==1.0.2",
     "python-dotenv==1.0.0",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.2",
 ]
 
 [tool.black]
