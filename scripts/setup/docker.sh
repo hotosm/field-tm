@@ -4,8 +4,6 @@
 # Note: this script must be run as a non-root user
 # Note: The user must be logged in directly (not via su)
 
-OS_NAME="debian"
-
 pretty_echo() {
     local message="$1"
     local length=${#message}
