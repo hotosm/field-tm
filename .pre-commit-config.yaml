@@ -12,7 +12,7 @@ repos:
     hooks:
       - id: black
         files: ^src/backend/(?:.*/)*.*$
-        args: [--target-version=py39]
+        args: [--target-version=py310]
 
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
