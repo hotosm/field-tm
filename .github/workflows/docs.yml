@@ -29,6 +29,5 @@ jobs:
       - build_doxygen
       - build_openapi_json
     with:
-      image: ghcr.io/${{ github.repository }}/backend:ci-${{ github.ref_name }}
       doxygen: true
       openapi: true
