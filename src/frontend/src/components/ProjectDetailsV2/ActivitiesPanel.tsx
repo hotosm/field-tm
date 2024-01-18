@@ -133,13 +133,13 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   return (
     <div className="fmtm-w-full fmtm-px-2 sm:fmtm-px-0 fmtm-relative">
       <div className="fmtm-sticky sm:fmtm-relative -fmtm-top-[1px] fmtm-bg-white sm:fmtm-bg-[#F5F5F5]">
-        <div className="fmtm-flex fmtm-items-center fmtm-w-full fmtm-justify-between">
+        <div className="fmtm-flex fmtm-items-center fmtm-w-full fmtm-justify-between fmtm-gap-4">
           <input
             type="text"
             onChange={handleOnchange}
             value={searchText}
             placeholder="Search by task id or username"
-            className="fmtm-min-w-[14.3rem] fmtm-w-[67%] fmtm-text-md fmtm-px-1 fmtm-py-[0.18rem] fmtm-outline-none fmtm-border-[1px] fmtm-border-[#E7E2E2]"
+            className="fmtm-w-full fmtm-text-md fmtm-px-1 fmtm-py-[0.18rem] fmtm-outline-none fmtm-border-[1px] fmtm-border-[#E7E2E2]"
           />
           <div>
             <div className="fmtm-relative">
