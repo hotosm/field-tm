@@ -75,6 +75,7 @@ nav:
       - Deployment Flow: dev/Deployment-Flow.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
+      - Pre-Commit: https://docs.hotosm.org/dev-guide/pre-commit/
       - Versioning: https://docs.hotosm.org/dev-guide/version-control/#creating-releases
   - API: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
   - Class Hierarchy: apidocs/html/inherits.html
