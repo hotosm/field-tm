@@ -28,7 +28,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser, login_required
 from app.db.database import get_db
-from app.db.db_models import DbProject, DbUser, DbUserRoles
+from app.db.db_models import DbProject, DbUser, DbUserRoles, organisation_managers
 from app.models.enums import HTTPStatus, ProjectRole, UserRole
 from app.projects.project_deps import get_project_by_id
 
@@ -70,36 +70,32 @@ async def org_admin(
     user_data: AuthUser = Depends(login_required),
 ) -> AuthUser:
     """Organization admin with full permission for projects in an organization."""
+    if project and org_id:
+        log.error("Both org_id and project_id cannot be passed at the same time")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Both org_id and project_id cannot be passed at the same time",
+        )
+
     user_id = await get_uid(user_data)
 
+    if project:
+        org_id = db.query(DbProject).filter_by(id=project.id).first().organisation_id
+
     org_admin = (
-        db.query(DbUserRoles)
-        .filter_by(user_id=user_id, role=ProjectRole.ORGANIZATION_ADMIN)
+        db.query(organisation_managers)
+        .filter_by(organisation_id=org_id, user_id=user_id)
         .first()
     )
 
     if not org_admin:
-        log.error(f"User ID {user_id} is not an admin for any organization")
+        log.error(f"User ID {user_id} is not an admin for organization {org_id}")
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN,
-            detail="User must be an organization admin",
+            detail="User is not organization admin",
         )
 
-    matched_project = db.query(DbProject).filter_by(id=org_admin.project_id).first()
-    matched_org_id = matched_project.organisation_id
-
-    if (
-        org_id
-        and matched_org_id == org_id
-        or project
-        and matched_org_id == project.organisation_id
-    ):
-        return user_data
-
-    log.error(f"User ID {user_id} is not an organization admin for id {org_id}")
-    raise HTTPException(
-        status_code=HTTPStatus.FORBIDDEN, detail="User is not an organization admin"
-    )
+    return user_data
 
 
 async def validator(
