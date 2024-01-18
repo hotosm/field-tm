@@ -212,7 +212,7 @@ const OrganisationService: Function = (url: string) => {
         const resp: OrganisationListModel = getOrganisationListResponse.data;
         dispatch(CreateProjectActions.GetOrganisationList(resp));
       } catch (error) {
-        dispatch(CreateProjectActions.GetOrganizationListLoading(false));
+        dispatch(CreateProjectActions.GetOrganisationListLoading(false));
       }
     };
 

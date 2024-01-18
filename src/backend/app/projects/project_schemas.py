@@ -184,10 +184,10 @@ class ProjectDashboard(BaseModel):
     """Project details dashboard."""
 
     project_name_prefix: str
-    organization: str
+    organisation: str
     total_tasks: int
     created: datetime
-    organization_logo: Optional[str] = None
+    organisation_logo: Optional[str] = None
     total_submission: Optional[int] = None
     total_contributors: Optional[int] = None
     last_active: Optional[Union[str, datetime]] = None

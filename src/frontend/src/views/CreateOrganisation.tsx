@@ -2,27 +2,27 @@ import React, { useEffect } from 'react';
 import CoreModules from '../shared/CoreModules';
 import environment from '../environment';
 import useForm from '../hooks/useForm';
-import OrganizationAddValidation from '../components/organization/Validation/OrganizationAddValidation';
-import { PostOrganizationDataService } from '../api/OrganizationService';
+import OrganisationAddValidation from '../components/organisation/Validation/OrganisationAddValidation';
+import { PostOrganisationDataService } from '../api/OrganisationService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { OrganizationAction } from '../store/slices/organizationSlice';
+import { OrganisationAction } from '../store/slices/organisationSlice';
 
-const CreateOrganizationForm = () => {
+const CreateOrganisationForm = () => {
   const dispatch = CoreModules.useAppDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const postOrganizationData: any = CoreModules.useAppSelector((state) => state.organization.postOrganizationData);
+  const postOrganisationData: any = CoreModules.useAppSelector((state) => state.organisation.postOrganisationData);
 
-  const organizationFormData: any = CoreModules.useAppSelector((state) => state.organization.organizationFormData);
+  const organisationFormData: any = CoreModules.useAppSelector((state) => state.organisation.organisationFormData);
 
   const submission = () => {
-    dispatch(PostOrganizationDataService(`${import.meta.env.VITE_API_URL}/organization/`, values));
+    dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`, values));
   };
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
-    organizationFormData,
+    organisationFormData,
     submission,
-    OrganizationAddValidation,
+    OrganisationAddValidation,
   );
   const inputFormStyles = () => {
     return {
@@ -35,16 +35,16 @@ const CreateOrganizationForm = () => {
   };
 
   useEffect(() => {
-    if (postOrganizationData) {
-      dispatch(OrganizationAction.postOrganizationData(null));
-      dispatch(OrganizationAction.SetOrganizationFormData({}));
+    if (postOrganisationData) {
+      dispatch(OrganisationAction.postOrganisationData(null));
+      dispatch(OrganisationAction.SetOrganisationFormData({}));
       if (searchParams.get('popup') === 'true') {
         window.close();
       } else {
-        navigate('/organization');
+        navigate('/organisation');
       }
     }
-  }, [postOrganizationData]);
+  }, [postOrganisationData]);
 
   return (
     <CoreModules.Box
@@ -184,4 +184,4 @@ const CreateOrganizationForm = () => {
   );
 };
 
-export default CreateOrganizationForm;
+export default CreateOrganisationForm;

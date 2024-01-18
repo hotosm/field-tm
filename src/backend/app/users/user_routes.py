@@ -77,48 +77,6 @@ async def get_user_by_identifier(id: str, db: Session = Depends(database.get_db)
     return user
 
 
-@router.post("/user-role")
-async def create_user_role(
-    user_role: user_schemas.UserRoles, db: Session = Depends(database.get_db)
-):
-    """Create a new user role.
-
-    # FIXME is this endpoint really necessary?
-
-    The role can be:
-        - Admin
-        - Organization Admin
-        - Field Admin
-        - Mapper
-        - Validator
-        - Read Only
-
-    The request param `user_role` is a json of user_id, organization_id,
-    project_id, user_role:
-        user_id (required): ID of the user for whom the role is being created
-        organization_id (optional): ID of the organization for which the
-            user is being assigned a role
-        project_id (optional): ID of the project for which the user is
-            being assigned a role
-        user_role (required): Role being assigned to the user
-
-    Response:
-        Status Code 200 (OK): If the role is successfully created
-        Status Code 400 (Bad Request): If the user is already assigned a role
-    """
-    existing_user_role = await user_crud.get_user_role_by_user_id(
-        db, user_id=user_role.user_id
-    )
-    if existing_user_role is not None:
-        raise HTTPException(status_code=400, detail="User is already assigned a role")
-
-    user = await user_crud.get_user(db, user_id=user_role.user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return await user_crud.create_user_roles(user_role, db)
-
-
 @router.get("/user-role-options/")
 async def get_user_roles():
     """Check for available user role options."""

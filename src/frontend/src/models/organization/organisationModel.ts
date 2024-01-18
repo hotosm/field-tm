@@ -1,4 +1,4 @@
-export interface OrganizationModal {
+export interface OrganisationModal {
   name: string;
   description: string;
   url: string;
@@ -20,7 +20,7 @@ export interface OrganisationListModel {
   url: string;
 }
 
-export interface GetOrganizationDataModel {
+export interface GetOrganisationDataModel {
   name: string;
   slug: string;
   description: string;
@@ -30,7 +30,7 @@ export interface GetOrganizationDataModel {
   logo: string;
   url: string;
 }
-export interface PostOrganizationDataModel {
+export interface PostOrganisationDataModel {
   name: string;
   slug: string;
   description: string;

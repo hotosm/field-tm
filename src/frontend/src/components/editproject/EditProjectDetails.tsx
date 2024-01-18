@@ -11,7 +11,7 @@ const EditProjectDetails = ({ projectId }) => {
   const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = CoreModules.useAppSelector((state) => state.createproject.organizationList);
+  const organisationListData: any = CoreModules.useAppSelector((state) => state.createproject.organisationList);
   // //we use use selector from redux to get all state of projectDetails from createProject slice
 
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -35,7 +35,7 @@ const EditProjectDetails = ({ projectId }) => {
     submission,
     EditProjectValidation,
   );
-  const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
+  const organisationList = organisationListData.map((item) => ({ label: item.name, value: item.id }));
   const inputFormStyles = () => {
     return {
       style: {
@@ -93,18 +93,18 @@ const EditProjectDetails = ({ projectId }) => {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={values.organization || ''}
+                value={values.organisation || ''}
                 onChange={(e) => {
-                  handleCustomChange('organization', e.target.value);                }}
+                  handleCustomChange('organisation', e.target.value);                }}
               >
-                {organizationList?.map((org) => (
+                {organisationList?.map((org) => (
                   <MenuItem value={org.value}>{org.label}</MenuItem>
                 ))}
               </CoreModules.Select>
             </CoreModules.Stack>
-            {errors.organization && (
+            {errors.organisation && (
               <CoreModules.FormLabel component="h3" sx={{ color: defaultTheme.palette.error.main }}>
-                {errors.organization}
+                {errors.organisation}
               </CoreModules.FormLabel>
             )}
           </CoreModules.FormControl> */}

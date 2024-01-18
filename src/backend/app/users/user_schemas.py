@@ -53,6 +53,5 @@ class UserRoles(BaseModel):
     """User details with role, org, and associated project."""
 
     user_id: int
-    organization_id: Optional[int] = None
     project_id: Optional[int] = None
     role: UserRole

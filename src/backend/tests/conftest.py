@@ -94,7 +94,7 @@ def user(db):
 
 
 @pytest.fixture(scope="function")
-def organization(db):
+def organisation(db):
     """A test organisation."""
     db_org = DbOrganisation(
         name="test_org_qwerty",
@@ -109,7 +109,7 @@ def organization(db):
 
 
 @pytest.fixture(scope="function")
-async def project(db, user, organization):
+async def project(db, user, organisation):
     """A test project, using the test user and org."""
     project_metadata = ProjectUpload(
         author=User(username=user.username, id=user.id),
@@ -125,7 +125,7 @@ async def project(db, user, organization):
             odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
         ),
         hashtags=["hot-fmtm"],
-        organisation_id=organization.id,
+        organisation_id=organisation.id,
     )
 
     # Create ODK Central Project
@@ -162,18 +162,18 @@ async def project(db, user, organization):
 # @pytest.fixture(scope="function")
 # def get_ids(db, project):
 #     user_id_query = text(f"SELECT id FROM {DbUser.__table__.name} LIMIT 1")
-#     organization_id_query = text(
+#     organisation_id_query = text(
 #         f"SELECT id FROM {DbOrganisation.__table__.name} LIMIT 1"
 #     )
 #     project_id_query = text(f"SELECT id FROM {DbProject.__table__.name} LIMIT 1")
 
 #     user_id = db.execute(user_id_query).scalar()
-#     organization_id = db.execute(organization_id_query).scalar()
+#     organisation_id = db.execute(organisation_id_query).scalar()
 #     project_id = db.execute(project_id_query).scalar()
 
 #     data = {
 #         "user_id": user_id,
-#         "organization_id": organization_id,
+#         "organisation_id": organisation_id,
 #         "project_id": project_id,
 #     }
 #     log.debug(f"get_ids return: {data}")

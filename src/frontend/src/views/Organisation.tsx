@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import CoreModules from '../shared/CoreModules';
 import AssetModules from '../shared/AssetModules';
 import environment from '../environment';
-import { OrganizationDataService } from '../api/OrganizationService';
+import { OrganisationDataService } from '../api/OrganisationService';
 
-const Organization = () => {
+const Organisation = () => {
   const cardStyle = {
     padding: 2,
     display: 'flex',
@@ -25,14 +25,14 @@ const Organization = () => {
 
   const dispatch = CoreModules.useAppDispatch();
 
-  const oraganizationData: any = CoreModules.useAppSelector((state) => state.organization.oraganizationData);
+  const oraganizationData: any = CoreModules.useAppSelector((state) => state.organisation.oraganizationData);
   console.log(oraganizationData, 'oraganizationData');
   const filteredCardData = oraganizationData?.filter((data) =>
     data.name.toLowerCase().includes(searchKeyword.toLowerCase()),
   );
 
   useEffect(() => {
-    dispatch(OrganizationDataService(`${import.meta.env.VITE_API_URL}/organization/`));
+    dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
   }, []);
 
   return (
@@ -48,7 +48,7 @@ const Organization = () => {
     >
       <CoreModules.Box className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-items-center fmtm-pt-5 fmtm-gap-2 sm:fmtm-gap-4">
         <h1 className="fmtm-text-[1.5rem] lg:fmtm-text-[2.25rem] fmtm-font-bold">MANAGE ORGANIZATIONS</h1>
-        <CoreModules.Link to={'/createOrganization'}>
+        <CoreModules.Link to={'/createOrganisation'}>
           <CoreModules.Button
             variant="outlined"
             color="error"
@@ -146,4 +146,4 @@ const Organization = () => {
   );
 };
 
-export default Organization;
+export default Organisation;

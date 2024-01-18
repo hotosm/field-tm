@@ -9,7 +9,7 @@ const CommonSlice = CoreModules.createSlice({
       duration: 0,
     },
     loading: false,
-    postOrganizationLoading: false,
+    postOrganisationLoading: false,
     currentStepFormStep: {
       create_project: {
         step: 1,
@@ -23,8 +23,8 @@ const CommonSlice = CoreModules.createSlice({
     SetLoading(state, action) {
       state.loading = action.payload;
     },
-    PostOrganizationLoading(state, action) {
-      state.organization = action.payload;
+    PostOrganisationLoading(state, action) {
+      state.organisation = action.payload;
     },
     SetCurrentStepFormStep(state, action) {
       state.currentStepFormStep[action.payload.flag] = { step: action.payload.step };

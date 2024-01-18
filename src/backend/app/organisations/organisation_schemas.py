@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic models for Organizations."""
+"""Pydantic models for Organisations."""
 
 from re import sub
 from typing import Optional
@@ -26,18 +26,18 @@ from pydantic.functional_validators import field_validator
 
 from app.models.enums import OrganisationType
 
-# class OrganizationBase(BaseModel):
+# class OrganisationBase(BaseModel):
 #     """Base model for organisation to extend."""
 
 
 class OrganisationIn(BaseModel):
     """Organisation to create from user input."""
 
-    name: str = Field(Form(..., description="Organization name"))
+    name: str = Field(Form(..., description="Organisation name"))
     description: Optional[str] = Field(
-        Form(None, description="Organization description")
+        Form(None, description="Organisation description")
     )
-    url: Optional[HttpUrl] = Field(Form(None, description="Organization website URL"))
+    url: Optional[HttpUrl] = Field(Form(None, description="Organisation website URL"))
 
     @field_validator("url", mode="after")
     @classmethod
@@ -52,7 +52,7 @@ class OrganisationIn(BaseModel):
     @computed_field
     @property
     def slug(self) -> str:
-        """Sanitise the organization name for use in a URL."""
+        """Sanitise the organisation name for use in a URL."""
         if self.name:
             # Remove special characters and replace spaces with hyphens
             slug = sub(r"[^\w\s-]", "", self.name).strip().lower().replace(" ", "-")
@@ -65,7 +65,7 @@ class OrganisationEdit(OrganisationIn):
     """Organisation to edit via user input."""
 
     # Override to make name optional
-    name: Optional[str] = Field(Form(None, description="Organization name"))
+    name: Optional[str] = Field(Form(None, description="Organisation name"))
 
 
 class OrganisationOut(BaseModel):

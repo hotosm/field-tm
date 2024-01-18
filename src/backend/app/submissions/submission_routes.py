@@ -32,7 +32,7 @@ from app.central import central_crud
 from app.config import settings
 from app.db import database
 from app.projects import project_crud, project_schemas
-from app.submission import submission_crud
+from app.submissions import submission_crud
 from app.tasks import tasks_crud
 
 router = APIRouter(

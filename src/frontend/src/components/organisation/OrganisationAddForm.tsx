@@ -1,28 +1,28 @@
 import React from 'react';
 import CoreModules from '../../shared/CoreModules.js';
-import useForm from '../../hooks/useForm';
-import OrganizationAddValidation from './Validation/OrganizationAddValidation';
+import useForm from '../../hooks/useForm.js';
+import OrganisationAddValidation from './Validation/OrganisationAddValidation.js';
 import { MenuItem, Select } from '@mui/material';
-import { OrganizationService } from '../../api/OrganizationService';
-import environment from '../../environment';
+import { OrganisationService } from '../../api/OrganisationService';
+import environment from '../../environment.js';
 
 const formData = {};
-const organizationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
-const organizationDataList = organizationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
-const OrganizationAddForm = () => {
+const organisationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
+const organisationDataList = organisationTypeList.map((item, index) => ({ label: item, value: index + 1 }));
+const OrganisationAddForm = () => {
   const dispatch = CoreModules.useAppDispatch();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const submission = () => {
     // eslint-disable-next-line no-use-before-define
     // submitForm();
-    dispatch(OrganizationService(`${import.meta.env.VITE_API_URL}/organization/`, values));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`, values));
     // navigate("/select-form", { replace: true, state: { values: values } });
   };
   const { handleSubmit, handleCustomChange, values, errors }: any = useForm(
     formData,
     submission,
-    OrganizationAddValidation,
+    OrganisationAddValidation,
   );
   const inputFormStyles = () => {
     return {
@@ -165,10 +165,10 @@ const OrganizationAddForm = () => {
               label="Organization Type"
               onChange={(e) => {
                 handleCustomChange('type', e.target.value);
-                // dispatch(CreateProjectActions.SetProjectDetails({ key: 'organization', value: e.target.value }))
+                // dispatch(CreateProjectActions.SetProjectDetails({ key: 'organisation', value: e.target.value }))
               }}
             >
-              {organizationDataList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
+              {organisationDataList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
             </Select>
           </CoreModules.Stack>
           {errors.type && (
@@ -198,6 +198,6 @@ const OrganizationAddForm = () => {
   );
 };
 
-OrganizationAddForm.propTypes = {};
+OrganisationAddForm.propTypes = {};
 
-export default OrganizationAddForm;
+export default OrganisationAddForm;

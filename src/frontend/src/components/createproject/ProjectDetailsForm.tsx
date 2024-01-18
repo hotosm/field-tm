@@ -22,7 +22,7 @@ const ProjectDetailsForm: React.FC = () => {
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   //we use use selector from redux to get all state of projectDetails from createProject slice
 
-  const organizationListData: any = useAppSelector((state) => state.createproject.organizationList);
+  const organisationListData: any = useAppSelector((state) => state.createproject.organisationList);
   //we use use selector from redux to get all state of projectDetails from createProject slice
 
   const submission = () => {
@@ -56,12 +56,12 @@ const ProjectDetailsForm: React.FC = () => {
       }, // or className: 'your-class'
     };
   };
-  // Changed OrganizationList Data into the Picker Component Format i.e label and value
-  const organizationList = organizationListData.map((item) => ({ label: item.name, value: item.id }));
+  // Changed OrganisationList Data into the Picker Component Format i.e label and value
+  const organisationList = organisationListData.map((item) => ({ label: item.name, value: item.id }));
 
   // User has switched back to the tab
   const onFocus = () => {
-    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organization/`));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
   };
   useEffect(() => {
     window.addEventListener('focus', onFocus);
@@ -151,14 +151,14 @@ const ProjectDetailsForm: React.FC = () => {
                   handleCustomChange('organisation_id', e.target.value);
                 }}
               >
-                {organizationList?.map((org) => (
+                {organisationList?.map((org) => (
                   <MenuItem key={org.value} value={org.value}>
                     {org.label}
                   </MenuItem>
                 ))}
               </Select>
               <CoreModules.IconButton
-                onClick={() => createPopup('Create Organization', 'createOrganization?popup=true')}
+                onClick={() => createPopup('Create Organization', 'createOrganisation?popup=true')}
                 sx={{ width: 'auto' }}
                 // disabled={qrcode == "" ? true : false}
                 color="info"

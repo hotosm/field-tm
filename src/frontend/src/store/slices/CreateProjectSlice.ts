@@ -24,8 +24,8 @@ export const initialState: CreateProjectStateTypes = {
   formCategoryList: [],
   formCategoryLoading: false,
   generateQrLoading: false,
-  organizationList: [],
-  organizationListLoading: false,
+  organisationList: [],
+  organisationListLoading: false,
   generateQrSuccess: null,
   generateProjectLogLoading: false,
   generateProjectLog: null,
@@ -113,10 +113,10 @@ const CreateProject = createSlice({
       state.generateQrLoading = action.payload;
     },
     GetOrganisationList(state, action) {
-      state.organizationList = action.payload;
+      state.organisationList = action.payload;
     },
     GetOrganisationListLoading(state, action) {
-      state.organizationListLoading = action.payload;
+      state.organisationListLoading = action.payload;
     },
     GenerateProjectQRSuccess(state, action) {
       if (action.payload.status === 'SUCCESS') {

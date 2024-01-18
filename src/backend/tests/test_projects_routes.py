@@ -44,7 +44,7 @@ odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = os.getenv("ODK_CENTRAL_PASSWD")
 
 
-async def test_create_project(client, organization, user):
+async def test_create_project(client, organisation, user):
     """Test project creation endpoint."""
     project_data = {
         "author": {"username": user.username, "id": user.id},
@@ -60,7 +60,7 @@ async def test_create_project(client, organization, user):
             "odk_central_password": odk_central_password,
         },
         "hashtags": ["hot-fmtm"],
-        "organisation_id": organization.id,
+        "organisation_id": organisation.id,
     }
 
     response = client.post("/projects/create_project", json=project_data)

@@ -10,8 +10,8 @@ import CreateProject from './views/CreateProject';
 import EditProject from './views/EditProject';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import NotFoundPage from './views/NotFound404';
-import Organization from './views/Organization';
-import CreateOrganization from './views/CreateOrganization';
+import Organisation from './views/Organisation';
+import CreateOrganisation from './views/CreateOrganisation';
 import Authorized from './views/Authorized';
 import SubmissionDetails from './views/SubmissionDetails';
 import CreateNewProject from './views/CreateNewProject';
@@ -39,18 +39,18 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organization',
+        path: '/organisation',
         element: (
           <ErrorBoundary>
-            <Organization />
+            <Organisation />
           </ErrorBoundary>
         ),
       },
       {
-        path: '/createOrganization',
+        path: '/createOrganisation',
         element: (
           <ErrorBoundary>
-            <CreateOrganization />
+            <CreateOrganisation />
           </ErrorBoundary>
         ),
       },
