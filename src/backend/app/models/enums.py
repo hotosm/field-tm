@@ -110,7 +110,6 @@ class ProjectRole(IntEnum, Enum):
         - FIELD_MANAGER = can invite mappers and organise people
         - ASSOCIATE_PROJECT_MANAGER = helps the project manager, cannot delete project
         - PROJECT_MANAGER = has all permissions to manage a project, including delete
-        - ORGANIZATION_ADMIN = has project manager permissions for all projects in org
     """
 
     MAPPER = 0
@@ -118,7 +117,6 @@ class ProjectRole(IntEnum, Enum):
     FIELD_MANAGER = 2
     ASSOCIATE_PROJECT_MANAGER = 3
     PROJECT_MANAGER = 4
-    ORGANIZATION_ADMIN = 5
 
 
 class MappingLevel(IntEnum, Enum):

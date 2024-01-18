@@ -140,8 +140,7 @@ CREATE TYPE public.projectrole as ENUM (
     'VALIDATOR',
     'FIELD_MANAGER',
     'ASSOCIATE_PROJECT_MANAGER',
-    'PROJECT_MANAGER',
-    'ORGANIZATION_ADMIN'
+    'PROJECT_MANAGER'
 );
 ALTER TYPE public.projectrole OWNER TO fmtm;
 
