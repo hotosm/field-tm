@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:80794d6db7b8d5838b7acde428f467ef529d2cc0b35cf9d51291b61d7ff8b233"
+content_hash = "sha256:cd2f83ee59482e1ea855cd03678325fd002328067fb17bfa00886864260bc28f"
 
 [[package]]
 name = "aiohttp"
@@ -602,7 +602,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "0.2.5"
+version = "0.2.6"
 requires_python = ">=3.10"
 summary = "A program for splitting a large AOI into smaller tasks."
 dependencies = [
@@ -615,8 +615,8 @@ dependencies = [
     "sqlalchemy>=2.0.0",
 ]
 files = [
-    {file = "fmtm-splitter-0.2.5.tar.gz", hash = "sha256:03b40cf80ca9d6593d24737df0edd4cc1f0ed91a05f7eee4bdeadb2c810a0300"},
-    {file = "fmtm_splitter-0.2.5-py3-none-any.whl", hash = "sha256:b6f6247f06bb30e511ddc22aaba4ccb9e89b7463ce47a7bc9dc9038eac39408b"},
+    {file = "fmtm-splitter-0.2.6.tar.gz", hash = "sha256:473ccca145569d61c25f5b05ca7366f6b015fcda7159ab6ba759c9353b15d271"},
+    {file = "fmtm_splitter-0.2.6-py3-none-any.whl", hash = "sha256:3a5e6f35975f349c19e0135aa0d6b662d2235410db88f61e14076f280ce5482c"},
 ]
 
 [[package]]
@@ -1428,7 +1428,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.4.0"
+version = "0.4.1"
 requires_python = ">=3.10"
 summary = "Processing field data from OpenDataKit to OpenStreetMap format."
 dependencies = [
@@ -1439,7 +1439,7 @@ dependencies = [
     "haversine>=2.8.0",
     "levenshtein>=0.20.0",
     "mercantile>=1.2.1",
-    "osm-rawdata>=0.1.6",
+    "osm-rawdata>=0.1.7",
     "pandas>=1.5.0",
     "pmtiles>=3.2.0",
     "progress>=1.6",
@@ -1454,8 +1454,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.4.0.tar.gz", hash = "sha256:145011a7d918ac35237fe7953235b3e630e10318a024c2fde2a8dd340a1aa2b1"},
-    {file = "osm_fieldwork-0.4.0-py3-none-any.whl", hash = "sha256:10ec0b2ca8e426329adc1a07d640b8ba864ca3fcbfa884db3f58512074a10633"},
+    {file = "osm-fieldwork-0.4.1.tar.gz", hash = "sha256:e3f3381b7024d816ffeb15082083accfbdbff573fa1a485e9976f68b2356f1b8"},
+    {file = "osm_fieldwork-0.4.1-py3-none-any.whl", hash = "sha256:d0328fb1ea03649a052c96a5cd253218d96909ba8353f6c7fd92cbbfe1566924"},
 ]
 
 [[package]]
