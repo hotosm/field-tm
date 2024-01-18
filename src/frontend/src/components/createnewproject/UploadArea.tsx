@@ -44,6 +44,20 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
   const totalAreaSelection = useAppSelector((state) => state.createproject.totalAreaSelection);
 
   const submission = () => {
+    if (totalAreaSelection) {
+      const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
+      if (totalArea > 1000) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Cannot create project of project area exceeding 1000 Sq.KM.',
+            variant: 'error',
+            duration: 3000,
+          }),
+        );
+        return;
+      }
+    }
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 3 }));
     navigate('/select-form');
@@ -132,6 +146,32 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
   };
+
+  useEffect(() => {
+    if (totalAreaSelection) {
+      const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
+      if (totalArea > 100) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'The project area exceeded over 100 Sq.KM.',
+            variant: 'warning',
+            duration: 3000,
+          }),
+        );
+      }
+      if (totalArea > 1000) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+            variant: 'error',
+            duration: 3000,
+          }),
+        );
+      }
+    }
+  }, [totalAreaSelection]);
 
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
@@ -264,7 +304,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
                 handleCustomChange('drawnGeojson', geojson);
                 dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));
-                dispatch(CreateProjectActions.ClearProjectStepState());
+                dispatch(CreateProjectActions.ClearProjectStepState(formValues));
                 setCustomLineUpload(null);
                 setCustomPolygonUpload(null);
                 setGeojsonFile(null);
