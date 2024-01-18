@@ -157,8 +157,20 @@ alembic upgrade head
 To use it:
 
 1. Re-build the docker image `docker compose build api`
-2. Start the docker container `docker compose up -d api`
-3. Connect to the debugger on port **5678**.
+2. Uncomment the debug port in docker-compose.yml:
+
+   ```yml
+   services:
+     ...
+     api:
+       ...
+       ports:
+         - "7052:8000"
+       #   - "5678:5678" # Debugger port
+   ```
+
+3. Start the docker container `docker compose up -d api`
+4. Connect to the debugger on port **5678**.
 
 You can configure your IDE to do this with the build in debugger.
 
