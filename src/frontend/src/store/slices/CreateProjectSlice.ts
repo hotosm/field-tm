@@ -219,11 +219,11 @@ const CreateProject = createSlice({
     SetFgbFetchingStatus(state, action) {
       state.isFgbFetching = action.payload;
     },
-    ClearProjectStepState(state) {
+    ClearProjectStepState(state, action) {
       state.dividedTaskGeojson = null;
       state.splitTasksSelection = null;
       state.dataExtractGeojson = null;
-      state.projectDetails = { ...state.projectDetails, customLineUpload: null, customPolygonUpload: null };
+      state.projectDetails = { ...action.payload, customLineUpload: null, customPolygonUpload: null };
     },
   },
 });
