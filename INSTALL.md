@@ -4,23 +4,21 @@
 
 It is recommended to run FMTM on a Linux-based machine.
 
-> This includes MacOS, but some [tools must be
-> substituted](#alternative-operating-systems).
+> This includes MacOS, but some [tools must be substituted][1].
 >
-> For Windows users, the easiest option is to use [Windows Subsystem for
-> Linux](#alternative-operating-systems)
+> For Windows users, the easiest option is to use [Windows Subsystem for Linux][2]
 
 Before you can install and use this application, you will need to have
 the following software installed and configured on your system:
 
 > If running Debian/Ubuntu, the install script below does this for you.
 
-[Git](https://git-scm.com/) to clone the FMTM repository.
+[Git][3] to clone the FMTM repository.
 
-[Docker](https://docs.docker.com/engine/install/)
+[Docker][4]
 to run FMTM inside containers.
 
-[Docker Compose](https://docs.docker.com/compose/install)
+[Docker Compose][5]
 for easy orchestration of the FMTM services.
 
 > This is Docker Compose V2, the official Docker CLI plugin.
@@ -45,16 +43,31 @@ bash install.sh
 ## Manual Install
 
 If more details are required, check out the
-[dev docs](https://hotosm.github.io/fmtm/dev/Setup/)
+[dev docs][6]
 
 ### Table of Contents
 
-1. [Clone the FMTM repository](#clone-the-fmtm-repository)
-2. [Development: Setup Your Local Environment](#setup-your-local-environment)
-3. [Start the API with Docker](#start-the-api-with-docker)
-4. [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
-5. [Import Test Data (Optional)](#import-test-data-optional)
-6. [Check Authentication (Optional)](#check-authentication-optional)
+- [Installation](#installation)
+  - [Software Requirements](#software-requirements)
+  - [Easy Install](#easy-install)
+  - [Manual Install](#manual-install)
+    - [Table of Contents](#table-of-contents)
+    - [Clone the FMTM repository](#clone-the-fmtm-repository)
+    - [Setup Your Local Environment](#setup-your-local-environment)
+      - [1. Setup OSM OAUTH 2.0](#1-setup-osm-oauth-20)
+      - [2. Create an `.env` File](#2-create-an-env-file)
+    - [Start the API with Docker](#start-the-api-with-docker)
+      - [Select the install type](#select-the-install-type)
+      - [Pull the Images](#pull-the-images)
+      - [Build the Frontend](#build-the-frontend)
+      - [Start the Containers](#start-the-containers)
+    - [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
+    - [Import Test Data (Optional)](#import-test-data-optional)
+    - [Check Authentication (Optional)](#check-authentication-optional)
+  - [Alternative Operating Systems](#alternative-operating-systems)
+    - [Windows](#windows)
+    - [MacOS](#macos)
+    - [A Note on Docker Desktop](#a-note-on-docker-desktop)
 
 ### Clone the FMTM repository
 
@@ -77,7 +90,7 @@ The FMTM uses OAUTH2 with OSM to authenticate users.
 
 To properly configure your FMTM project, you will need to create keys for OSM.
 
-1. [Login to OSM](https://www.openstreetmap.org/login)
+1. [Login to OSM][28]
    (_If you do not have an account yet, click the signup
    button at the top navigation bar to create one_).
    Click the drop down arrow on the top right of the navigation bar
@@ -90,7 +103,7 @@ To properly configure your FMTM project, you will need to create keys for OSM.
    > Note: `127.0.0.1` is required for debugging instead of `localhost`
    > due to OSM restrictions.
 
-   ![image](https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png)
+   ![image][29]
 
 3. Only the _read user preferences permission_ is required as of now.
 
@@ -237,13 +250,13 @@ Windows Subsystem for Linux (WSL) can be used to run Docker.
 This will run a Linux machine inside Windows very efficiently.
 
 To install follow the
-[official instructions](https://learn.microsoft.com/en-us/windows/wsl/install).
+[official instructions][30].
 
-Then continue with the FMTM [installation](#software-requirements).
+Then continue with the FMTM [installation][31].
 
 ### MacOS
 
-[Colima](https://github.com/abiosoft/colima) is recommended
+[Colima][32] is recommended
 to run `docker` and `docker compose` commands.
 
 Install colima, docker, docker compose using brew:
@@ -267,7 +280,7 @@ Run Colima:
 colima start
 ```
 
-Then continue with the FMTM [installation](#software-requirements).
+Then continue with the FMTM [installation][33].
 
 > Note: only tagged backend images are multi-architecture, supporting
 > MacOS. The regular images for fast continuous deployment are not:
@@ -289,3 +302,16 @@ runs docker commands inside a Linux virtual machine underneath.
 It is often easier and more flexible to do this yourself.
 Plus it gives you access to all other other tools available
 in a Linux operating system!
+
+[1]: #alternative-operating-systems "tools must be substituted"
+[2]: #alternative-operating-systems "Windows Subsystem for Linux"
+[3]: https://git-scm.com/ "Git"
+[4]: https://docs.docker.com/engine/install/ "Docker"
+[5]: https://docs.docker.com/compose/install "Docker Compose"
+[6]: https://hotosm.github.io/fmtm/dev/Setup/ "dev docs"
+[28]: https://www.openstreetmap.org/login "Login to OSM"
+[29]: https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png "image"
+[30]: https://learn.microsoft.com/en-us/windows/wsl/install "official instructions"
+[31]: #software-requirements "installation"
+[32]: https://github.com/abiosoft/colima "Colima"
+[33]: #software-requirements "installation"
