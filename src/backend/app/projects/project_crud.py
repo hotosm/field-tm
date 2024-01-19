@@ -621,7 +621,7 @@ async def get_data_extract_url(
             shape(feature.get("geometry")) for feature in aoi.get("features", [])
         ]
         merged_geom = unary_union(geometries)
-    elif geom_type := aoi.get("type") == "Feature":
+    elif geom_type == "Feature":
         merged_geom = shape(aoi.get("geometry"))
     else:
         merged_geom = shape(aoi)
