@@ -33,7 +33,7 @@ from sqlalchemy.sql import text
 
 from app.central import central_crud
 from app.db import database
-from app.projects import project_crud, project_schemas
+from app.projects import project_schemas
 
 router = APIRouter(
     prefix="/central",
@@ -52,25 +52,6 @@ async def list_projects():
     if projects is None:
         return {"message": "No projects found"}
     return JSONResponse(content={"projects": projects})
-
-
-@router.get("/appuser")
-async def create_appuser(
-    project_id: int,
-    name: str,
-    db: Session = Depends(database.get_db),
-):
-    """Create an appuser in Central."""
-    appuser = central_crud.create_appuser(project_id, name=name)
-    return await project_crud.create_qrcode(db, project_id, appuser.get("token"), name)
-
-
-# @router.get("/list_submissions")
-# async def list_submissions(project_id: int):
-#     """List the submissions data from Central"""
-#     submissions = central_crud.list_submissions(project_id)
-#     log.info("/central/list_submissions is Unimplemented!")
-#     return {"data": submissions}
 
 
 @router.get("/list-forms")

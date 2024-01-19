@@ -1153,7 +1153,7 @@ def generate_task_files(
 
     # Create an app user for the task
     project_log.info(f"Creating odkcentral app user for task {task_id}")
-    appuser = central_crud.create_appuser(odk_id, name, odk_credentials)
+    appuser = central_crud.create_odk_app_user(odk_id, name, odk_credentials)
 
     # If app user could not be created, raise an exception.
     if not appuser:
@@ -1493,7 +1493,7 @@ async def create_qrcode(
     """Create a QR code for a task."""
     # Make QR code for an app_user.
     log.debug(f"Generating base64 encoded QR settings for token: {token}")
-    qrcode_data = await central_crud.create_qrcode(
+    qrcode_data = await central_crud.encode_qrcode_json(
         odk_id, token, project_name, odk_central_url
     )
 
