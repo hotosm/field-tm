@@ -46,9 +46,9 @@ dependencies = [
     "asgiref==3.7.2",
     "sozipfile==0.3.2",
     "osm-login-python==1.0.1",
-    "osm-fieldwork==0.4.0",
+    "osm-fieldwork==0.4.1",
     "osm-rawdata==0.1.7",
-    "fmtm-splitter==0.2.5",
+    "fmtm-splitter==0.2.6",
 ]
 requires-python = ">=3.10"
 readme = "../../README.md"
