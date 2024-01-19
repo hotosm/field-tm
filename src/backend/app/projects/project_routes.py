@@ -1065,9 +1065,9 @@ async def download_tiles(tile_id: int, db: Session = Depends(database.get_db)):
     log.info(f"User requested download for tiles: {tiles_path.path}")
 
     project_id = tiles_path.project_id
-    project_name = await project_crud.get_project(db, project_id).project_name_prefix
+    project = await project_crud.get_project(db, project_id)
     filename = Path(tiles_path.path).name.replace(
-        f"{project_id}_", f"{project_name.replace(' ', '_')}_"
+        f"{project_id}_", f"{project.project_name_prefix.replace(' ', '_')}_"
     )
     log.debug(f"Sending tile archive to user: {filename}")
 
