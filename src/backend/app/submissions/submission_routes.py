@@ -21,7 +21,7 @@ import json
 import os
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from osm_fieldwork.odk_merge import OdkMerge
@@ -32,7 +32,7 @@ from app.central import central_crud
 from app.config import settings
 from app.db import database
 from app.projects import project_crud, project_schemas
-from app.submissions import submission_crud
+from app.submissions import submission_crud, submission_schemas
 from app.tasks import tasks_crud
 
 router = APIRouter(
@@ -356,4 +356,50 @@ async def get_submission_form_fields(
     task_list = await tasks_crud.get_task_id_list(db, project_id)
     odk_form = central_crud.get_odk_form(project)
     response = odk_form.form_fields(project.odkid, str(task_list[0]))
+    return response
+
+
+@router.get("/submission_table/{project_id}")
+async def submission_table(
+    background_tasks: BackgroundTasks,
+    project_id: int,
+    page: int = Query(1, ge=1),
+    results_per_page: int = Query(13, le=100),
+    db: Session = Depends(database.get_db),
+):
+    """This API returns the submission table of a project.
+
+    Args:
+        background_tasks (BackgroundTasks): The background tasks manager.
+
+        project_id (int): The ID of the project.
+
+        page (int, optional): The page number for pagination. Defaults to 1.
+
+        results_per_page (int, optional): The number of results per page for pagination.
+        Defaults to 13.
+
+        db (Session, optional): The database session.
+
+    Returns:
+        PaginatedSubmissions: The paginated submission table of the project.
+
+    """
+    skip = (page - 1) * results_per_page
+    limit = results_per_page
+    count, data = await submission_crud.get_submission_by_project(
+        project_id, skip, limit, db
+    )
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, "sync_submission", project_id
+    )
+
+    background_tasks.add_task(
+        submission_crud.update_submission_in_s3, db, project_id, background_task_id
+    )
+    pagination = await project_crud.get_pagination(page, count, results_per_page, count)
+    response = submission_schemas.PaginatedSubmissions(
+        results=data,
+        pagination=submission_schemas.PaginationInfo(**pagination.dict()),
+    )
     return response
