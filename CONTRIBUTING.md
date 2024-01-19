@@ -12,8 +12,7 @@ If you have **any** questions, please ask!
 
 You can see an overview of the project and the process we have gone through in
 developing FMTM so far in these
-[slides](<https://docs.google.com/presentation/d/>
-1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0)
+[slides][1]
 
 Furthermore, there are many ways to contribute to the
 **Field Mapping Tasking Manager (FMTM)**, which includes:
@@ -39,15 +38,15 @@ Skills with the following would be beneficial:
 - CI/CD workflows
 
 Our latest task board can be found
-[here](https://github.com/orgs/hotosm/projects/22).
+[here][2].
 
 ## Report bugs and suggest improvements
 
-The [issue queue](https://github.com/hotosm/fmtm/issues) is the best way to get
+The [issue queue][3] is the best way to get
 started. There are issue templates for BUGs and FEATURES that you can use, you
 could also create your own. Once you have submitted an issue, it will be
 assigned one label from the following
-[label categories](<<https://github.com/hotosm/fmtm/labels>).
+[label categories][4].
 If you are wondering where to start, you can filter by the
 **good first issue label**.
 
@@ -62,8 +61,7 @@ Github, please reach out to us via our Slack **#geospatial-tech-and-innovation**
 
 ### Workflow
 
-We operate the "Fork & Pull" model explained at [About Pull
-Requests](https://help.github.com/articles/about-pull-requests/)
+We operate the "Fork & Pull" model explained at [About Pull Requests][5]
 
 You should fork the project into your own repo, create a topic branch
 there and then make one or more pull requests back to the repository.
@@ -94,8 +92,7 @@ community of people involved with this project.
 
 ### Documentation
 
-Project documentation should be in [Markdown
-format](https://www.markdownguide.org/), and in a _docs_
+Project documentation should be in [Markdown format][6], and in a _docs_
 subdirectory. While it is possible to use HTML in Markdown documents
 for tables and images, it is prefered to use the Markdown style as
 it's much easier to read.
@@ -110,10 +107,10 @@ to be easily reused and run either standalone, or part of a REST API
 backend. Code that is not designed to be run standalone can have a
 main function to do simple testing during development. That test code
 should be moved to a standalone test case when possible.
-[Pytest](https://pytest.org/) is used as the test framework for
+[Pytest][7] is used as the test framework for
 standalone test cases.
 
-Code follows a [CamelCase](https://en.wikipedia.org/wiki/Camel_case)
+Code follows a [CamelCase][8]
 style. Classes use an Upper Case for the first word, method use a
 lower case for the first word. Variable names are all lower case with
 an underbar as a word separator. Properly naming everything makes it
@@ -121,9 +118,19 @@ much easier to read the code and get an idea of what it is doing. This
 enables people new to this project to contribute easier.
 
 All methods should have a comment that can be used by
-[pydoc](https://docs.python.org/3/library/pydoc.html). The usage of
+[pydoc][9]. The usage of
 base classes is encouraged so functionality can be shared. Comments in
 the code are encouraged when necessary to explain code that may not be
 obvious, but avoid over commenting as well. Code should be able to be
 read like a book, with descriptive names used, no fancy tricks unless
 required. Always be concious of performance and security.
+
+[1]: https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0 "slides"
+[2]: https://github.com/orgs/hotosm/projects/22 "Our latest task board"
+[3]: https://github.com/hotosm/fmtm/issues "issue queue"
+[4]: https://github.com/hotosm/fmtm/labels "label categories"
+[5]: https://help.github.com/articles/about-pull-requests/ "About Pull Requests"
+[6]: https://www.markdownguide.org/ "Markdown format"
+[7]: https://pytest.org/ "Pytest"
+[8]: https://en.wikipedia.org/wiki/Camel_case "CamelCase"
+[9]: https://docs.python.org/3/library/pydoc.html "pydoc"

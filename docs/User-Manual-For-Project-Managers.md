@@ -3,14 +3,15 @@
 This manual is a step by step guide for the project managers on how to get
 started with the Field Mapping Tasking Manager.
 
-- [Introduction](#introduction)
-- [An Overview Of FMTM In Relations With HOT, OSM and ODK.](#an-overview-of-fmtm-in-relations-with-hot-osm-and-odk)
-- [Prerequisites](#prerequisites)
-- [Video Tutorial](#video-tutorial)
-- [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
-- [Steps to start access your project and Start mapping](#steps-to-start-access-your-project-and-start-mapping-or-a-mapping-campaign)
-- [Help and Support](#help-and-support)
-- [Thank you note](#thank-you)
+- [User Manual for FMTM](#user-manual-for-fmtm)
+  - [Introduction](#introduction)
+  - [An Overview Of FMTM In Relations With HOT, OSM and ODK](#an-overview-of-fmtm-in-relations-with-hot-osm-and-odk)
+  - [Prerequisites](#prerequisites)
+  - [Video Tutorial](#video-tutorial)
+  - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
+  - [Steps to start access your project and Start mapping or a mapping campaign](#steps-to-start-access-your-project-and-start-mapping-or-a-mapping-campaign)
+  - [Help and Support](#help-and-support)
+  - [Thank you](#thank-you)
 
 ## Introduction
 
@@ -79,9 +80,9 @@ and improve the effectiveness of humanitarian efforts.
 
 - Stable Internet connection
 - Knowledge on field mapping . If you are new to mapping we suggest you to read
-  [this](https://tasks.hotosm.org/learn/map) .
+  [this][9] .
 - Account on ODK Central Server.
-  [Here](https://docs.getodk.org/central-install-digital-ocean/)
+  [Here][10]
   are the instructions for setting up an ODK Central server on Digital Ocean
   (it's very similar on AWS etc)
 
@@ -105,18 +106,18 @@ and improve the effectiveness of humanitarian efforts.
 
 ## Steps to create a project in FMTM
 
-1. Go to [fmtm](https://fmtm.hotosm.org/) .
+1. Go to [fmtm][11] .
 2. In the header, you'll find three tabs: Explore Projects, Manage Organization,
    and Manage Categories.
 
-   ![fmtm dashboard](https://github.com/hotosm/fmtm/assets/97789856/c0d272f0-c69c-483f-9e9d-83dd75b9e748)
+   ![fmtm dashboard][12]
 
 3. Start by exploring the projects listed by different nations and world
    communities for field mapping exercises.
 4. Use the filters or search option to narrow down the project cards based on
    your preferences.
 
-   ![project filters](https://github.com/hotosm/fmtm/assets/97789856/a5d61628-70e6-426c-a860-b9c7968b4dea)
+   ![project filters][13]
 
 5. If you are not logged into the system, the "Create new project" button will
    be disabled.
@@ -128,7 +129,7 @@ and improve the effectiveness of humanitarian efforts.
 9. Start by filling in the project details, including the organization name,
    project name, description, and other relevant information.
 
-   ![project details 2](https://github.com/hotosm/fmtm/assets/97789856/97c38c80-aa0e-4fe2-b8a5-f4ee43a9a63a)
+   ![project details 2][14]
 
 10. If your organization's name is not listed, you can add it through the
     "Manage Organization" tab.
@@ -140,17 +141,17 @@ and improve the effectiveness of humanitarian efforts.
     Review the displayed map that corresponds to your selected area and click
     on "Next".
 
-    ![project create info](https://github.com/hotosm/fmtm/assets/97789856/680eb831-790a-48f1-8997-c20b5213909d)
+    ![project create info][15]
 
 13. Define the tasks of the project.
 
-    ![project create area](https://github.com/hotosm/fmtm/assets/97789856/177d8258-900e-447f-906a-28aeb1fd6b03)
+    ![project create area][16]
 
     If you choose "Divide on Square," specify the dimensions of the square tasks.
 
     Click on "Next" to proceed.
 
-    ![project task split](https://github.com/hotosm/fmtm/assets/97789856/f53d76b4-e6cc-44a4-8c7c-00082eb72693)
+    ![project task split][17]
 
 14. Select Form . Select the form category you want to use for the field
     mapping, such as "Data Extract" or any other relevant category.
@@ -159,7 +160,7 @@ and improve the effectiveness of humanitarian efforts.
     if needed.
     Click on "Submit" to proceed.
 
-    ![project creation status](https://github.com/hotosm/fmtm/assets/97789856/f9a4bed7-d1a9-44dd-b2d4-b55f428f9416)
+    ![project creation status][18]
 
 15. Wait for the system to generate QR codes for each task, which will be used
     later in the field mapping process.
@@ -172,7 +173,7 @@ and improve the effectiveness of humanitarian efforts.
    next step.
 2. Select one of the available tasks and start the field mapping exercise.
 
-   ![select task](https://github.com/hotosm/fmtm/assets/97789856/162af2e0-dbfa-4787-8037-f03e71417df8)
+   ![select task][19]
 
 3. If a task is already locked by another user, choose a different task that is
    available for mapping.If a task is already locked by another user, choose a
@@ -197,7 +198,7 @@ and improve the effectiveness of humanitarian efforts.
    > Note: 'task' refers to each section of the map enclosed in the dotted
    > lines and each task has a corresponding number tag.
 
-   ![map legend](https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c)
+   ![map legend][20]
 
    - To begin mapping, click on a task closest to you that has the color
      code associated with **READY** and change it's status from **READY**
@@ -223,8 +224,8 @@ and improve the effectiveness of humanitarian efforts.
 If you encounter any issues or need assistance while using FMTM, you can access
 the following resources:
 
-- Check the [FAQs](https://hotosm.github.io/fmtm/FAQ) .
-- Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
+- Check the [FAQs][21] .
+- Ask your doubts in the [Slack channel: #fmtm-field-pilots][22]
 
 ## Thank you
 
@@ -258,3 +259,18 @@ appreciate your commitment to making a difference.
 Happy mapping!
 
 The FMTM Team
+
+[9]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
+[10]: https://docs.getodk.org/central-install-digital-ocean/ "Account on ODK Central Server"
+[11]: https://fmtm.hotosm.org/ "fmtm"
+[12]: https://github.com/hotosm/fmtm/assets/97789856/c0d272f0-c69c-483f-9e9d-83dd75b9e748 "fmtm dashboard"
+[13]: https://github.com/hotosm/fmtm/assets/97789856/a5d61628-70e6-426c-a860-b9c7968b4dea "project filters"
+[14]: https://github.com/hotosm/fmtm/assets/97789856/97c38c80-aa0e-4fe2-b8a5-f4ee43a9a63a "project details 2"
+[15]: https://github.com/hotosm/fmtm/assets/97789856/680eb831-790a-48f1-8997-c20b5213909d "project create info"
+[16]: https://github.com/hotosm/fmtm/assets/97789856/177d8258-900e-447f-906a-28aeb1fd6b03 "project create area"
+[17]: https://github.com/hotosm/fmtm/assets/97789856/f53d76b4-e6cc-44a4-8c7c-00082eb72693 "project task split"
+[18]: https://github.com/hotosm/fmtm/assets/97789856/f9a4bed7-d1a9-44dd-b2d4-b55f428f9416 "project creation status"
+[19]: https://github.com/hotosm/fmtm/assets/97789856/162af2e0-dbfa-4787-8037-f03e71417df8 "select task"
+[20]: https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c "map legend"
+[21]: https://hotosm.github.io/fmtm/FAQ "FAQs"
+[22]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #fmtm-field-pilots"
