@@ -762,3 +762,42 @@ async def get_submissions_by_date(
         ]
 
     return response
+
+
+async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Session):
+    """Get submission by project.
+
+    Retrieves a paginated list of submissions for a given project.
+
+    Args:
+        project_id (int): The ID of the project.
+        skip (int): The number of submissions to skip.
+        limit (int): The maximum number of submissions to retrieve.
+        db (Session): The database session.
+
+    Returns:
+        Tuple[int, List]: A tuple containing the total number of submissions and
+        the paginated list of submissions.
+
+    Raises:
+        ValueError: If the submission file cannot be found.
+
+    """
+    project = await project_crud.get_project(db, project_id)
+    s3_project_path = f"/{project.organisation_id}/{project_id}"
+    s3_submission_path = f"/{s3_project_path}/submission.zip"
+
+    try:
+        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
+    except ValueError:
+        return 0, []
+
+    with zipfile.ZipFile(file, "r") as zip_ref:
+        with zip_ref.open("submissions.json") as file_in_zip:
+            content = file_in_zip.read()
+
+    content = json.loads(content)
+    start_index = skip
+    end_index = skip + limit
+    paginated_content = content[start_index:end_index]
+    return len(content), paginated_content
