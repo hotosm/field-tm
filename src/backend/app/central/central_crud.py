@@ -556,6 +556,7 @@ async def encode_qrcode_json(
             "form_update_mode": "match_exactly",
             "basemap_source": "osm",
             "autosend": "wifi_and_cellular",
+            "metadata_username": "svcfmtm",
         },
         "project": {"name": f"{name}"},
         "admin": {},
