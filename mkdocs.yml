@@ -65,7 +65,7 @@ nav:
       - Installation: INSTALL.md
       - Contribution Guidelines: CONTRIBUTING.md
       - Documentation Contribution: Guide-On-Improving-Documentation.md
-      - Code of Conduct: CODE_OF_CONDUCT.md
+      - Code of Conduct: https://docs.hotosm.org/code-of-conduct
       - FAQ: FAQ.md
   - User Manuals:
       - Project Managers: User-Manual-For-Project-Managers.md
