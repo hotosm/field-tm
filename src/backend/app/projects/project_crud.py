@@ -515,10 +515,12 @@ async def preview_split_by_square(boundary: str, meters: int):
 
     # Merge multiple geometries into single polygon
     if multi_polygons:
-        boundary = multi_polygons[0]
+        geometry = multi_polygons[0]
         for geom in multi_polygons[1:]:
-            boundary = boundary.union(geom)
-
+            geometry = geometry.union(geom)
+        for feature in features:
+            feature["geometry"] = geometry
+        boundary["features"] = features
     return await run_in_threadpool(
         lambda: split_by_square(
             boundary,
