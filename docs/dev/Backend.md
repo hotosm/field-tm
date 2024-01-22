@@ -208,6 +208,19 @@ To run the backend tests locally, run:
 docker compose run --rm api pytest
 ```
 
+To assess coverage of tests, run:
+
+```bash
+docker compose run --rm --entrypoint='sh -c' api \
+  'coverage run -m pytest && coverage report -m'
+```
+
+To assess performance of endpoints:
+
+- We can use the pyinstrument profiler.
+- While in debug mode (DEBUG=True), access any endpoint.
+- Add the `?profile=true` arg to the URL to view the execution time.
+
 ## Using the local version of ODK Central
 
 - During project creation a Central ODK URL must be provided.

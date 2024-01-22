@@ -20,6 +20,7 @@ jobs:
       - name: Vars and Secrets to Env
         env:
           TAG_OVERRIDE: ${{ env.TAG_OVERRIDE || 'ci-development' }}
+          TARGET_OVERRIDE: ${{ env.TARGET_OVERRIDE || 'ci' }}
           GIT_BRANCH: ${{ github.ref_name }}
           VARS_CONTEXT: ${{ toJson(vars) }}
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
@@ -32,6 +33,7 @@ jobs:
 
           # Set all vars
           echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> $GITHUB_ENV
+          echo "TARGET_OVERRIDE=${TARGET_OVERRIDE}" >> $GITHUB_ENV
           echo "GIT_BRANCH=${GIT_BRANCH}" >> $GITHUB_ENV
 
           # Set VARS_CONTEXT if not null
@@ -61,8 +63,38 @@ jobs:
           fi
 
           echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
+          echo "GIT_BRANCH=${GIT_BRANCH}" >> .env
 
-      - name: Run Tests
+      - name: Run Tests With Coverage
         run: |
           docker compose up -d proxy
-          docker compose run api pytest
+          docker compose run --entrypoint "sh -c" \
+            --volume ${{ github.workspace }}/coverage:/tmp/coverage api \
+            "coverage run -m pytest \
+            && coverage report && coverage html \
+            && coverage-badge -o coverage.svg \
+            && mv htmlcov/index.html /tmp/coverage/coverage.html \
+            && mv coverage.svg /tmp/coverage/coverage.svg"
+
+      - name: Upload Coverage
+        run: |
+          # Pull content from gh-pages
+          mkdir tmp_pages
+          cd tmp_pages
+          git init
+          git pull https://github.com/${{ github.repository }}.wiki
+          cd ..
+
+          # Sync coverage index and badge using rsync
+          sudo apt-get update && sudo apt-get install -y rsync --no-install-recommends
+
+          echo "Coverage dir contents:"
+          ls ${{ github.workspace }}/coverage
+          echo ""
+
+          cp ${{ github.workspace }}/coverage/coverage.* docs/
+          rsync -av --delete docs/ tmp_pages/ --exclude .git
+
+          # Assess diff
+          cd tmp_pages
+          git --no-pager diff
