@@ -81,3 +81,4 @@ nav:
       - Versioning: https://docs.hotosm.org/dev-guide/version-control/#creating-releases
   - API: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
   - Class Hierarchy: apidocs/html/inherits.html
+  - Code Coverage: coverage.html
