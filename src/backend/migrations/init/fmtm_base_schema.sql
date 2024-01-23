@@ -102,13 +102,6 @@ CREATE TYPE public.taskaction AS ENUM (
 );
 ALTER TYPE public.taskaction OWNER TO fmtm;
 
-CREATE TYPE public.taskcreationmode AS ENUM (
-    'GRID',
-    'ROADS',
-    'UPLOAD'
-);
-ALTER TYPE public.taskcreationmode OWNER TO fmtm;
-
 CREATE TYPE public.taskstatus AS ENUM (
     'READY',
     'LOCKED_FOR_MAPPING',
@@ -151,6 +144,14 @@ CREATE TYPE public.validationpermission AS ENUM (
     'TEAMS_LEVEL'
 );
 ALTER TYPE public.validationpermission OWNER TO fmtm;
+
+CREATE TYPE public.projectvisibility AS ENUM (
+    'PUBLIC',
+    'PRIVATE',
+    'INVITE_ONLY'
+);
+ALTER TYPE public.projectvisibility OWNER TO fmtm;
+
 
 
 -- Extra
@@ -294,13 +295,6 @@ ALTER TABLE public.organisations_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.organisations_id_seq OWNED BY public.organisations.id;
 
 
-CREATE TABLE public.project_allowed_users (
-    project_id integer,
-    user_id bigint
-);
-ALTER TABLE public.project_allowed_users OWNER TO fmtm;
-
-
 CREATE TABLE public.project_chat (
     id bigint NOT NULL,
     project_id integer NOT NULL,
@@ -344,7 +338,6 @@ CREATE TABLE public.projects (
     odkid integer,
     author_id bigint NOT NULL,
     created timestamp without time zone NOT NULL,
-    task_creation_mode public.taskcreationmode NOT NULL,
     project_name_prefix character varying,
     task_type_prefix character varying,
     location_str character varying,
@@ -352,9 +345,8 @@ CREATE TABLE public.projects (
     last_updated timestamp without time zone,
     status public.projectstatus NOT NULL,
     total_tasks integer,
-    odk_central_src character varying,
     xform_title character varying,
-    private boolean,
+    visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     mapper_level public.mappinglevel NOT NULL,
     priority public.projectpriority,
     featured boolean,
@@ -786,12 +778,6 @@ ALTER TABLE ONLY public.organisation_managers
 
 ALTER TABLE ONLY public.organisation_managers
     ADD CONSTRAINT organisation_managers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-ALTER TABLE ONLY public.project_allowed_users
-    ADD CONSTRAINT project_allowed_users_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id);
-
-ALTER TABLE ONLY public.project_allowed_users
-    ADD CONSTRAINT project_allowed_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 ALTER TABLE ONLY public.project_chat
     ADD CONSTRAINT project_chat_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id);
