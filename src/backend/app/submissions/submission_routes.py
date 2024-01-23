@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session
 
 from app.central import central_crud
 from app.config import settings
-from app.db import database
+from app.db import database, db_models
 from app.projects import project_crud, project_deps, project_schemas
 from app.submissions import submission_crud, submission_schemas
 from app.tasks import tasks_crud
@@ -397,7 +397,7 @@ async def submission_table(
 @router.get("/task_submissions/{project_id}")
 async def task_submissions(
     task_id: int,
-    project: project_deps.get_project_by_id = Depends(),
+    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
     page: int = Query(1, ge=1),
     limit: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
