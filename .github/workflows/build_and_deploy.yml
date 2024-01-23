@@ -119,6 +119,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          # Get a8m/envsubst (required for default vals syntax ${VAR:-default})
+          echo "Downloading envsubst"
+          curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+          chmod +x envsubst
+
+          echo "Substituing variables from .env.example --> .env"
+          ./envsubst < .env.example > .env
+
       - name: Frontend smoke test
         run: |
           if docker compose up --detach \
