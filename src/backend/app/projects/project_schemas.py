@@ -184,7 +184,7 @@ class ProjectDashboard(BaseModel):
     """Project details dashboard."""
 
     project_name_prefix: str
-    organisation: str
+    organisation_name: str
     total_tasks: int
     created: datetime
     organisation_logo: Optional[str] = None

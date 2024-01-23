@@ -46,6 +46,7 @@ from app.auth.osm import AuthUser, login_required
 from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
+from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.projects.project_crud import check_crs
 from app.static import data_path
@@ -1179,28 +1180,33 @@ async def get_template_file(
     "/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard
 )
 async def project_dashboard(
-    project_id: int,
     background_tasks: BackgroundTasks,
+    db_project: db_models.DbProject = Depends(project_deps.get_project_by_id),
+    db_organisation: db_models.DbOrganisation = Depends(
+        organisation_deps.org_from_project
+    ),
     db: Session = Depends(database.get_db),
 ):
     """Get the project dashboard details.
 
     Args:
-        project_id (int): The ID of the project.
         background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
+        db_project (db_models.DbProject): An instance of the project.
+        db_organisation (db_models.DbOrganisation): An instance of the organisation.
         db (Session): The database session.
 
     Returns:
         ProjectDashboard: The project dashboard details.
     """
-    data = await project_crud.get_dashboard_detail(project_id, db)
+    data = await project_crud.get_dashboard_detail(db_project, db_organisation, db)
+
     background_task_id = await project_crud.insert_background_task_into_database(
-        db, "sync_submission", project_id
+        db, "sync_submission", db_project.id
+    )
+    background_tasks.add_task(
+        submission_crud.update_submission_in_s3, db, db_project.id, background_task_id
     )
 
-    background_tasks.add_task(
-        submission_crud.update_submission_in_s3, db, project_id, background_task_id
-    )
     return data
 
 

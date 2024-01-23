@@ -27,8 +27,9 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.db_models import DbOrganisation
+from app.db.db_models import DbOrganisation, DbProject
 from app.models.enums import HTTPStatus
+from app.projects import project_deps
 
 
 async def get_organisation_by_name(
@@ -120,3 +121,11 @@ async def org_exists(
     Requires Depends from a route.
     """
     return await check_org_exists(db, org_id)
+
+
+async def org_from_project(
+    project: DbProject = Depends(project_deps.get_project_by_id),
+    db: Session = Depends(get_db),
+) -> DbOrganisation:
+    """Get an organisation from a project id."""
+    return await check_org_exists(db, project.organisation_id)
