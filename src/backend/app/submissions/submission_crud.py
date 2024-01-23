@@ -38,6 +38,7 @@ from sqlalchemy.orm import Session
 
 from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
 from app.config import settings
+from app.db import db_models
 from app.projects import project_crud, project_schemas
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
@@ -801,3 +802,31 @@ async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Se
     end_index = skip + limit
     paginated_content = content[start_index:end_index]
     return len(content), paginated_content
+
+
+async def get_submission_by_task(
+    project: db_models.DbProject, task_id: int, filters: dict, db: Session
+):
+    """Get submissions and count by task.
+
+    Args:
+        project: The project instance.
+        task_id: The ID of the task.
+        filters: A dictionary of filters.
+        db: The database session.
+
+    Returns:
+        Tuple: A tuple containing the list of submissions and the count.
+    """
+    odk_credentials = project_schemas.ODKCentral(
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
+
+    xform = get_odk_form(odk_credentials)
+    data = xform.listSubmissions(project.odkid, task_id, filters)
+    submissions = data.get("value", [])
+    count = data.get("@odata.count", 0)
+
+    return submissions, count
