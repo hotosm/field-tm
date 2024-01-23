@@ -74,7 +74,6 @@ export interface OrganisationListModel {
   slug: string;
   description: string;
   type: number;
-  subscription_tier: null | string;
   id: number;
   logo: string;
   url: string;

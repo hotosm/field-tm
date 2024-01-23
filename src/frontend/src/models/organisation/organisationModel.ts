@@ -14,7 +14,6 @@ export interface OrganisationListModel {
   slug: string;
   description: string;
   type: number;
-  subscription_tier: null | string;
   id: number;
   logo: string;
   url: string;
@@ -25,7 +24,6 @@ export interface GetOrganisationDataModel {
   slug: string;
   description: string;
   type: number;
-  subscription_tier: null;
   id: number;
   logo: string;
   url: string;
@@ -35,7 +33,6 @@ export interface PostOrganisationDataModel {
   slug: string;
   description: string;
   type: number;
-  subscription_tier: null;
   id: number;
   logo: string;
   url: string;

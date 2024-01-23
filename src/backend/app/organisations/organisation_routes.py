@@ -25,25 +25,29 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
+from app.auth.osm import AuthUser, login_required
+from app.auth.roles import org_admin, super_admin
 from app.db import database
-from app.db.db_models import DbOrganisation
+from app.db.db_models import DbOrganisation, DbUser
 from app.organisations import organisation_crud, organisation_schemas
-from app.organisations.organisation_deps import org_exists
+from app.organisations.organisation_deps import check_org_exists, org_exists
+from app.users.user_deps import user_exists_in_db
 
 router = APIRouter(
     prefix="/organisation",
     tags=["organisation"],
-    dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
 
 
 @router.get("/", response_model=list[organisation_schemas.OrganisationOut])
-def get_organisations(
+async def get_organisations(
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
+    approved: bool = True,
 ) -> list[organisation_schemas.OrganisationOut]:
     """Get a list of all organisations."""
-    return organisation_crud.get_organisations(db)
+    return await organisation_crud.get_organisations(db, current_user, approved)
 
 
 @router.get("/{org_id}", response_model=organisation_schemas.OrganisationOut)
@@ -85,3 +89,31 @@ async def delete_organisations(
 ):
     """Delete an organisation."""
     return await organisation_crud.delete_organisation(db, organisation)
+
+
+@router.post("/approve/")
+async def approve_organisation(
+    org_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(super_admin),
+):
+    """Approve the organisation request made by the user.
+
+    The logged in user must be super admin to perform this action .
+    """
+    org_obj = await check_org_exists(db, org_id, check_approved=False)
+    return await organisation_crud.approve_organisation(db, org_obj)
+
+
+@router.post("/add_admin/")
+async def add_new_organisation_admin(
+    db: Session = Depends(database.get_db),
+    organisation: DbOrganisation = Depends(org_exists),
+    user: DbUser = Depends(user_exists_in_db),
+    current_user: AuthUser = Depends(org_admin),
+):
+    """Add a new organisation admin.
+
+    The logged in user must be either the owner of the organisation or a super admin.
+    """
+    return await organisation_crud.add_organisation_admin(db, user, organisation)

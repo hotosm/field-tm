@@ -276,7 +276,11 @@ CREATE TABLE public.organisations (
     logo character varying,
     description character varying,
     url character varying,
-    type public.organisationtype NOT NULL
+    type public.organisationtype NOT NULL,
+    approved BOOLEAN DEFAULT false,
+    odk_central_url character varying,
+    odk_central_user character varying,
+    odk_central_password character varying
 );
 ALTER TABLE public.organisations OWNER TO fmtm;
 CREATE SEQUENCE public.organisations_id_seq
