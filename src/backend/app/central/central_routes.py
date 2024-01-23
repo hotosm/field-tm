@@ -38,7 +38,6 @@ from app.projects import project_schemas
 router = APIRouter(
     prefix="/central",
     tags=["central"],
-    dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
 

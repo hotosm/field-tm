@@ -38,7 +38,6 @@ from app.tasks import tasks_crud
 router = APIRouter(
     prefix="/submission",
     tags=["submission"],
-    dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
 

@@ -29,7 +29,6 @@ from app.users import user_crud, user_schemas
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-    dependencies=[Depends(database.get_db)],
     responses={404: {"description": "Not found"}},
 )
 
