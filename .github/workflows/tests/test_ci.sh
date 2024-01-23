@@ -21,7 +21,7 @@ export TARGET_OVERRIDE=ci
 #     --var-file=.env --secret-file=.env
 
 # Instead, run backend PyTest manually
-docker compose build api
+TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose build api
 act pull_request -W .github/workflows/tests/pytest.yml \
     -e .github/workflows/tests/pr_payload.json \
     --var-file=.env --secret-file=.env

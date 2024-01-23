@@ -103,9 +103,8 @@ class UserRole(IntEnum, Enum):
 class ProjectRole(IntEnum, Enum):
     """Available roles assigned to a user for a specific project.
 
-    Invitation is required for a MAPPER to join a project.
     All roles must be assigned by someone higher in the hierarchy:
-        - MAPPER = default for all (invitation required)
+        - MAPPER = default for all
         - VALIDATOR = can validate the mappers output
         - FIELD_MANAGER = can invite mappers and organise people
         - ASSOCIATE_PROJECT_MANAGER = helps the project manager, cannot delete project
@@ -143,14 +142,6 @@ class ValidationPermission(IntEnum, Enum):
     LEVEL = 1
     TEAMS = 2
     TEAMS_LEVEL = 3
-
-
-class TaskCreationMode(IntEnum, Enum):
-    """Enum to describe task creation mode."""
-
-    GRID = 0
-    ROADS = 1
-    UPLOAD = 2
 
 
 class TaskStatus(IntEnum, Enum):
@@ -287,3 +278,11 @@ class TaskSplitType(IntEnum, Enum):
     DIVIDE_ON_SQUARE = 0
     CHOOSE_AREA_AS_TASK = 1
     TASK_SPLITTING_ALGORITHM = 2
+
+
+class ProjectVisibility(IntEnum, Enum):
+    """Enum describing task splitting type."""
+
+    PUBLIC = 0
+    PRIVATE = 1
+    INVITE_ONLY = 2

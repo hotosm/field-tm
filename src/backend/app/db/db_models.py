@@ -53,8 +53,8 @@ from app.models.enums import (
     ProjectPriority,
     ProjectRole,
     ProjectStatus,
+    ProjectVisibility,
     TaskAction,
-    TaskCreationMode,
     TaskSplitType,
     TaskStatus,
     TeamVisibility,
@@ -176,16 +176,6 @@ class DbTeam(Base):
         Enum(TeamVisibility), default=TeamVisibility.PUBLIC, nullable=False
     )
     organisation = relationship(DbOrganisation, backref="teams")
-
-
-# Secondary table defining many-to-many join for
-# private projects that only defined users can map on
-project_allowed_users = Table(
-    "project_allowed_users",
-    FmtmMetadata,
-    Column("project_id", Integer, ForeignKey("projects.id")),
-    Column("user_id", BigInteger, ForeignKey("users.id")),
-)
 
 
 class DbProjectTeams(Base):
@@ -432,9 +422,8 @@ class DbProject(Base):
     )
     author = relationship(DbUser, uselist=False, backref="user")
     created = Column(DateTime, default=timestamp, nullable=False)
-    task_creation_mode = Column(
-        Enum(TaskCreationMode), default=TaskCreationMode.UPLOAD, nullable=False
-    )
+
+    task_split_type = Column(Enum(TaskSplitType), nullable=True)
     # split_strategy = Column(Integer)
     # grid_meters = Column(Integer)
     # task_type = Column(Integer)
@@ -454,11 +443,14 @@ class DbProject(Base):
     # GEOMETRY
     outline = Column(Geometry("POLYGON", srid=4326))
     # geometry = Column(Geometry("POLYGON", srid=4326, from_text='ST_GeomFromWkt'))
-    # TODO add outline_geojson as computed @property
+    centroid = Column(Geometry("POINT", srid=4326))
 
     # PROJECT STATUS
     last_updated = Column(DateTime, default=timestamp)
     status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
+    visibility = Column(
+        Enum(ProjectVisibility), default=ProjectVisibility.PUBLIC, nullable=False
+    )
     total_tasks = Column(Integer)
     # tasks_mapped = Column(Integer, default=0, nullable=False)
     # tasks_validated = Column(Integer, default=0, nullable=False)
@@ -508,9 +500,6 @@ class DbProject(Base):
         )
 
     # XFORM DETAILS
-    # TODO This field was probably replaced by odk_central_url
-    # TODO remove in a migration
-    odk_central_src = Column(String, default="")
     xform_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
     xform = relationship(DbXForm)
 
@@ -519,10 +508,6 @@ class DbProject(Base):
         {},
     )
 
-    ## ---------------------------------------------- ##
-    # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
-    # PROJECT ACCESS
-    private = Column(Boolean, default=False)  # Only allowed users can validate
     mapper_level = Column(
         Enum(MappingLevel),
         default=MappingLevel.INTERMEDIATE,
@@ -537,31 +522,13 @@ class DbProject(Base):
     validation_permission = Column(
         Enum(ValidationPermission), default=ValidationPermission.LEVEL
     )  # Means only users with validator role can validate
-    allowed_users = relationship(DbUser, secondary=project_allowed_users)
     organisation_id = Column(
         Integer,
         ForeignKey("organisations.id", name="fk_organisations"),
         index=True,
     )
     organisation = relationship(DbOrganisation, backref="projects")
-    # PROJECT DETAILS
-    due_date = Column(DateTime)
     changeset_comment = Column(String)
-    osmcha_filter_id = Column(
-        String
-    )  # Optional custom filter id for filtering on OSMCha
-    imagery = Column(String)
-    osm_preset = Column(String)
-    odk_preset = Column(String)
-    josm_preset = Column(String)
-    id_presets = Column(ARRAY(String))
-    extra_id_params = Column(String)
-    license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
-    # GEOMETRY
-    centroid = Column(Geometry("POINT", srid=4326))
-    # country = Column(ARRAY(String), default=[])
-    # FEEDBACK
-    project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
 
     ## Odk central server
     odk_central_url = Column(String)
@@ -581,6 +548,24 @@ class DbProject(Base):
     task_num_buildings = Column(SmallInteger, nullable=True)
 
     hashtags = Column(ARRAY(String))  # Project hashtag
+
+    ## ---------------------------------------------- ##
+    # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
+    imagery = Column(String)
+    osm_preset = Column(String)
+    odk_preset = Column(String)
+    josm_preset = Column(String)
+    id_presets = Column(ARRAY(String))
+    extra_id_params = Column(String)
+    license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
+    # GEOMETRY
+    # country = Column(ARRAY(String), default=[])
+    # FEEDBACK
+    project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
+    osmcha_filter_id = Column(
+        String
+    )  # Optional custom filter id for filtering on OSMCha
+    due_date = Column(DateTime)
 
 
 # TODO: Add index on project geometry, tried to add in __table args__
