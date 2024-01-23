@@ -135,11 +135,13 @@ jobs:
               --no-deps --wait --wait-timeout 30 \
               ui
           then
-              docker compose logs api
+              docker compose logs ui
+              echo "Sleeping 5 seconds to wait for dev server"
+              sleep 5
               curl --fail http://localhost:7051 || exit 1
           else
               echo "Application not healthy after 30s. Exiting."
-              docker compose logs api
+              docker compose logs ui
               exit 1
           fi
 
