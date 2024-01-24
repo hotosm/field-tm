@@ -114,6 +114,9 @@ extend-immutable-calls = [
     "fastapi.Security",
 ]
 
+[tool.pyright]
+extraPaths = ["__pypackages__/3.10/lib/"]
+
 [tool.pytest.ini_options]
 addopts = "-ra -q"
 testpaths = [
