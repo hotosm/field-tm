@@ -41,8 +41,8 @@ class AuthUser(BaseModel):
 
     id: int
     username: str
-    img_url: Optional[str]
-    role: Optional[UserRole]
+    img_url: Optional[str] = None
+    role: Optional[UserRole] = None
 
 
 async def init_osm_auth():
@@ -62,11 +62,10 @@ async def login_required(
 ) -> AuthUser:
     """Dependency to inject into endpoints requiring login."""
     if settings.DEBUG:
-        return {
-            "id": 20386219,
-            "username": "svcfmtm",
-            "img_url": None,
-        }
+        AuthUser(
+            id=20386219,
+            username="svcfmtm",
+        )
 
     osm_auth = await init_osm_auth()
 
