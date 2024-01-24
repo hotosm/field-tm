@@ -133,11 +133,12 @@ fastapi `Depends(login_required)` on endpoints.
 
 #### Creating Migration Files
 
-- Exec into the API container: `docker compose exec api bash`.
-- Run the command to generate migrations: `alembic revision`.
-- The migration file should be generated under
-  `src/backend/migrations/versions`.
-- Commit the file to the repo.
+- Migrations can be written to `src/backend/migrations`.
+- Each file must be an SQL script that is:
+  - Idempotent: can be run multiple times without consequence.
+  - Atomic: Run within a BEGIN/COMMIT transaction.
+- Migrations must also include an equivalent revert migration under:
+  `src/backend/migrations/revert`
 
 #### Applying Migrations
 
@@ -146,7 +147,21 @@ fastapi `Depends(login_required)` on endpoints.
 - To run manually:
 
 ```bash
-alembic upgrade head
+docker compose up -d migrations
+```
+
+### Type Checking
+
+- It is a good idea to have your code 'type checked' to avoid potential
+  future bugs.
+- To do this, install `pyright` (VSCode has an extension).
+- You may need to add the backend dependencies to `extraPaths`. In VSCode
+  your settings.json would include:
+
+```json
+{
+  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.10/lib/"]
+}
 ```
 
 ## Backend Debugging
