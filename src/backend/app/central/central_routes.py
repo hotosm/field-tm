@@ -263,27 +263,3 @@ async def get_submission(
     except Exception as e:
         log.error(e)
         raise HTTPException(status_code=500, detail=str(e)) from e
-
-
-# @router.get("/upload")
-# async def upload_project_files(
-#         project_id: int,
-#         filespec: str
-# ):
-#     """Upload the XForm and data files to Central"""
-#     log.warning("/central/upload is Unimplemented!")
-#     return {"message": "Hello World from /central/upload"}
-
-
-# @router.get("/download")
-# async def download_project_files(
-#     project_id: int,
-#     type: central_schemas.CentralFileType
-# ):
-#     """Download the project data files from Central. The filespec is
-#     a string that can contain multiple filenames separated by a comma.
-#     """
-#     # FileResponse("README.md")
-#     # xxx = central_crud.does_central_exist()
-#     log.warning("/central/download is Unimplemented!")
-#     return {"message": "Hello World from /central/download"}

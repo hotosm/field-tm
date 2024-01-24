@@ -48,6 +48,7 @@ class OrganisationIn(BaseModel):
         """
         if value:
             return value.unicode_string()
+        return ""
 
     @computed_field
     @property
