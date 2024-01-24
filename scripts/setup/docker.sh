@@ -1,8 +1,15 @@
 #!/bin/bash
 
+# Script installs Docker in rootless mode for the current user
+
 # Tested for Debian 11 Bookworm & Ubuntu 22.04 LTS
-# Note: this script must be run as a non-root user
-# Note: The user must be logged in directly (not via su)
+
+# Note #
+# This script must be run as any user other than 'root'
+# However they must have 'sudo' access to run the script
+# The user must also be logged in directly (not via su)
+#
+# If ran as root, the user fmtm is created instead
 
 pretty_echo() {
     local message="$1"
@@ -113,18 +120,38 @@ apt_install_docker() {
 }
 
 check_user_not_root() {
-    pretty_echo "Use non-root user"
-
     if [ "$(id -u)" -eq 0 ]; then
-        if id "fmtm" &>/dev/null; then
-            echo "Current user is root. Switching to existing non-privileged user 'fmtm'."
+
+        pretty_echo "Use non-root user"
+
+        echo "Current user is root."
+        echo "This script must run as a non-privileged user account."
+        echo
+
+        if id "svcfmtm" &>/dev/null; then
+            echo "User 'svcfmtm' found."
         else
-            echo "Current user is root. Creating a non-privileged user 'fmtm'."
-            useradd -m -s /bin/bash fmtm
+            echo "Creating user 'svcfmtm'."
+            useradd -m -d /home/svcfmtm -s /bin/bash svcfmtm 2>/dev/null
         fi
 
-        echo "Rerunning this script as user 'fmtm'."
-        sudo -u fmtm bash -c "$0 $*"
+        echo
+        echo "Temporarily adding to sudoers list."
+        echo "svcfmtm ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/fmtm-sudoers >/dev/null
+
+        # User called script directly, copy to /home/svcfmtm/docker.sh
+        root_script_path="$(readlink -f "$0")"
+        user_script_path="/home/svcfmtm/$(basename "$0")"
+        cp "$root_script_path" "$user_script_path"
+        chown svcfmtm:svcfmtm "$user_script_path"
+        chmod +x "$user_script_path"
+
+
+        echo
+        echo "Rerunning this script as user 'svcfmtm'."
+        echo
+
+        sudo -u svcfmtm bash -c "${user_script_path} $*"
         exit 0
     fi
 }
@@ -138,8 +165,9 @@ update_to_rootless() {
 }
 
 restart_docker_rootless() {
-    heading_echo "Restarting Docker Service"
+    pretty_echo "Restarting Docker Service"
     echo "This is required as sometimes docker doesn't init correctly."
+    sleep 5
     systemctl --user daemon-reload
     systemctl --user restart docker
     echo
@@ -168,7 +196,7 @@ add_vars_to_bashrc() {
     # DOCKER_HOST must be added to the top of bashrc, as running non-interactively
     # Most distros exit .bashrc execution is non-interactive
 
-    heading_echo "Adding rootless DOCKER_HOST to bashrc"
+    pretty_echo "Adding rootless DOCKER_HOST to bashrc"
 
     user_id=$(id -u)
     docker_host_var="export DOCKER_HOST=unix:///run/user/$user_id/docker.sock"
@@ -186,7 +214,7 @@ add_vars_to_bashrc() {
     echo "Done"
     echo
 
-    heading_echo "Adding dc='docker compose' alias"
+    pretty_echo "Adding dc='docker compose' alias"
 
     # Check if the alias already exists in user's .bashrc
     if ! grep -q "$dc_alias_cmd" ~/.bashrc; then
@@ -203,6 +231,28 @@ add_vars_to_bashrc() {
     mv "$tmpfile" ~/.bashrc
 
     echo "Done"
+}
+
+remove_from_sudoers() {
+    pretty_echo "Remove from sudoers"
+
+    echo "This script installed docker for user svcfmtm"
+    echo
+    echo "The user will now have sudo access revoked"
+    echo
+    sudo rm /etc/sudoers.d/fmtm-sudoers
+
+    echo
+    echo "You must exit (login or ssh) your session, then login as user svcfmtm"
+    echo
+    echo "You may need to add an authorized key for the user svcfmtm first:"
+    echo
+    echo "     mkdir /home/svcfmtm/.ssh"
+    echo "     cp ~/.ssh/authorized_keys /home/svcfmtm/.ssh/authorized_keys"
+    echo "     chown svcfmtm:svcfmtm /home/svcfmtm/.ssh/authorized_keys"
+    echo "     chmod 600 /home/svcfmtm/.ssh/authorized_keys"
+    echo
+    echo
 }
 
 install_docker() {
@@ -222,3 +272,4 @@ install_docker() {
 check_user_not_root "$@"
 trap cleanup_and_exit INT
 install_docker
+remove_from_sudoers
