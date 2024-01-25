@@ -83,7 +83,9 @@ const VectorLayer = ({
     map.addInteraction(select);
 
     return () => {
-      // map.removeInteraction(defaultInteractions().extend([select, modify]))
+      // map.removeInteraction(defaultInteractions().extend([select, modify]));
+      map.removeInteraction(modify);
+      map.removeInteraction(select);
     };
   }, [map, vectorLayer, onModify]);
 
@@ -213,7 +215,7 @@ const VectorLayer = ({
           ]
         : [getStyles({ style, feature, resolution })];
     });
-  }, [vectorLayer, style, setStyle]);
+  }, [vectorLayer, style, setStyle, onModify]);
 
   useEffect(() => {
     if (!vectorLayer) return;

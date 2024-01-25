@@ -4,6 +4,7 @@ import { MapContainer as MapComponent } from '../components/MapComponent/OpenLay
 import LayerSwitcherControl from '../components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { VectorLayer } from '../components/MapComponent/OpenLayersComponent/Layers';
 import { GeoJSONFeatureTypes } from '../store/types/ICreateProject';
+import MapControlComponent from '../components/createnewproject/MapControlComponent';
 
 type NewDefineAreaMapProps = {
   drawToggle?: boolean;
@@ -12,7 +13,8 @@ type NewDefineAreaMapProps = {
   buildingExtractedGeojson?: GeoJSONFeatureTypes;
   lineExtractedGeojson?: GeoJSONFeatureTypes;
   onDraw?: (geojson: any, area: number) => void;
-  onModify?: (geojson: any, area?: number) => void;
+  onModify?: ((geojson: any, area?: number) => void) | null;
+  hasEditUndo?: boolean;
 };
 const NewDefineAreaMap = ({
   drawToggle,
@@ -22,6 +24,7 @@ const NewDefineAreaMap = ({
   lineExtractedGeojson,
   onDraw,
   onModify,
+  hasEditUndo,
 }: NewDefineAreaMapProps) => {
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
@@ -43,6 +46,7 @@ const NewDefineAreaMap = ({
         }}
       >
         <LayerSwitcherControl />
+        <MapControlComponent map={map} hasEditUndo={hasEditUndo} />
         {splittedGeojson && (
           <VectorLayer
             geojson={splittedGeojson}

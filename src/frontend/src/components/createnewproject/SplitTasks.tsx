@@ -62,6 +62,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   );
   const isTasksGenerated = CoreModules.useAppSelector((state) => state.createproject.isTasksGenerated);
   const isFgbFetching = CoreModules.useAppSelector((state) => state.createproject.isFgbFetching);
+  const toggleSplittedGeojsonEdit = CoreModules.useAppSelector(
+    (state) => state.createproject.toggleSplittedGeojsonEdit,
+  );
 
   const toggleStep = (step, url) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
@@ -427,11 +430,17 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                   splittedGeojson={dividedTaskGeojson}
                   uploadedOrDrawnGeojsonFile={drawnGeojson}
                   buildingExtractedGeojson={dataExtractGeojson}
-                  onModify={(geojson) => {
-                    handleCustomChange('drawnGeojson', geojson);
-                    dispatch(CreateProjectActions.SetDividedTaskGeojson(JSON.parse(geojson)));
-                    setGeojsonFile(null);
-                  }}
+                  onModify={
+                    toggleSplittedGeojsonEdit
+                      ? (geojson) => {
+                          handleCustomChange('drawnGeojson', geojson);
+                          dispatch(CreateProjectActions.SetDividedTaskGeojson(JSON.parse(geojson)));
+                          setGeojsonFile(null);
+                        }
+                      : null
+                  }
+                  // toggleSplittedGeojsonEdit
+                  hasEditUndo
                 />
               </div>
               {generateProjectLog ? (

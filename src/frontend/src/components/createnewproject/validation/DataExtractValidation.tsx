@@ -36,7 +36,6 @@ function DataExtractValidation(values: ProjectValues) {
     errors.customPolygonUpload = 'A GeoJSON file is required.';
   }
 
-  console.log(errors);
   return errors;
 }
 
