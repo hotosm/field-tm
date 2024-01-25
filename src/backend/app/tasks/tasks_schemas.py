@@ -48,6 +48,14 @@ class TaskHistoryOut(TaskHistoryBase):
     profile_img: Optional[str]
 
 
+class TaskHistoryCount(BaseModel):
+    """Task mapping history display."""
+
+    date: str
+    validated: int
+    mapped: int
+
+
 class TaskBase(BaseModel):
     """Core fields for a Task."""
 

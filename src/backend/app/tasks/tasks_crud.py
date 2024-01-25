@@ -18,7 +18,8 @@
 """Logic for FMTM tasks."""
 
 import base64
-from typing import List
+from datetime import datetime, timedelta
+from typing import List, Optional
 
 from fastapi import Depends, HTTPException
 from geoalchemy2.shape import from_shape
@@ -357,3 +358,77 @@ async def update_task_history(
                 process_history_entry(history_entry)
 
     return tasks
+
+
+def get_task_history(
+    project_id: int,
+    end_date: Optional[datetime],
+    db: Session,
+) -> list[db_models.DbTaskHistory]:
+    """Retrieves the task history records for a specific project.
+
+    Args:
+        project_id: The ID of the project.
+        end_date: The end date of the task history
+        records to retrieve (optional).
+        db: The database session.
+
+    Returns:
+        A list of task history records for the specified project.
+    """
+    query = db.query(db_models.DbTaskHistory).filter(
+        db_models.DbTaskHistory.project_id == project_id
+    )
+
+    if end_date:
+        query = query.filter(db_models.DbTaskHistory.action_date >= end_date)
+
+    return query.all()
+
+
+async def count_validated_and_mapped_tasks(
+    task_history: list[db_models.DbTaskHistory], end_date: datetime
+) -> list[tasks_schemas.TaskHistoryCount]:
+    """Counts the number of validated and mapped tasks.
+
+    Args:
+        task_history: The task history records to count.
+        end_date: The end date of the date range.
+
+    Returns:
+        A list of dictionaries with following keys:
+        - 'date': The date in the format 'MM/DD'.
+        - 'validated': The cumulative count of validated tasks.
+        - 'mapped': The cumulative count of mapped tasks.
+    """
+    cumulative_counts = {}
+    results = []
+
+    current_date = end_date
+    while current_date <= datetime.now():
+        date_str = current_date.strftime("%m/%d")
+        cumulative_counts = {"date": date_str, "validated": 0, "mapped": 0}
+        results.append(cumulative_counts)
+        current_date += timedelta(days=1)
+
+    # Populate cumulative_counts with counts from task_history
+    for result in task_history:
+        task_status = result.action_text.split()[5]
+        date_str = result.action_date.strftime("%m/%d")
+        entry = next((entry for entry in results if entry["date"] == date_str), None)
+
+        if entry:
+            if task_status == "VALIDATED":
+                entry["validated"] += 1
+            elif task_status == "MAPPED":
+                entry["mapped"] += 1
+
+    total_validated = 0
+    total_mapped = 0
+
+    for entry in results:
+        total_validated += entry["validated"]
+        total_mapped += entry["mapped"]
+        entry.update({"validated": total_validated, "mapped": total_mapped})
+
+    return results
