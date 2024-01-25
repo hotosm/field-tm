@@ -666,7 +666,10 @@ async def update_project_form(
     contents = await form.read()
 
     form_updated = await project_crud.update_project_form(
-        db, project_id, contents, file_ext[1:]  # Form Contents  # File type
+        db,
+        project_id,
+        contents,
+        file_ext[1:],  # Form Contents  # File type
     )
 
     return form_updated
@@ -904,7 +907,10 @@ async def update_project_category(
 
     # Update odk forms
     await project_crud.update_project_form(
-        db, project_id, file_ext[1:] if upload else "xls", upload  # Form
+        db,
+        project_id,
+        file_ext[1:] if upload else "xls",
+        upload,  # Form
     )
 
     return JSONResponse(status_code=200, content={"success": True})
@@ -1157,7 +1163,7 @@ async def get_task_status(
 async def get_template_file(
     file_type: str = Query(
         ..., enum=["data_extracts", "form"], description="Choose file type"
-    )
+    ),
 ):
     """Get template file.
 

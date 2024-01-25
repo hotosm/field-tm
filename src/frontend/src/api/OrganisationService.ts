@@ -43,7 +43,7 @@ export const OrganisationDataService: Function = (url: string) => {
     dispatch(OrganisationAction.GetOrganisationDataLoading(true));
     const getOrganisationData = async (url) => {
       try {
-        const getOrganisationDataResponse = await axios.get(url,{withCredentials: 'true'});
+        const getOrganisationDataResponse = await axios.get(url, { withCredentials: 'true' });
         const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
         dispatch(OrganisationAction.GetOrganisationsData(response));
       } catch (error) {
