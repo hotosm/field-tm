@@ -56,6 +56,8 @@ import {
   AccessTime as AccessTimeIcon,
   ImportExport as ImportExportIcon,
   Check as CheckIcon,
+  Undo as UndoIcon,
+  Timeline as TimelineIcon,
 } from '@mui/icons-material';
 import LockPng from '../assets/images/lock.png';
 import RedLockPng from '../assets/images/red-lock.png';
@@ -122,4 +124,6 @@ export default {
   AccessTimeIcon,
   ImportExportIcon,
   CheckIcon,
+  UndoIcon,
+  TimelineIcon,
 };

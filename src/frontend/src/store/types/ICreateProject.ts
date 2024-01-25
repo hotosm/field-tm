@@ -35,6 +35,7 @@ export type CreateProjectStateTypes = {
   canSwitchCreateProjectSteps: boolean;
   isTasksGenerated: {};
   isFgbFetching: boolean;
+  toggleSplittedGeojsonEdit: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };

@@ -161,12 +161,18 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
       layerSwitcher.style.justifyContent = 'center';
       layerSwitcher.style.alignItems = 'center';
     }
-    if (location.pathname.includes('project_details')) {
+    if (
+      location.pathname.includes('project_details') ||
+      location.pathname.includes('upload-area') ||
+      location.pathname.includes('select-form') ||
+      location.pathname.includes('data-extract') ||
+      location.pathname.includes('split-tasks')
+    ) {
       const olZoom = document.querySelector('.ol-zoom');
       if (olZoom) {
         olZoom.style.display = 'none';
       }
-      if (layerSwitcher) {
+      if (layerSwitcher && location.pathname.includes('project_details')) {
         layerSwitcher.style.right = '19px';
         layerSwitcher.style.top = '250px';
         layerSwitcher.style.zIndex = '1000';
