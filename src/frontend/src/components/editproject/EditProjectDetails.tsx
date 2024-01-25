@@ -1,12 +1,12 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import useForm from '../../hooks/useForm';
-import EditProjectValidation from './validation/EditProjectDetailsValidation';
-import { diffObject } from '../../utilfunctions/compareUtils';
-import environment from '../../environment';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { PatchProjectDetails } from '../../api/CreateProjectService';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import useForm from '@/hooks/useForm';
+import EditProjectValidation from '@/components/editproject/validation/EditProjectDetailsValidation';
+import { diffObject } from '@/utilfunctions/compareUtils';
+import environment from '@/environment';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import { PatchProjectDetails } from '@/api/CreateProjectService';
 const EditProjectDetails = ({ projectId }) => {
   const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
   // //we use use selector from redux to get all state of projectDetails from createProject slice

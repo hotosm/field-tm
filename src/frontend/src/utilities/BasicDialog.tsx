@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TransitionProps } from '@mui/material/transitions';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {

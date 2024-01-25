@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import AssetModules from '../../shared/AssetModules.js';
-import ProjectIcon from '../../assets/images/project_icon.png';
-import CoreModules from '../../shared/CoreModules';
+import AssetModules from '@/shared/AssetModules.js';
+import ProjectIcon from '@/assets/images/project_icon.png';
+import CoreModules from '@/shared/CoreModules';
 
 const ProjectInfo = () => {
   const paraRef = useRef(null);

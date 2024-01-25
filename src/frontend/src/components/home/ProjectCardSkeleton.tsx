@@ -1,5 +1,5 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 // Skeleton card main purpose is to perfom loading in case of any delay in retrieving project
 const ProjectCardSkeleton = ({ cardsPerRow, defaultTheme }) => {
   return cardsPerRow.map((data, index) => {

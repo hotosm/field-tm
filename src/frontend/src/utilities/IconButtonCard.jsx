@@ -1,5 +1,5 @@
 import React from 'react';
-import CoreModules from '../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 export default function IconButtonCard({ element, style, radius }) {
   return (
     <CoreModules.Stack

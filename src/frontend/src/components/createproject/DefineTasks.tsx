@@ -1,17 +1,17 @@
 import React from 'react';
-import enviroment from '../../environment';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules.js';
+import enviroment from '@/environment';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules.js';
 import FormGroup from '@mui/material/FormGroup';
-import { GetDividedTaskFromGeojson, TaskSplittingPreviewService } from '../../api/CreateProjectService';
+import { GetDividedTaskFromGeojson, TaskSplittingPreviewService } from '@/api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { InputLabel, MenuItem, Select } from '@mui/material';
 //@ts-ignore
-import DefineAreaMap from '../../views/DefineAreaMap';
-import useForm from '../../hooks/useForm';
-import DefineTaskValidation from './validation/DefineTaskValidation';
-import { useAppSelector } from '../../types/reduxTypes';
+import DefineAreaMap from '@/views/DefineAreaMap';
+import useForm from '@/hooks/useForm';
+import DefineTaskValidation from '@/components/createproject/validation/DefineTaskValidation';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const alogrithmList = [
   { id: 1, value: 'Divide on Square', label: 'Divide on Square' },

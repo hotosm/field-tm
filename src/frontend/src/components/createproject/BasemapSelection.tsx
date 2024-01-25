@@ -1,5 +1,5 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules.js';
+import CoreModules from '@/shared/CoreModules.js';
 // import { SelectPicker } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
 

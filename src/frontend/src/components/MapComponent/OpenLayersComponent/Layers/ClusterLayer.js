@@ -8,9 +8,9 @@ import Fill from 'ol/style/Fill';
 import { Cluster, OSM as OSMSource } from 'ol/source';
 import { Text, Circle, Icon } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
-import { hexToRgba } from '../../../MapComponent/OpenLayersComponent/helpers/styleUtils';
 import SelectCluster from 'ol-ext/interaction/SelectCluster';
-import MarkerIcon from '../../../../assets/images/red_marker.png';
+import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import MarkerIcon from '@/assets/images/red_marker.png';
 
 function setAsyncStyle(style, feature, getIndividualStyle) {
   const styleCache = {};
@@ -202,8 +202,8 @@ const ClusterLayer = ({
             font: '15px Times New Roman',
           }),
         });
-        return style;
         fillColor = '#96bfff';
+        return style;
       } else {
         return;
       }

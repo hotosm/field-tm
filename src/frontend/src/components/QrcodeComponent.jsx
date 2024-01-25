@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import BasicCard from '../utilities/BasicCard';
+import BasicCard from '@/utilities/BasicCard';
 // import Activities from "./Activities";
-import environment from '../environment';
-import { ProjectFilesById } from '../api/Files';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
-import { HomeActions } from '../store/slices/HomeSlice';
+import environment from '@/environment';
+import { ProjectFilesById } from '@/api/Files';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import { HomeActions } from '@/store/slices/HomeSlice';
 
 const TasksComponent = ({ type, task, defaultTheme }) => {
   const dispatch = CoreModules.useAppDispatch();

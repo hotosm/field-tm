@@ -1,5 +1,5 @@
 import * as React from 'react';
-import CoreModules from '../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <CoreModules.MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });

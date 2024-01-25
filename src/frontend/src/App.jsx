@@ -1,14 +1,17 @@
+import axios from 'axios';
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { RouterProvider } from 'react-router-dom';
-import { store, persistor } from './store/Store';
 import { Provider } from 'react-redux';
-import routes from './routes';
 import { PersistGate } from 'redux-persist/integration/react';
-import './index.css';
+
+import { store, persistor } from '@/store/Store';
+import routes from '@/routes';
+import environment from '@/environment';
+
+import '@/index.css';
 import 'ol/ol.css';
 import 'react-loading-skeleton/dist/skeleton.css';
-import environment from './environment';
 
 // Added Fix of Console Error of MUI Issue
 const consoleError = console.error;
@@ -24,6 +27,32 @@ console.error = function filterWarnings(msg, ...args) {
   if (!SUPPRESSED_WARNINGS.some((entry) => msg.includes(entry))) {
     consoleError(msg, ...args);
   }
+};
+
+const GlobalInit = () => {
+  useEffect(() => {
+    axios.interceptors.request.use(
+      (config) => {
+        // Do something before request is sent
+
+        // const excludedDomains = ['xxx', 'xxx'];
+        // const urlIsExcluded = excludedDomains.some((domain) => config.url.includes(domain));
+        // if (!urlIsExcluded) {
+        //   config.withCredentials = true;
+        // }
+
+        config.withCredentials = true;
+
+        return config;
+      },
+      (error) =>
+        // Do something with request error
+        Promise.reject(error),
+    );
+    return () => {};
+  }, []);
+
+  return null; // Renders nothing
 };
 
 const SentryInit = () => {
@@ -105,6 +134,7 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <RouterProvider router={routes} />
+      <GlobalInit />
       <MatomoTrackingInit />
       <SentryInit />
     </PersistGate>

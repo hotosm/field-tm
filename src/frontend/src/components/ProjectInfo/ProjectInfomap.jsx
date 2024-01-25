@@ -1,20 +1,20 @@
 import React, { useCallback, useState, useEffect } from 'react';
 
-import CoreModules from '../../shared/CoreModules';
-import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
-import { useOLMap } from '../MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher';
-import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import CoreModules from '@/shared/CoreModules';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { Vector as VectorSource } from 'ol/source';
 import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
-import { ProjectBuildingGeojsonService } from '../../api/SubmissionService';
-import environment from '../../environment';
-import { getStyles } from '../MapComponent/OpenLayersComponent/helpers/styleUtils';
-import { ProjectActions } from '../../store/slices/ProjectSlice';
-import { basicGeojsonTemplate } from '../../utilities/mapUtils';
-import ProjectInfoMapLegend from './ProjectInfoMapLegend';
-import Accordion from '../common/Accordion';
+import { ProjectBuildingGeojsonService } from '@/api/SubmissionService';
+import environment from '@/environment';
+import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { basicGeojsonTemplate } from '@/utilities/mapUtils';
+import ProjectInfoMapLegend from '@/components/ProjectInfo/ProjectInfoMapLegend';
+import Accordion from '@/components/common/Accordion';
 
 export const defaultStyles = {
   lineColor: '#000000',

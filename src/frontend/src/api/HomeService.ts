@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { HomeActions } from '../store/slices/HomeSlice';
-import { HomeProjectCardModel } from '../models/home/homeModel';
-import environment from '../environment';
+import { HomeActions } from '@/store/slices/HomeSlice';
+import { HomeProjectCardModel } from '@/models/home/homeModel';
+import environment from '@/environment';
 
 export const HomeSummaryService: Function = (url: string) => {
   return async (dispatch) => {

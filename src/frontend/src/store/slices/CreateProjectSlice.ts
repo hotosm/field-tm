@@ -1,4 +1,4 @@
-import { CreateProjectStateTypes } from '../types/ICreateProject';
+import { CreateProjectStateTypes } from '@/types/ICreateProject';
 import { createSlice } from '@reduxjs/toolkit';
 
 export const initialState: CreateProjectStateTypes = {

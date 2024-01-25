@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import useOLMap from '../../hooks/useOlMap';
-import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import useOLMap from '@/hooks/useOlMap';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 
 function elastic(t) {
   return Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1;

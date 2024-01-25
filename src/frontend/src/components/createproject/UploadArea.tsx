@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import { useNavigate, Link } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import DrawSvg from '../createproject/DrawSvg';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import DrawSvg from '@/components/createproject/DrawSvg';
 // @ts-ignore
 const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
 

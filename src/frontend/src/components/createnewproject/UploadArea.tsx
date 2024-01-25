@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CommonActions } from '../../store/slices/CommonSlice';
-import Button from '../../components/common/Button';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import Button from '@/components/common/Button';
 import { useDispatch } from 'react-redux';
-import RadioButton from '../../components/common/RadioButton';
-import AssetModules from '../../shared/AssetModules.js';
-import DrawSvg from './DrawSvg';
+import RadioButton from '@/components/common/RadioButton';
+import AssetModules from '@/shared/AssetModules.js';
+import DrawSvg from '@/components/createnewproject/DrawSvg';
 import { useNavigate } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import useForm from '../../hooks/useForm';
-import { useAppSelector } from '../../types/reduxTypes';
-import UploadAreaValidation from './validation/UploadAreaValidation';
-import FileInputComponent from '../common/FileInputComponent';
-import NewDefineAreaMap from '../../views/NewDefineAreaMap';
-import { checkWGS84Projection } from '../../utilfunctions/checkWGS84Projection.js';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useForm from '@/hooks/useForm';
+import { useAppSelector } from '@/types/reduxTypes';
+import UploadAreaValidation from '@/components/createnewproject/validation/UploadAreaValidation';
+import FileInputComponent from '@/components/common/FileInputComponent';
+import NewDefineAreaMap from '@/views/NewDefineAreaMap';
+import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
+
 // @ts-ignore
 const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
 

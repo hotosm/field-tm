@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import windowDimention from '../hooks/WindowDimension';
-import CoreModules from '../shared/CoreModules';
+import windowDimention from '@/hooks/WindowDimension';
+import CoreModules from '@/shared/CoreModules';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

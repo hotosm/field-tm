@@ -1,8 +1,8 @@
 import React from 'react';
-import useOLMap from '../hooks/useOlMap';
-import { MapContainer as MapComponent } from '../components/MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '../components/MapComponent/OpenLayersComponent/Layers';
+import useOLMap from '@/hooks/useOlMap';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 
 const EditProjectArea = ({ geojson }) => {
   const { mapRef, map } = useOLMap({

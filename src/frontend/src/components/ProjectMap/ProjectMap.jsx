@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import CoreModules from 'fmtm/CoreModules';
-import { useOLMap } from '../MapComponent/OpenLayersComponent';
-import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
+import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 
 const basicGeojsonTemplate = {
   type: 'FeatureCollection',

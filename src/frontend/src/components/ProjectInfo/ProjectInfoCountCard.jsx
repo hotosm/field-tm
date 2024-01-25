@@ -1,7 +1,7 @@
 import React from 'react';
-import AssetModules from '../../shared/AssetModules';
-import CoreModules from '../../shared/CoreModules';
-import ProjectInfoCountSkeleton from './ProjectInfoCountCardSkeleton';
+import AssetModules from '@/shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import ProjectInfoCountSkeleton from '@/components/ProjectInfo/ProjectInfoCountCardSkeleton';
 
 const ProjectInfoCountCard = () => {
   const taskData = CoreModules.useAppSelector((state) => state.task.taskData);

@@ -1,4 +1,4 @@
-import { createPopup } from './createPopup';
+import { createPopup } from '@/utilfunctions/createPopup';
 
 export const createLoginWindow = (redirectTo) => {
   fetch(`${import.meta.env.VITE_API_URL}/auth/osm_login/`)

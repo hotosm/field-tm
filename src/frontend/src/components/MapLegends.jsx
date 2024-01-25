@@ -1,6 +1,6 @@
 import React from 'react';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 
 const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatus }) => {
   const MapDetails = [

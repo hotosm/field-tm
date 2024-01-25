@@ -1,11 +1,11 @@
 import React from 'react';
-import windowDimention from '../hooks/WindowDimension';
-import PrimaryAppBar from '../utilities/PrimaryAppBar';
-import CoreModules from '../shared/CoreModules';
-import CustomizedSnackbars from '../utilities/CustomizedSnackbar';
-import { CommonActions } from '../store/slices/CommonSlice';
-import Loader from '../utilities/AppLoader';
-import MappingHeader from '../utilities/MappingHeader';
+import windowDimention from '@/hooks/WindowDimension';
+import PrimaryAppBar from '@/utilities/PrimaryAppBar';
+import CoreModules from '@/shared/CoreModules';
+import CustomizedSnackbars from '@/utilities/CustomizedSnackbar';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import Loader from '@/utilities/AppLoader';
+import MappingHeader from '@/utilities/MappingHeader';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 const MainView = () => {

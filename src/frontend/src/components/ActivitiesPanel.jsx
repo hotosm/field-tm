@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import BasicCard from '../utilities/BasicCard';
-import Activities from '../components/Activities';
-import environment from '../environment';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import BasicCard from '@/utilities/BasicCard';
+import Activities from '@/components/Activities';
+import environment from '@/environment';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 
 const Search = AssetModules.styled('div')(({ theme }) => ({
   position: 'relative',

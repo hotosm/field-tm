@@ -1,6 +1,6 @@
 import React from 'react';
-import cardImg from '../assets/images/project_icon.png';
-import logo from '../assets/images/hotLog.png';
+import cardImg from '@/assets/images/project_icon.png';
+import logo from '@/assets/images/hotLog.png';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 const Switcher = ({ status, width, height }) => {
   switch (status) {

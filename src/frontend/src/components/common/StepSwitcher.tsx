@@ -1,7 +1,7 @@
 import React from 'react';
-import AssetModules from '../../shared/AssetModules.js';
-import { CommonActions } from '../../store/slices/CommonSlice';
-import CoreModules from '../../shared/CoreModules.js';
+import AssetModules from '@/shared/AssetModules.js';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import CoreModules from '@/shared/CoreModules.js';
 import { useNavigate } from 'react-router-dom';
 
 const StepSwitcher = ({ data, flag, switchSteps }) => {

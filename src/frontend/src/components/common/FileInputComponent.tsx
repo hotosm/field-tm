@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import AssetModules from '../../shared/AssetModules.js';
+import AssetModules from '@/shared/AssetModules.js';
 
 const FileInputComponent = ({
   accept = '.geojson, .json',

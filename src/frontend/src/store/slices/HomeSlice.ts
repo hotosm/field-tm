@@ -1,4 +1,4 @@
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 const HomeSlice = CoreModules.createSlice({
   name: 'home',
   initialState: {

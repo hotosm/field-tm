@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useOLMap } from '../MapComponent/OpenLayersComponent';
-import { MapContainer as MapComponent } from '../MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '../MapComponent/OpenLayersComponent/Layers';
-import { ClusterLayer } from '../MapComponent/OpenLayersComponent/Layers';
-import CoreModules from '../../shared/CoreModules';
-import { geojsonObjectModel } from '../../constants/geojsonObjectModal';
-import { defaultStyles, getStyles } from '../MapComponent/OpenLayersComponent/helpers/styleUtils';
-import MarkerIcon from '../../assets/images/red_marker.png';
+import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
+import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
+import CoreModules from '@/shared/CoreModules';
+import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
+import { defaultStyles, getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import MarkerIcon from '@/assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
-import environment from '../../environment';
+import environment from '@/environment';
 import { Style, Text, Icon, Fill } from 'ol/style';
 
 type HomeProjectSummaryType = {

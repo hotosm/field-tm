@@ -68,10 +68,10 @@ import {
 import { Provider } from 'react-redux';
 import { createSlice, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
-import LoadingBar from '../components/createproject/LoadingBar';
-import { TaskActions } from '../store/slices/TaskSlice';
-import { useAppDispatch, useAppSelector } from '../types/reduxTypes';
-import CustomizedModal from '../utilities/CustomizedModal';
+import LoadingBar from '@/components/createproject/LoadingBar';
+import { TaskActions } from '@/store/slices/TaskSlice';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import CustomizedModal from '@/utilities/CustomizedModal';
 
 export default {
   Provider,

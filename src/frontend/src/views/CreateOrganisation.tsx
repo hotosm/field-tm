@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import CoreModules from '../shared/CoreModules';
-import environment from '../environment';
-import useForm from '../hooks/useForm';
-import OrganisationAddValidation from '../components/organisation/Validation/OrganisationAddValidation';
-import { PostOrganisationDataService } from '../api/OrganisationService';
+import CoreModules from '@/shared/CoreModules';
+import environment from '@/environment';
+import useForm from '@/hooks/useForm';
+import OrganisationAddValidation from '@/components/organisation/Validation/OrganisationAddValidation';
+import { PostOrganisationDataService } from '@/api/OrganisationService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { OrganisationAction } from '../store/slices/organisationSlice';
+import { OrganisationAction } from '@/store/slices/organisationSlice';
 
 const CreateOrganisationForm = () => {
   const dispatch = CoreModules.useAppDispatch();

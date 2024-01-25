@@ -1,8 +1,8 @@
 import { Fill, Icon, Stroke, Style } from 'ol/style';
 import { transform } from 'ol/proj';
 import { Point } from 'ol/geom';
-import AssetModules from '../shared/AssetModules';
-import { task_priority_str } from '../types/enums';
+import AssetModules from '@/shared/AssetModules';
+import { task_priority_str } from '@/types/enums';
 
 function createPolygonStyle(fillColor, strokeColor) {
   return new Style({

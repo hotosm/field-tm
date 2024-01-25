@@ -59,8 +59,6 @@ const useForm = (initialState, callback, validate) => {
   useEffect(() => {
     setValues(initialState);
     setErrors({});
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialState]);
 
   return {

@@ -1,7 +1,7 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import { ProjectActions } from '../../store/slices/ProjectSlice';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 const TaskSectionPopup = ({ body }) => {
   const dispatch = CoreModules.useAppDispatch();

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SubmissionActions } from '../store/slices/SubmissionSlice';
+import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
 export const SubmissionService: Function = (url: string) => {
   return async (dispatch) => {

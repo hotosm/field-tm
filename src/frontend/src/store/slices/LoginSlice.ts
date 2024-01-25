@@ -1,4 +1,4 @@
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 import storage from 'redux-persist/lib/storage';
 const LoginSlice = CoreModules.createSlice({
   name: 'login',

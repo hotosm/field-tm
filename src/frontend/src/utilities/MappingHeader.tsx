@@ -1,6 +1,6 @@
 import React from 'react';
-import CoreModules from '../shared/CoreModules';
-import environment from '../environment';
+import CoreModules from '@/shared/CoreModules';
+import environment from '@/environment';
 
 const MappingHeader = () => {
   const onToggleOutline = (e) => {

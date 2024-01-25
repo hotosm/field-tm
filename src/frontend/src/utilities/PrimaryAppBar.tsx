@@ -1,14 +1,14 @@
 import * as React from 'react';
-import windowDimention from '../hooks/WindowDimension';
-import DrawerComponent from './CustomDrawer';
-import CustomizedImage from '../utilities/CustomizedImage';
-import { ThemeActions } from '../store/slices/ThemeSlice';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
-import { CommonActions } from '../store/slices/CommonSlice';
-import { LoginActions } from '../store/slices/LoginSlice';
-import { ProjectActions } from '../store/slices/ProjectSlice';
-import { createLoginWindow, revokeCookie } from '../utilfunctions/login';
+import windowDimention from '@/hooks/WindowDimension';
+import DrawerComponent from '@/utilities/CustomDrawer';
+import CustomizedImage from '@/utilities/CustomizedImage';
+import { ThemeActions } from '@/store/slices/ThemeSlice';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { LoginActions } from '@/store/slices/LoginSlice';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
 
 export default function PrimaryAppBar() {

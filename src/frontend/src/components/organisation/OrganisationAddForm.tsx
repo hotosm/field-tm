@@ -1,10 +1,9 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules.js';
-import useForm from '../../hooks/useForm.js';
-import OrganisationAddValidation from './Validation/OrganisationAddValidation.js';
+import CoreModules from '@/shared/CoreModules.js';
+import useForm from '@/hooks/useForm.js';
+import OrganisationAddValidation from '@/components/organisation/Validation/OrganisationAddValidation.js';
 import { MenuItem, Select } from '@mui/material';
-import { OrganisationService } from '../../api/OrganisationService';
-import environment from '../../environment.js';
+import { OrganisationService } from '@/api/OrganisationService';
 
 const formData = {};
 const organisationTypeList = ['FREE', 'DISCOUNTED', 'FULL_FEE'];
@@ -168,7 +167,11 @@ const OrganisationAddForm = () => {
                 // dispatch(CreateProjectActions.SetProjectDetails({ key: 'organisation', value: e.target.value }))
               }}
             >
-              {organisationDataList?.map((org) => <MenuItem value={org.value}>{org.label}</MenuItem>)}
+              {organisationDataList?.map((org) => (
+                <MenuItem key={org.value} value={org.value}>
+                  {org.label}
+                </MenuItem>
+              ))}
             </Select>
           </CoreModules.Stack>
           {errors.type && (

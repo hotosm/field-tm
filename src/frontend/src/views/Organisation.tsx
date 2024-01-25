@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
-import environment from '../environment';
-import { OrganisationDataService } from '../api/OrganisationService';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import environment from '@/environment';
+import { OrganisationDataService } from '@/api/OrganisationService';
 
 const Organisation = () => {
   const cardStyle = {

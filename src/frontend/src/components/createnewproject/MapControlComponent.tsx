@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import AssetModules from '../../shared/AssetModules';
 import VectorLayer from 'ol/layer/Vector';
-import CoreModules from '../../shared/CoreModules.js';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import AssetModules from '@/shared/AssetModules';
+import CoreModules from '@/shared/CoreModules.js';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 
 const MapControlComponent = ({ map, hasEditUndo }) => {
   const dispatch = CoreModules.useAppDispatch();

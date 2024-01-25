@@ -1,12 +1,12 @@
 import * as React from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 import { NavLink } from 'react-router-dom';
-import { createLoginWindow, revokeCookie } from '../utilfunctions/login';
-import { CommonActions } from '../store/slices/CommonSlice';
-import { LoginActions } from '../store/slices/LoginSlice';
-import { ProjectActions } from '../store/slices/ProjectSlice';
+import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { LoginActions } from '@/store/slices/LoginSlice';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut, setOpen }) {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);

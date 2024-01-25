@@ -1,8 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import MainView from '../src/views/MainView';
-import { store } from '../src/store/Store';
-import { renderWithRouter } from '../src/utilfunctions/testUtils';
+import MainView from '@/views/MainView';
+import { store } from '@/store/Store';
+import { renderWithRouter } from '@/utilfunctions/testUtils';
 import { Provider } from 'react-redux';
 import { expect, test, it, describe } from 'vitest';
 

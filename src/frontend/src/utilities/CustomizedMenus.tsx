@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { MenuProps } from '@mui/material/Menu';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 
 const StyledMenu = AssetModules.styled((props: MenuProps) => (
   <CoreModules.Menu

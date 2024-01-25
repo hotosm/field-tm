@@ -1,7 +1,7 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
-import IconButtonCard from '../../utilities/IconButtonCard';
-import AssetModules from '../../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import IconButtonCard from '@/utilities/IconButtonCard';
+import AssetModules from '@/shared/AssetModules';
 
 const ProjectCard = () => {
   return (

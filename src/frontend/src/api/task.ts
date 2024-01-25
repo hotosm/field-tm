@@ -1,5 +1,5 @@
-import CoreModules from '../shared/CoreModules';
-import { CommonActions } from '../store/slices/CommonSlice';
+import CoreModules from '@/shared/CoreModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 export const fetchInfoTask: Function = (url: string) => {
   return async (dispatch) => {

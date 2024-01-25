@@ -1,6 +1,6 @@
 import React from 'react';
-import ActivitiesPanel from './ActivitiesPanel';
-import CoreModules from '../../shared/CoreModules';
+import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
+import CoreModules from '@/shared/CoreModules';
 
 const MobileActivitiesContents = ({ map, mainView, mapDivPostion }) => {
   const params = CoreModules.useParams();
