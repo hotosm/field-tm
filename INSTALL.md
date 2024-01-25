@@ -196,7 +196,7 @@ https://{YOUR_DOMAIN}
 http://fmtm.localhost:7050
 ```
 
-> Note: If those link doesn't work, check the logs with `docker logs fmtm-api`.
+> Note: If those link doesn't work, check the logs with `docker compose logs api`.
 >
 > Note: Use `docker ps` to view all container names.
 

@@ -17,6 +17,8 @@
 
 version: "3"
 
+name: fmtm-stage
+
 volumes:
   fmtm_frontend:
     name: fmtm-frontend-${GIT_BRANCH}
@@ -56,7 +58,6 @@ services:
     extends:
       file: docker-compose.development.yml
       service: ui
-    image: "ghcr.io/hotosm/fmtm/frontend:${GIT_BRANCH:-staging}"
   central:
     extends:
       file: docker-compose.development.yml
@@ -83,7 +84,6 @@ services:
       service: migrations
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-backups-${GIT_BRANCH}
     depends_on:
       fmtm-db:
         condition: service_healthy

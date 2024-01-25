@@ -39,7 +39,7 @@ URLs defined in the docker-compose file and your env file.
    `http://api.fmtm.localhost:7050/docs`
 
 > Note: If that link doesn't work, check the logs with
-> `docker log fmtm-api`.
+> `docker compose logs api`.
 > Note: the database host `fmtm-db` is automatically
 > resolved by docker compose to the database container IP.
 

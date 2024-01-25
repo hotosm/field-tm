@@ -62,7 +62,7 @@ async def login_required(
 ) -> AuthUser:
     """Dependency to inject into endpoints requiring login."""
     if settings.DEBUG:
-        AuthUser(
+        return AuthUser(
             id=20386219,
             username="svcfmtm",
         )

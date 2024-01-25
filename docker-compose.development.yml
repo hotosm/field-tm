@@ -17,6 +17,8 @@
 
 version: "3"
 
+name: fmtm-dev
+
 volumes:
   fmtm_frontend:
     name: fmtm-frontend-${GIT_BRANCH}
@@ -46,7 +48,6 @@ networks:
 services:
   proxy:
     image: "ghcr.io/hotosm/fmtm/proxy:${GIT_BRANCH}"
-    container_name: fmtm-${GIT_BRANCH}
     depends_on:
       api:
         condition: service_started
@@ -79,7 +80,6 @@ services:
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-api-${GIT_BRANCH}
     volumes:
       - fmtm_logs:/opt/logs
       - fmtm_tiles:/opt/tiles
@@ -95,6 +95,15 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    deploy:
+      replicas: ${API_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: "0.9"
+          memory: 1500M
+        reservations:
+          cpus: "0.1"
+          memory: 100M
 
   ui:
     # This service simply builds the frontend to a volume
@@ -106,7 +115,6 @@ services:
       args:
         APP_VERSION: ${GIT_BRANCH}
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-    container_name: fmtm-ui-${GIT_BRANCH}
     volumes:
       - fmtm_frontend:/frontend
     network_mode: none
@@ -114,7 +122,6 @@ services:
 
   central:
     image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2023.5.0}"
-    container_name: fmtm-central-${GIT_BRANCH}
     depends_on:
       central-db:
         condition: service_healthy
@@ -147,7 +154,6 @@ services:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
     image: "ghcr.io/hotosm/fmtm/odkcentral-ui:${ODK_CENTRAL_TAG:-v2023.5.0}"
-    container_name: fmtm-central-ui-${GIT_BRANCH}
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -155,7 +161,6 @@ services:
 
   s3:
     image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2024-01-01T16-36-33Z}"
-    container_name: fmtm-s3-${GIT_BRANCH}
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
@@ -177,7 +182,6 @@ services:
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
-    container_name: fmtm-db-${GIT_BRANCH}
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -198,7 +202,6 @@ services:
 
   central-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
-    container_name: fmtm-central-db-${GIT_BRANCH}
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
@@ -219,7 +222,6 @@ services:
 
   migrations:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    container_name: fmtm-migrations-${GIT_BRANCH}
     depends_on:
       fmtm-db:
         condition: service_healthy
@@ -234,7 +236,6 @@ services:
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
-    container_name: fmtm-cert-renew-${GIT_BRANCH}
     volumes:
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot

@@ -214,11 +214,12 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.delete("/{project_id}")
 async def delete_project(
-    project: int = Depends(project_deps.get_project_by_id),
+    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
     db: Session = Depends(database.get_db),
     user_data: AuthUser = Depends(login_required),
 ):
     """Delete a project from both ODK Central and the local database."""
+    log.info(f"User {user_data.username} attempting deletion of project {project.id}")
     # Odk crendentials
     odk_credentials = project_schemas.ODKCentral(
         odk_central_url=project.odk_central_url,
@@ -229,6 +230,8 @@ async def delete_project(
     await central_crud.delete_odk_project(project.odkid, odk_credentials)
     # Delete FMTM project
     await project_crud.delete_one_project(db, project)
+
+    log.info(f"Deletion of project {project.id} successful")
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
