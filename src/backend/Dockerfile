@@ -154,7 +154,7 @@ RUN pip install --user --upgrade --no-warn-script-location \
     && rm -r /opt/python
 CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
     "-m", "uvicorn", "app.main:api", \
-    "--host", "0.0.0.0", "--port", "8000", "--workers", "4", \
+    "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
     "--reload", "--log-level", "critical", "--no-access-log"]
 
 
@@ -190,6 +190,6 @@ CMD ["sleep", "infinity"]
 FROM runtime as prod
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
-# Note: 4 uvicorn workers as running with docker, change to 1 worker for Kubernetes
+# Note: 1 worker (process) per container, behind load balancer
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
-    "--workers", "4", "--log-level", "critical", "--no-access-log"]
+    "--workers", "1", "--log-level", "critical", "--no-access-log"]

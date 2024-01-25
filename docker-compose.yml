@@ -17,6 +17,8 @@
 
 version: "3"
 
+name: fmtm
+
 volumes:
   fmtm_data:
   fmtm_db_data:
@@ -38,7 +40,6 @@ services:
       target: debug
       args:
         NGINX_TAG: "${NGINX_TAG:-1.25.3}"
-    container_name: fmtm
     depends_on:
       api:
         condition: service_started
@@ -67,7 +68,6 @@ services:
       target: "${TARGET_OVERRIDE:-debug}"
       args:
         APP_VERSION: "${TAG_OVERRIDE:-debug}"
-    container_name: fmtm-api
     # Uncomment these to debug with a terminal debugger like pdb
     # Then `docker attach fmtm_api` to debug
     # stdin_open: true
@@ -94,18 +94,26 @@ services:
     env_file:
       - .env
     ports:
-      - "7052:8000"
-    #   - "5678:5678" # Debugger port
+      - "7052-7053:8000"
+    #   - "5678-5679:5678" # Debugger port
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    deploy:
+      replicas: ${API_REPLICAS:-1}
+      resources:
+        limits:
+          cpus: "0.9"
+          memory: 1500M
+        reservations:
+          cpus: "0.1"
+          memory: 100M
 
   ui:
     image: "ghcr.io/hotosm/fmtm/frontend:debug"
     build:
       context: src/frontend
       dockerfile: debug.dockerfile
-    container_name: fmtm-ui
     depends_on:
       api:
         condition: service_started
@@ -130,7 +138,6 @@ services:
       context: odkcentral/api
       args:
         ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.5.0}
-    container_name: fmtm-central
     depends_on:
       central-db:
         condition: service_healthy
@@ -170,7 +177,6 @@ services:
       context: odkcentral/ui
       args:
         ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2023.5.0}
-    container_name: fmtm-central-ui
     volumes:
       - central_frontend:/frontend
     network_mode: none
@@ -178,7 +184,6 @@ services:
 
   s3:
     image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2024-01-01T16-36-33Z}"
-    container_name: fmtm-s3
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
@@ -203,7 +208,6 @@ services:
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
-    container_name: fmtm-db
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -225,7 +229,6 @@ services:
   central-db:
     profiles: ["", "central"]
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
-    container_name: fmtm-central-db
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:
@@ -246,7 +249,6 @@ services:
 
   migrations:
     image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
-    container_name: fmtm-migrations
     depends_on:
       fmtm-db:
         condition: service_healthy
