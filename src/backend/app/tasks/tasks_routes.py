@@ -18,6 +18,7 @@
 """Routes for FMTM tasks."""
 
 import json
+from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -201,3 +202,28 @@ async def task_features_count(
         )
 
     return data
+
+
+@router.get("/activity/", response_model=List[tasks_schemas.TaskHistoryCount])
+async def task_activity(
+    project_id: int, days: int = 10, db: Session = Depends(database.get_db)
+):
+    """Retrieves the validate and mapped task count for a specific project.
+
+    Args:
+        project_id: The ID of the project.
+        days: The number of days to consider for the
+        task activity (default: 10).
+        db: The database session.
+
+    Returns:
+        list[TaskHistoryCount]: A list of task history counts.
+
+    """
+    end_date = datetime.now() - timedelta(days=days)
+    task_history = tasks_crud.get_task_history(project_id, end_date, db)
+
+    return await tasks_crud.count_validated_and_mapped_tasks(
+        task_history,
+        end_date,
+    )
