@@ -1,4 +1,4 @@
-import CoreModules from '../../shared/CoreModules.js';
+import CoreModules from '@/shared/CoreModules.js';
 
 const OrganisationSlice = CoreModules.createSlice({
   name: 'organisation',

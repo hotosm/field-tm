@@ -1,5 +1,5 @@
 import React from 'react';
-import AssetModules from '../../shared/AssetModules.js';
+import AssetModules from '@/shared/AssetModules.js';
 import { useNavigate } from 'react-router-dom';
 
 const CreateProjectHeader = () => {

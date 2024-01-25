@@ -1,7 +1,7 @@
 import React from 'react';
-import AssetModules from '../../shared/AssetModules.js';
-import CoreModules from '../../shared/CoreModules';
-import { ProjectActions } from '../../store/slices/ProjectSlice';
+import AssetModules from '@/shared/AssetModules.js';
+import CoreModules from '@/shared/CoreModules';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 const MobileFooter = () => {
   const dispatch = CoreModules.useAppDispatch();

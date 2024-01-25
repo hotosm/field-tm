@@ -1,6 +1,6 @@
 import * as React from 'react';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 export default function BasicDialog({ open, actions, title, onClose, subtitle }) {
   return (
     <CoreModules.Dialog fullWidth open={open}>

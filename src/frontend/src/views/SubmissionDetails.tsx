@@ -1,7 +1,7 @@
-import CoreModules from '../shared/CoreModules.js';
+import CoreModules from '@/shared/CoreModules.js';
 import React, { useEffect } from 'react';
-import environment from '../environment';
-import { SubmissionService } from '../api/Submission';
+import environment from '@/environment';
+import { SubmissionService } from '@/api/Submission';
 
 const SubmissionDetails = () => {
   const dispatch = CoreModules.useAppDispatch();

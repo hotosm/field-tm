@@ -1,9 +1,9 @@
-import { ProjectActions } from '../store/slices/ProjectSlice';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { easeIn, easeOut } from 'ol/easing';
-import { HomeActions } from '../store/slices/HomeSlice';
-import CoreModules from '../shared/CoreModules';
-import { CommonActions } from '../store/slices/CommonSlice';
-import { task_priority_str } from '../types/enums';
+import { HomeActions } from '@/store/slices/HomeSlice';
+import CoreModules from '@/shared/CoreModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { task_priority_str } from '@/types/enums';
 
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
   return async (dispatch) => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import CoreModules from '../../shared/CoreModules';
-import environment from '../../environment';
-import { FormCategoryService, PostFormUpdate } from '../../api/CreateProjectService';
+import CoreModules from '@/shared/CoreModules';
+import environment from '@/environment';
+import { FormCategoryService, PostFormUpdate } from '@/api/CreateProjectService';
 import { MenuItem } from '@mui/material';
-import { diffObject } from '../../utilfunctions/compareUtils.js';
+import { diffObject } from '@/utilfunctions/compareUtils.js';
 
 const UpdateForm = ({ projectId }) => {
   const dispatch = CoreModules.useAppDispatch();

@@ -1,8 +1,8 @@
 import React from 'react';
-import MainView from '../src/views/MainView';
+import MainView from '@/views/MainView';
 import { Provider } from 'react-redux';
-import { store } from '../src/store/Store';
-import { renderWithRouter } from '../src/utilfunctions/testUtils';
+import { store } from '@/store/Store';
+import { renderWithRouter } from '@/utilfunctions/testUtils';
 import { expect, it, describe } from 'vitest';
 
 describe('Frontend Application Running', () => {

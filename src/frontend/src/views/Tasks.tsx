@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 // import '../styles/home.css'
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
 // import { styled, alpha } from '@mui/material';
 
-import Avatar from '../assets/images/avatar.png';
-import SubmissionMap from '../components/SubmissionMap/SubmissionMap';
-import environment from '../environment';
-import { ProjectBuildingGeojsonService, ProjectSubmissionService } from '../api/SubmissionService';
-import { ProjectActions } from '../store/slices/ProjectSlice';
-import { ProjectById } from '../api/Project';
-import { getDownloadProjectSubmission } from '../api/task';
+import Avatar from '@/assets/images/avatar.png';
+import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
+import environment from '@/environment';
+import { ProjectBuildingGeojsonService, ProjectSubmissionService } from '@/api/SubmissionService';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { ProjectById } from '@/api/Project';
+import { getDownloadProjectSubmission } from '@/api/task';
 const basicGeojsonTemplate = {
   type: 'FeatureCollection',
   features: [],
@@ -235,6 +235,7 @@ const TasksSubmission = () => {
               const formattedDate = date.toLocaleDateString('en-US', dateOptions);
               return (
                 <CoreModules.Link
+                  key={submission.id}
                   style={{ textDecoration: 'auto' }}
                   className="submission-item"
                   to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}

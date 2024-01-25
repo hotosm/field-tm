@@ -25,6 +25,7 @@ const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean; className: s
   const { open, className, ...other } = props;
   return <div className={clsx({ 'MuiBackdrop-open': open }, className)} ref={ref} {...other} />;
 });
+Backdrop.displayName = 'ModalBackdrop';
 
 const StyledModal = styled(Modal)`
   position: fixed;

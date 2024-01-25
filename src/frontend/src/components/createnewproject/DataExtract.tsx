@@ -1,18 +1,18 @@
 import axios from 'axios';
 import { geojson as fgbGeojson } from 'flatgeobuf';
 import React, { useEffect, useState } from 'react';
-import Button from '../../components/common/Button';
+import Button from '@/components/common/Button';
 import { useDispatch } from 'react-redux';
-import { CommonActions } from '../../store/slices/CommonSlice';
-import RadioButton from '../../components/common/RadioButton';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import RadioButton from '@/components/common/RadioButton';
 import { useNavigate } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import useForm from '../../hooks/useForm';
-import { useAppSelector } from '../../types/reduxTypes';
-import { FormCategoryService } from '../../api/CreateProjectService';
-import FileInputComponent from '../../components/common/FileInputComponent';
-import DataExtractValidation from './validation/DataExtractValidation';
-import NewDefineAreaMap from '../../views/NewDefineAreaMap';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import useForm from '@/hooks/useForm';
+import { useAppSelector } from '@/types/reduxTypes';
+import { FormCategoryService } from '@/api/CreateProjectService';
+import FileInputComponent from '@/components/common/FileInputComponent';
+import DataExtractValidation from '@/components/createnewproject/validation/DataExtractValidation';
+import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Use OSM data extract' },

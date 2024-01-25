@@ -6,8 +6,8 @@ import VectorTileSource from 'ol/source/VectorTile';
 import { transformExtent } from 'ol/proj';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
-import { getStyles, defaultStyles } from '../helpers/styleUtils';
-import { isExtentValid } from '../helpers/layerUtils';
+import { getStyles, defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { isExtentValid } from '@/components/MapComponent/OpenLayersComponent/helpers/layerUtils';
 
 const selectElement = 'singleselect';
 

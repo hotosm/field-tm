@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import FmtmLogo from '../../assets/images/hotLog.png';
+import FmtmLogo from '@/assets/images/hotLog.png';
 
 const BottomSheet = ({ body, onClose }) => {
   const sheetContentRef: any = useRef(null);

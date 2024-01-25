@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LoginActions } from '../store/slices/LoginSlice';
-import CoreModules from '../shared/CoreModules.js';
+import { LoginActions } from '@/store/slices/LoginSlice';
+import CoreModules from '@/shared/CoreModules.js';
 
 function Authorized() {
   const navigate = useNavigate();

@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 import { useNavigate } from 'react-router-dom';
-import useForm from '../../hooks/useForm';
-import CreateProjectValidation from './validation/CreateProjectValidation';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import { OrganisationService } from '../../api/CreateProjectService';
-import environment from '../../environment';
+import useForm from '@/hooks/useForm';
+import CreateProjectValidation from '@/components/createproject/validation/CreateProjectValidation';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import { OrganisationService } from '@/api/CreateProjectService';
 import { MenuItem, Select } from '@mui/material';
-import { createPopup } from '../../utilfunctions/createPopup';
-import { useAppSelector } from '../../types/reduxTypes';
+import { createPopup } from '@/utilfunctions/createPopup';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const ProjectDetailsForm: React.FC = () => {
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);

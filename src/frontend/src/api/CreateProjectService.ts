@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import {
   ProjectDetailsModel,
   FormCategoryListModel,
   OrganisationListModel,
-} from '../models/createproject/createProjectModel';
-import { CommonActions } from '../store/slices/CommonSlice';
+} from '@/models/createproject/createProjectModel';
+import { CommonActions } from '@/store/slices/CommonSlice';
 import { ValidateCustomFormResponse } from 'store/types/ICreateProject';
-import { task_split_type } from '../types/enums';
+import { task_split_type } from '@/types/enums';
 
 const CreateProjectService: Function = (
   url: string,

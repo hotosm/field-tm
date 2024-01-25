@@ -1,23 +1,22 @@
 import React, { useEffect, useRef } from 'react';
-import enviroment from '../../environment';
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 import FormGroup from '@mui/material/FormGroup';
 import {
   CreateProjectService,
   FormCategoryService,
   GenerateProjectLog,
   ValidateCustomForm,
-} from '../../api/CreateProjectService';
+} from '@/api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { Grid, InputLabel, MenuItem, Select } from '@mui/material';
-import AssetModules from '../../shared/AssetModules.js';
-import useForm from '../../hooks/useForm';
-import SelectFormValidation from './validation/SelectFormValidation';
-import { CommonActions } from '../../store/slices/CommonSlice';
-import LoadingBar from './LoadingBar';
-import environment from '../../environment';
-import { useAppSelector } from '../../types/reduxTypes';
+import AssetModules from '@/shared/AssetModules.js';
+import useForm from '@/hooks/useForm';
+import SelectFormValidation from '@/components/createproject/validation/SelectFormValidation';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import LoadingBar from '@/components/createproject/LoadingBar';
+import environment from '@/environment';
+import { useAppSelector } from '@/types/reduxTypes';
 
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb: any = null;

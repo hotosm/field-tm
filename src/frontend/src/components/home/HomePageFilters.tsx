@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import windowDimention from '../../hooks/WindowDimension';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import Switch from '../common/Switch';
-import { HomeActions } from '../../store/slices/HomeSlice';
+import windowDimention from '@/hooks/WindowDimension';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import Switch from '@/components/common/Switch';
+import { HomeActions } from '@/store/slices/HomeSlice';
 
 //Home Filter
 const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) => {

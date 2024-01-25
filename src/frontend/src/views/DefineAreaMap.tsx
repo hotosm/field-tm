@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import useOLMap from '../hooks/useOlMap';
-import { MapContainer as MapComponent } from '../components/MapComponent/OpenLayersComponent';
-import LayerSwitcherControl from '../components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '../components/MapComponent/OpenLayersComponent/Layers';
-import CoreModules from '../shared/CoreModules';
-import { CreateProjectActions } from '../store/slices/CreateProjectSlice';
+import useOLMap from '@/hooks/useOlMap';
+import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
+import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
+import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
+import CoreModules from '@/shared/CoreModules';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 
 const DefineAreaMap = ({
   uploadedGeojson,

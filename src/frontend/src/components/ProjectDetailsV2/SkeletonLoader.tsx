@@ -1,5 +1,5 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 
 export const ActivitiesCardSkeletonLoader = () => {
   return (

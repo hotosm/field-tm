@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Tooltip } from '@mui/material';
 import { LinearProgress } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 
 const LoadingBar = ({ activeStep, totalSteps, title }) => {
   const theme = createTheme({

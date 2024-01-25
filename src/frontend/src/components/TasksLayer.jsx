@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Vector as VectorLayer } from 'ol/layer.js';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source.js';
-import { geojsonObjectModel } from '../models/geojsonObjectModel';
-import MapStyles from '../hooks/MapStyles';
-import environment from '../environment';
-import CoreModules from '../shared/CoreModules';
+import { geojsonObjectModel } from '@/models/geojsonObjectModel';
+import MapStyles from '@/hooks/MapStyles';
+import environment from '@/environment';
+import CoreModules from '@/shared/CoreModules';
 import { get } from 'ol/proj';
 let geojsonObject;
 const TasksLayer = (map, view, feature) => {

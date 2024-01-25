@@ -1,4 +1,4 @@
-import CoreModules from '../../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 
 const ThemeSlice = CoreModules.createSlice({
   name: 'theme',

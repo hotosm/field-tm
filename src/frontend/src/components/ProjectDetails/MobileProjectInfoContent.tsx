@@ -1,5 +1,5 @@
 import React from 'react';
-import AssetModules from '../../shared/AssetModules';
+import AssetModules from '@/shared/AssetModules';
 
 const MobileProjectInfoContent = ({ projectInfo }) => {
   return (

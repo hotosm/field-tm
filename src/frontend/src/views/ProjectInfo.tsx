@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import CoreModules from '../shared/CoreModules';
-import ProjectInfoSidebar from '../components/ProjectInfo/ProjectInfoSidebar';
-import ProjectInfomap from '../components/ProjectInfo/ProjectInfomap';
-import environment from '../environment';
-import { ProjectActions } from '../store/slices/ProjectSlice';
+import CoreModules from '@/shared/CoreModules';
+import ProjectInfoSidebar from '@/components/ProjectInfo/ProjectInfoSidebar';
+import ProjectInfomap from '@/components/ProjectInfo/ProjectInfomap';
+import environment from '@/environment';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 import {
   ConvertXMLToJOSM,
@@ -11,11 +11,11 @@ import {
   fetchInfoTask,
   getDownloadProjectSubmission,
   getDownloadProjectSubmissionJson,
-} from '../api/task';
-import AssetModules from '../shared/AssetModules';
-import { ProjectById } from '../api/Project';
-import ProjectInfoCountCard from '../components/ProjectInfo/ProjectInfoCountCard';
-import { CommonActions } from '../store/slices/CommonSlice';
+} from '@/api/task';
+import AssetModules from '@/shared/AssetModules';
+import { ProjectById } from '@/api/Project';
+import ProjectInfoCountCard from '@/components/ProjectInfo/ProjectInfoCountCard';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 const boxStyles = {
   animation: 'blink 1s infinite',

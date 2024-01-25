@@ -1,11 +1,11 @@
 import * as React from 'react';
-import CustomizedImage from '../../utilities/CustomizedImage';
-import CustomizedProgressBar from '../../utilities/CustomizedProgressBar';
-import environment from '../../environment';
-import { HomeActions } from '../../store/slices/HomeSlice';
-import { HomeProjectCardModel } from '../../models/home/homeModel';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
+import CustomizedImage from '@/utilities/CustomizedImage';
+import CustomizedProgressBar from '@/utilities/CustomizedProgressBar';
+import environment from '@/environment';
+import { HomeActions } from '@/store/slices/HomeSlice';
+import { HomeProjectCardModel } from '@/models/home/homeModel';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
 
 //Explore Project Card Model to be renderd in home view
 export default function ExploreProjectCard({ data }) {

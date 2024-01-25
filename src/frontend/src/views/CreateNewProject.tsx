@@ -1,17 +1,17 @@
-import StepSwitcher from '../components/common/StepSwitcher';
-import CreateProjectHeader from '../components/createnewproject/CreateProjectHeader';
+import StepSwitcher from '@/components/common/StepSwitcher';
+import CreateProjectHeader from '@/components/createnewproject/CreateProjectHeader';
 import React, { useEffect, useState } from 'react';
-import { createProjectSteps } from '../constants/StepFormConstants';
-import ProjectDetailsForm from '../components/createnewproject/ProjectDetailsForm';
-import UploadArea from '../components/createnewproject/UploadArea';
-import DataExtract from '../components/createnewproject/DataExtract';
-import SplitTasks from '../components/createnewproject/SplitTasks';
-import SelectForm from '../components/createnewproject/SelectForm';
+import { createProjectSteps } from '@/constants/StepFormConstants';
+import ProjectDetailsForm from '@/components/createnewproject/ProjectDetailsForm';
+import UploadArea from '@/components/createnewproject/UploadArea';
+import DataExtract from '@/components/createnewproject/DataExtract';
+import SplitTasks from '@/components/createnewproject/SplitTasks';
+import SelectForm from '@/components/createnewproject/SelectForm';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { CommonActions } from '.././store/slices/CommonSlice';
-import { useAppSelector } from '../types/reduxTypes';
-import Prompt from '../hooks/Prompt';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { useAppSelector } from '@/types/reduxTypes';
+import Prompt from '@/hooks/Prompt';
 const CreateNewProject = () => {
   const location = useLocation();
   const dispatch = useDispatch();

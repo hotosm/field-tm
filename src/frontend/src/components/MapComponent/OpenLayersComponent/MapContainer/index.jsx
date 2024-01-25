@@ -34,4 +34,6 @@ MapContainer.propTypes = {
   mapInstance: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
 };
 
+MapContainer.displayName = 'MapContainer';
+
 export default MapContainer;

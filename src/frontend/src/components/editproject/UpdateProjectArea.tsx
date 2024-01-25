@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import EditProjectArea from '../../views/EditProjectArea';
-import enviroment from '../../environment';
-import { EditProjectBoundaryService, GetDividedTaskFromGeojson } from '../../api/CreateProjectService';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import EditProjectArea from '@/views/EditProjectArea';
+import enviroment from '@/environment';
+import { EditProjectBoundaryService, GetDividedTaskFromGeojson } from '@/api/CreateProjectService';
 
 const UpdateProjectArea = ({ projectId }) => {
   const dispatch = CoreModules.useAppDispatch();

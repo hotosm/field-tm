@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import AssetModules from '../../shared/AssetModules';
+import AssetModules from '@/shared/AssetModules';
 
 interface IAccordion {
   collapsed?: boolean;

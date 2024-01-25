@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
-import environment from '../environment';
-import { DownloadTile, GenerateProjectTiles, GetTilesList } from '../api/Project';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import environment from '@/environment';
+import { DownloadTile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
 
 const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectInfo }) => {
   const dispatch = CoreModules.useAppDispatch();

@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react';
-import environment from '../../environment';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import { CustomSelect } from '../../components/common/Select';
-import profilePic from '../../assets/images/project_icon.png';
+import environment from '@/environment';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import { CustomSelect } from '@/components/common/Select';
+import profilePic from '@/assets/images/project_icon.png';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
-import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from './SkeletonLoader';
+import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
 
 const sortByList = [
   { id: 'activities', name: 'Activities' },

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
-import ExploreProjectCard from '../components/home/ExploreProjectCard';
-import windowDimention from '../hooks/WindowDimension';
-import { HomeSummaryService } from '../api/HomeService';
-import enviroment from '../environment';
-import ProjectCardSkeleton from '../components/home/ProjectCardSkeleton';
-import HomePageFilters from '../components/home/HomePageFilters';
-import CoreModules from '../shared/CoreModules';
-import AssetModules from '../shared/AssetModules';
-import ProjectListMap from '../components/home/ProjectListMap';
+import ExploreProjectCard from '@/components/home/ExploreProjectCard';
+import windowDimention from '@/hooks/WindowDimension';
+import { HomeSummaryService } from '@/api/HomeService';
+import enviroment from '@/environment';
+import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
+import HomePageFilters from '@/components/home/HomePageFilters';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import ProjectListMap from '@/components/home/ProjectListMap';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');

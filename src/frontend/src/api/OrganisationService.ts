@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { HomeProjectCardModel } from '../models/home/homeModel';
-import { GetOrganisationDataModel, OrganisationModal } from '../models/organisation/organisationModel';
-import { CommonActions } from '../store/slices/CommonSlice';
-import { OrganisationAction } from '../store/slices/organisationSlice';
+import { HomeProjectCardModel } from '@/models/home/homeModel';
+import { GetOrganisationDataModel, OrganisationModal } from '@/models/organisation/organisationModel';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { OrganisationAction } from '@/store/slices/organisationSlice';
 
 function appendObjectToFormData(formData, object) {
   for (const [key, value] of Object.entries(object)) {

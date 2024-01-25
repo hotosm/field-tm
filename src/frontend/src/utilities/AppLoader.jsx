@@ -11,7 +11,7 @@ import {
   ScaleLoader,
   DotLoader,
 } from 'react-spinners';
-import CoreModules from '../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 
 const override = {
   display: 'block',

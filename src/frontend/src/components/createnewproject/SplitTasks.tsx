@@ -1,27 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Button from '../../components/common/Button';
-import RadioButton from '../../components/common/RadioButton';
-import AssetModules from '../../shared/AssetModules.js';
+import Button from '@/components/common/Button';
+import RadioButton from '@/components/common/RadioButton';
+import AssetModules from '@/shared/AssetModules.js';
 import { useDispatch } from 'react-redux';
-import { CommonActions } from '../../store/slices/CommonSlice';
+import { CommonActions } from '@/store/slices/CommonSlice';
 import { useNavigate } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
-import CoreModules from '../../shared/CoreModules';
-import useForm from '../../hooks/useForm';
-import DefineTaskValidation from '../../components/createnewproject/validation/DefineTaskValidation';
-import NewDefineAreaMap from '../../views/NewDefineAreaMap';
-import { useAppSelector } from '../../types/reduxTypes';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import CoreModules from '@/shared/CoreModules';
+import useForm from '@/hooks/useForm';
+import DefineTaskValidation from '@/components/createnewproject/validation/DefineTaskValidation';
+import NewDefineAreaMap from '@/views/NewDefineAreaMap';
+import { useAppSelector } from '@/types/reduxTypes';
 import {
   CreateProjectService,
   GenerateProjectLog,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
-} from '../../api/CreateProjectService';
-import environment from '../../environment';
-import LoadingBar from '../../components/createproject/LoadingBar';
-import { Modal } from '../../components/common/Modal';
-import ProgressBar from '../../components/common/ProgressBar';
-import { task_split_type } from '../../types/enums';
+} from '@/api/CreateProjectService';
+import environment from '@/environment';
+import { Modal } from '@/components/common/Modal';
+import ProgressBar from '@/components/common/ProgressBar';
+import { task_split_type } from '@/types/enums';
 
 const alogrithmList = [
   { name: 'define_tasks', value: task_split_type['divide_on_square'].toString(), label: 'Divide on square' },

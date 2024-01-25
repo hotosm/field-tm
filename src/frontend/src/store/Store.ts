@@ -1,14 +1,14 @@
-import HomeSlice from './slices/HomeSlice';
-import ThemeSlice from './slices/ThemeSlice';
+import HomeSlice from '@/store/slices/HomeSlice';
+import ThemeSlice from '@/store/slices/ThemeSlice';
 import { persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import ProjectSlice from './slices/ProjectSlice';
-import CreateProjectReducer from './slices/CreateProjectSlice';
-import CommonSlice from './slices/CommonSlice';
-import LoginSlice from './slices/LoginSlice';
-import OrganisationSlice from './slices/organisationSlice';
-import SubmissionSlice from './slices/SubmissionSlice';
-import TaskSlice from './slices/TaskSlice';
+import ProjectSlice from '@/store/slices/ProjectSlice';
+import CreateProjectReducer from '@/store/slices/CreateProjectSlice';
+import CommonSlice from '@/store/slices/CommonSlice';
+import LoginSlice from '@/store/slices/LoginSlice';
+import OrganisationSlice from '@/store/slices/organisationSlice';
+import SubmissionSlice from '@/store/slices/SubmissionSlice';
+import TaskSlice from '@/store/slices/TaskSlice';
 import { persistReducer } from 'redux-persist';
 import { combineReducers, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 

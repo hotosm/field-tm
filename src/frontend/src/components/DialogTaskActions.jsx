@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import environment from '../environment';
-import ProjectTaskStatus from '../api/ProjectTaskStatus';
-import MapStyles from '../hooks/MapStyles';
-import CoreModules from '../shared/CoreModules';
-import { CommonActions } from '../store/slices/CommonSlice';
-import { task_priority_str } from '../types/enums';
+import environment from '@/environment';
+import ProjectTaskStatus from '@/api/ProjectTaskStatus';
+import MapStyles from '@/hooks/MapStyles';
+import CoreModules from '@/shared/CoreModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import { task_priority_str } from '@/types/enums';
 
 export default function Dialog({ taskId, feature, map, view }) {
   // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;

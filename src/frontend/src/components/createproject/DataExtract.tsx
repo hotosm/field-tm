@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import enviroment from '../../environment';
-import CoreModules from '../../shared/CoreModules.js';
+import enviroment from '@/environment';
+import CoreModules from '@/shared/CoreModules.js';
 import FormGroup from '@mui/material/FormGroup';
-import { FormCategoryService } from '../../api/CreateProjectService';
+import { FormCategoryService } from '@/api/CreateProjectService';
 import { useNavigate, Link } from 'react-router-dom';
-import { CreateProjectActions } from '../../store/slices/CreateProjectSlice';
+import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { Grid, InputLabel, MenuItem, Select } from '@mui/material';
-import useForm from '../../hooks/useForm';
+import useForm from '@/hooks/useForm';
 //@ts-ignore
-// import DefineAreaMap from './views/DefineAreaMap';
-import DefineAreaMap from '../../views//DefineAreaMap';
-import DataExtractValidation from './validation/DataExtractValidation';
+// import DefineAreaMap from '@/views/DefineAreaMap';
+import DefineAreaMap from '@/views//DefineAreaMap';
+import DataExtractValidation from '@/components/createproject/validation/DataExtractValidation';
 
 // import { SelectPicker } from 'rsuite';
 let generateProjectLogIntervalCb: any = null;

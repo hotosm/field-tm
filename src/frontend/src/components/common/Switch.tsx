@@ -1,6 +1,6 @@
 import React from 'react';
 import * as SwitchPrimitives from '@radix-ui/react-switch';
-import { cn } from '../../utilfunctions/shadcn';
+import { cn } from '@/utilfunctions/shadcn';
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,

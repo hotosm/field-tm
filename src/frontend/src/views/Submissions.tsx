@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 // import '../styles/home.css'
-import CoreModules from '../shared/CoreModules';
+import CoreModules from '@/shared/CoreModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
-import Avatar from '../assets/images/avatar.png';
-import SubmissionMap from '../components/SubmissionMap/SubmissionMap';
-import environment from '../environment';
-import { ProjectBuildingGeojsonService, ProjectSubmissionService } from '../api/SubmissionService';
-import { ProjectActions } from '../store/slices/ProjectSlice';
-import { ProjectById } from '../api/Project';
+import Avatar from '@/assets/images/avatar.png';
+import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
+import environment from '@/environment';
+import { ProjectBuildingGeojsonService, ProjectSubmissionService } from '@/api/SubmissionService';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { ProjectById } from '@/api/Project';
 
 const Submissions = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -100,6 +100,7 @@ const Submissions = () => {
               const formattedDate = date.toLocaleDateString('en-US', dateOptions);
               return (
                 <CoreModules.Box
+                  key={submission.id}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',

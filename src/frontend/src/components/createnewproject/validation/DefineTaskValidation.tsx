@@ -1,4 +1,4 @@
-import { task_split_type } from '../../../types/enums';
+import { task_split_type } from '@/types/enums';
 
 interface ProjectValues {
   task_split_type: number;

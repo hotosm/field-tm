@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import CoreModules from '../../shared/CoreModules';
-import AssetModules from '../../shared/AssetModules';
-import environment from '../../environment';
-import { DownloadDataExtract, DownloadProjectForm } from '../../api/Project';
-import { ProjectActions } from '../../store/slices/ProjectSlice';
+import CoreModules from '@/shared/CoreModules';
+import AssetModules from '@/shared/AssetModules';
+import environment from '@/environment';
+import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 const ProjectOptions = ({ setToggleGenerateModal }) => {
   const dispatch = CoreModules.useAppDispatch();

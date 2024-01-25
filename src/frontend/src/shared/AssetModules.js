@@ -59,8 +59,8 @@ import {
   Undo as UndoIcon,
   Timeline as TimelineIcon,
 } from '@mui/icons-material';
-import LockPng from '../assets/images/lock.png';
-import RedLockPng from '../assets/images/red-lock.png';
+import LockPng from '@/assets/images/lock.png';
+import RedLockPng from '@/assets/images/red-lock.png';
 import { styled, alpha } from '@mui/material/styles';
 export default {
   ExitToAppIcon,

@@ -1,8 +1,8 @@
 import React from 'react';
-import CoreModules from '../../shared/CoreModules';
-import ProjectCard from './ProjectCard';
-import environment from '../../environment';
-import ProjectInfoSidebarSkeleton from './ProjectInfoSidebarSkeleton';
+import CoreModules from '@/shared/CoreModules';
+import ProjectCard from '@/components/ProjectInfo/ProjectCard';
+import environment from '@/environment';
+import ProjectInfoSidebarSkeleton from '@/components/ProjectInfo/ProjectInfoSidebarSkeleton';
 
 const ProjectInfoSidebar = ({ projectId, taskInfo }) => {
   const dispatch = CoreModules.useAppDispatch();

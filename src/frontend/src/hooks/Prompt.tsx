@@ -1,5 +1,5 @@
 import React from 'react';
-import pathNotToBlock from '../constants/blockerUrl';
+import pathNotToBlock from '@/constants/blockerUrl';
 import { unstable_useBlocker as useBlocker } from 'react-router-dom';
 
 function Prompt(props) {

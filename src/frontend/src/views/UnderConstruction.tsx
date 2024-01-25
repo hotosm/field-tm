@@ -1,5 +1,5 @@
 import React from 'react';
-import UnderConstructionImage from '../assets/images/under_construction.png';
+import UnderConstructionImage from '@/assets/images/under_construction.png';
 
 const UnderConstruction = () => {
   return (

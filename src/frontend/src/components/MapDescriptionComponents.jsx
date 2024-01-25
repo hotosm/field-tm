@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomizedMenus from '../utilities/CustomizedMenus';
-import CoreModules from '../shared/CoreModules';
+import CustomizedMenus from '@/utilities/CustomizedMenus';
+import CoreModules from '@/shared/CoreModules';
 
 const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
   const descriptionData = [
