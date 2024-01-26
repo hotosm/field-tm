@@ -22,7 +22,7 @@ These methods use FastAPI Depends for dependency injection
 and always return an AuthUser object in a standard format.
 """
 
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import Depends, HTTPException
 from loguru import logger as log
@@ -50,7 +50,7 @@ async def get_uid(user_data: AuthUser) -> int:
 
 async def check_super_admin(
     db: Session,
-    user: [AuthUser, int],
+    user: Union[AuthUser, int],
 ) -> DbUser:
     """Database check to determine if super admin role."""
     if isinstance(user, int):
@@ -81,7 +81,7 @@ async def super_admin(
 
 async def check_org_admin(
     db: Session,
-    user: [AuthUser, int],
+    user: Union[AuthUser, int],
     project: Optional[DbProject],
     org_id: Optional[int],
 ) -> DbUser:
@@ -98,8 +98,8 @@ async def check_org_admin(
     await check_org_exists(db, org_id)
 
     # If user is admin, skip checks
-    if await check_super_admin(db, user):
-        return user
+    if db_user := await check_super_admin(db, user):
+        return db_user
 
     return (
         db.query(organisation_managers)
