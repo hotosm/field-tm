@@ -34,10 +34,10 @@ export const createLoginWindow = (redirectTo) => {
                 .then((resp) => resp.json())
                 .then((userRes) => {
                   const params = new URLSearchParams({
-                    username: userRes.user_data.username,
+                    username: userRes.username,
                     osm_oauth_token: res.access_token,
-                    id: userRes.user_data.id,
-                    picture: userRes.user_data.img_url,
+                    id: userRes.id,
+                    picture: userRes.img_url,
                     redirect_to: redirectTo,
                   }).toString();
                   const redirectUrl = `/osmauth?${params}`;
