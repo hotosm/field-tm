@@ -38,7 +38,7 @@ from app.projects.project_deps import get_project_by_id
 
 async def get_uid(user_data: AuthUser) -> int:
     """Extract user id from returned OSM user."""
-    if user_id := user_data.get("id"):
+    if user_id := user_data.id:
         return user_id
     else:
         log.error(f"Failed to get user id from auth object: {user_data}")
@@ -69,7 +69,7 @@ async def super_admin(
 
     if not super_admin:
         log.error(
-            f"User {user_data.get('username')} requested an admin endpoint, "
+            f"User {user_data.username} requested an admin endpoint, "
             "but is not admin"
         )
         raise HTTPException(
