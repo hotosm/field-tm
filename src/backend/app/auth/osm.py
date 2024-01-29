@@ -85,4 +85,4 @@ async def login_required(
         log.error("Failed to deserialise access token")
         raise HTTPException(status_code=401, detail="Access token not valid") from e
 
-    return osm_user
+    return AuthUser(**osm_user)
