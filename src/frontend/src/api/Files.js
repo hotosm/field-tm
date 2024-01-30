@@ -1,35 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import CoreModules from '@/shared/CoreModules';
+import { useEffect, useState } from 'react';
+import qrcodeGenerator from 'qrcode-generator';
 
-export const ProjectFilesById = (url, taskId) => {
+export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
   const [loading, setLoading] = useState(true);
   const [qrcode, setQrcode] = useState('');
-  const source = CoreModules.axios.CancelToken.source();
   useEffect(() => {
-    const fetchProjectFileById = async (url) => {
-      try {
-        setLoading(true);
-        const fileJson = await CoreModules.axios.get(url, {
-          cancelToken: source.token,
-        });
-        const resp = fileJson.data;
-        const taskIndex = resp.findIndex((task) => task.id == taskId);
-        const getQrcodeByIndex = resp[taskIndex].qr_code_base64;
-        setQrcode(getQrcodeByIndex);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
+    const fetchProjectFileById = async (odkToken, projectName, osmUser, taskId) => {
+      setLoading(true);
+
+      const odkCollectJson = JSON.stringify({
+        general: {
+          server_url: odkToken,
+          form_update_mode: 'manual',
+          basemap_source: 'osm',
+          autosend: 'wifi_and_cellular',
+          metadata_username: osmUser,
+          metadata_email: taskId,
+        },
+        project: { name: projectName },
+        admin: {},
+      });
+
+      // Note: error correction level = "L"
+      const code = qrcodeGenerator(0, 'L');
+      // Note: btoa base64 encodes the JSON string
+      code.addData(btoa(odkCollectJson));
+      code.make();
+
+      // Note: cell size = 3, margin = 5
+      setQrcode(code.createDataURL(3, 5));
+      setLoading(false);
     };
 
-    fetchProjectFileById(url);
+    fetchProjectFileById(odkToken, projectName, osmUser, taskId);
 
     const cleanUp = () => {
       setLoading(false);
       setQrcode('');
-      if (source) {
-        source.cancel('component unmounted');
-      }
     };
 
     return cleanUp;

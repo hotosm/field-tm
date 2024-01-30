@@ -386,23 +386,6 @@ ALTER TABLE public.projects_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 
 
-CREATE TABLE public.qr_code (
-    id integer NOT NULL,
-    filename character varying,
-    image bytea
-);
-ALTER TABLE public.qr_code OWNER TO fmtm;
-CREATE SEQUENCE public.qr_code_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.qr_code_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.qr_code_id_seq OWNED BY public.qr_code.id;
-
-
 CREATE TABLE public.task_history (
     id integer NOT NULL,
     project_id integer,
@@ -481,7 +464,7 @@ CREATE TABLE public.tasks (
     locked_by bigint,
     mapped_by bigint,
     validated_by bigint,
-    qr_code_id integer
+    odk_token character varying
 );
 ALTER TABLE public.tasks OWNER TO fmtm;
 CREATE SEQUENCE public.tasks_id_seq
@@ -589,7 +572,6 @@ ALTER TABLE ONLY public.mbtiles_path ALTER COLUMN id SET DEFAULT nextval('public
 ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval('public.organisations_id_seq'::regclass);
 ALTER TABLE ONLY public.project_chat ALTER COLUMN id SET DEFAULT nextval('public.project_chat_id_seq'::regclass);
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
-ALTER TABLE ONLY public.qr_code ALTER COLUMN id SET DEFAULT nextval('public.qr_code_id_seq'::regclass);
 ALTER TABLE ONLY public.task_history ALTER COLUMN id SET DEFAULT nextval('public.task_history_id_seq'::regclass);
 ALTER TABLE ONLY public.task_invalidation_history ALTER COLUMN id SET DEFAULT nextval('public.task_invalidation_history_id_seq'::regclass);
 ALTER TABLE ONLY public.task_mapping_issues ALTER COLUMN id SET DEFAULT nextval('public.task_mapping_issues_id_seq'::regclass);
@@ -649,9 +631,6 @@ ALTER TABLE ONLY public.project_teams
 ALTER TABLE ONLY public.projects
     ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.qr_code
-    ADD CONSTRAINT qr_code_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.splitpolygons
     ADD CONSTRAINT splitpolygons_pkey PRIMARY KEY (polyid);
 
@@ -708,7 +687,6 @@ CREATE INDEX ix_task_mapping_issues_task_history_id ON public.task_mapping_issue
 CREATE INDEX ix_tasks_locked_by ON public.tasks USING btree (locked_by);
 CREATE INDEX ix_tasks_mapped_by ON public.tasks USING btree (mapped_by);
 CREATE INDEX ix_tasks_project_id ON public.tasks USING btree (project_id);
-CREATE INDEX ix_tasks_qr_code_id ON public.tasks USING btree (qr_code_id);
 CREATE INDEX ix_tasks_validated_by ON public.tasks USING btree (validated_by);
 CREATE INDEX ix_users_id ON public.users USING btree (id);
 CREATE INDEX textsearch_idx ON public.project_info USING btree (text_searchable);
@@ -805,9 +783,6 @@ ALTER TABLE ONLY public.task_mapping_issues
 
 ALTER TABLE ONLY public.tasks
     ADD CONSTRAINT tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id);
-
-ALTER TABLE ONLY public.tasks
-    ADD CONSTRAINT tasks_qr_code_id_fkey FOREIGN KEY (qr_code_id) REFERENCES public.qr_code(id);
 
 ALTER TABLE ONLY public.user_licenses
     ADD CONSTRAINT user_licenses_license_fkey FOREIGN KEY (license) REFERENCES public.licenses(id);

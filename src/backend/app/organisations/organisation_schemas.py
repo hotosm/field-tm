@@ -21,9 +21,10 @@ from re import sub
 from typing import Optional
 
 from fastapi import Form
-from pydantic import BaseModel, Field, HttpUrl, computed_field
+from pydantic import BaseModel, Field, HttpUrl, SecretStr, computed_field
 from pydantic.functional_validators import field_validator
 
+from app.config import decrypt_value, encrypt_value
 from app.models.enums import OrganisationType
 
 # class OrganisationBase(BaseModel):
@@ -37,7 +38,16 @@ class OrganisationIn(BaseModel):
     description: Optional[str] = Field(
         Form(None, description="Organisation description")
     )
-    url: Optional[HttpUrl] = Field(Form(None, description="Organisation website URL"))
+    url: Optional[HttpUrl] = Field(Form(None, description=("Organisation website URL")))
+    odk_central_url: Optional[str] = Field(
+        Form(None, description="Organisation default ODK URL")
+    )
+    odk_central_user: Optional[str] = Field(
+        Form(None, description="Organisation default ODK User")
+    )
+    odk_central_password: Optional[SecretStr] = Field(
+        Form(None, description="Organisation default ODK Password")
+    )
 
     @field_validator("url", mode="after")
     @classmethod
@@ -54,12 +64,21 @@ class OrganisationIn(BaseModel):
     @property
     def slug(self) -> str:
         """Sanitise the organisation name for use in a URL."""
-        if self.name:
-            # Remove special characters and replace spaces with hyphens
-            slug = sub(r"[^\w\s-]", "", self.name).strip().lower().replace(" ", "-")
-            # Remove consecutive hyphens
-            slug = sub(r"[-\s]+", "-", slug)
-            return slug
+        if not self.name:
+            return ""
+        # Remove special characters and replace spaces with hyphens
+        slug = sub(r"[^\w\s-]", "", self.name).strip().lower().replace(" ", "-")
+        # Remove consecutive hyphens
+        slug = sub(r"[-\s]+", "-", slug)
+        return slug
+
+    @field_validator("odk_central_password", mode="before")
+    @classmethod
+    def encrypt_odk_password(cls, value: str) -> Optional[SecretStr]:
+        """Encrypt the ODK Central password before db insertion."""
+        if not value:
+            return None
+        return SecretStr(encrypt_value(value))
 
 
 class OrganisationEdit(OrganisationIn):
@@ -79,3 +98,22 @@ class OrganisationOut(BaseModel):
     slug: Optional[str]
     url: Optional[str]
     type: OrganisationType
+    odk_central_url: Optional[str] = None
+
+
+class OrganisationOutWithCreds(BaseModel):
+    """Organisation plus ODK Central credentials.
+
+    Note: the password is obsfucated as SecretStr.
+    """
+
+    odk_central_user: Optional[str] = None
+    odk_central_password: Optional[SecretStr] = None
+
+    def model_post_init(self, ctx):
+        """Run logic after model object instantiated."""
+        # Decrypt odk central password from database
+        if self.odk_central_password:
+            self.odk_central_password = SecretStr(
+                decrypt_value(self.odk_central_password.get_secret_value())
+            )

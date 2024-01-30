@@ -239,7 +239,7 @@ services:
       - "5434:5432"
     networks:
       - fmtm-net
-    restart: "on-failure:3"
+    restart: "unless-stopped"
     healthcheck:
       test: pg_isready -U ${CENTRAL_DB_USER:-odk} -d ${CENTRAL_DB_NAME:-odk}
       start_period: 5s

@@ -149,6 +149,11 @@ class DbOrganisation(Base):
     type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
     approved = Column(Boolean, default=False)
 
+    ## Odk central server
+    odk_central_url = Column(String)
+    odk_central_user = Column(String)
+    odk_central_password = Column(String)
+
     managers = relationship(
         DbUser,
         secondary=organisation_managers,
@@ -345,16 +350,6 @@ class DbTaskHistory(Base):
     )
 
 
-class DbQrCode(Base):
-    """QR Code."""
-
-    __tablename__ = "qr_code"
-
-    id = Column(Integer, primary_key=True)
-    filename = Column(String)
-    image = Column(LargeBinary)
-
-
 class DbTask(Base):
     """Describes an individual mapping Task."""
 
@@ -380,13 +375,9 @@ class DbTask(Base):
     validated_by = Column(
         BigInteger, ForeignKey("users.id", name="fk_users_validator"), index=True
     )
+    odk_token = Column(String, nullable=True)
 
     # Mapped objects
-    qr_code_id = Column(Integer, ForeignKey("qr_code.id"), index=True)
-    qr_code = relationship(
-        DbQrCode, cascade="all, delete, delete-orphan", single_parent=True
-    )
-
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
     )

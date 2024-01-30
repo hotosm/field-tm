@@ -136,15 +136,6 @@ async def update_task_status(
     return updated_task
 
 
-@router.post("/task-qr-code/{task_id}")
-async def get_qr_code_list(
-    task_id: int,
-    db: Session = Depends(database.get_db),
-):
-    """Get the associated ODK Collect QR code for a task."""
-    return await tasks_crud.get_qr_codes_for_task(db=db, task_id=task_id)
-
-
 @router.post("/edit-task-boundary")
 async def edit_task_boundary(
     task_id: int,

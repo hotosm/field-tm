@@ -17,8 +17,6 @@
 #
 """Pydantic schemas for FMTM task areas."""
 
-
-import base64
 from datetime import datetime
 from typing import Any, List, Optional
 
@@ -28,6 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator
 
+from app.config import decrypt_value
 from app.db.postgis_utils import geometry_to_geojson, get_centroid
 from app.models.enums import TaskStatus
 
@@ -56,7 +55,7 @@ class TaskHistoryCount(BaseModel):
     mapped: int
 
 
-class TaskBase(BaseModel):
+class Task(BaseModel):
     """Core fields for a Task."""
 
     model_config = ConfigDict(
@@ -67,7 +66,6 @@ class TaskBase(BaseModel):
     # Excluded
     lock_holder: Any = Field(exclude=True)
     outline: Any = Field(exclude=True)
-    qr_code: Any = Field(exclude=True)
 
     id: int
     project_id: int
@@ -80,6 +78,7 @@ class TaskBase(BaseModel):
     locked_by_uid: Optional[int] = None
     locked_by_username: Optional[str] = None
     task_history: Optional[List[TaskHistoryBase]] = None
+    odk_token: Optional[str] = None
 
     @field_validator("outline_geojson", mode="before")
     @classmethod
@@ -123,25 +122,13 @@ class TaskBase(BaseModel):
             return self.lock_holder.username
         return None
 
-
-class Task(TaskBase):
-    """Task details plus base64 QR codes."""
-
-    qr_code_base64: Optional[str] = None
-
-    @field_validator("qr_code_base64", mode="before")
-    @classmethod
-    def get_qrcode_base64(cls, value: Any, info: ValidationInfo) -> str:
-        """Get base64 encoded qrcode."""
-        if qr_code := info.data.get("qr_code"):
-            log.debug(
-                f"QR code found for task ID {info.data.get('id')}. "
-                "Converting to base64"
-            )
-            return base64.b64encode(qr_code.image)
-        else:
-            log.warning(f"No QR code found for task ID {info.data.get('id')}")
+    @field_serializer("odk_token")
+    def decrypt_password(self, value: str) -> str:
+        """Decrypt the ODK Token extracted from the db."""
+        if not value:
             return ""
+
+        return decrypt_value(value)
 
 
 class ReadTask(Task):

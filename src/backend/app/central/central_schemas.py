@@ -32,7 +32,6 @@ class Central(CentralBase):
     """ODK Central return, with extras."""
 
     geometry_geojson: str
-    # qr_code_binary: bytes
 
 
 class CentralOut(CentralBase):

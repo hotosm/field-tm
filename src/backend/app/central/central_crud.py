@@ -17,10 +17,7 @@
 #
 """Logic for interaction with ODK Central & data."""
 
-import base64
-import json
 import os
-import zlib
 from xml.etree import ElementTree
 
 # import osm_fieldwork
@@ -43,7 +40,7 @@ def get_odk_project(odk_central: project_schemas.ODKCentral = None):
     if odk_central:
         url = odk_central.odk_central_url
         user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
+        pw = odk_central.odk_central_password.get_secret_value()
     else:
         log.debug("ODKCentral connection variables not set in function")
         log.debug("Attempting extraction from environment variables")
@@ -68,7 +65,7 @@ def get_odk_form(odk_central: project_schemas.ODKCentral = None):
     if odk_central:
         url = odk_central.odk_central_url
         user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
+        pw = odk_central.odk_central_password.get_secret_value()
 
     else:
         log.debug("ODKCentral connection variables not set in function")
@@ -94,7 +91,7 @@ def get_odk_app_user(odk_central: project_schemas.ODKCentral = None):
     if odk_central:
         url = odk_central.odk_central_url
         user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
+        pw = odk_central.odk_central_password.get_secret_value()
     else:
         log.debug("ODKCentral connection variables not set in function")
         log.debug("Attempting extraction from environment variables")
@@ -161,36 +158,6 @@ async def delete_odk_project(
         return "Could not delete project from central odk"
 
 
-def create_odk_app_user(
-    project_id: int, name: str, odk_credentials: project_schemas.ODKCentral = None
-):
-    """Create an app user specific to a project on ODK Central.
-
-    If odk credentials of the project are provided, use them to create an app user.
-    """
-    if odk_credentials:
-        url = odk_credentials.odk_central_url
-        user = odk_credentials.odk_central_user
-        pw = odk_credentials.odk_central_password
-
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
-
-    odk_app_user = OdkAppUser(url, user, pw)
-
-    log.debug(
-        "ODKCentral: attempting user creation: name: " f"{name} | project: {project_id}"
-    )
-    result = odk_app_user.create(project_id, name)
-
-    log.debug(f"ODKCentral response: {result.json()}")
-    return result
-
-
 def delete_odk_app_user(
     project_id: int, name: str, odk_central: project_schemas.ODKCentral = None
 ):
@@ -226,7 +193,7 @@ def upload_xform_media(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.uploadMedia(project_id, title, filespec)
+    xform.uploadMedia(project_id, title, filespec)
     result = xform.publishForm(project_id, title)
     return result
 
@@ -268,9 +235,7 @@ def create_odk_xform(
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     if upload_media:
-        result = xform.uploadMedia(
-            project_id, title, data, convert_to_draft_when_publishing
-        )
+        xform.uploadMedia(project_id, title, data, convert_to_draft_when_publishing)
 
     result = xform.publishForm(project_id, title)
     return result
@@ -535,38 +500,6 @@ def generate_updated_xform(
     # db.commit()
 
     return outfile
-
-
-async def encode_qrcode_json(
-    project_id: int, token: str, name: str, odk_central_url: str = None
-):
-    """Assemble the ODK Collect JSON and base64 encode.
-
-    The base64 encoded string is used to generate a QR code later.
-    """
-    if not odk_central_url:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        odk_central_url = settings.ODK_CENTRAL_URL
-
-    # QR code text json in the format acceptable by odk collect
-    qr_code_setting = {
-        "general": {
-            "server_url": f"{odk_central_url}/v1/key/{token}/projects/{project_id}",
-            "form_update_mode": "match_exactly",
-            "basemap_source": "osm",
-            "autosend": "wifi_and_cellular",
-            "metadata_username": "svcfmtm",
-        },
-        "project": {"name": f"{name}"},
-        "admin": {},
-    }
-
-    # Base64 encoded
-    qr_data = base64.b64encode(
-        zlib.compress(json.dumps(qr_code_setting).encode("utf-8"))
-    )
-    return qr_data
 
 
 def upload_media(
