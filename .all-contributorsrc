@@ -134,6 +134,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/75838716?v=4",
       "profile": "https://github.com/Roseford",
       "contributions": ["doc"]
+    },
+    {
+      "login": "cordovez",
+      "name": "JC CorMan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75356640?v=4",
+      "profile": "https://www.el-cordovez.com",
+      "contributions": ["doc"]
     }
   ],
   "contributorsPerLine": 7,
