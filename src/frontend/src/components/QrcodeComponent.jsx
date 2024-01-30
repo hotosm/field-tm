@@ -24,19 +24,20 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
   const checkIfTaskAssignedOrNot =
     selectedTask?.locked_by_username === token?.username || selectedTask?.locked_by_username === null;
 
-  const { qrLoading, qrcode } = ProjectFilesById(selectedTask.odk_token, projectName, token?.username, task);
+  // TODO fix multiple renders of component (6 times)
+  const { qrcode } = ProjectFilesById(selectedTask.odk_token, projectName, token?.username, task);
 
-  const socialStyles = {
-    copyContainer: {
-      border: `1px solid ${defaultTheme.palette.info['main']}`,
-      background: defaultTheme.palette.info['info'],
-      color: defaultTheme.palette.info['main'],
-    },
-    title: {
-      color: defaultTheme.palette.info['main'],
-      fontStyle: 'italic',
-    },
-  };
+  // const socialStyles = {
+  //   copyContainer: {
+  //     border: `1px solid ${defaultTheme.palette.info['main']}`,
+  //     background: defaultTheme.palette.info['info'],
+  //     color: defaultTheme.palette.info['main'],
+  //   },
+  //   title: {
+  //     color: defaultTheme.palette.info['main'],
+  //     fontStyle: 'italic',
+  //   },
+  // };
 
   return (
     <CoreModules.Stack>
