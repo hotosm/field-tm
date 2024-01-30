@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import qrcodeGenerator from 'qrcode-generator';
 
 export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
-  const [loading, setLoading] = useState(true);
   const [qrcode, setQrcode] = useState('');
   useEffect(() => {
     const fetchProjectFileById = async (odkToken, projectName, osmUser, taskId) => {
-      setLoading(true);
+      if (!taskId || odkToken === '') {
+        setQrcode('');
+        return;
+      }
 
       const odkCollectJson = JSON.stringify({
         general: {
@@ -29,17 +31,15 @@ export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
 
       // Note: cell size = 3, margin = 5
       setQrcode(code.createDataURL(3, 5));
-      setLoading(false);
     };
 
     fetchProjectFileById(odkToken, projectName, osmUser, taskId);
 
     const cleanUp = () => {
-      setLoading(false);
       setQrcode('');
     };
 
     return cleanUp;
   }, [taskId]);
-  return { loading, qrcode };
+  return { qrcode };
 };
