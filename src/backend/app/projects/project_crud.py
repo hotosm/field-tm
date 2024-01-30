@@ -17,7 +17,6 @@
 #
 """Logic for FMTM project routes."""
 
-import io
 import json
 import os
 import time
@@ -31,7 +30,6 @@ from typing import List, Optional, Union
 import geoalchemy2
 import geojson
 import requests
-import segno
 import shapely.wkb as wkblib
 import sozipfile.sozipfile as zipfile
 import sqlalchemy
@@ -60,17 +58,16 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.central import central_crud
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db import db_models
 from app.db.database import get_db
-from app.db.postgis_utils import geojson_to_flatgeobuf, geometry_to_geojson, timestamp
+from app.db.postgis_utils import geojson_to_flatgeobuf, geometry_to_geojson
+from app.models.enums import HTTPStatus
 from app.projects import project_schemas
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
 from app.users import user_crud
 
-QR_CODES_DIR = "QR_codes/"
-TASK_GEOJSON_DIR = "geojson/"
 TILESDIR = "/opt/tiles"
 
 
@@ -259,6 +256,8 @@ async def create_project_with_project_info(
     """Create a new project, including all associated info."""
     # FIXME the ProjectUpload model should be converted to the db model directly
     # FIXME we don't need to extract each variable and pass manually
+    # project_data = project_metadata.model_dump()
+
     project_user = project_metadata.author
     project_info = project_metadata.project_info
     xform_title = project_metadata.xform_title
@@ -272,11 +271,20 @@ async def create_project_with_project_info(
 
     # verify data coming in
     if not project_user:
-        raise HTTPException("User details are missing")
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="User details are missing",
+        )
     if not project_info:
-        raise HTTPException("Project info is missing")
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Project info is missing",
+        )
     if not odk_project_id:
-        raise HTTPException("ODK Central project id is missing")
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="ODK Central project id is missing",
+        )
 
     log.debug(
         "Creating project in FMTM database with vars: "
@@ -291,7 +299,7 @@ async def create_project_with_project_info(
     if odk_credentials:
         url = odk_credentials.odk_central_url
         user = odk_credentials.odk_central_user
-        pw = odk_credentials.odk_central_password
+        pw = odk_credentials.odk_central_password.get_secret_value()
 
     else:
         log.debug("ODKCentral connection variables not set in function")
@@ -784,174 +792,200 @@ async def update_project_boundary(
     return True
 
 
-async def update_project_with_zip(
-    db: Session,
-    project_id: int,
-    project_name_prefix: str,
-    task_type_prefix: str,
-    uploaded_zip: UploadFile,
-):
-    """Update a project from a zip file.
+# TODO delete me (does not handle ODK project too)
+# async def update_project_with_zip(
+#     db: Session,
+#     project_id: int,
+#     project_name_prefix: str,
+#     task_type_prefix: str,
+#     uploaded_zip: UploadFile,
+# ):
+#     """Update a project from a zip file.
 
-    TODO ensure that logged in user is user who created this project,
-    return 403 (forbidden) if not authorized.
-    """
-    # ensure file upload is zip
-    if uploaded_zip.content_type not in [
-        "application/zip",
-        "application/zip-compressed",
-        "application/x-zip-compressed",
-    ]:
-        raise HTTPException(
-            status_code=415,
-            detail=f"File must be a zip. Uploaded file was {uploaded_zip.content_type}",
-        )
+#     TODO ensure that logged in user is user who created this project,
+#     return 403 (forbidden) if not authorized.
+#     """
+#     QR_CODES_DIR = "QR_codes/"
+#     TASK_GEOJSON_DIR = "geojson/"
 
-    with zipfile.ZipFile(io.BytesIO(uploaded_zip.file.read()), "r") as zip:
-        # verify valid zip file
-        bad_file = zip.testzip()
-        if bad_file:
-            raise HTTPException(
-                status_code=400, detail=f"Zip contained a bad file: {bad_file}"
-            )
+#     # ensure file upload is zip
+#     if uploaded_zip.content_type not in [
+#         "application/zip",
+#         "application/zip-compressed",
+#         "application/x-zip-compressed",
+#     ]:
+#         raise HTTPException(
+#             status_code=415,
+#             detail=(
+#                   "File must be a zip. Uploaded file was "
+#                   f"{uploaded_zip.content_type}",
+#         ))
 
-        # verify zip includes top level files & directories
-        listed_files = zip.namelist()
+#     with zipfile.ZipFile(io.BytesIO(uploaded_zip.file.read()), "r") as zip:
+#         # verify valid zip file
+#         bad_file = zip.testzip()
+#         if bad_file:
+#             raise HTTPException(
+#                 status_code=400, detail=f"Zip contained a bad file: {bad_file}"
+#             )
 
-        if QR_CODES_DIR not in listed_files:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Zip must contain directory named {QR_CODES_DIR}",
-            )
+#         # verify zip includes top level files & directories
+#         listed_files = zip.namelist()
 
-        if TASK_GEOJSON_DIR not in listed_files:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Zip must contain directory named {TASK_GEOJSON_DIR}",
-            )
+#         if QR_CODES_DIR not in listed_files:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail=f"Zip must contain directory named {QR_CODES_DIR}",
+#             )
 
-        outline_filename = f"{project_name_prefix}.geojson"
-        if outline_filename not in listed_files:
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    f"Zip must contain file named '{outline_filename}' "
-                    "that contains a FeatureCollection outlining the project"
-                ),
-            )
+#         if TASK_GEOJSON_DIR not in listed_files:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail=f"Zip must contain directory named {TASK_GEOJSON_DIR}",
+#             )
 
-        task_outlines_filename = f"{project_name_prefix}_polygons.geojson"
-        if task_outlines_filename not in listed_files:
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    f"Zip must contain file named '{task_outlines_filename}' "
-                    "that contains a FeatureCollection where each Feature "
-                    "outlines a task"
-                ),
-            )
+#         outline_filename = f"{project_name_prefix}.geojson"
+#         if outline_filename not in listed_files:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail=(
+#                     f"Zip must contain file named '{outline_filename}' "
+#                     "that contains a FeatureCollection outlining the project"
+#                 ),
+#             )
 
-        # verify project exists in db
-        db_project = await get_project_by_id(db, project_id)
-        if not db_project:
-            raise HTTPException(
-                status_code=428, detail=f"Project with id {project_id} does not exist"
-            )
+#         task_outlines_filename = f"{project_name_prefix}_polygons.geojson"
+#         if task_outlines_filename not in listed_files:
+#             raise HTTPException(
+#                 status_code=400,
+#                 detail=(
+#                     f"Zip must contain file named '{task_outlines_filename}' "
+#                     "that contains a FeatureCollection where each Feature "
+#                     "outlines a task"
+#                 ),
+#             )
 
-        # add prefixes
-        db_project.project_name_prefix = project_name_prefix
-        db_project.task_type_prefix = task_type_prefix
+#         # verify project exists in db
+#         db_project = await get_project_by_id(db, project_id)
+#         if not db_project:
+#             raise HTTPException(
+#                 status_code=428, detail=f"Project with id {project_id} does not exist"
+#             )
 
-        # generate outline from file and add to project
-        outline_shape = await get_outline_from_geojson_file_in_zip(
-            zip, outline_filename, f"Could not generate Shape from {outline_filename}"
-        )
-        await update_project_location_info(db_project, outline_shape.wkt)
+#         # add prefixes
+#         db_project.project_name_prefix = project_name_prefix
+#         db_project.task_type_prefix = task_type_prefix
 
-        # get all task outlines from file
-        project_tasks_feature_collection = await get_json_from_zip(
-            zip,
-            task_outlines_filename,
-            f"Could not generate FeatureCollection from {task_outlines_filename}",
-        )
+#         # generate outline from file and add to project
+#         outline_shape = await get_outline_from_geojson_file_in_zip(
+#             zip, outline_filename, f"Could not generate Shape from {outline_filename}"
+#         )
+#         await update_project_location_info(db_project, outline_shape.wkt)
 
-        # generate task for each feature
-        try:
-            task_count = 0
-            db_project.total_tasks = len(project_tasks_feature_collection["features"])
-            for feature in project_tasks_feature_collection["features"]:
-                task_name = feature["properties"]["task"]
+#         # get all task outlines from file
+#         project_tasks_feature_collection = await get_json_from_zip(
+#             zip,
+#             task_outlines_filename,
+#             f"Could not generate FeatureCollection from {task_outlines_filename}",
+#         )
 
-                # generate and save qr code in db
-                qr_filename = (
-                    f"{project_name_prefix}_{task_type_prefix}__{task_name}.png"
-                )
-                db_qr = await get_dbqrcode_from_file(
-                    zip,
-                    QR_CODES_DIR + qr_filename,
-                    (
-                        f"QRCode for task {task_name} does not exist. "
-                        f"File should be in {qr_filename}"
-                    ),
-                )
-                db.add(db_qr)
+#         # TODO move me if required
+#         async def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
+#             """Get qr code from database during import."""
+#             try:
+#                 with zip.open(qr_filename) as qr_file:
+#                     binary_qrcode = qr_file.read()
+#                     if binary_qrcode:
+#                         return db_models.DbQrCode(
+#                             filename=qr_filename,
+#                             image=binary_qrcode,
+#                         )
+#                     else:
+#                         raise HTTPException(
+#                             status_code=400, detail=f"{qr_filename} is an empty file"
+#                         ) from None
+#             except Exception as e:
+#                 log.exception(e)
+#                 raise HTTPException(
+#                     status_code=400, detail=f"{error_detail} ----- Error: {e}"
+#                 ) from e
 
-                # save outline
-                task_outline_shape = await get_shape_from_json_str(
-                    feature,
-                    f"Could not create task outline for {task_name} using {feature}",
-                )
+#         # generate task for each feature
+#         try:
+#             task_count = 0
+#             db_project.total_tasks = len(project_tasks_feature_collection["features"])
+#             for feature in project_tasks_feature_collection["features"]:
+#                 task_name = feature["properties"]["task"]
 
-                # extract task geojson
-                task_geojson_filename = (
-                    f"{project_name_prefix}_{task_type_prefix}__{task_name}.geojson"
-                )
-                task_geojson = await get_json_from_zip(
-                    zip,
-                    TASK_GEOJSON_DIR + task_geojson_filename,
-                    f"Geojson for task {task_name} does not exist",
-                )
+#                 # TODO remove qr code entry to db
+#                 # TODO replace with entry to tasks.odk_token
+#                 # generate and save qr code in db
+#                 db_qr = await get_dbqrcode_from_file(
+#                     zip,
+#                     QR_CODES_DIR + qr_filename,
+#                     (
+#                         f"QRCode for task {task_name} does not exist. "
+#                         f"File should be in {qr_filename}"
+#                     ),
+#                 )
+#                 db.add(db_qr)
 
-                # generate qr code id first
-                db.flush()
-                # save task in db
-                task = db_models.DbTask(
-                    project_id=project_id,
-                    project_task_index=feature["properties"]["fid"],
-                    project_task_name=task_name,
-                    qr_code=db_qr,
-                    qr_code_id=db_qr.id,
-                    outline=task_outline_shape.wkt,
-                    # geometry_geojson=json.dumps(task_geojson),
-                    initial_feature_count=len(task_geojson["features"]),
-                )
-                db.add(task)
+#                 # save outline
+#                 task_outline_shape = await get_shape_from_json_str(
+#                     feature,
+#                     f"Could not create task outline for {task_name} using {feature}",
+#                 )
 
-                # for error messages
-                task_count = task_count + 1
-            db_project.last_updated = timestamp()
+#                 # extract task geojson
+#                 task_geojson_filename = (
+#                     f"{project_name_prefix}_{task_type_prefix}__{task_name}.geojson"
+#                 )
+#                 task_geojson = await get_json_from_zip(
+#                     zip,
+#                     TASK_GEOJSON_DIR + task_geojson_filename,
+#                     f"Geojson for task {task_name} does not exist",
+#                 )
 
-            db.commit()
-            # should now include outline, geometry and tasks
-            db.refresh(db_project)
+#                 # generate qr code id first
+#                 db.flush()
+#                 # save task in db
+#                 task = db_models.DbTask(
+#                     project_id=project_id,
+#                     project_task_index=feature["properties"]["fid"],
+#                     project_task_name=task_name,
+#                     qr_code=db_qr,
+#                     qr_code_id=db_qr.id,
+#                     outline=task_outline_shape.wkt,
+#                     # geometry_geojson=json.dumps(task_geojson),
+#                     initial_feature_count=len(task_geojson["features"]),
+#                 )
+#                 db.add(task)
 
-            return db_project
+#                 # for error messages
+#                 task_count = task_count + 1
+#             db_project.last_updated = timestamp()
 
-        # Exception was raised by app logic and has an error message,
-        # just pass it along
-        except HTTPException as e:
-            log.error(e)
-            raise e from None
+#             db.commit()
+#             # should now include outline, geometry and tasks
+#             db.refresh(db_project)
 
-        # Unexpected exception
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=(
-                    f"{task_count} tasks were created before the "
-                    f"following error was thrown: {e}, on feature: {feature}"
-                ),
-            ) from e
+#             return db_project
+
+#         # Exception was raised by app logic and has an error message,
+#         # just pass it along
+#         except HTTPException as e:
+#             log.error(e)
+#             raise e from None
+
+#         # Unexpected exception
+#         except Exception as e:
+#             raise HTTPException(
+#                 status_code=500,
+#                 detail=(
+#                     f"{task_count} tasks were created before the "
+#                     f"following error was thrown: {e}, on feature: {feature}"
+#                 ),
+#             ) from e
 
 
 # ---------------------------
@@ -1150,40 +1184,42 @@ def generate_task_files(
     odk_id = project.odkid
     project_name = project.project_name_prefix
     category = project.xform_title
-    name = f"{project_name}_{category}_{task_id}"
+    appuser_name = f"{project_name}_{category}_{task_id}"
 
     # Create an app user for the task
-    project_log.info(f"Creating odkcentral app user for task {task_id}")
-    appuser = central_crud.create_odk_app_user(odk_id, name, odk_credentials)
+    project_log.info(
+        f"Creating odkcentral app user ({appuser_name}) "
+        f"for FMTM task ({task_id}) in FMTM project ({project_id})"
+    )
+    appuser = OdkAppUser(
+        odk_credentials.odk_central_url,
+        odk_credentials.odk_central_user,
+        odk_credentials.odk_central_password.get_secret_value(),
+    )
+    appuser_json = appuser.create(odk_id, appuser_name)
 
     # If app user could not be created, raise an exception.
-    if not appuser:
-        project_log.error("Couldn't create appuser for project")
+    if not appuser_json:
+        project_log.error(f"Couldn't create appuser {appuser_name} for project")
         return False
-
-    # prefix should be sent instead of name
-    project_log.info(f"Creating qr code for task {task_id}")
-    create_qr_sync = async_to_sync(create_qrcode)
-    qr_code = create_qr_sync(
-        db,
-        odk_id,
-        appuser.json()["token"],
-        project_name,
-        odk_credentials.odk_central_url,
-    )
+    if not (appuser_token := appuser_json.get("token")):
+        project_log.error(f"Couldn't get token for appuser {appuser_name}")
+        return False
 
     get_task_sync = async_to_sync(tasks_crud.get_task)
     task = get_task_sync(db, task_id)
-    task.qr_code_id = qr_code["qr_code_id"]
+    task.odk_token = encrypt_value(
+        f"{odk_credentials.odk_central_url}/key/{appuser_token}/projects/{odk_id}"
+    )
     db.commit()
     db.refresh(task)
 
     # This file will store xml contents of an xls form.
-    xform = f"/tmp/{name}.xml"
-    extracts = f"/tmp/{name}.geojson"  # This file will store osm extracts
+    xform = f"/tmp/{appuser_name}.xml"
+    extracts = f"/tmp/{appuser_name}.geojson"  # This file will store osm extracts
 
     # xform_id_format
-    xform_id = f"{name}".split("_")[2]
+    xform_id = f"{appuser_name}".split("_")[2]
 
     # Get the features for this task.
     # Postgis query to filter task inside this task outline and of this project
@@ -1249,23 +1285,8 @@ def generate_task_files(
     project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
     try:
-        # Pass odk credentials
-        if odk_credentials:
-            url = odk_credentials.odk_central_url
-            user = odk_credentials.odk_central_user
-            pw = odk_credentials.odk_central_password
-
-        else:
-            log.debug("ODKCentral connection variables not set in function")
-            log.debug("Attempting extraction from environment variables")
-            url = settings.ODK_CENTRAL_URL
-            user = settings.ODK_CENTRAL_USER
-            pw = settings.ODK_CENTRAL_PASSWD
-
-        odk_app = OdkAppUser(url, user, pw)
-
-        odk_app.updateRole(
-            projectId=odk_id, xform=xform_id, actorId=appuser.json()["id"]
+        appuser.updateRole(
+            projectId=odk_id, xform=xform_id, actorId=appuser_json.get("id")
         )
     except Exception as e:
         log.exception(e)
@@ -1484,39 +1505,6 @@ def generate_appuser_files(
             raise e
 
 
-async def create_qrcode(
-    db: Session,
-    odk_id: int,
-    token: str,
-    project_name: str,
-    odk_central_url: str = None,
-):
-    """Create a QR code for a task."""
-    # Make QR code for an app_user.
-    log.debug(f"Generating base64 encoded QR settings for token: {token}")
-    qrcode_data = await central_crud.encode_qrcode_json(
-        odk_id, token, project_name, odk_central_url
-    )
-
-    log.debug("Generating QR code from base64 settings")
-    qrcode = segno.make(qrcode_data, micro=False)
-
-    log.debug("Saving to buffer and decoding")
-    buffer = io.BytesIO()
-    qrcode.save(buffer, kind="png", scale=5)
-    qrcode_binary = buffer.getvalue()
-
-    log.debug(f"Writing QR code to database for token {token}")
-    qrdb = db_models.DbQrCode(image=qrcode_binary)
-    db.add(qrdb)
-    db.commit()
-    codes = table("qr_code", column("id"))
-    sql = select(sqlalchemy.func.count(codes.c.id))
-    result = db.execute(sql)
-    rows = result.fetchone()[0]
-    return {"data": qrcode, "id": rows + 1, "qr_code_id": qrdb.id}
-
-
 async def get_project_geometry(db: Session, project_id: int):
     """Retrieves the geometry of a project.
 
@@ -1651,27 +1639,6 @@ async def get_shape_from_json_str(feature: str, error_detail: str):
         raise HTTPException(
             status_code=400,
             detail=f"{error_detail} ----- Error: {e} ---- Json: {feature}",
-        ) from e
-
-
-async def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
-    """Get qr code from database during import."""
-    try:
-        with zip.open(qr_filename) as qr_file:
-            binary_qrcode = qr_file.read()
-            if binary_qrcode:
-                return db_models.DbQrCode(
-                    filename=qr_filename,
-                    image=binary_qrcode,
-                )
-            else:
-                raise HTTPException(
-                    status_code=400, detail=f"{qr_filename} is an empty file"
-                ) from None
-    except Exception as e:
-        log.exception(e)
-        raise HTTPException(
-            status_code=400, detail=f"{error_detail} ----- Error: {e}"
         ) from e
 
 

@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:d73a7c181c5594d5f391a5c715559194fb5c6c4a923e5a4d15e3c1a57b073e27"
+content_hash = "sha256:73bb79db4e82351bb07d7b0faf51b90fc523e0d3f316dca54e14dffee0bc077e"
 
 [[package]]
 name = "annotated-types"
@@ -416,6 +416,49 @@ files = [
 ]
 
 [[package]]
+name = "cryptography"
+version = "42.0.1"
+requires_python = ">=3.7"
+summary = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
+dependencies = [
+    "cffi>=1.12; platform_python_implementation != \"PyPy\"",
+]
+files = [
+    {file = "cryptography-42.0.1-cp37-abi3-macosx_10_12_universal2.whl", hash = "sha256:265bdc693570b895eb641410b8fc9e8ddbce723a669236162b9d9cfb70bd8d77"},
+    {file = "cryptography-42.0.1-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:160fa08dfa6dca9cb8ad9bd84e080c0db6414ba5ad9a7470bc60fb154f60111e"},
+    {file = "cryptography-42.0.1-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:727387886c9c8de927c360a396c5edcb9340d9e960cda145fca75bdafdabd24c"},
+    {file = "cryptography-42.0.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4d84673c012aa698555d4710dcfe5f8a0ad76ea9dde8ef803128cc669640a2e0"},
+    {file = "cryptography-42.0.1-cp37-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:e6edc3a568667daf7d349d7e820783426ee4f1c0feab86c29bd1d6fe2755e009"},
+    {file = "cryptography-42.0.1-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:d50718dd574a49d3ef3f7ef7ece66ef281b527951eb2267ce570425459f6a404"},
+    {file = "cryptography-42.0.1-cp37-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:9544492e8024f29919eac2117edd8c950165e74eb551a22c53f6fdf6ba5f4cb8"},
+    {file = "cryptography-42.0.1-cp37-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:ab6b302d51fbb1dd339abc6f139a480de14d49d50f65fdc7dff782aa8631d035"},
+    {file = "cryptography-42.0.1-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:2fe16624637d6e3e765530bc55caa786ff2cbca67371d306e5d0a72e7c3d0407"},
+    {file = "cryptography-42.0.1-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:ed1b2130f5456a09a134cc505a17fc2830a1a48ed53efd37dcc904a23d7b82fa"},
+    {file = "cryptography-42.0.1-cp37-abi3-win32.whl", hash = "sha256:e5edf189431b4d51f5c6fb4a95084a75cef6b4646c934eb6e32304fc720e1453"},
+    {file = "cryptography-42.0.1-cp37-abi3-win_amd64.whl", hash = "sha256:6bfd823b336fdcd8e06285ae8883d3d2624d3bdef312a0e2ef905f332f8e9302"},
+    {file = "cryptography-42.0.1-cp39-abi3-macosx_10_12_universal2.whl", hash = "sha256:351db02c1938c8e6b1fee8a78d6b15c5ccceca7a36b5ce48390479143da3b411"},
+    {file = "cryptography-42.0.1-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:430100abed6d3652208ae1dd410c8396213baee2e01a003a4449357db7dc9e14"},
+    {file = "cryptography-42.0.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2dff7a32880a51321f5de7869ac9dde6b1fca00fc1fef89d60e93f215468e824"},
+    {file = "cryptography-42.0.1-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:b512f33c6ab195852595187af5440d01bb5f8dd57cb7a91e1e009a17f1b7ebca"},
+    {file = "cryptography-42.0.1-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:95d900d19a370ae36087cc728e6e7be9c964ffd8cbcb517fd1efb9c9284a6abc"},
+    {file = "cryptography-42.0.1-cp39-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:6ac8924085ed8287545cba89dc472fc224c10cc634cdf2c3e2866fe868108e77"},
+    {file = "cryptography-42.0.1-cp39-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:cb2861a9364fa27d24832c718150fdbf9ce6781d7dc246a516435f57cfa31fe7"},
+    {file = "cryptography-42.0.1-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:25ec6e9e81de5d39f111a4114193dbd39167cc4bbd31c30471cebedc2a92c323"},
+    {file = "cryptography-42.0.1-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:9d61fcdf37647765086030d81872488e4cb3fafe1d2dda1d487875c3709c0a49"},
+    {file = "cryptography-42.0.1-cp39-abi3-win32.whl", hash = "sha256:16b9260d04a0bfc8952b00335ff54f471309d3eb9d7e8dbfe9b0bd9e26e67881"},
+    {file = "cryptography-42.0.1-cp39-abi3-win_amd64.whl", hash = "sha256:7911586fc69d06cd0ab3f874a169433db1bc2f0e40988661408ac06c4527a986"},
+    {file = "cryptography-42.0.1-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:d3594947d2507d4ef7a180a7f49a6db41f75fb874c2fd0e94f36b89bfd678bf2"},
+    {file = "cryptography-42.0.1-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:8d7efb6bf427d2add2f40b6e1e8e476c17508fa8907234775214b153e69c2e11"},
+    {file = "cryptography-42.0.1-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:126e0ba3cc754b200a2fb88f67d66de0d9b9e94070c5bc548318c8dab6383cb6"},
+    {file = "cryptography-42.0.1-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:802d6f83233cf9696b59b09eb067e6b4d5ae40942feeb8e13b213c8fad47f1aa"},
+    {file = "cryptography-42.0.1-pp39-pypy39_pp73-macosx_10_12_x86_64.whl", hash = "sha256:0b7cacc142260ada944de070ce810c3e2a438963ee3deb45aa26fd2cee94c9a4"},
+    {file = "cryptography-42.0.1-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:32ea63ceeae870f1a62e87f9727359174089f7b4b01e4999750827bf10e15d60"},
+    {file = "cryptography-42.0.1-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:d3902c779a92151f134f68e555dd0b17c658e13429f270d8a847399b99235a3f"},
+    {file = "cryptography-42.0.1-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:50aecd93676bcca78379604ed664c45da82bc1241ffb6f97f6b7392ed5bc6f04"},
+    {file = "cryptography-42.0.1.tar.gz", hash = "sha256:fd33f53809bb363cf126bebe7a99d97735988d9b0131a2be59fbf83e1259a5b7"},
+]
+
+[[package]]
 name = "debugpy"
 version = "1.8.0"
 requires_python = ">=3.8"
@@ -568,7 +611,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.0.0rc0"
+version = "1.0.0"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
@@ -579,8 +622,8 @@ dependencies = [
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.0.0rc0.tar.gz", hash = "sha256:56efe64a1076ef8188afdd423f5895c66602309ee894bf49599bd3ca7e5506ac"},
-    {file = "fmtm_splitter-1.0.0rc0-py3-none-any.whl", hash = "sha256:9647a85e99308141df036546380e273ccf9e4317e21298d0131f988c6b61d622"},
+    {file = "fmtm-splitter-1.0.0.tar.gz", hash = "sha256:e6c823b9341f0f58413ee892c2ebb7b91377cddcafb4e6a9edbb4382aee1dd2b"},
+    {file = "fmtm_splitter-1.0.0-py3-none-any.whl", hash = "sha256:cb6b391b32caddcca489aa24bdd1e2bb9c4245f345c0b3d42fdd517694ac9bfc"},
 ]
 
 [[package]]
@@ -1298,7 +1341,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.4.1"
+version = "0.4.2"
 requires_python = ">=3.10"
 summary = "Processing field data from OpenDataKit to OpenStreetMap format."
 dependencies = [
@@ -1313,10 +1356,8 @@ dependencies = [
     "pandas>=1.5.0",
     "pmtiles>=3.2.0",
     "progress>=1.6",
-    "psycopg2>=2.9.1",
     "py-cpuinfo>=9.0.0",
     "pySmartDL>=1.3.4",
-    "pymbtiles>=0.5.0",
     "requests>=2.26.0",
     "segno>=1.5.2",
     "shapely>=1.8.5",
@@ -1324,8 +1365,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.4.1.tar.gz", hash = "sha256:e3f3381b7024d816ffeb15082083accfbdbff573fa1a485e9976f68b2356f1b8"},
-    {file = "osm_fieldwork-0.4.1-py3-none-any.whl", hash = "sha256:d0328fb1ea03649a052c96a5cd253218d96909ba8353f6c7fd92cbbfe1566924"},
+    {file = "osm-fieldwork-0.4.2.tar.gz", hash = "sha256:9ae6cb4d90b5dd8a10045a5a3bd512a073c814ad3b16fb245edd023312aed17d"},
+    {file = "osm_fieldwork-0.4.2-py3-none-any.whl", hash = "sha256:4e7a596c50bfaef7f91b002d44ed5e3d1b377e50bf0a2a509d915a60d7ddcab1"},
 ]
 
 [[package]]
@@ -1790,15 +1831,6 @@ files = [
     {file = "pyinstrument-4.6.1-cp312-cp312-win32.whl", hash = "sha256:1d0b76683df2ad5c40eff73607dc5c13828c92fbca36aff1ddf869a3c5a55fa6"},
     {file = "pyinstrument-4.6.1-cp312-cp312-win_amd64.whl", hash = "sha256:c4b7af1d9d6a523cfbfedebcb69202242d5bd0cb89c4e094cc73d5d6e38279bd"},
     {file = "pyinstrument-4.6.1.tar.gz", hash = "sha256:f4731b27121350f5a983d358d2272fe3df2f538aed058f57217eef7801a89288"},
-]
-
-[[package]]
-name = "pymbtiles"
-version = "0.5.0"
-summary = "MapBox Mbtiles Utilities"
-files = [
-    {file = "pymbtiles-0.5.0-py3-none-any.whl", hash = "sha256:91c1c2fa3e25f581d563a60e705105f7277b0dbb9ff727c8c28cb66f0f891c84"},
-    {file = "pymbtiles-0.5.0.tar.gz", hash = "sha256:b4eb2c470d2eb3d94627cdc8a8ae448b8899af2dd696f9a5eca706ddf8293b58"},
 ]
 
 [[package]]

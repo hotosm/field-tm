@@ -389,7 +389,7 @@ async def submission_table(
     pagination = await project_crud.get_pagination(page, count, results_per_page, count)
     response = submission_schemas.PaginatedSubmissions(
         results=data,
-        pagination=submission_schemas.PaginationInfo(**pagination.dict()),
+        pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
     return response
 
@@ -424,6 +424,6 @@ async def task_submissions(
     pagination = await project_crud.get_pagination(page, count, limit, count)
     response = submission_schemas.PaginatedSubmissions(
         results=data,
-        pagination=submission_schemas.PaginationInfo(**pagination.dict()),
+        pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
     return response

@@ -11,22 +11,20 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
   const dispatch = CoreModules.useAppDispatch();
   const [open, setOpen] = useState(false);
   const params = CoreModules.useParams();
-  const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectName = CoreModules.useAppSelector((state) => state.project.projectInfo.title);
+  const projectTaskData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const currentProjectId = environment.decode(params.id);
-  const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
+  const projectIndex = projectTaskData.findIndex((project) => project.id == currentProjectId);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
-  const currentStatus = {
-    ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
+  const selectedTask = {
+    ...projectTaskData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
       return indTask.id == task;
     })?.[0],
   };
   const checkIfTaskAssignedOrNot =
-    currentStatus?.locked_by_username === token?.username || currentStatus?.locked_by_username === null;
+    selectedTask?.locked_by_username === token?.username || selectedTask?.locked_by_username === null;
 
-  const { loading, qrcode } = ProjectFilesById(
-    `${import.meta.env.VITE_API_URL}/tasks/task-list?project_id=${environment.decode(params.id)}`,
-    task,
-  );
+  const { qrLoading, qrcode } = ProjectFilesById(selectedTask.odk_token, projectName, token?.username, task);
 
   const socialStyles = {
     copyContainer: {
@@ -66,7 +64,7 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                       </CoreModules.SkeletonTheme>
                     </CoreModules.Stack>
                   ) : (
-                    <img id="qrcodeImg" src={`data:image/png;base64,${qrcode}`} alt="qrcode" />
+                    <img id="qrcodeImg" src={qrcode} alt="qrcode" />
                   )}
                 </CoreModules.Stack>
 
@@ -74,9 +72,8 @@ const TasksComponent = ({ type, task, defaultTheme }) => {
                   <CoreModules.Stack width={40} height={40} borderRadius={55} boxShadow={2} justifyContent={'center'}>
                     <CoreModules.IconButton
                       onClick={() => {
-                        const linkSource = `data:image/png;base64,${qrcode}`;
                         const downloadLink = document.createElement('a');
-                        downloadLink.href = linkSource;
+                        downloadLink.href = qrcode;
                         downloadLink.download = `Task_${task}`;
                         downloadLink.click();
                       }}

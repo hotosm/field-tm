@@ -17,9 +17,11 @@
 #
 """Config file for Pydantic and FastAPI, using environment variables."""
 
+import base64
 from functools import lru_cache
 from typing import Any, Optional, Union
 
+from cryptography.fernet import Fernet
 from pydantic import PostgresDsn, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -30,6 +32,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "FMTM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    ENCRYPTION_KEY: str = ""
 
     FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = "7050"
@@ -159,6 +162,27 @@ def get_settings():
     if _settings.DEBUG:
         print(f"Loaded settings: {_settings.model_dump()}")
     return _settings
+
+
+@lru_cache
+def get_cipher_suite():
+    """Cache cypher suite."""
+    return Fernet(settings.ENCRYPTION_KEY)
+
+
+def encrypt_value(password: str) -> str:
+    """Encrypt value before going to the DB."""
+    cipher_suite = get_cipher_suite()
+    encrypted_password = cipher_suite.encrypt(password.encode("utf-8"))
+    return base64.b64encode(encrypted_password).decode("utf-8")
+
+
+def decrypt_value(db_password: str) -> str:
+    """Decrypt the database value."""
+    cipher_suite = get_cipher_suite()
+    encrypted_password = base64.b64decode(db_password.encode("utf-8"))
+    decrypted_password = cipher_suite.decrypt(encrypted_password)
+    return decrypted_password.decode("utf-8")
 
 
 settings = get_settings()

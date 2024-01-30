@@ -21,12 +21,13 @@ export const ProjectById = (existingProjectList, projectId) => {
           return {
             id: data.id,
             project_task_name: data.project_task_name,
-            task_status: task_priority_str[data.task_status],
             outline_geojson: data.outline_geojson,
             outline_centroid: data.outline_centroid,
-            task_history: data.task_history,
+            task_status: task_priority_str[data.task_status],
             locked_by_uid: data.locked_by_uid,
             locked_by_username: data.locked_by_username,
+            task_history: data.task_history,
+            odk_token: data.odk_token,
           };
         });
         // added centroid from another api to projecttaskboundries

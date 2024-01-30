@@ -17,7 +17,6 @@
 #
 """Logic for FMTM tasks."""
 
-import base64
 from datetime import datetime, timedelta
 from typing import List, Optional
 
@@ -92,7 +91,7 @@ async def get_tasks(
     return db_tasks
 
 
-async def get_task(db: Session, task_id: int):
+async def get_task(db: Session, task_id: int) -> db_models.DbTask:
     """Get details for a specific task ID."""
     log.debug(f"Getting task with ID '{task_id}' from database")
     return db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
@@ -222,24 +221,6 @@ async def create_task_history_for_status_change(
 # TODO: write tests for these
 
 
-async def get_qr_codes_for_task(
-    db: Session,
-    task_id: int,
-):
-    """Get the ODK Collect QR code for a task area."""
-    task = await get_task(db=db, task_id=task_id)
-    if task:
-        if task.qr_code:
-            log.debug(f"QR code found for task ID {task.id}. Converting to base64")
-            qr_code = base64.b64encode(task.qr_code.image)
-        else:
-            log.debug(f"QR code not found for task ID {task.id}.")
-            qr_code = None
-        return {"id": task_id, "qr_code": qr_code}
-    else:
-        raise HTTPException(status_code=400, detail="Task does not exist")
-
-
 async def update_task_files(
     db: Session,
     project_id: int,
@@ -335,7 +316,7 @@ async def edit_task_boundary(db: Session, task_id: int, boundary: str):
 
 
 async def update_task_history(
-    tasks: List[tasks_schemas.TaskBase], db: Session = Depends(database.get_db)
+    tasks: List[tasks_schemas.Task], db: Session = Depends(database.get_db)
 ):
     """Update task history with username and user profile image."""
 

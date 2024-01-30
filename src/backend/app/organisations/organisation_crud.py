@@ -106,7 +106,7 @@ async def create_organisation(
 
     try:
         # Create new organisation without logo set
-        db_organisation = db_models.DbOrganisation(**org_model.dict())
+        db_organisation = db_models.DbOrganisation(**org_model.model_dump())
 
         db.add(db_organisation)
         db.commit()
