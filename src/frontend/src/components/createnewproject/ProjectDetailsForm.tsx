@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
 import useForm from '@/hooks/useForm';
-import CreateProjectValidation from '@/components/createproject/validation//CreateProjectValidation';
+import CreateProjectValidation from '@/components/createnewproject/validation/CreateProjectValidation';
 import Button from '@/components/common/Button';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import AssetModules from '@/shared/AssetModules.js';

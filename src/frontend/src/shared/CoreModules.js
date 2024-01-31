@@ -48,6 +48,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -151,4 +152,5 @@ export default {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
 };
