@@ -300,7 +300,7 @@ const Home = () => {
             )}
             <p
               className="fmtm-text-sm fmtm-text-primaryRed hover:fmtm-cursor-pointer hover:fmtm-text-red-700"
-              onClick={() => navigate(`/projectInfo/${encodedId}`)}
+              onClick={() => navigate(`/project-submissions/${encodedId}`)}
             >
               View Submissions <AssetModules.LaunchIcon style={{ fontSize: '14px' }} />
             </p>
