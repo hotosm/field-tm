@@ -662,19 +662,28 @@ async def get_data_extract_url(
         log.error(f"Failed to get extract from raw data api: {error_dict}")
         return error_dict
 
-    task_id = result.json()["task_id"]
+    task_id = result.json().get("task_id")
 
     # Check status of task (PENDING, or SUCCESS)
     task_url = f"{base_url}/tasks/status/{task_id}"
     while True:
         result = requests.get(task_url, headers=headers)
-        if result.json()["status"] == "PENDING":
+        if result.json().get("status") == "PENDING":
             # Wait 2 seconds before polling again
             time.sleep(2)
-        elif result.json()["status"] == "SUCCESS":
+        elif result.json().get("status") == "SUCCESS":
             break
 
-    fgb_url = result.json()["result"]["download_url"]
+    fgb_url = result.json().get("result", {}).get("download_url", None)
+
+    if not fgb_url:
+        log.error("Could not get download URL for data extract. Did the API change?")
+        log.error(f"To debug: {task_url}")
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Could not get download URL for data extract. Did the API change?",
+        )
+
     return fgb_url
 
 
