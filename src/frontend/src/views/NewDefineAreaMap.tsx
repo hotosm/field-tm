@@ -12,9 +12,10 @@ type NewDefineAreaMapProps = {
   uploadedOrDrawnGeojsonFile: GeoJSONFeatureTypes;
   buildingExtractedGeojson?: GeoJSONFeatureTypes;
   lineExtractedGeojson?: GeoJSONFeatureTypes;
-  onDraw?: (geojson: any, area: number) => void;
+  onDraw?: ((geojson: any, area: number) => void) | null;
   onModify?: ((geojson: any, area?: number) => void) | null;
   hasEditUndo?: boolean;
+  getAOIArea?: ((area?: number) => void) | null;
 };
 const NewDefineAreaMap = ({
   drawToggle,
@@ -25,6 +26,7 @@ const NewDefineAreaMap = ({
   onDraw,
   onModify,
   hasEditUndo,
+  getAOIArea,
 }: NewDefineAreaMapProps) => {
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
@@ -71,6 +73,7 @@ const NewDefineAreaMap = ({
             onDraw={onDraw}
             onModify={onModify}
             zoomToLayer
+            getAOIArea={getAOIArea}
           />
         )}
 
