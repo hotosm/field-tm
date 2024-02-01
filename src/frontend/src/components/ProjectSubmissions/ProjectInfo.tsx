@@ -55,7 +55,13 @@ const ProjectInfo = () => {
               {projectDashboardLoading ? (
                 <CoreModules.Skeleton className="!fmtm-w-[100px]" />
               ) : (
-                <span>{projectDashboardDetail?.created}</span>
+                <span>
+                  {projectDashboardDetail?.created
+                    ? `${projectDashboardDetail?.created?.split('T')[0]} ${projectDashboardDetail?.created
+                        ?.split('T')[1]
+                        ?.split('.')[0]}`
+                    : '-'}
+                </span>
               )}
             </p>
             <p className="fmtm-text-sm fmtm-text-[#706E6E] fmtm-font-archivo">
