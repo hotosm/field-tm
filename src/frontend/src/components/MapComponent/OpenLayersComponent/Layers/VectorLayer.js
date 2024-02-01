@@ -50,6 +50,7 @@ const VectorLayer = ({
   getTaskStatusStyle,
   layerProperties,
   rotation,
+  getAOIArea,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
   useEffect(() => () => map && vectorLayer && map.removeLayer(vectorLayer), [map, vectorLayer]);
@@ -135,6 +136,7 @@ const VectorLayer = ({
     });
     map.addInteraction(draw);
     return () => {
+      map.removeInteraction(draw);
       // map.removeInteraction(snap);
     };
   }, [map, vectorLayer, onDraw]);
@@ -298,6 +300,13 @@ const VectorLayer = ({
       setStyle?.getImage().setRotation(rotation);
     }
   }, [rotation, map, geojson]);
+
+  useEffect(() => {
+    if (!vectorLayer || !getAOIArea) return;
+    const geometry = vectorLayer.getSource().getFeatures()?.[0].getGeometry();
+    const area = formatArea(geometry);
+    getAOIArea(area);
+  }, [vectorLayer, getAOIArea]);
 
   // ROTATE MAP ACCORDING TO ORIENTATION
   // useEffect(() => {
