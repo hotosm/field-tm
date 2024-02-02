@@ -72,7 +72,7 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
         )
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -151,7 +151,7 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
     form_category = project_info.xform_title
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -235,7 +235,7 @@ def gather_all_submission_csvs(db, project_id):
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -330,7 +330,7 @@ def update_submission_in_s3(
         project = get_project_sync(db, project_id)
 
         # Gather metadata
-        odk_credentials = project_schemas.ODKCentral(
+        odk_credentials = project_schemas.ODKCentralDecrypted(
             odk_central_url=project.odk_central_url,
             odk_central_user=project.odk_central_user,
             odk_central_password=project.odk_central_password,
@@ -427,7 +427,7 @@ def get_all_submissions_json(db: Session, project_id):
     project_info = get_project_sync(db, project_id)
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -457,7 +457,7 @@ def get_all_submissions_json(db: Session, project_id):
 #     project_tasks = project_info.tasks
 
 #     # ODK Credentials
-#     odk_credentials = project_schemas.ODKCentral(
+#     odk_credentials = project_schemas.ODKCentralDecrypted(
 #         odk_central_url=project_info.odk_central_url,
 #         odk_central_user=project_info.odk_central_user,
 #         odk_central_password=project_info.odk_central_password,
@@ -499,7 +499,7 @@ async def download_submission(
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -609,7 +609,7 @@ async def get_submission_points(db: Session, project_id: int, task_id: int = Non
     form_category = project_info.xform_title
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -674,7 +674,7 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project_info.odk_central_url,
         odk_central_user=project_info.odk_central_user,
         odk_central_password=project_info.odk_central_password,
@@ -818,7 +818,7 @@ async def get_submission_by_task(
     Returns:
         Tuple: A tuple containing the list of submissions and the count.
     """
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project.odk_central_url,
         odk_central_user=project.odk_central_user,
         odk_central_password=project.odk_central_password,

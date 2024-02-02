@@ -45,7 +45,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
   const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
-  const userDetails: any = CoreModules.useAppSelector((state) => state.login.loginToken);
 
   const generateQrSuccess: any = CoreModules.useAppSelector((state) => state.createproject.generateQrSuccess);
   const projectDetailsResponse = CoreModules.useAppSelector((state) => state.createproject.projectDetailsResponse);
@@ -109,15 +108,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         short_description: projectDetails.short_description,
         description: projectDetails.description,
       },
-      author: {
-        username: userDetails.username,
-        id: userDetails.id,
-      },
-      odk_central: {
-        odk_central_url: projectDetails.odk_central_url,
-        odk_central_user: projectDetails.odk_central_user,
-        odk_central_password: projectDetails.odk_central_password,
-      },
+      odk_central_url: projectDetails.odk_central_url,
+      odk_central_user: projectDetails.odk_central_user,
+      odk_central_password: projectDetails.odk_central_password,
       // dont send xform_title if upload custom form is selected
       xform_title: projectDetails.formCategorySelection,
       task_split_type: splitTasksSelection,

@@ -20,7 +20,7 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
-from geojson_pydantic import Feature
+from geojson_pydantic import Feature as GeojsonFeature
 from loguru import logger as log
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
 from pydantic.functional_serializers import field_serializer
@@ -71,8 +71,8 @@ class Task(BaseModel):
     project_id: int
     project_task_index: int
     project_task_name: str
-    outline_geojson: Optional[Feature] = None
-    outline_centroid: Optional[Feature] = None
+    outline_geojson: Optional[GeojsonFeature] = None
+    outline_centroid: Optional[GeojsonFeature] = None
     initial_feature_count: Optional[int] = None
     task_status: TaskStatus
     locked_by_uid: Optional[int] = None

@@ -29,14 +29,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 
+from app.auth.osm import AuthUser
 from app.central import central_crud
 from app.config import settings
 from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbUser
 from app.main import get_application
 from app.projects import project_crud
-from app.projects.project_schemas import ODKCentral, ProjectInfo, ProjectUpload
-from app.users.user_schemas import User
+from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
 
 engine = create_engine(settings.FMTM_DB_URL.unicode_string())
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -102,6 +102,7 @@ def organisation(db):
         description="test org",
         url="https://test.org",
         logo="none",
+        approved=True,
     )
     db.add(db_org)
     db.commit()
@@ -112,32 +113,30 @@ def organisation(db):
 async def project(db, user, organisation):
     """A test project, using the test user and org."""
     project_metadata = ProjectUpload(
-        author=User(username=user.username, id=user.id),
         project_info=ProjectInfo(
             name="test project",
             short_description="test",
             description="test",
         ),
         xform_title="buildings",
-        odk_central=ODKCentral(
-            odk_central_url=os.getenv("ODK_CENTRAL_URL"),
-            odk_central_user=os.getenv("ODK_CENTRAL_USER"),
-            odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
-        ),
+        odk_central_url=os.getenv("ODK_CENTRAL_URL"),
+        odk_central_user=os.getenv("ODK_CENTRAL_USER"),
+        odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
         hashtags=["hot-fmtm"],
         organisation_id=organisation.id,
     )
 
-    # Create ODK Central Project
-    if project_metadata.odk_central.odk_central_url.endswith("/"):
-        # Remove trailing slash
-        project_metadata.odk_central.odk_central_url = (
-            project_metadata.odk_central.odk_central_url[:-1]
-        )
+    odk_creds_decrypted = ODKCentralDecrypted(
+        odk_central_url=project_metadata.odk_central_url,
+        odk_central_user=project_metadata.odk_central_user,
+        odk_central_password=project_metadata.odk_central_password,
+    )
 
+    # Create ODK Central Project
     try:
         odkproject = central_crud.create_odk_project(
-            project_metadata.project_info.name, project_metadata.odk_central
+            project_metadata.project_info.name,
+            odk_creds_decrypted,
         )
         log.debug(f"ODK project returned: {odkproject}")
         assert odkproject is not None
@@ -148,7 +147,10 @@ async def project(db, user, organisation):
     # Create FMTM Project
     try:
         new_project = await project_crud.create_project_with_project_info(
-            db, project_metadata, odkproject["id"]
+            db,
+            project_metadata,
+            odkproject["id"],
+            AuthUser(username=user.username, id=user.id),
         )
         log.debug(f"Project returned: {new_project.__dict__}")
         assert new_project is not None

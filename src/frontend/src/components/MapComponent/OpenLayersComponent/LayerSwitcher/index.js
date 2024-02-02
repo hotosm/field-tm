@@ -164,7 +164,7 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
     if (
       location.pathname.includes('project_details') ||
       location.pathname.includes('upload-area') ||
-      location.pathname.includes('select-form') ||
+      location.pathname.includes('select-category') ||
       location.pathname.includes('data-extract') ||
       location.pathname.includes('split-tasks')
     ) {

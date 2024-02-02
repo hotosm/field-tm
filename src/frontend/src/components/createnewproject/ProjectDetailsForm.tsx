@@ -51,27 +51,12 @@ const ProjectDetailsForm = ({ flag }) => {
     };
   }, []);
 
-  const hashtagPrefix = '#FMTM ';
-
   // Checks if hashtag value starts with hotosm-fmtm'
   const handleHashtagOnChange = (e) => {
     let enteredText = e.target.value;
-    if (!enteredText.startsWith(hashtagPrefix)) {
-      handleCustomChange('hashtags', hashtagPrefix);
-      return;
-    }
     handleCustomChange('hashtags', enteredText);
   };
 
-  // Doesn't let the user to press 'Backspace' or 'Delete' if input value is 'hotosm-fmtm '
-  const handleHashtagKeyPress = (e) => {
-    if (
-      ((e.key === 'Backspace' || e.key === 'Delete') && values.hashtags === hashtagPrefix) ||
-      (e.ctrlKey && e.key === 'Backspace')
-    ) {
-      e.preventDefault();
-    }
-  };
   const handleInputChanges = (e) => {
     handleChange(e);
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
@@ -164,9 +149,6 @@ const ProjectDetailsForm = ({ flag }) => {
                 value={values?.hashtags}
                 onChange={(e) => {
                   handleHashtagOnChange(e);
-                }}
-                onKeyDown={(e) => {
-                  handleHashtagKeyPress(e);
                 }}
                 fieldType="text"
                 required

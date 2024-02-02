@@ -211,7 +211,7 @@ async def get_submission(
             return {"error": "No such project!"}
 
         # ODK Credentials
-        odk_credentials = project_schemas.ODKCentral(
+        odk_credentials = project_schemas.ODKCentralDecrypted(
             odk_central_url=first.odk_central_url,
             odk_central_user=first.odk_central_user,
             odk_central_password=first.odk_central_password,

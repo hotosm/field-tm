@@ -19,11 +19,16 @@
 
 import base64
 from functools import lru_cache
-from typing import Any, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from cryptography.fernet import Fernet
-from pydantic import PostgresDsn, ValidationInfo, field_validator
+from pydantic import BeforeValidator, TypeAdapter, ValidationInfo, field_validator
+from pydantic.networks import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+HttpUrlStr = Annotated[
+    str, BeforeValidator(lambda value: str(TypeAdapter(HttpUrl).validate_python(value)))
+]
 
 
 class Settings(BaseSettings):
@@ -100,14 +105,14 @@ class Settings(BaseSettings):
         )
         return pg_url
 
-    ODK_CENTRAL_URL: Optional[str] = ""
+    ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
     ODK_CENTRAL_PASSWD: Optional[str] = ""
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
     OSM_SECRET_KEY: str
-    OSM_URL: str = "https://www.openstreetmap.org"
+    OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
     OSM_SCOPE: str = "read_prefs"
     OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth/"
 
@@ -147,7 +152,7 @@ class Settings(BaseSettings):
                 return f"http://s3.{fmtm_domain}:{dev_port}"
             return f"https://s3.{fmtm_domain}"
 
-    UNDERPASS_API_URL: str = "https://api-prod.raw-data.hotosm.org/v1/"
+    UNDERPASS_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1/"
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(
