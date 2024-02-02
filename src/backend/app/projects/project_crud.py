@@ -1218,7 +1218,7 @@ def generate_task_files(
     get_task_sync = async_to_sync(tasks_crud.get_task)
     task = get_task_sync(db, task_id)
     task.odk_token = encrypt_value(
-        f"{odk_credentials.odk_central_url}/key/{appuser_token}/projects/{odk_id}"
+        f"{odk_credentials.odk_central_url}/v1/key/{appuser_token}/projects/{odk_id}"
     )
     db.commit()
     db.refresh(task)
