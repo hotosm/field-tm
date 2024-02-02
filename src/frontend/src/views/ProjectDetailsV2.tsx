@@ -369,6 +369,7 @@ const Home = () => {
               btnText="VIEW INFOGRAPHICS"
               btnType="other"
               className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md fmtm-my-2"
+              onClick={() => navigate(`/project-submissions/${encodedId}`)}
             />
             <div className="fmtm-relative" ref={divRef}>
               <div onClick={() => handleToggle()}>
