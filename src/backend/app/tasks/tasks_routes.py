@@ -162,7 +162,7 @@ async def task_features_count(
     project = await project_crud.get_project(db, project_id)
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project.odk_central_url,
         odk_central_user=project.odk_central_user,
         odk_central_password=project.odk_central_password,

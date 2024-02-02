@@ -28,12 +28,3 @@ export interface GetOrganisationDataModel {
   logo: string;
   url: string;
 }
-export interface PostOrganisationDataModel {
-  name: string;
-  slug: string;
-  description: string;
-  type: number;
-  id: number;
-  logo: string;
-  url: string;
-}

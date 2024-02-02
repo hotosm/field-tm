@@ -41,7 +41,7 @@ const CreateNewProject = () => {
       case '/upload-area':
         dispatch(CommonActions.SetCurrentStepFormStep({ flag: 'create_project', step: 2 }));
         break;
-      case '/select-form':
+      case '/select-category':
         dispatch(CommonActions.SetCurrentStepFormStep({ flag: 'create_project', step: 3 }));
         break;
       case '/data-extract':
@@ -70,7 +70,7 @@ const CreateNewProject = () => {
             setCustomPolygonUpload={setCustomPolygonUpload}
           />
         );
-      case '/select-form':
+      case '/select-category':
         return (
           <SelectForm
             flag="create_project"

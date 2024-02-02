@@ -98,7 +98,7 @@ async def create_organisation(
     if await get_organisation_by_name(db, org_name=org_model.name):
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail=f"Organisation already exists with the name {org_model.name}",
+            detail=f"Organisation already exists with the name ({org_model.name})",
         )
 
     # Required to check if exists on error

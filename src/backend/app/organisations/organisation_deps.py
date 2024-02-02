@@ -23,13 +23,12 @@ from typing import Union
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from loguru import logger as log
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.db_models import DbOrganisation, DbProject
 from app.models.enums import HTTPStatus
-from app.projects import project_deps
+from app.projects import project_deps, project_schemas
 
 
 async def get_organisation_by_name(
@@ -45,16 +44,20 @@ async def get_organisation_by_name(
     Returns:
         DbOrganisation: organisation with the given id
     """
-    org_obj = (
-        db.query(DbOrganisation)
-        .filter(func.lower(DbOrganisation.name).like(func.lower(f"%{org_name}%")))
-        .first()
-    )
+    # # For getting org with LIKE match
+    # org_obj = (
+    #     db.query(DbOrganisation)
+    #     .filter(func.lower(DbOrganisation.name).like(func.lower(f"%{org_name}%")))
+    #     .first()
+    # )
+    org_obj = db.query(DbOrganisation).filter_by(name=org_name).first()
+
     if org_obj and check_approved and org_obj.approved is False:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
+            status_code=HTTPStatus.FORBIDDEN,
             detail=f"Organisation ({org_obj.id}) is not approved yet",
         )
+
     return org_obj
 
 
@@ -72,23 +75,51 @@ async def get_organisation_by_id(
         DbOrganisation: organisation with the given id
     """
     org_obj = db.query(DbOrganisation).filter_by(id=org_id).first()
+
     if org_obj and check_approved and org_obj.approved is False:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail=f"Organisation {org_id} is not approved yet",
+            status_code=HTTPStatus.FORBIDDEN,
+            detail=f"Organisation ({org_id}) is not approved yet",
         )
     return org_obj
 
 
+async def get_org_odk_creds(
+    org: DbOrganisation,
+) -> project_schemas.ODKCentralDecrypted:
+    """Get odk credentials for an organisation, else error."""
+    url = org.odk_central_url
+    user = org.odk_central_user
+    password = org.odk_central_password
+
+    if not all([url, user, password]):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Organisation does not have ODK Central credentials configured",
+        )
+
+    return project_schemas.ODKCentralDecrypted(
+        odk_central_url=org.odk_central_url,
+        odk_central_user=org.odk_central_user,
+        odk_central_password=org.odk_central_password,
+    )
+
+
 async def check_org_exists(
     db: Session,
-    org_id: Union[str, int],
+    org_id: Union[str, int, None],
     check_approved: bool = True,
 ) -> DbOrganisation:
     """Check if organisation name exists, else error.
 
     The org_id can also be an org name.
     """
+    if not org_id:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Organisation id not provided",
+        )
+
     try:
         org_id = int(org_id)
     except ValueError:
@@ -98,14 +129,14 @@ async def check_org_exists(
         log.debug(f"Getting organisation by id: {org_id}")
         db_organisation = await get_organisation_by_id(db, org_id, check_approved)
 
-    if isinstance(org_id, str):
+    else:  # is string
         log.debug(f"Getting organisation by name: {org_id}")
         db_organisation = await get_organisation_by_name(db, org_id, check_approved)
 
     if not db_organisation:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f"Organisation {org_id} does not exist",
+            detail=f"Organisation ({org_id}) does not exist",
         )
 
     log.debug(f"Organisation match: {db_organisation}")

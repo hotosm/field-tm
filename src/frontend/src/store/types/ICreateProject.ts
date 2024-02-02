@@ -40,10 +40,6 @@ export type CreateProjectStateTypes = {
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
 };
-export type AuthorTypes = {
-  username: string;
-  id: number;
-};
 
 export type GeometryTypes = {
   type: string;
@@ -82,7 +78,6 @@ export type ProjectInfoTypes = {
 type EditProjectResponseTypes = {
   id: number;
   odkid: number;
-  author: AuthorTypes;
   project_info: ProjectInfoTypes[];
   status: number;
   outline_geojson: GeoJSONFeatureTypes;

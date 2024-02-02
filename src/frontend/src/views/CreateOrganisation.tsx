@@ -132,6 +132,69 @@ const CreateOrganisationForm = () => {
                 FormHelperTextProps={inputFormStyles()}
               />
             </CoreModules.FormControl>
+            <CoreModules.FormControl sx={{ width: '100%' }}>
+              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <CoreModules.FormLabel sx={{}} component="h3">
+                  ODK Central URL (Optional)
+                </CoreModules.FormLabel>
+              </CoreModules.Box>
+              <CoreModules.TextField
+                id="odk_central_url"
+                label=""
+                variant="filled"
+                value={values.odk_central_url}
+                onChange={(e) => {
+                  handleCustomChange('odk_central_url', e.target.value);
+                }}
+                fullWidth
+                multiline
+                rows={1}
+                helperText={errors.odk_central_url}
+                FormHelperTextProps={inputFormStyles()}
+              />
+            </CoreModules.FormControl>
+            <CoreModules.FormControl sx={{ width: '100%' }}>
+              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <CoreModules.FormLabel sx={{}} component="h3">
+                  ODK Central User (Optional)
+                </CoreModules.FormLabel>
+              </CoreModules.Box>
+              <CoreModules.TextField
+                id="odk_central_user"
+                label=""
+                variant="filled"
+                value={values.odk_central_user}
+                onChange={(e) => {
+                  handleCustomChange('odk_central_user', e.target.value);
+                }}
+                fullWidth
+                multiline
+                rows={1}
+                helperText={errors.odk_central_user}
+                FormHelperTextProps={inputFormStyles()}
+              />
+            </CoreModules.FormControl>
+            <CoreModules.FormControl sx={{ width: '100%' }}>
+              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <CoreModules.FormLabel sx={{}} component="h3">
+                  ODK Central Password (Optional)
+                </CoreModules.FormLabel>
+              </CoreModules.Box>
+              <CoreModules.TextField
+                id="odk_central_password"
+                label=""
+                variant="filled"
+                value={values.odk_central_password}
+                onChange={(e) => {
+                  handleCustomChange('odk_central_password', e.target.value);
+                }}
+                fullWidth
+                multiline
+                rows={1}
+                helperText={errors.odk_central_password}
+                FormHelperTextProps={inputFormStyles()}
+              />
+            </CoreModules.FormControl>
             <CoreModules.FormControl fullWidth margin="normal" variant="filled" sx={{ gap: 1 }}>
               <CoreModules.Box
                 sx={{

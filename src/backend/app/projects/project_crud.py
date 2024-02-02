@@ -57,6 +57,7 @@ from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from app.auth.osm import AuthUser
 from app.central import central_crud
 from app.config import encrypt_value, settings
 from app.db import db_models
@@ -203,7 +204,9 @@ async def partial_update_project_info(
 
 
 async def update_project_info(
-    db: Session, project_metadata: project_schemas.ProjectUpload, project_id
+    db: Session,
+    project_metadata: project_schemas.ProjectUpload,
+    project_id: int,
 ):
     """Full project update for PUT."""
     user = project_metadata.author
@@ -251,35 +254,18 @@ async def update_project_info(
 
 
 async def create_project_with_project_info(
-    db: Session, project_metadata: project_schemas.ProjectUpload, odk_project_id: int
+    db: Session,
+    project_metadata: project_schemas.ProjectUpload,
+    odk_project_id: int,
+    current_user: AuthUser,
 ):
     """Create a new project, including all associated info."""
     # FIXME the ProjectUpload model should be converted to the db model directly
     # FIXME we don't need to extract each variable and pass manually
     # project_data = project_metadata.model_dump()
 
-    project_user = project_metadata.author
-    project_info = project_metadata.project_info
-    xform_title = project_metadata.xform_title
-    odk_credentials = project_metadata.odk_central
-    hashtags = project_metadata.hashtags
-    organisation_id = project_metadata.organisation_id
-    task_split_type = project_metadata.task_split_type
-    task_split_dimension = project_metadata.task_split_dimension
-    task_num_buildings = project_metadata.task_num_buildings
-    data_extract_type = project_metadata.task_num_buildings
+    log.warning(project_metadata.model_dump())
 
-    # verify data coming in
-    if not project_user:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="User details are missing",
-        )
-    if not project_info:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Project info is missing",
-        )
     if not odk_project_id:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -288,71 +274,33 @@ async def create_project_with_project_info(
 
     log.debug(
         "Creating project in FMTM database with vars: "
-        f"project_user: {project_user} | "
-        f"project_info: {project_info} | "
-        f"xform_title: {xform_title} | "
-        f"hashtags: {hashtags}| "
-        f"organisation_id: {organisation_id}"
+        f"project_user: {current_user.username} | "
+        f"project_name: {project_metadata.project_info.name} | "
+        f"xform_title: {project_metadata.xform_title} | "
+        f"hashtags: {project_metadata.hashtags} | "
+        f"organisation_id: {project_metadata.organisation_id}"
     )
 
-    # Check / set credentials
-    if odk_credentials:
-        url = odk_credentials.odk_central_url
-        user = odk_credentials.odk_central_user
-        pw = odk_credentials.odk_central_password.get_secret_value()
+    # Extract project_info details, then remove key
+    project_name = project_metadata.project_info.name
+    project_description = project_metadata.project_info.description
+    project_short_description = project_metadata.project_info.short_description
 
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
-
-    # get db user
-    # TODO: get this from logged in user / request instead,
-    # return 403 (forbidden) if not authorized
-    db_user = await user_crud.get_user(db, project_user.id)
-    if not db_user:
-        raise HTTPException(
-            status_code=400, detail=f"User {project_user.username} does not exist"
-        )
-
-    hashtags = (
-        list(
-            map(
-                lambda hashtag: hashtag if hashtag.startswith("#") else f"#{hashtag}",
-                hashtags,
-            )
-        )
-        if hashtags
-        else None
-    )
     # create new project
     db_project = db_models.DbProject(
-        author=db_user,
+        author_id=current_user.id,
         odkid=odk_project_id,
-        project_name_prefix=project_info.name,
-        xform_title=xform_title,
-        odk_central_url=url,
-        odk_central_user=user,
-        odk_central_password=pw,
-        hashtags=hashtags,
-        organisation_id=organisation_id,
-        task_split_type=task_split_type,
-        task_split_dimension=task_split_dimension,
-        task_num_buildings=task_num_buildings,
-        data_extract_type=data_extract_type,
-        # country=[project_metadata.country],
-        # location_str=f"{project_metadata.city}, {project_metadata.country}",
+        project_name_prefix=project_name,
+        **project_metadata.model_dump(exclude=["project_info"]),
     )
     db.add(db_project)
 
     # add project info (project id needed to create project info)
     db_project_info = db_models.DbProjectInfo(
         project=db_project,
-        name=project_info.name,
-        short_description=project_info.short_description,
-        description=project_info.description,
+        name=project_name,
+        short_description=project_short_description,
+        description=project_description,
     )
     db.add(db_project_info)
 
@@ -1180,7 +1128,7 @@ def generate_task_files(
     task_id: int,
     xlsform: str,
     form_type: str,
-    odk_credentials: project_schemas.ODKCentral,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
     """Generate all files for a task."""
     project_log = log.bind(task="create_project", project_id=project_id)
@@ -1203,7 +1151,7 @@ def generate_task_files(
     appuser = OdkAppUser(
         odk_credentials.odk_central_url,
         odk_credentials.odk_central_user,
-        odk_credentials.odk_central_password.get_secret_value(),
+        odk_credentials.odk_central_password,
     )
     appuser_json = appuser.create(odk_id, appuser_name)
 
@@ -1379,7 +1327,7 @@ def generate_appuser_files(
                 "odk_central_password": one.odk_central_password,
             }
 
-            odk_credentials = project_schemas.ODKCentral(**odk_credentials)
+            odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
 
             xform_title = one.xform_title if one.xform_title else None
 
@@ -1668,7 +1616,7 @@ async def convert_to_app_project(db_project: db_models.DbProject):
         return None
 
     log.debug("Converting db project to app project")
-    app_project: project_schemas.Project = db_project
+    app_project = db_project
 
     if db_project.outline:
         log.debug("Converting project outline to geojson")
@@ -1892,7 +1840,7 @@ async def update_project_form(
     odk_id = project.odkid
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentral(
+    odk_credentials = project_schemas.ODKCentralDecrypted(
         odk_central_url=project.odk_central_url,
         odk_central_user=project.odk_central_user,
         odk_central_password=project.odk_central_password,

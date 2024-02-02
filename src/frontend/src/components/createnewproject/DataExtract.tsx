@@ -141,7 +141,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
   }, [formValues?.dataExtractWays, formValues?.dataExtractFeatureType]);
 
   const toggleStep = (step, url) => {
-    if (url === '/select-form') {
+    if (url === '/select-category') {
       dispatch(
         CreateProjectActions.SetIndividualProjectDetailsData({
           ...formValues,
@@ -326,7 +326,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(3, '/select-form')}
+                onClick={() => toggleStep(3, '/select-category')}
                 className="fmtm-font-bold"
               />
               <Button

@@ -220,7 +220,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/select-form',
+        path: '/select-category',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
@@ -292,7 +292,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: 'edit-project/select-form/:projectId',
+        path: 'edit-project/select-category/:projectId',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>

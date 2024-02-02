@@ -7,7 +7,7 @@ export const initialState: CreateProjectStateTypes = {
   projectDetails: {
     dimension: 10,
     no_of_buildings: 5,
-    hashtags: '#FMTM ',
+    hashtags: '',
     name: '',
     short_description: '',
     odk_central_url: '',
@@ -70,7 +70,7 @@ const CreateProject = createSlice({
       state.projectDetails = {
         dimension: 10,
         no_of_buildings: 5,
-        hashtags: '#FMTM ',
+        hashtags: '',
         name: '',
         short_description: '',
         odk_central_url: '',

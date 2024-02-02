@@ -19,10 +19,10 @@ export const createProjectSteps: ICreateProjectSteps[] = [
     name: 'Upload Area',
   },
   {
-    url: '/select-form',
+    url: '/select-category',
     step: 3,
     label: '03',
-    name: 'Select Form',
+    name: 'Select Category',
   },
   {
     url: '/data-extract',

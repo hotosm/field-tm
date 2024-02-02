@@ -33,7 +33,7 @@ from shapely import Polygon, wkb
 from shapely.geometry import shape
 
 from app.central.central_crud import create_odk_project
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db import db_models
 from app.projects import project_crud, project_schemas
 from app.tasks import tasks_crud
@@ -41,27 +41,29 @@ from tests.test_data import test_data_path
 
 odk_central_url = os.getenv("ODK_CENTRAL_URL")
 odk_central_user = os.getenv("ODK_CENTRAL_USER")
-odk_central_password = os.getenv("ODK_CENTRAL_PASSWD")
+odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
 
 
-async def test_create_project(client, organisation, user):
+async def test_create_project(client, organisation):
     """Test project creation endpoint."""
+    odk_credentials = {
+        "odk_central_url": odk_central_url,
+        "odk_central_user": odk_central_user,
+        "odk_central_password": odk_central_password,
+    }
+    odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
+
     project_data = {
-        "author": {"username": user.username, "id": user.id},
         "project_info": {
             "name": "test project",
             "short_description": "test",
             "description": "test",
         },
         "xform_title": "buildings",
-        "odk_central": {
-            "odk_central_url": odk_central_url,
-            "odk_central_user": odk_central_user,
-            "odk_central_password": odk_central_password,
-        },
-        "hashtags": ["hot-fmtm"],
+        "hashtags": ["#FMTM"],
         "organisation_id": organisation.id,
     }
+    project_data.update(**odk_credentials.model_dump())
 
     response = client.post("/projects/create_project", json=project_data)
 
@@ -133,7 +135,7 @@ async def test_generate_appuser_files(db, project):
         "odk_central_user": odk_central_user,
         "odk_central_password": odk_central_password,
     }
-    odk_credentials = project_schemas.ODKCentral(**odk_credentials)
+    odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
 
     project_id = project.id
     log.debug(f"Testing project ID: {project_id}")

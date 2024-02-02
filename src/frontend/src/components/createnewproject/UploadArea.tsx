@@ -61,7 +61,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
     }
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 3 }));
-    navigate('/select-form');
+    navigate('/select-category');
   };
   const {
     handleSubmit,
@@ -73,14 +73,6 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
-
-  // const onCreateProjectSubmission = () => {
-  //   if (!drawnGeojson && !geojsonFile) {
-  //     return;
-  //   } else {
-  //     toggleStep(3, '/new-select-form');
-  //   }
-  // };
 
   const convertFileToGeojson = async (file) => {
     if (!file) return;
