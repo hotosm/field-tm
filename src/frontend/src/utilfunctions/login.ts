@@ -1,14 +1,19 @@
 import { createPopup } from '@/utilfunctions/createPopup';
 
 export const createLoginWindow = (redirectTo) => {
+  // Create popup outside of request (required for Safari security)
+  const popup = createPopup('OSM Auth', '');
+
   fetch(`${import.meta.env.VITE_API_URL}/auth/osm_login/`)
     .then((resp) => resp.json())
     .then((resp) => {
-      const popup = createPopup('OSM auth', resp.login_url);
       if (!popup) {
         console.warn('Popup blocked or unavailable.');
         return;
       }
+
+      // Set URL for popup from response
+      popup.location = resp.login_url;
 
       // Get OAuth2 authorization url, extract state
       const authUrl = new URL(resp.login_url);
