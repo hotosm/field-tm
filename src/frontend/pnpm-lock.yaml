@@ -101,6 +101,9 @@ dependencies:
   ol-ext:
     specifier: ^4.0.11
     version: 4.0.11(ol@8.1.0)
+  pako:
+    specifier: ^2.1.0
+    version: 2.1.0
   qrcode-generator:
     specifier: ^1.4.4
     version: 1.4.4
