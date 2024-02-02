@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API } from '@/api';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import {
   ProjectDetailsModel,
@@ -519,6 +520,46 @@ const ValidateCustomForm: Function = (url: string, formUpload: any) => {
     await validateCustomForm(url, formUpload);
   };
 };
+
+const DeleteProjectService: Function = (url: string) => {
+  return async (dispatch) => {
+    const deleteProject = async (url: string) => {
+      try {
+        await API.delete(url);
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Project deleted. Redirecting...',
+            variant: 'success',
+            duration: 2000,
+          }),
+        );
+        // Redirect to homepage
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } catch (error) {
+        if (error.response.status === 404) {
+          dispatch(
+            CommonActions.SetSnackBar({
+              open: true,
+              message: 'Project already deleted',
+              variant: 'success',
+              duration: 2000,
+            }),
+          );
+        } else {
+          console.log(error);
+          console.log('Project deletion failed.');
+        }
+      }
+    };
+
+    await deleteProject(url);
+    // TODO extra cleanup required?
+  };
+};
+
 export {
   UploadAreaService,
   CreateProjectService,
@@ -534,4 +575,5 @@ export {
   PostFormUpdate,
   EditProjectBoundaryService,
   ValidateCustomForm,
+  DeleteProjectService,
 };

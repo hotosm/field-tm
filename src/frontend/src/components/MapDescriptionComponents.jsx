@@ -5,7 +5,7 @@ import CoreModules from '@/shared/CoreModules';
 const MapDescriptionComponents = ({ type, state, defaultTheme }) => {
   const descriptionData = [
     {
-      value: 'Descriptions',
+      value: 'Description',
       element: <CoreModules.Typography align="center">{state.projectInfo.description}</CoreModules.Typography>,
     },
     // {
