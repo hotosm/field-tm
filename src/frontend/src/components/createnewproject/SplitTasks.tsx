@@ -281,10 +281,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
             <div className="fmtm-p-10">
               <ProgressBar totalSteps={totalSteps} currentStep={generateProjectLog?.progress} />
             </div>
-            <p className="fmtm-text-base">
-              Please stay on this page until the process is complete. Your changes might be lost if you cancel the
-              pop-up.
-            </p>
           </div>
         }
         open={toggleStatus}
