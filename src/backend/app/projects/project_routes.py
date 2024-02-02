@@ -43,6 +43,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app.auth.osm import AuthUser, login_required
+from app.auth.roles import org_admin
 from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
@@ -215,7 +216,7 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 @router.delete("/{project_id}")
 async def delete_project(
     project: db_models.DbProject = Depends(project_deps.get_project_by_id),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(org_admin),
     db: Session = Depends(database.get_db),
 ):
     """Delete a project from both ODK Central and the local database."""
