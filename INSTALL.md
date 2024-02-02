@@ -84,19 +84,21 @@ git checkout main
 
 These steps are essential to run and test your code!
 
-#### 1. Setup OSM OAUTH 2.0
+#### 1. Setup OSM OAuth 2.0
 
-The FMTM uses OAUTH2 with OSM to authenticate users.
+The FMTM uses OAuth with OSM to authenticate users.
 
 To properly configure your FMTM project, you will need to create keys for OSM.
 
 1. [Login to OSM][28]
    (_If you do not have an account yet, click the signup
    button at the top navigation bar to create one_).
+
    Click the drop down arrow on the top right of the navigation bar
    and select My Settings.
 
 2. Register your FMTM instance to OAuth 2 applications.
+
    Put your login redirect url as `http://127.0.0.1:7051/osmauth/` if running locally,
    or for production replace with https://{YOUR_DOMAIN}/osmauth/
 
