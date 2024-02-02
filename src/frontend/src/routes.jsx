@@ -316,6 +316,18 @@ const routes = createBrowserRouter([
         ),
       },
       {
+        path: 'edit-project/delete/:projectId',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ErrorBoundary>
+                <EditProject />
+              </ErrorBoundary>
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/osmauth/',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
