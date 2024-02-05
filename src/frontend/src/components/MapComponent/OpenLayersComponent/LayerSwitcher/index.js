@@ -71,7 +71,7 @@ const mapboxOutdoors = (visible) =>
         'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
       // url:
       //   'https://api.mapbox.com/styles/v1/geovation/ckpicg3of094w17nyqyd2ziie/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2VvdmF0aW9uIiwiYSI6ImNrcGljOXBwbTBoc3oyb3BjMGsxYW9wZ2EifQ.euYtUXb6HJGLHkj4Wi3gjA',
-      url: 'https://api.mapbox.com/styles/v1/naxa-np/cl50pm1l5001814qpncu8s4ib/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoibmF4YS1ucCIsImEiOiJja2E5bGp0ZDQwdHE4MnJxdnhmcGxsdGpuIn0.kB42E50iZFlFPcQiqQMClw',
+      url: 'https://api.mapbox.com/styles/v1/nishon-naxa/ckgjcanml7alo19qki5fu694f/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoibmlzaG9uLW5heGEiLCJhIjoiY2xhYnhwbzN0MDUxYTN1bWhvcWxocWlpaSJ9.0FarR4aPxb7F9BHP31msww',
       layer: 'topoMap',
       maxZoom: 19,
       crossOrigin: 'Anonymous',
