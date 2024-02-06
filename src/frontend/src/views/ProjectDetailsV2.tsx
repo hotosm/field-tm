@@ -304,6 +304,7 @@ const Home = () => {
               btnType="other"
               className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md"
               icon={<AssetModules.SettingsIcon />}
+              onClick={() => navigate(`/manage-project/${params?.id}`)}
             />
           </div>
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">

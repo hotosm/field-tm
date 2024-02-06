@@ -430,8 +430,8 @@ const PostFormUpdate: Function = (url: string, payload: any) => {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: error.response.data.detail,
-            variant: 'success',
+            message: error?.response?.data?.detail || 'Failed to update Form',
+            variant: 'error',
             duration: 2000,
           }),
         );
