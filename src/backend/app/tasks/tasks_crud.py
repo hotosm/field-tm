@@ -341,7 +341,7 @@ async def update_task_history(
     return tasks
 
 
-def get_task_history(
+async def get_project_task_history(
     project_id: int,
     end_date: Optional[datetime],
     db: Session,
@@ -349,10 +349,10 @@ def get_task_history(
     """Retrieves the task history records for a specific project.
 
     Args:
-        project_id: The ID of the project.
-        end_date: The end date of the task history
-        records to retrieve (optional).
-        db: The database session.
+        project_id (int): The ID of the project.
+        end_date (datetime, optional): The end date of the task history
+            records to retrieve.
+        db (Session): The database session.
 
     Returns:
         A list of task history records for the specified project.
