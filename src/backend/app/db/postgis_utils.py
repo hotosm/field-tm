@@ -18,8 +18,9 @@
 """PostGIS and geometry handling helper funcs."""
 
 import datetime
+from typing import Optional, Union
 
-from geoalchemy2 import Geometry
+from geoalchemy2 import WKBElement
 from geoalchemy2.shape import to_shape
 from geojson import FeatureCollection
 from geojson_pydantic import Feature
@@ -36,7 +37,9 @@ def timestamp():
     return datetime.datetime.utcnow()
 
 
-def geometry_to_geojson(geometry: Geometry, properties: str = {}, id: int = None):
+def geometry_to_geojson(
+    geometry: WKBElement, properties: Optional[dict] = None, id: Optional[int] = None
+) -> Union[Feature, dict]:
     """Convert SQLAlchemy geometry to GeoJSON."""
     if geometry:
         shape = to_shape(geometry)
@@ -51,7 +54,9 @@ def geometry_to_geojson(geometry: Geometry, properties: str = {}, id: int = None
     return {}
 
 
-def get_centroid(geometry: Geometry, properties: str = {}, id: int = None):
+def get_centroid(
+    geometry: WKBElement, properties: Optional[dict] = None, id: Optional[int] = None
+):
     """Convert SQLAlchemy geometry to Centroid GeoJSON."""
     if geometry:
         shape = to_shape(geometry)
@@ -66,7 +71,9 @@ def get_centroid(geometry: Geometry, properties: str = {}, id: int = None):
     return {}
 
 
-async def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection) -> bytes:
+async def geojson_to_flatgeobuf(
+    db: Session, geojson: FeatureCollection
+) -> Optional[bytes]:
     """From a given FeatureCollection, return a memory flatgeobuf obj.
 
     Args:
@@ -101,13 +108,13 @@ async def geojson_to_flatgeobuf(db: Session, geojson: FeatureCollection) -> byte
     # Run the SQL
     result = db.execute(text(sql))
     # Get a memoryview object, then extract to Bytes
-    flatgeobuf = result.fetchone()[0]
+    flatgeobuf = result.first()
 
     # Cleanup table
     db.execute(text("DROP TABLE IF EXISTS public.temp_features CASCADE;"))
 
     if flatgeobuf:
-        return flatgeobuf.tobytes()
+        return flatgeobuf[0].tobytes()
 
     # Nothing returned (either no features passed, or failed)
     return None

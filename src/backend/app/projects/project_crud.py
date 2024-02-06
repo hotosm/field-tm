@@ -76,8 +76,8 @@ async def get_projects(
     user_id: int,
     skip: int = 0,
     limit: int = 100,
-    hashtags: List[str] = None,
-    search: str = None,
+    hashtags: Optional[List[str]] = None,
+    search: Optional[str] = None,
 ):
     """Get all projects."""
     filters = []
@@ -85,16 +85,20 @@ async def get_projects(
         filters.append(db_models.DbProject.author_id == user_id)
 
     if hashtags:
-        filters.append(db_models.DbProject.hashtags.op("&&")(hashtags))
+        filters.append(db_models.DbProject.hashtags.op("&&")(hashtags))  # type: ignore
 
     if search:
-        filters.append(db_models.DbProject.project_name_prefix.ilike(f"%{search}%"))
+        filters.append(
+            db_models.DbProject.project_name_prefix.ilike(  # type: ignore
+                f"%{search}%"
+            )
+        )
 
     if len(filters) > 0:
         db_projects = (
             db.query(db_models.DbProject)
             .filter(and_(*filters))
-            .order_by(db_models.DbProject.id.desc())
+            .order_by(db_models.DbProject.id.desc())  # type: ignore
             .offset(skip)
             .limit(limit)
             .all()
@@ -104,7 +108,7 @@ async def get_projects(
     else:
         db_projects = (
             db.query(db_models.DbProject)
-            .order_by(db_models.DbProject.id.desc())
+            .order_by(db_models.DbProject.id.desc())  # type: ignore
             .offset(skip)
             .limit(limit)
             .all()
@@ -118,8 +122,8 @@ async def get_project_summaries(
     user_id: int,
     skip: int = 0,
     limit: int = 100,
-    hashtags: str = None,
-    search: str = None,
+    hashtags: Optional[List[str]] = None,
+    search: Optional[str] = None,
 ):
     """Get project summary details for main page."""
     project_count, db_projects = await get_projects(
@@ -188,13 +192,14 @@ async def partial_update_project_info(
     db_project_info = await get_project_info_by_id(db, project_id)
 
     # Update project informations
-    if project_metadata.name:
-        db_project.project_name_prefix = project_metadata.name
-        db_project_info.name = project_metadata.name
-    if project_metadata.description:
-        db_project_info.description = project_metadata.description
-    if project_metadata.short_description:
-        db_project_info.short_description = project_metadata.short_description
+    if db_project and db_project_info:
+        if project_metadata.name:
+            db_project.project_name_prefix = project_metadata.name
+            db_project_info.name = project_metadata.name
+        if project_metadata.description:
+            db_project_info.description = project_metadata.description
+        if project_metadata.short_description:
+            db_project_info.short_description = project_metadata.short_description
 
     db.commit()
     db.refresh(db_project)
@@ -212,7 +217,10 @@ async def update_project_info(
     project_info = project_metadata.project_info
 
     if not project_info:
-        raise HTTPException("No project info passed in")
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="No project info passed in",
+        )
 
     # verify project exists in db
     db_project = await get_project_by_id(db, project_id)
@@ -232,9 +240,10 @@ async def update_project_info(
     db_project_info = await get_project_info_by_id(db, project_id)
 
     # Update projects meta informations (name, descriptions)
-    db_project_info.name = project_info.name
-    db_project_info.short_description = project_info.short_description
-    db_project_info.description = project_info.description
+    if db_project and db_project_info:
+        db_project_info.name = project_info.name
+        db_project_info.short_description = project_info.short_description
+        db_project_info.description = project_info.description
 
     db.commit()
     db.refresh(db_project)
@@ -319,7 +328,7 @@ async def upload_xlsform(
         return True
     except Exception as e:
         log.exception(e)
-        raise HTTPException(status=400, detail={"message": str(e)}) from e
+        raise HTTPException(status_code=400, detail={"message": str(e)}) from e
 
 
 async def update_multi_polygon_project_boundary(
