@@ -62,6 +62,10 @@ import {
   AccessTime as AccessTimeIcon,
   ImportExport as ImportExportIcon,
   Check as CheckIcon,
+  CloudUploadOutlined as CloudUploadOutlinedIcon,
+  Autorenew as AutorenewIcon,
+  EditOutlined as EditOutlinedIcon,
+  DeleteOutlined as DeleteOutlinedIcon,
   Undo as UndoIcon,
   Timeline as TimelineIcon,
 } from '@mui/icons-material';
@@ -136,6 +140,10 @@ export default {
   AccessTimeIcon,
   ImportExportIcon,
   CheckIcon,
+  CloudUploadOutlinedIcon,
+  AutorenewIcon,
+  EditOutlinedIcon,
+  DeleteOutlinedIcon,
   UndoIcon,
   TimelineIcon,
 };

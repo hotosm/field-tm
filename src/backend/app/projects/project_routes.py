@@ -43,7 +43,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app.auth.osm import AuthUser, login_required
-from app.auth.roles import org_admin, project_admin, super_admin
+from app.auth.roles import mapper, org_admin, project_admin, super_admin
 from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
@@ -75,7 +75,11 @@ async def read_projects(
 
 
 @router.get("/details/{project_id}/")
-async def get_projet_details(project_id: int, db: Session = Depends(database.get_db)):
+async def get_projet_details(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+):
     """Returns the project details.
 
     Also includes ODK project details, so takes extra time to return.
@@ -976,7 +980,7 @@ async def update_project_category(
 async def download_template(
     category: str,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Download an XLSForm template to fill out."""
     xlsform_path = f"{xlsforms_path}/{category}.xls"
@@ -990,14 +994,14 @@ async def download_template(
 async def download_project_boundary(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Downloads the boundary of a project as a GeoJSON file.
 
     Args:
         project_id (int): The id of the project.
         db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
+        current_user (AuthUser): Check if user is mapper.
 
     Returns:
         Response: The HTTP response object containing the downloaded file.
@@ -1015,14 +1019,14 @@ async def download_project_boundary(
 async def download_task_boundaries(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: Session = Depends(mapper),
 ):
     """Downloads the boundary of the tasks for a project as a GeoJSON file.
 
     Args:
         project_id (int): The id of the project.
         db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
+        current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         Response: The HTTP response object containing the downloaded file.
@@ -1041,14 +1045,14 @@ async def download_task_boundaries(
 async def download_features(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Downloads the features of a project as a GeoJSON file.
 
     Args:
         project_id (int): The id of the project.
         db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
+        current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         Response: The HTTP response object containing the downloaded file.
@@ -1078,7 +1082,7 @@ async def generate_project_tiles(
         description="Provide a custom TMS URL, optional",
     ),
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Returns basemap tiles for a project.
 
@@ -1089,7 +1093,7 @@ async def generate_project_tiles(
         format (str, optional): Default "mbtiles". Other options: "pmtiles", "sqlite3".
         tms (str, optional): Default None. Custom TMS provider URL.
         db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
+        current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         str: Success message that tile generation started.
@@ -1167,14 +1171,14 @@ async def download_tiles(
 async def download_task_boundary_osm(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Downloads the boundary of a task as a OSM file.
 
     Args:
         project_id (int): The id of the project.
         db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
+        current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         Response: The HTTP response object containing the downloaded file.
@@ -1300,12 +1304,17 @@ async def project_dashboard(
 
 
 @router.get("/contributors/{project_id}")
-async def get_contributors(project_id: int, db: Session = Depends(database.get_db)):
+async def get_contributors(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+):
     """Get contributors of a project.
 
     Args:
         project_id (int): ID of project.
         db (Session): The database session.
+        current_user (AuthUser): Check if user is mapper.
 
     Returns:
         list[project_schemas.ProjectUser]: List of project users.
