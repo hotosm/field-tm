@@ -42,9 +42,9 @@ async def get_organisations(
     """Get all orgs."""
     db_user = await get_user(db, current_user.id)
 
-    if db_user.role != UserRole.ADMIN:
-        # If user not admin, only show approved orgs
-        is_approved = True
+    if db_user.role == UserRole.ADMIN:
+        # If admin, show unapproved orgs too
+        is_approved = False
 
     return db.query(db_models.DbOrganisation).filter_by(approved=is_approved).all()
 
