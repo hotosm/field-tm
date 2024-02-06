@@ -25,26 +25,28 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser
-from app.auth.roles import check_super_admin
 from app.config import settings
 from app.db import db_models
-from app.models.enums import HTTPStatus
+from app.models.enums import HTTPStatus, UserRole
 from app.organisations.organisation_deps import (
     get_organisation_by_name,
 )
 from app.organisations.organisation_schemas import OrganisationEdit, OrganisationIn
 from app.s3 import add_obj_to_bucket
+from app.users.user_crud import get_user
 
 
-async def get_organisations(db: Session, current_user: AuthUser, is_approved: bool):
+async def get_organisations(
+    db: Session, current_user: AuthUser, is_approved: bool
+) -> list[db_models.DbOrganisation]:
     """Get all orgs."""
-    super_admin = await check_super_admin(db, current_user)
+    db_user = await get_user(db, current_user.id)
 
-    if super_admin:
-        return db.query(db_models.DbOrganisation).filter_by(approved=is_approved).all()
+    if db_user.role != UserRole.ADMIN:
+        # If user not admin, only show approved orgs
+        is_approved = True
 
-    # If user not admin, only show approved orgs
-    return db.query(db_models.DbOrganisation).filter_by(approved=True).all()
+    return db.query(db_models.DbOrganisation).filter_by(approved=is_approved).all()
 
 
 async def upload_logo_to_s3(

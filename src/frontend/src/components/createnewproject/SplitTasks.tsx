@@ -118,7 +118,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       // "uploaded_form": projectDetails.uploaded_form,
       data_extractWays: projectDetails.data_extractWays,
       hashtags: arrayHashtag,
-      organisation_id: projectDetails.organisation_id,
       data_extract_type: projectDetails.data_extract_type,
     };
     if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {
@@ -128,7 +127,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     }
     dispatch(
       CreateProjectService(
-        `${import.meta.env.VITE_API_URL}/projects/create_project`,
+        `${import.meta.env.VITE_API_URL}/projects/create_project?org_id=${projectDetails.organisation_id}`,
         projectData,
         drawnGeojsonFile,
         customFormFile,

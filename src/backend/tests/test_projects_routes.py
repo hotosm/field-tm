@@ -44,7 +44,7 @@ odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
 
 
-async def test_create_project(client, organisation):
+async def test_create_project(client, admin_user, organisation):
     """Test project creation endpoint."""
     odk_credentials = {
         "odk_central_url": odk_central_url,
@@ -61,11 +61,12 @@ async def test_create_project(client, organisation):
         },
         "xform_title": "buildings",
         "hashtags": ["#FMTM"],
-        "organisation_id": organisation.id,
     }
     project_data.update(**odk_credentials.model_dump())
 
-    response = client.post("/projects/create_project", json=project_data)
+    response = client.post(
+        f"/projects/create_project?org_id={organisation.id}", json=project_data
+    )
 
     assert response.status_code == 200
 

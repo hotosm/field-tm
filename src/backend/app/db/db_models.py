@@ -76,7 +76,7 @@ class DbUserRoles(Base):
         index=True,
         primary_key=True,
     )
-    role = Column(Enum(ProjectRole), default=UserRole.MAPPER)
+    role = Column(Enum(ProjectRole), default=ProjectRole.MAPPER)
 
 
 class DbUser(Base):

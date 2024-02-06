@@ -29,12 +29,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 
+from app.auth.auth_routes import get_or_create_user
 from app.auth.osm import AuthUser
 from app.central import central_crud
 from app.config import settings
 from app.db.database import Base, get_db
-from app.db.db_models import DbOrganisation, DbUser
+from app.db.db_models import DbOrganisation
 from app.main import get_application
+from app.models.enums import UserRole
 from app.projects import project_crud
 from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
 
@@ -85,10 +87,18 @@ def db(db_engine):
 
 
 @pytest.fixture(scope="function")
-def user(db):
+async def admin_user(db):
     """A test user."""
-    db_user = DbUser(id=100, username="test_user")
-    db.add(db_user)
+    db_user = await get_or_create_user(
+        db,
+        AuthUser(
+            username="svcfmtm",
+            id=20386219,
+            role=UserRole.ADMIN,
+        ),
+    )
+    # Upgrade role from default MAPPER (if user already exists)
+    db_user.role = UserRole.ADMIN
     db.commit()
     return db_user
 
@@ -110,7 +120,7 @@ def organisation(db):
 
 
 @pytest.fixture(scope="function")
-async def project(db, user, organisation):
+async def project(db, admin_user, organisation):
     """A test project, using the test user and org."""
     project_metadata = ProjectUpload(
         project_info=ProjectInfo(
@@ -150,7 +160,11 @@ async def project(db, user, organisation):
             db,
             project_metadata,
             odkproject["id"],
-            AuthUser(username=user.username, id=user.id),
+            AuthUser(
+                username=admin_user.username,
+                id=admin_user.id,
+                role=UserRole.ADMIN,
+            ),
         )
         log.debug(f"Project returned: {new_project.__dict__}")
         assert new_project is not None
