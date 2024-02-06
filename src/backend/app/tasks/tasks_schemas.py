@@ -22,7 +22,7 @@ from typing import Any, List, Optional
 
 from geojson_pydantic import Feature as GeojsonFeature
 from loguru import logger as log
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, computed_field
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator
 
@@ -96,7 +96,9 @@ class Task(BaseModel):
 
     @field_validator("outline_centroid", mode="before")
     @classmethod
-    def get_centroid_from_outline(cls, value: Any, info: ValidationInfo) -> str:
+    def get_centroid_from_outline(
+        cls, value: Any, info: ValidationInfo
+    ) -> Optional[str]:
         """Get outline_centroid from Shapely geom."""
         if outline := info.data.get("outline"):
             properties = {
@@ -109,21 +111,21 @@ class Task(BaseModel):
         return None
 
     @field_serializer("locked_by_uid")
-    def get_locked_by_uid(self, value: str) -> str:
+    def get_locked_by_uid(self, value: str) -> Optional[str]:
         """Get lock uid from lock_holder details."""
         if self.lock_holder:
             return self.lock_holder.id
         return None
 
     @field_serializer("locked_by_username")
-    def get_locked_by_username(self, value: str) -> str:
+    def get_locked_by_username(self, value: str) -> Optional[str]:
         """Get lock username from lock_holder details."""
         if self.lock_holder:
             return self.lock_holder.username
         return None
 
     @field_serializer("odk_token")
-    def decrypt_password(self, value: str) -> str:
+    def decrypt_password(self, value: str) -> Optional[str]:
         """Decrypt the ODK Token extracted from the db."""
         if not value:
             return ""
@@ -135,3 +137,46 @@ class ReadTask(Task):
     """Task details plus updated task history."""
 
     task_history: Optional[List[TaskHistoryOut]] = None
+
+
+class TaskHistory(BaseModel):
+    """Task history details."""
+
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+    # Excluded
+    user: Any = Field(exclude=True)
+
+    task_id: int
+    action_text: str
+    action_date: datetime
+
+    @computed_field
+    @property
+    def username(self) -> Optional[str]:
+        """Get username from user db obj."""
+        if self.user:
+            return self.user.username
+        return None
+
+    @computed_field
+    @property
+    def profile_img(self) -> Optional[str]:
+        """Get profile_img from user db obj."""
+        if self.user:
+            return self.user.profile_img
+        return None
+
+    @computed_field
+    @property
+    def status(self) -> Optional[str]:
+        """Extract status from standard format action_text."""
+        if self.action_text:
+            split_text = self.action_text.split()
+            if len(split_text) > 5:
+                return split_text[5]
+            else:
+                return self.action_text
+        return None
