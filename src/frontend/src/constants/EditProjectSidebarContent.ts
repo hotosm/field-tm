@@ -21,6 +21,11 @@ const SidebarContent: ISidebarContent[] = [
     name: 'Update Project Boundary',
     slug: 'update-project-boundary',
   },
+  {
+    id: 4,
+    name: 'Delete Project',
+    slug: 'delete-project',
+  },
 ];
 
 export default SidebarContent;

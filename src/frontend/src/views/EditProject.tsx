@@ -9,6 +9,7 @@ import SidebarContent from '@/constants/EditProjectSidebarContent';
 import { useNavigate } from 'react-router-dom';
 import UpdateForm from '@/components/editproject/UpdateForm';
 import UpdateProjectArea from '@/components/editproject/UpdateProjectArea';
+import DeleteProject from '@/components/editproject/DeleteProject';
 
 const EditProject: React.FC = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -86,6 +87,7 @@ const EditProject: React.FC = () => {
             {selectedTab === 'project-description' ? <EditProjectDetails projectId={decodedProjectId} /> : null}
             {selectedTab === 'form-update' ? <UpdateForm projectId={decodedProjectId} /> : null}
             {selectedTab === 'update-project-boundary' ? <UpdateProjectArea projectId={decodedProjectId} /> : null}
+            {selectedTab === 'delete-project' ? <DeleteProject projectId={decodedProjectId} /> : null}
           </CoreModules.Stack>
         </CoreModules.Stack>
       </CoreModules.Stack>
