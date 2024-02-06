@@ -114,7 +114,7 @@ export default class Table extends Component {
 
   renderHeader = () => {
     const { fields, rowColSpanValue, headClassName, isSubheaderCollection } = this.getFields();
-    const { headerWidths, data } = this.props;
+    const { headerWidths, data, flag } = this.props;
     return fields.map((field, index) => {
       const isSubHeader = isSubheaderCollection[index];
       const rowCol = rowColSpanValue[index].split('_');
@@ -132,7 +132,11 @@ export default class Table extends Component {
                 maxWidth: headerWidths[index],
               },
             })}
-          className="fmtm-px-5 fmtm-pt-4 fmtm-pb-4 fmtm-bg-black-100 fmtm-align-middle fmtm-text-body-sm fmtm-leading-5 fmtm-text-left fmtm-capitalize fmtm-font-bold fmtm-border-[1px] fmtm-border-[#B9B9B9] fmtm-text-sm fmtm-bg-[#F0F0F0] fmtm-max-w-[11rem]"
+          className={`fmtm-px-5 fmtm-pt-4 fmtm-pb-4 fmtm-bg-black-100 fmtm-align-middle fmtm-text-body-sm fmtm-leading-5 fmtm-text-left fmtm-capitalize fmtm-font-bold fmtm-border-[1px] fmtm-text-sm fmtm-max-w-[11rem] ${
+            flag.toLowerCase() === 'primarytable'
+              ? 'fmtm-bg-primaryRed fmtm-text-white fmtm-border-white'
+              : 'fmtm-bg-[#F0F0F0] fmtm-border-[#B9B9B9]'
+          }`}
         >
           {this.getHeaderData(field)}
         </th>
@@ -206,9 +210,9 @@ export default class Table extends Component {
             style: { cursor: 'pointer' },
           })}
           className={`${trClassName && trClassName(row)} ${
-            flag.toLowerCase() === 'dashboard' ? '' : 'hover:fmtm-bg-active_bg'
-          } fmtm-cursor-pointer fmtm-ease-in fmtm-duration-100 fmtm-h-[50px] 
-      fmtm-items-baseline fmtm-relative fmtm-bg-white`}
+            flag.toLowerCase() === 'primarytable' ? 'hover:fmtm-bg-[#F2E3E3]' : ''
+          } fmtm-cursor-pointer fmtm-ease-in fmtm-duration-100 fmtm-h-[50px]
+          fmtm-items-baseline fmtm-relative fmtm-bg-white`}
         >
           {fields.map(
             (field, ind) =>
@@ -216,7 +220,11 @@ export default class Table extends Component {
                 <td
                   // eslint-disable-next-line
                   key={`${field}_${row[field] || ind}_${row[uniqueKey] || ind}`.replace(/ /g, '_')}
-                  className={`${rowClassName[ind]} fmtm-text-slate-900 fmtm-font-normal fmtm-text-body-md fmtm-px-5 fmtm-relative fmtm-border-[1px] fmtm-border-[#B9B9B9]`}
+                  className={`${
+                    rowClassName[ind]
+                  } fmtm-text-slate-900 fmtm-font-normal fmtm-text-body-md fmtm-px-5 fmtm-relative ${
+                    flag.toLowerCase() === 'primarytable' ? '' : 'fmtm-border-[1px] fmtm-border-[#B9B9B9]'
+                  }`}
                 >
                   {this.getBodyCellData(row, field, index)}
                 </td>
@@ -228,15 +236,18 @@ export default class Table extends Component {
   };
 
   render() {
-    const { showHeader, className, style, tableClassName, loadMoreRef, parentloadMoreRef, scrollElement } = this.props;
+    const { showHeader, className, style, tableClassName, loadMoreRef, parentloadMoreRef, scrollElement, flag } =
+      this.props;
     return (
       <div
         ref={parentloadMoreRef}
-        className={`fmtm-block fmtm-pb-1 fmtm-relative fmtm-z-[2] fmtm-overflow-x-auto fmtm-mt-3 scrollbar ${tableClassName}`}
+        className={`fmtm-block fmtm-pb-1 fmtm-overflow-x-auto fmtm-mt-3 scrollbar ${tableClassName}`}
         style={style}
       >
         <table
-          className={`fmtm-w-full fmtm-border-separate fmtm-border-spacing-y-0 ${className} fmtm-border-[1px] fmtm-border-[#B9B9B9]`}
+          className={`fmtm-w-full fmtm-border-separate fmtm-border-spacing-y-0 ${className} ${
+            flag.toLowerCase() === 'primarytable' ? '' : 'fmtm-border-[1px] fmtm-border-[#B9B9B9]'
+          }`}
         >
           {showHeader && (
             <thead className="fmtm-sticky fmtm-top-0 fmtm-z-[2] fmtm-bg-white fmtm-border-b-regular fmtm-border-[#B9B9B9]">

@@ -5,10 +5,12 @@ import environment from '@/environment';
 import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import Button from '@/components/common/Button';
+import { useNavigate } from 'react-router-dom';
 
 const ProjectOptions = ({ setToggleGenerateModal }) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
+  const navigate = useNavigate();
 
   const downloadProjectFormLoading = CoreModules.useAppSelector((state) => state.project.downloadProjectFormLoading);
   const downloadDataExtractLoading = CoreModules.useAppSelector((state) => state.project.downloadDataExtractLoading);
@@ -114,6 +116,25 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
               className="fmtm-truncate"
             >
               Generate MbTiles
+            </CoreModules.Button>
+            <CoreModules.Button
+              onClick={() => navigate(`/manage-project/${encodedId}`)}
+              variant="contained"
+              color="error"
+              sx={{ width: '200px', mr: '15px' }}
+              endIcon={<AssetModules.SettingsIcon />}
+              className="fmtm-truncate"
+            >
+              Manage Project
+            </CoreModules.Button>
+            <CoreModules.Button
+              onClick={() => navigate(`/project-submissions/${encodedId}`)}
+              variant="contained"
+              color="error"
+              sx={{ width: '200px', mr: '15px' }}
+              className="fmtm-truncate"
+            >
+              View Infographics
             </CoreModules.Button>
           </div>
         </div>
