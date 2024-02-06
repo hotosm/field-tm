@@ -57,7 +57,7 @@ const Button = ({
     >
       {isLoading ? (
         <>
-          {type === 'submit' ? 'Submitting...' : loadingText ? loadingText : 'Loading...'}
+          {loadingText ? loadingText : type === 'submit' ? 'Submitting...' : 'Loading...'}
           <Loader2 className="fmtm-mr-2 fmtm-h-6 fmtm-w-6 fmtm-animate-spin" />
         </>
       ) : (
