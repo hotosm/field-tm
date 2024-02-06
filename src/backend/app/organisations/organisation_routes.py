@@ -45,7 +45,7 @@ async def get_organisations(
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(login_required),
     approved: bool = True,
-) -> list[organisation_schemas.OrganisationOut]:
+) -> list[DbOrganisation]:
     """Get a list of all organisations."""
     return await organisation_crud.get_organisations(db, current_user, approved)
 
@@ -65,7 +65,7 @@ async def create_organisation(
     org: organisation_schemas.OrganisationIn = Depends(),
     logo: UploadFile = File(None),
     db: Session = Depends(database.get_db),
-    org_user_dict: DbUser = Depends(org_admin),
+    current_user: DbUser = Depends(super_admin),
 ) -> organisation_schemas.OrganisationOut:
     """Create an organisation with the given details."""
     return await organisation_crud.create_organisation(db, org, logo)

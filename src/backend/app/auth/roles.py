@@ -134,7 +134,7 @@ async def super_admin(
     db_user = await check_access(user_data, db)
 
     if db_user:
-        return user_data
+        return db_user
 
     log.error(
         f"User {user_data.username} requested an admin endpoint, " "but is not admin"
