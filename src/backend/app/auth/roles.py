@@ -32,7 +32,7 @@ from sqlalchemy.orm import Session
 from app.auth.osm import AuthUser, login_required
 from app.db.database import get_db
 from app.db.db_models import DbProject, DbUser
-from app.models.enums import HTTPStatus, ProjectRole
+from app.models.enums import HTTPStatus, ProjectRole, ProjectVisibility
 from app.organisations.organisation_deps import check_org_exists
 from app.projects.project_deps import get_project_by_id
 
@@ -255,4 +255,30 @@ async def validator(
     raise HTTPException(
         status_code=HTTPStatus.FORBIDDEN,
         detail="User does not have validator permission",
+    )
+
+
+async def mapper(
+    project: DbProject = Depends(get_project_by_id),
+    db: Session = Depends(get_db),
+    user_data: AuthUser = Depends(login_required),
+) -> Optional[DbUser]:
+    """A mapper for a specific project."""
+    # If project is public, skip permission check
+    if project.visibility == ProjectVisibility.PUBLIC:
+        return None
+
+    db_user = await check_access(
+        user_data,
+        db,
+        project_id=project.id,
+        role=ProjectRole.VALIDATOR,
+    )
+
+    if db_user:
+        return db_user
+
+    raise HTTPException(
+        status_code=HTTPStatus.FORBIDDEN,
+        detail="User does not have mapper permission",
     )

@@ -44,10 +44,9 @@ router = APIRouter(
 async def get_organisations(
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(login_required),
-    approved: bool = True,
 ) -> list[DbOrganisation]:
     """Get a list of all organisations."""
-    return await organisation_crud.get_organisations(db, current_user, approved)
+    return await organisation_crud.get_organisations(db, current_user)
 
 
 @router.get("/{org_id}", response_model=organisation_schemas.OrganisationOut)
