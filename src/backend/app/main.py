@@ -34,6 +34,7 @@ from app.auth import auth_routes
 from app.central import central_routes
 from app.config import settings
 from app.db.database import get_db
+from app.models.enums import HTTPStatus
 from app.organisations import organisation_routes
 from app.projects import project_routes
 from app.projects.project_crud import read_xlsforms
@@ -186,13 +187,14 @@ if settings.DEBUG:
 @api.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Exception handler for more descriptive logging."""
+    status_code = 500
     errors = []
     for error in exc.errors():
         # TODO Handle this properly
         if error["msg"] in ["Invalid input", "field required"]:
-            status_code = 422  # Unprocessable Entity
+            status_code = HTTPStatus.UNPROCESSABLE_ENTITY
         else:
-            status_code = 400  # Bad Request
+            status_code = HTTPStatus.BAD_REQUEST
         errors.append(
             {
                 "loc": error["loc"],

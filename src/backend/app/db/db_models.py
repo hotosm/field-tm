@@ -17,7 +17,10 @@
 #
 """SQLAlchemy database models for interacting with Postgresql."""
 
-from geoalchemy2 import Geometry
+from datetime import datetime
+from typing import cast
+
+from geoalchemy2 import Geometry, WKBElement
 from sqlalchemy import (
     ARRAY,
     BigInteger,
@@ -36,8 +39,10 @@ from sqlalchemy import (
     UniqueConstraint,
     desc,
 )
+from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQLArray  # noqa: N811
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
-from sqlalchemy.orm import (  # , declarative_base  # , declarative_base
+from sqlalchemy.orm import (
+    # declarative_base,
     backref,
     object_session,
     relationship,
@@ -69,14 +74,17 @@ class DbUserRoles(Base):
     __tablename__ = "user_roles"
 
     # Table has composite PK on (user_id and project_id)
-    user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
-    project_id = Column(
-        Integer,
-        ForeignKey("projects.id"),
-        index=True,
-        primary_key=True,
+    user_id = cast(int, Column(BigInteger, ForeignKey("users.id"), primary_key=True))
+    project_id = cast(
+        int,
+        Column(
+            Integer,
+            ForeignKey("projects.id"),
+            index=True,
+            primary_key=True,
+        ),
     )
-    role = Column(Enum(ProjectRole), default=ProjectRole.MAPPER)
+    role = cast(ProjectRole, Column(Enum(ProjectRole), default=ProjectRole.MAPPER))
 
 
 class DbUser(Base):
@@ -84,29 +92,32 @@ class DbUser(Base):
 
     __tablename__ = "users"
 
-    id = Column(BigInteger, primary_key=True, index=True)
-    username = Column(String, unique=True)
-    profile_img = Column(String)
-    role = Column(Enum(UserRole), default=UserRole.MAPPER)
+    id = cast(int, Column(BigInteger, primary_key=True, index=True))
+    username = cast(str, Column(String, unique=True))
+    profile_img = cast(str, Column(String))
+    role = cast(UserRole, Column(Enum(UserRole), default=UserRole.MAPPER))
     project_roles = relationship(
         DbUserRoles, backref="user_roles_link", cascade="all, delete, delete-orphan"
     )
 
-    name = Column(String)
-    city = Column(String)
-    country = Column(String)
-    email_address = Column(String)
-    is_email_verified = Column(Boolean, default=False)
-    is_expert = Column(Boolean, default=False)
+    name = cast(str, Column(String))
+    city = cast(str, Column(String))
+    country = cast(str, Column(String))
+    email_address = cast(str, Column(String))
+    is_email_verified = cast(bool, Column(Boolean, default=False))
+    is_expert = cast(bool, Column(Boolean, default=False))
 
-    mapping_level = Column(
-        Enum(MappingLevel),
-        default=MappingLevel.BEGINNER,
+    mapping_level = cast(
+        MappingLevel,
+        Column(
+            Enum(MappingLevel),
+            default=MappingLevel.BEGINNER,
+        ),
     )
-    tasks_mapped = Column(Integer, default=0)
-    tasks_validated = Column(Integer, default=0)
-    tasks_invalidated = Column(Integer, default=0)
-    projects_mapped = Column(ARRAY(Integer))
+    tasks_mapped = cast(int, Column(Integer, default=0))
+    tasks_validated = cast(int, Column(Integer, default=0))
+    tasks_invalidated = cast(int, Column(Integer, default=0))
+    projects_mapped = cast(PostgreSQLArray, Column(ARRAY(Integer)))
 
     # mentions_notifications = Column(Boolean, default=True, nullable=False)
     # projects_comments_notifications = Column(
@@ -119,9 +130,9 @@ class DbUser(Base):
     #     Boolean, default=True, nullable=False
     # )
 
-    date_registered = Column(DateTime, default=timestamp)
+    date_registered = cast(datetime, Column(DateTime, default=timestamp))
     # Represents the date the user last had one of their tasks validated
-    last_validation_date = Column(DateTime, default=timestamp)
+    last_validation_date = cast(datetime, Column(DateTime, default=timestamp))
 
 
 # Secondary table defining many-to-many relationship between organisations and managers
@@ -140,19 +151,22 @@ class DbOrganisation(Base):
     __tablename__ = "organisations"
 
     # Columns
-    id = Column(Integer, primary_key=True)
-    name = Column(String(512), nullable=False, unique=True)
-    slug = Column(String(255), nullable=False, unique=True)
-    logo = Column(String)  # URL of a logo
-    description = Column(String)
-    url = Column(String)
-    type = Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False)
-    approved = Column(Boolean, default=False)
+    id = cast(int, Column(Integer, primary_key=True))
+    name = cast(str, Column(String(512), nullable=False, unique=True))
+    slug = cast(str, Column(String(255), nullable=False, unique=True))
+    logo = cast(str, Column(String))  # URL of a logo
+    description = cast(str, Column(String))
+    url = cast(str, Column(String))
+    type = cast(
+        OrganisationType,
+        Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False),
+    )
+    approved = cast(bool, Column(Boolean, default=False))
 
     ## Odk central server
-    odk_central_url = Column(String)
-    odk_central_user = Column(String)
-    odk_central_password = Column(String)
+    odk_central_url = cast(str, Column(String))
+    odk_central_user = cast(str, Column(String))
+    odk_central_password = cast(str, Column(String))
 
     managers = relationship(
         DbUser,
@@ -167,18 +181,22 @@ class DbTeam(Base):
     __tablename__ = "teams"
 
     # Columns
-    id = Column(Integer, primary_key=True)
-    organisation_id = Column(
-        Integer,
-        ForeignKey("organisations.id", name="fk_organisations"),
-        nullable=False,
+    id = cast(int, Column(Integer, primary_key=True))
+    organisation_id = cast(
+        int,
+        Column(
+            Integer,
+            ForeignKey("organisations.id", name="fk_organisations"),
+            nullable=False,
+        ),
     )
-    name = Column(String(512), nullable=False)
-    logo = Column(String)  # URL of a logo
-    description = Column(String)
-    invite_only = Column(Boolean, default=False, nullable=False)
-    visibility = Column(
-        Enum(TeamVisibility), default=TeamVisibility.PUBLIC, nullable=False
+    name = cast(str, Column(String(512), nullable=False))
+    logo = cast(str, Column(String))  # URL of a logo
+    description = cast(str, Column(String))
+    invite_only = cast(bool, Column(Boolean, default=False, nullable=False))
+    visibility = cast(
+        TeamVisibility,
+        Column(Enum(TeamVisibility), default=TeamVisibility.PUBLIC, nullable=False),
     )
     organisation = relationship(DbOrganisation, backref="teams")
 
@@ -187,9 +205,9 @@ class DbProjectTeams(Base):
     """Link table between teams and projects."""
 
     __tablename__ = "project_teams"
-    team_id = Column(Integer, ForeignKey("teams.id"), primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), primary_key=True)
-    role = Column(Integer, nullable=False)
+    team_id = cast(int, Column(Integer, ForeignKey("teams.id"), primary_key=True))
+    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), primary_key=True))
+    role = cast(int, Column(Integer, nullable=False))
 
     project = relationship(
         "DbProject", backref=backref("teams", cascade="all, delete-orphan")
@@ -204,15 +222,15 @@ class DbProjectInfo(Base):
 
     __tablename__ = "project_info"
 
-    project_id = Column(Integer, ForeignKey("projects.id"), primary_key=True)
-    project_id_str = Column(String)
-    name = Column(String(512))
-    short_description = Column(String)
-    description = Column(String)
-    text_searchable = Column(
-        TSVECTOR
+    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), primary_key=True))
+    project_id_str = cast(str, Column(String))
+    name = cast(str, Column(String(512)))
+    short_description = cast(str, Column(String))
+    description = cast(str, Column(String))
+    text_searchable = cast(
+        TSVECTOR, Column(TSVECTOR)
     )  # This contains searchable text and is populated by a DB Trigger
-    per_task_instructions = Column(String)
+    per_task_instructions = cast(str, Column(String))
 
     __table_args__ = (
         Index("textsearch_idx", "text_searchable"),
@@ -224,11 +242,13 @@ class DbProjectChat(Base):
     """Contains all project info localized into supported languages."""
 
     __tablename__ = "project_chat"
-    id = Column(BigInteger, primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    time_stamp = Column(DateTime, nullable=False, default=timestamp)
-    message = Column(String, nullable=False)
+    id = cast(int, Column(BigInteger, primary_key=True))
+    project_id = cast(
+        int, Column(Integer, ForeignKey("projects.id"), index=True, nullable=False)
+    )
+    user_id = cast(int, Column(Integer, ForeignKey("users.id"), nullable=False))
+    time_stamp = cast(datetime, Column(DateTime, nullable=False, default=timestamp))
+    message = cast(str, Column(String, nullable=False))
 
     # Relationships
     posted_by = relationship(DbUser, foreign_keys=[user_id])
@@ -238,14 +258,14 @@ class DbXForm(Base):
     """Xform templates and custom uploads."""
 
     __tablename__ = "xlsforms"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = cast(int, Column(Integer, primary_key=True, autoincrement=True))
     # The XLSForm name is the only unique thing we can use for a key
     # so on conflict update works. Otherwise we get multiple entries.
-    title = Column(String, unique=True)
-    category = Column(String)
-    description = Column(String)
-    xml = Column(String)  # Internal form representation
-    xls = Column(LargeBinary)  # Human readable representation
+    title = cast(str, Column(String, unique=True))
+    category = cast(str, Column(String))
+    description = cast(str, Column(String))
+    xml = cast(str, Column(String))  # Internal form representation
+    xls = cast(bytes, Column(LargeBinary))  # Human readable representation
 
 
 class DbTaskInvalidationHistory(Base):
@@ -255,20 +275,25 @@ class DbTaskInvalidationHistory(Base):
     """
 
     __tablename__ = "task_invalidation_history"
-    id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
-    task_id = Column(Integer, nullable=False)
-    is_closed = Column(Boolean, default=False)
-    mapper_id = Column(BigInteger, ForeignKey("users.id", name="fk_mappers"))
-    mapped_date = Column(DateTime)
-    invalidator_id = Column(BigInteger, ForeignKey("users.id", name="fk_invalidators"))
-    invalidated_date = Column(DateTime)
-    invalidation_history_id = Column(
-        Integer, ForeignKey("task_history.id", name="fk_invalidation_history")
+    id = cast(int, Column(Integer, primary_key=True))
+    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), nullable=False))
+    task_id = cast(int, Column(Integer, nullable=False))
+    is_closed = cast(bool, Column(Boolean, default=False))
+    mapper_id = cast(int, Column(BigInteger, ForeignKey("users.id", name="fk_mappers")))
+    mapped_date = cast(datetime, Column(DateTime))
+    invalidator_id = cast(
+        int, Column(BigInteger, ForeignKey("users.id", name="fk_invalidators"))
     )
-    validator_id = Column(BigInteger, ForeignKey("users.id", name="fk_validators"))
-    validated_date = Column(DateTime)
-    updated_date = Column(DateTime, default=timestamp)
+    invalidated_date = cast(datetime, Column(DateTime))
+    invalidation_history_id = cast(
+        int,
+        Column(Integer, ForeignKey("task_history.id", name="fk_invalidation_history")),
+    )
+    validator_id = cast(
+        int, Column(BigInteger, ForeignKey("users.id", name="fk_validators"))
+    )
+    validated_date = cast(datetime, Column(DateTime))
+    updated_date = cast(datetime, Column(DateTime, default=timestamp))
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -293,27 +318,31 @@ class DbTaskMappingIssue(Base):
     """
 
     __tablename__ = "task_mapping_issues"
-    id = Column(Integer, primary_key=True)
-    task_history_id = Column(
-        Integer, ForeignKey("task_history.id"), nullable=False, index=True
+    id = cast(int, Column(Integer, primary_key=True))
+    task_history_id = cast(
+        int, Column(Integer, ForeignKey("task_history.id"), nullable=False, index=True)
     )
-    issue = Column(String, nullable=False)
-    mapping_issue_category_id = Column(
-        Integer,
-        ForeignKey("mapping_issue_categories.id", name="fk_issue_category"),
-        nullable=False,
+    issue = cast(str, Column(String, nullable=False))
+    mapping_issue_category_id = cast(
+        int,
+        Column(
+            Integer,
+            ForeignKey("mapping_issue_categories.id", name="fk_issue_category"),
+            nullable=False,
+        ),
     )
-    count = Column(Integer, nullable=False)
+    count = cast(int, Column(Integer, nullable=False))
 
 
 class DbMappingIssueCategory(Base):
     """Represents a category of task mapping issues identified during validaton."""
 
     __tablename__ = "mapping_issue_categories"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
-    description = Column(String, nullable=True)
-    archived = Column(Boolean, default=False, nullable=False)
+
+    id = cast(int, Column(Integer, primary_key=True))
+    name = cast(str, Column(String, nullable=False, unique=True))
+    description = cast(str, Column(String, nullable=True))
+    archived = cast(bool, Column(Boolean, default=False, nullable=False))
 
 
 class DbTaskHistory(Base):
@@ -321,22 +350,26 @@ class DbTaskHistory(Base):
 
     __tablename__ = "task_history"
 
-    id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), index=True)
-    task_id = Column(Integer, nullable=False)
-    action = Column(Enum(TaskAction), nullable=False)
-    action_text = Column(String)
-    action_date = Column(DateTime, nullable=False, default=timestamp)
-    user_id = Column(
-        BigInteger,
-        ForeignKey("users.id", name="fk_users"),
-        index=True,
-        nullable=False,
+    id = cast(int, Column(Integer, primary_key=True))
+    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), index=True))
+    task_id = cast(int, Column(Integer, nullable=False))
+    action = cast(TaskAction, Column(Enum(TaskAction), nullable=False))
+    action_text = cast(str, Column(String))
+    action_date = cast(datetime, Column(DateTime, nullable=False, default=timestamp))
+    user_id = cast(
+        int,
+        Column(
+            BigInteger,
+            ForeignKey("users.id", name="fk_users"),
+            index=True,
+            nullable=False,
+        ),
     )
+
+    # Define relationships
     invalidation_history = relationship(
         DbTaskInvalidationHistory, lazy="dynamic", cascade="all"
     )
-
     actioned_by = relationship(DbUser)
     task_mapping_issues = relationship(DbTaskMappingIssue, cascade="all")
 
@@ -356,28 +389,33 @@ class DbTask(Base):
     __tablename__ = "tasks"
 
     # Table has composite PK on (id and project_id)
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    project_id = Column(
-        Integer, ForeignKey("projects.id"), index=True, primary_key=True
+    id = cast(int, Column(Integer, primary_key=True, autoincrement=True))
+    project_id = cast(
+        int, Column(Integer, ForeignKey("projects.id"), index=True, primary_key=True)
     )
-    project_task_index = Column(Integer)
-    project_task_name = Column(String)
-    outline = Column(Geometry("POLYGON", srid=4326))
-    geometry_geojson = Column(String)
-    initial_feature_count = Column(Integer)
-    task_status = Column(Enum(TaskStatus), default=TaskStatus.READY)
-    locked_by = Column(
-        BigInteger, ForeignKey("users.id", name="fk_users_locked"), index=True
+    project_task_index = cast(int, Column(Integer))
+    project_task_name = cast(str, Column(String))
+    outline = cast(WKBElement, Column(Geometry("POLYGON", srid=4326)))
+    geometry_geojson = cast(str, Column(String))
+    initial_feature_count = cast(int, Column(Integer))
+    task_status = cast(TaskStatus, Column(Enum(TaskStatus), default=TaskStatus.READY))
+    locked_by = cast(
+        int,
+        Column(BigInteger, ForeignKey("users.id", name="fk_users_locked"), index=True),
     )
-    mapped_by = Column(
-        BigInteger, ForeignKey("users.id", name="fk_users_mapper"), index=True
+    mapped_by = cast(
+        int,
+        Column(BigInteger, ForeignKey("users.id", name="fk_users_mapper"), index=True),
     )
-    validated_by = Column(
-        BigInteger, ForeignKey("users.id", name="fk_users_validator"), index=True
+    validated_by = cast(
+        int,
+        Column(
+            BigInteger, ForeignKey("users.id", name="fk_users_validator"), index=True
+        ),
     )
-    odk_token = Column(String, nullable=True)
+    odk_token = cast(str, Column(String, nullable=True))
 
-    # Mapped objects
+    # Define relationships
     task_history = relationship(
         DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
     )
@@ -401,48 +439,60 @@ class DbProject(Base):
     __tablename__ = "projects"
 
     # Columns
-    id = Column(Integer, primary_key=True)
-    odkid = Column(Integer)
+    id = cast(int, Column(Integer, primary_key=True))
+    odkid = cast(int, Column(Integer))
+    organisation_id = cast(
+        int,
+        Column(
+            Integer,
+            ForeignKey("organisations.id", name="fk_organisations"),
+            index=True,
+        ),
+    )
+    organisation = relationship(DbOrganisation, backref="projects")
 
     # PROJECT CREATION
-    author_id = Column(
-        BigInteger,
-        ForeignKey("users.id", name="fk_users"),
-        nullable=False,
-        server_default="20386219",
+    author_id = cast(
+        int,
+        Column(
+            BigInteger,
+            ForeignKey("users.id", name="fk_users"),
+            nullable=False,
+            server_default="20386219",
+        ),
     )
     author = relationship(DbUser, uselist=False, backref="user")
-    created = Column(DateTime, default=timestamp, nullable=False)
-
-    task_split_type = Column(Enum(TaskSplitType), nullable=True)
-    # split_strategy = Column(Integer)
-    # grid_meters = Column(Integer)
-    # task_type = Column(Integer)
-    # target_number_of_features = Column(Integer)
+    created = cast(datetime, Column(DateTime, default=timestamp, nullable=False))
 
     # PROJECT DETAILS
-    project_name_prefix = Column(String)
-    task_type_prefix = Column(String)
+    project_name_prefix = cast(str, Column(String))
+    task_type_prefix = cast(str, Column(String))
     project_info = relationship(
         DbProjectInfo,
         cascade="all, delete, delete-orphan",
         uselist=False,
         backref="project",
     )
-    location_str = Column(String)
+    location_str = cast(str, Column(String))
 
     # GEOMETRY
-    outline = Column(Geometry("POLYGON", srid=4326))
+    outline = cast(WKBElement, Column(Geometry("POLYGON", srid=4326)))
     # geometry = Column(Geometry("POLYGON", srid=4326, from_text='ST_GeomFromWkt'))
-    centroid = Column(Geometry("POINT", srid=4326))
+    centroid = cast(WKBElement, Column(Geometry("POINT", srid=4326)))
 
     # PROJECT STATUS
-    last_updated = Column(DateTime, default=timestamp)
-    status = Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
-    visibility = Column(
-        Enum(ProjectVisibility), default=ProjectVisibility.PUBLIC, nullable=False
+    last_updated = cast(datetime, Column(DateTime, default=timestamp))
+    status = cast(
+        ProjectStatus,
+        Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False),
     )
-    total_tasks = Column(Integer)
+    visibility = cast(
+        ProjectVisibility,
+        Column(
+            Enum(ProjectVisibility), default=ProjectVisibility.PUBLIC, nullable=False
+        ),
+    )
+    total_tasks = cast(int, Column(Integer))
     # tasks_mapped = Column(Integer, default=0, nullable=False)
     # tasks_validated = Column(Integer, default=0, nullable=False)
     # tasks_bad_imagery = Column(Integer, default=0, nullable=False)
@@ -491,7 +541,9 @@ class DbProject(Base):
         )
 
     # XFORM DETAILS
-    xform_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
+    xform_title = cast(
+        str, Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
+    )
     xform = relationship(DbXForm)
 
     __table_args__ = (
@@ -499,68 +551,77 @@ class DbProject(Base):
         {},
     )
 
-    mapper_level = Column(
-        Enum(MappingLevel),
-        default=MappingLevel.INTERMEDIATE,
-        nullable=False,
-        index=True,
-    )  # Mapper level project is suitable for
-    priority = Column(Enum(ProjectPriority), default=ProjectPriority.MEDIUM)
-    featured = Column(
-        Boolean, default=False
-    )  # Only admins can set a project as featured
-    mapping_permission = Column(Enum(MappingPermission), default=MappingPermission.ANY)
-    validation_permission = Column(
-        Enum(ValidationPermission), default=ValidationPermission.LEVEL
-    )  # Means only users with validator role can validate
-    organisation_id = Column(
-        Integer,
-        ForeignKey("organisations.id", name="fk_organisations"),
-        index=True,
+    mapper_level = cast(
+        MappingLevel,
+        Column(
+            Enum(MappingLevel),
+            default=MappingLevel.INTERMEDIATE,
+            nullable=False,
+            index=True,
+        ),
     )
-    organisation = relationship(DbOrganisation, backref="projects")
-    changeset_comment = Column(String)
+    priority = cast(
+        ProjectPriority, Column(Enum(ProjectPriority), default=ProjectPriority.MEDIUM)
+    )
+    featured = cast(
+        bool, Column(Boolean, default=False)
+    )  # Only admins can set a project as featured
+    mapping_permission = cast(
+        MappingPermission,
+        Column(Enum(MappingPermission), default=MappingPermission.ANY),
+    )
+    validation_permission = cast(
+        ValidationPermission,
+        Column(Enum(ValidationPermission), default=ValidationPermission.LEVEL),
+    )  # Means only users with validator role can validate
+    changeset_comment = cast(str, Column(String))
 
-    ## Odk central server
-    odk_central_url = Column(String)
-    odk_central_user = Column(String)
-    odk_central_password = Column(String)
+    # Odk central server
+    odk_central_url = cast(str, Column(String))
+    odk_central_user = cast(str, Column(String))
+    odk_central_password = cast(str, Column(String))
 
     # Count of tasks where osm extracts is completed, used for progress bar.
-    extract_completed_count = Column(Integer, default=0)
+    extract_completed_count = cast(int, Column(Integer, default=0))
 
-    form_xls = Column(LargeBinary)  # XLSForm file if custom xls is uploaded
-    form_config_file = Column(LargeBinary)  # Yaml config file if custom xls is uploaded
+    form_xls = cast(
+        bytes, Column(LargeBinary)
+    )  # XLSForm file if custom xls is uploaded
+    form_config_file = cast(
+        bytes, Column(LargeBinary)
+    )  # Yaml config file if custom xls is uploaded
 
-    data_extract_type = Column(String)  # Type of data extract (Polygon or Centroid)
-    # Options: divide on square, manual upload, task splitting algo
-    task_split_type = Column(Enum(TaskSplitType), nullable=True)
-    task_split_dimension = Column(SmallInteger, nullable=True)
-    task_num_buildings = Column(SmallInteger, nullable=True)
+    data_extract_type = cast(
+        str, Column(String)
+    )  # Type of data extract (Polygon or Centroid)
+    task_split_type = cast(
+        TaskSplitType, Column(Enum(TaskSplitType), nullable=True)
+    )  # Options: divide on square, manual upload, task splitting algo
+    task_split_dimension = cast(int, Column(SmallInteger, nullable=True))
+    task_num_buildings = cast(int, Column(SmallInteger, nullable=True))
 
-    hashtags = Column(ARRAY(String))  # Project hashtag
+    hashtags = cast(list, Column(ARRAY(String)))  # Project hashtag
 
-    ## ---------------------------------------------- ##
-    # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
-    imagery = Column(String)
-    osm_preset = Column(String)
-    odk_preset = Column(String)
-    josm_preset = Column(String)
-    id_presets = Column(ARRAY(String))
-    extra_id_params = Column(String)
-    license_id = Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
+    # Other Attributes
+    imagery = cast(str, Column(String))
+    osm_preset = cast(str, Column(String))
+    odk_preset = cast(str, Column(String))
+    josm_preset = cast(str, Column(String))
+    id_presets = cast(list, Column(ARRAY(String)))
+    extra_id_params = cast(str, Column(String))
+    license_id = cast(
+        int, Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
+    )
+
     # GEOMETRY
     # country = Column(ARRAY(String), default=[])
+
     # FEEDBACK
-    project_chat = relationship(DbProjectChat, lazy="dynamic", cascade="all")
-    osmcha_filter_id = Column(
-        String
+    osmcha_filter_id = cast(
+        str, Column(String)
     )  # Optional custom filter id for filtering on OSMCha
-    due_date = Column(DateTime)
+    due_date = cast(datetime, Column(DateTime))
 
-
-# TODO: Add index on project geometry, tried to add in __table args__
-# Index("idx_geometry", DbProject.geometry, postgresql_using="gist")
 
 # Secondary table defining the many-to-many join
 user_licenses_table = Table(
@@ -576,10 +637,10 @@ class DbLicense(Base):
 
     __tablename__ = "licenses"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
-    description = Column(String)
-    plain_text = Column(String)
+    id = cast(int, Column(Integer, primary_key=True))
+    name = cast(str, Column(String, unique=True))
+    description = cast(str, Column(String))
+    plain_text = cast(str, Column(String))
 
     projects = relationship(DbProject, backref="license")
     users = relationship(
@@ -592,15 +653,17 @@ class DbFeatures(Base):
 
     __tablename__ = "features"
 
-    id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey("projects.id"))
-    project = relationship(DbProject, backref="features")
+    id = cast(int, Column(Integer, primary_key=True))
+    project_id = cast(int, Column(Integer, ForeignKey("projects.id")))
+    project = cast(DbProject, relationship(DbProject, backref="features"))
 
-    category_title = Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
-    category = relationship(DbXForm)
-    task_id = Column(Integer, nullable=True)
-    properties = Column(JSONB)
-    geometry = Column(Geometry(geometry_type="GEOMETRY", srid=4326))
+    category_title = cast(
+        str, Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
+    )
+    category = cast(DbXForm, relationship(DbXForm))
+    task_id = cast(int, Column(Integer, nullable=True))
+    properties = cast(dict, Column(JSONB))
+    geometry = cast(WKBElement, Column(Geometry(geometry_type="GEOMETRY", srid=4326)))
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -616,11 +679,13 @@ class BackgroundTasks(Base):
 
     __tablename__ = "background_tasks"
 
-    id = Column(String, primary_key=True)
-    name = Column(String)
-    project_id = Column(Integer, nullable=True)
-    status = Column(Enum(BackgroundTaskStatus), nullable=False)
-    message = Column(String)
+    id = cast(str, Column(String, primary_key=True))
+    name = cast(str, Column(String))
+    project_id = cast(int, Column(Integer, nullable=True))
+    status = cast(
+        BackgroundTaskStatus, Column(Enum(BackgroundTaskStatus), nullable=False)
+    )
+    message = cast(str, Column(String))
 
 
 class DbTilesPath(Base):
@@ -628,10 +693,12 @@ class DbTilesPath(Base):
 
     __tablename__ = "mbtiles_path"
 
-    id = Column(Integer, primary_key=True)
-    project_id = Column(Integer)
-    status = Column(Enum(BackgroundTaskStatus), nullable=False)
-    path = Column(String)
-    tile_source = Column(String)
-    background_task_id = Column(String)
-    created_at = Column(DateTime, default=timestamp)
+    id = cast(int, Column(Integer, primary_key=True))
+    project_id = cast(int, Column(Integer))
+    status = cast(
+        BackgroundTaskStatus, Column(Enum(BackgroundTaskStatus), nullable=False)
+    )
+    path = cast(str, Column(String))
+    tile_source = cast(str, Column(String))
+    background_task_id = cast(str, Column(String))
+    created_at = cast(datetime, Column(DateTime, default=timestamp))
