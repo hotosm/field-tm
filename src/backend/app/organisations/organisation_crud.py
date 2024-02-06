@@ -37,16 +37,18 @@ from app.users.user_crud import get_user
 
 
 async def get_organisations(
-    db: Session, current_user: AuthUser, is_approved: bool
+    db: Session,
+    current_user: AuthUser,
 ) -> list[db_models.DbOrganisation]:
     """Get all orgs."""
     db_user = await get_user(db, current_user.id)
 
+    # If admin, show all orgs
     if db_user.role == UserRole.ADMIN:
-        # If admin, show unapproved orgs too
-        is_approved = False
+        return db.query(db_models.DbOrganisation).all()
 
-    return db.query(db_models.DbOrganisation).filter_by(approved=is_approved).all()
+    # If not admin, only show approved orgs
+    return db.query(db_models.DbOrganisation).filter_by(approved=True).all()
 
 
 async def upload_logo_to_s3(
