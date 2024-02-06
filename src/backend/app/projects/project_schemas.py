@@ -129,21 +129,13 @@ class ProjectInfo(BaseModel):
     description: str
 
 
-class ProjectUpdate(BaseModel):
-    """Update project."""
-
-    name: Optional[str] = None
-    short_description: Optional[str] = None
-    description: Optional[str] = None
-
-
 class ProjectIn(BaseModel):
     """Upload new project."""
 
     project_info: ProjectInfo
+    organisation_id: Optional[int] = None
     xform_title: str
     hashtags: Optional[List[str]] = None
-    organisation_id: Optional[int] = None
     task_split_type: Optional[TaskSplitType] = None
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
@@ -173,6 +165,15 @@ class ProjectUpload(ProjectIn, ODKCentralIn):
     """Project upload details, plus ODK credentials."""
 
     pass
+
+
+class ProjectUpdate(ProjectIn):
+    """Update project."""
+
+    name: Optional[str] = None
+    short_description: Optional[str] = None
+    description: Optional[str] = None
+    organisation_id: Optional[int] = None
 
 
 class Feature(BaseModel):

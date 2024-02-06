@@ -28,6 +28,7 @@ from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
 
+from app.auth.osm import AuthUser, login_required
 from app.central import central_crud
 from app.config import settings
 from app.db import database, db_models
@@ -47,6 +48,7 @@ async def read_submissions(
     project_id: int,
     task_id: int = None,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ) -> list[dict]:
     """Get all submissions made for a project.
 
@@ -55,6 +57,7 @@ async def read_submissions(
         task_id (int, optional): The ID of the task.
             If provided, returns the submissions made for a specific task only.
         db (Session): The database session, automatically provided.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         list[dict]: The list of submissions.
@@ -68,6 +71,7 @@ async def download_submission(
     task_id: int = None,
     export_json: bool = True,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Download the submissions for a given project.
 
@@ -79,6 +83,7 @@ async def download_submission(
             If provided, returns the submissions made for a specific task only.
         export_json (bool): Export in JSON format, else returns a file.
         db (Session): The database session, automatically provided.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         Union[list[dict], File]: JSON of submissions, or submission file.
@@ -97,6 +102,7 @@ async def submission_points(
     project_id: int,
     task_id: int = None,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Get submission points for a given project.
 
@@ -105,6 +111,7 @@ async def submission_points(
         task_id (int, optional): The ID of the task.
             If provided, returns the submissions made for a specific task only.
         db (Session): The database session, automatically provided.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         File: a zip containing submission points.
@@ -117,6 +124,7 @@ async def convert_to_osm(
     project_id: int,
     task_id: int = None,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ) -> str:
     """Convert JSON submissions to OSM XML for a project.
 
@@ -125,6 +133,7 @@ async def convert_to_osm(
         task_id (int, optional): The ID of the task.
             If provided, returns the submissions made for a specific task only.
         db (Session): The database session, automatically provided.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         File: an OSM XML of submissions.
@@ -149,6 +158,7 @@ async def get_submission_count(
 async def conflate_osm_data(
     project_id: int,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Conflate submission data against existing OSM data."""
     # All Submissions JSON
@@ -210,6 +220,7 @@ async def download_submission_json(
     project_id: int,
     background_task_id: Optional[str] = None,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Download submissions for a project in JSON format.
 
@@ -257,6 +268,7 @@ async def download_submission_json(
 async def get_osm_xml(
     project_id: int,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Get the submissions in OSM XML format for a project.
 
@@ -309,6 +321,7 @@ async def get_submission_page(
     background_tasks: BackgroundTasks,
     planned_task: Optional[int] = None,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Summary submissison details for submission page.
 
@@ -318,6 +331,7 @@ async def get_submission_page(
         project_id (int): The ID of the project.
         days (int): The number of days to consider for fetching submissions.
         planned_task (int): Associated task id.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         dict: A dictionary containing the submission counts for each date.
@@ -340,13 +354,16 @@ async def get_submission_page(
 
 @router.get("/submission_form_fields/{project_id}")
 async def get_submission_form_fields(
-    project_id: int, db: Session = Depends(database.get_db)
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Retrieves the submission form for a specific project.
 
     Args:
         project_id (int): The ID of the project.
         db (Session): The database session, automatically generated.
+        current_user (AuthUser): Check if user is logged in.
 
     Returns:
         Any: The response from the submission form API.
@@ -365,6 +382,7 @@ async def submission_table(
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """This api returns the submission table of a project.
 
@@ -401,6 +419,7 @@ async def task_submissions(
     page: int = Query(1, ge=1),
     limit: int = Query(13, le=100),
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """This api returns the submission table of a project.
 

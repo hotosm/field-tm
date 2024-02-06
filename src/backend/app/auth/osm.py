@@ -42,7 +42,7 @@ class AuthUser(BaseModel):
     id: int
     username: str
     img_url: Optional[str] = None
-    role: Optional[UserRole] = None
+    role: Optional[UserRole] = UserRole.MAPPER
 
 
 async def init_osm_auth():
@@ -65,6 +65,7 @@ async def login_required(
         return AuthUser(
             id=20386219,
             username="svcfmtm",
+            role=UserRole.ADMIN,
         )
 
     osm_auth = await init_osm_auth()

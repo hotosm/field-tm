@@ -25,6 +25,8 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
+from app.auth.osm import AuthUser, login_required
+from app.auth.roles import project_admin
 from app.central import central_crud
 from app.db import database
 from app.models.enums import TaskStatus
@@ -125,6 +127,7 @@ async def update_task_status(
     task_id: int,
     new_status: TaskStatus,
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Update the task status."""
     user_id = user.id
@@ -141,6 +144,7 @@ async def edit_task_boundary(
     task_id: int,
     boundary: UploadFile = File(...),
     db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(project_admin),
 ):
     """Update the task boundary manually."""
     # read entire file
