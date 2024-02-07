@@ -28,15 +28,6 @@ function EditProjectValidation(values: ProjectValues) {
   // if (!values?.organisation) {
   //   errors.organisation = 'Organization is Required.';
   // }
-  // if (!values?.odk_central_url) {
-  //   errors.odk_central_url = 'ODK Central Url is Required.';
-  // }
-  // if (!values?.odk_central_user) {
-  //   errors.odk_central_user = 'ODK Central User is Required.';
-  // }
-  // if (!values?.odk_central_password) {
-  //   errors.odk_central_password = 'ODK Central Password is Required.';
-  // }
   if (!values?.name) {
     errors.name = 'Project Name is Required.';
   }

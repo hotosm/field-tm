@@ -1,5 +1,6 @@
 import TextArea from '@/components/common/TextArea';
 import InputTextField from '@/components/common/InputTextField';
+import RadioButton from '@/components/common/RadioButton';
 import React, { useEffect } from 'react';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
@@ -34,6 +35,11 @@ const ProjectDetailsForm = ({ flag }) => {
     submission,
     CreateProjectValidation,
   );
+
+  const orgDefaultOdkCreds = useAppSelector((state) => state.createproject.orgDefaultOdkCreds);
+  const handleCheckboxChange = () => {
+    dispatch(CreateProjectActions.ToggleOrgDefaultOdkCreds(!orgDefaultOdkCreds)); // Dispatch the action to toggle the orgDefaultOdkCreds state
+  };
 
   const onFocus = () => {
     dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
@@ -112,52 +118,55 @@ const ProjectDetailsForm = ({ flag }) => {
               required
               errorMsg={errors.short_description}
             />
-            <InputTextField
-              id="odk_central_url"
-              name="odk_central_url"
-              label="ODK Central URL"
-              value={values?.odk_central_url}
-              onChange={handleChange}
-              fieldType="text"
-              required
-              errorMsg={errors.odk_central_url}
-            />
-            <InputTextField
-              id="odk_central_user"
-              name="odk_central_user"
-              label="Central ODK Email/Username"
-              value={values?.odk_central_user}
-              onChange={handleChange}
-              fieldType="text"
-              required
-              errorMsg={errors.odk_central_user}
-            />
-            <InputTextField
-              id="odk_central_password"
-              name="odk_central_password"
-              label="Central ODK Password"
-              value={values?.odk_central_password}
-              onChange={handleChange}
-              fieldType="password"
-              required
-              errorMsg={errors.odk_central_password}
-            />
+            <label>
+              <input type="checkbox" checked={orgDefaultOdkCreds} onChange={handleCheckboxChange} /> Use Custom ODK
+              Credentials (Optional)
+            </label>
+            {orgDefaultOdkCreds && (
+              <>
+                <InputTextField
+                  id="odk_central_url"
+                  name="odk_central_url"
+                  label="ODK Central URL"
+                  value={values?.odk_central_url}
+                  onChange={handleChange}
+                  fieldType="text"
+                  errorMsg={errors.odk_central_url}
+                />
+                <InputTextField
+                  id="odk_central_user"
+                  name="odk_central_user"
+                  label="ODK Central Email"
+                  value={values?.odk_central_user}
+                  onChange={handleChange}
+                  fieldType="text"
+                  errorMsg={errors.odk_central_user}
+                />
+                <InputTextField
+                  id="odk_central_password"
+                  name="odk_central_password"
+                  label="ODK Central Password"
+                  value={values?.odk_central_password}
+                  onChange={handleChange}
+                  fieldType="password"
+                  errorMsg={errors.odk_central_password}
+                />
+              </>
+            )}
             <div>
               <InputTextField
                 id="hashtags"
-                label="Changeset Comment"
+                label="Tags"
                 value={values?.hashtags}
                 onChange={(e) => {
                   handleHashtagOnChange(e);
                 }}
                 fieldType="text"
-                required
                 errorMsg={errors.hashtag}
               />
               <p className="fmtm-text-sm fmtm-text-gray-500 fmtm-leading-4 fmtm-mt-2">
-                *Default comments added to uploaded changeset comment field. Users should also be encouraged to add text
-                describing what they mapped. Hashtags are sometimes used for analysis later, but should be human
-                informative and not overused, #group #event
+                *Hashtags related to what is being mapped. By default #FMTM is included. Hashtags are sometimes used for
+                analysis later, but should be human informative and not overused, #group #event
               </p>
             </div>
           </div>
