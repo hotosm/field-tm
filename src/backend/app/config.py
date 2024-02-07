@@ -27,7 +27,10 @@ from pydantic.networks import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 HttpUrlStr = Annotated[
-    str, BeforeValidator(lambda value: str(TypeAdapter(HttpUrl).validate_python(value)))
+    str,
+    BeforeValidator(
+        lambda value: str(TypeAdapter(HttpUrl).validate_python(value) if value else "")
+    ),
 ]
 
 

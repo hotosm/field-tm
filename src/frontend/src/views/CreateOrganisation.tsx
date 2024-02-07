@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import environment from '@/environment';
 import useForm from '@/hooks/useForm';
+import InputTextField from '@/components/common/InputTextField';
+import TextArea from '@/components/common/TextArea';
 import OrganisationAddValidation from '@/components/organisation/Validation/OrganisationAddValidation';
 import { PostOrganisationDataService } from '@/api/OrganisationService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -63,136 +65,90 @@ const CreateOrganisationForm = () => {
           borderRadius: 2,
         }}
       >
-        <form onSubmit={handleSubmit}>
-          <CoreModules.FormGroup>
+        <form
+          className="xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar"
+          onSubmit={handleSubmit}
+        >
+          <CoreModules.FormGroup className="fmtm-flex fmtm-flex-col fmtm-gap-6 md:fmtm-w-[50%]">
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel component="h3">Organization Name</CoreModules.FormLabel>
-                <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
-                  *
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-
-              <CoreModules.TextField
+              <InputTextField
                 id="name"
-                variant="filled"
-                fullWidth
-                margin="normal"
+                name="name"
+                label="Organization Name"
                 value={values.name}
                 onChange={(e) => {
                   handleCustomChange('name', e.target.value);
                 }}
-                helperText={errors.name}
-                FormHelperTextProps={inputFormStyles()}
+                fieldType="text"
+                required
+                errorMsg={errors.name}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel sx={{}} component="h3">
-                  Website URL
-                </CoreModules.FormLabel>
-                <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
-                  *
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.TextField
+              <InputTextField
                 id="url"
+                name="url"
+                label="Website URL"
                 value={values.url}
-                variant="filled"
-                margin="normal"
                 onChange={(e) => {
                   handleCustomChange('url', e.target.value);
                 }}
-                fullWidth
-                helperText={errors.url}
-                FormHelperTextProps={inputFormStyles()}
+                fieldType="text"
+                required
+                errorMsg={errors.url}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel sx={{}} component="h3">
-                  Description
-                </CoreModules.FormLabel>
-                <CoreModules.FormLabel component="h3" sx={{ color: 'red' }}>
-                  *
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.TextField
+              <TextArea
                 id="description"
-                label=""
-                variant="filled"
+                name="description"
+                label="Description"
+                rows={3}
                 value={values.description}
                 onChange={(e) => {
                   handleCustomChange('description', e.target.value);
                 }}
-                fullWidth
-                multiline
-                rows={4}
-                helperText={errors.description}
-                FormHelperTextProps={inputFormStyles()}
+                required
+                errorMsg={errors.description}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel sx={{}} component="h3">
-                  ODK Central URL (Optional)
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.TextField
+              <InputTextField
                 id="odk_central_url"
-                label=""
-                variant="filled"
+                name="odk_central_url"
+                label="ODK Central URL (Optional)"
                 value={values.odk_central_url}
                 onChange={(e) => {
                   handleCustomChange('odk_central_url', e.target.value);
                 }}
-                fullWidth
-                multiline
-                rows={1}
-                helperText={errors.odk_central_url}
-                FormHelperTextProps={inputFormStyles()}
+                fieldType="text"
+                errorMsg={errors.odk_central_url}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel sx={{}} component="h3">
-                  ODK Central User (Optional)
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.TextField
+              <InputTextField
                 id="odk_central_user"
-                label=""
-                variant="filled"
+                name="odk_central_user"
+                label="ODK Central User (Optional)"
                 value={values.odk_central_user}
                 onChange={(e) => {
                   handleCustomChange('odk_central_user', e.target.value);
                 }}
-                fullWidth
-                multiline
-                rows={1}
-                helperText={errors.odk_central_user}
-                FormHelperTextProps={inputFormStyles()}
+                fieldType="text"
+                errorMsg={errors.odk_central_user}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl sx={{ width: '100%' }}>
-              <CoreModules.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                <CoreModules.FormLabel sx={{}} component="h3">
-                  ODK Central Password (Optional)
-                </CoreModules.FormLabel>
-              </CoreModules.Box>
-              <CoreModules.TextField
+              <InputTextField
                 id="odk_central_password"
-                label=""
-                variant="filled"
+                name="odk_central_password"
+                label="ODK Central Password (Optional)"
                 value={values.odk_central_password}
                 onChange={(e) => {
                   handleCustomChange('odk_central_password', e.target.value);
                 }}
-                fullWidth
-                multiline
-                rows={1}
-                helperText={errors.odk_central_password}
-                FormHelperTextProps={inputFormStyles()}
+                fieldType="password"
+                errorMsg={errors.odk_central_password}
               />
             </CoreModules.FormControl>
             <CoreModules.FormControl fullWidth margin="normal" variant="filled" sx={{ gap: 1 }}>
@@ -209,6 +165,7 @@ const CreateOrganisationForm = () => {
                     '&.Mui-focused': {
                       color: 'black',
                     },
+                    fontWeight: 'bold',
                   }}
                 >
                   Upload Logo

@@ -50,6 +50,7 @@ export const initialState: CreateProjectStateTypes = {
   isTasksGenerated: { divide_on_square: false, task_splitting_algorithm: false },
   isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
+  orgDefaultOdkCreds: false,
 };
 
 const CreateProject = createSlice({
@@ -91,6 +92,7 @@ const CreateProject = createSlice({
       state.uploadAreaSelection = null;
       state.dividedTaskGeojson = null;
       state.dividedTaskLoading = false;
+      state.orgDefaultOdkCreds = false;
     },
     UploadAreaLoading(state, action) {
       state.projectAreaLoading = action.payload;
@@ -228,6 +230,9 @@ const CreateProject = createSlice({
     },
     SetToggleSplittedGeojsonEdit(state, action) {
       state.toggleSplittedGeojsonEdit = action.payload;
+    },
+    ToggleOrgDefaultOdkCreds(state, action) {
+      state.orgDefaultOdkCreds = action.payload;
     },
   },
 });
