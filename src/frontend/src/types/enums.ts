@@ -15,3 +15,9 @@ export enum task_priority_str {
   SPLIT = 7,
   ARCHIVED = 8,
 }
+
+export enum user_roles {
+  READ_ONLY = '-1',
+  MAPPER = '0',
+  ADMIN = '1',
+}

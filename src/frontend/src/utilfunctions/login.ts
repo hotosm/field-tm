@@ -44,6 +44,7 @@ export const createLoginWindow = (redirectTo) => {
                     id: userRes.id,
                     picture: userRes.img_url,
                     redirect_to: redirectTo,
+                    role: userRes.role,
                   }).toString();
                   const redirectUrl = `/osmauth?${params}`;
                   window.location.href = redirectUrl;

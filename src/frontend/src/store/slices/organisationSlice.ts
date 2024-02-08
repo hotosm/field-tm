@@ -8,6 +8,13 @@ const OrganisationSlice = CoreModules.createSlice({
     postOrganisationData: null,
     organisationDataLoading: false,
     postOrganisationDataLoading: false,
+    consentDetailsFormData: {
+      give_consent: '',
+      review_documentation: [],
+      log_into: [],
+      participated_in: [],
+    },
+    consentApproval: false,
   },
   reducers: {
     GetOrganisationsData(state, action) {
@@ -23,6 +30,15 @@ const OrganisationSlice = CoreModules.createSlice({
       state.postOrganisationDataLoading = action.payload;
     },
     SetOrganisationFormData(state, action) {
+      state.organisationFormData = action.payload;
+    },
+    SetConsentDetailsFormData(state, action) {
+      state.consentDetailsFormData = action.payload;
+    },
+    SetConsentApproval(state, action) {
+      state.consentApproval = action.payload;
+    },
+    SetIndividualOrganization(state, action) {
       state.organisationFormData = action.payload;
     },
   },

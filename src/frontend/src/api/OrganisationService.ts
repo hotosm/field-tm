@@ -78,24 +78,110 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'Organization Successfully Created.',
+            message: 'Organization Request Submitted.',
             variant: 'success',
             duration: 2000,
           }),
         );
       } catch (error: any) {
+        dispatch(OrganisationAction.PostOrganisationDataLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: error.response.data.detail,
+            message: error.response.data.detail || 'Failed to create organization.',
             variant: 'error',
             duration: 2000,
           }),
         );
-        dispatch(OrganisationAction.PostOrganisationDataLoading(false));
       }
     };
 
     await postOrganisationData(url, payload);
+  };
+};
+
+export const GetIndividualOrganizationService: Function = (url: string) => {
+  return async (dispatch) => {
+    const getOrganisationData = async (url) => {
+      try {
+        const getOrganisationDataResponse = await axios.get(url);
+        const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
+        dispatch(OrganisationAction.SetIndividualOrganization(response));
+      } catch (error) {}
+    };
+    await getOrganisationData(url);
+  };
+};
+
+export const PatchOrganizationDataService: Function = (url: string, payload: any) => {
+  return async (dispatch) => {
+    dispatch(OrganisationAction.PostOrganisationDataLoading(true));
+
+    const patchOrganisationData = async (url, payload) => {
+      dispatch(OrganisationAction.SetOrganisationFormData(payload));
+
+      try {
+        const generateApiFormData = new FormData();
+        appendObjectToFormData(generateApiFormData, payload);
+
+        const patchOrganisationData = await axios.patch(url, payload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        const resp: HomeProjectCardModel = patchOrganisationData.data;
+        dispatch(OrganisationAction.PostOrganisationDataLoading(false));
+        dispatch(OrganisationAction.postOrganisationData(resp));
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Organization Updated Successfully.',
+            variant: 'success',
+            duration: 2000,
+          }),
+        );
+      } catch (error: any) {
+        dispatch(OrganisationAction.PostOrganisationDataLoading(false));
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: error.response.data.detail || 'Failed to update organization.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+    };
+
+    await patchOrganisationData(url, payload);
+  };
+};
+
+export const ApproveOrganizationService: Function = (url: string, organizationId: string) => {
+  return async (dispatch) => {
+    const approveOrganization = async (url) => {
+      try {
+        await axios.post(url, organizationId);
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Organization approved successfully.',
+            variant: 'success',
+            duration: 2000,
+          }),
+        );
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to approve organization.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+    };
+    await approveOrganization(url);
   };
 };
