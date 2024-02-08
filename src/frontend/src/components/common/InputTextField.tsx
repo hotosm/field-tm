@@ -6,6 +6,7 @@ export const blockInvalidChar = (e) => ['e', 'E', '+', '-'].includes(e.key) && e
 interface IInputTextFieldProps {
   id?: string;
   label: string;
+  subLabel?: string | React.JSX.Element;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   errorMsg?: string;
@@ -25,6 +26,7 @@ interface IInputTextFieldProps {
 function InputTextField({
   id,
   label,
+  subLabel,
   onChange,
   onKeyDown,
   errorMsg,
@@ -42,9 +44,12 @@ function InputTextField({
 }: IInputTextFieldProps) {
   return (
     <div className={`fmtm-custom-textField ${classNames}`}>
-      <div className="fmtm-flex fmtm-gap-1">
-        <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold">{label}</p>
-        {required && <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>}
+      <div className="fmtm-mb-2">
+        <div className="fmtm-flex fmtm-gap-1">
+          <p className="fmtm-text-[1rem] fmtm-font-semibold">{label}</p>
+          {required && <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>}
+        </div>
+        {subLabel && <p className="fmtm-text-base fmtm-text-[#7A7676]">{subLabel}</p>}
       </div>
       <div
         className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-h-[2.3rem] fmtm-w-full fmtm-justify-between fmtm-flex fmtm-items-center fmtm-overflow-hidden fmtm-rounded-md`}

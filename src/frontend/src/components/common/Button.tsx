@@ -23,7 +23,7 @@ const btnStyle = (btnType, className) => {
       return `hover:fmtm-bg-gray-100 fmtm-flex fmtm-bg-white  fmtm-px-4 fmtm-py-1 fmtm-border border-[#E0E0E0] fmtm-rounded-[8px] ${className}`;
 
     case 'other':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-red-600 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-red-600 ${className}`;
+      return `fmtm-py-1 fmtm-px-4 fmtm-text-red-600 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 ${className}`;
     case 'disabled':
       return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed ${className}`;
 
