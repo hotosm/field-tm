@@ -371,7 +371,7 @@ class DbTaskHistory(Base):
     invalidation_history = relationship(
         DbTaskInvalidationHistory, lazy="dynamic", cascade="all"
     )
-    actioned_by = relationship(DbUser)
+    actioned_by = relationship(DbUser, overlaps="task_history_user,user")
     task_mapping_issues = relationship(DbTaskMappingIssue, cascade="all")
 
     __table_args__ = (
