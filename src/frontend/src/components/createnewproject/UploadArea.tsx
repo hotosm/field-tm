@@ -13,6 +13,7 @@ import UploadAreaValidation from '@/components/createnewproject/validation/Uploa
 import FileInputComponent from '@/components/common/FileInputComponent';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
+import { valid } from 'geojson-validation';
 
 // @ts-ignore
 const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
@@ -92,15 +93,32 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
       };
     }
     addGeojsonToState(geojsonConversion);
+    return geojsonConversion;
   };
+
   const addGeojsonToState = (geojson) => {
     dispatch(CreateProjectActions.SetDrawnGeojson(geojson));
   };
-  const changeFileHandler = (event) => {
+
+  const changeFileHandler = async (event) => {
     const { files } = event.target;
-    handleCustomChange('uploadedAreaFile', files[0].name);
-    setGeojsonFile(files[0]);
-    convertFileToGeojson(files[0]);
+    if (valid(await convertFileToGeojson(files[0]))) {
+      handleCustomChange('uploadedAreaFile', files[0].name);
+      setGeojsonFile(files[0]);
+      convertFileToGeojson(files[0]);
+    } else {
+      handleCustomChange('uploadedAreaFile', '');
+      setGeojsonFile(null);
+      addGeojsonToState(null);
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'File not a valid geojson',
+          variant: 'error',
+          duration: 4000,
+        }),
+      );
+    }
     handleCustomChange('drawnGeojson', null);
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
   };
