@@ -131,7 +131,7 @@ export const consentQuestions: consentQuestionsType[] = [
   {
     id: 'participated_in',
     type: 'checkbox',
-    required: true,
+    required: false,
     question: 'Have you participated in...?',
     description: 'These are not required but helpful in assessing on-boarding pathways.',
     options: [
