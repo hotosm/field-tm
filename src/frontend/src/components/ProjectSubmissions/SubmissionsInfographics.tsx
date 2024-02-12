@@ -158,8 +158,8 @@ const SubmissionsInfographics = () => {
 
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
-      <div className="fmtm-flex fmtm-gap-10">
-        <div className="fmtm-w-[70%]">
+      <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 lg:fmtm-gap-10">
+        <div className="lg:fmtm-w-[70%]">
           <InfographicsCard
             cardRef={formSubmissionRef}
             header="Form Submissions"
@@ -183,7 +183,7 @@ const SubmissionsInfographics = () => {
             }
           />
         </div>
-        <div className="fmtm-w-[30%]">
+        <div className="lg:fmtm-w-[30%]">
           <InfographicsCard
             cardRef={projectProgressRef}
             header="Project Progress"
@@ -201,8 +201,8 @@ const SubmissionsInfographics = () => {
           />
         </div>
       </div>
-      <div className="fmtm-flex fmtm-gap-10">
-        <div className="fmtm-w-[70%]">
+      <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 lg:fmtm-gap-10">
+        <div className="lg:fmtm-w-[70%]">
           <InfographicsCard
             cardRef={plannedVsActualRef}
             header="Validated vs Mapped Task"
@@ -226,7 +226,7 @@ const SubmissionsInfographics = () => {
             }
           />
         </div>
-        <div className="fmtm-w-[30%]">
+        <div className="lg:fmtm-w-[30%]">
           <InfographicsCard
             cardRef={totalContributorsRef}
             header={`Total Contributors: ${submissionContributorsData.length}`}

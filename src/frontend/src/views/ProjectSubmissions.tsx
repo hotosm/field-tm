@@ -70,9 +70,7 @@ const ProjectSubmissions = () => {
             onClick={() => setViewBy('table')}
           />
         </div>
-        <div className="fmtm-flex fmtm-flex-grow ">
-          <ProjectInfo />
-        </div>
+        <ProjectInfo />
       </div>
       <div className="fmtm-w-full">
         {viewBy === 'infographics' ? <SubmissionsInfographics /> : <SubmissionsTable />}
