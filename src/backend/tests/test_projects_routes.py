@@ -21,6 +21,7 @@ import functools
 import json
 import os
 import uuid
+from io import BytesIO
 from unittest.mock import Mock, patch
 
 import pytest
@@ -203,6 +204,8 @@ async def test_generate_appuser_files(db, project):
 
     # Provide custom xlsform file path
     xlsform_file = f"{test_data_path}/buildings.xls"
+    with open(xlsform_file, "rb") as xlsform_data:
+        xlsform_obj = BytesIO(xlsform_data.read())
 
     for task_id in task_ids:
         # NOTE avoid the lambda function for run_in_threadpool
@@ -226,12 +229,13 @@ async def test_generate_appuser_files(db, project):
         lambda: project_crud.generate_appuser_files(
             db,
             project_id,
-            custom_xls_form=xlsform_file,
-            category="buildings",
-            form_type="example_form_type",
+            custom_form=xlsform_obj,
+            form_category="buildings",
+            form_format="example_form_type",
             background_task_id=uuid.uuid4(),
         )
     )
+
     assert result is None
 
 
