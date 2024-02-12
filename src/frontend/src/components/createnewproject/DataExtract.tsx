@@ -20,13 +20,13 @@ const dataExtractOptions = [
 ];
 
 const osmFeatureTypeOptions = [
-  { name: 'osm_feature_type', value: 'point_centroid', label: 'Point/Centroid' },
+  { name: 'osm_feature_type', value: 'centroid', label: 'Point/Centroid' },
   { name: 'osm_feature_type', value: 'line', label: 'Line' },
   { name: 'osm_feature_type', value: 'polygon', label: 'Polygon' },
 ];
 
 enum FeatureTypeName {
-  point_centroid = 'Point/Centroid',
+  centroid = 'Point/Centroid',
   line = 'Line',
   polygon = 'Polygon',
 }
@@ -38,7 +38,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
   const [extractWays, setExtractWays] = useState('');
   const [featureType, setFeatureType] = useState('');
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
-  const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
+  const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
 
@@ -73,61 +73,69 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
     errors,
   }: any = useForm(projectDetails, submission, DataExtractValidation);
 
+  const getFileFromGeojson = (geojson) => {
+    // Create a File object from the geojson Blob
+    const geojsonBlob = new Blob([JSON.stringify(geojson)], { type: 'application/json' });
+    return new File([geojsonBlob], 'data.geojson', { type: 'application/json' });
+  };
+
   // Generate OSM data extract
   const generateDataExtract = async () => {
-    // Get OSM data extract if required
-    if (extractWays === 'osm_data_extract') {
-      // Remove current data extract
-      dispatch(CreateProjectActions.setDataExtractGeojson(null));
+    if (extractWays !== 'osm_data_extract') {
+      return;
+    }
 
-      // Create a file object from the project area Blob
-      const projectAreaBlob = new Blob([JSON.stringify(drawnGeojson)], { type: 'application/json' });
-      const drawnGeojsonFile = new File([projectAreaBlob], 'outline.json', { type: 'application/json' });
+    // Remove current data extract
+    dispatch(CreateProjectActions.setDataExtractGeojson(null));
 
-      dispatch(CreateProjectActions.SetFgbFetchingStatus(true));
-      // Create form and POST endpoint
-      const dataExtractRequestFormData = new FormData();
-      dataExtractRequestFormData.append('geojson_file', drawnGeojsonFile);
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/projects/get_data_extract/`,
-          dataExtractRequestFormData,
-        );
+    const dataExtractRequestFormData = new FormData();
+    const projectAoiGeojsonFile = getFileFromGeojson(projectAoiGeojson);
+    dataExtractRequestFormData.append('geojson_file', projectAoiGeojsonFile);
+    dataExtractRequestFormData.append('form_category', projectDetails.formCategorySelection);
 
-        const fgbUrl = response.data.url;
-        // Append url to project data & remove custom files
-        dispatch(
-          CreateProjectActions.SetIndividualProjectDetailsData({
-            ...formValues,
-            data_extract_type: fgbUrl,
-            dataExtractWays: extractWays,
-            dataExtractFeatureType: featureType,
-            customLineUpload: null,
-            customPolygonUpload: null,
-          }),
-        );
+    // Set flatgeobuf as loading
+    dispatch(CreateProjectActions.SetFgbFetchingStatus(true));
 
-        // Extract fgb and set geojson to map
-        const fgbFile = await fetch(fgbUrl);
-        const binaryData = await fgbFile.arrayBuffer();
-        const uint8ArrayData = new Uint8Array(binaryData);
-        // Deserialize the binary data
-        const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
-        dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
-        await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: 'Error to generate FGB file.',
-            variant: 'error',
-            duration: 2000,
-          }),
-        );
-        dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
-        // TODO add error message for user
-        console.error('Error getting data extract:', error);
-      }
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/projects/generate-data-extract/`,
+        dataExtractRequestFormData,
+      );
+
+      const fgbUrl = response.data.url;
+      // Append url to project data & remove custom files
+      dispatch(
+        CreateProjectActions.SetIndividualProjectDetailsData({
+          ...formValues,
+          data_extract_type: featureType,
+          data_extract_url: fgbUrl,
+          dataExtractWays: extractWays,
+          dataExtractFeatureType: featureType,
+          customLineUpload: null,
+          customPolygonUpload: null,
+        }),
+      );
+
+      // Extract fgb and set geojson to map
+      const fgbFile = await fetch(fgbUrl);
+      const binaryData = await fgbFile.arrayBuffer();
+      const uint8ArrayData = new Uint8Array(binaryData);
+      // Deserialize the binary data
+      const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
+      dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
+      await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
+    } catch (error) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'Error generating data extract.',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+      dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
+      // TODO add error message for user
+      console.error('Error getting data extract:', error);
     }
   };
 
@@ -248,20 +256,6 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                 errorMsg={errors.dataExtractWays}
               />
               {extractWays === 'osm_data_extract' && (
-                <div className="fmtm-mt-6">
-                  <RadioButton
-                    topic="Select OSM feature type"
-                    options={osmFeatureTypeOptions}
-                    direction="column"
-                    value={featureType}
-                    onChangeData={(value) => {
-                      setFeatureType(value);
-                    }}
-                    errorMsg={errors.dataExtractFeatureType}
-                  />
-                </div>
-              )}
-              {extractWays === 'osm_data_extract' && featureType && (
                 <Button
                   btnText="Generate Data Extract"
                   btnType="primary"
@@ -273,24 +267,37 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                   className="fmtm-mt-6"
                   isLoading={isFgbFetching}
                   loadingText="Data extracting..."
-                  disabled={
-                    featureType === formValues?.dataExtractFeatureType &&
-                    dataExtractGeojson &&
-                    !customPolygonUpload &&
-                    !customLineUpload
-                      ? true
-                      : false
-                  }
+                  disabled={dataExtractGeojson && !customPolygonUpload && !customLineUpload ? true : false}
                 />
               )}
               {extractWays === 'custom_data_extract' && (
                 <>
+                  {/* TODO add option for point upload */}
+                  {/* Set dataExtractFeatureType = 'centroid' */}
+                  {/* <FileInputComponent
+                    onChange={(e) => {
+                      changeFileHandler(e, setCustomPolygonUpload);
+                      handleCustomChange('customPolygonUpload', e.target.files[0]);
+                      handleCustomChange('dataExtractFeatureType', 'polygon');
+                      setFeatureType('');
+                    }}
+                    onResetFile={() => {
+                      resetFile(setCustomPolygonUpload);
+                      handleCustomChange('customPolygonUpload', null);
+                    }}
+                    customFile={customPolygonUpload}
+                    btnText="Upload Polygons"
+                    accept=".geojson,.json,.fgb"
+                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
+                    errorMsg={errors.customPolygonUpload}
+                  /> */}
                   <FileInputComponent
                     onChange={(e) => {
                       changeFileHandler(e, setCustomPolygonUpload);
                       handleCustomChange('customPolygonUpload', e.target.files[0]);
-                      handleCustomChange('dataExtractFeatureType', '');
-                      setFeatureType('');
+                      handleCustomChange('dataExtractFeatureType', 'polygon');
+                      handleCustomChange('data_extract_type', 'line');
+                      setFeatureType('polygon');
                     }}
                     onResetFile={() => {
                       resetFile(setCustomPolygonUpload);
@@ -306,7 +313,9 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                     onChange={(e) => {
                       changeFileHandler(e, setCustomLineUpload);
                       handleCustomChange('customLineUpload', e.target.files[0]);
-                      handleCustomChange('dataExtractFeatureType', null);
+                      handleCustomChange('dataExtractFeatureType', 'line');
+                      handleCustomChange('data_extract_type', 'line');
+                      setFeatureType('line');
                     }}
                     onResetFile={() => {
                       resetFile(setCustomLineUpload);
@@ -336,9 +345,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                 className="fmtm-font-bold"
                 dataTip={`${!dataExtractGeojson ? 'Please Generate Data Extract First.' : ''}`}
                 disabled={
-                  !dataExtractGeojson ||
-                  (extractWays === 'osm_data_extract' && !formValues?.dataExtractFeatureType) ||
-                  isFgbFetching
+                  !dataExtractGeojson || (extractWays === 'osm_data_extract' && !dataExtractGeojson) || isFgbFetching
                     ? true
                     : false
                 }
@@ -346,7 +353,10 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
-            <NewDefineAreaMap uploadedOrDrawnGeojsonFile={drawnGeojson} buildingExtractedGeojson={dataExtractGeojson} />
+            <NewDefineAreaMap
+              uploadedOrDrawnGeojsonFile={projectAoiGeojson}
+              buildingExtractedGeojson={dataExtractGeojson}
+            />
           </div>
         </div>
       </div>

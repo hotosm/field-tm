@@ -9,7 +9,7 @@ BEGIN;
 -- Drop qr_code table
 DROP TABLE IF EXISTS public.qr_code CASCADE;
 
--- Update field in projects table
+-- Update field in tasks table
 ALTER TABLE IF EXISTS public.tasks
     DROP COLUMN IF EXISTS qr_code_id,
     ADD COLUMN IF NOT EXISTS odk_token VARCHAR;

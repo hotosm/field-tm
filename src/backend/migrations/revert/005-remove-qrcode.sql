@@ -21,7 +21,7 @@ ALTER TABLE ONLY public.qr_code ALTER COLUMN id SET DEFAULT nextval('public.qr_c
 ALTER TABLE ONLY public.qr_code
     ADD CONSTRAINT qr_code_pkey PRIMARY KEY (id);
 
--- Update field in projects table
+-- Update field in tasks table
 ALTER TABLE IF EXISTS public.tasks
     DROP COLUMN IF EXISTS odk_token,
     ADD COLUMN IF NOT EXISTS qr_code_id integer;

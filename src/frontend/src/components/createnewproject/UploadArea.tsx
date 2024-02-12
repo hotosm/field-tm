@@ -15,9 +15,6 @@ import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
 import { valid } from 'geojson-validation';
 
-// @ts-ignore
-const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
-
 const uploadAreaOptions = [
   {
     name: 'upload_area',

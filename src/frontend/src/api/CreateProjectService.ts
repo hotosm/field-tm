@@ -16,7 +16,6 @@ const CreateProjectService: Function = (
   fileUpload: any,
   formUpload: any,
   dataExtractFile: any,
-  lineExtractFile: any,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
@@ -33,8 +32,9 @@ const CreateProjectService: Function = (
             UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/custom_task_boundaries`, fileUpload),
           );
         } else if (payload.splitting_algorithm === 'Use natural Boundary') {
+          // TODO this is not longer valid, remove?
           await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/task_split/${resp.id}/`, fileUpload),
+            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/task-split/${resp.id}/`, fileUpload),
           );
         } else {
           await dispatch(
@@ -50,28 +50,32 @@ const CreateProjectService: Function = (
             duration: 2000,
           }),
         );
-        if (dataExtractFile) {
+
+        if (payload.dataExtractWays === 'osm_data_extract') {
+          // Upload data extract generated from raw-data-api
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${resp.id}`,
+            {
+              url: payload.data_extract_url,
+              extract_type: payload.data_extract_type,
+            },
+          );
+        } else if (dataExtractFile) {
+          // Upload custom data extract from user
           const dataExtractFormData = new FormData();
           dataExtractFormData.append('custom_extract_file', dataExtractFile);
-          await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}`,
+          const response = await axios.post(
+            `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract/?project_id=${resp.id}`,
             dataExtractFormData,
           );
         }
-        if (lineExtractFile) {
-          const lineExtractFormData = new FormData();
-          lineExtractFormData.append('custom_extract_file', lineExtractFile);
-          await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/upload_custom_extract/?project_id=${resp.id}`,
-            lineExtractFormData,
-          );
-        }
+
+        // Generate QR codes
         await dispatch(
           GenerateProjectQRService(
-            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/generate`,
+            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/generate-project-data`,
             payload,
             formUpload,
-            dataExtractFile,
           ),
         );
 
@@ -152,40 +156,34 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
     await postUploadArea(url, filePayload, payload);
   };
 };
-const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any, dataExtractFile: any) => {
+const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GenerateProjectQRLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
     const postUploadArea = async (url, payload: any, formUpload) => {
-      // debugger;
-      console.log(formUpload, 'formUpload');
-      console.log(payload, 'payload');
       try {
-        const isPolygon = payload.data_extractWays === 'Polygon';
-        const generateApiFormData = new FormData();
+        let postNewProjectDetails;
+
         if (payload.form_ways === 'custom_form') {
-          generateApiFormData.append('extract_polygon', isPolygon.toString());
-          generateApiFormData.append('upload', formUpload);
-          if (dataExtractFile) {
-            generateApiFormData.append('data_extracts', dataExtractFile);
-          }
+          // TODO move form upload to a separate service / endpoint?
+          const generateApiFormData = new FormData();
+          generateApiFormData.append('xls_form_upload', formUpload);
+          postNewProjectDetails = await axios.post(url, generateApiFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
         } else {
-          generateApiFormData.append('extract_polygon', isPolygon.toString());
-          if (dataExtractFile) {
-            generateApiFormData.append('data_extracts', dataExtractFile);
-          }
+          postNewProjectDetails = await axios.post(url, {});
         }
-        const postNewProjectDetails = await axios.post(url, generateApiFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+
         const resp: string = postNewProjectDetails.data;
         await dispatch(CreateProjectActions.GenerateProjectQRLoading(false));
         dispatch(CommonActions.SetLoading(false));
         await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp));
       } catch (error: any) {
+        console.log(error);
         dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
@@ -218,38 +216,6 @@ const OrganisationService: Function = (url: string) => {
     };
 
     await getOrganisationList(url);
-  };
-};
-
-const UploadCustomXLSFormService: Function = (url: string, payload: any) => {
-  return async (dispatch) => {
-    dispatch(CreateProjectActions.UploadCustomXLSFormLoading(true));
-
-    const postUploadCustomXLSForm = async (url, payload) => {
-      try {
-        const customXLSFormData = new FormData();
-        customXLSFormData.append('upload', payload[0]);
-        const postCustomXLSForm = await axios.post(url, customXLSFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        await dispatch(CreateProjectActions.UploadCustomXLSFormLoading(false));
-        await dispatch(CreateProjectActions.UploadCustomXLSFormSuccess(postCustomXLSForm.data));
-      } catch (error: any) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: JSON.stringify(error.response.data.detail) || 'Something Went Wrong',
-            variant: 'error',
-            duration: 2000,
-          }),
-        );
-        dispatch(CreateProjectActions.UploadCustomXLSFormLoading(false));
-      }
-    };
-
-    await postUploadCustomXLSForm(url, payload);
   };
 };
 
@@ -329,8 +295,8 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
 const TaskSplittingPreviewService: Function = (
   url: string,
   fileUpload: any,
-  dataExtractFile: any,
   no_of_buildings: string,
+  dataExtractFile: any,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
@@ -339,8 +305,10 @@ const TaskSplittingPreviewService: Function = (
       try {
         const taskSplittingFileFormData = new FormData();
         taskSplittingFileFormData.append('project_geojson', fileUpload);
-        taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
         taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
+        if (dataExtractFile) {
+          taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
+        }
 
         const getTaskSplittingResponse = await axios.post(url, taskSplittingFileFormData);
         const resp: OrganisationListModel = getTaskSplittingResponse.data;
@@ -566,7 +534,6 @@ export {
   FormCategoryService,
   GenerateProjectQRService,
   OrganisationService,
-  UploadCustomXLSFormService,
   GenerateProjectLog,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,

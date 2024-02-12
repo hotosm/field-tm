@@ -3,7 +3,6 @@ interface ProjectValues {
   dataExtractWays: string;
   data_extractFile: object;
   data_extract_options: string;
-  dataExtractFeatureType: string;
   drawnGeojson: string;
   uploadedAreaFile: string;
 }
@@ -12,7 +11,6 @@ interface ValidationErrors {
   dataExtractWays?: string;
   data_extractFile?: string;
   data_extract_options?: string;
-  dataExtractFeatureType?: string;
   drawnGeojson?: string;
   uploadedAreaFile?: string;
 }

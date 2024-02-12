@@ -371,6 +371,7 @@ CREATE TABLE public.projects (
     form_xls bytea,
     form_config_file bytea,
     data_extract_type character varying,
+    data_extract_url character varying,
     task_split_type character varying,
     hashtags character varying[]
 );

@@ -3,7 +3,6 @@ interface ProjectValues {
   dataExtractWays: string;
   data_extractFile: object;
   data_extract_options: string;
-  dataExtractFeatureType: string;
   customPolygonUpload: string;
   customLineUpload: string;
 }
@@ -12,7 +11,6 @@ interface ValidationErrors {
   dataExtractWays?: string;
   data_extractFile?: string;
   data_extract_options?: string;
-  dataExtractFeatureType?: string;
   customPolygonUpload?: string;
   customLineUpload?: string;
 }
@@ -21,12 +19,9 @@ function DataExtractValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
   if (!values?.dataExtractWays) {
-    errors.dataExtractWays = 'Data Extract Ways is Required.';
+    errors.dataExtractWays = 'Data Extract Selection is Required.';
   }
 
-  if (values.dataExtractWays && values.dataExtractWays === 'osm_data_extract' && !values.dataExtractFeatureType) {
-    errors.dataExtractFeatureType = 'OSM Feature Type is Required.';
-  }
   if (
     values.dataExtractWays &&
     values.dataExtractWays === 'custom_data_extract' &&

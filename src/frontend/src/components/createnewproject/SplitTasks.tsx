@@ -116,9 +116,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       task_split_type: splitTasksSelection,
       form_ways: projectDetails.formWays,
       // "uploaded_form": projectDetails.uploaded_form,
-      data_extractWays: projectDetails.data_extractWays,
       hashtags: arrayHashtag,
       data_extract_type: projectDetails.data_extract_type,
+      data_extract_url: projectDetails.data_extract_url,
     };
     if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {
       projectData = { ...projectData, task_num_buildings: projectDetails.average_buildings_per_task };
@@ -162,8 +162,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     const drawnGeojsonFile = new File([projectAreaBlob], 'outline.json', { type: 'application/json' });
 
     // Create a file object from the data extract Blob
-    const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
-    const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
+    // const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
+    // const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
 
     if (splitTasksSelection === task_split_type['divide_on_square']) {
       dispatch(
@@ -179,10 +179,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       // a.click();
       dispatch(
         TaskSplittingPreviewService(
-          `${import.meta.env.VITE_API_URL}/projects/task_split`,
+          `${import.meta.env.VITE_API_URL}/projects/task-split`,
           drawnGeojsonFile,
-          dataExtractFile,
           formValues?.average_buildings_per_task,
+          // TODO include extract file only if custom upload
+          // dataExtractFile,
         ),
       );
     }
