@@ -17,8 +17,6 @@ const osmFeatureTypeOptions = [
   { name: 'form_ways', value: 'existing_form', label: 'Use Existing Form' },
   { name: 'form_ways', value: 'custom_form', label: 'Upload a Custom Form' },
 ];
-// @ts-ignore
-const DefineAreaMap = React.lazy(() => import('../../views/DefineAreaMap'));
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
   const dispatch = useDispatch();
@@ -26,6 +24,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
+  const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
@@ -105,6 +104,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   value={formValues.formCategorySelection}
                   onValueChange={(value) => {
                     handleCustomChange('formCategorySelection', value);
+                    dispatch(CreateProjectActions.setDataExtractGeojson(null));
                   }}
                   errorMsg={errors.formCategorySelection}
                   className="fmtm-max-w-[13.5rem]"
@@ -137,7 +137,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   onResetFile={resetFile}
                   customFile={customFormFile}
                   btnText="Select a Form"
-                  accept=".xlsx"
+                  accept=".xls,.xlsx"
                   fileDescription="*The supported file formats are .xlsx, .xls"
                   errorMsg={errors.customFormUpload}
                 />

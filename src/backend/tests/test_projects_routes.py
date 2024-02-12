@@ -226,9 +226,7 @@ async def test_generate_appuser_files(db, project):
         lambda: project_crud.generate_appuser_files(
             db,
             project_id,
-            extract_polygon=True,
             custom_xls_form=xlsform_file,
-            extracts_contents=data_extracts,
             category="buildings",
             form_type="example_form_type",
             background_task_id=uuid.uuid4(),

@@ -20,6 +20,7 @@
 import json
 import os
 import uuid
+from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
@@ -37,6 +38,7 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse, JSONResponse
 from loguru import logger as log
+from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
@@ -46,10 +48,10 @@ from app.auth.osm import AuthUser, login_required
 from app.auth.roles import mapper, org_admin, project_admin, super_admin
 from app.central import central_crud
 from app.db import database, db_models
+from app.db.postgis_utils import check_crs
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
-from app.projects.project_crud import check_crs
 from app.static import data_path
 from app.submissions import submission_crud
 from app.tasks import tasks_crud
@@ -410,7 +412,7 @@ async def upload_custom_task_boundaries(
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
-    check_crs(boundary)
+    await check_crs(boundary)
 
     log.debug("Creating tasks for each polygon in project")
     result = await project_crud.update_multi_polygon_project_boundary(
@@ -432,10 +434,10 @@ async def upload_custom_task_boundaries(
     }
 
 
-@router.post("/task_split")
+@router.post("/task-split")
 async def task_split(
     project_geojson: UploadFile = File(...),
-    extract_geojson: UploadFile = File(...),
+    extract_geojson: Optional[UploadFile] = File(None),
     no_of_buildings: int = Form(50),
     db: Session = Depends(database.get_db),
 ):
@@ -444,8 +446,9 @@ async def task_split(
     Args:
         project_geojson (UploadFile): The geojson to split.
             Should be a FeatureCollection.
-        extract_geojson (UploadFile): Data extract geojson containing osm features.
-            Should be a FeatureCollection.
+        extract_geojson (UploadFile, optional): Custom data extract geojson
+            containing osm features (should be a FeatureCollection).
+            If not included, an extract is generated automatically.
         no_of_buildings (int, optional): The number of buildings per subtask.
             Defaults to 50.
         db (Session, optional): The database session. Injected by FastAPI.
@@ -457,18 +460,19 @@ async def task_split(
     # read project boundary
     parsed_boundary = geojson.loads(await project_geojson.read())
     # Validatiing Coordinate Reference Systems
-    check_crs(parsed_boundary)
+    await check_crs(parsed_boundary)
 
     # read data extract
-    parsed_extract = geojson.loads(await extract_geojson.read())
-
-    check_crs(parsed_extract)
+    parsed_extract = None
+    if extract_geojson:
+        parsed_extract = geojson.loads(await extract_geojson.read())
+        await check_crs(parsed_extract)
 
     return await project_crud.split_geojson_into_tasks(
         db,
         parsed_boundary,
-        parsed_extract,
         no_of_buildings,
+        parsed_extract,
     )
 
 
@@ -504,7 +508,7 @@ async def upload_project_boundary(
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
-    check_crs(boundary)
+    await check_crs(boundary)
 
     # update project boundary and dimension
     result = await project_crud.update_project_boundary(
@@ -546,7 +550,7 @@ async def edit_project_boundary(
     boundary = json.loads(content)
 
     # Validatiing Coordinate Reference System
-    check_crs(boundary)
+    await check_crs(boundary)
 
     result = await project_crud.update_project_boundary(
         db, project_id, boundary, dimension
@@ -584,14 +588,11 @@ async def validate_form(form: UploadFile):
     return await central_crud.test_form_validity(contents, file_ext[1:])
 
 
-@router.post("/{project_id}/generate")
+@router.post("/{project_id}/generate-project-data")
 async def generate_files(
     background_tasks: BackgroundTasks,
     project_id: int,
-    extract_polygon: bool = Form(False),
     xls_form_upload: Optional[UploadFile] = File(None),
-    xls_form_config_file: Optional[UploadFile] = File(None),
-    data_extracts: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
     org_user_dict: db_models.DbUser = Depends(org_admin),
 ):
@@ -610,12 +611,8 @@ async def generate_files(
     Args:
         background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
         project_id (int): The ID of the project for which files are being generated.
-        extract_polygon (bool): A boolean flag indicating whether the polygon
-            is extracted or not.
         xls_form_upload (UploadFile, optional): A custom XLSForm to use in the project.
             A file should be provided if user wants to upload a custom xls form.
-        xls_form_config_file (UploadFile, optional): The config YAML for the XLS form.
-        data_extracts (UploadFile, optional): Custom data extract GeoJSON.
         db (Session): Database session, provided automatically.
         org_user_dict (AuthUser): Current logged in user. Must be org admin.
 
@@ -623,8 +620,6 @@ async def generate_files(
         json (JSONResponse): A success message containing the project ID.
     """
     log.debug(f"Generating media files tasks for project: {project_id}")
-    custom_xls_form = None
-    xform_title = None
 
     project = await project_crud.get_project(db, project_id)
     if not project:
@@ -632,48 +627,26 @@ async def generate_files(
             status_code=428, detail=f"Project with id {project_id} does not exist"
         )
 
-    project.data_extract_type = "polygon" if extract_polygon else "centroid"
-    db.commit()
-
+    form_category = project.xform_title
+    custom_xls_form = None
     if xls_form_upload:
         log.debug("Validating uploaded XLS form")
-        # Validating for .XLS File.
-        file_name = os.path.splitext(xls_form_upload.filename)
-        file_ext = file_name[1]
-        allowed_extensions = [".xls", ".xlsx", ".xml"]
+
+        file_path = Path(xls_form_upload.filename)
+        file_ext = file_path.suffix.lower()
+        allowed_extensions = {".xls", ".xlsx", ".xml"}
         if file_ext not in allowed_extensions:
-            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
-        xform_title = file_name[0]
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Invalid file extension, must be {allowed_extensions}",
+            )
+
+        form_category = file_path.stem
         custom_xls_form = await xls_form_upload.read()
 
+        # Write XLS form content to db
         project.form_xls = custom_xls_form
-
-        if xls_form_config_file:
-            config_file_name = os.path.splitext(xls_form_config_file.filename)
-            config_file_ext = config_file_name[1]
-            if not config_file_ext == ".yaml":
-                raise HTTPException(
-                    status_code=400, detail="Provide a valid .yaml config file"
-                )
-            config_file_contents = await xls_form_config_file.read()
-            project.form_config_file = config_file_contents
-
         db.commit()
-
-    if data_extracts:
-        log.debug("Validating uploaded geojson file")
-        # Validating for .geojson File.
-        data_extracts_file_name = os.path.splitext(data_extracts.filename)
-        extracts_file_ext = data_extracts_file_name[1]
-        if extracts_file_ext != ".geojson":
-            raise HTTPException(status_code=400, detail="Provide a valid geojson file")
-        try:
-            extracts_contents = await data_extracts.read()
-            json.loads(extracts_contents)
-        except json.JSONDecodeError as e:
-            raise HTTPException(
-                status_code=400, detail="Provide a valid geojson file"
-            ) from e
 
     # Create task in db and return uuid
     log.debug(f"Creating export background task for project ID: {project_id}")
@@ -686,11 +659,9 @@ async def generate_files(
         project_crud.generate_appuser_files,
         db,
         project_id,
-        extract_polygon,
-        custom_xls_form,
-        extracts_contents if data_extracts else None,
-        xform_title,
-        file_ext[1:] if xls_form_upload else "xls",
+        BytesIO(custom_xls_form) if custom_xls_form else None,
+        form_category,
+        file_ext if xls_form_upload else "xls",
         background_task_id,
     )
 
@@ -841,42 +812,69 @@ async def preview_split_by_square(
     boundary = geojson.loads(content)
 
     # Validatiing Coordinate Reference System
-    check_crs(boundary)
+    await check_crs(boundary)
 
     result = await project_crud.preview_split_by_square(boundary, dimension)
     return result
 
 
-@router.post("/get_data_extract/")
+@router.post("/generate-data-extract/")
 async def get_data_extract(
     geojson_file: UploadFile = File(...),
-    project_id: int = Query(None, description="Project ID"),
-    db: Session = Depends(database.get_db),
+    form_category: Optional[str] = Form(None),
+    # config_file: Optional[str] = Form(None),
     current_user: AuthUser = Depends(login_required),
 ):
-    """Get the data extract for a given project AOI.
+    """Get a new data extract for a given project AOI.
 
-    Use for both generating a new data extract and for getting
-    and existing extract.
+    TODO allow config file (YAML/JSON) upload for data extract generation
+    TODO alternatively, direct to raw-data-api to generate first, then upload
     """
     boundary_geojson = json.loads(await geojson_file.read())
 
-    fgb_url = await project_crud.get_data_extract_url(
-        db,
+    # Get extract config file from existing data_models
+    if form_category:
+        data_model = f"{data_models_path}/{form_category}.yaml"
+        with open(data_model, "rb") as data_model_yaml:
+            extract_config = BytesIO(data_model_yaml.read())
+    else:
+        extract_config = None
+
+    fgb_url = await project_crud.generate_data_extract(
         boundary_geojson,
-        project_id,
+        extract_config,
     )
+
     return JSONResponse(status_code=200, content={"url": fgb_url})
 
 
-@router.post("/upload_custom_extract/")
+@router.post("/data-extract-url/")
+async def get_or_set_data_extract(
+    url: Optional[str] = None,
+    extract_type: Optional[str] = None,
+    project_id: int = Query(..., description="Project ID"),
+    db: Session = Depends(database.get_db),
+    org_user_dict: db_models.DbUser = Depends(project_admin),
+):
+    """Get or set the data extract URL for a project."""
+    fgb_url = await project_crud.get_or_set_data_extract_url(
+        db,
+        project_id,
+        url,
+        extract_type,
+    )
+
+    return JSONResponse(status_code=200, content={"url": fgb_url})
+
+
+@router.post("/upload-custom-extract/")
 async def upload_custom_extract(
     custom_extract_file: UploadFile = File(...),
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(org_admin),
+    org_user_dict: db_models.DbUser = Depends(project_admin),
 ):
-    """Upload a custom data extract for a project as fgb in S3.
+    """Upload a custom data extract geojson for a project.
 
     Request Body
     - 'custom_extract_file' (file): Geojson files with the features. Required.
@@ -959,6 +957,7 @@ async def update_project_category(
         if file_ext not in allowed_extensions:
             raise HTTPException(status_code=400, detail="Provide a valid .xls file")
 
+        # FIXME
         project.form_xls = contents
         db.commit()
 
@@ -1057,14 +1056,14 @@ async def download_features(
     Returns:
         Response: The HTTP response object containing the downloaded file.
     """
-    out = await project_crud.get_project_features_geojson(db, project_id)
+    feature_collection = await project_crud.get_project_features_geojson(db, project_id)
 
     headers = {
         "Content-Disposition": "attachment; filename=project_features.geojson",
         "Content-Type": "application/media",
     }
 
-    return Response(content=json.dumps(out), headers=headers)
+    return Response(content=json.dumps(feature_collection), headers=headers)
 
 
 @router.get("/tiles/{project_id}")

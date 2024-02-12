@@ -601,6 +601,7 @@ class DbProject(Base):
     data_extract_type = cast(
         str, Column(String)
     )  # Type of data extract (Polygon or Centroid)
+    data_extract_url = cast(str, Column(String))
     task_split_type = cast(
         TaskSplitType, Column(Enum(TaskSplitType), nullable=True)
     )  # Options: divide on square, manual upload, task splitting algo
