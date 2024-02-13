@@ -134,6 +134,22 @@ async def project(db, admin_user, organisation):
         odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
         hashtags=["hot-fmtm"],
         organisation_id=organisation.id,
+        outline_geojson={
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "coordinates": [
+                    [
+                        [85.317028828, 27.7052522097],
+                        [85.317028828, 27.7041424888],
+                        [85.318844411, 27.7041424888],
+                        [85.318844411, 27.7052522097],
+                        [85.317028828, 27.7052522097],
+                    ]
+                ],
+                "type": "Polygon",
+            },
+        },
     )
 
     odk_creds_decrypted = ODKCentralDecrypted(

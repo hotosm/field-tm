@@ -22,8 +22,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 
 from dateutil import parser
-from fastapi import Form
-from geojson_pydantic import Feature as GeojsonFeature
+from geojson_pydantic import Feature, FeatureCollection, Polygon
 from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
 from pydantic.functional_serializers import field_serializer
@@ -32,7 +31,13 @@ from typing_extensions import Self
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
 from app.db import db_models
-from app.db.postgis_utils import geometry_to_geojson
+from app.db.postgis_utils import (
+    geojson_to_geometry,
+    geometry_to_geojson,
+    get_address_from_lat_lon,
+    read_wkb,
+    write_wkb,
+)
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
 from app.tasks import tasks_schemas
 from app.users.user_schemas import User
@@ -41,13 +46,9 @@ from app.users.user_schemas import User
 class ODKCentralIn(BaseModel):
     """ODK Central credentials inserted to database."""
 
-    odk_central_url: Optional[HttpUrlStr] = Field(
-        Form(None, description="ODK Central URL")
-    )
-    odk_central_user: Optional[str] = Field(Form(None, description="ODK Central User"))
-    odk_central_password: Optional[str] = Field(
-        Form(None, description="ODK Central Password")
-    )
+    odk_central_url: Optional[HttpUrlStr] = None
+    odk_central_user: Optional[str] = None
+    odk_central_password: Optional[str] = None
 
     @field_validator("odk_central_url", mode="after")
     @classmethod
@@ -140,8 +141,36 @@ class ProjectIn(BaseModel):
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
     data_extract_type: Optional[str] = None
+    outline_geojson: Union[FeatureCollection, Feature, Polygon]
     # city: str
     # country: str
+
+    @computed_field
+    @property
+    def outline(self) -> Optional[Any]:
+        """Compute WKBElement geom from geojson."""
+        if not self.outline_geojson:
+            return None
+        return geojson_to_geometry(self.outline_geojson)
+
+    @computed_field
+    @property
+    def centroid(self) -> Optional[Any]:
+        """Compute centroid for project outline."""
+        if not self.outline:
+            return None
+        return write_wkb(read_wkb(self.outline).centroid)
+
+    @computed_field
+    @property
+    def location_str(self) -> Optional[str]:
+        """Compute geocoded location string from centroid."""
+        if not self.centroid:
+            return None
+        geom = read_wkb(self.centroid)
+        latitude, longitude = geom.y, geom.x
+        address = get_address_from_lat_lon(latitude, longitude)
+        return address if address is not None else ""
 
     @field_validator("hashtags", mode="after")
     @classmethod
@@ -176,11 +205,11 @@ class ProjectUpdate(ProjectIn):
     organisation_id: Optional[int] = None
 
 
-class Feature(BaseModel):
+class GeojsonFeature(BaseModel):
     """Features used for Task definitions."""
 
     id: int
-    geometry: Optional[GeojsonFeature] = None
+    geometry: Optional[Feature] = None
 
 
 class ProjectSummary(BaseModel):
@@ -264,8 +293,8 @@ class ProjectBase(BaseModel):
 
     @computed_field
     @property
-    def outline_geojson(self) -> Optional[GeojsonFeature]:
-        """Sanitise the organisation name for use in a URL."""
+    def outline_geojson(self) -> Optional[Feature]:
+        """Compute the geojson outline from WKBElement outline."""
         if not self.outline:
             return None
         return geometry_to_geojson(self.outline, {"id": self.id}, self.id)
