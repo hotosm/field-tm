@@ -67,3 +67,4 @@ class OrganisationOut(BaseModel):
     slug: Optional[str]
     url: Optional[str]
     type: OrganisationType
+    odk_central_url: Optional[str]
