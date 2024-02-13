@@ -18,17 +18,18 @@
 """PostGIS and geometry handling helper funcs."""
 
 import datetime
+import json
 import logging
-from json import dumps as json_dumps
 from typing import Optional, Union
 
+import geojson
+import requests
 from fastapi import HTTPException
 from geoalchemy2 import WKBElement
-from geoalchemy2.shape import to_shape
-from geojson import FeatureCollection
-from geojson import loads as geojson_loads
-from geojson_pydantic import Feature
-from shapely.geometry import mapping
+from geoalchemy2.shape import from_shape, to_shape
+from geojson_pydantic import Feature, Polygon
+from geojson_pydantic import FeatureCollection as FeatCol
+from shapely.geometry import mapping, shape
 from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
@@ -78,14 +79,46 @@ def get_centroid(
     return {}
 
 
+def geojson_to_geometry(
+    geojson: Union[FeatCol, Feature, Polygon],
+) -> Optional[WKBElement]:
+    """Convert GeoJSON to SQLAlchemy geometry."""
+    parsed_geojson = parse_and_filter_geojson(geojson.model_dump_json(), filter=False)
+
+    if not parsed_geojson:
+        return None
+
+    features = parsed_geojson.get("features", [])
+
+    if len(features) > 1:
+        # TODO code to merge all geoms into multipolygon
+        # TODO do not use convex hull
+        pass
+
+    geometry = features[0].get("geometry")
+
+    shapely_geom = shape(geometry)
+    return from_shape(shapely_geom)
+
+
+def read_wkb(wkb: WKBElement):
+    """Load a WKBElement and return a shapely geometry."""
+    return to_shape(wkb)
+
+
+def write_wkb(shape):
+    """Load shapely geometry and output WKBElement."""
+    return from_shape(shape)
+
+
 async def geojson_to_flatgeobuf(
-    db: Session, geojson: FeatureCollection
+    db: Session, geojson: geojson.FeatureCollection
 ) -> Optional[bytes]:
     """From a given FeatureCollection, return a memory flatgeobuf obj.
 
     Args:
         db (Session): SQLAlchemy db session.
-        geojson (FeatureCollection): a geojson.FeatureCollection object.
+        geojson (geojson.FeatureCollection): a FeatureCollection object.
 
     Returns:
         flatgeobuf (bytes): a Python bytes representation of a flatgeobuf file.
@@ -142,7 +175,7 @@ async def geojson_to_flatgeobuf(
         FROM (SELECT * FROM public.temp_features as geoms) AS fgb_data;
     """
     # Run the SQL
-    result = db.execute(text(sql), {"geojson": json_dumps(geojson)})
+    result = db.execute(text(sql), {"geojson": json.dumps(geojson)})
     # Get a memoryview object, then extract to Bytes
     flatgeobuf = result.first()
 
@@ -158,7 +191,7 @@ async def geojson_to_flatgeobuf(
 
 async def flatgeobuf_to_geojson(
     db: Session, flatgeobuf: bytes
-) -> Optional[FeatureCollection]:
+) -> Optional[geojson.FeatureCollection]:
     """Converts FlatGeobuf data to GeoJSON.
 
     Args:
@@ -166,7 +199,7 @@ async def flatgeobuf_to_geojson(
         flatgeobuf (bytes): FlatGeobuf data in bytes format.
 
     Returns:
-        FeatureCollection: A GeoJSON FeatureCollection object.
+        geojson.FeatureCollection: A FeatureCollection object.
     """
     sql = text(
         """
@@ -204,41 +237,49 @@ async def flatgeobuf_to_geojson(
         return None
 
     if feature_collection:
-        return geojson_loads(json_dumps(feature_collection[0]))
+        return geojson.loads(json.dumps(feature_collection[0]))
 
     return None
 
 
-async def parse_and_filter_geojson(geojson_str: str) -> Optional[FeatureCollection]:
+def parse_and_filter_geojson(
+    geojson_str: str, filter: bool = True
+) -> Optional[geojson.FeatureCollection]:
     """Parse geojson string and filter out incomaptible geometries."""
-    log.debug("Parsing geojson file")
-    geojson_parsed = geojson_loads(geojson_str)
-    if isinstance(geojson_parsed, FeatureCollection):
+    log.debug("Parsing geojson string")
+    geojson_parsed = geojson.loads(geojson_str)
+    if isinstance(geojson_parsed, geojson.FeatureCollection):
         log.debug("Already in FeatureCollection format, skipping reparse")
         featcol = geojson_parsed
-    elif isinstance(geojson_parsed, Feature):
+    elif isinstance(geojson_parsed, geojson.Feature):
         log.debug("Converting Feature to FeatureCollection")
-        featcol = FeatureCollection(geojson_parsed)
+        featcol = geojson.FeatureCollection(features=[geojson_parsed])
     else:
         log.debug("Converting geometry to FeatureCollection")
-        featcol = FeatureCollection[Feature(geometry=geojson_parsed)]
+        featcol = geojson.FeatureCollection(
+            features=[geojson.Feature(geometry=geojson_parsed)]
+        )
 
-    # Validating Coordinate Reference System
-    check_crs(featcol)
+    # Exit early if no geoms
+    if not featcol.get("features", []):
+        return None
 
-    geom_type = await get_featcol_main_geom_type(featcol)
+    # Return unfiltered featcol
+    if not filter:
+        return featcol
 
     # Filter out geoms not matching main type
+    geom_type = get_featcol_main_geom_type(featcol)
     features_filtered = [
         feature
         for feature in featcol.get("features", [])
         if feature.get("geometry", {}).get("type", "") == geom_type
     ]
 
-    return FeatureCollection(features_filtered)
+    return geojson.FeatureCollection(features_filtered)
 
 
-async def get_featcol_main_geom_type(featcol: FeatureCollection) -> str:
+def get_featcol_main_geom_type(featcol: geojson.FeatureCollection) -> str:
     """Get the predominant geometry type in a FeatureCollection."""
     geometry_counts = {"Polygon": 0, "Point": 0, "Polyline": 0}
 
@@ -250,7 +291,7 @@ async def get_featcol_main_geom_type(featcol: FeatureCollection) -> str:
     return max(geometry_counts, key=geometry_counts.get)
 
 
-async def check_crs(input_geojson: Union[dict, FeatureCollection]):
+async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
     """Validate CRS is valid for a geojson."""
     log.debug("validating coordinate reference system")
 
@@ -307,3 +348,46 @@ async def check_crs(input_geojson: Union[dict, FeatureCollection]):
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
         raise HTTPException(status_code=400, detail=error_message)
+
+
+def get_address_from_lat_lon(latitude, longitude):
+    """Get address using Nominatim, using lat,lon."""
+    base_url = "https://nominatim.openstreetmap.org/reverse"
+
+    params = {
+        "format": "json",
+        "lat": latitude,
+        "lon": longitude,
+        "zoom": 18,
+    }
+    headers = {"Accept-Language": "en"}  # Set the language to English
+
+    log.debug("Getting Nominatim address from project centroid")
+    response = requests.get(base_url, params=params, headers=headers)
+    if (status_code := response.status_code) != 200:
+        log.error(f"Getting address string failed: {status_code}")
+        return None
+
+    data = response.json()
+    log.debug(f"Nominatim response: {data}")
+
+    address = data.get("address", None)
+    if not address:
+        log.error(f"Getting address string failed: {status_code}")
+        return None
+
+    country = address.get("country", "")
+    city = address.get("city", "")
+
+    address_str = f"{city},{country}"
+
+    if not address_str or address_str == ",":
+        log.error("Getting address string failed")
+        return None
+
+    return address_str
+
+
+async def get_address_from_lat_lon_async(latitude, longitude):
+    """Async wrapper for get_address_from_lat_lon."""
+    return get_address_from_lat_lon(latitude, longitude)

@@ -12,36 +12,31 @@ import { task_split_type } from '@/types/enums';
 
 const CreateProjectService: Function = (
   url: string,
-  payload: any,
-  fileUpload: any,
+  projectData: any,
+  taskAreaGeojson: any,
   formUpload: any,
   dataExtractFile: any,
+  isOsmExtract: boolean,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
-    const postCreateProjectDetails = async (url, payload, fileUpload, formUpload) => {
+    const postCreateProjectDetails = async (url, projectData, taskAreaGeojson, formUpload) => {
       try {
-        const postNewProjectDetails = await axios.post(url, payload);
+        // Create project
+        const postNewProjectDetails = await axios.post(url, projectData);
         const resp: ProjectDetailsModel = postNewProjectDetails.data;
         await dispatch(CreateProjectActions.PostProjectDetails(resp));
 
-        if (payload.task_split_type === task_split_type['choose_area_as_task']) {
-          await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/custom_task_boundaries`, fileUpload),
-          );
-        } else if (payload.splitting_algorithm === 'Use natural Boundary') {
-          // TODO this is not longer valid, remove?
-          await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/task-split/${resp.id}/`, fileUpload),
-          );
-        } else {
-          await dispatch(
-            UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/custom_task_boundaries`, fileUpload),
-          );
-          // await dispatch(UploadAreaService(`${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload`, fileUpload, { dimension: payload.dimension }));
-        }
+        // Submit task boundaries
+        await dispatch(
+          UploadTaskAreasService(
+            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload-task-boundaries`,
+            taskAreaGeojson,
+          ),
+        );
+
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -51,14 +46,12 @@ const CreateProjectService: Function = (
           }),
         );
 
-        if (payload.dataExtractWays === 'osm_data_extract') {
+        if (isOsmExtract) {
           // Upload data extract generated from raw-data-api
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${resp.id}`,
-            {
-              url: payload.data_extract_url,
-              extract_type: payload.data_extract_type,
-            },
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${resp.id}&url=${
+              projectData.data_extract_url
+            }`,
           );
         } else if (dataExtractFile) {
           // Upload custom data extract from user
@@ -74,7 +67,7 @@ const CreateProjectService: Function = (
         await dispatch(
           GenerateProjectQRService(
             `${import.meta.env.VITE_API_URL}/projects/${resp.id}/generate-project-data`,
-            payload,
+            projectData,
             formUpload,
           ),
         );
@@ -101,7 +94,7 @@ const CreateProjectService: Function = (
       }
     };
 
-    await postCreateProjectDetails(url, payload, fileUpload, formUpload);
+    await postCreateProjectDetails(url, projectData, taskAreaGeojson, formUpload);
   };
 };
 const FormCategoryService: Function = (url: string) => {
@@ -121,16 +114,13 @@ const FormCategoryService: Function = (url: string) => {
     await getFormCategoryList(url);
   };
 };
-const UploadAreaService: Function = (url: string, filePayload: any, payload: any) => {
+const UploadTaskAreasService: Function = (url: string, filePayload: any, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.UploadAreaLoading(true));
-    const postUploadArea = async (url, filePayload, payload) => {
+    const postUploadArea = async (url, filePayload) => {
       try {
         const areaFormData = new FormData();
-        areaFormData.append('project_geojson', filePayload);
-        if (payload?.dimension) {
-          areaFormData.append('dimension', payload?.dimension);
-        }
+        areaFormData.append('task_geojson', filePayload);
         const postNewProjectDetails = await axios.post(url, areaFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -153,19 +143,19 @@ const UploadAreaService: Function = (url: string, filePayload: any, payload: any
       }
     };
 
-    await postUploadArea(url, filePayload, payload);
+    await postUploadArea(url, filePayload);
   };
 };
-const GenerateProjectQRService: Function = (url: string, payload: any, formUpload: any) => {
+const GenerateProjectQRService: Function = (url: string, projectData: any, formUpload: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GenerateProjectQRLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
-    const postUploadArea = async (url, payload: any, formUpload) => {
+    const postUploadArea = async (url, projectData: any, formUpload) => {
       try {
         let postNewProjectDetails;
 
-        if (payload.form_ways === 'custom_form') {
+        if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
           const generateApiFormData = new FormData();
           generateApiFormData.append('xls_form_upload', formUpload);
@@ -197,7 +187,7 @@ const GenerateProjectQRService: Function = (url: string, payload: any, formUploa
       }
     };
 
-    await postUploadArea(url, payload, formUpload);
+    await postUploadArea(url, projectData, formUpload);
   };
 };
 
@@ -236,15 +226,15 @@ const GenerateProjectLog: Function = (url: string, params: any) => {
     await getGenerateProjectLog(url, params);
   };
 };
-const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
+const GetDividedTaskFromGeojson: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true));
 
-    const getDividedTaskFromGeojson = async (url, payload) => {
+    const getDividedTaskFromGeojson = async (url, projectData) => {
       try {
         const dividedTaskFormData = new FormData();
-        dividedTaskFormData.append('project_geojson', payload.geojson);
-        dividedTaskFormData.append('dimension', payload.dimension);
+        dividedTaskFormData.append('project_geojson', projectData.geojson);
+        dividedTaskFormData.append('dimension', projectData.dimension);
         const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
         const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
         dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: true }));
@@ -258,17 +248,17 @@ const GetDividedTaskFromGeojson: Function = (url: string, payload: any) => {
       }
     };
 
-    await getDividedTaskFromGeojson(url, payload);
+    await getDividedTaskFromGeojson(url, projectData);
   };
 };
 
-const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
+const GetIndividualProjectDetails: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(true));
 
-    const getIndividualProjectDetails = async (url, payload) => {
+    const getIndividualProjectDetails = async (url, projectData) => {
       try {
-        const getIndividualProjectDetailsResponse = await axios.get(url, { params: payload });
+        const getIndividualProjectDetailsResponse = await axios.get(url, { params: projectData });
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
         const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline_geojson, id: 1 }] };
         const modifiedResponse = {
@@ -288,24 +278,25 @@ const GetIndividualProjectDetails: Function = (url: string, payload: any) => {
       }
     };
 
-    await getIndividualProjectDetails(url, payload);
+    await getIndividualProjectDetails(url, projectData);
   };
 };
 
 const TaskSplittingPreviewService: Function = (
   url: string,
-  fileUpload: any,
+  projectAoiFile: any,
   no_of_buildings: string,
   dataExtractFile: any,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(true));
 
-    const getTaskSplittingGeojson = async (url, fileUpload, dataExtractFile) => {
+    const getTaskSplittingGeojson = async (url, projectAoiFile, dataExtractFile) => {
       try {
         const taskSplittingFileFormData = new FormData();
-        taskSplittingFileFormData.append('project_geojson', fileUpload);
+        taskSplittingFileFormData.append('project_geojson', projectAoiFile);
         taskSplittingFileFormData.append('no_of_buildings', no_of_buildings);
+        // Only include data extract if custom extract uploaded
         if (dataExtractFile) {
           taskSplittingFileFormData.append('extract_geojson', dataExtractFile);
         }
@@ -335,16 +326,16 @@ const TaskSplittingPreviewService: Function = (
       }
     };
 
-    await getTaskSplittingGeojson(url, fileUpload, dataExtractFile);
+    await getTaskSplittingGeojson(url, projectAoiFile, dataExtractFile);
   };
 };
-const PatchProjectDetails: Function = (url: string, payload: any) => {
+const PatchProjectDetails: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(true));
 
-    const patchProjectDetails = async (url, payload) => {
+    const patchProjectDetails = async (url, projectData) => {
       try {
-        const getIndividualProjectDetailsResponse = await axios.patch(url, payload);
+        const getIndividualProjectDetailsResponse = await axios.patch(url, projectData);
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         dispatch(CreateProjectActions.SetPatchProjectDetails(resp));
@@ -364,22 +355,22 @@ const PatchProjectDetails: Function = (url: string, payload: any) => {
       }
     };
 
-    await patchProjectDetails(url, payload);
+    await patchProjectDetails(url, projectData);
   };
 };
-const PostFormUpdate: Function = (url: string, payload: any) => {
+const PostFormUpdate: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetPostFormUpdateLoading(true));
 
-    const postFormUpdate = async (url, payload) => {
+    const postFormUpdate = async (url, projectData) => {
       try {
         const formFormData = new FormData();
-        formFormData.append('project_id', payload.project_id);
-        if (payload.category) {
-          formFormData.append('category', payload.category);
+        formFormData.append('project_id', projectData.project_id);
+        if (projectData.category) {
+          formFormData.append('category', projectData.category);
         }
-        if (payload.upload) {
-          formFormData.append('upload', payload.upload);
+        if (projectData.upload) {
+          formFormData.append('upload', projectData.upload);
         }
         const postFormUpdateResponse = await axios.post(url, formFormData);
         const resp: ProjectDetailsModel = postFormUpdateResponse.data;
@@ -409,7 +400,7 @@ const PostFormUpdate: Function = (url: string, payload: any) => {
       }
     };
 
-    await postFormUpdate(url, payload);
+    await postFormUpdate(url, projectData);
   };
 };
 const EditProjectBoundaryService: Function = (url: string, geojsonUpload: any, dimension: any) => {
@@ -529,7 +520,7 @@ const DeleteProjectService: Function = (url: string) => {
 };
 
 export {
-  UploadAreaService,
+  UploadTaskAreasService,
   CreateProjectService,
   FormCategoryService,
   GenerateProjectQRService,

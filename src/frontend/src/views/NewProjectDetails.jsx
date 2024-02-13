@@ -121,7 +121,7 @@ const Home = () => {
         ...feature.outline_geojson.properties,
         centroid: feature.bbox,
       },
-      id: `${feature.project_task_name}_${feature.task_status}`,
+      id: `${feature.id}_${feature.task_status}`,
     }));
     const taskBuildingGeojsonFeatureCollection = {
       ...geojsonObjectModel,

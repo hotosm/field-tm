@@ -70,7 +70,7 @@ class Task(BaseModel):
     id: int
     project_id: int
     project_task_index: int
-    project_task_name: str
+    project_task_name: Optional[str]
     outline_geojson: Optional[GeojsonFeature] = None
     outline_centroid: Optional[GeojsonFeature] = None
     initial_feature_count: Optional[int] = None

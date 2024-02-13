@@ -41,7 +41,7 @@ const UpdateProjectArea = ({ projectId }) => {
 
   const generateTasksOnMap = () => {
     dispatch(
-      GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
+      GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square/`, {
         geojson: uploadAOI,
         dimension: projectBoundaryDetails?.dimension,
       }),

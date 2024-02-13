@@ -89,12 +89,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   const submission = () => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
 
-    const projectAreaBlob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], {
-      type: 'application/json',
-    });
-    // Create a file object from the Blob
-    const drawnGeojsonFile = new File([projectAreaBlob], 'data.json', { type: 'application/json' });
-
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     const hashtags = projectDetails.hashtags;
     const arrayHashtag = hashtags
@@ -102,12 +96,15 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       .map((item) => item.trim())
       .filter(Boolean);
 
+    // Project POST data
     let projectData = {
       project_info: {
         name: projectDetails.name,
         short_description: projectDetails.short_description,
         description: projectDetails.description,
       },
+      // Use split task areas, or project area if no task splitting
+      outline_geojson: dividedTaskGeojson || drawnGeojson,
       odk_central_url: projectDetails.odk_central_url,
       odk_central_user: projectDetails.odk_central_user,
       odk_central_password: projectDetails.odk_central_password,
@@ -120,19 +117,27 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       data_extract_type: projectDetails.data_extract_type,
       data_extract_url: projectDetails.data_extract_url,
     };
+    // Append extra param depending on task split type
     if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {
       projectData = { ...projectData, task_num_buildings: projectDetails.average_buildings_per_task };
     } else {
       projectData = { ...projectData, task_split_dimension: projectDetails.dimension };
     }
+    // Create file object from generated task areas
+    const taskAreaBlob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], {
+      type: 'application/json',
+    });
+    // Create a file object from the Blob
+    const taskAreaGeojsonFile = new File([taskAreaBlob], 'data.json', { type: 'application/json' });
+
     dispatch(
       CreateProjectService(
         `${import.meta.env.VITE_API_URL}/projects/create_project?org_id=${projectDetails.organisation_id}`,
         projectData,
-        drawnGeojsonFile,
+        taskAreaGeojsonFile,
         customFormFile,
-        customPolygonUpload,
-        customLineUpload,
+        customPolygonUpload || customLineUpload,
+        projectDetails.dataExtractWays === 'osm_data_extract',
       ),
     );
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
@@ -162,12 +167,12 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     const drawnGeojsonFile = new File([projectAreaBlob], 'outline.json', { type: 'application/json' });
 
     // Create a file object from the data extract Blob
-    // const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
-    // const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
+    const dataExtractBlob = new Blob([JSON.stringify(dataExtractGeojson)], { type: 'application/json' });
+    const dataExtractFile = new File([dataExtractBlob], 'extract.json', { type: 'application/json' });
 
     if (splitTasksSelection === task_split_type['divide_on_square']) {
       dispatch(
-        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview_split_by_square/`, {
+        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square/`, {
           geojson: drawnGeojsonFile,
           dimension: formValues?.dimension,
         }),
@@ -182,8 +187,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
           `${import.meta.env.VITE_API_URL}/projects/task-split`,
           drawnGeojsonFile,
           formValues?.average_buildings_per_task,
-          // TODO include extract file only if custom upload
-          // dataExtractFile,
+          // Only send dataExtractFile if custom extract
+          formValues.dataExtractWays === 'osm_data_extract' ? null : dataExtractFile,
         ),
       );
     }

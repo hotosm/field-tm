@@ -31,7 +31,6 @@ import geojson
 import requests
 import shapely.wkb as wkblib
 import sozipfile.sozipfile as zipfile
-import sqlalchemy
 from asgiref.sync import async_to_sync
 from fastapi import File, HTTPException, Response, UploadFile
 from fastapi.concurrency import run_in_threadpool
@@ -62,6 +61,7 @@ from app.db.postgis_utils import (
     flatgeobuf_to_geojson,
     geojson_to_flatgeobuf,
     geometry_to_geojson,
+    get_address_from_lat_lon_async,
     get_featcol_main_geom_type,
     parse_and_filter_geojson,
 )
@@ -286,7 +286,7 @@ async def create_project_with_project_info(
         author_id=current_user.id,
         odkid=odk_project_id,
         project_name_prefix=project_name,
-        **project_metadata.model_dump(exclude=["project_info"]),
+        **project_metadata.model_dump(exclude=["project_info", "outline_geojson"]),
     )
     db.add(db_project)
 
@@ -334,39 +334,23 @@ async def upload_xlsform(
         raise HTTPException(status_code=400, detail={"message": str(e)}) from e
 
 
-async def update_multi_polygon_project_boundary(
+async def create_tasks_from_geojson(
     db: Session,
     project_id: int,
-    boundary: str,
+    boundaries: str,
 ):
-    """Update the boundary for a project & update tasks.
-
-    TODO requires refactoring, as it has too large of
-    a scope. It should update a project boundary only, then manage
-    tasks in another function.
-
-    This function receives the project_id and boundary as a parameter
-    and creates a task for each polygon in the database.
-    This function also creates a project outline from the multiple
-    polygons received.
-    """
+    """Create tasks for a project, from provided task boundaries."""
     try:
-        if isinstance(boundary, str):
-            boundary = json.loads(boundary)
-
-        # verify project exists in db
-        db_project = await get_project_by_id(db, project_id)
-        if not db_project:
-            log.error(f"Project {project_id} doesn't exist!")
-            return False
+        if isinstance(boundaries, str):
+            boundaries = json.loads(boundaries)
 
         # Update the boundary polyon on the database.
-        if boundary["type"] == "Feature":
-            polygons = [boundary]
+        if boundaries["type"] == "Feature":
+            polygons = [boundaries]
         else:
-            polygons = boundary["features"]
+            polygons = boundaries["features"]
         log.debug(f"Processing {len(polygons)} task geometries")
-        for polygon in polygons:
+        for index, polygon in enumerate(polygons):
             # If the polygon is a MultiPolygon, convert it to a Polygon
             if polygon["geometry"]["type"] == "MultiPolygon":
                 log.debug("Converting MultiPolygon to Polygon")
@@ -375,49 +359,21 @@ async def update_multi_polygon_project_boundary(
                     0
                 ]
 
-            # def remove_z_dimension(coord):
-            #     """Helper to remove z dimension.
-
-            #     To be used in lambda, to remove z dimension from
-            #     each coordinate in the feature's geometry.
-            #     """
-            #     return coord.pop() if len(coord) == 3 else None
-
-            # # Apply the lambda function to each coordinate in its geometry
-            # list(map(remove_z_dimension, polygon["geometry"]["coordinates"][0]))
-
             db_task = db_models.DbTask(
                 project_id=project_id,
                 outline=wkblib.dumps(shape(polygon["geometry"]), hex=True),
-                project_task_index=1,
+                project_task_index=index,
             )
             db.add(db_task)
-            db.commit()
-
-            # Id is passed in the task_name too
-            db_task.project_task_name = str(db_task.id)
             log.debug(
                 "Created database task | "
                 f"Project ID {project_id} | "
-                f"Task ID {db_task.project_task_name}"
+                f"Task index {index}"
             )
-            db.commit()
 
-        # Generate project outline from tasks
-        query = text(
-            f"""SELECT ST_AsText(ST_ConvexHull(ST_Collect(outline)))
-                        FROM tasks
-                        WHERE project_id={project_id};"""
-        )
-
-        log.debug("Generating project outline from tasks")
-        result = db.execute(query)
-        data = result.fetchone()
-
-        await update_project_location_info(db_project, data[0])
-
+        # Commit all tasks and update project location in db
         db.commit()
-        db.refresh(db_project)
+
         log.debug("COMPLETE: creating project boundary, based on task boundaries")
 
         return True
@@ -536,7 +492,7 @@ async def split_geojson_into_tasks(
     db: Session,
     project_geojson: Union[dict, FeatureCollection],
     no_of_buildings: int,
-    extract_geojson: Optional[Union[dict, FeatureCollection]] = None,
+    extract_geojson: Optional[FeatureCollection] = None,
 ):
     """Splits a project into tasks.
 
@@ -546,7 +502,7 @@ async def split_geojson_into_tasks(
             boundary.
         extract_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
             boundary osm data extract (features).
-        extract_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
+        extract_geojson (FeatureCollection): A GeoJSON of the project
             boundary osm data extract (features).
             If not included, an extract is generated automatically.
         no_of_buildings (int): The number of buildings to include in each task.
@@ -570,7 +526,11 @@ async def split_geojson_into_tasks(
 async def update_project_boundary(
     db: Session, project_id: int, boundary: str, meters: int
 ):
-    """Update the boundary for a project and update tasks."""
+    """Update the boundary for a project and update tasks.
+
+    TODO this needs a big refactor or removal
+    #
+    """
     # verify project exists in db
     db_project = await get_project_by_id(db, project_id)
     if not db_project:
@@ -617,7 +577,12 @@ async def update_project_boundary(
     else:
         outline = shape(features[0]["geometry"])
 
-    await update_project_location_info(db_project, outline.wkt)
+    centroid = (wkt.loads(outline.wkt)).centroid.wkt
+    db_project.centroid = centroid
+    geometry = wkt.loads(centroid)
+    longitude, latitude = geometry.x, geometry.y
+    address = await get_address_from_lat_lon_async(latitude, longitude)
+    db_project.location_str = address if address is not None else ""
 
     db.commit()
     db.refresh(db_project)
@@ -628,17 +593,15 @@ async def update_project_boundary(
         boundary,
         meters=meters,
     )
-    for poly in tasks["features"]:
+    for index, poly in enumerate(tasks["features"]):
         log.debug(poly)
-        task_id = str(poly.get("properties", {}).get("id") or poly.get("id"))
         db_task = db_models.DbTask(
             project_id=project_id,
-            project_task_name=task_id,
             outline=wkblib.dumps(shape(poly["geometry"]), hex=True),
             # qr_code=db_qr,
             # qr_code_id=db_qr.id,
             # project_task_index=feature["properties"]["fid"],
-            project_task_index=1,
+            project_task_index=index,
             # geometry_geojson=geojson.dumps(task_geojson),
             # initial_feature_count=len(task_geojson["features"]),
         )
@@ -918,7 +881,6 @@ async def get_or_set_data_extract_url(
     db: Session,
     project_id: int,
     url: Optional[str],
-    extract_type: Optional[str],
 ) -> str:
     """Get or set the data extract URL for a project.
 
@@ -927,8 +889,6 @@ async def get_or_set_data_extract_url(
         project_id (int): The ID of the project.
         url (str): URL to the streamable flatgeobuf data extract.
             If not passed, a new extract is generated.
-        extract_type (str): The type of data extract, required if setting URL
-            in database.
 
     Returns:
         str: URL to fgb file in S3.
@@ -953,10 +913,9 @@ async def get_or_set_data_extract_url(
             raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
         return existing_url
 
-    if not extract_type:
-        msg = "The extract_type param is required if URL is set."
-        log.error(msg)
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
+    # FIXME Identify data extract type from form type
+    # FIXME use mapping e.g. building=polygon, waterways=line, etc
+    extract_type = "polygon"
 
     await update_data_extract_url_in_db(db, db_project, url, extract_type)
 
@@ -994,15 +953,16 @@ async def upload_custom_data_extract(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    featcol_filtered = await parse_and_filter_geojson(geojson_str)
+    featcol_filtered = parse_and_filter_geojson(geojson_str)
     if not featcol_filtered:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Could not process geojson input",
         )
+    await check_crs(featcol_filtered)
 
     # Get geom type from data extract
-    geom_type = await get_featcol_main_geom_type(featcol_filtered)
+    geom_type = get_featcol_main_geom_type(featcol_filtered)
     if geom_type not in ["Polygon", "Polyline", "Point"]:
         msg = (
             "Extract does not contain valid geometry types, from 'Polygon' "
@@ -1241,6 +1201,7 @@ def generate_appuser_files(
         odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
 
         if custom_form:
+            log.debug("User provided custom XLSForm")
             # TODO uncomment after refactor to use BytesIO
             # xlsform = custom_form
 
@@ -1248,6 +1209,8 @@ def generate_appuser_files(
             with open(xlsform, "wb") as f:
                 f.write(custom_form.getvalue())
         else:
+            log.debug(f"Using default XLSForm for category {form_category}")
+
             # TODO uncomment after refactor to use BytesIO
             # xlsform_path = f"{xlsforms_path}/{form_category}.xls"
             # with open(xlsform_path, "rb") as f:
@@ -1265,6 +1228,7 @@ def generate_appuser_files(
 
             # FIXME do we need these geoms in the db?
             # FIXME can we remove this section?
+            log.debug("Adding data extract geometries to database")
             get_extract_geojson_sync = async_to_sync(get_project_features_geojson)
             data_extract_geojson = get_extract_geojson_sync(db, project_id)
             # Collect feature mappings for bulk insert
@@ -1598,7 +1562,7 @@ async def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
     TODO refactor to use Pydantic model methods instead.
     """
     if db_project_feature:
-        app_project_feature: project_schemas.Feature = db_project_feature
+        app_project_feature: project_schemas.GeojsonFeature = db_project_feature
 
         if db_project_feature.geometry:
             app_project_feature.geometry = geometry_to_geojson(
@@ -1614,7 +1578,7 @@ async def convert_to_project_feature(db_project_feature: db_models.DbFeatures):
 
 async def convert_to_project_features(
     db_project_features: List[db_models.DbFeatures],
-) -> List[project_schemas.Feature]:
+) -> List[project_schemas.GeojsonFeature]:
     """Legacy function to convert db models --> Pydantic.
 
     TODO refactor to use Pydantic model methods instead.
@@ -2040,49 +2004,6 @@ async def get_mbtiles_list(db: Session, project_id: int):
 async def convert_geojson_to_osm(geojson_file: str):
     """Convert a GeoJSON file to OSM format."""
     return json2osm(geojson_file)
-
-
-async def get_address_from_lat_lon(latitude, longitude):
-    """Get address using Nominatim, using lat,lon."""
-    base_url = "https://nominatim.openstreetmap.org/reverse"
-
-    params = {
-        "format": "json",
-        "lat": latitude,
-        "lon": longitude,
-        "zoom": 18,
-    }
-    headers = {"Accept-Language": "en"}  # Set the language to English
-
-    response = requests.get(base_url, params=params, headers=headers)
-    data = response.json()
-    address = data["address"]["country"]
-
-    if response.status_code == 200:
-        if "city" in data["address"]:
-            city = data["address"]["city"]
-            address = f"{city}" + "," + address
-        return address
-    else:
-        return "Address not found."
-
-
-async def update_project_location_info(
-    db_project: sqlalchemy.orm.declarative_base, project_boundary: str
-):
-    """Update project boundary, centroid, address.
-
-    Args:
-        db_project(sqlalchemy.orm.declarative_base): The project database record.
-        project_boundary(str): WKT string geometry.
-    """
-    db_project.outline = project_boundary
-    centroid = (wkt.loads(project_boundary)).centroid.wkt
-    db_project.centroid = centroid
-    geometry = wkt.loads(centroid)
-    longitude, latitude = geometry.x, geometry.y
-    address = await get_address_from_lat_lon(latitude, longitude)
-    db_project.location_str = address if address is not None else ""
 
 
 async def get_tasks_count(db: Session, project_id: int):

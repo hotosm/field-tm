@@ -59,7 +59,6 @@ export type ProjectTaskTypes = {
   id: number;
   project_id: number;
   project_task_index: number;
-  project_task_name: string;
   outline_geojson: GeoJSONFeatureTypes;
   outline_centroid: GeoJSONFeatureTypes;
   task_status: number;
