@@ -51,6 +51,13 @@ async def get_organisations(
     return db.query(db_models.DbOrganisation).filter_by(approved=True).all()
 
 
+async def get_unapproved_organisations(
+    db: Session,
+) -> list[db_models.DbOrganisation]:
+    """Get unapproved orgs."""
+    return db.query(db_models.DbOrganisation).filter_by(approved=False)
+
+
 async def upload_logo_to_s3(
     db_org: db_models.DbOrganisation, logo_file: UploadFile(None)
 ) -> str:

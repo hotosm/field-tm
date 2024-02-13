@@ -85,8 +85,9 @@ async def test_create_project(client, admin_user, organisation):
     assert "id" in response_data
 
 
-async def test_delete_project(client, project):
+async def test_delete_project(client, admin_user, project):
     """Test deleting a FMTM project, plus ODK Central project."""
+    log.warning(project)
     response = client.delete(f"/projects/{project.id}")
     assert response.status_code == 204
 

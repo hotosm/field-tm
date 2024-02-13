@@ -286,3 +286,13 @@ class ProjectVisibility(IntEnum, Enum):
     PUBLIC = 0
     PRIVATE = 1
     INVITE_ONLY = 2
+
+
+class CommunityType(IntEnum, Enum):
+    """Enum describing community type."""
+
+    OSM_COMMUNITY = 0
+    COMPANY = 1
+    NON_PROFIT = 2
+    UNIVERSITY = 3
+    OTHER = 4

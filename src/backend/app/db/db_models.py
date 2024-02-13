@@ -52,6 +52,7 @@ from app.db.database import Base, FmtmMetadata
 from app.db.postgis_utils import timestamp
 from app.models.enums import (
     BackgroundTaskStatus,
+    CommunityType,
     MappingLevel,
     MappingPermission,
     OrganisationType,
@@ -167,6 +168,13 @@ class DbOrganisation(Base):
     odk_central_url = cast(str, Column(String))
     odk_central_user = cast(str, Column(String))
     odk_central_password = cast(str, Column(String))
+
+    community_type = cast(
+        CommunityType,
+        Column(
+            Enum(CommunityType), default=CommunityType.OSM_COMMUNITY, nullable=False
+        ),
+    )
 
     managers = relationship(
         DbUser,
