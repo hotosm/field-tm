@@ -23,7 +23,7 @@ from typing import Optional
 from pydantic import BaseModel, computed_field
 
 from app.config import HttpUrlStr
-from app.models.enums import OrganisationType
+from app.models.enums import CommunityType, OrganisationType
 from app.projects.project_schemas import ODKCentralIn
 
 # class OrganisationBase(BaseModel):
@@ -36,6 +36,7 @@ class OrganisationIn(ODKCentralIn):
     name: str
     description: Optional[str] = None
     url: Optional[HttpUrlStr] = None
+    community_type: Optional[CommunityType] = None
 
     @computed_field
     @property

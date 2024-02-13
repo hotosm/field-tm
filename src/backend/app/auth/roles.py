@@ -207,11 +207,16 @@ async def org_admin(
             detail="org_id must be provided to check organisation admin role",
         )
 
-    return await check_org_admin(
+    org_user_dict = await check_org_admin(
         db,
         user_data,
         org_id=org_id,
     )
+
+    if project:
+        org_user_dict["project"] = project
+
+    return org_user_dict
 
 
 async def project_admin(

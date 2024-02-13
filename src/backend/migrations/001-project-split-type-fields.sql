@@ -16,7 +16,7 @@ BEGIN
     );
   END IF;
 END $$;
-ALTER TYPE public.mappinglevel OWNER TO fmtm;
+ALTER TYPE public.tasksplittype OWNER TO fmtm;
 
 -- Update task_split_type
 DO $$ 

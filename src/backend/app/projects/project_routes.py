@@ -222,12 +222,12 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
 
 @router.delete("/{project_id}")
 async def delete_project(
-    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
-    current_user: AuthUser = Depends(org_admin),
     db: Session = Depends(database.get_db),
     org_user_dict: db_models.DbUser = Depends(org_admin),
 ):
     """Delete a project from both ODK Central and the local database."""
+    project = org_user_dict.get("project")
+
     log.info(
         f"User {org_user_dict.get('user').username} attempting "
         f"deletion of project {project.id}"
@@ -614,11 +614,7 @@ async def generate_files(
     """
     log.debug(f"Generating media files tasks for project: {project_id}")
 
-    project = await project_crud.get_project(db, project_id)
-    if not project:
-        raise HTTPException(
-            status_code=428, detail=f"Project with id {project_id} does not exist"
-        )
+    project = org_user_dict.get("project")
 
     form_category = project.xform_title
     custom_xls_form = None

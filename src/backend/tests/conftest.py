@@ -36,7 +36,7 @@ from app.config import settings
 from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation
 from app.main import get_application
-from app.models.enums import UserRole
+from app.models.enums import CommunityType, UserRole
 from app.projects import project_crud
 from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
 
@@ -113,6 +113,7 @@ def organisation(db):
         url="https://test.org",
         logo="none",
         approved=True,
+        community_type=CommunityType.OSM_COMMUNITY,
     )
     db.add(db_org)
     db.commit()
@@ -133,7 +134,6 @@ async def project(db, admin_user, organisation):
         odk_central_user=os.getenv("ODK_CENTRAL_USER"),
         odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
         hashtags=["hot-fmtm"],
-        organisation_id=organisation.id,
         outline_geojson={
             "type": "Feature",
             "properties": {},
@@ -150,6 +150,7 @@ async def project(db, admin_user, organisation):
                 "type": "Polygon",
             },
         },
+        organisation_id=organisation.id,
     )
 
     odk_creds_decrypted = ODKCentralDecrypted(
