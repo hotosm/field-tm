@@ -18,8 +18,9 @@
 """Logic for organisation management."""
 
 from io import BytesIO
+from typing import Optional
 
-from fastapi import HTTPException, Response, UploadFile
+from fastapi import File, HTTPException, Response, UploadFile
 from loguru import logger as log
 from sqlalchemy import update
 from sqlalchemy.orm import Session
@@ -59,7 +60,7 @@ async def get_unapproved_organisations(
 
 
 async def upload_logo_to_s3(
-    db_org: db_models.DbOrganisation, logo_file: UploadFile(None)
+    db_org: db_models.DbOrganisation, logo_file: UploadFile
 ) -> str:
     """Upload logo using standardised /{org_id}/logo.png format.
 
@@ -91,7 +92,7 @@ async def upload_logo_to_s3(
 
 
 async def create_organisation(
-    db: Session, org_model: OrganisationIn, logo: UploadFile(None)
+    db: Session, org_model: OrganisationIn, logo: Optional[UploadFile] = File(None)
 ) -> db_models.DbOrganisation:
     """Creates a new organisation with the given name, description, url, type, and logo.
 

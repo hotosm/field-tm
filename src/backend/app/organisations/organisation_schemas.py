@@ -20,7 +20,8 @@
 from re import sub
 from typing import Optional
 
-from pydantic import BaseModel, computed_field
+from fastapi import Form
+from pydantic import BaseModel, Field, computed_field
 
 from app.config import HttpUrlStr
 from app.models.enums import CommunityType, OrganisationType
@@ -33,10 +34,16 @@ from app.projects.project_schemas import ODKCentralIn
 class OrganisationIn(ODKCentralIn):
     """Organisation to create from user input."""
 
-    name: str
-    description: Optional[str] = None
-    url: Optional[HttpUrlStr] = None
-    community_type: Optional[CommunityType] = None
+    name: str = Field(Form(..., description="Organisation name"))
+    description: Optional[str] = Field(
+        Form(None, description="Organisation description")
+    )
+    url: Optional[HttpUrlStr] = Field(
+        Form(None, description=("Organisation website URL"))
+    )
+    community_type: Optional[CommunityType] = Field(
+        Form(None, description=("Organisation community type"))
+    )
 
     @computed_field
     @property
@@ -49,6 +56,28 @@ class OrganisationIn(ODKCentralIn):
         # Remove consecutive hyphens
         slug = sub(r"[-\s]+", "-", slug)
         return slug
+
+    # TODO replace once computed logo complete below
+    odk_central_url: Optional[HttpUrlStr] = Field(
+        Form(None, description=("ODK Central URL"))
+    )
+    odk_central_user: Optional[str] = Field(
+        Form(None, description=("ODK Central User"))
+    )
+    odk_central_password: Optional[str] = Field(
+        Form(None, description=("ODK Central Password"))
+    )
+
+    # TODO decode base64 logo and upload in computed property
+    # @computed_field
+    # @property
+    # def logo(self) -> Optional[str]:
+    #     """Decode and upload logo to S3, return URL."""
+    #     if not self.logo_base64:
+    #         return None
+    #     logo_decoded = base64.b64decode(self.logo_base64)
+    #     # upload to S3
+    #     return url
 
 
 class OrganisationEdit(OrganisationIn):
