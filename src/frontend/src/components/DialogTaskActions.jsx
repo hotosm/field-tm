@@ -67,6 +67,7 @@ export default function Dialog({ taskId, feature, map, view }) {
             view,
             taskId,
             body,
+            { project_id: currentProjectId },
           ),
         );
       } else {

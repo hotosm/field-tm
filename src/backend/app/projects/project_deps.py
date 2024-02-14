@@ -18,6 +18,8 @@
 
 """Project dependencies for use in Depends."""
 
+from typing import Optional
+
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
@@ -28,7 +30,7 @@ from app.models.enums import HTTPStatus
 
 
 async def get_project_by_id(
-    db: Session = Depends(get_db), project_id: int = None
+    db: Session = Depends(get_db), project_id: Optional[int] = None
 ) -> DbProject:
     """Get a single project by id."""
     if not project_id:

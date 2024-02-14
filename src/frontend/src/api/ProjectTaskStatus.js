@@ -5,14 +5,14 @@ import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { task_priority_str } from '@/types/enums';
 
-const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body) => {
+const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body, params) => {
   return async (dispatch) => {
     const index = existingData.findIndex((project) => project.id == currentProjectId);
-    const updateTask = async (url, existingData, body, feature) => {
+    const updateTask = async (url, existingData, body, feature, params) => {
       try {
         dispatch(CommonActions.SetLoading(true));
 
-        const response = await CoreModules.axios.post(url, body);
+        const response = await CoreModules.axios.post(url, body, { params });
         const findIndexForUpdation = existingData[index].taskBoundries.findIndex((obj) => obj.id == response.data.id);
 
         let project_tasks = [...existingData[index].taskBoundries];
@@ -52,7 +52,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         );
       }
     };
-    await updateTask(url, existingData, body, feature);
+    await updateTask(url, existingData, body, feature, params);
     const centroid = await existingData[index].taskBoundries.filter((task) => {
       return task.id == taskId;
     })[0].outline_centroid.geometry.coordinates;
