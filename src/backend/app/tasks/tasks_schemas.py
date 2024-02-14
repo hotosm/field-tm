@@ -133,6 +133,32 @@ class Task(BaseModel):
         return decrypt_value(value)
 
 
+class TaskCommentResponse(BaseModel):
+    """Task mapping history."""
+
+    id: int
+    task_id: int
+    comment: Optional[str] = None
+    commented_by: str
+    created_at: datetime
+
+
+class TaskCommentBase(BaseModel):
+    """Task mapping history."""
+
+    comment: str
+    commented_by: str
+    created_at: datetime
+
+
+class TaskCommentRequest(BaseModel):
+    """Task mapping history."""
+
+    task_id: int
+    project_id: int
+    comment: str
+
+
 class ReadTask(Task):
     """Task details plus updated task history."""
 

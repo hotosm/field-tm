@@ -246,7 +246,6 @@ def parse_and_filter_geojson(
     geojson_str: str, filter: bool = True
 ) -> Optional[geojson.FeatureCollection]:
     """Parse geojson string and filter out incomaptible geometries."""
-    log.debug("Parsing geojson string")
     geojson_parsed = geojson.loads(geojson_str)
     if isinstance(geojson_parsed, geojson.FeatureCollection):
         log.debug("Already in FeatureCollection format, skipping reparse")
@@ -255,7 +254,7 @@ def parse_and_filter_geojson(
         log.debug("Converting Feature to FeatureCollection")
         featcol = geojson.FeatureCollection(features=[geojson_parsed])
     else:
-        log.debug("Converting geometry to FeatureCollection")
+        log.debug("Converting Geometry to FeatureCollection")
         featcol = geojson.FeatureCollection(
             features=[geojson.Feature(geometry=geojson_parsed)]
         )

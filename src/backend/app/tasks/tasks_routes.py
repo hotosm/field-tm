@@ -25,7 +25,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.auth.osm import AuthUser
+from app.auth.osm import AuthUser, login_required
 from app.auth.roles import get_uid, mapper, project_admin
 from app.central import central_crud
 from app.db import database
@@ -194,6 +194,47 @@ async def task_features_count(
         )
 
     return data
+
+
+@router.get("/task-comments/", response_model=list[tasks_schemas.TaskCommentResponse])
+async def task_comments(
+    project_id: int,
+    task_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Retrieve a list of task comments for a specific project and task.
+
+    Args:
+        project_id (int): The ID of the project.
+        task_id (int): The ID of the task.
+        db (Session, optional): The database session.
+
+    Returns:
+        List[tasks_schemas.TaskCommentResponse]: A list of task comments.
+    """
+    task_comment_list = await tasks_crud.get_task_comments(db, project_id, task_id)
+
+    return task_comment_list
+
+
+@router.post("/task-comments/", response_model=tasks_schemas.TaskCommentResponse)
+async def add_task_comments(
+    comment: tasks_schemas.TaskCommentRequest,
+    db: Session = Depends(database.get_db),
+    user_data: AuthUser = Depends(login_required),
+):
+    """Create a new task comment.
+
+    Parameters:
+        comment (TaskCommentRequest): The task comment to be created.
+        db (Session): The database session.
+        user_data (AuthUser): The authenticated user.
+
+    Returns:
+        TaskCommentResponse: The created task comment.
+    """
+    task_comment_list = await tasks_crud.add_task_comments(db, comment, user_data)
+    return task_comment_list
 
 
 @router.get("/activity/", response_model=List[tasks_schemas.TaskHistoryCount])
