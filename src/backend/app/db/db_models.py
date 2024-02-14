@@ -93,7 +93,7 @@ class DbUser(Base):
 
     __tablename__ = "users"
 
-    id = cast(int, Column(BigInteger, primary_key=True, index=True))
+    id = cast(int, Column(BigInteger, primary_key=True))
     username = cast(str, Column(String, unique=True))
     profile_img = cast(str, Column(String))
     role = cast(UserRole, Column(Enum(UserRole), default=UserRole.MAPPER))
