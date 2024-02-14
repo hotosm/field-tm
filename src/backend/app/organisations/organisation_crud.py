@@ -22,11 +22,11 @@ from typing import Optional
 
 from fastapi import File, HTTPException, Response, UploadFile
 from loguru import logger as log
-from sqlalchemy import update
+from sqlalchemy import text, update
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db import db_models
 from app.models.enums import HTTPStatus, UserRole
 from app.organisations.organisation_deps import (
@@ -35,6 +35,93 @@ from app.organisations.organisation_deps import (
 from app.organisations.organisation_schemas import OrganisationEdit, OrganisationIn
 from app.s3 import add_obj_to_bucket
 from app.users.user_crud import get_user
+
+
+async def init_admin_org(db: Session):
+    """Init admin org and user at application startup."""
+    sql = text(
+        """
+        -- Start a transaction
+        BEGIN;
+
+        -- Insert FMTM Public Beta organisation
+        INSERT INTO public.organisations (
+            name,
+            slug,
+            logo,
+            description,
+            url,
+            type,
+            approved,
+            odk_central_url,
+            odk_central_user,
+            odk_central_password
+        )
+        VALUES (
+            'FMTM Public Beta',
+            'fmtm-public-beta',
+            'https://avatars.githubusercontent.com/u/458752?s=280&v=4',
+            'HOTOSM Public Beta for FMTM.',
+            'https://hotosm.org',
+            'FREE',
+            true,
+            :odk_url,
+            :odk_user,
+            :odk_pass
+        )
+        ON CONFLICT ("name") DO NOTHING;
+
+        -- Insert svcfmtm admin user
+        INSERT INTO public.users (
+            id,
+            username,
+            role,
+            name,
+            email_address,
+            is_email_verified,
+            mapping_level,
+            tasks_mapped,
+            tasks_validated,
+            tasks_invalidated
+        )
+        VALUES (
+            :user_id,
+            :username,
+            'ADMIN',
+            'Admin',
+            :odk_user,
+            true,
+            'ADVANCED',
+            0,
+            0,
+            0
+        )
+        ON CONFLICT ("username") DO NOTHING;
+
+        -- Set svcfmtm user as org admin
+        WITH org_cte AS (
+            SELECT id FROM public.organisations
+            WHERE name = 'FMTM Public Beta'
+        )
+        INSERT INTO public.organisation_managers (organisation_id, user_id)
+        SELECT (SELECT id FROM org_cte), :user_id
+        ON CONFLICT DO NOTHING;
+
+        -- Commit the transaction
+        COMMIT;
+    """
+    )
+
+    db.execute(
+        sql,
+        {
+            "user_id": 20386219,
+            "username": "svcfmtm",
+            "odk_url": settings.ODK_CENTRAL_URL,
+            "odk_user": settings.ODK_CENTRAL_USER,
+            "odk_pass": encrypt_value(settings.ODK_CENTRAL_PASSWD),
+        },
+    )
 
 
 async def get_organisations(

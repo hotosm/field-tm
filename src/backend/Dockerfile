@@ -96,6 +96,7 @@ RUN set -ex \
     -y --no-install-recommends \
         "nano" \
         "curl" \
+        "gettext-base" \
         "libpcre3" \
         "mime-support" \
         "postgresql-client" \

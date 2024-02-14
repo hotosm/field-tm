@@ -176,7 +176,7 @@ def get_cipher_suite():
     return Fernet(settings.ENCRYPTION_KEY)
 
 
-def encrypt_value(password: str) -> str:
+def encrypt_value(password: Union[str, HttpUrlStr]) -> str:
     """Encrypt value before going to the DB."""
     cipher_suite = get_cipher_suite()
     encrypted_password = cipher_suite.encrypt(password.encode("utf-8"))

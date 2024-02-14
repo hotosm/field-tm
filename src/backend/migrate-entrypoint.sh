@@ -128,7 +128,7 @@ backup_db() {
         --host "$FMTM_DB_HOST" --username "$FMTM_DB_USER" "$FMTM_DB_NAME"
 
     echo "gzipping file --> ${db_backup_file}.gz"
-    gzip "$db_backup_file"
+    gzip --force "$db_backup_file"
     db_backup_file="${db_backup_file}.gz"
 
     BUCKET_NAME="fmtm-db-backups"
@@ -145,10 +145,11 @@ execute_migrations() {
     for script_name in "${scripts_to_execute[@]}"; do
         script_file="/opt/migrations/$script_name"
         pretty_echo "Executing migration: $script_name"
-        psql "$db_url" -a -f "$script_file"
-
-        # Add an entry in the migrations table to indicate completion
-        psql "$db_url" <<SQL
+        # Apply migration with env vars substituted & if succeeds,
+        # add an entry in the migrations table to indicate completion
+        envsubst < "$script_file" | psql "$db_url" \
+            --set ON_ERROR_STOP=1 --echo-all \
+        && psql "$db_url" <<SQL
     DO \$\$
     BEGIN
         INSERT INTO public."_migrations" (date_executed, script_name)
@@ -162,20 +163,6 @@ SQL
     done
 }
 
-create_svc_user() {
-    pretty_echo "Creating default svcfmtm user."
-    psql "$db_url" <<SQL
-    DO \$\$
-    BEGIN
-        INSERT INTO users (id, username, role, mapping_level, tasks_mapped, tasks_validated, tasks_invalidated)
-        VALUES (20386219, 'svcfmtm', 'MAPPER', 'BEGINNER', 0, 0, 0);
-        RAISE NOTICE 'User "svcfmtm" (uid 20386219) successfully created.';
-    EXCEPTION   
-        WHEN OTHERS THEN
-            RAISE NOTICE 'User "svcfmtm" (uid 20386219) already exists.';
-    END\$\$;
-SQL
-}
 ### Functions END ###
 
 
@@ -206,12 +193,7 @@ if [ ${#scripts_to_execute[@]} -gt 0 ]; then
 else
     pretty_echo "No new migrations found."
 fi
-pretty_echo "Migrations complete."
-
-# Create service user account, if not exists
-create_svc_user
-
-pretty_echo "### Script End ###"
+pretty_echo "### Script End: Migrations Complete ###"
 
 ####################
 ###  Script END  ###

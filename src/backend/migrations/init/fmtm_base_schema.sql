@@ -531,18 +531,9 @@ CREATE TABLE public.users (
     tasks_invalidated integer NOT NULL,
     projects_mapped integer[],
     date_registered timestamp without time zone,
-    last_validation_date timestamp without time zone,
-    password character varying
+    last_validation_date timestamp without time zone
 );
 ALTER TABLE public.users OWNER TO fmtm;
-CREATE SEQUENCE public.users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.users_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 CREATE TABLE public.xlsforms (
     id integer NOT NULL,
@@ -578,7 +569,6 @@ ALTER TABLE ONLY public.task_invalidation_history ALTER COLUMN id SET DEFAULT ne
 ALTER TABLE ONLY public.task_mapping_issues ALTER COLUMN id SET DEFAULT nextval('public.task_mapping_issues_id_seq'::regclass);
 ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
 ALTER TABLE ONLY public.teams ALTER COLUMN id SET DEFAULT nextval('public.teams_id_seq'::regclass);
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval('public.xlsforms_id_seq'::regclass);
 
 
