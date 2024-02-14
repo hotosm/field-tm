@@ -128,7 +128,7 @@ async def update_task_status(
     current_user: AuthUser = Depends(mapper),
 ):
     """Update the task status."""
-    user_id = get_uid(current_user)
+    user_id = await get_uid(current_user)
     task = await tasks_crud.update_task_status(db, user_id, task_id, new_status)
     updated_task = await tasks_crud.update_task_history(task, db)
     if not task:
