@@ -29,6 +29,7 @@ from shapely.geometry import shape
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
+from app.auth.osm import AuthUser
 from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import (
@@ -313,6 +314,103 @@ async def edit_task_boundary(db: Session, task_id: int, boundary: str):
     )
 
     return True
+
+
+async def get_task_comments(db: Session, project_id: int, task_id: int):
+    """Get a list of tasks id for a project."""
+    query = text(
+        """
+        SELECT
+            task_history.id, task_history.task_id, users.username,
+            task_history.action_text, task_history.action_date
+        FROM
+            task_history
+        LEFT JOIN
+            users ON task_history.user_id = users.id
+        WHERE
+            project_id = :project_id
+            AND task_id = :task_id
+            AND action = 'COMMENT'
+    """
+    )
+
+    params = {"project_id": project_id, "task_id": task_id}
+
+    result = db.execute(query, params)
+
+    # Convert the result to a list of dictionaries
+    result_dict_list = [
+        {
+            "id": row[0],
+            "task_id": row[1],
+            "commented_by": row[2],
+            "comment": row[3],
+            "created_at": row[4],
+        }
+        for row in result.fetchall()
+    ]
+
+    return result_dict_list
+
+
+async def add_task_comments(
+    db: Session, comment: tasks_schemas.TaskCommentBase, user_data: AuthUser
+):
+    """Add a comment to a task.
+
+    Parameters:
+    - db: SQLAlchemy database session
+    - comment: TaskCommentBase instance containing the comment details
+    - user_data: AuthUser instance containing the user details
+
+    Returns:
+    - Dictionary with the details of the added comment
+    """
+    currentdate = datetime.now()
+    # Construct the query to insert the comment and retrieve inserted comment details
+    query = text(
+        """
+        INSERT INTO task_history (
+            project_id, task_id, action, action_text,
+            action_date, user_id
+        )
+        VALUES (
+            :project_id, :task_id, 'COMMENT', :comment_text,
+            :current_date, :user_id
+        )
+        RETURNING
+            task_history.id,
+            task_history.task_id,
+            (SELECT username FROM users WHERE id = task_history.user_id) AS user_id,
+            task_history.action_text,
+            task_history.action_date;
+    """
+    )
+
+    # Define a dictionary with the parameter values
+    params = {
+        "project_id": comment.project_id,
+        "task_id": comment.task_id,
+        "comment_text": comment.comment,
+        "current_date": currentdate,
+        "user_id": user_data.id,
+    }
+
+    # Execute the query with the named parameters and commit the transaction
+    result = db.execute(query, params)
+    db.commit()
+
+    # Fetch the first row of the query result
+    row = result.fetchone()
+
+    # Return the details of the added comment as a dictionary
+    return {
+        "id": row[0],
+        "task_id": row[1],
+        "commented_by": row[2],
+        "comment": row[3],
+        "created_at": row[4],
+    }
 
 
 async def update_task_history(

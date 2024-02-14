@@ -594,7 +594,6 @@ async def update_project_boundary(
         meters=meters,
     )
     for index, poly in enumerate(tasks["features"]):
-        log.debug(poly)
         db_task = db_models.DbTask(
             project_id=project_id,
             outline=wkblib.dumps(shape(poly["geometry"]), hex=True),
@@ -607,8 +606,6 @@ async def update_project_boundary(
         )
         db.add(db_task)
         db.commit()
-
-        # FIXME: write to tasks table
     return True
 
 
