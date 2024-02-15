@@ -27,9 +27,11 @@ import uuid
 from collections import Counter
 from datetime import datetime, timedelta
 from io import BytesIO
+from typing import Optional
 
 import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
+from dateutil import parser
 from fastapi import HTTPException, Response
 from fastapi.responses import FileResponse
 from loguru import logger as log
@@ -765,7 +767,15 @@ async def get_submissions_by_date(
     return response
 
 
-async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Session):
+async def get_submission_by_project(
+    project_id: int,
+    skip: 0,
+    limit: 100,
+    db: Session,
+    submitted_by: Optional[str] = None,
+    review_state: Optional[str] = None,
+    submitted_date: Optional[str] = None,
+):
     """Get submission by project.
 
     Retrieves a paginated list of submissions for a given project.
@@ -775,6 +785,9 @@ async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Se
         skip (int): The number of submissions to skip.
         limit (int): The maximum number of submissions to retrieve.
         db (Session): The database session.
+        submitted_by: username of submitter.
+        review_state: reviewState of the submission.
+        submitted_date: date of submissions.
 
     Returns:
         Tuple[int, List]: A tuple containing the total number of submissions and
@@ -795,9 +808,25 @@ async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Se
 
     with zipfile.ZipFile(file, "r") as zip_ref:
         with zip_ref.open("submissions.json") as file_in_zip:
-            content = file_in_zip.read()
+            content = json.loads(file_in_zip.read())
+    if submitted_by:
+        content = [
+            sub for sub in content if submitted_by.lower() in sub["username"].lower()
+        ]
+    if review_state:
+        content = [
+            sub
+            for sub in content
+            if sub.get("__system", {}).get("reviewState") == review_state
+        ]
+    if submitted_date:
+        content = [
+            sub
+            for sub in content
+            if parser.parse(sub.get("end")).date()
+            == parser.parse(submitted_date).date()
+        ]
 
-    content = json.loads(content)
     start_index = skip
     end_index = skip + limit
     paginated_content = content[start_index:end_index]
@@ -805,7 +834,10 @@ async def get_submission_by_project(project_id: int, skip: 0, limit: 100, db: Se
 
 
 async def get_submission_by_task(
-    project: db_models.DbProject, task_id: int, filters: dict, db: Session
+    project: db_models.DbProject,
+    task_id: int,
+    filters: dict,
+    db: Session,
 ):
     """Get submissions and count by task.
 
