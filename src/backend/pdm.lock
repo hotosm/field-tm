@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:074c775ec2ac53324b4b050880d4da3a80b5efd8ba7474868b7bd65a9f70f8a8"
+content_hash = "sha256:a95b5c13f4ae148a7496f234b55b5a27f5cd3d172aef6ffafdca2b9f9e1ad5b1"
 
 [[package]]
 name = "annotated-types"
@@ -611,20 +611,20 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.1.1"
+version = "1.1.2"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
     "geojson>=2.5.0",
     "geopandas>=0.11.0",
     "numpy>=1.21.0",
-    "osm-rawdata>=0.2.1",
+    "osm-rawdata>=0.2.2",
     "psycopg2>=2.9.1",
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.1.1.tar.gz", hash = "sha256:29893d9ae017a9c0fc74a5ecb84ec6f0a072870be06d2979cd165f35001bcb80"},
-    {file = "fmtm_splitter-1.1.1-py3-none-any.whl", hash = "sha256:101120bfce3b5c55bdb8cd9a9a56dbe150dc8ba6620c80ab69a016288158ab77"},
+    {file = "fmtm-splitter-1.1.2.tar.gz", hash = "sha256:e6881e04ee2491f7ce3cb50827a2d05d8274228cb0390ddf2e5fbd62f7195c8e"},
+    {file = "fmtm_splitter-1.1.2-py3-none-any.whl", hash = "sha256:9ffe3381c1ef435f0a5fa9595515ba4748d822317434c34830740908249048a7"},
 ]
 
 [[package]]
@@ -1387,7 +1387,7 @@ files = [
 
 [[package]]
 name = "osm-rawdata"
-version = "0.2.1"
+version = "0.2.2"
 requires_python = ">=3.10"
 summary = "Make data extracts from OSM data."
 dependencies = [
@@ -1403,8 +1403,8 @@ dependencies = [
     "sqlalchemy>=2.0.0",
 ]
 files = [
-    {file = "osm-rawdata-0.2.1.tar.gz", hash = "sha256:7cfdee658b57634c2d7ac7aaefcd6a1c5c8d4268b5f2883720283037e7f113d1"},
-    {file = "osm_rawdata-0.2.1-py3-none-any.whl", hash = "sha256:f4aa4e9fb4984cab89bec9eb4bab3f39710b562075290560a4154a0ecf50eb7b"},
+    {file = "osm-rawdata-0.2.2.tar.gz", hash = "sha256:c037bd49bd954a316eb67ac249dff3ffa68aac34337a2ef38dd0224e4d9f960a"},
+    {file = "osm_rawdata-0.2.2-py3-none-any.whl", hash = "sha256:732347cd5745f7c1dbf00ac98095b625f2b492d3e1da788d43242c900a3103fb"},
 ]
 
 [[package]]
