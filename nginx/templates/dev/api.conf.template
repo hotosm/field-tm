@@ -32,8 +32,12 @@ server {
     # Response headers (note: Access-Control-Allow-Origin already set by FastAPI, not required)
 
     location / {
-        proxy_read_timeout 40s;
+        # Max time to initiate connection with backend
         proxy_connect_timeout 20s;
+        # Max time for a backend response to return, i.e. download
+        proxy_read_timeout 60s;
+        # Max time to send request to backend, i.e. upload
+        proxy_send_timeout 40s;
 
         # Requests headers
         proxy_set_header Host                $http_host;
