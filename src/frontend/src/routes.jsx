@@ -6,7 +6,6 @@ import {
 import Home from '@/views/Home';
 import Tabbed from '@/views/Tabbed';
 import MainView from '@/views/MainView';
-import EditProject from '@/views/EditProject';
 import ProtectedRoute from '@/utilities/ProtectedRoute';
 import NotFoundPage from '@/views/NotFound404';
 import Organisation from '@/views/Organisation';
@@ -265,90 +264,6 @@ const routes = createBrowserRouter([
             <Suspense fallback={<div>Loading...</div>}>
               <ErrorBoundary>
                 <CreateNewProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/edit-project/project-details/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/upload-area/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/data-extract/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/split-tasks/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/select-category/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/basemap-selection/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'edit-project/delete/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <EditProject />
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>

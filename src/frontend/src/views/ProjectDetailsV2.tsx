@@ -318,14 +318,6 @@ const Home = () => {
                 >
                   {state.projectInfo.title}
                 </p>
-
-                <div title="Edit Project">
-                  <AssetModules.EditIcon
-                    className="fmtm-absolute fmtm-bottom-2 fmtm-right-0 fmtm-text-primaryRed hover:fmtm-cursor-pointer hover:fmtm-text-red-700"
-                    style={{ fontSize: '18px' }}
-                    onClick={() => navigate(`/edit-project/project-details/${encodedId}`)}
-                  />
-                </div>
               </div>
             )}
             <div className="fmtm-w-full fmtm-h-1 fmtm-bg-white"></div>
