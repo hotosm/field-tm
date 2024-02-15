@@ -474,6 +474,7 @@ async def generate_data_extract(
             "fileName": "fmtm_extract",
             "outputType": "fgb",
             "bind_zip": False,
+            "useStWithin": False,
         },
     )
 
