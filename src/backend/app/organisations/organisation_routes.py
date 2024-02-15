@@ -60,6 +60,18 @@ async def list_unapproved_organisations(
     return await organisation_crud.get_unapproved_organisations(db)
 
 
+@router.get(
+    "/unapproved/{org_id}", response_model=list[organisation_schemas.OrganisationOut]
+)
+async def unapproved_org_detail(
+    org_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(super_admin),
+):
+    """Get a detail of an unapproved organisations."""
+    return await organisation_crud.get_unapproved_org_detail(db, org_id)
+
+
 @router.get("/{org_id}", response_model=organisation_schemas.OrganisationOut)
 async def get_organisation_detail(
     organisation: DbOrganisation = Depends(org_exists),
