@@ -81,15 +81,14 @@ const ProjectDescriptionTab = ({ projectId }) => {
         errorMsg={errors.instruction}
       />
       <InputTextField
-        id="changeset"
+        id="tags"
         name="hashtags"
-        label="Changeset"
+        label="Hashtags"
         value={values?.hashtags}
         onChange={handleChange}
         fieldType="text"
         classNames="fmtm-w-full"
         errorMsg={errors.hashtags}
-        required
       />
       <div className="fmtm-flex fmtm-justify-center fmtm-mt-4">
         <Button

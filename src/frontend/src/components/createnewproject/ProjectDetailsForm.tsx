@@ -156,7 +156,7 @@ const ProjectDetailsForm = ({ flag }) => {
             <div>
               <InputTextField
                 id="hashtags"
-                label="Tags"
+                label="Hashtags"
                 value={values?.hashtags}
                 onChange={(e) => {
                   handleHashtagOnChange(e);

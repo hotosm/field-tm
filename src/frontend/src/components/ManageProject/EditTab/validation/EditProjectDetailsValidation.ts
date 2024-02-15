@@ -32,9 +32,6 @@ function EditProjectValidation(values: ProjectValues) {
   if (!values?.description) {
     errors.description = 'Description is Required.';
   }
-  if (!values?.hashtags) {
-    errors.hashtags = 'Changeset is Required.';
-  }
 
   return errors;
 }
