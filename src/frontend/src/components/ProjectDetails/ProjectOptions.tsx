@@ -140,21 +140,6 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
           >
             Generate MbTiles
           </CoreModules.Button>
-          {/* <CoreModules.Link
-            to={`/edit-project/project-details/${encodedId}`}
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-              textDecoration: 'none',
-              marginRight: '15px',
-            }}
-            className="fmtm-w-fit"
-          >
-            <CoreModules.Button variant="outlined" color="error" className="fmtm-truncate">
-              Edit Project
-            </CoreModules.Button>
-          </CoreModules.Link> */}
         </div>
       </div>
     </div>
