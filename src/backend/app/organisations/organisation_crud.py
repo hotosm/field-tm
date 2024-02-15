@@ -328,3 +328,13 @@ async def approve_organisation(db, organisation):
     organisation.approved = True
     db.commit()
     return Response(status_code=HTTPStatus.OK)
+
+
+async def get_unapproved_org_detail(db, org_id):
+    """Returns detail of an unapproved organisation.
+
+    Args:
+        db: The database session.
+        org_id: ID of unapproved organisation.
+    """
+    return db.query(db_models.DbOrganisation).filter_by(approved=False, id=org_id)
