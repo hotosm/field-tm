@@ -28,7 +28,24 @@ console.error = function filterWarnings(msg, ...args) {
     consoleError(msg, ...args);
   }
 };
+axios.interceptors.request.use(
+  (config) => {
+    // Do something before request is sent
 
+    // const excludedDomains = ['xxx', 'xxx'];
+    // const urlIsExcluded = excludedDomains.some((domain) => config.url.includes(domain));
+    // if (!urlIsExcluded) {
+    //   config.withCredentials = true;
+    // }
+
+    config.withCredentials = true;
+
+    return config;
+  },
+  (error) =>
+    // Do something with request error
+    Promise.reject(error),
+);
 const GlobalInit = () => {
   useEffect(() => {
     console.log('adding interceptors');
