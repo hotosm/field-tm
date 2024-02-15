@@ -231,3 +231,17 @@ button {
     background-position: 50px 50px;
   }
 }
+
+/* react-date-picker */
+.react-datepicker-popper {
+  z-index: 9000;
+}
+.react-datepicker__day--selected {
+  background-color: #d73f3e;
+}
+.react-datepicker__day--selected:hover {
+  background-color: #bc2c2c;
+}
+.react-datepicker__day--keyboard-selected {
+  background-color: #fcc2c2;
+}

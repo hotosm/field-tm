@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#F19C3C', '#D73F3F', '#FFB74D', '#EC407A'];
 
@@ -38,6 +38,15 @@ const CustomPieChart = ({ data, dataKey, nameKey }) => {
           ))}
         </Pie>
         <Tooltip />
+        <Legend
+          verticalAlign="bottom"
+          iconType="circle"
+          height={36}
+          wrapperStyle={{
+            paddingTop: '20px',
+          }}
+          iconSize={10}
+        />
       </PieChart>
     </ResponsiveContainer>
   );

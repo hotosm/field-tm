@@ -112,12 +112,12 @@ export const SubmissionFormFieldsService: Function = (url: string) => {
   };
 };
 
-export const SubmissionTableService: Function = (url: string) => {
+export const SubmissionTableService: Function = (url: string, payload) => {
   return async (dispatch) => {
-    const fetchSubmissionTable = async (url: string) => {
+    const fetchSubmissionTable = async (url: string, payload) => {
       try {
         dispatch(SubmissionActions.SetSubmissionTableLoading(true));
-        const response = await CoreModules.axios.get(url);
+        const response = await CoreModules.axios.get(url, { params: payload });
         const submissionTableData: any = response.data;
         dispatch(SubmissionActions.SetSubmissionTable(submissionTableData));
         dispatch(SubmissionActions.SetSubmissionTableLoading(false));
@@ -128,6 +128,6 @@ export const SubmissionTableService: Function = (url: string) => {
       }
     };
 
-    await fetchSubmissionTable(url);
+    await fetchSubmissionTable(url, payload);
   };
 };
