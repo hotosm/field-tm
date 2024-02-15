@@ -68,7 +68,7 @@ const TaskSubmissions = () => {
     <div className="md:fmtm-h-[70vh] fmtm-flex fmtm-gap-10 fmtm-flex-col md:fmtm-flex-row">
       <div className="fmtm-w-full md:fmtm-w-[39rem] fmtm-bg-white fmtm-rounded-xl fmtm-p-5">
         <InputTextField
-          fieldType="string"
+          fieldType="number"
           label=""
           onChange={(e) => {
             setSearchedTaskId(e.target.value);
@@ -83,9 +83,13 @@ const TaskSubmissions = () => {
                 <TaskCardSkeletonLoader key={i} />
               ))}
             </div>
-          ) : (
+          ) : filteredTaskInfo?.length > 0 ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
               {filteredTaskInfo?.map((task: taskInfoType) => <TaskCard key={task.task_id} task={task} />)}
+            </div>
+          ) : (
+            <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-mt-10">
+              <p className="fmtm-text-gray-400 fmtm-text-xl">No tasks found!</p>
             </div>
           )}
         </div>
