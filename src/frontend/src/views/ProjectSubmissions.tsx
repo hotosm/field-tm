@@ -51,29 +51,40 @@ const ProjectSubmissions = () => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
   }, []);
 
+  const ToggleView = () => (
+    <div className="fmtm-flex fmtm-justify-end fmtm-gap-3">
+      <div title="Infographics View">
+        <AssetModules.GridViewIcon
+          style={{ fontSize: '30px' }}
+          className={`${
+            viewBy === 'infographics' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
+          } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
+          onClick={() => setViewBy('infographics')}
+        />
+      </div>
+      <div title="Table View">
+        <AssetModules.ListAltIcon
+          style={{ fontSize: '30px' }}
+          className={`${
+            viewBy === 'table' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
+          } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
+          onClick={() => setViewBy('table')}
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fmtm-bg-[#F5F5F5] fmtm-px-5 sm:fmtm-px-5 fmtm-pb-5">
+    <div className="fmtm-bg-[#F5F5F5] fmtm-px-5 sm:fmtm-px-5 lg:fmtm-px-8 xl:fmtm-px-16 fmtm-pb-5">
       <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-my-4 fmtm-w-full">
-        <div className="sm:fmtm-bg-white fmtm-flex sm:fmtm-flex-col fmtm-gap-4 sm:fmtm-mr-6 sm:fmtm-p-2 fmtm-justify-end sm:fmtm-justify-start">
-          <AssetModules.GridViewIcon
-            style={{ fontSize: '30px' }}
-            className={`${
-              viewBy === 'infographics' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
-            } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-            onClick={() => setViewBy('infographics')}
-          />
-          <AssetModules.ListAltIcon
-            style={{ fontSize: '30px' }}
-            className={`${
-              viewBy === 'table' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
-            } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-            onClick={() => setViewBy('table')}
-          />
-        </div>
         <ProjectInfo />
       </div>
       <div className="fmtm-w-full">
-        {viewBy === 'infographics' ? <SubmissionsInfographics /> : <SubmissionsTable />}
+        {viewBy === 'infographics' ? (
+          <SubmissionsInfographics toggleView={<ToggleView />} />
+        ) : (
+          <SubmissionsTable toggleView={<ToggleView />} />
+        )}
       </div>
     </div>
   );

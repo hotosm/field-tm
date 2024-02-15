@@ -43,10 +43,8 @@ const ProjectInfo = () => {
     </div>
   );
 
-  const widthStyle = window.innerWidth >= 640 ? { width: 'calc(100% - 80px)' } : { width: '100%' };
-
   return (
-    <div style={widthStyle} className="sm:fmtm-ml-2 fmtm-border-b-[1px] fmtm-border-gray-300 fmtm-pb-10">
+    <div className="fmtm-w-full sm:fmtm-ml-2 fmtm-border-b-[1px] fmtm-border-gray-300 fmtm-pb-10">
       <div className="fmtm-pb-4">
         <p className="fmtm-text-[#706E6E] fmtm-text-base">
           <span
