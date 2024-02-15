@@ -325,24 +325,14 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
         )
     elif input_geojson_type == "Feature":
         coordinates = input_geojson.get("geometry", {}).get("coordinates", [])
-
-    geometry_type = (
-        features[0].get("geometry", {}).get("type")
-        if input_geojson_type == "FeatureCollection" and features
-        else input_geojson.get("geometry", {}).get("type", "")
-    )
-    if geometry_type == "MultiPolygon":
-        first_coordinate = (
-            coordinates[0][0][0] if coordinates and coordinates[0] else None
-        )
-    elif geometry_type == "Point":
-        first_coordinate = coordinates if coordinates else None
-
-    elif geometry_type == "LineString":
-        first_coordinate = coordinates[0] if coordinates else None
-
     else:
-        first_coordinate = coordinates[0][0] if coordinates else None  # type polygon
+        coordinates = input_geojson.get("coordinates", {})
+
+    first_coordinate = None
+    if coordinates:
+        while isinstance(coordinates, list):
+            first_coordinate = coordinates
+            coordinates = coordinates[0]
 
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
