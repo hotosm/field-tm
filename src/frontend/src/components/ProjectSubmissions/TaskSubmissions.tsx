@@ -1,21 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TaskSubmissionsMap from '@/components/ProjectSubmissions/TaskSubmissionsMap';
 import InputTextField from '@/components/common/InputTextField';
 import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
 import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
+import { taskInfoType } from '@/models/submission/submissionModel';
 
 const TaskSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
-  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const taskLoading = CoreModules.useAppSelector((state) => state.task.taskLoading);
+  const [searchedTaskId, setSearchedTaskId] = useState<string>('');
+  const [debouncedSearchedTaskId, setDebouncedSearchedTaskId] = useState<string>('');
+  const [filteredTaskInfo, setFilteredTaskInfo] = useState<taskInfoType[]>([]);
 
   const zoomToTask = (taskId) => {
     dispatch(CoreModules.TaskActions.SetSelectedTask(+taskId));
   };
 
-  const TaskCard = ({ task }) => (
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchedTaskId(searchedTaskId);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchedTaskId, 1000]);
+
+  useEffect(() => {
+    if (debouncedSearchedTaskId) {
+      const searchedTaskInfoList = taskInfo?.filter((task): boolean => {
+        return task.task_id.includes(debouncedSearchedTaskId);
+      });
+      setFilteredTaskInfo(searchedTaskInfoList);
+    } else {
+      setFilteredTaskInfo(taskInfo);
+    }
+  }, [debouncedSearchedTaskId, taskInfo]);
+
+  const TaskCard = ({ task }: { task: taskInfoType }) => (
     <div className="fmtm-bg-red-50 fmtm-px-5 fmtm-pb-5 fmtm-pt-2 fmtm-rounded-lg">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -45,17 +67,25 @@ const TaskSubmissions = () => {
   return (
     <div className="md:fmtm-h-[70vh] fmtm-flex fmtm-gap-10 fmtm-flex-col md:fmtm-flex-row">
       <div className="fmtm-w-full md:fmtm-w-[39rem] fmtm-bg-white fmtm-rounded-xl fmtm-p-5">
-        <InputTextField fieldType="string" label="" onChange={() => {}} value="" placeholder="Search by task id" />
+        <InputTextField
+          fieldType="string"
+          label=""
+          onChange={(e) => {
+            setSearchedTaskId(e.target.value);
+          }}
+          value={searchedTaskId}
+          placeholder="Search by task id"
+        />
         <div className="fmtm-mt-5 fmtm-h-[58vh] fmtm-overflow-y-scroll scrollbar">
           {taskLoading ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {Array.from({ length: 10 }).map((i) => (
+              {Array.from({ length: 10 }).map((_, i) => (
                 <TaskCardSkeletonLoader key={i} />
               ))}
             </div>
           ) : (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {taskInfo?.map((task) => <TaskCard key={task.task_id} task={task} />)}
+              {filteredTaskInfo?.map((task: taskInfoType) => <TaskCard key={task.task_id} task={task} />)}
             </div>
           )}
         </div>
