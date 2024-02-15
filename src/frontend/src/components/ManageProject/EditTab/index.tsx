@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import environment from '@/environment';
 import ProjectDescriptionTab from './ProjectDescriptionTab';
 import FormUpdateTab from './FormUpdateTab';
-import { FormCategoryService, GetIndividualProjectDetails } from '@/api/CreateProjectService';
-import CoreModules from '@/shared/CoreModules';
 
 const tabList: ['Project Description', 'Form Update'] = ['Project Description', 'Form Update'];
 
 const EditTab = ({ projectId }) => {
-  const dispatch = CoreModules.useAppDispatch();
   const [tabView, setTabView] = useState<'Project Description' | 'Form Update'>('Project Description');
-
-  useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
-  }, []);
 
   return (
     <div>
