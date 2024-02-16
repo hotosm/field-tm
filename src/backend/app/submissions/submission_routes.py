@@ -371,7 +371,12 @@ async def get_submission_form_fields(
     """
     project = await project_crud.get_project(db, project_id)
     task_list = await tasks_crud.get_task_id_list(db, project_id)
-    odk_form = central_crud.get_odk_form(project)
+    odk_credentials = project_schemas.ODKCentralDecrypted(
+        odk_central_url=project.odk_central_url,
+        odk_central_user=project.odk_central_user,
+        odk_central_password=project.odk_central_password,
+    )
+    odk_form = central_crud.get_odk_form(odk_credentials)
     response = odk_form.form_fields(project.odkid, str(task_list[0]))
     return response
 
