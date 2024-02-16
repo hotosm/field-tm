@@ -196,12 +196,13 @@ class ProjectUpload(ProjectIn, ODKCentralIn):
     pass
 
 
-class ProjectUpdate(ProjectIn):
+class ProjectUpdate(BaseModel):
     """Update project."""
 
     name: Optional[str] = None
     short_description: Optional[str] = None
     description: Optional[str] = None
+    changeset_comment: Optional[str] = None
 
 
 class GeojsonFeature(BaseModel):
