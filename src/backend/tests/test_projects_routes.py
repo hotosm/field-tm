@@ -97,8 +97,15 @@ async def test_create_odk_project():
     mock_project = Mock()
     mock_project.createProject.return_value = {"status": "success"}
 
+    odk_credentials = {
+        "odk_central_url": odk_central_url,
+        "odk_central_user": odk_central_user,
+        "odk_central_password": odk_central_password,
+    }
+    odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
+
     with patch("app.central.central_crud.get_odk_project", return_value=mock_project):
-        result = create_odk_project("Test Project")
+        result = create_odk_project("Test Project", odk_credentials)
 
     assert result == {"status": "success"}
     mock_project.createProject.assert_called_once_with("Test Project")
