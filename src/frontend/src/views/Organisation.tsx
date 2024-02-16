@@ -5,6 +5,7 @@ import { OrganisationDataService } from '@/api/OrganisationService';
 import { user_roles } from '@/types/enums';
 import CustomizedImage from '@/utilities/CustomizedImage';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
+import { useNavigate } from 'react-router-dom';
 
 const Organisation = () => {
   const cardStyle = {
@@ -17,11 +18,11 @@ const Organisation = () => {
     borderRadius: '0px',
   };
 
-  const url = 'https://fmtm.naxa.com.np/d907cf67fe587072a592.png';
+  const navigate = useNavigate();
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
-  const [verifiedTab, setVerifiedTab] = useState<boolean>(false);
+  const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
 
   const handleSearchChange = (event) => {
@@ -38,8 +39,16 @@ const Organisation = () => {
   );
 
   useEffect(() => {
-    dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
-  }, []);
+    if (verifiedTab) {
+      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
+    } else {
+      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/`));
+    }
+  }, [verifiedTab]);
+
+  const approveOrganization = (id: number) => {
+    navigate(`/approve-organization/${id}`);
+  };
 
   return (
     <CoreModules.Box
@@ -177,7 +186,7 @@ const Organisation = () => {
       </div>
       <CoreModules.Box className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5">
         {filteredCardData?.map((data, index) => (
-          <CoreModules.Card key={index} sx={cardStyle}>
+          <CoreModules.Card key={index} sx={cardStyle} onClick={() => !verifiedTab && approveOrganization(data.id)}>
             {data.logo ? (
               <div className="fmtm-min-w-[60px] md:fmtm-min-w-[80px] lg:fmtm-min-w-[120px]">
                 <CoreModules.CardMedia component="img" src={data.logo} sx={{ width: ['60px', '80px', '120px'] }} />

@@ -15,6 +15,11 @@ const OrganisationSlice = CoreModules.createSlice({
       participated_in: [],
     },
     consentApproval: false,
+    organizationApprovalStatus: {
+      isSuccess: false,
+      organizationApproving: false,
+      organizationRejecting: false,
+    },
   },
   reducers: {
     GetOrganisationsData(state, action) {
@@ -40,6 +45,15 @@ const OrganisationSlice = CoreModules.createSlice({
     },
     SetIndividualOrganization(state, action) {
       state.organisationFormData = action.payload;
+    },
+    SetOrganizationApproving(state, action) {
+      state.organizationApprovalStatus.organizationApproving = action.payload;
+    },
+    SetOrganizationRejecting(state, action) {
+      state.organizationApprovalStatus.organizationRejecting = action.payload;
+    },
+    SetOrganizationApprovalStatus(state, action) {
+      state.organizationApprovalStatus.isSuccess = action.payload;
     },
   },
 });
