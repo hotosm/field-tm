@@ -337,7 +337,7 @@ async def update_project(
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
 async def project_partial_update(
     project_id: int,
-    project_info: project_schemas.ProjectUpdate,
+    project_info: project_schemas.ProjectPartialUpdate,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(project_admin),
 ):

@@ -203,6 +203,12 @@ async def partial_update_project_info(
             db_project_info.description = project_metadata.description
         if project_metadata.short_description:
             db_project_info.short_description = project_metadata.short_description
+        if project_metadata.per_task_instructions:
+            db_project_info.per_task_instructions = (
+                project_metadata.per_task_instructions
+            )
+        if project_metadata.hashtags:
+            db_project.hashtags = project_metadata.hashtags
 
     db.commit()
     db.refresh(db_project)
@@ -280,6 +286,7 @@ async def create_project_with_project_info(
     project_name = project_metadata.project_info.name
     project_description = project_metadata.project_info.description
     project_short_description = project_metadata.project_info.short_description
+    project_instructions = project_metadata.project_info.per_task_instructions
 
     # create new project
     db_project = db_models.DbProject(
@@ -296,6 +303,7 @@ async def create_project_with_project_info(
         name=project_name,
         short_description=project_short_description,
         description=project_description,
+        per_task_instructions=project_instructions,
     )
     db.add(db_project_info)
 

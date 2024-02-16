@@ -128,6 +128,7 @@ class ProjectInfo(BaseModel):
     name: str
     short_description: str
     description: str
+    per_task_instructions: Optional[str] = None
 
 
 class ProjectIn(BaseModel):
@@ -196,13 +197,20 @@ class ProjectUpload(ProjectIn, ODKCentralIn):
     pass
 
 
-class ProjectUpdate(BaseModel):
-    """Update project."""
+class ProjectPartialUpdate(BaseModel):
+    """Update projects metadata."""
 
     name: Optional[str] = None
     short_description: Optional[str] = None
     description: Optional[str] = None
-    changeset_comment: Optional[str] = None
+    hashtags: Optional[List[str]] = None
+    per_task_instructions: Optional[str] = None
+
+
+class ProjectUpdate(ProjectIn):
+    """Update project."""
+
+    pass
 
 
 class GeojsonFeature(BaseModel):
