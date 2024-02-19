@@ -10,8 +10,10 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function PrimaryAppBar() {
+  const location = useLocation();
   const [open, setOpen] = React.useState<boolean>(false);
   const [brightness, setBrightness] = React.useState<boolean>(true);
   const dispatch = CoreModules.useAppDispatch();
@@ -37,6 +39,14 @@ export default function PrimaryAppBar() {
     };
     dispatch(ThemeActions.UpdateBrightness(newTheme));
   };
+
+  React.useEffect(() => {
+    if (location.pathname.includes('organisation') || location.pathname.includes('organization')) {
+      setActiveTab(1);
+    } else {
+      setActiveTab(0);
+    }
+  }, [location]);
 
   const appBarInnerStyles = {
     logo: {
