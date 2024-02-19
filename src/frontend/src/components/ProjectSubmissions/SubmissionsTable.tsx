@@ -12,7 +12,8 @@ import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 import CustomDatePicker from '@/components/common/CustomDatePicker';
 import { format } from 'date-fns';
-import Button from '../common/Button';
+import Button from '@/components/common/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/common/Dropdown';
 
 type filterType = {
   task_id: number | null;
@@ -42,8 +43,20 @@ const SubmissionsTable = ({ toggleView }) => {
   const submissionTableDataLoading = CoreModules.useAppSelector((state) => state.submission.submissionTableDataLoading);
   const submissionTableRefreshing = CoreModules.useAppSelector((state) => state.submission.submissionTableRefreshing);
   const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string>('');
+
+  useEffect(() => {
+    let count = 0;
+    const filters = Object.keys(filter);
+    filters?.map((fltr) => {
+      if (filter[fltr]) {
+        count = count + 1;
+      }
+    });
+    setNumberOfFilters(count);
+  }, [filter]);
 
   const updatedSubmissionFormFields = submissionFormFields?.map((formField) => {
     if (formField.type !== 'structure') {
@@ -148,68 +161,90 @@ const SubmissionsTable = ({ toggleView }) => {
         <div
           className={`${
             windowSize.width < 2000 ? 'fmtm-w-full md:fmtm-w-fit' : 'fmtm-w-fit'
-          } fmtm-flex xl:fmtm-items-end fmtm-gap-2 xl:fmtm-gap-4 fmtm-rounded-lg fmtm-relative fmtm-flex-col xl:fmtm-flex-row `}
+          } fmtm-flex xl:fmtm-items-end fmtm-gap-2 xl:fmtm-gap-4 fmtm-rounded-lg fmtm-flex-col xl:fmtm-flex-row `}
         >
-          <div className="fmtm-grid fmtm-grid-cols-2 sm:fmtm-grid-cols-3 md:fmtm-grid-cols-4 lg:fmtm-grid-cols-5 fmtm-gap-4 fmtm-items-end">
-            <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
-              <CustomSelect
-                title="Task Id"
-                placeholder="Select"
-                data={taskInfo}
-                dataKey="value"
-                value={filter?.task_id?.toString() || null}
-                valueKey="task_id"
-                label="task_id"
-                onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: +value }))}
-                className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
-              />
-            </div>
-            <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
-              <CustomSelect
-                title="Review State"
-                placeholder="Select"
-                data={reviewStateData}
-                dataKey="value"
-                value={filter?.review_state}
-                valueKey="value"
-                label="label"
-                onValueChange={(value) => value && setFilter((prev) => ({ ...prev, review_state: value.toString() }))}
-                errorMsg=""
-                className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
-              />
-            </div>
-            <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
-              <CustomDatePicker
-                title="Submitted Date"
-                selectedDate={filter?.submitted_date}
-                setSelectedDate={(date) =>
-                  setFilter((prev) => ({ ...prev, submitted_date: format(new Date(date), 'yyyy-MM-dd') }))
-                }
-                className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-w-full"
-              />
-            </div>
-            <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
-              <p className={`fmtm-text-grey-700 fmtm-text-sm fmtm-font-semibold !fmtm-bg-transparent`}>Submitted By</p>
-              <div className="fmtm-border fmtm-border-gray-300 sm:fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-items-center fmtm-px-1">
-                <input
-                  type="search"
-                  className="fmtm-h-[1.9rem] fmtm-p-2 fmtm-w-full fmtm-outline-none"
-                  placeholder="Search User"
-                  onChange={(e) => setSubmittedBy(e.target.value)}
-                ></input>
-                <i className="material-icons fmtm-text-[#9B9999] fmtm-cursor-pointer">search</i>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger>
+              <button
+                className={`fmtm-py-1 fmtm-px-2 fmtm-text-red-600 fmtm-rounded fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-text-base fmtm-gap-2 fmtm-bg-white`}
+              >
+                <AssetModules.TuneIcon style={{ fontSize: '20px' }} /> <p>FILTER</p>{' '}
+                <div className="fmtm-text-sm fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-justify-center fmtm-items-center">
+                  <p>{numberOfFilters}</p>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="fmtm-z-[50]" align="start">
+              <div
+                className={`fmtm-w-fit -fmtm-bottom-20 fmtm-bg-white fmtm-px-4 fmtm-rounded-lg fmtm-shadow-2xl fmtm-pb-4 fmtm-pt-2 fmtm-grid fmtm-grid-cols-2 sm:fmtm-grid-cols-3 md:fmtm-grid-cols-4 lg:fmtm-grid-cols-5 fmtm-gap-4 fmtm-items-end`}
+              >
+                <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
+                  <CustomSelect
+                    title="Task Id"
+                    placeholder="Select"
+                    data={taskInfo}
+                    dataKey="value"
+                    value={filter?.task_id?.toString() || null}
+                    valueKey="task_id"
+                    label="task_id"
+                    onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: +value }))}
+                    className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
+                  />
+                </div>
+                <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
+                  <CustomSelect
+                    title="Review State"
+                    placeholder="Select"
+                    data={reviewStateData}
+                    dataKey="value"
+                    value={filter?.review_state}
+                    valueKey="value"
+                    label="label"
+                    onValueChange={(value) =>
+                      value && setFilter((prev) => ({ ...prev, review_state: value.toString() }))
+                    }
+                    errorMsg=""
+                    className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
+                  />
+                </div>
+                <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
+                  <CustomDatePicker
+                    title="Submitted Date"
+                    selectedDate={filter?.submitted_date}
+                    setSelectedDate={(date) =>
+                      setFilter((prev) => ({ ...prev, submitted_date: format(new Date(date), 'yyyy-MM-dd') }))
+                    }
+                    className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-w-full"
+                  />
+                </div>
+                <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
+                  <p className={`fmtm-text-grey-700 fmtm-text-sm fmtm-font-semibold !fmtm-bg-transparent`}>
+                    Submitted By
+                  </p>
+                  <div className="fmtm-border fmtm-border-gray-300 sm:fmtm-w-fit fmtm-flex fmtm-bg-white fmtm-items-center fmtm-px-1">
+                    <input
+                      type="search"
+                      className="fmtm-h-[1.9rem] fmtm-p-2 fmtm-w-full fmtm-outline-none"
+                      placeholder="Search User"
+                      onChange={(e) => {
+                        setSubmittedBy(e.target.value);
+                      }}
+                    ></input>
+                    <i className="material-icons fmtm-text-[#9B9999] fmtm-cursor-pointer">search</i>
+                  </div>
+                </div>
+                <Button
+                  btnText="Reset Filter"
+                  btnType="other"
+                  className={`${
+                    submissionTableDataLoading || submissionFormFieldsLoading ? '' : 'fmtm-bg-white'
+                  } !fmtm-text-base !fmtm-font-bold !fmtm-rounded`}
+                  onClick={clearFilters}
+                  disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+                />
               </div>
-            </div>
-            <Button
-              btnText="Reset Filter"
-              btnType="other"
-              className={`${
-                submissionTableDataLoading || submissionFormFieldsLoading ? '' : 'fmtm-bg-white'
-              } !fmtm-text-base !fmtm-font-bold !fmtm-rounded`}
-              onClick={clearFilters}
-              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
-            />
-          </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-justify-end -fmtm-order-1 xl:fmtm-order-2 xl:fmtm-w-fit fmtm-gap-3">
           <button
