@@ -29,14 +29,14 @@ const FormUpdateTab = ({ projectId }) => {
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-10">
       <UploadArea
         title="Upload Form"
-        label="Please upload .xls, .slxs, .xml file"
+        label="Please upload .xls, .xlsx, .xml file"
         multiple={false}
         data={uploadForm || []}
         filterKey="url"
         onUploadFile={(updatedFiles) => {
           setUploadForm(updatedFiles);
         }}
-        acceptedInput=".xls, .slxs, .xml"
+        acceptedInput=".xls, .xlsx, .xml"
       />
       <div className="fmtm-flex fmtm-justify-center">
         <Button onClick={onSave} btnText="UPDATE" btnType="primary" className="fmtm-rounded-md" />
