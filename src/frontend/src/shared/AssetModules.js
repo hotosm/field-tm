@@ -69,6 +69,7 @@ import {
   Undo as UndoIcon,
   Timeline as TimelineIcon,
   PeopleAlt as PeopleAltIcon,
+  Tune as TuneIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -148,4 +149,5 @@ export default {
   UndoIcon,
   TimelineIcon,
   PeopleAltIcon,
+  TuneIcon,
 };
