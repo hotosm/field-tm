@@ -30,6 +30,7 @@ from app.config import encrypt_value, settings
 from app.db import db_models
 from app.models.enums import HTTPStatus, UserRole
 from app.organisations.organisation_deps import (
+    check_org_exists,
     get_organisation_by_name,
 )
 from app.organisations.organisation_schemas import OrganisationEdit, OrganisationIn
@@ -198,7 +199,10 @@ async def upload_logo_to_s3(
 
 
 async def create_organisation(
-    db: Session, org_model: OrganisationIn, logo: Optional[UploadFile] = File(None)
+    db: Session,
+    org_model: OrganisationIn,
+    current_user: AuthUser,
+    logo: Optional[UploadFile] = File(None),
 ) -> db_models.DbOrganisation:
     """Creates a new organisation with the given name, description, url, type, and logo.
 
@@ -209,6 +213,7 @@ async def create_organisation(
         org_model (OrganisationIn): Pydantic model for organisation input.
         logo (UploadFile, optional): logo file of the organisation.
             Defaults to File(...).
+        current_user: logged in user.
 
     Returns:
         DbOrganisation: SQLAlchemy Organisation model.
@@ -225,6 +230,7 @@ async def create_organisation(
     try:
         # Create new organisation without logo set
         db_organisation = db_models.DbOrganisation(**org_model.model_dump())
+        db_organisation.user_id = current_user.id
 
         db.add(db_organisation)
         db.commit()
@@ -312,41 +318,55 @@ async def delete_organisation(
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
-async def add_organisation_admin(
-    db: Session, user: db_models.DbUser, organisation: db_models.DbOrganisation
-):
+async def add_organisation_admin(db: Session, org_id: int, user_id: int):
     """Adds a user as an admin to the specified organisation.
 
     Args:
         db (Session): The database session.
-        user (DbUser): The user model instance.
-        organisation (DbOrganisation): The organisation model instance.
+        org_id (int): The organisation ID.
+        user_id (int): The user ID to add as manager.
 
     Returns:
         Response: The HTTP response with status code 200.
     """
-    log.info(f"Adding user ({user.id}) as org ({organisation.id}) admin")
-    # add data to the managers field in organisation model
-    organisation.managers.append(user)
+    log.info(f"Adding user ({user_id}) as org ({org_id}) admin")
+    sql = text(
+        """
+        INSERT INTO public.organisation_managers
+        (organisation_id, user_id) VALUES (:org_id, :user_id)
+        ON CONFLICT DO NOTHING;
+    """
+    )
+
+    db.execute(
+        sql,
+        {
+            "org_id": org_id,
+            "user_id": user_id,
+        },
+    )
+
     db.commit()
 
     return Response(status_code=HTTPStatus.OK)
 
 
-async def approve_organisation(db, organisation):
+async def approve_organisation(db, org_id: int):
     """Approves an oranisation request made by the user .
 
     Args:
         db: The database session.
-        organisation (DbOrganisation): The organisation model instance.
+        org_id (int): The organisation ID.
 
     Returns:
         Response: An HTTP response with the status code 200.
     """
-    log.info(f"Approving organisation ID {organisation.id}")
-    organisation.approved = True
+    org_obj = await check_org_exists(db, org_id, check_approved=False)
+
+    org_obj.approved = True
     db.commit()
-    return Response(status_code=HTTPStatus.OK)
+
+    return org_obj
 
 
 async def get_unapproved_org_detail(db, org_id):

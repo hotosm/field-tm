@@ -32,7 +32,7 @@ from app.auth.roles import org_admin, super_admin
 from app.db import database
 from app.db.db_models import DbOrganisation, DbUser
 from app.organisations import organisation_crud, organisation_schemas
-from app.organisations.organisation_deps import check_org_exists, org_exists
+from app.organisations.organisation_deps import org_exists
 from app.users.user_deps import user_exists_in_db
 
 router = APIRouter(
@@ -103,7 +103,7 @@ async def create_organisation(
     TODO refactor to use base64 encoded logo / no upload file.
     TODO then we can use the pydantic model as intended.
     """
-    return await organisation_crud.create_organisation(db, org, logo)
+    return await organisation_crud.create_organisation(db, org, current_user, logo)
 
 
 @router.patch("/{org_id}/", response_model=organisation_schemas.OrganisationOut)
@@ -131,7 +131,7 @@ async def delete_organisations(
     return await organisation_crud.delete_organisation(db, organisation)
 
 
-@router.post("/approve/")
+@router.post("/approve/", response_model=organisation_schemas.OrganisationOut)
 async def approve_organisation(
     org_id: int,
     db: Session = Depends(database.get_db),
@@ -141,19 +141,28 @@ async def approve_organisation(
 
     The logged in user must be super admin to perform this action .
     """
-    org_obj = await check_org_exists(db, org_id, check_approved=False)
-    return await organisation_crud.approve_organisation(db, org_obj)
+    approved_org = await organisation_crud.approve_organisation(db, org_id)
+
+    # Set organisation requester as organisation manager
+    if approved_org.created_by:
+        await organisation_crud.add_organisation_admin(
+            db, approved_org.id, approved_org.created_by
+        )
+
+    return approved_org
 
 
 @router.post("/add_admin/")
 async def add_new_organisation_admin(
     db: Session = Depends(database.get_db),
-    organisation: DbOrganisation = Depends(org_exists),
     user: DbUser = Depends(user_exists_in_db),
+    org: DbOrganisation = Depends(org_exists),
     org_user_dict: DbUser = Depends(org_admin),
 ):
     """Add a new organisation admin.
 
     The logged in user must be either the owner of the organisation or a super admin.
     """
-    return await organisation_crud.add_organisation_admin(db, user, organisation)
+    # NOTE extracting the org this way means org_id is not a mandatory URL param
+    # org_id = org_user_dict["organisation"].id
+    return await organisation_crud.add_organisation_admin(db, org.id, user.id)
