@@ -185,7 +185,7 @@ export const ConvertXMLToJOSM: Function = (url: string, projectBbox) => {
       try {
         // checkJOSMOpen - To check if JOSM Editor is Open Or Not.
         await CoreModules.axios.get(`http://127.0.0.1:8111/version?jsonp=checkJOSM`);
-        //importToJosmEditor - To open JOSM Editor and add XML of Project Submission To JOSM.
+        //importToJosmEditor - To open JOSM Editor and add base layer To JOSM.
         CoreModules.axios.get(
           `http://127.0.0.1:8111/imagery?title=osm&type=tms&url=https://tile.openstreetmap.org/%7Bzoom%7D/%7Bx%7D/%7By%7D.png`,
         );
