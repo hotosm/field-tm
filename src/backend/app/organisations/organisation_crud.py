@@ -337,4 +337,6 @@ async def get_unapproved_org_detail(db, org_id):
         db: The database session.
         org_id: ID of unapproved organisation.
     """
-    return db.query(db_models.DbOrganisation).filter_by(approved=False, id=org_id)
+    return (
+        db.query(db_models.DbOrganisation).filter_by(approved=False, id=org_id).first()
+    )

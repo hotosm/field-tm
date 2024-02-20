@@ -57,6 +57,7 @@ export const OrganisationDataService: Function = (url: string) => {
 
 export const PostOrganisationDataService: Function = (url: string, payload: any) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
     const postOrganisationData = async (url, payload) => {
@@ -102,6 +103,7 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
 
 export const GetIndividualOrganizationService: Function = (url: string) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     const getOrganisationData = async (url) => {
       try {
         const getOrganisationDataResponse = await axios.get(url);
@@ -115,6 +117,7 @@ export const GetIndividualOrganizationService: Function = (url: string) => {
 
 export const PatchOrganizationDataService: Function = (url: string, payload: any) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
     const patchOrganisationData = async (url, payload) => {

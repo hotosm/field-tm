@@ -60,9 +60,7 @@ async def list_unapproved_organisations(
     return await organisation_crud.get_unapproved_organisations(db)
 
 
-@router.get(
-    "/unapproved/{org_id}", response_model=list[organisation_schemas.OrganisationOut]
-)
+@router.get("/unapproved/{org_id}", response_model=organisation_schemas.OrganisationOut)
 async def unapproved_org_detail(
     org_id: int,
     db: Session = Depends(database.get_db),
