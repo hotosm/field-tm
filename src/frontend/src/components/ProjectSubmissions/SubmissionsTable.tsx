@@ -14,6 +14,8 @@ import CustomDatePicker from '@/components/common/CustomDatePicker';
 import { format } from 'date-fns';
 import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/common/Dropdown';
+import { ConvertXMLToJOSM } from '@/api/task';
+import { Modal } from '../common/Modal';
 
 type filterType = {
   task_id: number | null;
@@ -43,6 +45,8 @@ const SubmissionsTable = ({ toggleView }) => {
   const submissionTableDataLoading = CoreModules.useAppSelector((state) => state.submission.submissionTableDataLoading);
   const submissionTableRefreshing = CoreModules.useAppSelector((state) => state.submission.submissionTableRefreshing);
   const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const josmEditorError = CoreModules.useAppSelector((state) => state.task.josmEditorError);
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string>('');
@@ -166,8 +170,32 @@ const SubmissionsTable = ({ toggleView }) => {
     return value ? (typeof value === 'object' ? '-' : value) : '';
   }
 
+  const uploadToJOSM = () => {
+    dispatch(
+      ConvertXMLToJOSM(
+        `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${decodedId}`,
+        projectInfo.outline_geojson.bbox,
+      ),
+    );
+  };
+
   return (
     <div className="">
+      <Modal
+        className={`fmtm-w-[700px]`}
+        description={
+          <div>
+            <h3 className="fmtm-text-lg fmtm-font-bold fmtm-mb-4">Connection with JOSM failed</h3>
+            <p className="fmtm-text-lg">
+              Please verify if JOSM is running on your computer and the remote control is enabled.
+            </p>
+          </div>
+        }
+        open={!!josmEditorError}
+        onOpenChange={(value) => {
+          dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
+        }}
+      />
       <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col md:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
         <div
           className={`${
@@ -263,7 +291,7 @@ const SubmissionsTable = ({ toggleView }) => {
                   ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
                   : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
               }`}
-              onClick={() => {}}
+              onClick={uploadToJOSM}
               disabled={submissionTableDataLoading || submissionFormFieldsLoading}
             >
               {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
