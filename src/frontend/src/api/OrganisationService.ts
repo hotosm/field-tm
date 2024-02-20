@@ -55,6 +55,22 @@ export const OrganisationDataService: Function = (url: string) => {
   };
 };
 
+export const MyOrganisationDataService: Function = (url: string) => {
+  return async (dispatch) => {
+    dispatch(OrganisationAction.GetMyOrganisationDataLoading(true));
+    const getMyOrganisationData = async (url) => {
+      try {
+        const getMyOrganisationDataResponse = await API.get(url);
+        const response: GetOrganisationDataModel[] = getMyOrganisationDataResponse.data;
+        dispatch(OrganisationAction.GetMyOrganisationsData(response));
+      } catch (error) {
+        dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
+      }
+    };
+    await getMyOrganisationData(url);
+  };
+};
+
 export const PostOrganisationDataService: Function = (url: string, payload: any) => {
   return async (dispatch) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));

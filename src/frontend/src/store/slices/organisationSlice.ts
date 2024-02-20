@@ -1,32 +1,42 @@
 import CoreModules from '@/shared/CoreModules.js';
+import { IOrganisationState } from '../types/IOrganisation';
 
+const initialState: IOrganisationState = {
+  organisationFormData: {},
+  organisationData: [],
+  myOrganisationData: [],
+  postOrganisationData: null,
+  organisationDataLoading: false,
+  myOrganisationDataLoading: false,
+  postOrganisationDataLoading: false,
+  consentDetailsFormData: {
+    give_consent: '',
+    review_documentation: [],
+    log_into: [],
+    participated_in: [],
+  },
+  consentApproval: false,
+  organizationApprovalStatus: {
+    isSuccess: false,
+    organizationApproving: false,
+    organizationRejecting: false,
+  },
+};
 const OrganisationSlice = CoreModules.createSlice({
   name: 'organisation',
-  initialState: {
-    organisationFormData: {},
-    organisationData: [],
-    postOrganisationData: null,
-    organisationDataLoading: false,
-    postOrganisationDataLoading: false,
-    consentDetailsFormData: {
-      give_consent: '',
-      review_documentation: [],
-      log_into: [],
-      participated_in: [],
-    },
-    consentApproval: false,
-    organizationApprovalStatus: {
-      isSuccess: false,
-      organizationApproving: false,
-      organizationRejecting: false,
-    },
-  },
+  initialState: initialState,
   reducers: {
     GetOrganisationsData(state, action) {
-      state.oraganizationData = action.payload;
+      state.organisationData = action.payload;
     },
     GetOrganisationDataLoading(state, action) {
       state.organisationDataLoading = action.payload;
+    },
+    GetMyOrganisationsData(state, action) {
+      state.myOrganisationData = action.payload;
+    },
+    GetMyOrganisationDataLoading(state, action) {
+      state.myOrganisationDataLoading = action.payload;
     },
     postOrganisationData(state, action) {
       state.postOrganisationData = action.payload;

@@ -51,6 +51,17 @@ async def get_organisations(
     return await organisation_crud.get_organisations(db, current_user)
 
 
+@router.get(
+    "/my-organisations", response_model=list[organisation_schemas.OrganisationOut]
+)
+async def get_my_organisations(
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
+) -> list[DbOrganisation]:
+    """Get a list of all organisations."""
+    return await organisation_crud.get_my_organisations(db, current_user)
+
+
 @router.get("/unapproved/", response_model=list[organisation_schemas.OrganisationOut])
 async def list_unapproved_organisations(
     db: Session = Depends(database.get_db),
