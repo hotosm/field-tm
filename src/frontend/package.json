@@ -7,7 +7,10 @@
     "build:start": "cd dist && PORT=8080 npx serve",
     "start": "env-cmd -f .env.dev vite dev",
     "start:live": "vite dev",
-    "test": "vitest tests/",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx src"
   },
   "license": "GPL-3.0-only",
