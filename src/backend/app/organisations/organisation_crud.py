@@ -139,6 +139,25 @@ async def get_organisations(
     return db.query(db_models.DbOrganisation).filter_by(approved=True).all()
 
 
+async def get_my_organisations(
+    db: Session,
+    current_user: AuthUser,
+) -> list[db_models.DbOrganisation]:
+    """Get organisations filtered by the current user.
+
+    Args:
+    db (Session): The database session.
+    current_user (AuthUser): The current user.
+
+    Returns:
+    list[db_models.DbOrganisation]: A list of organisations
+    filtered by the current user.
+    """
+    db_user = await get_user(db, current_user.id)
+
+    return db_user.organisations
+
+
 async def get_unapproved_organisations(
     db: Session,
 ) -> list[db_models.DbOrganisation]:
