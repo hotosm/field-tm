@@ -92,9 +92,10 @@ class OrganisationOut(BaseModel):
 
     id: int
     name: str
+    approved: bool
+    type: OrganisationType
     logo: Optional[str]
     description: Optional[str]
     slug: Optional[str]
     url: Optional[str]
-    type: OrganisationType
     odk_central_url: Optional[str]
