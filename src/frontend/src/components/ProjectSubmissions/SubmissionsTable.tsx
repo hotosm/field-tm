@@ -13,8 +13,8 @@ import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 import CustomDatePicker from '@/components/common/CustomDatePicker';
 import { format } from 'date-fns';
 import Button from '@/components/common/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { ConvertXMLToJOSM } from '@/api/task';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
+import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmissionJson } from '@/api/task';
 import { Modal } from '../common/Modal';
 
 type filterType = {
@@ -47,6 +47,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = CoreModules.useAppSelector((state) => state.task.josmEditorError);
+  const downloadSubmissionLoading = CoreModules.useAppSelector((state) => state.task.downloadSubmissionLoading);
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string>('');
@@ -179,6 +180,22 @@ const SubmissionsTable = ({ toggleView }) => {
     );
   };
 
+  const handleDownload = (downloadType) => {
+    if (downloadType === 'csv') {
+      dispatch(
+        getDownloadProjectSubmission(
+          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}&export_json=false`,
+        ),
+      );
+    } else if (downloadType === 'json') {
+      dispatch(
+        getDownloadProjectSubmissionJson(
+          `${import.meta.env.VITE_API_URL}/submission/download-submission?project_id=${decodedId}`,
+        ),
+      );
+    }
+  };
+
   return (
     <div className="">
       <Modal
@@ -286,37 +303,48 @@ const SubmissionsTable = ({ toggleView }) => {
           </DropdownMenu>
           <div className="fmtm-flex fmtm-gap-2">
             <button
-              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
-                submissionTableDataLoading || submissionFormFieldsLoading
-                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
-                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
-              }`}
+              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 fmtm-bg-primaryRed hover:fmtm-bg-red-700`}
               onClick={uploadToJOSM}
-              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
             >
-              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
-                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
-              ) : (
-                <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
-              )}
+              <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
               <p className="fmtm-text-white fmtm-text-base fmtm-truncate">UPLOAD TO JOSM</p>
             </button>
-            <button
-              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
-                submissionTableDataLoading || submissionFormFieldsLoading
-                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
-                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
-              }`}
-              onClick={() => {}}
-              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
-            >
-              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
-                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
-              ) : (
-                <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
-              )}
-              <p className="fmtm-text-white fmtm-text-base">DOWNLOAD</p>
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <button
+                  className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150
+                    fmtm-bg-primaryRed hover:fmtm-bg-red-700
+                  `}
+                >
+                  <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
+                  <p className="fmtm-text-white fmtm-text-base">DOWNLOAD</p>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="fmtm-z-[5000] fmtm-bg-white">
+                <DropdownMenuItem
+                  disabled={downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading}
+                  onSelect={() => handleDownload('csv')}
+                >
+                  <div className="fmtm-flex fmtm-gap-2 fmtm-items-center">
+                    <p className="fmtm-text-base">Download as Csv</p>
+                    {downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading && (
+                      <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => handleDownload('json')}
+                  disabled={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
+                >
+                  <div className="fmtm-flex fmtm-gap-2 fmtm-items-center">
+                    <p className="fmtm-text-base">Download as Json</p>
+                    {downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading && (
+                      <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
+                    )}
+                  </div>{' '}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
