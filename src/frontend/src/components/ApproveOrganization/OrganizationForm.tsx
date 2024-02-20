@@ -30,7 +30,9 @@ const OrganizationForm = () => {
 
   useEffect(() => {
     if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`));
+      dispatch(
+        GetIndividualOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/${organizationId}`),
+      );
     }
   }, [organizationId]);
 
@@ -51,6 +53,7 @@ const OrganizationForm = () => {
   // redirect to manage-organization page after approve/reject success
   useEffect(() => {
     if (organizationApprovalSuccess) {
+      dispatch(OrganisationAction.SetOrganisationFormData({}));
       dispatch(OrganisationAction.SetOrganizationApprovalStatus(false));
       navigate('/organisation');
     }
@@ -69,15 +72,6 @@ const OrganizationForm = () => {
           name="name"
           label="Community or Organization Name"
           value={organisationFormData?.name}
-          onChange={() => {}}
-          fieldType="text"
-          disabled
-        />
-        <InputTextField
-          id="email"
-          name="email"
-          label="Email"
-          value={organisationFormData?.email}
           onChange={() => {}}
           fieldType="text"
           disabled

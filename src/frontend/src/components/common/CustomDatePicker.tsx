@@ -2,7 +2,14 @@ import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const CustomDatePicker = ({ title, className, selectedDate, setSelectedDate }) => {
+type CustomDatePickerType = {
+  title: string;
+  className: string;
+  selectedDate: string | null;
+  setSelectedDate: (date: Date) => void;
+};
+
+const CustomDatePicker = ({ title, className, selectedDate, setSelectedDate }: CustomDatePickerType) => {
   return (
     <div className="fmtm-z-[10000] fmtm-w-full">
       {title && (
