@@ -184,12 +184,12 @@ export const ConvertXMLToJOSM: Function = (url: string, projectBbox) => {
     const getConvertXMLToJOSM = async (url) => {
       try {
         // checkJOSMOpen - To check if JOSM Editor is Open Or Not.
-        await CoreModules.axios.get(`http://127.0.0.1:8111/version?jsonp=checkJOSM`);
+        await fetch(`http://127.0.0.1:8111/version?jsonp=checkJOSM`);
         //importToJosmEditor - To open JOSM Editor and add base layer To JOSM.
-        CoreModules.axios.get(
+        fetch(
           `http://127.0.0.1:8111/imagery?title=osm&type=tms&url=https://tile.openstreetmap.org/%7Bzoom%7D/%7Bx%7D/%7By%7D.png`,
         );
-        await CoreModules.axios.get(`http://127.0.0.1:8111/import?url=${url}`);
+        await fetch(`http://127.0.0.1:8111/import?url=${url}`);
         // `http://127.0.0.1:8111/load_and_zoom?left=80.0580&right=88.2015&top=27.9268&bottom=26.3470`;
 
         const loadAndZoomParams = {
@@ -202,9 +202,11 @@ export const ConvertXMLToJOSM: Function = (url: string, projectBbox) => {
           new_layer: 'true',
           layer_name: 'OSM Data',
         };
-        await CoreModules.axios.get(`http://127.0.0.1:8111/zoom`, {
-          params: loadAndZoomParams,
-        });
+        const queryString = Object.keys(loadAndZoomParams)
+          .map((key) => key + '=' + loadAndZoomParams[key])
+          .join('&');
+
+        await fetch(`http://127.0.0.1:8111/zoom?${queryString}`);
       } catch (error: any) {
         dispatch(CoreModules.TaskActions.SetJosmEditorError('JOSM Error'));
         // alert(error.response.data);
