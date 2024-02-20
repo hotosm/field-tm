@@ -145,14 +145,25 @@ const SubmissionsTable = ({ toggleView }) => {
     let value = obj;
     path?.split('.')?.map((item) => {
       if (path === 'start' || path === 'end') {
+        // start & end date is static
         value = `${value[item]?.split('T')[0]} ${value[item]?.split('T')[1]}`;
-      } else if (item === 'point') {
+      } else if (
+        value &&
+        value[item] &&
+        typeof value[item] === 'object' &&
+        Object.values(value[item]).includes('Point')
+      ) {
+        // if the object values contains 'Point' as type
         value = `${value[item].type} (${value[item].coordinates})`;
       } else {
-        value = value[item];
+        if (!value || !item) {
+          value = '';
+          return;
+        }
+        value = value?.[item];
       }
     });
-    return value ? value : '-';
+    return value ? (typeof value === 'object' ? '-' : value) : '';
   }
 
   return (
