@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AssetModules from '@/shared/AssetModules.js';
 import { CustomSelect } from '@/components/common/Select.js';
 import windowDimention from '@/hooks/WindowDimension';
@@ -168,11 +168,11 @@ const SubmissionsTable = ({ toggleView }) => {
 
   return (
     <div className="">
-      <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col xl:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
+      <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col md:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
         <div
           className={`${
             windowSize.width < 2000 ? 'fmtm-w-full md:fmtm-w-fit' : 'fmtm-w-fit'
-          } fmtm-flex xl:fmtm-items-end fmtm-gap-2 xl:fmtm-gap-4 fmtm-rounded-lg fmtm-flex-col xl:fmtm-flex-row `}
+          } fmtm-flex xl:fmtm-items-end fmtm-gap-2 xl:fmtm-gap-4 fmtm-rounded-lg fmtm-flex-col sm:fmtm-flex-row fmtm-order-2 md:-fmtm-order-1`}
         >
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger>
@@ -256,8 +256,42 @@ const SubmissionsTable = ({ toggleView }) => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="fmtm-flex fmtm-gap-2">
+            <button
+              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
+                submissionTableDataLoading || submissionFormFieldsLoading
+                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
+                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
+              }`}
+              onClick={() => {}}
+              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+            >
+              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
+                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
+              ) : (
+                <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
+              )}
+              <p className="fmtm-text-white fmtm-text-base fmtm-truncate">UPLOAD TO JOSM</p>
+            </button>
+            <button
+              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
+                submissionTableDataLoading || submissionFormFieldsLoading
+                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
+                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
+              }`}
+              onClick={() => {}}
+              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+            >
+              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
+                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
+              ) : (
+                <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
+              )}
+              <p className="fmtm-text-white fmtm-text-base">DOWNLOAD</p>
+            </button>
+          </div>
         </div>
-        <div className="fmtm-w-full fmtm-flex fmtm-justify-end -fmtm-order-1 xl:fmtm-order-2 xl:fmtm-w-fit fmtm-gap-3">
+        <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
           <button
             className={`fmtm-px-4 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
               submissionTableDataLoading || submissionFormFieldsLoading
