@@ -143,7 +143,7 @@ export const CustomSelect = ({
             <SelectTrigger className="fmtm-h-[2.35rem]">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="fmtm-z-[100]">
               <SelectGroup className="fmtm-max-h-72 fmtm-overflow-y-auto">
                 {data?.map((item) => (
                   <SelectItem key={item[dataKey]} value={item[valueKey].toString()}>

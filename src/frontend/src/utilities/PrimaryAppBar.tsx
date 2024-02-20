@@ -2,7 +2,6 @@ import * as React from 'react';
 import windowDimention from '@/hooks/WindowDimension';
 import DrawerComponent from '@/utilities/CustomDrawer';
 import CustomizedImage from '@/utilities/CustomizedImage';
-import { ThemeActions } from '@/store/slices/ThemeSlice';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -10,10 +9,11 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function PrimaryAppBar() {
+  const location = useLocation();
   const [open, setOpen] = React.useState<boolean>(false);
-  const [brightness, setBrightness] = React.useState<boolean>(true);
   const dispatch = CoreModules.useAppDispatch();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
@@ -25,18 +25,13 @@ export default function PrimaryAppBar() {
     setOpen(false);
   };
 
-  const handleLightToggle = () => {
-    setBrightness(!brightness);
-
-    const newTheme = {
-      ...defaultTheme,
-      palette: {
-        ...defaultTheme.palette,
-        mode: !brightness == true ? 'light' : 'dark',
-      },
-    };
-    dispatch(ThemeActions.UpdateBrightness(newTheme));
-  };
+  React.useEffect(() => {
+    if (location.pathname.includes('organisation') || location.pathname.includes('organization')) {
+      setActiveTab(1);
+    } else {
+      setActiveTab(0);
+    }
+  }, [location]);
 
   const appBarInnerStyles = {
     logo: {
@@ -126,17 +121,6 @@ export default function PrimaryAppBar() {
                 onClick={() => setActiveTab(1)}
               />
             </CoreModules.Link>
-            {/* <CoreModules.Link to={''} style={{ color: defaultTheme.palette.black }}>
-              <CoreModules.Tab
-                label="MANAGE CATEGORY"
-                sx={{
-                  borderBottom: activeTab === 2 ? '2.5px solid #2c3038' : 'none',
-                  '&:hover': { backgroundColor: '#fff' },
-                  fontSize: 16,
-                }}
-                onClick={() => setActiveTab(2)}
-              />
-            </CoreModules.Link> */}
           </CoreModules.Tabs>
           {/* position changed */}
           {token != null && (
@@ -163,19 +147,6 @@ export default function PrimaryAppBar() {
           )}
 
           <CoreModules.Stack sx={{ flexGrow: 1 }} />
-
-          {/* <CoreModules.Stack>
-            <CoreModules.IconButton
-              size="large"
-              aria-label="show more"
-              aria-haspopup="true"
-              onClick={handleLightToggle}
-              color="inherit"
-            >
-              {brightness != true ? <AssetModules.LightModeIcon /> : <AssetModules.DarkModeIcon />}
-            </CoreModules.IconButton>
-          </CoreModules.Stack> */}
-
           <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex', xs: 'none' } }}>
             {token != null ? (
               <CoreModules.Link style={{ textDecoration: 'none' }} to={'/'}>

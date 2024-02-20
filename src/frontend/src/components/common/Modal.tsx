@@ -29,10 +29,11 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 interface IModalProps {
-  dialogOpen: React.FC<any>;
-  title: React.FC<any>;
-  description: React.FC<any>;
+  dialogOpen?: React.FC<any>;
+  title?: React.FC<any>;
+  description: React.ReactNode;
   open: boolean;
+  className: string;
   onOpenChange: (boolean) => void;
 }
 
