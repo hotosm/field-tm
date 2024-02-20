@@ -125,6 +125,8 @@ async def geojson_to_flatgeobuf(
     """
     # FIXME make this with with properties / tags
     # FIXME this is important
+    # FIXME but difficult to guarantee users upload geojson
+    # FIXME With required properties included
     # sql = """
     #     DROP TABLE IF EXISTS public.temp_features CASCADE;
 
@@ -171,7 +173,7 @@ async def geojson_to_flatgeobuf(
             FROM data
         ) AS f;
 
-        SELECT ST_AsFlatGeobuf(fgb_data)
+        SELECT ST_AsFlatGeobuf(fgb_data, true)
         FROM (SELECT * FROM public.temp_features as geoms) AS fgb_data;
     """
     # Run the SQL
@@ -201,6 +203,7 @@ async def flatgeobuf_to_geojson(
     Returns:
         geojson.FeatureCollection: A FeatureCollection object.
     """
+    # FIXME can we use SELECT * to extract all fields into geojson properties?
     sql = text(
         """
         DROP TABLE IF EXISTS public.temp_fgb CASCADE;
@@ -215,11 +218,23 @@ async def flatgeobuf_to_geojson(
             SELECT jsonb_build_object(
                 'type', 'Feature',
                 'geometry', ST_AsGeoJSON(fgb_data.geom)::jsonb,
-                'properties', fgb_data.properties::jsonb
+                'properties', jsonb_build_object(
+                    'osm_id', fgb_data.osm_id,
+                    'tags', fgb_data.tags,
+                    'version', fgb_data.version,
+                    'changeset', fgb_data.changeset,
+                    'timestamp', fgb_data.timestamp
+
+                )::jsonb
             ) AS feature
             FROM (
-            SELECT *,
-                NULL as properties
+                SELECT
+                    geom,
+                    NULL as osm_id,
+                    NULL as tags,
+                    NULL as version,
+                    NULL as changeset,
+                    NULL as timestamp
                 FROM ST_FromFlatGeobuf(null::temp_fgb, :fgb_bytes)
             ) AS fgb_data
         ) AS features;
