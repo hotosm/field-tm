@@ -49,7 +49,7 @@ const ProjectInfo = () => {
         <p className="fmtm-text-[#706E6E] fmtm-text-base">
           <span
             className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
-            onClick={() => navigate(`/newproject_details/${encodedId}`)}
+            onClick={() => navigate(`/project_details/${encodedId}`)}
           >
             {projectInfo?.title}{' '}
           </span>

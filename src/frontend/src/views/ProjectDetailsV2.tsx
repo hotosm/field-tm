@@ -17,7 +17,6 @@ import GenerateBasemap from '@/components/GenerateBasemap';
 import { ProjectBuildingGeojsonService } from '@/api/SubmissionService';
 import TaskSectionPopup from '@/components/ProjectDetailsV2/TaskSectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
-import QrcodeComponent from '@/components/QrcodeComponent';
 import MobileFooter from '@/components/ProjectDetailsV2/MobileFooter';
 import MobileActivitiesContents from '@/components/ProjectDetailsV2/MobileActivitiesContents';
 import BottomSheet from '@/components/common/BottomSheet';
@@ -505,10 +504,11 @@ const Home = () => {
       </div>
       {featuresLayer != undefined && (
         <TaskSectionPopup
+          taskId={taskId}
+          feature={featuresLayer}
           body={
             <div>
               <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
-              <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={type} />
             </div>
           }
         />

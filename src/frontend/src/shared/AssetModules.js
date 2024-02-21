@@ -68,6 +68,7 @@ import {
   DeleteOutlined as DeleteOutlinedIcon,
   Undo as UndoIcon,
   Timeline as TimelineIcon,
+  DescriptionOutlined as DescriptionOutlinedIcon,
   PeopleAlt as PeopleAltIcon,
   Tune as TuneIcon,
 } from '@mui/icons-material';
@@ -148,6 +149,7 @@ export default {
   DeleteOutlinedIcon,
   UndoIcon,
   TimelineIcon,
+  DescriptionOutlinedIcon,
   PeopleAltIcon,
   TuneIcon,
 };
