@@ -9,15 +9,16 @@ import { ProjectById } from '@/api/Project';
 import environment from '@/environment';
 import { fetchInfoTask } from '@/api/task';
 import { GetProjectDashboard } from '@/api/Project';
+import { useSearchParams } from 'react-router-dom';
 
 const ProjectSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
 
-  const [viewBy, setViewBy] = useState<'infographics' | 'table'>('infographics');
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
 
@@ -51,24 +52,34 @@ const ProjectSubmissions = () => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
   }, []);
 
+  useEffect(() => {
+    if (!searchParams.get('tab')) {
+      setSearchParams({ tab: 'infographics' });
+    }
+  }, []);
+
   const ToggleView = () => (
     <div className="fmtm-flex fmtm-justify-end fmtm-gap-3">
       <div title="Infographics View">
         <AssetModules.GridViewIcon
           style={{ fontSize: '30px' }}
           className={`${
-            viewBy === 'infographics' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
+            searchParams.get('tab') === 'infographics' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
           } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-          onClick={() => setViewBy('infographics')}
+          onClick={() => {
+            setSearchParams({ tab: 'infographics' });
+          }}
         />
       </div>
       <div title="Table View">
         <AssetModules.ListAltIcon
           style={{ fontSize: '30px' }}
           className={`${
-            viewBy === 'table' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
+            searchParams.get('tab') === 'table' ? 'fmtm-text-primaryRed' : 'fmtm-text-[#545454]'
           } hover:fmtm-text-primaryRed fmtm-cursor-pointer`}
-          onClick={() => setViewBy('table')}
+          onClick={() => {
+            setSearchParams({ tab: 'table' });
+          }}
         />
       </div>
     </div>
@@ -80,7 +91,7 @@ const ProjectSubmissions = () => {
         <ProjectInfo />
       </div>
       <div className="fmtm-w-full">
-        {viewBy === 'infographics' ? (
+        {searchParams.get('tab') === 'infographics' ? (
           <SubmissionsInfographics toggleView={<ToggleView />} />
         ) : (
           <SubmissionsTable toggleView={<ToggleView />} />
