@@ -16,6 +16,7 @@ import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmissionJson } from '@/api/task';
 import { Modal } from '../common/Modal';
+import { useNavigate } from 'react-router-dom';
 
 type filterType = {
   task_id: number | null;
@@ -35,6 +36,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const { windowSize } = windowDimention();
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
+  const navigate = useNavigate();
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
   const submissionFormFields = CoreModules.useAppSelector((state) => state.submission.submissionFormFields);
@@ -51,6 +53,8 @@ const SubmissionsTable = ({ toggleView }) => {
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string>('');
+
+  const encodedTaskId = environment.encode(3468);
 
   useEffect(() => {
     let count = 0;
@@ -404,7 +408,12 @@ const SubmissionsTable = ({ toggleView }) => {
             rowClassName="updatedRow"
             dataFormat={(row) => (
               <div className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
-                <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454]" />{' '}
+                <AssetModules.VisibilityOutlinedIcon
+                  className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                  onClick={() => {
+                    navigate(`/project/${encodedId}/tasks/${encodedTaskId}/submission/${row?.meta?.instanceID}`);
+                  }}
+                />{' '}
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
                 <AssetModules.CheckOutlinedIcon className="fmtm-text-[#545454]" />{' '}
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
