@@ -16,27 +16,32 @@ import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmissionJson } from '@/api/task';
 import { Modal } from '../common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import filterParams from '@/utilfunctions/filterParams';
 
 type filterType = {
-  task_id: number | null;
-  submitted_by: string;
+  task_id: string | null;
+  submitted_by: string | null;
   review_state: string | null;
   submitted_date: string | null;
 };
 
 const SubmissionsTable = ({ toggleView }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const initialFilterState = {
-    task_id: null,
-    submitted_by: '',
-    review_state: null,
-    submitted_date: null,
+    task_id: searchParams.get('task_id') ? searchParams?.get('task_id') : null,
+    submitted_by: searchParams.get('submitted_by'),
+    review_state: searchParams.get('review_state'),
+    submitted_date: searchParams.get('submitted_date'),
   };
   const [filter, setFilter] = useState<filterType>(initialFilterState);
+
   const { windowSize } = windowDimention();
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
+
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
   const submissionFormFields = CoreModules.useAppSelector((state) => state.submission.submissionFormFields);
@@ -52,7 +57,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const downloadSubmissionLoading = CoreModules.useAppSelector((state) => state.task.downloadSubmissionLoading);
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
-  const [submittedBy, setSubmittedBy] = useState<string>('');
+  const [submittedBy, setSubmittedBy] = useState<string | null>(null);
 
   const encodedTaskId = environment.encode(3468);
 
@@ -130,7 +135,9 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setFilter((prev) => ({ ...prev, submitted_by: submittedBy }));
+      if (submittedBy != null) {
+        setFilter((prev) => ({ ...prev, submitted_by: submittedBy }));
+      }
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [submittedBy, 500]);
@@ -147,7 +154,8 @@ const SubmissionsTable = ({ toggleView }) => {
   };
 
   const clearFilters = () => {
-    setFilter(initialFilterState);
+    setSearchParams({ tab: 'table' });
+    setFilter({ task_id: null, submitted_by: null, review_state: null, submitted_date: null });
   };
 
   function getValueByPath(obj: any, path: string) {
@@ -200,6 +208,11 @@ const SubmissionsTable = ({ toggleView }) => {
     }
   };
 
+  useEffect(() => {
+    const filteredParams = filterParams(filter);
+    setSearchParams({ tab: 'table', ...filteredParams });
+  }, [filter]);
+
   return (
     <div className="">
       <Modal
@@ -247,7 +260,7 @@ const SubmissionsTable = ({ toggleView }) => {
                     value={filter?.task_id?.toString() || null}
                     valueKey="task_id"
                     label="task_id"
-                    onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: +value }))}
+                    onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: value.toString() }))}
                     className="fmtm-text-grey-700 fmtm-text-sm !fmtm-mb-0 fmtm-bg-white"
                   />
                 </div>
