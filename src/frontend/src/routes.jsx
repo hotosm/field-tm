@@ -15,15 +15,13 @@ import ApproveOrganization from '@/views/ApproveOrganization';
 import Authorized from '@/views/Authorized';
 import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
-import ProjectDetails from '@/views/ProjectDetails';
 import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
-import NewProjectDetails from '@/views/NewProjectDetails';
+// import NewProjectDetails from '@/views/NewProjectDetails';
 import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
 import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
 
-// const ProjectDetails = React.lazy(() => import('./views/ProjectDetails'));
 const Submissions = React.lazy(() => import('./views/Submissions'));
 const Tasks = React.lazy(() => import('./views/Tasks'));
 const ProjectInfo = React.lazy(() => import('./views/ProjectInfo'));
@@ -160,14 +158,13 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
       // {
       //   path: '/project_details/:id',
       //   element: (
       //     <ProtectedRoute>
       //       <Suspense fallback={<div>Loading...</div>}>
       //         <ErrorBoundary>
-      //           <ProjectDetails />
+      //           <NewProjectDetails />
       //         </ErrorBoundary>
       //       </Suspense>
       //     </ProtectedRoute>
@@ -175,18 +172,6 @@ const routes = createBrowserRouter([
       // },
       {
         path: '/project_details/:id',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <NewProjectDetails />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: '/newproject_details/:id',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>

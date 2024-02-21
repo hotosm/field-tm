@@ -73,3 +73,9 @@ export interface OrganisationListModel {
   logo: string;
   url: string;
 }
+
+export type organizationDropdownType = {
+  label: string;
+  value: number;
+  hasODKCredentials: boolean;
+};

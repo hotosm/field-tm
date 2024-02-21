@@ -1,7 +1,6 @@
 import TextArea from '@/components/common/TextArea';
 import InputTextField from '@/components/common/InputTextField';
-import RadioButton from '@/components/common/RadioButton';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +13,8 @@ import AssetModules from '@/shared/AssetModules.js';
 import { createPopup } from '@/utilfunctions/createPopup';
 import { CustomSelect } from '@/components/common/Select';
 import { OrganisationService } from '@/api/CreateProjectService';
+import { CustomCheckbox } from '@/components/common/Checkbox';
+import { organizationDropdownType } from '@/models/createproject/createProjectModel';
 
 const ProjectDetailsForm = ({ flag }) => {
   const dispatch = useDispatch();
@@ -21,8 +22,12 @@ const ProjectDetailsForm = ({ flag }) => {
 
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const organisationListData: any = useAppSelector((state) => state.createproject.organisationList);
-
-  const organisationList = organisationListData.map((item) => ({ label: item.name, value: item.id }));
+  const organisationList: organizationDropdownType[] = organisationListData.map((item) => ({
+    label: item.name,
+    value: item.id,
+    hasODKCredentials: item?.odk_central_url ? true : false,
+  }));
+  const [hasODKCredentials, setHasODKCredentials] = useState(false);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
@@ -35,11 +40,6 @@ const ProjectDetailsForm = ({ flag }) => {
     submission,
     CreateProjectValidation,
   );
-
-  const orgDefaultOdkCreds = useAppSelector((state) => state.createproject.orgDefaultOdkCreds);
-  const handleCheckboxChange = () => {
-    dispatch(CreateProjectActions.ToggleOrgDefaultOdkCreds(!orgDefaultOdkCreds)); // Dispatch the action to toggle the orgDefaultOdkCreds state
-  };
 
   const onFocus = () => {
     dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
@@ -68,6 +68,27 @@ const ProjectDetailsForm = ({ flag }) => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
   };
 
+  useEffect(() => {
+    if (!values.organisation_id) {
+      handleCustomChange('defaultODKCredentials', false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (values.defaultODKCredentials) {
+      handleCustomChange('odk_central_url', '');
+      handleCustomChange('odk_central_user', '');
+      handleCustomChange('odk_central_password', '');
+    }
+  }, [values.defaultODKCredentials]);
+
+  useEffect(() => {
+    organisationList?.map((organization) => {
+      if (values?.organisation_id == organization?.value) {
+        setHasODKCredentials(organization.hasODKCredentials);
+      }
+    });
+  }, [values?.organisation_id, organisationList]);
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
       <div className="fmtm-bg-white xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -96,115 +117,124 @@ const ProjectDetailsForm = ({ flag }) => {
         className="xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar"
         onSubmit={handleSubmit}
       >
-        <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row">
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 md:fmtm-w-[50%]">
-            <InputTextField
-              id="name"
-              name="name"
-              label="Project Name"
-              value={values?.name}
-              onChange={handleInputChanges}
-              fieldType="text"
-              required
-              errorMsg={errors.name}
-            />
-            <TextArea
-              id="short_description"
-              name="short_description"
-              label="Short Description"
-              rows={3}
-              value={values?.short_description}
-              onChange={handleInputChanges}
-              required
-              errorMsg={errors.short_description}
-            />
-            <label>
-              <input type="checkbox" checked={orgDefaultOdkCreds} onChange={handleCheckboxChange} /> Use Custom ODK
-              Credentials (Optional)
-            </label>
-            {orgDefaultOdkCreds && (
-              <>
-                <InputTextField
-                  id="odk_central_url"
-                  name="odk_central_url"
-                  label="ODK Central URL"
-                  value={values?.odk_central_url}
-                  onChange={handleChange}
-                  fieldType="text"
-                  errorMsg={errors.odk_central_url}
-                />
-                <InputTextField
-                  id="odk_central_user"
-                  name="odk_central_user"
-                  label="ODK Central Email"
-                  value={values?.odk_central_user}
-                  onChange={handleChange}
-                  fieldType="text"
-                  errorMsg={errors.odk_central_user}
-                />
-                <InputTextField
-                  id="odk_central_password"
-                  name="odk_central_password"
-                  label="ODK Central Password"
-                  value={values?.odk_central_password}
-                  onChange={handleChange}
-                  fieldType="password"
-                  errorMsg={errors.odk_central_password}
-                />
-              </>
-            )}
-            <div>
-              <InputTextField
-                id="hashtags"
-                label="Hashtags"
-                value={values?.hashtags}
-                onChange={(e) => {
-                  handleHashtagOnChange(e);
+        <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 xl:fmtm-w-[50%]">
+          <InputTextField
+            id="name"
+            name="name"
+            label="Project Name"
+            value={values?.name}
+            onChange={handleInputChanges}
+            fieldType="text"
+            required
+            errorMsg={errors.name}
+          />
+          <TextArea
+            id="short_description"
+            name="short_description"
+            label="Short Description"
+            rows={3}
+            value={values?.short_description}
+            onChange={handleInputChanges}
+            required
+            errorMsg={errors.short_description}
+          />
+          <div className="">
+            <div className="fmtm-flex fmtm-items-center">
+              <CustomSelect
+                title="Organization Name"
+                placeholder="Organization Name"
+                data={organisationList}
+                dataKey="value"
+                value={values.organisation_id?.toString()}
+                valueKey="value"
+                label="label"
+                onValueChange={(value) => {
+                  handleCustomChange('organisation_id', value && +value);
+                  handleCustomChange('defaultODKCredentials', false);
                 }}
-                fieldType="text"
-                errorMsg={errors.hashtag}
               />
-              <p className="fmtm-text-sm fmtm-text-gray-500 fmtm-leading-4 fmtm-mt-2">
-                *Hashtags related to what is being mapped. By default #FMTM is included. Hashtags are sometimes used for
-                analysis later, but should be human informative and not overused, #group #event
-              </p>
+              <AssetModules.AddIcon
+                className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-9"
+                onClick={() => createPopup('Create Organization', 'createOrganisation?popup=true')}
+              />
             </div>
+            {errors.organisation_id && (
+              <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.organisation_id}</p>
+            )}
           </div>
-          <div className="md:fmtm-w-[50%] fmtm-flex fmtm-flex-col fmtm-gap-6">
-            <div className="">
-              <div className="fmtm-flex fmtm-items-center fmtm-max-w-[18rem]">
-                <CustomSelect
-                  title="Organization Name"
-                  placeholder="Organization Name"
-                  data={organisationList}
-                  dataKey="value"
-                  value={values.organisation_id?.toString()}
-                  valueKey="value"
-                  label="label"
-                  onValueChange={(value) => handleCustomChange('organisation_id', value && +value)}
-                />
-                <AssetModules.AddIcon
-                  className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-9"
-                  onClick={() => createPopup('Create Organization', 'createOrganisation?popup=true')}
-                />
-              </div>
-              {errors.organisation_id && (
-                <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.organisation_id}</p>
-              )}
-            </div>
-            <TextArea
-              id="description"
-              label="Description"
-              rows={3}
-              value={values?.description}
-              onChange={(e) => handleCustomChange('description', e.target.value)}
-              required
-              errorMsg={errors.description}
+          {hasODKCredentials && (
+            <CustomCheckbox
+              key="defaultODKCredentials"
+              label="Use default ODK credentials"
+              checked={values.defaultODKCredentials}
+              onCheckedChange={() => {
+                handleCustomChange('defaultODKCredentials', !values.defaultODKCredentials);
+              }}
+              className="fmtm-text-black"
             />
+          )}
+          {!values.defaultODKCredentials && (
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
+              <InputTextField
+                id="odk_central_url"
+                name="odk_central_url"
+                label="ODK Central URL"
+                value={values?.odk_central_url}
+                onChange={handleChange}
+                fieldType="text"
+                errorMsg={errors.odk_central_url}
+                required
+              />
+              <InputTextField
+                id="odk_central_user"
+                name="odk_central_user"
+                label="ODK Central Email"
+                value={values?.odk_central_user}
+                onChange={handleChange}
+                fieldType="text"
+                errorMsg={errors.odk_central_user}
+                required
+              />
+              <InputTextField
+                id="odk_central_password"
+                name="odk_central_password"
+                label="ODK Central Password"
+                value={values?.odk_central_password}
+                onChange={handleChange}
+                fieldType="password"
+                errorMsg={errors.odk_central_password}
+                required
+              />
+            </div>
+          )}
+          <div>
+            <InputTextField
+              id="hashtags"
+              label="Hashtags"
+              value={values?.hashtags}
+              onChange={(e) => {
+                handleHashtagOnChange(e);
+              }}
+              fieldType="text"
+              errorMsg={errors.hashtag}
+            />
+            <p className="fmtm-text-sm fmtm-text-gray-500 fmtm-leading-4 fmtm-mt-2">
+              *Hashtags related to what is being mapped. By default #FMTM is included. Hashtags are sometimes used for
+              analysis later, but should be human informative and not overused, #group #event
+            </p>
           </div>
-        </div>
-        <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
-          <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
+          <TextArea
+            id="description"
+            label="Description"
+            rows={3}
+            value={values?.description}
+            onChange={(e) => handleCustomChange('description', e.target.value)}
+            required
+            errorMsg={errors.description}
+          />
+          <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
+            <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
+          </div>
         </div>
       </form>
     </div>

@@ -36,7 +36,6 @@ export type CreateProjectStateTypes = {
   isTasksGenerated: {};
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
-  orgDefaultOdkCreds: boolean;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -92,10 +91,11 @@ export type EditProjectDetailsTypes = {
 };
 
 export type ProjectDetailsTypes = {
-  data_extract_type: string;
-  data_extract_url: string;
-  task_split_dimension: number;
-  task_num_buildings: number;
+  dimension: number;
+  data_extract_type?: string;
+  data_extract_url?: string;
+  task_split_dimension?: number;
+  task_num_buildings?: number;
   no_of_buildings: number;
   odk_central_user?: string;
   odk_central_password?: string;

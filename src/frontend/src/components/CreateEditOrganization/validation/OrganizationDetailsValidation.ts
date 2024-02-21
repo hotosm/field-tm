@@ -8,9 +8,9 @@ interface OrganisationValues {
   odk_central_url: string;
   odk_central_user: string;
   odk_central_password: string;
-  email: string;
   osm_profile: string;
   organization_type: string;
+  fillODKCredentials: boolean;
 }
 interface ValidationErrors {
   logo?: string;
@@ -21,9 +21,9 @@ interface ValidationErrors {
   odk_central_url?: string;
   odk_central_user?: string;
   odk_central_password?: string;
-  email?: string;
   osm_profile?: string;
   organization_type?: string;
+  fillODKCredentials?: boolean;
 }
 
 function isValidUrl(url: string) {
@@ -61,8 +61,16 @@ function OrganizationDetailsValidation(values: OrganisationValues) {
     errors.odk_central_url = 'Invalid URL.';
   }
 
-  if (!values?.email) {
-    errors.email = 'Email is Required.';
+  if (values?.fillODKCredentials && !values.odk_central_url) {
+    errors.odk_central_url = 'ODK central URL is Required.';
+  }
+
+  if (values?.fillODKCredentials && !values.odk_central_user) {
+    errors.odk_central_user = 'ODK central URL is Required.';
+  }
+
+  if (values?.fillODKCredentials && !values.odk_central_password) {
+    errors.odk_central_password = 'ODK central URL is Required.';
   }
 
   return errors;

@@ -55,8 +55,25 @@ export const OrganisationDataService: Function = (url: string) => {
   };
 };
 
+export const MyOrganisationDataService: Function = (url: string) => {
+  return async (dispatch) => {
+    dispatch(OrganisationAction.GetMyOrganisationDataLoading(true));
+    const getMyOrganisationData = async (url) => {
+      try {
+        const getMyOrganisationDataResponse = await API.get(url);
+        const response: GetOrganisationDataModel[] = getMyOrganisationDataResponse.data;
+        dispatch(OrganisationAction.GetMyOrganisationsData(response));
+      } catch (error) {
+        dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
+      }
+    };
+    await getMyOrganisationData(url);
+  };
+};
+
 export const PostOrganisationDataService: Function = (url: string, payload: any) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
     const postOrganisationData = async (url, payload) => {
@@ -102,6 +119,7 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
 
 export const GetIndividualOrganizationService: Function = (url: string) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     const getOrganisationData = async (url) => {
       try {
         const getOrganisationDataResponse = await axios.get(url);
@@ -115,6 +133,7 @@ export const GetIndividualOrganizationService: Function = (url: string) => {
 
 export const PatchOrganizationDataService: Function = (url: string, payload: any) => {
   return async (dispatch) => {
+    dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
     const patchOrganisationData = async (url, payload) => {

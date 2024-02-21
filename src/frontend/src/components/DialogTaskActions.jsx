@@ -5,9 +5,11 @@ import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { task_priority_str } from '@/types/enums';
+import Button from '@/components/common/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dialog({ taskId, feature, map, view }) {
-  // const featureStatus = feature.id_ != undefined ? feature.id_.replace("_", ",").split(',')[1] : null;
+  const navigate = useNavigate();
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const loading = CoreModules.useAppSelector((state) => state.common.loading);
@@ -46,15 +48,11 @@ export default function Dialog({ taskId, feature, map, view }) {
     }
   }, [projectData, taskId, feature]);
 
-  // const tasksList = environment.tasksStatus.map((status) => {
-  //   return status.key;
-  // });
-
   const handleOnClick = (event) => {
-    const status = task_priority_str[event.target.id];
+    const status = task_priority_str[event.currentTarget.dataset.btnid];
     const body = token != null ? { ...token } : {};
-    const geoStyle = geojsonStyles[event.target.id];
-    if (event.target.id != undefined) {
+    const geoStyle = geojsonStyles[event.currentTarget.dataset.btnid];
+    if (event.currentTarget.dataset.btnid != undefined) {
       if (body.hasOwnProperty('id')) {
         dispatch(
           ProjectTaskStatus(
@@ -95,64 +93,59 @@ export default function Dialog({ taskId, feature, map, view }) {
     currentStatus?.locked_by_username === token?.username || currentStatus?.locked_by_username === null;
 
   return (
-    <CoreModules.Stack direction={'column'} spacing={2}>
-      <CoreModules.Stack direction={'row'} pl={1}>
-        <CoreModules.Typography fontWeight={'bold'} variant="h3">
-          {`Task : ${taskId}`}
-        </CoreModules.Typography>
-      </CoreModules.Stack>
-      <CoreModules.Stack direction={'row'} pl={1}>
-        <CoreModules.Typography variant="h3">
-          {/* {`STATUS : ${task_status?.toString()?.replaceAll('_', ' ')}`} */}
-          {`STATUS : ${task_status}`}
-        </CoreModules.Typography>
-      </CoreModules.Stack>
-      <CoreModules.Link
-        to={`/project/${params.id}/tasks/${currentTaskId}`}
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          textDecoration: 'none',
-          marginRight: '15px',
-        }}
-      >
-        <CoreModules.Button
-          // id={data.value}
-          // key={index}
-          variant="contained"
-          color="error"
-          // onClick={handleOnClick}
-          // disabled={loading}
+    <div className="fmtm-flex fmtm-flex-col">
+      {list_of_task_status?.length > 0 && (
+        <div
+          className={`fmtm-grid fmtm-border-t-[1px] fmtm-p-5 ${
+            list_of_task_status?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
+          }`}
         >
-          Task Submission
-        </CoreModules.Button>
-      </CoreModules.Link>
-      {checkIfTaskAssignedOrNot &&
-        list_of_task_status?.map((data, index) => {
-          return list_of_task_status?.length != 0 ? (
-            <CoreModules.Button
-              id={data.value}
-              key={index}
-              variant="contained"
-              color="error"
-              onClick={handleOnClick}
-              disabled={loading}
-            >
-              {data.key}
-            </CoreModules.Button>
-          ) : (
-            <CoreModules.Button
-              id={data.value}
-              key={index}
-              variant="contained"
-              color="error"
-              onClick={handleOnClick}
-              disabled={true}
-            >
-              {data.key}
-            </CoreModules.Button>
-          );
-        })}
-    </CoreModules.Stack>
+          {checkIfTaskAssignedOrNot &&
+            list_of_task_status?.map((data, index) => {
+              return list_of_task_status?.length != 0 ? (
+                <Button
+                  btnId={data.value}
+                  key={index}
+                  onClick={handleOnClick}
+                  disabled={loading}
+                  btnText={data.key.toUpperCase()}
+                  btnType={data.btnBG === 'red' ? 'primary' : 'other'}
+                  className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center ${
+                    data.btnBG === 'gray'
+                      ? '!fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none'
+                      : data.btnBG === 'transparent'
+                        ? '!fmtm-bg-transparent !fmtm-text-primaryRed !fmtm-border-none !fmtm-w-fit fmtm-mx-auto hover:!fmtm-text-red-700'
+                        : ''
+                  }`}
+                />
+              ) : null;
+            })}
+        </div>
+      )}
+      {task_status !== 'READY' && task_status !== 'LOCKED_FOR_MAPPING' && (
+        <div className="fmtm-p-5 fmtm-border-t">
+          <Button
+            btnText="GO TO TASK SUBMISSION"
+            btnType="primary"
+            type="submit"
+            className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+            onClick={() => navigate(`/project/${params.id}/tasks/${currentTaskId}`)}
+          />
+        </div>
+      )}
+      {task_status === 'LOCKED_FOR_MAPPING' && (
+        <div className="fmtm-p-5 fmtm-border-t">
+          <Button
+            btnText="GO TO ODK"
+            btnType="primary"
+            type="submit"
+            className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+            onClick={() => {
+              document.location.href = 'intent://getodk.org/#Intent;scheme=app;package=org.odk.collect.android;end';
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
