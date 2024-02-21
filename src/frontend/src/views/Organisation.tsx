@@ -1,23 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { OrganisationDataService } from '@/api/OrganisationService';
+import { MyOrganisationDataService, OrganisationDataService } from '@/api/OrganisationService';
 import { user_roles } from '@/types/enums';
-import CustomizedImage from '@/utilities/CustomizedImage';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
+import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
 import { useNavigate } from 'react-router-dom';
 
 const Organisation = () => {
-  const cardStyle = {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'row',
-    cursor: 'pointer',
-    gap: '20px',
-    boxShadow: 'none',
-    borderRadius: '0px',
-  };
-
   const navigate = useNavigate();
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -31,13 +21,21 @@ const Organisation = () => {
 
   const dispatch = CoreModules.useAppDispatch();
 
-  const oraganizationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
-    (state) => state.organisation.oraganizationData,
+  const organisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
+    (state) => state.organisation.organisationData,
   );
-  const filteredCardData: GetOrganisationDataModel[] = oraganizationData?.filter((data) =>
-    data.name.toLowerCase().includes(searchKeyword.toLowerCase()),
+  const myOrganisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
+    (state) => state.organisation.myOrganisationData,
   );
-
+  const filteredBySearch = (data, searchKeyword) => {
+    const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
+      d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
+    );
+    return filteredCardData;
+  };
+  useEffect(() => {
+    dispatch(MyOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/my-organisations`));
+  }, []);
   useEffect(() => {
     if (verifiedTab) {
       dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
@@ -45,10 +43,6 @@ const Organisation = () => {
       dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/`));
     }
   }, [verifiedTab]);
-
-  const approveOrganization = (id: number) => {
-    navigate(`/approve-organization/${id}`);
-  };
 
   return (
     <CoreModules.Box
@@ -102,27 +96,29 @@ const Organisation = () => {
               className="fmtm-duration-150"
               onClick={() => setActiveTab(1)}
             />
-            <CoreModules.Link to={'/create-organization'}>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                startIcon={<AssetModules.AddIcon />}
-                sx={{
-                  marginLeft: ['8px', '12px', '12px'],
-                  minWidth: 'fit-content',
-                  width: 'auto',
-                  fontWeight: 'bold',
-                  minHeight: ['26px', '36px', '36px'],
-                  height: ['30px', '36px', '36px'],
-                  px: ['12px', '16px', '16px'],
-                }}
-              >
-                New
-              </CoreModules.Button>
-            </CoreModules.Link>
+            {token && (
+              <CoreModules.Link to={'/create-organization'}>
+                <CoreModules.Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<AssetModules.AddIcon />}
+                  sx={{
+                    marginLeft: ['8px', '12px', '12px'],
+                    minWidth: 'fit-content',
+                    width: 'auto',
+                    fontWeight: 'bold',
+                    minHeight: ['26px', '36px', '36px'],
+                    height: ['30px', '36px', '36px'],
+                    px: ['12px', '16px', '16px'],
+                  }}
+                >
+                  New
+                </CoreModules.Button>
+              </CoreModules.Link>
+            )}
           </CoreModules.Tabs>
         </CoreModules.Box>
-        {token !== null && token['role'] && token['role'] === user_roles.ADMIN && (
+        {token !== null && token['role'] && token['role'] === user_roles.ADMIN && activeTab === 0 && (
           <CoreModules.Box>
             <CoreModules.Tabs sx={{ minHeight: 'fit-content' }}>
               <CoreModules.Tab
@@ -179,41 +175,18 @@ const Organisation = () => {
           className="fmtm-min-w-[14rem] lg:fmtm-w-[20%]"
         />
       </CoreModules.Box>
-      <div>
-        <p className="fmtm-text-[#9B9999]">
-          Showing {filteredCardData?.length} of {oraganizationData?.length} organizations
-        </p>
-      </div>
-      <CoreModules.Box className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 lg:fmtm-grid-cols-3 fmtm-gap-5">
-        {filteredCardData?.map((data, index) => (
-          <CoreModules.Card key={index} sx={cardStyle} onClick={() => !verifiedTab && approveOrganization(data.id)}>
-            {data.logo ? (
-              <div className="fmtm-min-w-[60px] md:fmtm-min-w-[80px] lg:fmtm-min-w-[120px]">
-                <CoreModules.CardMedia component="img" src={data.logo} sx={{ width: ['60px', '80px', '120px'] }} />
-              </div>
-            ) : (
-              <div className="fmtm-min-w-[60px] fmtm-max-w-[60px] md:fmtm-min-w-[80px] md:fmtm-max-w-[80px] lg:fmtm-min-w-[120px] lg:fmtm-max-w-[120px]">
-                <CustomizedImage status={'card'} style={{ width: '100%' }} />
-              </div>
-            )}
-
-            <CoreModules.Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }} className="fmtm-overflow-hidden">
-              <h2
-                className="fmtm-line-clamp-1 fmtm-text-base sm:fmtm-text-lg fmtm-font-bold fmtm-capitalize"
-                title={data.name}
-              >
-                {data.name}
-              </h2>
-              <p
-                className="fmtm-line-clamp-3 fmtm-text-[#7A7676] fmtm-font-archivo fmtm-text-sm sm:fmtm-text-base"
-                title={data.description}
-              >
-                {data.description}
-              </p>
-            </CoreModules.Box>
-          </CoreModules.Card>
-        ))}
-      </CoreModules.Box>
+      {activeTab === 0 ? (
+        <OrganisationGridCard
+          filteredData={filteredBySearch(organisationData, searchKeyword)}
+          allDataLength={organisationData?.length}
+        />
+      ) : null}
+      {activeTab === 1 ? (
+        <OrganisationGridCard
+          filteredData={filteredBySearch(myOrganisationData, searchKeyword)}
+          allDataLength={myOrganisationData?.length}
+        />
+      ) : null}
     </CoreModules.Box>
   );
 };

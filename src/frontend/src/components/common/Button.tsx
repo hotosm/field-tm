@@ -13,19 +13,20 @@ interface IButton {
   isLoading?: boolean;
   disabled?: boolean;
   loadingText?: string;
+  btnId?: string;
 }
 
 const btnStyle = (btnType, className) => {
   switch (btnType) {
     case 'primary':
-      return `${className} hover:fmtm-bg-red-700 fmtm-flex fmtm-px-4 fmtm-py-1 fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-[8px] fmtm-w-full`;
+      return `${className} hover:fmtm-bg-red-700 fmtm-flex fmtm-px-4 fmtm-py-1 fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-[8px] fmtm-w-fit`;
     case 'secondary':
-      return `hover:fmtm-bg-gray-100 fmtm-flex fmtm-bg-white  fmtm-px-4 fmtm-py-1 fmtm-border border-[#E0E0E0] fmtm-rounded-[8px] ${className}`;
+      return `hover:fmtm-bg-gray-100 fmtm-flex fmtm-bg-white  fmtm-px-4 fmtm-py-1 fmtm-border border-[#E0E0E0] fmtm-rounded-[8px] fmtm-w-fit ${className}`;
 
     case 'other':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-red-600 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 ${className}`;
+      return `fmtm-py-1 fmtm-px-4 fmtm-text-red-600 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 fmtm-w-fit ${className}`;
     case 'disabled':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed ${className}`;
+      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed fmtm-w-fit ${className}`;
 
     default:
       return 'fmtm-primary';
@@ -43,9 +44,12 @@ const Button = ({
   icon,
   isLoading,
   loadingText,
+  btnId,
 }: IButton) => (
-  <div className="fmtm-w-fit">
+  <div>
     <button
+      data-btnid={btnId}
+      data-testid="test-button"
       type={type === 'submit' ? 'submit' : 'button'}
       onClick={onClick}
       className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 ${btnStyle(

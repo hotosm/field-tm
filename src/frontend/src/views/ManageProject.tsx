@@ -28,7 +28,7 @@ const ManageProject = () => {
     <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-bg-[#F5F5F5] fmtm-p-5 fmtm-gap-8 fmtm-flex-1">
       <div className="sm:fmtm-w-[15%] sm:fmtm-min-w-[7.3rem] fmtm-flex sm:fmtm-flex-col fmtm-items-center sm:fmtm-items-start fmtm-gap-4 sm:fmtm-gap-0 ">
         <div
-          onClick={() => navigate(`/newproject_details/${params?.id}`)}
+          onClick={() => navigate(`/project_details/${params?.id}`)}
           className="fmtm-flex fmtm-items-center sm:fmtm-mb-8 fmtm-cursor-pointer hover:fmtm-text-primaryRed fmtm-duration-300"
         >
           <AssetModules.ArrowBackIosIcon style={{ fontSize: '20px' }} />

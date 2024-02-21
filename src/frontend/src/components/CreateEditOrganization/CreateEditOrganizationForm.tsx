@@ -17,6 +17,7 @@ import {
 } from '@/api/OrganisationService';
 import { diffObject } from '@/utilfunctions/compareUtils';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
+import { CustomCheckbox } from '@/components/common/Checkbox';
 
 type optionsType = {
   name: string;
@@ -46,9 +47,11 @@ const CreateEditOrganizationForm = ({ organizationId }) => {
 
   const submission = () => {
     if (!organizationId) {
-      dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`, values));
+      const { fillODKCredentials, ...filteredValues } = values;
+      dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`, filteredValues));
     } else {
-      const changedValues = diffObject(organisationFormData, values);
+      const { fillODKCredentials, ...filteredValues } = values;
+      const changedValues = diffObject(organisationFormData, filteredValues);
       if (Object.keys(changedValues).length > 0) {
         dispatch(
           PatchOrganizationDataService(
@@ -89,6 +92,7 @@ const CreateEditOrganizationForm = ({ organizationId }) => {
           participated_in: [],
         }),
       );
+      dispatch(OrganisationAction.SetConsentApproval(false));
       if (searchParams.get('popup') === 'true') {
         window.close();
       } else {
@@ -102,6 +106,18 @@ const CreateEditOrganizationForm = ({ organizationId }) => {
       dispatch(GetIndividualOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`));
     }
   }, [organizationId]);
+
+  useEffect(() => {
+    if (!values?.fillODKCredentials) {
+      handleCustomChange('odk_central_url', null);
+      handleCustomChange('odk_central_user', null);
+      handleCustomChange('odk_central_password', null);
+    }
+  }, [values?.fillODKCredentials]);
+
+  useEffect(() => {
+    handleCustomChange('fillODKCredentials', false);
+  }, []);
 
   return (
     <div
@@ -126,17 +142,6 @@ const CreateEditOrganizationForm = ({ organizationId }) => {
             required
             errorMsg={errors.name}
           />
-          <InputTextField
-            id="email"
-            name="email"
-            label="Email?"
-            subLabel="We will use this email for scheduling on-boarding training sessions and follow-up needed to create your org."
-            value={values?.email}
-            onChange={handleChange}
-            fieldType="text"
-            required
-            errorMsg={errors.email}
-          />
           {!organizationId && (
             <InputTextField
               id="url"
@@ -159,30 +164,49 @@ const CreateEditOrganizationForm = ({ organizationId }) => {
             required
             errorMsg={errors.description}
           />
-          <InputTextField
-            id="odk_central_url"
-            name="odk_central_url"
-            label="ODK Central URL (Optional)"
-            value={values?.odk_central_url}
-            onChange={handleChange}
-            fieldType="text"
+          <CustomCheckbox
+            key="fillODKCredentials"
+            label="Fill ODK credentials now"
+            checked={values.fillODKCredentials}
+            onCheckedChange={() => {
+              handleCustomChange('fillODKCredentials', !values.fillODKCredentials);
+            }}
+            className="fmtm-text-black"
           />
-          <InputTextField
-            id="odk_central_user"
-            name="odk_central_user"
-            label="ODK Central User (Optional)"
-            value={values?.odk_central_user}
-            onChange={handleChange}
-            fieldType="text"
-          />
-          <InputTextField
-            id="odk_central_password"
-            name="odk_central_password"
-            label="ODK Central Password (Optional)"
-            value={values?.odk_central_password}
-            onChange={handleChange}
-            fieldType="password"
-          />
+          {values?.fillODKCredentials && (
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
+              <InputTextField
+                id="odk_central_url"
+                name="odk_central_url"
+                label="ODK Central URL"
+                value={values?.odk_central_url}
+                onChange={handleChange}
+                fieldType="text"
+                errorMsg={errors.odk_central_url}
+                required
+              />
+              <InputTextField
+                id="odk_central_user"
+                name="odk_central_user"
+                label="ODK Central Email"
+                value={values?.odk_central_user}
+                onChange={handleChange}
+                fieldType="text"
+                errorMsg={errors.odk_central_user}
+                required
+              />
+              <InputTextField
+                id="odk_central_password"
+                name="odk_central_password"
+                label="ODK Central Password"
+                value={values?.odk_central_password}
+                onChange={handleChange}
+                fieldType="password"
+                errorMsg={errors.odk_central_password}
+                required
+              />
+            </div>
+          )}
           {!organizationId && (
             <RadioButton
               topic="What type of community or organization are you applying for? "

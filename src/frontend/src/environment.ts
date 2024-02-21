@@ -12,31 +12,32 @@ export default {
   tasksStatus: [
     {
       label: 'READY',
-      action: [{ key: 'Start Mapping', value: 'LOCKED_FOR_MAPPING' }],
+      action: [{ key: 'Start Mapping', value: 'LOCKED_FOR_MAPPING', btnBG: 'red' }],
+      btnBG: 'red',
     },
     {
       label: 'LOCKED_FOR_MAPPING',
       action: [
-        { key: 'Mark as fully mapped', value: 'MAPPED' },
-        { key: 'Assign to someone else', value: 'READY' },
+        { key: 'Mark as fully mapped', value: 'MAPPED', btnBG: 'gray' },
+        { key: 'Stop Mapping', value: 'READY', btnBG: 'transparent' },
       ],
     },
     {
       label: 'MAPPED',
       action: [
-        { key: 'Start Validating', value: 'LOCKED_FOR_VALIDATION' },
-        { key: 'Return to Mapping', value: 'LOCKED_FOR_MAPPING' },
+        { key: 'Start Validation', value: 'LOCKED_FOR_VALIDATION', btnBG: 'gray' },
+        // { key: 'Return to Mapping', value: 'LOCKED_FOR_MAPPING' },
       ],
     },
     {
       label: 'LOCKED_FOR_VALIDATION',
       action: [
-        { key: 'Confirm fully Mapped', value: 'VALIDATED' },
-        { key: 'More Mapping Needed', value: 'INVALIDATED' },
+        { key: 'Confirm fully Mapped', value: 'VALIDATED', btnBG: 'gray' },
+        { key: 'Mapping Needed', value: 'INVALIDATED', btnBG: 'transparent' },
       ],
     },
     { label: 'VALIDATED', action: [] },
-    { label: 'INVALIDATED', action: [{ key: 'Map Again', value: 'LOCKED_FOR_MAPPING' }] },
+    { label: 'INVALIDATED', action: [{ key: 'Map Again', value: 'LOCKED_FOR_MAPPING', btnBG: 'gray' }] },
     { label: 'BAD', action: [] },
     // "SPLIT",
     // "ARCHIVED",

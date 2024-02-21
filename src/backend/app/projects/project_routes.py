@@ -1048,7 +1048,9 @@ async def download_features(
     feature_collection = await project_crud.get_project_features_geojson(db, project_id)
 
     headers = {
-        "Content-Disposition": "attachment; filename=project_features.geojson",
+        "Content-Disposition": (
+            f"attachment; filename=fmtm_project_{project_id}_features.geojson"
+        ),
         "Content-Type": "application/media",
     }
 

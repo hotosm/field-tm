@@ -163,6 +163,7 @@ class DbOrganisation(Base):
         Column(Enum(OrganisationType), default=OrganisationType.FREE, nullable=False),
     )
     approved = cast(bool, Column(Boolean, default=False))
+    created_by = Column(Integer)
 
     ## Odk central server
     odk_central_url = cast(str, Column(String))
