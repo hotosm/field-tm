@@ -6,13 +6,11 @@ import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
 import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
 import { taskInfoType } from '@/models/submission/submissionModel';
-import { useNavigate, useParams } from 'react-router-dom';
-import environment from '@/environment';
+import { useSearchParams } from 'react-router-dom';
 
 const TaskSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
-  const navigate = useNavigate();
-  const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const taskLoading = CoreModules.useAppSelector((state) => state.task.taskLoading);
   const [searchedTaskId, setSearchedTaskId] = useState<string>('');
@@ -59,7 +57,7 @@ const TaskSubmissions = () => {
           <Button
             btnText="View Submissions"
             btnType="primary"
-            onClick={() => navigate(`/project/${params.projectId}/tasks/${environment.encode(task?.task_id)}`)}
+            onClick={() => setSearchParams({ tab: 'table', task_id: task?.task_id })}
           />
           <button
             className="fmtm-border-primaryRed fmtm-border-[2px] fmtm-flex fmtm-w-fit fmtm-px-2 fmtm-py-1 fmtm-rounded-md fmtm-items-center fmtm-gap-2 fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-duration-150"
