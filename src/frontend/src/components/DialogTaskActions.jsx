@@ -129,7 +129,7 @@ export default function Dialog({ taskId, feature, map, view }) {
             btnType="primary"
             type="submit"
             className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
-            onClick={() => navigate(`/project/${params.id}/tasks/${currentTaskId}`)}
+            onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
           />
         </div>
       )}
