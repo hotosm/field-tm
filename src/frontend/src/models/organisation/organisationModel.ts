@@ -27,4 +27,5 @@ export interface GetOrganisationDataModel {
   id: number;
   logo: string;
   url: string;
+  approved: boolean;
 }

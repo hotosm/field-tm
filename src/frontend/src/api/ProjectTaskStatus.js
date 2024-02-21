@@ -35,7 +35,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         dispatch(
           HomeActions.SetSnackBar({
             open: true,
-            message: `Task #${response.data.id} has been updated to ${response.data.task_status}`,
+            message: `Task #${response.data.id} has been updated to ${task_priority_str[response.data.task_status]}`,
             variant: 'success',
             duration: 3000,
           }),

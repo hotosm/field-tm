@@ -44,10 +44,6 @@ const Organisation = () => {
     }
   }, [verifiedTab]);
 
-  const approveOrganization = (id: number) => {
-    navigate(`/approve-organization/${id}`);
-  };
-
   return (
     <CoreModules.Box
       sx={{
@@ -100,27 +96,29 @@ const Organisation = () => {
               className="fmtm-duration-150"
               onClick={() => setActiveTab(1)}
             />
-            <CoreModules.Link to={'/create-organization'}>
-              <CoreModules.Button
-                variant="outlined"
-                color="error"
-                startIcon={<AssetModules.AddIcon />}
-                sx={{
-                  marginLeft: ['8px', '12px', '12px'],
-                  minWidth: 'fit-content',
-                  width: 'auto',
-                  fontWeight: 'bold',
-                  minHeight: ['26px', '36px', '36px'],
-                  height: ['30px', '36px', '36px'],
-                  px: ['12px', '16px', '16px'],
-                }}
-              >
-                New
-              </CoreModules.Button>
-            </CoreModules.Link>
+            {token && (
+              <CoreModules.Link to={'/create-organization'}>
+                <CoreModules.Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<AssetModules.AddIcon />}
+                  sx={{
+                    marginLeft: ['8px', '12px', '12px'],
+                    minWidth: 'fit-content',
+                    width: 'auto',
+                    fontWeight: 'bold',
+                    minHeight: ['26px', '36px', '36px'],
+                    height: ['30px', '36px', '36px'],
+                    px: ['12px', '16px', '16px'],
+                  }}
+                >
+                  New
+                </CoreModules.Button>
+              </CoreModules.Link>
+            )}
           </CoreModules.Tabs>
         </CoreModules.Box>
-        {token !== null && token['role'] && token['role'] === user_roles.ADMIN && (
+        {token !== null && token['role'] && token['role'] === user_roles.ADMIN && activeTab === 0 && (
           <CoreModules.Box>
             <CoreModules.Tabs sx={{ minHeight: 'fit-content' }}>
               <CoreModules.Tab
