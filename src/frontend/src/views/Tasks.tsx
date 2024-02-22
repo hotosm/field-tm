@@ -268,7 +268,7 @@ const TasksSubmission = () => {
           </CoreModules.Box>
         </CoreModules.Stack>
         <CoreModules.Box sx={{ width: '100%', ml: 6, border: '1px solid green' }}>
-          <SubmissionMap outlineBoundary={projectBoundaries} featureGeojson={buildingBoundaries} />
+          {/* <SubmissionMap outlineBoundary={projectBoundaries} featureGeojson={buildingBoundaries} /> */}
         </CoreModules.Box>
       </CoreModules.Stack>
     </CoreModules.Box>

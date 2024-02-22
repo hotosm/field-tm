@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import CoreModules from '@/shared/CoreModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '@/assets/images/avatar.png';
-import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
+// import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
 import environment from '@/environment';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
@@ -126,7 +126,7 @@ const Submissions = () => {
           </CoreModules.Box>
         </CoreModules.Stack>
         <CoreModules.Box sx={{ width: '100%', ml: 6, border: '1px solid green' }}>
-          <SubmissionMap />
+          {/* <SubmissionMap /> */}
         </CoreModules.Box>
       </CoreModules.Stack>
     </CoreModules.Box>
