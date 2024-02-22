@@ -18,6 +18,7 @@
 """Tests for project routes."""
 
 import functools
+import json
 import os
 import uuid
 from io import BytesIO
@@ -25,7 +26,6 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
-import sozipfile.sozipfile as zipfile
 from fastapi.concurrency import run_in_threadpool
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
@@ -34,6 +34,7 @@ from shapely import Polygon
 from app.central.central_crud import create_odk_project
 from app.config import encrypt_value, settings
 from app.db import db_models
+from app.db.postgis_utils import split_geojson_by_task_areas
 from app.projects import project_crud, project_schemas
 from app.tasks import tasks_crud
 from tests.test_data import test_data_path
@@ -147,7 +148,55 @@ async def test_create_project_with_project_info(db, project):
     assert isinstance(project.project_name_prefix, str)
 
 
-async def test_generate_appuser_files(db, project):
+async def test_upload_data_extracts(client, project):
+    """Test uploading data extracts in GeoJSON and flatgeobuf formats."""
+    # Flatgeobuf
+    fgb_file = {
+        "custom_extract_file": (
+            "file.fgb",
+            open(f"{test_data_path}/data_extract_kathmandu.fgb", "rb"),
+        )
+    }
+    response = client.post(
+        f"/projects/upload-custom-extract/?project_id={project.id}",
+        files=fgb_file,
+    )
+
+    assert response.status_code == 200
+
+    response = client.get(
+        f"/projects/data-extract-url/?project_id={project.id}",
+    )
+    assert "url" in response.json()
+
+    # Geojson
+    geojson_file = {
+        "custom_extract_file": (
+            "file.geojson",
+            open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb"),
+        )
+    }
+    response = client.post(
+        f"/projects/upload-custom-extract/?project_id={project.id}",
+        files=geojson_file,
+    )
+
+    assert response.status_code == 200
+
+    response = client.get(
+        f"/projects/data-extract-url/?project_id={project.id}",
+    )
+    assert "url" in response.json()
+
+    # TODO add extra handling for custom extras not in specific format
+    # TODO replace properties
+    # TODO fix loading extracts without standard structure
+    # data_extracts_file = f"{test_data_path}/building_footprint.zip"
+    # with zipfile.ZipFile(data_extracts_file, "r") as zip_archive:
+    #     data_extracts = zip_archive.read("building_foot_jnk.geojson")
+
+
+async def test_generate_project_files(db, client, project):
     """Test generate all appuser files (during creation)."""
     odk_credentials = {
         "odk_central_url": odk_central_url,
@@ -159,14 +208,41 @@ async def test_generate_appuser_files(db, project):
     project_id = project.id
     log.debug(f"Testing project ID: {project_id}")
 
-    # Load data extracts
-    data_extracts_file = f"{test_data_path}/building_footprint.zip"
-    with zipfile.ZipFile(data_extracts_file, "r") as zip_archive:
-        data_extracts = zip_archive.read("building_foot_jnk.geojson")
+    # First generate a single task from the project area
+    task_geojson = json.dumps(
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.29998911, 27.7140080437],
+                        [85.29998911, 27.7108923499],
+                        [85.304783157, 27.7108923499],
+                        [85.304783157, 27.7140080437],
+                        [85.29998911, 27.7140080437],
+                    ]
+                ],
+            },
+        }
+    ).encode("utf-8")
+    task_geojson_file = {
+        "task_geojson": (
+            "file.geojson",
+            BytesIO(task_geojson).read(),
+        )
+    }
+    response = client.post(
+        f"/projects/{project_id}/upload-task-boundaries",
+        files=task_geojson_file,
+    )
 
     # Upload data extracts
+    with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
+        data_extracts = json.dumps(json.load(f))
     log.debug(f"Uploading custom data extracts: {str(data_extracts)[:100]}...")
-    data_extract_s3_path = await project_crud.upload_custom_data_extract(
+    data_extract_s3_path = await project_crud.upload_custom_geojson_extract(
         db,
         project_id,
         data_extracts,
@@ -180,7 +256,15 @@ async def test_generate_appuser_files(db, project):
     response = requests.head(internal_file_path, allow_redirects=True)
     assert response.status_code < 400
 
-    # Get project tasks list
+    # Extract data extract from flatgeobuf
+    feature_collection = await project_crud.get_project_features_geojson(db, project)
+    # Split extract by task area
+    split_extract_dict = await split_geojson_by_task_areas(
+        db, feature_collection, project_id
+    )
+    assert split_extract_dict is not None
+
+    # Get project tasks list (no longer required)
     task_ids = await tasks_crud.get_task_id_list(db, project_id)
     assert isinstance(task_ids, list)
 
@@ -189,7 +273,7 @@ async def test_generate_appuser_files(db, project):
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    for task_id in task_ids:
+    for task_id in split_extract_dict.keys():
         # NOTE avoid the lambda function for run_in_threadpool
         # functools.partial captures the loop variable task_id in a
         # way that is safe for use within asynchronous code
@@ -199,6 +283,7 @@ async def test_generate_appuser_files(db, project):
                 db,
                 project_id,
                 task_id,
+                split_extract_dict[task_id],
                 xlsform_file,
                 "building",
                 odk_credentials,
@@ -208,7 +293,7 @@ async def test_generate_appuser_files(db, project):
 
     # Generate appuser files
     result = await run_in_threadpool(
-        lambda: project_crud.generate_appuser_files(
+        lambda: project_crud.generate_project_files(
             db,
             project_id,
             custom_form=xlsform_obj,

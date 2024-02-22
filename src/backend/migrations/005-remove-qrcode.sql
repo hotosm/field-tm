@@ -8,6 +8,8 @@ BEGIN;
 
 -- Drop qr_code table
 DROP TABLE IF EXISTS public.qr_code CASCADE;
+DROP SEQUENCE IF EXISTS public.qr_code_id_seq;
+DROP INDEX IF EXISTS ix_tasks_qr_code_id;
 
 -- Update field in tasks table
 ALTER TABLE IF EXISTS public.tasks

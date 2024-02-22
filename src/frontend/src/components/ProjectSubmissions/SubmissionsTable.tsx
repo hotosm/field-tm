@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmissionJson } from '@/api/task';
-import { Modal } from '../common/Modal';
+import { Modal } from '@/components/common/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
 

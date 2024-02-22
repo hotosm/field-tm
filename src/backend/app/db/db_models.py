@@ -40,7 +40,7 @@ from sqlalchemy import (
     desc,
 )
 from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQLArray  # noqa: N811
-from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import (
     # declarative_base,
     backref,
@@ -689,32 +689,6 @@ class DbLicense(Base):
     users = relationship(
         DbUser, secondary=user_licenses_table
     )  # Many to Many relationship
-
-
-class DbFeatures(Base):
-    """Features extracted from osm data."""
-
-    __tablename__ = "features"
-
-    id = cast(int, Column(Integer, primary_key=True))
-    project_id = cast(int, Column(Integer, ForeignKey("projects.id")))
-    project = cast(DbProject, relationship(DbProject, backref="features"))
-
-    category_title = cast(
-        str, Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
-    )
-    category = cast(DbXForm, relationship(DbXForm))
-    task_id = cast(int, Column(Integer, nullable=True))
-    properties = cast(dict, Column(JSONB))
-    geometry = cast(WKBElement, Column(Geometry(geometry_type="GEOMETRY", srid=4326)))
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [task_id, project_id], ["tasks.id", "tasks.project_id"], name="fk_tasks"
-        ),
-        Index("idx_features_composite", "task_id", "project_id"),
-        {},
-    )
 
 
 class BackgroundTasks(Base):

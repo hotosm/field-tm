@@ -322,6 +322,7 @@ class ReadProject(ProjectBase):
 
     project_uuid: uuid.UUID = uuid.uuid4()
     location_str: Optional[str] = None
+    data_extract_url: str
 
 
 class BackgroundTaskStatus(BaseModel):

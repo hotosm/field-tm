@@ -33,6 +33,7 @@ repos:
             "!CONTRIBUTING.md",
             "!LICENSE.md",
             "!src/frontend/pnpm-lock.yaml",
+            "!src/backend/tests/test_data/**",
           ]
 
   # # Lint: Dockerfile (disabled until binary is bundled)

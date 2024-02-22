@@ -76,53 +76,54 @@ async def read_projects(
     return projects
 
 
-@router.get("/details/{project_id}/")
-async def get_projet_details(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Returns the project details.
+# TODO delete me
+# @router.get("/details/{project_id}/")
+# async def get_projet_details(
+#     project_id: int,
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(mapper),
+# ):
+#     """Returns the project details.
 
-    Also includes ODK project details, so takes extra time to return.
+#     Also includes ODK project details, so takes extra time to return.
 
-    Parameters:
-        project_id: int
+#     Parameters:
+#         project_id: int
 
-    Returns:
-        Response: Project details.
-    """
-    project = await project_crud.get_project(db, project_id)
-    if not project:
-        raise HTTPException(status_code=404, detail={"Project not found"})
+#     Returns:
+#         Response: Project details.
+#     """
+#     project = await project_crud.get_project(db, project_id)
+#     if not project:
+#         raise HTTPException(status_code=404, detail={"Project not found"})
 
-    # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project.odk_central_url,
-        odk_central_user=project.odk_central_user,
-        odk_central_password=project.odk_central_password,
-    )
+#     # ODK Credentials
+#     odk_credentials = project_schemas.ODKCentralDecrypted(
+#         odk_central_url=project.odk_central_url,
+#         odk_central_user=project.odk_central_user,
+#         odk_central_password=project.odk_central_password,
+#     )
 
-    odk_details = central_crud.get_odk_project_full_details(
-        project.odkid, odk_credentials
-    )
+#     odk_details = central_crud.get_odk_project_full_details(
+#         project.odkid, odk_credentials
+#     )
 
-    # Features count
-    query = text(
-        "select count(*) from features where "
-        f"project_id={project_id} and task_id is not null"
-    )
-    result = db.execute(query)
-    features = result.fetchone()[0]
+#     # Features count
+#     query = text(
+#         "select count(*) from features where "
+#         f"project_id={project_id} and task_id is not null"
+#     )
+#     result = db.execute(query)
+#     features = result.fetchone()[0]
 
-    return {
-        "id": project_id,
-        "odkName": odk_details["name"],
-        "createdAt": odk_details["createdAt"],
-        "tasks": odk_details["forms"],
-        "lastSubmission": odk_details["lastSubmission"],
-        "total_features": features,
-    }
+#     return {
+#         "id": project_id,
+#         "odkName": odk_details["name"],
+#         "createdAt": odk_details["createdAt"],
+#         "tasks": odk_details["forms"],
+#         "lastSubmission": odk_details["lastSubmission"],
+#         "total_features": features,
+#     }
 
 
 @router.post("/near_me", response_model=list[project_schemas.ProjectSummary])
@@ -645,7 +646,7 @@ async def generate_files(
 
     log.debug(f"Submitting {background_task_id} to background tasks stack")
     background_tasks.add_task(
-        project_crud.generate_appuser_files,
+        project_crud.generate_project_files,
         db,
         project_id,
         BytesIO(custom_xls_form) if custom_xls_form else None,
@@ -683,30 +684,6 @@ async def update_project_form(
     )
 
     return form_updated
-
-
-@router.get(
-    "/{project_id}/features", response_model=list[project_schemas.GeojsonFeature]
-)
-async def get_project_features(
-    project_id: int,
-    task_id: int = None,
-    db: Session = Depends(database.get_db),
-):
-    """Fetch all the features for a project.
-
-    The features are generated from raw-data-api.
-
-    Args:
-        project_id (int): The project id.
-        task_id (int): The task id.
-        db (Session): the DB session, provided automatically.
-
-    Returns:
-        feature(json): JSON object containing a list of features
-    """
-    features = await project_crud.get_project_features(db, project_id, task_id)
-    return features
 
 
 @router.get("/generate-log/")
@@ -866,7 +843,7 @@ async def upload_custom_extract(
     """Upload a custom data extract geojson for a project.
 
     Request Body
-    - 'custom_extract_file' (file): Geojson files with the features. Required.
+    - 'custom_extract_file' (file): File with the data extract features.
 
     Query Params:
     - 'project_id' (int): the project's id. Required.
@@ -874,14 +851,23 @@ async def upload_custom_extract(
     # Validating for .geojson File.
     file_name = os.path.splitext(custom_extract_file.filename)
     file_ext = file_name[1]
-    allowed_extensions = [".geojson", ".json"]
+    allowed_extensions = [".geojson", ".json", ".fgb"]
     if file_ext not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
+        raise HTTPException(
+            status_code=400, detail="Provide a valid .geojson or .fgb file"
+        )
 
     # read entire file
-    geojson_str = await custom_extract_file.read()
+    extract_data = await custom_extract_file.read()
 
-    fgb_url = await project_crud.upload_custom_data_extract(db, project_id, geojson_str)
+    if file_ext == ".fgb":
+        fgb_url = await project_crud.upload_custom_fgb_extract(
+            db, project_id, extract_data
+        )
+    else:
+        fgb_url = await project_crud.upload_custom_geojson_extract(
+            db, project_id, extract_data
+        )
     return JSONResponse(status_code=200, content={"url": fgb_url})
 
 

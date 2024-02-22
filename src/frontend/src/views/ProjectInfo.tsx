@@ -1,3 +1,5 @@
+// TODO delete this?
+
 import React, { useEffect, useState } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import ProjectInfoSidebar from '@/components/ProjectInfo/ProjectInfoSidebar';
@@ -67,8 +69,6 @@ const ProjectInfo = () => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
-
-      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
@@ -90,21 +90,6 @@ const ProjectInfo = () => {
       ),
     );
   };
-
-  // useEffect(() => {
-  //   const fetchData = () => {
-  //     dispatch(fetchInfoTask(`${environment.baseApiUrl}/tasks/tasks-features/?project_id=${decodedId}`));
-  //   };
-  //   fetchData();
-  //   let interval;
-  //   if (isMonitoring) {
-  //     interval = setInterval(fetchData, 3000);
-  //   } else {
-  //     clearInterval(interval);
-  //   }
-
-  //   return () => clearInterval(interval);
-  // }, [dispatch, isMonitoring]);
 
   useEffect(() => {
     const fetchData = () => {

@@ -21,23 +21,17 @@ from datetime import datetime, timedelta
 from typing import List, Optional
 
 from fastapi import Depends, HTTPException
-from geoalchemy2.shape import from_shape
-from geojson import dump
 from loguru import logger as log
-from osm_rawdata.postgres import PostgresClient
-from shapely.geometry import shape
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app.auth.osm import AuthUser
-from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import (
     TaskStatus,
     get_action_for_status_change,
     verify_valid_status_update,
 )
-from app.projects import project_crud
 from app.tasks import tasks_schemas
 from app.users import user_crud
 
@@ -220,100 +214,6 @@ async def create_task_history_for_status_change(
 # --------------------
 
 # TODO: write tests for these
-
-
-async def update_task_files(
-    db: Session,
-    project_id: int,
-    project_odk_id: int,
-    project_name: str,
-    task_id: int,
-    category: str,
-    task_boundary: str,
-):
-    """Update associated files for a task."""
-    # This file will store osm extracts
-    task_polygons = f"/tmp/{project_name}_{category}_{task_id}.geojson"
-
-    # Update data extracts in the odk central
-    pg = PostgresClient("underpass")
-
-    category = "buildings"
-
-    # This file will store osm extracts
-    outfile = f"/tmp/test_project_{category}.geojson"
-
-    # Delete all tasks of the project if there are some
-    db.query(db_models.DbFeatures).filter(
-        db_models.DbFeatures.task_id == task_id
-    ).delete()
-
-    # OSM Extracts
-    outline_geojson = pg.getFeatures(
-        boundary=task_boundary,
-        filespec=outfile,
-        polygon=True,
-        xlsfile=f"{category}.xls",
-        category=category,
-    )
-
-    updated_outline_geojson = {"type": "FeatureCollection", "features": []}
-
-    # Collect feature mappings for bulk insert
-    for feature in outline_geojson["features"]:
-        # If the osm extracts contents do not have a title,
-        # provide an empty text for that
-        feature["properties"]["title"] = ""
-
-        feature_shape = shape(feature["geometry"])
-
-        wkb_element = from_shape(feature_shape, srid=4326)
-        updated_outline_geojson["features"].append(feature)
-
-        db_feature = db_models.DbFeatures(
-            project_id=project_id,
-            geometry=wkb_element,
-            properties=feature["properties"],
-        )
-        db.add(db_feature)
-        db.commit()
-
-    # Update task_polygons file containing osm extracts with the new
-    # geojson contents containing title in the properties.
-    with open(task_polygons, "w") as jsonfile:
-        jsonfile.truncate(0)  # clear the contents of the file
-        dump(updated_outline_geojson, jsonfile)
-
-    # Update the osm extracts in the form.
-    central_crud.upload_xform_media(project_odk_id, task_id, task_polygons, None)
-
-    return True
-
-
-async def edit_task_boundary(db: Session, task_id: int, boundary: str):
-    """Update the boundary polyon on the database."""
-    geometry = boundary["features"][0]["geometry"]
-    outline = shape(geometry)
-
-    task = await get_task(db, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    task.outline = outline.wkt
-    db.commit()
-
-    # Get category, project_name
-    project_id = task.project_id
-    project = await project_crud.get_project(db, project_id)
-    category = project.xform_title
-    project_name = project.project_name_prefix
-    odk_id = project.odkid
-
-    await update_task_files(
-        db, project_id, odk_id, project_name, task_id, category, geometry
-    )
-
-    return True
 
 
 async def get_task_comments(db: Session, project_id: int, task_id: int):

@@ -10,8 +10,7 @@ const ProjectSlice = createSlice({
     projectInfo: {},
     projectSubmissionLoading: false,
     projectSubmission: [],
-    projectBuildingGeojsonLoading: false,
-    projectBuildingGeojson: [],
+    projectDataExtractLoading: false,
     downloadProjectFormLoading: { type: 'form', loading: false },
     generateProjectTilesLoading: false,
     tilesList: [],
@@ -47,12 +46,6 @@ const ProjectSlice = createSlice({
     },
     SetProjectSubmission(state, action) {
       state.projectSubmission = action.payload;
-    },
-    GetProjectBuildingGeojsonLoading(state, action) {
-      state.projectSubmissionLoading = action.payload;
-    },
-    SetProjectBuildingGeojson(state, action) {
-      state.projectBuildingGeojson = action.payload;
     },
     SetDownloadProjectFormLoading(state, action) {
       state.downloadProjectFormLoading = action.payload;

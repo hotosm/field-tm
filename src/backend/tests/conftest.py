@@ -24,6 +24,7 @@ from typing import Any, Generator
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from geojson_pydantic import Polygon
 from loguru import logger as log
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -134,22 +135,18 @@ async def project(db, admin_user, organisation):
         odk_central_user=os.getenv("ODK_CENTRAL_USER"),
         odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
         hashtags=["hot-fmtm"],
-        outline_geojson={
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "coordinates": [
-                    [
-                        [85.317028828, 27.7052522097],
-                        [85.317028828, 27.7041424888],
-                        [85.318844411, 27.7041424888],
-                        [85.318844411, 27.7052522097],
-                        [85.317028828, 27.7052522097],
-                    ]
-                ],
-                "type": "Polygon",
-            },
-        },
+        outline_geojson=Polygon(
+            type="Polygon",
+            coordinates=[
+                [
+                    [85.299989110, 27.7140080437],
+                    [85.299989110, 27.7108923499],
+                    [85.304783157, 27.7108923499],
+                    [85.304783157, 27.7140080437],
+                    [85.299989110, 27.7140080437],
+                ]
+            ],
+        ),
         organisation_id=organisation.id,
     )
 

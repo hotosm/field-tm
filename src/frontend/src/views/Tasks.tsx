@@ -1,3 +1,5 @@
+// TODO should this be deleted??
+
 import React, { useEffect, useState } from 'react';
 // import '../styles/home.css'
 import CoreModules from '@/shared/CoreModules';
@@ -6,9 +8,8 @@ import AssetModules from '@/shared/AssetModules';
 // import { styled, alpha } from '@mui/material';
 
 import Avatar from '@/assets/images/avatar.png';
-import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
 import environment from '@/environment';
-import { ProjectBuildingGeojsonService, ProjectSubmissionService } from '@/api/SubmissionService';
+import { ProjectSubmissionService } from '@/api/SubmissionService';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
 import { getDownloadProjectSubmission } from '@/api/task';
@@ -37,22 +38,22 @@ const TasksSubmission = () => {
         `${import.meta.env.VITE_API_URL}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
       ),
     );
-    dispatch(
-      ProjectBuildingGeojsonService(
-        `${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
-      ),
-    );
+    // dispatch(
+    //   ProjectDataExtractService(
+    //     `${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
+    //   ),
+    // );
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
   //Fetch project for the first time
   useEffect(() => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedProjectId)) == -1) {
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));
-      dispatch(
-        ProjectBuildingGeojsonService(
-          `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
-        ),
-      );
+      // dispatch(
+      //   ProjectDataExtractService(
+      //     `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
+      //   ),
+      // );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));

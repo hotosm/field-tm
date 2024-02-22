@@ -18,11 +18,11 @@
 """Logic for interaction with ODK Central & data."""
 
 import os
+from io import BytesIO
+from pathlib import Path
 from typing import Optional
 from xml.etree import ElementTree
 
-# import osm_fieldwork
-# Qr code imports
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from loguru import logger as log
@@ -210,11 +210,11 @@ def upload_xform_media(
 
 def create_odk_xform(
     project_id: int,
-    xform_id: str,
+    xform_name: str,
     filespec: str,
+    feature_geojson: BytesIO,
     odk_credentials: Optional[project_schemas.ODKCentralDecrypted] = None,
     create_draft: bool = False,
-    upload_media=True,
     convert_to_draft_when_publishing=True,
 ):
     """Create an XForm on a remote ODK Central server."""
@@ -236,16 +236,26 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.createForm(project_id, xform_id, filespec, create_draft)
+    result = xform.createForm(project_id, xform_name, filespec, create_draft)
 
     if result != 200 and result != 409:
         return result
-    data = f"/tmp/{title}.geojson"
+
+    # TODO refactor osm_fieldwork.OdkCentral.OdkForm.uploadMedia
+    # to accept passing a bytesio object and update
+    geojson_file = Path(f"/tmp/{title}.geojson")
+    with open(geojson_file, "w") as f:
+        f.write(feature_geojson.getvalue().decode("utf-8"))
 
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
-    if upload_media:
-        xform.uploadMedia(project_id, title, data, convert_to_draft_when_publishing)
+    # Upload the geojson of features to be modified
+    xform.uploadMedia(
+        project_id, title, str(geojson_file), convert_to_draft_when_publishing
+    )
+
+    # Delete temp geojson file
+    geojson_file.unlink(missing_ok=True)
 
     result = xform.publishForm(project_id, title)
     return result

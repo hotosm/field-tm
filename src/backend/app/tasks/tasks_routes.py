@@ -17,16 +17,15 @@
 #
 """Routes for FMTM tasks."""
 
-import json
 from datetime import datetime, timedelta
 from typing import List
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app.auth.osm import AuthUser, login_required
-from app.auth.roles import get_uid, mapper, project_admin
+from app.auth.roles import get_uid, mapper
 from app.central import central_crud
 from app.db import database
 from app.models.enums import TaskStatus
@@ -136,23 +135,6 @@ async def update_task_status(
     return updated_task
 
 
-@router.post("/edit-task-boundary")
-async def edit_task_boundary(
-    task_id: int,
-    boundary: UploadFile = File(...),
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
-):
-    """Update the task boundary manually."""
-    # read entire file
-    content = await boundary.read()
-    boundary_json = json.loads(content)
-
-    edit_boundary = await tasks_crud.edit_task_boundary(db, task_id, boundary_json)
-
-    return edit_boundary
-
-
 @router.get("/tasks-features/")
 async def task_features_count(
     project_id: int,
@@ -174,6 +156,7 @@ async def task_features_count(
     # Assemble the final data list
     data = []
     for x in odk_details:
+        # TODO features table will be removed, calc from temp table
         feature_count_query = text(
             f"""
             select count(*) from features

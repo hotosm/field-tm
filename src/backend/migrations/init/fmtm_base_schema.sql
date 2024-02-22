@@ -179,26 +179,6 @@ CREATE TABLE public.background_tasks (
 ALTER TABLE public.background_tasks OWNER TO fmtm;
 
 
-CREATE TABLE public.features (
-    id integer NOT NULL,
-    project_id integer,
-    category_title character varying,
-    task_id integer,
-    properties jsonb,
-    geometry public.geometry(Geometry,4326)
-);
-ALTER TABLE public.features OWNER TO fmtm;
-CREATE SEQUENCE public.features_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE public.features_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.features_id_seq OWNED BY public.features.id;
-
-
 CREATE TABLE public.licenses (
     id integer NOT NULL,
     name character varying,
@@ -557,7 +537,6 @@ ALTER SEQUENCE public.xlsforms_id_seq OWNED BY public.xlsforms.id;
 
 -- nextval for primary keys (autoincrement)
 
-ALTER TABLE ONLY public.features ALTER COLUMN id SET DEFAULT nextval('public.features_id_seq'::regclass);
 ALTER TABLE ONLY public.licenses ALTER COLUMN id SET DEFAULT nextval('public.licenses_id_seq'::regclass);
 ALTER TABLE ONLY public.mapping_issue_categories ALTER COLUMN id SET DEFAULT nextval('public.mapping_issue_categories_id_seq'::regclass);
 ALTER TABLE ONLY public.mbtiles_path ALTER COLUMN id SET DEFAULT nextval('public.mbtiles_path_id_seq'::regclass);
@@ -579,9 +558,6 @@ ALTER TABLE public."_migrations"
 
 ALTER TABLE ONLY public.background_tasks
     ADD CONSTRAINT background_tasks_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.features
-    ADD CONSTRAINT features_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.licenses
     ADD CONSTRAINT licenses_name_key UNIQUE (name);
@@ -658,8 +634,6 @@ ALTER TABLE ONLY public.xlsforms
 
 -- Indexing
 
-CREATE INDEX idx_features_composite ON public.features USING btree (task_id, project_id);
-CREATE INDEX idx_features_geometry ON public.features USING gist (geometry);
 CREATE INDEX idx_geometry ON public.projects USING gist (outline);
 CREATE INDEX idx_projects_centroid ON public.projects USING gist (centroid);
 CREATE INDEX idx_projects_outline ON public.projects USING gist (outline);
@@ -686,9 +660,6 @@ CREATE INDEX idx_org_managers ON public.organisation_managers USING btree (user_
 
 -- Foreign keys
 
-ALTER TABLE ONLY public.features
-    ADD CONSTRAINT features_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id);
-
 ALTER TABLE ONLY public.task_invalidation_history
     ADD CONSTRAINT fk_invalidation_history FOREIGN KEY (invalidation_history_id) REFERENCES public.task_history(id);
 
@@ -711,9 +682,6 @@ ALTER TABLE ONLY public.projects
     ADD CONSTRAINT fk_organisations FOREIGN KEY (organisation_id) REFERENCES public.organisations(id);
 
 ALTER TABLE ONLY public.task_history
-    ADD CONSTRAINT fk_tasks FOREIGN KEY (task_id, project_id) REFERENCES public.tasks(id, project_id);
-
-ALTER TABLE ONLY public.features
     ADD CONSTRAINT fk_tasks FOREIGN KEY (task_id, project_id) REFERENCES public.tasks(id, project_id);
 
 ALTER TABLE ONLY public.task_invalidation_history
@@ -739,9 +707,6 @@ ALTER TABLE ONLY public.task_invalidation_history
 
 ALTER TABLE ONLY public.projects
     ADD CONSTRAINT fk_xform FOREIGN KEY (xform_title) REFERENCES public.xlsforms(title);
-
-ALTER TABLE ONLY public.features
-    ADD CONSTRAINT fk_xform FOREIGN KEY (category_title) REFERENCES public.xlsforms(title);
 
 ALTER TABLE ONLY public.organisation_managers
     ADD CONSTRAINT organisation_managers_organisation_id_fkey FOREIGN KEY (organisation_id) REFERENCES public.organisations(id);
