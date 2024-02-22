@@ -27,6 +27,7 @@ from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator, model_validator
+from shapely import wkb
 from typing_extensions import Self
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
@@ -305,7 +306,9 @@ class ProjectBase(BaseModel):
         """Compute the geojson outline from WKBElement outline."""
         if not self.outline:
             return None
-        return geometry_to_geojson(self.outline, {"id": self.id}, self.id)
+        geometry = wkb.loads(bytes(self.outline.data))
+        bbox = geometry.bounds  # Calculate bounding box
+        return geometry_to_geojson(self.outline, {"id": self.id, "bbox": bbox}, self.id)
 
 
 class ProjectOut(ProjectBase):
