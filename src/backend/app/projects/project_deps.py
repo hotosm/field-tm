@@ -18,7 +18,7 @@
 
 """Project dependencies for use in Depends."""
 
-from typing import Optional
+from typing import Any, Optional, Union
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
@@ -27,6 +27,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.db_models import DbProject
 from app.models.enums import HTTPStatus
+from app.projects import project_crud, project_schemas
 
 
 async def get_project_by_id(
@@ -45,3 +46,19 @@ async def get_project_by_id(
         )
 
     return db_project
+
+
+async def get_odk_credentials(db: Session, project: Union[int, Any]):
+    """Get odk credentials of project."""
+    if isinstance(project, int):
+        db_project = await project_crud.get_project(db, project)
+    else:
+        db_project = project
+
+    odk_credentials = {
+        "odk_central_url": db_project.odk_central_url,
+        "odk_central_user": db_project.odk_central_user,
+        "odk_central_password": db_project.odk_central_password,
+    }
+
+    return project_schemas.ODKCentralDecrypted(**odk_credentials)

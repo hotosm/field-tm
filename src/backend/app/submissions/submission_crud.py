@@ -41,7 +41,7 @@ from sqlalchemy.orm import Session
 from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
 from app.config import settings
 from app.db import db_models
-from app.projects import project_crud, project_schemas
+from app.projects import project_crud, project_deps
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
 
@@ -74,12 +74,8 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
         )
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_sync = async_to_sync(project_deps.get_odk_credentials)
+    odk_credentials = odk_sync(db, project_info)
     xform = get_odk_form(odk_credentials)
 
     # If task id is not provided, submission for all the task are listed
@@ -144,21 +140,13 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
     get_project_sync = async_to_sync(project_crud.get_project)
     project_info = get_project_sync(db, project_id)
 
-    # Return exception if project is not found
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_sync = async_to_sync(project_deps.get_odk_credentials)
+    odk_credentials = odk_sync(db, project_info)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -227,22 +215,14 @@ def gather_all_submission_csvs(db, project_id):
     get_project_sync = async_to_sync(project_crud.get_project)
     project_info = get_project_sync(db, project_id)
 
-    # Return empty list if project is not found
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_sync = async_to_sync(project_deps.get_odk_credentials)
+    odk_credentials = odk_sync(db, project_info)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -332,11 +312,8 @@ def update_submission_in_s3(
         project = get_project_sync(db, project_id)
 
         # Gather metadata
-        odk_credentials = project_schemas.ODKCentralDecrypted(
-            odk_central_url=project.odk_central_url,
-            odk_central_user=project.odk_central_user,
-            odk_central_password=project.odk_central_password,
-        )
+        odk_sync = async_to_sync(project_deps.get_odk_credentials)
+        odk_credentials = odk_sync(db, project)
         odk_forms = list_odk_xforms(project.odkid, odk_credentials, True)
 
         # Get latest submission date
@@ -429,12 +406,8 @@ def get_all_submissions_json(db: Session, project_id):
     project_info = get_project_sync(db, project_id)
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_sync = async_to_sync(project_deps.get_odk_credentials)
+    odk_credentials = odk_sync(db, project_info)
     project = get_odk_project(odk_credentials)
 
     get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
@@ -491,22 +464,13 @@ async def download_submission(
     """Download submission data from ODK Central and aggregate."""
     project_info = await project_crud.get_project(db, project_id)
 
-    # Return empty list if project is not found
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
     if not export_json:
@@ -611,12 +575,7 @@ async def get_submission_points(db: Session, project_id: int, task_id: int = Non
     form_category = project_info.xform_title
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
     xform = get_odk_form(odk_credentials)
 
     if task_id:
@@ -666,22 +625,13 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
     """Return the total number of submissions made for a project."""
     project_info = await project_crud.get_project(db, project_id)
 
-    # Return empty list if project is not found
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
     form_category = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project_info.odk_central_url,
-        odk_central_user=project_info.odk_central_user,
-        odk_central_password=project_info.odk_central_password,
-    )
-
+    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -850,14 +800,10 @@ async def get_submission_by_task(
     Returns:
         Tuple: A tuple containing the list of submissions and the count.
     """
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project.odk_central_url,
-        odk_central_user=project.odk_central_user,
-        odk_central_password=project.odk_central_password,
-    )
+    odk_credentials = await project_deps.get_odk_credentials(db, project)
 
     xform = get_odk_form(odk_credentials)
-    data = xform.listSubmissions(project.odkid, task_id, filters)
+    data = xform.listSubmissions(project.odkid, str(task_id), filters)
     submissions = data.get("value", [])
     count = data.get("@odata.count", 0)
 
