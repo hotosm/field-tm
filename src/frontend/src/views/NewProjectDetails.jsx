@@ -7,13 +7,13 @@ import environment from '@/environment';
 import { ProjectById } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
+import { Modal } from '@/components/common/Modal';
 import OnScroll from '@/hooks/OnScroll';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import FmtmLogo from '@/assets/images/hotLog.png';
 import GenerateBasemap from '@/components/GenerateBasemap';
-import { ProjectBuildingGeojsonService } from '@/api/SubmissionService';
 import TaskSectionPopup from '@/components/ProjectDetails/TaskSectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
 import QrcodeComponent from '@/components/QrcodeComponent';
@@ -28,7 +28,6 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import MapControlComponent from '@/components/ProjectDetails/MapControlComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
-import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import getTaskStatusStyle from '@/utilfunctions/getTaskStatusStyle';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MapLegends from '@/components/MapLegends';
@@ -38,6 +37,7 @@ import { Icon, Style } from 'ol/style';
 import { Motion } from '@capacitor/motion';
 import locationArc from '@/assets/images/locationArc.png';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { isValidUrl } from '@/utilfunctions/urlChecker';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -49,11 +49,14 @@ const Home = () => {
   const [mainView, setView] = useState();
   const [featuresLayer, setFeaturesLayer] = useState();
   const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
-  const [taskBuildingGeojson, setTaskBuildingGeojson] = useState(null);
-  const [initialFeaturesLayer, setInitialFeaturesLayer] = useState(null);
+  const [taskBoundariesLayer, setTaskBoundariesLayer] = useState(null);
+  const [dataExtractUrl, setDataExtractUrl] = useState(null);
+  const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [currentCoordinate, setCurrentCoordinate] = useState({ latitude: null, longitude: null });
   const [positionGeojson, setPositionGeojson] = useState(null);
   const [deviceRotation, setDeviceRotation] = useState(0);
+  const [selectedFeature, setSelectedFeature] = useState(false);
+  const [dataExtractModalOpen, setDataExtractModalOpen] = useState(false);
 
   const encodedId = params.id;
   const decodedId = environment.decode(encodedId);
@@ -61,7 +64,6 @@ const Home = () => {
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo = CoreModules.useAppSelector((state) => state.home.selectedProject);
   const stateSnackBar = CoreModules.useAppSelector((state) => state.home.snackbar);
-  const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
@@ -80,13 +82,13 @@ const Home = () => {
       }),
     );
   };
+
   //Fetch project for the first time
   useEffect(() => {
     dispatch(ProjectActions.SetNewProjectTrigger());
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
-      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
@@ -98,9 +100,7 @@ const Home = () => {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }
-    return () => {
-      dispatch(ProjectActions.SetProjectBuildingGeojson(null));
-    };
+    return () => {};
   }, [params.id]);
 
   const { mapRef, map } = useOLMap({
@@ -123,39 +123,21 @@ const Home = () => {
       },
       id: `${feature.id}_${feature.task_status}`,
     }));
-    const taskBuildingGeojsonFeatureCollection = {
+    const taskBoundariesFeatcol = {
       ...geojsonObjectModel,
       features: features,
     };
-    setInitialFeaturesLayer(taskBuildingGeojsonFeatureCollection);
+    setTaskBoundariesLayer(taskBoundariesFeatcol);
   }, [state.projectTaskBoundries[0]?.taskBoundries?.length]);
-
-  useEffect(() => {
-    if (!map) return;
-    if (!projectBuildingGeojson) return;
-
-    const taskBuildingGeojsonFeatureCollection = {
-      ...basicGeojsonTemplate,
-      features: [
-        ...projectBuildingGeojson?.map((feature) => ({
-          ...feature.geometry,
-          id: feature.id,
-        })),
-      ],
-    };
-
-    setTaskBuildingGeojson(taskBuildingGeojsonFeatureCollection);
-  }, [map, projectBuildingGeojson]);
 
   // TasksLayer(map, mainView, featuresLayer);
   const projectClickOnMap = (properties, feature) => {
     setFeaturesLayer(feature, 'feature');
-    let extent = properties.geometry.getExtent();
-    dispatch(
-      ProjectBuildingGeojsonService(
-        `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${properties.uid}`,
-      ),
-    );
+    const extent = properties.geometry.getExtent();
+
+    setDataExtractExtent(properties.geometry);
+    setDataExtractUrl(state.projectInfo.data_extract_url);
+
     mapRef.current?.scrollIntoView({
       block: 'center',
       behavior: 'smooth',
@@ -171,6 +153,11 @@ const Home = () => {
         padding: [20, 350, 50, 10],
       });
     }
+  };
+
+  const displayDataExtractValues = (properties) => {
+    setSelectedFeature(properties);
+    setDataExtractModalOpen(true);
   };
 
   const buildingStyle = {
@@ -282,6 +269,23 @@ const Home = () => {
         />
       </div>
 
+      <div>
+        <Modal
+          className={`fmtm-w-[700px]`}
+          description={
+            <div>
+              {Object.entries(selectedFeature).map(([key, value]) => (
+                <p key={key} className="fmtm-text-base">{`${key}: ${value}`}</p>
+              ))}
+            </div>
+          }
+          open={dataExtractModalOpen}
+          onOpenChange={(value) => {
+            setDataExtractModalOpen(value);
+          }}
+        />
+      </div>
+
       {/* Top project details heading medium dimension*/}
       {windowSize.width >= 640 && (
         <div className="fmtm-relative">
@@ -367,7 +371,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* <ProjectMap /> */}
         {params?.id && (
           <div className="fmtm-relative sm:fmtm-static">
             <MapComponent
@@ -381,9 +384,9 @@ const Home = () => {
             >
               <LayerSwitcherControl visible={'outdoors'} />
 
-              {initialFeaturesLayer && initialFeaturesLayer?.features?.length > 0 && (
+              {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
                 <VectorLayer
-                  geojson={initialFeaturesLayer}
+                  geojson={taskBoundariesLayer}
                   viewProperties={{
                     size: map?.getSize(),
                     padding: [50, 50, 50, 50],
@@ -397,9 +400,10 @@ const Home = () => {
                   getTaskStatusStyle={(feature) => getTaskStatusStyle(feature, mapTheme)}
                 />
               )}
-              {taskBuildingGeojson && taskBuildingGeojson?.features?.length > 0 && (
+              {dataExtractUrl && isValidUrl(dataExtractUrl) && (
                 <VectorLayer
-                  geojson={taskBuildingGeojson}
+                  fgbUrl={dataExtractUrl}
+                  fgbExtent={dataExtractExtent}
                   style={buildingStyle}
                   viewProperties={{
                     size: map?.getSize(),
@@ -407,8 +411,9 @@ const Home = () => {
                     constrainResolution: true,
                     duration: 2000,
                   }}
+                  mapOnClick={displayDataExtractValues}
                   zoomToLayer
-                  zIndex={5}
+                  zIndex={10}
                 />
               )}
               {geolocationStatus && currentCoordinate?.latitude && currentCoordinate?.longitude && (
@@ -422,7 +427,7 @@ const Home = () => {
                     constrainResolution: true,
                     duration: 2000,
                   }}
-                  zIndex={5}
+                  zIndex={15}
                   rotation={deviceRotation}
                 />
               )}

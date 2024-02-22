@@ -1,3 +1,5 @@
+// TODO should this be deleted??
+
 import React, { useCallback, useState, useEffect } from 'react';
 
 import CoreModules from '@/shared/CoreModules';
@@ -8,7 +10,6 @@ import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layer
 import { Vector as VectorSource } from 'ol/source';
 import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
-import { ProjectBuildingGeojsonService } from '@/api/SubmissionService';
 import environment from '@/environment';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
@@ -128,7 +129,7 @@ const ProjectInfomap = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(ProjectActions.SetProjectBuildingGeojson(null));
+      dispatch(ProjectActions.SetProjectDataExtract(null));
     };
   }, []);
 
@@ -198,11 +199,11 @@ const ProjectInfomap = () => {
       duration: 2000,
     });
 
-    dispatch(
-      ProjectBuildingGeojsonService(
-        `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${selectedTask}`,
-      ),
-    );
+    // dispatch(
+    //   ProjectDataExtractService(
+    //     `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${selectedTask}`,
+    //   ),
+    // );
   }, [selectedTask]);
 
   const taskOnSelect = (properties, feature) => {

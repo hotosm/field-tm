@@ -57,6 +57,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             tasks_validated: projectResp.tasks_validated,
             xform_title: projectResp.xform_title,
             tasks_bad: projectResp.tasks_bad,
+            data_extract_url: projectResp.data_extract_url,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));

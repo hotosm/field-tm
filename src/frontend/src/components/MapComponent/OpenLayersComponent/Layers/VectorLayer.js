@@ -13,7 +13,13 @@ import { isExtentValid } from '@/components/MapComponent/OpenLayersComponent/hel
 import { Draw, Modify, Snap, Select, defaults as defaultInteractions } from 'ol/interaction.js';
 import { getArea } from 'ol/sphere';
 import { valid } from 'geojson-validation';
+import Point from 'ol/geom/Point.js';
 import MultiPoint from 'ol/geom/MultiPoint.js';
+import { buffer } from 'ol/extent';
+import { bbox as OLBbox } from 'ol/loadingstrategy';
+import { geojson as FGBGeoJson } from 'flatgeobuf';
+
+import { isValidUrl } from '@/utilfunctions/urlChecker';
 
 const selectElement = 'singleselect';
 
@@ -36,6 +42,8 @@ const layerViewProperties = {
 const VectorLayer = ({
   map,
   geojson,
+  fgbUrl,
+  fgbExtent,
   style,
   zIndex,
   zoomToLayer = false,
@@ -141,6 +149,89 @@ const VectorLayer = ({
     };
   }, [map, vectorLayer, onDraw]);
 
+  function fgbBoundingBox(originalExtent) {
+    // Add a 50m buffer to the bbox search
+    const bufferMeters = 50;
+    const bufferedExtent = buffer(originalExtent, bufferMeters);
+
+    const minPoint = new Point([bufferedExtent[0], bufferedExtent[1]]);
+    minPoint.transform('EPSG:3857', 'EPSG:4326');
+
+    const maxPoint = new Point([bufferedExtent[2], bufferedExtent[3]]);
+    maxPoint.transform('EPSG:3857', 'EPSG:4326');
+
+    return {
+      minX: minPoint.getCoordinates()[0],
+      minY: minPoint.getCoordinates()[1],
+      maxX: maxPoint.getCoordinates()[0],
+      maxY: maxPoint.getCoordinates()[1],
+    };
+  }
+
+  function geomWithin(geom, area) {
+    // Only include features that intersect extent
+    let geomCoord;
+
+    if (geom.getType() === 'Point') {
+      geomCoord = geom.getCoordinates();
+    } else if (geom.getType() === 'Polygon') {
+      geomCoord = geom.getInteriorPoint().getCoordinates();
+    } else if (geom.getType() === 'LineString') {
+      geomCoord = geom.getExtent();
+    }
+
+    if (area.intersectsCoordinate(geomCoord)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async function loadFgbRemote(filterExtent = true, extractGeomCol = true) {
+    this.clear();
+    const filteredFeatures = [];
+
+    for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtent.getExtent()))) {
+      if (extractGeomCol && feature.geometry.type === 'GeometryCollection') {
+        // Extract first geom from geomcollection
+        feature = {
+          ...feature,
+          geometry: feature.geometry.geometries[0],
+        };
+      }
+      let extractGeom = new GeoJSON().readFeature(feature, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
+
+      // Clip geoms to another geometry (i.e. ST_Within)
+      if (filterExtent) {
+        if (geomWithin(extractGeom.getGeometry(), fgbExtent)) {
+          filteredFeatures.push(extractGeom);
+        }
+      } else {
+        filteredFeatures.push(extractGeom);
+      }
+    }
+    this.addFeatures(filteredFeatures);
+  }
+
+  function triggerMapClick(feature) {
+    // Perform an action if a feature is found
+    if (feature) {
+      // Extract properties
+      const properties = feature.getProperties();
+      // Remove geometry key if properties are present
+      // If no properties are set, the feature uid is included
+      if (!('uid' in properties)) {
+        const { geometry, ...restProperties } = properties;
+        mapOnClick(restProperties, feature);
+        return;
+      }
+      mapOnClick(properties, feature);
+    }
+  }
+
   useEffect(() => {
     if (!map) return;
     if (!geojson) return;
@@ -154,6 +245,7 @@ const VectorLayer = ({
       }),
       declutter: true,
     });
+
     map.on('click', (evt) => {
       var pixel = evt.pixel;
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
@@ -162,19 +254,47 @@ const VectorLayer = ({
         }
       });
 
-      // Perform an action if a feature is found
-      if (feature) {
-        // Do something with the feature
-        // dispatch()
-        mapOnClick(feature.getProperties(), feature);
-      }
+      triggerMapClick(feature);
     });
+
     setVectorLayer(vectorLyr);
     return () => {
       setVectorLayer(null);
       map.un('click', () => {});
     };
   }, [map, geojson]);
+
+  useEffect(() => {
+    if (!map || !fgbUrl || !isValidUrl(fgbUrl)) return;
+
+    const vectorLyr = new OLVectorLayer({
+      source: new VectorSource({
+        useSpatialIndex: true,
+        strategy: OLBbox,
+        loader: loadFgbRemote,
+      }),
+    });
+
+    map.on('click', (evt) => {
+      const pixel = evt.pixel;
+
+      const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+        if (layer === vectorLyr) {
+          return feature;
+        }
+      });
+
+      triggerMapClick(feature);
+    });
+
+    // map.addLayer(vectorLyr);
+    setVectorLayer(vectorLyr);
+
+    return () => {
+      setVectorLayer(null);
+      map.un('click', () => {});
+    };
+  }, [fgbUrl, fgbExtent]);
 
   useEffect(() => {
     if (!map || !vectorLayer) return;
@@ -226,7 +346,9 @@ const VectorLayer = ({
 
   useEffect(() => {
     if (!map || !vectorLayer || !zoomToLayer) return;
-    const extent = vectorLayer.getSource().getExtent();
+    const source = vectorLayer.getSource();
+    if (source.getFeatures().length === 0) return;
+    const extent = source.getExtent();
     if (!isExtentValid(extent)) return;
     map.getView().fit(extent, viewProperties);
   }, [map, vectorLayer, zoomToLayer]);
@@ -328,7 +450,24 @@ VectorLayer.defaultProps = {
 };
 
 VectorLayer.propTypes = {
-  geojson: PropTypes.object.isRequired,
+  // Ensure either geojson or fgbUrl is provided
+  geojson: (props, propName, componentName) => {
+    if (!props.geojson && !props.fgbUrl) {
+      return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
+    }
+    if (props.geojson && props.fgbUrl) {
+      return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
+    }
+  },
+  fgbUrl: (props, propName, componentName) => {
+    if (!props.geojson && !props.fgbUrl) {
+      return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
+    }
+    if (props.geojson && props.fgbUrl) {
+      return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
+    }
+  },
+  fgbExtent: PropTypes.object,
   style: PropTypes.object,
   zIndex: PropTypes.number,
   zoomToLayer: PropTypes.bool,

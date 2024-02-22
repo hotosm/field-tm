@@ -1,3 +1,5 @@
+import { isValidUrl } from '@/utilfunctions/urlChecker';
+
 interface ProjectValues {
   organisation_id: string;
   name: string;
@@ -25,15 +27,6 @@ interface ValidationErrors {
 }
 
 const regexForSymbol = /_/g;
-
-function isValidUrl(url: string) {
-  try {
-    new URL(url);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
 
 function CreateProjectValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};

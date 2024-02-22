@@ -1,3 +1,5 @@
+// TODO should this be deleted??
+
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
@@ -24,7 +26,6 @@ import GeoJSON from 'ol/format/GeoJSON';
 import FmtmLogo from '@/assets/images/hotLog.png';
 
 import GenerateBasemap from '@/components/GenerateBasemap';
-import { ProjectBuildingGeojsonService } from '@/api/SubmissionService';
 import { get } from 'ol/proj';
 import { buildingStyle, basicGeojsonTemplate } from '@/utilities/mapUtils';
 import MapLegends from '@/components/MapLegends';
@@ -82,12 +83,11 @@ const Home = () => {
 
   //Fetch project for the first time
   useEffect(() => {
+    console.log('HERE');
     dispatch(ProjectActions.SetNewProjectTrigger());
     if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
-
-      // dispatch(ProjectBuildingGeojsonService(`${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedId)}/features`))
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
@@ -100,7 +100,7 @@ const Home = () => {
       }
     }
     return () => {
-      dispatch(ProjectActions.SetProjectBuildingGeojson(null));
+      dispatch(ProjectActions.SetProjectDataExtract(null));
     };
   }, [params.id]);
 
@@ -180,13 +180,13 @@ const Home = () => {
           document.querySelector('#project-details-map').scrollIntoView({
             behavior: 'smooth',
           });
-          dispatch(
-            ProjectBuildingGeojsonService(
-              `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${
-                feature?.getId()?.split('_')?.[0]
-              }`,
-            ),
-          );
+          // dispatch(
+          //   ProjectDataExtractService(
+          //     `${import.meta.env.VITE_API_URL}/projects/${decodedId}/features?task_id=${
+          //       feature?.getId()?.split('_')?.[0]
+          //     }`,
+          //   ),
+          // );
         }
       });
     });
@@ -366,7 +366,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* <ProjectMap /> */}
         {params?.id && (
           <div className="fmtm-relative sm:fmtm-static">
             <OpenLayersMap

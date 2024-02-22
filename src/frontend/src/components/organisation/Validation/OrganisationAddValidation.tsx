@@ -1,3 +1,5 @@
+import { isValidUrl } from '@/utilfunctions/urlChecker';
+
 interface OrganisationValues {
   logo: string;
   name: string;
@@ -17,15 +19,6 @@ interface ValidationErrors {
   odk_central_url?: string;
   odk_central_user?: string;
   odk_central_password?: string;
-}
-
-function isValidUrl(url: string) {
-  try {
-    new URL(url);
-    return true;
-  } catch (error) {
-    return false;
-  }
 }
 
 function OrganisationAddValidation(values: OrganisationValues) {

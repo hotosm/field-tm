@@ -116,6 +116,9 @@ async def geojson_to_flatgeobuf(
 ) -> Optional[bytes]:
     """From a given FeatureCollection, return a memory flatgeobuf obj.
 
+    NOTE this generate an fgb with string timestamps, not datetime.
+    NOTE ogr2ogr would generate datetime, but parsing does not seem to work.
+
     Args:
         db (Session): SQLAlchemy db session.
         geojson (geojson.FeatureCollection): a FeatureCollection object.
@@ -123,66 +126,40 @@ async def geojson_to_flatgeobuf(
     Returns:
         flatgeobuf (bytes): a Python bytes representation of a flatgeobuf file.
     """
-    # FIXME make this with with properties / tags
-    # FIXME this is important
-    # FIXME but difficult to guarantee users upload geojson
-    # FIXME With required properties included
-    # sql = """
-    #     DROP TABLE IF EXISTS public.temp_features CASCADE;
-
-    #     CREATE TABLE IF NOT EXISTS public.temp_features(
-    #         geom geometry,
-    #         osm_id integer,
-    #         changeset integer,
-    #         timestamp timestamp
-    #     );
-
-    # WITH data AS (SELECT CAST(:geojson AS json) AS fc)
-    # INSERT INTO public.temp_features (geom, osm_id, changeset, timestamp)
-    # SELECT
-    #     ST_SetSRID(ST_GeomFromGeoJSON(feat->>'geometry'), 4326) AS geom,
-    #     COALESCE((feat->'properties'->>'osm_id')::integer, -1) AS osm_id,
-    #     COALESCE((feat->'properties'->>'changeset')::integer, -1) AS changeset,
-    #     CASE
-    #         WHEN feat->'properties'->>'timestamp' IS NOT NULL
-    #         THEN (feat->'properties'->>'timestamp')::timestamp
-    #         ELSE NULL
-    #     END AS timestamp
-    # FROM (
-    #     SELECT json_array_elements(fc->'features') AS feat
-    #     FROM data
-    # ) AS f;
-
-    #     -- Second param = generate with spatial index
-    #     SELECT ST_AsFlatGeobuf(geoms, true)
-    #     FROM (SELECT * FROM public.temp_features) AS geoms;
-    # """
     sql = """
-        DROP TABLE IF EXISTS public.temp_features CASCADE;
+        DROP TABLE IF EXISTS temp_features CASCADE;
 
-        CREATE TABLE IF NOT EXISTS public.temp_features(
-            geom geometry
+        -- Wrap geometries in GeometryCollection
+        CREATE TEMP TABLE IF NOT EXISTS temp_features(
+            geom geometry(GeometryCollection, 4326),
+            osm_id integer,
+            tags text,
+            version integer,
+            changeset integer,
+            timestamp text
         );
 
         WITH data AS (SELECT CAST(:geojson AS json) AS fc)
-        INSERT INTO public.temp_features (geom)
+        INSERT INTO temp_features
+            (geom, osm_id, tags, version, changeset, timestamp)
         SELECT
-            ST_SetSRID(ST_GeomFromGeoJSON(feat->>'geometry'), 4326) AS geom
-        FROM (
-            SELECT json_array_elements(fc->'features') AS feat
-            FROM data
-        ) AS f;
+            ST_ForceCollection(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom,
+            (feat->'properties'->>'osm_id')::integer as osm_id,
+            (feat->'properties'->>'tags')::text as tags,
+            (feat->'properties'->>'version')::integer as version,
+            (feat->'properties'->>'changeset')::integer as changeset,
+            (feat->'properties'->>'timestamp')::text as timestamp
+        FROM json_array_elements((SELECT fc->'features' FROM data)) AS f(feat);
 
-        SELECT ST_AsFlatGeobuf(fgb_data, true)
-        FROM (SELECT * FROM public.temp_features as geoms) AS fgb_data;
+        -- Second param = generate with spatial index
+        SELECT ST_AsFlatGeobuf(geoms, true)
+        FROM (SELECT * FROM temp_features) AS geoms;
     """
+
     # Run the SQL
     result = db.execute(text(sql), {"geojson": json.dumps(geojson)})
     # Get a memoryview object, then extract to Bytes
     flatgeobuf = result.first()
-
-    # Cleanup table
-    # db.execute(text("DROP TABLE IF EXISTS public.temp_features CASCADE;"))
 
     if flatgeobuf:
         return flatgeobuf[0].tobytes()
@@ -196,6 +173,8 @@ async def flatgeobuf_to_geojson(
 ) -> Optional[geojson.FeatureCollection]:
     """Converts FlatGeobuf data to GeoJSON.
 
+    Extracts single geometries from wrapped GeometryCollection if used.
+
     Args:
         db (Session): SQLAlchemy db session.
         flatgeobuf (bytes): FlatGeobuf data in bytes format.
@@ -203,7 +182,6 @@ async def flatgeobuf_to_geojson(
     Returns:
         geojson.FeatureCollection: A FeatureCollection object.
     """
-    # FIXME can we use SELECT * to extract all fields into geojson properties?
     sql = text(
         """
         DROP TABLE IF EXISTS public.temp_fgb CASCADE;
@@ -217,24 +195,23 @@ async def flatgeobuf_to_geojson(
         FROM (
             SELECT jsonb_build_object(
                 'type', 'Feature',
-                'geometry', ST_AsGeoJSON(fgb_data.geom)::jsonb,
+                'geometry', ST_AsGeoJSON(ST_GeometryN(fgb_data.geom, 1))::jsonb,
                 'properties', jsonb_build_object(
                     'osm_id', fgb_data.osm_id,
                     'tags', fgb_data.tags,
                     'version', fgb_data.version,
                     'changeset', fgb_data.changeset,
                     'timestamp', fgb_data.timestamp
-
                 )::jsonb
             ) AS feature
             FROM (
                 SELECT
                     geom,
-                    NULL as osm_id,
-                    NULL as tags,
-                    NULL as version,
-                    NULL as changeset,
-                    NULL as timestamp
+                    osm_id,
+                    tags,
+                    version,
+                    changeset,
+                    timestamp
                 FROM ST_FromFlatGeobuf(null::temp_fgb, :fgb_bytes)
             ) AS fgb_data
         ) AS features;
@@ -247,12 +224,112 @@ async def flatgeobuf_to_geojson(
     except ProgrammingError as e:
         log.error(e)
         log.error(
-            "Attempted flatgeobuf --> geojson conversion, but duplicate column found"
+            "Attempted flatgeobuf --> geojson conversion failed. "
+            "Perhaps there is a duplicate 'id' column?"
         )
         return None
 
     if feature_collection:
         return geojson.loads(json.dumps(feature_collection[0]))
+
+    return None
+
+
+async def split_geojson_by_task_areas(
+    db: Session,
+    featcol: geojson.FeatureCollection,
+    project_id: int,
+) -> Optional[dict[int, geojson.FeatureCollection]]:
+    """Split GeoJSON into tagged task area GeoJSONs.
+
+    Args:
+        db (Session): SQLAlchemy db session.
+        featcol (bytes): Data extract feature collection.
+        project_id (int): The project ID for associated tasks.
+
+    Returns:
+        dict[int, geojson.FeatureCollection]: {task_id: FeatureCollection} mapping.
+    """
+    sql = text(
+        """
+        -- Drop table if already exists
+        DROP TABLE IF EXISTS temp_features CASCADE;
+
+        -- Create a temporary table to store the parsed GeoJSON features
+        CREATE TEMP TABLE temp_features (
+            id SERIAL PRIMARY KEY,
+            geometry GEOMETRY,
+            properties JSONB
+        );
+
+        -- Insert parsed geometries and properties into the temporary table
+        INSERT INTO temp_features (geometry, properties)
+        SELECT
+            ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326) AS geometry,
+            jsonb_set(
+                jsonb_set(feature->'properties', '{task_id}', to_jsonb(tasks.id), true),
+                '{project_id}', to_jsonb(tasks.project_id), true
+            ) AS properties
+        FROM (
+            SELECT jsonb_array_elements(CAST(:geojson_featcol AS jsonb)->'features')
+            AS feature
+        ) AS features
+        CROSS JOIN tasks
+        WHERE tasks.project_id = :project_id;
+
+        -- Retrieve task outlines based on the provided project_id
+        WITH task_outlines AS (
+            SELECT id, outline
+            FROM tasks
+            WHERE project_id = :project_id
+        )
+        SELECT
+            task_outlines.id AS task_id,
+            jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(features.feature)
+            ) AS task_features
+        FROM
+            task_outlines
+        LEFT JOIN LATERAL (
+            -- Construct a feature collection with geometries per task area
+            SELECT
+                jsonb_build_object(
+                    'type', 'Feature',
+                    'geometry', ST_AsGeoJSON(temp_features.geometry)::jsonb,
+                    'properties', temp_features.properties
+                ) AS feature
+            FROM
+                temp_features
+            WHERE
+                ST_Within(temp_features.geometry, task_outlines.outline)
+        ) AS features ON true
+        GROUP BY
+            task_outlines.id;
+        """
+    )
+
+    try:
+        result = db.execute(
+            sql,
+            {
+                "geojson_featcol": json.dumps(featcol),
+                "project_id": project_id,
+            },
+        )
+        feature_collections = result.all()
+
+    except ProgrammingError as e:
+        log.error(e)
+        log.error("Attempted geojson task splitting failed")
+        return None
+
+    if feature_collections:
+        task_geojson_dict = {
+            record[0]: geojson.loads(json.dumps(record[1]))
+            for record in feature_collections
+        }
+        return task_geojson_dict
 
     return None
 
