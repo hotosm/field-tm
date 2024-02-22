@@ -67,7 +67,7 @@ from app.db.postgis_utils import (
     split_geojson_by_task_areas,
 )
 from app.models.enums import HTTPStatus, ProjectRole
-from app.projects import project_schemas
+from app.projects import project_deps, project_schemas
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
 from app.users import user_crud
@@ -143,6 +143,11 @@ async def get_project(db: Session, project_id: int):
         .filter(db_models.DbProject.id == project_id)
         .first()
     )
+    if not db_project:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"Project with id {project_id} does not exist",
+        )
     return db_project
 
 
@@ -1054,9 +1059,6 @@ async def upload_custom_geojson_extract(
     project = await get_project(db, project_id)
     log.debug(f"Uploading custom data extract for project: {project}")
 
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-
     featcol_filtered = parse_and_filter_geojson(geojson_str)
     if not featcol_filtered:
         raise HTTPException(
@@ -1234,14 +1236,8 @@ def generate_project_files(
                 detail=f"Project with id {project_id} does not exist",
             )
 
-        # Get odk credentials from project.
-        odk_credentials = {
-            "odk_central_url": project.odk_central_url,
-            "odk_central_user": project.odk_central_user,
-            "odk_central_password": project.odk_central_password,
-        }
-
-        odk_credentials = project_schemas.ODKCentralDecrypted(**odk_credentials)
+        odk_sync = async_to_sync(project_deps.get_odk_credentials)
+        odk_credentials = odk_sync(db, project)
 
         if custom_form:
             log.debug("User provided custom XLSForm")
@@ -1664,11 +1660,7 @@ async def update_project_form(
     odk_id = project.odkid
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project.odk_central_url,
-        odk_central_user=project.odk_central_user,
-        odk_central_password=project.odk_central_password,
-    )
+    odk_credentials = await project_deps.get_odk_credentials(db, project)
 
     if form:
         xlsform = f"/tmp/custom_form.{form_type}"

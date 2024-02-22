@@ -29,7 +29,7 @@ from app.auth.roles import get_uid, mapper
 from app.central import central_crud
 from app.db import database
 from app.models.enums import TaskStatus
-from app.projects import project_crud, project_schemas
+from app.projects import project_crud, project_deps
 from app.tasks import tasks_crud, tasks_schemas
 
 router = APIRouter(
@@ -145,11 +145,7 @@ async def task_features_count(
     project = await project_crud.get_project(db, project_id)
 
     # ODK Credentials
-    odk_credentials = project_schemas.ODKCentralDecrypted(
-        odk_central_url=project.odk_central_url,
-        odk_central_user=project.odk_central_user,
-        odk_central_password=project.odk_central_password,
-    )
+    odk_credentials = await project_deps.get_odk_credentials(db, project)
 
     odk_details = central_crud.list_odk_xforms(project.odkid, odk_credentials, True)
 
