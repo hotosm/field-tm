@@ -23,10 +23,6 @@ const Organisation = () => {
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
-  const handleSearchChange = (event) => {
-    setSearchKeyword(event.target.value);
-  };
-
   const organisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
     (state) => state.organisation.organisationData,
   );
@@ -38,6 +34,14 @@ const Organisation = () => {
   const myOrganisationDataLoading = CoreModules.useAppSelector((state) => state.organisation.myOrganisationDataLoading);
   // loading states for the organisations from selector
 
+  let cardsPerRow = new Array(
+    type == 'xl' ? 3 : type == 'lg' ? 3 : type == 'md' ? 3 : type == 'sm' ? 2 : type == 's' ? 2 : 1,
+  ).fill(0);
+  // calculate number of cards to display according to the screen size
+
+  const handleSearchChange = (event) => {
+    setSearchKeyword(event.target.value);
+  };
   const filteredBySearch = (data, searchKeyword) => {
     const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
       d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
@@ -54,11 +58,6 @@ const Organisation = () => {
       dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/`));
     }
   }, [verifiedTab]);
-
-  let cardsPerRow = new Array(
-    type == 'xl' ? 3 : type == 'lg' ? 3 : type == 'md' ? 3 : type == 'sm' ? 2 : type == 's' ? 2 : 1,
-  ).fill(0);
-  // calculate number of cards to display according to the screen size
 
   return (
     <CoreModules.Box
