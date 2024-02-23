@@ -25,9 +25,21 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
+  const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
+    if (!customFileValidity && formValues.formWays === 'custom_form') {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'Your file is invalid',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+      return;
+    }
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 4 }));
     navigate('/data-extract');
   };
@@ -46,6 +58,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
    * @param {Event} event - The change event object.
    */
   const changeFileHandler = (event): void => {
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
     // Get the selected files from the event target
     const { files } = event.target;
     // Set the selected file as the customFormFile state
@@ -53,6 +66,8 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
     handleCustomChange('customFormUpload', files[0]);
   };
   const resetFile = (): void => {
+    handleCustomChange('customFormUpload', null);
+    dispatch(CreateProjectActions.SetCustomFileValidity(false));
     setCustomFormFile(null);
   };
 
@@ -65,7 +80,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
     navigate(url);
   };
   useEffect(() => {
-    if (customFormFile) {
+    if (customFormFile && !customFileValidity) {
       dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate_form`, customFormFile));
     }
   }, [customFormFile]);
@@ -127,6 +142,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 direction="column"
                 value={formValues.formWays}
                 onChangeData={(value) => {
+                  resetFile();
                   handleCustomChange('formWays', value);
                 }}
                 errorMsg={errors.formWays}
@@ -151,13 +167,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 onClick={() => toggleStep(2, '/upload-area')}
                 className="fmtm-font-bold"
               />
-              <Button
-                btnText="NEXT"
-                btnType="primary"
-                type="submit"
-                onClick={() => console.log('submit')}
-                className="fmtm-font-bold"
-              />
+              <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">

@@ -130,7 +130,6 @@ const UploadTaskAreasService: Function = (url: string, filePayload: any, project
         await dispatch(CreateProjectActions.UploadAreaLoading(false));
         await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data));
       } catch (error: any) {
-        console.log(error, 'error');
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -173,7 +172,6 @@ const GenerateProjectQRService: Function = (url: string, projectData: any, formU
         dispatch(CommonActions.SetLoading(false));
         await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp));
       } catch (error: any) {
-        console.log(error);
         dispatch(CommonActions.SetLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
@@ -459,6 +457,7 @@ const ValidateCustomForm: Function = (url: string, formUpload: any) => {
             duration: 2000,
           }),
         );
+        dispatch(CreateProjectActions.SetCustomFileValidity(true));
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
@@ -471,6 +470,7 @@ const ValidateCustomForm: Function = (url: string, formUpload: any) => {
           }),
         );
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
+        dispatch(CreateProjectActions.SetCustomFileValidity(false));
       } finally {
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
       }
@@ -508,8 +508,6 @@ const DeleteProjectService: Function = (url: string) => {
             }),
           );
         } else {
-          console.log(error);
-          console.log('Project deletion failed.');
         }
       }
     };
