@@ -28,14 +28,13 @@ from sqlalchemy.orm import Session
 from app.auth.osm import AuthUser
 from app.config import encrypt_value, settings
 from app.db import db_models
-from app.models.enums import HTTPStatus, UserRole
+from app.models.enums import HTTPStatus
 from app.organisations.organisation_deps import (
     check_org_exists,
     get_organisation_by_name,
 )
 from app.organisations.organisation_schemas import OrganisationEdit, OrganisationIn
 from app.s3 import add_obj_to_bucket
-from app.users.user_crud import get_user
 
 
 async def init_admin_org(db: Session):
@@ -128,35 +127,62 @@ async def init_admin_org(db: Session):
 async def get_organisations(
     db: Session,
     current_user: AuthUser,
-) -> list[db_models.DbOrganisation]:
-    """Get all orgs."""
-    db_user = await get_user(db, current_user.id)
+):
+    """Get all orgs.
 
-    # If admin, show all orgs
-    if db_user.role == UserRole.ADMIN:
-        return db.query(db_models.DbOrganisation).all()
+    Also returns unapproved orgs if admin user.
+    """
+    user_id = current_user.id
 
-    # If not admin, only show approved orgs
-    return db.query(db_models.DbOrganisation).filter_by(approved=True).all()
+    sql = text(
+        """
+        SELECT *
+        FROM organisations
+        WHERE
+            CASE
+                WHEN (SELECT role FROM users WHERE id = :user_id) = 'ADMIN' THEN TRUE
+                ELSE approved
+            END = TRUE;
+    """
+    )
+    return db.execute(sql, {"user_id": user_id}).all()
 
 
 async def get_my_organisations(
     db: Session,
     current_user: AuthUser,
-) -> list[db_models.DbOrganisation]:
+):
     """Get organisations filtered by the current user.
 
+    TODO add extra UNION for all associated projects to user.
+
     Args:
-    db (Session): The database session.
-    current_user (AuthUser): The current user.
+        db (Session): The database session.
+        current_user (AuthUser): The current user.
 
     Returns:
-    list[db_models.DbOrganisation]: A list of organisations
-    filtered by the current user.
+        list[dict]: A list of organisation objects to be serialised.
     """
-    db_user = await get_user(db, current_user.id)
+    user_id = current_user.id
 
-    return db_user.organisations
+    sql = text(
+        """
+        SELECT DISTINCT org.*
+        FROM organisations org
+        JOIN organisation_managers managers
+            ON managers.organisation_id = org.id
+        WHERE managers.user_id = :user_id
+
+        UNION
+
+        SELECT DISTINCT org.*
+        FROM organisations org
+        JOIN projects project
+            ON project.organisation_id = org.id
+        WHERE project.author_id = :user_id;
+    """
+    )
+    return db.execute(sql, {"user_id": user_id}).all()
 
 
 async def get_unapproved_organisations(
