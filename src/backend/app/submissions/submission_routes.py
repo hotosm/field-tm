@@ -298,21 +298,9 @@ async def get_osm_xml(
     # Remove the extra closing </osm> tag from the end of the file
     with open(osmoutfile, "r") as f:
         osmoutfile_data = f.read()
-        # Find the last index of the closing </osm> tag
-        last_osm_index = osmoutfile_data.rfind("</osm>")
-        # Remove the extra closing </osm> tag from the end
-        processed_xml_string = (
-            osmoutfile_data[:last_osm_index]
-            + osmoutfile_data[last_osm_index + len("</osm>") :]
-        )
-
-    # Write the modified XML data back to the file
-    with open(osmoutfile, "w") as f:
-        f.write(processed_xml_string)
 
     # Create a plain XML response
-    response = Response(content=processed_xml_string, media_type="application/xml")
-    return response
+    return Response(content=osmoutfile_data, media_type="application/xml")
 
 
 @router.get("/submission_page/{project_id}")
