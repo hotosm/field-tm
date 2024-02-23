@@ -121,12 +121,24 @@ async def update_organisation(
 
 
 @router.delete("/{org_id}")
-async def delete_organisations(
-    org_id: int,
+async def delete_org(
     db: Session = Depends(database.get_db),
     org_user_dict: DbUser = Depends(org_admin),
 ):
     """Delete an organisation."""
+    return await organisation_crud.delete_organisation(db, org_user_dict["org"])
+
+
+@router.delete("/unapproved/{org_id}")
+async def delete_unapproved_org(
+    org_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: DbUser = Depends(super_admin),
+):
+    """Delete an unapproved organisation.
+
+    ADMIN ONLY ENDPOINT.
+    """
     organisation = db.query(DbOrganisation).filter(DbOrganisation.id == org_id).first()
     return await organisation_crud.delete_organisation(db, organisation)
 

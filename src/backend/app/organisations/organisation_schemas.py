@@ -18,10 +18,11 @@
 """Pydantic models for Organisations."""
 
 from re import sub
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import Form
 from pydantic import BaseModel, Field, computed_field
+from pydantic.functional_validators import field_validator
 
 from app.config import HttpUrlStr
 from app.models.enums import CommunityType, OrganisationType
@@ -93,9 +94,17 @@ class OrganisationOut(BaseModel):
     id: int
     name: str
     approved: bool
-    type: OrganisationType
+    type: Union[OrganisationType, str]
     logo: Optional[str]
     description: Optional[str]
     slug: Optional[str]
     url: Optional[str]
     odk_central_url: Optional[str]
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def parse_enum_string(cls, value: Union[str, OrganisationType]) -> OrganisationType:
+        """If a string value is used, parsed as Enum."""
+        if isinstance(value, OrganisationType):
+            return value
+        return OrganisationType[value]
