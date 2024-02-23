@@ -11,6 +11,12 @@ import AssetModules from '@/shared/AssetModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
 
 const Home = () => {
+  const dispatch = CoreModules.useAppDispatch();
+  //dispatch function to perform redux state mutation
+
+  const { type } = windowDimention();
+  //get window dimension
+
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [paginationPage, setPaginationPage] = useState(1);
@@ -21,22 +27,15 @@ const Home = () => {
   // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
   // console.log('state main :',state)
 
-  const { type } = windowDimention();
-  //get window dimension
-
-  const dispatch = CoreModules.useAppDispatch();
-  //dispatch function to perform redux state mutation
-
   const stateHome = CoreModules.useAppSelector((state) => state.home);
   //we use use selector from redux to get all state of home from home slice
+
   const filteredProjectCards = stateHome.homeProjectSummary;
 
   let cardsPerRow = new Array(
     type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1,
   ).fill(0);
   //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
-
-  const theme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
