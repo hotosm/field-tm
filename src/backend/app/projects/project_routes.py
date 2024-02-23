@@ -1017,20 +1017,26 @@ async def download_task_boundaries(
 @router.get("/features/download/")
 async def download_features(
     project_id: int,
+    task_id: Optional[int] = None,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(mapper),
 ):
     """Downloads the features of a project as a GeoJSON file.
 
+    Can generate a geojson for the entire project, or specific task areas.
+
     Args:
         project_id (int): The id of the project.
+        task_id (int): Specify a specific task area to download for.
         db (Session): The database session, provided automatically.
         current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         Response: The HTTP response object containing the downloaded file.
     """
-    feature_collection = await project_crud.get_project_features_geojson(db, project_id)
+    feature_collection = await project_crud.get_project_features_geojson(
+        db, project_id, task_id
+    )
 
     headers = {
         "Content-Disposition": (

@@ -1387,7 +1387,9 @@ async def get_task_geometry(db: Session, project_id: int):
 
 
 async def get_project_features_geojson(
-    db: Session, project: Union[db_models.DbProject, int]
+    db: Session,
+    project: Union[db_models.DbProject, int],
+    task_id: Optional[int] = None,
 ) -> FeatureCollection:
     """Get a geojson of all features for a task."""
     if isinstance(project, int):
@@ -1426,6 +1428,18 @@ async def get_project_features_geojson(
                 f"project ({project_id})"
             ),
         )
+
+    # Split by task areas if task_id provided
+    if task_id:
+        split_extract_dict = await split_geojson_by_task_areas(
+            db, data_extract_geojson, project_id
+        )
+        if not split_extract_dict:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=(f"Failed to extract geojson for task ({task_id})"),
+            )
+        return split_extract_dict[task_id]
 
     return data_extract_geojson
 
