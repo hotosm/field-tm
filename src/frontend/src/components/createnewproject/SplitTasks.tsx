@@ -340,7 +340,9 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                         />
                       </div>
                       {errors.dimension && (
-                        <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.dimension}</p>
+                        <div>
+                          <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.dimension}</p>
+                        </div>
                       )}
                     </>
                   )}
@@ -356,9 +358,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                         />
                       </div>
                       {errors.average_buildings_per_task && (
-                        <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">
-                          {errors.average_buildings_per_task}
-                        </p>
+                        <div>
+                          <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">
+                            {errors.average_buildings_per_task}
+                          </p>
+                        </div>
                       )}
                     </>
                   )}
@@ -395,9 +399,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                   {(splitTasksSelection === task_split_type['divide_on_square'] ||
                     splitTasksSelection === task_split_type['task_splitting_algorithm'] ||
                     splitTasksSelection === task_split_type['choose_area_as_task']) && (
-                    <p className="fmtm-text-gray-500 fmtm-mt-5">
-                      Total number of task: <span className="fmtm-font-bold">{totalSteps}</span>
-                    </p>
+                    <div>
+                      <p className="fmtm-text-gray-500 fmtm-mt-5">
+                        Total number of task: <span className="fmtm-font-bold">{totalSteps}</span>
+                      </p>
+                    </div>
                   )}
                 </div>
                 <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">

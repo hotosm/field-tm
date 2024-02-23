@@ -28,7 +28,6 @@ function UploadAreaValidation(values: ProjectValues) {
     errors.uploadedAreaFile = 'Uploaded Area File is Required.';
   }
 
-  console.log(errors);
   return errors;
 }
 
