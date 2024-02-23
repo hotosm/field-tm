@@ -90,7 +90,7 @@ async def download_submission(
         Union[list[dict], File]: JSON of submissions, or submission file.
     """
     if not (task_id or export_json):
-        file = submission_crud.gather_all_submission_csvs(db, project_id)
+        file = await submission_crud.gather_all_submission_csvs(db, project_id)
         return FileResponse(file)
 
     return await submission_crud.download_submission(
