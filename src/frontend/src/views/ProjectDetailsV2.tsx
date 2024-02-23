@@ -32,6 +32,7 @@ import getTaskStatusStyle from '@/utilfunctions/getTaskStatusStyle';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MapLegends from '@/components/MapLegends';
 import Accordion from '@/components/common/Accordion';
+import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import { Geolocation } from '@capacitor/geolocation';
 import { Icon, Style } from 'ol/style';
 import { Motion } from '@capacitor/motion';
@@ -40,6 +41,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
 import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
+import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 
 const Home = () => {
@@ -49,7 +51,6 @@ const Home = () => {
   const { windowSize, type } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
-  const [taskId, setTaskId] = useState();
   const [mainView, setView] = useState();
   const [featuresLayer, setFeaturesLayer] = useState();
   const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
@@ -65,6 +66,7 @@ const Home = () => {
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo = CoreModules.useAppSelector((state) => state.home.selectedProject);
+  const selectedTask = CoreModules.useAppSelector((state) => state.task.selectedTask);
   const stateSnackBar = CoreModules.useAppSelector((state) => state.home.snackbar);
   const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -135,8 +137,31 @@ const Home = () => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
   }, []);
 
-  // TasksLayer(map, mainView, featuresLayer);
-  const projectClickOnMap = (properties, feature) => {
+  const dataExtractDataPopup = (properties: dataExtractPropertyType) => {
+    return (
+      <div className="fmtm-h-fit">
+        <h2 className="fmtm-border-b-[2px] fmtm-border-primaryRed fmtm-w-fit fmtm-pr-1">
+          OSM ID: #{properties?.osm_id}
+        </h2>
+        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
+          <p>
+            Tags: <span className="fmtm-text-primaryRed">{properties?.tags}</span>
+          </p>
+          <p>
+            Timestamp: <span className="fmtm-text-primaryRed">{properties?.timestamp}</span>
+          </p>
+          <p>
+            Changeset: <span className="fmtm-text-primaryRed">{properties?.changeset}</span>
+          </p>
+          <p>
+            Version: <span className="fmtm-text-primaryRed">{properties?.version}</span>
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const projectClickOnMapTask = (properties, feature) => {
     setFeaturesLayer(feature, 'feature');
     let extent = properties.geometry.getExtent();
 
@@ -147,7 +172,9 @@ const Home = () => {
       block: 'center',
       behavior: 'smooth',
     });
-    setTaskId(properties.uid);
+
+    dispatch(CoreModules.TaskActions.SetSelectedTask(properties.uid));
+
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
     if (windowSize.width < 768) {
       map.getView().fit(extent, {
@@ -382,7 +409,7 @@ const Home = () => {
                     duration: 2000,
                   }}
                   layerProperties={{ name: 'project-area' }}
-                  mapOnClick={projectClickOnMap}
+                  mapOnClick={projectClickOnMapTask}
                   zoomToLayer
                   zIndex={5}
                   getTaskStatusStyle={(feature) => getTaskStatusStyle(feature, mapTheme)}
@@ -403,6 +430,7 @@ const Home = () => {
                   zIndex={5}
                 />
               )}
+              <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} />
               {geolocationStatus && currentCoordinate?.latitude && currentCoordinate?.longitude && (
                 <VectorLayer
                   map={map}
@@ -485,11 +513,11 @@ const Home = () => {
       </div>
       {featuresLayer != undefined && (
         <TaskSectionPopup
-          taskId={taskId}
+          taskId={selectedTask}
           feature={featuresLayer}
           body={
             <div>
-              <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
+              <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={selectedTask} />
             </div>
           }
         />

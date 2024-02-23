@@ -15,7 +15,7 @@ import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
-import { taskFeaturePropertyType, taskInfoType } from '@/models/submission/submissionModel';
+import { taskFeaturePropertyType, taskInfoType } from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 
 export const defaultStyles = {

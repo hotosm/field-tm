@@ -14,6 +14,7 @@ type asyncPopupPropType = {
   closePopup?: any;
   loading?: boolean;
   showOnHover?: string;
+  primaryKey: string;
 };
 
 function hasKey(obj, key) {
@@ -33,6 +34,7 @@ const AsyncPopup = ({
   closePopup = false,
   loading = false,
   showOnHover = 'click',
+  primaryKey = 'uid',
 }: asyncPopupPropType) => {
   const popupRef = useRef<any>(null);
   const popupCloserRef = useRef<any>(null);
@@ -111,8 +113,11 @@ const AsyncPopup = ({
         return;
       }
       const featureProperties = features[0].getProperties();
-      const { uid } = featureProperties;
-      if (layerIds.includes(uid) || (hasKey(featureProperties, 'uid') && featureProperties?.uid)) {
+      const { [primaryKey]: primaryKeyValue } = featureProperties;
+      if (
+        layerIds.includes(primaryKeyValue) ||
+        (hasKey(featureProperties, primaryKey) && featureProperties?.[primaryKey])
+      ) {
         setProperties(featureProperties);
         setCoordinates(coordinate);
       } else {
