@@ -50,6 +50,7 @@ export const initialState: CreateProjectStateTypes = {
   isTasksGenerated: { divide_on_square: false, task_splitting_algorithm: false },
   isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
+  customFileValidity: false,
 };
 
 const CreateProject = createSlice({
@@ -228,6 +229,9 @@ const CreateProject = createSlice({
     },
     SetToggleSplittedGeojsonEdit(state, action) {
       state.toggleSplittedGeojsonEdit = action.payload;
+    },
+    SetCustomFileValidity(state, action) {
+      state.customFileValidity = action.payload;
     },
   },
 });
