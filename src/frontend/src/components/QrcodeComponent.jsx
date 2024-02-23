@@ -2,7 +2,7 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
-const TasksComponent = ({ qrcode }) => {
+const TasksComponent = ({ qrcode, taskId }) => {
   return (
     <div className="fmtm-flex fmtm-justify-center fmtm-py-5 fmtm-border-t-[1px]">
       <div className="fmtm-p-5 fmtm-border-[1px] fmtm-rounded-lg fmtm-relative">
@@ -16,7 +16,7 @@ const TasksComponent = ({ qrcode }) => {
             onClick={() => {
               const downloadLink = document.createElement('a');
               downloadLink.href = qrcode;
-              downloadLink.download = `Task_${task}`;
+              downloadLink.download = `Task_${taskId}`;
               downloadLink.click();
             }}
             disabled={qrcode == '' ? true : false}

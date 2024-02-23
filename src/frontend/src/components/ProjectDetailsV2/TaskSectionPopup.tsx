@@ -74,7 +74,9 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
           <h4 className="fmtm-text-lg fmtm-font-bold">Task: {taskId}</h4>
           <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_status}</p>
         </div>
-        {checkIfTaskAssignedOrNot && task_status !== 'LOCKED_FOR_MAPPING' && <QrcodeComponent qrcode={qrcode} />}
+        {checkIfTaskAssignedOrNot && task_status !== 'LOCKED_FOR_MAPPING' && (
+          <QrcodeComponent qrcode={qrcode} taskId={taskId} />
+        )}
         {body}
       </div>
     </div>
