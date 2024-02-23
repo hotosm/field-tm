@@ -440,7 +440,7 @@ CREATE TABLE public.tasks (
     project_task_name character varying,
     outline public.geometry(Polygon,4326),
     geometry_geojson character varying,
-    initial_feature_count integer,
+    feature_count integer,
     task_status public.taskstatus,
     locked_by bigint,
     mapped_by bigint,

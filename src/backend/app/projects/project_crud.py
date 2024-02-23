@@ -618,7 +618,7 @@ async def update_project_boundary(
             # project_task_index=feature["properties"]["fid"],
             project_task_index=index,
             # geometry_geojson=geojson.dumps(task_geojson),
-            # initial_feature_count=len(task_geojson["features"]),
+            # feature_count=len(task_geojson["features"]),
         )
         db.add(db_task)
         db.commit()
@@ -790,7 +790,7 @@ async def update_project_boundary(
 #                     qr_code_id=db_qr.id,
 #                     outline=task_outline_shape.wkt,
 #                     # geometry_geojson=json.dumps(task_geojson),
-#                     initial_feature_count=len(task_geojson["features"]),
+#                     feature_count=len(task_geojson["features"]),
 #                 )
 #                 db.add(task)
 
@@ -1155,8 +1155,6 @@ def generate_task_files(
     task.odk_token = encrypt_value(
         f"{odk_credentials.odk_central_url}/v1/key/{appuser_token}/projects/{odk_id}"
     )
-    db.commit()
-    db.refresh(task)
 
     # This file will store xml contents of an xls form.
     xform = f"/tmp/{appuser_name}.xml"
@@ -1185,6 +1183,7 @@ def generate_task_files(
         odk_credentials,
         False,
     )
+    task.feature_count = len(data_extract.get("features", []))
 
     project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
@@ -1196,6 +1195,8 @@ def generate_task_files(
         log.exception(e)
 
     project.extract_completed_count += 1
+
+    # Commit db transaction
     db.commit()
     db.refresh(project)
 
