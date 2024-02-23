@@ -178,7 +178,7 @@ export const fetchConvertToOsmDetails: Function = (url: string) => {
   };
 };
 
-export const ConvertXMLToJOSM: Function = (url: string, projectBbox) => {
+export const ConvertXMLToJOSM: Function = (url: string, projectBbox: number[]) => {
   return async (dispatch) => {
     dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(true));
     const getConvertXMLToJOSM = async (url) => {
