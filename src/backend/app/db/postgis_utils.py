@@ -278,34 +278,35 @@ async def split_geojson_by_task_areas(
         WHERE tasks.project_id = :project_id;
 
         -- Retrieve task outlines based on the provided project_id
-        WITH task_outlines AS (
-            SELECT id, outline
-            FROM tasks
-            WHERE project_id = :project_id
-        )
         SELECT
-            task_outlines.id AS task_id,
+            tasks.id AS task_id,
             jsonb_build_object(
                 'type', 'FeatureCollection',
-                'features', jsonb_agg(features.feature)
+                'features', jsonb_agg(feature)
             ) AS task_features
         FROM
-            task_outlines
+            tasks
         LEFT JOIN LATERAL (
-            -- Construct a feature collection with geometries per task area
             SELECT
                 jsonb_build_object(
                     'type', 'Feature',
                     'geometry', ST_AsGeoJSON(temp_features.geometry)::jsonb,
                     'properties', temp_features.properties
                 ) AS feature
-            FROM
-                temp_features
+            FROM (
+                SELECT DISTINCT ON (geometry)
+                    id,
+                    geometry,
+                    properties
+                FROM temp_features
+            ) AS temp_features
             WHERE
-                ST_Within(temp_features.geometry, task_outlines.outline)
-        ) AS features ON true
+                ST_Within(temp_features.geometry, tasks.outline)
+        ) AS feature ON true
+        WHERE
+            tasks.project_id = :project_id
         GROUP BY
-            task_outlines.id;
+            tasks.id;
         """
     )
 
