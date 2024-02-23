@@ -22,7 +22,6 @@ function SelectFormValidation(values: ProjectValues) {
     errors.customFormUpload = 'Form needs to be Uploaded.';
   }
 
-  console.log(errors);
   return errors;
 }
 
