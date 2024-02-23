@@ -48,7 +48,7 @@ from app.auth.osm import AuthUser, login_required
 from app.auth.roles import mapper, org_admin, project_admin, super_admin
 from app.central import central_crud
 from app.db import database, db_models
-from app.db.postgis_utils import check_crs
+from app.db.postgis_utils import check_crs, parse_and_filter_geojson
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -455,8 +455,12 @@ async def task_split(
     # read data extract
     parsed_extract = None
     if extract_geojson:
-        parsed_extract = geojson.loads(await extract_geojson.read())
-        await check_crs(parsed_extract)
+        geojson_data = json.dumps(json.loads(await extract_geojson.read()))
+        parsed_extract = parse_and_filter_geojson(geojson_data, filter=False)
+        if parsed_extract:
+            await check_crs(parsed_extract)
+        else:
+            log.warning("Parsed geojson file contained no geometries")
 
     return await project_crud.split_geojson_into_tasks(
         db,

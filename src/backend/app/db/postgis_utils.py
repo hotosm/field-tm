@@ -339,6 +339,7 @@ def parse_and_filter_geojson(
 ) -> Optional[geojson.FeatureCollection]:
     """Parse geojson string and filter out incomaptible geometries."""
     geojson_parsed = geojson.loads(geojson_str)
+
     if isinstance(geojson_parsed, geojson.FeatureCollection):
         log.debug("Already in FeatureCollection format, skipping reparse")
         featcol = geojson_parsed
@@ -352,8 +353,17 @@ def parse_and_filter_geojson(
         )
 
     # Exit early if no geoms
-    if not featcol.get("features", []):
+    if not (features := featcol.get("features", [])):
         return None
+
+    # Strip out GeometryCollection wrappers
+    for feat in features:
+        geom = feat.get("geometry")
+        if (
+            geom.get("type") == "GeometryCollection"
+            and len(geom.get("geometries")) == 1
+        ):
+            feat["geometry"] = geom.get("geometries")[0]
 
     # Return unfiltered featcol
     if not filter:
@@ -363,7 +373,7 @@ def parse_and_filter_geojson(
     geom_type = get_featcol_main_geom_type(featcol)
     features_filtered = [
         feature
-        for feature in featcol.get("features", [])
+        for feature in features
         if feature.get("geometry", {}).get("type", "") == geom_type
     ]
 
@@ -412,9 +422,11 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
 
     if (input_geojson_type := input_geojson.get("type")) == "FeatureCollection":
         features = input_geojson.get("features", [])
+        log.warning(features[-1])
         coordinates = (
             features[-1].get("geometry", {}).get("coordinates", []) if features else []
         )
+        log.warning(coordinates)
     elif input_geojson_type == "Feature":
         coordinates = input_geojson.get("geometry", {}).get("coordinates", [])
     else:
