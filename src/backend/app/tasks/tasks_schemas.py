@@ -73,7 +73,7 @@ class Task(BaseModel):
     project_task_name: Optional[str]
     outline_geojson: Optional[GeojsonFeature] = None
     outline_centroid: Optional[GeojsonFeature] = None
-    initial_feature_count: Optional[int] = None
+    feature_count: Optional[int] = None
     task_status: TaskStatus
     locked_by_uid: Optional[int] = None
     locked_by_username: Optional[str] = None
