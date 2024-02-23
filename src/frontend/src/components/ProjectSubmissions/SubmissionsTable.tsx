@@ -198,7 +198,7 @@ const SubmissionsTable = ({ toggleView }) => {
     dispatch(
       ConvertXMLToJOSM(
         `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${decodedId}`,
-        projectInfo.outline_geojson.bbox,
+        projectInfo?.outline_geojson?.properties?.bbox,
       ),
     );
   };
