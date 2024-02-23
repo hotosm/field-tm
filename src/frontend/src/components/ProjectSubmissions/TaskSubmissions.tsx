@@ -5,7 +5,7 @@ import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
 import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
-import { taskInfoType } from '@/models/submission/submissionModel';
+import { taskInfoType } from '@/models/task/taskModel';
 import { useSearchParams } from 'react-router-dom';
 
 const TaskSubmissions = () => {

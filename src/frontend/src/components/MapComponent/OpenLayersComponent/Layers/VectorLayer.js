@@ -221,13 +221,6 @@ const VectorLayer = ({
     if (feature) {
       // Extract properties
       const properties = feature.getProperties();
-      // Remove geometry key if properties are present
-      // If no properties are set, the feature uid is included
-      if (!('uid' in properties)) {
-        const { geometry, ...restProperties } = properties;
-        mapOnClick(restProperties, feature);
-        return;
-      }
       mapOnClick(properties, feature);
     }
   }
