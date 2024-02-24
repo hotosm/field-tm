@@ -31,7 +31,6 @@ repos:
             "!chart/**",
             "!CHANGELOG.md",
             "!CONTRIBUTING.md",
-            "!LICENSE.md",
             "!src/frontend/pnpm-lock.yaml",
             "!src/backend/tests/test_data/**",
           ]
@@ -70,14 +69,4 @@ repos:
     hooks:
       - id: markdownlint
         args:
-          [
-            --fix,
-            --disable,
-            MD033,
-            --ignore,
-            LICENSE.md,
-            --ignore,
-            CHANGELOG.md,
-            --ignore,
-            .github,
-          ]
+          [--fix, --disable, MD033, --ignore, CHANGELOG.md, --ignore, .github]
