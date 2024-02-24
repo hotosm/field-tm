@@ -152,6 +152,21 @@ CREATE TYPE public.projectvisibility AS ENUM (
 );
 ALTER TYPE public.projectvisibility OWNER TO fmtm;
 
+CREATE TYPE public.tasksplittype AS ENUM (
+    'DIVIDE_ON_SQUARE',
+    'CHOOSE_AREA_AS_TASK',
+    'TASK_SPLITTING_ALGORITHM'
+);
+ALTER TYPE public.tasksplittype OWNER TO fmtm;
+
+CREATE TYPE public.communitytype AS ENUM (
+    'OSM_COMMUNITY',
+    'COMPANY',
+    'NON_PROFIT',
+    'UNIVERSITY',
+    'OTHER'
+);
+ALTER TYPE public.communitytype OWNER TO fmtm;
 
 
 -- Extra
@@ -257,7 +272,9 @@ CREATE TABLE public.organisations (
     logo character varying,
     description character varying,
     url character varying,
-    type public.organisationtype NOT NULL,
+    type public.organisationtype DEFAULT 'FREE',
+    community_type public.communitytype DEFAULT 'OSM_COMMUNITY',
+    created_by integer,
     approved BOOLEAN DEFAULT false,
     odk_central_url character varying,
     odk_central_user character varying,
@@ -352,7 +369,7 @@ CREATE TABLE public.projects (
     form_config_file bytea,
     data_extract_type character varying,
     data_extract_url character varying,
-    task_split_type character varying,
+    task_split_type public.tasksplittype,
     hashtags character varying[]
 );
 ALTER TABLE public.projects OWNER TO fmtm;
@@ -502,6 +519,7 @@ CREATE TABLE public.users (
     name character varying,
     city character varying,
     country character varying,
+    profile_img character varying,
     email_address character varying,
     is_email_verified boolean,
     is_expert boolean,
