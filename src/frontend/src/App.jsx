@@ -75,7 +75,7 @@ const GlobalInit = () => {
 
 const SentryInit = () => {
   useEffect(() => {
-    if (import.meta.env.MODE === 'development') {
+    if (import.meta.env.MODE === 'development' || import.meta.env.BASE_URL !== 'fmtm.hotosm.org') {
       return;
     }
     console.log('Adding Sentry');
@@ -83,14 +83,11 @@ const SentryInit = () => {
     import('@sentry/react').then((Sentry) => {
       // Init Sentry
       Sentry.init({
-        dsn:
-          import.meta.env.BASE_URL === 'fmtm.hotosm.org'
-            ? 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928'
-            : 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
+        dsn: 'https://35c80d0894e441f593c5ac5dfa1094a0@o68147.ingest.sentry.io/4505557311356928',
         integrations: [
           new Sentry.BrowserTracing({
             // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-            tracePropagationTargets: ['https://fmtm.naxa.com.np/', 'https://fmtm.hotosm.org/'],
+            tracePropagationTargets: ['https://fmtm.hotosm.org/'],
           }),
           new Sentry.Replay(),
         ],
