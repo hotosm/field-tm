@@ -101,8 +101,15 @@ check_if_missing_migrations() {
     ")
     echo "Existing migrations: ${existing_scripts}"
 
-    # Iterate through files under /opt/migrations
-    for script_file in /opt/migrations/*.sql; do
+    # Check if there are .sql files under /opt/migrations and iterate
+    migration_files=$(find /opt/migrations -maxdepth 1 -type f -name '*.sql')
+    if [ -z "$migration_files" ]; then
+        echo "No migration scripts found in /opt/migrations directory."
+        return
+    fi
+
+    # Iterate through migration files
+    for script_file in $migration_files; do
         # Extract the script name from the file path
         script_name=$(basename "$script_file")
 
