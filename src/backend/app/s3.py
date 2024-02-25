@@ -23,6 +23,18 @@ def s3_client():
         settings.S3_SECRET_KEY,
         secure=is_secure,
     )
+    # For AWS Instance Profile usage, but doesn't seem to work...
+    # from minio.credentials import IamAwsProvider
+    # return Minio(
+    #     "s3.amazonaws.com",
+    #     secure=True,
+    #     credentials=IamAwsProvider()
+    # )
+    # NOTE however this seems to generate creds without issue
+    # provider = IamAwsProvider()
+    # creds = provider.retrieve()
+    # print(creds.access_key)
+    # print(creds.secret_key)
 
 
 def add_file_to_bucket(bucket_name: str, file_path: str, s3_path: str):
