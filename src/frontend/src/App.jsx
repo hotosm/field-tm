@@ -24,10 +24,14 @@ const SUPPRESSED_WARNINGS = [
 ];
 
 console.error = function filterWarnings(msg, ...args) {
-  if (!SUPPRESSED_WARNINGS.some((entry) => msg.includes(entry))) {
+  if (typeof msg !== 'string') {
+    // Unhandled exception type
+    consoleError(msg, ...args);
+  } else if (!SUPPRESSED_WARNINGS.some((entry) => msg.includes(entry))) {
     consoleError(msg, ...args);
   }
 };
+
 axios.interceptors.request.use(
   (config) => {
     // Do something before request is sent
@@ -46,30 +50,12 @@ axios.interceptors.request.use(
     // Do something with request error
     Promise.reject(error),
 );
+
 const GlobalInit = () => {
   useEffect(() => {
-    console.log('adding interceptors');
-    axios.interceptors.request.use(
-      (config) => {
-        // Do something before request is sent
-
-        // const excludedDomains = ['xxx', 'xxx'];
-        // const urlIsExcluded = excludedDomains.some((domain) => config.url.includes(domain));
-        // if (!urlIsExcluded) {
-        //   config.withCredentials = true;
-        // }
-
-        config.withCredentials = true;
-
-        return config;
-      },
-      (error) =>
-        // Do something with request error
-        Promise.reject(error),
-    );
+    // Do stuff at init here
     return () => {};
   }, []);
-
   return null; // Renders nothing
 };
 
@@ -111,6 +97,8 @@ const MatomoTrackingInit = () => {
     if (import.meta.env.MODE === 'development' || import.meta.env.BASE_URL !== 'fmtm.hotosm.org') {
       return;
     }
+    console.log('Adding Matomo');
+
     // Set matomo tracking id
     window.site_id = environment.matomoTrackingId;
 
