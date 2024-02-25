@@ -370,6 +370,8 @@ CREATE TABLE public.projects (
     data_extract_type character varying,
     data_extract_url character varying,
     task_split_type public.tasksplittype,
+    task_split_dimension smallint,
+    task_num_buildings smallint,
     hashtags character varying[]
 );
 ALTER TABLE public.projects OWNER TO fmtm;
