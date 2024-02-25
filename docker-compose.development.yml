@@ -115,6 +115,7 @@ services:
       args:
         APP_VERSION: ${GIT_BRANCH}
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
+        NODE_ENV: development
     volumes:
       - fmtm_frontend:/frontend
     network_mode: none
