@@ -281,7 +281,7 @@ async def test_generate_project_files(db, client, project):
             functools.partial(
                 project_crud.generate_task_files,
                 db,
-                project_id,
+                project,
                 task_id,
                 split_extract_dict[task_id],
                 xlsform_file,
