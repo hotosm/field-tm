@@ -47,8 +47,8 @@ wait_for_s3 &
 # Wait until checks complete
 wait
 
-# Skip init S3 if env var present and not empty
-if [ -z "${S3_SKIP_BUCKET_INIT+x}" ]; then
+# Skip init S3 if env var present
+if [ "${S3_SKIP_BUCKET_INIT}" != true ]; then
     create_s3_buckets
 fi
 
