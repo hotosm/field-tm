@@ -132,6 +132,7 @@ services:
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    command: -c 'max_connections=300'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
