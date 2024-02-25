@@ -1110,7 +1110,7 @@ def flatten_dict(d, parent_key="", sep="_"):
 # NOTE defined as non-async to run in separate thread
 def generate_task_files(
     db: Session,
-    project_id: int,
+    project: db_models.DbProject,
     task_id: int,
     data_extract: FeatureCollection,
     xlsform: str,
@@ -1118,12 +1118,9 @@ def generate_task_files(
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
     """Generate all files for a task."""
-    project_log = log.bind(task="create_project", project_id=project_id)
+    project_log = log.bind(task="create_project", project_id=project.id)
 
     project_log.info(f"Generating files for task {task_id}")
-
-    get_project_sync = async_to_sync(get_project)
-    project = get_project_sync(db, project_id)
 
     odk_id = project.odkid
     project_name = project.project_name_prefix
@@ -1133,7 +1130,7 @@ def generate_task_files(
     # Create an app user for the task
     project_log.info(
         f"Creating odkcentral app user ({appuser_name}) "
-        f"for FMTM task ({task_id}) in FMTM project ({project_id})"
+        f"for FMTM task ({task_id}) in FMTM project ({project.id})"
     )
     appuser = OdkAppUser(
         odk_credentials.odk_central_url,
@@ -1198,7 +1195,7 @@ def generate_task_files(
 
     # Commit db transaction
     db.commit()
-    db.refresh(project)
+    # db.refresh(project)
 
     return True
 
@@ -1295,7 +1292,7 @@ def generate_project_files(
             try:
                 generate_task_files(
                     next(get_db()),
-                    project_id,
+                    project,
                     task_id,
                     split_extract_dict[task_id],
                     xlsform,
