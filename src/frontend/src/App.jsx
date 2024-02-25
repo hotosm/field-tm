@@ -24,9 +24,8 @@ const SUPPRESSED_WARNINGS = [
 ];
 
 console.error = function filterWarnings(msg, ...args) {
-  if (typeof msg !== 'string') {
-    // Unhandled exception type
-    consoleError(msg, ...args);
+  if (!msg) {
+    consoleError(...args);
   } else if (!SUPPRESSED_WARNINGS.some((entry) => msg.includes(entry))) {
     consoleError(msg, ...args);
   }
