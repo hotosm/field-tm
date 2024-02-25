@@ -92,6 +92,9 @@ jobs:
           echo "TAG_OVERRIDE=${TAG_OVERRIDE}" >> .env
 
       - name: Backend smoke test
+        env:
+          # Hardcode replicas=1 for test
+          API_REPLICAS: 1
         run: |
           # Migrate db first, so api works
           docker compose up migrations --exit-code-from migrations
