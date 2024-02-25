@@ -102,27 +102,27 @@ COPY container-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 COPY templates/cert-init/fmtm.conf.template \
      templates/cert-init/api.conf.template \
+     templates/cert-init/minio.conf.template \
      /etc/nginx/templates/
 
 
 
 FROM certs-init-main as certs-init-development
 COPY templates/cert-init/odk.conf.template \
-     templates/cert-init/minio.conf.template \
      /etc/nginx/templates/
 
 
 
 FROM base as main
-# API & Frontend only
+# API, Frontend, S3
 COPY templates/fmtm.conf.template \
      templates/api.conf.template \
+     templates/minio.conf.template \
      /etc/nginx/templates/
 
 
 
 FROM main as development
-# API, Frontend, ODK, S3
+# API, Frontend, S3 + ODK
 COPY templates/odk.conf.template \
-     templates/minio.conf.template \
      /etc/nginx/templates/
