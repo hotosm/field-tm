@@ -159,7 +159,9 @@ async def geojson_to_flatgeobuf(
     )
 
     # Run the SQL
-    result = db.execute(text(sql), {"geojson": json.dumps(geojson)})
+    log.warning(json.dumps(geojson))
+
+    result = db.execute(sql, {"geojson": json.dumps(geojson)})
     # Get a memoryview object, then extract to Bytes
     flatgeobuf = result.first()
 
@@ -438,11 +440,9 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
 
     if (input_geojson_type := input_geojson.get("type")) == "FeatureCollection":
         features = input_geojson.get("features", [])
-        log.warning(features[-1])
         coordinates = (
             features[-1].get("geometry", {}).get("coordinates", []) if features else []
         )
-        log.warning(coordinates)
     elif input_geojson_type == "Feature":
         coordinates = input_geojson.get("geometry", {}).get("coordinates", [])
     else:
