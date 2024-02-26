@@ -61,6 +61,7 @@ async def check_access(
     Access is determined based on the user's role and permissions:
     - If the user has an 'ADMIN' role, access is granted.
     - If the user has a 'READ_ONLY' role, access is denied.
+    - If the organisation is the public beta, then grant access.
     - For other roles, access is granted if the user is an organisation manager
       for the specified organisation (org_id) or has the specified role
       in the specified project (project_id).
@@ -86,6 +87,12 @@ async def check_access(
                 CASE
                     WHEN role = 'ADMIN' THEN true
                     WHEN role = 'READ_ONLY' THEN false
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM organisations
+                        WHERE organisations.id = :org_id
+                        AND organisations.slug = 'fmtm-public-beta'
+                    ) THEN true
                     ELSE
                         EXISTS (
                             SELECT 1
@@ -112,43 +119,6 @@ async def check_access(
             "project_id": project_id,
             "org_id": org_id,
             "role": getattr(role, "name", None),
-        },
-    )
-    db_user = result.first()
-
-    if db_user:
-        return DbUser(**db_user._asdict())
-
-    return None
-
-
-async def is_public_beta(
-    org_id: Optional[int],
-    user: Union[AuthUser, int],
-    db: Session,
-) -> Optional[DbUser]:
-    """Bypass organisation manager check if public beta org."""
-    user_id = user if isinstance(user, int) else await get_uid(user)
-
-    sql = text(
-        """
-        SELECT *
-        FROM public.users
-        WHERE EXISTS (
-            SELECT 1
-            FROM organisations
-            WHERE organisations.id = :org_id
-            AND organisations.slug = 'fmtm-public-beta'
-        )
-        AND id = :user_id;
-    """
-    )
-
-    result = db.execute(
-        sql,
-        {
-            "user_id": user_id,
-            "org_id": org_id,
         },
     )
     db_user = result.first()
@@ -192,10 +162,6 @@ async def check_org_admin(
         dict: in format {'user': DbUser, 'org': DbOrganisation}.
     """
     db_org = await check_org_exists(db, org_id)
-
-    # First check if public beta
-    if db_user := await is_public_beta(org_id, user, db):
-        return {"user": db_user, "org": db_org}
 
     # Check if org admin, or super admin
     db_user = await check_access(
