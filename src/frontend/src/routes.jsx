@@ -1,8 +1,5 @@
 import React, { Suspense } from 'react';
-import {
-  createBrowserRouter,
-  // Navigate,
-} from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import Home from '@/views/Home';
 import Tabbed from '@/views/Tabbed';
 import MainView from '@/views/MainView';
@@ -23,7 +20,6 @@ import ManageProject from '@/views/ManageProject';
 
 const Submissions = React.lazy(() => import('./views/Submissions'));
 const Tasks = React.lazy(() => import('./views/Tasks'));
-const ProjectInfo = React.lazy(() => import('./views/ProjectInfo'));
 
 const routes = createBrowserRouter([
   {
@@ -89,20 +85,6 @@ const routes = createBrowserRouter([
           </ErrorBoundary>
         ),
       },
-
-      {
-        path: '/projectInfo/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div></div>}>
-              <ErrorBoundary>
-                <ProjectInfo />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-
       {
         path: '/project-submissions/:projectId',
         element: (
