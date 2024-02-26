@@ -267,8 +267,22 @@ async def split_geojson_by_task_areas(
         SELECT
             ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326) AS geometry,
             jsonb_set(
-                jsonb_set(feature->'properties', '{task_id}', to_jsonb(tasks.id), true),
-                '{project_id}', to_jsonb(tasks.project_id), true
+                jsonb_set(
+                    jsonb_set(
+                        jsonb_set(
+                            feature->'properties',
+                            '{task_id}', to_jsonb(tasks.id), true
+                        ),
+                        '{project_id}', to_jsonb(tasks.project_id), true
+                    ),
+                    '{id}', to_jsonb(tasks.id), true
+                ),
+                '{title}', to_jsonb(CONCAT(
+                    'project_',
+                    :project_id,
+                    '_task_',
+                    tasks.id
+                )), true
             ) AS properties
         FROM (
             SELECT jsonb_array_elements(CAST(:geojson_featcol AS jsonb)->'features')
