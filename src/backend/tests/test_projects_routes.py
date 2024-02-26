@@ -55,7 +55,7 @@ async def test_create_project(client, admin_user, organisation):
 
     project_data = {
         "project_info": {
-            "name": "test project",
+            "name": "Test Project",
             "short_description": "test",
             "description": "test",
         },

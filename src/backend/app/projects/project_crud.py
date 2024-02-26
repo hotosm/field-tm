@@ -203,7 +203,7 @@ async def partial_update_project_info(
     # Update project informations
     if db_project and db_project_info:
         if project_metadata.name:
-            db_project.project_name_prefix = project_metadata.name
+            db_project.project_name_prefix = project_metadata.project_name_prefix
             db_project_info.name = project_metadata.name
         if project_metadata.description:
             db_project_info.description = project_metadata.description
@@ -249,7 +249,7 @@ async def update_project_info(
 
     # Update author of the project
     db_project.author_id = db_user.id
-    db_project.project_name_prefix = project_info.name
+    db_project.project_name_prefix = project_metadata.project_name_prefix
 
     # get project info
     db_project_info = await get_project_info_by_id(db, project_id)
@@ -298,7 +298,6 @@ async def create_project_with_project_info(
     db_project = db_models.DbProject(
         author_id=current_user.id,
         odkid=odk_project_id,
-        project_name_prefix=project_name,
         **project_metadata.model_dump(exclude=["project_info", "outline_geojson"]),
     )
     db.add(db_project)
