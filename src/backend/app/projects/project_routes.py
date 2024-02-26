@@ -269,6 +269,7 @@ async def create_project(
     )
 
     # Must decrypt ODK password & connect to ODK Central before proj created
+    # cannot use get_odk_credentials helper as no project id yet
     if project_info.odk_central_url:
         odk_creds_decrypted = project_schemas.ODKCentralDecrypted(
             odk_central_url=project_info.odk_central_url,
@@ -822,7 +823,7 @@ async def get_or_set_data_extract(
     url: Optional[str] = None,
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    project_user_dict: db_models.DbUser = Depends(project_admin),
+    org_user_dict: db_models.DbUser = Depends(project_admin),
 ):
     """Get or set the data extract URL for a project."""
     fgb_url = await project_crud.get_or_set_data_extract_url(
@@ -839,7 +840,7 @@ async def upload_custom_extract(
     custom_extract_file: UploadFile = File(...),
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    project_user_dict: db_models.DbUser = Depends(project_admin),
+    org_user_dict: db_models.DbUser = Depends(project_admin),
 ):
     """Upload a custom data extract geojson for a project.
 

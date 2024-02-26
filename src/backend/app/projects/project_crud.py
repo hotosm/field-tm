@@ -1235,7 +1235,7 @@ def generate_project_files(
             )
 
         odk_sync = async_to_sync(project_deps.get_odk_credentials)
-        odk_credentials = odk_sync(db, project)
+        odk_credentials = odk_sync(db, project_id)
 
         if custom_form:
             log.debug("User provided custom XLSForm")
@@ -1672,7 +1672,7 @@ async def update_project_form(
     odk_id = project.odkid
 
     # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project)
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
 
     if form:
         xlsform = f"/tmp/custom_form.{form_type}"
