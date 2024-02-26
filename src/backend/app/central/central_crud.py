@@ -123,12 +123,15 @@ def list_odk_projects(
 def create_odk_project(
     name: str, odk_central: Optional[project_schemas.ODKCentralDecrypted] = None
 ):
-    """Create a project on a remote ODK Server."""
+    """Create a project on a remote ODK Server.
+
+    Appends FMTM to the project name to help identify on shared servers.
+    """
     project = get_odk_project(odk_central)
 
     try:
-        log.debug("Attempting ODKCentral project creation")
-        result = project.createProject(name)
+        log.debug(f"Attempting ODKCentral project creation: FMTM {name}")
+        result = project.createProject(f"FMTM {name}")
 
         # Sometimes createProject returns a list if fails
         if isinstance(result, dict):
