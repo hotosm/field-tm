@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import DialogTaskActions from '@/components/DialogTaskActions';
 import '../styles/home.scss';
 import CoreModules from '@/shared/CoreModules';
 import Control from 'ol/control/Control';
@@ -7,7 +6,6 @@ import locationImg from '@/assets/images/location.png';
 import accDownImg from '@/assets/images/acc-down.png';
 import accUpImg from '@/assets/images/acc-up.png';
 import gridIcon from '@/assets/images/grid.png';
-import QrcodeComponent from '@/components/QrcodeComponent';
 import * as ol from 'ol';
 import { Point } from 'ol/geom';
 import Vector from 'ol/layer/Vector';
@@ -16,10 +14,6 @@ import { transform } from 'ol/proj';
 import { Icon, Style } from 'ol/style';
 import LocationImage from '@/assets/images/location.png';
 import AssetModules from '@/shared/AssetModules';
-import { Modal } from '@/components/common/Modal';
-import Button from '@/components/common/Button';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
-import TaskSectionModal from '@/components/ProjectDetails/TaskSectionPopup';
 import VectorLayer from 'ol/layer/Vector';
 import WindowDimension from '@/hooks/WindowDimension';
 
@@ -91,9 +85,6 @@ const OpenLayersMap = ({
               setCurrentLocLayer(null);
             }
           }
-          // setToggleCurrentLoc(!toggleCurrentLoc);
-
-          // map.getView().setZoom(15);
         } else if (e.target.id == 'taskBoundries') {
           const layers = map.getAllLayers();
           let extent;
@@ -108,24 +99,6 @@ const OpenLayersMap = ({
           map.getView().fit(extent, {
             padding: [10, 10, 10, 10],
           });
-
-          // if (state.projectTaskBoundries.length != 0 && map != undefined) {
-          //   if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(params.id)) != -1) {
-          //     const index = state.projectTaskBoundries.findIndex(
-          //       (project) => project.id == environment.decode(params.id),
-          //     );
-          //     const centroid =
-          //       state.projectTaskBoundries[index].taskBoundries[
-          //         state.projectTaskBoundries[index].taskBoundries.length - 1
-          //       ].outline_centroid.geometry.coordinates;
-
-          //     mainView.animate({
-          //       center: centroid,
-          //       duration: 2000,
-          //       easing: elastic,
-          //     });
-          //   }
-          // }
 
           map.getTargetElement().classList.remove('spinner');
         }
@@ -218,11 +191,6 @@ const OpenLayersMap = ({
           color: defaultTheme.palette.mapFeatureColors.validated,
           status: 'none',
         },
-        // {
-        //   value: "Bad",
-        //   color: defaultTheme.palette.mapFeatureColors.bad,
-        //   status: "none",
-        // },
         {
           value: 'More mapping needed',
           color: defaultTheme.palette.mapFeatureColors.invalidated,
@@ -250,17 +218,12 @@ const OpenLayersMap = ({
       accUp.src = accUpImg;
       accUp.style.width = '18px';
       accUp.style.height = '18px';
-      // accUp.style.display = 'none';
-      // img.id = `${elmnt}`;
-      // legendAccIcon.addEventListener("click", function(){
 
-      // }, false);
       legendAccIcon.appendChild(img);
       legendAccIcon.appendChild(accUp);
       legendContainer.appendChild(legendLabel);
       legendContainer.appendChild(legendAccIcon);
 
-      // const legendContainer = document.getElementById('legendContainer');
       let legendContent = document.createElement('div');
       legendContent.className = 'legend-content';
       legendContent.style.display = 'none';
@@ -276,7 +239,6 @@ const OpenLayersMap = ({
         if (detail.type === 'locked') {
           const legendSquare = document.createElement('img');
           legendSquare.className = 'legend-lock-img';
-          // legendSquare.style.width = "20px";
           legendSquare.style.height = '20px';
           legendSquare.src = AssetModules.LockPng;
           legend.appendChild(legendText);
@@ -331,9 +293,7 @@ const OpenLayersMap = ({
     <CoreModules.Stack spacing={1} direction={'column'} className="fmtm-px-0 sm:fmtm-px-[1rem] sm:fmtm-py-[1rem]">
       <CoreModules.Stack
         id="project-details-map"
-        // style={{ border: `4px solid ${defaultTheme.palette.error.main}` }}
         justifyContent={'center'}
-        // height={608}
         className={`${
           windowSize.width <= 640
             ? 'fmtm-h-[100vh]'
@@ -341,30 +301,6 @@ const OpenLayersMap = ({
         }`}
       >
         <div ref={mapElement} id="map_container"></div>
-        {/* <div id="popup" className="ol-popup">
-          <a href="#" id="popup-closer" className="ol-popup-closer"></a>
-          {featuresLayer != undefined && (
-            <CoreModules.Stack>
-              <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
-              <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={windowType} />
-            </CoreModules.Stack>
-          )}
-        </div> */}
-        {/* {featuresLayer != undefined && (
-          <div>
-            <Modal
-              title={<p></p>}
-              description={
-                <div>
-                  <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={taskId} />
-                  <QrcodeComponent defaultTheme={defaultTheme} task={taskId} type={windowType} />
-                </div>
-              }
-              open={taskModalStatus}
-              onOpenChange={(value) => dispatch(ProjectActions.ToggleTaskModalStatus(value))}
-            />
-          </div>
-        )} */}
       </CoreModules.Stack>
     </CoreModules.Stack>
   );
