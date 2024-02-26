@@ -144,21 +144,21 @@ ReactDOM.render(
   document.getElementById('app'),
 );
 
-// Register service worker
-if (import.meta.env.MODE === 'production') {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/service-worker.js')
-        .then((registration) => {
-          console.log('ServiceWorker registered: ', registration);
-        })
-        .catch((error) => {
-          console.log('ServiceWorker registration failed: ', error);
-        });
-    });
-  }
-}
+// // Register service worker manually
+// if (import.meta.env.MODE === 'production') {
+//   if ('serviceWorker' in navigator) {
+//     window.addEventListener('load', () => {
+//       navigator.serviceWorker
+//         .register('/service-worker.js')
+//         .then((registration) => {
+//           console.log('ServiceWorker registered: ', registration);
+//         })
+//         .catch((error) => {
+//           console.log('ServiceWorker registration failed: ', error);
+//         });
+//     });
+//   }
+// }
 // if (import.meta.env.MODE === 'development') {
 //   navigator.serviceWorker.getRegistrations().then(function (registrations) {
 //     for (let registration of registrations) {
