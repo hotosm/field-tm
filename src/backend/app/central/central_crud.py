@@ -212,25 +212,18 @@ def upload_xform_media(
 
 
 def create_odk_xform(
-    project_id: int,
-    xform_name: str,
-    filespec: str,
+    odk_id: int,
+    xform_path: Path,
+    xform_category: str,
     feature_geojson: BytesIO,
-    odk_credentials: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
     create_draft: bool = False,
     convert_to_draft_when_publishing=True,
 ):
     """Create an XForm on a remote ODK Central server."""
-    title = os.path.basename(os.path.splitext(filespec)[0])
     # result = xform.createForm(project_id, title, filespec, True)
     # Pass odk credentials of project in xform
 
-    if not odk_credentials:
-        odk_credentials = project_schemas.ODKCentralDecrypted(
-            odk_central_url=settings.ODK_CENTRAL_URL,
-            odk_central_user=settings.ODK_CENTRAL_USER,
-            odk_central_password=settings.ODK_CENTRAL_PASSWD,
-        )
     try:
         xform = get_odk_form(odk_credentials)
     except Exception as e:
@@ -239,28 +232,29 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.createForm(project_id, xform_name, filespec, create_draft)
+    result = xform.createForm(odk_id, xform_path.stem, str(xform_path), create_draft)
 
     if result != 200 and result != 409:
         return result
 
     # TODO refactor osm_fieldwork.OdkCentral.OdkForm.uploadMedia
     # to accept passing a bytesio object and update
-    geojson_file = Path(f"/tmp/{title}.geojson")
-    with open(geojson_file, "w") as f:
-        f.write(feature_geojson.getvalue().decode("utf-8"))
+    geojson_path = Path(f"/tmp/fmtm/odk/{odk_id}/{xform_category}.geojson")
+    geojson_path.parents[0].mkdir(parents=True, exist_ok=True)
+    with open(geojson_path, "w") as geojson_file:
+        geojson_file.write(feature_geojson.getvalue().decode("utf-8"))
 
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     # Upload the geojson of features to be modified
     xform.uploadMedia(
-        project_id, title, str(geojson_file), convert_to_draft_when_publishing
+        odk_id, xform_path.stem, str(geojson_path), convert_to_draft_when_publishing
     )
 
     # Delete temp geojson file
-    geojson_file.unlink(missing_ok=True)
+    geojson_path.unlink(missing_ok=True)
 
-    result = xform.publishForm(project_id, title)
+    result = xform.publishForm(odk_id, xform_path.stem)
     return result
 
 
@@ -272,7 +266,7 @@ def delete_odk_xform(
 ):
     """Delete an XForm from a remote ODK Central server."""
     xform = get_odk_form(odk_central)
-    result = xform.deleteForm(project_id, xform_id, filespec, True)
+    result = xform.deleteForm(project_id, xform_id)
     # FIXME: make sure it's a valid project id
     return result
 
@@ -410,39 +404,36 @@ async def test_form_validity(xform_content: str, form_type: str):
 
 
 def generate_updated_xform(
-    xlsform: str,
-    xform: str,
-    form_type: str,
-):
+    input_path: str,
+    xform_path: Path,
+    form_file_extension: str,
+    form_category: str,
+) -> str:
     """Update the version in an XForm so it's unique."""
-    name = os.path.basename(xform).replace(".xml", "")
-    outfile = xform
-
-    log.debug(f"Reading xlsform: {xlsform}")
-    if form_type != "xml":
+    if form_file_extension != "xml":
         try:
-            xls2xform_convert(xlsform_path=xlsform, xform_path=outfile, validate=False)
+            log.debug(f"Reading & converting xlsform -> xform: {input_path}")
+            xls2xform_convert(
+                xlsform_path=input_path, xform_path=str(xform_path), validate=False
+            )
         except Exception as e:
-            log.error(f"Couldn't convert {xlsform} to an XForm!", str(e))
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            log.error(e)
+            msg = f"Couldn't convert {input_path} to an XForm!"
+            log.error(msg)
+            raise HTTPException(status_code=400, detail=msg) from e
 
-        if os.path.getsize(outfile) <= 0:
-            log.warning(f"{outfile} is empty!")
-            raise HTTPException(status=400, detail=f"{outfile} is empty!") from None
+        if xform_path.stat().st_size <= 0:
+            log.warning(f"{str(xform_path)} is empty!")
+            raise HTTPException(
+                status_code=400, detail=f"{str(xform_path)} is empty!"
+            ) from None
 
-        xls = open(outfile, "r")
-        data = xls.read()
-        xls.close()
+        with open(xform_path, "r") as xform:
+            data = xform.read()
     else:
-        xls = open(xlsform, "r")
-        data = xls.read()
-        xls.close()
-
-    tmp = name.split("_")
-    tmp[0]
-    tmp[1]
-    id = tmp[2].split(".")[0]
-    extract = f"jr://file/{name}.geojson"
+        with open(input_path, "r") as xlsform:
+            log.debug(f"Reading XForm directly: {str(input_path)}")
+            data = xlsform.read()
 
     # # Parse the XML to geojson
     # xml = xmltodict.parse(str(data))
@@ -479,41 +470,45 @@ def generate_updated_xform(
     #     index += 1
     # xml["h:html"]["h:head"]["h:title"] = name
 
+    log.debug("Updating XML keys in XForm with data extract file & form id")
     namespaces = {
         "h": "http://www.w3.org/1999/xhtml",
         "odk": "http://www.opendatakit.org/xforms",
         "xforms": "http://www.w3.org/2002/xforms",
     }
 
+    instances = []
     root = ElementTree.fromstring(data)
     head = root.find("h:head", namespaces)
-    model = head.find("xforms:model", namespaces)
-    instances = model.findall("xforms:instance", namespaces)
+    if head:
+        model = head.find("xforms:model", namespaces)
+        if model:
+            instances = model.findall("xforms:instance", namespaces)
 
-    index = 0
     for inst in instances:
         try:
             if "src" in inst.attrib:
-                if (inst.attrib["src"].split("."))[1] == "geojson":
-                    (inst.attrib)["src"] = extract
+                src_value = inst.attrib.get("src", "")
+                if src_value.endswith(".geojson"):
+                    inst.attrib["src"] = f"jr://file/{form_category}.geojson"
 
             # Looking for data tags
             data_tags = inst.findall("xforms:data", namespaces)
             if data_tags:
                 for dt in data_tags:
-                    dt.attrib["id"] = id
-        except Exception:
+                    if "id" in dt.attrib:
+                        dt.attrib["id"] = str(xform_path.stem)
+        except Exception as e:
+            log.debug(e)
+            log.warning(f"Exception parsing XForm XML: {str(xform_path)}")
             continue
-        index += 1
 
     # Save the modified XML
     newxml = ElementTree.tostring(root)
 
     # write the updated XML file
-    outxml = open(outfile, "w")
-    # newxml = xmltodict.unparse(xml)
-    outxml.write(newxml.decode())
-    outxml.close()
+    with open(xform_path, "wb") as outxml:
+        outxml.write(newxml)
 
     # insert the new version
     # forms = table(
@@ -526,7 +521,7 @@ def generate_updated_xform(
     # db.execute(sql)
     # db.commit()
 
-    return outfile
+    return str(xform_path)
 
 
 def upload_media(
