@@ -22,6 +22,7 @@ from typing import Optional
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
+from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -77,6 +78,8 @@ async def get_odk_credentials(db: Session, project_id: int):
     url = creds.odk_central_url
     user = creds.odk_central_user
     password = creds.odk_central_password
+
+    log.debug(f"Retrieved ODK creds for project ({project_id}): {url} | {user}")
 
     return project_schemas.ODKCentralDecrypted(
         odk_central_url=url,
