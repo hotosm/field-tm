@@ -75,7 +75,7 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
     # ODK Credentials
     odk_sync = async_to_sync(project_deps.get_odk_credentials)
-    odk_credentials = odk_sync(db, project_info)
+    odk_credentials = odk_sync(db, project_id)
     xform = get_odk_form(odk_credentials)
 
     # If task id is not provided, submission for all the task are listed
@@ -146,7 +146,7 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
 
     # ODK Credentials
     odk_sync = async_to_sync(project_deps.get_odk_credentials)
-    odk_credentials = odk_sync(db, project_info)
+    odk_credentials = odk_sync(db, project_id)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -221,7 +221,7 @@ async def gather_all_submission_csvs(db, project_id):
 
     # ODK Credentials
     odk_sync = async_to_sync(project_deps.get_odk_credentials)
-    odk_credentials = odk_sync(db, project_info)
+    odk_credentials = odk_sync(db, project_id)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -312,7 +312,7 @@ def update_submission_in_s3(
 
         # Gather metadata
         odk_sync = async_to_sync(project_deps.get_odk_credentials)
-        odk_credentials = odk_sync(db, project)
+        odk_credentials = odk_sync(db, project_id)
         odk_forms = list_odk_xforms(project.odkid, odk_credentials, True)
 
         # Get latest submission date
@@ -406,7 +406,7 @@ def get_all_submissions_json(db: Session, project_id):
 
     # ODK Credentials
     odk_sync = async_to_sync(project_deps.get_odk_credentials)
-    odk_credentials = odk_sync(db, project_info)
+    odk_credentials = odk_sync(db, project_id)
     project = get_odk_project(odk_credentials)
 
     get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
@@ -469,7 +469,7 @@ async def download_submission(
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
     if not export_json:
@@ -574,7 +574,7 @@ async def get_submission_points(db: Session, project_id: int, task_id: int = Non
     form_category = project_info.xform_title
 
     # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     xform = get_odk_form(odk_credentials)
 
     if task_id:
@@ -630,7 +630,7 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
     project_tasks = project_info.tasks
 
     # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project_info)
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
@@ -799,7 +799,7 @@ async def get_submission_by_task(
     Returns:
         Tuple: A tuple containing the list of submissions and the count.
     """
-    odk_credentials = await project_deps.get_odk_credentials(db, project)
+    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
 
     xform = get_odk_form(odk_credentials)
     data = xform.listSubmissions(project.odkid, str(task_id), filters)
