@@ -257,25 +257,23 @@ async def split_geojson_by_task_areas(
 
         -- Create a temporary table to store the parsed GeoJSON features
         CREATE TEMP TABLE temp_features (
-            id SERIAL PRIMARY KEY,
+            id INTEGER,
             geometry GEOMETRY,
             properties JSONB
         );
 
         -- Insert parsed geometries and properties into the temporary table
-        INSERT INTO temp_features (geometry, properties)
+        INSERT INTO temp_features (id, geometry, properties)
         SELECT
+            tasks.id,
             ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326) AS geometry,
             jsonb_set(
                 jsonb_set(
                     jsonb_set(
-                        jsonb_set(
-                            feature->'properties',
-                            '{task_id}', to_jsonb(tasks.id), true
-                        ),
-                        '{project_id}', to_jsonb(tasks.project_id), true
+                        feature->'properties',
+                        '{task_id}', to_jsonb(tasks.id), true
                     ),
-                    '{id}', to_jsonb(tasks.id), true
+                    '{project_id}', to_jsonb(tasks.project_id), true
                 ),
                 '{title}', to_jsonb(CONCAT(
                     'project_',
@@ -305,6 +303,7 @@ async def split_geojson_by_task_areas(
                 jsonb_build_object(
                     'type', 'Feature',
                     'geometry', ST_AsGeoJSON(temp_features.geometry)::jsonb,
+                    'id', temp_features.id,
                     'properties', temp_features.properties
                 ) AS feature
             FROM (
