@@ -89,21 +89,6 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
             </CoreModules.LoadingButton>
           </div>
           <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full sm:fmtm-ml-4 fmtm-gap-6">
-            <CoreModules.Link
-              to={`/projectInfo/${encodedId}`}
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-                textDecoration: 'none',
-                marginRight: '15px',
-              }}
-              className="fmtm-w-fit"
-            >
-              <CoreModules.Button variant="contained" color="error">
-                ProjectInfo
-              </CoreModules.Button>
-            </CoreModules.Link>
             <CoreModules.Button
               onClick={() => {
                 setToggleGenerateModal(true);
