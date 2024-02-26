@@ -24,6 +24,7 @@ from asyncio import gather
 from concurrent.futures import ThreadPoolExecutor, wait
 from importlib.resources import files as pkg_files
 from io import BytesIO
+from pathlib import Path
 from typing import List, Optional, Union
 
 import geoalchemy2
@@ -93,7 +94,7 @@ async def get_projects(
 
     if search:
         filters.append(
-            db_models.DbProject.project_name_prefix.ilike(  # type: ignore
+            db_models.DbProject.project_info.name.ilike(  # type: ignore
                 f"%{search}%"
             )
         )
@@ -1112,8 +1113,8 @@ def generate_task_files(
     project: db_models.DbProject,
     task_id: int,
     data_extract: FeatureCollection,
-    xlsform: str,
-    form_type: str,
+    xlsform_path: str,
+    form_file_extension: str,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
     """Generate all files for a task."""
@@ -1154,11 +1155,10 @@ def generate_task_files(
         f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
     )
 
-    # This file will store xml contents of an xls form.
-    xform = f"/tmp/{appuser_name}.xml"
-
-    # xform_id_format
-    xform_id = f"{appuser_name}".split("_")[2]
+    # This file will store xml contents of an xls form
+    # NOTE there must be two underscores, for [2] index in OdkCentral.py
+    xform_path = Path(f"/tmp/fmtm/{project_name}_{task_id}_{category}.xml")
+    xform_path.parents[0].mkdir(parents=True, exist_ok=True)
 
     # Create memory object from split data extract
     geojson_string = geojson.dumps(data_extract)
@@ -1167,30 +1167,39 @@ def generate_task_files(
 
     project_log.info(
         f"Generating xform for task: {task_id} | "
-        f"using xform: {xform} | form_type: {form_type}"
+        f"xform: {xform_path} | form_type: {form_file_extension}"
     )
-    xform_path = central_crud.generate_updated_xform(xlsform, xform, form_type)
+    central_crud.generate_updated_xform(
+        xlsform_path, xform_path, form_file_extension, category
+    )
 
     # Create an odk xform
     project_log.info(f"Uploading data extract media to task ({task_id})")
     central_crud.create_odk_xform(
         odk_id,
-        str(task_id),
         xform_path,
+        category,
         geojson_bytesio,
         odk_credentials,
-        False,
+        create_draft=False,
     )
+
+    # Update db with feature count after form uploaded with media
     task.feature_count = len(data_extract.get("features", []))
+    log.debug(f"({task.feature_count}) features added for task ({task_id})")
 
     project_log.info(f"Updating role for app user in task {task_id}")
     # Update the user role for the created xform.
     try:
+        log.debug("Updating appuser role to access XForm")
         appuser.updateRole(
-            projectId=odk_id, xform=xform_id, actorId=appuser_json.get("id")
+            projectId=odk_id, xform=xform_path.stem, actorId=appuser_json.get("id")
         )
     except Exception as e:
         log.exception(e)
+
+    # Remove xform temp files
+    xform_path.unlink(missing_ok=True)
 
     project.extract_completed_count += 1
 
@@ -1243,18 +1252,18 @@ def generate_project_files(
             # TODO uncomment after refactor to use BytesIO
             # xlsform = custom_form
 
-            xlsform = f"/tmp/{form_category}.{form_format}"
-            with open(xlsform, "wb") as f:
+            xlsform_path = f"/tmp/{form_category}.{form_format}"
+            with open(xlsform_path, "wb") as f:
                 f.write(custom_form.getvalue())
         else:
-            log.debug(f"Using default XLSForm for category {form_category}")
+            log.debug(f"Using default XLSForm for category: '{form_category}'")
 
             # TODO uncomment after refactor to use BytesIO
             # xlsform_path = f"{xlsforms_path}/{form_category}.xls"
             # with open(xlsform_path, "rb") as f:
             #     xlsform = BytesIO(f.read())
 
-            xlsform = f"{xlsforms_path}/{form_category}.xls"
+            xlsform_path = f"{xlsforms_path}/{form_category}.xls"
 
             # filter = FilterData(xlsform)
             # updated_data_extract = {"type": "FeatureCollection", "features": []}
@@ -1273,9 +1282,9 @@ def generate_project_files(
 
         # Split extract by task area
         split_geojson_sync = async_to_sync(split_geojson_by_task_areas)
-        split_extract_dict = split_geojson_sync(db, feature_collection, project_id)
+        task_extract_dict = split_geojson_sync(db, feature_collection, project_id)
 
-        if not split_extract_dict:
+        if not task_extract_dict:
             log.warning("Project ({project_id}) failed splitting tasks")
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -1295,8 +1304,8 @@ def generate_project_files(
                     next(get_db()),
                     project,
                     task_id,
-                    split_extract_dict[task_id],
-                    xlsform,
+                    task_extract_dict[task_id],
+                    xlsform_path,
                     form_format,
                     odk_credentials,
                 )
@@ -1308,7 +1317,7 @@ def generate_project_files(
             # Submit tasks to the thread pool
             futures = [
                 executor.submit(wrap_generate_task_files, task_id)
-                for task_id in split_extract_dict.keys()
+                for task_id in task_extract_dict.keys()
             ]
             # Wait for all tasks to complete
             wait(futures)
@@ -1669,7 +1678,6 @@ async def update_project_form(
     """Upload a new custom XLSForm for a project."""
     project = await get_project(db, project_id)
     category = project.xform_title
-    project_title = project.project_name_prefix
     odk_id = project.odkid
 
     # ODK Credentials
@@ -1685,9 +1693,7 @@ async def update_project_form(
 
     # TODO fix this to use correct data extract generation
     pg = PostgresClient("underpass")
-    outfile = (
-        f"/tmp/{project_title}_{category}.geojson"  # This file will store osm extracts
-    )
+    outfile = f"/tmp/{category}.geojson"  # This file will store osm extracts
 
     # FIXME test this works
     # FIXME PostgresClient.getFeatures does not exist...
@@ -1716,25 +1722,25 @@ async def update_project_form(
 
     tasks_list = await tasks_crud.get_task_id_list(db, project_id)
 
-    for task in tasks_list:
+    for task_id in tasks_list:
         # This file will store xml contents of an xls form.
-        xform = f"/tmp/{project_title}_{category}_{task}.xml"
-        extracts = f"/tmp/{project_title}_{category}_{task}.geojson"
+        xform_path = Path(f"/tmp/{category}_{task_id}.xml")
 
-        # Update outfile containing osm extracts with the new geojson contents
-        #  containing title in the properties.
-        with open(extracts, "w") as jsonfile:
-            jsonfile.truncate(0)  # clear the contents of the file
-            geojson.dump(feature_geojson, jsonfile)
-
-        outfile = central_crud.generate_updated_xform(xlsform, xform, form_type)
+        outfile = central_crud.generate_updated_xform(
+            xlsform, xform_path, form_type, category
+        )
 
         # Create an odk xform
         # TODO include data extract geojson correctly
         result = central_crud.create_odk_xform(
-            odk_id, str(task), xform, feature_geojson, odk_credentials, True, False
+            odk_id,
+            xform_path,
+            category,
+            feature_geojson,
+            odk_credentials,
+            create_draft=True,
+            convert_to_draft_when_publishing=False,
         )
-
     return True
 
 
