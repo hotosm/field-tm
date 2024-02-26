@@ -109,7 +109,8 @@ async def test_create_odk_project():
         result = create_odk_project("Test Project", odk_credentials)
 
     assert result == {"status": "success"}
-    mock_project.createProject.assert_called_once_with("Test Project")
+    # FMTM gets appended to project name by default
+    mock_project.createProject.assert_called_once_with("FMTM Test Project")
 
 
 async def test_convert_to_app_project():
