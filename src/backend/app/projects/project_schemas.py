@@ -114,10 +114,10 @@ class ODKCentralDecrypted(BaseModel):
 
     @field_validator("odk_central_url", mode="after")
     @classmethod
-    def remove_trailing_slash(cls, value: HttpUrlStr) -> HttpUrlStr:
+    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
         """Remove trailing slash from ODK Central URL."""
         if not value:
-            return ""
+            return None
         if value.endswith("/"):
             return value[:-1]
         return value
