@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Optional
 
 import geojson
+import requests
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -48,7 +49,11 @@ from app.auth.osm import AuthUser, login_required
 from app.auth.roles import mapper, org_admin, project_admin, super_admin
 from app.central import central_crud
 from app.db import database, db_models
-from app.db.postgis_utils import check_crs, parse_and_filter_geojson
+from app.db.postgis_utils import (
+    check_crs,
+    flatgeobuf_to_geojson,
+    parse_and_filter_geojson,
+)
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -1047,6 +1052,48 @@ async def download_features(
     }
 
     return Response(content=json.dumps(feature_collection), headers=headers)
+
+
+@router.get("/convert-fgb-to-geojson/")
+async def convert_fgb_to_geojson(
+    url: str,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(login_required),
+):
+    """Convert flatgeobuf to GeoJSON format, extracting GeometryCollection.
+
+    Helper endpoint to test data extracts during project creation.
+    Required as the flatgeobuf files wrapped in GeometryCollection
+    cannot be read in QGIS or other tools.
+
+    Args:
+        url (str): URL to the flatgeobuf file.
+        db (Session): The database session, provided automatically.
+        current_user (AuthUser): Check if user is logged in.
+
+    Returns:
+        Response: The HTTP response object containing the downloaded file.
+    """
+    with requests.get(url) as response:
+        if not response.ok:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="Download failed for data extract",
+            )
+        data_extract_geojson = await flatgeobuf_to_geojson(db, response.content)
+
+    if not data_extract_geojson:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=("Failed to convert flatgeobuf --> geojson"),
+        )
+
+    headers = {
+        "Content-Disposition": ("attachment; filename=fmtm_data_extract.geojson"),
+        "Content-Type": "application/media",
+    }
+
+    return Response(content=json.dumps(data_extract_geojson), headers=headers)
 
 
 @router.get("/tiles/{project_id}")
