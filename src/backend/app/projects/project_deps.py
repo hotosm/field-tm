@@ -23,6 +23,7 @@ from typing import Optional
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from loguru import logger as log
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -51,7 +52,8 @@ async def get_project_by_id(
 
 async def get_odk_credentials(db: Session, project_id: int):
     """Get ODK credentials of a project, or default organization credentials."""
-    sql = """
+    sql = text(
+        """
     SELECT
         COALESCE(
             NULLIF(projects.odk_central_url, ''),
@@ -72,6 +74,7 @@ async def get_odk_credentials(db: Session, project_id: int):
     WHERE
         projects.id = :project_id
     """
+    )
     result = db.execute(sql, {"project_id": project_id})
     creds = result.first()
 

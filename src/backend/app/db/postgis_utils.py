@@ -126,7 +126,8 @@ async def geojson_to_flatgeobuf(
     Returns:
         flatgeobuf (bytes): a Python bytes representation of a flatgeobuf file.
     """
-    sql = """
+    sql = text(
+        """
         DROP TABLE IF EXISTS temp_features CASCADE;
 
         -- Wrap geometries in GeometryCollection
@@ -155,6 +156,7 @@ async def geojson_to_flatgeobuf(
         SELECT ST_AsFlatGeobuf(geoms, true)
         FROM (SELECT * FROM temp_features) AS geoms;
     """
+    )
 
     # Run the SQL
     result = db.execute(text(sql), {"geojson": json.dumps(geojson)})
