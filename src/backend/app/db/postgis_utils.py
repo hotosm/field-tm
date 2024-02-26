@@ -200,6 +200,7 @@ async def flatgeobuf_to_geojson(
             SELECT jsonb_build_object(
                 'type', 'Feature',
                 'geometry', ST_AsGeoJSON(ST_GeometryN(fgb_data.geom, 1))::jsonb,
+                'id', fgb_data.osm_id,
                 'properties', jsonb_build_object(
                     'osm_id', fgb_data.osm_id,
                     'tags', fgb_data.tags,
@@ -269,7 +270,7 @@ async def split_geojson_by_task_areas(
         -- Insert parsed geometries and properties into the temporary table
         INSERT INTO temp_features (id, geometry, properties)
         SELECT
-            tasks.id,
+            (feature->'properties'->>'osm_id')::INTEGER AS id,
             ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326) AS geometry,
             jsonb_set(
                 jsonb_set(
