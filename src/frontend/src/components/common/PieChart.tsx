@@ -4,22 +4,51 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 const COLORS = ['#F19C3C', '#D73F3F', '#FFB74D', '#EC407A'];
 
 const RADIAN = Math.PI / 180;
+
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.2;
+  const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+    <text x={x} y={y} fill={COLORS[index]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
 };
 
+const renderColorfulLegendText = (value, entry) => (
+  <span style={{ color: '#596579', fontWeight: 500, padding: '10px' }}>{value}</span>
+);
+
+const CustomLegend = ({ payload }) => (
+  <div
+    className={`fmtm-gap-x-6 fmtm-grid fmtm-grid-cols-auto fmtm-min-w-[100px] ${
+      // eslint-disable-next-line no-nested-ternary
+      payload.length > 6 ? 'fmtm-grid-cols-3' : payload.length > 3 ? 'fmtm-grid-cols-2' : ''
+    }`}
+  >
+    {payload.map((entry, index) => (
+      <div className="fmtm-flex fmtm-items-center fmtm-gap-2" key={index}>
+        <div
+          style={{ backgroundColor: entry.color }}
+          className="fmtm-w-[10px] fmtm-h-[10px] fmtm-min-w-3 fmtm-min-h-3 fmtm-rounded-full"
+        />
+        <p
+          className="fmtm-capitalize fmtm-truncate fmtm-text-base"
+          title={`${entry.value} - ${(entry.payload.percent * 100).toFixed(0)}%`}
+        >
+          {entry.value} - {(entry.payload.percent * 100).toFixed(0)}%
+        </p>
+      </div>
+    ))}
+  </div>
+);
+
 const CustomPieChart = ({ data, dataKey, nameKey }) => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart width={800} height={400}>
+    <ResponsiveContainer width="100%" height="105%">
+      <PieChart width={400} height={400}>
         <Pie
           data={data}
           cx="50%"
@@ -27,10 +56,8 @@ const CustomPieChart = ({ data, dataKey, nameKey }) => {
           innerRadius={60}
           outerRadius={110}
           fill="#8884d8"
-          paddingAngle={2}
+          paddingAngle={0}
           dataKey={dataKey}
-          labelLine={false}
-          label={renderCustomizedLabel}
           nameKey={nameKey}
         >
           {data.map((entry, index) => (
@@ -39,13 +66,12 @@ const CustomPieChart = ({ data, dataKey, nameKey }) => {
         </Pie>
         <Tooltip />
         <Legend
-          verticalAlign="bottom"
           iconType="circle"
-          height={36}
-          wrapperStyle={{
-            paddingTop: '20px',
-          }}
+          layout="vertical"
+          verticalAlign="bottom"
           iconSize={10}
+          formatter={renderColorfulLegendText}
+          content={<CustomLegend payload={data?.map((index) => COLORS[index % COLORS.length])} />}
         />
       </PieChart>
     </ResponsiveContainer>
