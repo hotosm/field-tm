@@ -22,7 +22,7 @@ export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
       const odkCollectJson = JSON.stringify({
         general: {
           server_url: odkToken,
-          form_update_mode: 'manual',
+          form_update_mode: 'match_exactly',
           basemap_source: 'osm',
           autosend: 'wifi_and_cellular',
           metadata_username: osmUser,
