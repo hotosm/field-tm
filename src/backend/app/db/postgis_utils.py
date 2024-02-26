@@ -262,7 +262,7 @@ async def split_geojson_by_task_areas(
 
         -- Create a temporary table to store the parsed GeoJSON features
         CREATE TEMP TABLE temp_features (
-            id INTEGER,
+            id VARCHAR,
             geometry GEOMETRY,
             properties JSONB
         );
@@ -270,7 +270,7 @@ async def split_geojson_by_task_areas(
         -- Insert parsed geometries and properties into the temporary table
         INSERT INTO temp_features (id, geometry, properties)
         SELECT
-            (feature->'properties'->>'osm_id')::INTEGER AS id,
+            (feature->'properties'->>'osm_id')::VARCHAR AS id,
             ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326) AS geometry,
             jsonb_set(
                 jsonb_set(
