@@ -1149,8 +1149,10 @@ def generate_task_files(
 
     get_task_sync = async_to_sync(tasks_crud.get_task)
     task = get_task_sync(db, task_id)
+    odk_url = odk_credentials.odk_central_url
+    log.debug(f"Setting odk token for task ({task_id}) on server: {odk_url}")
     task.odk_token = encrypt_value(
-        f"{odk_credentials.odk_central_url}/v1/key/{appuser_token}/projects/{odk_id}"
+        f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
     )
 
     # This file will store xml contents of an xls form.
