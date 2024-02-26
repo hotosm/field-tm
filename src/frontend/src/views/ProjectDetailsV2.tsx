@@ -461,6 +461,15 @@ const Home = () => {
                   collapsed={true}
                 />
               </div>
+              <div className="fmtm-absolute fmtm-top-3 fmtm-right-3 fmtm-z-50">
+                <Button
+                  btnText="GENERATE MBTILES"
+                  icon={<AssetModules.BoltIcon />}
+                  onClick={() => setToggleGenerateModal(true)}
+                  btnType="primary"
+                  className="!fmtm-text-base !fmtm-pr-2"
+                />
+              </div>
               <MapControlComponent map={map} />
             </MapComponent>
             <div

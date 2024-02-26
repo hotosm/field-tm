@@ -1,6 +1,6 @@
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
-import environment from '@/environment';
 import { task_priority_str } from '@/types/enums';
 
 export const ProjectById = (existingProjectList, projectId) => {
@@ -62,7 +62,15 @@ export const ProjectById = (existingProjectList, projectId) => {
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
       } catch (error) {
-        // console.log('error :', error)
+        dispatch(ProjectActions.SetProjectDetialsLoading(false));
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to fetch project.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
       }
     };
 

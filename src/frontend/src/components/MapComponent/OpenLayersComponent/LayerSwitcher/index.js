@@ -173,8 +173,8 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
         olZoom.style.display = 'none';
       }
       if (layerSwitcher && location.pathname.includes('project_details')) {
-        layerSwitcher.style.right = '19px';
-        layerSwitcher.style.top = '250px';
+        layerSwitcher.style.right = '14px';
+        layerSwitcher.style.top = '300px';
         layerSwitcher.style.zIndex = '1000';
       }
     }
