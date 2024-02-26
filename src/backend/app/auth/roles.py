@@ -122,6 +122,43 @@ async def check_access(
     return None
 
 
+async def is_public_beta(
+    org_id: Optional[int],
+    user: Union[AuthUser, int],
+    db: Session,
+) -> Optional[DbUser]:
+    """Bypass organisation manager check if public beta org."""
+    user_id = user if isinstance(user, int) else await get_uid(user)
+
+    sql = text(
+        """
+        SELECT *
+        FROM public.users
+        WHERE EXISTS (
+            SELECT 1
+            FROM organisations
+            WHERE organisations.id = :org_id
+            AND organisations.slug = 'fmtm-public-beta'
+        )
+        AND id = :user_id;
+    """
+    )
+
+    result = db.execute(
+        sql,
+        {
+            "user_id": user_id,
+            "org_id": org_id,
+        },
+    )
+    db_user = result.first()
+
+    if db_user:
+        return DbUser(**db_user._asdict())
+
+    return None
+
+
 async def super_admin(
     user_data: AuthUser = Depends(login_required),
     db: Session = Depends(get_db),
@@ -155,6 +192,10 @@ async def check_org_admin(
         dict: in format {'user': DbUser, 'org': DbOrganisation}.
     """
     db_org = await check_org_exists(db, org_id)
+
+    # First check if public beta
+    if db_user := await is_public_beta(org_id, user, db):
+        return {"user": db_user, "org": db_org}
 
     # Check if org admin, or super admin
     db_user = await check_access(
