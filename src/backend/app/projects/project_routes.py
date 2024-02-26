@@ -822,7 +822,7 @@ async def get_or_set_data_extract(
     url: Optional[str] = None,
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(project_admin),
+    project_user_dict: db_models.DbUser = Depends(project_admin),
 ):
     """Get or set the data extract URL for a project."""
     fgb_url = await project_crud.get_or_set_data_extract_url(
@@ -839,7 +839,7 @@ async def upload_custom_extract(
     custom_extract_file: UploadFile = File(...),
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(project_admin),
+    project_user_dict: db_models.DbUser = Depends(project_admin),
 ):
     """Upload a custom data extract geojson for a project.
 

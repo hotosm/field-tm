@@ -90,8 +90,16 @@ async def check_access(
                     WHEN EXISTS (
                         SELECT 1
                         FROM organisations
-                        WHERE organisations.id = :org_id
-                        AND organisations.slug = 'fmtm-public-beta'
+                        WHERE (organisations.id = :org_id
+                            AND organisations.slug = 'fmtm-public-beta')
+                        OR EXISTS (
+                            SELECT 1
+                            FROM projects
+                            JOIN organisations AS org
+                                ON projects.organisation_id = org.id
+                            WHERE org.slug = 'fmtm-public-beta'
+                                AND projects.id = :project_id
+                        )
                     ) THEN true
                     ELSE
                         EXISTS (
