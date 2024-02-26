@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:159414827ee8e9d879c14c51e20e44e3c32fb1cc7a3feca8692f19ea47bea91a"
+content_hash = "sha256:db2e4cca920f58370b6920034f3e7a7ebcc339f4eedde11c801e1c96515254aa"
 
 [[package]]
 name = "annotated-types"
@@ -1341,7 +1341,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.4.3"
+version = "0.4.4"
 requires_python = ">=3.10"
 summary = "Processing field data from OpenDataKit to OpenStreetMap format."
 dependencies = [
@@ -1365,8 +1365,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.4.3.tar.gz", hash = "sha256:3c41b81d5146d57a7c82a0f5db297d4e3584a2d04f099fcc2460dc32d9c25c9f"},
-    {file = "osm_fieldwork-0.4.3-py3-none-any.whl", hash = "sha256:c533d5443546592bdd2c54f8551e2e5dca6889cfd7d9da4270ea9286616a2ecc"},
+    {file = "osm-fieldwork-0.4.4.tar.gz", hash = "sha256:2d782f7f440abf2d704cf5bbf4726fe533bf5e96829489a2bceccaaecd89a40d"},
+    {file = "osm_fieldwork-0.4.4-py3-none-any.whl", hash = "sha256:7f863506f2555c1b528e4e345d028ad827d295cda410c6674a012d35b519a30a"},
 ]
 
 [[package]]
