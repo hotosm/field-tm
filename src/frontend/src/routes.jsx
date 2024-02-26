@@ -17,7 +17,6 @@ import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
 import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
-// import NewProjectDetails from '@/views/NewProjectDetails';
 import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
 import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
@@ -158,18 +157,6 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: '/project_details/:id',
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={<div>Loading...</div>}>
-      //         <ErrorBoundary>
-      //           <NewProjectDetails />
-      //         </ErrorBoundary>
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
       {
         path: '/project_details/:id',
         element: (

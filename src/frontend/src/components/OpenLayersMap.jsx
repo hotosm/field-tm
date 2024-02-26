@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import DialogTaskActions from '@/components/DialogTaskActions';
 import '../styles/home.scss';
 import CoreModules from '@/shared/CoreModules';
 import Control from 'ol/control/Control';
@@ -7,7 +6,6 @@ import locationImg from '@/assets/images/location.png';
 import accDownImg from '@/assets/images/acc-down.png';
 import accUpImg from '@/assets/images/acc-up.png';
 import gridIcon from '@/assets/images/grid.png';
-import QrcodeComponent from '@/components/QrcodeComponent';
 import * as ol from 'ol';
 import { Point } from 'ol/geom';
 import Vector from 'ol/layer/Vector';
@@ -16,10 +14,6 @@ import { transform } from 'ol/proj';
 import { Icon, Style } from 'ol/style';
 import LocationImage from '@/assets/images/location.png';
 import AssetModules from '@/shared/AssetModules';
-import { Modal } from '@/components/common/Modal';
-import Button from '@/components/common/Button';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
-import TaskSectionModal from '@/components/ProjectDetails/TaskSectionPopup';
 import VectorLayer from 'ol/layer/Vector';
 import WindowDimension from '@/hooks/WindowDimension';
 
