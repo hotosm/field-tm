@@ -139,7 +139,7 @@ services:
       central-db:
         condition: service_healthy
     environment:
-      - DOMAIN=local
+      - DOMAIN=odk.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
       - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
