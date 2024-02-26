@@ -1,8 +1,5 @@
 import React, { Suspense } from 'react';
-import {
-  createBrowserRouter,
-  // Navigate,
-} from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import Home from '@/views/Home';
 import Tabbed from '@/views/Tabbed';
 import MainView from '@/views/MainView';
@@ -17,14 +14,12 @@ import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
 import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
-// import NewProjectDetails from '@/views/NewProjectDetails';
 import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
 import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
 
 const Submissions = React.lazy(() => import('./views/Submissions'));
 const Tasks = React.lazy(() => import('./views/Tasks'));
-const ProjectInfo = React.lazy(() => import('./views/ProjectInfo'));
 
 const routes = createBrowserRouter([
   {
@@ -90,20 +85,6 @@ const routes = createBrowserRouter([
           </ErrorBoundary>
         ),
       },
-
-      {
-        path: '/projectInfo/:projectId',
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div></div>}>
-              <ErrorBoundary>
-                <ProjectInfo />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-
       {
         path: '/project-submissions/:projectId',
         element: (
@@ -158,18 +139,6 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: '/project_details/:id',
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={<div>Loading...</div>}>
-      //         <ErrorBoundary>
-      //           <NewProjectDetails />
-      //         </ErrorBoundary>
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
       {
         path: '/project_details/:id',
         element: (
