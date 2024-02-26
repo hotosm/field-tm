@@ -174,6 +174,12 @@ class ProjectIn(BaseModel):
         address = get_address_from_lat_lon(latitude, longitude)
         return address if address is not None else ""
 
+    @computed_field
+    @property
+    def project_name_prefix(self) -> str:
+        """Compute project name prefix with underscores."""
+        return self.project_info.name.replace(" ", "_").lower()
+
     @field_validator("hashtags", mode="after")
     @classmethod
     def prepend_hash_to_tags(cls, hashtags: List[str]) -> Optional[List[str]]:
