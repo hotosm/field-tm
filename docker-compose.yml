@@ -140,6 +140,7 @@ services:
         condition: service_healthy
     environment:
       - DOMAIN=local
+      - SSL_TYPE=upstream
       - SYSADMIN_EMAIL=${ODK_CENTRAL_USER}
       - SYSADMIN_PASSWD=${ODK_CENTRAL_PASSWD}
       - HTTPS_PORT=${HTTPS_PORT:-443}
