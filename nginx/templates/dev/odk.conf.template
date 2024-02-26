@@ -25,8 +25,8 @@ server {
     listen 80;
     server_name odk.fmtm.localhost;
 
-    # Max upload size 100MB
-    client_max_body_size 100m;
+    # Max upload size 500MB
+    client_max_body_size 500m;
 
     # The frontend
     location / {
@@ -78,8 +78,8 @@ server {
     ssl_certificate /etc/nginx/central-fullchain.crt;
     ssl_certificate_key /etc/nginx/central.key;
 
-    # Max upload size 100MB
-    client_max_body_size 100m;
+    # Max upload size 500MB
+    client_max_body_size 500m;
 
     # The API
     location ~ ^/v\d {
