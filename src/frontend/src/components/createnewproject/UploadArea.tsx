@@ -312,7 +312,6 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
                 drawnGeojson || uploadAreaSelection === 'upload_file'
                   ? null
                   : (geojson, area) => {
-                      console.log('drawn');
                       handleCustomChange('drawnGeojson', geojson);
                       dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
                       dispatch(CreateProjectActions.SetTotalAreaSelection(area));
