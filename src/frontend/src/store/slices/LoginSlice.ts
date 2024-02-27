@@ -1,11 +1,15 @@
 import CoreModules from '@/shared/CoreModules';
 import storage from 'redux-persist/lib/storage';
+import { LoginStateTypes } from '@/store/types/ILogin';
+
+const initialState: LoginStateTypes = {
+  loginToken: {},
+  authDetails: {},
+};
+
 const LoginSlice = CoreModules.createSlice({
   name: 'login',
-  initialState: {
-    loginToken: {},
-    authDetails: {},
-  },
+  initialState: initialState,
   reducers: {
     SetLoginToken(state, action) {
       state.loginToken = action.payload;

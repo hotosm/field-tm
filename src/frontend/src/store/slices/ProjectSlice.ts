@@ -1,29 +1,41 @@
 import { createSlice } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
+import { ProjectStateTypes } from '@/store/types/IProject';
+
+const initialState: ProjectStateTypes = {
+  projectLoading: true,
+  projectTaskBoundries: [],
+  newProjectTrigger: false,
+  projectInfo: {},
+  projectSubmissionLoading: false,
+  projectSubmission: [],
+  projectDataExtractLoading: false,
+  downloadProjectFormLoading: { type: 'form', loading: false },
+  generateProjectTilesLoading: false,
+  tilesList: [],
+  tilesListLoading: false,
+  downloadTilesLoading: false,
+  downloadDataExtractLoading: false,
+  taskModalStatus: false,
+  mobileFooterSelection: 'explore',
+  geolocationStatus: false,
+  projectDetailsLoading: true,
+  projectDashboardDetail: {
+    project_name_prefix: '',
+    organisation_name: '',
+    total_tasks: null,
+    created: '',
+    organisation_logo: '',
+    total_submission: null,
+    total_contributors: null,
+    last_active: '',
+  },
+  projectDashboardLoading: false,
+};
 
 const ProjectSlice = createSlice({
   name: 'project',
-  initialState: {
-    projectLoading: true,
-    projectTaskBoundries: [],
-    newProjectTrigger: false,
-    projectInfo: {},
-    projectSubmissionLoading: false,
-    projectSubmission: [],
-    projectDataExtractLoading: false,
-    downloadProjectFormLoading: { type: 'form', loading: false },
-    generateProjectTilesLoading: false,
-    tilesList: [],
-    tilesListLoading: false,
-    downloadTilesLoading: false,
-    downloadDataExtractLoading: false,
-    taskModalStatus: false,
-    mobileFooterSelection: 'explore',
-    geolocationStatus: false,
-    projectDetailsLoading: true,
-    projectDashboardDetail: {},
-    projectDashboardLoading: false,
-  },
+  initialState: initialState,
   reducers: {
     SetProjectTaskBoundries(state, action) {
       state.projectTaskBoundries = action.payload;
