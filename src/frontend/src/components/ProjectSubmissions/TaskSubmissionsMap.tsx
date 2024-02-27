@@ -15,8 +15,16 @@ import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
-import { taskFeaturePropertyType, taskInfoType } from '@/models/task/taskModel';
+import {
+  colorCodesType,
+  federalWiseProjectCount,
+  legendColorArrayType,
+  taskBoundariesType,
+  taskFeaturePropertyType,
+  taskInfoType,
+} from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
+import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 
 export const defaultStyles = {
   lineColor: '#000000',
@@ -62,8 +70,7 @@ export const municipalStyles = {
   width: 10,
 };
 
-const colorCodes = {
-  // '#9edefa': { min: 0, max: 5 },
+const colorCodes: colorCodesType = {
   '#A9D2F3': { min: 10, max: 50 },
   '#7CB2E8': { min: 50, max: 100 },
   '#4A90D9': { min: 100, max: 130 },
@@ -105,24 +112,22 @@ const getChoroplethColor = (value, colorCodesOutput) => {
 
 const TaskSubmissionsMap = () => {
   const dispatch = CoreModules.useAppDispatch();
-  const [taskBoundaries, setTaskBoundaries] = useState(null);
-  const [dataExtractUrl, setDataExtractUrl] = useState(null);
+  const [taskBoundaries, setTaskBoundaries] = useState<taskBoundariesType | null>(null);
+  const [dataExtractUrl, setDataExtractUrl] = useState<string | null>(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
-  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const projectTaskBoundries: projectTaskBoundriesType[] = CoreModules.useAppSelector(
+    (state) => state.project.projectTaskBoundries,
+  );
 
   const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
-  const federalWiseProjectCount = taskInfo?.map((task) => ({
+  const federalWiseProjectCount: federalWiseProjectCount[] = taskInfo?.map((task) => ({
     code: task.task_id,
     count: task.submission_count,
   }));
 
-  const selectedTask = CoreModules.useAppSelector((state) => state.task.selectedTask);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const params = CoreModules.useParams();
-  const encodedId = params.projectId;
-  const decodedId = environment.decode(encodedId);
-  const legendColorArray = colorRange(federalWiseProjectCount, '4');
+  const selectedTask: number = CoreModules.useAppSelector((state) => state.task.selectedTask);
+  const legendColorArray: legendColorArrayType[] = colorRange(federalWiseProjectCount, '4');
   const { mapRef, map } = useOLMap({
     center: [0, 0],
     zoom: 4,
@@ -150,7 +155,6 @@ const TaskSubmissionsMap = () => {
   }, [projectTaskBoundries]);
 
   useEffect(() => {
-    console.log(taskBoundaries);
     if (!taskBoundaries) return;
     const filteredSelectedTaskGeojson = {
       ...basicGeojsonTemplate,

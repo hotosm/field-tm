@@ -68,4 +68,50 @@ export type projectInfoType = {
   total_tasks: any;
 };
 
-export type downloadProjectFormLoadingType = { type: 'form' | 'geojson'; loading: boolean };
+export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
+
+export type projectDashboardDetailTypes = {
+  project_name_prefix: string;
+  organisation_name: string;
+  total_tasks: number | null;
+  created: string;
+  organisation_logo: string;
+  total_submission: number | null;
+  total_contributors: number | null;
+  last_active: string;
+};
+
+export type projectTaskBoundriesType = {
+  id: number;
+  taskBoundries: taskBoundriesTypes[];
+};
+
+export type taskBoundriesTypes = {
+  bbox: [number, number];
+  id: number;
+  locked_by_uid: null | string;
+  locked_by_username: null | string;
+  odk_token: string;
+  outline_geojson: {
+    type: string;
+    geometry: {
+      coordinates: [string, string];
+      type: string;
+    };
+    properties: Record<string, any>;
+    id: string;
+    bbox: [string, string, string, string];
+  };
+  outline_centroid: {
+    type: string;
+    geometry: {
+      coordinates: [string, string];
+      type: string;
+    };
+    properties: Record<string, any>;
+    id: string;
+    bbox: [string, string, string, string];
+  };
+  task_history: taskHistoryTypes[];
+  task_status: string;
+};

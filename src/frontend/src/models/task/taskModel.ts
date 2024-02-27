@@ -11,3 +11,25 @@ export type taskFeaturePropertyType = {
   name: string | null;
   uid: number;
 };
+
+export type federalWiseProjectCount = {
+  code: string;
+  count: number;
+};
+
+export type taskBoundariesType = {
+  type: string;
+  features: Record<string, any>[];
+};
+
+export type colorCodesType = Record<string, colorMinMaxType>;
+type colorMinMaxType = {
+  min: number;
+  max: number;
+};
+
+export type legendColorArrayType = {
+  min: number;
+  max: number;
+  color: string;
+};
