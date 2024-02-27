@@ -37,3 +37,10 @@ export type projectType = {
   title: string;
   total_tasks: number;
 };
+
+export type snackbarTypes = {
+  open: boolean;
+  message: string;
+  variant: 'info' | 'success' | 'error' | 'warning';
+  duration: number;
+};

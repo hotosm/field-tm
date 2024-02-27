@@ -1,3 +1,5 @@
+import { downloadProjectFormLoadingType, projectInfoType, taskHistoryTypes } from '@/models/project/projectModel';
+
 export type ProjectStateTypes = {
   projectLoading: boolean;
   projectTaskBoundries: projectTaskBoundriesType[];
@@ -54,46 +56,6 @@ type taskBoundriesTypes = {
   task_history: taskHistoryTypes[];
   task_status: string;
 };
-
-type projectInfoType = {
-  id: number;
-  outline_geojson: {
-    type: string;
-    geometry: {
-      type: string;
-      coordinates: [];
-    };
-    properties: {
-      id: number;
-      bbox: [number, number, number, number];
-    };
-    id: number;
-  };
-  priority: number;
-  priority_str: string;
-  title: string;
-  location_str: string;
-  description: string;
-  short_description: string;
-  xform_title: string;
-  data_extract_url: string;
-  num_contributors: any;
-  tasks_bad: any;
-  tasks_mapped: any;
-  tasks_validated: any;
-  total_tasks: any;
-};
-
-type taskHistoryTypes = {
-  action_date: string;
-  action_text: string;
-  id: number;
-  profile_img: null | string;
-  status: string;
-  username: string;
-};
-
-type downloadProjectFormLoadingType = { type: 'form' | 'geojson'; loading: boolean };
 
 type tilesListTypes = {
   id: number;

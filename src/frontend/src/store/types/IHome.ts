@@ -1,4 +1,4 @@
-import { homeProjectPaginationTypes, projectType } from '@/models/home/homeModel';
+import { homeProjectPaginationTypes, projectType, snackbarTypes } from '@/models/home/homeModel';
 
 export type HomeStateTypes = {
   homeProjectSummary: projectType[];
@@ -9,11 +9,4 @@ export type HomeStateTypes = {
   showMapStatus: boolean;
   projectCentroidLoading: boolean;
   homeProjectPagination: homeProjectPaginationTypes;
-};
-
-type snackbarTypes = {
-  open: boolean;
-  message: string;
-  variant: 'info' | 'success' | 'error' | 'warning';
-  duration: number;
 };

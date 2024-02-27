@@ -43,6 +43,7 @@ import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
+import { projectType, snackbarTypes } from '@/models/home/homeModel';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -51,27 +52,27 @@ const Home = () => {
   const { windowSize, type } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
-  const [mainView, setView] = useState();
+  const [mainView, setView] = useState<any>();
   const [featuresLayer, setFeaturesLayer] = useState();
-  const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
+  const [toggleGenerateModal, setToggleGenerateModal] = useState<boolean>(false);
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
-  const [taskBoundariesLayer, setTaskBoundariesLayer] = useState(null);
+  const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState({ latitude: null, longitude: null });
-  const [positionGeojson, setPositionGeojson] = useState(null);
+  const [positionGeojson, setPositionGeojson] = useState<any>(null);
   const [deviceRotation, setDeviceRotation] = useState(0);
   const [viewState, setViewState] = useState('project_info');
-  const encodedId = params.id;
-  const decodedId = environment.decode(encodedId);
+  const encodedId: string = params.id;
+  const decodedId: number = environment.decode(encodedId);
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useAppSelector((state) => state.project);
-  const projectInfo = CoreModules.useAppSelector((state) => state.home.selectedProject);
-  const selectedTask = CoreModules.useAppSelector((state) => state.task.selectedTask);
-  const stateSnackBar = CoreModules.useAppSelector((state) => state.home.snackbar);
-  const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
+  const projectInfo: projectType = CoreModules.useAppSelector((state) => state.home.selectedProject);
+  const selectedTask: number = CoreModules.useAppSelector((state) => state.task.selectedTask);
+  const stateSnackBar: snackbarTypes = CoreModules.useAppSelector((state) => state.home.snackbar);
+  const mobileFooterSelection: string = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
-  const projectDetailsLoading = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const geolocationStatus: boolean = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
+  const projectDetailsLoading: boolean = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -160,9 +161,8 @@ const Home = () => {
       </div>
     );
   };
-
   const projectClickOnMapTask = (properties, feature) => {
-    setFeaturesLayer(feature, 'feature');
+    setFeaturesLayer(feature);
     let extent = properties.geometry.getExtent();
 
     setDataExtractExtent(properties.geometry);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import environment from '@/environment';
@@ -6,17 +6,22 @@ import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { downloadProjectFormLoadingType } from '@/models/project/projectModel';
 
 const ProjectOptions = ({ setToggleGenerateModal }) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
 
-  const downloadProjectFormLoading = CoreModules.useAppSelector((state) => state.project.downloadProjectFormLoading);
-  const downloadDataExtractLoading = CoreModules.useAppSelector((state) => state.project.downloadDataExtractLoading);
+  const downloadProjectFormLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
+    (state) => state.project.downloadProjectFormLoading,
+  );
+  const downloadDataExtractLoading: boolean = CoreModules.useAppSelector(
+    (state) => state.project.downloadDataExtractLoading,
+  );
 
-  const encodedId = params.id;
-  const decodedId = environment.decode(encodedId);
+  const encodedId: string = params.id;
+  const decodedId: number = environment.decode(encodedId);
 
   const handleDownload = (downloadType) => {
     if (downloadType === 'form') {
