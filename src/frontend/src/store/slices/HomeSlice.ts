@@ -1,7 +1,7 @@
 import CoreModules from '@/shared/CoreModules';
-import { Home } from '@/store/types/IHome';
+import { HomeStateTypes } from '@/store/types/IHome';
 
-const initialState: Home = {
+const initialState: HomeStateTypes = {
   homeProjectSummary: [],
   homeProjectLoading: true,
   selectedProject: {},

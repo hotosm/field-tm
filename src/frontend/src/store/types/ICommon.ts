@@ -1,4 +1,4 @@
-export type CommonType = {
+export type CommonStateTypes = {
   snackbar: snackbarTypes;
   loading: boolean;
   postOrganisationLoading: boolean;

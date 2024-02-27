@@ -1,4 +1,4 @@
-export type ProjectType = {
+export type ProjectStateTypes = {
   projectLoading: boolean;
   projectTaskBoundries: projectTaskBoundriesType[];
   newProjectTrigger: boolean;

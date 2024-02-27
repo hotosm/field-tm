@@ -1,4 +1,4 @@
-export type LoginType = {
+export type LoginStateTypes = {
   loginToken: logintTokenType | {};
   authDetails: {} | string;
 };

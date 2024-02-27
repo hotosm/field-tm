@@ -1,8 +1,8 @@
 import CoreModules from '@/shared/CoreModules';
 import storage from 'redux-persist/lib/storage';
-import { LoginType } from '@/store/types/ILogin';
+import { LoginStateTypes } from '@/store/types/ILogin';
 
-const initialState: LoginType = {
+const initialState: LoginStateTypes = {
   loginToken: {},
   authDetails: {},
 };

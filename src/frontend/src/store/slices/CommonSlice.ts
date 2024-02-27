@@ -1,7 +1,7 @@
 import CoreModules from '@/shared/CoreModules';
-import { CommonType } from '@/store/types/ICommon';
+import { CommonStateTypes } from '@/store/types/ICommon';
 
-const initialState: CommonType = {
+const initialState: CommonStateTypes = {
   snackbar: {
     open: false,
     message: '',

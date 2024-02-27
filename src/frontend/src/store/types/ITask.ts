@@ -1,4 +1,4 @@
-export type ITaskSlice = {
+export type TaskStateTypes = {
   taskLoading: boolean;
   taskInfo: taskInfoType[];
   selectedTask: number | null;
