@@ -1,4 +1,4 @@
-export type Home = {
+export type HomeStateTypes = {
   homeProjectSummary: homeProjectSummaryType[];
   selectedProject: homeProjectSummaryType;
   homeProjectLoading: boolean;

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ITaskSlice, taskInfoType } from '@/store/types/ITask';
+import { TaskStateTypes, taskInfoType } from '@/store/types/ITask';
 
-const initialState: ITaskSlice = {
+const initialState: TaskStateTypes = {
   taskLoading: false,
   taskInfo: [],
   selectedTask: null,

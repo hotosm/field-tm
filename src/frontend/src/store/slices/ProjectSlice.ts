@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
-import { ProjectType } from '@/store/types/IProject';
+import { ProjectStateTypes } from '@/store/types/IProject';
 
-const initialState: ProjectType = {
+const initialState: ProjectStateTypes = {
   projectLoading: true,
   projectTaskBoundries: [],
   newProjectTrigger: false,
