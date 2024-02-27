@@ -156,6 +156,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
     handleCustomChange('drawnGeojson', null);
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
+    dispatch(CreateProjectActions.ClearProjectStepState(formValues));
   };
 
   useEffect(() => {
@@ -311,6 +312,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
                 drawnGeojson || uploadAreaSelection === 'upload_file'
                   ? null
                   : (geojson, area) => {
+                      console.log('drawn');
                       handleCustomChange('drawnGeojson', geojson);
                       dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
                       dispatch(CreateProjectActions.SetTotalAreaSelection(area));
