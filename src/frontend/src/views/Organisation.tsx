@@ -20,6 +20,7 @@ const Organisation = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
   const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
+  const [myOrgsLoaded, setMyOrgsLoaded] = useState(false);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
 
@@ -48,9 +49,7 @@ const Organisation = () => {
     );
     return filteredCardData;
   };
-  useEffect(() => {
-    dispatch(MyOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/my-organisations`));
-  }, []);
+
   useEffect(() => {
     if (verifiedTab) {
       dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
@@ -58,6 +57,14 @@ const Organisation = () => {
       dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/`));
     }
   }, [verifiedTab]);
+
+  const loadMyOrganisations = () => {
+    if (!myOrgsLoaded) {
+      dispatch(MyOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/my-organisations`));
+      setMyOrgsLoaded(true);
+    }
+    setActiveTab(1);
+  };
 
   return (
     <CoreModules.Box
@@ -109,7 +116,7 @@ const Organisation = () => {
                 px: ['12px', '16px', '16px'],
               }}
               className="fmtm-duration-150"
-              onClick={() => setActiveTab(1)}
+              onClick={() => loadMyOrganisations()}
             />
             {token && (
               <CoreModules.Link to={'/create-organization'}>
