@@ -1,3 +1,10 @@
+import {
+  submissionContributorsTypes,
+  submissionFormFieldsTypes,
+  submissionInfographicsTypes,
+  validatedVsMappedInfographicsTypes,
+} from '@/models/submission/submissionModel';
+
 export type SubmissionStateTypes = {
   submissionDetailsLoading: boolean;
   submissionDetails: [];

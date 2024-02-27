@@ -14,7 +14,7 @@ type asyncPopupPropType = {
   closePopup?: any;
   loading?: boolean;
   showOnHover?: string;
-  primaryKey: string;
+  primaryKey?: string;
 };
 
 function hasKey(obj, key) {

@@ -18,6 +18,9 @@ import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmi
 import { Modal } from '@/components/common/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
+import { downloadProjectFormLoadingType, projectInfoType } from '@/models/project/projectModel';
+import { submissionFormFieldsTypes } from '@/models/submission/submissionModel';
+import { taskInfoType } from '@/models/task/taskModel';
 
 type filterType = {
   task_id: string | null;
@@ -29,7 +32,7 @@ type filterType = {
 const SubmissionsTable = ({ toggleView }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilterState = {
+  const initialFilterState: filterType = {
     task_id: searchParams.get('task_id') ? searchParams?.get('task_id') : null,
     submitted_by: searchParams.get('submitted_by'),
     review_state: searchParams.get('review_state'),
@@ -44,17 +47,25 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
-  const submissionFormFields = CoreModules.useAppSelector((state) => state.submission.submissionFormFields);
-  const submissionTableData = CoreModules.useAppSelector((state) => state.submission.submissionTableData);
-  const submissionFormFieldsLoading = CoreModules.useAppSelector(
+  const submissionFormFields: submissionFormFieldsTypes[] = CoreModules.useAppSelector(
+    (state) => state.submission.submissionFormFields,
+  );
+  const submissionTableData: any = CoreModules.useAppSelector((state) => state.submission.submissionTableData);
+  const submissionFormFieldsLoading: boolean = CoreModules.useAppSelector(
     (state) => state.submission.submissionFormFieldsLoading,
   );
-  const submissionTableDataLoading = CoreModules.useAppSelector((state) => state.submission.submissionTableDataLoading);
-  const submissionTableRefreshing = CoreModules.useAppSelector((state) => state.submission.submissionTableRefreshing);
-  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
-  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const josmEditorError = CoreModules.useAppSelector((state) => state.task.josmEditorError);
-  const downloadSubmissionLoading = CoreModules.useAppSelector((state) => state.task.downloadSubmissionLoading);
+  const submissionTableDataLoading: boolean = CoreModules.useAppSelector(
+    (state) => state.submission.submissionTableDataLoading,
+  );
+  const submissionTableRefreshing: boolean = CoreModules.useAppSelector(
+    (state) => state.submission.submissionTableRefreshing,
+  );
+  const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const josmEditorError: string = CoreModules.useAppSelector((state) => state.task.josmEditorError);
+  const downloadSubmissionLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
+    (state) => state.task.downloadSubmissionLoading,
+  );
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string | null>(null);
