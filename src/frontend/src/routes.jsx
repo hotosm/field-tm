@@ -142,13 +142,11 @@ const routes = createBrowserRouter([
       {
         path: '/project_details/:id',
         element: (
-          <ProtectedRoute>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ErrorBoundary>
-                <ProjectDetailsV2 />
-              </ErrorBoundary>
-            </Suspense>
-          </ProtectedRoute>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ErrorBoundary>
+              <ProjectDetailsV2 />
+            </ErrorBoundary>
+          </Suspense>
         ),
       },
       {
