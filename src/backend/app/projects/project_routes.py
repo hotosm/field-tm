@@ -289,6 +289,24 @@ async def create_project(
         )
         odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
 
+    sql = text(
+        """
+            SELECT EXISTS (
+                SELECT 1
+                FROM project_info
+                WHERE LOWER(name) = :project_name
+            )
+            """
+    )
+    result = db.execute(sql, {"project_name": project_info.project_info.name.lower()})
+    project_exists = result.fetchone()[0]
+    if project_exists:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Project already exists with the name "
+            f"{project_info.project_info.name}",
+        )
+
     odkproject = central_crud.create_odk_project(
         project_info.project_info.name,
         odk_creds_decrypted,
