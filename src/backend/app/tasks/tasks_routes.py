@@ -166,17 +166,24 @@ async def task_features_count(
         msg = f"To tasks found for project {project_id}"
         log.warning(msg)
         raise HTTPException(status_code=404, detail=msg)
-    feature_count_task_dict = {
-        f"task_{record[0]}": record[1] for record in feature_counts
-    }
+
+    feature_count_task_dict = {f"{record[0]}": record[1] for record in feature_counts}
+
+    project_name_prefix = project.project_name_prefix
+    form_category = project.xform_title
 
     for x in odk_details:
+        # Strip project name and form type from xmlFormId
+        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_").strip(
+            f"_{form_category}"
+        )
+
         data.append(
             {
-                "task_id": x["xmlFormId"],
+                "task_id": task_id,
                 "submission_count": x["submissions"],
                 "last_submission": x["lastSubmission"],
-                "feature_count": feature_count_task_dict[f"task_{x['xmlFormId']}"],
+                "feature_count": feature_count_task_dict[task_id],
             }
         )
 
