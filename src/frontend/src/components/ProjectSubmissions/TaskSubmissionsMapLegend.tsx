@@ -1,10 +1,6 @@
+import { legendColorArrayType } from '@/models/task/taskModel';
 import React from 'react';
 
-type legendColorArrayType = {
-  color: string;
-  min: number;
-  max: number;
-};
 const LegendListItem = ({ code }) => (
   <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
     <div style={{ backgroundColor: code.color }} className="fmtm-w-10 fmtm-h-6 fmtm-mx-2"></div>

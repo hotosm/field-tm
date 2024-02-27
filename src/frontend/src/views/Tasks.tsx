@@ -13,6 +13,7 @@ import { ProjectSubmissionService } from '@/api/SubmissionService';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
 import { getDownloadProjectSubmission } from '@/api/task';
+import { downloadProjectFormLoadingType } from '@/models/project/projectModel';
 const basicGeojsonTemplate = {
   type: 'FeatureCollection',
   features: [],
@@ -83,7 +84,6 @@ const TasksSubmission = () => {
           })),
       ],
     };
-    console.log(taskGeojsonFeatureCollection, 'taskGeojsonFeatureCollection');
     setProjectBoundaries(taskGeojsonFeatureCollection);
   }
   if (projectBuildingGeojson?.length > 0 && buildingBoundaries === null) {
@@ -158,7 +158,9 @@ const TasksSubmission = () => {
     }
   };
 
-  const downloadSubmissionLoading = CoreModules.useAppSelector((state) => state.task.downloadSubmissionLoading);
+  const downloadSubmissionLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
+    (state) => state.task.downloadSubmissionLoading,
+  );
 
   return (
     <CoreModules.Box sx={{ px: 25, py: 6 }}>
