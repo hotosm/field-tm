@@ -1,21 +1,34 @@
 import CoreModules from '@/shared/CoreModules';
+import { Home } from '@/store/types/IHome';
+
+const initialState: Home = {
+  homeProjectSummary: [],
+  homeProjectLoading: true,
+  selectedProject: {},
+  dialogStatus: false,
+  snackbar: {
+    open: false,
+    message: '',
+    variant: 'info',
+    duration: 0,
+  },
+  showMapStatus: true,
+  projectCentroidLoading: false,
+  homeProjectPagination: {
+    has_next: false,
+    has_prev: false,
+    next_num: null,
+    page: null,
+    pages: null,
+    prev_num: null,
+    per_page: null,
+    total: null,
+  },
+};
+
 const HomeSlice = CoreModules.createSlice({
   name: 'home',
-  initialState: {
-    homeProjectSummary: [],
-    homeProjectLoading: true,
-    selectedProject: {},
-    dialogStatus: false,
-    snackbar: {
-      open: false,
-      message: '',
-      variant: 'info',
-      duration: 0,
-    },
-    showMapStatus: true,
-    projectCentroidLoading: false,
-    homeProjectPagination: {},
-  },
+  initialState: initialState,
   reducers: {
     SetHomeProjectSummary(state, action) {
       state.homeProjectSummary = action.payload;
