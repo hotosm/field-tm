@@ -4,7 +4,7 @@ import ProjectIcon from '@/assets/images/project_icon.png';
 import CoreModules from '@/shared/CoreModules';
 
 const ProjectInfo = () => {
-  const paraRef = useRef(null);
+  const paraRef = useRef<any>(null);
   const [seeMore, setSeeMore] = useState(false);
   const [descLines, setDescLines] = useState(1);
   const projectInfo = CoreModules.useAppSelector((state) => state?.project?.projectInfo);
