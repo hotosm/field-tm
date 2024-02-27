@@ -10,6 +10,7 @@ import environment from '@/environment';
 import { fetchInfoTask } from '@/api/task';
 import { GetProjectDashboard } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
+import { projectInfoType } from '@/models/project/projectModel';
 
 const ProjectSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -20,7 +21,7 @@ const ProjectSubmissions = () => {
   const decodedId = environment.decode(encodedId);
 
   const state = CoreModules.useAppSelector((state) => state.project);
-  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
 
   //Fetch project for the first time
   useEffect(() => {

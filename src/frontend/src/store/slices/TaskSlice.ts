@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { TaskStateTypes, taskInfoType } from '@/store/types/ITask';
+import { TaskStateTypes } from '@/store/types/ITask';
+import { taskInfoType } from '@/models/task/taskModel';
 
 const initialState: TaskStateTypes = {
   taskLoading: false,
