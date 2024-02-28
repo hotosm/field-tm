@@ -1,6 +1,6 @@
-import CoreModules from '@/shared/CoreModules';
+import { createSlice } from '@reduxjs/toolkit';
 
-const ThemeSlice = CoreModules.createSlice({
+const ThemeSlice = createSlice({
   name: 'theme',
   initialState: {
     hotTheme: {
