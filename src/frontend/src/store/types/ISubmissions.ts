@@ -2,6 +2,7 @@ import {
   submissionContributorsTypes,
   submissionFormFieldsTypes,
   submissionInfographicsTypes,
+  submissionTableDataTypes,
   validatedVsMappedInfographicsTypes,
 } from '@/models/submission/submissionModel';
 
@@ -13,7 +14,7 @@ export type SubmissionStateTypes = {
   submissionContributors: submissionContributorsTypes[];
   submissionContributorsLoading: boolean;
   submissionFormFields: submissionFormFieldsTypes[];
-  submissionTableData: [];
+  submissionTableData: submissionTableDataTypes;
   submissionFormFieldsLoading: boolean;
   submissionTableDataLoading: boolean;
   submissionTableRefreshing: boolean;

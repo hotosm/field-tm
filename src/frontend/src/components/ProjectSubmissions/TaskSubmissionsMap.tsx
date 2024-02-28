@@ -25,6 +25,7 @@ import {
 } from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 export const defaultStyles = {
   lineColor: '#000000',
@@ -120,7 +121,7 @@ const TaskSubmissionsMap = () => {
     (state) => state.project.projectTaskBoundries,
   );
 
-  const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const federalWiseProjectCount: federalWiseProjectCount[] = taskInfo?.map((task) => ({
     code: task.task_id,
     count: task.submission_count,

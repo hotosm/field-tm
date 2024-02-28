@@ -9,7 +9,17 @@ const initialState: SubmissionStateTypes = {
   submissionContributors: [],
   submissionContributorsLoading: true,
   submissionFormFields: [],
-  submissionTableData: [],
+  submissionTableData: {
+    results: [],
+    pagination: {
+      total: null,
+      page: null,
+      prev_num: null,
+      next_num: null,
+      per_page: null,
+      pages: null,
+    },
+  },
   submissionFormFieldsLoading: false,
   submissionTableDataLoading: false,
   submissionTableRefreshing: false,
