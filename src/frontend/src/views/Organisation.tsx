@@ -7,6 +7,7 @@ import { GetOrganisationDataModel } from '@/models/organisation/organisationMode
 import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
 import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const Organisation = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -20,21 +21,13 @@ const Organisation = () => {
   const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
   const [myOrgsLoaded, setMyOrgsLoaded] = useState(false);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
-  const organisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
-    (state) => state.organisation.organisationData,
-  );
-  const myOrganisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
-    (state) => state.organisation.myOrganisationData,
-  );
+  const organisationData = useAppSelector((state) => state.organisation.organisationData);
+  const myOrganisationData = useAppSelector((state) => state.organisation.myOrganisationData);
 
-  const organisationDataLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.organisation.organisationDataLoading,
-  );
-  const myOrganisationDataLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.organisation.myOrganisationDataLoading,
-  );
+  const organisationDataLoading = useAppSelector((state) => state.organisation.organisationDataLoading);
+  const myOrganisationDataLoading = useAppSelector((state) => state.organisation.myOrganisationDataLoading);
   // loading states for the organisations from selector
 
   let cardsPerRow = new Array(

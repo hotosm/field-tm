@@ -19,6 +19,7 @@ import { diffObject } from '@/utilfunctions/compareUtils';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const organizationTypeOptions: organizationTypeOptionsType[] = [
   { name: 'osm_community', value: 'osm_community', label: 'OSM Community' },
@@ -33,15 +34,9 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const inputFileRef = useRef<any>(null);
-  const organisationFormData: Record<string, string | number> = CoreModules.useAppSelector(
-    (state) => state.organisation.organisationFormData,
-  );
-  const postOrganisationDataLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.organisation.postOrganisationDataLoading,
-  );
-  const postOrganisationData: Record<string, string | number> | null = CoreModules.useAppSelector(
-    (state) => state.organisation.postOrganisationData,
-  );
+  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
+  const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
+  const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
   const [previewSource, setPreviewSource] = useState<any>('');
 
   const submission = () => {
