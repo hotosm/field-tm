@@ -1,7 +1,7 @@
-import CoreModules from '@/shared/CoreModules';
+import { createSlice } from '@reduxjs/toolkit';
 import { HomeStateTypes } from '@/store/types/IHome';
 
-const initialState: HomeStateTypes = {
+export const initialState: HomeStateTypes = {
   homeProjectSummary: [],
   homeProjectLoading: true,
   selectedProject: {},
@@ -26,7 +26,7 @@ const initialState: HomeStateTypes = {
   },
 };
 
-const HomeSlice = CoreModules.createSlice({
+const HomeSlice = createSlice({
   name: 'home',
   initialState: initialState,
   reducers: {

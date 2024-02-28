@@ -1,4 +1,4 @@
-import CoreModules from '@/shared/CoreModules';
+import { createSlice } from '@reduxjs/toolkit';
 import { CommonStateTypes } from '@/store/types/ICommon';
 
 const initialState: CommonStateTypes = {
@@ -17,7 +17,7 @@ const initialState: CommonStateTypes = {
   },
 };
 
-const CommonSlice = CoreModules.createSlice({
+const CommonSlice = createSlice({
   name: 'common',
   initialState: initialState,
   reducers: {

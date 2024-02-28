@@ -20,8 +20,8 @@ const ProjectDetailsForm = ({ flag }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
-  const organisationListData: any = useAppSelector((state) => state.createproject.organisationList);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
+  const organisationListData = useAppSelector((state) => state.createproject.organisationList);
   const organisationList: organizationDropdownType[] = organisationListData.map((item) => ({
     label: item.name,
     value: item.id,

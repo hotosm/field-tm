@@ -2,10 +2,11 @@ import React from 'react';
 import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const MobileFooter = () => {
   const dispatch = CoreModules.useAppDispatch();
-  const mobileFooterSelection = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
+  const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
 
   const footerItem = [
     {

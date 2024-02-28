@@ -2,6 +2,7 @@ import {
   submissionContributorsTypes,
   submissionFormFieldsTypes,
   submissionInfographicsTypes,
+  submissionTableDataTypes,
   validatedVsMappedInfographicsTypes,
 } from '@/models/submission/submissionModel';
 
@@ -13,34 +14,10 @@ export type SubmissionStateTypes = {
   submissionContributors: submissionContributorsTypes[];
   submissionContributorsLoading: boolean;
   submissionFormFields: submissionFormFieldsTypes[];
-  submissionTableData: [];
+  submissionTableData: submissionTableDataTypes;
   submissionFormFieldsLoading: boolean;
   submissionTableDataLoading: boolean;
   submissionTableRefreshing: boolean;
   validatedVsMappedInfographics: validatedVsMappedInfographicsTypes[];
   validatedVsMappedLoading: boolean;
-};
-
-type submissionInfographicsTypes = {
-  date: string;
-  count: 1;
-};
-
-type submissionContributorsTypes = {
-  user: string;
-  contributions: number;
-};
-
-type submissionFormFieldsTypes = {
-  path: string;
-  name: string;
-  type: string;
-  binary: any;
-  selectMultiple: any;
-};
-
-type validatedVsMappedInfographicsTypes = {
-  date: string;
-  validated: number;
-  mapped: number;
 };

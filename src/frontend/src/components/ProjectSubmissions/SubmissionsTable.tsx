@@ -18,9 +18,8 @@ import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmi
 import { Modal } from '@/components/common/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
-import { downloadProjectFormLoadingType, projectInfoType } from '@/models/project/projectModel';
-import { submissionFormFieldsTypes } from '@/models/submission/submissionModel';
-import { taskInfoType } from '@/models/task/taskModel';
+import { projectInfoType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 type filterType = {
   task_id: string | null;
@@ -47,25 +46,15 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const encodedId = params.projectId;
   const decodedId = environment.decode(encodedId);
-  const submissionFormFields: submissionFormFieldsTypes[] = CoreModules.useAppSelector(
-    (state) => state.submission.submissionFormFields,
-  );
-  const submissionTableData: any = CoreModules.useAppSelector((state) => state.submission.submissionTableData);
-  const submissionFormFieldsLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.submission.submissionFormFieldsLoading,
-  );
-  const submissionTableDataLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.submission.submissionTableDataLoading,
-  );
-  const submissionTableRefreshing: boolean = CoreModules.useAppSelector(
-    (state) => state.submission.submissionTableRefreshing,
-  );
-  const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
+  const submissionFormFields = useAppSelector((state) => state.submission.submissionFormFields);
+  const submissionTableData = useAppSelector((state) => state.submission.submissionTableData);
+  const submissionFormFieldsLoading = useAppSelector((state) => state.submission.submissionFormFieldsLoading);
+  const submissionTableDataLoading = useAppSelector((state) => state.submission.submissionTableDataLoading);
+  const submissionTableRefreshing = useAppSelector((state) => state.submission.submissionTableRefreshing);
+  const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const josmEditorError: string = CoreModules.useAppSelector((state) => state.task.josmEditorError);
-  const downloadSubmissionLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
-    (state) => state.task.downloadSubmissionLoading,
-  );
+  const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
+  const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string | null>(null);
@@ -168,6 +157,7 @@ const SubmissionsTable = ({ toggleView }) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | React.KeyboardEvent<HTMLInputElement>,
     newPage: number,
   ) => {
+    if (!submissionTableData?.pagination?.pages) return;
     if (newPage + 1 > submissionTableData?.pagination?.pages || newPage + 1 < 1) {
       setPaginationPage(paginationPage);
       return;
@@ -466,7 +456,7 @@ const SubmissionsTable = ({ toggleView }) => {
           <CoreModules.TablePagination
             component="div"
             count={submissionTableData?.pagination?.total}
-            page={submissionTableData?.pagination?.page - 1}
+            page={submissionTableData?.pagination?.page ? submissionTableData?.pagination?.page - 1 : 1}
             onPageChange={handleChangePage}
             rowsPerPage={submissionTableData?.pagination?.per_page}
             rowsPerPageOptions={[]}

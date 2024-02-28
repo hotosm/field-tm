@@ -79,6 +79,7 @@ export type projectDashboardDetailTypes = {
   total_submission: number | null;
   total_contributors: number | null;
   last_active: string;
+  organisation: string;
 };
 
 export type projectTaskBoundriesType = {

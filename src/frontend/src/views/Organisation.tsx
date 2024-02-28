@@ -5,12 +5,11 @@ import { MyOrganisationDataService, OrganisationDataService } from '@/api/Organi
 import { user_roles } from '@/types/enums';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
 import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
-import { useNavigate } from 'react-router-dom';
 import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const Organisation = () => {
-  const navigate = useNavigate();
   const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
 
@@ -22,17 +21,13 @@ const Organisation = () => {
   const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
   const [myOrgsLoaded, setMyOrgsLoaded] = useState(false);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
-  const organisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
-    (state) => state.organisation.organisationData,
-  );
-  const myOrganisationData: GetOrganisationDataModel[] = CoreModules.useAppSelector(
-    (state) => state.organisation.myOrganisationData,
-  );
+  const organisationData = useAppSelector((state) => state.organisation.organisationData);
+  const myOrganisationData = useAppSelector((state) => state.organisation.myOrganisationData);
 
-  const organisationDataLoading = CoreModules.useAppSelector((state) => state.organisation.organisationDataLoading);
-  const myOrganisationDataLoading = CoreModules.useAppSelector((state) => state.organisation.myOrganisationDataLoading);
+  const organisationDataLoading = useAppSelector((state) => state.organisation.organisationDataLoading);
+  const myOrganisationDataLoading = useAppSelector((state) => state.organisation.myOrganisationDataLoading);
   // loading states for the organisations from selector
 
   let cardsPerRow = new Array(
@@ -43,7 +38,7 @@ const Organisation = () => {
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
   };
-  const filteredBySearch = (data, searchKeyword) => {
+  const filteredBySearch = (data: GetOrganisationDataModel[], searchKeyword: string) => {
     const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
       d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
     );
