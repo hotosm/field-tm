@@ -72,10 +72,10 @@ const Home = () => {
   const projectInfo = useAppSelector((state) => state.home.selectedProject);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
   const stateSnackBar = useAppSelector((state) => state.home.snackbar);
-  const mobileFooterSelection: string = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
-  const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const geolocationStatus: boolean = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
-  const projectDetailsLoading: boolean = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
+  const mapTheme = useAppSelector((state) => state.theme.hotTheme);
+  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
+  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
