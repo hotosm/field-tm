@@ -8,15 +8,16 @@ import OrganisationAddValidation from '@/components/organisation/Validation/Orga
 import { PostOrganisationDataService } from '@/api/OrganisationService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const CreateOrganisationForm = () => {
   const dispatch = CoreModules.useAppDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const postOrganisationData: any = CoreModules.useAppSelector((state) => state.organisation.postOrganisationData);
+  const defaultTheme: any = useAppSelector((state) => state.theme.hotTheme);
+  const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
 
-  const organisationFormData: any = CoreModules.useAppSelector((state) => state.organisation.organisationFormData);
+  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
 
   const submission = () => {
     dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`, values));

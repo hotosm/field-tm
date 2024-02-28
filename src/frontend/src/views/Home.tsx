@@ -7,28 +7,26 @@ import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
 import HomePageFilters from '@/components/home/HomePageFilters';
 import CoreModules from '@/shared/CoreModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
-import { homeProjectPaginationTypes, projectType } from '@/models/home/homeModel';
-import { HomeStateTypes } from '@/store/types/IHome';
+import { projectType } from '@/models/home/homeModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
 
   const { type } = windowDimention();
 
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
-  const [paginationPage, setPaginationPage] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [paginationPage, setPaginationPage] = useState(1);
 
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const showMapStatus: boolean = CoreModules.useAppSelector((state) => state.home.showMapStatus);
-  const homeProjectPagination: homeProjectPaginationTypes = CoreModules.useAppSelector(
-    (state) => state.home.homeProjectPagination,
-  );
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
+  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
+  const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
 
-  const stateHome: HomeStateTypes = CoreModules.useAppSelector((state) => state.home);
+  const stateHome = useAppSelector((state) => state.home);
   //we use use selector from redux to get all state of home from home slice
 
-  const filteredProjectCards: projectType[] = stateHome.homeProjectSummary;
+  const filteredProjectCards = stateHome.homeProjectSummary;
 
   let cardsPerRow = new Array(
     type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1,

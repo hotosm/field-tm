@@ -22,7 +22,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);

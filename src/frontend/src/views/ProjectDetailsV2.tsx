@@ -43,7 +43,7 @@ import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { projectType, snackbarTypes } from '@/models/home/homeModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -54,24 +54,28 @@ const Home = () => {
 
   const [mainView, setView] = useState<any>();
   const [featuresLayer, setFeaturesLayer] = useState();
+  const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
-  const [currentCoordinate, setCurrentCoordinate] = useState({ latitude: null, longitude: null });
+  const [currentCoordinate, setCurrentCoordinate] = useState<{ latitude: null | number; longitude: null | number }>({
+    latitude: null,
+    longitude: null,
+  });
   const [positionGeojson, setPositionGeojson] = useState<any>(null);
   const [deviceRotation, setDeviceRotation] = useState(0);
   const [viewState, setViewState] = useState('project_info');
   const encodedId: string = params.id;
   const decodedId: number = environment.decode(encodedId);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useAppSelector((state) => state.project);
-  const projectInfo: projectType = CoreModules.useAppSelector((state) => state.home.selectedProject);
-  const selectedTask: number = CoreModules.useAppSelector((state) => state.task.selectedTask);
-  const stateSnackBar: snackbarTypes = CoreModules.useAppSelector((state) => state.home.snackbar);
-  const mobileFooterSelection: string = CoreModules.useAppSelector((state) => state.project.mobileFooterSelection);
-  const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const geolocationStatus: boolean = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
-  const projectDetailsLoading: boolean = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const projectInfo = useAppSelector((state) => state.home.selectedProject);
+  const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  const stateSnackBar = useAppSelector((state) => state.home.snackbar);
+  const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
+  const mapTheme = useAppSelector((state) => state.theme.hotTheme);
+  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
+  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -87,6 +91,7 @@ const Home = () => {
       }),
     );
   };
+
   //Fetch project for the first time
   useEffect(() => {
     dispatch(ProjectActions.SetNewProjectTrigger());

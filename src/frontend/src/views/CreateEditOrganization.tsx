@@ -5,12 +5,13 @@ import ConsentDetailsForm from '@/components/CreateEditOrganization/ConsentDetai
 import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
 import { useDispatch } from 'react-redux';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const CreateEditOrganization = () => {
   const params = CoreModules.useParams();
   const dispatch = useDispatch();
-  const organizationId = params.id;
-  const consentApproval: any = CoreModules.useAppSelector((state) => state.organisation.consentApproval);
+  const organizationId: string = params.id;
+  const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 
   useEffect(() => {
     // clear consent form on new org add

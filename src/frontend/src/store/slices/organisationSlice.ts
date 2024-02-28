@@ -1,7 +1,8 @@
-import CoreModules from '@/shared/CoreModules.js';
+// import CoreModules from '@/shared/CoreModules.js';
+import { createSlice } from '@reduxjs/toolkit';
 import { IOrganisationState } from '../types/IOrganisation';
 
-const initialState: IOrganisationState = {
+export const initialState: IOrganisationState = {
   organisationFormData: {},
   organisationData: [],
   myOrganisationData: [],
@@ -22,7 +23,7 @@ const initialState: IOrganisationState = {
     organizationRejecting: false,
   },
 };
-const OrganisationSlice = CoreModules.createSlice({
+const OrganisationSlice = createSlice({
   name: 'organisation',
   initialState: initialState,
   reducers: {

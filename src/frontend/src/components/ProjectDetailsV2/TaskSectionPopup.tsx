@@ -7,7 +7,7 @@ import { ProjectFilesById } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
 
 type TaskSectionPopupPropType = {
-  taskId: string | undefined | number;
+  taskId: number | null;
   body: React.JSX.Element;
   feature: any;
 };
