@@ -21,6 +21,8 @@ theme:
   palette:
     primary: custom
   language: en
+  favicon: assets/images/favicon.png
+  logo: assets/images/hot_logo.png
 
 extra_css:
   - css/extra.css
