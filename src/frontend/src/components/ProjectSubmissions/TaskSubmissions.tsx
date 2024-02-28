@@ -12,7 +12,7 @@ const TaskSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const taskInfo: taskInfoType[] = CoreModules.useAppSelector((state) => state.task.taskInfo);
-  const taskLoading = CoreModules.useAppSelector((state) => state.task.taskLoading);
+  const taskLoading: boolean = CoreModules.useAppSelector((state) => state.task.taskLoading);
   const [searchedTaskId, setSearchedTaskId] = useState<string>('');
   const [debouncedSearchedTaskId, setDebouncedSearchedTaskId] = useState<string>('');
   const [filteredTaskInfo, setFilteredTaskInfo] = useState<taskInfoType[]>([]);
