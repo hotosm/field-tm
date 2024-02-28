@@ -2,14 +2,17 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { useNavigate } from 'react-router-dom';
+import { projectDashboardDetailTypes, projectInfoType } from '@/models/project/projectModel';
 
 const ProjectInfo = () => {
   const navigate = useNavigate();
   const params = CoreModules.useParams();
   const encodedId = params.projectId;
-  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const projectDashboardDetail = CoreModules.useAppSelector((state) => state.project.projectDashboardDetail);
-  const projectDashboardLoading = CoreModules.useAppSelector((state) => state.project.projectDashboardLoading);
+  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const projectDashboardDetail: projectDashboardDetailTypes = CoreModules.useAppSelector(
+    (state) => state.project.projectDashboardDetail,
+  );
+  const projectDashboardLoading: boolean = CoreModules.useAppSelector((state) => state.project.projectDashboardLoading);
 
   const dataCard = [
     {

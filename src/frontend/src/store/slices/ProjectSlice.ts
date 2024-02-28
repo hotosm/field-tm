@@ -46,7 +46,7 @@ const ProjectSlice = createSlice({
     SetProjectInfo(state, action) {
       state.projectInfo = action.payload;
     },
-    SetNewProjectTrigger(state, action) {
+    SetNewProjectTrigger(state) {
       state.newProjectTrigger = !state.newProjectTrigger;
     },
     clearProjects(state, action) {
