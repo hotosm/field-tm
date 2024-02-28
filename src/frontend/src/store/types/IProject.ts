@@ -20,6 +20,7 @@ export type ProjectStateTypes = {
   downloadTilesLoading: boolean;
   downloadDataExtractLoading: boolean;
   taskModalStatus: boolean;
+  toggleGenerateMbTilesModal: boolean;
   mobileFooterSelection: string;
   geolocationStatus: boolean;
   projectDetailsLoading: boolean;
