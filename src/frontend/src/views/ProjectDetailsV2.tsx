@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
-import MapDescriptionComponents from '@/components/MapDescriptionComponents';
+// import MapDescriptionComponents from '@/components/MapDescriptionComponents';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
 import environment from '@/environment';
 import { ProjectById, GetProjectDashboard } from '@/api/Project';
@@ -27,7 +27,7 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import MapControlComponent from '@/components/ProjectDetailsV2/MapControlComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
-import { basicGeojsonTemplate } from '@/utilities/mapUtils';
+// import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import getTaskStatusStyle from '@/utilfunctions/getTaskStatusStyle';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MapLegends from '@/components/MapLegends';
@@ -54,7 +54,6 @@ const Home = () => {
 
   const [mainView, setView] = useState<any>();
   const [featuresLayer, setFeaturesLayer] = useState();
-  const [toggleGenerateModal, setToggleGenerateModal] = useState<boolean>(false);
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
@@ -195,7 +194,7 @@ const Home = () => {
 
   useEffect(() => {
     if (mobileFooterSelection !== 'explore') {
-      setToggleGenerateModal(false);
+      dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(false));
     }
   }, [mobileFooterSelection]);
 
@@ -278,11 +277,7 @@ const Home = () => {
     <div className="fmtm-bg-[#F5F5F5] fmtm-h-[100vh] sm:fmtm-h-[90vh]">
       {/* Customized Modal For Generate Tiles */}
       <div>
-        <GenerateBasemap
-          toggleGenerateModal={toggleGenerateModal}
-          setToggleGenerateModal={setToggleGenerateModal}
-          projectInfo={state.projectInfo}
-        />
+        <GenerateBasemap projectInfo={state.projectInfo} />
 
         {/* Home snackbar */}
         <CustomizedSnackbar
@@ -383,7 +378,7 @@ const Home = () => {
                   toggle ? 'fmtm-left-0 fmtm-top-0' : '-fmtm-left-[60rem] fmtm-top-0'
                 }`}
               >
-                <ProjectOptions setToggleGenerateModal={false} />
+                <ProjectOptions />
               </div>
             </div>
           </div>
@@ -465,7 +460,9 @@ const Home = () => {
                 <Button
                   btnText="GENERATE MBTILES"
                   icon={<AssetModules.BoltIcon />}
-                  onClick={() => setToggleGenerateModal(true)}
+                  onClick={() => {
+                    dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
+                  }}
                   btnType="primary"
                   className="!fmtm-text-base !fmtm-pr-2"
                 />
@@ -509,7 +506,7 @@ const Home = () => {
               <BottomSheet
                 body={
                   <div className="fmtm-mb-[10vh]">
-                    <ProjectOptions setToggleGenerateModal={setToggleGenerateModal} />
+                    <ProjectOptions />
                   </div>
                 }
                 onClose={() => dispatch(ProjectActions.SetMobileFooterSelection('explore'))}
