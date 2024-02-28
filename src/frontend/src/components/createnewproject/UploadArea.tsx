@@ -37,7 +37,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
   // const [uploadAreaFile, setUploadAreaFile] = useState(null);
   const [isGeojsonWGS84, setIsGeojsonWG84] = useState(true);
 
-  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const uploadAreaSelection = useAppSelector((state) => state.createproject.uploadAreaSelection);
   const drawToggle = useAppSelector((state) => state.createproject.drawToggle);
@@ -76,8 +76,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
   const convertFileToGeojson = async (file) => {
     if (!file) return;
     const fileReader = new FileReader();
-    const fileLoaded = await new Promise((resolve) => {
-      fileReader.onload = (e) => resolve(e.target.result);
+    const fileLoaded: any = await new Promise((resolve) => {
+      fileReader.onload = (e) => resolve(e.target?.result);
       fileReader.readAsText(file, 'UTF-8');
     });
     const parsedJSON = JSON.parse(fileLoaded);
