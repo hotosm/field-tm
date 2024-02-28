@@ -17,6 +17,7 @@ const initialState: ProjectStateTypes = {
   downloadTilesLoading: false,
   downloadDataExtractLoading: false,
   taskModalStatus: false,
+  toggleGenerateMbTilesModal: false,
   mobileFooterSelection: 'explore',
   geolocationStatus: false,
   projectDetailsLoading: true,
@@ -79,6 +80,9 @@ const ProjectSlice = createSlice({
     },
     ToggleTaskModalStatus(state, action) {
       state.taskModalStatus = action.payload;
+    },
+    ToggleGenerateMbTilesModalStatus(state, action) {
+      state.toggleGenerateMbTilesModal = action.payload;
     },
     SetMobileFooterSelection(state, action) {
       state.mobileFooterSelection = action.payload;
