@@ -9,8 +9,8 @@ import { OrganisationAction } from '@/store/slices/organisationSlice';
 const CreateEditOrganization = () => {
   const params = CoreModules.useParams();
   const dispatch = useDispatch();
-  const organizationId = params.id;
-  const consentApproval: any = CoreModules.useAppSelector((state) => state.organisation.consentApproval);
+  const organizationId: string = params.id;
+  const consentApproval: boolean = CoreModules.useAppSelector((state) => state.organisation.consentApproval);
 
   useEffect(() => {
     // clear consent form on new org add

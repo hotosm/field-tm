@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { consentQuestions } from '@/constants/ConsentQuestions';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import RadioButton from '@/components/common/RadioButton';
@@ -15,7 +15,9 @@ const ConsentDetailsForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const consentDetailsFormData: any = CoreModules.useAppSelector((state) => state.organisation.consentDetailsFormData);
+  const consentDetailsFormData: Record<string, string | number> = CoreModules.useAppSelector(
+    (state) => state.organisation.consentDetailsFormData,
+  );
 
   const submission = () => {
     dispatch(OrganisationAction.SetConsentApproval(true));
