@@ -1,14 +1,12 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react';
 import environment from '@/environment';
-import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { CustomSelect } from '@/components/common/Select';
-import profilePic from '@/assets/images/project_icon.png';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
 import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
 import { taskHistoryListType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const sortByList = [
   { id: 'activities', name: 'Activities' },
@@ -25,7 +23,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   const [allActivities, setAllActivities] = useState(0);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [showShortBy, setShowSortBy] = useState(false);
-  const projectDetailsLoading = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   const handleOnchange = (event) => {
     setSearchText(event.target.value);
