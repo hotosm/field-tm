@@ -3,19 +3,23 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import environment from '@/environment';
 import { DownloadTile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
+import { ProjectActions } from '@/store/slices/ProjectSlice';
 
-const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectInfo }) => {
+const GenerateBasemap = ({ projectInfo }) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const encodedId = params.id;
   const decodedId = environment.decode(encodedId);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const generateProjectTilesLoading = CoreModules.useAppSelector((state) => state.project.generateProjectTilesLoading);
-  const tilesList = CoreModules.useAppSelector((state) => state.project.tilesList);
+
   const [selectedTileSource, setSelectedTileSource] = useState(null);
   const [selectedOutputFormat, setSelectedOutputFormat] = useState(null);
   const [tmsUrl, setTmsUrl] = useState('');
   const [error, setError] = useState([]);
+
+  const toggleGenerateMbTilesModal = CoreModules.useAppSelector((state) => state.project.toggleGenerateMbTilesModal);
+  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const generateProjectTilesLoading = CoreModules.useAppSelector((state) => state.project.generateProjectTilesLoading);
+  const tilesList = CoreModules.useAppSelector((state) => state.project.tilesList);
 
   const modalStyle = (theme) => ({
     width: '90vw', // Responsive modal width using vw
@@ -35,10 +39,10 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
   useEffect(() => {
     // Only fetch tiles list when the modal is open
-    if (toggleGenerateModal) {
+    if (toggleGenerateMbTilesModal) {
       getTilesList();
     }
-  }, [toggleGenerateModal]);
+  }, [toggleGenerateMbTilesModal]);
 
   const handleTileSourceChange = (e) => {
     setSelectedTileSource(e.target.value);
@@ -83,16 +87,20 @@ const GenerateBasemap = ({ setToggleGenerateModal, toggleGenerateModal, projectI
 
   return (
     <CoreModules.CustomizedModal
-      isOpen={!!toggleGenerateModal}
+      isOpen={!!toggleGenerateMbTilesModal}
       style={modalStyle}
-      toggleOpen={() => setToggleGenerateModal(!toggleGenerateModal)}
+      toggleOpen={() => {
+        dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(!toggleGenerateMbTilesModal));
+      }}
     >
       <CoreModules.Grid container spacing={2}>
         {/* Close Button */}
         <CoreModules.Grid item xs={12}>
           <CoreModules.IconButton
             aria-label="close"
-            onClick={() => setToggleGenerateModal(!toggleGenerateModal)}
+            onClick={() => {
+              dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(!toggleGenerateMbTilesModal));
+            }}
             sx={{ width: '50px', float: 'right', display: 'block' }}
           >
             <AssetModules.CloseIcon />
