@@ -5,12 +5,10 @@ import { MyOrganisationDataService, OrganisationDataService } from '@/api/Organi
 import { user_roles } from '@/types/enums';
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
 import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
-import { useNavigate } from 'react-router-dom';
 import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
 
 const Organisation = () => {
-  const navigate = useNavigate();
   const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
 
@@ -30,8 +28,12 @@ const Organisation = () => {
     (state) => state.organisation.myOrganisationData,
   );
 
-  const organisationDataLoading = CoreModules.useAppSelector((state) => state.organisation.organisationDataLoading);
-  const myOrganisationDataLoading = CoreModules.useAppSelector((state) => state.organisation.myOrganisationDataLoading);
+  const organisationDataLoading: boolean = CoreModules.useAppSelector(
+    (state) => state.organisation.organisationDataLoading,
+  );
+  const myOrganisationDataLoading: boolean = CoreModules.useAppSelector(
+    (state) => state.organisation.myOrganisationDataLoading,
+  );
   // loading states for the organisations from selector
 
   let cardsPerRow = new Array(
@@ -42,7 +44,7 @@ const Organisation = () => {
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
   };
-  const filteredBySearch = (data, searchKeyword) => {
+  const filteredBySearch = (data: GetOrganisationDataModel[], searchKeyword: string) => {
     const filteredCardData: GetOrganisationDataModel[] = data?.filter((d) =>
       d.name.toLowerCase().includes(searchKeyword.toLowerCase()),
     );

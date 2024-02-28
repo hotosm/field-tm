@@ -29,3 +29,9 @@ export interface GetOrganisationDataModel {
   url: string;
   approved: boolean;
 }
+
+export type organizationTypeOptionsType = {
+  name: string;
+  value: string;
+  label: string;
+};
