@@ -98,7 +98,6 @@ const CreateNewProject = () => {
             customLineUpload={customLineUpload}
             customPolygonUpload={customPolygonUpload}
             customFormFile={customFormFile}
-            dataExtractFile={dataExtractFile}
           />
         );
       default:
