@@ -8,7 +8,7 @@ import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { downloadProjectFormLoadingType } from '@/models/project/projectModel';
 
-const ProjectOptions = ({ setToggleGenerateModal }) => {
+const ProjectOptions = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
@@ -96,7 +96,7 @@ const ProjectOptions = ({ setToggleGenerateModal }) => {
           <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full sm:fmtm-ml-4 fmtm-gap-6">
             <CoreModules.Button
               onClick={() => {
-                setToggleGenerateModal(true);
+                dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
                 dispatch(ProjectActions.SetMobileFooterSelection('explore'));
               }}
               variant="contained"
