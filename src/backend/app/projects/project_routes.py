@@ -598,7 +598,7 @@ async def validate_form(form: UploadFile):
     file = Path(form.filename)
     file_ext = file.suffix
 
-    allowed_extensions = [".xls", ".xlsx", "xml"]
+    allowed_extensions = [".xls", ".xlsx", ".xml"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
             status_code=400, detail="Provide a valid .xls,.xlsx,.xml file"

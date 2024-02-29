@@ -378,7 +378,7 @@ async def test_form_validity(xform_content: bytes, form_type: str):
         form_type (str): type of form (xls or xlsx).
     """
     try:
-        if form_type != "xml":
+        if form_type == "xml":
             # Write xform_content to a temporary file
             with open(f"/tmp/xform_temp.{form_type}", "wb") as f:
                 f.write(xform_content)
