@@ -22,6 +22,7 @@ import json
 import os
 import uuid
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -270,7 +271,7 @@ async def test_generate_project_files(db, client, project):
     assert isinstance(task_ids, list)
 
     # Provide custom xlsform file path
-    xlsform_file = f"{test_data_path}/buildings.xls"
+    xlsform_file = Path(f"{test_data_path}/buildings.xls")
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
@@ -285,8 +286,8 @@ async def test_generate_project_files(db, client, project):
                 project,
                 task_id,
                 split_extract_dict[task_id],
-                xlsform_file,
-                "building",
+                xlsform_obj,
+                xlsform_file.suffix,
                 odk_credentials,
             )
         )
@@ -299,7 +300,7 @@ async def test_generate_project_files(db, client, project):
             project_id,
             custom_form=xlsform_obj,
             form_category="buildings",
-            form_format="example_form_type",
+            form_file_ext=Path(xlsform_file).suffix,
             background_task_id=uuid.uuid4(),
         )
     )
