@@ -45,6 +45,7 @@ from app.users import user_routes
 
 # Add sentry tracing only in prod
 if not settings.DEBUG:
+    log.info("Adding Sentry tracing")
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         traces_sample_rate=0.1,

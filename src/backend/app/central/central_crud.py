@@ -357,7 +357,7 @@ def download_submissions(
     return fixed.splitlines()
 
 
-async def test_form_validity(xform_content: str, form_type: str):
+async def test_form_validity(xform_content: bytes, form_type: str):
     """Validate an XForm.
 
     Args:
@@ -365,37 +365,34 @@ async def test_form_validity(xform_content: str, form_type: str):
         form_type (str): type of form (xls or xlsx).
     """
     try:
-        xlsform_path = f"/tmp/validate_form.{form_type}"
-        outfile = "/tmp/outfile.xml"
+        if form_type != "xml":
+            # Write xform_content to a temporary file
+            with open(f"/tmp/xform_temp.{form_type}", "wb") as f:
+                f.write(xform_content)
+        else:
+            with open(f"/tmp/xlsform.{form_type}", "wb") as f:
+                f.write(xform_content)
+            # Convert XLSForm to XForm
+            xls2xform_convert(
+                xlsform_path="/tmp/xlsform.xls",
+                xform_path="/tmp/xform_temp.xml",
+                validate=False,
+            )
 
-        with open(xlsform_path, "wb") as f:
-            f.write(xform_content)
+        # Parse XForm
+        namespaces = {"xforms": "http://www.w3.org/2002/xforms"}
+        tree = ElementTree.parse("/tmp/xform_temp.xml")
+        root = tree.getroot()
 
-        xls2xform_convert(xlsform_path=xlsform_path, xform_path=outfile, validate=False)
+        # Extract geojson filenames
+        geojson_list = [
+            os.path.splitext(inst.attrib["src"].split("/")[-1])[0]
+            for inst in root.findall(".//xforms:instance[@src]", namespaces)
+            if inst.attrib.get("src", "").endswith(".geojson")
+        ]
 
-        namespaces = {
-            "h": "http://www.w3.org/1999/xhtml",
-            "odk": "http://www.opendatakit.org/xforms",
-            "xforms": "http://www.w3.org/2002/xforms",
-        }
-
-        with open(outfile, "r") as xml:
-            data = xml.read()
-
-        root = ElementTree.fromstring(data)
-        instances = root.findall(".//xforms:instance[@src]", namespaces)
-
-        geojson_list = []
-        for inst in instances:
-            try:
-                if "src" in inst.attrib:
-                    if (inst.attrib["src"].split("."))[1] == "geojson":
-                        parts = (inst.attrib["src"].split("."))[0].split("/")
-                        geojson_name = parts[-1]
-                        geojson_list.append(geojson_name)
-            except Exception:
-                continue
         return {"required media": geojson_list, "message": "Your form is valid"}
+
     except Exception as e:
         return JSONResponse(
             content={"message": "Your form is invalid", "possible_reason": str(e)},
