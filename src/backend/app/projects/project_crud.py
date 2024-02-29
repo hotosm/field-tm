@@ -996,6 +996,15 @@ async def upload_custom_fgb_extract(
 ) -> str:
     """Upload a flatgeobuf data extract.
 
+    FIXME how can we validate this has the required fields for geojson conversion?
+    Requires:
+        "id"
+        "osm_id"
+        "tags"
+        "version"
+        "changeset"
+        "timestamp"
+
     Args:
         db (Session): SQLAlchemy database session.
         project_id (int): The ID of the project.
@@ -1113,8 +1122,8 @@ def generate_task_files(
     project: db_models.DbProject,
     task_id: int,
     data_extract: FeatureCollection,
-    xlsform_path: str,
-    form_file_extension: str,
+    xlsform_data: BytesIO,
+    form_file_ext: str,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
     """Generate all files for a task."""
@@ -1125,11 +1134,11 @@ def generate_task_files(
     odk_id = project.odkid
     project_name = project.project_name_prefix
     category = project.xform_title
-    appuser_name = f"{project_name}_{category}_{task_id}"
+    form_name = f"{project_name}_{category}_{task_id}"
 
     # Create an app user for the task
     project_log.info(
-        f"Creating odkcentral app user ({appuser_name}) "
+        f"Creating odkcentral app user ({form_name}) "
         f"for FMTM task ({task_id}) in FMTM project ({project.id})"
     )
     appuser = OdkAppUser(
@@ -1137,14 +1146,14 @@ def generate_task_files(
         odk_credentials.odk_central_user,
         odk_credentials.odk_central_password,
     )
-    appuser_json = appuser.create(odk_id, appuser_name)
+    appuser_json = appuser.create(odk_id, form_name)
 
     # If app user could not be created, raise an exception.
     if not appuser_json:
-        project_log.error(f"Couldn't create appuser {appuser_name} for project")
+        project_log.error(f"Couldn't create appuser {form_name} for project")
         return False
     if not (appuser_token := appuser_json.get("token")):
-        project_log.error(f"Couldn't get token for appuser {appuser_name}")
+        project_log.error(f"Couldn't get token for appuser {form_name}")
         return False
 
     get_task_sync = async_to_sync(tasks_crud.get_task)
@@ -1155,51 +1164,55 @@ def generate_task_files(
         f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
     )
 
-    # This file will store xml contents of an xls form
-    # NOTE there must be two underscores, for [2] index in OdkCentral.py
-    xform_path = Path(f"/tmp/fmtm/{project_name}_{task_id}_{category}.xml")
-    xform_path.parents[0].mkdir(parents=True, exist_ok=True)
-
     # Create memory object from split data extract
     geojson_string = geojson.dumps(data_extract)
     geojson_bytes = geojson_string.encode("utf-8")
-    geojson_bytesio = BytesIO(geojson_bytes)
+    geojson_data = BytesIO(geojson_bytes)
 
-    project_log.info(
-        f"Generating xform for task: {task_id} | "
-        f"xform: {xform_path} | form_type: {form_file_extension}"
-    )
-    central_crud.generate_updated_xform(
-        xlsform_path, xform_path, form_file_extension, category
+    project_log.info(f"Generating xform from for task: ({task_id})")
+
+    # This is where the ODK form name and geojson media name are set
+    xform_data = central_crud.update_xform_info(
+        xlsform_data,
+        form_file_ext,
+        form_name,
+        f"{form_name}.geojson",
     )
 
     # Create an odk xform
     project_log.info(f"Uploading data extract media to task ({task_id})")
-    central_crud.create_odk_xform(
+    xform_name = central_crud.create_odk_xform(
         odk_id,
-        xform_path,
-        category,
-        geojson_bytesio,
+        xform_data,
+        f"{form_name}.geojson",
+        geojson_data,
         odk_credentials,
-        create_draft=False,
     )
 
     # Update db with feature count after form uploaded with media
     task.feature_count = len(data_extract.get("features", []))
     log.debug(f"({task.feature_count}) features added for task ({task_id})")
 
-    project_log.info(f"Updating role for app user in task {task_id}")
-    # Update the user role for the created xform.
-    try:
-        log.debug("Updating appuser role to access XForm")
-        appuser.updateRole(
-            projectId=odk_id, xform=xform_path.stem, actorId=appuser_json.get("id")
-        )
-    except Exception as e:
-        log.exception(e)
-
-    # Remove xform temp files
-    xform_path.unlink(missing_ok=True)
+    project_log.info(f"Updating xform role for appuser in task {task_id}")
+    # Update the user role for the created xform
+    response = appuser.updateRole(
+        projectId=odk_id, xform=xform_name, actorId=appuser_json.get("id")
+    )
+    if not response.ok:
+        try:
+            json_data = response.json()
+            log.error(json_data)
+        except json.decoder.JSONDecodeError:
+            log.error(
+                "Could not parse response json during appuser update. "
+                f"status_code={response.status_code}"
+            )
+        finally:
+            msg = f"Failed to update appuser for form: ({xform_name})"
+            log.error(msg)
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            ) from None
 
     project.extract_completed_count += 1
 
@@ -1216,7 +1229,7 @@ def generate_project_files(
     project_id: int,
     custom_form: Optional[BytesIO],
     form_category: str,
-    form_format: str,
+    form_file_ext: str,
     background_task_id: Optional[uuid.UUID] = None,
 ):
     """Generate the files for a project.
@@ -1228,7 +1241,7 @@ def generate_project_files(
         - project_id: Project ID
         - custom_form: the xls file to upload if we have a custom form
         - form_category: the category for the custom XLS form
-        - form_format: weather the form is xls, xlsx or xml
+        - form_file_ext: weather the form is xls, xlsx or xml
         - background_task_id: the task_id of the background task running this function.
     """
     try:
@@ -1249,22 +1262,16 @@ def generate_project_files(
 
         if custom_form:
             log.debug("User provided custom XLSForm")
-            # TODO uncomment after refactor to use BytesIO
-            # xlsform = custom_form
-
-            xlsform_path = f"/tmp/{form_category}.{form_format}"
-            with open(xlsform_path, "wb") as f:
-                f.write(custom_form.getvalue())
+            xlsform = custom_form
         else:
             log.debug(f"Using default XLSForm for category: '{form_category}'")
 
-            # TODO uncomment after refactor to use BytesIO
-            # xlsform_path = f"{xlsforms_path}/{form_category}.xls"
-            # with open(xlsform_path, "rb") as f:
-            #     xlsform = BytesIO(f.read())
-
             xlsform_path = f"{xlsforms_path}/{form_category}.xls"
+            with open(xlsform_path, "rb") as f:
+                xlsform = BytesIO(f.read())
 
+            # NOTE would filtering be required at any point if this
+            # NOTE is handled upstream?
             # filter = FilterData(xlsform)
             # updated_data_extract = {"type": "FeatureCollection", "features": []}
             # filtered_data_extract = (
@@ -1305,8 +1312,8 @@ def generate_project_files(
                     project,
                     task_id,
                     task_extract_dict[task_id],
-                    xlsform_path,
-                    form_format,
+                    xlsform,
+                    form_file_ext,
                     odk_credentials,
                 )
             except Exception as e:
@@ -1726,7 +1733,7 @@ async def update_project_form(
         # This file will store xml contents of an xls form.
         xform_path = Path(f"/tmp/{category}_{task_id}.xml")
 
-        outfile = central_crud.generate_updated_xform(
+        outfile = central_crud.update_xform_info(
             xlsform, xform_path, form_type, category
         )
 
@@ -1738,9 +1745,8 @@ async def update_project_form(
             category,
             feature_geojson,
             odk_credentials,
-            create_draft=True,
-            convert_to_draft_when_publishing=False,
         )
+
     return True
 
 
