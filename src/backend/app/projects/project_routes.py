@@ -588,19 +588,21 @@ async def edit_project_boundary(
     }
 
 
-@router.post("/validate_form")
+@router.post("/validate-form")
 async def validate_form(form: UploadFile):
     """Tests the validity of the xls form uploaded.
 
     Parameters:
         - form: The xls form to validate
     """
-    file_name = os.path.splitext(form.filename)
-    file_ext = file_name[1]
+    file = Path(form.filename)
+    file_ext = file.suffix
 
-    allowed_extensions = [".xls", ".xlsx"]
+    allowed_extensions = [".xls", ".xlsx", "xml"]
     if file_ext not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+        raise HTTPException(
+            status_code=400, detail="Provide a valid .xls,.xlsx,.xml file"
+        )
 
     contents = await form.read()
     return await central_crud.test_form_validity(contents, file_ext[1:])
