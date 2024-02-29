@@ -594,7 +594,7 @@ async def validate_form(form: UploadFile):
         - form: The xls form to validate
     """
     file = Path(form.filename)
-    file_ext = file.suffix
+    file_ext = file.suffix.lower()
 
     allowed_extensions = [".xls", ".xlsx", ".xml"]
     if file_ext not in allowed_extensions:
@@ -603,7 +603,7 @@ async def validate_form(form: UploadFile):
         )
 
     contents = await form.read()
-    return await central_crud.test_form_validity(contents, file_ext[1:])
+    return await central_crud.test_form_validity(contents, file_ext)
 
 
 @router.post("/{project_id}/generate-project-data")
@@ -676,7 +676,7 @@ async def generate_files(
         project_id,
         BytesIO(custom_xls_form) if custom_xls_form else None,
         form_category,
-        file_ext if xls_form_upload else "xls",
+        file_ext if xls_form_upload else ".xls",
         background_task_id,
     )
 
@@ -684,31 +684,6 @@ async def generate_files(
         status_code=200,
         content={"Message": f"{project_id}", "task_id": f"{background_task_id}"},
     )
-
-
-@router.post("/update-form/{project_id}")
-async def update_project_form(
-    project_id: int,
-    form: Optional[UploadFile],
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
-):
-    """Update XLSForm for a project."""
-    file_name = os.path.splitext(form.filename)
-    file_ext = file_name[1]
-    allowed_extensions = [".xls"]
-    if file_ext not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Provide a valid .xls file")
-    contents = await form.read()
-
-    form_updated = await project_crud.update_project_form(
-        db,
-        project_id,
-        contents,
-        file_ext[1:],  # Form Contents  # File type
-    )
-
-    return form_updated
 
 
 @router.get("/generate-log/")
@@ -931,58 +906,65 @@ async def download_form(
     return Response(content=project.form_xls, headers=headers)
 
 
-@router.post("/update_category")
-async def update_project_category(
+@router.post("/update-form")
+async def update_project_form(
     # background_tasks: BackgroundTasks,
-    project_id: int,
     category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
-):
-    """Update the XLSForm category for a project.
+    project_user_dict: dict = Depends(project_admin),
+) -> project_schemas.ProjectBase:
+    """Update the XForm data in ODK Central.
 
-    Not valid for custom form uploads.
+    Also updates the category and custom XLSForm data in the database.
     """
-    contents = None
+    # TODO migrate most logic to project_crud
+    project = project_user_dict["project"]
 
-    project = await project_crud.get_project(db, project_id)
-    if not project:
-        raise HTTPException(
-            status_code=400, detail=f"Project with id {project_id} does not exist"
-        )
-
-    current_category = project.xform_title
-    if current_category == category:
+    if project.xform_title == category:
         if not upload:
             raise HTTPException(
                 status_code=400, detail="Current category is same as new category"
             )
 
     if upload:
-        # Validating for .XLS File.
-        file_name = os.path.splitext(upload.filename)
-        file_ext = file_name[1]
+        file_ext = Path(upload.filename).suffix.lower()
         allowed_extensions = [".xls", ".xlsx", ".xml"]
         if file_ext not in allowed_extensions:
-            raise HTTPException(status_code=400, detail="Provide a valid .xls file")
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="Provide a valid .xls, .xlsx, .xml file.",
+            )
+        new_xform_data = await upload.read()
+        # Update the XLSForm blob in the database
+        project.form_xls = new_xform_data
+        new_xform_data = BytesIO(new_xform_data)
+    else:
+        xlsform_path = Path(f"{xlsforms_path}/{category}.xls")
+        file_ext = xlsform_path.suffix.lower()
+        with open(xlsform_path, "rb") as f:
+            new_xform_data = BytesIO(f.read())
 
-        # FIXME
-        project.form_xls = contents
-        db.commit()
-
+    # Update category in database
     project.xform_title = category
+    # Commit changes to db
     db.commit()
 
-    # Update odk forms
-    await project_crud.update_project_form(
-        db,
-        project_id,
-        file_ext[1:] if upload else "xls",
-        upload,  # Form
+    # Get ODK Central credentials for project
+    odk_creds = await project_deps.get_odk_credentials(db, project.id)
+    # Get task id list
+    task_list = await tasks_crud.get_task_id_list(db, project.id)
+    # Update ODK Central form data
+    await central_crud.update_odk_xforms(
+        task_list,
+        project.odkid,
+        new_xform_data,
+        file_ext,
+        f"{project.project_name_prefix}_{category}",
+        odk_creds,
     )
 
-    return JSONResponse(status_code=200, content={"success": True})
+    return project
 
 
 @router.get("/download_template/")

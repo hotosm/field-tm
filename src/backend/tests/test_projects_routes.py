@@ -287,7 +287,7 @@ async def test_generate_project_files(db, client, project):
                 task_id,
                 split_extract_dict[task_id],
                 xlsform_obj,
-                xlsform_file.suffix,
+                xlsform_file.suffix.lower(),
                 odk_credentials,
             )
         )
@@ -300,7 +300,7 @@ async def test_generate_project_files(db, client, project):
             project_id,
             custom_form=xlsform_obj,
             form_category="buildings",
-            form_file_ext=Path(xlsform_file).suffix,
+            form_file_ext=Path(xlsform_file).suffix.lower(),
             background_task_id=uuid.uuid4(),
         )
     )

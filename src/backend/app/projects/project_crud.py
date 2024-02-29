@@ -24,7 +24,6 @@ from asyncio import gather
 from concurrent.futures import ThreadPoolExecutor, wait
 from importlib.resources import files as pkg_files
 from io import BytesIO
-from pathlib import Path
 from typing import List, Optional, Union
 
 import geoalchemy2
@@ -33,7 +32,7 @@ import requests
 import shapely.wkb as wkblib
 import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
-from fastapi import File, HTTPException, Response, UploadFile
+from fastapi import HTTPException, Response
 from fastapi.concurrency import run_in_threadpool
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geoalchemy2.shape import to_shape
@@ -828,7 +827,7 @@ async def read_xlsforms(
                 xlsforms.append(xls)
             else:
                 continue
-    log.info(xls)
+
     inspect(db_models.DbXForm)
     forms = table(
         "xlsforms", column("title"), column("xls"), column("xml"), column("id")
@@ -1665,75 +1664,76 @@ async def update_background_task_status_in_database(
     return True
 
 
-async def update_project_form(
-    db: Session, project_id: int, form_type: str, form: UploadFile = File(None)
-):
-    """Upload a new custom XLSForm for a project."""
-    project = await get_project(db, project_id)
-    category = project.xform_title
-    odk_id = project.odkid
+# TODO remove me
+# async def update_project_form(
+#     db: Session, project_id: int, form_type: str, form: UploadFile = File(None)
+# ):
+#     """Upload a new custom XLSForm for a project."""
+#     project = await get_project(db, project_id)
+#     category = project.xform_title
+#     odk_id = project.odkid
 
-    # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
+#     # ODK Credentials
+#     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
 
-    if form:
-        xlsform = f"/tmp/custom_form.{form_type}"
-        contents = await form.read()
-        with open(xlsform, "wb") as f:
-            f.write(contents)
-    else:
-        xlsform = f"{xlsforms_path}/{category}.xls"
+#     if form:
+#         xlsform = f"/tmp/custom_form.{form_type}"
+#         contents = await form.read()
+#         with open(xlsform, "wb") as f:
+#             f.write(contents)
+#     else:
+#         xlsform = f"{xlsforms_path}/{category}.xls"
 
-    # TODO fix this to use correct data extract generation
-    pg = PostgresClient("underpass")
-    outfile = f"/tmp/{category}.geojson"  # This file will store osm extracts
+#     # TODO fix this to use correct data extract generation
+#     pg = PostgresClient("underpass")
+#     outfile = f"/tmp/{category}.geojson"  # This file will store osm extracts
 
-    # FIXME test this works
-    # FIXME PostgresClient.getFeatures does not exist...
-    # FIXME getFeatures is part of the DataExtract osm-fieldwork class
-    extract_polygon = True if project.data_extract_type == "polygon" else False
+#     # FIXME test this works
+#     # FIXME PostgresClient.getFeatures does not exist...
+#     # FIXME getFeatures is part of the DataExtract osm-fieldwork class
+#     extract_polygon = True if project.data_extract_type == "polygon" else False
 
-    project = table("projects", column("outline"))
+#     project = table("projects", column("outline"))
 
-    # where = f"id={project_id}
-    sql = select(
-        geoalchemy2.functions.ST_AsGeoJSON(project.c.outline).label("outline"),
-    ).where(text(f"id={project_id}"))
-    result = db.execute(sql)
-    project_outline = result.first()
+#     # where = f"id={project_id}
+#     sql = select(
+#         geoalchemy2.functions.ST_AsGeoJSON(project.c.outline).label("outline"),
+#     ).where(text(f"id={project_id}"))
+#     result = db.execute(sql)
+#     project_outline = result.first()
 
-    final_outline = json.loads(project_outline.outline)
+#     final_outline = json.loads(project_outline.outline)
 
-    feature_geojson = pg.getFeatures(
-        boundary=final_outline,
-        filespec=outfile,
-        polygon=extract_polygon,
-        xlsfile=f"{category}.xls",
-        category=category,
-    )
-    # TODO upload data extract to S3 bucket
+#     feature_geojson = pg.getFeatures(
+#         boundary=final_outline,
+#         filespec=outfile,
+#         polygon=extract_polygon,
+#         xlsfile=f"{category}.xls",
+#         category=category,
+#     )
+#     # TODO upload data extract to S3 bucket
 
-    tasks_list = await tasks_crud.get_task_id_list(db, project_id)
+#     tasks_list = await tasks_crud.get_task_id_list(db, project_id)
 
-    for task_id in tasks_list:
-        # This file will store xml contents of an xls form.
-        xform_path = Path(f"/tmp/{category}_{task_id}.xml")
+#     for task_id in tasks_list:
+#         # This file will store xml contents of an xls form.
+#         xform_path = Path(f"/tmp/{category}_{task_id}.xml")
 
-        outfile = central_crud.update_xform_info(
-            xlsform, xform_path, form_type, category
-        )
+#         outfile = central_crud.update_xform_info(
+#             xlsform, xform_path, form_type, category
+#         )
 
-        # Create an odk xform
-        # TODO include data extract geojson correctly
-        result = central_crud.create_odk_xform(
-            odk_id,
-            xform_path,
-            category,
-            feature_geojson,
-            odk_credentials,
-        )
+#         # Create an odk xform
+#         # TODO include data extract geojson correctly
+#         result = central_crud.create_odk_xform(
+#             odk_id,
+#             xform_path,
+#             category,
+#             feature_geojson,
+#             odk_credentials,
+#         )
 
-    return True
+#     return True
 
 
 async def get_extracted_data_from_db(db: Session, project_id: int, outfile: str):

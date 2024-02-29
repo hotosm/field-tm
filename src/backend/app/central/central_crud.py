@@ -18,7 +18,7 @@
 """Logic for interaction with ODK Central & data."""
 
 import os
-from http import HTTPStatus
+from asyncio import gather
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
@@ -30,10 +30,11 @@ from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.db import db_models
+from app.models.enums import HTTPStatus
 from app.projects import project_schemas
 
 
@@ -167,40 +168,6 @@ def delete_odk_app_user(
     """Delete an app-user from a remote ODK Server."""
     odk_app_user = get_odk_app_user(odk_central)
     result = odk_app_user.delete(project_id, name)
-    return result
-
-
-def upload_xform_media(
-    project_id: int,
-    xform_id: str,
-    filespec: str,
-    odk_credentials: Optional[dict] = None,
-):
-    """Upload and publish an XForm on ODKCentral."""
-    title = os.path.basename(os.path.splitext(filespec)[0])
-
-    if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
-
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
-
-    try:
-        xform = OdkForm(url, user, pw)
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=500, detail={"message": "Connection failed to odk central"}
-        ) from e
-
-    xform.uploadMedia(project_id, title, filespec)
-    result = xform.publishForm(project_id, title)
     return result
 
 
@@ -352,7 +319,88 @@ def get_form_list(db: Session, skip: int, limit: int):
 
     except Exception as e:
         log.error(e)
-        raise HTTPException(e) from e
+
+async def update_odk_xforms(
+    task_list: list[int],
+    odk_id: int,
+    xform_data: BytesIO,
+    form_file_ext: str,
+    form_name_prefix: str,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
+) -> bool:
+    """Asyncio update XForm data for each ODK Form in project.
+
+    Args:
+        task_list (List[int]): List of task IDs.
+        odk_id (int): ODK Central form ID.
+        xform_data (BytesIO): XForm data.
+        form_file_ext (str): Extension of the form file.
+        form_name_prefix (str): Prefix for the form name in ODK Central.
+        odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+
+    Returns:
+        bool: True if the update is successful.
+    """
+    coroutines = []
+
+    for task_id in task_list:
+        coro = update_and_publish_form(
+            task_id,
+            odk_id,
+            xform_data,
+            form_file_ext,
+            form_name_prefix,
+            odk_credentials,
+        )
+        coroutines.append(coro)
+
+    await gather(*coroutines)
+
+    return True
+
+
+async def update_and_publish_form(
+    task_id: int,
+    odk_id: int,
+    xform_data: BytesIO,
+    form_file_ext: str,
+    form_name_prefix: str,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
+) -> None:
+    """Update and publish the XForm for a specific task.
+
+    Args:
+        task_id (int): Task ID.
+        odk_id (int): ODK Central form ID.
+        xform_data (BytesIO): XForm data.
+        form_file_ext (str): Extension of the form file.
+        form_name_prefix (str): Prefix for the form name in ODK Central.
+        odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+    """
+    odk_form_name = f"{form_name_prefix}_{task_id}"
+    updated_xform_data = update_xform_info(
+        xform_data,
+        form_file_ext,
+        odk_form_name,
+        f"{odk_form_name}.geojson",
+    )
+
+    try:
+        xform = get_odk_form(odk_credentials)
+    except Exception as e:
+        log.error(e)
+        raise HTTPException(
+            status_code=500, detail={"message": "Connection failed to odk central"}
+        ) from e
+
+    # NOTE calling createForm with the form_name specified should update
+    xform.createForm(
+        odk_id,
+        updated_xform_data,
+        odk_form_name,
+    )
+    # The draft form must be published after upload
+    xform.publishForm(odk_id, odk_form_name)
 
 
 def download_submissions(
@@ -375,10 +423,10 @@ async def test_form_validity(xform_content: bytes, form_type: str):
 
     Args:
         xform_content (str): form to be tested
-        form_type (str): type of form (xls or xlsx).
+        form_type (str): type of form (.xls, .xlsx, or .xml).
     """
     try:
-        if form_type == "xml":
+        if form_type == ".xml":
             # Write xform_content to a temporary file
             with open(f"/tmp/xform_temp.{form_type}", "wb") as f:
                 f.write(xform_content)
@@ -439,12 +487,12 @@ def update_xform_info(
     with open(form_path, "wb") as f:
         f.write(form_data.getvalue())
 
-    form_file_extension = form_path.suffix
+    form_file_extension = form_path.suffix.lower()
     # This file will store xml contents of an xls form
     # NOTE a file on disk is required by xls2xform_convert
     xform_path = Path("/tmp/fmtm_xform_tmp.xml")
 
-    if form_file_extension != "xml":
+    if form_file_extension != ".xml":
         try:
             log.debug(f"Converting xlsform -> xform: {str(form_path)}")
             xls2xform_convert(
