@@ -479,7 +479,7 @@ async def task_split(
     # read data extract
     parsed_extract = None
     if extract_geojson:
-        geojson_data = json.dumps(json.loads(await extract_geojson.read()))
+        geojson_data = await extract_geojson.read()
         parsed_extract = parse_and_filter_geojson(geojson_data, filter=False)
         if parsed_extract:
             await check_crs(parsed_extract)
@@ -868,6 +868,18 @@ async def upload_custom_extract(
     org_user_dict: db_models.DbUser = Depends(project_admin),
 ):
     """Upload a custom data extract geojson for a project.
+
+    Extract can be in geojson for flatgeobuf format.
+
+    Note the following properties are mandatory:
+    - "id"
+    - "osm_id"
+    - "tags"
+    - "version"
+    - "changeset"
+    - "timestamp"
+
+    Extracts are best generated with https://export.hotosm.org for full compatibility.
 
     Request Body
     - 'custom_extract_file' (file): File with the data extract features.
