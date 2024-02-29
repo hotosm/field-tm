@@ -21,8 +21,7 @@ const CreateNewProject = () => {
   const canSwitchCreateProjectSteps = useAppSelector((state) => state.createproject.canSwitchCreateProjectSteps);
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const [geojsonFile, setGeojsonFile] = useState(null);
-  const [customLineUpload, setCustomLineUpload] = useState(null);
-  const [customPolygonUpload, setCustomPolygonUpload] = useState(null);
+  const [customDataExtractUpload, setCustomDataExtractUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
   const [dataExtractFile] = useState(null);
 
@@ -66,8 +65,7 @@ const CreateNewProject = () => {
             flag="create_project"
             geojsonFile={geojsonFile}
             setGeojsonFile={setGeojsonFile}
-            setCustomLineUpload={setCustomLineUpload}
-            setCustomPolygonUpload={setCustomPolygonUpload}
+            setCustomDataExtractUpload={setCustomDataExtractUpload}
           />
         );
       case '/select-category':
@@ -83,10 +81,8 @@ const CreateNewProject = () => {
         return (
           <DataExtract
             flag="create_project"
-            customLineUpload={customLineUpload}
-            setCustomLineUpload={setCustomLineUpload}
-            customPolygonUpload={customPolygonUpload}
-            setCustomPolygonUpload={setCustomPolygonUpload}
+            customDataExtractUpload={customDataExtractUpload}
+            setCustomDataExtractUpload={setCustomDataExtractUpload}
           />
         );
       case '/split-tasks':
@@ -95,8 +91,7 @@ const CreateNewProject = () => {
             flag="create_project"
             geojsonFile={geojsonFile}
             setGeojsonFile={setGeojsonFile}
-            customLineUpload={customLineUpload}
-            customPolygonUpload={customPolygonUpload}
+            customDataExtractUpload={customDataExtractUpload}
             customFormFile={customFormFile}
           />
         );

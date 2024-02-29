@@ -9,7 +9,7 @@ export type ProjectStateTypes = {
   projectLoading: boolean;
   projectTaskBoundries: projectTaskBoundriesType[];
   newProjectTrigger: boolean;
-  projectInfo: projectInfoType | Record<string, any>;
+  projectInfo: Partial<projectInfoType>;
   projectSubmissionLoading: boolean;
   projectSubmission: [];
   projectDataExtractLoading: boolean;

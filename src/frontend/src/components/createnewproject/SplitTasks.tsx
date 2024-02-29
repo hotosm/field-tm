@@ -33,7 +33,7 @@ const alogrithmList = [
 ];
 let generateProjectLogIntervalCb: any = null;
 
-const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, customPolygonUpload, customFormFile }) => {
+const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload, customFormFile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -114,7 +114,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       form_ways: projectDetails.formWays,
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: arrayHashtag,
-      data_extract_type: projectDetails.data_extract_type,
       data_extract_url: projectDetails.data_extract_url,
     };
     // Append extra param depending on task split type
@@ -136,7 +135,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         projectData,
         taskAreaGeojsonFile,
         customFormFile,
-        customPolygonUpload || customLineUpload,
+        customDataExtractUpload,
         projectDetails.dataExtractWays === 'osm_data_extract',
       ),
     );
@@ -386,13 +385,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                               : false
                           }
                         />
-                        {/* <Button
-                        btnText="Stop generating"
-                        btnType="secondary"
-                        type="button"
-                        onClick={() => console.log('stop gen')}
-                        className=""
-                      /> */}
                       </div>
                     </div>
                   )}
