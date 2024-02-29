@@ -60,7 +60,6 @@ from app.projects import project_crud, project_deps, project_schemas
 from app.static import data_path
 from app.submissions import submission_crud
 from app.tasks import tasks_crud
-from app.users.user_deps import user_exists_in_db
 
 router = APIRouter(
     prefix="/projects",
@@ -326,10 +325,9 @@ async def create_project(
 
 @router.put("/{project_id}", response_model=project_schemas.ProjectOut)
 async def update_project(
-    project_id: int,
     project_info: project_schemas.ProjectUpdate,
     db: Session = Depends(database.get_db),
-    current_user: db_models.DbUser = Depends(project_admin),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Update an existing project by ID.
 
@@ -348,7 +346,7 @@ async def update_project(
     - HTTPException with 404 status code if project not found
     """
     project = await project_crud.update_project_info(
-        db, project_info, project_id, current_user
+        db, project_info, project_user_dict["project"], project_user_dict["user"]
     )
     if not project:
         raise HTTPException(status_code=422, detail="Project could not be updated")
@@ -360,7 +358,7 @@ async def project_partial_update(
     project_id: int,
     project_info: project_schemas.ProjectPartialUpdate,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Partial Update an existing project by ID.
 
@@ -378,7 +376,7 @@ async def project_partial_update(
     """
     # Update project informations
     project = await project_crud.partial_update_project_info(
-        db, project_info, project_id
+        db, project_info, project_user_dict["project"]
     )
 
     if not project:
@@ -553,7 +551,7 @@ async def edit_project_boundary(
     boundary_geojson: UploadFile = File(...),
     dimension: int = Form(500),
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Edit the existing project boundary."""
     # Validating for .geojson File.
@@ -848,7 +846,7 @@ async def get_or_set_data_extract(
     url: Optional[str] = None,
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(project_admin),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Get or set the data extract URL for a project."""
     fgb_url = await project_crud.get_or_set_data_extract_url(
@@ -865,7 +863,7 @@ async def upload_custom_extract(
     custom_extract_file: UploadFile = File(...),
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(project_admin),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Upload a custom data extract geojson for a project.
 
@@ -1387,12 +1385,12 @@ async def get_contributors(
 @router.post("/add_admin/")
 async def add_new_project_admin(
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(project_admin),
-    user: db_models.DbUser = Depends(user_exists_in_db),
-    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
+    project_user_dict: dict = Depends(project_admin),
 ):
     """Add a new project manager.
 
     The logged in user must be either the admin of the organisation or a super admin.
     """
-    return await project_crud.add_project_admin(db, user, project)
+    return await project_crud.add_project_admin(
+        db, project_user_dict["user"], project_user_dict["project"]
+    )

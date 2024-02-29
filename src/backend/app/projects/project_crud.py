@@ -186,20 +186,13 @@ async def delete_one_project(db: Session, db_project: db_models.DbProject) -> No
 
 
 async def partial_update_project_info(
-    db: Session, project_metadata: project_schemas.ProjectUpdate, project_id
+    db: Session,
+    project_metadata: project_schemas.ProjectPartialUpdate,
+    db_project: db_models.DbProject,
 ):
     """Partial project update for PATCH."""
-    # Get the project from db
-    db_project = await get_project_by_id(db, project_id)
-
-    # Raise an exception if project is not found.
-    if not db_project:
-        raise HTTPException(
-            status_code=428, detail=f"Project with id {project_id} does not exist"
-        ) from None
-
     # Get project info
-    db_project_info = await get_project_info_by_id(db, project_id)
+    db_project_info = await get_project_info_by_id(db, db_project.id)
 
     # Update project informations
     if db_project and db_project_info:
@@ -226,7 +219,7 @@ async def partial_update_project_info(
 async def update_project_info(
     db: Session,
     project_metadata: project_schemas.ProjectUpdate,
-    project_id: int,
+    db_project: db_models.DbProject,
     db_user: db_models.DbUser,
 ):
     """Full project update for PUT."""
@@ -238,13 +231,6 @@ async def update_project_info(
             detail="No project info passed in",
         )
 
-    # verify project exists in db
-    db_project = await get_project_by_id(db, project_id)
-    if not db_project:
-        raise HTTPException(
-            status_code=428, detail=f"Project with id {project_id} does not exist"
-        )
-
     # Project meta informations
     project_info = project_metadata.project_info
 
@@ -253,7 +239,7 @@ async def update_project_info(
     db_project.project_name_prefix = project_metadata.project_name_prefix
 
     # get project info
-    db_project_info = await get_project_info_by_id(db, project_id)
+    db_project_info = await get_project_info_by_id(db, db_project.id)
 
     # Update projects meta informations (name, descriptions)
     if db_project and db_project_info:
@@ -1053,14 +1039,14 @@ async def get_data_extract_type(featcol: FeatureCollection) -> str:
 async def upload_custom_geojson_extract(
     db: Session,
     project_id: int,
-    geojson_str: str,
+    geojson_raw: Union[str, bytes],
 ) -> str:
     """Upload a geojson data extract.
 
     Args:
         db (Session): SQLAlchemy database session.
         project_id (int): The ID of the project.
-        geojson_str (str): The custom data extracts contents.
+        geojson_raw (str): The custom data extracts contents.
 
     Returns:
         str: URL to fgb file in S3.
@@ -1068,7 +1054,7 @@ async def upload_custom_geojson_extract(
     project = await get_project(db, project_id)
     log.debug(f"Uploading custom data extract for project: {project}")
 
-    featcol_filtered = parse_and_filter_geojson(geojson_str)
+    featcol_filtered = parse_and_filter_geojson(geojson_raw)
     if not featcol_filtered:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
