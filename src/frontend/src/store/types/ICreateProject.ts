@@ -93,7 +93,6 @@ export type EditProjectDetailsTypes = {
 
 export type ProjectDetailsTypes = {
   dimension: number;
-  data_extract_type?: string;
   data_extract_url?: string;
   task_split_dimension?: number;
   task_num_buildings?: number;

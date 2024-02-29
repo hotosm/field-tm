@@ -3,16 +3,14 @@ interface ProjectValues {
   dataExtractWays: string;
   data_extractFile: object;
   data_extract_options: string;
-  customPolygonUpload: string;
-  customLineUpload: string;
+  customDataExtractUpload: string;
 }
 interface ValidationErrors {
   form_ways?: string;
   dataExtractWays?: string;
   data_extractFile?: string;
   data_extract_options?: string;
-  customPolygonUpload?: string;
-  customLineUpload?: string;
+  customDataExtractUpload?: string;
 }
 
 function DataExtractValidation(values: ProjectValues) {
@@ -22,13 +20,8 @@ function DataExtractValidation(values: ProjectValues) {
     errors.dataExtractWays = 'Data Extract Selection is Required.';
   }
 
-  if (
-    values.dataExtractWays &&
-    values.dataExtractWays === 'custom_data_extract' &&
-    !values.customPolygonUpload &&
-    !values.customLineUpload
-  ) {
-    errors.customPolygonUpload = 'A GeoJSON file is required.';
+  if (values.dataExtractWays && values.dataExtractWays === 'custom_data_extract' && !values.customDataExtractUpload) {
+    errors.customDataExtractUpload = 'A GeoJSON file is required.';
   }
 
   return errors;
