@@ -300,25 +300,38 @@ def list_submissions(
 def get_form_list(db: Session, skip: int, limit: int):
     """Returns the list of id and title of xforms from the database."""
     try:
-        forms = (
-            db.query(db_models.DbXForm.id, db_models.DbXForm.title)
-            .offset(skip)
-            .limit(limit)
-            .all()
+        categories_to_filter = [
+            "amenities",
+            "camping",
+            "cemeteries",
+            "education",
+            "nature",
+            "places",
+            "wastedisposal",
+            "waterpoints",
+        ]
+
+        sql_query = text(
+            """
+            SELECT id, title FROM xlsforms
+            WHERE title NOT IN
+                (SELECT UNNEST(:categories));
+            """
         )
 
-        result_dict = []
-        for form in forms:
-            form_dict = {
-                "id": form[0],  # Assuming the first element is the ID
-                "title": form[1],  # Assuming the second element is the title
-            }
-            result_dict.append(form_dict)
+        result = db.execute(sql_query, {"categories": categories_to_filter}).fetchall()
+
+        result_dict = [{"id": row.id, "title": row.title} for row in result]
 
         return result_dict
 
     except Exception as e:
         log.error(e)
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        ) from e
+
 
 async def update_odk_xforms(
     task_list: list[int],
