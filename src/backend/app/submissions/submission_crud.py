@@ -411,7 +411,12 @@ def get_all_submissions_json(db: Session, project_id):
 
     get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
     task_list = get_task_id_list_sync(db, project_id)
-    submissions = project.getAllSubmissions(project_info.odkid, task_list)
+    xform_list = [
+        f"{project_info.project_name_prefix}_{task}_{project_info.xform_title}"
+        for task in task_list
+    ]
+
+    submissions = project.getAllSubmissions(project_info.odkid, xform_list)
     return submissions
 
 
@@ -802,7 +807,8 @@ async def get_submission_by_task(
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
 
     xform = get_odk_form(odk_credentials)
-    data = xform.listSubmissions(project.odkid, str(task_id), filters)
+    xform_name = f"{project.project_name_prefix}_{task_id}_{project.xform_title}"
+    data = xform.listSubmissions(project.odkid, xform_name, filters)
     submissions = data.get("value", [])
     count = data.get("@odata.count", 0)
 
