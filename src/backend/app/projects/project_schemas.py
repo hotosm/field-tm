@@ -301,7 +301,6 @@ class ProjectBase(BaseModel):
     project_info: ProjectInfo
     status: ProjectStatus
     # location_str: str
-    project_tasks: Optional[List[tasks_schemas.Task]]
     xform_title: Optional[str] = None
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
@@ -317,13 +316,19 @@ class ProjectBase(BaseModel):
         return geometry_to_geojson(self.outline, {"id": self.id, "bbox": bbox}, self.id)
 
 
-class ProjectOut(ProjectBase):
+class ProjectWithTasks(ProjectBase):
+    """Project plus list of tasks objects."""
+
+    project_tasks: Optional[List[tasks_schemas.Task]]
+
+
+class ProjectOut(ProjectWithTasks):
     """Project display to user."""
 
     project_uuid: uuid.UUID = uuid.uuid4()
 
 
-class ReadProject(ProjectBase):
+class ReadProject(ProjectWithTasks):
     """Redundant model for refactor."""
 
     project_uuid: uuid.UUID = uuid.uuid4()
