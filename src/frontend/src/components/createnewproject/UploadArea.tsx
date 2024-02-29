@@ -46,7 +46,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   const submission = () => {
     if (totalAreaSelection) {
       const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
-      if (totalArea > 1000) {
+      const areaUnit = totalAreaSelection?.split(' ')[1];
+      if (totalArea > 1000 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -162,7 +163,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   useEffect(() => {
     if (totalAreaSelection) {
       const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
-      if (totalArea > 100) {
+      const areaUnit = totalAreaSelection?.split(' ')[1];
+      if (totalArea > 100 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -172,7 +174,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
           }),
         );
       }
-      if (totalArea > 1000) {
+      if (totalArea > 1000 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
