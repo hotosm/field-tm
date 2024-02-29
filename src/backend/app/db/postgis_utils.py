@@ -17,10 +17,11 @@
 #
 """PostGIS and geometry handling helper funcs."""
 
-import datetime
 import json
 import logging
+from datetime import datetime, timezone
 from typing import Optional, Union
+from uuid import uuid4
 
 import geojson
 import requests
@@ -42,7 +43,7 @@ def timestamp():
 
     Used to insert a current timestamp into Pydantic models.
     """
-    return datetime.datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 
 def geometry_to_geojson(
@@ -126,6 +127,8 @@ async def geojson_to_flatgeobuf(
     Returns:
         flatgeobuf (bytes): a Python bytes representation of a flatgeobuf file.
     """
+    geojson_with_props = add_required_geojson_properties(geojson)
+
     sql = text(
         """
         DROP TABLE IF EXISTS temp_features CASCADE;
@@ -159,9 +162,7 @@ async def geojson_to_flatgeobuf(
     )
 
     # Run the SQL
-    log.warning(json.dumps(geojson))
-
-    result = db.execute(sql, {"geojson": json.dumps(geojson)})
+    result = db.execute(sql, {"geojson": json.dumps(geojson_with_props)})
     # Get a memoryview object, then extract to Bytes
     flatgeobuf = result.first()
 
@@ -246,6 +247,8 @@ async def split_geojson_by_task_areas(
     project_id: int,
 ) -> Optional[dict[int, geojson.FeatureCollection]]:
     """Split GeoJSON into tagged task area GeoJSONs.
+
+    NOTE inserts feature.properties.osm_id as feature.id for each feature.
 
     Args:
         db (Session): SQLAlchemy db session.
@@ -353,11 +356,45 @@ async def split_geojson_by_task_areas(
     return None
 
 
+def add_required_geojson_properties(
+    geojson: geojson.FeatureCollection,
+) -> geojson.FeatureCollection:
+    """Add required geojson properties if not present.
+
+    This step is required prior to flatgeobuf generation,
+    else the workflows of conversion between the formats will fail.
+    """
+    for feature in geojson.get("features", []):
+        properties = feature.get("properties", {})
+
+        # NOTE the osm_id field is used to generate the feature.id later
+        if not properties.get("osm_id"):
+            if prop_id := properties.get("id"):
+                properties["osm_id"] = prop_id
+            elif fid := properties.get("fid"):
+                properties["osm_id"] = fid
+            else:
+                # Random id
+                properties["osm_id"] = uuid4()
+
+        # Other required fields
+        if not properties.get("tags"):
+            properties["tags"] = {}
+        if not properties.get("version"):
+            properties["version"] = 1
+        if not properties.get("changeset"):
+            properties["changeset"] = 1
+        if not properties.get("timestamp"):
+            properties["timestamp"] = timestamp().strftime("%Y-%m-%dT%H:%M:%S")
+
+    return geojson
+
+
 def parse_and_filter_geojson(
-    geojson_str: str, filter: bool = True
+    geojson_raw: Union[str, bytes], filter: bool = True
 ) -> Optional[geojson.FeatureCollection]:
     """Parse geojson string and filter out incomaptible geometries."""
-    geojson_parsed = geojson.loads(geojson_str)
+    geojson_parsed = geojson.loads(geojson_raw)
 
     if isinstance(geojson_parsed, geojson.FeatureCollection):
         log.debug("Already in FeatureCollection format, skipping reparse")
