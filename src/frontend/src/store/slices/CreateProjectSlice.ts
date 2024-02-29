@@ -105,9 +105,6 @@ const CreateProject = createSlice({
     GetFormCategoryList(state, action) {
       state.formCategoryList = action.payload;
     },
-    SetFormCategory(state, action) {
-      state.formCategoryList = action.payload;
-    },
     SetIndividualProjectDetailsData(state, action) {
       state.projectDetails = action.payload;
     },
