@@ -238,7 +238,7 @@ async def project_admin(
     project: DbProject = Depends(get_project_by_id),
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
-) -> DbUser:
+) -> dict:
     """Project admin role."""
     db_user = await check_access(
         user_data,
@@ -248,7 +248,11 @@ async def project_admin(
     )
 
     if db_user:
-        return db_user
+        project_user_dict = {
+            "user": db_user,
+            "project": project,
+        }
+        return project_user_dict
 
     raise HTTPException(
         status_code=HTTPStatus.FORBIDDEN,

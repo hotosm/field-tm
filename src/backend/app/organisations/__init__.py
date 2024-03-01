@@ -1,1 +1,1 @@
-"""FMTM projects API."""
+"""FMTM organisations API."""

@@ -34,6 +34,7 @@ from app.auth import auth_routes
 from app.central import central_routes
 from app.config import settings
 from app.db.database import get_db
+from app.helpers import helper_routes
 from app.models.enums import HTTPStatus
 from app.organisations import organisation_routes
 from app.organisations.organisation_crud import init_admin_org
@@ -102,6 +103,7 @@ def get_application() -> FastAPI:
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organisation_routes.router)
+    _app.include_router(helper_routes.router)
 
     return _app
 
