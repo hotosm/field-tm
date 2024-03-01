@@ -1514,7 +1514,7 @@ async def convert_to_app_project(db_project: db_models.DbProject):
             db_project.outline, {"id": db_project.id}, db_project.id
         )
 
-    app_project.project_tasks = db_project.tasks
+    app_project.tasks = db_project.tasks
 
     return app_project
 

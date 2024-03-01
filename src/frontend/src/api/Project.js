@@ -9,15 +9,8 @@ export const ProjectById = (existingProjectList, projectId) => {
       try {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
         const project = await CoreModules.axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}`);
-        const taskList = await CoreModules.axios.get(
-          `${import.meta.env.VITE_API_URL}/tasks/task-list?project_id=${projectId}`,
-        );
-        const taskBbox = await CoreModules.axios.get(
-          `${import.meta.env.VITE_API_URL}/tasks/point_on_surface?project_id=${projectId}`,
-        );
         const projectResp = project.data;
-        const taskListResp = taskList.data;
-        const persistingValues = taskListResp.map((data) => {
+        const persistingValues = projectResp.tasks.map((data) => {
           return {
             id: data.id,
             outline_geojson: data.outline_geojson,
@@ -29,18 +22,9 @@ export const ProjectById = (existingProjectList, projectId) => {
             odk_token: data.odk_token,
           };
         });
-        // added centroid from another api to projecttaskboundries
+        // At top level id project id to object
         const projectTaskBoundries = [{ id: projectResp.id, taskBoundries: persistingValues }];
-        const mergedBboxIntoTask = projectTaskBoundries[0].taskBoundries.map((projectTask) => {
-          const filteredTaskIdCentroid = taskBbox.data.find((task) => task.id === projectTask.id).point[0];
-          return {
-            ...projectTask,
-            bbox: filteredTaskIdCentroid,
-          };
-        });
-        dispatch(
-          ProjectActions.SetProjectTaskBoundries([{ ...projectTaskBoundries[0], taskBoundries: mergedBboxIntoTask }]),
-        );
+        dispatch(ProjectActions.SetProjectTaskBoundries([{ ...projectTaskBoundries[0] }]));
         dispatch(
           ProjectActions.SetProjectInfo({
             id: projectResp.id,

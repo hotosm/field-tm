@@ -122,25 +122,23 @@ const Home = () => {
   useEffect(() => {
     if (!map) return;
 
-    const features = state.projectTaskBoundries[0]?.taskBoundries?.map((feature) => ({
+    const features = state.projectTaskBoundries[0]?.taskBoundries?.map((taskObj) => ({
       type: 'Feature',
-      geometry: { ...feature.outline_geojson.geometry },
+      geometry: { ...taskObj.outline_geojson.geometry },
       properties: {
-        ...feature.outline_geojson.properties,
-        centroid: feature.bbox,
+        ...taskObj.outline_geojson.properties,
+        centroid: taskObj.outline_centroid.geometry.coordinates,
+        // TODO add bbox field here too?
       },
-      id: `${feature.id}_${feature.task_status}`,
+      id: `${taskObj.id}_${taskObj.task_status}`,
     }));
+
     const taskBoundariesFeatcol = {
       ...geojsonObjectModel,
       features: features,
     };
     setTaskBoundariesLayer(taskBoundariesFeatcol);
   }, [state.projectTaskBoundries[0]?.taskBoundries?.length]);
-
-  useEffect(() => {
-    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
-  }, []);
 
   const dataExtractDataPopup = (properties: dataExtractPropertyType) => {
     return (

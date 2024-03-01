@@ -140,8 +140,8 @@ async def test_convert_to_app_project():
 
     assert result.outline_geojson is not None
 
-    assert result.project_tasks is not None
-    assert isinstance(result.project_tasks, list)
+    assert result.tasks is not None
+    assert isinstance(result.tasks, list)
 
 
 async def test_create_project_with_project_info(db, project):

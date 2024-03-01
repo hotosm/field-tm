@@ -23,7 +23,7 @@ export interface ProjectDetailsModel {
     id: string;
     bbox: [string, string, string, string];
   };
-  project_tasks: {
+  tasks: {
     id: number;
     project_id: number;
     project_task_index: number;

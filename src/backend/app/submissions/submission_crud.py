@@ -41,6 +41,7 @@ from sqlalchemy.orm import Session
 from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
 from app.config import settings
 from app.db import db_models
+from app.models.enums import HTTPStatus
 from app.projects import project_crud, project_deps
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
@@ -315,6 +316,14 @@ def update_submission_in_s3(
         odk_credentials = odk_sync(db, project_id)
         odk_forms = list_odk_xforms(project.odkid, odk_credentials, True)
 
+        if not odk_forms:
+            msg = f"No odk forms returned for project ({project_id})"
+            log.warning(msg)
+            return HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
+
         # Get latest submission date
         valid_datetimes = [
             form["lastSubmission"]
@@ -329,6 +338,13 @@ def update_submission_in_s3(
             if valid_datetimes
             else None
         )
+        if not last_submission:
+            msg = f"Could not identify last submission for project ({project_id})"
+            log.warning(msg)
+            return HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=msg,
+            )
 
         # Check if the file already exists in s3
         s3_project_path = f"/{project.organisation_id}/{project_id}"
