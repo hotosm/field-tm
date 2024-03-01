@@ -122,6 +122,7 @@ services:
       - /app/node_modules/
     environment:
       - VITE_API_URL=http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
+      - VITE_FMTM_DOMAIN=${FMTM_DOMAIN}
     ports:
       - "7051:7051"
     networks:
