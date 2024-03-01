@@ -18,6 +18,7 @@
 """Logic for interaction with ODK Central & data."""
 
 import os
+from asyncio import gather
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
@@ -29,10 +30,11 @@ from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.xls2xform import xls2xform_convert
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.db import db_models
+from app.models.enums import HTTPStatus
 from app.projects import project_schemas
 
 
@@ -61,19 +63,11 @@ def get_odk_project(odk_central: Optional[project_schemas.ODKCentralDecrypted] =
     return project
 
 
-def get_odk_form(odk_central: Optional[project_schemas.ODKCentralDecrypted] = None):
+def get_odk_form(odk_central: project_schemas.ODKCentralDecrypted):
     """Helper function to get the OdkForm with credentials."""
-    if odk_central:
-        url = odk_central.odk_central_url
-        user = odk_central.odk_central_user
-        pw = odk_central.odk_central_password
-
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
+    url = odk_central.odk_central_url
+    user = odk_central.odk_central_user
+    pw = odk_central.odk_central_password
 
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
@@ -177,53 +171,25 @@ def delete_odk_app_user(
     return result
 
 
-def upload_xform_media(
-    project_id: int,
-    xform_id: str,
-    filespec: str,
-    odk_credentials: Optional[dict] = None,
-):
-    """Upload and publish an XForm on ODKCentral."""
-    title = os.path.basename(os.path.splitext(filespec)[0])
-
-    if odk_credentials:
-        url = odk_credentials["odk_central_url"]
-        user = odk_credentials["odk_central_user"]
-        pw = odk_credentials["odk_central_password"]
-
-    else:
-        log.debug("ODKCentral connection variables not set in function")
-        log.debug("Attempting extraction from environment variables")
-        url = settings.ODK_CENTRAL_URL
-        user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
-
-    try:
-        xform = OdkForm(url, user, pw)
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=500, detail={"message": "Connection failed to odk central"}
-        ) from e
-
-    xform.uploadMedia(project_id, title, filespec)
-    result = xform.publishForm(project_id, title)
-    return result
-
-
 def create_odk_xform(
     odk_id: int,
-    xform_path: Path,
-    xform_category: str,
-    feature_geojson: BytesIO,
+    xform_data: BytesIO,
+    geojson_file_name: str,
+    geojson_data: BytesIO,
     odk_credentials: project_schemas.ODKCentralDecrypted,
-    create_draft: bool = False,
-    convert_to_draft_when_publishing=True,
-):
-    """Create an XForm on a remote ODK Central server."""
-    # result = xform.createForm(project_id, title, filespec, True)
-    # Pass odk credentials of project in xform
+) -> str:
+    """Create an XForm on a remote ODK Central server.
 
+    Args:
+        odk_id (str): Project ID for ODK Central.
+        xform_data (BytesIO): XForm data to set.
+        geojson_file_name (str): Name of the attached geojson media file.
+        geojson_data (BytesIO): GeoJSON data to set.
+        odk_credentials (ODKCentralDecrypted): Creds for ODK Central.
+
+    Returns:
+        form_name (str): ODK Central form name for the API.
+    """
     try:
         xform = get_odk_form(odk_credentials)
     except Exception as e:
@@ -232,30 +198,44 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    result = xform.createForm(odk_id, xform_path.stem, str(xform_path), create_draft)
-
-    if result != 200 and result != 409:
-        return result
-
-    # TODO refactor osm_fieldwork.OdkCentral.OdkForm.uploadMedia
-    # to accept passing a bytesio object and update
-    geojson_path = Path(f"/tmp/fmtm/odk/{odk_id}/{xform_category}.geojson")
-    geojson_path.parents[0].mkdir(parents=True, exist_ok=True)
-    with open(geojson_path, "w") as geojson_file:
-        geojson_file.write(feature_geojson.getvalue().decode("utf-8"))
+    form_name = xform.createForm(odk_id, xform_data, publish=True)
+    if not form_name:
+        namespaces = {
+            "h": "http://www.w3.org/1999/xhtml",
+            "odk": "http://www.opendatakit.org/xforms",
+            "xforms": "http://www.w3.org/2002/xforms",
+        }
+        # Parse the XML
+        root = ElementTree.fromstring(xform_data.getvalue())
+        # Update id attribute to equal the form name to be generated
+        xml_data = root.findall(".//xforms:data[@id]", namespaces)
+        extracted_name = "Not Found"
+        for dt in xml_data:
+            extracted_name = dt.get("id")
+        msg = f"Failed to create form on ODK Central: ({extracted_name})"
+        log.error(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+        ) from None
 
     # This modifies an existing published XForm to be in draft mode.
     # An XForm must be in draft mode to upload an attachment.
     # Upload the geojson of features to be modified
-    xform.uploadMedia(
-        odk_id, xform_path.stem, str(geojson_path), convert_to_draft_when_publishing
+    # NOTE the form is automatically republished
+    result = xform.uploadMedia(
+        odk_id,
+        form_name,
+        geojson_data,
+        filename=geojson_file_name,
     )
+    if not result:
+        msg = f"Failed to upload file ({geojson_file_name}) to form ({form_name})"
+        log.error(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+        ) from None
 
-    # Delete temp geojson file
-    geojson_path.unlink(missing_ok=True)
-
-    result = xform.publishForm(odk_id, xform_path.stem)
-    return result
+    return form_name
 
 
 def delete_odk_xform(
@@ -320,26 +300,120 @@ def list_submissions(
 def get_form_list(db: Session, skip: int, limit: int):
     """Returns the list of id and title of xforms from the database."""
     try:
-        forms = (
-            db.query(db_models.DbXForm.id, db_models.DbXForm.title)
-            .offset(skip)
-            .limit(limit)
-            .all()
+        categories_to_filter = [
+            "amenities",
+            "camping",
+            "cemeteries",
+            "education",
+            "nature",
+            "places",
+            "wastedisposal",
+            "waterpoints",
+        ]
+
+        sql_query = text(
+            """
+            SELECT id, title FROM xlsforms
+            WHERE title NOT IN
+                (SELECT UNNEST(:categories));
+            """
         )
 
-        result_dict = []
-        for form in forms:
-            form_dict = {
-                "id": form[0],  # Assuming the first element is the ID
-                "title": form[1],  # Assuming the second element is the title
-            }
-            result_dict.append(form_dict)
+        result = db.execute(sql_query, {"categories": categories_to_filter}).fetchall()
+
+        result_dict = [{"id": row.id, "title": row.title} for row in result]
 
         return result_dict
 
     except Exception as e:
         log.error(e)
-        raise HTTPException(e) from e
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        ) from e
+
+
+async def update_odk_xforms(
+    task_list: list[int],
+    odk_id: int,
+    xform_data: BytesIO,
+    form_file_ext: str,
+    form_name_prefix: str,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
+) -> bool:
+    """Asyncio update XForm data for each ODK Form in project.
+
+    Args:
+        task_list (List[int]): List of task IDs.
+        odk_id (int): ODK Central form ID.
+        xform_data (BytesIO): XForm data.
+        form_file_ext (str): Extension of the form file.
+        form_name_prefix (str): Prefix for the form name in ODK Central.
+        odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+
+    Returns:
+        bool: True if the update is successful.
+    """
+    coroutines = []
+
+    for task_id in task_list:
+        coro = update_and_publish_form(
+            task_id,
+            odk_id,
+            xform_data,
+            form_file_ext,
+            form_name_prefix,
+            odk_credentials,
+        )
+        coroutines.append(coro)
+
+    await gather(*coroutines)
+
+    return True
+
+
+async def update_and_publish_form(
+    task_id: int,
+    odk_id: int,
+    xform_data: BytesIO,
+    form_file_ext: str,
+    form_name_prefix: str,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
+) -> None:
+    """Update and publish the XForm for a specific task.
+
+    Args:
+        task_id (int): Task ID.
+        odk_id (int): ODK Central form ID.
+        xform_data (BytesIO): XForm data.
+        form_file_ext (str): Extension of the form file.
+        form_name_prefix (str): Prefix for the form name in ODK Central.
+        odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+    """
+    odk_form_name = f"{form_name_prefix}_{task_id}"
+    updated_xform_data = update_xform_info(
+        xform_data,
+        form_file_ext,
+        odk_form_name,
+        f"{odk_form_name}.geojson",
+    )
+
+    try:
+        xform = get_odk_form(odk_credentials)
+    except Exception as e:
+        log.error(e)
+        raise HTTPException(
+            status_code=500, detail={"message": "Connection failed to odk central"}
+        ) from e
+
+    # NOTE calling createForm with the form_name specified should update
+    xform.createForm(
+        odk_id,
+        updated_xform_data,
+        odk_form_name,
+    )
+    # The draft form must be published after upload
+    xform.publishForm(odk_id, odk_form_name)
 
 
 def download_submissions(
@@ -362,10 +436,10 @@ async def test_form_validity(xform_content: bytes, form_type: str):
 
     Args:
         xform_content (str): form to be tested
-        form_type (str): type of form (xls or xlsx).
+        form_type (str): type of form (.xls, .xlsx, or .xml).
     """
     try:
-        if form_type != "xml":
+        if form_type == ".xml":
             # Write xform_content to a temporary file
             with open(f"/tmp/xform_temp.{form_type}", "wb") as f:
                 f.write(xform_content)
@@ -400,22 +474,46 @@ async def test_form_validity(xform_content: bytes, form_type: str):
         )
 
 
-def generate_updated_xform(
-    input_path: str,
-    xform_path: Path,
-    form_file_extension: str,
-    form_category: str,
-) -> str:
-    """Update the version in an XForm so it's unique."""
-    if form_file_extension != "xml":
+def update_xform_info(
+    form_data: BytesIO,
+    form_file_ext: str,
+    form_name,
+    geojson_file_name: str,
+) -> BytesIO:
+    """Update fields in the XForm to work with FMTM.
+
+    Updated the 'id' field as the form name via the API.
+    Also updates the geojson filename to match that of the uploaded media.
+
+    Args:
+        form_data (str): The input form data.
+        form_file_ext (str): Extension from xls, xlsx or xml (xform).
+        form_name (str): Name of the XForm to set.
+        geojson_file_name (str): Name of the geojson media to set.
+
+    Returns:
+        BytesIO: The XForm data.
+    """
+    # TODO xls2xform_convert requires files on disk
+    # TODO create PR to accept BytesIO?
+    form_path = Path(f"/tmp/fmtm_form_input_tmp.{form_file_ext}")
+    with open(form_path, "wb") as f:
+        f.write(form_data.getvalue())
+
+    form_file_extension = form_path.suffix.lower()
+    # This file will store xml contents of an xls form
+    # NOTE a file on disk is required by xls2xform_convert
+    xform_path = Path("/tmp/fmtm_xform_tmp.xml")
+
+    if form_file_extension != ".xml":
         try:
-            log.debug(f"Reading & converting xlsform -> xform: {input_path}")
+            log.debug(f"Converting xlsform -> xform: {str(form_path)}")
             xls2xform_convert(
-                xlsform_path=input_path, xform_path=str(xform_path), validate=False
+                xlsform_path=str(form_path), xform_path=str(xform_path), validate=False
             )
         except Exception as e:
             log.error(e)
-            msg = f"Couldn't convert {input_path} to an XForm!"
+            msg = f"Couldn't convert {str(form_path)} to an XForm!"
             log.error(msg)
             raise HTTPException(status_code=400, detail=msg) from e
 
@@ -427,10 +525,15 @@ def generate_updated_xform(
 
         with open(xform_path, "r") as xform:
             data = xform.read()
+            # Delete temp from output
+            xform_path.unlink()
     else:
-        with open(input_path, "r") as xlsform:
-            log.debug(f"Reading XForm directly: {str(input_path)}")
+        with open(form_path, "r") as xlsform:
+            log.debug(f"Reading XForm directly: {str(form_path)}")
             data = xlsform.read()
+
+    # Delete temp form input
+    form_path.unlink()
 
     # # Parse the XML to geojson
     # xml = xmltodict.parse(str(data))
@@ -468,57 +571,35 @@ def generate_updated_xform(
     # xml["h:html"]["h:head"]["h:title"] = name
 
     log.debug("Updating XML keys in XForm with data extract file & form id")
+
+    # Namespaces definition
     namespaces = {
         "h": "http://www.w3.org/1999/xhtml",
         "odk": "http://www.opendatakit.org/xforms",
         "xforms": "http://www.w3.org/2002/xforms",
     }
 
-    instances = []
+    # Parse the XML
     root = ElementTree.fromstring(data)
-    head = root.find("h:head", namespaces)
-    if head:
-        model = head.find("xforms:model", namespaces)
-        if model:
-            instances = model.findall("xforms:instance", namespaces)
 
-    for inst in instances:
-        try:
-            if "src" in inst.attrib:
-                src_value = inst.attrib.get("src", "")
-                if src_value.endswith(".geojson"):
-                    inst.attrib["src"] = f"jr://file/{form_category}.geojson"
+    # Update id attribute to equal the form name to be generated
+    xform_data = root.findall(".//xforms:data[@id]", namespaces)
+    for dt in xform_data:
+        dt.set("id", form_name)
 
-            # Looking for data tags
-            data_tags = inst.findall("xforms:data", namespaces)
-            if data_tags:
-                for dt in data_tags:
-                    if "id" in dt.attrib:
-                        dt.attrib["id"] = str(xform_path.stem)
-        except Exception as e:
-            log.debug(e)
-            log.warning(f"Exception parsing XForm XML: {str(xform_path)}")
-            continue
+    # # Update the form title if needed
+    # existing_title = root.find('.//h:title', namespaces)
+    # if existing_title is not None:
+    #     existing_title.text = "New Title"
 
-    # Save the modified XML
-    newxml = ElementTree.tostring(root)
+    # Update src attribute for instances ending with .geojson
+    xform_instances = root.findall(".//xforms:instance[@src]", namespaces)
+    for inst in xform_instances:
+        src_value = inst.get("src", "")
+        if src_value.endswith(".geojson"):
+            inst.set("src", f"jr://file/{geojson_file_name}")
 
-    # write the updated XML file
-    with open(xform_path, "wb") as outxml:
-        outxml.write(newxml)
-
-    # insert the new version
-    # forms = table(
-    #     "xlsforms", column("title"), column("xls"), column("xml"), column("id")
-    # )
-    # ins = insert(forms).values(title=name, xml=data)
-    # sql = ins.on_conflict_do_update(
-    #     constraint="xlsforms_title_key", set_=dict(title=name, xml=newxml)
-    # )
-    # db.execute(sql)
-    # db.commit()
-
-    return str(xform_path)
+    return BytesIO(ElementTree.tostring(root))
 
 
 def upload_media(
