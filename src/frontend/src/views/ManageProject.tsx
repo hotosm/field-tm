@@ -1,5 +1,6 @@
 import EditTab from '../components/ManageProject/EditTab';
 import UserTab from '../components/ManageProject/UserTab';
+import DeleteTab from '../components/ManageProject/DeleteTab';
 import React, { useEffect, useState } from 'react';
 import AssetModules from '../shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules';
@@ -11,6 +12,7 @@ import { useAppSelector } from '@/types/reduxTypes';
 const tabList = [
   { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
   { id: 'edit', name: 'EDIT', icon: <AssetModules.EditIcon style={{ fontSize: '20px' }} /> },
+  { id: 'delete', name: 'DELETE', icon: <AssetModules.DeleteIcon style={{ fontSize: '20px' }} /> },
 ];
 const ManageProject = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -54,7 +56,13 @@ const ManageProject = () => {
         <h2 className="fmtm-font-archivo fmtm-text-xl fmtm-font-semibold fmtm-text-[#484848] fmtm-tracking-wider fmtm-mb-8">
           {editProjectDetails?.name}
         </h2>
-        {tabView === 'users' ? <UserTab /> : <EditTab projectId={decodedProjectId} />}
+        {tabView === 'users' ? (
+          <UserTab />
+        ) : tabView === 'edit' ? (
+          <EditTab projectId={decodedProjectId} />
+        ) : (
+          <DeleteTab projectId={decodedProjectId} projectName={editProjectDetails?.name} />
+        )}
       </div>
     </div>
   );

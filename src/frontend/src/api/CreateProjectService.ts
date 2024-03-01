@@ -513,7 +513,6 @@ const DeleteProjectService: Function = (url: string) => {
     };
 
     await deleteProject(url);
-    // TODO extra cleanup required?
   };
 };
 
