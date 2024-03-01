@@ -21,7 +21,6 @@ from datetime import datetime
 from typing import Any, List, Optional
 
 from geojson_pydantic import Feature as GeojsonFeature
-from loguru import logger as log
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, computed_field
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator
@@ -90,7 +89,6 @@ class Task(BaseModel):
                 "uid": info.data.get("id"),
                 "name": info.data.get("project_task_name"),
             }
-            log.debug("Converting task outline to geojson")
             return geometry_to_geojson(outline, properties, info.data.get("id"))
         return None
 
@@ -106,7 +104,6 @@ class Task(BaseModel):
                 "uid": info.data.get("id"),
                 "name": info.data.get("project_task_name"),
             }
-            log.debug("Converting task outline to geojson")
             return get_centroid(outline, properties, info.data.get("id"))
         return None
 
