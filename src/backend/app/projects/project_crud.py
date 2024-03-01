@@ -1507,11 +1507,9 @@ async def convert_to_app_project(db_project: db_models.DbProject):
         log.debug("convert_to_app_project called, but no project provided")
         return None
 
-    log.debug("Converting db project to app project")
     app_project = db_project
 
     if db_project.outline:
-        log.debug("Converting project outline to geojson")
         app_project.outline_geojson = geometry_to_geojson(
             db_project.outline, {"id": db_project.id}, db_project.id
         )
