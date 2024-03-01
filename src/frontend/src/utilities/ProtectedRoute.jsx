@@ -9,14 +9,13 @@ const ProtectedRoute = ({ children }) => {
   if (import.meta.env.MODE === 'development') {
     return children;
   }
-  console.log(import.meta.env, 'test');
-  // const token = CoreModules.useAppSelector((state) => state.login.loginToken);
-  const changedDomainToUnderscore = import.meta.env.VITE_FMTM_DOMAIN.replace('.', '_');
-  const token = getCookie(changedDomainToUnderscore);
+
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   if (token == null) {
     createLoginWindow('/');
     return <Navigate to="/" replace />;
   }
+
   return children;
 };
 export default ProtectedRoute;
