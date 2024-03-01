@@ -6,6 +6,7 @@ import CoreModules from '@/shared/CoreModules';
 import environment from '@/environment';
 import { GetIndividualProjectDetails } from '@/api/CreateProjectService';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const tabList = [
   { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
@@ -18,7 +19,7 @@ const ManageProject = () => {
   const encodedProjectId = params.id;
   const decodedProjectId = environment.decode(encodedProjectId);
   const [tabView, setTabView] = useState<'users' | 'edit' | string>('users');
-  const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
+  const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
 
   useEffect(() => {
     dispatch(GetIndividualProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}`));

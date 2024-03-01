@@ -2,6 +2,7 @@ import CoreModules from '@/shared/CoreModules.js';
 import React, { useEffect } from 'react';
 import environment from '@/environment';
 import { SubmissionService } from '@/api/Submission';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const SubmissionDetails = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -12,7 +13,7 @@ const SubmissionDetails = () => {
   const decodedTaskId = environment.decode(encodedTaskId);
   const paramsInstanceId = params.instanceId;
 
-  const submissionDetails = CoreModules.useAppSelector((state) => state.submission.submissionDetails);
+  const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
 
   useEffect(() => {
     dispatch(

@@ -33,7 +33,7 @@ const alogrithmList = [
 ];
 let generateProjectLogIntervalCb: any = null;
 
-const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, customPolygonUpload, customFormFile }) => {
+const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload, customFormFile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,30 +41,24 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
   const [taskGenerationStatus, setTaskGenerationStatus] = useState(false);
 
   const divRef = useRef(null);
-  const splitTasksSelection = CoreModules.useAppSelector((state) => state.createproject.splitTasksSelection);
-  const drawnGeojson = CoreModules.useAppSelector((state) => state.createproject.drawnGeojson);
-  const projectDetails = CoreModules.useAppSelector((state) => state.createproject.projectDetails);
+  const splitTasksSelection = useAppSelector((state) => state.createproject.splitTasksSelection);
+  const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
 
-  const generateQrSuccess: any = CoreModules.useAppSelector((state) => state.createproject.generateQrSuccess);
-  const projectDetailsResponse = CoreModules.useAppSelector((state) => state.createproject.projectDetailsResponse);
-  const generateProjectLog: any = CoreModules.useAppSelector((state) => state.createproject.generateProjectLog);
-  const dividedTaskGeojson = CoreModules.useAppSelector((state) => state.createproject.dividedTaskGeojson);
-  const projectDetailsLoading = CoreModules.useAppSelector((state) => state.createproject.projectDetailsLoading);
-  const generateProjectLogLoading = CoreModules.useAppSelector(
-    (state) => state.createproject.generateProjectLogLoading,
-  );
-  const dividedTaskLoading = CoreModules.useAppSelector((state) => state.createproject.dividedTaskLoading);
-  const taskSplittingGeojsonLoading = CoreModules.useAppSelector(
-    (state) => state.createproject.taskSplittingGeojsonLoading,
-  );
-  const isTasksGenerated = CoreModules.useAppSelector((state) => state.createproject.isTasksGenerated);
-  const isFgbFetching = CoreModules.useAppSelector((state) => state.createproject.isFgbFetching);
-  const toggleSplittedGeojsonEdit = CoreModules.useAppSelector(
-    (state) => state.createproject.toggleSplittedGeojsonEdit,
-  );
+  const generateQrSuccess = useAppSelector((state) => state.createproject.generateQrSuccess);
+  const projectDetailsResponse = useAppSelector((state) => state.createproject.projectDetailsResponse);
+  const generateProjectLog = useAppSelector((state) => state.createproject.generateProjectLog);
+  const dividedTaskGeojson = useAppSelector((state) => state.createproject.dividedTaskGeojson);
+  const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
+  const generateProjectLogLoading = useAppSelector((state) => state.createproject.generateProjectLogLoading);
+  const dividedTaskLoading = useAppSelector((state) => state.createproject.dividedTaskLoading);
+  const taskSplittingGeojsonLoading = useAppSelector((state) => state.createproject.taskSplittingGeojsonLoading);
+  const isTasksGenerated = useAppSelector((state) => state.createproject.isTasksGenerated);
+  const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
+  const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
 
-  const toggleStep = (step, url) => {
+  const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
   };
@@ -92,7 +86,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     const hashtags = projectDetails.hashtags;
     const arrayHashtag = hashtags
-      .split('#')
+      ?.split('#')
       .map((item) => item.trim())
       .filter(Boolean);
 
@@ -114,7 +108,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
       form_ways: projectDetails.formWays,
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: arrayHashtag,
-      data_extract_type: projectDetails.data_extract_type,
       data_extract_url: projectDetails.data_extract_url,
     };
     // Append extra param depending on task split type
@@ -136,7 +129,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         projectData,
         taskAreaGeojsonFile,
         customFormFile,
-        customPolygonUpload || customLineUpload,
+        customDataExtractUpload,
         projectDetails.dataExtractWays === 'osm_data_extract',
       ),
     );
@@ -178,10 +171,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
         }),
       );
     } else if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {
-      // const a = document.createElement('a');
-      // a.href = URL.createObjectURL(drawnGeojsonFile);
-      // a.download = 'test.json';
-      // a.click();
       dispatch(
         TaskSplittingPreviewService(
           `${import.meta.env.VITE_API_URL}/projects/task-split`,
@@ -312,7 +301,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between">
                 <div>
                   <RadioButton
-                    value={splitTasksSelection?.toString()}
+                    value={splitTasksSelection?.toString() || ''}
                     topic="Select an option to split the task"
                     options={alogrithmList}
                     direction="column"
@@ -386,13 +375,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customLineUpload, custo
                               : false
                           }
                         />
-                        {/* <Button
-                        btnText="Stop generating"
-                        btnType="secondary"
-                        type="button"
-                        onClick={() => console.log('stop gen')}
-                        className=""
-                      /> */}
                       </div>
                     </div>
                   )}

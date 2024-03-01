@@ -9,22 +9,22 @@ import {
   GetIndividualOrganizationService,
   RejectOrganizationService,
 } from '@/api/OrganisationService';
-import CoreModules from '@/shared/CoreModules';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const OrganizationForm = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const navigate = useNavigate();
   const organizationId = params.id;
-  const organisationFormData: any = CoreModules.useAppSelector((state) => state.organisation.organisationFormData);
-  const organizationApproving: any = CoreModules.useAppSelector(
+  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
+  const organizationApproving = useAppSelector(
     (state) => state.organisation.organizationApprovalStatus.organizationApproving,
   );
-  const organizationRejecting: any = CoreModules.useAppSelector(
+  const organizationRejecting = useAppSelector(
     (state) => state.organisation.organizationApprovalStatus.organizationRejecting,
   );
-  const organizationApprovalSuccess: any = CoreModules.useAppSelector(
+  const organizationApprovalSuccess = useAppSelector(
     (state) => state.organisation.organizationApprovalStatus.isSuccess,
   );
 

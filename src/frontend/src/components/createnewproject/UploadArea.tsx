@@ -31,13 +31,13 @@ const uploadAreaOptions = [
   },
 ];
 
-const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, setCustomPolygonUpload }) => {
+const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // const [uploadAreaFile, setUploadAreaFile] = useState(null);
   const [isGeojsonWGS84, setIsGeojsonWG84] = useState(true);
 
-  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const uploadAreaSelection = useAppSelector((state) => state.createproject.uploadAreaSelection);
   const drawToggle = useAppSelector((state) => state.createproject.drawToggle);
@@ -46,7 +46,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
   const submission = () => {
     if (totalAreaSelection) {
       const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
-      if (totalArea > 1000) {
+      const areaUnit = totalAreaSelection?.split(' ')[1];
+      if (totalArea > 1000 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -76,8 +77,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
   const convertFileToGeojson = async (file) => {
     if (!file) return;
     const fileReader = new FileReader();
-    const fileLoaded = await new Promise((resolve) => {
-      fileReader.onload = (e) => resolve(e.target.result);
+    const fileLoaded: any = await new Promise((resolve) => {
+      fileReader.onload = (e) => resolve(e.target?.result);
       fileReader.readAsText(file, 'UTF-8');
     });
     const parsedJSON = JSON.parse(fileLoaded);
@@ -156,12 +157,14 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
     handleCustomChange('drawnGeojson', null);
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
+    dispatch(CreateProjectActions.ClearProjectStepState(formValues));
   };
 
   useEffect(() => {
     if (totalAreaSelection) {
       const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
-      if (totalArea > 100) {
+      const areaUnit = totalAreaSelection?.split(' ')[1];
+      if (totalArea > 100 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -171,7 +174,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
           }),
         );
       }
-      if (totalArea > 1000) {
+      if (totalArea > 1000 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -322,8 +325,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomLineUpload, se
                 dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));
                 dispatch(CreateProjectActions.ClearProjectStepState(formValues));
-                setCustomLineUpload(null);
-                setCustomPolygonUpload(null);
+                setCustomDataExtractUpload(null);
               }}
               getAOIArea={(area) => {
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));

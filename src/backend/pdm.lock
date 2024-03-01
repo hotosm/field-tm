@@ -1088,6 +1088,18 @@ files = [
 ]
 
 [[package]]
+name = "mdx-truly-sane-lists"
+version = "1.3"
+summary = "Extension for Python-Markdown that makes lists truly sane. Custom indents for nested lists and fix for messy linebreaks."
+dependencies = [
+    "Markdown>=2.6",
+]
+files = [
+    {file = "mdx_truly_sane_lists-1.3-py3-none-any.whl", hash = "sha256:b9546a4c40ff8f1ab692f77cee4b6bfe8ddf9cccf23f0a24e71f3716fe290a37"},
+    {file = "mdx_truly_sane_lists-1.3.tar.gz", hash = "sha256:b661022df7520a1e113af7c355c62216b384c867e4f59fb8ee7ad511e6e77f45"},
+]
+
+[[package]]
 name = "mercantile"
 version = "1.2.1"
 summary = "Web mercator XYZ tile utilities"

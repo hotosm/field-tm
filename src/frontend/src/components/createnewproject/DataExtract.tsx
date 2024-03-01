@@ -19,42 +19,17 @@ const dataExtractOptions = [
   { name: 'data_extract', value: 'custom_data_extract', label: 'Upload custom data extract' },
 ];
 
-const osmFeatureTypeOptions = [
-  { name: 'osm_feature_type', value: 'centroid', label: 'Point/Centroid' },
-  { name: 'osm_feature_type', value: 'line', label: 'Line' },
-  { name: 'osm_feature_type', value: 'polygon', label: 'Polygon' },
-];
-
-enum FeatureTypeName {
-  centroid = 'Point/Centroid',
-  line = 'Line',
-  polygon = 'Polygon',
-}
-
-const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygonUpload, setCustomPolygonUpload }) => {
+const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  console.log(customDataExtractUpload, 'customDataExtractUpload');
   const [extractWays, setExtractWays] = useState('');
-  const [featureType, setFeatureType] = useState('');
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
 
   const submission = () => {
-    if (featureType !== formValues?.dataExtractFeatureType && formValues.dataExtractWays === 'osm_data_extract') {
-      dispatch(
-        CommonActions.SetSnackBar({
-          open: true,
-          message: `Please generate data extract for ${FeatureTypeName[featureType]}`,
-          variant: 'warning',
-          duration: 2000,
-        }),
-      );
-      return;
-    }
-
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 5 }));
 
@@ -107,12 +82,9 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
       dispatch(
         CreateProjectActions.SetIndividualProjectDetailsData({
           ...formValues,
-          data_extract_type: featureType,
           data_extract_url: fgbUrl,
           dataExtractWays: extractWays,
-          dataExtractFeatureType: featureType,
-          customLineUpload: null,
-          customPolygonUpload: null,
+          customDataExtractUpload: null,
         }),
       );
 
@@ -143,10 +115,7 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
     if (formValues?.dataExtractWays) {
       setExtractWays(formValues?.dataExtractWays);
     }
-    if (formValues?.dataExtractFeatureType) {
-      setFeatureType(formValues?.dataExtractFeatureType);
-    }
-  }, [formValues?.dataExtractWays, formValues?.dataExtractFeatureType]);
+  }, [formValues?.dataExtractWays]);
 
   const toggleStep = (step, url) => {
     if (url === '/select-category') {
@@ -154,7 +123,6 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
         CreateProjectActions.SetIndividualProjectDetailsData({
           ...formValues,
           dataExtractWays: extractWays,
-          dataExtractFeatureType: featureType,
         }),
       );
     }
@@ -166,8 +134,8 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
     if (!file) return;
     // Parse file as JSON
     const fileReader = new FileReader();
-    const fileLoaded = await new Promise((resolve) => {
-      fileReader.onload = (e) => resolve(e.target.result);
+    const fileLoaded: any = await new Promise((resolve) => {
+      fileReader.onload = (e) => resolve(e.target?.result);
       fileReader.readAsText(file, 'UTF-8');
     });
     const parsedJSON = JSON.parse(fileLoaded);
@@ -260,72 +228,32 @@ const DataExtract = ({ flag, customLineUpload, setCustomLineUpload, customPolygo
                   btnText="Generate Data Extract"
                   btnType="primary"
                   onClick={() => {
-                    resetFile(setCustomPolygonUpload);
-                    resetFile(setCustomLineUpload);
+                    resetFile(setCustomDataExtractUpload);
                     generateDataExtract();
                   }}
                   className="fmtm-mt-6"
                   isLoading={isFgbFetching}
                   loadingText="Data extracting..."
-                  disabled={dataExtractGeojson && !customPolygonUpload && !customLineUpload ? true : false}
+                  disabled={dataExtractGeojson && customDataExtractUpload ? true : false}
                 />
               )}
               {extractWays === 'custom_data_extract' && (
                 <>
-                  {/* TODO add option for point upload */}
-                  {/* Set dataExtractFeatureType = 'centroid' */}
-                  {/* <FileInputComponent
-                    onChange={(e) => {
-                      changeFileHandler(e, setCustomPolygonUpload);
-                      handleCustomChange('customPolygonUpload', e.target.files[0]);
-                      handleCustomChange('dataExtractFeatureType', 'polygon');
-                      setFeatureType('');
-                    }}
-                    onResetFile={() => {
-                      resetFile(setCustomPolygonUpload);
-                      handleCustomChange('customPolygonUpload', null);
-                    }}
-                    customFile={customPolygonUpload}
-                    btnText="Upload Polygons"
-                    accept=".geojson,.json,.fgb"
-                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
-                    errorMsg={errors.customPolygonUpload}
-                  /> */}
                   <FileInputComponent
                     onChange={(e) => {
-                      changeFileHandler(e, setCustomPolygonUpload);
-                      handleCustomChange('customPolygonUpload', e.target.files[0]);
-                      handleCustomChange('dataExtractFeatureType', 'polygon');
-                      handleCustomChange('data_extract_type', 'line');
-                      setFeatureType('polygon');
+                      changeFileHandler(e, setCustomDataExtractUpload);
+                      handleCustomChange('customDataExtractUpload', e.target.files[0]);
                     }}
                     onResetFile={() => {
-                      resetFile(setCustomPolygonUpload);
-                      handleCustomChange('customPolygonUpload', null);
+                      resetFile(setCustomDataExtractUpload);
+                      handleCustomChange('customDataExtractUpload', null);
+                      dispatch(CreateProjectActions.setDataExtractGeojson(null));
                     }}
-                    customFile={customPolygonUpload}
-                    btnText="Upload Polygons"
+                    customFile={customDataExtractUpload}
+                    btnText="Upload Data Extract"
                     accept=".geojson,.json,.fgb"
                     fileDescription="*The supported file formats are .geojson, .json, .fgb"
-                    errorMsg={errors.customPolygonUpload}
-                  />
-                  <FileInputComponent
-                    onChange={(e) => {
-                      changeFileHandler(e, setCustomLineUpload);
-                      handleCustomChange('customLineUpload', e.target.files[0]);
-                      handleCustomChange('dataExtractFeatureType', 'line');
-                      handleCustomChange('data_extract_type', 'line');
-                      setFeatureType('line');
-                    }}
-                    onResetFile={() => {
-                      resetFile(setCustomLineUpload);
-                      handleCustomChange('customLineUpload', null);
-                    }}
-                    customFile={customLineUpload}
-                    btnText="Upload Lines"
-                    accept=".geojson,.json,.fgb"
-                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
-                    errorMsg={errors.customLineUpload}
+                    errorMsg={errors.customDataExtractUpload}
                   />
                 </>
               )}

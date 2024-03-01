@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import AssetModules from '@/shared/AssetModules.js';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import CoreModules from '@/shared/CoreModules';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const ProjectInfo = () => {
-  const paraRef = useRef(null);
+  const paraRef = useRef<any>(null);
   const [seeMore, setSeeMore] = useState(false);
   const [descLines, setDescLines] = useState(1);
-  const projectInfo = CoreModules.useAppSelector((state) => state?.project?.projectInfo);
-  const projectDetailsLoading = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
-  const projectDashboardDetail = CoreModules.useAppSelector((state) => state?.project?.projectDashboardDetail);
-  const projectDashboardLoading = CoreModules.useAppSelector((state) => state?.project?.projectDashboardLoading);
+  const projectInfo = useAppSelector((state) => state?.project?.projectInfo);
+  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const projectDashboardDetail = useAppSelector((state) => state?.project?.projectDashboardDetail);
+  const projectDashboardLoading = useAppSelector((state) => state?.project?.projectDashboardLoading);
 
   useEffect(() => {
     if (paraRef.current) {

@@ -3,31 +3,27 @@ import '../styles/home.css';
 import ExploreProjectCard from '@/components/home/ExploreProjectCard';
 import windowDimention from '@/hooks/WindowDimension';
 import { HomeSummaryService } from '@/api/HomeService';
-import enviroment from '@/environment';
 import ProjectCardSkeleton from '@/components/home/ProjectCardSkeleton';
 import HomePageFilters from '@/components/home/HomePageFilters';
 import CoreModules from '@/shared/CoreModules';
-import AssetModules from '@/shared/AssetModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
+import { projectType } from '@/models/home/homeModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
-  //dispatch function to perform redux state mutation
 
   const { type } = windowDimention();
-  //get window dimension
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [paginationPage, setPaginationPage] = useState(1);
 
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const showMapStatus = CoreModules.useAppSelector((state) => state.home.showMapStatus);
-  const homeProjectPagination = CoreModules.useAppSelector((state) => state.home.homeProjectPagination);
-  // const state:any = CoreModules.useAppSelector(state=>state.project.projectData)
-  // console.log('state main :',state)
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
+  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
+  const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
 
-  const stateHome = CoreModules.useAppSelector((state) => state.home);
+  const stateHome = useAppSelector((state) => state.home);
   //we use use selector from redux to get all state of home from home slice
 
   const filteredProjectCards = stateHome.homeProjectSummary;
@@ -98,7 +94,7 @@ const Home = () => {
                           : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[75vh] lg:fmtm-overflow-y-scroll lg:scrollbar'
                       }`}
                     >
-                      {filteredProjectCards.map((value, index) => (
+                      {filteredProjectCards.map((value: projectType, index: number) => (
                         <ExploreProjectCard data={value} key={index} />
                       ))}
                     </div>

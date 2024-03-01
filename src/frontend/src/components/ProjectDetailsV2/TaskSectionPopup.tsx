@@ -7,7 +7,7 @@ import { ProjectFilesById } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
 
 type TaskSectionPopupPropType = {
-  taskId: string | undefined;
+  taskId: number | null;
   body: React.JSX.Element;
   feature: any;
 };
@@ -60,14 +60,27 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
         fmtm-rounded-t-3xl fmtm-border-opacity-50`}
     >
       <div
-        onClick={() => dispatch(ProjectActions.ToggleTaskModalStatus(false))}
         className={`fmtm-absolute fmtm-top-[17px] fmtm-right-[20px] ${
           taskModalStatus ? '' : 'fmtm-hidden'
         }  fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-3`}
       >
-        <AssetModules.FileDownloadOutlinedIcon style={{ width: '20px' }} className="hover:fmtm-text-primaryRed " />
-        <AssetModules.DescriptionOutlinedIcon style={{ width: '20px' }} className="hover:fmtm-text-primaryRed " />
-        <AssetModules.CloseIcon style={{ width: '20px' }} className="hover:fmtm-text-primaryRed " />
+        <AssetModules.FileDownloadOutlinedIcon
+          style={{ width: '20px' }}
+          className="hover:fmtm-text-primaryRed"
+          onClick={() => {
+            dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
+          }}
+        />
+        <AssetModules.DescriptionOutlinedIcon
+          style={{ width: '20px' }}
+          className="hover:fmtm-text-primaryRed"
+          onClick={() => {}}
+        />
+        <AssetModules.CloseIcon
+          style={{ width: '20px' }}
+          className="hover:fmtm-text-primaryRed"
+          onClick={() => dispatch(ProjectActions.ToggleTaskModalStatus(false))}
+        />
       </div>
       <div className="fmtm-bg-[#fbfbfb] fmtm-rounded-t-2xl fmtm-shadow-[-20px_0px_60px_25px_rgba(0,0,0,0.2)]  md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-p-5">

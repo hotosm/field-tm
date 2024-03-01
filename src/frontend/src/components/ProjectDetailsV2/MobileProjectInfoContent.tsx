@@ -1,7 +1,8 @@
 import React from 'react';
 import AssetModules from '@/shared/AssetModules';
+import { projectInfoType } from '@/models/project/projectModel';
 
-const MobileProjectInfoContent = ({ projectInfo }) => {
+const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: projectInfoType }) => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-mb-[12vh]">
       <div className="fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2">

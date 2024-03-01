@@ -18,14 +18,10 @@ import {
 import { diffObject } from '@/utilfunctions/compareUtils';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { CustomCheckbox } from '@/components/common/Checkbox';
+import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
-type optionsType = {
-  name: string;
-  value: string;
-  label: string;
-};
-
-const organizationTypeOptions: optionsType[] = [
+const organizationTypeOptions: organizationTypeOptionsType[] = [
   { name: 'osm_community', value: 'osm_community', label: 'OSM Community' },
   { name: 'company', value: 'company', label: 'Company' },
   { name: 'non_profit', value: 'non_profit', label: 'Non-profit' },
@@ -33,16 +29,14 @@ const organizationTypeOptions: optionsType[] = [
   { name: 'other', value: 'other', label: 'Other' },
 ];
 
-const CreateEditOrganizationForm = ({ organizationId }) => {
+const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const inputFileRef = useRef<any>(null);
-  const organisationFormData: any = CoreModules.useAppSelector((state) => state.organisation.organisationFormData);
-  const postOrganisationDataLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.organisation.postOrganisationDataLoading,
-  );
-  const postOrganisationData: any = CoreModules.useAppSelector((state) => state.organisation.postOrganisationData);
+  const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
+  const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
+  const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
   const [previewSource, setPreviewSource] = useState<any>('');
 
   const submission = () => {

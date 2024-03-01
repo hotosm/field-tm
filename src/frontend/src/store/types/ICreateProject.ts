@@ -1,13 +1,15 @@
+import { task_split_type } from '@/types/enums';
+
 export type CreateProjectStateTypes = {
   editProjectDetails: EditProjectDetailsTypes;
   editProjectResponse?: EditProjectResponseTypes | null;
-  projectDetails: ProjectDetailsTypes;
+  projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
   projectArea: ProjectAreaTypes | null;
   projectAreaLoading: boolean;
-  formCategoryList: FormCategoryListTypes | [];
+  formCategoryList: FormCategoryListTypes[] | [];
   formCategoryLoading: boolean;
   generateQrLoading: boolean;
   organisationList: OrganisationListTypes[];
@@ -17,7 +19,7 @@ export type CreateProjectStateTypes = {
   generateProjectLog: GenerateProjectLogTypes | null;
   createProjectStep: number;
   dividedTaskLoading: boolean;
-  dividedTaskGeojson: string | null;
+  dividedTaskGeojson: null | GeoJSONFeatureTypes;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
   taskSplittingGeojson: TaskSplittingGeojsonTypes | null;
@@ -26,14 +28,14 @@ export type CreateProjectStateTypes = {
   drawToggle: boolean;
   validateCustomFormLoading: boolean;
   validateCustomFormResponse: ValidateCustomFormResponse | null;
-  uploadAreaSelection: string | null;
+  uploadAreaSelection: string;
   totalAreaSelection: string | null;
-  splitTasksSelection: string | null;
-  dataExtractGeojson: null;
+  splitTasksSelection: task_split_type | null;
+  dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
   isUnsavedChanges: boolean;
   canSwitchCreateProjectSteps: boolean;
-  isTasksGenerated: {};
+  isTasksGenerated: Record<string, any>;
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
@@ -53,6 +55,7 @@ export type GeoJSONFeatureTypes = {
   properties: Record<string, any>;
   id: string;
   bbox: null | number[];
+  features?: [];
 };
 
 export type ProjectTaskTypes = {
@@ -93,7 +96,6 @@ export type EditProjectDetailsTypes = {
 
 export type ProjectDetailsTypes = {
   dimension: number;
-  data_extract_type?: string;
   data_extract_url?: string;
   task_split_dimension?: number;
   task_num_buildings?: number;
@@ -111,6 +113,10 @@ export type ProjectDetailsTypes = {
   data_extract_options?: string;
   form_ways?: string;
   organisation_id?: number | null;
+  formWays?: string;
+  formCategorySelection?: string;
+  average_buildings_per_task?: number;
+  dataExtractWays?: string;
 };
 
 export type ProjectAreaTypes = {
@@ -135,6 +141,7 @@ export type OrganisationListTypes = {
   name: string;
   description: string;
   type: 1;
+  odk_central_url: string | null;
 };
 
 export type GenerateProjectLogTypes = {
@@ -152,4 +159,5 @@ export type DrawnGeojsonTypes = {
   type: string;
   properties: null;
   geometry: GeometryTypes;
+  features?: [];
 };

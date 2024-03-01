@@ -3,14 +3,14 @@ import useOLMap from '@/hooks/useOlMap';
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
-import { GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
+import { DrawnGeojsonTypes, GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
 import MapControlComponent from '@/components/createnewproject/MapControlComponent';
 
 type NewDefineAreaMapProps = {
   drawToggle?: boolean;
-  splittedGeojson: GeoJSONFeatureTypes | null;
-  uploadedOrDrawnGeojsonFile: GeoJSONFeatureTypes;
-  buildingExtractedGeojson?: GeoJSONFeatureTypes;
+  splittedGeojson?: GeoJSONFeatureTypes | null;
+  uploadedOrDrawnGeojsonFile: DrawnGeojsonTypes | null;
+  buildingExtractedGeojson?: GeoJSONFeatureTypes | null;
   lineExtractedGeojson?: GeoJSONFeatureTypes;
   onDraw?: ((geojson: any, area: number) => void) | null;
   onModify?: ((geojson: any, area?: number) => void) | null;
@@ -28,7 +28,7 @@ const NewDefineAreaMap = ({
   hasEditUndo,
   getAOIArea,
 }: NewDefineAreaMapProps) => {
-  const { mapRef, map } = useOLMap({
+  const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
     zoom: 1,
