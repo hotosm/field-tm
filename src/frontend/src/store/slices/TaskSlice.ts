@@ -1,20 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { TaskStateTypes } from '@/store/types/ITask';
+import { taskInfoType } from '@/models/task/taskModel';
+
+const initialState: TaskStateTypes = {
+  taskLoading: false,
+  taskInfo: [],
+  selectedTask: null,
+  projectBoundaryLoading: false,
+  projectBoundary: [],
+  convertToOsmLoading: false,
+  convertToOsm: [],
+  downloadSubmissionLoading: { type: '', loading: false },
+  convertXMLToJOSMLoading: false,
+  josmEditorError: null,
+  taskData: { feature_count: 0, submission_count: 0, task_count: 0 },
+};
 
 const TaskSlice = createSlice({
   name: 'task',
-  initialState: {
-    taskLoading: false,
-    taskInfo: [],
-    selectedTask: null,
-    projectBoundaryLoading: false,
-    projectBoundary: [],
-    convertToOsmLoading: null,
-    convertToOsm: [],
-    downloadSubmissionLoading: { type: '', loading: false },
-    convertXMLToJOSMLoading: false,
-    josmEditorError: null,
-    taskData: { feature_count: 0, submission_count: 0, task_count: 0 },
-  },
+  initialState: initialState,
   reducers: {
     SetTaskLoading(state, action) {
       state.taskLoading = action.payload;
@@ -26,7 +30,7 @@ const TaskSlice = createSlice({
       state.convertToOsmLoading = action.payload;
     },
     FetchTaskInfoDetails(state, action) {
-      const taskInfo = action.payload;
+      const taskInfo: taskInfoType[] = action.payload;
 
       state.taskInfo = taskInfo;
 

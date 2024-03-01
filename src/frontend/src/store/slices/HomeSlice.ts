@@ -1,21 +1,34 @@
-import CoreModules from '@/shared/CoreModules';
-const HomeSlice = CoreModules.createSlice({
-  name: 'home',
-  initialState: {
-    homeProjectSummary: [],
-    homeProjectLoading: true,
-    selectedProject: {},
-    dialogStatus: false,
-    snackbar: {
-      open: false,
-      message: '',
-      variant: 'info',
-      duration: 0,
-    },
-    showMapStatus: true,
-    projectCentroidLoading: false,
-    homeProjectPagination: {},
+import { createSlice } from '@reduxjs/toolkit';
+import { HomeStateTypes } from '@/store/types/IHome';
+
+export const initialState: HomeStateTypes = {
+  homeProjectSummary: [],
+  homeProjectLoading: true,
+  selectedProject: {},
+  dialogStatus: false,
+  snackbar: {
+    open: false,
+    message: '',
+    variant: 'info',
+    duration: 0,
   },
+  showMapStatus: true,
+  projectCentroidLoading: false,
+  homeProjectPagination: {
+    has_next: false,
+    has_prev: false,
+    next_num: null,
+    page: null,
+    pages: null,
+    prev_num: null,
+    per_page: null,
+    total: null,
+  },
+};
+
+const HomeSlice = createSlice({
+  name: 'home',
+  initialState: initialState,
   reducers: {
     SetHomeProjectSummary(state, action) {
       state.homeProjectSummary = action.payload;

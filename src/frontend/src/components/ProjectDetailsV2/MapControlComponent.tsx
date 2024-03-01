@@ -3,6 +3,7 @@ import AssetModules from '@/shared/AssetModules';
 import VectorLayer from 'ol/layer/Vector';
 import CoreModules from '@/shared/CoreModules.js';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const MapControlComponent = ({ map }) => {
   const btnList = [
@@ -25,7 +26,7 @@ const MapControlComponent = ({ map }) => {
   ];
   const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
-  const geolocationStatus = CoreModules.useAppSelector((state) => state.project.geolocationStatus);
+  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const handleOnClick = (btnId) => {
     if (btnId === 'add') {
       const actualZoom = map.getView().getZoom();

@@ -22,7 +22,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
+  const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
@@ -81,7 +81,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   };
   useEffect(() => {
     if (customFormFile && !customFileValidity) {
-      dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate_form`, customFormFile));
+      dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate-form`, customFormFile));
     }
   }, [customFormFile]);
   return (
@@ -153,8 +153,8 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   onResetFile={resetFile}
                   customFile={customFormFile}
                   btnText="Select a Form"
-                  accept=".xls,.xlsx"
-                  fileDescription="*The supported file formats are .xlsx, .xls"
+                  accept=".xls,.xlsx,.xml"
+                  fileDescription="*The supported file formats are .xlsx, .xls, .xml"
                   errorMsg={errors.customFormUpload}
                 />
               ) : null}

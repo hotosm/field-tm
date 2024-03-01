@@ -4,15 +4,23 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import Switch from '@/components/common/Switch';
 import { HomeActions } from '@/store/slices/HomeSlice';
+import { homeProjectPaginationTypes } from '@/models/home/homeModel';
+import { useAppSelector } from '@/types/reduxTypes';
+
+type homePageFiltersPropType = {
+  onSearch: (data: string) => void;
+  filteredProjectCount: number;
+  totalProjectCount: number;
+};
 
 //Home Filter
-const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }) => {
+const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }: homePageFiltersPropType) => {
   const [searchQuery, setSearchQuery] = useState('');
   const dispatch = CoreModules.useAppDispatch();
 
-  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const showMapStatus: boolean = CoreModules.useAppSelector((state) => state.home.showMapStatus);
-  const homeProjectPagination = CoreModules.useAppSelector((state) => state.home.homeProjectPagination);
+  const defaultTheme: any = useAppSelector((state) => state.theme.hotTheme);
+  const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
+  const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
 
   const { windowSize } = windowDimention();
   const searchableInnerStyle: any = {

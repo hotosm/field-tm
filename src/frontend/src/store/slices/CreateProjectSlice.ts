@@ -40,7 +40,7 @@ export const initialState: CreateProjectStateTypes = {
   drawToggle: false,
   validateCustomFormLoading: false,
   validateCustomFormResponse: null,
-  uploadAreaSelection: null,
+  uploadAreaSelection: '',
   totalAreaSelection: null,
   splitTasksSelection: null,
   dataExtractGeojson: null,
@@ -89,7 +89,7 @@ const CreateProject = createSlice({
       state.generateProjectLog = null;
       state.generateProjectLogLoading = false;
       state.isUnsavedChanges = false;
-      state.uploadAreaSelection = null;
+      state.uploadAreaSelection = '';
       state.dividedTaskGeojson = null;
       state.dividedTaskLoading = false;
     },

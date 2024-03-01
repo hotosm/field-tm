@@ -11,6 +11,7 @@ import MarkerIcon from '@/assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
 import environment from '@/environment';
 import { Style, Text, Icon, Fill } from 'ol/style';
+import { projectType } from '@/models/home/homeModel';
 
 type HomeProjectSummaryType = {
   features: { geometry: any; properties: any; type: any }[];
@@ -66,9 +67,9 @@ const ProjectListMap = () => {
     zoom: 4,
     maxZoom: 17,
   });
-  const homeProjectSummary = CoreModules.useAppSelector((state) => state.home.homeProjectSummary);
+  const homeProjectSummary: projectType[] = CoreModules.useAppSelector((state) => state.home.homeProjectSummary);
   useEffect(() => {
-    if (!homeProjectSummary && homeProjectSummary?.length === 0) return;
+    if (homeProjectSummary?.length === 0) return;
     const convertedHomeProjectSummaryGeojson: HomeProjectSummaryType = {
       ...geojsonObjectModel,
       features: homeProjectSummary.map((project) => ({

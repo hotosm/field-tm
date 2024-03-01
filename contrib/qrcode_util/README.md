@@ -1,5 +1,18 @@
 # QR Code Utils
 
+Small util for encoding and decoding QR code content.
+
+```bash
+usage: qrcode_util.py [-h] [--write] [--read]
+
+Encode or decode QR code data.
+
+options:
+  -h, --help  show this help message and exit
+  --write     Write data from STDIN to a QRCode.
+  --read      Read QRCode data from STDIN and print to terminal.
+```
+
 ## Convert QR Code to JSON
 
 ```bash

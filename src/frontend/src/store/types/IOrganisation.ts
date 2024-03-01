@@ -1,12 +1,12 @@
 import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
 
 export interface IOrganisationState {
-  organisationFormData: any;
+  organisationFormData: Record<string, any>;
   organisationData: GetOrganisationDataModel[];
   myOrganisationData: GetOrganisationDataModel[];
-  postOrganisationData: any;
-  organisationDataLoading: Boolean;
-  postOrganisationDataLoading: Boolean;
+  postOrganisationData: Record<string, any> | null;
+  organisationDataLoading: boolean;
+  postOrganisationDataLoading: boolean;
   myOrganisationDataLoading: false;
   consentDetailsFormData: {
     give_consent: any;
@@ -14,10 +14,10 @@ export interface IOrganisationState {
     log_into: any;
     participated_in: any;
   };
-  consentApproval: Boolean;
+  consentApproval: boolean;
   organizationApprovalStatus: {
-    isSuccess: Boolean;
-    organizationApproving: Boolean;
-    organizationRejecting: Boolean;
+    isSuccess: boolean;
+    organizationApproving: boolean;
+    organizationRejecting: boolean;
   };
 }

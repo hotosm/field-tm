@@ -6,7 +6,6 @@ import MainView from '@/views/MainView';
 import ProtectedRoute from '@/utilities/ProtectedRoute';
 import NotFoundPage from '@/views/NotFound404';
 import Organisation from '@/views/Organisation';
-import CreateOrganisation from '@/views/CreateOrganisation';
 import CreateEditOrganization from '@/views/CreateEditOrganization';
 import ApproveOrganization from '@/views/ApproveOrganization';
 import Authorized from '@/views/Authorized';
@@ -38,14 +37,6 @@ const routes = createBrowserRouter([
         element: (
           <ErrorBoundary>
             <Organisation />
-          </ErrorBoundary>
-        ),
-      },
-      {
-        path: '/createOrganisation',
-        element: (
-          <ErrorBoundary>
-            <CreateOrganisation />
           </ErrorBoundary>
         ),
       },

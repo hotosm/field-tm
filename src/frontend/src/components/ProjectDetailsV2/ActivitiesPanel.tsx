@@ -1,13 +1,12 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react';
 import environment from '@/environment';
-import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { CustomSelect } from '@/components/common/Select';
-import profilePic from '@/assets/images/project_icon.png';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
 import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
+import { taskHistoryListType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const sortByList = [
   { id: 'activities', name: 'Activities' },
@@ -18,13 +17,13 @@ const sortByList = [
 
 const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion, states }) => {
   const displayLimit = 10;
-  const [searchText, setSearchText] = useState('');
-  const [taskHistories, setTaskHistories] = useState([]);
+  const [searchText, setSearchText] = useState<string>('');
+  const [taskHistories, setTaskHistories] = useState<taskHistoryListType[]>([]);
   const [taskDisplay, setTaskDisplay] = React.useState(displayLimit);
   const [allActivities, setAllActivities] = useState(0);
-  const [sortBy, setSortBy] = useState(null);
+  const [sortBy, setSortBy] = useState<string | null>(null);
   const [showShortBy, setShowSortBy] = useState(false);
-  const projectDetailsLoading = CoreModules.useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   const handleOnchange = (event) => {
     setSearchText(event.target.value);
@@ -32,7 +31,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
 
   useEffect(() => {
     const index = state.findIndex((project) => project.id == environment.decode(params.id));
-    let taskHistories = [];
+    let taskHistories: taskHistoryListType[] = [];
 
     if (index != -1) {
       state[index].taskBoundries.forEach((task) => {
@@ -50,8 +49,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
       });
     }
     setAllActivities(taskHistories.length);
-
-    let finalTaskHistory = taskHistories.filter((task) => {
+    let finalTaskHistory: taskHistoryListType[] = taskHistories.filter((task) => {
       return (
         task.taskId.toString().includes(searchText) ||
         task.action_text.split(':')[1].replace(/\s+/g, '').toString().includes(searchText.toString())
@@ -74,13 +72,13 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
       geometry: new Polygon(geojson.geometry.coordinates).transform('EPSG:4326', 'EPSG:3857'),
     });
     // Get the extent of the OpenLayers feature
-    const extent = olFeature.getGeometry().getExtent();
+    const extent = olFeature.getGeometry()?.getExtent();
     map.getView().fit(extent, {
       padding: [0, 0, 0, 0],
     });
   };
 
-  const ActivitiesCard = ({ taskHistory }) => {
+  const ActivitiesCard = ({ taskHistory }: { taskHistory: taskHistoryListType }) => {
     const actionDate = taskHistory?.action_date?.split('T')[0];
     const actionTime = `${taskHistory?.action_date?.split('T')[1].split(':')[0]}:${taskHistory?.action_date
       ?.split('T')[1]
@@ -193,7 +191,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
       <div className="sm:fmtm-h-[52vh] fmtm-overflow-y-scroll scrollbar">
         {projectDetailsLoading ? (
           <div>
-            {Array.from({ length: 10 }).map((i) => (
+            {Array.from({ length: 10 }).map((_, i) => (
               <ActivitiesCardSkeletonLoader key={i} />
             ))}
           </div>

@@ -1,21 +1,25 @@
-import CoreModules from '@/shared/CoreModules';
-const CommonSlice = CoreModules.createSlice({
-  name: 'common',
-  initialState: {
-    snackbar: {
-      open: false,
-      message: '',
-      variant: 'info',
-      duration: 0,
-    },
-    loading: false,
-    postOrganisationLoading: false,
-    currentStepFormStep: {
-      create_project: {
-        step: 1,
-      },
+import { createSlice } from '@reduxjs/toolkit';
+import { CommonStateTypes } from '@/store/types/ICommon';
+
+const initialState: CommonStateTypes = {
+  snackbar: {
+    open: false,
+    message: '',
+    variant: 'info',
+    duration: 0,
+  },
+  loading: false,
+  postOrganisationLoading: false,
+  currentStepFormStep: {
+    create_project: {
+      step: 1,
     },
   },
+};
+
+const CommonSlice = createSlice({
+  name: 'common',
+  initialState: initialState,
   reducers: {
     SetSnackBar(state, action) {
       state.snackbar = action.payload;
