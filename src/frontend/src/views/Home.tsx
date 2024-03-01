@@ -50,7 +50,7 @@ const Home = () => {
         HomeSummaryService(
           `${
             import.meta.env.VITE_API_URL
-          }/projects/search_projects?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
+          }/projects/search-projects?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
         ),
       );
     }

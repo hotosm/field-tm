@@ -177,7 +177,7 @@ async def read_project_summaries(
 
 
 @router.get(
-    "/search_projects", response_model=project_schemas.PaginatedProjectSummaries
+    "/search-projects", response_model=project_schemas.PaginatedProjectSummaries
 )
 async def search_project(
     search: str,
@@ -1286,6 +1286,7 @@ async def project_dashboard(
     background_task_id = await project_crud.insert_background_task_into_database(
         db, "sync_submission", db_project.id
     )
+    # Update submissions in S3
     background_tasks.add_task(
         submission_crud.update_submission_in_s3, db, db_project.id, background_task_id
     )

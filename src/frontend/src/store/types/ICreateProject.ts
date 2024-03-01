@@ -84,7 +84,7 @@ type EditProjectResponseTypes = {
   project_info: ProjectInfoTypes[];
   status: number;
   outline_geojson: GeoJSONFeatureTypes;
-  project_tasks: ProjectTaskTypes[];
+  tasks: ProjectTaskTypes[];
   xform_title: string;
   hashtags: string[];
 };

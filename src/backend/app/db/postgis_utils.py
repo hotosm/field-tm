@@ -64,12 +64,20 @@ def geometry_to_geojson(
 
 
 def get_centroid(
-    geometry: WKBElement, properties: Optional[dict] = None, id: Optional[int] = None
-):
-    """Convert SQLAlchemy geometry to Centroid GeoJSON."""
+    geometry: WKBElement,
+    properties: Optional[dict] = None,
+    id: Optional[int] = None,
+) -> Union[list[int], Feature]:
+    """Convert SQLAlchemy geometry to Centroid GeoJSON.
+
+    If no id or properties fields are passed, returns the coordinate only.
+    Else returns a Feature GeoJSON.
+    """
     if geometry:
         shape = to_shape(geometry)
         point = shape.centroid
+        if not properties and not id:
+            return point
         geojson = {
             "type": "Feature",
             "geometry": mapping(point),
