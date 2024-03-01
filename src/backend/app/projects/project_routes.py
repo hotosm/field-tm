@@ -908,7 +908,7 @@ async def download_form(
 
 @router.post("/update-form")
 async def update_project_form(
-    # background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
     category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
@@ -955,7 +955,9 @@ async def update_project_form(
     # Get task id list
     task_list = await tasks_crud.get_task_id_list(db, project.id)
     # Update ODK Central form data
-    await central_crud.update_odk_xforms(
+    # FIXME runs in background but status is not tracked
+    background_tasks.add_task(
+        central_crud.update_odk_xforms,
         task_list,
         project.odkid,
         new_xform_data,
