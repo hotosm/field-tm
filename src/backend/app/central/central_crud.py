@@ -431,20 +431,20 @@ def download_submissions(
     return fixed.splitlines()
 
 
-async def test_form_validity(xform_content: bytes, form_type: str):
+async def test_form_validity(xform_content: bytes, form_file_ext: str):
     """Validate an XForm.
 
     Args:
         xform_content (str): form to be tested
-        form_type (str): type of form (.xls, .xlsx, or .xml).
+        form_file_ext (str): type of form (.xls, .xlsx, or .xml).
     """
     try:
-        if form_type == ".xml":
+        if form_file_ext == ".xml":
             # Write xform_content to a temporary file
-            with open(f"/tmp/xform_temp.{form_type}", "wb") as f:
+            with open(f"/tmp/xform_temp{form_file_ext}", "wb") as f:
                 f.write(xform_content)
         else:
-            with open(f"/tmp/xlsform.{form_type}", "wb") as f:
+            with open(f"/tmp/xlsform{form_file_ext}", "wb") as f:
                 f.write(xform_content)
             # Convert XLSForm to XForm
             xls2xform_convert(
@@ -496,7 +496,7 @@ def update_xform_info(
     """
     # TODO xls2xform_convert requires files on disk
     # TODO create PR to accept BytesIO?
-    form_path = Path(f"/tmp/fmtm_form_input_tmp.{form_file_ext}")
+    form_path = Path(f"/tmp/fmtm_form_input_tmp{form_file_ext}")
     with open(form_path, "wb") as f:
         f.write(form_data.getvalue())
 
