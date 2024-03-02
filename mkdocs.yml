@@ -75,7 +75,7 @@ nav:
   - User Manuals:
       - Project Managers: User-Manual-For-Project-Managers.md
   - Utilities:
-      - XLSForm Converter: xlsform-util.md
+      - XLSForm Converter: https://getodk.org/xlsform/
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - API Docs: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
