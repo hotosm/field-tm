@@ -657,11 +657,21 @@ async def generate_log(
         task_status, task_message = await project_crud.get_background_task_status(
             uuid, db
         )
-        extract_completion_count = (
-            db.query(db_models.DbProject)
-            .filter(db_models.DbProject.id == project_id)
-            .first()
-        ).extract_completed_count
+
+        sql = text(
+            """
+            SELECT
+                COUNT(CASE WHEN odk_token IS NOT NULL THEN 1 END) AS tasks_complete,
+                COUNT(*) AS total_tasks
+            FROM tasks
+            WHERE project_id = :project_id;
+        """
+        )
+        result = db.execute(sql, {"project_id": project_id})
+        row = result.fetchone()
+
+        tasks_generated = row[0] if row else 0
+        total_task_count = row[1] if row else 0
 
         project_log_file = Path("/opt/logs/create_project.json")
         project_log_file.touch(exist_ok=True)
@@ -677,12 +687,12 @@ async def generate_log(
             last_50_logs = filtered_logs[-50:]
 
             logs = "\n".join(last_50_logs)
-            task_count = await project_crud.get_tasks_count(db, project_id)
+
             return {
                 "status": task_status.name,
-                "total_tasks": task_count,
+                "total_tasks": total_task_count,
                 "message": task_message,
-                "progress": extract_completion_count,
+                "progress": tasks_generated,
                 "logs": logs,
             }
     except Exception as e:
