@@ -27,7 +27,7 @@ const ProjectOptions = () => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
-          `${import.meta.env.VITE_API_URL}/projects/download_form/${decodedId}/`,
+          `${import.meta.env.VITE_API_URL}/projects/download-form/${decodedId}/`,
           downloadType,
           decodedId,
         ),
