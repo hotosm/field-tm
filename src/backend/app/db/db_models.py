@@ -582,11 +582,10 @@ class DbProject(Base):
             .count()
         )
 
-    # XFORM DETAILS
-    xform_title = cast(
-        str, Column(String, ForeignKey("xlsforms.title", name="fk_xform"))
-    )
-    xform = relationship(DbXForm)
+    # XForm title for ODK Central (this never changes once set)
+    xform_title = cast(str, Column(String))
+    # XForm category specified
+    xform_category = cast(str, Column(String))
 
     __table_args__ = (
         Index("idx_geometry", outline, postgresql_using="gist"),
@@ -622,9 +621,6 @@ class DbProject(Base):
     odk_central_url = cast(str, Column(String))
     odk_central_user = cast(str, Column(String))
     odk_central_password = cast(str, Column(String))
-
-    # Count of tasks where osm extracts is completed, used for progress bar.
-    extract_completed_count = cast(int, Column(Integer, default=0))
 
     form_xls = cast(
         bytes, Column(LargeBinary)
