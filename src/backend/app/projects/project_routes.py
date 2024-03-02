@@ -839,7 +839,7 @@ async def upload_custom_extract(
     return JSONResponse(status_code=200, content={"url": fgb_url})
 
 
-@router.get("/download_form/{project_id}/")
+@router.get("/download-form/{project_id}/")
 async def download_form(
     project_id: int,
     db: Session = Depends(database.get_db),

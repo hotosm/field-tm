@@ -44,7 +44,7 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/tasks-features/?project_id=${decodedId}`));
+      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/features/?project_id=${decodedId}`));
     };
     fetchData();
   }, []);

@@ -139,7 +139,7 @@ async def update_task_status(
     return updated_task
 
 
-@router.get("/tasks-features/")
+@router.get("/features/")
 async def task_features_count(
     project_id: int,
     db: Session = Depends(database.get_db),
@@ -173,12 +173,12 @@ async def task_features_count(
     feature_count_task_dict = {f"{record[0]}": record[1] for record in feature_counts}
 
     project_name_prefix = project.project_name_prefix
-    form_category = project.xform_title
+    xform_title = project.xform_title
 
     for x in odk_details:
         # Strip project name and form type from xmlFormId
         task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_").strip(
-            f"_{form_category}"
+            f"_{xform_title}"
         )
 
         data.append(
