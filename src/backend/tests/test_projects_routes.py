@@ -23,6 +23,7 @@ import os
 import uuid
 from io import BytesIO
 from pathlib import Path
+from random import randint
 from unittest.mock import Mock, patch
 
 import pytest
@@ -56,7 +57,7 @@ async def test_create_project(client, admin_user, organisation):
 
     project_data = {
         "project_info": {
-            "name": "Test Project",
+            "name": f"Test Project {randint(1, 1000000)}",
             "short_description": "test",
             "description": "test",
         },
@@ -81,6 +82,8 @@ async def test_create_project(client, admin_user, organisation):
         f"/projects/create_project?org_id={organisation.id}", json=project_data
     )
 
+    if response.status_code != 200:
+        log.error(response.json())
     assert response.status_code == 200
 
     response_data = response.json()
