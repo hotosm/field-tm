@@ -269,7 +269,7 @@ async def create_project_with_project_info(
         "Creating project in FMTM database with vars: "
         f"project_user: {current_user.username} | "
         f"project_name: {project_metadata.project_info.name} | "
-        f"xform_title: {project_metadata.xform_title} | "
+        f"xform_category: {project_metadata.xform_title} | "
         f"hashtags: {project_metadata.hashtags} | "
         f"organisation_id: {project_metadata.organisation_id}"
     )
@@ -284,6 +284,7 @@ async def create_project_with_project_info(
     db_project = db_models.DbProject(
         author_id=current_user.id,
         odkid=odk_project_id,
+        xform_category=project_metadata.xform_title,
         **project_metadata.model_dump(exclude=["project_info", "outline_geojson"]),
     )
     db.add(db_project)
