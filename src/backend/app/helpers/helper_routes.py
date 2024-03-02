@@ -41,19 +41,23 @@ router = APIRouter(
 )
 
 
-@router.post("/validate-data-extract")
-async def download_features(
+@router.post("/append-geojson-properties")
+async def append_required_geojson_properties(
     geojson: UploadFile,
     current_user: AuthUser = Depends(login_required),
 ):
-    """Validate and append tags to data extract geojson.
+    """Append required properties to a GeoJSON file.
 
-    Args:
-        geojson (UploadFile): The GeoJSON file.
-        current_user (AuthUser): Check if user is logged in.
+    The required properties for FMTM are:
+    - "id"
+    - "osm_id"
+    - "tags"
+    - "version"
+    - "changeset"
+    - "timestamp"
 
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
+    These are added automatically if missing during the project creation workflow.
+    However it may be useful to run your file through this endpoint to validation.
     """
     featcol = parse_and_filter_geojson(await geojson.read())
     if featcol:
