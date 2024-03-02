@@ -391,7 +391,9 @@ async def update_and_publish_form(
     """
     odk_form_name = f"{form_name_prefix}_{task_id}"
     xform_data = await read_and_test_xform(
-        xform_data, form_file_ext, return_form_data=True
+        xform_data,
+        form_file_ext,
+        return_form_data=True,
     )
     updated_xform_data = await update_xform_info(
         xform_data,
