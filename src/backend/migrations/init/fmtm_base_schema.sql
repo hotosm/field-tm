@@ -344,6 +344,7 @@ CREATE TABLE public.projects (
     status public.projectstatus NOT NULL,
     total_tasks integer,
     xform_title character varying,
+    xform_category character varying,
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     mapper_level public.mappinglevel NOT NULL,
     priority public.projectpriority,
@@ -364,7 +365,6 @@ CREATE TABLE public.projects (
     odk_central_url character varying,
     odk_central_user character varying,
     odk_central_password character varying,
-    extract_completed_count integer,
     form_xls bytea,
     form_config_file bytea,
     data_extract_type character varying,
@@ -724,9 +724,6 @@ ALTER TABLE ONLY public.tasks
 
 ALTER TABLE ONLY public.task_invalidation_history
     ADD CONSTRAINT fk_validators FOREIGN KEY (validator_id) REFERENCES public.users(id);
-
-ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT fk_xform FOREIGN KEY (xform_title) REFERENCES public.xlsforms(title);
 
 ALTER TABLE ONLY public.organisation_managers
     ADD CONSTRAINT organisation_managers_organisation_id_fkey FOREIGN KEY (organisation_id) REFERENCES public.organisations(id);
