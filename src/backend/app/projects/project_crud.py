@@ -1105,49 +1105,44 @@ def flatten_dict(d, parent_key="", sep="_"):
 # NOTE defined as non-async to run in separate thread
 def generate_task_files(
     db: Session,
-    project: db_models.DbProject,
+    project_id: int,
+    odk_id,
     task_id: int,
     data_extract: FeatureCollection,
+    xform_name: str,
     xform_data: BytesIO,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
-    """Generate all files for a task."""
-    project_log = log.bind(task="create_project", project_id=project.id)
+    """Generate all files for a task.
+
+    TODO refactor to pass through a dict project variables, instead of DB connection.
+    TODO All required vars could be genrated from the DB first before
+    """
+    project_log = log.bind(task="create_project", project_id=project_id)
 
     project_log.info(f"Generating files for task {task_id}")
 
-    odk_id = project.odkid
-    project_name = project.project_name_prefix
-    category = project.xform_title
-    form_name = f"{project_name}_{category}_{task_id}"
+    # NOTE START create ODK Central appuser and form
 
     # Create an app user for the task
     project_log.info(
-        f"Creating odkcentral app user ({form_name}) "
-        f"for FMTM task ({task_id}) in FMTM project ({project.id})"
+        f"Creating odkcentral app user ({xform_name}) "
+        f"for FMTM task ({task_id}) in FMTM project ({project_id})"
     )
     appuser = OdkAppUser(
         odk_credentials.odk_central_url,
         odk_credentials.odk_central_user,
         odk_credentials.odk_central_password,
     )
-    appuser_json = appuser.create(odk_id, form_name)
+    appuser_json = appuser.create(odk_id, xform_name)
 
     # If app user could not be created, raise an exception.
     if not appuser_json:
-        project_log.error(f"Couldn't create appuser {form_name} for project")
+        project_log.error(f"Couldn't create appuser {xform_name} for project")
         return False
     if not (appuser_token := appuser_json.get("token")):
-        project_log.error(f"Couldn't get token for appuser {form_name}")
+        project_log.error(f"Couldn't get token for appuser {xform_name}")
         return False
-
-    get_task_sync = async_to_sync(tasks_crud.get_task)
-    task = get_task_sync(db, task_id)
-    odk_url = odk_credentials.odk_central_url
-    log.debug(f"Setting odk token for task ({task_id}) on server: {odk_url}")
-    task.odk_token = encrypt_value(
-        f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
-    )
 
     # Create memory object from split data extract
     geojson_string = geojson.dumps(data_extract)
@@ -1160,8 +1155,8 @@ def generate_task_files(
     update_xform_sync = async_to_sync(central_crud.update_xform_info)
     updated_xform = update_xform_sync(
         xform_data,
-        form_name,
-        f"{form_name}.geojson",
+        xform_name,
+        f"{xform_name}.geojson",
     )
 
     # Create an odk xform
@@ -1169,14 +1164,10 @@ def generate_task_files(
     xform_name = central_crud.create_odk_xform(
         odk_id,
         updated_xform,
-        f"{form_name}.geojson",
+        f"{xform_name}.geojson",
         geojson_data,
         odk_credentials,
     )
-
-    # Update db with feature count after form uploaded with media
-    task.feature_count = len(data_extract.get("features", []))
-    log.debug(f"({task.feature_count}) features added for task ({task_id})")
 
     project_log.info(f"Updating xform role for appuser in task {task_id}")
     # Update the user role for the created xform
@@ -1199,11 +1190,25 @@ def generate_task_files(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
             ) from None
 
-    project.extract_completed_count += 1
+    # NOTE ODK Central creation complete, update task in database
 
-    # Commit db transaction
+    # Get task entry from db
+    get_task_sync = async_to_sync(tasks_crud.get_task)
+    task = get_task_sync(db, task_id)
+
+    # Add odk_token to task
+    odk_url = odk_credentials.odk_central_url
+    log.debug(f"Setting odk token for task ({task_id}) on server: {odk_url}")
+    task.odk_token = encrypt_value(
+        f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
+    )
+
+    # Add task feature count to task
+    task.feature_count = len(data_extract.get("features", []))
+    log.debug(f"({task.feature_count}) features added for task ({task_id})")
+
+    # Commit database after final task record update
     db.commit()
-    # db.refresh(project)
 
     return True
 
@@ -1287,6 +1292,16 @@ def generate_project_files(
         read_xform_sync = async_to_sync(central_crud.read_and_test_xform)
         xform_data = read_xform_sync(xlsform, form_file_ext, return_form_data=True)
 
+        # Generate extra task info as dicts (to allow closing db connection)
+        task_form_name_dict = {}
+        for task_id in task_extract_dict.keys():
+            project_name = project.project_name_prefix
+            category = project.xform_title
+            task_form_name_dict[task_id] = f"{project_name}_{category}_{task_id}"
+
+        # Get ODK Project ID from database
+        project_odk_id = project.odkid
+
         # Run with expensive task via threadpool
         def wrap_generate_task_files(task_id):
             """Func to wrap and return errors from thread.
@@ -1298,9 +1313,11 @@ def generate_project_files(
             try:
                 generate_task_files(
                     next(get_db()),
-                    project,
+                    project_id,
+                    project_odk_id,
                     task_id,
                     task_extract_dict[task_id],
+                    task_form_name_dict[task_id],
                     xform_data,
                     odk_credentials,
                 )
@@ -1899,17 +1916,6 @@ async def get_mbtiles_list(db: Session, project_id: int):
 async def convert_geojson_to_osm(geojson_file: str):
     """Convert a GeoJSON file to OSM format."""
     return json2osm(geojson_file)
-
-
-async def get_tasks_count(db: Session, project_id: int):
-    """Get number of tasks for a project."""
-    db_task = (
-        db.query(db_models.DbProject)
-        .filter(db_models.DbProject.id == project_id)
-        .first()
-    )
-    task_count = len(db_task.tasks)
-    return task_count
 
 
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
