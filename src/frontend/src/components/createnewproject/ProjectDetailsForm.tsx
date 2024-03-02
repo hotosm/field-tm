@@ -68,6 +68,23 @@ const ProjectDetailsForm = ({ flag }) => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
   };
 
+  const setSelectedOrganisation = (orgId) => {
+    // Ensure orgId is not null or undefined before integer convert
+    const orgIdInt = orgId && +orgId;
+
+    if (!orgIdInt) {
+      return;
+    }
+
+    handleCustomChange('organisation_id', orgIdInt);
+
+    const selectedOrg = organisationList.find((org) => org.value === orgIdInt);
+
+    if (selectedOrg && selectedOrg.hasODKCredentials) {
+      handleCustomChange('defaultODKCredentials', selectedOrg.hasODKCredentials);
+    }
+  };
+
   useEffect(() => {
     if (!values.organisation_id) {
       handleCustomChange('defaultODKCredentials', false);
@@ -76,6 +93,7 @@ const ProjectDetailsForm = ({ flag }) => {
 
   useEffect(() => {
     if (values.defaultODKCredentials) {
+      // Reset user provided credentials
       handleCustomChange('odk_central_url', '');
       handleCustomChange('odk_central_user', '');
       handleCustomChange('odk_central_password', '');
@@ -88,7 +106,8 @@ const ProjectDetailsForm = ({ flag }) => {
         setHasODKCredentials(organization.hasODKCredentials);
       }
     });
-  }, [values?.organisation_id, organisationList]);
+  }, [organisationList]);
+
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
       <div className="fmtm-bg-white xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -149,8 +168,7 @@ const ProjectDetailsForm = ({ flag }) => {
                 valueKey="value"
                 label="label"
                 onValueChange={(value) => {
-                  handleCustomChange('organisation_id', value && +value);
-                  handleCustomChange('defaultODKCredentials', false);
+                  setSelectedOrganisation(value);
                 }}
               />
               <AssetModules.AddIcon
