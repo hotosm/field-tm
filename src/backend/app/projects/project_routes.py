@@ -878,7 +878,7 @@ async def update_project_form(
     # TODO migrate most logic to project_crud
     project = project_user_dict["project"]
 
-    if project.xform_title == category:
+    if project.xform_category == category:
         if not upload:
             raise HTTPException(
                 status_code=400, detail="Current category is same as new category"
@@ -902,10 +902,13 @@ async def update_project_form(
         with open(xlsform_path, "rb") as f:
             new_xform_data = BytesIO(f.read())
 
-    # Update category in database
-    project.xform_title = category
+    # NOTE never update xform_title as this links to ODK Central
+    project.xform_category = category
     # Commit changes to db
     db.commit()
+
+    # The reference to the form via ODK Central API (minus task_id)
+    xform_name_prefix = f"{project.project_name_prefix}_{project.xform_title}"
 
     # Get ODK Central credentials for project
     odk_creds = await project_deps.get_odk_credentials(db, project.id)
@@ -919,7 +922,7 @@ async def update_project_form(
         project.odkid,
         new_xform_data,
         file_ext,
-        f"{project.project_name_prefix}_{category}",
+        xform_name_prefix,
         odk_creds,
     )
 
