@@ -74,6 +74,11 @@ nav:
       - FAQ: FAQ.md
   - User Manuals:
       - Project Managers: User-Manual-For-Project-Managers.md
+  - Utilities:
+      - XLSForm Converter: xlsform-util.md
+      - QRCode Converter: qrcode-util.md
+      - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
+  - API Docs: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
   - Dev:
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
@@ -84,7 +89,5 @@ nav:
       - Troubleshooting: dev/Troubleshooting.md
       - Pre-Commit: https://docs.hotosm.org/dev-guide/pre-commit/
       - Versioning: https://docs.hotosm.org/dev-guide/version-control/#creating-releases
-  - API: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
-  - Class Hierarchy: apidocs/html/inherits.html
-  - Code Coverage: coverage.html
-  - QRCode Converter: qrcode-util.md
+      - Class Hierarchy: apidocs/html/inherits.html
+      - Code Coverage: coverage.html
