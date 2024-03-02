@@ -588,7 +588,7 @@ async def generate_files(
 
     project = org_user_dict.get("project")
 
-    form_category = project.xform_title
+    xform_title = project.xform_title
     custom_xls_form = None
     file_ext = None
     if xls_form_upload:
@@ -603,7 +603,6 @@ async def generate_files(
                 detail=f"Invalid file extension, must be {allowed_extensions}",
             )
 
-        form_category = file_path.stem
         custom_xls_form = await xls_form_upload.read()
 
         # Write XLS form content to db
@@ -622,7 +621,7 @@ async def generate_files(
         db,
         project_id,
         BytesIO(custom_xls_form) if custom_xls_form else None,
-        form_category,
+        xform_title,
         file_ext if xls_form_upload else ".xls",
         background_task_id,
     )
