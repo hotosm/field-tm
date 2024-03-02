@@ -550,7 +550,7 @@ async def validate_form(form: UploadFile):
         )
 
     contents = await form.read()
-    return await central_crud.test_form_validity(contents, file_ext)
+    return await central_crud.read_and_test_xform(BytesIO(contents), file_ext)
 
 
 @router.post("/{project_id}/generate-project-data")

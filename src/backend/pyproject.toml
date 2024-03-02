@@ -45,6 +45,7 @@ dependencies = [
     "asgiref==3.7.2",
     "sozipfile==0.3.2",
     "cryptography>=42.0.1",
+    "defusedxml>=0.7.1",
     "osm-login-python==1.0.1",
     "osm-fieldwork==0.5.1",
     "osm-rawdata==0.2.3",
