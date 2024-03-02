@@ -21,11 +21,10 @@ import os
 from asyncio import gather
 from io import BytesIO
 from pathlib import Path
-from typing import Optional
-from xml.etree import ElementTree
+from typing import Optional, Union
 
+from defusedxml import ElementTree
 from fastapi import HTTPException
-from fastapi.responses import JSONResponse
 from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
@@ -391,9 +390,11 @@ async def update_and_publish_form(
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
     """
     odk_form_name = f"{form_name_prefix}_{task_id}"
-    updated_xform_data = update_xform_info(
+    xform_data = await read_and_test_xform(
+        xform_data, form_file_ext, return_form_data=True
+    )
+    updated_xform_data = await update_xform_info(
         xform_data,
-        form_file_ext,
         odk_form_name,
         f"{odk_form_name}.geojson",
     )
@@ -431,53 +432,101 @@ def download_submissions(
     return fixed.splitlines()
 
 
-async def test_form_validity(xform_content: bytes, form_file_ext: str):
-    """Validate an XForm.
+async def read_and_test_xform(
+    input_data: BytesIO,
+    form_file_ext: str,
+    return_form_data: bool = False,
+) -> Union[BytesIO, dict]:
+    """Read and validate an XForm.
 
     Args:
-        xform_content (str): form to be tested
+        input_data (BytesIO): form to be tested.
         form_file_ext (str): type of form (.xls, .xlsx, or .xml).
+        return_form_data (bool): return the XForm data.
     """
-    try:
-        if form_file_ext == ".xml":
-            # Write xform_content to a temporary file
-            with open(f"/tmp/xform_temp{form_file_ext}", "wb") as f:
-                f.write(xform_content)
-        else:
-            with open(f"/tmp/xlsform{form_file_ext}", "wb") as f:
-                f.write(xform_content)
-            # Convert XLSForm to XForm
+    # TODO xls2xform_convert requires files on disk
+    # TODO create PR to accept BytesIO?
+
+    # Read from BytesIO object
+    input_content = input_data.getvalue()
+    file_ext = form_file_ext.lower()
+
+    input_path = Path(f"/tmp/fmtm_form_input_tmp{file_ext}")
+    # This file will store xml contents of an xls form
+    # NOTE a file on disk is required by xls2xform_convert
+    output_path = Path("/tmp/fmtm_xform_temp.xml")
+
+    if file_ext == ".xml":
+        # Create output file to write to
+        output_path.touch(exist_ok=True)
+        # Write input_content to a temporary file
+        with open(output_path, "wb") as f:
+            f.write(input_content)
+    else:
+        # Create input file to write to
+        input_path.touch(exist_ok=True)
+        with open(input_path, "wb") as f:
+            f.write(input_content)
+        try:
+            log.debug(f"Converting xlsform -> xform: {str(output_path)}")
+            # FIXME should this be validate=True?
             xls2xform_convert(
-                xlsform_path="/tmp/xlsform.xls",
-                xform_path="/tmp/xform_temp.xml",
+                xlsform_path=str(input_path),
+                xform_path=str(output_path),
                 validate=False,
             )
+        except Exception as e:
+            log.error(e)
+            msg = f"XLSForm is invalid. Possible reason: {str(e)}"
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            ) from e
 
-        # Parse XForm
+    # Parse XForm
+    try:
+        # TODO for memory object use ElementTree.fromstring()
+        xml_parsed = ElementTree.parse(str(output_path))
+        if return_form_data:
+            xml_bytes = ElementTree.tostring(xml_parsed.getroot())
+            return BytesIO(xml_bytes)
+    except ElementTree.ParseError as e:
+        log.error(e)
+        msg = f"Error parsing XForm XML: Possible reason: {str(e)}"
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+        ) from e
+
+    # Delete temp files
+    if file_ext != ".xml":
+        input_path.unlink()
+    output_path.unlink()
+
+    if return_form_data:
+        return xml_parsed
+
+    # Extract geojson filenames
+    try:
+        root = xml_parsed.getroot()
         namespaces = {"xforms": "http://www.w3.org/2002/xforms"}
-        tree = ElementTree.parse("/tmp/xform_temp.xml")
-        root = tree.getroot()
-
-        # Extract geojson filenames
         geojson_list = [
             os.path.splitext(inst.attrib["src"].split("/")[-1])[0]
             for inst in root.findall(".//xforms:instance[@src]", namespaces)
             if inst.attrib.get("src", "").endswith(".geojson")
         ]
 
-        return {"required media": geojson_list, "message": "Your form is valid"}
+        return {"required_media": geojson_list, "message": "Your form is valid"}
 
     except Exception as e:
-        return JSONResponse(
-            content={"message": "Your form is invalid", "possible_reason": str(e)},
-            status_code=400,
-        )
+        log.error(e)
+        msg = f"Error extracting geojson filename: Possible reason: {str(e)}"
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+        ) from e
 
 
-def update_xform_info(
+async def update_xform_info(
     form_data: BytesIO,
-    form_file_ext: str,
-    form_name,
+    form_name: str,
     geojson_file_name: str,
 ) -> BytesIO:
     """Update fields in the XForm to work with FMTM.
@@ -494,82 +543,6 @@ def update_xform_info(
     Returns:
         BytesIO: The XForm data.
     """
-    # TODO xls2xform_convert requires files on disk
-    # TODO create PR to accept BytesIO?
-    form_path = Path(f"/tmp/fmtm_form_input_tmp{form_file_ext}")
-    with open(form_path, "wb") as f:
-        f.write(form_data.getvalue())
-
-    form_file_extension = form_path.suffix.lower()
-    # This file will store xml contents of an xls form
-    # NOTE a file on disk is required by xls2xform_convert
-    xform_path = Path("/tmp/fmtm_xform_tmp.xml")
-
-    if form_file_extension != ".xml":
-        try:
-            log.debug(f"Converting xlsform -> xform: {str(form_path)}")
-            xls2xform_convert(
-                xlsform_path=str(form_path), xform_path=str(xform_path), validate=False
-            )
-        except Exception as e:
-            log.error(e)
-            msg = f"Couldn't convert {str(form_path)} to an XForm!"
-            log.error(msg)
-            raise HTTPException(status_code=400, detail=msg) from e
-
-        if xform_path.stat().st_size <= 0:
-            log.warning(f"{str(xform_path)} is empty!")
-            raise HTTPException(
-                status_code=400, detail=f"{str(xform_path)} is empty!"
-            ) from None
-
-        with open(xform_path, "r") as xform:
-            data = xform.read()
-            # Delete temp from output
-            xform_path.unlink()
-    else:
-        with open(form_path, "r") as xlsform:
-            log.debug(f"Reading XForm directly: {str(form_path)}")
-            data = xlsform.read()
-
-    # Delete temp form input
-    form_path.unlink()
-
-    # # Parse the XML to geojson
-    # xml = xmltodict.parse(str(data))
-
-    # # First change the osm data extract file
-    # index = 0
-    # for inst in xml["h:html"]["h:head"]["model"]["instance"]:
-    #     try:
-    #         if "@src" in inst:
-    #             if (
-    #                 xml["h:html"]["h:head"]["model"]["instance"][index] \
-    #                 ["@src"].split(
-    #                     "."
-    #                 )[1]
-    #                 == "geojson"
-    #             ):
-    #                 xml["h:html"]["h:head"]["model"]["instance"][index][
-    #                     "@src"
-    #                 ] = extract
-
-    #         if "data" in inst:
-    #             print("data in inst")
-    #             if "data" == inst:
-    #                 print("Data = inst ", inst)
-    #                 xml["h:html"]["h:head"]["model"]["instance"]["data"] \
-    #                 ["@id"] = id
-    #                 # xml["h:html"]["h:head"]["model"]["instance"]["data"] \
-    #                 # ["@id"] = xform
-    #             else:
-    #                 xml["h:html"]["h:head"]["model"]["instance"][0]["data"] \
-    #                 ["@id"] = id
-    #     except Exception:
-    #         continue
-    #     index += 1
-    # xml["h:html"]["h:head"]["h:title"] = name
-
     log.debug("Updating XML keys in XForm with data extract file & form id")
 
     # Namespaces definition
@@ -580,7 +553,7 @@ def update_xform_info(
     }
 
     # Parse the XML
-    root = ElementTree.fromstring(data)
+    root = ElementTree.fromstring(form_data.getvalue())
 
     # Update id attribute to equal the form name to be generated
     xform_data = root.findall(".//xforms:data[@id]", namespaces)

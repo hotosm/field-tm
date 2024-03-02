@@ -1107,8 +1107,7 @@ def generate_task_files(
     project: db_models.DbProject,
     task_id: int,
     data_extract: FeatureCollection,
-    xlsform_data: BytesIO,
-    form_file_ext: str,
+    xform_data: BytesIO,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ):
     """Generate all files for a task."""
@@ -1157,9 +1156,9 @@ def generate_task_files(
     project_log.info(f"Generating xform from for task: ({task_id})")
 
     # This is where the ODK form name and geojson media name are set
-    xform_data = central_crud.update_xform_info(
-        xlsform_data,
-        form_file_ext,
+    update_xform_sync = async_to_sync(central_crud.update_xform_info)
+    updated_xform = update_xform_sync(
+        xform_data,
         form_name,
         f"{form_name}.geojson",
     )
@@ -1168,7 +1167,7 @@ def generate_task_files(
     project_log.info(f"Uploading data extract media to task ({task_id})")
     xform_name = central_crud.create_odk_xform(
         odk_id,
-        xform_data,
+        updated_xform,
         f"{form_name}.geojson",
         geojson_data,
         odk_credentials,
@@ -1283,6 +1282,10 @@ def generate_project_files(
                 detail="Failed splitting extract by tasks.",
             )
 
+        # Convert XLSForm --> XForm for all tasks
+        read_xform_sync = async_to_sync(central_crud.read_and_test_xform)
+        xform_data = read_xform_sync(xlsform, form_file_ext, return_form_data=True)
+
         # Run with expensive task via threadpool
         def wrap_generate_task_files(task_id):
             """Func to wrap and return errors from thread.
@@ -1297,8 +1300,7 @@ def generate_project_files(
                     project,
                     task_id,
                     task_extract_dict[task_id],
-                    xlsform,
-                    form_file_ext,
+                    xform_data,
                     odk_credentials,
                 )
             except Exception as e:
