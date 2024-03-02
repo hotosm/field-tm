@@ -269,7 +269,7 @@ async def create_project_with_project_info(
         "Creating project in FMTM database with vars: "
         f"project_user: {current_user.username} | "
         f"project_name: {project_metadata.project_info.name} | "
-        f"xform_category: {project_metadata.xform_title} | "
+        f"xform_category: {project_metadata.xform_category} | "
         f"hashtags: {project_metadata.hashtags} | "
         f"organisation_id: {project_metadata.organisation_id}"
     )
@@ -284,7 +284,6 @@ async def create_project_with_project_info(
     db_project = db_models.DbProject(
         author_id=current_user.id,
         odkid=odk_project_id,
-        xform_category=project_metadata.xform_title,
         **project_metadata.model_dump(exclude=["project_info", "outline_geojson"]),
     )
     db.add(db_project)
@@ -303,35 +302,6 @@ async def create_project_with_project_info(
     db.refresh(db_project)
 
     return await convert_to_app_project(db_project)
-
-
-async def upload_xlsform(
-    db: Session,
-    xlsform: str,
-    name: str,
-    category: str,
-):
-    """Upload a custom XLSForm from the user."""
-    try:
-        forms = table(
-            "xlsforms",
-            column("title"),
-            column("xls"),
-            column("xml"),
-            column("id"),
-            column("category"),
-        )
-        ins = insert(forms).values(title=name, xls=xlsform, category=category)
-        sql = ins.on_conflict_do_update(
-            constraint="xlsforms_title_key",
-            set_=dict(title=name, xls=xlsform, category=category),
-        )
-        db.execute(sql)
-        db.commit()
-        return True
-    except Exception as e:
-        log.exception(e)
-        raise HTTPException(status_code=400, detail={"message": str(e)}) from e
 
 
 async def create_tasks_from_geojson(
@@ -1292,14 +1262,9 @@ def generate_project_files(
         read_xform_sync = async_to_sync(central_crud.read_and_test_xform)
         xform_data = read_xform_sync(xlsform, form_file_ext, return_form_data=True)
 
-        # Generate extra task info as dicts (to allow closing db connection)
-        task_form_name_dict = {}
-        for task_id in task_extract_dict.keys():
-            project_name = project.project_name_prefix
-            category = project.xform_title
-            task_form_name_dict[task_id] = f"{project_name}_{category}_{task_id}"
-
-        # Get ODK Project ID from database
+        # Get project name for XForm name
+        project_name = project.project_name_prefix
+        # Get ODK Project ID
         project_odk_id = project.odkid
 
         # Run with expensive task via threadpool
@@ -1317,7 +1282,7 @@ def generate_project_files(
                     project_odk_id,
                     task_id,
                     task_extract_dict[task_id],
-                    task_form_name_dict[task_id],
+                    f"{project_name}_task_{task_id}",
                     xform_data,
                     odk_credentials,
                 )

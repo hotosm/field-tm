@@ -60,7 +60,7 @@ async def test_create_project(client, admin_user, organisation):
             "short_description": "test",
             "description": "test",
         },
-        "xform_title": "buildings",
+        "xform_category": "buildings",
         "hashtags": ["#FMTM"],
         "outline_geojson": {
             "coordinates": [
@@ -280,14 +280,9 @@ async def test_generate_project_files(db, client, project):
         xlsform_obj, xlsform_file.suffix.lower(), return_form_data=True
     )
 
-    # Generate extra task info as dicts (to allow closing db connection)
-    task_form_name_dict = {}
-    for task_id in split_extract_dict.keys():
-        project_name = project.project_name_prefix
-        category = project.xform_title
-        task_form_name_dict[task_id] = f"{project_name}_{category}_{task_id}"
-
-    # Get ODK Project ID from database
+    # Get project name for XForm name
+    project_name = project.project_name_prefix
+    # Get ODK Project ID
     project_odk_id = project.odkid
 
     for task_id in split_extract_dict.keys():
@@ -302,7 +297,7 @@ async def test_generate_project_files(db, client, project):
                 project_odk_id,
                 task_id,
                 split_extract_dict[task_id],
-                task_form_name_dict[task_id],
+                f"{project_name}_task_{task_id}",
                 xform_data,
                 odk_credentials,
             )

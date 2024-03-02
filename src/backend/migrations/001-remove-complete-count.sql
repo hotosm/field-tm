@@ -1,5 +1,6 @@
 -- ## Migration to:
 -- * Remove projects.extract_completed_count
+-- * Remove projects.xform_title
 -- * Add projects.xform_category
 -- * Remove projects.xform_title foreign key constraint
 
@@ -9,6 +10,10 @@ BEGIN;
 -- Remove extract_completed_count
 ALTER TABLE IF EXISTS public.projects
 DROP COLUMN IF EXISTS extract_completed_count;
+
+-- Remove xform_title
+ALTER TABLE IF EXISTS public.projects
+DROP COLUMN IF EXISTS xform_title;
 
 -- Add xform_category
 ALTER TABLE IF EXISTS public.projects

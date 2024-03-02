@@ -173,13 +173,10 @@ async def task_features_count(
     feature_count_task_dict = {f"{record[0]}": record[1] for record in feature_counts}
 
     project_name_prefix = project.project_name_prefix
-    xform_title = project.xform_title
 
     for x in odk_details:
-        # Strip project name and form type from xmlFormId
-        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_").strip(
-            f"_{xform_title}"
-        )
+        # Strip everything except task id from xmlFormId
+        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_").strip("_task")
 
         data.append(
             {

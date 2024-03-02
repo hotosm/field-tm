@@ -5,6 +5,11 @@ BEGIN;
 ALTER TABLE IF EXISTS public.projects
 ADD COLUMN IF NOT EXISTS extract_complete_count integer;
 
+-- Add the 'xform_title' column if it doesn't exist
+
+ALTER TABLE IF EXISTS public.projects
+ADD COLUMN IF NOT EXISTS xform_title character varying;
+
 -- Remove the 'xform_category' column if it exists
 ALTER TABLE IF EXISTS public.projects
 DROP COLUMN IF EXISTS xform_category;

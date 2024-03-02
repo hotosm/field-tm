@@ -361,7 +361,7 @@ async def get_submission_form_fields(
     task_list = await tasks_crud.get_task_id_list(db, project_id)
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     odk_form = central_crud.get_odk_form(odk_credentials)
-    xform = f"{project.project_name_prefix}_{project.xform_title}_{task_list[0]}"
+    xform = f"{project.project_name_prefix}_task_{task_list[0]}"
     return odk_form.formFields(project.odkid, xform)
 
 

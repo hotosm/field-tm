@@ -136,7 +136,7 @@ class ProjectIn(BaseModel):
     """Upload new project."""
 
     project_info: ProjectInfo
-    xform_title: str
+    xform_category: str
     organisation_id: Optional[int] = None
     hashtags: Optional[List[str]] = None
     task_split_type: Optional[TaskSplitType] = None
@@ -313,7 +313,7 @@ class ProjectBase(BaseModel):
     project_info: ProjectInfo
     status: ProjectStatus
     # location_str: str
-    xform_title: Optional[str] = None
+    xform_category: Optional[str] = None
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
 

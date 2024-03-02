@@ -343,7 +343,6 @@ CREATE TABLE public.projects (
     last_updated timestamp without time zone,
     status public.projectstatus NOT NULL,
     total_tasks integer,
-    xform_title character varying,
     xform_category character varying,
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     mapper_level public.mappinglevel NOT NULL,

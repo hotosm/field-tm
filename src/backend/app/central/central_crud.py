@@ -389,7 +389,7 @@ async def update_and_publish_form(
         form_name_prefix (str): Prefix for the form name in ODK Central.
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
     """
-    odk_form_name = f"{form_name_prefix}_{task_id}"
+    odk_form_name = f"{form_name_prefix}_task_{task_id}"
     xform_data = await read_and_test_xform(
         xform_data,
         form_file_ext,

@@ -46,6 +46,5 @@ async def get_xform_name(
         db_project = project
 
     project_name = db_project.project_name_prefix
-    xform_title = db_project.xform_title
-    form_name = f"{project_name}_{xform_title}_{task_id}"
+    form_name = f"{project_name}_task_{task_id}"
     return form_name
