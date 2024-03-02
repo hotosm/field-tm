@@ -39,7 +39,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             total_tasks: projectResp.total_tasks,
             tasks_mapped: projectResp.tasks_mapped,
             tasks_validated: projectResp.tasks_validated,
-            xform_title: projectResp.xform_title,
+            xform_category: projectResp.xform_category,
             tasks_bad: projectResp.tasks_bad,
             data_extract_url: projectResp.data_extract_url,
           }),

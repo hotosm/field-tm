@@ -59,7 +59,7 @@ export type projectInfoType = {
   location_str: string;
   description: string;
   short_description: string;
-  xform_title: string;
+  xform_category: string;
   data_extract_url: string;
   num_contributors: any;
   tasks_bad: any;

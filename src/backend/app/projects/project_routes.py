@@ -46,7 +46,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app.auth.osm import AuthUser, login_required
-from app.auth.roles import mapper, org_admin, project_admin, super_admin
+from app.auth.roles import mapper, org_admin, project_admin
 from app.central import central_crud
 from app.db import database, db_models
 from app.db.postgis_utils import (
@@ -384,29 +384,6 @@ async def project_partial_update(
     return project
 
 
-@router.post("/upload_xlsform")
-async def upload_custom_xls(
-    upload: UploadFile = File(...),
-    category: str = Form(...),
-    db: Session = Depends(database.get_db),
-    current_user: db_models.DbUser = Depends(super_admin),
-):
-    """Upload a custom XLSForm to the database.
-
-    Args:
-        upload (UploadFile): the XLSForm file
-        category (str): the category of the XLSForm.
-        db (Session): the DB session, provided automatically.
-        current_user (DbUser): Check if user is super_admin
-    """
-    content = await upload.read()  # read file content
-    name = upload.filename.split(".")[0]  # get name of file without extension
-    await project_crud.upload_xlsform(db, content, name, category)
-
-    # FIXME: fix return value
-    return {"xform_title": f"{category}"}
-
-
 @router.post("/{project_id}/upload-task-boundaries")
 async def upload_project_task_boundaries(
     project_id: int,
@@ -588,7 +565,7 @@ async def generate_files(
 
     project = org_user_dict.get("project")
 
-    xform_title = project.xform_title
+    xform_category = project.xform_category
     custom_xls_form = None
     file_ext = None
     if xls_form_upload:
@@ -621,7 +598,7 @@ async def generate_files(
         db,
         project_id,
         BytesIO(custom_xls_form) if custom_xls_form else None,
-        xform_title,
+        xform_category,
         file_ext if xls_form_upload else ".xls",
         background_task_id,
     )
@@ -853,8 +830,7 @@ async def download_form(
         "Content-Type": "application/media",
     }
     if not project.form_xls:
-        project_category = project.xform_title
-        xlsform_path = f"{xlsforms_path}/{project_category}.xls"
+        xlsform_path = f"{xlsforms_path}/{project.xform_category}.xls"
         if os.path.exists(xlsform_path):
             return FileResponse(xlsform_path, filename="form.xls")
         else:
@@ -901,13 +877,13 @@ async def update_project_form(
         with open(xlsform_path, "rb") as f:
             new_xform_data = BytesIO(f.read())
 
-    # NOTE never update xform_title as this links to ODK Central
+    # Update form category in database
     project.xform_category = category
     # Commit changes to db
     db.commit()
 
     # The reference to the form via ODK Central API (minus task_id)
-    xform_name_prefix = f"{project.project_name_prefix}_{project.xform_title}"
+    xform_name_prefix = project.project_name_prefix
 
     # Get ODK Central credentials for project
     odk_creds = await project_deps.get_odk_credentials(db, project.id)

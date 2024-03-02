@@ -85,7 +85,7 @@ type EditProjectResponseTypes = {
   status: number;
   outline_geojson: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
-  xform_title: string;
+  xform_category: string;
   hashtags: string[];
 };
 export type EditProjectDetailsTypes = {
@@ -109,7 +109,7 @@ export type ProjectDetailsTypes = {
   short_description?: string;
   description?: string;
   task_split_type?: number;
-  xform_title?: string;
+  xform_category?: string;
   data_extract_options?: string;
   form_ways?: string;
   organisation_id?: number | null;

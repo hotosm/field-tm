@@ -582,8 +582,6 @@ class DbProject(Base):
             .count()
         )
 
-    # XForm title for ODK Central (this never changes once set)
-    xform_title = cast(str, Column(String))
     # XForm category specified
     xform_category = cast(str, Column(String))
 

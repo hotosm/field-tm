@@ -11,7 +11,7 @@ export interface ProjectDetailsModel {
     per_task_instructions: string;
   };
   status: number;
-  xform_title: string;
+  xform_category: string;
   location_str: string;
   outline_geojson: {
     type: string;

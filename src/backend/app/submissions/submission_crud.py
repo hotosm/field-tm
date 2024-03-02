@@ -62,7 +62,6 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
     project_tasks = project_info.tasks
 
     if not (
@@ -87,9 +86,9 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
         data = []
 
-        for id in task_list:
+        for task_list_id in task_list:
             # XML Form Id is a combination or project_name, category and task_id
-            xform_name = f"{project_name}_{xform_title}_{id}"
+            xform_name = f"{project_name}_task_{task_list_id}"
             submission_list = xform.listSubmissions(odkid, xform_name)
 
             # data.append(submission_list)
@@ -100,7 +99,7 @@ def get_submission_of_project(db: Session, project_id: int, task_id: int = None)
 
     else:
         # If task_id is provided, submission made to this particular task is returned.
-        xform_name = f"{project_name}_{xform_title}_{task_id}"
+        xform_name = f"{project_name}_task_{task_id}"
         submission_list = xform.listSubmissionBasicInfo(odkid, xform_name)
         for x in submission_list:
             x["submitted_by"] = xform_name
@@ -143,8 +142,7 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
-    xform_name = f"{project_name}_{xform_title}_{task_id}"
+    xform_name = f"{project_name}_task_{task_id}"
 
     # ODK Credentials
     odk_sync = async_to_sync(project_deps.get_odk_credentials)
@@ -153,7 +151,7 @@ def convert_to_osm(db: Session, project_id: int, task_id: int):
     xform = get_odk_form(odk_credentials)
 
     # Create a new ZIP file for the extracted files
-    final_zip_file_path = f"/tmp/{project_name}_{xform_title}_osm.zip"
+    final_zip_file_path = f"/tmp/{project_name}_osm.zip"
 
     # Remove the ZIP file if it already exists
     if os.path.exists(final_zip_file_path):
@@ -218,7 +216,6 @@ async def gather_all_submission_csvs(db, project_id):
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
@@ -232,9 +229,9 @@ async def gather_all_submission_csvs(db, project_id):
             f"Thread {threading.current_thread().name} - "
             f"Downloading submission for Task ID {task_id}"
         )
-        xform_name = f"{project_name}_{xform_title}_{task_id}"
+        xform_name = f"{project_name}_form_{task_id}"
         file = xform.getSubmissionMedia(odkid, xform_name)
-        file_path = f"{project_name}_{xform_title}_submission_{task_id}.zip"
+        file_path = f"{project_name}_submission_{task_id}.zip"
         with open(file_path, "wb") as f:
             f.write(file.content)
         return file_path
@@ -295,7 +292,7 @@ async def gather_all_submission_csvs(db, project_id):
                 )
 
     # Create a new ZIP file for the extracted files
-    final_zip_file_path = f"{project_name}_{xform_title}_submissions_final.zip"
+    final_zip_file_path = f"{project_name}_submissions_final.zip"
     with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
         for file_path in extracted_files:
             final_zip_file.write(file_path)
@@ -429,8 +426,7 @@ def get_all_submissions_json(db: Session, project_id):
     get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
     task_list = get_task_id_list_sync(db, project_id)
     xform_list = [
-        f"{project_info.project_name_prefix}_{project_info.xform_title}_{task}"
-        for task in task_list
+        f"{project_info.project_name_prefix}_task_{task}" for task in task_list
     ]
 
     submissions = project.getAllSubmissions(project_info.odkid, xform_list)
@@ -487,7 +483,6 @@ async def download_submission(
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
@@ -505,19 +500,17 @@ async def download_submission(
             task_list = [x.id for x in project_tasks]
 
             # # Create a new ZIP file for all submissions
-            # zip_file_path = f"{project_name}_{xform_title}_submissions.zip"
+            # zip_file_path = f"{project_name}_submissions.zip"
             files = []
 
             for task_list_id in task_list:
-                xform_name = f"{project_name}_{xform_title}_{task_list_id}"
+                xform_name = f"{project_name}_task_{task_list_id}"
 
                 # XML Form Id is a combination or project_name, category and task_id
                 file = xform.getSubmissionMedia(odkid, xform_name)
 
                 # Create a new output file for each submission
-                file_path = (
-                    f"{project_name}_{xform_title}_submission_{task_list_id}.zip"
-                )
+                file_path = f"{project_name}_submission_{task_list_id}.zip"
                 with open(file_path, "wb") as f:
                     f.write(file.content)
 
@@ -536,14 +529,14 @@ async def download_submission(
                     ]  # Add the extracted file paths to the list of extracted files
 
             # Create a new ZIP file for the extracted files
-            final_zip_file_path = f"{project_name}_{xform_title}_submissions_final.zip"
+            final_zip_file_path = f"{project_name}_submissions_final.zip"
             with zipfile.ZipFile(final_zip_file_path, mode="w") as final_zip_file:
                 for file_path in extracted_files:
                     final_zip_file.write(file_path)
 
             return FileResponse(final_zip_file_path)
         else:
-            xform_name = f"{project_name}_{xform_title}_{task_id}"
+            xform_name = f"{project_name}_task_{task_id}"
             file = xform.getSubmissionMedia(odkid, xform_name)
             with open(file_path, "wb") as f:
                 f.write(file.content)
@@ -559,7 +552,7 @@ async def download_submission(
         if task_id is None:
             task_list = [x.id for x in project_tasks]
             for task_list_id in task_list:
-                xform_name = f"{project_name}_{xform_title}_{task_list_id}"
+                xform_name = f"{project_name}_task_{task_list_id}"
                 file = xform.getSubmissions(odkid, xform_name, None, False, True)
                 if not file:
                     json_data = None
@@ -569,7 +562,7 @@ async def download_submission(
                     if json_data_value:
                         files.extend(json_data_value)
         else:
-            xform_name = f"{project_name}_{xform_title}_{task_id}"
+            xform_name = f"{project_name}_task_{task_id}"
             file = xform.getSubmissions(odkid, xform_name, None, False, True)
             json_data = json.loads(file)
 
@@ -594,14 +587,13 @@ async def get_submission_points(db: Session, project_id: int, task_id: int = Non
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
 
     # ODK Credentials
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     xform = get_odk_form(odk_credentials)
 
     if task_id:
-        xform_name = f"{project_name}_{xform_title}_{task_id}"
+        xform_name = f"{project_name}_task_{task_id}"
         # file_path = f"{project_id}_submissions.zip"
         response_file = xform.getSubmissionMedia(odkid, xform_name)
 
@@ -647,7 +639,6 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
 
     odkid = project_info.odkid
     project_name = project_info.project_name_prefix
-    xform_title = project_info.xform_title
     project_tasks = project_info.tasks
 
     # ODK Credentials
@@ -659,7 +650,7 @@ async def get_submission_count_of_a_project(db: Session, project_id: int):
 
     task_list = [x.id for x in project_tasks]
     for task_id in task_list:
-        xform_name = f"{project_name}_{xform_title}_{task_id}"
+        xform_name = f"{project_name}_task_{task_id}"
         file = xform.getSubmissions(odkid, xform_name, None, False, True)
         if not file:
             json_data = None
@@ -823,7 +814,7 @@ async def get_submission_by_task(
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
 
     xform = get_odk_form(odk_credentials)
-    xform_name = f"{project.project_name_prefix}_{project.xform_title}_{task_id}"
+    xform_name = f"{project.project_name_prefix}_task_{task_id}"
     data = xform.listSubmissions(project.odkid, xform_name, filters)
     submissions = data.get("value", [])
     count = data.get("@odata.count", 0)
