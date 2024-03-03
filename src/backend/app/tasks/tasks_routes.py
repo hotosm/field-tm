@@ -176,7 +176,7 @@ async def task_features_count(
 
     for x in odk_details:
         # Strip everything except task id from xmlFormId
-        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_").strip("_task")
+        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_task_")
 
         data.append(
             {
