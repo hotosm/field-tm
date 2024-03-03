@@ -7,7 +7,7 @@ interface ProgressBarProps {
   currentProgress?: number;
 }
 const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps }) => {
-  const stepProgressInPercent = currentStep && totalSteps ? (currentStep / totalSteps) * 100 : 0;
+  const stepProgressInPercent = currentStep && totalSteps ? Math.round((currentStep / totalSteps) * 100) : 0;
 
   return (
     <>
