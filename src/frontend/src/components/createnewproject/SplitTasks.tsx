@@ -233,7 +233,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
               uuid: generateQrSuccess.task_id,
             }),
           );
-        }, 2000);
+        }, 5000);
       }
     }
   }, [generateQrSuccess, generateProjectLog]);
