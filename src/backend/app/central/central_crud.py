@@ -368,6 +368,10 @@ async def update_odk_xforms(
 
     await gather(*coroutines)
 
+    log.info(
+        f"{len(task_list)} XForms updated in ODK Central for: ({form_name_prefix})"
+    )
+
     return True
 
 
