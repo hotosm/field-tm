@@ -217,17 +217,18 @@ const TaskSubmissionsMap = () => {
 
   const taskSubmissionsPopupUI = (properties: taskFeaturePropertyType) => {
     const currentTask = taskInfo?.filter((task) => +task.task_id === properties.uid);
+    if (currentTask?.length === 0) return;
     return (
       <div className="fmtm-h-fit">
         <h2 className="fmtm-border-b-[2px] fmtm-border-primaryRed fmtm-w-fit fmtm-pr-1">
-          Task ID: #{currentTask?.[0].task_id}
+          Task ID: #{currentTask?.[0]?.task_id}
         </h2>
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
           <p>
-            Expected Count: <span className="fmtm-text-primaryRed">{currentTask?.[0].feature_count}</span>
+            Expected Count: <span className="fmtm-text-primaryRed">{currentTask?.[0]?.feature_count}</span>
           </p>
           <p>
-            Submission Count: <span className="fmtm-text-primaryRed">{currentTask?.[0].submission_count}</span>
+            Submission Count: <span className="fmtm-text-primaryRed">{currentTask?.[0]?.submission_count}</span>
           </p>
         </div>
       </div>
@@ -284,7 +285,7 @@ const TaskSubmissionsMap = () => {
             collapsed={true}
           />
         </div>
-        <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} />
+        {taskInfo?.length > 0 && <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} />}
         {dataExtractUrl && isValidUrl(dataExtractUrl) && (
           <VectorLayer fgbUrl={dataExtractUrl} fgbExtent={dataExtractExtent} zIndex={15} />
         )}
