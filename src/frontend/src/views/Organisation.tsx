@@ -15,7 +15,6 @@ const Organisation = () => {
 
   const { type } = windowDimention();
   //get window dimension
-  console.log(import.meta.env, 'test');
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
