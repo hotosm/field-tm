@@ -22,11 +22,15 @@ const EditTab = ({ projectId }) => {
           </div>
         ))}
       </div>
-      <div className="fmtm-max-w-[29.5rem]">
+      <div>
         {tabView === 'Project Description' ? (
-          <ProjectDescriptionTab projectId={projectId} />
+          <div className="fmtm-max-w-[42rem]">
+            <ProjectDescriptionTab projectId={projectId} />
+          </div>
         ) : (
-          <FormUpdateTab projectId={projectId} />
+          <div className="fmtm-max-w-[29.5rem]">
+            <FormUpdateTab projectId={projectId} />
+          </div>
         )}
       </div>
     </div>

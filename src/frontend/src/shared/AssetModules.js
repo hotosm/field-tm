@@ -71,6 +71,16 @@ import {
   DescriptionOutlined as DescriptionOutlinedIcon,
   PeopleAlt as PeopleAltIcon,
   Tune as TuneIcon,
+  FormatBold as FormatBoldIcon,
+  FormatItalic as FormatItalicIcon,
+  StrikethroughS as StrikethroughSIcon,
+  FormatListNumbered as FormatListNumberedIcon,
+  Code as CodeIcon,
+  Redo as RedoIcon,
+  FormatQuote as FormatQuoteIcon,
+  AddPhotoAlternateOutlined as ImageAddIcon,
+  HorizontalRule as HorizontalRuleIcon,
+  VideoFileOutlined as VideoFileOutlinedIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -152,4 +162,14 @@ export default {
   DescriptionOutlinedIcon,
   PeopleAltIcon,
   TuneIcon,
+  FormatBoldIcon,
+  FormatItalicIcon,
+  StrikethroughSIcon,
+  FormatListNumberedIcon,
+  CodeIcon,
+  RedoIcon,
+  FormatQuoteIcon,
+  ImageAddIcon,
+  HorizontalRuleIcon,
+  VideoFileOutlinedIcon,
 };

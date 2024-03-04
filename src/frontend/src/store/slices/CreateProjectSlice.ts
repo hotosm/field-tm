@@ -15,6 +15,7 @@ export const initialState: CreateProjectStateTypes = {
     odk_central_password: '',
     description: '',
     organisation_id: null,
+    per_task_instructions: '',
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
