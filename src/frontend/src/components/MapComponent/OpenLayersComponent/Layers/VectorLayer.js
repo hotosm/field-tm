@@ -360,6 +360,24 @@ const VectorLayer = ({
     vectorLayer.setProperties(layerProperties);
   }, [map, vectorLayer, layerProperties]);
 
+  useEffect(() => {
+    if (!map) return;
+    map.on('pointermove', function (e) {
+      const pixel = map.getEventPixel(e.originalEvent);
+      const features = map.getFeaturesAtPixel(pixel);
+      if (features.length > 0) {
+        document.getElementById('ol-map').style.cursor = 'pointer';
+      } else {
+        document.getElementById('ol-map').style.cursor = 'default';
+      }
+    });
+
+    // Clean up
+    return () => {
+      map.setTarget(null);
+    };
+  }, [map]);
+
   // style on hover
   useEffect(() => {
     if (!map) return null;

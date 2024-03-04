@@ -22,22 +22,22 @@ const ProjectInfo = () => {
   }, [projectInfo, paraRef.current]);
 
   return (
-    <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-mt-3 fmtm-h-[56vh] fmtm-overflow-y-scroll scrollbar fmtm-pr-1">
+    <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-mt-3  fmtm-h-[50vh] fmtm-overflow-y-scroll scrollbar fmtm-pr-1">
       <div>
         <p className="fmtm-font-bold">Description</p>
         {projectDetailsLoading ? (
           <div>
-            {Array.from({ length: 10 }).map((i) => (
+            {Array.from({ length: 7 }).map((i) => (
               <CoreModules.Skeleton key={i} />
             ))}
             <CoreModules.Skeleton className="!fmtm-w-[80px]" />
           </div>
         ) : (
           <div>
-            <p className={`${!seeMore ? 'fmtm-line-clamp-[10]' : ''} fmtm-text-[#706E6E]`} ref={paraRef}>
+            <p className={`${!seeMore ? 'fmtm-line-clamp-[7]' : ''} fmtm-text-[#706E6E]`} ref={paraRef}>
               {projectInfo?.description}
             </p>
-            {descLines >= 10 && (
+            {descLines >= 7 && (
               <p
                 className="fmtm-text-primaryRed hover:fmtm-text-red-700 hover:fmtm-cursor-pointer"
                 onClick={() => setSeeMore(!seeMore)}
