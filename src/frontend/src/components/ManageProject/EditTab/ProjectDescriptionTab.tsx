@@ -9,6 +9,7 @@ import { diffObject } from '@/utilfunctions/compareUtils';
 import useForm from '@/hooks/useForm';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import RichTextEditor from '@/components/common/Editor/Editor';
 
 const ProjectDescriptionTab = ({ projectId }) => {
   const dispatch = CoreModules.useAppDispatch();
@@ -33,7 +34,7 @@ const ProjectDescriptionTab = ({ projectId }) => {
       );
     }
   };
-  const { handleSubmit, handleChange, values, errors }: any = useForm(
+  const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
     editProjectDetails,
     submission,
     EditProjectValidation,
@@ -71,15 +72,14 @@ const ProjectDescriptionTab = ({ projectId }) => {
         errorMsg={errors.description}
         required
       />
-      <TextArea
-        id="instruction"
-        name="instruction"
-        label="Instruction"
-        rows={2}
-        value={values?.instruction}
-        onChange={handleChange}
-        errorMsg={errors.instruction}
-      />
+      <div>
+        <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold">Instructions</p>
+        <RichTextEditor
+          editorHtmlContent={values?.per_task_instructions}
+          setEditorHtmlContent={(content) => handleCustomChange('per_task_instructions', content)}
+          editable={true}
+        />
+      </div>
       <InputTextField
         id="tags"
         name="hashtags"

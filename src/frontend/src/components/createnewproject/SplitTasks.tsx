@@ -96,6 +96,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
         name: projectDetails.name,
         short_description: projectDetails.short_description,
         description: projectDetails.description,
+        per_task_instructions: projectDetails.per_task_instructions,
       },
       // Use split task areas, or project area if no task splitting
       outline_geojson: dividedTaskGeojson || drawnGeojson,

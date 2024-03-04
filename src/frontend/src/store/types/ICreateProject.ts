@@ -117,6 +117,7 @@ export type ProjectDetailsTypes = {
   formCategorySelection?: string;
   average_buildings_per_task?: number;
   dataExtractWays?: string;
+  per_task_instructions?: string;
 };
 
 export type ProjectAreaTypes = {

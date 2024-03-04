@@ -15,6 +15,7 @@ import { CustomSelect } from '@/components/common/Select';
 import { OrganisationService } from '@/api/CreateProjectService';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationDropdownType } from '@/models/createproject/createProjectModel';
+import RichTextEditor from '@/components/common/Editor/Editor';
 
 const ProjectDetailsForm = ({ flag }) => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const ProjectDetailsForm = ({ flag }) => {
     hasODKCredentials: item?.odk_central_url ? true : false,
   }));
   const [hasODKCredentials, setHasODKCredentials] = useState(false);
+  const [editorHtmlContent, setEditorHtmlContent] = useState('');
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
@@ -157,6 +159,15 @@ const ProjectDetailsForm = ({ flag }) => {
             required
             errorMsg={errors.short_description}
           />
+          <TextArea
+            id="description"
+            label="Description"
+            rows={3}
+            value={values?.description}
+            onChange={(e) => handleCustomChange('description', e.target.value)}
+            required
+            errorMsg={errors.description}
+          />
           <div className="">
             <div className="fmtm-flex fmtm-items-center">
               <CustomSelect
@@ -241,15 +252,14 @@ const ProjectDetailsForm = ({ flag }) => {
               analysis later, but should be human informative and not overused, #group #event
             </p>
           </div>
-          <TextArea
-            id="description"
-            label="Description"
-            rows={3}
-            value={values?.description}
-            onChange={(e) => handleCustomChange('description', e.target.value)}
-            required
-            errorMsg={errors.description}
-          />
+          <div>
+            <p className="fmtm-text-[1rem] fmtm-font-semibold fmtm-mb-2">Instructions</p>
+            <RichTextEditor
+              editorHtmlContent={values?.per_task_instructions}
+              setEditorHtmlContent={(content) => handleCustomChange('per_task_instructions', content)}
+              editable={true}
+            />
+          </div>
           <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
             <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
           </div>
