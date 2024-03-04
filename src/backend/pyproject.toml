@@ -47,7 +47,7 @@ dependencies = [
     "cryptography>=42.0.1",
     "defusedxml>=0.7.1",
     "osm-login-python==1.0.1",
-    "osm-fieldwork==0.5.1",
+    "osm-fieldwork==0.5.2",
     "osm-rawdata==0.2.3",
     "fmtm-splitter==1.1.2",
 ]
