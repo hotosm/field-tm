@@ -59,8 +59,6 @@ const SubmissionsTable = ({ toggleView }) => {
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [submittedBy, setSubmittedBy] = useState<string | null>(null);
 
-  const encodedTaskId = environment.encode(3468);
-
   useEffect(() => {
     let count = 0;
     const filters = Object.keys(filter);
@@ -436,7 +434,7 @@ const SubmissionsTable = ({ toggleView }) => {
                 <AssetModules.VisibilityOutlinedIcon
                   className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
                   onClick={() => {
-                    navigate(`/project/${encodedId}/tasks/${encodedTaskId}/submission/${row?.meta?.instanceID}`);
+                    navigate(`/project/${encodedId}/tasks/${row?.phonenumber}/submission/${row?.meta?.instanceID}`);
                   }}
                 />{' '}
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}

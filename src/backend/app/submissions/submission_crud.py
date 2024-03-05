@@ -820,3 +820,28 @@ async def get_submission_by_task(
     count = data.get("@odata.count", 0)
 
     return submissions, count
+
+
+async def get_submission_detail(
+    project: db_models.DbProject,
+    task_id: int,
+    submission_id: str,
+    db: Session,
+):
+    """Get the details of a submission.
+
+    Args:
+        project: The project object representing the project.
+        task_id: The ID of the task associated with the submission.
+        submission_id: The ID of the submission.
+        db: The database session.
+
+    Returns:
+        The details of the submission as a JSON object.
+    """
+    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
+    odk_form = get_odk_form(odk_credentials)
+    xform = f"{project.project_name_prefix}_task_{task_id}"
+    submission = odk_form.getSubmissions(project.odkid, xform, submission_id)
+
+    return json.loads(submission)

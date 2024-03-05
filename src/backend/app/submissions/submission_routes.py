@@ -413,6 +413,7 @@ async def task_submissions(
     project: db_models.DbProject = Depends(project_deps.get_project_by_id),
     page: int = Query(1, ge=1),
     limit: int = Query(13, le=100),
+    submission_id: Optional[str] = None,
     submitted_by: Optional[str] = None,
     review_state: Optional[str] = None,
     submitted_date: Optional[str] = Query(
@@ -463,4 +464,10 @@ async def task_submissions(
         results=data,
         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
+    if submission_id:
+        submission_detail = await submission_crud.get_submission_detail(
+            project, task_id, submission_id, db
+        )
+        response = submission_detail.get("value", [])[0]
+
     return response
