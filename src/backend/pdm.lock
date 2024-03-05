@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:039de770c061d4344db4702d522287fdc4ce4012a702d136b8b9c0a86aa01edd"
+content_hash = "sha256:1d893705d982a642491330dfdbdb7b74af413215c466fdc942295633e2db1385"
 
 [[package]]
 name = "annotated-types"
@@ -1340,15 +1340,15 @@ files = [
 
 [[package]]
 name = "openpyxl"
-version = "3.0.9"
+version = "3.1.2"
 requires_python = ">=3.6"
 summary = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 dependencies = [
     "et-xmlfile",
 ]
 files = [
-    {file = "openpyxl-3.0.9-py2.py3-none-any.whl", hash = "sha256:8f3b11bd896a95468a4ab162fc4fcd260d46157155d1f8bfaabb99d88cfcf79f"},
-    {file = "openpyxl-3.0.9.tar.gz", hash = "sha256:40f568b9829bf9e446acfffce30250ac1fa39035124d55fc024025c41481c90f"},
+    {file = "openpyxl-3.1.2-py2.py3-none-any.whl", hash = "sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5"},
+    {file = "openpyxl-3.1.2.tar.gz", hash = "sha256:a6f5977418eff3b2d5500d54d9db50c8277a368436f4e4f8ddb1be3422870184"},
 ]
 
 [[package]]
@@ -1974,17 +1974,16 @@ files = [
 
 [[package]]
 name = "pyxform"
-version = "1.12.2"
+version = "2.0.0"
 requires_python = ">=3.7"
+git = "https://github.com/hotosm/pyxform"
+ref = "feat/xls2xform_convert_bytesio"
+revision = "79f0db7403dcd1124c29af5ba5710ab396cfe793"
 summary = "A Python package to create XForms for ODK Collect."
 dependencies = [
     "defusedxml==0.7.1",
-    "openpyxl==3.0.9",
+    "openpyxl==3.1.2",
     "xlrd==2.0.1",
-]
-files = [
-    {file = "pyxform-1.12.2-py3-none-any.whl", hash = "sha256:27ceb648a9f2a49e40f30a625bf82557a0ee01d6febf749b0d81614bb6544ac8"},
-    {file = "pyxform-1.12.2.tar.gz", hash = "sha256:fb67cee3e89fb21329d5efa6acb87518cbdffe835224f7dbae16bf7e84b519f7"},
 ]
 
 [[package]]
