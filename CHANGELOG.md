@@ -1,5 +1,286 @@
 # Changelog
 
+## 2024.3.0 (2024-03-05)
+
+### Feat
+
+- add rich text editor project creation instructions field (#1311)
+- add task_deps to get xform_name for a task
+- add simple ui to delete projects on frontend (#1314)
+- add helpers router to helper util endpoints
+- cookie check added for auth check
+- improve form validation logic, allow xform xml uploads (#1294)
+- implement opening the generate tiles modal when download in qr is clicked
+- replace local `useState` for generating mb tile modal with global state
+- add global state for `toggleGenerateMbTiles` modal and add types for it
+- add mbtiles btn back in, pie chart progress (#1278)
+- add helper route to convert fgb --> geojson
+- add map popups to data extract geometries (#1266)
+- **manage-organisations**: implement skeleton loader while Organizations are being fetched
+- **manage-organizations**: add `OrganizationCardSkeleton` component
+- flatgeobuf data extracts on frontend & backend (#1241)
+- added bbox in read project's outline (#1244)
+- added approved in get organisation response (#1226)
+- improve submissions dynamic filtering (#1217)
+- api returning details of unapproved org (#1218)
+- filters on submission table (#1191)
+- init public beta org and svcfmtm user migration (#1206)
+- endpoints for task comments (#1171)
+- add community_type for organisations, add unapproved org list endpoint (#1197)
+- osm-rawdata for generating data extracts (#1183)
+- create / edit organization form (#1178)
+- **frontend**: default organisation credentials during proj create  (#1174)
+- task history end point with associated user (#1071)
+- manage / edit project UI (#1154)
+- mapper role (#1163)
+- project admin role (#1133)
+- **frontend**: project deletion capability
+- set project delete endpoint to org_admin only
+- project submissions page (#1150)
+- dynamic qrcode generation via frontend (#1143)
+- add AOI editing to map during project creation (#1135)
+- endpoint to return count of validated and mapped tasks (#1138)
+- added withcredential to include cookies on organization list api
+- paginated submissions per task (#1128)
+- organisation approval and admin endpoints (#1126)
+- add test coverage metric (#1129)
+- paginated submissions by project (#1110)
+- add basic user role support to backend (#1094)
+- cookie based authentication (#1091)
+- use flatgeobuf data extracts (#1047)
+- **backend**: form fields for the submision table (#1072)
+- new project details page (#1070)
+- get contributors by project (#1062)
+- endpoint for submission page count by date (#1051)
+- **backend**: project dashboard endpoint (#1054)
+- cache submissions in s3 (#1035)
+- add mamoto tracking to prod frontend (#1040)
+- integrate fmtm-splitter and remove splitting code in fmtm (#1037)
+- project info legend (#1017)
+- add profiler to calculate route execution time (#1020)
+- capacitor geolocation and orientation (#1016)
+- cluster spread on click (#1007)
+- **frontend**: edit draw AOI in create project (#999)
+- generic endpoint to get task status from db
+
+### Fix
+
+- update osm-fieldwork --> 0.5.3 for validateMedia fix
+- submission detail of each task's submission (#1324)
+- **frontend**: project details improve UI responsiveness (#1321)
+- redirect to loginPopup on Manage Organization click if user not signed in (#1322)
+- **backend**: format of task_id in xform_name for getting submissions
+- **frontend**: decrease generate-log interval 2s --> 5s (server load)
+- **backend**: only access db once during task creation
+- **backend**: do not overwrite form_category with form filename
+- **backend**: update form endpoint updates xform_category (not xform_title)
+- **backend**: generate project-log based on odk_token in tasks
+- **backend**: add xform_category during project creation
+- **frontend**: automatically use default odk org creds if present
+- use defusedxml for xml parsing, only parse one in proj creation (#1316)
+- **frontend**: revert change to ProtectedRoute attempting cookie access
+- **frontend**: remove 'use client' react/nextjs delcarations from files
+- **backend**: run xform update in background task
+- **backend**: bug with xform/xlsform reading with suffix appended
+- **frontend**: update odk collect qrcode task id in metadata_phonenumber
+- update-form endpoint working
+- **frontend**: form update page UI + correct post params
+- update project_admin role to return user/project dict
+- fix form validation check during project creation
+- fix form naming during creation, media upload, appuser set
+- update xform name to fetch submissions (#1306)
+- remove data extract upload type (#1261)
+- **frontend**: only load my organisations once on tab click (#1287)
+- **frontend**: hotfix allow access to project details without login (for qr codes)
+- fix xform name in task feature count dict
+- check for existing project name (#1285)
+- **frontend**: hotfix allow access to project details without login (for qr codes)
+- fix xform name in task feature count dict
+- updated the xform in form fields
+- **frontend**: hotfix disable aoi area check temp
+- **frontend**: hotfix allow access to project details without login (for qr codes)
+- xform name in task feature count dict (#1288)
+- default map background changed to white (#1281)
+- cast osm_id as string for geojson id
+- top level id in geojson Feature as osm_id
+- create odk projects with prepended 'FMTM xxx' to identify
+- **frontend**: update qrcode form_update_mode --> match_exactly for sync
+- double wrapped db.execute statement in text()
+- fix passing project id for odk creds proj deletion
+- wrap raw sql expressions in SQLAlchemy.text
+- update odk_central_url validation to prevent blank string
+- extra logs when extracting odk creds from proj/org
+- put feature id on top level of task geojson for odk collect
+- update logic getting default org odk creds
+- geojson task splitting props in odk collect format
+- logic to bypass project_admin if public beta
+- update public org checking logic as part of role check
+- allow public project creation during public beta (#1274)
+- set sqlalchemy connection max_overflow unlimited, until task queue
+- **frontend**: change console log msg check to type check
+- reduce db connections during project creation
+- **frontend**: console errors when msg prop is not defined
+- **frontend**: handle case when console error is not string
+- temporarily bundle minio in prod until minio instance profile
+- make data_extract_url optional for ReadProject schema
+- data extract splitting by task refined, update download endpoint (#1269)
+- console log errors during project creation
+- qrcode download from task popup
+- rendering of qrcode based on task_status
+- task splitting with custom data extract (#1255)
+- dynamic submissions legend chloropeth (#1250)
+- update initial_feature_count --> feature_count and populate values (#1265)
+- use raw sql for organisation crud (#1253)
+- file validity check on fileUpload only once (#1262)
+- send bbox from geojson properties to josm (#1256)
+- comment broken SubmissionMap import on frontend
+- move OdkDecrypted logic into project_deps (#1239)
+- qr popup on task status & styling (#1184)
+- add created_by user id to organisation table (#1232)
+- project org UI issues (#1230)
+- required odk credentials if no organisation default (#1205)
+- removed deps from delele org api (#1233)
+- update schema to edit only required fields (#1223)
+- first coordinate check when check_crs geojson
+- data extract generation and task splitting with polylines (#1219)
+- update task status when mapping starts (#1208)
+- org creation using Form params
+- add odk_central_url to org details returned
+- project creation workflow fixes (task splitting) (#1194)
+- axios interceptor testing
+- feature type not being saved as a geojson type
+- axios interceptors fixing test
+- project submission card UI enhancement (#1186)
+- update db relations for generating submissions (#1179)
+- remove approved flag from organisations endpoint
+- organisation routes role usage & approval
+- baselayer url changed with token
+- create popup outside of async request (fix ios login) (#1167)
+- organisation logo display full width (#1166)
+- map default odk credentials to organisations (#1123)
+- **backend**: append /v1/ to odk_token url for qrcodes
+- **frontend**: remove svcfmtm from loginSlice initialState
+- zlib compress dynamic QR codes from frontend (#1159)
+- project submission date and time formatted (#1160)
+- project creation draw and max boundary area (#1157)
+- **frontend**: do not render qrcode if odktoken is empty
+- API interceptor used in getOrganizationRequest
+- login_required decorator return value converted to AuthUser
+- all usage of AuthUser replace .get methods (#1142)
+- use optional params for extra AuthUser items
+- Depends usage for task_submissions endpoint
+- tile archive download for projects
+- use organization_manager table for org admins
+- limit project area during create (#1109)
+- editable vector layer in ol for project creation (#1102)
+- task split by square fail if data extract pending (#1095)
+- optimize the performance of project dashboard (#1079)
+- create & edit project UI fixes (#1078)
+- more robust method to support different date format
+- string based date to custom date format for over 7days
+- add image to user profile (#1053)
+- homepage height, split on square disable button (#1046)
+- authentication on delete projects api (#1042)
+- **frontend**: use task status string directly (#1032)
+- prevent generate building task without int (#1030)
+- serialize task status as string (#1031)
+- retriving field value directly using model object
+- task status var type, openlayers styling (#1026)
+- allow qr code access from all users (#1023)
+- error while using task splitting algorithm when drawing aoi
+- use async by default, with occasional def threading (#1015)
+- changed post request to get
+- add template data extract example (#1011)
+- improve logging if organization patch fails
+- setting S3_DOWNLOAD_ROOT if not debug
+- set S3_DOWNLOAD_ROOT if empty string
+- correctly set org logo url on update
+- upload organisation logo in S3 (distributed) (#1008)
+- **frontend**: project summary search all (#1005)
+- post task split type, dimension, num buildings (#1003)
+- solve pagination error (#997)
+- revert FastAPI UploadFile.getvalue(), use .read()
+- **frontend**: custom tms url input (#998)
+- rename upload-->project_geojson upload boundary
+- add_obj_to_bucket s3 method all args
+- use S3_DOWNLOAD_ROOT for s3 downloads
+- project.project_info as a dict, not list
+- set uselist=False for Project-->ProjectInfo relationship
+- get_form_full_details func not a json
+- refs BETAProjectUpload --> ProjectUpload
+- use sync def for non-io bound tasks
+- minor fixes, project_info dict, utils bg tasks
+- add uuid in read project and total_task in generate-log (#978)
+- add task_split_type to project when task splitting complete (#990)
+- sign in text, user profile (#996)
+- task id on task polygon and feature extracts (#976)
+- create new project aoi zoom (#989)
+- **install-script**: add DOCKER_HOST to top of bashrc
+- enforce https for osm oauth callbacks
+- add is_public option to s3 bucket init
+
+### Refactor
+
+- use pyxform fork for BytesIO XForm usage (#1327)
+- **frontend**: round creation progress to nearest percent
+- **backend**: add log after project xform update complete
+- remove projects.xform_title completely, in favour of xform_category
+- usage of form_category variable --> xform_title --> xform_name
+- remove redundant central endpoints
+- reduce API calls on home page and project details page (#1315)
+- remove verbose logs from task pydantic model
+- **backend**: remove verbose logs on project home page
+- **backend**: remove project boundary upload endpoint (not used)
+- remove categories from form list, update to raw sql
+- old organization creation page removed (#1299)
+- add ts types to store (#1286)
+- remove unneccessary consoles
+- update logic for odk form creation & media upload
+- correctly set project.project_name_prefix on creation
+- remove code for manual service worker registration
+- update sentry to only run on prod website
+- removing redundant code for removing extra closing </osm> tag (#1264)
+- reorganize the code to make it cleaner
+- changed sync to async gather_all_submission_csvs (#1258)
+- improve flatgeobuf loading and generation (#1235)
+- remove old edit-project code (#1210)
+- org creation page consent questions (#1185)
+- task status update endpoint to adjust mapper role (#1180)
+- cast all fields for sqlalchemy with python types (#1173)
+- add extra error handling if data extract download fails (#1158)
+- remove withCredentials from org endpoint (use interceptor)
+- **frontend**: use absolute (aliased) imports over relative imports (#1136)
+- fix return type for organisation url validator
+- update project dashboard to use deps functions (#1127)
+- add metadata_username to odk qr code as test
+- refactor odk appuser + qrcode function naming
+- fix linting errors in project_crud
+- renaming for consistency with database (#1114)
+- remove variable from docker install script
+- fix all pre-commit.ci linting errors (#1101)
+- organization routes/crud/schemas to use best practice (#1096)
+- replace project last active validator --> serializer
+- task status fetched from enums (#1082)
+- serialization for task_status and created project dashboard fields (#1076)
+- pydantic v2 deprecations (#1074)
+- rename mamoto --> matomo
+- replace get_user_by_id with get_user on login
+- remove /images/ endpoint, replaced by s3 logos (#1013)
+- remove endpoints specific to janakpur project (#1012)
+- use DEBUG param to determine S3_DOWNLOAD_ROOT local
+- bytesio .seek(0) & .read() methods with .getvalue() (#1001)
+- replace deprecated on_event with lifespan event
+- generate uuid for background tasks automatically
+- make get_odk_project_full_details synchronous
+- rename project route variables for clarity
+- default s3 bucket name --> fmtm-data
+- rename var S3_BUCKET_NAME_BASEMAPS --> S3_BUCKET_NAME
+- generate uuid for background tasks automatically
+- rename project_id --> odk_project_id for clarity
+- rename get odk project details for clarity
+- remove unused project_crud function
+- remove ref to project_export for now
+
 ## 0.1.0 (2023-11-08)
 
 ### Feat
