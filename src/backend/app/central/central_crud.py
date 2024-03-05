@@ -20,7 +20,6 @@
 import os
 from asyncio import gather
 from io import BytesIO
-from pathlib import Path
 from typing import Optional, Union
 
 from defusedxml import ElementTree
@@ -450,83 +449,68 @@ async def read_and_test_xform(
         form_file_ext (str): type of form (.xls, .xlsx, or .xml).
         return_form_data (bool): return the XForm data.
     """
-    # TODO xls2xform_convert requires files on disk
-    # TODO create PR to accept BytesIO?
-
     # Read from BytesIO object
-    input_content = input_data.getvalue()
     file_ext = form_file_ext.lower()
 
-    input_path = Path(f"/tmp/fmtm_form_input_tmp{file_ext}")
-    # This file will store xml contents of an xls form
-    # NOTE a file on disk is required by xls2xform_convert
-    output_path = Path("/tmp/fmtm_xform_temp.xml")
-
     if file_ext == ".xml":
-        # Create output file to write to
-        output_path.touch(exist_ok=True)
-        # Write input_content to a temporary file
-        with open(output_path, "wb") as f:
-            f.write(input_content)
-    else:
-        # Create input file to write to
-        input_path.touch(exist_ok=True)
-        with open(input_path, "wb") as f:
-            f.write(input_content)
+        xform_bytesio = input_data
+        # Parse / validate XForm
         try:
-            log.debug(f"Converting xlsform -> xform: {str(output_path)}")
-            # FIXME should this be validate=True?
-            xls2xform_convert(
-                xlsform_path=str(input_path),
-                xform_path=str(output_path),
+            ElementTree.fromstring(xform_bytesio.getvalue())
+        except ElementTree.ParseError as e:
+            log.error(e)
+            msg = f"Error parsing XForm XML: Possible reason: {str(e)}"
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            ) from e
+    else:
+        try:
+            log.debug("Converting xlsform -> xform")
+            # NOTE do not enable validate=True, as this requires Java installed
+            xform_bytesio, warnings = xls2xform_convert(
+                xlsform_path=f"/tmp/form{file_ext}",
                 validate=False,
+                xlsform_object=input_data,
             )
+            if warnings:
+                log.warning(warnings)
         except Exception as e:
             log.error(e)
-            msg = f"XLSForm is invalid. Possible reason: {str(e)}"
+            msg = f"XLSForm is invalid: {str(e)}"
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
             ) from e
 
-    # Parse XForm
-    try:
-        # TODO for memory object use ElementTree.fromstring()
-        xml_parsed = ElementTree.parse(str(output_path))
-        if return_form_data:
-            xml_bytes = ElementTree.tostring(xml_parsed.getroot())
-            return BytesIO(xml_bytes)
-    except ElementTree.ParseError as e:
-        log.error(e)
-        msg = f"Error parsing XForm XML: Possible reason: {str(e)}"
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-        ) from e
-
-    # Delete temp files
-    if file_ext != ".xml":
-        input_path.unlink()
-    output_path.unlink()
-
+    # Return immediately
     if return_form_data:
-        return xml_parsed
+        return xform_bytesio
+
+    # Load XML
+    xform_xml = ElementTree.fromstring(xform_bytesio.getvalue())
 
     # Extract geojson filenames
     try:
-        root = xml_parsed.getroot()
         namespaces = {"xforms": "http://www.w3.org/2002/xforms"}
         geojson_list = [
             os.path.splitext(inst.attrib["src"].split("/")[-1])[0]
-            for inst in root.findall(".//xforms:instance[@src]", namespaces)
+            for inst in xform_xml.findall(".//xforms:instance[@src]", namespaces)
             if inst.attrib.get("src", "").endswith(".geojson")
         ]
+
+        # No select_one_from_file defined
+        if not geojson_list:
+            msg = (
+                "The form has no select_one_from_file or "
+                "select_multiple_from_file field defined."
+            )
+            raise ValueError(msg) from None
 
         return {"required_media": geojson_list, "message": "Your form is valid"}
 
     except Exception as e:
         log.error(e)
-        msg = f"Error extracting geojson filename: Possible reason: {str(e)}"
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e)
         ) from e
 
 
