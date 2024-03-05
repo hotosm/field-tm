@@ -9,8 +9,7 @@ const SubmissionDetails = () => {
   const params = CoreModules.useParams();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
-  const encodedTaskId = params.taskId;
-  const decodedTaskId = environment.decode(encodedTaskId);
+  const taskId = params.taskId;
   const paramsInstanceId = params.instanceId;
 
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
@@ -20,10 +19,10 @@ const SubmissionDetails = () => {
       SubmissionService(
         `${
           import.meta.env.VITE_API_URL
-        }/central/submission?project_id=${decodedProjectId}&xmlFormId=${decodedTaskId}&submission_id=${paramsInstanceId}`,
+        }/submission/task_submissions/${decodedProjectId}?task_id=${taskId}&submission_id=${paramsInstanceId}`,
       ),
     );
-  }, []);
+  }, [decodedProjectId, taskId, paramsInstanceId]);
 
   function removeNullValues(obj) {
     const newObj = {};
