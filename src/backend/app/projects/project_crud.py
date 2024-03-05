@@ -77,9 +77,9 @@ TILESDIR = "/opt/tiles"
 
 async def get_projects(
     db: Session,
-    user_id: int,
     skip: int = 0,
     limit: int = 100,
+    user_id: Optional[int] = None,
     hashtags: Optional[List[str]] = None,
     search: Optional[str] = None,
 ):
@@ -93,8 +93,8 @@ async def get_projects(
 
     if search:
         filters.append(
-            db_models.DbProject.project_info.name.ilike(  # type: ignore
-                f"%{search}%"
+            db_models.DbProject.project_info.has(
+                db_models.DbProjectInfo.name.ilike(f"%{search}%")
             )
         )
 
@@ -123,15 +123,15 @@ async def get_projects(
 
 async def get_project_summaries(
     db: Session,
-    user_id: int,
     skip: int = 0,
     limit: int = 100,
+    user_id: Optional[int] = None,
     hashtags: Optional[List[str]] = None,
     search: Optional[str] = None,
 ):
     """Get project summary details for main page."""
     project_count, db_projects = await get_projects(
-        db, user_id, skip, limit, hashtags, search
+        db, skip, limit, user_id, hashtags, search
     )
     return project_count, await convert_to_project_summaries(db_projects)
 

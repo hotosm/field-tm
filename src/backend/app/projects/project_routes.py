@@ -141,10 +141,10 @@ async def get_tasks_near_me(lat: float, long: float, user_id: int = None):
 
 @router.get("/summaries", response_model=project_schemas.PaginatedProjectSummaries)
 async def read_project_summaries(
-    user_id: int = None,
-    hashtags: str = None,
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
+    user_id: Optional[int] = None,
+    hashtags: Optional[str] = None,
     db: Session = Depends(database.get_db),
 ):
     """Get a paginated summary of projects."""
@@ -159,7 +159,7 @@ async def read_project_summaries(
     limit = results_per_page
 
     project_count, projects = await project_crud.get_project_summaries(
-        db, user_id, skip, limit, hashtags, None
+        db, skip, limit, user_id, hashtags, None
     )
 
     pagination = await project_crud.get_pagination(
@@ -181,10 +181,10 @@ async def read_project_summaries(
 )
 async def search_project(
     search: str,
-    user_id: int = None,
-    hashtags: str = None,
     page: int = Query(1, ge=1),  # Default to page 1, must be greater than or equal to 1
     results_per_page: int = Query(13, le=100),
+    user_id: Optional[int] = None,
+    hashtags: Optional[str] = None,
     db: Session = Depends(database.get_db),
 ):
     """Search projects by string, hashtag, or other criteria."""
@@ -199,7 +199,7 @@ async def search_project(
     limit = results_per_page
 
     project_count, projects = await project_crud.get_project_summaries(
-        db, user_id, skip, limit, hashtags, search
+        db, skip, limit, user_id, hashtags, search
     )
 
     pagination = await project_crud.get_pagination(
