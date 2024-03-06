@@ -175,5 +175,4 @@ async def my_data(
     Returns:
         user_data(dict): The dict of user data.
     """
-    await get_or_create_user(db, user_data)
-    return user_data
+    return await get_or_create_user(db, user_data)
