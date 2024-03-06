@@ -39,3 +39,10 @@ export type submissionTableDataTypes = {
     pages: number | null;
   };
 };
+
+export type reviewListType = {
+  id: string;
+  title: string;
+  className: string;
+  hoverClass: string;
+};
