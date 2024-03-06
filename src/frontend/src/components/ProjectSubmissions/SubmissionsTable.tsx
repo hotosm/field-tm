@@ -18,6 +18,7 @@ import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmi
 import { Modal } from '@/components/common/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
+import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
 
@@ -240,6 +241,7 @@ const SubmissionsTable = ({ toggleView }) => {
           dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
         }}
       />
+      <UpdateReviewStatusModal />
       <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col md:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
         <div
           className={`${
@@ -427,10 +429,10 @@ const SubmissionsTable = ({ toggleView }) => {
           })}
           <TableHeader
             dataField="Actions"
-            headerClassName="updatedHeader"
-            rowClassName="updatedRow"
+            headerClassName="updatedHeader !fmtm-sticky fmtm-right-0 fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)] fmtm-text-center"
+            rowClassName="updatedRow !fmtm-sticky fmtm-right-0 fmtm-bg-white fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)]"
             dataFormat={(row) => (
-              <div className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
+              <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
                 <AssetModules.VisibilityOutlinedIcon
                   className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
                   onClick={() => {
@@ -438,9 +440,17 @@ const SubmissionsTable = ({ toggleView }) => {
                   }}
                 />{' '}
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
-                <AssetModules.CheckOutlinedIcon className="fmtm-text-[#545454]" />{' '}
-                <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
-                <AssetModules.DeleteIcon className="fmtm-text-[#545454]" />
+                <AssetModules.CheckOutlinedIcon
+                  className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                  onClick={() => {
+                    dispatch(
+                      SubmissionActions.SetUpdateReviewStatusModal({
+                        toggleModalStatus: true,
+                        submissionId: row?.meta?.instanceID,
+                      }),
+                    );
+                  }}
+                />
               </div>
             )}
           />
