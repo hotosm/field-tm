@@ -9,8 +9,6 @@ import useForm from '@/hooks/useForm';
 import CreateProjectValidation from '@/components/createnewproject/validation/CreateProjectValidation';
 import Button from '@/components/common/Button';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import AssetModules from '@/shared/AssetModules.js';
-import { createPopup } from '@/utilfunctions/createPopup';
 import { CustomSelect } from '@/components/common/Select';
 import { OrganisationService } from '@/api/CreateProjectService';
 import { CustomCheckbox } from '@/components/common/Checkbox';
@@ -181,10 +179,6 @@ const ProjectDetailsForm = ({ flag }) => {
                 onValueChange={(value) => {
                   setSelectedOrganisation(value);
                 }}
-              />
-              <AssetModules.AddIcon
-                className="fmtm-bg-red-600 fmtm-text-white fmtm-rounded-full fmtm-mb-[0.15rem] hover:fmtm-bg-red-700 hover:fmtm-cursor-pointer fmtm-ml-5 fmtm-mt-9"
-                onClick={() => createPopup('Create Organization', 'createOrganisation?popup=true')}
               />
             </div>
             {errors.organisation_id && (
