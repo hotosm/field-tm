@@ -8,10 +8,12 @@ import Button from '@/components/common/Button';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { useAppSelector } from '@/types/reduxTypes';
+import { useNavigate } from 'react-router-dom';
 
 const SubmissionDetails = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
+  const navigate = useNavigate();
   const encodedProjectId = params.projectId;
   const decodedProjectId = environment.decode(encodedProjectId);
   const taskId = params.taskId;
@@ -114,6 +116,29 @@ const SubmissionDetails = () => {
   return (
     <div className="fmtm-bg-gray-100 fmtm-box-border fmtm-border-[1px] fmtm-border-t-white fmtm-border-t-[0px] fmtm-px-[1.5rem] md:fmtm-px-[3.5rem] fmtm-py-[1.5rem] md:fmtm-py-[2rem]">
       <UpdateReviewStatusModal />
+      {projectDashboardLoading ? (
+        <CoreModules.Skeleton style={{ width: '250px' }} className="fmtm-mb-1" />
+      ) : (
+        <div className="fmtm-pb-4">
+          <p className="fmtm-text-[#706E6E] fmtm-text-base">
+            <span
+              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
+              onClick={() => navigate(`/project_details/${encodedProjectId}`)}
+            >
+              {projectDashboardDetail?.project_name_prefix}
+            </span>
+            <span> &gt; </span>
+            <span
+              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
+              onClick={() => navigate(`/project-submissions/${encodedProjectId}?tab=table`)}
+            >
+              Dashboard
+            </span>
+            <span> &gt; </span>
+            <span className="fmtm-text-black">Submissions</span>
+          </p>
+        </div>
+      )}
       <div className="fmtm-flex fmtm-flex-col xl:fmtm-flex-row">
         <div>
           {projectDashboardLoading ? (

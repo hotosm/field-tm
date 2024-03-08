@@ -5,6 +5,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
 import { ProjectFilesById } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
+import { useNavigate } from 'react-router-dom';
 
 type TaskSectionPopupPropType = {
   taskId: number | null;
@@ -14,6 +15,7 @@ type TaskSectionPopupPropType = {
 
 const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) => {
   const dispatch = CoreModules.useAppDispatch();
+  const navigate = useNavigate();
   const [task_status, set_task_status] = useState('READY');
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const params = CoreModules.useParams();
@@ -69,12 +71,13 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
           className="hover:fmtm-text-primaryRed"
           onClick={() => {
             dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
+            dispatch(ProjectActions.ToggleTaskModalStatus(false));
           }}
         />
         <AssetModules.DescriptionOutlinedIcon
           style={{ width: '20px' }}
           className="hover:fmtm-text-primaryRed"
-          onClick={() => {}}
+          onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
         />
         <AssetModules.CloseIcon
           style={{ width: '20px' }}
