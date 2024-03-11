@@ -257,6 +257,7 @@ async def split_geojson_by_task_areas(
     """Split GeoJSON into tagged task area GeoJSONs.
 
     NOTE inserts feature.properties.osm_id as feature.id for each feature.
+    NOTE ST_Within used on polygon centroids to correctly capture the geoms per task.
 
     Args:
         db (Session): SQLAlchemy db session.
@@ -330,7 +331,7 @@ async def split_geojson_by_task_areas(
                 FROM temp_features
             ) AS temp_features
             WHERE
-                ST_Within(temp_features.geometry, tasks.outline)
+                ST_Within(ST_Centroid(temp_features.geometry), tasks.outline)
         ) AS feature ON true
         WHERE
             tasks.project_id = :project_id
