@@ -148,6 +148,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/123072058?v=4",
       "profile": "https://github.com/Prajwalism",
       "contributions": ["code"]
+    },
+    {
+      "login": "manjitapandey",
+      "name": "Manjita Pandey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97273021?v=4",
+      "profile": "https://github.com/manjitapandey",
+      "contributions": ["bug"]
     }
   ],
   "contributorsPerLine": 7,
