@@ -2,19 +2,13 @@
 
 - [ ] 🍕 Feature
 - [ ] 🐛 Bug Fix
-- [ ] 📝 Documentation Update
-- [ ] 🎨 Style
-- [ ] 🧑‍💻 Code Refactor
-- [ ] 🔥 Performance Improvements
+- [ ] 📝 Documentation
+- [ ] 🧑‍💻 Refactor
 - [ ] ✅ Test
-- [ ] 🤖 Build
-- [ ] 🔁 CI
-- [ ] 📦 Chore (Release)
-- [ ] ⏩ Revert
+- [ ] 🤖 Build or CI
+- [ ] ❓ Other (please specify)
 
 ## Related Issue
-
-Ticket number, link, or description.
 
 Example: Fixes #123
 
@@ -25,6 +19,14 @@ A brief description of how this solves the issue.
 ## Screenshots
 
 Please provide screenshots of the change.
+
+## Alternative Approaches Considered
+
+Did you attempt any other approaches that are not documented in code?
+
+## Review Guide
+
+Notes for the reviewer. How to test this change?
 
 ## Checklist before requesting a review
 
