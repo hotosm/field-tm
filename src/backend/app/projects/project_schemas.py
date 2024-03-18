@@ -234,7 +234,7 @@ class ProjectSummary(BaseModel):
     priority: ProjectPriority = ProjectPriority.MEDIUM
     priority_str: str = priority.name
     title: Optional[str] = None
-    centroid: list[float]
+    centroid: Optional[list[float]] = None
     location_str: Optional[str] = None
     description: Optional[str] = None
     total_tasks: Optional[int] = None
@@ -253,9 +253,11 @@ class ProjectSummary(BaseModel):
     ) -> "ProjectSummary":
         """Generate model from database obj."""
         priority = project.priority
-        centroid_point = read_wkb(project.centroid)
-        # NOTE format x,y (lon,lat) required for GeoJSON
-        centroid_coords = [centroid_point.x, centroid_point.y]
+        centroid_coords = []
+        if project.centroid:
+            centroid_point = read_wkb(project.centroid)
+            # NOTE format x,y (lon,lat) required for GeoJSON
+            centroid_coords = [centroid_point.x, centroid_point.y]
 
         return cls(
             id=project.id,
