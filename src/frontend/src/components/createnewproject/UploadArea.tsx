@@ -42,6 +42,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   const uploadAreaSelection = useAppSelector((state) => state.createproject.uploadAreaSelection);
   const drawToggle = useAppSelector((state) => state.createproject.drawToggle);
   const totalAreaSelection = useAppSelector((state) => state.createproject.totalAreaSelection);
+  const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
 
   const submission = () => {
     if (totalAreaSelection) {
@@ -62,6 +63,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 3 }));
     navigate('/select-category');
+    dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
   const {
     handleSubmit,
@@ -72,6 +74,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   const toggleStep = (step, url) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
+    dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
 
   const convertFileToGeojson = async (file) => {
@@ -320,16 +323,21 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                       setGeojsonFile(null);
                     }
               }
-              onModify={(geojson, area) => {
-                handleCustomChange('drawnGeojson', geojson);
-                dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
-                dispatch(CreateProjectActions.SetTotalAreaSelection(area));
-                dispatch(CreateProjectActions.ClearProjectStepState(formValues));
-                setCustomDataExtractUpload(null);
-              }}
+              onModify={
+                toggleSplittedGeojsonEdit
+                  ? (geojson, area) => {
+                      handleCustomChange('drawnGeojson', geojson);
+                      dispatch(CreateProjectActions.SetDrawnGeojson(JSON.parse(geojson)));
+                      dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+                      dispatch(CreateProjectActions.ClearProjectStepState(formValues));
+                      setCustomDataExtractUpload(null);
+                    }
+                  : null
+              }
               getAOIArea={(area) => {
                 dispatch(CreateProjectActions.SetTotalAreaSelection(area));
               }}
+              hasEditUndo
             />
           </div>
         </div>
