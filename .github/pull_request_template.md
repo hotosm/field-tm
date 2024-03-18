@@ -31,7 +31,7 @@ Notes for the reviewer. How to test this change?
 ## Checklist before requesting a review
 
 - 📖 Read the FMTM Contributing Guide: <https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md>
-- 📖 Read the FMTM Code of Conduct: <https://github.com/hotosm/fmtm/blob/main/CODE_OF_CONDUCT.md>
+- 📖 Read the HOT Code of Conduct: <https://docs.hotosm.org/code-of-conduct>
 - 👷‍♀️ Create small PRs. In most cases, this will be possible.
 - ✅ Provide tests for your changes.
 - 📝 Use descriptive commit messages.
