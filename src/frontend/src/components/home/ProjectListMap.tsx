@@ -80,7 +80,7 @@ const ProjectListMap = () => {
         },
         geometry: {
           type: 'Point',
-          coordinates: project.centroid,
+          coordinates: project.centroid || [],
         },
       })),
     };
