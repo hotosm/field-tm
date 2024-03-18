@@ -61,6 +61,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
   const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
+    dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
 
   const checkTasksGeneration = () => {
