@@ -21,6 +21,7 @@ import VectorSource from 'ol/source/Vector';
 import logo from '@/assets/images/navigation.svg';
 import RedNavigationMarker from '@/assets/images/rednavigationmarker.svg';
 import navigationMarker from '@/assets/images/navigation.png';
+import pngbluedot from '@/assets/images/png bluedot.png';
 
 type HomeProjectSummaryType = {
   features: { geometry: any; properties: any; type: any }[];
@@ -122,8 +123,8 @@ const ProjectListMap = () => {
         color: 'rgba(0, 0, 255, 0.2)',
       }),
       image: new Icon({
-        src: navigationMarker,
-        scale: 0.04,
+        src: pngbluedot,
+        scale: 0.09,
         imgSize: [27, 55],
         rotateWithView: true,
       }),
