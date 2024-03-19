@@ -99,7 +99,7 @@ async def admin_user(db):
         ),
     )
     # Upgrade role from default MAPPER (if user already exists)
-    db_user.role = UserRole.ADMIN
+    db_user["role"] = UserRole.ADMIN
     db.commit()
     return db_user
 
@@ -175,8 +175,8 @@ async def project(db, admin_user, organisation):
             project_metadata,
             odkproject["id"],
             AuthUser(
-                username=admin_user.username,
-                id=admin_user.id,
+                username=admin_user["username"],
+                id=admin_user["id"],
                 role=UserRole.ADMIN,
             ),
         )
