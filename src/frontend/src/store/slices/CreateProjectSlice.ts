@@ -16,6 +16,7 @@ export const initialState: CreateProjectStateTypes = {
     description: '',
     organisation_id: null,
     per_task_instructions: '',
+    formWays: 'existing_form',
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,
@@ -80,6 +81,7 @@ const CreateProject = createSlice({
         odk_central_password: '',
         description: '',
         organisation_id: null,
+        form_ways: 'existing_form',
       };
       state.projectArea = null;
       state.totalAreaSelection = null;
