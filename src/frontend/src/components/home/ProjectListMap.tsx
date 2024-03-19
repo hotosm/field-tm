@@ -19,6 +19,8 @@ import { Point } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import logo from '@/assets/images/navigation.svg';
+import RedNavigationMarker from '@/assets/images/rednavigationmarker.svg';
+import navigationMarker from '@/assets/images/navigation.png';
 
 type HomeProjectSummaryType = {
   features: { geometry: any; properties: any; type: any }[];
@@ -72,7 +74,7 @@ const ProjectListMap = () => {
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
     zoom: 4,
-    maxZoom: 17,
+    maxZoom: 20,
   });
   useEffect(() => {
     if (!map) return;
@@ -120,8 +122,8 @@ const ProjectListMap = () => {
         color: 'rgba(0, 0, 255, 0.2)',
       }),
       image: new Icon({
-        src: logo,
-        scale: 0.02,
+        src: navigationMarker,
+        scale: 0.04,
         imgSize: [27, 55],
         rotateWithView: true,
       }),
@@ -194,7 +196,7 @@ const ProjectListMap = () => {
     // We use referenceFrame: 'screen' because the web page will rotate when
     // the phone switches from portrait to landscape.
     const sensor = new AbsoluteOrientationSensor({
-      frequency: 1,
+      frequency: 5,
       referenceFrame: 'screen',
     });
     sensor.addEventListener('reading', () => {
