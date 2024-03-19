@@ -41,7 +41,7 @@ class AuthUser(BaseModel):
 
     id: int
     username: str
-    img_url: Optional[str] = None
+    profile_img: Optional[str] = None
     role: Optional[UserRole] = UserRole.MAPPER
 
 
