@@ -12,11 +12,7 @@ import FileInputComponent from '@/components/common/FileInputComponent';
 import SelectFormValidation from '@/components/createnewproject/validation/SelectFormValidation';
 import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectService';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
-
-const osmFeatureTypeOptions = [
-  { name: 'form_ways', value: 'existing_form', label: 'Use Existing Form' },
-  { name: 'form_ways', value: 'custom_form', label: 'Upload a Custom Form' },
-];
+import { CustomCheckbox } from '../common/Checkbox';
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
   const dispatch = useDispatch();
@@ -136,16 +132,18 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   {`if uploading the final submissions to OSM.`}
                 </p>
               </div>
-              <RadioButton
-                topic="You may choose to use existing category or upload your own xlsx form"
-                options={osmFeatureTypeOptions}
-                direction="column"
-                value={formValues.formWays}
-                onChangeData={(value) => {
-                  resetFile();
-                  handleCustomChange('formWays', value);
+              <CustomCheckbox
+                key="fillODKCredentials"
+                label="Upload a custom XLSForm instead"
+                checked={formValues.formWays === 'custom_form'}
+                onCheckedChange={(status) => {
+                  if (status) {
+                    handleCustomChange('formWays', 'custom_form');
+                  } else {
+                    handleCustomChange('formWays', 'existing_form');
+                  }
                 }}
-                errorMsg={errors.formWays}
+                className="fmtm-text-black"
               />
               {formValues.formWays === 'custom_form' ? (
                 <FileInputComponent
