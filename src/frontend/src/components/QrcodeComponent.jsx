@@ -22,6 +22,7 @@ const TasksComponent = ({ qrcode, taskId }) => {
             disabled={qrcode == '' ? true : false}
             aria-label="download qrcode"
             className={` ${qrcode === '' ? 'fmtm-cursor-not-allowed fmtm-opacity-50' : 'fmtm-cursor-pointer'}`}
+            title="Download QR Code"
           >
             <AssetModules.FileDownloadIcon />
           </button>
