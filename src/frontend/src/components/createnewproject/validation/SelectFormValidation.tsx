@@ -15,9 +15,6 @@ function SelectFormValidation(values: ProjectValues) {
   if (!values?.formCategorySelection) {
     errors.formCategorySelection = 'Form Category is Required.';
   }
-  if (!values?.formWays) {
-    errors.formWays = 'Form Selection is Required.';
-  }
   if (values?.formWays === 'custom_form' && !values?.customFormUpload) {
     errors.customFormUpload = 'Form needs to be Uploaded.';
   }
