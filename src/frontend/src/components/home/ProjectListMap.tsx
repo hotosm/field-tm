@@ -197,13 +197,13 @@ const ProjectListMap = () => {
     // We use referenceFrame: 'screen' because the web page will rotate when
     // the phone switches from portrait to landscape.
     const sensor = new AbsoluteOrientationSensor({
-      frequency: 5,
+      frequency: 60,
       referenceFrame: 'screen',
     });
-    sensor.addEventListener('reading', () => {
+    sensor.addEventListener('reading', (event) => {
+      console.log(event, 'event');
       layer.on('postrender', handleReading(sensor.quaternion));
     });
-
     // handleReading([0.509, -0.071, -0.19, 0.836]);
 
     Promise.all([
