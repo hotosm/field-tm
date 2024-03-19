@@ -200,7 +200,7 @@ const ProjectListMap = () => {
       referenceFrame: 'screen',
     });
     sensor.addEventListener('reading', () => {
-      handleReading(sensor.quaternion);
+      layer.on('postrender', handleReading(sensor.quaternion));
     });
 
     // handleReading([0.509, -0.071, -0.19, 0.836]);
