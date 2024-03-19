@@ -177,6 +177,7 @@ const Organisation = () => {
       </div>
       <CoreModules.Box>
         <CoreModules.TextField
+          id="search-organization"
           variant="outlined"
           size="small"
           placeholder="Search organization"
@@ -193,7 +194,7 @@ const Organisation = () => {
         />
       </CoreModules.Box>
       {activeTab === 0 ? (
-        !organisationDataLoading ? (
+        organisationDataLoading ? (
           <CoreModules.Stack
             sx={{
               display: {
@@ -219,7 +220,7 @@ const Organisation = () => {
         )
       ) : null}
       {activeTab === 1 ? (
-        !myOrganisationDataLoading ? (
+        myOrganisationDataLoading ? (
           <CoreModules.Stack
             sx={{
               display: {
