@@ -48,6 +48,7 @@ export const OrganisationDataService: Function = (url: string) => {
         const getOrganisationDataResponse = await API.get(url);
         const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
         dispatch(OrganisationAction.GetOrganisationsData(response));
+        dispatch(OrganisationAction.GetOrganisationDataLoading(false));
       } catch (error) {
         dispatch(OrganisationAction.GetOrganisationDataLoading(false));
         if (error.response.status === 401) {
@@ -67,6 +68,7 @@ export const MyOrganisationDataService: Function = (url: string) => {
         const getMyOrganisationDataResponse = await API.get(url);
         const response: GetOrganisationDataModel[] = getMyOrganisationDataResponse.data;
         dispatch(OrganisationAction.GetMyOrganisationsData(response));
+        dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
       } catch (error) {
         dispatch(OrganisationAction.GetMyOrganisationDataLoading(false));
       }
