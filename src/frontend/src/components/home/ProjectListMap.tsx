@@ -95,7 +95,7 @@ const ProjectListMap = () => {
         alert(`ERROR: ${error.message}`);
       },
       {
-        enableHighAccuracy: false,
+        enableHighAccuracy: true,
       },
     );
     const locate = document.createElement('div');
@@ -194,7 +194,7 @@ const ProjectListMap = () => {
     // We use referenceFrame: 'screen' because the web page will rotate when
     // the phone switches from portrait to landscape.
     const sensor = new AbsoluteOrientationSensor({
-      frequency: 10,
+      frequency: 1,
       referenceFrame: 'screen',
     });
     sensor.addEventListener('reading', () => {
