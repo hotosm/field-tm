@@ -38,7 +38,7 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { useAppSelector } from '@/types/reduxTypes';
-import { Geolocation } from '@/components/MapComponent/OpenLayersComponent/Geolocation/Geolocation';
+import { Geolocation } from '@/utilfunctions/Geolocation';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
