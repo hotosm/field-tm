@@ -126,6 +126,17 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   };
 
   useEffect(() => {
+    if (drawnGeojson && !valid(drawnGeojson)) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'File not a valid geojson',
+          variant: 'error',
+          duration: 4000,
+        }),
+      );
+      return;
+    }
     if (drawnGeojson) {
       const isWGS84 = () => {
         if (uploadAreaSelection === 'upload_file') {
