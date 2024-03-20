@@ -73,7 +73,7 @@ and [contributor guidance](https://hotosm.github.io/fmtm/CONTRIBUTING/)
 for more details!
 Reach out to us if any questions! 👍🎉
 
-## Using OpenDataKit's Select From Map feature
+## Using ODK's Select From Map feature
 
 As of mid-2022, ODK incorporates a new functionality, select from map,
 that allows field mappers to select an object from a map,
@@ -110,7 +110,7 @@ field mappers to go out and collect data. They need to:
 ### Field mappers
 
 Field mappers select (or are allocated) individual tasks within a project
-AOI and use ODK Collect to gather data in those areas. They need to:
+AOI and use the ODK mobile app to gather data in those areas. They need to:
 
 - Visit a mobile-friendly Web page where they can see available tasks on a map
 - Choose an area and launch ODK Collect
@@ -149,7 +149,7 @@ A breakdown of the components:
 ### ODK Collect
 
 A mobile data collection tool that functions on almost all Android phones.
-Field mappers use ODK Collect to select features such as buildings or amenities,
+Field mappers use the ODK mobile app to select features such as buildings or amenities,
 and fill out forms with survey questions to collect attributes or data
 about those features (normally at least some of these attributes are intended
 to become OSM tags associated with those features).
