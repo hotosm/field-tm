@@ -9,6 +9,18 @@ import { circular } from 'ol/geom/Polygon';
 import { Style } from 'ol/style';
 import { Icon } from 'ol/style';
 
+const locationIconStyle = new Style({
+  fill: new Fill({
+    color: 'rgba(0, 0, 255, 0.2)',
+  }),
+  image: new Icon({
+    src: pngbluedot,
+    scale: 0.09,
+    imgSize: [27, 55],
+    rotateWithView: true,
+  }),
+});
+
 export const Geolocation = (map) => {
   if (!map) return;
   const source = new VectorSource();
@@ -37,18 +49,7 @@ export const Geolocation = (map) => {
     },
   );
 
-  const style = new Style({
-    fill: new Fill({
-      color: 'rgba(0, 0, 255, 0.2)',
-    }),
-    image: new Icon({
-      src: pngbluedot,
-      scale: 0.09,
-      imgSize: [27, 55],
-      rotateWithView: true,
-    }),
-  });
-  layer.setStyle(style);
+  layer.setStyle(locationIconStyle);
 
   function handleReading(quaternion) {
     // https://w3c.github.io/orientation-sensor/#model explains the order of
@@ -91,7 +92,7 @@ export const Geolocation = (map) => {
     heading = Math.round(heading);
 
     // To make the arrow point north, rotate it opposite to the phone rotation.
-    style.getImage().setRotation((Math.PI / 180) * heading);
+    locationIconStyle.getImage().setRotation((Math.PI / 180) * heading);
   }
 
   // See the API specification at: https://w3c.github.io/orientation-sensor
