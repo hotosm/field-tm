@@ -21,7 +21,7 @@ import json
 import os
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from osm_fieldwork.odk_merge import OdkMerge
@@ -33,6 +33,7 @@ from app.auth.roles import mapper
 from app.central import central_crud
 from app.config import settings
 from app.db import database, db_models
+from app.models.enums import ReviewStateEnum
 from app.projects import project_crud, project_deps, project_schemas
 from app.submissions import submission_crud, submission_schemas
 from app.tasks import tasks_crud
@@ -471,3 +472,35 @@ async def task_submissions(
         response = submission_detail.get("value", [])[0]
 
     return response
+
+
+@router.post("/update_review_state/{project_id}")
+async def update_review_state(
+    project_id: int,
+    instance_id: str,
+    review_state: ReviewStateEnum,
+    task_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Updates the review state of a project submission.
+
+    Args:
+        project_id (int): The ID of the project.
+        instance_id (str): The ID of the submission instance.
+        review_state (ReviewStateEnum): The new review state to be set.
+        task_id (int): The ID of the task associated with the submission.
+        db (Session): The database session dependency.
+    """
+    try:
+        project = await project_crud.get_project(db, project_id)
+        odk_creds = await project_deps.get_odk_credentials(db, project_id)
+        odk_project = central_crud.get_odk_project(odk_creds)
+        response = odk_project.updateReviewState(
+            project.odkid,
+            f"{project.project_name_prefix}_task_{task_id}",
+            instance_id,
+            {"reviewState": review_state},
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
