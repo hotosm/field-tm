@@ -109,7 +109,7 @@ added to and built upon.
 
 1. **Acronyms should be stated in full before repetitive
    use**. Acronyms like ODK, OSM, etc, should be stated in full before
-   use or after each use within brackets e.g ODK (Open Data Kit). This
+   use or after each use within brackets e.g ODK (ODK). This
    negates confusion for readers / users and just simplifies things.
 
 2. **Important features should be put in bold**. For example “select
