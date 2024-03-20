@@ -22,7 +22,6 @@ export type ProjectStateTypes = {
   taskModalStatus: boolean;
   toggleGenerateMbTilesModal: boolean;
   mobileFooterSelection: string;
-  geolocationStatus: boolean;
   projectDetailsLoading: boolean;
   projectDashboardDetail: projectDashboardDetailTypes;
   projectDashboardLoading: boolean;

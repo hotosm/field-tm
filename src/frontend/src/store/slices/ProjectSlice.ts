@@ -19,7 +19,6 @@ const initialState: ProjectStateTypes = {
   taskModalStatus: false,
   toggleGenerateMbTilesModal: false,
   mobileFooterSelection: 'explore',
-  geolocationStatus: false,
   projectDetailsLoading: true,
   projectDashboardDetail: {
     project_name_prefix: '',
@@ -86,9 +85,6 @@ const ProjectSlice = createSlice({
     },
     SetMobileFooterSelection(state, action) {
       state.mobileFooterSelection = action.payload;
-    },
-    ToggleGeolocationStatus(state, action) {
-      state.geolocationStatus = action.payload;
     },
     SetProjectDetialsLoading(state, action) {
       state.projectDetailsLoading = action.payload;
