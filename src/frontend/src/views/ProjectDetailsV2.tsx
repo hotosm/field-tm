@@ -27,23 +27,18 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import MapControlComponent from '@/components/ProjectDetailsV2/MapControlComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
-// import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import getTaskStatusStyle from '@/utilfunctions/getTaskStatusStyle';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MapLegends from '@/components/MapLegends';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
-import { Geolocation } from '@capacitor/geolocation';
-import { Icon, Style } from 'ol/style';
-import { Motion } from '@capacitor/motion';
-import locationArc from '@/assets/images/locationArc.png';
-import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
 import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { useAppSelector } from '@/types/reduxTypes';
+import { Geolocation } from '@/utilfunctions/Geolocation';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -54,19 +49,12 @@ const Home = () => {
 
   const [mainView, setView] = useState<any>();
   const [featuresLayer, setFeaturesLayer] = useState();
-  const [toggleGenerateModal, setToggleGenerateModal] = useState(false);
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
-  const [currentCoordinate, setCurrentCoordinate] = useState<{ latitude: null | number; longitude: null | number }>({
-    latitude: null,
-    longitude: null,
-  });
-  const [positionGeojson, setPositionGeojson] = useState<any>(null);
-  const [deviceRotation, setDeviceRotation] = useState(0);
+
   const [viewState, setViewState] = useState('project_info');
   const encodedId: string = params.id;
-  const decodedId: number = environment.decode(encodedId);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.home.selectedProject);
@@ -74,7 +62,6 @@ const Home = () => {
   const stateSnackBar = useAppSelector((state) => state.home.snackbar);
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = useAppSelector((state) => state.theme.hotTheme);
-  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
 
   //snackbar handle close funtion
@@ -116,6 +103,11 @@ const Home = () => {
     center: [0, 0],
     zoom: 4,
   });
+
+  useEffect(() => {
+    if (!map) return;
+    Geolocation(map);
+  }, [map]);
 
   const { y } = OnScroll(map, windowSize.width);
 
@@ -201,87 +193,11 @@ const Home = () => {
     }
   }, [mobileFooterSelection]);
 
-  const handlePositionChange = (position) => {
-    setCurrentCoordinate({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    });
-
-    const geojson = {
-      type: 'Point',
-      coordinates: [position.coords.longitude, position.coords.latitude],
-    };
-    setPositionGeojson(geojson);
-  };
-
-  useEffect(async () => {
-    if (geolocationStatus) {
-      const checkPermission = await Geolocation.checkPermissions();
-      if (checkPermission.location === 'denied') {
-        await Geolocation.requestPermissions(['location']);
-      }
-    }
-  }, [geolocationStatus]);
-
-  useEffect(() => {
-    if (geolocationStatus) {
-      const getCurrentPosition = async () => {
-        try {
-          const position = await Geolocation.getCurrentPosition();
-          handlePositionChange(position);
-          // Watch for position changes
-          const watchId = Geolocation.watchPosition({ enableHighAccuracy: true }, handlePositionChange);
-          // Clean up the watchPosition when the component unmounts
-          return () => {
-            Geolocation.clearWatch({ id: watchId });
-          };
-        } catch (error) {
-          dispatch(
-            CommonActions.SetSnackBar({
-              open: true,
-              message: `Error getting current position. Please ensure location permissions has been granted.`,
-              variant: 'error',
-              duration: 2000,
-            }),
-          );
-          dispatch(ProjectActions.ToggleGeolocationStatus(false));
-        }
-      };
-
-      getCurrentPosition();
-    }
-  }, [geolocationStatus]);
-
-  const locationArcStyle = new Style({
-    image: new Icon({
-      src: locationArc,
-    }),
-  });
-
-  const startOrientation = async () => {
-    const handler = await Motion.addListener('orientation', (event) => {
-      var alphaRad = event?.alpha * (Math.PI / 180);
-      var betaRad = event?.beta * (Math.PI / 180);
-      var gammaRad = event?.gamma * (Math.PI / 180);
-
-      setDeviceRotation(alphaRad + betaRad + gammaRad);
-    });
-  };
-
-  useEffect(() => {
-    // Cleanup when the component unmounts
-    if (geolocationStatus) {
-      startOrientation();
-    }
-    return () => {};
-  }, [geolocationStatus]);
-
   return (
     <div className="fmtm-bg-[#F5F5F5] fmtm-h-[100vh] sm:fmtm-h-[90vh]">
       {/* Customized Modal For Generate Tiles */}
       <div>
         <GenerateBasemap projectInfo={state.projectInfo} />
-
         {/* Home snackbar */}
         <CustomizedSnackbar
           duration={stateSnackBar.duration}
@@ -429,21 +345,6 @@ const Home = () => {
                 />
               )}
               <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} />
-              {geolocationStatus && currentCoordinate?.latitude && currentCoordinate?.longitude && (
-                <VectorLayer
-                  map={map}
-                  geojson={positionGeojson}
-                  setStyle={locationArcStyle}
-                  viewProperties={{
-                    size: map?.getSize(),
-                    padding: [50, 50, 50, 50],
-                    constrainResolution: true,
-                    duration: 2000,
-                  }}
-                  zIndex={5}
-                  rotation={deviceRotation}
-                />
-              )}
               <div className="fmtm-top-28 fmtm-left-5">{window.DeviceMotionEvent}</div>
               <div className="fmtm-hidden sm:fmtm-block fmtm-absolute fmtm-bottom-5 fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
