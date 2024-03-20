@@ -239,6 +239,9 @@ const VectorLayer = ({
       declutter: true,
     });
 
+    const vlFeature = vectorLyr?.getSource().getFeatures();
+    if (!vlFeature || (vlFeature && vlFeature?.length === 0)) return;
+
     map.on('click', (evt) => {
       var pixel = evt.pixel;
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
