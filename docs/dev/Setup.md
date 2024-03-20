@@ -49,7 +49,7 @@ A computer-screen-optimized web app that allows Campaign Managers to:
 #### [ODK Collect](https://docs.getodk.org/collect-intro/)
 
 A mobile data collection tool that functions on almost all Android phones.
-Field mappers use ODK Collect to select features such as buildings or amenities,
+Field mappers use the ODK mobile app to select features such as buildings or amenities,
 and fill out forms with survey questions to collect attributes or data about
 those features (normally at least some of these attributes are intended to
 become OSM tags associated with those features).

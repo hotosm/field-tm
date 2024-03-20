@@ -64,9 +64,9 @@ you're interested in getting involved, please see our
 for more information. We welcome questions and feedback, so don't hesitate
 to reach out to us. 👍🎉
 
-## Using OpenDataKit's Select From Map feature
+## Using ODK's Select From Map feature
 
-OpenDataKit's Select From Map feature is a useful tool for field mappers to
+ODK's Select From Map feature is a useful tool for field mappers to
 collect data in a well-structured questionnaire format. The tool was
 incorporated into ODK in mid-2022 and allows mappers to select an object from a
 map, view its existing attributes, and fill out a form with new information
@@ -116,7 +116,7 @@ to go out and collect data. They need to:
 ### Field mappers
 
 Field mappers select (or are allocated) individual tasks within a project AOI
-and use ODK Collect to gather data in those areas. They need to:
+and use the ODK mobile app to gather data in those areas. They need to:
 
 - Visit a mobile-friendly Web page where they can see available tasks on a map
 - Choose an area and launch ODK Collect with the form corresponding to their

@@ -54,7 +54,7 @@ their progress. The tool includes features for collaborative editing,
 data validation, and error detection. This ensures that the data
 collected by volunteers is accurate and reliable.
 
-**FMTM** is designed to be used in conjunction with **Open Data Kit
+**FMTM** is designed to be used in conjunction with **ODK
 (ODK)**. **ODK** is a free and open-source set of tools that allows
 users to create, collect, and manage data with mobile devices. The
 **ODK** provides a set of open-source tools that allow users to build
@@ -133,7 +133,7 @@ and improve the effectiveness of humanitarian efforts.
 
 10. If your organization's name is not listed, you can add it through the
     "Manage Organization" tab.
-11. Provide the necessary credentials for the ODK (Open Data Kit) central setup,
+11. Provide the necessary credentials for the ODK (ODK) central setup,
     including URL, username, and password.
 12. Proceed to the next step, which is uploading the area for field mapping.
     Choose the file option and select the AOI (Area of Interest) file in GEOJSON
