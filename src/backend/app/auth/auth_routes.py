@@ -153,7 +153,7 @@ async def get_or_create_user(
             {
                 "user_id": user_data.id,
                 "username": user_data.username,
-                "profile_img": user_data.profile_img,
+                "profile_img": user_data.img_url,
                 "role": role,
                 "mapping_level": "BEGINNER",
                 "current_date": datetime.now(timezone.utc),
