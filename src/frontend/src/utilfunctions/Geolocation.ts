@@ -1,4 +1,5 @@
 import pngbluedot from '@/assets/images/png bluedot.png';
+import LocationDot from '@/assets/images/LocationDot.png';
 import { Fill } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import OLVectorLayer from 'ol/layer/Vector';
@@ -9,21 +10,34 @@ import { circular } from 'ol/geom/Polygon';
 import { Style } from 'ol/style';
 import { Icon } from 'ol/style';
 import VectorLayer from 'ol/layer/Vector';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
-const locationIconStyle = new Style({
-  fill: new Fill({
-    color: 'rgba(0, 0, 255, 0.2)',
-  }),
-  image: new Icon({
-    src: pngbluedot,
-    scale: 0.09,
-    imgSize: [27, 55],
-    rotateWithView: true,
-  }),
-});
-
-export const Geolocation = (map, geolocationStatus) => {
+export const Geolocation = (map, geolocationStatus, dispatch) => {
   if (!map) return;
+
+  // check firefox or safari browser as it doesnt support browser's Sensor API
+  // @ts-ignore
+  const isFirefox = typeof InstallTrigger !== 'undefined';
+  const isSafari =
+    // @ts-ignore
+    /constructor/i.test(window.HTMLElement) ||
+    (function (p) {
+      return p.toString() === '[object SafariRemoteNotification]';
+      // @ts-ignore
+    })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+  const locationIconStyle = new Style({
+    fill: new Fill({
+      color: 'rgba(0, 0, 255, 0.2)',
+    }),
+    image: new Icon({
+      src: isFirefox || isSafari ? LocationDot : pngbluedot,
+      scale: 0.09,
+      imgSize: [27, 55],
+      rotateWithView: true,
+    }),
+  });
+
   const source = new VectorSource();
   const layer = new OLVectorLayer({
     source: source,
@@ -124,30 +138,41 @@ export const Geolocation = (map, geolocationStatus) => {
       locationIconStyle.getImage().setRotation((Math.PI / 180) * heading);
     }
 
-    // See the API specification at: https://w3c.github.io/orientation-sensor
-    // We use referenceFrame: 'screen' because the web page will rotate when
-    // the phone switches from portrait to landscape.
-    const sensor = new AbsoluteOrientationSensor({
-      frequency: 60,
-      referenceFrame: 'screen',
-    });
-    sensor.addEventListener('reading', (event) => {
-      layer.on('postrender', handleReading(sensor.quaternion));
-    });
-    // handleReading([0.509, -0.071, -0.19, 0.836]);
+    if (isFirefox || isSafari) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
+          variant: 'error',
+          duration: 4000,
+        }),
+      );
+    } else {
+      // See the API specification at: https://w3c.github.io/orientation-sensor
+      // We use referenceFrame: 'screen' because the web page will rotate when
+      // the phone switches from portrait to landscape.
+      const sensor = new AbsoluteOrientationSensor({
+        frequency: 60,
+        referenceFrame: 'screen',
+      });
+      sensor.addEventListener('reading', (event) => {
+        layer.on('postrender', handleReading(sensor.quaternion));
+      });
+      // handleReading([0.509, -0.071, -0.19, 0.836]);
 
-    Promise.all([
-      navigator.permissions.query({ name: 'accelerometer' }),
-      navigator.permissions.query({ name: 'magnetometer' }),
-      navigator.permissions.query({ name: 'gyroscope' }),
-    ]).then((results) => {
-      if (results.every((result) => result.state === 'granted')) {
-        sensor.start();
-        // stat.value = "Sensor started!";
-      } else {
-        // stat.value = "No permissions to use AbsoluteOrientationSensor.";
-      }
-    });
+      Promise.all([
+        navigator.permissions.query({ name: 'accelerometer' }),
+        navigator.permissions.query({ name: 'magnetometer' }),
+        navigator.permissions.query({ name: 'gyroscope' }),
+      ]).then((results) => {
+        if (results.every((result) => result.state === 'granted')) {
+          sensor.start();
+          // stat.value = "Sensor started!";
+        } else {
+          // stat.value = "No permissions to use AbsoluteOrientationSensor.";
+        }
+      });
+    }
   }
 
   // remove the geolocation layer if geolocationStatus turned off

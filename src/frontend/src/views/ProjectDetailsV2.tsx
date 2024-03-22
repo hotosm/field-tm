@@ -111,7 +111,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!map) return;
-    Geolocation(map, geolocationStatus);
+    Geolocation(map, geolocationStatus, dispatch);
   }, [geolocationStatus]);
 
   const { y } = OnScroll(map, windowSize.width);
