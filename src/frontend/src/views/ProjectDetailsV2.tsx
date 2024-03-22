@@ -66,6 +66,7 @@ const Home = () => {
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = useAppSelector((state) => state.theme.hotTheme);
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
 
   //snackbar handle close funtion
@@ -110,8 +111,8 @@ const Home = () => {
 
   useEffect(() => {
     if (!map) return;
-    Geolocation(map);
-  }, [map]);
+    Geolocation(map, geolocationStatus);
+  }, [geolocationStatus]);
 
   const { y } = OnScroll(map, windowSize.width);
 
@@ -403,7 +404,7 @@ const Home = () => {
                   collapsed={true}
                 />
               </div>
-              <div className="fmtm-absolute fmtm-top-3 fmtm-right-3 fmtm-z-50">
+              <div className="fmtm-absolute fmtm-bottom-[8.6rem] sm:fmtm-top-3 fmtm-right-3 fmtm-z-50">
                 <Button
                   btnText="GENERATE MBTILES"
                   icon={<AssetModules.BoltIcon />}
