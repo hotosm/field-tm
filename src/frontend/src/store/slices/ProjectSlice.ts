@@ -31,6 +31,7 @@ const initialState: ProjectStateTypes = {
     last_active: '',
   },
   projectDashboardLoading: false,
+  geolocationStatus: false,
   projectCommentsList: [],
   projectPostCommentsLoading: false,
   projectGetCommentsLoading: false,
@@ -98,6 +99,9 @@ const ProjectSlice = createSlice({
     },
     SetProjectDashboardLoading(state, action) {
       state.projectDashboardLoading = action.payload;
+    },
+    ToggleGeolocationStatus(state, action) {
+      state.geolocationStatus = action.payload;
     },
     SetProjectCommentsList(state, action) {
       state.projectCommentsList = action.payload;

@@ -25,6 +25,7 @@ export type ProjectStateTypes = {
   projectDetailsLoading: boolean;
   projectDashboardDetail: projectDashboardDetailTypes;
   projectDashboardLoading: boolean;
+  geolocationStatus: boolean;
   projectCommentsList: projectCommentsListTypes[];
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;
