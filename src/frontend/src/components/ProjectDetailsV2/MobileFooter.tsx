@@ -10,17 +10,6 @@ const MobileFooter = () => {
 
   const footerItem = [
     {
-      id: 'explore',
-      title: 'Explore',
-      icon: (
-        <AssetModules.LocationOnIcon
-          className={`${
-            mobileFooterSelection === 'explore' ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
-          } fmtm-duration-300`}
-        />
-      ),
-    },
-    {
       id: 'projectInfo',
       title: 'Project Info',
       icon: (
@@ -43,12 +32,23 @@ const MobileFooter = () => {
       ),
     },
     {
-      id: 'mapLegend',
-      title: 'Legend',
+      id: 'instructions',
+      title: 'Instructions',
       icon: (
-        <AssetModules.LegendToggleIcon
+        <AssetModules.IntegrationInstructionsIcon
           className={`${
-            mobileFooterSelection === 'mapLegend' ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
+            mobileFooterSelection === 'instructions' ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
+          } fmtm-duration-300`}
+        />
+      ),
+    },
+    {
+      id: 'comment',
+      title: 'Comment',
+      icon: (
+        <AssetModules.QuestionAnswerIcon
+          className={`${
+            mobileFooterSelection === 'comment' ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
           } fmtm-duration-300`}
         />
       ),
