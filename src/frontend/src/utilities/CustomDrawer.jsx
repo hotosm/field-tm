@@ -110,6 +110,12 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
       isExternalLink: true,
       isActive: true,
     },
+    {
+      name: 'Download Custom ODK Collect',
+      ref: 'https://github.com/hotosm/odkcollect/releases/download/entity-preselection/ODK-Collect-entity-preselection.apk',
+      isExternalLink: true,
+      isActive: true,
+    },
   ];
 
   const handleOnSignOut = async () => {
