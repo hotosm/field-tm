@@ -138,7 +138,7 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```bash
-curl -L https://https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
+curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
 bash install.sh
 ```
 

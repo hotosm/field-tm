@@ -34,7 +34,7 @@ On a Linux-based machine with `bash` installed, run the script:
 > However, if you run as root, a user svcfmtm will be created for you.
 
 ```bash
-curl -L https://https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
+curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
 bash install.sh
 
 # Then follow the prompts
