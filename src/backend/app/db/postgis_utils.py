@@ -20,8 +20,8 @@
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Optional, Union
 from random import getrandbits
+from typing import Optional, Union
 
 import geojson
 import requests
@@ -386,7 +386,7 @@ def add_required_geojson_properties(
             else:
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
-                properties["osm_id"] = getrandbits(32)
+                properties["osm_id"] = getrandbits(30)
 
         # Other required fields
         if not properties.get("tags"):
