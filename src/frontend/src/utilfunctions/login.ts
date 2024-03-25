@@ -42,7 +42,7 @@ export const createLoginWindow = (redirectTo) => {
                     username: userRes.username,
                     osm_oauth_token: res.access_token,
                     id: userRes.id,
-                    picture: userRes.img_url,
+                    picture: userRes.profile_img,
                     redirect_to: redirectTo,
                     role: userRes.role,
                   }).toString();

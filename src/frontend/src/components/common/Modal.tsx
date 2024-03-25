@@ -28,7 +28,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 interface IModalProps {
   dialogOpen?: React.FC<any>;
-  title?: React.FC<any>;
+  title?: React.ReactNode;
   description: React.ReactNode;
   open: boolean;
   className: string;
@@ -95,11 +95,11 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-const Modal = ({ dialogOpen, title, description, open, onOpenChange }: IModalProps) => {
+const Modal = ({ dialogOpen, title, description, open, onOpenChange, className }: IModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger>{dialogOpen}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className={`${className}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

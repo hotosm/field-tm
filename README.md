@@ -73,7 +73,7 @@ and [contributor guidance](https://hotosm.github.io/fmtm/CONTRIBUTING/)
 for more details!
 Reach out to us if any questions! 👍🎉
 
-## Using OpenDataKit's Select From Map feature
+## Using ODK's Select From Map feature
 
 As of mid-2022, ODK incorporates a new functionality, select from map,
 that allows field mappers to select an object from a map,
@@ -110,7 +110,7 @@ field mappers to go out and collect data. They need to:
 ### Field mappers
 
 Field mappers select (or are allocated) individual tasks within a project
-AOI and use ODK Collect to gather data in those areas. They need to:
+AOI and use the ODK mobile app to gather data in those areas. They need to:
 
 - Visit a mobile-friendly Web page where they can see available tasks on a map
 - Choose an area and launch ODK Collect
@@ -138,7 +138,7 @@ To install for a quick test, or on a production instance,
 use the convenience script:
 
 ```bash
-curl -L https://https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
+curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
 bash install.sh
 ```
 
@@ -149,7 +149,7 @@ A breakdown of the components:
 ### ODK Collect
 
 A mobile data collection tool that functions on almost all Android phones.
-Field mappers use ODK Collect to select features such as buildings or amenities,
+Field mappers use the ODK mobile app to select features such as buildings or amenities,
 and fill out forms with survey questions to collect attributes or data
 about those features (normally at least some of these attributes are intended
 to become OSM tags associated with those features).
@@ -303,6 +303,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Roseford"><img src="https://avatars.githubusercontent.com/u/75838716?v=4?s=100" width="100px;" alt="Uju"/><br /><sub><b>Uju</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Roseford" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.el-cordovez.com"><img src="https://avatars.githubusercontent.com/u/75356640?v=4?s=100" width="100px;" alt="JC CorMan"/><br /><sub><b>JC CorMan</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=cordovez" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Prajwalism"><img src="https://avatars.githubusercontent.com/u/123072058?v=4?s=100" width="100px;" alt="Prajwal Khadgi"/><br /><sub><b>Prajwal Khadgi</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Prajwalism" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/manjitapandey"><img src="https://avatars.githubusercontent.com/u/97273021?v=4?s=100" width="100px;" alt="Manjita Pandey"/><br /><sub><b>Manjita Pandey</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/issues?q=author%3Amanjitapandey" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
   <tfoot>

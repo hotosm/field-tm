@@ -1,5 +1,7 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Button from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { NavLink } from 'react-router-dom';
@@ -9,6 +11,30 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut, setOpen }) {
+  const [showDebugConsole, setShowDebugConsole] = useState(false);
+  const [logs, setLogs] = useState([]);
+  useEffect(() => {
+    if (import.meta.env.MODE === 'development') {
+      // Override console.log to capture logs
+      const originalConsoleLog = console.log;
+      console.log = (...args) => {
+        originalConsoleLog.apply(console, args);
+        setLogs((prevLogs) => [
+          ...prevLogs,
+          args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)).join(' '),
+        ]);
+      };
+
+      // Restore original console.log when component unmounts
+      return () => {
+        console.log = originalConsoleLog;
+      };
+    }
+  }, []);
+  const toggleDebugConsole = () => {
+    setShowDebugConsole((prev) => !prev);
+  };
+
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const dispatch = CoreModules.useAppDispatch();
 
@@ -84,6 +110,12 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
       isExternalLink: true,
       isActive: true,
     },
+    {
+      name: 'Download Custom ODK Collect',
+      ref: 'https://github.com/hotosm/odkcollect/releases/download/entity-preselection/ODK-Collect-entity-preselection.apk',
+      isExternalLink: true,
+      isActive: true,
+    },
   ];
 
   const handleOnSignOut = async () => {
@@ -106,6 +138,33 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
 
   return (
     <div>
+      {import.meta.env.MODE === 'development' && (
+        <div>
+          <div
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              width: '100%',
+              height: '33vh',
+              backgroundColor: 'white',
+              border: '1px solid',
+              padding: '16px 32px',
+              display: showDebugConsole ? 'flex' : 'none',
+              flexDirection: 'column',
+              zIndex: 10000,
+              overflowY: 'auto',
+            }}
+          >
+            <button style={{ alignSelf: 'flex-end', marginBottom: '10px' }} onClick={toggleDebugConsole}>
+              Close
+            </button>
+            {/* Display console logs */}
+            {logs.map((log, index) => (
+              <p key={index}>{log}</p>
+            ))}
+          </div>
+        </div>
+      )}
       <React.Fragment>
         <SwipeableDrawer swipeAreaWidth={0} onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
           <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
@@ -198,6 +257,9 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
                     </CoreModules.ListItem>
                   </NavLink>
                 ),
+              )}
+              {import.meta.env.MODE === 'development' && (
+                <Button onClick={() => setShowDebugConsole(true)} btnText="Open Console" btnType="secondary" />
               )}
               <div className="fmtm-ml-4 fmtm-mt-2 lg:fmtm-hidden">
                 {token != null ? (

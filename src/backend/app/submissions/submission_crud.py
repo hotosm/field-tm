@@ -19,6 +19,7 @@
 
 import concurrent.futures
 import csv
+import hashlib
 import io
 import json
 import os
@@ -328,6 +329,13 @@ def update_submission_in_s3(
             for form in odk_forms
             if form["lastSubmission"] is not None
         ]
+
+        review_states = [
+            form["reviewStates"]
+            for form in odk_forms
+            if form["reviewStates"] is not None
+        ]
+
         last_submission = (
             max(
                 valid_datetimes,
@@ -348,11 +356,29 @@ def update_submission_in_s3(
         s3_project_path = f"/{project.organisation_id}/{project_id}"
         metadata_s3_path = f"/{s3_project_path}/submissions.meta.json"
         try:
-            # Get the last submission date from the metadata
+            # Get the last submission date and review state from the metadata
             data = get_obj_from_bucket(settings.S3_BUCKET_NAME, metadata_s3_path)
+            submission_metadata = json.loads(data.getvalue())
 
-            zip_file_last_submission = (json.loads(data.getvalue()))["last_submission"]
-            if last_submission <= zip_file_last_submission:
+            zip_file_last_submission = submission_metadata["last_submission"]
+            zip_file_review_states = (
+                submission_metadata["review_states"]
+                if "review_states" in submission_metadata
+                else None
+            )
+
+            # converting list into hash str to compare them easily
+            odk_review_state_hash = hashlib.sha256(
+                json.dumps(review_states).encode()
+            ).hexdigest()
+            s3_review_state_hash = hashlib.sha256(
+                json.dumps(zip_file_review_states).encode()
+            ).hexdigest()
+
+            if (
+                last_submission <= zip_file_last_submission
+                and odk_review_state_hash == s3_review_state_hash
+            ):
                 # Update background task status to COMPLETED
                 update_bg_task_sync = async_to_sync(
                     project_crud.update_background_task_status_in_database
@@ -366,6 +392,7 @@ def update_submission_in_s3(
         # Zip file is outdated, regenerate
         metadata = {
             "last_submission": last_submission,
+            "review_states": review_states,
         }
 
         # Get submissions from ODK Central

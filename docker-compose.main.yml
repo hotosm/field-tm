@@ -105,6 +105,7 @@ services:
       args:
         APP_VERSION: main
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
+        NODE_ENV: production
     volumes:
       - fmtm_frontend:/frontend
     network_mode: none

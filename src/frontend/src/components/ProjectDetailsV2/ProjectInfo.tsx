@@ -93,7 +93,7 @@ const ProjectInfo = () => {
                 alt="Organization Photo"
               />
             </div>
-            <p className="fmtm-text-center fmtm-text-[#706E6E]">{projectDashboardDetail?.organisation}</p>
+            <p className="fmtm-text-center fmtm-text-[#706E6E]">{projectDashboardDetail?.organisation_name}</p>
           </div>
         )}
       </div>

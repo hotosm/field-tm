@@ -10,23 +10,29 @@ const MapControlComponent = ({ map }) => {
     {
       id: 'add',
       icon: <AssetModules.AddIcon />,
+      title: 'Zoom In',
     },
     {
       id: 'minus',
       icon: <AssetModules.RemoveIcon />,
+      title: 'Zoom Out',
     },
     {
       id: 'currentLocation',
       icon: <AssetModules.MyLocationIcon />,
+      title: 'My Location',
     },
     {
       id: 'taskBoundries',
       icon: <AssetModules.CropFreeIcon />,
+      title: 'Zoom to Project',
     },
   ];
+
   const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
+
   const handleOnClick = (btnId) => {
     if (btnId === 'add') {
       const actualZoom = map.getView().getZoom();
@@ -59,8 +65,11 @@ const MapControlComponent = ({ map }) => {
       {btnList.map((btn) => (
         <div key={btn.id}>
           <div
-            className="fmtm-bg-white fmtm-rounded-full fmtm-p-2 hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300"
+            className={`fmtm-bg-white fmtm-rounded-full fmtm-p-2 hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 ${
+              geolocationStatus && btn.id === 'currentLocation' ? 'fmtm-text-primaryRed' : ''
+            }`}
             onClick={() => handleOnClick(btn.id)}
+            title={btn.title}
           >
             {btn.icon}
           </div>

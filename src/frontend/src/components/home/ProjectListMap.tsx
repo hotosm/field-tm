@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
-import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import CoreModules from '@/shared/CoreModules';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
@@ -23,21 +22,6 @@ type HomeProjectSummaryType = {
     };
   };
 };
-
-// const projectGeojsonLayerStyle = {
-//   ...defaultStyles,
-//   fillOpacity: 0,
-//   lineColor: '#ffffff',
-//   labelFontSize: 20,
-//   lineThickness: 7,
-//   lineOpacity: 40,
-//   showLabel: true,
-//   labelField: 'project_id',
-//   labelOffsetY: 35,
-//   labelFontWeight: 'bold',
-//   labelMaxResolution: 10000,
-//   icon: { scale: [0.09, 0.09], url: MarkerIcon },
-// };
 
 const getIndividualStyle = (featureProperty) => {
   const style = new Style({
@@ -65,8 +49,9 @@ const ProjectListMap = () => {
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
     zoom: 4,
-    maxZoom: 17,
+    maxZoom: 20,
   });
+
   const homeProjectSummary: projectType[] = CoreModules.useAppSelector((state) => state.home.homeProjectSummary);
   useEffect(() => {
     if (homeProjectSummary?.length === 0) return;
@@ -80,7 +65,7 @@ const ProjectListMap = () => {
         },
         geometry: {
           type: 'Point',
-          coordinates: project.centroid,
+          coordinates: project.centroid || [],
         },
       })),
     };
@@ -106,45 +91,6 @@ const ProjectListMap = () => {
           }}
         >
           <LayerSwitcherControl visible={'outdoors'} />
-          {/* {projectGeojson && projectGeojson?.features?.length > 0 && (
-            <VectorLayer
-              geojson={projectGeojson}
-              style={projectGeojsonLayerStyle}
-              viewProperties={{
-                size: map?.getSize(),
-                padding: [50, 50, 50, 50],
-                constrainResolution: true,
-                duration: 2000,
-              }}
-              mapOnClick={projectClickOnMap}
-              zoomToLayer
-              zIndex={5}
-              // hoverEffect={(selectedFeature, layer) => {
-              //   if (!selectedFeature)
-              //     return layer.setStyle((feature, resolution) =>
-              //       getStyles({
-              //         style: { ...projectGeojsonLayerStyle },
-              //         feature,
-              //         resolution,
-              //       }),
-              //     );
-              //   else {
-              //     selectedFeature.setStyle((feature, resolution) =>
-              //       getStyles({
-              //         style: { ...projectGeojsonLayerStyle, icon: { scale: [0.15, 0.15], url: MarkerIcon } },
-              //         feature,
-              //         resolution,
-              //       }),
-              //     );
-              //   }
-              //   // selectedFeature.setStyle({
-              //   //   ...projectGeojsonLayerStyle,
-              //   //   icon: { scale: [0.15, 0.15], url: MarkerIcon },
-              //   // });
-              //   // selectedFeature.setStyle();
-              // }}
-            />
-          )} */}
           {projectGeojson && projectGeojson?.features?.length > 0 && (
             <ClusterLayer
               map={map}

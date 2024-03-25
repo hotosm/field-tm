@@ -2,6 +2,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
 import { task_priority_str } from '@/types/enums';
+import axios from 'axios';
 
 export const ProjectById = (existingProjectList, projectId) => {
   return async (dispatch) => {
@@ -42,6 +43,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             xform_category: projectResp.xform_category,
             tasks_bad: projectResp.tasks_bad,
             data_extract_url: projectResp.data_extract_url,
+            instructions: projectResp?.project_info?.per_task_instructions,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
@@ -196,5 +198,41 @@ export const GetProjectDashboard = (url) => {
       }
     };
     await getProjectDashboard(url);
+  };
+};
+
+export const GetProjectComments = (url) => {
+  return async (dispatch) => {
+    const getProjectComments = async (url) => {
+      try {
+        dispatch(ProjectActions.SetProjectGetCommentsLoading(true));
+        const response = await axios.get(url);
+        dispatch(ProjectActions.SetProjectCommentsList(response.data));
+        dispatch(ProjectActions.SetProjectGetCommentsLoading(false));
+      } catch (error) {
+        dispatch(ProjectActions.SetProjectGetCommentsLoading(false));
+      } finally {
+        dispatch(ProjectActions.SetProjectGetCommentsLoading(false));
+      }
+    };
+    await getProjectComments(url);
+  };
+};
+
+export const PostProjectComments = (url, payload) => {
+  return async (dispatch) => {
+    const postProjectComments = async (url) => {
+      try {
+        dispatch(ProjectActions.SetPostProjectCommentsLoading(true));
+        const response = await axios.post(url, payload);
+        dispatch(ProjectActions.UpdateProjectCommentsList(response.data));
+        dispatch(ProjectActions.SetPostProjectCommentsLoading(false));
+      } catch (error) {
+        dispatch(ProjectActions.SetPostProjectCommentsLoading(false));
+      } finally {
+        dispatch(ProjectActions.SetPostProjectCommentsLoading(false));
+      }
+    };
+    await postProjectComments(url);
   };
 };
