@@ -175,11 +175,11 @@ const Home = () => {
     dispatch(CoreModules.TaskActions.SetSelectedTask(properties.uid));
 
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
-    if (windowSize.width < 768) {
+    if (windowSize.width < 768 && map.getView().getZoom() < 17) {
       map.getView().fit(extent, {
         padding: [10, 20, 300, 20],
       });
-    } else {
+    } else if (windowSize.width > 768 && map.getView().getZoom() < 17) {
       map.getView().fit(extent, {
         padding: [20, 350, 50, 10],
       });
@@ -388,7 +388,7 @@ const Home = () => {
                   zIndex={5}
                 />
               )}
-              <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} />
+              <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} showOnHover="singleclick" />
               <div className="fmtm-top-28 fmtm-left-5">{window.DeviceMotionEvent}</div>
               <div className="fmtm-absolute fmtm-bottom-36 sm:fmtm-bottom-5 fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
