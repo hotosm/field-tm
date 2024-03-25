@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:966534b69fc4c93c1ac1340c2f2c2d407d318a030482bfca028700b648e70a6d"
+content_hash = "sha256:40e828b16d7a8f7e20e3f3815214857dd6f2efa9c005380162ac2e1a87c528e6"
 
 [[package]]
 name = "annotated-types"
@@ -1032,7 +1032,7 @@ files = [
 name = "mergedeep"
 version = "1.3.4"
 requires_python = ">=3.6"
-summary = "A deep merge function for ğŸ��."
+summary = "A deep merge function for 🐍."
 files = [
     {file = "mergedeep-1.3.4-py3-none-any.whl", hash = "sha256:70775750742b25c0d8f36c55aed03d24c3384d17c951b3175d898bd778ef0307"},
     {file = "mergedeep-1.3.4.tar.gz", hash = "sha256:0096d52e9dad9939c3d975a774666af186eda617e6ca84df4c94dec30004f2a8"},
@@ -1257,15 +1257,15 @@ files = [
 
 [[package]]
 name = "openpyxl"
-version = "3.1.2"
+version = "3.0.9"
 requires_python = ">=3.6"
 summary = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 dependencies = [
     "et-xmlfile",
 ]
 files = [
-    {file = "openpyxl-3.1.2-py2.py3-none-any.whl", hash = "sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5"},
-    {file = "openpyxl-3.1.2.tar.gz", hash = "sha256:a6f5977418eff3b2d5500d54d9db50c8277a368436f4e4f8ddb1be3422870184"},
+    {file = "openpyxl-3.0.9-py2.py3-none-any.whl", hash = "sha256:8f3b11bd896a95468a4ab162fc4fcd260d46157155d1f8bfaabb99d88cfcf79f"},
+    {file = "openpyxl-3.0.9.tar.gz", hash = "sha256:40f568b9829bf9e446acfffce30250ac1fa39035124d55fc024025c41481c90f"},
 ]
 
 [[package]]
@@ -1891,16 +1891,17 @@ files = [
 
 [[package]]
 name = "pyxform"
-version = "2.0.0"
+version = "2.0.2"
 requires_python = ">=3.7"
-git = "https://github.com/hotosm/pyxform"
-ref = "feat/xls2xform_convert_bytesio"
-revision = "79f0db7403dcd1124c29af5ba5710ab396cfe793"
 summary = "A Python package to create XForms for ODK Collect."
 dependencies = [
     "defusedxml==0.7.1",
-    "openpyxl==3.1.2",
+    "openpyxl==3.0.9",
     "xlrd==2.0.1",
+]
+files = [
+    {file = "pyxform-2.0.2-py3-none-any.whl", hash = "sha256:a480009d2c75c5ea2aaab509b0c3aa5c751cf285c319f5dbb9cc9dd141957125"},
+    {file = "pyxform-2.0.2.tar.gz", hash = "sha256:833cfd0fbae1ccadf12edd9d5af45a11f9b2b12c724bd22467f4b6d324d98843"},
 ]
 
 [[package]]
@@ -1952,7 +1953,7 @@ files = [
 name = "questionary"
 version = "2.0.1"
 requires_python = ">=3.8"
-summary = "Python library to build pretty command line user prompts â­�ï¸�"
+summary = "Python library to build pretty command line user prompts ⭐️"
 dependencies = [
     "prompt-toolkit<=3.0.36,>=2.0",
 ]
