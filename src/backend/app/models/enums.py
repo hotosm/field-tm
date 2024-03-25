@@ -296,3 +296,11 @@ class CommunityType(IntEnum, Enum):
     NON_PROFIT = 2
     UNIVERSITY = 3
     OTHER = 4
+
+
+class ReviewStateEnum(StrEnum, Enum):
+    """Enum describing review states of submission."""
+
+    hasissues = "hasIssues"
+    approved = "approved"
+    rejected = "rejected"

@@ -57,13 +57,13 @@ const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatu
               {...iconBtnProps}
               color="primary"
               component="label"
-              className="fmtm-w-10 fmtm-h-10"
+              className="fmtm-w-7 fmtm-h-7 sm:fmtm-w-10 sm:fmtm-h-10"
             ></CoreModules.IconButton>
           ) : (
-            <AssetModules.LockIcon sx={{ fontSize: '40px' }} />
+            <AssetModules.LockIcon className="!fmtm-text-[28px] sm:!fmtm-text-[40px]" />
           )}
         </div>
-        <p className="fmtm-text-lg">{data.value}</p>
+        <p className="fmtm-text-base sm:fmtm-text-lg">{data.value}</p>
       </div>
     );
   };
@@ -89,12 +89,8 @@ const MapLegends = ({ direction, spacing, iconBtnProps, defaultTheme, valueStatu
     //     );
     //   })}
     // </CoreModules.Stack>
-    <div className="fmtm-py-0 sm:fmtm-py-3">
-      <div className="sm:fmtm-hidden fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2 fmtm-mb-4">
-        <AssetModules.LegendToggleIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '35px' }} />
-        <p className="fmtm-text-2xl">Map Legend</p>
-      </div>
-      <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
+    <div className="fmtm-py-3">
+      <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 sm:fmtm-gap-4">
         {MapDetails.map((data, index) => {
           return <LegendListItem data={data} key={index} />;
         })}

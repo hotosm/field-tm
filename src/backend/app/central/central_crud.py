@@ -52,6 +52,15 @@ def get_odk_project(odk_central: Optional[project_schemas.ODKCentralDecrypted] =
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         project = OdkProject(url, user, pw)
+
+    except ValueError as e:
+        log.error(e)
+        raise HTTPException(
+            status_code=401,
+            detail="""
+            ODK credentials are invalid, or may have been updated. Please update them.
+            """,
+        ) from e
     except Exception as e:
         log.exception(e)
         raise HTTPException(

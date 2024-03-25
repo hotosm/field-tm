@@ -19,7 +19,6 @@ const initialState: ProjectStateTypes = {
   taskModalStatus: false,
   toggleGenerateMbTilesModal: false,
   mobileFooterSelection: 'explore',
-  geolocationStatus: false,
   projectDetailsLoading: true,
   projectDashboardDetail: {
     project_name_prefix: '',
@@ -32,6 +31,11 @@ const initialState: ProjectStateTypes = {
     last_active: '',
   },
   projectDashboardLoading: false,
+  geolocationStatus: false,
+  projectCommentsList: [],
+  projectPostCommentsLoading: false,
+  projectGetCommentsLoading: false,
+  clearEditorContent: false,
 };
 
 const ProjectSlice = createSlice({
@@ -87,9 +91,6 @@ const ProjectSlice = createSlice({
     SetMobileFooterSelection(state, action) {
       state.mobileFooterSelection = action.payload;
     },
-    ToggleGeolocationStatus(state, action) {
-      state.geolocationStatus = action.payload;
-    },
     SetProjectDetialsLoading(state, action) {
       state.projectDetailsLoading = action.payload;
     },
@@ -98,6 +99,24 @@ const ProjectSlice = createSlice({
     },
     SetProjectDashboardLoading(state, action) {
       state.projectDashboardLoading = action.payload;
+    },
+    ToggleGeolocationStatus(state, action) {
+      state.geolocationStatus = action.payload;
+    },
+    SetProjectCommentsList(state, action) {
+      state.projectCommentsList = action.payload;
+    },
+    SetPostProjectCommentsLoading(state, action) {
+      state.projectPostCommentsLoading = action.payload;
+    },
+    SetProjectGetCommentsLoading(state, action) {
+      state.projectGetCommentsLoading = action.payload;
+    },
+    ClearEditorContent(state, action) {
+      state.clearEditorContent = action.payload;
+    },
+    UpdateProjectCommentsList(state, action) {
+      state.projectCommentsList = [...state.projectCommentsList, action.payload];
     },
   },
 });

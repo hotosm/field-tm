@@ -92,7 +92,7 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
               </div>
             </Tooltip>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="fmtm-flex fmtm-gap-1 fmtm-bg-white fmtm-px-1">
+          <DropdownMenuContent className="fmtm-flex fmtm-gap-1 fmtm-bg-white fmtm-px-1 fmtm-z-50">
             <Tooltip title="Heading 1">
               <p
                 onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -159,7 +159,7 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
               <AssetModules.LinkIcon className={`${iconClassName} ${isEditorActive('link')}`} />
             </Tooltip>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-bg-white">
+          <DropdownMenuContent className="fmtm-z-50 fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-bg-white">
             <InputTextField
               placeholder="URL"
               onChange={(e) => {
@@ -194,7 +194,7 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
               <AssetModules.ImageAddIcon className={`${iconClassName}`} />
             </Tooltip>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-bg-white">
+          <DropdownMenuContent className="fmtm-z-50 fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-bg-white">
             <InputTextField
               placeholder="Image URL"
               onChange={(e) => {

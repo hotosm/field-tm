@@ -253,7 +253,7 @@ const GenerateBasemap = ({ projectInfo }) => {
             component={CoreModules.Paper}
             className="scrollbar fmtm-overflow-y-auto fmtm-max-h-[38vh] lg:fmtm-max-h-[45vh] sm:fmtm-mb-5"
           >
-            <CoreModules.Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <CoreModules.Table className="fmtm-min-w-[300px] md:fmtm-min-w-[650px]" aria-label="simple table">
               <CoreModules.TableHead>
                 <CoreModules.TableRow>
                   {/* <CoreModules.TableCell>Id</CoreModules.TableCell> */}

@@ -239,6 +239,9 @@ const VectorLayer = ({
       declutter: true,
     });
 
+    const vlFeature = vectorLyr?.getSource().getFeatures();
+    if (!vlFeature || (vlFeature && vlFeature?.length === 0)) return;
+
     map.on('click', (evt) => {
       var pixel = evt.pixel;
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
@@ -359,24 +362,6 @@ const VectorLayer = ({
     if (!map || !vectorLayer || !layerProperties) return;
     vectorLayer.setProperties(layerProperties);
   }, [map, vectorLayer, layerProperties]);
-
-  useEffect(() => {
-    if (!map) return;
-    map.on('pointermove', function (e) {
-      const pixel = map.getEventPixel(e.originalEvent);
-      const features = map.getFeaturesAtPixel(pixel);
-      if (features.length > 0) {
-        document.getElementById('ol-map').style.cursor = 'pointer';
-      } else {
-        document.getElementById('ol-map').style.cursor = 'default';
-      }
-    });
-
-    // Clean up
-    return () => {
-      map.setTarget(null);
-    };
-  }, [map]);
 
   // style on hover
   useEffect(() => {

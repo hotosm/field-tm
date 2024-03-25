@@ -10,7 +10,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN pnpm install
 
-ARG NODE_ENV=production
+ARG NODE_ENV
 ENV NODE_ENV ${NODE_ENV}
 COPY . .
 RUN pnpm run build --mode ${NODE_ENV}

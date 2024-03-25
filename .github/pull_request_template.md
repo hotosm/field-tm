@@ -2,19 +2,13 @@
 
 - [ ] 🍕 Feature
 - [ ] 🐛 Bug Fix
-- [ ] 📝 Documentation Update
-- [ ] 🎨 Style
-- [ ] 🧑‍💻 Code Refactor
-- [ ] 🔥 Performance Improvements
+- [ ] 📝 Documentation
+- [ ] 🧑‍💻 Refactor
 - [ ] ✅ Test
-- [ ] 🤖 Build
-- [ ] 🔁 CI
-- [ ] 📦 Chore (Release)
-- [ ] ⏩ Revert
+- [ ] 🤖 Build or CI
+- [ ] ❓ Other (please specify)
 
 ## Related Issue
-
-Ticket number, link, or description.
 
 Example: Fixes #123
 
@@ -26,10 +20,18 @@ A brief description of how this solves the issue.
 
 Please provide screenshots of the change.
 
+## Alternative Approaches Considered
+
+Did you attempt any other approaches that are not documented in code?
+
+## Review Guide
+
+Notes for the reviewer. How to test this change?
+
 ## Checklist before requesting a review
 
 - 📖 Read the FMTM Contributing Guide: <https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md>
-- 📖 Read the FMTM Code of Conduct: <https://github.com/hotosm/fmtm/blob/main/CODE_OF_CONDUCT.md>
+- 📖 Read the HOT Code of Conduct: <https://docs.hotosm.org/code-of-conduct>
 - 👷‍♀️ Create small PRs. In most cases, this will be possible.
 - ✅ Provide tests for your changes.
 - 📝 Use descriptive commit messages.

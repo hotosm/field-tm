@@ -48,18 +48,22 @@ const ProjectInfo = () => {
 
   return (
     <div className="fmtm-w-full sm:fmtm-ml-2 fmtm-border-b-[1px] fmtm-border-gray-300 fmtm-pb-10">
-      <div className="fmtm-pb-4">
-        <p className="fmtm-text-[#706E6E] fmtm-text-base">
-          <span
-            className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
-            onClick={() => navigate(`/project_details/${encodedId}`)}
-          >
-            {projectInfo?.title}{' '}
-          </span>
-          <span> &gt; </span>
-          <span className="fmtm-text-black">Dashboard</span>
-        </p>
-      </div>
+      {projectDashboardLoading ? (
+        <CoreModules.Skeleton style={{ width: '150px' }} className="fmtm-mb-1" />
+      ) : (
+        <div className="fmtm-pb-4">
+          <p className="fmtm-text-[#706E6E] fmtm-text-base">
+            <span
+              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
+              onClick={() => navigate(`/project_details/${encodedId}`)}
+            >
+              {projectInfo?.title}{' '}
+            </span>
+            <span> &gt; </span>
+            <span className="fmtm-text-black">Dashboard</span>
+          </p>
+        </div>
+      )}
       <div className=" fmtm-flex fmtm-flex-col xl:fmtm-flex-row fmtm-w-full sm:fmtm-items-center fmtm-gap-10 fmtm-mt-3">
         {projectDashboardLoading ? (
           <CoreModules.Skeleton className="!fmtm-w-full sm:!fmtm-w-[30rem] 2xl:!fmtm-w-[34rem] !fmtm-h-[8rem] !fmtm-rounded-xl" />

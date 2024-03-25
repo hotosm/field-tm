@@ -167,6 +167,15 @@ services:
       - fmtm-net
     restart: "unless-stopped"
 
+  pyxform:
+    image: "ghcr.io/getodk/pyxform-http:v2.0.2"
+    depends_on:
+      central-db:
+        condition: service_healthy
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
   central-ui:
     # This service simply builds the frontend to a volume
     # accessible to the proxy, then shuts down
