@@ -341,28 +341,51 @@ async def update_task_history(
 
 async def get_project_task_history(
     project_id: int,
-    end_date: Optional[datetime],
+    comment: bool,
+    end_date: datetime,
+    task_id: Optional[int],
     db: Session,
-) -> list[db_models.DbTaskHistory]:
+):
     """Retrieves the task history records for a specific project.
 
     Args:
         project_id (int): The ID of the project.
+        comment (bool): True or False, True to get comments
+            from the project tasks and False by default for
+            entire task status history.
         end_date (datetime, optional): The end date of the task history
             records to retrieve.
+        task_id (int): The task_id of the project.
         db (Session): The database session.
 
     Returns:
         A list of task history records for the specified project.
     """
-    query = db.query(db_models.DbTaskHistory).filter(
-        db_models.DbTaskHistory.project_id == project_id
-    )
+    query = f"""SELECT *
+                    FROM task_history
+                    WHERE project_id = {project_id}
+                    AND  action_date >= '{end_date}'
+            """
 
-    if end_date:
-        query = query.filter(db_models.DbTaskHistory.action_date >= end_date)
+    query += " AND action = 'COMMENT'" if comment else " AND action != 'COMMENT'"
 
-    return query.all()
+    if task_id:
+        query += f" AND task_id = {task_id}"
+
+    result = db.execute(text(query)).fetchall()
+    task_history = [
+        {
+            "id": row[0],
+            "project_id": row[1],
+            "task_id": row[2],
+            "action": row[3],
+            "action_text": row[4],
+            "action_date": row[5],
+            "status": None if comment else row[4].split()[5],
+        }
+        for row in result
+    ]
+    return task_history
 
 
 async def count_validated_and_mapped_tasks(
