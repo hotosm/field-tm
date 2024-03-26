@@ -28,6 +28,7 @@ import requests
 from fastapi import HTTPException
 from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape, to_shape
+from geojson.feature import FeatureCollection
 from geojson_pydantic import Feature, Polygon
 from geojson_pydantic import FeatureCollection as FeatCol
 from shapely.geometry import mapping, shape
@@ -376,21 +377,33 @@ def add_required_geojson_properties(
     for feature in geojson.get("features", []):
         properties = feature.get("properties", {})
 
-        # NOTE the osm_id field is used to generate the feature.id later
-        if not properties.get("osm_id"):
+        # The top level id is defined, set to osm_id
+        if feature_id := feature.get("id"):
+            properties["osm_id"] = feature_id
+
+        # Check for id type embedded in properties
+        if properties.get("osm_id"):
+            # osm_id exists already, skip
+            pass
+        else:
             if prop_id := properties.get("id"):
+                # id is nested in properties, use that
+                feature["id"] = prop_id
                 properties["osm_id"] = prop_id
             elif fid := properties.get("fid"):
                 # The default from QGIS
+                feature["id"] = fid
                 properties["osm_id"] = fid
             else:
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
-                properties["osm_id"] = getrandbits(30)
+                random_id = getrandbits(30)
+                feature["id"] = random_id
+                properties["osm_id"] = random_id
 
         # Other required fields
         if not properties.get("tags"):
-            properties["tags"] = {}
+            properties["tags"] = ""
         if not properties.get("version"):
             properties["version"] = 1
         if not properties.get("changeset"):
@@ -549,3 +562,73 @@ def get_address_from_lat_lon(latitude, longitude):
 async def get_address_from_lat_lon_async(latitude, longitude):
     """Async wrapper for get_address_from_lat_lon."""
     return get_address_from_lat_lon(latitude, longitude)
+
+
+async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
+    """Convert a GeoJSON Polygon geometry to JavaRosa format string.
+
+    This format is unique to ODK and the JavaRosa XForm processing library.
+    Example JavaRosa polygon (semicolon separated):
+    -8.38071535576881 115.640801902838 0.0 0.0;
+    -8.38074220774489 115.640848633963 0.0 0.0;
+    -8.38080128208577 115.640815355738 0.0 0.0;
+    -8.38077407987063 115.640767444534 0.0 0.0;
+    -8.38071535576881 115.640801902838 0.0 0.0
+
+    Args:
+        geojson_geometry (dict): The geojson polygon geom.
+
+    Returns:
+        str: A string representing the geometry in JavaRosa format.
+    """
+    # Ensure the GeoJSON geometry is of type Polygon
+    # FIXME support other geom types
+    if geojson_geometry["type"] != "Polygon":
+        raise ValueError("Input must be a GeoJSON Polygon")
+
+    coordinates = geojson_geometry["coordinates"][
+        0
+    ]  # Extract the coordinates of the Polygon
+    javarosa_geometry = []
+
+    for coordinate in coordinates:
+        lon, lat = coordinate[:2]
+        javarosa_geometry.append(f"{lat} {lon} 0.0 0.0")
+
+    javarosa_geometry_string = ";".join(javarosa_geometry)
+
+    return javarosa_geometry_string
+
+
+async def get_entity_dicts_from_task_geojson(
+    project_id: int,
+    task_id: int,
+    task_data_extract: FeatureCollection,
+) -> dict:
+    """Get a dictionary of Entity info mapped from task geojsons."""
+    id_properties_dict = {}
+
+    features = task_data_extract.get("features", [])
+    for feature in features:
+        geometry = feature.get("geometry")
+        javarosa_geom = await geojson_to_javarosa_geom(geometry)
+
+        properties = feature.get("properties", {})
+        osm_id = properties.get("osm_id", getrandbits(30))
+        tags = properties.get("tags")
+        version = properties.get("version")
+        changeset = properties.get("changeset")
+        timestamp = properties.get("timestamp")
+
+        # Must be string values to work with Entities
+        id_properties_dict[osm_id] = {
+            "project_id": str(project_id),
+            "task_id": str(task_id),
+            "geometry": javarosa_geom,
+            "tags": str(tags),
+            "version": str(version),
+            "changeset": str(changeset),
+            "timestamp": str(timestamp),
+        }
+
+    return id_properties_dict
