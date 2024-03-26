@@ -29,7 +29,7 @@ export type taskDataTypes = {
 };
 
 export type submissionTableDataTypes = {
-  results: [];
+  results: any[];
   pagination: {
     total: number | null;
     page: number | null;

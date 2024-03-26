@@ -160,7 +160,10 @@ const SubmissionDetails = () => {
               dispatch(
                 SubmissionActions.SetUpdateReviewStatusModal({
                   toggleModalStatus: true,
-                  submissionId: paramsInstanceId,
+                  instanceId: paramsInstanceId,
+                  projectId: decodedProjectId,
+                  taskId: taskId,
+                  reviewState: submissionDetails?.__system?.reviewState,
                 }),
               );
             }}
