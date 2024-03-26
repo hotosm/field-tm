@@ -66,22 +66,19 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
           taskModalStatus ? '' : 'fmtm-hidden'
         }  fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-3`}
       >
-        <div title="Download Tiles">
+        <div
+          title="Download Tiles"
+          className="fmtm-flex fmtm-items-center fmtm-gap-1 fmtm-group"
+          onClick={() => {
+            dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
+            dispatch(ProjectActions.ToggleTaskModalStatus(false));
+          }}
+        >
           <AssetModules.FileDownloadOutlinedIcon
             style={{ width: '20px' }}
-            className="hover:fmtm-text-primaryRed"
-            onClick={() => {
-              dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
-              dispatch(ProjectActions.ToggleTaskModalStatus(false));
-            }}
+            className="fmtm-text-primaryRed group-hover:fmtm-text-red-700"
           />
-        </div>
-        <div title="View Task Submissions">
-          <AssetModules.DescriptionOutlinedIcon
-            style={{ width: '20px' }}
-            className="hover:fmtm-text-primaryRed"
-            onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
-          />
+          <p className="fmtm-text-base fmtm-text-primaryRed group-hover:fmtm-text-red-700">MB TILES</p>
         </div>
         <div title="Close">
           <AssetModules.CloseIcon

@@ -48,11 +48,11 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     if (totalAreaSelection) {
       const totalArea = parseFloat(totalAreaSelection?.split(' ')[0]);
       const areaUnit = totalAreaSelection?.split(' ')[1];
-      if (totalArea > 1000 && areaUnit === 'km²') {
+      if (totalArea > 200 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'Cannot create project of project area exceeding 1000 Sq.KM.',
+            message: 'Cannot create project of project area exceeding 200 Sq.KM.',
             variant: 'error',
             duration: 3000,
           }),
@@ -188,11 +188,11 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
           }),
         );
       }
-      if (totalArea > 1000 && areaUnit === 'km²') {
+      if (totalArea > 200 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'The project area exceeded 1000 Sq.KM. and must be less than 1000 Sq.KM.',
+            message: 'The project area exceeded 200 Sq.KM. and must be less than 200 Sq.KM.',
             variant: 'error',
             duration: 3000,
           }),
@@ -346,7 +346,9 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   : null
               }
               getAOIArea={(area) => {
-                dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+                if (drawnGeojson) {
+                  dispatch(CreateProjectActions.SetTotalAreaSelection(area));
+                }
               }}
               hasEditUndo
             />
