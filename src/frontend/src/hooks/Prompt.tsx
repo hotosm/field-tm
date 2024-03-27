@@ -1,15 +1,15 @@
 import React from 'react';
 import pathNotToBlock from '@/constants/blockerUrl';
-import { unstable_useBlocker as useBlocker } from 'react-router-dom';
+// import { unstable_useBlocker as useBlocker } from 'react-router-dom';
 
 function Prompt(props) {
   const block = props.when;
-  useBlocker(({ nextLocation }) => {
-    if (block && !pathNotToBlock.includes(nextLocation.pathname)) {
-      return !window.confirm(props.message);
-    }
-    return false;
-  });
+  // useBlocker(({ nextLocation }) => {
+  //   if (block && !pathNotToBlock.includes(nextLocation.pathname)) {
+  //     return !window.confirm(props.message);
+  //   }
+  //   return false;
+  // });
 
   return <div key={block} />;
 }

@@ -3,12 +3,16 @@
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 // import "../../node_modules/ol-layerswitcher/dist/ol-layerswitcher.css";
 import LayerGroup from 'ol/layer/Group';
+import Collection from 'ol/Collection.js';
 import LayerTile from 'ol/layer/Tile';
 import SourceOSM from 'ol/source/OSM';
 import LayerSwitcher from 'ol-layerswitcher';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XYZ } from 'ol/source';
 import { useLocation } from 'react-router-dom';
+import DataTile from 'ol/source/DataTile.js';
+import TileLayer from 'ol/layer/WebGLTile.js';
+import { FileSource, PMTiles } from 'pmtiles';
 
 // const mapboxOutdoors = new MapboxVector({
 //   styleUrl: 'mapbox://styles/geovation/ckpicg3of094w17nyqyd2ziie',
@@ -21,6 +25,7 @@ const osm = (visible) =>
     visible: visible === 'osm',
     source: new SourceOSM(),
   });
+
 const none = (visible) =>
   new LayerTile({
     title: 'None',
@@ -28,6 +33,7 @@ const none = (visible) =>
     visible: visible === 'none',
     source: null,
   });
+
 const bingMaps = (visible) =>
   new LayerTile({
     title: 'Satellite',
@@ -45,6 +51,7 @@ const bingMaps = (visible) =>
     //   crossOrigin: 'Anonymous',
     // }),
   });
+
 const mapboxMap = (visible) =>
   new LayerTile({
     title: 'Mapbox Light',
@@ -60,6 +67,7 @@ const mapboxMap = (visible) =>
       crossOrigin: 'Anonymous',
     }),
   });
+
 const mapboxOutdoors = (visible) =>
   new LayerTile({
     title: 'Mapbox Outdoors',
@@ -126,29 +134,64 @@ const monochromeMidNight = (visible = false) =>
     }),
   });
 
-const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
+const pmTileLayer = (pmTileLayerData, visible) => {
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.addEventListener('load', () => resolve(img));
+      img.addEventListener('error', () => reject(new Error('load failed')));
+      img.src = src;
+    });
+  }
+
+  const pmTiles = new PMTiles(new FileSource(pmTileLayerData));
+
+  async function loader(z, x, y) {
+    const response = await pmTiles.getZxy(z, x, y);
+    const blob = new Blob([response.data]);
+    const src = URL.createObjectURL(blob);
+    const image = await loadImage(src);
+    URL.revokeObjectURL(src);
+    return image;
+  }
+  return new TileLayer({
+    title: `${pmTileLayerData.name}`,
+    type: 'raster pm tiles',
+    visible: true,
+    source: new DataTile({
+      loader,
+      wrapX: true,
+      tileSize: [512, 512],
+      maxZoom: 22,
+      attributions: 'Tiles © OpenAerialMap',
+    }),
+  });
+};
+
+const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) => {
+  const [basemapLayers, setBasemapLayers] = useState(
+    new LayerGroup({
+      title: 'Base maps',
+      layers: [
+        bingMaps(visible),
+        osm(visible),
+        mapboxMap(visible),
+        mapboxOutdoors(visible),
+        none(visible),
+        // pmTileLayer(pmTileLayerData, visible),
+      ],
+    }),
+  );
+
   useEffect(() => {
     if (!map) return;
 
-    const baseMaps = new LayerGroup({
-      title: 'Base maps',
-      layers: [bingMaps(visible), osm(visible), mapboxMap(visible), mapboxOutdoors(visible), none(visible)],
-    });
-
-    const layerSwitcher = new LayerSwitcher({
+    const layerSwitcherControl = new LayerSwitcher({
       reverse: true,
       groupSelectStyle: 'group',
     });
-    map.addLayer(baseMaps);
-    map.addControl(layerSwitcher);
-    // eslint-disable-next-line consistent-return
-    return () => {
-      map.removeLayer(baseMaps);
-    };
-  }, [map, visible]);
-
-  const location = useLocation();
-  useEffect(() => {
+    map.addLayer(basemapLayers);
+    map.addControl(layerSwitcherControl);
     const layerSwitcher = document.querySelector('.layer-switcher');
     if (layerSwitcher) {
       const layerSwitcherButton = layerSwitcher.querySelector('button');
@@ -178,7 +221,31 @@ const LayerSwitcherControl = ({ map, visible = 'osm' }) => {
         layerSwitcher.style.zIndex = '1000';
       }
     }
-  }, [map]);
+    // eslint-disable-next-line consistent-return
+    return () => {
+      map.removeLayer(basemapLayers);
+      map.removeControl(layerSwitcherControl);
+    };
+  }, [map, visible]);
+
+  useEffect(() => {
+    if (!pmTileLayerData) {
+      return;
+    }
+
+    const pmTileBaseLayer = pmTileLayer(pmTileLayerData, visible);
+
+    const currentLayers = basemapLayers.getLayers();
+    currentLayers.push(pmTileBaseLayer);
+    basemapLayers.setLayers(currentLayers);
+
+    return () => {
+      basemapLayers.getLayers().remove(pmTileBaseLayer);
+    };
+  }, [pmTileLayerData]);
+
+  const location = useLocation();
+  useEffect(() => {}, [map]);
 
   return null;
 };

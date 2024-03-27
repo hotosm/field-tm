@@ -30,6 +30,7 @@ export type ProjectStateTypes = {
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;
   clearEditorContent: boolean;
+  projectOpfsBasemapPath: string | null;
 };
 
 type tilesListTypes = {
