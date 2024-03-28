@@ -2,19 +2,20 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-// import { VitePWA } from 'vite-plugin-pwa';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      // VitePWA({
-      //   registerType: 'autoUpdate',
-      //   devOptions: {
-      //     enabled: true,
-      //   },
-      // }),
+      VitePWA({
+        registerType: 'autoUpdate',
+        devOptions: {
+          enabled: true,
+        },
+        selfDestroying: true,
+      }),
     ],
     server: {
       port: 7051,
