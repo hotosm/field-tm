@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         devOptions: {
           enabled: true,
         },
-        selfDestroying: true,
+        selfDestroying: false,
       }),
     ],
     server: {
