@@ -42,6 +42,7 @@ import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import { readFileFromOPFS } from '@/api/Files';
+import DebugConsole from '@/utilities/DebugConsole';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -237,9 +238,12 @@ const Home = () => {
 
     return () => {};
   }, [projectOpfsBasemapPath]);
+  const [showDebugConsole, setShowDebugConsole] = useState(false);
 
   return (
     <div className="fmtm-bg-[#f5f5f5]" style={{ height: '100%' }}>
+      {/* only used to display debug console */}
+      <DebugConsole showDebugConsole={showDebugConsole} setShowDebugConsole={setShowDebugConsole} />
       {/* Customized Modal For Generate Tiles */}
       <div>
         <GenerateBasemap projectInfo={state.projectInfo} />
@@ -377,6 +381,15 @@ const Home = () => {
                 windowSize.width <= 640 ? 'fmtm-h-[100vh]' : 'fmtm-h-full'
               }`}
             >
+              {import.meta.env.MODE === 'development' && (
+                <div className="fmtm-absolute fmtm-top-16 fmtm-left-4 fmtm-z-50">
+                  <Button
+                    btnText="Toggle Console"
+                    btnType="secondary"
+                    onClick={() => setShowDebugConsole(!showDebugConsole)}
+                  />
+                </div>
+              )}
               <LayerSwitcherControl
                 visible={customBasemapData ? 'custom' : 'outdoors'}
                 pmTileLayerData={customBasemapData}

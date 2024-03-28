@@ -9,34 +9,12 @@ import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import DebugConsole from '@/utilities/DebugConsole';
 
 export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut, setOpen }) {
-  const [showDebugConsole, setShowDebugConsole] = useState(false);
-  const [logs, setLogs] = useState([]);
-  useEffect(() => {
-    if (import.meta.env.MODE === 'development') {
-      // Override console.log to capture logs
-      const originalConsoleLog = console.log;
-      console.log = (...args) => {
-        originalConsoleLog.apply(console, args);
-        setLogs((prevLogs) => [
-          ...prevLogs,
-          args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)).join(' '),
-        ]);
-      };
-
-      // Restore original console.log when component unmounts
-      return () => {
-        console.log = originalConsoleLog;
-      };
-    }
-  }, []);
-  const toggleDebugConsole = () => {
-    setShowDebugConsole((prev) => !prev);
-  };
-
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const dispatch = CoreModules.useAppDispatch();
+  const [showDebugConsole, setShowDebugConsole] = useState(false);
 
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
@@ -138,33 +116,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
 
   return (
     <div>
-      {import.meta.env.MODE === 'development' && (
-        <div>
-          <div
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              width: '100%',
-              height: '33vh',
-              backgroundColor: 'white',
-              border: '1px solid',
-              padding: '16px 32px',
-              display: showDebugConsole ? 'flex' : 'none',
-              flexDirection: 'column',
-              zIndex: 10000,
-              overflowY: 'auto',
-            }}
-          >
-            <button style={{ alignSelf: 'flex-end', marginBottom: '10px' }} onClick={toggleDebugConsole}>
-              Close
-            </button>
-            {/* Display console logs */}
-            {logs.map((log, index) => (
-              <p key={index}>{log}</p>
-            ))}
-          </div>
-        </div>
-      )}
+      <DebugConsole showDebugConsole={showDebugConsole} setShowDebugConsole={setShowDebugConsole} />
       <React.Fragment>
         <SwipeableDrawer swipeAreaWidth={0} onOpen={onClose} anchor={'right'} open={open} onClose={onClose}>
           <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'column', padding: 3 }}>
