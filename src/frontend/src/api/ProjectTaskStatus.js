@@ -14,12 +14,14 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
 
         const response = await CoreModules.axios.post(url, body, { params });
         const findIndexForUpdation = existingData[index].taskBoundries.findIndex((obj) => obj.id == response.data.id);
+        console.log(response, 'response');
 
         let project_tasks = [...existingData[index].taskBoundries];
         project_tasks[findIndexForUpdation] = {
           ...response.data,
           task_status: task_priority_str[response.data.task_status],
         };
+        console.log(project_tasks, 'project_tasks');
 
         let updatedProject = [...existingData];
         const finalProjectOBJ = {
@@ -29,6 +31,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         updatedProject[index] = finalProjectOBJ;
 
         dispatch(ProjectActions.SetProjectTaskBoundries(updatedProject));
+        console.log(updatedProject, 'updatedProject');
 
         await feature.setStyle(style);
         dispatch(CommonActions.SetLoading(false));
@@ -41,6 +44,7 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
           }),
         );
       } catch (error) {
+        console.log(error, 'error');
         dispatch(CommonActions.SetLoading(false));
         dispatch(
           HomeActions.SetSnackBar({
