@@ -21,9 +21,13 @@ export type SubmissionStateTypes = {
   validatedVsMappedInfographics: validatedVsMappedInfographicsTypes[];
   validatedVsMappedLoading: boolean;
   updateReviewStatusModal: updateReviewStatusModal;
+  updateReviewStateLoading: boolean;
 };
 
 type updateReviewStatusModal = {
   toggleModalStatus: boolean;
-  submissionId: string | null;
+  instanceId: string | null;
+  taskId: string | null;
+  projectId: number | null;
+  reviewState: string;
 };

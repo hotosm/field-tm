@@ -218,3 +218,15 @@ async def my_data(
         user_data(dict): The dict of user data.
     """
     return await get_or_create_user(db, user_data)
+
+
+@router.get("/introspect", response_model=AuthUser)
+async def check_login(
+    db: Session = Depends(database.get_db),
+    user_data: AuthUser = Depends(login_required),
+):
+    """Verifies the validity of login cookies.
+
+    Returns True if authenticated, False otherwise.
+    """
+    return user_data

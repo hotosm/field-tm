@@ -17,7 +17,7 @@ function Authorized() {
     // First case: authCode is passed
     // return to get user details
     if (authCode !== null) {
-      window.opener.postMessage({ authCode, state }, '*');
+      window?.opener?.postMessage({ authCode, state }, '*');
       window.close();
       return;
     }

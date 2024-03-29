@@ -21,6 +21,7 @@ type RichTextEditorProps = {
   setEditorHtmlContent?: (content: string) => any;
   editable: boolean;
   isEditorEmpty?: (status: boolean) => void;
+  className?: string;
 };
 
 const extensions = [
@@ -40,7 +41,13 @@ const extensions = [
   }),
 ];
 
-const RichTextEditor = ({ editorHtmlContent, setEditorHtmlContent, editable, isEditorEmpty }: RichTextEditorProps) => {
+const RichTextEditor = ({
+  editorHtmlContent,
+  setEditorHtmlContent,
+  editable,
+  isEditorEmpty,
+  className,
+}: RichTextEditorProps) => {
   const dispatch = useDispatch();
   const editor = useEditor({
     extensions,
@@ -74,9 +81,9 @@ const RichTextEditor = ({ editorHtmlContent, setEditorHtmlContent, editable, isE
   }
 
   return (
-    <div className="fmtm-border-[1px] fmtm-border-gray-300 fmtm-rounded-md fmtm-bg-white">
+    <div className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-rounded-md fmtm-bg-white ${className}`}>
       {editable && <Toolbar editor={editor} />}
-      <EditorContent editor={editor} className={`${editable ? 'fmtm-min-h-[150px]' : 'fmtm-min-h-[50px]'}`} />
+      <EditorContent editor={editor} className={`${editable ? 'fmtm-min-h-[150px] fmtm-p-4' : 'fmtm-min-h-[50px]'}`} />
     </div>
   );
 };

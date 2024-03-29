@@ -50,6 +50,11 @@ const AsyncPopup = ({
       element: popupRef.current,
       positioning: 'center-center',
       id: popupId,
+      autoPan: {
+        animation: {
+          duration: 250,
+        },
+      },
     });
     setOverlay(overlayInstance);
   }, [map, popupRef]);
@@ -98,7 +103,7 @@ const AsyncPopup = ({
     if (!overlay) return;
 
     map.on(showOnHover, (evt) => {
-      map.updateSize();
+      // map.updateSize();
       overlay.setPosition(undefined);
       setPopupHTML('');
       setProperties(null);

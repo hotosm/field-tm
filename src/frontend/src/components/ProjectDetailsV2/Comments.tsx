@@ -72,19 +72,41 @@ const Comments = () => {
             {projectCommentsList?.length > 0 ? (
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-mb-1">
                 {projectCommentsList?.map((projectComment, i) => (
-                  <div key={i} className="fmtm-flex fmtm-w-full fmtm-gap-4 fmtm-px-2">
+                  <div
+                    key={i}
+                    className="fmtm-flex fmtm-w-full fmtm-gap-4 fmtm-px-2 fmtm-border-b fmtm-border-[#e9e9e9] sm:fmtm-border-white fmtm-pb-3"
+                  >
                     <div className="fmtm-h-8 fmtm-w-8 fmtm-rounded-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-bg-white">
                       <AssetModules.PersonIcon color="success" sx={{ fontSize: '30px' }} />
                     </div>
-                    <div className=" fmtm-flex-1">
+                    <div className="fmtm-flex-1 fmtm-flex fmtm-flex-col fmtm-gap-1">
                       <div className="fmtm-flex fmtm-gap-3 fmtm-items-center">
                         <p>{projectComment?.commented_by}</p>
-                        <p className="fmtm-text-sm fmtm-text-gray-600">
-                          {projectComment?.created_at?.split('T')[0]} {projectComment?.created_at?.split('T')[1]}
-                        </p>
                       </div>
-                      <div className="fmtm-mt-2">
-                        <RichTextEditor editorHtmlContent={projectComment?.comment} editable={false} />
+                      <div>
+                        <RichTextEditor
+                          editorHtmlContent={projectComment?.comment}
+                          editable={false}
+                          className="sm:!fmtm-bg-[#f5f5f5] !fmtm-rounded-none !fmtm-border-none"
+                        />
+                      </div>
+                      <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
+                        <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676]">#{selectedTask}</p>
+                        <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+                          <div className="fmtm-flex fmtm-items-center fmtm-mb-1">
+                            <AssetModules.AccessTimeIcon
+                              className="fmtm-text-primaryRed"
+                              style={{ fontSize: '20px' }}
+                            />
+                          </div>
+                          <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676] fmtm-flex fmtm-gap-2">
+                            <span>{projectComment?.created_at?.split('T')[0]}</span>
+                            <span>
+                              {projectComment?.created_at?.split('T')[1].split(':')[0]}:
+                              {projectComment?.created_at?.split('T')[1].split(':')[1]}
+                            </span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -96,7 +118,7 @@ const Comments = () => {
           </div>
         )}
       </div>
-      <div className="fmtm-pt-2">
+      <div className="fmtm-pt-2 sm:fmtm-max-h-[235px] sm:fmtm-overflow-scroll sm:scrollbar">
         <RichTextEditor
           editorHtmlContent={comment}
           setEditorHtmlContent={(content) => setComment(content)}
@@ -108,7 +130,7 @@ const Comments = () => {
         <div className="fmtm-w-1/2">
           <Button
             type="button"
-            btnText="Cancel"
+            btnText="CLEAR COMMENT"
             btnType="other"
             className="!fmtm-rounded !fmtm-py-[3px] fmtm-w-full fmtm-flex fmtm-justify-center"
             onClick={() => {
@@ -120,7 +142,7 @@ const Comments = () => {
         <div className="fmtm-w-1/2">
           <Button
             type="button"
-            btnText="Save Comment"
+            btnText="SAVE COMMENT"
             btnType="primary"
             className="!fmtm-rounded fmtm-w-full fmtm-flex fmtm-justify-center"
             onClick={handleComment}

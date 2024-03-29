@@ -7,7 +7,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
-    plugins: [react(), VitePWA({ registerType: 'autoUpdate' })],
+    plugins: [
+      react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        devOptions: {
+          enabled: true,
+        },
+        selfDestroying: false,
+      }),
+    ],
     server: {
       port: 7051,
       host: '0.0.0.0',

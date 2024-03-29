@@ -27,7 +27,8 @@ from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
-from pyxform.xls2xform import xls2xform_convert
+from pyxform.builder import create_survey_element_from_dict
+from pyxform.xls2json import parse_file_to_json
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -475,14 +476,17 @@ async def read_and_test_xform(
     else:
         try:
             log.debug("Converting xlsform -> xform")
-            # NOTE do not enable validate=True, as this requires Java installed
-            xform_bytesio, warnings = xls2xform_convert(
-                xlsform_path=f"/tmp/form{file_ext}",
-                validate=False,
-                xlsform_object=input_data,
+            json_data = parse_file_to_json(
+                path="/dummy/path/with/file/ext.xls",
+                file_object=input_data,
             )
-            if warnings:
-                log.warning(warnings)
+            generated_xform = create_survey_element_from_dict(json_data)
+            # NOTE do not enable validate=True, as this requires Java to be installed
+            xform_bytesio = BytesIO(
+                generated_xform.to_xml(
+                    validate=False,
+                ).encode("utf-8")
+            )
         except Exception as e:
             log.error(e)
             msg = f"XLSForm is invalid: {str(e)}"

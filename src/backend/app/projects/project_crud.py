@@ -19,6 +19,7 @@
 
 import json
 import os
+import subprocess
 import uuid
 from asyncio import gather
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -1769,8 +1770,7 @@ def get_project_tiles(
         tms (str, optional): Default None. Custom TMS provider URL.
     """
     zooms = "12-19"
-    tiles_path_id = uuid.uuid4()
-    tiles_dir = f"{TILESDIR}/{tiles_path_id}"
+    tiles_dir = f"{TILESDIR}/{project_id}"
     outfile = f"{tiles_dir}/{project_id}_{source}tiles.{output_format}"
 
     tile_path_instance = db_models.DbTilesPath(
@@ -1815,15 +1815,34 @@ def get_project_tiles(
             f"xy={False} | "
             f"tms={tms}"
         )
-        create_basemap_file(
-            boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
-            outfile=outfile,
-            zooms=zooms,
-            outdir=tiles_dir,
-            source=source,
-            xy=False,
-            tms=tms,
-        )
+
+        # TODO replace this temp workaround with osm-fieldwork code
+        # TODO to generate pmtiles directly instead of with go-pmtiles
+        if output_format == "pmtiles":
+            create_basemap_file(
+                boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
+                outfile=outfile.replace("pmtiles", "mbtiles"),
+                zooms=zooms,
+                outdir=tiles_dir,
+                source=source,
+                xy=False,
+                tms=tms,
+            )
+            subprocess.call(
+                "pmtiles convert " f"{outfile.replace('pmtiles', 'mbtiles')} {outfile}",
+                shell=True,
+            )
+        else:
+            create_basemap_file(
+                boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
+                outfile=outfile,
+                zooms=zooms,
+                outdir=tiles_dir,
+                source=source,
+                xy=False,
+                tms=tms,
+            )
+
         log.info(f"Basemap created for project ID {project_id}: {outfile}")
 
         tile_path_instance.status = 4
