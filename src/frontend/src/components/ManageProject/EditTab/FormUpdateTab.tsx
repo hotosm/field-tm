@@ -19,6 +19,7 @@ const FormUpdateTab = ({ projectId }) => {
 
   const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [error, setError] = useState({ formError: '', categoryError: '' });
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
   const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
 
@@ -26,13 +27,29 @@ const FormUpdateTab = ({ projectId }) => {
     dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
   }, []);
 
+  const validateForm = () => {
+    setError({ formError: '', categoryError: '' });
+    let isValid = true;
+    if (!uploadForm || (uploadForm && uploadForm?.length === 0)) {
+      setError((prev) => ({ ...prev, formError: 'Form is required.' }));
+      isValid = false;
+    }
+    if (!selectedCategory) {
+      setError((prev) => ({ ...prev, categoryError: 'Category is required.' }));
+      isValid = false;
+    }
+    return isValid;
+  };
+
   const onSave = () => {
-    dispatch(
-      PostFormUpdate(`${import.meta.env.VITE_API_URL}/projects/update-form?project_id=${projectId}`, {
-        category: selectedCategory,
-        upload: uploadForm && uploadForm?.[0]?.url,
-      }),
-    );
+    if (validateForm()) {
+      dispatch(
+        PostFormUpdate(`${import.meta.env.VITE_API_URL}/projects/update-form?project_id=${projectId}`, {
+          category: selectedCategory,
+          upload: uploadForm && uploadForm?.[0]?.url,
+        }),
+      );
+    }
   };
 
   return (
@@ -51,6 +68,7 @@ const FormUpdateTab = ({ projectId }) => {
           }}
           className="fmtm-max-w-[13.5rem]"
         />
+        {error.categoryError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.categoryError}</p>}
         <p className="fmtm-text-base fmtm-mt-2">
           The category will be used to set the OpenStreetMap{' '}
           <a
@@ -63,17 +81,20 @@ const FormUpdateTab = ({ projectId }) => {
           {`if uploading the final submissions to OSM.`}
         </p>
       </div>
-      <UploadArea
-        title="Upload Form"
-        label="Please upload .xls, .xlsx, .xml file"
-        multiple={false}
-        data={uploadForm || []}
-        filterKey="url"
-        onUploadFile={(updatedFiles) => {
-          setUploadForm(updatedFiles);
-        }}
-        acceptedInput=".xls, .xlsx, .xml"
-      />
+      <div>
+        <UploadArea
+          title="Upload Form"
+          label="Please upload .xls, .xlsx, .xml file"
+          multiple={false}
+          data={uploadForm || []}
+          filterKey="url"
+          onUploadFile={(updatedFiles) => {
+            setUploadForm(updatedFiles);
+          }}
+          acceptedInput=".xls, .xlsx, .xml"
+        />
+        {error.formError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.formError}</p>}
+      </div>
       <div className="fmtm-flex fmtm-justify-center">
         <Button onClick={onSave} btnText="UPDATE" btnType="primary" className="fmtm-rounded-md" />
       </div>

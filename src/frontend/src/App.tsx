@@ -2,8 +2,9 @@ import axios from 'axios';
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { RouterProvider } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 import { store, persistor } from '@/store/Store';
 import routes from '@/routes';
@@ -12,6 +13,11 @@ import environment from '@/environment';
 import '@/index.css';
 import 'ol/ol.css';
 import 'react-loading-skeleton/dist/skeleton.css';
+
+enum Status {
+  'online',
+  'offline',
+}
 
 // Added Fix of Console Error of MUI Issue
 const consoleError = console.error;
@@ -51,9 +57,27 @@ axios.interceptors.request.use(
 );
 
 const GlobalInit = () => {
+  const dispatch = useDispatch();
+  const checkStatus = (status: string) => {
+    console.log(status);
+    dispatch(
+      CommonActions.SetSnackBar({
+        open: true,
+        message: 'Connection Status: ' + status,
+        variant: status === 'online' ? 'success' : 'error',
+        duration: 2000,
+      }),
+    );
+  };
   useEffect(() => {
+    window.addEventListener('offline', () => checkStatus('offline'));
+    window.addEventListener('online', () => checkStatus('online'));
+
     // Do stuff at init here
-    return () => {};
+    return () => {
+      window.removeEventListener('offline', () => checkStatus('offline'));
+      window.removeEventListener('online', () => checkStatus('online'));
+    };
   }, []);
   return null; // Renders nothing
 };

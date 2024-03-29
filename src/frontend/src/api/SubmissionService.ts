@@ -1,4 +1,5 @@
 import CoreModules from '@/shared/CoreModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 // import { HomeProjectCardModel } from '@/models/home/homeModel';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
@@ -112,5 +113,39 @@ export const SubmissionTableService: Function = (url: string, payload) => {
     };
 
     await fetchSubmissionTable(url, payload);
+  };
+};
+
+export const UpdateReviewStateService: Function = (url: string) => {
+  return async (dispatch) => {
+    const UpdateReviewState = async (url: string) => {
+      try {
+        dispatch(SubmissionActions.UpdateReviewStateLoading(true));
+        const response = await CoreModules.axios.post(url);
+        dispatch(SubmissionActions.UpdateSubmissionTableDataReview(response.data));
+        dispatch(
+          SubmissionActions.SetUpdateReviewStatusModal({
+            toggleModalStatus: false,
+            projectId: null,
+            instanceId: null,
+            taskId: null,
+            reviewState: '',
+          }),
+        );
+        dispatch(SubmissionActions.UpdateReviewStateLoading(false));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to update review state.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+        dispatch(SubmissionActions.UpdateReviewStateLoading(false));
+      }
+    };
+
+    await UpdateReviewState(url);
   };
 };
