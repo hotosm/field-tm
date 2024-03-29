@@ -37,7 +37,7 @@ function TextArea({
         {required && <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>}
       </div>
       <div
-        className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-bg-inactive_bg fmtm-w-full fmtm-justify-between fmtm-flex fmtm-items-center fmtm-overflow-hidden`}
+        className={`fmtm-border-[1px] fmtm-border-gray-300 fmtm-bg-inactive_bg fmtm-w-full fmtm-justify-between fmtm-flex fmtm-items-center fmtm-overflow-hidden fmtm-relative`}
       >
         <textarea
           id={id}
@@ -52,6 +52,11 @@ function TextArea({
           onChange={onChange}
           disabled={disabled}
         />
+        {maxLength && (
+          <p className="fmtm-text-sm fmtm-absolute fmtm-bottom-1 fmtm-right-1 fmtm-text-gray-400">
+            {value.length}/{maxLength}
+          </p>
+        )}
       </div>
       {errorMsg && <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errorMsg}</p>}
     </div>

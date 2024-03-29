@@ -61,12 +61,13 @@ const ProjectDescriptionTab = ({ projectId }) => {
         onChange={handleChange}
         errorMsg={errors.short_description}
         required
+        maxLength={200}
       />
       <TextArea
         id="description"
         name="description"
         label="Description"
-        rows={2}
+        rows={3}
         value={values?.description}
         onChange={handleChange}
         errorMsg={errors.description}

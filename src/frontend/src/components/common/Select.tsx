@@ -118,6 +118,7 @@ interface ICustomSelect {
   onValueChange: (value: string | null | number) => void;
   errorMsg?: string;
   className?: string;
+  required?: boolean;
 }
 
 export const CustomSelect = ({
@@ -131,11 +132,15 @@ export const CustomSelect = ({
   onValueChange,
   errorMsg,
   className,
+  required,
 }: ICustomSelect) => {
   return (
     <div className="fmtm-w-full">
       {title && (
-        <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent ${className}`}>{title}</p>
+        <div className="fmtm-flex fmtm-gap-1">
+          <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent ${className}`}>{title}</p>
+          {required && <p className="fmtm-text-red-500 fmtm-text-[1.2rem]">*</p>}
+        </div>
       )}
       <div className="fmtm-flex fmtm-items-end">
         <div className={`fmtm-w-full ${className}`}>
