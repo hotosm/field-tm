@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import BasicCard from '@/utilities/BasicCard';
 import Activities from '@/components/Activities';
-import environment from '@/environment';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
@@ -67,7 +66,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   };
 
   useEffect(() => {
-    const index = state.findIndex((project) => project.id == environment.decode(params.id));
+    const index = state.findIndex((project) => project.id == params.id);
     let taskHistories = [];
 
     if (index != -1) {

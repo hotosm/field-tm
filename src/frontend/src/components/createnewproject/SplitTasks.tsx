@@ -17,7 +17,6 @@ import {
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
 } from '@/api/CreateProjectService';
-import environment from '@/environment';
 import { Modal } from '@/components/common/Modal';
 import ProgressBar from '@/components/common/ProgressBar';
 import { task_split_type } from '@/types/enums';
@@ -211,7 +210,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       );
     } else if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
       clearInterval(generateProjectLogIntervalCb);
-      const encodedProjectId = environment.encode(projectDetailsResponse?.id);
+      const projectId = projectDetailsResponse?.id;
       dispatch(
         CommonActions.SetSnackBar({
           open: true,
@@ -222,7 +221,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       );
       dispatch(CreateProjectActions.SetGenerateProjectLog(null));
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
-      navigate(`/project_details/${encodedProjectId}`);
+      navigate(`/project_details/${projectId}`);
       dispatch(CreateProjectActions.ClearCreateProjectFormData());
       dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
     }

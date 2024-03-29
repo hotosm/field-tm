@@ -1,7 +1,6 @@
 import * as React from 'react';
 import CustomizedImage from '@/utilities/CustomizedImage';
 import CustomizedProgressBar from '@/utilities/CustomizedProgressBar';
-import environment from '@/environment';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import { HomeProjectCardModel, projectType } from '@/models/home/homeModel';
 import CoreModules from '@/shared/CoreModules';
@@ -60,7 +59,7 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
         const project: projectType = data;
         // dispatch(ProjectActions.SetProjectTaskBoundries([]))
         dispatch(HomeActions.SetSelectedProject(project));
-        navigate(`/project_details/${environment.encode(data.id)}`);
+        navigate(`/project_details/${data.id}`);
       }}
       style={cardInnerStyles.card}
       sx={{ boxShadow: 0 }}

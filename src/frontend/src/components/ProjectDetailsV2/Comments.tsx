@@ -4,7 +4,6 @@ import Button from '@/components/common/Button';
 import { PostProjectComments, GetProjectComments } from '@/api/Project';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import environment from '@/environment';
 import { useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { ProjectCommentsSekeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
@@ -21,7 +20,7 @@ const Comments = () => {
   const projectPostCommentsLoading = useAppSelector((state) => state?.project?.projectPostCommentsLoading);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
 
-  const projectId = environment.decode(params.id);
+  const projectId = params.id;
 
   useEffect(() => {
     dispatch(

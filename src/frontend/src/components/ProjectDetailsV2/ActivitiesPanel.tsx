@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react';
-import environment from '@/environment';
 import AssetModules from '@/shared/AssetModules';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
@@ -23,7 +22,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   };
 
   useEffect(() => {
-    const index = state.findIndex((project) => project.id == environment.decode(params.id));
+    const index = state.findIndex((project) => project.id == params.id);
     let taskHistories: taskHistoryListType[] = [];
 
     if (index != -1) {

@@ -19,8 +19,8 @@ export default function Dialog({ taskId, feature, map, view }) {
   const geojsonStyles = MapStyles();
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
-  const currentProjectId = environment.decode(params.id);
-  const currentTaskId = environment.encode(taskId);
+  const currentProjectId = params.id;
+  const currentTaskId = taskId;
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const currentStatus = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {

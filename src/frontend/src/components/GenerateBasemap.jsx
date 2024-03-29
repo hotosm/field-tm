@@ -9,8 +9,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 const GenerateBasemap = ({ projectInfo }) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
-  const encodedId = params.id;
-  const decodedId = environment.decode(encodedId);
+  const id = params.id;
 
   const [selectedTileSource, setSelectedTileSource] = useState(null);
   const [selectedOutputFormat, setSelectedOutputFormat] = useState(null);
@@ -37,7 +36,7 @@ const GenerateBasemap = ({ projectInfo }) => {
   };
 
   const getTilesList = () => {
-    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/tiles_list/${decodedId}/`));
+    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/tiles_list/${id}/`));
   };
 
   useEffect(() => {
@@ -81,8 +80,8 @@ const GenerateBasemap = ({ projectInfo }) => {
         GenerateProjectTiles(
           `${
             import.meta.env.VITE_API_URL
-          }/projects/tiles/${decodedId}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
-          decodedId,
+          }/projects/tiles/${id}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
+          id,
         ),
       );
     }

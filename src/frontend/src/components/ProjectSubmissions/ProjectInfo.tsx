@@ -7,7 +7,7 @@ import { projectDashboardDetailTypes, projectInfoType } from '@/models/project/p
 const ProjectInfo = () => {
   const navigate = useNavigate();
   const params = CoreModules.useParams();
-  const encodedId = params.projectId;
+  const projectId = params.projectId;
   const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const projectDashboardDetail: projectDashboardDetailTypes = CoreModules.useAppSelector(
     (state) => state.project.projectDashboardDetail,
@@ -55,7 +55,7 @@ const ProjectInfo = () => {
           <p className="fmtm-text-[#706E6E] fmtm-text-base">
             <span
               className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
-              onClick={() => navigate(`/project_details/${encodedId}`)}
+              onClick={() => navigate(`/project_details/${projectId}`)}
             >
               {projectInfo?.title}{' '}
             </span>

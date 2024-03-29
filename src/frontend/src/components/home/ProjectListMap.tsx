@@ -8,7 +8,6 @@ import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
 import { defaultStyles, getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MarkerIcon from '@/assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
-import environment from '@/environment';
 import { Style, Text, Icon, Fill } from 'ol/style';
 import { projectType } from '@/models/home/homeModel';
 
@@ -74,8 +73,8 @@ const ProjectListMap = () => {
   }, [homeProjectSummary]);
 
   const projectClickOnMap = (properties: any) => {
-    const encodedProjectId = environment.encode(properties.id);
-    navigate(`/project_details/${encodedProjectId}`);
+    const projectId = properties.id;
+    navigate(`/project_details/${projectId}`);
   };
 
   return (

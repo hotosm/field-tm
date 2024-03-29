@@ -8,7 +8,6 @@ import AssetModules from '@/shared/AssetModules';
 // import { styled, alpha } from '@mui/material';
 
 import Avatar from '@/assets/images/avatar.png';
-import environment from '@/environment';
 import { ProjectSubmissionService } from '@/api/SubmissionService';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
@@ -28,41 +27,37 @@ const TasksSubmission = () => {
   // const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   // const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const params = CoreModules.useParams();
-  const encodedProjectId = params.projectId;
-  const decodedProjectId = environment.decode(encodedProjectId);
-  const encodedTaskId = params.taskId;
-  const decodedTaskId = environment.decode(encodedTaskId);
+  const projectId = params.projectId;
+  const taskId = params.taskId;
   // const theme = CoreModules.useAppSelector(state => state.theme.hotTheme)
   useEffect(() => {
     dispatch(
-      ProjectSubmissionService(
-        `${import.meta.env.VITE_API_URL}/submission/?project_id=${decodedProjectId}&task_id=${decodedTaskId}`,
-      ),
+      ProjectSubmissionService(`${import.meta.env.VITE_API_URL}/submission/?project_id=${projectId}&task_id=${taskId}`),
     );
     // dispatch(
     //   ProjectDataExtractService(
-    //     `${import.meta.env.VITE_API_URL}/projects/${decodedProjectId}/features?task_id=${decodedTaskId}`,
+    //     `${import.meta.env.VITE_API_URL}/projects/${projectId}/features?task_id=${taskId}`,
     //   ),
     // );
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
   //Fetch project for the first time
   useEffect(() => {
-    if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedProjectId)) == -1) {
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));
+    if (state.projectTaskBoundries.findIndex((project) => project.id == projectId) == -1) {
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
       // dispatch(
       //   ProjectDataExtractService(
-      //     `${import.meta.env.VITE_API_URL}/projects/${environment.decode(encodedProjectId)}/features`,
+      //     `${import.meta.env.VITE_API_URL}/projects/${projectId}/features`,
       //   ),
       // );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedProjectId)));
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
     } else {
-      if (state.projectInfo.id != environment.decode(encodedProjectId)) {
+      if (state.projectInfo.id != projectId) {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }
@@ -77,7 +72,7 @@ const TasksSubmission = () => {
       ...basicGeojsonTemplate,
       features: [
         ...projectTaskBoundries?.[0]?.taskBoundries
-          ?.filter((task) => task.id === decodedTaskId)
+          ?.filter((task) => task.id == taskId)
           .map((task) => ({
             ...task.outline_geojson,
             id: task.outline_geojson.properties.uid,
@@ -91,7 +86,7 @@ const TasksSubmission = () => {
       ...basicGeojsonTemplate,
       features: [
         ...projectBuildingGeojson
-          ?.filter((task) => task.task_id === decodedTaskId)
+          ?.filter((task) => task.task_id == taskId)
           .map((task) => ({ ...task.geometry, id: task.id })),
       ],
       // features: projectBuildingGeojson.map((feature) => ({ ...feature.geometry, id: feature.id }))
@@ -144,7 +139,7 @@ const TasksSubmission = () => {
         getDownloadProjectSubmission(
           `${
             import.meta.env.VITE_API_URL
-          }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=false`,
+          }/submission/download?project_id=${projectId}&task_id=${taskId}&export_json=false`,
         ),
       );
     } else if (downloadType === 'json') {
@@ -152,7 +147,7 @@ const TasksSubmission = () => {
         getDownloadProjectSubmission(
           `${
             import.meta.env.VITE_API_URL
-          }/submission/download?project_id=${decodedProjectId}&task_id=${decodedTaskId}&export_json=true`,
+          }/submission/download?project_id=${projectId}&task_id=${taskId}&export_json=true`,
         ),
       );
     }
@@ -241,7 +236,7 @@ const TasksSubmission = () => {
                   key={submission.id}
                   style={{ textDecoration: 'auto' }}
                   className="submission-item"
-                  to={`/project/${encodedProjectId}/tasks/${encodedTaskId}/submission/${submission.instanceId}`}
+                  to={`/project/${projectId}/tasks/${taskId}/submission/${submission.instanceId}`}
                 >
                   <CoreModules.Box
                     sx={{

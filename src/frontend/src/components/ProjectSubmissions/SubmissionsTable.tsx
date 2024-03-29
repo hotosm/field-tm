@@ -5,7 +5,6 @@ import windowDimention from '@/hooks/WindowDimension';
 import Table, { TableHeader } from '@/components/common/CustomTable';
 import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
 import CoreModules from '@/shared/CoreModules.js';
-import environment from '@/environment';
 import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader.js';
 import { Loader2 } from 'lucide-react';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
@@ -46,8 +45,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const params = CoreModules.useParams();
   const navigate = useNavigate();
 
-  const encodedId = params.projectId;
-  const decodedId = environment.decode(encodedId);
+  const projectId = params.projectId;
   const submissionFormFields = useAppSelector((state) => state.submission.submissionFormFields);
   const submissionTableData = useAppSelector((state) => state.submission.submissionTableData);
   const submissionFormFieldsLoading = useAppSelector((state) => state.submission.submissionFormFieldsLoading);
@@ -96,21 +94,21 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     dispatch(
-      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${decodedId}`),
+      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${projectId}`),
     );
   }, []);
 
   useEffect(() => {
     if (!filter.task_id) {
       dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${decodedId}`, {
+        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
           page: paginationPage,
           ...filter,
         }),
       );
     } else {
       dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${decodedId}`, {
+        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${projectId}`, {
           page: paginationPage,
           ...filter,
         }),
@@ -124,19 +122,19 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const refreshTable = () => {
     dispatch(
-      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${decodedId}`),
+      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${projectId}`),
     );
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     if (!filter.task_id) {
       dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${decodedId}`, {
+        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
           page: paginationPage,
           ...filter,
         }),
       );
     } else {
       dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${decodedId}`, {
+        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${projectId}`, {
           page: paginationPage,
           ...filter,
         }),
@@ -198,7 +196,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const uploadToJOSM = () => {
     dispatch(
       ConvertXMLToJOSM(
-        `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${decodedId}`,
+        `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${projectId}`,
         projectInfo?.outline_geojson?.properties?.bbox,
       ),
     );
@@ -208,13 +206,13 @@ const SubmissionsTable = ({ toggleView }) => {
     if (downloadType === 'csv') {
       dispatch(
         getDownloadProjectSubmission(
-          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}&export_json=false`,
+          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=false`,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
         getDownloadProjectSubmissionJson(
-          `${import.meta.env.VITE_API_URL}/submission/download-submission?project_id=${decodedId}`,
+          `${import.meta.env.VITE_API_URL}/submission/download-submission?project_id=${projectId}`,
         ),
       );
     }
@@ -447,7 +445,7 @@ const SubmissionsTable = ({ toggleView }) => {
                 <AssetModules.VisibilityOutlinedIcon
                   className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
                   onClick={() => {
-                    navigate(`/project/${encodedId}/tasks/${row?.phonenumber}/submission/${row?.meta?.instanceID}`);
+                    navigate(`/project/${projectId}/tasks/${row?.phonenumber}/submission/${row?.meta?.instanceID}`);
                   }}
                 />{' '}
                 <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
