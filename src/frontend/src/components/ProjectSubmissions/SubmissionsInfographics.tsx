@@ -11,7 +11,6 @@ import {
   ProjectSubmissionInfographicsService,
   ValidatedVsMappedInfographicsService,
 } from '@/api/SubmissionService';
-import environment from '@/environment';
 import {
   submissionContributorsTypes,
   submissionInfographicsTypes,
@@ -96,8 +95,7 @@ const SubmissionsInfographics = ({ toggleView }) => {
   const dispatch = CoreModules.useAppDispatch();
 
   const params = CoreModules.useParams();
-  const encodedId = params.projectId;
-  const decodedId = environment.decode(encodedId);
+  const projectId = params.projectId;
 
   const submissionInfographicsData: submissionInfographicsTypes[] = CoreModules.useAppSelector(
     (state) => state.submission.submissionInfographics,
@@ -124,19 +122,19 @@ const SubmissionsInfographics = ({ toggleView }) => {
   useEffect(() => {
     dispatch(
       ProjectSubmissionInfographicsService(
-        `${import.meta.env.VITE_API_URL}/submission/submission_page/${decodedId}?days=${submissionProjection}`,
+        `${import.meta.env.VITE_API_URL}/submission/submission_page/${projectId}?days=${submissionProjection}`,
       ),
     );
   }, [submissionProjection]);
 
   useEffect(() => {
     dispatch(
-      ValidatedVsMappedInfographicsService(`${import.meta.env.VITE_API_URL}/tasks/activity/?project_id=${decodedId}`),
+      ValidatedVsMappedInfographicsService(`${import.meta.env.VITE_API_URL}/tasks/activity/?project_id=${projectId}`),
     );
   }, []);
 
   useEffect(() => {
-    dispatch(ProjectContributorsService(`${import.meta.env.VITE_API_URL}/projects/contributors/${decodedId}`));
+    dispatch(ProjectContributorsService(`${import.meta.env.VITE_API_URL}/projects/contributors/${projectId}`));
   }, []);
 
   const FormSubmissionSubHeader = () => (

@@ -19,7 +19,7 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
   const [task_status, set_task_status] = useState('READY');
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const params = CoreModules.useParams();
-  const currentProjectId = environment.decode(params.id);
+  const currentProjectId = params.id;
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
 

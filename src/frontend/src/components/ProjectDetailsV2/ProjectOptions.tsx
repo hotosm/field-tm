@@ -1,7 +1,6 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import environment from '@/environment';
 import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import Button from '@/components/common/Button';
@@ -20,31 +19,30 @@ const ProjectOptions = () => {
     (state) => state.project.downloadDataExtractLoading,
   );
 
-  const encodedId: string = params.id;
-  const decodedId: number = environment.decode(encodedId);
+  const projectId: string = params.id;
 
   const handleDownload = (downloadType) => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
-          `${import.meta.env.VITE_API_URL}/projects/download-form/${decodedId}/`,
+          `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}/`,
           downloadType,
-          decodedId,
+          projectId,
         ),
       );
     } else if (downloadType === 'geojson') {
       dispatch(
         DownloadProjectForm(
-          `${import.meta.env.VITE_API_URL}/projects/${decodedId}/download_tasks`,
+          `${import.meta.env.VITE_API_URL}/projects/${projectId}/download_tasks`,
           downloadType,
-          decodedId,
+          projectId,
         ),
       );
     }
   };
   const onDataExtractDownload = () => {
     dispatch(
-      DownloadDataExtract(`${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${decodedId}`),
+      DownloadDataExtract(`${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`),
     );
   };
   return (
@@ -108,7 +106,7 @@ const ProjectOptions = () => {
               Generate MbTiles
             </CoreModules.Button>
             <CoreModules.Button
-              onClick={() => navigate(`/manage-project/${encodedId}`)}
+              onClick={() => navigate(`/manage-project/${projectId}`)}
               variant="contained"
               color="error"
               sx={{ width: '200px', mr: '15px' }}
@@ -118,7 +116,7 @@ const ProjectOptions = () => {
               Manage Project
             </CoreModules.Button>
             <CoreModules.Button
-              onClick={() => navigate(`/project-submissions/${encodedId}`)}
+              onClick={() => navigate(`/project-submissions/${projectId}`)}
               variant="contained"
               color="error"
               sx={{ width: '200px', mr: '15px' }}

@@ -1,12 +1,11 @@
 import React from 'react';
 import IconButtonCard from '@/utilities/IconButtonCard';
-import environment from '@/environment';
 import { easeIn, easeOut } from 'ol/easing';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 //Activity Model to be display in Activities panel
 const Activities = ({ history, defaultTheme, mapDivPostion, map, view, state, params }) => {
-  const index = state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(params.id));
+  const index = state.projectTaskBoundries.findIndex((project) => project.id == params.id);
 
   return (
     <CoreModules.Stack minWidth={100} direction={'column'} spacing={1}>

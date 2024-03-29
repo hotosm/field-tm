@@ -6,7 +6,6 @@ import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.j
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
-import environment from '@/environment';
 import { fetchInfoTask } from '@/api/task';
 import { GetProjectDashboard } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
@@ -17,8 +16,7 @@ const ProjectSubmissions = () => {
   const params = CoreModules.useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const encodedId = params.projectId;
-  const decodedId = environment.decode(encodedId);
+  const projectId = params.projectId;
 
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
@@ -26,17 +24,17 @@ const ProjectSubmissions = () => {
   //Fetch project for the first time
   useEffect(() => {
     dispatch(ProjectActions.SetNewProjectTrigger());
-    if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
+    if (state.projectTaskBoundries.findIndex((project) => project.id == projectId) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
     } else {
-      if (state.projectInfo.id != environment.decode(encodedId)) {
+      if (state.projectInfo.id != projectId) {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }
@@ -44,13 +42,13 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/features/?project_id=${decodedId}`));
+      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/features/?project_id=${projectId}`));
     };
     fetchData();
   }, []);
 
   useEffect(() => {
-    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${decodedId}`));
+    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
   }, []);
 
   useEffect(() => {

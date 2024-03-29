@@ -6,7 +6,6 @@ import CoreModules from '@/shared/CoreModules';
 // import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '@/assets/images/avatar.png';
 // import SubmissionMap from '@/components/SubmissionMap/SubmissionMap';
-import environment from '@/environment';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
 
@@ -19,27 +18,26 @@ const Submissions = () => {
   // const projectTaskBoundries = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   // const projectBuildingGeojson = CoreModules.useAppSelector((state) => state.project.projectBuildingGeojson);
   const params = CoreModules.useParams();
-  const encodedId = params.id;
-  const decodedId = environment.decode(encodedId);
+  const projectId = params.id;
   // const theme = CoreModules.useAppSelector(state => state.theme.hotTheme)
   useEffect(() => {
-    dispatch(ProjectSubmissionService(`${import.meta.env.VITE_API_URL}/submission/?project_id=${decodedId}`));
-    // dispatch(ProjectDataExtractService(`${import.meta.env.VITE_API_URL}/projects/${decodedId}/features`));
+    dispatch(ProjectSubmissionService(`${import.meta.env.VITE_API_URL}/submission/?project_id=${projectId}`));
+    // dispatch(ProjectDataExtractService(`${import.meta.env.VITE_API_URL}/projects/${projectId}/features`));
     //creating a manual thunk that will make an API call then autamatically perform state mutation whenever we navigate to home page
   }, []);
 
   // Requesting Task Boundaries on Page Load
   useEffect(() => {
-    if (state.projectTaskBoundries.findIndex((project) => project.id == environment.decode(encodedId)) == -1) {
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
+    if (state.projectTaskBoundries.findIndex((project) => project.id == projectId) == -1) {
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, environment.decode(encodedId)));
+      dispatch(ProjectById(state.projectTaskBoundries, projectId));
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
     } else {
-      if (state.projectInfo.id != environment.decode(encodedId)) {
+      if (state.projectInfo.id != projectId) {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }
@@ -66,7 +64,7 @@ const Submissions = () => {
             <CoreModules.Button variant="contained" color="error">
               Convert
             </CoreModules.Button>
-            <a href={`${import.meta.env.VITE_API_URL}/submission/download?project_id=${decodedId}`} download>
+            <a href={`${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}`} download>
               <CoreModules.Button variant="contained" color="error">
                 Download CSV
               </CoreModules.Button>
