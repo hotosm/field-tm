@@ -42,6 +42,7 @@ import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import { readFileFromOPFS } from '@/api/Files';
 import DebugConsole from '@/utilities/DebugConsole';
+import { CustomCheckbox } from '@/components/common/Checkbox';
 
 const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -229,7 +230,6 @@ const Home = () => {
       return;
     }
 
-    console.log(projectOpfsBasemapPath);
     const opfsPmtilesData = await readFileFromOPFS(projectOpfsBasemapPath);
     setCustomBasemapData(opfsPmtilesData);
     // setCustomBasemapData(projectOpfsBasemapPath);
@@ -380,11 +380,14 @@ const Home = () => {
               }`}
             >
               {import.meta.env.MODE === 'development' && (
-                <div className="fmtm-absolute fmtm-top-16 fmtm-left-4 fmtm-z-50">
-                  <Button
-                    btnText="Toggle Console"
-                    btnType="secondary"
-                    onClick={() => setShowDebugConsole(!showDebugConsole)}
+                <div className="fmtm-block sm:fmtm-hidden fmtm-absolute fmtm-top-6 fmtm-left-16 fmtm-z-50">
+                  <CustomCheckbox
+                    label="Toggle-Console"
+                    checked={showDebugConsole}
+                    onCheckedChange={(status) => {
+                      setShowDebugConsole(status);
+                    }}
+                    className="fmtm-text-black !fmtm-w-full"
                   />
                 </div>
               )}

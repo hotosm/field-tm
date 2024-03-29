@@ -463,7 +463,7 @@ const ValidateCustomForm: Function = (url: string, formUpload: any) => {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: JSON.stringify(error.response.data.detail) || 'Something Went Wrong',
+            message: JSON.stringify(error) || 'Something Went Wrong',
             variant: 'error',
             duration: 5000,
           }),
