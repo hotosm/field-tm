@@ -17,6 +17,7 @@ import {
   taskDataTypes,
   validatedVsMappedInfographicsTypes,
 } from '@/models/submission/submissionModel';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const lineKeyData = [
   {
@@ -88,6 +89,7 @@ const lineKeyData = [
 ];
 
 const SubmissionsInfographics = ({ toggleView }) => {
+  useDocumentTitle('Submission Infographics');
   const formSubmissionRef = useRef(null);
   const projectProgressRef = useRef(null);
   const totalContributorsRef = useRef(null);

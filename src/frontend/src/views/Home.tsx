@@ -9,8 +9,10 @@ import CoreModules from '@/shared/CoreModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import { projectType } from '@/models/home/homeModel';
 import { useAppSelector } from '@/types/reduxTypes';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const Home = () => {
+  useDocumentTitle('Explore Projects');
   const dispatch = CoreModules.useAppDispatch();
 
   const { type } = windowDimention();

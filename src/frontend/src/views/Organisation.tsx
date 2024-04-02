@@ -8,8 +8,10 @@ import OrganisationGridCard from '@/components/organisation/OrganisationGridCard
 import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
 import { useAppSelector } from '@/types/reduxTypes';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const Organisation = () => {
+  useDocumentTitle('Organizations');
   const dispatch = CoreModules.useAppDispatch();
   //dispatch function to perform redux state mutation
 

@@ -10,8 +10,10 @@ import { useDispatch } from 'react-redux';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { useAppSelector } from '@/types/reduxTypes';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ConsentDetailsForm = () => {
+  useDocumentTitle('Consent Details Form');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
