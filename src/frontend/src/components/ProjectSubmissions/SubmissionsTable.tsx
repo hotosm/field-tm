@@ -21,6 +21,7 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateRevie
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 type filterType = {
   task_id: string | null;
@@ -30,6 +31,7 @@ type filterType = {
 };
 
 const SubmissionsTable = ({ toggleView }) => {
+  useDocumentTitle('Submission Table');
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilterState: filterType = {

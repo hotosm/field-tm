@@ -13,8 +13,10 @@ import SelectFormValidation from '@/components/createnewproject/validation/Selec
 import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectService';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { CustomCheckbox } from '../common/Checkbox';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
+  useDocumentTitle('Create Project: Select Category');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

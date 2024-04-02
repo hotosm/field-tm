@@ -20,6 +20,7 @@ import {
 import { Modal } from '@/components/common/Modal';
 import ProgressBar from '@/components/common/ProgressBar';
 import { task_split_type } from '@/types/enums';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const alogrithmList = [
   { name: 'define_tasks', value: task_split_type['divide_on_square'].toString(), label: 'Divide on square' },
@@ -33,6 +34,7 @@ const alogrithmList = [
 let generateProjectLogIntervalCb: any = null;
 
 const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload, customFormFile }) => {
+  useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

@@ -4,6 +4,7 @@ import AssetModules from '../../../shared/AssetModules.js';
 import Chips from '../../common/Chips';
 import { CustomSelect } from '../../common/Select';
 import Button from '../..//common/Button';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const roleList = [
   { label: 'Project Manger', value: 'project_manager' },
@@ -11,6 +12,7 @@ const roleList = [
   { label: 'Supervisor', value: 'supervisor' },
 ];
 const AssignTab = () => {
+  useDocumentTitle('Manage Project: Assign User');
   const [user, setUser] = useState<string | null>('');
   const [assignUser, setAssignUser] = useState<string[]>([]);
   const [assignedRole, setAssignedRole] = useState<string>('');

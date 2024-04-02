@@ -113,6 +113,14 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
     handleCustomChange('fillODKCredentials', false);
   }, []);
 
+  useEffect(() => {
+    if (organizationId) {
+      document.title = 'Edit Organization - Field Mapping Tasking Manager';
+    } else {
+      document.title = 'Add Organization - Field Mapping Tasking Manager';
+    }
+  }, []);
+
   return (
     <div
       className={`fmtm-flex ${

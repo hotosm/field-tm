@@ -1,8 +1,10 @@
 import React from 'react';
 import ApproveOrganizationHeader from '@/components/ApproveOrganization/ApproveOrganizationHeader';
 import OrganizationForm from '@/components/ApproveOrganization/OrganizationForm';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ApproveOrganization = () => {
+  useDocumentTitle('Approve Organization');
   return (
     <div className="fmtm-bg-[#F5F5F5]">
       <ApproveOrganizationHeader />

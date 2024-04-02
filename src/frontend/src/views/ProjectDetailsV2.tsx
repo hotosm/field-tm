@@ -43,8 +43,10 @@ import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import { readFileFromOPFS } from '@/api/Files';
 import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const Home = () => {
+  useDocumentTitle('Project Details');
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
@@ -77,6 +79,14 @@ const Home = () => {
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const projectOpfsBasemapPath = useAppSelector((state) => state?.project?.projectOpfsBasemapPath);
+
+  useEffect(() => {
+    if (state.projectInfo.title) {
+      document.title = `${state.projectInfo.title} - HOT Field Mapping Tasking Manager`;
+    } else {
+      document.title = 'HOT Field Mapping Tasking Manager';
+    }
+  }, [state.projectInfo.title]);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {

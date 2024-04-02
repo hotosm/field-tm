@@ -15,6 +15,7 @@ import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
 import { valid } from 'geojson-validation';
 import { DivideSquareIcon } from 'lucide-react';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const uploadAreaOptions = [
   {
@@ -32,6 +33,7 @@ const uploadAreaOptions = [
 ];
 
 const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload }) => {
+  useDocumentTitle('Create Project: Upload Area');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // const [uploadAreaFile, setUploadAreaFile] = useState(null);

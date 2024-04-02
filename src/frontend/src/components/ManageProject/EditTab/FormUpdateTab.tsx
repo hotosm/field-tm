@@ -9,6 +9,7 @@ import { PostFormUpdate } from '@/api/CreateProjectService';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { Loader2 } from 'lucide-react';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 type FileType = {
   id: string;
@@ -18,6 +19,7 @@ type FileType = {
 };
 
 const FormUpdateTab = ({ projectId }) => {
+  useDocumentTitle('Manage Project: Form Update');
   const dispatch = CoreModules.useAppDispatch();
 
   const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);

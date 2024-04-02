@@ -13,6 +13,7 @@ import { FormCategoryService } from '@/api/CreateProjectService';
 import FileInputComponent from '@/components/common/FileInputComponent';
 import DataExtractValidation from '@/components/createnewproject/validation/DataExtractValidation';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Use OSM data extract' },
@@ -20,9 +21,9 @@ const dataExtractOptions = [
 ];
 
 const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload }) => {
+  useDocumentTitle('Create Project: Data Extract');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(customDataExtractUpload, 'customDataExtractUpload');
   const [extractWays, setExtractWays] = useState('');
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);

@@ -14,8 +14,10 @@ import { OrganisationService } from '@/api/CreateProjectService';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationDropdownType } from '@/models/createproject/createProjectModel';
 import RichTextEditor from '@/components/common/Editor/Editor';
+import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ProjectDetailsForm = ({ flag }) => {
+  useDocumentTitle('Create Project: Project Details');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
