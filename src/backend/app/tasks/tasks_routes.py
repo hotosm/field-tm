@@ -248,7 +248,9 @@ async def task_activity(
 
     """
     end_date = datetime.now() - timedelta(days=days)
-    task_history = await tasks_crud.get_project_task_history(project_id, end_date, db)
+    task_history = await tasks_crud.get_project_task_history(
+        project_id, False, end_date, None, db
+    )
 
     return await tasks_crud.count_validated_and_mapped_tasks(
         task_history,
