@@ -18,7 +18,7 @@
 """Logic for FMTM tasks."""
 
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import Depends, HTTPException
 from loguru import logger as log
@@ -314,29 +314,17 @@ async def add_task_comments(
 
 
 async def update_task_history(
-    tasks: List[tasks_schemas.Task], db: Session = Depends(database.get_db)
+    task: db_models.DbTaskHistory, db: Session = Depends(database.get_db)
 ):
     """Update task history with username and user profile image."""
-
-    def process_history_entry(history_entry):
-        status = history_entry.action_text.split()
-        history_entry.status = status[5]
-
-        if history_entry.user_id:
-            user = (
-                db.query(db_models.DbUser).filter_by(id=history_entry.user_id).first()
-            )
-            if user:
-                history_entry.username = user.username
-                history_entry.profile_img = user.profile_img
-
-    for task in tasks if isinstance(tasks, list) else [tasks]:
-        task_history = task.task_history
-        if isinstance(task_history, list):
-            for history_entry in task_history:
-                process_history_entry(history_entry)
-
-    return tasks
+    status = task.action_text.split()
+    task.status = status[5]
+    if user_id := task.user_id:
+        user = db.query(db_models.DbUser).filter_by(id=user_id).first()
+        if user:
+            task.username = user.username
+            task.profile_img = user.profile_img
+    return task
 
 
 async def get_project_task_history(
@@ -361,8 +349,12 @@ async def get_project_task_history(
     Returns:
         A list of task history records for the specified project.
     """
-    query = f"""SELECT *
+    query = f"""
+                SELECT task_history.task_id, task_history.action_text,
+                    task_history.action_date, users.username,
+                    users.profile_img
                     FROM task_history
+                    LEFT JOIN users on users.id = task_history.user_id
                     WHERE project_id = {project_id}
                     AND  action_date >= '{end_date}'
             """
@@ -375,13 +367,12 @@ async def get_project_task_history(
     result = db.execute(text(query)).fetchall()
     task_history = [
         {
-            "id": row[0],
-            "project_id": row[1],
-            "task_id": row[2],
-            "action": row[3],
-            "action_text": row[4],
-            "action_date": row[5],
-            "status": None if comment else row[4].split()[5],
+            "task_id": row[0],
+            "action_text": row[1],
+            "action_date": row[2],
+            "status": None if comment else row[1].split()[5],
+            "username": row[3],
+            "profile_img": row[4],
         }
         for row in result
     ]
