@@ -153,7 +153,7 @@ class Settings(BaseSettings):
                 return f"http://s3.{fmtm_domain}:{dev_port}"
             return f"https://s3.{fmtm_domain}"
 
-    UNDERPASS_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1/"
+    UNDERPASS_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(
