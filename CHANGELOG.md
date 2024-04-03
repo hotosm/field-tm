@@ -1,5 +1,55 @@
 # Changelog
 
+## 2024.2.0 (2024-04-03)
+
+### Feat
+
+- OPFS-based offline-first PMTile basemaps (#1395)
+- endpoint to check the validity of login cookie (#1380)
+- add link to custom ODK Collect build in sidebar menu
+- toggleable debug console on mobile in local/dev/stage (#1371)
+- handle geo orientation crash firefox & safari (#1381)
+- raw sql replacing sqlalchemy in auth/me endpoint (#1334)
+- added marker blue dot
+- navigation icon changes
+- uploadArea edit AOI btn add (#1346)
+- navigation WIP
+- submission review status modal (#1246)
+
+### Fix
+
+- default UNDERPASS_API_URL no trailing slash
+- post message added undefined check
+- vite test
+- hotfix add top level id to geojson with it missing
+- replace custom pyxform with multi-stage bytesio usage
+- hotfix add top level id to geojson with it missing
+- reduce length of random id generated for data extract
+- fix random integer generation if missing in data extract
+- update user profile image (#1373)
+- log event for sensor
+- ui for basemap gen, tooltip titles (#1363)
+- blank space input validation (#1362)
+- issues on project summaries with no centroids
+- remove add org btn, redirect for submissions page (#1332)
+- **hotfix**: use centroids for extract division by task area (#1336)
+- return db user instead of auth user on /auth/me (#1247)
+- reduce length of random id generated for data extract
+- fix random integer generation if missing in data extract
+- **hotfix**: use centroids for extract division by task area (#1336)
+- default UNDERPASS_API_URL no trailing slash
+- hotfix add top level id to geojson with it missing
+- reduce length of random id generated for data extract
+- fix random integer generation if missing in data extract
+- **hotfix**: use centroids for extract division by task area (#1336)
+- **hotfix**: use centroids for extract division by task area
+
+### Refactor
+
+- separate response for comment and task status history (#1391)
+- update submission in s3 even if reviewstate is updated (#1379)
+- updated the version of fmtm-splitter -> 1.2.1 (#1375)
+
 ## 2024.1.0 (2024-03-05)
 
 ### Feat
