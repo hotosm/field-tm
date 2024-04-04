@@ -22,7 +22,6 @@ import os
 import subprocess
 import uuid
 from asyncio import gather
-from concurrent.futures import ThreadPoolExecutor, wait
 from importlib.resources import files as pkg_files
 from io import BytesIO
 from typing import List, Optional, Union
@@ -42,7 +41,9 @@ from loguru import logger as log
 from osm_fieldwork.basemapper import create_basemap_file
 from osm_fieldwork.json2osm import json2osm
 from osm_fieldwork.OdkCentral import OdkAppUser
+from osm_fieldwork.OdkCentralAsync import OdkEntity
 from osm_fieldwork.xlsforms import xlsforms_path
+from osm_fieldwork.xlsforms.entities import registration_form
 from osm_rawdata.postgres import PostgresClient
 from shapely import wkt
 from shapely.geometry import (
@@ -56,7 +57,6 @@ from sqlalchemy.orm import Session
 from app.central import central_crud
 from app.config import encrypt_value, settings
 from app.db import db_models
-from app.db.database import get_db
 from app.db.postgis_utils import (
     check_crs,
     flatgeobuf_to_geojson,
@@ -66,6 +66,7 @@ from app.db.postgis_utils import (
     get_featcol_main_geom_type,
     parse_and_filter_geojson,
     split_geojson_by_task_areas,
+    task_geojson_dict_to_entity_values,
 )
 from app.models.enums import HTTPStatus, ProjectRole
 from app.projects import project_deps, project_schemas
@@ -582,202 +583,6 @@ async def update_project_boundary(
     return True
 
 
-# TODO delete me (does not handle ODK project too)
-# async def update_project_with_zip(
-#     db: Session,
-#     project_id: int,
-#     project_name_prefix: str,
-#     task_type_prefix: str,
-#     uploaded_zip: UploadFile,
-# ):
-#     """Update a project from a zip file.
-
-#     TODO ensure that logged in user is user who created this project,
-#     return 403 (forbidden) if not authorized.
-#     """
-#     QR_CODES_DIR = "QR_codes/"
-#     TASK_GEOJSON_DIR = "geojson/"
-
-#     # ensure file upload is zip
-#     if uploaded_zip.content_type not in [
-#         "application/zip",
-#         "application/zip-compressed",
-#         "application/x-zip-compressed",
-#     ]:
-#         raise HTTPException(
-#             status_code=415,
-#             detail=(
-#                   "File must be a zip. Uploaded file was "
-#                   f"{uploaded_zip.content_type}",
-#         ))
-
-#     with zipfile.ZipFile(io.BytesIO(uploaded_zip.file.read()), "r") as zip:
-#         # verify valid zip file
-#         bad_file = zip.testzip()
-#         if bad_file:
-#             raise HTTPException(
-#                 status_code=400, detail=f"Zip contained a bad file: {bad_file}"
-#             )
-
-#         # verify zip includes top level files & directories
-#         listed_files = zip.namelist()
-
-#         if QR_CODES_DIR not in listed_files:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=f"Zip must contain directory named {QR_CODES_DIR}",
-#             )
-
-#         if TASK_GEOJSON_DIR not in listed_files:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=f"Zip must contain directory named {TASK_GEOJSON_DIR}",
-#             )
-
-#         outline_filename = f"{project_name_prefix}.geojson"
-#         if outline_filename not in listed_files:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=(
-#                     f"Zip must contain file named '{outline_filename}' "
-#                     "that contains a FeatureCollection outlining the project"
-#                 ),
-#             )
-
-#         task_outlines_filename = f"{project_name_prefix}_polygons.geojson"
-#         if task_outlines_filename not in listed_files:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=(
-#                     f"Zip must contain file named '{task_outlines_filename}' "
-#                     "that contains a FeatureCollection where each Feature "
-#                     "outlines a task"
-#                 ),
-#             )
-
-#         # verify project exists in db
-#         db_project = await get_project_by_id(db, project_id)
-#         if not db_project:
-#             raise HTTPException(
-#                 status_code=428, detail=f"Project with id {project_id} does not exist"
-#             )
-
-#         # add prefixes
-#         db_project.project_name_prefix = project_name_prefix
-#         db_project.task_type_prefix = task_type_prefix
-
-#         # generate outline from file and add to project
-#         outline_shape = await get_outline_from_geojson_file_in_zip(
-#             zip, outline_filename, f"Could not generate Shape from {outline_filename}"
-#         )
-#         await update_project_location_info(db_project, outline_shape.wkt)
-
-#         # get all task outlines from file
-#         project_tasks_feature_collection = await get_json_from_zip(
-#             zip,
-#             task_outlines_filename,
-#             f"Could not generate FeatureCollection from {task_outlines_filename}",
-#         )
-
-#         # TODO move me if required
-#         async def get_dbqrcode_from_file(zip, qr_filename: str, error_detail: str):
-#             """Get qr code from database during import."""
-#             try:
-#                 with zip.open(qr_filename) as qr_file:
-#                     binary_qrcode = qr_file.read()
-#                     if binary_qrcode:
-#                         return db_models.DbQrCode(
-#                             filename=qr_filename,
-#                             image=binary_qrcode,
-#                         )
-#                     else:
-#                         raise HTTPException(
-#                             status_code=400, detail=f"{qr_filename} is an empty file"
-#                         ) from None
-#             except Exception as e:
-#                 log.exception(e)
-#                 raise HTTPException(
-#                     status_code=400, detail=f"{error_detail} ----- Error: {e}"
-#                 ) from e
-
-#         # generate task for each feature
-#         try:
-#             task_count = 0
-#             db_project.total_tasks = len(project_tasks_feature_collection["features"])
-#             for feature in project_tasks_feature_collection["features"]:
-#                 task_name = feature["properties"]["task"]
-
-#                 # TODO remove qr code entry to db
-#                 # TODO replace with entry to tasks.odk_token
-#                 # generate and save qr code in db
-#                 db_qr = await get_dbqrcode_from_file(
-#                     zip,
-#                     QR_CODES_DIR + qr_filename,
-#                     (
-#                         f"QRCode for task {task_name} does not exist. "
-#                         f"File should be in {qr_filename}"
-#                     ),
-#                 )
-#                 db.add(db_qr)
-
-#                 # save outline
-#                 task_outline_shape = await get_shape_from_json_str(
-#                     feature,
-#                     f"Could not create task outline for {task_name} using {feature}",
-#                 )
-
-#                 # extract task geojson
-#                 task_geojson_filename = (
-#                     f"{project_name_prefix}_{task_type_prefix}__{task_name}.geojson"
-#                 )
-#                 task_geojson = await get_json_from_zip(
-#                     zip,
-#                     TASK_GEOJSON_DIR + task_geojson_filename,
-#                     f"Geojson for task {task_name} does not exist",
-#                 )
-
-#                 # generate qr code id first
-#                 db.flush()
-#                 # save task in db
-#                 task = db_models.DbTask(
-#                     project_id=project_id,
-#                     project_task_index=feature["properties"]["fid"],
-#                     project_task_name=task_name,
-#                     qr_code=db_qr,
-#                     qr_code_id=db_qr.id,
-#                     outline=task_outline_shape.wkt,
-#                     # geometry_geojson=json.dumps(task_geojson),
-#                     feature_count=len(task_geojson["features"]),
-#                 )
-#                 db.add(task)
-
-#                 # for error messages
-#                 task_count = task_count + 1
-#             db_project.last_updated = timestamp()
-
-#             db.commit()
-#             # should now include outline, geometry and tasks
-#             db.refresh(db_project)
-
-#             return db_project
-
-#         # Exception was raised by app logic and has an error message,
-#         # just pass it along
-#         except HTTPException as e:
-#             log.error(e)
-#             raise e from None
-
-#         # Unexpected exception
-#         except Exception as e:
-#             raise HTTPException(
-#                 status_code=500,
-#                 detail=(
-#                     f"{task_count} tasks were created before the "
-#                     f"following error was thrown: {e}, on feature: {feature}"
-#                 ),
-#             ) from e
-
-
 # ---------------------------
 # ---- SUPPORT FUNCTIONS ----
 # ---------------------------
@@ -800,7 +605,7 @@ async def read_xlsforms(
             else:
                 continue
 
-    inspect(db_models.DbXForm)
+    inspect(db_models.DbXLSForm)
     forms = table(
         "xlsforms", column("title"), column("xls"), column("xml"), column("id")
     )
@@ -1073,119 +878,7 @@ def flatten_dict(d, parent_key="", sep="_"):
     return items
 
 
-# NOTE defined as non-async to run in separate thread
-def generate_task_files(
-    db: Session,
-    project_id: int,
-    odk_id,
-    task_id: int,
-    data_extract: FeatureCollection,
-    xform_name: str,
-    xform_data: BytesIO,
-    odk_credentials: project_schemas.ODKCentralDecrypted,
-):
-    """Generate all files for a task.
-
-    TODO refactor to pass through a dict project variables, instead of DB connection.
-    TODO All required vars could be genrated from the DB first before
-    """
-    project_log = log.bind(task="create_project", project_id=project_id)
-
-    project_log.info(f"Generating files for task {task_id}")
-
-    # NOTE START create ODK Central appuser and form
-
-    # Create an app user for the task
-    project_log.info(
-        f"Creating odkcentral app user ({xform_name}) "
-        f"for FMTM task ({task_id}) in FMTM project ({project_id})"
-    )
-    appuser = OdkAppUser(
-        odk_credentials.odk_central_url,
-        odk_credentials.odk_central_user,
-        odk_credentials.odk_central_password,
-    )
-    appuser_json = appuser.create(odk_id, xform_name)
-
-    # If app user could not be created, raise an exception.
-    if not appuser_json:
-        project_log.error(f"Couldn't create appuser {xform_name} for project")
-        return False
-    if not (appuser_token := appuser_json.get("token")):
-        project_log.error(f"Couldn't get token for appuser {xform_name}")
-        return False
-
-    # Create memory object from split data extract
-    geojson_string = geojson.dumps(data_extract)
-    geojson_bytes = geojson_string.encode("utf-8")
-    geojson_data = BytesIO(geojson_bytes)
-
-    project_log.info(f"Generating xform from for task: ({task_id})")
-
-    # This is where the ODK form name and geojson media name are set
-    update_xform_sync = async_to_sync(central_crud.update_xform_info)
-    updated_xform = update_xform_sync(
-        xform_data,
-        xform_name,
-        f"{xform_name}.geojson",
-    )
-
-    # Create an odk xform
-    project_log.info(f"Uploading data extract media to task ({task_id})")
-    xform_name = central_crud.create_odk_xform(
-        odk_id,
-        updated_xform,
-        f"{xform_name}.geojson",
-        geojson_data,
-        odk_credentials,
-    )
-
-    project_log.info(f"Updating xform role for appuser in task {task_id}")
-    # Update the user role for the created xform
-    response = appuser.updateRole(
-        projectId=odk_id, xform=xform_name, actorId=appuser_json.get("id")
-    )
-    if not response.ok:
-        try:
-            json_data = response.json()
-            log.error(json_data)
-        except json.decoder.JSONDecodeError:
-            log.error(
-                "Could not parse response json during appuser update. "
-                f"status_code={response.status_code}"
-            )
-        finally:
-            msg = f"Failed to update appuser for form: ({xform_name})"
-            log.error(msg)
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-            ) from None
-
-    # NOTE ODK Central creation complete, update task in database
-
-    # Get task entry from db
-    get_task_sync = async_to_sync(tasks_crud.get_task)
-    task = get_task_sync(db, task_id)
-
-    # Add odk_token to task
-    odk_url = odk_credentials.odk_central_url
-    log.debug(f"Setting odk token for task ({task_id}) on server: {odk_url}")
-    task.odk_token = encrypt_value(
-        f"{odk_url}/v1/key/{appuser_token}/projects/{odk_id}"
-    )
-
-    # Add task feature count to task
-    task.feature_count = len(data_extract.get("features", []))
-    log.debug(f"({task.feature_count}) features added for task ({task_id})")
-
-    # Commit database after final task record update
-    db.commit()
-
-    return True
-
-
-# NOTE defined as non-async to run in separate thread
-def generate_project_files(
+async def generate_project_files(
     db: Session,
     project_id: int,
     custom_form: Optional[BytesIO],
@@ -1206,20 +899,16 @@ def generate_project_files(
         - background_task_id: the task_id of the background task running this function.
     """
     try:
-        project_log = log.bind(task="create_project", project_id=project_id)
+        log.info(f"Starting generate_project_files for project {project_id}")
 
-        project_log.info(f"Starting generate_project_files for project {project_id}")
-
-        get_project_sync = async_to_sync(get_project)
-        project = get_project_sync(db, project_id)
+        project = await get_project(db, project_id)
         if not project:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail=f"Project with id {project_id} does not exist",
             )
 
-        odk_sync = async_to_sync(project_deps.get_odk_credentials)
-        odk_credentials = odk_sync(db, project_id)
+        odk_credentials = await project_deps.get_odk_credentials(db, project_id)
 
         if custom_form:
             log.debug("User provided custom XLSForm")
@@ -1241,81 +930,160 @@ def generate_project_files(
             #     else updated_data_extract
             # )
 
-        # Generating QR Code, XForm and uploading OSM Extracts to the form.
-        # Creating app users and updating the role of that user.
-
         # Extract data extract from flatgeobuf
-        feat_project_features_sync = async_to_sync(get_project_features_geojson)
-        feature_collection = feat_project_features_sync(db, project)
+        log.debug("Getting data extract geojson from flatgeobuf")
+        feature_collection = await get_project_features_geojson(db, project)
 
         # Split extract by task area
-        split_geojson_sync = async_to_sync(split_geojson_by_task_areas)
-        task_extract_dict = split_geojson_sync(db, feature_collection, project_id)
+        log.debug("Splitting data extract per task area")
+        task_extract_dict = await split_geojson_by_task_areas(
+            db, feature_collection, project_id
+        )
 
         if not task_extract_dict:
-            log.warning("Project ({project_id}) failed splitting tasks")
+            log.warning(f"Project ({project_id}) failed splitting tasks")
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                 detail="Failed splitting extract by tasks.",
             )
-
-        # Convert XLSForm --> XForm for all tasks
-        read_xform_sync = async_to_sync(central_crud.read_and_test_xform)
-        xform_data = read_xform_sync(xlsform, form_file_ext, return_form_data=True)
 
         # Get project name for XForm name
         project_name = project.project_name_prefix
         # Get ODK Project ID
         project_odk_id = project.odkid
 
-        # Run with expensive task via threadpool
-        def wrap_generate_task_files(task_id):
-            """Func to wrap and return errors from thread.
+        # Create an app user (i.e. QR Code) for the project
+        log.info(
+            f"Creating odkcentral app user ({project_name}) "
+            f"for FMTM project ({project_id})"
+        )
+        appuser = OdkAppUser(
+            odk_credentials.odk_central_url,
+            odk_credentials.odk_central_user,
+            odk_credentials.odk_central_password,
+        )
+        appuser_json = appuser.create(project_odk_id, project_name)
 
-            Also passes it's own database session for thread safety.
-            If we pass a single db session to multiple threads,
-            there may be inconsistencies or errors.
-            """
+        # If app user could not be created, raise an exception.
+        if not appuser_json:
+            log.error(f"Couldn't create appuser {project_name} for project")
+            return False
+        if not (appuser_token := appuser_json.get("token")):
+            log.error(f"Couldn't get token for appuser {project_name}")
+            return False
+        appuser_id = appuser_json.get("id")
+
+        # First upload entity registration form
+        with open(registration_form, "rb") as f:
+            reg_form_bytes = BytesIO(f.read())
+        # Convert XLSForm --> XForm
+        registration_form_data = await central_crud.read_and_test_xform(
+            reg_form_bytes, "xls", return_form_data=True
+        )
+        # Update fields in XML
+        updated_reg_xform = await central_crud.update_entity_registration_xform(
+            registration_form_data, form_category
+        )
+        # Upload entity registration XForm
+        log.info("Uploading Entity registration XForm to ODK Central")
+        central_crud.create_odk_xform(
+            project_odk_id,
+            updated_reg_xform,
+            odk_credentials,
+        )
+
+        # TODO in the future we may possibly support multiple forms per project.
+        # TODO to faciliate this we need to add the _{form_category} suffix and track.
+        # TODO this in the new xforms.category field/table.
+        xform_name_to_inject = project_name
+        task_ids = task_extract_dict.keys()
+        # Convert XLSForm --> XForm
+        xform_data = await central_crud.read_and_test_xform(
+            xlsform, form_file_ext, return_form_data=True
+        )
+        # This is where the ODK form name is set
+        updated_xform = await central_crud.update_survey_xform(
+            xform_data,
+            xform_name_to_inject,
+            form_category,
+            task_ids,
+        )
+        # Upload survey XForm
+        log.info("Uploading survey XForm to ODK Central")
+        xform_name = central_crud.create_odk_xform(
+            project_odk_id,
+            updated_xform,
+            odk_credentials,
+        )
+
+        log.info("Updating XForm role for appuser in ODK Central")
+        # Update the user role for the created xform
+        response = appuser.updateRole(
+            projectId=project_odk_id,
+            xform=xform_name,
+            actorId=appuser_id,
+        )
+        if not response.ok:
             try:
-                generate_task_files(
-                    next(get_db()),
-                    project_id,
-                    project_odk_id,
-                    task_id,
-                    task_extract_dict[task_id],
-                    f"{project_name}_task_{task_id}",
-                    xform_data,
-                    odk_credentials,
+                json_data = response.json()
+                log.error(json_data)
+            except json.decoder.JSONDecodeError:
+                log.error(
+                    "Could not parse response json during appuser update. "
+                    f"status_code={response.status_code}"
                 )
-            except Exception as e:
-                log.exception(str(e))
+            finally:
+                msg = f"Failed to update appuser for form: ({xform_name})"
+                log.error(msg)
+                raise HTTPException(
+                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                ) from None
 
-        # Use a ThreadPoolExecutor to run the synchronous code in threads
-        with ThreadPoolExecutor() as executor:
-            # Submit tasks to the thread pool
-            futures = [
-                executor.submit(wrap_generate_task_files, task_id)
-                for task_id in task_extract_dict.keys()
-            ]
-            # Wait for all tasks to complete
-            wait(futures)
+        odk_url = odk_credentials.odk_central_url
+
+        # NOTE ODK Central creation complete, update database
+        log.debug(f"Setting odk token for project ({project_id}) on server: {odk_url}")
+        project.odk_token = encrypt_value(
+            f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
+        )
+
+        for task in project.tasks:
+            # Add task feature count to task
+            task.feature_count = len(task_extract_dict[task.id].get("features", []))
+            log.debug(f"({task.feature_count}) features added for task ({task.id})")
+
+        # Commit all updated database records
+        db.commit()
+
+        # Map geojson to entities dict
+        entities_data_dict = await task_geojson_dict_to_entity_values(task_extract_dict)
+        # Create entities
+        async with OdkEntity(
+            url=odk_credentials.odk_central_url,
+            user=odk_credentials.odk_central_user,
+            passwd=odk_credentials.odk_central_password,
+        ) as odk_central:
+            entities = await odk_central.createEntities(
+                project_odk_id,
+                form_category,
+                entities_data_dict,
+            )
+            log.debug(f"Wrote entities for project ({project_id}): {entities}")
 
         if background_task_id:
             # Update background task status to COMPLETED
-            update_bg_task_sync = async_to_sync(
-                update_background_task_status_in_database
-            )
-            update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
+            await update_background_task_status_in_database(
+                db, background_task_id, 4
+            )  # 4 is COMPLETED
 
     except Exception as e:
         log.warning(str(e))
 
         if background_task_id:
             # Update background task status to FAILED
-            update_bg_task_sync = async_to_sync(
-                update_background_task_status_in_database
-            )
-            update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
+            await update_background_task_status_in_database(
+                db, background_task_id, 2, str(e)
+            )  # 2 is FAILED
         else:
             # Raise original error if not running in background
             raise e
@@ -1399,19 +1167,21 @@ async def get_project_features_geojson(
 
     with requests.get(data_extract_url) as response:
         if not response.ok:
+            msg = f"Download failed for data extract, project ({project_id})"
+            log.error(msg)
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Download failed for data extract, project ({project_id})",
+                detail=msg,
             )
+        log.debug("Converting download flatgeobuf to geojson")
         data_extract_geojson = await flatgeobuf_to_geojson(db, response.content)
 
     if not data_extract_geojson:
+        msg = "Failed to convert flatgeobuf --> geojson for " f"project ({project_id})"
+        log.error(msg)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=(
-                "Failed to convert flatgeobuf --> geojson for "
-                f"project ({project_id})"
-            ),
+            detail=msg,
         )
 
     # Split by task areas if task_id provided
@@ -1703,7 +1473,7 @@ async def update_background_task_status_in_database(
 #         # This file will store xml contents of an xls form.
 #         xform_path = Path(f"/tmp/{category}_{task_id}.xml")
 
-#         outfile = central_crud.update_xform_info(
+#         outfile = central_crud.update_survey_xform(
 #             xlsform, xform_path, form_type, category
 #         )
 

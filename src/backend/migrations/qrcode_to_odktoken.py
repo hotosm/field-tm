@@ -1,4 +1,7 @@
-"""Convert a QR Code image in Postgres to a Fernet encrypted odk_token URL."""
+"""Convert a QR Code image in Postgres to a Fernet encrypted odk_token URL.
+
+NOTE since 2024-04-04 database migrations, this will no longer work!
+"""
 
 import argparse
 import base64

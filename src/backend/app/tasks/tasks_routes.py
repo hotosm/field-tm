@@ -169,22 +169,15 @@ async def task_features_count(
         log.warning(msg)
         raise HTTPException(status_code=404, detail=msg)
 
-    feature_count_task_dict = {f"{record[0]}": record[1] for record in feature_counts}
-
-    project_name_prefix = project.project_name_prefix
-
-    for x in odk_details:
-        # Strip everything except task id from xmlFormId
-        task_id = f"{x['xmlFormId']}".strip(f"{project_name_prefix}_task_")
-
-        data.append(
-            {
-                "task_id": task_id,
-                "submission_count": x["submissions"],
-                "last_submission": x["lastSubmission"],
-                "feature_count": feature_count_task_dict[task_id],
-            }
-        )
+    data.extend(
+        {
+            "task_id": record[0],
+            "submission_count": odk_details[0]["submissions"],
+            "last_submission": odk_details[0]["lastSubmission"],
+            "feature_count": record[1],
+        }
+        for record in feature_counts
+    )
 
     return data
 

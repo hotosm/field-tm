@@ -207,23 +207,6 @@ const OrganisationService: Function = (url: string) => {
   };
 };
 
-const GenerateProjectLog: Function = (url: string, params: any) => {
-  return async (dispatch) => {
-    dispatch(CreateProjectActions.GenerateProjectLogLoading(true));
-
-    const getGenerateProjectLog = async (url, params) => {
-      try {
-        const getGenerateProjectLogResponse = await axios.get(url, { params });
-        const resp: OrganisationListModel = getGenerateProjectLogResponse.data;
-        dispatch(CreateProjectActions.SetGenerateProjectLog(resp));
-      } catch (error) {
-        dispatch(CreateProjectActions.GenerateProjectLogLoading(false));
-      }
-    };
-
-    await getGenerateProjectLog(url, params);
-  };
-};
 const GetDividedTaskFromGeojson: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(true));
@@ -521,7 +504,6 @@ export {
   FormCategoryService,
   GenerateProjectQRService,
   OrganisationService,
-  GenerateProjectLog,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
   GetIndividualProjectDetails,

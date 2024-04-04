@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/common/Button';
 import RadioButton from '@/components/common/RadioButton';
 import AssetModules from '@/shared/AssetModules.js';
@@ -6,19 +6,15 @@ import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { useNavigate } from 'react-router-dom';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
-import CoreModules from '@/shared/CoreModules';
 import useForm from '@/hooks/useForm';
 import DefineTaskValidation from '@/components/createnewproject/validation/DefineTaskValidation';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { useAppSelector } from '@/types/reduxTypes';
 import {
   CreateProjectService,
-  GenerateProjectLog,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
 } from '@/api/CreateProjectService';
-import { Modal } from '@/components/common/Modal';
-import ProgressBar from '@/components/common/ProgressBar';
 import { task_split_type } from '@/types/enums';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
@@ -31,17 +27,14 @@ const alogrithmList = [
     label: 'Task Splitting Algorithm',
   },
 ];
-let generateProjectLogIntervalCb: any = null;
 
 const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload, customFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [toggleStatus, setToggleStatus] = useState(false);
   const [taskGenerationStatus, setTaskGenerationStatus] = useState(false);
 
-  const divRef = useRef(null);
   const splitTasksSelection = useAppSelector((state) => state.createproject.splitTasksSelection);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
@@ -49,10 +42,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
 
   const generateQrSuccess = useAppSelector((state) => state.createproject.generateQrSuccess);
   const projectDetailsResponse = useAppSelector((state) => state.createproject.projectDetailsResponse);
-  const generateProjectLog = useAppSelector((state) => state.createproject.generateProjectLog);
   const dividedTaskGeojson = useAppSelector((state) => state.createproject.dividedTaskGeojson);
   const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
-  const generateProjectLogLoading = useAppSelector((state) => state.createproject.generateProjectLogLoading);
   const dividedTaskLoading = useAppSelector((state) => state.createproject.dividedTaskLoading);
   const taskSplittingGeojsonLoading = useAppSelector((state) => state.createproject.taskSplittingGeojsonLoading);
   const isTasksGenerated = useAppSelector((state) => state.createproject.isTasksGenerated);
@@ -185,33 +176,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       );
     }
   };
-  //Log Functions
   useEffect(() => {
     if (generateQrSuccess) {
-      if (generateProjectLogIntervalCb === null) {
-        dispatch(
-          GenerateProjectLog(`${import.meta.env.VITE_API_URL}/projects/generate-log/`, {
-            project_id: projectDetailsResponse?.id,
-            uuid: generateQrSuccess.task_id,
-          }),
-        );
-        setToggleStatus(true);
-      }
-    }
-  }, [generateQrSuccess]);
-  useEffect(() => {
-    if (generateQrSuccess && generateProjectLog?.status === 'FAILED') {
-      clearInterval(generateProjectLogIntervalCb);
-      dispatch(
-        CommonActions.SetSnackBar({
-          open: true,
-          message: `QR Generation Failed. ${generateProjectLog?.message}`,
-          variant: 'error',
-          duration: 10000,
-        }),
-      );
-    } else if (generateQrSuccess && generateProjectLog?.status === 'SUCCESS') {
-      clearInterval(generateProjectLogIntervalCb);
       const projectId = projectDetailsResponse?.id;
       dispatch(
         CommonActions.SetSnackBar({
@@ -221,35 +187,13 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
           duration: 2000,
         }),
       );
-      dispatch(CreateProjectActions.SetGenerateProjectLog(null));
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
       navigate(`/project_details/${projectId}`);
       dispatch(CreateProjectActions.ClearCreateProjectFormData());
       dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
     }
-    if (generateQrSuccess && generateProjectLog?.status === 'PENDING') {
-      if (generateProjectLogIntervalCb === null) {
-        generateProjectLogIntervalCb = setInterval(() => {
-          dispatch(
-            GenerateProjectLog(`${import.meta.env.VITE_API_URL}/projects/generate-log/`, {
-              project_id: projectDetailsResponse?.id,
-              uuid: generateQrSuccess.task_id,
-            }),
-          );
-        }, 5000);
-      }
-    }
-  }, [generateQrSuccess, generateProjectLog]);
+  }, [generateQrSuccess]);
 
-  useEffect(() => {
-    return () => {
-      clearInterval(generateProjectLogIntervalCb);
-      generateProjectLogIntervalCb = null;
-      dispatch(CreateProjectActions.SetGenerateProjectLog(null));
-    };
-  }, []);
-
-  // END
   const renderTraceback = (errorText: string) => {
     if (!errorText) {
       return null;
@@ -267,24 +211,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
   const totalSteps = dividedTaskGeojson?.features ? dividedTaskGeojson?.features?.length : parsedTaskGeojsonCount;
   return (
     <>
-      <Modal
-        className={`fmtm-w-[700px]`}
-        description={
-          <div>
-            <p className="fmtm-text-base">
-              Thank you for successfully completing the project setup. The QR code for each task is being generated at
-              the moment. This may take several minutes to process.
-            </p>
-            <div className="fmtm-p-10">
-              <ProgressBar totalSteps={totalSteps} currentStep={generateProjectLog?.progress} />
-            </div>
-          </div>
-        }
-        open={toggleStatus}
-        onOpenChange={(value) => {
-          setToggleStatus(value);
-        }}
-      />
       <form onSubmit={handleSubmit}>
         <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row">
           <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
@@ -400,7 +326,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
                     className="fmtm-font-bold"
                   />
                   <Button
-                    isLoading={projectDetailsLoading || generateProjectLogLoading}
+                    isLoading={projectDetailsLoading}
                     btnText="SUBMIT"
                     btnType="primary"
                     type="submit"
@@ -427,30 +353,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
                   hasEditUndo
                 />
               </div>
-              {generateProjectLog ? (
-                <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6  fmtm-h-[60vh] lg:fmtm-h-full">
-                  <Button btnText="Show Progress" btnType="primary" onClick={() => setToggleStatus(true)} />
-                  <CoreModules.Stack>
-                    <CoreModules.Stack sx={{ width: '100%', height: '48vh' }}>
-                      <div
-                        ref={divRef}
-                        style={{
-                          backgroundColor: 'black',
-                          color: 'white',
-                          padding: '10px',
-                          fontSize: '12px',
-                          whiteSpace: 'pre-wrap',
-                          fontFamily: 'monospace',
-                          overflow: 'auto',
-                          height: '100%',
-                        }}
-                      >
-                        {renderTraceback(generateProjectLog?.logs)}
-                      </div>
-                    </CoreModules.Stack>
-                  </CoreModules.Stack>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>

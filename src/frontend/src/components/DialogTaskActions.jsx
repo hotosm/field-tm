@@ -10,7 +10,8 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Dialog({ taskId, feature, map, view }) {
   const navigate = useNavigate();
-  const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const token = CoreModules.useAppSelector((state) => state.login.loginToken);
   const loading = CoreModules.useAppSelector((state) => state.common.loading);
   const [list_of_task_status, set_list_of_task_status] = useState([]);
@@ -21,9 +22,10 @@ export default function Dialog({ taskId, feature, map, view }) {
   const params = CoreModules.useParams();
   const currentProjectId = params.id;
   const currentTaskId = taskId;
+  const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const currentStatus = {
-    ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
+    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task.id == taskId;
     })?.[0],
   };
@@ -31,7 +33,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   useEffect(() => {
     if (projectIndex != -1) {
       const currentStatus = {
-        ...projectData[projectIndex].taskBoundries.filter((task) => {
+        ...taskBoundaryData[projectIndex].taskBoundries.filter((task) => {
           return task.id == taskId;
         })[0],
       };
@@ -46,7 +48,7 @@ export default function Dialog({ taskId, feature, map, view }) {
 
       set_list_of_task_status(tasksStatusList);
     }
-  }, [projectData, taskId, feature]);
+  }, [taskBoundaryData, taskId, feature]);
 
   const handleOnClick = (event) => {
     const status = task_priority_str[event.currentTarget.dataset.btnid];
@@ -58,7 +60,7 @@ export default function Dialog({ taskId, feature, map, view }) {
           ProjectTaskStatus(
             `${import.meta.env.VITE_API_URL}/tasks/${taskId}/new_status/${status}`,
             geoStyle,
-            projectData,
+            taskBoundaryData,
             currentProjectId,
             feature,
             map,
@@ -141,7 +143,13 @@ export default function Dialog({ taskId, feature, map, view }) {
             type="submit"
             className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
             onClick={() => {
-              document.location.href = 'intent://getodk.org/#Intent;scheme=app;package=org.odk.collect.android;end';
+              // XForm name is constructed from lower case project title with underscores
+              const projectName = projectInfo.title.toLowerCase().split(' ').join('_');
+              const projectCategory = projectInfo.xform_category;
+              const formName = `${projectName}_${projectCategory}`;
+              document.location.href = `odkcollect://form/${formName}?task_id=${taskId}`;
+              // TODO add this to each feature popup to pre-load a selected entity
+              // document.location.href = `odkcollect://form/${formName}?${geomFieldName}=${entityId}`;
             }}
           />
         </div>
