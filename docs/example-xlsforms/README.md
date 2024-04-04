@@ -8,6 +8,8 @@ organisations.
 ## Slum Building Assessment (Monrovia, Liberia)
 
 - [XLSForm](slum_assessment_survey.xlsx)
+- Generated with help from Slum Dwellers International and local partners in Monrovia.
+- [Detailed info about project](https://docs.google.com/document/d/1jzxDO922iVfFgf-Noz-AtA64T56G6kq8E6OO9V2swUE/edit#heading=h.oj17xl5txjet)
 
 ## Building Natural Hazard Assessment (Bali, Indonesia)
 
