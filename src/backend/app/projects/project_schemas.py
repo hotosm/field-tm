@@ -213,6 +213,12 @@ class ProjectPartialUpdate(BaseModel):
     hashtags: Optional[List[str]] = None
     per_task_instructions: Optional[str] = None
 
+    @computed_field
+    @property
+    def project_name_prefix(self) -> str:
+        """Compute project name prefix with underscores."""
+        return self.name.replace(" ", "_").lower()
+
 
 class ProjectUpdate(ProjectIn):
     """Update project."""
