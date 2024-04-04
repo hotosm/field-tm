@@ -3,9 +3,8 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
-import { ProjectFilesById } from '@/api/Files';
+import { GetProjectQrCode } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
-import { useNavigate } from 'react-router-dom';
 
 type TaskSectionPopupPropType = {
   taskId: number | null;
@@ -15,7 +14,6 @@ type TaskSectionPopupPropType = {
 
 const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) => {
   const dispatch = CoreModules.useAppDispatch();
-  const navigate = useNavigate();
   const [task_status, set_task_status] = useState('READY');
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const params = CoreModules.useParams();
@@ -25,17 +23,17 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
 
   //qrcodecomponent
   const projectName = CoreModules.useAppSelector((state) => state.project.projectInfo.title);
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const odkToken = CoreModules.useAppSelector((state) => state.project.odk_token);
+  const loginToken = CoreModules.useAppSelector((state) => state.login.loginToken);
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
       return indTask.id == taskId;
     })?.[0],
   };
   const checkIfTaskAssignedOrNot =
-    selectedTask?.locked_by_username === token?.username || selectedTask?.locked_by_username === null;
+    selectedTask?.locked_by_username === loginToken?.username || selectedTask?.locked_by_username === null;
 
-  // TODO fix multiple renders of component (6 times)
-  const { qrcode } = ProjectFilesById(selectedTask.odk_token, projectName, token?.username, taskId);
+  const { qrcode } = GetProjectQrCode(odkToken, projectName, loginToken?.username);
   useEffect(() => {
     if (projectIndex != -1) {
       const currentStatus = {

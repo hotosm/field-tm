@@ -304,3 +304,11 @@ class ReviewStateEnum(StrEnum, Enum):
     hasissues = "hasIssues"
     approved = "approved"
     rejected = "rejected"
+
+
+class GeometryType(str, Enum):
+    """Enum for GeoJSON types."""
+
+    Polygon = "Polygon"
+    LineString = "LineString"
+    Point = "Point"

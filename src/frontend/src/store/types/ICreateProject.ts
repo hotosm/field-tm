@@ -15,8 +15,6 @@ export type CreateProjectStateTypes = {
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
   generateQrSuccess: GenerateQrSuccessTypes | null;
-  generateProjectLogLoading: boolean;
-  generateProjectLog: GenerateProjectLogTypes | null;
   createProjectStep: number;
   dividedTaskLoading: boolean;
   dividedTaskGeojson: null | GeoJSONFeatureTypes;
@@ -143,13 +141,6 @@ export type OrganisationListTypes = {
   description: string;
   type: 1;
   odk_central_url: string | null;
-};
-
-export type GenerateProjectLogTypes = {
-  status: string;
-  message: string | null;
-  progress: number;
-  logs: string;
 };
 
 export type TaskSplittingGeojsonTypes = {

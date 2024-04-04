@@ -10,11 +10,11 @@ function base64zlibencode(string) {
   return window.btoa(String.fromCodePoint(...deflate(new TextEncoder().encode(string))));
 }
 
-export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
+export const GetProjectQrCode = (odkToken, projectName, osmUser) => {
   const [qrcode, setQrcode] = useState('');
   useEffect(() => {
-    const fetchProjectFileById = async (odkToken, projectName, osmUser, taskId) => {
-      if (!taskId || odkToken === '') {
+    const fetchProjectFileById = async (odkToken, projectName, osmUser) => {
+      if (odkToken === '') {
         setQrcode('');
         return;
       }
@@ -27,7 +27,6 @@ export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
           autosend: 'wifi_and_cellular',
           metadata_email: 'NOT IMPLEMENTED',
           metadata_username: osmUser,
-          metadata_phonenumber: taskId.toString(),
         },
         project: { name: projectName },
         admin: {},
@@ -44,14 +43,14 @@ export const ProjectFilesById = (odkToken, projectName, osmUser, taskId) => {
       setQrcode(code.createDataURL(3, 5));
     };
 
-    fetchProjectFileById(odkToken, projectName, osmUser, taskId);
+    fetchProjectFileById(odkToken, projectName, osmUser);
 
     const cleanUp = () => {
       setQrcode('');
     };
 
     return cleanUp;
-  }, [taskId]);
+  }, []);
   return { qrcode };
 };
 

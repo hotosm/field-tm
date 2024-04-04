@@ -21,7 +21,6 @@ export const ProjectById = (existingProjectList, projectId) => {
             locked_by_uid: data.locked_by_uid,
             locked_by_username: data.locked_by_username,
             task_history: data.task_history,
-            odk_token: data.odk_token,
           };
         });
         // At top level id project id to object
@@ -45,6 +44,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             tasks_bad: projectResp.tasks_bad,
             data_extract_url: projectResp.data_extract_url,
             instructions: projectResp?.project_info?.per_task_instructions,
+            odk_token: projectResp?.odk_token,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));

@@ -19,7 +19,6 @@
 
 import json
 import os
-import uuid
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
@@ -608,73 +607,6 @@ async def generate_files(
     )
 
 
-@router.get("/generate-log/")
-async def generate_log(
-    project_id: int,
-    uuid: uuid.UUID,
-    db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(org_admin),
-):
-    r"""Get the contents of a log file in a log format.
-
-    ### Response
-    - **200 OK**: Returns the contents of the log file in a log format.
-        Each line is separated by a newline character "\n".
-
-    - **500 Internal Server Error**: Returns an error message if the log file
-        cannot be generated.
-
-    ### Return format
-    Task Status and Logs are returned in a JSON format.
-    """
-    try:
-        # Get the backgrund task status
-        task_status, task_message = await project_crud.get_background_task_status(
-            uuid, db
-        )
-
-        sql = text(
-            """
-            SELECT
-                COUNT(CASE WHEN odk_token IS NOT NULL THEN 1 END) AS tasks_complete,
-                COUNT(*) AS total_tasks
-            FROM tasks
-            WHERE project_id = :project_id;
-        """
-        )
-        result = db.execute(sql, {"project_id": project_id})
-        row = result.fetchone()
-
-        tasks_generated = row[0] if row else 0
-        total_task_count = row[1] if row else 0
-
-        project_log_file = Path("/opt/logs/create_project.json")
-        project_log_file.touch(exist_ok=True)
-        with open(project_log_file, "r") as log_file:
-            logs = [json.loads(line) for line in log_file]
-
-            filtered_logs = [
-                log.get("record", {}).get("message", None)
-                for log in logs
-                if log.get("record", {}).get("extra", {}).get("project_id")
-                == project_id
-            ]
-            last_50_logs = filtered_logs[-50:]
-
-            logs = "\n".join(last_50_logs)
-
-            return {
-                "status": task_status.name,
-                "total_tasks": total_task_count,
-                "message": task_message,
-                "progress": tasks_generated,
-                "logs": logs,
-            }
-    except Exception as e:
-        log.error(e)
-        return "Error in generating log file"
-
-
 @router.get("/categories/")
 async def get_categories(current_user: AuthUser = Depends(login_required)):
     """Get api for fetching all the categories.
@@ -839,7 +771,6 @@ async def download_form(
 
 @router.post("/update-form")
 async def update_project_form(
-    background_tasks: BackgroundTasks,
     category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
@@ -852,11 +783,10 @@ async def update_project_form(
     # TODO migrate most logic to project_crud
     project = project_user_dict["project"]
 
-    if project.xform_category == category:
-        if not upload:
-            raise HTTPException(
-                status_code=400, detail="Current category is same as new category"
-            )
+    if project.xform_category == category and not upload:
+        raise HTTPException(
+            status_code=400, detail="Current category is same as new category"
+        )
 
     if upload:
         file_ext = Path(upload.filename).suffix.lower()
@@ -882,21 +812,20 @@ async def update_project_form(
     db.commit()
 
     # The reference to the form via ODK Central API (minus task_id)
-    xform_name_prefix = project.project_name_prefix
+    project_name = project.project_name_prefix
 
     # Get ODK Central credentials for project
     odk_creds = await project_deps.get_odk_credentials(db, project.id)
     # Get task id list
     task_list = await tasks_crud.get_task_id_list(db, project.id)
     # Update ODK Central form data
-    # FIXME runs in background but status is not tracked
-    background_tasks.add_task(
-        central_crud.update_odk_xforms,
+    await central_crud.update_project_xform(
         task_list,
         project.odkid,
         new_xform_data,
         file_ext,
-        xform_name_prefix,
+        project_name,
+        category,
         odk_creds,
     )
 

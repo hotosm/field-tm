@@ -17,10 +17,8 @@
 #
 """Tests for project routes."""
 
-import functools
 import json
 import os
-import uuid
 from io import BytesIO
 from pathlib import Path
 from random import randint
@@ -28,17 +26,14 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
-from fastapi.concurrency import run_in_threadpool
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
 from shapely import Polygon
 
-from app.central.central_crud import create_odk_project, read_and_test_xform
+from app.central.central_crud import create_odk_project
 from app.config import encrypt_value, settings
 from app.db import db_models
-from app.db.postgis_utils import split_geojson_by_task_areas
 from app.projects import project_crud, project_schemas
-from app.tasks import tasks_crud
 from tests.test_data import test_data_path
 
 odk_central_url = os.getenv("ODK_CENTRAL_URL")
@@ -242,6 +237,7 @@ async def test_generate_project_files(db, client, project):
         f"/projects/{project_id}/upload-task-boundaries",
         files=task_geojson_file,
     )
+    assert response.status_code == 200
 
     # Upload data extracts
     with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as f:
@@ -261,65 +257,22 @@ async def test_generate_project_files(db, client, project):
     response = requests.head(internal_file_path, allow_redirects=True)
     assert response.status_code < 400
 
-    # Extract data extract from flatgeobuf
-    feature_collection = await project_crud.get_project_features_geojson(db, project)
-    # Split extract by task area
-    split_extract_dict = await split_geojson_by_task_areas(
-        db, feature_collection, project_id
-    )
-    assert split_extract_dict is not None
-
-    # Get project tasks list (no longer required)
-    task_ids = await tasks_crud.get_task_id_list(db, project_id)
-    assert isinstance(task_ids, list)
-
-    # Provide custom xlsform file path
+    # Get custom XLSForm path
     xlsform_file = Path(f"{test_data_path}/buildings.xls")
     with open(xlsform_file, "rb") as xlsform_data:
         xlsform_obj = BytesIO(xlsform_data.read())
 
-    # Convert XLSForm --> XForm for all tasks
-    xform_data = await read_and_test_xform(
-        xlsform_obj, xlsform_file.suffix.lower(), return_form_data=True
-    )
-
-    # Get project name for XForm name
-    project_name = project.project_name_prefix
-    # Get ODK Project ID
-    project_odk_id = project.odkid
-
-    for task_id in split_extract_dict.keys():
-        # NOTE avoid the lambda function for run_in_threadpool
-        # functools.partial captures the loop variable task_id in a
-        # way that is safe for use within asynchronous code
-        success = await run_in_threadpool(
-            functools.partial(
-                project_crud.generate_task_files,
-                db,
-                project_id,
-                project_odk_id,
-                task_id,
-                split_extract_dict[task_id],
-                f"{project_name}_task_{task_id}",
-                xform_data,
-                odk_credentials,
-            )
+    xform_file = {
+        "xls_form_upload": (
+            "buildings.xls",
+            xlsform_obj,
         )
-        assert success
-
-    # Generate appuser files
-    result = await run_in_threadpool(
-        lambda: project_crud.generate_project_files(
-            db,
-            project_id,
-            custom_form=xlsform_obj,
-            form_category="buildings",
-            form_file_ext=Path(xlsform_file).suffix.lower(),
-            background_task_id=uuid.uuid4(),
-        )
+    }
+    response = client.post(
+        f"/projects/{project_id}/generate-project-data",
+        files=xform_file,
     )
-
-    assert result is None
+    assert response.status_code == 200
 
 
 # async def test_update_project_boundary(db, project):
