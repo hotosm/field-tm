@@ -7,11 +7,11 @@ organisations.
 
 ## Slum Building Assessment (Monrovia, Liberia)
 
-- [XLSForm](building_natural_risks_survey.xlsx)
+- [XLSForm](slum_assessment_survey.xlsx)
 
 ## Building Natural Hazard Assessment (Bali, Indonesia)
 
-- [XLSForm](slum_assessment_survey.xlsx)
+- [XLSForm](building_natural_risks_survey.xlsx)
 - Generated with help from BPBD in Bali.
 - Used in the Karangasem region.
 - Particular attention was paid to the unique temple structures in Bali, often
