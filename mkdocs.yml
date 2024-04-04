@@ -78,6 +78,7 @@ nav:
       - XLSForm Converter: https://getodk.org/xlsform/
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
+  - Example XLSForms: example_xlsforms/README.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
   - Dev:
       - Setup: dev/Setup.md
