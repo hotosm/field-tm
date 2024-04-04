@@ -34,6 +34,7 @@ class TaskHistoryBase(BaseModel):
     """Task mapping history."""
 
     id: int
+    task_id: int
     action_text: str
     action_date: datetime
 
@@ -41,9 +42,9 @@ class TaskHistoryBase(BaseModel):
 class TaskHistoryOut(TaskHistoryBase):
     """Task mapping history display."""
 
-    status: str
     username: str
     profile_img: Optional[str]
+    status: Optional[str] = None
 
 
 class TaskHistoryCount(BaseModel):
@@ -130,26 +131,12 @@ class Task(BaseModel):
         return decrypt_value(value)
 
 
-class TaskCommentResponse(BaseModel):
-    """Task mapping history."""
-
-    id: int
-    task_id: int
-    comment: Optional[str] = None
-    commented_by: str
-    created_at: datetime
-
-
-class TaskCommentBase(BaseModel):
-    """Task mapping history."""
-
-    comment: str
-    commented_by: str
-    created_at: datetime
+class TaskCommentResponse(TaskHistoryOut):
+    """Wrapper Class for comment."""
 
 
 class TaskCommentRequest(BaseModel):
-    """Task mapping history."""
+    """Task comment form."""
 
     task_id: int
     project_id: int
