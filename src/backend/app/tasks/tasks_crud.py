@@ -254,7 +254,7 @@ async def get_task_comments(db: Session, project_id: int, task_id: int):
 
 
 async def add_task_comments(
-    db: Session, comment: tasks_schemas.TaskCommentBase, user_data: AuthUser
+    db: Session, comment: tasks_schemas.TaskCommentRequest, user_data: AuthUser
 ):
     """Add a comment to a task.
 
@@ -281,9 +281,10 @@ async def add_task_comments(
         RETURNING
             task_history.id,
             task_history.task_id,
-            (SELECT username FROM users WHERE id = task_history.user_id) AS user_id,
             task_history.action_text,
-            task_history.action_date;
+            task_history.action_date,
+            (SELECT username FROM users WHERE id = :user_id) AS username,
+            (SELECT profile_img FROM users WHERE id = :user_id) AS profile_img;
     """
     )
 
@@ -307,9 +308,10 @@ async def add_task_comments(
     return {
         "id": row[0],
         "task_id": row[1],
-        "commented_by": row[2],
-        "comment": row[3],
-        "created_at": row[4],
+        "action_text": row[2],
+        "action_date": row[3],
+        "username": row[4],
+        "profile_img": row[5],
     }
 
 
@@ -350,7 +352,7 @@ async def get_project_task_history(
         A list of task history records for the specified project.
     """
     query = f"""
-                SELECT task_history.task_id, task_history.action_text,
+                SELECT task_history.id, task_history.task_id, task_history.action_text,
                     task_history.action_date, users.username,
                     users.profile_img
                     FROM task_history
@@ -367,12 +369,13 @@ async def get_project_task_history(
     result = db.execute(text(query)).fetchall()
     task_history = [
         {
-            "task_id": row[0],
-            "action_text": row[1],
-            "action_date": row[2],
-            "status": None if comment else row[1].split()[5],
-            "username": row[3],
-            "profile_img": row[4],
+            "id": row[0],
+            "task_id": row[1],
+            "action_text": row[2],
+            "action_date": row[3],
+            "username": row[4],
+            "profile_img": row[5],
+            "status": None if comment else row[2].split()[5],
         }
         for row in result
     ]

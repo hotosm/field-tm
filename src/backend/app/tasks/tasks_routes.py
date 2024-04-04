@@ -188,26 +188,29 @@ async def task_features_count(
 
     return data
 
+    # @router.get(
+    # "/task-comments/", response_model=list[tasks_schemas.TaskCommentResponse]
+    # )
+    # async def task_comments(
+    #     project_id: int,
+    #     task_id: int,
+    #     db: Session = Depends(database.get_db),
+    # ):
+    #     """Retrieve a list of task comments for a specific project and task.
 
-@router.get("/task-comments/", response_model=list[tasks_schemas.TaskCommentResponse])
-async def task_comments(
-    project_id: int,
-    task_id: int,
-    db: Session = Depends(database.get_db),
-):
-    """Retrieve a list of task comments for a specific project and task.
+    #     Args:
+    #         project_id (int): The ID of the project.
+    #         task_id (int): The ID of the task.
+    #         db (Session, optional): The database session.
 
-    Args:
-        project_id (int): The ID of the project.
-        task_id (int): The ID of the task.
-        db (Session, optional): The database session.
+    #     Returns:
+    #         A list of task comments.
+    #     """
+    #     task_comment_list = await tasks_crud.get_task_comments(
+    #               db, project_id, task_id
+    #               )
 
-    Returns:
-        List[tasks_schemas.TaskCommentResponse]: A list of task comments.
-    """
-    task_comment_list = await tasks_crud.get_task_comments(db, project_id, task_id)
-
-    return task_comment_list
+    # return task_comment_list
 
 
 @router.post("/task-comments/", response_model=tasks_schemas.TaskCommentResponse)
@@ -257,7 +260,7 @@ async def task_activity(
     )
 
 
-@router.get("/task_history/")
+@router.get("/task_history/", response_model=List[tasks_schemas.TaskHistoryOut])
 async def task_history(
     project_id: int,
     days: int = 10,
