@@ -160,7 +160,7 @@ async def update_task_status(
 
         db.commit()
         db.refresh(db_task)
-        return db_task
+        return update_history
 
     else:
         raise HTTPException(
