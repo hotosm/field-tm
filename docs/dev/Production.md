@@ -94,30 +94,54 @@ ssh root@fmtm.hotosm.org -N -f -L 5430:localhost:5433
 
 This will map port 5432 on the remote machine to port 5430 on your local machine.
 
-## Manual Database Backups
+## Backup Process
 
-```bash
-GIT_BRANCH=development
-backup_filename="fmtm-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
-echo $backup_filename
+- Backup FMTM database:
 
-docker exec -i -e PGPASSWORD=PASSWORD_HERE \
-fmtm-${GIT_BRANCH}-fmtm-db-1 \
-pg_dump --verbose --format c -U fmtm fmtm \
-| gzip -9 > "$backup_filename"
+  ```bash
+  GIT_BRANCH=development
+  backup_filename="fmtm-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
+  echo $backup_filename
 
-# For ODK
-docker exec -i -e PGPASSWORD=PASSWORD_HERE \
-fmtm-${GIT_BRANCH}-central-db-1 \
-pg_dump --verbose --format c -U odk odk | \
-gzip -9 > "$backup_filename"
-```
+  docker exec -i -e PGPASSWORD=PASSWORD_HERE \
+  fmtm-${GIT_BRANCH}-fmtm-db-1 \
+  pg_dump --verbose --format c -U fmtm fmtm \
+  | gzip -9 > "$backup_filename"
+  ```
 
 > Note: if you are dumping to import into a pre-existing
 > database, you should also include the --clean flag.
 >
 > This will drop the existing tables prior to import,
 > and should prevent conflicts.
+
+- Backup ODK Central database:
+
+  ```bash
+  GIT_BRANCH=development
+  backup_filename="fmtm-odk-db-${GIT_BRANCH}-$(date +'%Y-%m-%d').sql.gz"
+  echo $backup_filename
+
+  docker exec -i -e PGPASSWORD=PASSWORD_HERE \
+  fmtm-${GIT_BRANCH}-central-db-1 \
+  pg_dump --verbose --format c -U odk odk | \
+  gzip -9 > "$backup_filename"
+  ```
+
+- Backup the S3 data:
+
+```bash
+GIT_BRANCH=development
+backup_filename="fmtm-s3-${GIT_BRANCH}-$(date +'%Y-%m-%d').tar.gz"
+echo $backup_filename
+
+docker run --rm -i --entrypoint=tar \
+-u 0:0 \
+-v $PWD:/backups -v \
+fmtm-s3-data-${GIT_BRANCH}:/mnt/data \
+ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+-cvzf "/backups/$backup_filename" /mnt/data/
+```
 
 ## Manual Database Restores
 
@@ -126,7 +150,7 @@ The restore should be as easy as:
 ```bash
 # On a different machine (else change the container name)
 GIT_BRANCH=development
-backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
+backup_filename=fmtm-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
 
 cat "$backup_filename" | gunzip | \
 docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE \
@@ -134,10 +158,19 @@ fmtm-${GIT_BRANCH}-fmtm-db-1 \
 pg_restore --verbose -U fmtm -d fmtm
 
 # For ODK
+backup_filename=fmtm-odk-db-${GIT_BRANCH}-XXXX-XX-XX.sql.gz
 cat "$backup_filename" | gunzip | \
 docker exec -i -e PGPASSWORD=NEW_PASSWORD_HERE \
 fmtm-${GIT_BRANCH}-central-db-1 \
 pg_restore --verbose -U odk -d odk
+
+# For S3 (with the backup file in current dir)
+backup_filename=fmtm-s3-${GIT_BRANCH}-XXXX-XX-XX.tar.gz
+docker run --rm -i --entrypoint=tar \
+-u 0:0 --working-dir=/ \
+-v $backup_filename:/$backup_filename -v \
+ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH} \
+-xvzf "$backup_filename"
 ```
 
 However, in some cases you may have existing data
