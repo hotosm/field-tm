@@ -22,10 +22,39 @@ CREATE SEQUENCE IF NOT EXISTS public.xforms_id_seq
 ALTER TABLE public.xforms_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.xforms_id_seq OWNED BY public.xforms.id;
 ALTER TABLE ONLY public.xforms ALTER COLUMN id SET DEFAULT nextval('public.xforms_id_seq'::regclass);
-ALTER TABLE ONLY public.xforms
-    ADD CONSTRAINT xforms_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.xforms
-    ADD CONSTRAINT fk_project_id FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM information_schema.constraint_column_usage 
+        WHERE constraint_name = 'xforms_pkey'
+    ) THEN
+        RAISE NOTICE 'Primary key constraint "xforms_pkey" already exists.';
+    ELSE
+        ALTER TABLE ONLY public.xforms
+            ADD CONSTRAINT xforms_pkey PRIMARY KEY (id);
+        
+        RAISE NOTICE 'Primary key constraint "xforms_pkey" successfully added.';
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM information_schema.constraint_column_usage 
+        WHERE constraint_name = 'fk_project_id'
+    ) THEN
+        RAISE NOTICE 'Foreign key constraint "fk_project_id" already exists.';
+    ELSE
+        ALTER TABLE ONLY public.xforms
+            ADD CONSTRAINT fk_project_id 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id);
+        
+        RAISE NOTICE 'Foreign key constraint "fk_project_id" successfully added.';
+    END IF;
+END $$;
 
 -- Create field public.projects.odk_token
 ALTER TABLE public.projects
