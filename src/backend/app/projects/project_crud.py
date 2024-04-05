@@ -46,10 +46,8 @@ from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.xlsforms.entities import registration_form
 from osm_rawdata.postgres import PostgresClient
 from shapely import wkt
-from shapely.geometry import (
-    Polygon,
-    shape,
-)
+from shapely.geometry import MultiPolygon, Polygon, mapping, shape
+from shapely.ops import unary_union
 from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -393,12 +391,19 @@ async def preview_split_by_square(boundary: str, meters: int):
 
     # Merge multiple geometries into single polygon
     if multi_polygons:
-        geometry = multi_polygons[0]
-        for geom in multi_polygons[1:]:
-            geometry = geometry.union(geom)
-        for feature in features:
-            feature["geometry"] = geometry
+        merged_polygon = unary_union(multi_polygons)
+        if isinstance(merged_polygon, MultiPolygon):
+            merged_polygon = merged_polygon.convex_hull
+        merged_geojson = mapping(merged_polygon)
+        features = [
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": merged_geojson,
+            }
+        ]
         boundary["features"] = features
+
     return await run_in_threadpool(
         lambda: split_by_square(
             boundary,
