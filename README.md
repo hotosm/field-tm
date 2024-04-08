@@ -2,7 +2,7 @@
 
 ![HOT Logo](https://github.com/hotosm/fmtm/blob/main/images/hot_logo.png?raw=true)
 
-A project to provide tools for Open Mapping campaigns.
+Coordinated field mapping for Open Mapping campaigns.
 
 <!-- markdownlint-disable -->
 

@@ -19,7 +19,7 @@
 [project]
 name = "fmtm"
 dynamic = ["version"]
-description = "Field mapping tasking manager"
+description = "Field Mapping Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
@@ -133,6 +133,7 @@ version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
     "../frontend/package.json:version",
+    "../../chart/Chart.yaml:appVersion",
 ]
 changelog_file = "../../CHANGELOG.md"
 update_changelog_on_bump = true

@@ -89,3 +89,6 @@ envsubst
 
 # Scripts
 **/openapi.json
+
+# Chart dependencies
+chart/charts
