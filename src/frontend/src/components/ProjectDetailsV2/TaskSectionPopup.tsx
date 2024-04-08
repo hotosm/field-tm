@@ -23,7 +23,7 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
 
   //qrcodecomponent
   const projectName = CoreModules.useAppSelector((state) => state.project.projectInfo.title);
-  const odkToken = CoreModules.useAppSelector((state) => state.project.odk_token);
+  const odkToken = CoreModules.useAppSelector((state) => state.project.projectInfo.odk_token);
   const loginToken = CoreModules.useAppSelector((state) => state.login.loginToken);
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
