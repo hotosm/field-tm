@@ -1,0 +1,177 @@
+# Default values for fmtm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+domain: fmtm.localhost
+
+image:
+  repository: ghcr.io/hotosm/fmtm
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+backend:
+  dbHostOverride: ""
+
+  extraEnvFrom:
+    - secretRef:
+        name: db-fmtm-vars
+    - secretRef:
+        name: s3-fmtm-vars
+    - secretRef:
+        name: api-fmtm-vars
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: ""
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+db:
+  # This can be disabled, but an external database must be configured, with Postgis
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14-debian-12
+  auth:
+    enablePostgresUser: false
+    username: fmtm
+    database: fmtm
+    # Must contain keys postgres-password and password
+    existingSecret: db-fmtm-vars
+    secretKeys:
+      userPasswordKey: FMTM_DB_PASSWORD
+  initdb:
+    scripts:
+      01-enable-postgis.sql: |
+        CREATE EXTENSION IF NOT EXISTS postgis;
+  primary:
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+
+s3:
+  # This can be disabled, but an external S3 provider must be configured
+  enabled: true
+  mode: standalone
+  replicas: 1
+  image:
+    repository: quay.io/minio/minio
+    tag: RELEASE.2024-01-01T16-36-33Z
+  environment:
+    MINIO_BROWSER: "off"
+  mountPath: /mnt/data
+  resources:
+    requests:
+      memory: 200Mi
+  users:
+    - accessKey: fmtm
+      existingSecret: s3-fmtm-vars
+      existingSecretKey: S3_SECRET_KEY
+      policy: readwrite
+  ingress:
+    enabled: true
+    ingressClassName: ~
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    path: /
+    hosts:
+      - api.fmtm.localhost
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

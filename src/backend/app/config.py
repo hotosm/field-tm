@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "FMTM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
-    ENCRYPTION_KEY: str = ""
+    ENCRYPTION_KEY: str
 
     FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = "7050"
