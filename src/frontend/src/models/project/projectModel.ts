@@ -61,6 +61,7 @@ export type projectInfoType = {
   short_description: string;
   xform_category: string;
   data_extract_url: string;
+  odk_token: string;
   num_contributors: any;
   tasks_bad: any;
   tasks_mapped: any;

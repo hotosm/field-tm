@@ -25,7 +25,6 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, computed_fiel
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator
 
-from app.config import decrypt_value
 from app.db.postgis_utils import geometry_to_geojson, get_centroid
 from app.models.enums import TaskStatus
 
@@ -78,7 +77,6 @@ class Task(BaseModel):
     locked_by_uid: Optional[int] = None
     locked_by_username: Optional[str] = None
     task_history: Optional[List[TaskHistoryBase]] = None
-    odk_token: Optional[str] = None
 
     @field_validator("outline_geojson", mode="before")
     @classmethod
@@ -121,14 +119,6 @@ class Task(BaseModel):
         if self.lock_holder:
             return self.lock_holder.username
         return None
-
-    @field_serializer("odk_token")
-    def decrypt_password(self, value: str) -> Optional[str]:
-        """Decrypt the ODK Token extracted from the db."""
-        if not value:
-            return ""
-
-        return decrypt_value(value)
 
 
 class TaskCommentResponse(TaskHistoryOut):
