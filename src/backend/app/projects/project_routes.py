@@ -221,6 +221,10 @@ async def read_project(project_id: int, db: Session = Depends(database.get_db)):
     project = await project_crud.get_project_by_id(db, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+    if project.odk_token == "":
+        log.warning(
+            f"Project ({project.id}) has no 'odk_token' set. The QRCode will not work!"
+        )
     return project
 
 

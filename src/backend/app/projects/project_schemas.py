@@ -351,7 +351,7 @@ class ProjectOut(ProjectWithTasks):
 class ReadProject(ProjectWithTasks):
     """Redundant model for refactor."""
 
-    odk_token: str
+    odk_token: Optional[str] = None
     project_uuid: uuid.UUID = uuid.uuid4()
     location_str: Optional[str] = None
     data_extract_url: Optional[str] = None
