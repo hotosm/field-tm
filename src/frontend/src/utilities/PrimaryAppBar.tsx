@@ -1,7 +1,6 @@
 import * as React from 'react';
 import windowDimention from '@/hooks/WindowDimension';
 import DrawerComponent from '@/utilities/CustomDrawer';
-import CustomizedImage from '@/utilities/CustomizedImage';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -9,10 +8,12 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import logo from '@/assets/images/hotLog.png';
 
 export default function PrimaryAppBar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState<boolean>(false);
   const dispatch = CoreModules.useAppDispatch();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
@@ -81,9 +82,7 @@ export default function PrimaryAppBar() {
         sx={{ boxShadow: 0, borderBottom: '1px solid #e1e0e0', borderTop: '1px solid #e1e0e0' }}
       >
         <CoreModules.Toolbar>
-          <CoreModules.Link to={'/'}>
-            <CustomizedImage status={'logo'} style={appBarInnerStyles.logo} />
-          </CoreModules.Link>
+          <img src={logo} alt="FMTM Logo" onClick={() => navigate('/')} className="fmtm-w-[5.5rem] sm:fmtm-w-28" />
 
           {/* Tabs switch added */}
           <CoreModules.Tabs
@@ -122,9 +121,17 @@ export default function PrimaryAppBar() {
               />
             </CoreModules.Link>
           </CoreModules.Tabs>
+          <CoreModules.Stack sx={{ flexGrow: 1 }} />
+
           {/* position changed */}
           {token != null && (
-            <CoreModules.Stack direction={'row'} spacing={1} justifyContent="center" alignItems="center">
+            <CoreModules.Stack
+              direction={'row'}
+              spacing={1}
+              justifyContent="end"
+              alignItems="center"
+              className="fmtm-text-ellipsis fmtm-max-w-[9.5rem]"
+            >
               {token['picture'] !== 'null' && token['picture'] ? (
                 <CoreModules.Stack
                   className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
@@ -133,23 +140,17 @@ export default function PrimaryAppBar() {
                   <img src={token['picture']} alt="Profile Picture" />
                 </CoreModules.Stack>
               ) : (
-                <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }} />
+                <AssetModules.PersonIcon color="success" sx={{ mt: '3%' }} />
               )}
-              <CoreModules.Typography
-                variant="typography"
-                color={'info'}
-                noWrap
-                sx={{ display: { xs: 'none', md: 'block' } }}
-              >
+              <CoreModules.Typography variant="typography" color={'info'} noWrap>
                 {token['username']}
               </CoreModules.Typography>
             </CoreModules.Stack>
           )}
 
-          <CoreModules.Stack sx={{ flexGrow: 1 }} />
-          <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex', xs: 'none' } }}>
+          <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex' } }}>
             {token != null ? (
-              <CoreModules.Link style={{ textDecoration: 'none' }} to={'/'}>
+              <CoreModules.Link style={{ textDecoration: 'none' }} className="fmtm-hidden sm:fmtm-flex" to={'/'}>
                 <CoreModules.Button
                   className="btnLogin fmtm-truncate"
                   style={appBarInnerStyles.btnLogin}

@@ -249,8 +249,9 @@ const Home = () => {
   const [showDebugConsole, setShowDebugConsole] = useState(false);
 
   return (
-    <div className="fmtm-bg-[#f5f5f5]" style={{ height: '100%' }}>
+    <div className="fmtm-bg-[#f5f5f5] fmtm-h-[100dvh] sm:fmtm-h-full">
       {/* only used to display debug console */}
+
       <DebugConsole showDebugConsole={showDebugConsole} setShowDebugConsole={setShowDebugConsole} />
       {/* Customized Modal For Generate Tiles */}
       <div>
@@ -371,7 +372,9 @@ const Home = () => {
                 </div>
                 <div
                   className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-[#F5F5F5] fmtm-p-2 fmtm-rounded-md ${
-                    toggle ? 'fmtm-left-0 fmtm-top-0' : '-fmtm-left-[60rem] fmtm-top-0'
+                    toggle
+                      ? 'fmtm-left-0 fmtm-bottom-0 md:fmtm-top-0'
+                      : '-fmtm-left-[60rem] fmtm-bottom-0 md:fmtm-top-0'
                   }`}
                 >
                   <ProjectOptions />
@@ -386,7 +389,7 @@ const Home = () => {
               ref={mapRef}
               mapInstance={map}
               className={`map naxatw-relative naxatw-min-h-full naxatw-w-full ${
-                windowSize.width <= 640 ? 'fmtm-h-[100vh]' : 'fmtm-h-full'
+                windowSize.width <= 640 ? 'fmtm-h-[100dvh]' : 'fmtm-h-full'
               }`}
             >
               {import.meta.env.MODE === 'development' && (
@@ -438,12 +441,11 @@ const Home = () => {
                 />
               )}
               <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} showOnHover="singleclick" />
-              <div className="fmtm-top-28 fmtm-left-5">{window.DeviceMotionEvent}</div>
-              <div className="fmtm-absolute fmtm-bottom-36 sm:fmtm-bottom-5 fmtm-left-5 fmtm-z-50 fmtm-rounded-lg">
+              <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
                   body={<MapLegends defaultTheme={defaultTheme} />}
                   header={
-                    <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
+                    <div className="fmtm-flex fmtm-items-center fmtm-gap-1 sm:fmtm-gap-2">
                       <AssetModules.LegendToggleIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '30px' }} />
                       <p className="fmtm-text-lg fmtm-font-normal">Legend</p>
                     </div>
@@ -453,9 +455,9 @@ const Home = () => {
                   collapsed={true}
                 />
               </div>
-              <div className="fmtm-absolute fmtm-bottom-[8.6rem] sm:fmtm-top-3 fmtm-right-3 fmtm-z-50 fmtm-h-fit">
+              <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-right-3 fmtm-z-50 fmtm-h-fit">
                 <Button
-                  btnText="GENERATE MBTILES"
+                  btnText="TILES"
                   icon={<AssetModules.BoltIcon />}
                   onClick={() => {
                     dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
@@ -487,7 +489,7 @@ const Home = () => {
             {mobileFooterSelection === 'instructions' && (
               <BottomSheet
                 body={
-                  <div className="fmtm-mb-[12vh]">
+                  <div className="fmtm-mb-[10vh]">
                     <Instructions instructions={state?.projectInfo?.instructions} />
                   </div>
                 }
@@ -497,7 +499,7 @@ const Home = () => {
             {mobileFooterSelection === 'comment' && (
               <BottomSheet
                 body={
-                  <div className="fmtm-mb-[12vh]">
+                  <div className="fmtm-mb-[10vh]">
                     <Comments />
                   </div>
                 }

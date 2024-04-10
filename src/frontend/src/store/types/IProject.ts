@@ -41,9 +41,11 @@ type tilesListTypes = {
 };
 
 type projectCommentsListTypes = {
-  comment: string;
-  commented_by: string;
-  created_at: string;
   id: number;
   task_id: number;
+  action_text: string;
+  action_date: string;
+  username: string;
+  profile_img: string | null;
+  status: null;
 };

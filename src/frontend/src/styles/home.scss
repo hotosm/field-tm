@@ -109,3 +109,14 @@
 .ol-popup-closer:after {
   content: '✖';
 }
+
+.map .ol-rotate {
+  right: 14px;
+  .ol-rotate-reset {
+    width: 35px;
+    height: 35px;
+    .ol-compass {
+      scale: 150%;
+    }
+  }
+}

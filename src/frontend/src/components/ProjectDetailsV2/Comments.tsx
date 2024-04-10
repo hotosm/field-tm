@@ -82,11 +82,11 @@ const Comments = () => {
                     </div>
                     <div className="fmtm-flex-1 fmtm-flex fmtm-flex-col fmtm-gap-1">
                       <div className="fmtm-flex fmtm-gap-3 fmtm-items-center">
-                        <p>{projectComment?.commented_by}</p>
+                        <p>{projectComment?.username}</p>
                       </div>
                       <div>
                         <RichTextEditor
-                          editorHtmlContent={projectComment?.comment}
+                          editorHtmlContent={projectComment?.action_text}
                           editable={false}
                           className="sm:!fmtm-bg-[#f5f5f5] !fmtm-rounded-none !fmtm-border-none"
                         />
@@ -101,10 +101,10 @@ const Comments = () => {
                             />
                           </div>
                           <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676] fmtm-flex fmtm-gap-2">
-                            <span>{projectComment?.created_at?.split('T')[0]}</span>
+                            <span>{projectComment?.action_date?.split('T')[0]}</span>
                             <span>
-                              {projectComment?.created_at?.split('T')[1].split(':')[0]}:
-                              {projectComment?.created_at?.split('T')[1].split(':')[1]}
+                              {projectComment?.action_date?.split('T')[1].split(':')[0]}:
+                              {projectComment?.action_date?.split('T')[1].split(':')[1]}
                             </span>
                           </p>
                         </div>
