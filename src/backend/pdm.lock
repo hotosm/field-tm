@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:3fe0134fd41a9bae8e32a662049718ddd5f95e88de7bcf29e72eaea43132aabe"
+content_hash = "sha256:050398876ce81974dd0dfe06adcd987b2b7515b0f1fb9434c0b420084f7891d3"
 
 [[package]]
 name = "aiohttp"
@@ -1506,17 +1506,17 @@ files = [
 
 [[package]]
 name = "osm-login-python"
-version = "1.0.1"
+version = "1.0.3"
 requires_python = ">=3.9"
 summary = "Use OSM Token exchange with OAuth2.0 for python projects."
 dependencies = [
-    "itsdangerous~=2.1.2",
-    "pydantic>=2.0.1",
-    "requests-oauthlib~=1.3.1",
+    "itsdangerous>=2.0.0",
+    "pydantic>=2.0.0",
+    "requests-oauthlib>=1.3.0",
 ]
 files = [
-    {file = "osm-login-python-1.0.1.tar.gz", hash = "sha256:d00e6318e22d7c363ddb552a62397351ad15bb1090e3d21ddde7a1de466343a8"},
-    {file = "osm_login_python-1.0.1-py3-none-any.whl", hash = "sha256:6e69200b6d1e97f46337643a030e093dde7490ba11b5a85598e74630cde601d0"},
+    {file = "osm-login-python-1.0.3.tar.gz", hash = "sha256:b9737e74b2daf63b3e5e06032013ea3fd0f9bedf618e3581db84bdc2b791b865"},
+    {file = "osm_login_python-1.0.3-py3-none-any.whl", hash = "sha256:64c37a7d1c7cac211551a589a6f8ffafc641b29e27d608c94e52ab6cb531f937"},
 ]
 
 [[package]]
