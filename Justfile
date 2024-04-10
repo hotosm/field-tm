@@ -52,7 +52,7 @@ test-backend:
   docker compose run --rm api pytest
 
 test-frontend:
-  docker compose run -e CI=True --rm --entrypoint='sh -c' ui 'npm run test'
+  docker compose run --rm ui-test
 
 test: test-backend test-frontend
 

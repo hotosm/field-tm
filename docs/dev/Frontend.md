@@ -64,10 +64,17 @@ directory. Then add a new entry to the `src/frontend/router.tsx` file.
 To add a new component, create a new .tsx file in the src/frontend/
 components directory.
 
-## Conclusion
+## Frontend Testing
 
-Running the FMTM project is easy with Docker. You can also run the
-project locally outside of Docker, but it requires more setup. The
-frontend is built with React and Typescript, and the backend is built
-with FastAPI. Use the tips provided to customize and extend the
-functionality of the project.
+To run the frontend tests locally, run:
+
+```bash
+docker compose run --rm ui-test
+```
+
+To run the FMTM UI for interactive testing, run:
+
+```bash
+docker compose up -d
+docker compose run --rm ui-test npx -y playwright open http://ui:7051
+```
