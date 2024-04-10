@@ -4,7 +4,14 @@ Chart for HOTOSM Field Mapping Tasking Manager.
 
 ## Secrets
 
-Requires secrets to be pre-populated.
+Requires secrets to be pre-populated inside the correct namespace:
+
+- Create namespace:
+
+```bash
+kubectl create namespace fmtm
+kubectl 
+```
 
 - **db-fmtm-vars** for postgres database
 
@@ -14,7 +21,7 @@ Requires secrets to be pre-populated.
   - key: FMTM_DB_NAME
 
   ```bash
-  kubectl create secret generic db-fmtm-vars \
+  kubectl create secret generic db-fmtm-vars --namespace fmtm \
     --from-literal=FMTM_DB_HOST=fmtm-db.fmtm.svc.cluster.local \
     --from-literal=FMTM_DB_USER=xxxxxxx \
     --from-literal=FMTM_DB_PASSWORD=xxxxxxx \
@@ -29,7 +36,7 @@ Requires secrets to be pre-populated.
   - key: S3_BUCKET_NAME
 
   ```bash
-  kubectl create secret generic s3-fmtm-vars \
+  kubectl create secret generic s3-fmtm-vars --namespace fmtm \
     --from-literal=S3_ENDPOINT=fmtm-s3.fmtm.svc.cluster.local \
     --from-literal=S3_ACCESS_KEY=fmtm \
     --from-literal=S3_SECRET_KEY=xxxxxxx \
@@ -45,7 +52,7 @@ Requires secrets to be pre-populated.
   - key: OSM_SECRET_KEY
 
   ```bash
-  kubectl create secret generic api-fmtm-vars \
+  kubectl create secret generic api-fmtm-vars --namespace fmtm \
     --from-literal=ENCRYPTION_KEY=xxxxxxx \
     --from-literal=FMTM_DOMAIN=some.domain.com \
     --from-literal=OSM_CLIENT_ID=xxxxxxx \
@@ -56,11 +63,10 @@ Requires secrets to be pre-populated.
 ## Deployment
 
 ```bash
-helm upgrade --install fmtm oci://ghcr.io/hotosm/fmtm \
-    --namespace fmtm --create-namespace
+helm upgrade --install fmtm oci://ghcr.io/hotosm/fmtm --namespace fmtm
 ```
 
-Values can be overriden using `values.yaml` or the `--set` flag.
+Chart values can be overriden using `values.yaml` or the `--set` flag.
 
 ```bash
 helm upgrade --install fmtm . \
