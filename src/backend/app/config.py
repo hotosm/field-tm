@@ -154,6 +154,17 @@ class Settings(BaseSettings):
             return f"https://s3.{fmtm_domain}"
 
     UNDERPASS_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
+    # NOTE this var is used by HOT internally and not required
+    OSM_SVC_ACCOUNT_TOKEN: Optional[str] = None
+
+    @field_validator("OSM_SVC_ACCOUNT_TOKEN", mode="before")
+    @classmethod
+    def set_osm_svc_account_none(cls, v: Optional[str]) -> Optional[str]:
+        """Set OSM_SVC_ACCOUNT_TOKEN to None if set to empty string."""
+        if v == "":
+            return None
+        return v
+
     SENTRY_DSN: Optional[str] = None
 
     model_config = SettingsConfigDict(

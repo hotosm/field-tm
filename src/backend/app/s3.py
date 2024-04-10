@@ -71,9 +71,9 @@ def add_obj_to_bucket(
         kwargs (dict[str, Any]): Any other arguments to pass to client.put_object.
 
     """
-    # Ensure s3_path starts with a forward slash
-    if not s3_path.startswith("/"):
-        s3_path = f"/{s3_path}"
+    # Strip "/" from start of s3_path (not required by put_object)
+    if s3_path.startswith("/"):
+        s3_path = s3_path.lstrip("/")
 
     client = s3_client()
     # Set BytesIO object to start, prior to .read()

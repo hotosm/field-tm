@@ -443,12 +443,18 @@ async def generate_data_extract(
     pg = PostgresClient(
         "underpass",
         extract_config,
-        # auth_token=settings.OSM_SVC_ACCOUNT_TOKEN,
+        auth_token=settings.OSM_SVC_ACCOUNT_TOKEN
+        if settings.OSM_SVC_ACCOUNT_TOKEN
+        else None,
     )
     fgb_url = pg.execQuery(
         aoi,
         extra_params={
-            "fileName": "fmtm_extract",
+            "fileName": (
+                f"fmtm/{settings.FMTM_DOMAIN}/data_extract"
+                if settings.OSM_SVC_ACCOUNT_TOKEN
+                else "fmtm_extract"
+            ),
             "outputType": "fgb",
             "bind_zip": False,
             "useStWithin": False,
@@ -736,9 +742,9 @@ async def upload_custom_extract_to_s3(
         raise HTTPException(status_code=404, detail="Project not found")
 
     fgb_obj = BytesIO(fgb_content)
-    s3_fgb_path = f"/{project.organisation_id}/{project_id}/custom_extract.fgb"
+    s3_fgb_path = f"{project.organisation_id}/{project_id}/custom_extract.fgb"
 
-    log.debug(f"Uploading fgb to S3 path: {s3_fgb_path}")
+    log.debug(f"Uploading fgb to S3 path: /{s3_fgb_path}")
     add_obj_to_bucket(
         settings.S3_BUCKET_NAME,
         fgb_obj,
@@ -748,7 +754,7 @@ async def upload_custom_extract_to_s3(
 
     # Add url and type to database
     s3_fgb_full_url = (
-        f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}{s3_fgb_path}"
+        f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{s3_fgb_path}"
     )
 
     await update_data_extract_url_in_db(db, project, s3_fgb_full_url, data_extract_type)
@@ -924,16 +930,6 @@ async def generate_project_files(
             xlsform_path = f"{xlsforms_path}/{form_category}.xls"
             with open(xlsform_path, "rb") as f:
                 xlsform = BytesIO(f.read())
-
-            # NOTE would filtering be required at any point if this
-            # NOTE is handled upstream?
-            # filter = FilterData(xlsform)
-            # updated_data_extract = {"type": "FeatureCollection", "features": []}
-            # filtered_data_extract = (
-            #     filter.cleanData(data_extract)
-            #     if data_extract
-            #     else updated_data_extract
-            # )
 
         # Extract data extract from flatgeobuf
         log.debug("Getting data extract geojson from flatgeobuf")
