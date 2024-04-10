@@ -129,6 +129,20 @@ services:
       - fmtm-net
     restart: "unless-stopped"
 
+  ui-test:
+    profiles: ["ui-test"]
+    image: mcr.microsoft.com/playwright:v1.43.0
+    working_dir: /app
+    environment:
+      - DISPLAY=:0
+    volumes:
+      - ./src/frontend:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: npm run test:e2e
+    networks:
+      - fmtm-net
+    restart: "never"
+
   central:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2023.5.0}"

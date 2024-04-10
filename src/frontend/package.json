@@ -8,9 +8,10 @@
     "start": "env-cmd -f .env.dev vite dev",
     "start:live": "vite dev",
     "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:ui": "vitest --ui",
+    "test:unit": "vitest",
     "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:install-deps": "playwright install-deps",
     "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx src"
   },
   "license": "GPL-3.0-only",
