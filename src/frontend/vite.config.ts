@@ -9,13 +9,13 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      VitePWA({
-        registerType: 'autoUpdate',
-        devOptions: {
-          enabled: true,
-        },
-        selfDestroying: false,
-      }),
+      // VitePWA({
+      //   registerType: 'autoUpdate',
+      //   devOptions: {
+      //     enabled: true,
+      //   },
+      //   selfDestroying: false,
+      // }),
     ],
     server: {
       port: 7051,
