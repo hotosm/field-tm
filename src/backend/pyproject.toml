@@ -48,7 +48,7 @@ dependencies = [
     "defusedxml>=0.7.1",
     "osm-login-python==1.0.3",
     "osm-fieldwork==0.7.0",
-    "osm-rawdata==0.2.3",
+    "osm-rawdata==0.2.4",
     "fmtm-splitter==1.2.1",
 ]
 requires-python = ">=3.10"
