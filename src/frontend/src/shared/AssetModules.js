@@ -83,6 +83,8 @@ import {
   VideoFileOutlined as VideoFileOutlinedIcon,
   QuestionAnswer as QuestionAnswerIcon,
   IntegrationInstructions as IntegrationInstructionsIcon,
+  QrCode2Outlined as QrCode2OutlinedIcon,
+  BarChart as BarChartIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -176,4 +178,6 @@ export default {
   VideoFileOutlinedIcon,
   QuestionAnswerIcon,
   IntegrationInstructionsIcon,
+  QrCode2OutlinedIcon,
+  BarChartIcon,
 };

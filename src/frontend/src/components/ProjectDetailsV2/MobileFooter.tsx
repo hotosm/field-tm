@@ -3,12 +3,21 @@ import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useAppSelector } from '@/types/reduxTypes';
+import { Link, useParams } from 'react-router-dom';
+
+type footerItemType = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+};
 
 const MobileFooter = () => {
   const dispatch = CoreModules.useAppDispatch();
+  const params = useParams();
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
+  const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
 
-  const footerItem = [
+  const footerItem: footerItemType[] = [
     {
       id: 'projectInfo',
       title: 'Project Info',
@@ -53,28 +62,25 @@ const MobileFooter = () => {
         />
       ),
     },
-    ,
-    {
-      id: 'others',
-      title: 'Others',
-      icon: (
-        <AssetModules.MoreVertIcon
-          className={`${
-            mobileFooterSelection === 'others' ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
-          } fmtm-duration-300`}
-        />
-      ),
-    },
   ];
+
+  const infographicFooterItem: footerItemType = {
+    id: 'infographics',
+    title: 'Infographics',
+    icon: <AssetModules.BarChartIcon className={`fmtm-text-gray-500 hover:fmtm-text-primaryRed fmtm-duration-300`} />,
+  };
+
   const FooterItemList = ({ item }) => {
     return (
       <div
         onClick={() => dispatch(ProjectActions.SetMobileFooterSelection(item?.id))}
-        className="fmtm-group fmtm-cursor-pointer"
+        className={`fmtm-group fmtm-cursor-pointer ${item.id === 'comment' && !taskModalStatus ? 'fmtm-hidden' : ''}`}
       >
         <div
           className={`fmtm-w-full fmtm-flex fmtm-justify-center fmtm-py-1 fmtm-rounded-3xl fmtm-mb-1 fmtm-duration-300 ${
-            mobileFooterSelection === item?.id ? 'fmtm-bg-red-100' : 'group-hover:fmtm-bg-gray-200'
+            mobileFooterSelection === item?.id
+              ? 'fmtm-bg-red-100' && mobileFooterSelection !== 'infographics'
+              : 'group-hover:fmtm-bg-gray-200'
           }`}
         >
           <div>{item?.icon}</div>
@@ -82,7 +88,9 @@ const MobileFooter = () => {
         <div className="fmtm-flex fmtm-justify-center">
           <p
             className={`${
-              mobileFooterSelection === item?.id ? 'fmtm-text-primaryRed' : 'fmtm-text-gray-500'
+              mobileFooterSelection === item?.id && mobileFooterSelection !== 'infographics'
+                ? 'fmtm-text-primaryRed'
+                : 'fmtm-text-gray-500'
             } fmtm-duration-300 fmtm-text-xs fmtm-whitespace-nowrap`}
           >
             {item?.title}
@@ -92,13 +100,18 @@ const MobileFooter = () => {
     );
   };
   return (
-    <div className="fmtm-absolute fmtm-bottom-0 sm:fmtm-hidden fmtm-w-full fmtm-border-t-[1px] fmtm-z-[1200]">
+    <div className="fmtm-absolute fmtm-bottom-0 sm:fmtm-hidden fmtm-w-full fmtm-border-t-[1px] fmtm-z-[10008]">
       <div
-        className={`fmtm-w-full fmtm-grid fmtm-grid-cols-5 fmtm-bg-white  fmtm-pb-16 fmtm-pt-2 fmtm-gap-5 fmtm-px-2`}
+        className={`fmtm-w-full fmtm-grid ${
+          taskModalStatus ? 'fmtm-grid-cols-5' : 'fmtm-grid-cols-4'
+        } fmtm-bg-white fmtm-pb-2 fmtm-pt-2 fmtm-gap-5 fmtm-px-2`}
       >
         {footerItem.map((item) => (
           <FooterItemList key={item?.id} item={item} />
         ))}
+        <Link to={`/project-submissions/${params.id}?tab=infographics`}>
+          <FooterItemList item={infographicFooterItem} />
+        </Link>
       </div>
     </div>
   );

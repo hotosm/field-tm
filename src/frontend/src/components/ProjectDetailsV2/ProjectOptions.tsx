@@ -2,15 +2,12 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
 import Button from '@/components/common/Button';
-import { useNavigate } from 'react-router-dom';
 import { downloadProjectFormLoadingType } from '@/models/project/projectModel';
 
 const ProjectOptions = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
-  const navigate = useNavigate();
 
   const downloadProjectFormLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
     (state) => state.project.downloadProjectFormLoading,
@@ -47,87 +44,7 @@ const ProjectOptions = () => {
   };
   return (
     <>
-      <div className="sm:fmtm-hidden">
-        <div className="fmtm-flex fmtm-gap-3 fmtm-border-b-[1px] fmtm-pb-2 fmtm-mb-4 sm:fmtm-hidden">
-          <AssetModules.ListViewIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '35px' }} />
-          <p className="fmtm-text-2xl">Project Options</p>
-        </div>
-        <div
-          className={`fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-6 lg:fmtm-gap-0 fmtm-px-3 sm:fmtm-px-0 sm:fmtm-flex`}
-        >
-          <div className="fmtm-w-full fmtm-flex fmtm-flex-col fmtm-items-start sm:fmtm-flex-row  sm:fmtm-justify-center lg:fmtm-justify-start sm:fmtm-items-center fmtm-gap-6  sm:fmtm-ml-4">
-            <CoreModules.LoadingButton
-              onClick={() => handleDownload('form')}
-              sx={{ width: 'unset' }}
-              loading={downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading}
-              loadingPosition="end"
-              endIcon={<AssetModules.FileDownloadIcon />}
-              variant="contained"
-              color="error"
-            >
-              Form
-            </CoreModules.LoadingButton>
-            <CoreModules.LoadingButton
-              onClick={() => handleDownload('geojson')}
-              sx={{ width: 'unset' }}
-              loading={downloadProjectFormLoading.type === 'geojson' && downloadProjectFormLoading.loading}
-              loadingPosition="end"
-              endIcon={<AssetModules.FileDownloadIcon />}
-              variant="contained"
-              color="error"
-            >
-              Tasks
-            </CoreModules.LoadingButton>
-            <CoreModules.LoadingButton
-              onClick={() => onDataExtractDownload()}
-              sx={{ width: 'unset' }}
-              loading={downloadDataExtractLoading}
-              loadingPosition="end"
-              endIcon={<AssetModules.FileDownloadIcon />}
-              variant="contained"
-              color="error"
-              className="fmtm-truncate"
-            >
-              Data Extract
-            </CoreModules.LoadingButton>
-          </div>
-          <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-justify-center lg:fmtm-justify-end fmtm-w-full sm:fmtm-ml-4 fmtm-gap-6">
-            <CoreModules.Button
-              onClick={() => {
-                dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
-                dispatch(ProjectActions.SetMobileFooterSelection('explore'));
-              }}
-              variant="contained"
-              color="error"
-              sx={{ width: '200px', mr: '15px' }}
-              endIcon={<AssetModules.BoltIcon />}
-              className="fmtm-truncate"
-            >
-              Generate MbTiles
-            </CoreModules.Button>
-            <CoreModules.Button
-              onClick={() => navigate(`/manage-project/${projectId}`)}
-              variant="contained"
-              color="error"
-              sx={{ width: '200px', mr: '15px' }}
-              endIcon={<AssetModules.SettingsIcon />}
-              className="fmtm-truncate"
-            >
-              Manage Project
-            </CoreModules.Button>
-            <CoreModules.Button
-              onClick={() => navigate(`/project-submissions/${projectId}`)}
-              variant="contained"
-              color="error"
-              sx={{ width: '200px', mr: '15px' }}
-              className="fmtm-truncate"
-            >
-              View Infographics
-            </CoreModules.Button>
-          </div>
-        </div>
-      </div>
-      <div className="fmtm-hidden sm:fmtm-flex fmtm-gap-4 fmtm-flex-col md:fmtm-flex-row">
+      <div className="fmtm-flex fmtm-gap-4 fmtm-flex-col md:fmtm-flex-row">
         <Button
           isLoading={downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading}
           loadingText="FORM"
