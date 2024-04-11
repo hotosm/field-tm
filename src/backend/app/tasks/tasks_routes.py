@@ -18,7 +18,7 @@
 """Routes for FMTM tasks."""
 
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from loguru import logger as log
@@ -253,24 +253,26 @@ async def task_activity(
     )
 
 
-@router.get("/task_history/", response_model=List[tasks_schemas.TaskHistoryOut])
+@router.get(
+    "/task_history/{project_id}", response_model=List[tasks_schemas.TaskHistoryOut]
+)
 async def task_history(
     project_id: int,
+    task_id: int,
     days: int = 10,
     comment: bool = False,
-    task_id: Optional[int] = None,
     db: Session = Depends(database.get_db),
 ):
     """Get the detailed task history for a project.
 
     Args:
         project_id (int): The ID of the project.
+        task_id (int): The task_id of the project.
         days (int): The number of days to consider for the
             task activity (default: 10).
         comment (bool): True or False, True to get comments
             from the project tasks and False by default for
             entire task status history.
-        task_id (int): The task_id of the project.
         db (Session): The database session.
 
     Returns:
@@ -278,5 +280,5 @@ async def task_history(
     """
     end_date = datetime.now() - timedelta(days=days)
     return await tasks_crud.get_project_task_history(
-        project_id, comment, end_date, task_id, db
+        project_id, task_id, comment, end_date, db
     )

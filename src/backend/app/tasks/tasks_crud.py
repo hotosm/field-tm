@@ -18,7 +18,6 @@
 """Logic for FMTM tasks."""
 
 from datetime import datetime, timedelta
-from typing import Optional
 
 from fastapi import Depends, HTTPException
 from loguru import logger as log
@@ -215,42 +214,42 @@ async def create_task_history_for_status_change(
 
 # TODO: write tests for these
 
+# TODO: remove it
+# async def get_task_comments(db: Session, project_id: int, task_id: int):
+#     """Get a list of tasks id for a project."""
+#     query = text(
+#         """
+#         SELECT
+#             task_history.id, task_history.task_id, users.username,
+#             task_history.action_text, task_history.action_date
+#         FROM
+#             task_history
+#         LEFT JOIN
+#             users ON task_history.user_id = users.id
+#         WHERE
+#             project_id = :project_id
+#             AND task_id = :task_id
+#             AND action = 'COMMENT'
+#     """
+#     )
 
-async def get_task_comments(db: Session, project_id: int, task_id: int):
-    """Get a list of tasks id for a project."""
-    query = text(
-        """
-        SELECT
-            task_history.id, task_history.task_id, users.username,
-            task_history.action_text, task_history.action_date
-        FROM
-            task_history
-        LEFT JOIN
-            users ON task_history.user_id = users.id
-        WHERE
-            project_id = :project_id
-            AND task_id = :task_id
-            AND action = 'COMMENT'
-    """
-    )
+#     params = {"project_id": project_id, "task_id": task_id}
 
-    params = {"project_id": project_id, "task_id": task_id}
+#     result = db.execute(query, params)
 
-    result = db.execute(query, params)
+#     # Convert the result to a list of dictionaries
+#     result_dict_list = [
+#         {
+#             "id": row[0],
+#             "task_id": row[1],
+#             "commented_by": row[2],
+#             "comment": row[3],
+#             "created_at": row[4],
+#         }
+#         for row in result.fetchall()
+#     ]
 
-    # Convert the result to a list of dictionaries
-    result_dict_list = [
-        {
-            "id": row[0],
-            "task_id": row[1],
-            "commented_by": row[2],
-            "comment": row[3],
-            "created_at": row[4],
-        }
-        for row in result.fetchall()
-    ]
-
-    return result_dict_list
+#     return result_dict_list
 
 
 async def add_task_comments(
@@ -307,7 +306,6 @@ async def add_task_comments(
     # Return the details of the added comment as a dictionary
     return {
         "id": row[0],
-        "task_id": row[1],
         "action_text": row[2],
         "action_date": row[3],
         "username": row[4],
@@ -331,21 +329,21 @@ async def update_task_history(
 
 async def get_project_task_history(
     project_id: int,
+    task_id: int,
     comment: bool,
     end_date: datetime,
-    task_id: Optional[int],
     db: Session,
 ):
     """Retrieves the task history records for a specific project.
 
     Args:
         project_id (int): The ID of the project.
+        task_id (int): The task_id of the project.
         comment (bool): True or False, True to get comments
             from the project tasks and False by default for
             entire task status history.
         end_date (datetime, optional): The end date of the task history
             records to retrieve.
-        task_id (int): The task_id of the project.
         db (Session): The database session.
 
     Returns:
@@ -357,20 +355,18 @@ async def get_project_task_history(
                     users.profile_img
                     FROM task_history
                     LEFT JOIN users on users.id = task_history.user_id
-                    WHERE project_id = {project_id}
+                    WHERE task_id = {task_id}
                     AND  action_date >= '{end_date}'
             """
 
     query += " AND action = 'COMMENT'" if comment else " AND action != 'COMMENT'"
 
-    if task_id:
-        query += f" AND task_id = {task_id}"
+    query += " ORDER BY id DESC"
 
     result = db.execute(text(query)).fetchall()
     task_history = [
         {
             "id": row[0],
-            "task_id": row[1],
             "action_text": row[2],
             "action_date": row[3],
             "username": row[4],
