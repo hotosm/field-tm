@@ -33,7 +33,6 @@ class TaskHistoryBase(BaseModel):
     """Task mapping history."""
 
     id: int
-    task_id: int
     action_text: str
     action_date: datetime
 
