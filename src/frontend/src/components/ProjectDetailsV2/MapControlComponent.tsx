@@ -81,7 +81,7 @@ const MapControlComponent = ({ map }) => {
         </div>
       ))}
       <div
-        className={`fmtm-relative ${!pathname.includes('project_details') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}
+        className={`fmtm-relative ${!pathname.includes('project/') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}
         ref={divRef}
       >
         <div
