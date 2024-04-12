@@ -188,7 +188,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
         }),
       );
       dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
-      navigate(`/project_details/${projectId}`);
+      navigate(`/project/${projectId}`);
       dispatch(CreateProjectActions.ClearCreateProjectFormData());
       dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
     }

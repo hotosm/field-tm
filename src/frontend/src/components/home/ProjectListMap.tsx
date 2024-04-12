@@ -74,7 +74,7 @@ const ProjectListMap = () => {
 
   const projectClickOnMap = (properties: any) => {
     const projectId = properties.id;
-    navigate(`/project_details/${projectId}`);
+    navigate(`/project/${projectId}`);
   };
 
   return (

@@ -46,7 +46,7 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams === 'true' || (location.pathname.includes('project_details') && windowSize.width <= 640) ? (
+            {popupInParams === 'true' || (location.pathname.includes('project') && windowSize.width <= 640) ? (
               <div></div>
             ) : (
               <div>
@@ -56,14 +56,14 @@ const MainView = () => {
             )}
             <CoreModules.Stack
               className={`mainview ${
-                location.pathname.includes('project_details')
+                location.pathname.includes('project/')
                   ? 'fmtm-px-0 sm:fmtm-px-[1.3rem] sm:fmtm-py-[1.3rem]'
                   : 'fmtm-px-[1.3rem] fmtm-py-[1.3rem]'
               }`}
               sx={{
                 height: popupInParams
                   ? '100vh'
-                  : location.pathname.includes('project_details') && windowSize.width <= 640
+                  : location.pathname.includes('project/') && windowSize.width <= 640
                     ? '100vh'
                     : windowSize.width <= 599
                       ? '90vh'

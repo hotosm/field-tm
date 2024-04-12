@@ -42,7 +42,7 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/tasks/features/?project_id=${projectId}`));
+      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/projects/${projectId}/task-completion`));
     };
     fetchData();
   }, []);

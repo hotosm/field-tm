@@ -131,7 +131,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/project_details/:id',
+        path: '/project/:id',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <ErrorBoundary>

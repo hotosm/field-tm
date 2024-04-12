@@ -59,7 +59,7 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
         const project: projectType = data;
         // dispatch(ProjectActions.SetProjectTaskBoundries([]))
         dispatch(HomeActions.SetSelectedProject(project));
-        navigate(`/project_details/${data.id}`);
+        navigate(`/project/${data.id}`);
       }}
       style={cardInnerStyles.card}
       sx={{ boxShadow: 0 }}

@@ -157,7 +157,9 @@ async def geojson_to_flatgeobuf(
             (geom, osm_id, tags, version, changeset, timestamp)
         SELECT
             ST_ForceCollection(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom,
-            (feat->'properties'->>'osm_id')::integer as osm_id,
+            regexp_replace(
+                (feat->'properties'->>'osm_id')::text, '[^0-9]', '', 'g'
+            )::integer as osm_id,
             (feat->'properties'->>'tags')::text as tags,
             (feat->'properties'->>'version')::integer as version,
             (feat->'properties'->>'changeset')::integer as changeset,

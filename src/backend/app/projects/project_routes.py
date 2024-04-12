@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Optional
 
 import geojson
+import geojson_pydantic
 import requests
 from fastapi import (
     APIRouter,
@@ -53,7 +54,7 @@ from app.db.postgis_utils import (
     flatgeobuf_to_geojson,
     parse_and_filter_geojson,
 )
-from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
+from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus, ProjectVisibility
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.submissions import submission_crud
@@ -66,6 +67,15 @@ router = APIRouter(
 )
 
 
+@router.get("/features", response_model=geojson_pydantic.FeatureCollection)
+async def read_projects_to_featcol(
+    db: Session = Depends(database.get_db),
+    bbox: Optional[str] = None,
+):
+    """Return all projects as a single FeatureCollection."""
+    return await project_crud.get_projects_featcol(db, bbox)
+
+
 @router.get("/", response_model=list[project_schemas.ProjectOut])
 async def read_projects(
     user_id: int = None,
@@ -74,58 +84,10 @@ async def read_projects(
     db: Session = Depends(database.get_db),
 ):
     """Return all projects."""
-    project_count, projects = await project_crud.get_projects(db, user_id, skip, limit)
+    project_count, projects = await project_crud.get_projects(
+        db, user_id=user_id, skip=skip, limit=limit
+    )
     return projects
-
-
-# TODO delete me
-# @router.get("/details/{project_id}/")
-# async def get_projet_details(
-#     project_id: int,
-#     db: Session = Depends(database.get_db),
-#     current_user: AuthUser = Depends(mapper),
-# ):
-#     """Returns the project details.
-
-#     Also includes ODK project details, so takes extra time to return.
-
-#     Parameters:
-#         project_id: int
-
-#     Returns:
-#         Response: Project details.
-#     """
-#     project = await project_crud.get_project(db, project_id)
-#     if not project:
-#         raise HTTPException(status_code=404, detail={"Project not found"})
-
-#     # ODK Credentials
-#     odk_credentials = project_schemas.ODKCentralDecrypted(
-#         odk_central_url=project.odk_central_url,
-#         odk_central_user=project.odk_central_user,
-#         odk_central_password=project.odk_central_password,
-#     )
-
-#     odk_details = central_crud.get_odk_project_full_details(
-#         project.odkid, odk_credentials
-#     )
-
-#     # Features count
-#     query = text(
-#         "select count(*) from features where "
-#         f"project_id={project_id} and task_id is not null"
-#     )
-#     result = db.execute(query)
-#     features = result.fetchone()[0]
-
-#     return {
-#         "id": project_id,
-#         "odkName": odk_details["name"],
-#         "createdAt": odk_details["createdAt"],
-#         "tasks": odk_details["forms"],
-#         "lastSubmission": odk_details["lastSubmission"],
-#         "total_features": features,
-#     }
 
 
 @router.post("/near_me", response_model=list[project_schemas.ProjectSummary])
@@ -152,7 +114,14 @@ async def read_project_summaries(
             filter(lambda hashtag: hashtag.startswith("#"), hashtags)
         )  # filter hashtags that do start with #
 
-    total_projects = db.query(db_models.DbProject).count()
+    total_project_count = (
+        db.query(db_models.DbProject)
+        .filter(
+            db_models.DbProject.visibility  # type: ignore
+            == ProjectVisibility.PUBLIC  # type: ignore
+        )
+        .count()
+    )
     skip = (page - 1) * results_per_page
     limit = results_per_page
 
@@ -161,8 +130,9 @@ async def read_project_summaries(
     )
 
     pagination = await project_crud.get_pagination(
-        page, project_count, results_per_page, total_projects
+        page, project_count, results_per_page, total_project_count
     )
+
     project_summaries = [
         project_schemas.ProjectSummary.from_db_project(project) for project in projects
     ]
@@ -212,6 +182,50 @@ async def search_project(
         pagination=pagination,
     )
     return response
+
+
+@router.get("/{project_id}/task-completion")
+async def task_features_count(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+):
+    """Get all features within a task area."""
+    # Get the project object.
+    project = await project_crud.get_project(db, project_id)
+
+    # ODK Credentials
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
+
+    odk_details = central_crud.list_odk_xforms(project.odkid, odk_credentials, True)
+
+    # Assemble the final data list
+    data = []
+    feature_count_query = text(
+        """
+        SELECT id, feature_count
+        FROM tasks
+        WHERE project_id = :project_id;
+    """
+    )
+    result = db.execute(feature_count_query, {"project_id": project_id})
+    feature_counts = result.all()
+
+    if not feature_counts:
+        msg = f"To tasks found for project {project_id}"
+        log.warning(msg)
+        raise HTTPException(status_code=404, detail=msg)
+
+    data.extend(
+        {
+            "task_id": record[0],
+            "submission_count": odk_details[0]["submissions"],
+            "last_submission": odk_details[0]["lastSubmission"],
+            "feature_count": record[1],
+        }
+        for record in feature_counts
+    )
+
+    return data
 
 
 @router.get("/{project_id}", response_model=project_schemas.ReadProject)
