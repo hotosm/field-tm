@@ -17,17 +17,20 @@
 #
 """Entrypoint for FastAPI app."""
 
+import json
 import logging
 import sys
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-import sentry_sdk
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.__version__ import __version__
 from app.auth import auth_routes
@@ -43,14 +46,6 @@ from app.projects.project_crud import read_xlsforms
 from app.submissions import submission_routes
 from app.tasks import tasks_routes
 from app.users import user_routes
-
-# Add sentry tracing only in prod
-if not settings.DEBUG:
-    log.info("Adding Sentry tracing")
-    sentry_sdk.init(
-        dsn=settings.SENTRY_DSN,
-        traces_sample_rate=0.1,
-    )
 
 
 @asynccontextmanager
@@ -206,3 +201,46 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def home():
     """Redirect home to docs."""
     return RedirectResponse("/docs")
+
+
+@api.get("/__version__")
+async def deployment_details():
+    """Mozilla Dockerflow Spec: source, version, commit, and link to CI build."""
+    details = {}
+
+    version_path = Path("/opt/version.json")
+    if version_path.exists():
+        with open(version_path, "r") as version_file:
+            details = json.load(version_file)
+    commit = details.get("commit", "commit key was not found in file!")
+    build = details.get("build", "build key was not found in file!")
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={
+            "source": "https://github.com/hotosm/fmtm",
+            "version": __version__,
+            "commit": commit or "/app/version.json not found",
+            "build": build or "/app/version.json not found",
+        },
+    )
+
+
+@api.get("/__heartbeat__")
+async def heartbeat_plus_db(db: Session = Depends(get_db)):
+    """Heartbeat that checks that API and DB are both up and running."""
+    try:
+        db.execute(text("SELECT 1"))
+        return Response(status_code=HTTPStatus.OK)
+    except Exception as e:
+        log.warning(e)
+        log.warning("Server failed __heartbeat__ database connection check")
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content={"error": str(e)}
+        )
+
+
+@api.get("/__lbheartbeat__")
+async def simple_heartbeat():
+    """Simple ping/pong API response."""
+    return Response(status_code=HTTPStatus.OK)
