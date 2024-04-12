@@ -56,7 +56,6 @@ from app.db.postgis_utils import (
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
-from app.static import data_path
 from app.submissions import submission_crud
 from app.tasks import tasks_crud
 
@@ -836,20 +835,6 @@ async def update_project_form(
     return project
 
 
-@router.get("/download_template/")
-async def download_template(
-    category: str,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Download an XLSForm template to fill out."""
-    xlsform_path = f"{xlsforms_path}/{category}.xls"
-    if os.path.exists(xlsform_path):
-        return FileResponse(xlsform_path, filename="form.xls")
-    else:
-        raise HTTPException(status_code=404, detail="Form not found")
-
-
 @router.get("/{project_id}/download")
 async def download_project_boundary(
     project_id: int,
@@ -1152,30 +1137,6 @@ async def get_task_status(
         status=task_status.name,
         message=task_message or None,
         # progress=some_func_to_get_progress,
-    )
-
-
-@router.get("/templates/")
-async def get_template_file(
-    file_type: str = Query(
-        ..., enum=["data_extracts", "form"], description="Choose file type"
-    ),
-    current_user: AuthUser = Depends(login_required),
-):
-    """Get template file.
-
-    Args: file_type: Type of template file.
-
-    returns: Requested file as a FileResponse.
-    """
-    file_type_paths = {
-        "data_extracts": f"{data_path}/template/template.geojson",
-        "form": f"{data_path}/template/template.xls",
-    }
-    file_path = file_type_paths.get(file_type)
-    filename = file_path.split("/")[-1]
-    return FileResponse(
-        file_path, media_type="application/octet-stream", filename=filename
     )
 
 

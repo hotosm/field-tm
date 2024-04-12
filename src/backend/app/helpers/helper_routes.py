@@ -27,7 +27,8 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
+from osm_fieldwork.xlsforms import xlsforms_path
 
 from app.auth.osm import AuthUser, login_required
 from app.central.central_crud import (
@@ -40,13 +41,26 @@ from app.db.postgis_utils import (
     javarosa_to_geojson_geom,
     parse_and_filter_geojson,
 )
-from app.models.enums import GeometryType, HTTPStatus
+from app.models.enums import GeometryType, HTTPStatus, XLSFormType
 
 router = APIRouter(
     prefix="/helper",
     tags=["helper"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router.get("/download-template-xlsform")
+async def download_template(
+    category: XLSFormType,
+    current_user: AuthUser = Depends(login_required),
+):
+    """Download an XLSForm template to fill out."""
+    xlsform_path = f"{xlsforms_path}/{category}.xls"
+    if Path(xlsform_path).exists:
+        return FileResponse(xlsform_path, filename="form.xls")
+    else:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")
 
 
 @router.post("/append-geojson-properties")
