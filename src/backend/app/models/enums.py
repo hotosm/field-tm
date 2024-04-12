@@ -312,3 +312,15 @@ class GeometryType(str, Enum):
     Polygon = "Polygon"
     LineString = "LineString"
     Point = "Point"
+
+
+class XLSFormType(str, Enum):
+    """Enum for XLSForm categories."""
+
+    BUILDING = "buildings"
+    HIGHWAYS = "highways"
+    HEALTH = "health"
+    TOILETS = "toilets"
+    RELIGIOUS = "religious"
+    LANDUSAGE = "landusage"
+    WATERWAYS = "waterways"

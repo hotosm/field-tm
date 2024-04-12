@@ -55,26 +55,14 @@ async def list_projects():
 
 @router.get("/list-forms")
 async def get_form_lists(
-    db: Session = Depends(database.get_db), skip: int = 0, limit: int = 100
-):
-    """Get a list of all XForms on ODK Central.
-
-    Option to skip a certain number of records and limit the number of
-    records returned.
-
-
-    Parameters:
-    skip (int): the number of records to skip before starting to retrieve records.
-        Defaults to 0 if not provided.
-    limit (int): the maximum number of records to retrieve.
-        Defaults to 10 if not provided.
-
+    db: Session = Depends(database.get_db),
+) -> dict:
+    """Get a list of all XLSForms available in FMTM.
 
     Returns:
-        list[dict]: list of id:title dicts of each XForm record.
+        dict: JSON of {id:title} with each XLSForm record.
     """
-    # NOTE runs in separate thread using run_in_threadpool
-    forms = await run_in_threadpool(lambda: central_crud.get_form_list(db, skip, limit))
+    forms = await central_crud.get_form_list(db)
     return forms
 
 

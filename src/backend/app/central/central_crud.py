@@ -41,7 +41,7 @@ from app.db.postgis_utils import (
     javarosa_to_geojson_geom,
     parse_and_filter_geojson,
 )
-from app.models.enums import HTTPStatus
+from app.models.enums import HTTPStatus, XLSFormType
 from app.projects import project_schemas
 
 
@@ -291,31 +291,22 @@ def list_submissions(
     return submissions
 
 
-def get_form_list(db: Session, skip: int, limit: int):
-    """Returns the list of id and title of xforms from the database."""
+async def get_form_list(db: Session) -> dict:
+    """Returns the dict of {id:title} for XLSForms in the database."""
     try:
-        categories_to_filter = [
-            "amenities",
-            "camping",
-            "cemeteries",
-            "education",
-            "nature",
-            "places",
-            "wastedisposal",
-            "waterpoints",
-        ]
+        include_categories = [category.value for category in XLSFormType]
 
         sql_query = text(
             """
             SELECT id, title FROM xlsforms
-            WHERE title NOT IN
+            WHERE title IN
                 (SELECT UNNEST(:categories));
             """
         )
 
-        result = db.execute(sql_query, {"categories": categories_to_filter}).fetchall()
+        result = db.execute(sql_query, {"categories": include_categories}).fetchall()
 
-        result_dict = [{"id": row.id, "title": row.title} for row in result]
+        result_dict = {row.id: row.title for row in result}
 
         return result_dict
 
