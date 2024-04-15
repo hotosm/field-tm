@@ -231,7 +231,11 @@ async def task_features_count(
 
 
 @router.get("/{project_id}", response_model=project_schemas.ReadProject)
-async def read_project(project_id: int, db: Session = Depends(database.get_db)):
+async def read_project(
+    project_id: int,
+    current_user: AuthUser = Depends(mapper),
+    db: Session = Depends(database.get_db),
+):
     """Get a specific project by ID."""
     project = await project_crud.get_project_by_id(db, project_id)
     if not project:
@@ -675,7 +679,7 @@ async def get_data_extract(
     geojson_file: UploadFile = File(...),
     form_category: Optional[str] = Form(None),
     # config_file: Optional[str] = Form(None),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Get a new data extract for a given project AOI.
 
@@ -771,7 +775,7 @@ async def upload_custom_extract(
 async def download_form(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Download the XLSForm for a project."""
     project = await project_crud.get_project(db, project_id)
@@ -1036,7 +1040,7 @@ async def generate_project_tiles(
 async def tiles_list(
     project_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Returns the list of tiles for a project.
 
@@ -1055,7 +1059,7 @@ async def tiles_list(
 async def download_tiles(
     tile_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    current_user: AuthUser = Depends(mapper),
 ):
     """Download the basemap tile archive for a project."""
     log.debug("Getting tile archive path from DB")
@@ -1113,6 +1117,7 @@ async def download_task_boundary_osm(
 @router.get("/centroid/")
 async def project_centroid(
     project_id: int = None,
+    current_user: AuthUser = Depends(mapper),
     db: Session = Depends(database.get_db),
 ):
     """Get a centroid of each projects.
@@ -1166,6 +1171,7 @@ async def project_dashboard(
     db_organisation: db_models.DbOrganisation = Depends(
         organisation_deps.org_from_project
     ),
+    current_user: AuthUser = Depends(mapper),
     db: Session = Depends(database.get_db),
 ):
     """Get the project dashboard details.
@@ -1174,6 +1180,7 @@ async def project_dashboard(
         background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
         db_project (db_models.DbProject): An instance of the project.
         db_organisation (db_models.DbOrganisation): An instance of the organisation.
+        current_user(AuthUser): logged in user.
         db (Session): The database session.
 
     Returns:

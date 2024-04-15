@@ -29,7 +29,7 @@ from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser, login_required
-from app.auth.roles import mapper
+from app.auth.roles import mapper, project_admin
 from app.central import central_crud
 from app.config import settings
 from app.db import database, db_models
@@ -480,6 +480,7 @@ async def update_review_state(
     instance_id: str,
     review_state: ReviewStateEnum,
     task_id: int,
+    current_user: AuthUser = Depends(project_admin),
     db: Session = Depends(database.get_db),
 ):
     """Updates the review state of a project submission.
@@ -489,6 +490,7 @@ async def update_review_state(
         instance_id (str): The ID of the submission instance.
         review_state (ReviewStateEnum): The new review state to be set.
         task_id (int): The ID of the task associated with the submission.
+        current_user(AuthUser): logged in user.
         db (Session): The database session dependency.
     """
     try:

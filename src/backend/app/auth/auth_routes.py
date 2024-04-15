@@ -18,6 +18,7 @@
 
 """Auth routes, to login, logout, and get user details."""
 from datetime import datetime, timezone
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -230,3 +231,37 @@ async def check_login(
     Returns True if authenticated, False otherwise.
     """
     return user_data
+
+
+@router.get("/login/")
+async def temp_login(
+    request: Request,
+    email: Optional[str] = None,
+):
+    """Handles the authentication check endpoint.
+
+    By creating a temporary access token and
+    setting it as a cookie.
+
+    Args:
+        request (Request): The incoming request object.
+        email: email of non-osm user.
+
+    Returns:
+        Response: The response object containing the access token as a cookie.
+    """
+    access_token = settings.OSM_SVC_ACCOUNT_TOKEN
+    response = JSONResponse(content={"access_token": access_token}, status_code=200)
+    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    response.set_cookie(
+        key=cookie_name,
+        value=access_token,
+        max_age=604800,
+        expires=604800,  # expiry set to 7 days,
+        path="/",
+        domain=settings.FMTM_DOMAIN,
+        secure=False if settings.DEBUG else True,
+        httponly=True,
+        samesite="lax",
+    )
+    return response
