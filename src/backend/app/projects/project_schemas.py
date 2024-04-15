@@ -36,6 +36,7 @@ from app.db.postgis_utils import (
     geojson_to_geometry,
     geometry_to_geojson,
     get_address_from_lat_lon,
+    merge_multipolygon,
     read_wkb,
     write_wkb,
 )
@@ -153,7 +154,9 @@ class ProjectIn(BaseModel):
         """Compute WKBElement geom from geojson."""
         if not self.outline_geojson:
             return None
-        return geojson_to_geometry(self.outline_geojson)
+        outline = merge_multipolygon(self.outline_geojson)
+
+        return geojson_to_geometry(outline)
 
     @computed_field
     @property

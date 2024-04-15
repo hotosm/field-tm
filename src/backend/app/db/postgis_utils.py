@@ -26,12 +26,14 @@ from typing import Optional, Union
 
 import geojson
 import requests
+import shapely
 from fastapi import HTTPException
 from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape, to_shape
-from geojson_pydantic import Feature, Polygon
+from geojson_pydantic import Feature, MultiPolygon, Polygon
 from geojson_pydantic import FeatureCollection as FeatCol
 from shapely.geometry import mapping, shape
+from shapely.ops import unary_union
 from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
@@ -90,10 +92,14 @@ def get_centroid(
 
 
 def geojson_to_geometry(
-    geojson: Union[FeatCol, Feature, Polygon],
+    geojson: Union[FeatCol, Feature, MultiPolygon, Polygon],
 ) -> Optional[WKBElement]:
     """Convert GeoJSON to SQLAlchemy geometry."""
-    parsed_geojson = parse_and_filter_geojson(geojson.model_dump_json(), filter=False)
+    parsed_geojson = geojson
+    if isinstance(geojson, (FeatCol, Feature, MultiPolygon, Polygon)):
+        parsed_geojson = parse_and_filter_geojson(
+            geojson.model_dump_json(), filter=False
+        )
 
     if not parsed_geojson:
         return None
@@ -668,3 +674,99 @@ async def task_geojson_dict_to_entity_values(task_geojson_dict):
     entity_values = await gather(*asyncio_tasks)
     # Merge all dicts into a single dict
     return {k: v for result in entity_values for k, v in result.items()}
+
+
+def multipolygon_to_polygon(features: Union[Feature, FeatCol, MultiPolygon, Polygon]):
+    """Converts a GeoJSON FeatureCollection of MultiPolygons to Polygons.
+
+    Args:
+        features : A GeoJSON FeatureCollection containing MultiPolygons/Polygons.
+
+    Returns:
+        geojson.FeatureCollection: A GeoJSON FeatureCollection containing Polygons.
+    """
+    geojson_feature = []
+    features = parse_featcol(features)
+
+    # handles both collection or single feature
+    features = features.get("features", [features])
+
+    for feature in features:
+        properties = feature["properties"]
+        geom = shape(feature["geometry"])
+        if geom.geom_type == "Polygon":
+            geojson_feature.append(
+                geojson.Feature(geometry=geom, properties=properties)
+            )
+        elif geom.geom_type == "MultiPolygon":
+            geojson_feature.extend(
+                geojson.Feature(geometry=polygon_coords, properties=properties)
+                for polygon_coords in geom.geoms
+            )
+
+    return geojson.FeatureCollection(geojson_feature)
+
+
+def merge_multipolygon(features: Union[Feature, FeatCol, MultiPolygon, Polygon]):
+    """Merge multiple Polygons or MultiPolygons into a single Polygon.
+
+    Args:
+        features: geojson features to merge.
+
+    Returns:
+        A GeoJSON FeatureCollection containing the merged Polygon.
+    """
+    try:
+
+        def remove_z_dimension(coord):
+            """Remove z dimension from geojson."""
+            return coord.pop() if len(coord) == 3 else None
+
+        features = parse_featcol(features)
+
+        multi_polygons = []
+        # handles both collection or single feature
+        features = features.get("features", [features])
+
+        for feature in features:
+            list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
+            polygon = shapely.geometry.shape(feature["geometry"])
+            multi_polygons.append(polygon)
+
+        merged_polygon = unary_union(multi_polygons)
+        if isinstance(merged_polygon, MultiPolygon):
+            merged_polygon = merged_polygon.convex_hull
+
+        merged_geojson = mapping(merged_polygon)
+        if merged_geojson["type"] == "MultiPolygon":
+            log.error(
+                "Resulted GeoJSON contains disjoint Polygons. "
+                "Adjacent polygons are preferred."
+            )
+        return geojson.FeatureCollection([geojson.Feature(geometry=merged_geojson)])
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Couldn't merge the multipolygon to polygon: {str(e)}",
+        ) from e
+
+
+def parse_featcol(features: Union[Feature, FeatCol, MultiPolygon, Polygon]):
+    """Parse a feature collection or feature into a GeoJSON FeatureCollection.
+
+    Args:
+        features: Feature, FeatCol, MultiPolygon, Polygon or dict.
+
+    Returns:
+        dict: Parsed GeoJSON FeatureCollection.
+    """
+    if isinstance(features, dict):
+        return features
+
+    feat_col = features.model_dump_json()
+    feat_col = geojson.loads(feat_col)
+    if isinstance(features, (Polygon, MultiPolygon)):
+        feat_col = geojson.FeatureCollection([geojson.Feature(geometry=feat_col)])
+    elif isinstance(features, Feature):
+        feat_col = geojson.FeatureCollection([feat_col])
+    return feat_col
