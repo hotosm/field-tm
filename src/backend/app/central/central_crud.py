@@ -291,8 +291,8 @@ def list_submissions(
     return submissions
 
 
-async def get_form_list(db: Session) -> dict:
-    """Returns the dict of {id:title} for XLSForms in the database."""
+async def get_form_list(db: Session) -> list:
+    """Returns the list of {id:title} for XLSForms in the database."""
     try:
         include_categories = [category.value for category in XLSFormType]
 
@@ -305,10 +305,8 @@ async def get_form_list(db: Session) -> dict:
         )
 
         result = db.execute(sql_query, {"categories": include_categories}).fetchall()
-
-        result_dict = {row.id: row.title for row in result}
-
-        return result_dict
+        result_list = [{"id": row.id, "title": row.title} for row in result]
+        return result_list
 
     except Exception as e:
         log.error(e)

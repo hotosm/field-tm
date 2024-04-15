@@ -56,7 +56,7 @@ async def list_projects():
 @router.get("/list-forms")
 async def get_form_lists(
     db: Session = Depends(database.get_db),
-) -> dict:
+) -> list:
     """Get a list of all XLSForms available in FMTM.
 
     Returns:
@@ -64,48 +64,6 @@ async def get_form_lists(
     """
     forms = await central_crud.get_form_list(db)
     return forms
-
-
-# TODO delete this endpoint (since replaced?)
-# @router.get("/download_submissions")
-# async def download_submissions(
-#     project_id: int,
-#     db: Session = Depends(database.get_db),
-# ):
-#     """Download the submissions data from Central."""
-#     project = table(
-#         "projects",
-#         column("project_name_prefix"),
-#         column("xform_title"),
-#         column("id"),
-#         column("odkid"),
-#     )
-#     where = f"id={project_id}"
-#     sql = select(project).where(text(where))
-#     result = db.execute(sql)
-#     first = result.first()
-#     if not first:
-#         return {"error": "No such project!"}
-#     # FIXME: this should be configurable
-#     tmp = "/tmp"
-#     filespec = f"{tmp}/{first.project_name_prefix}_{first.xform_title}"
-
-#     xforms = central_crud.list_odk_xforms(first.odkid)
-#     submissions = list()
-#     for xform in xforms:
-#         # FIXME this should be optimised via async or threadpool
-#         # FIXME very expensive opteration to run blocking in parallel
-#         data = central_crud.download_submissions(first.odkid, xform["xmlFormId"])
-#         # An empty submissions only has the CSV headers
-#         # headers = data[0]
-#         if len(submissions) == 0:
-#             submissions.append(data[0])
-#         if len(data) >= 2:
-#             for entry in range(1, len(data)):
-#                 submissions.append(data[entry])
-
-#     result = central_crud.convert_csv(filespec, submissions)
-#     return {"data": result}
 
 
 @router.get("/list-submissions")
