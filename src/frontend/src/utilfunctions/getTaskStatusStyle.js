@@ -1,5 +1,5 @@
 import { Fill, Icon, Stroke, Style } from 'ol/style';
-import { transform } from 'ol/proj';
+import { getCenter } from 'ol/extent';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
 import { task_priority_str } from '@/types/enums';
@@ -25,8 +25,8 @@ function createIconStyle(iconSrc) {
       src: iconSrc,
     }),
     geometry: function (feature) {
-      const convertedCenter = transform(feature.values_.centroid, 'EPSG:4326', 'EPSG:3857');
-      return new Point(convertedCenter);
+      const polygonCentroid = getCenter(feature.getGeometry().getExtent());
+      return new Point(polygonCentroid);
     },
   });
 }

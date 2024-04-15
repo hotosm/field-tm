@@ -103,16 +103,6 @@ export type taskBoundriesTypes = {
     id: string;
     bbox: [string, string, string, string];
   };
-  outline_centroid: {
-    type: string;
-    geometry: {
-      coordinates: [string, string];
-      type: string;
-    };
-    properties: Record<string, any>;
-    id: string;
-    bbox: [string, string, string, string];
-  };
   task_history: taskHistoryTypes[];
   task_status: string;
 };
