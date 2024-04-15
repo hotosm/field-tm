@@ -6,59 +6,53 @@ import { Polygon } from 'ol/geom';
 import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
 import { taskHistoryListType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
+import { useDispatch } from 'react-redux';
+import { GetProjectTaskActivity } from '@/api/Project';
 
 const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion, states }) => {
-  const displayLimit = 10;
+  const dispatch = useDispatch();
+  const id = params.id;
   const [searchText, setSearchText] = useState<string>('');
   const [taskHistories, setTaskHistories] = useState<taskHistoryListType[]>([]);
-  const [taskDisplay, setTaskDisplay] = React.useState(displayLimit);
   const [allActivities, setAllActivities] = useState(0);
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [showShortBy, setShowSortBy] = useState(false);
-  const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
+  const projectActivityLoading = useAppSelector((state) => state?.project?.projectActivityLoading);
+  const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
+  const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  useEffect(() => {
+    dispatch(
+      GetProjectTaskActivity(
+        `${import.meta.env.VITE_API_URL}/tasks/task_history/${id}?comment=false&task_id=${selectedTask}`,
+      ),
+    );
+  }, [selectedTask]);
 
   const handleOnchange = (event) => {
     setSearchText(event.target.value);
   };
 
   useEffect(() => {
-    const index = state.findIndex((project) => project.id == params.id);
-    let taskHistories: taskHistoryListType[] = [];
+    let taskHistories: taskHistoryListType[] = projectTaskActivityList;
 
-    if (index != -1) {
-      state[index].taskBoundries.forEach((task) => {
-        taskHistories = taskHistories.concat(
-          task.task_history.map((history) => {
-            return {
-              ...history,
-              changedToStatus: history.status,
-              taskId: task.id,
-              status: task.task_status,
-              outlineGeojson: task.outline_geojson,
-            };
-          }),
-        );
-      });
-    }
-    setAllActivities(taskHistories.length);
+    setAllActivities(projectTaskActivityList.length);
     let finalTaskHistory: taskHistoryListType[] = taskHistories.filter((task) => {
-      return (
-        task.taskId.toString().includes(searchText) ||
-        task.action_text.split(':')[1].replace(/\s+/g, '').toString().includes(searchText.toString())
-      );
+      return task.action_text.split(':')[1].replace(/\s+/g, '').toString().includes(searchText.toString());
     });
-
     if (searchText != '') {
       setTaskHistories(finalTaskHistory);
     } else {
       setTaskHistories(taskHistories);
     }
-  }, [taskDisplay, state, searchText]);
+  }, [state, searchText, projectTaskActivityList, selectedTask]);
 
   const zoomToTask = (taskId) => {
-    const geojson = taskHistories
-      .filter((history) => history.taskId === taskId)
-      .map((history) => history.outlineGeojson)[0];
+    let geojson = {};
+    const index = state.findIndex((project) => project.id == params.id);
+    if (index != -1) {
+      const taskIndex = state[index]?.taskBoundries.findIndex((task) => task.id == taskId);
+      if (index != -1) {
+        geojson = state[index]?.taskBoundries[taskIndex]?.outline_geojson;
+      }
+    }
 
     const olFeature = new Feature({
       geometry: new Polygon(geojson.geometry.coordinates).transform('EPSG:4326', 'EPSG:3857'),
@@ -92,14 +86,11 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
             <span className="fmtm-text-[#7A7676] fmtm-font-extralight fmtm-italic fmtm-font-archivo">
               updated status to{' '}
             </span>
-            <p
-              style={{ color: defaultTheme.statusTextTheme[taskHistory?.changedToStatus] }}
-              className="fmtm-font-archivo"
-            >
-              {taskHistory?.changedToStatus}
+            <p style={{ color: defaultTheme.statusTextTheme[taskHistory?.status] }} className="fmtm-font-archivo">
+              {taskHistory?.status}
             </p>
             <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
-              <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676]">#{taskHistory.taskId}</p>
+              <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676]">#{selectedTask}</p>
               <div className="fmtm-flex fmtm-items-center fmtm-mb-1">
                 <AssetModules.AccessTimeIcon className="fmtm-text-primaryRed" style={{ fontSize: '20px' }} />
               </div>
@@ -110,7 +101,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
             </div>
           </div>
         </div>
-        <div title="Zoom to Task" onClick={() => zoomToTask(taskHistory.taskId)}>
+        <div title="Zoom to Task" onClick={() => zoomToTask(selectedTask)}>
           <AssetModules.MapIcon
             className="fmtm-text-[#9B9999] hover:fmtm-text-[#555555] fmtm-cursor-pointer"
             style={{ fontSize: '20px' }}
@@ -128,11 +119,11 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
             type="text"
             onChange={handleOnchange}
             value={searchText}
-            placeholder="Search by task id or username"
+            placeholder="Search by username"
             className="fmtm-w-full fmtm-text-md fmtm-px-2 fmtm-py-[0.18rem] fmtm-outline-none fmtm-border-[1px] fmtm-border-[#E7E2E2] fmtm-mr-2"
           />
         </div>
-        {projectDetailsLoading ? (
+        {projectActivityLoading ? (
           <ShowingCountSkeletonLoader />
         ) : (
           <p className="fmtm-text-[#A8A6A6] fmtm-text-base fmtm-my-1">
@@ -141,7 +132,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
         )}
       </div>
       <div>
-        {projectDetailsLoading ? (
+        {projectActivityLoading ? (
           <div>
             {Array.from({ length: 10 }).map((_, i) => (
               <ActivitiesCardSkeletonLoader key={i} />

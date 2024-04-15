@@ -301,28 +301,42 @@ const Home = () => {
             )}
             <div className="fmtm-w-full fmtm-h-1 fmtm-bg-white"></div>
             <div className="fmtm-flex fmtm-w-full">
-              <button
-                className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                  viewState === 'project_info' || viewState === 'comments'
-                    ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                    : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                } fmtm-py-1`}
-                onClick={() => {
-                  taskModalStatus ? setViewState('comments') : setViewState('project_info');
-                }}
-              >
-                {taskModalStatus ? 'Comments' : 'Project Info'}
-              </button>
-              <button
-                className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                  viewState === 'task_activity'
-                    ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                    : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                } fmtm-py-1`}
-                onClick={() => setViewState('task_activity')}
-              >
-                Task Activity
-              </button>
+              {!taskModalStatus && (
+                <button
+                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                    viewState === 'project_info'
+                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                  } fmtm-py-1`}
+                  onClick={() => setViewState('project_info')}
+                >
+                  Project Info
+                </button>
+              )}
+              {taskModalStatus && (
+                <button
+                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                    viewState === 'comments'
+                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                  } fmtm-py-1`}
+                  onClick={() => setViewState('comments')}
+                >
+                  Comments
+                </button>
+              )}
+              {taskModalStatus && (
+                <button
+                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                    viewState === 'task_activity'
+                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                  } fmtm-py-1`}
+                  onClick={() => setViewState('task_activity')}
+                >
+                  Task Activity
+                </button>
+              )}
               <button
                 className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
                   viewState === 'instructions'

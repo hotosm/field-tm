@@ -37,6 +37,8 @@ const initialState: ProjectStateTypes = {
   projectGetCommentsLoading: false,
   clearEditorContent: false,
   projectOpfsBasemapPath: null,
+  projectTaskActivity: [],
+  projectActivityLoading: false,
 };
 
 const ProjectSlice = createSlice({
@@ -121,6 +123,15 @@ const ProjectSlice = createSlice({
     },
     SetProjectOpfsBasemapPath(state, action) {
       state.projectOpfsBasemapPath = action.payload;
+    },
+    SetProjectTaskActivity(state, action) {
+      state.projectTaskActivity = action.payload;
+    },
+    SetProjectTaskActivityLoading(state, action) {
+      state.projectActivityLoading = action.payload;
+    },
+    UpdateProjectTaskActivity(state, action) {
+      state.projectTaskActivity = [action.payload, ...state.projectTaskActivity];
     },
   },
 });

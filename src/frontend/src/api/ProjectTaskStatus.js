@@ -1,5 +1,4 @@
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { easeIn, easeOut } from 'ol/easing';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -7,35 +6,19 @@ import { task_priority_str } from '@/types/enums';
 
 const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, map, view, taskId, body, params) => {
   return async (dispatch) => {
-    const index = existingData.findIndex((project) => project.id == currentProjectId);
     const updateTask = async (url, existingData, body, feature, params) => {
       try {
         dispatch(CommonActions.SetLoading(true));
 
         const response = await CoreModules.axios.post(url, body, { params });
-        const findIndexForUpdation = existingData[index].taskBoundries.findIndex((obj) => obj.id == response.data.id);
-
-        let project_tasks = [...existingData[index].taskBoundries];
-        project_tasks[findIndexForUpdation] = {
-          ...response.data,
-          task_status: task_priority_str[response.data.task_status],
-        };
-
-        let updatedProject = [...existingData];
-        const finalProjectOBJ = {
-          id: updatedProject[index].id,
-          taskBoundries: project_tasks,
-        };
-        updatedProject[index] = finalProjectOBJ;
-
-        dispatch(ProjectActions.SetProjectTaskBoundries(updatedProject));
+        dispatch(ProjectActions.UpdateProjectTaskActivity(response.data));
 
         await feature.setStyle(style);
         dispatch(CommonActions.SetLoading(false));
         dispatch(
           HomeActions.SetSnackBar({
             open: true,
-            message: `Task #${response.data.id} has been updated to ${task_priority_str[response.data.task_status]}`,
+            message: `Task #${taskId} has been updated to ${task_priority_str[response.data.status]}`,
             variant: 'success',
             duration: 3000,
           }),
