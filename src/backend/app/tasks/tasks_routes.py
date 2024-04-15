@@ -23,7 +23,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser, login_required
+from app.auth.osm import AuthUser
 from app.auth.roles import get_uid, mapper
 from app.db import database
 from app.models.enums import TaskStatus
@@ -138,7 +138,7 @@ async def update_task_status(
 async def add_task_comments(
     comment: tasks_schemas.TaskCommentRequest,
     db: Session = Depends(database.get_db),
-    user_data: AuthUser = Depends(login_required),
+    user_data: AuthUser = Depends(mapper),
 ):
     """Create a new task comment.
 

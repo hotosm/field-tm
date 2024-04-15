@@ -71,7 +71,7 @@ async def init_admin_org(db: Session):
         )
         ON CONFLICT ("name") DO NOTHING;
 
-        -- Insert svcfmtm admin user
+        -- Insert localadmin admin user
         INSERT INTO public.users (
             id,
             username,
@@ -85,11 +85,11 @@ async def init_admin_org(db: Session):
             tasks_invalidated
         )
         VALUES (
-            :user_id,
-            :username,
+            :admin_user_id,
+            :admin_username,
             'ADMIN',
             'Admin',
-            :odk_user,
+            'admin@fmtm.dev',
             true,
             'ADVANCED',
             0,
@@ -98,14 +98,45 @@ async def init_admin_org(db: Session):
         )
         ON CONFLICT ("username") DO NOTHING;
 
-        -- Set svcfmtm user as org admin
+        -- Set localadmin user as org admin
         WITH org_cte AS (
             SELECT id FROM public.organisations
             WHERE name = 'FMTM Public Beta'
         )
         INSERT INTO public.organisation_managers (organisation_id, user_id)
-        SELECT (SELECT id FROM org_cte), :user_id
+        SELECT (SELECT id FROM org_cte), :admin_user_id
         ON CONFLICT DO NOTHING;
+
+        -- Insert svcfmtm user (for temp auth)
+        INSERT INTO public.users (
+            id,
+            username,
+            role,
+            name,
+            email_address,
+            is_email_verified,
+            mapping_level,
+            tasks_mapped,
+            tasks_validated,
+            tasks_invalidated
+        )
+        VALUES (
+            :svc_user_id,
+            :svc_username,
+            'MAPPER',
+            'FMTM Service Account',
+            :odk_user,
+            true,
+            'BEGINNER',
+            0,
+            0,
+            0
+        )
+        ON CONFLICT ("username") DO UPDATE
+        SET
+            role = EXCLUDED.role,
+            mapping_level = EXCLUDED.mapping_level,
+            name = EXCLUDED.name;
 
         -- Commit the transaction
         COMMIT;
@@ -115,11 +146,13 @@ async def init_admin_org(db: Session):
     db.execute(
         sql,
         {
-            "user_id": 20386219,
-            "username": "svcfmtm",
+            "admin_user_id": 1,
+            "admin_username": "localadmin",
             "odk_url": settings.ODK_CENTRAL_URL,
             "odk_user": settings.ODK_CENTRAL_USER,
             "odk_pass": encrypt_value(settings.ODK_CENTRAL_PASSWD),
+            "svc_user_id": 20386219,
+            "svc_username": "svcfmtm",
         },
     )
 
