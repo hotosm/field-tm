@@ -143,8 +143,6 @@ const Home = () => {
       geometry: { ...taskObj.outline_geojson.geometry },
       properties: {
         ...taskObj.outline_geojson.properties,
-        centroid: taskObj.outline_centroid.geometry.coordinates,
-        // TODO add bbox field here too?
       },
       id: `${taskObj.id}_${taskObj.task_status}`,
     }));

@@ -37,16 +37,6 @@ export interface ProjectDetailsModel {
       id: string;
       bbox: [string, string, string, string];
     };
-    outline_centroid: {
-      type: string;
-      geometry: {
-        coordinates: [string, string];
-        type: string;
-      };
-      properties: Record<string, any>;
-      id: string;
-      bbox: [string, string, string, string];
-    };
     task_status: number;
     locked_by_uid: number;
     locked_by_username: string;

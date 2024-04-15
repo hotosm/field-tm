@@ -25,7 +25,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, computed_fiel
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator
 
-from app.db.postgis_utils import geometry_to_geojson, get_centroid
+from app.db.postgis_utils import geometry_to_geojson
 from app.models.enums import TaskStatus
 
 
@@ -70,7 +70,6 @@ class Task(BaseModel):
     project_task_index: int
     project_task_name: Optional[str]
     outline_geojson: Optional[GeojsonFeature] = None
-    outline_centroid: Optional[GeojsonFeature] = None
     feature_count: Optional[int] = None
     task_status: TaskStatus
     locked_by_uid: Optional[int] = None
@@ -88,21 +87,6 @@ class Task(BaseModel):
                 "name": info.data.get("project_task_name"),
             }
             return geometry_to_geojson(outline, properties, info.data.get("id"))
-        return None
-
-    @field_validator("outline_centroid", mode="before")
-    @classmethod
-    def get_centroid_from_outline(
-        cls, value: Any, info: ValidationInfo
-    ) -> Optional[str]:
-        """Get outline_centroid from Shapely geom."""
-        if outline := info.data.get("outline"):
-            properties = {
-                "fid": info.data.get("project_task_index"),
-                "uid": info.data.get("id"),
-                "name": info.data.get("project_task_name"),
-            }
-            return get_centroid(outline, properties, info.data.get("id"))
         return None
 
     @field_serializer("locked_by_uid")

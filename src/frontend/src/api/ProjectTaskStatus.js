@@ -53,9 +53,6 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
       }
     };
     await updateTask(url, existingData, body, feature, params);
-    const centroid = await existingData[index].taskBoundries.filter((task) => {
-      return task.id == taskId;
-    })[0].outline_centroid.geometry.coordinates;
   };
 };
 

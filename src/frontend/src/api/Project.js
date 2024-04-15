@@ -16,7 +16,6 @@ export const ProjectById = (existingProjectList, projectId) => {
           return {
             id: data.id,
             outline_geojson: data.outline_geojson,
-            outline_centroid: data.outline_centroid,
             task_status: task_priority_str[data.task_status],
             locked_by_uid: data.locked_by_uid,
             locked_by_username: data.locked_by_username,
