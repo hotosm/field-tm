@@ -17,6 +17,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             id: data.id,
             outline_geojson: data.outline_geojson,
             task_status: task_priority_str[data.task_status],
+            odk_token: data.odk_token,
             locked_by_uid: data.locked_by_uid,
             locked_by_username: data.locked_by_username,
             task_history: data.task_history,
@@ -253,5 +254,23 @@ export const PostProjectComments = (url, payload) => {
       }
     };
     await postProjectComments(url);
+  };
+};
+
+export const GetProjectTaskActivity = (url) => {
+  return async (dispatch) => {
+    const getProjectActivity = async (url) => {
+      try {
+        dispatch(ProjectActions.SetProjectTaskActivityLoading(true));
+        const response = await CoreModules.axios.get(url);
+        dispatch(ProjectActions.SetProjectTaskActivity(response.data));
+        dispatch(ProjectActions.SetProjectTaskActivityLoading(false));
+      } catch (error) {
+        dispatch(ProjectActions.SetProjectTaskActivityLoading(false));
+      } finally {
+        dispatch(ProjectActions.SetProjectTaskActivityLoading(false));
+      }
+    };
+    await getProjectActivity(url);
   };
 };

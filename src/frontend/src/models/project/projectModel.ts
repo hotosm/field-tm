@@ -20,10 +20,10 @@ export type taskHistoryTypes = {
 };
 
 export type taskHistoryListType = {
+  action: string;
   action_date: string;
   action_text: string;
-  changedToStatus: string;
-  id: number;
+  project_id: number;
   outlineGeojson: {
     type: string;
     geometry: {
@@ -35,7 +35,7 @@ export type taskHistoryListType = {
   };
   profile_img: null | string;
   status: string;
-  taskId: string;
+  task_id: number;
   username: string;
 };
 
@@ -105,4 +105,28 @@ export type taskBoundriesTypes = {
   };
   task_history: taskHistoryTypes[];
   task_status: string;
+};
+
+export type taskBoundriesGeojson = {
+  id: number;
+  odk_token: string;
+  outline_geojson: {
+    type: string;
+    geometry: {
+      coordinates: [];
+      type: string;
+    };
+    properties: Record<string, any>;
+    id: string;
+  };
+  outline_centroid: {
+    type: string;
+    geometry: {
+      coordinates: [string, string];
+      type: string;
+    };
+    properties: Record<string, any>;
+    id: string;
+    bbox: [string, string, string, string];
+  };
 };

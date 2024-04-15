@@ -21,7 +21,6 @@ export default function Dialog({ taskId, feature, map, view }) {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const currentProjectId = params.id;
-  const currentTaskId = taskId;
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const currentStatus = {
@@ -29,26 +28,20 @@ export default function Dialog({ taskId, feature, map, view }) {
       return task.id == taskId;
     })?.[0],
   };
+  const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
 
   useEffect(() => {
     if (projectIndex != -1) {
-      const currentStatus = {
-        ...taskBoundaryData[projectIndex].taskBoundries.filter((task) => {
-          return task.id == taskId;
-        })[0],
-      };
-      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
-        (data) => data.label == currentStatus.task_status,
-      );
+      const currentStatus = projectTaskActivityList.length > 0 ? projectTaskActivityList[0].status : 'READY';
+      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex((data) => data.label == currentStatus);
       const tasksStatus =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
       set_task_status(tasksStatus);
       const tasksStatusList =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['action'] : [];
-
       set_list_of_task_status(tasksStatusList);
     }
-  }, [taskBoundaryData, taskId, feature]);
+  }, [projectTaskActivityList, taskId, feature]);
 
   const handleOnClick = (event) => {
     const status = task_priority_str[event.currentTarget.dataset.btnid];
