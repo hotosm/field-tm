@@ -52,6 +52,8 @@ from app.db import database, db_models
 from app.db.postgis_utils import (
     check_crs,
     flatgeobuf_to_geojson,
+    merge_multipolygon,
+    multipolygon_to_polygon,
     parse_and_filter_geojson,
 )
 from app.models.enums import TILES_FORMATS, TILES_SOURCE, HTTPStatus, ProjectVisibility
@@ -421,7 +423,7 @@ async def upload_project_task_boundaries(
     # read entire file
     content = await task_geojson.read()
     task_boundaries = json.loads(content)
-
+    task_boundaries = multipolygon_to_polygon(task_boundaries)
     # Validatiing Coordinate Reference System
     await check_crs(task_boundaries)
 
@@ -462,7 +464,8 @@ async def task_split(
 
     """
     # read project boundary
-    parsed_boundary = geojson.loads(await project_geojson.read())
+    boundary = geojson.loads(await project_geojson.read())
+    parsed_boundary = merge_multipolygon(boundary)
     # Validatiing Coordinate Reference Systems
     await check_crs(parsed_boundary)
 

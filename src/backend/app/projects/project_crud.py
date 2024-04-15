@@ -46,8 +46,7 @@ from osm_fieldwork.xlsforms import xlsforms_path
 from osm_fieldwork.xlsforms.entities import registration_form
 from osm_rawdata.postgres import PostgresClient
 from shapely import wkt
-from shapely.geometry import MultiPolygon, Polygon, mapping, shape
-from shapely.ops import unary_union
+from shapely.geometry import Polygon, shape
 from sqlalchemy import and_, column, func, inspect, select, table, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
@@ -62,6 +61,7 @@ from app.db.postgis_utils import (
     geometry_to_geojson,
     get_address_from_lat_lon_async,
     get_featcol_main_geom_type,
+    merge_multipolygon,
     parse_and_filter_geojson,
     split_geojson_by_task_areas,
     task_geojson_dict_to_entity_values,
@@ -416,51 +416,7 @@ async def preview_split_by_square(boundary: str, meters: int):
     Use a lambda function to remove the "z" dimension from each
     coordinate in the feature's geometry.
     """
-
-    def remove_z_dimension(coord):
-        """Remove z dimension from geojson."""
-        return coord.pop() if len(coord) == 3 else None
-
-    """ Check if the boundary is a Feature or a FeatureCollection """
-    if boundary["type"] == "Feature":
-        features = [boundary]
-    elif boundary["type"] == "FeatureCollection":
-        features = boundary["features"]
-    elif boundary["type"] == "Polygon":
-        features = [
-            {
-                "type": "Feature",
-                "properties": {},
-                "geometry": boundary,
-            }
-        ]
-    else:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid GeoJSON type: {boundary['type']}"
-        )
-
-    # Apply the lambda function to each coordinate in its geometry
-    # to remove the z-dimension - if it exists
-    multi_polygons = []
-    for feature in features:
-        list(map(remove_z_dimension, feature["geometry"]["coordinates"][0]))
-        if feature["geometry"]["type"] == "MultiPolygon":
-            multi_polygons.append(Polygon(feature["geometry"]["coordinates"][0][0]))
-
-    # Merge multiple geometries into single polygon
-    if multi_polygons:
-        merged_polygon = unary_union(multi_polygons)
-        if isinstance(merged_polygon, MultiPolygon):
-            merged_polygon = merged_polygon.convex_hull
-        merged_geojson = mapping(merged_polygon)
-        features = [
-            {
-                "type": "Feature",
-                "properties": {},
-                "geometry": merged_geojson,
-            }
-        ]
-        boundary["features"] = features
+    boundary = merge_multipolygon(boundary)
 
     return await run_in_threadpool(
         lambda: split_by_square(
