@@ -118,7 +118,7 @@ async def get_specific_task(task_id: int, db: Session = Depends(database.get_db)
 
 
 @router.post(
-    "/{task_id}/new_status/{new_status}", response_model=tasks_schemas.TaskHistoryOut
+    "/{task_id}/new-status/{new_status}", response_model=tasks_schemas.TaskHistoryOut
 )
 async def update_task_status(
     task_id: int,
@@ -182,7 +182,7 @@ async def task_activity(
 
 
 @router.get(
-    "/task_history/{project_id}", response_model=List[tasks_schemas.TaskHistoryOut]
+    "/task-history/{project_id}", response_model=List[tasks_schemas.TaskHistoryOut]
 )
 async def task_history(
     project_id: int,

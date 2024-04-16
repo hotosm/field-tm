@@ -655,6 +655,8 @@ async def feature_geojson_to_entity_dict(
     properties = {
         str(key): str(value) for key, value in feature.get("properties", {}).items()
     }
+    # Set to TaskStatus enum READY value (0)
+    properties["status"] = "0"
 
     task_id = properties.get("task_id")
     entity_label = f"task {task_id} feature {feature_id}"

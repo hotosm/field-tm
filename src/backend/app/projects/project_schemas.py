@@ -45,8 +45,8 @@ from app.tasks import tasks_schemas
 from app.users.user_schemas import User
 
 
-class ODKCentralIn(BaseModel):
-    """ODK Central credentials inserted to database."""
+class ODKCentral(BaseModel):
+    """ODK Central credentials."""
 
     odk_central_url: Optional[HttpUrlStr] = None
     odk_central_user: Optional[str] = None
@@ -82,6 +82,10 @@ class ODKCentralIn(BaseModel):
             log.debug(err)
             raise ValueError(err)
         return self
+
+
+class ODKCentralIn(ODKCentral):
+    """ODK Central credentials inserted to database."""
 
     @field_validator("odk_central_password", mode="after")
     @classmethod

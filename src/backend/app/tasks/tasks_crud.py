@@ -115,7 +115,7 @@ async def update_task_status(
             TaskStatus.LOCKED_FOR_VALIDATION,
         ]:
             log.debug(f"Task {task_id} currently locked")
-            if not (user_id is not db_task.locked_by):
+            if user_id != db_task.locked_by:
                 msg = (
                     f"User {user_id} with username {db_user.username} "
                     "has not locked this task."
@@ -349,21 +349,25 @@ async def get_project_task_history(
     Returns:
         A list of task history records for the specified project.
     """
-    query = f"""
-                SELECT task_history.id, task_history.task_id, task_history.action_text,
-                    task_history.action_date, users.username,
-                    users.profile_img
-                    FROM task_history
-                    LEFT JOIN users on users.id = task_history.user_id
-                    WHERE task_id = {task_id}
-                    AND  action_date >= '{end_date}'
-            """
+    # NOTE project_id will be used if we use the task project_task_index instead
+    query = """
+        SELECT task_history.id, task_history.task_id, task_history.action_text,
+            task_history.action_date, users.username,
+            users.profile_img
+            FROM task_history
+            LEFT JOIN users on users.id = task_history.user_id
+            WHERE task_id = :task_id
+            AND  action_date >= :end_date
+    """
 
     query += " AND action = 'COMMENT'" if comment else " AND action != 'COMMENT'"
-
     query += " ORDER BY id DESC"
 
-    result = db.execute(text(query)).fetchall()
+    query += ";"
+
+    result = db.execute(
+        text(query), {"task_id": task_id, "end_date": end_date}
+    ).fetchall()
     task_history = [
         {
             "id": row[0],
@@ -375,6 +379,7 @@ async def get_project_task_history(
         }
         for row in result
     ]
+
     return task_history
 
 

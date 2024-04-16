@@ -21,7 +21,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   useEffect(() => {
     dispatch(
       GetProjectTaskActivity(
-        `${import.meta.env.VITE_API_URL}/tasks/task_history/${id}?comment=false&task_id=${selectedTask}`,
+        `${import.meta.env.VITE_API_URL}/tasks/task-history/${id}?comment=false&task_id=${selectedTask}`,
       ),
     );
   }, [selectedTask]);
