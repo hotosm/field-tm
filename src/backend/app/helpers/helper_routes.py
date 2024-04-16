@@ -17,9 +17,11 @@
 #
 """Routes to help with common processes in the FMTM workflow."""
 
+import csv
 import json
-from io import BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
+from uuid import uuid4
 
 from fastapi import (
     APIRouter,
@@ -28,6 +30,7 @@ from fastapi import (
 )
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse, Response
+from osm_fieldwork.OdkCentralAsync import OdkEntity
 from osm_fieldwork.xlsforms import xlsforms_path
 
 from app.auth.osm import AuthUser, login_required
@@ -42,6 +45,7 @@ from app.db.postgis_utils import (
     parse_and_filter_geojson,
 )
 from app.models.enums import GeometryType, HTTPStatus, XLSFormType
+from app.projects.project_schemas import ODKCentral
 
 router = APIRouter(
     prefix="/helper",
@@ -140,6 +144,50 @@ async def convert_geojson_to_odk_csv_wrapper(
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.csv"}
     return Response(feature_csv.getvalue(), headers=headers)
+
+
+@router.post("/create-entities-from-csv")
+async def create_entities_from_csv(
+    csv_file: UploadFile,
+    odk_project_id: int,
+    entity_name: str,
+    odk_creds: ODKCentral = Depends(),
+    current_user: AuthUser = Depends(login_required),
+):
+    """Upload a CSV file to create new ODK Entities in a project.
+
+    The Entity must already be defined on the server.
+    The CSV fields must match the Entity fields.
+    """
+    filename = Path(csv_file.filename)
+    file_ext = filename.suffix.lower()
+
+    if file_ext != ".csv":
+        raise HTTPException(status_code=400, detail="Provide a valid .csv")
+
+    def parse_csv(csv_bytes):
+        parsed_data = []
+        csv_str = csv_bytes.decode("utf-8")
+        csv_reader = csv.DictReader(StringIO(csv_str))
+        for row in csv_reader:
+            parsed_data.append(dict(row))
+        return parsed_data
+
+    parsed_data = parse_csv(await csv_file.read())
+    entities_data_dict = {str(uuid4()): data for data in parsed_data}
+
+    async with OdkEntity(
+        url=odk_creds.odk_central_url,
+        user=odk_creds.odk_central_user,
+        passwd=odk_creds.odk_central_password,
+    ) as odk_central:
+        entities = await odk_central.createEntities(
+            odk_project_id,
+            entity_name,
+            entities_data_dict,
+        )
+
+    return entities
 
 
 @router.post("/javarosa-geom-to-geojson")

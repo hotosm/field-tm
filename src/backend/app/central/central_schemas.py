@@ -18,8 +18,13 @@
 """Schemas for returned ODK Central objects."""
 
 from enum import Enum
+from typing import Optional
 
-from pydantic import BaseModel
+from geojson_pydantic import Feature, FeatureCollection
+from pydantic import BaseModel, Field, ValidationInfo, computed_field
+from pydantic.functional_validators import field_validator
+
+from app.models.enums import TaskStatus
 
 
 class CentralBase(BaseModel):
@@ -51,3 +56,101 @@ class CentralDetails(CentralBase):
     """ODK Central details."""
 
     pass
+
+
+class EntityProperties(BaseModel):
+    """ODK Entity properties to include in GeoJSON."""
+
+    updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
+
+    # project_id: Optional[str] = None
+    task_id: Optional[str] = None
+    osm_id: Optional[str] = None
+    tags: Optional[str] = None
+    version: Optional[str] = None
+    changeset: Optional[str] = None
+    timestamp: Optional[str] = None
+    status: Optional[str] = None
+
+    @computed_field
+    @property
+    def updated_at(self) -> Optional[str]:
+        """Convert updatedAt field to updated_at."""
+        return self.updatedAt
+
+
+class EntityFeature(Feature):
+    """ODK Entities as a GeoJSON Feature."""
+
+    properties: EntityProperties
+
+
+class EntityFeatureCollection(FeatureCollection):
+    """ODK Entity Features wrapped in a FeatureCollection."""
+
+    features: list[EntityFeature]
+
+
+class EntityMappingStatus(BaseModel):
+    """The status for mapping an Entity/feature."""
+
+    updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
+
+    id: str
+    osm_id: Optional[str] = None
+    status: Optional[TaskStatus] = None
+
+    @computed_field
+    @property
+    def updated_at(self) -> Optional[str]:
+        """Convert updatedAt field to updated_at."""
+        return self.updatedAt
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def string_status_to_integer(cls, value: str) -> Optional[TaskStatus]:
+        """Convert string status to enum int value."""
+        if not value:
+            return None
+        try:
+            status_int = int(value)
+            return TaskStatus(status_int)
+        except (ValueError, KeyError) as e:
+            raise ValueError(f"Invalid TaskStatus value: {value}") from e
+
+
+class EntityMappingStatusIn(BaseModel):
+    """Update the mapping status for an Entity."""
+
+    entity_id: str
+    status: TaskStatus
+    label: str
+
+    @field_validator("label", mode="before")
+    @classmethod
+    def append_status_emoji(cls, value: str, info: ValidationInfo) -> str:
+        """Add 🔒 (locked), ✅ (complete) or ❌ (invalid) emojis."""
+        status = info.data.get("status", TaskStatus.READY.value)
+        emojis = {
+            str(TaskStatus.LOCKED_FOR_MAPPING.value): "🔒",
+            str(TaskStatus.MAPPED.value): "✅",
+            str(TaskStatus.INVALIDATED.value): "❌",
+            str(TaskStatus.BAD.value): "❌",
+        }
+
+        # Remove any existing emoji at the start of the label
+        for emoji in emojis.values():
+            if value.startswith(emoji):
+                value = value[len(emoji) :].lstrip()
+                break
+
+        if status in emojis.keys():
+            value = f"{emojis[status]} {value}"
+
+        return value
+
+    @field_validator("status", mode="after")
+    @classmethod
+    def integer_status_to_string(cls, value: TaskStatus) -> str:
+        """Convert integer status to string for ODK Entity data."""
+        return str(value.value)

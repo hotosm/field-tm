@@ -905,34 +905,27 @@ def flatten_dict(d, parent_key="", sep="_"):
 
 async def generate_project_files(
     db: Session,
-    project_id: int,
+    project: db_models.DbProject,
     custom_form: Optional[BytesIO],
     form_category: str,
     form_file_ext: str,
     background_task_id: Optional[uuid.UUID] = None,
-):
+) -> None:
     """Generate the files for a project.
 
     QR code, new XForm, and the OSM data extract.
 
-    Parameters:
-        - db: the database session
-        - project_id: Project ID
-        - custom_form: the xls file to upload if we have a custom form
-        - form_category: the category for the custom XLS form
-        - form_file_ext: weather the form is xls, xlsx or xml
-        - background_task_id: the task_id of the background task running this function.
+    Args:
+        db (Session): the database session.
+        project (DbProject): FMTM database project.
+        custom_form (BytesIO): the xls file to upload if we have a custom form
+        form_category (str): the category for the custom XLS form
+        form_file_ext (str): weather the form is xls, xlsx or xml
+        background_task_id (uuid): the task_id of the background task.
     """
     try:
+        project_id = project.id
         log.info(f"Starting generate_project_files for project {project_id}")
-
-        project = await get_project(db, project_id)
-        if not project:
-            raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
-                detail=f"Project with id {project_id} does not exist",
-            )
-
         odk_credentials = await project_deps.get_odk_credentials(db, project_id)
 
         if custom_form:
@@ -1083,7 +1076,7 @@ async def generate_project_files(
                 form_category,
                 entities_data_dict,
             )
-            log.debug(f"Wrote entities for project ({project_id}): {entities}")
+            log.debug(f"Wrote {len(entities)} entities for project ({project_id})")
 
         if background_task_id:
             # Update background task status to COMPLETED

@@ -51,7 +51,7 @@ export default function Dialog({ taskId, feature, map, view }) {
       if (body.hasOwnProperty('id')) {
         dispatch(
           ProjectTaskStatus(
-            `${import.meta.env.VITE_API_URL}/tasks/${taskId}/new_status/${status}`,
+            `${import.meta.env.VITE_API_URL}/tasks/${taskId}/new-status/${status}`,
             geoStyle,
             taskBoundaryData,
             currentProjectId,

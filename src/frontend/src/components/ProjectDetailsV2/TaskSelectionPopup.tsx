@@ -1,3 +1,5 @@
+// Popup used to display task area info & QR Code for ODK Collect
+
 import React, { useEffect, useState } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
@@ -6,13 +8,13 @@ import environment from '@/environment';
 import { GetProjectQrCode } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
 
-type TaskSectionPopupPropType = {
+type TaskSelectionPopupPropType = {
   taskId: number | null;
   body: React.JSX.Element;
   feature: any;
 };
 
-const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) => {
+const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropType) => {
   const dispatch = CoreModules.useAppDispatch();
   const [task_status, set_task_status] = useState('READY');
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
@@ -104,4 +106,4 @@ const TaskSectionPopup = ({ taskId, body, feature }: TaskSectionPopupPropType) =
   );
 };
 
-export default TaskSectionPopup;
+export default TaskSelectionPopup;

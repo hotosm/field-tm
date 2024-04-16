@@ -25,7 +25,7 @@ const Comments = () => {
   useEffect(() => {
     dispatch(
       GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/task_history/${projectId}?comment=true&task_id=${selectedTask}`,
+        `${import.meta.env.VITE_API_URL}/tasks/task-history/${projectId}?comment=true&task_id=${selectedTask}`,
       ),
     );
   }, [selectedTask, projectId]);

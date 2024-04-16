@@ -13,7 +13,7 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import FmtmLogo from '@/assets/images/hotLog.png';
 import GenerateBasemap from '@/components/GenerateBasemap';
-import TaskSectionPopup from '@/components/ProjectDetailsV2/TaskSectionPopup';
+import TaskSelectionPopup from '@/components/ProjectDetailsV2/TaskSelectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
 import MobileFooter from '@/components/ProjectDetailsV2/MobileFooter';
 import MobileActivitiesContents from '@/components/ProjectDetailsV2/MobileActivitiesContents';
@@ -177,12 +177,18 @@ const Home = () => {
       </div>
     );
   };
+
+  /**
+   * Handles the click event on a project task area.
+   *
+   * @param {Object} properties - Properties attached to task area boundary feature.
+   * @param {Object} feature - The clicked task area feature.
+   */
   const projectClickOnMapTask = (properties, feature) => {
     setFeaturesLayer(feature);
-    let extent = properties.geometry.getExtent();
 
+    let extent = properties.geometry.getExtent();
     setDataExtractExtent(properties.geometry);
-    setDataExtractUrl(state.projectInfo.data_extract_url);
 
     mapRef.current?.scrollIntoView({
       block: 'center',
@@ -190,8 +196,9 @@ const Home = () => {
     });
 
     dispatch(CoreModules.TaskActions.SetSelectedTask(properties.uid));
-
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
+
+    // Fit the map view to the clicked feature's extent based on the window size
     if (windowSize.width < 768 && map.getView().getZoom() < 17) {
       map.getView().fit(extent, {
         padding: [10, 20, 300, 20],
@@ -202,6 +209,13 @@ const Home = () => {
       });
     }
   };
+
+  /**
+   * Sets the data extract URL when the data extract URL in the state changes.
+   */
+  useEffect(() => {
+    setDataExtractUrl(state.projectInfo.data_extract_url);
+  }, [state.projectInfo.data_extract_url]);
 
   const buildingStyle = {
     ...defaultStyles,
@@ -437,7 +451,7 @@ const Home = () => {
                   getTaskStatusStyle={(feature) => getTaskStatusStyle(feature, mapTheme)}
                 />
               )}
-              {dataExtractUrl && isValidUrl(dataExtractUrl) && (
+              {dataExtractUrl && isValidUrl(dataExtractUrl) && dataExtractExtent && (
                 <VectorLayer
                   fgbUrl={dataExtractUrl}
                   fgbExtent={dataExtractExtent}
@@ -469,7 +483,7 @@ const Home = () => {
               </div>
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-right-3 fmtm-z-50 fmtm-h-fit">
                 <Button
-                  btnText="TILES"
+                  btnText="Basemaps"
                   icon={<AssetModules.BoltIcon />}
                   onClick={() => {
                     dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
@@ -534,7 +548,7 @@ const Home = () => {
         )}
       </div>
       {featuresLayer != undefined && (
-        <TaskSectionPopup
+        <TaskSelectionPopup
           taskId={selectedTask}
           feature={featuresLayer}
           body={

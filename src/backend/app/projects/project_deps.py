@@ -47,6 +47,12 @@ async def get_project_by_id(
             detail=f"Project with ID {project_id} does not exist",
         )
 
+    if db_project.odk_token == "":
+        log.warning(
+            f"Project ({db_project.id}) has no 'odk_token' set. "
+            "The QRCode will not work!"
+        )
+
     return db_project
 
 
