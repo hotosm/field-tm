@@ -105,7 +105,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
   docker exec -i -e PGPASSWORD=PASSWORD_HERE \
   fmtm-${GIT_BRANCH}-fmtm-db-1 \
-  pg_dump --verbose --format c -U fmtm fmtm \
+  pg_dump --verbose --encoding utf8 --format c -U fmtm fmtm \
   | gzip -9 > "$backup_filename"
   ```
 
@@ -124,7 +124,7 @@ This will map port 5432 on the remote machine to port 5430 on your local machine
 
   docker exec -i -e PGPASSWORD=PASSWORD_HERE \
   fmtm-${GIT_BRANCH}-central-db-1 \
-  pg_dump --verbose --format c -U odk odk | \
+  pg_dump --verbose --encoding utf8 --format c -U odk odk | \
   gzip -9 > "$backup_filename"
   ```
 

@@ -89,8 +89,8 @@ backup_db() {
         --username "$db_user" "$db_name" -c "VACUUM ANALYZE;"
 
     echo "Dumping current database to backup file: $db_backup_file"
-    PGPASSWORD="$db_password" pg_dump --verbose --format c \
-        --file "${db_backup_file}" \
+    PGPASSWORD="$db_password" pg_dump --verbose --encoding utf8 \
+        --format c --file "${db_backup_file}" \
         --host "$db_host" --username "$db_user" "$db_name" \
         >> /dev/null 2>&1
 
