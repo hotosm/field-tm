@@ -767,7 +767,7 @@ async def get_data_extract(
     geojson_file: UploadFile = File(...),
     form_category: Optional[str] = Form(None),
     # config_file: Optional[str] = Form(None),
-    current_user: AuthUser = Depends(mapper),
+    current_user: AuthUser = Depends(login_required),
 ):
     """Get a new data extract for a given project AOI.
 
