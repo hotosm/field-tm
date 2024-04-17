@@ -130,8 +130,8 @@ backup_db() {
         --username "$FMTM_DB_USER" "$FMTM_DB_NAME" -c "VACUUM ANALYZE;"
 
     pretty_echo "Dumping current database to backup file: $db_backup_file"
-    PGPASSWORD="$FMTM_DB_PASSWORD" pg_dump --verbose --format c \
-        --file "${db_backup_file}" \
+    PGPASSWORD="$FMTM_DB_PASSWORD" pg_dump --verbose --encoding utf8 \
+        --format c --file "${db_backup_file}" \
         --host "$FMTM_DB_HOST" --username "$FMTM_DB_USER" "$FMTM_DB_NAME"
 
     echo "gzipping file --> ${db_backup_file}.gz"
