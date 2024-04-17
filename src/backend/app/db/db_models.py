@@ -532,6 +532,7 @@ class DbProject(Base):
         backref="project",
     )
     location_str = cast(str, Column(String))
+    custom_tms_url = cast(str, Column(String))
 
     # GEOMETRY
     outline = cast(WKBElement, Column(Geometry("POLYGON", srid=4326)))
