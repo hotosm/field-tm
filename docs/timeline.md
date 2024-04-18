@@ -61,6 +61,15 @@
 > <div style="text-align: left; position: relative; padding-bottom: 1rem; margin-bottom: 1rem;">
 > <div style="position: absolute; left: -10rem; text-align: right; font-size: 0.9rem; font-weight: 700; opacity: 0.7; min-width: 6rem; top: 2px;">2024-03</div>
 >
+> <h3>Public Beta Release</h3>
+> A big push to get the public beta released 1st March. Open for testing by the public.
+>
+> <div style="position: absolute; box-shadow: 0 0 0 4px gray; left: -2.5rem; background: #444; border-radius: 50%; height: 11px; width: 11px; top: 5px;"></div>
+> </div>
+>
+> <div style="text-align: left; position: relative; padding-bottom: 1rem; margin-bottom: 1rem;">
+> <div style="position: absolute; left: -10rem; text-align: right; font-size: 0.9rem; font-weight: 700; opacity: 0.7; min-width: 6rem; top: 2px;">2024-03</div>
+>
 > <h3>Demo: Karangasem, Bali</h3>
 > Landslide risk assessment, refinement of the E2E workflow.
 >
