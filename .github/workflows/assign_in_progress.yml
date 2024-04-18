@@ -1,0 +1,18 @@
+# A workflow to move an issue to 'In Progress' for a Github project,
+# when it is assigned to a user
+
+name: Assigned --> In Progress
+
+on:
+  issues:
+    types: [assigned]
+
+jobs:
+  move-assigned-card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.9.0
+        with:
+          project: Field Mapping Tasking Manager (FMTM)
+          column: In Progress
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
