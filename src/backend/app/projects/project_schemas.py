@@ -192,9 +192,6 @@ class ProjectIn(BaseModel):
     @classmethod
     def prepend_hash_to_tags(cls, hashtags: List[str]) -> Optional[List[str]]:
         """Add '#' to hashtag if missing. Also added default '#FMTM'."""
-        if not hashtags:
-            return None
-
         hashtags_with_hash = [
             f"#{hashtag}" if hashtag and not hashtag.startswith("#") else hashtag
             for hashtag in hashtags

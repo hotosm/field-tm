@@ -359,6 +359,14 @@ async def create_project_with_project_info(
     db.commit()
     db.refresh(db_project)
 
+    # Append additional hashtag with FMTM domain and project id
+    generated_project_id = db_project.id
+    if db_project.hashtags:
+        db_project.hashtags = db_project.hashtags + [
+            f"{settings.FMTM_DOMAIN}-{generated_project_id}"
+        ]
+    db.commit()
+
     return await convert_to_app_project(db_project)
 
 
