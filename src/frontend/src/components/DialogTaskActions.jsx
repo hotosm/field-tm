@@ -7,6 +7,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { task_priority_str } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { GetProjectTaskActivity } from '@/api/Project';
 
 export default function Dialog({ taskId, feature, map, view }) {
   const navigate = useNavigate();
@@ -29,6 +30,14 @@ export default function Dialog({ taskId, feature, map, view }) {
     })?.[0],
   };
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
+
+  useEffect(() => {
+    dispatch(
+      GetProjectTaskActivity(
+        `${import.meta.env.VITE_API_URL}/tasks/task-history/${currentProjectId}?comment=false&task_id=${taskId}`,
+      ),
+    );
+  }, [taskId]);
 
   useEffect(() => {
     if (projectIndex != -1) {
