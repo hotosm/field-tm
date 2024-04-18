@@ -7,7 +7,6 @@ import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/comp
 import { taskHistoryListType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
 import { useDispatch } from 'react-redux';
-import { GetProjectTaskActivity } from '@/api/Project';
 
 const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion, states }) => {
   const dispatch = useDispatch();
@@ -18,13 +17,6 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
   const projectActivityLoading = useAppSelector((state) => state?.project?.projectActivityLoading);
   const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
-  useEffect(() => {
-    dispatch(
-      GetProjectTaskActivity(
-        `${import.meta.env.VITE_API_URL}/tasks/task-history/${id}?comment=false&task_id=${selectedTask}`,
-      ),
-    );
-  }, [selectedTask]);
 
   const handleOnchange = (event) => {
     setSearchText(event.target.value);
