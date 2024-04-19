@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import { RouterProvider } from 'react-router-dom';
 import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
+import { LoginActions } from '@/store/slices/LoginSlice';
 
 import { store, persistor } from '@/store/Store';
 import routes from '@/routes';
@@ -58,6 +60,28 @@ axios.interceptors.request.use(
 
 const GlobalInit = () => {
   const dispatch = useDispatch();
+  const storeUser = CoreModules.useAppSelector((state) => state.login);
+
+  const checkIfUserLoggedIn = () => {
+    fetch(`${import.meta.env.VITE_API_URL}/auth/introspect`, { credentials: 'include' })
+      .then((resp) => {
+        if (resp.status !== 200) {
+          dispatch(LoginActions.signOut(null));
+          return;
+        }
+        return resp.json();
+      })
+      .then((apiUser) => {
+        if (apiUser.username !== storeUser?.loginToken?.username) {
+          // Mismatch between store user and logged in user via api
+          dispatch(LoginActions.signOut(null));
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const checkStatus = (status: string) => {
     console.log(status);
     dispatch(
@@ -69,11 +93,16 @@ const GlobalInit = () => {
       }),
     );
   };
+
   useEffect(() => {
+    // Check online/offline status
     window.addEventListener('offline', () => checkStatus('offline'));
     window.addEventListener('online', () => checkStatus('online'));
 
-    // Do stuff at init here
+    // Check current login state
+    checkIfUserLoggedIn();
+
+    // Do things when component is unmounted
     return () => {
       window.removeEventListener('offline', () => checkStatus('offline'));
       window.removeEventListener('online', () => checkStatus('online'));
