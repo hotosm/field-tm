@@ -323,6 +323,106 @@ async def set_odk_entities_mapping_status(
     )
 
 
+@router.get("/{project_id}/tiles-list/")
+async def tiles_list(
+    project_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+):
+    """Returns the list of tiles for a project.
+
+    Parameters:
+        project_id: int
+        db (Session): The database session, provided automatically.
+        current_user (AuthUser): Check if user is logged in.
+
+    Returns:
+        Response: List of generated tiles for a project.
+    """
+    return await project_crud.get_mbtiles_list(db, project_id)
+
+
+@router.get("/{project_id}/download-tiles/")
+async def download_tiles(
+    tile_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+):
+    """Download the basemap tile archive for a project."""
+    log.debug("Getting tile archive path from DB")
+    tiles_path = (
+        db.query(db_models.DbTilesPath)
+        .filter(db_models.DbTilesPath.id == str(tile_id))
+        .first()
+    )
+    log.info(f"User requested download for tiles: {tiles_path.path}")
+
+    project_id = tiles_path.project_id
+    project = await project_crud.get_project(db, project_id)
+    filename = Path(tiles_path.path).name.replace(
+        f"{project_id}_", f"{project.project_name_prefix}_"
+    )
+    log.debug(f"Sending tile archive to user: {filename}")
+
+    return FileResponse(
+        tiles_path.path,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/{project_id}/tiles")
+async def generate_project_tiles(
+    background_tasks: BackgroundTasks,
+    project_id: int,
+    source: str = Query(
+        ..., description="Select a source for tiles", enum=TILES_SOURCE
+    ),
+    format: str = Query(
+        "mbtiles", description="Select an output format", enum=TILES_FORMATS
+    ),
+    tms: str = Query(
+        None,
+        description="Provide a custom TMS URL, optional",
+    ),
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+):
+    """Returns basemap tiles for a project.
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
+        project_id (int): ID of project to create tiles for.
+        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
+        format (str, optional): Default "mbtiles". Other options: "pmtiles", "sqlite3".
+        tms (str, optional): Default None. Custom TMS provider URL.
+        db (Session): The database session, provided automatically.
+        current_user (AuthUser): Check if user has MAPPER permission.
+
+    Returns:
+        str: Success message that tile generation started.
+    """
+    # Create task in db and return uuid
+    log.debug(
+        "Creating generate_project_tiles background task "
+        f"for project ID: {project_id}"
+    )
+    background_task_id = await project_crud.insert_background_task_into_database(
+        db, project_id=project_id
+    )
+
+    background_tasks.add_task(
+        project_crud.get_project_tiles,
+        db,
+        project_id,
+        background_task_id,
+        source,
+        format,
+        tms,
+    )
+
+    return {"Message": "Tile generation started"}
+
+
 @router.get("/{project_id}", response_model=project_schemas.ReadProject)
 async def read_project(
     current_user: AuthUser = Depends(mapper),
@@ -1069,106 +1169,6 @@ async def convert_fgb_to_geojson(
     }
 
     return Response(content=json.dumps(data_extract_geojson), headers=headers)
-
-
-@router.get("/tiles/{project_id}")
-async def generate_project_tiles(
-    background_tasks: BackgroundTasks,
-    project_id: int,
-    source: str = Query(
-        ..., description="Select a source for tiles", enum=TILES_SOURCE
-    ),
-    format: str = Query(
-        "mbtiles", description="Select an output format", enum=TILES_FORMATS
-    ),
-    tms: str = Query(
-        None,
-        description="Provide a custom TMS URL, optional",
-    ),
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Returns basemap tiles for a project.
-
-    Args:
-        background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
-        project_id (int): ID of project to create tiles for.
-        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
-        format (str, optional): Default "mbtiles". Other options: "pmtiles", "sqlite3".
-        tms (str, optional): Default None. Custom TMS provider URL.
-        db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user has MAPPER permission.
-
-    Returns:
-        str: Success message that tile generation started.
-    """
-    # Create task in db and return uuid
-    log.debug(
-        "Creating generate_project_tiles background task "
-        f"for project ID: {project_id}"
-    )
-    background_task_id = await project_crud.insert_background_task_into_database(
-        db, project_id=project_id
-    )
-
-    background_tasks.add_task(
-        project_crud.get_project_tiles,
-        db,
-        project_id,
-        background_task_id,
-        source,
-        format,
-        tms,
-    )
-
-    return {"Message": "Tile generation started"}
-
-
-@router.get("/tiles_list/{project_id}/")
-async def tiles_list(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Returns the list of tiles for a project.
-
-    Parameters:
-        project_id: int
-        db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user is logged in.
-
-    Returns:
-        Response: List of generated tiles for a project.
-    """
-    return await project_crud.get_mbtiles_list(db, project_id)
-
-
-@router.get("/download_tiles/")
-async def download_tiles(
-    tile_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Download the basemap tile archive for a project."""
-    log.debug("Getting tile archive path from DB")
-    tiles_path = (
-        db.query(db_models.DbTilesPath)
-        .filter(db_models.DbTilesPath.id == str(tile_id))
-        .first()
-    )
-    log.info(f"User requested download for tiles: {tiles_path.path}")
-
-    project_id = tiles_path.project_id
-    project = await project_crud.get_project(db, project_id)
-    filename = Path(tiles_path.path).name.replace(
-        f"{project_id}_", f"{project.project_name_prefix}_"
-    )
-    log.debug(f"Sending tile archive to user: {filename}")
-
-    return FileResponse(
-        tiles_path.path,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
 
 
 @router.get("/boundary_in_osm/{project_id}/")

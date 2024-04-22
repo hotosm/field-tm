@@ -31,12 +31,16 @@ const GenerateBasemap = ({ projectInfo }) => {
   });
   const downloadBasemap = (tileId, toOpfs = false) => {
     dispatch(
-      DownloadTile(`${import.meta.env.VITE_API_URL}/projects/download_tiles/?tile_id=${tileId}`, projectInfo, toOpfs),
+      DownloadTile(
+        `${import.meta.env.VITE_API_URL}/projects/${id}/download-tiles/?tile_id=${tileId}`,
+        projectInfo,
+        toOpfs,
+      ),
     );
   };
 
   const getTilesList = () => {
-    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/tiles_list/${id}/`));
+    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles-list/`));
   };
 
   useEffect(() => {
@@ -80,7 +84,7 @@ const GenerateBasemap = ({ projectInfo }) => {
         GenerateProjectTiles(
           `${
             import.meta.env.VITE_API_URL
-          }/projects/tiles/${id}?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
+          }/projects/${id}/tiles?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
           id,
         ),
       );
