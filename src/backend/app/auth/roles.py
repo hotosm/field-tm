@@ -290,7 +290,9 @@ async def mapper(
     """A mapper for a specific project."""
     # If project is public, skip permission check
     if project.visibility == ProjectVisibility.PUBLIC:
+        # FIXME this is a different type than DbUser
         return user_data
+
     db_user = await check_access(
         user_data,
         db,
