@@ -79,6 +79,7 @@ const Home = () => {
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const projectOpfsBasemapPath = useAppSelector((state) => state?.project?.projectOpfsBasemapPath);
+  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
 
   useEffect(() => {
     if (state.projectInfo.title) {
@@ -143,6 +144,7 @@ const Home = () => {
       geometry: { ...taskObj.outline_geojson.geometry },
       properties: {
         ...taskObj.outline_geojson.properties,
+        locked_by_user: taskObj?.locked_by_uid,
       },
       id: `${taskObj.id}_${taskObj.task_status}`,
     }));
@@ -176,6 +178,10 @@ const Home = () => {
         </div>
       </div>
     );
+  };
+
+  const lockedPopup = () => {
+    return <p>This task was locked by you</p>;
   };
 
   /**
@@ -448,7 +454,9 @@ const Home = () => {
                   mapOnClick={projectClickOnMapTask}
                   zoomToLayer
                   zIndex={5}
-                  getTaskStatusStyle={(feature) => getTaskStatusStyle(feature, mapTheme)}
+                  getTaskStatusStyle={(feature) => {
+                    return getTaskStatusStyle(feature, mapTheme, feature.getProperties()?.locked_by_user == token?.id);
+                  }}
                 />
               )}
               {dataExtractUrl && isValidUrl(dataExtractUrl) && dataExtractExtent && (
@@ -466,7 +474,22 @@ const Home = () => {
                   zIndex={5}
                 />
               )}
-              <AsyncPopup map={map} popupUI={dataExtractDataPopup} primaryKey={'osm_id'} showOnHover="singleclick" />
+              <AsyncPopup
+                map={map}
+                popupUI={lockedPopup}
+                primaryKey={'locked_by_user'}
+                showOnHover="pointermove"
+                popupId="locked-popup"
+                className="fmtm-w-[235px]"
+              />
+              <AsyncPopup
+                map={map}
+                popupUI={dataExtractDataPopup}
+                primaryKey={'osm_id'}
+                showOnHover="singleclick"
+                popupId="data-extract-popup"
+                className="fmtm-w-[300px]"
+              />
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
                   body={<MapLegends defaultTheme={defaultTheme} />}

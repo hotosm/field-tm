@@ -16,6 +16,7 @@ function createPolygonStyle(fillColor, strokeColor) {
     fill: new Fill({
       color: fillColor,
     }),
+    zIndex: 10,
   });
 }
 function createIconStyle(iconSrc) {
@@ -36,17 +37,18 @@ function createIconStyle(iconSrc) {
 export default function MapStyles() {
   const mapTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const [style, setStyle] = useState({});
-  const strokeColor = 'rgb(0,0,0,0.5)';
+  const strokeColor = 'rgb(0,0,0,0.3)';
+  const secondaryStrokeColor = 'rgb(0,0,0,1)';
 
   useEffect(() => {
     // Example usage:
     const lockedPolygonStyle = createPolygonStyle(
       mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb,
-      strokeColor,
+      secondaryStrokeColor,
     );
     const lockedValidationStyle = createPolygonStyle(
       mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
-      strokeColor,
+      secondaryStrokeColor,
     );
     const iconStyle = createIconStyle(AssetModules.LockPng);
     const redIconStyle = createIconStyle(AssetModules.RedLockPng);
