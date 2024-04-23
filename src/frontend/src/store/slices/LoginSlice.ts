@@ -5,6 +5,7 @@ import { LoginStateTypes } from '@/store/types/ILogin';
 const initialState: LoginStateTypes = {
   loginToken: {},
   authDetails: {},
+  loginModalOpen: false,
 };
 
 const LoginSlice = CoreModules.createSlice({
@@ -20,6 +21,9 @@ const LoginSlice = CoreModules.createSlice({
     },
     setAuthDetails(state, action) {
       state.authDetails = action.payload;
+    },
+    setLoginModalOpen(state, action) {
+      state.loginModalOpen = action.payload;
     },
   },
 });

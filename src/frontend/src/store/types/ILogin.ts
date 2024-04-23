@@ -1,6 +1,7 @@
 export type LoginStateTypes = {
   loginToken: logintTokenType | {};
   authDetails: {} | string;
+  loginModalOpen: false;
 };
 
 type logintTokenType = {

@@ -102,7 +102,7 @@ const Modal = ({ dialogOpen, title, description, open, onOpenChange, className }
       <DialogContent className={`${className}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription className="!fmtm-text-left">{description}</DialogDescription>
         </DialogHeader>
       </DialogContent>
     </Dialog>
