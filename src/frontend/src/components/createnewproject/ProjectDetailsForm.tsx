@@ -250,6 +250,28 @@ const ProjectDetailsForm = ({ flag }) => {
               analysis later, but should be human informative and not overused, #group #event
             </p>
           </div>
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
+            <CustomCheckbox
+              key="hasCustomTMS"
+              label="Will you use a custom TMS basemap"
+              checked={values.hasCustomTMS}
+              onCheckedChange={() => {
+                handleCustomChange('hasCustomTMS', !values.hasCustomTMS);
+              }}
+              className="fmtm-text-black"
+            />
+            {values.hasCustomTMS && (
+              <InputTextField
+                id="custom_tms_url"
+                name="custom_tms_url"
+                label="Custom TMS URL"
+                value={values?.custom_tms_url}
+                onChange={handleChange}
+                fieldType="text"
+                errorMsg={errors.custom_tms_url}
+              />
+            )}
+          </div>
           <div>
             <p className="fmtm-text-[1rem] fmtm-font-semibold fmtm-mb-2">Instructions</p>
             <RichTextEditor

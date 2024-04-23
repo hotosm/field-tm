@@ -115,6 +115,8 @@ export type ProjectDetailsTypes = {
   average_buildings_per_task?: number;
   dataExtractWays?: string;
   per_task_instructions?: string;
+  custom_tms_url: string;
+  hasCustomTMS: boolean;
 };
 
 export type ProjectAreaTypes = {

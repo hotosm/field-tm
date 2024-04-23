@@ -14,6 +14,7 @@ import DataTile from 'ol/source/DataTile.js';
 import TileLayer from 'ol/layer/WebGLTile.js';
 import { FileSource, PMTiles } from 'pmtiles';
 import windowDimention from '@/hooks/WindowDimension';
+import { useAppSelector } from '@/types/reduxTypes';
 
 // const mapboxOutdoors = new MapboxVector({
 //   styleUrl: 'mapbox://styles/geovation/ckpicg3of094w17nyqyd2ziie',
@@ -171,6 +172,7 @@ const pmTileLayer = (pmTileLayerData, visible) => {
 
 const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) => {
   const { windowSize } = windowDimention();
+  const { pathname } = useLocation();
 
   const [basemapLayers, setBasemapLayers] = useState(
     new LayerGroup({
@@ -185,6 +187,30 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
       ],
     }),
   );
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
+
+  useEffect(() => {
+    if (!projectInfo?.custom_tms_url || !pathname.includes('project')) return;
+
+    const tmsLayer = new LayerTile({
+      title: 'TMS Layer',
+      type: 'base',
+      visible: visible === 'tms',
+      source: new XYZ({
+        url: projectInfo.custom_tms_url,
+        layer: 'topoMap',
+        maxZoom: 19,
+        crossOrigin: 'Anonymous',
+      }),
+    });
+    const currentLayers = basemapLayers.getLayers();
+    currentLayers.push(tmsLayer);
+    basemapLayers.setLayers(currentLayers);
+
+    return () => {
+      basemapLayers.getLayers().remove(tmsLayer);
+    };
+  }, [projectInfo, pathname]);
 
   useEffect(() => {
     if (!map) return;

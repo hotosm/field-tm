@@ -103,6 +103,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: arrayHashtag,
       data_extract_url: projectDetails.data_extract_url,
+      custom_tms_url: projectDetails.custom_tms_url,
     };
     // Append extra param depending on task split type
     if (splitTasksSelection === task_split_type['task_splitting_algorithm']) {

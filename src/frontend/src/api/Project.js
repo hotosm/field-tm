@@ -45,6 +45,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             data_extract_url: projectResp.data_extract_url,
             instructions: projectResp?.project_info?.per_task_instructions,
             odk_token: projectResp?.odk_token,
+            custom_tms_url: projectResp?.custom_tms_url,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));

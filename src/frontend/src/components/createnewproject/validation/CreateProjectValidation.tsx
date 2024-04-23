@@ -13,6 +13,8 @@ interface ProjectValues {
   odk_central_user: string;
   odk_central_password: string;
   defaultODKCredentials: boolean;
+  hasCustomTMS: boolean;
+  custom_tms_url: string;
 }
 interface ValidationErrors {
   organisation_id?: string;
@@ -25,6 +27,7 @@ interface ValidationErrors {
   odk_central_url?: string;
   odk_central_user?: string;
   odk_central_password?: string;
+  custom_tms_url?: string;
 }
 
 const regexForSymbol = /_/g;
@@ -58,6 +61,12 @@ function CreateProjectValidation(values: ProjectValues) {
   }
   if (isInputEmpty(values?.description)) {
     errors.description = 'Description is Required.';
+  }
+  if (values?.hasCustomTMS && !values?.custom_tms_url) {
+    errors.custom_tms_url = 'Custom TMS is Required.';
+  }
+  if (values?.hasCustomTMS && values?.custom_tms_url && !isValidUrl(values.custom_tms_url)) {
+    errors.custom_tms_url = 'Invalid Custom TMS URL.';
   }
 
   return errors;
