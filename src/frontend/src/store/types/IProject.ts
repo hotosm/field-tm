@@ -24,6 +24,7 @@ export type ProjectStateTypes = {
   mobileFooterSelection: string;
   projectDetailsLoading: boolean;
   projectDashboardDetail: projectDashboardDetailTypes;
+  entityOsmMap: EntityOsmMap[];
   projectDashboardLoading: boolean;
   geolocationStatus: boolean;
   projectCommentsList: projectCommentsListTypes[];
@@ -33,6 +34,13 @@ export type ProjectStateTypes = {
   projectOpfsBasemapPath: string | null;
   projectTaskActivity: projectTaskActivity[];
   projectActivityLoading: boolean;
+};
+
+type EntityOsmMap = {
+  id: string;
+  osm_id: string;
+  status: number;
+  updated_at: string;
 };
 
 type tilesListTypes = {

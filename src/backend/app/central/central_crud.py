@@ -30,12 +30,12 @@ from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.CSVDump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
-from osm_fieldwork.OdkCentralAsync import OdkEntity
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.xls2json import parse_file_to_json
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.central import central_deps
 from app.config import settings
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -322,7 +322,6 @@ async def update_project_xform(
     odk_id: int,
     xform_data: BytesIO,
     form_file_ext: str,
-    project_name: str,
     category: str,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ) -> None:
@@ -333,15 +332,9 @@ async def update_project_xform(
         odk_id (int): ODK Central form ID.
         xform_data (BytesIO): XForm data.
         form_file_ext (str): Extension of the form file.
-        project_name (str): Name (title) of the project.
         category (str): Category of the XForm.
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
     """
-    # TODO in the future we may possibly support multiple forms per project.
-    # TODO to faciliate this we need to add the _{category} suffix and track.
-    # TODO this in the new xforms.category field/table.
-    form_name = project_name
-
     xform_data = await read_and_test_xform(
         xform_data,
         form_file_ext,
@@ -349,27 +342,21 @@ async def update_project_xform(
     )
     updated_xform_data = await update_survey_xform(
         xform_data,
-        form_name,
         category,
         task_ids,
     )
 
-    try:
-        xform = get_odk_form(odk_credentials)
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=500, detail={"message": "Connection failed to odk central"}
-        ) from e
+    xform_obj = get_odk_form(odk_credentials)
 
-    # NOTE calling createForm with the form_name specified should update
-    xform.createForm(
+    # NOTE calling createForm for an existing form will update it
+    form_name = category
+    xform_obj.createForm(
         odk_id,
         updated_xform_data,
         form_name,
     )
     # The draft form must be published after upload
-    xform.publishForm(odk_id, form_name)
+    xform_obj.publishForm(odk_id, form_name)
 
 
 def download_submissions(
@@ -425,6 +412,7 @@ async def read_and_test_xform(
             xform_bytesio = BytesIO(
                 generated_xform.to_xml(
                     validate=False,
+                    pretty_print=False,
                 ).encode("utf-8")
             )
         except Exception as e:
@@ -505,25 +493,28 @@ async def update_entity_registration_xform(
     for instance_elem in root.findall(".//xforms:instance[@src]", namespaces):
         src_value = instance_elem.get("src", "")
         if src_value.endswith(".csv"):
-            instance_elem.set("src", f"jr://file/{category}.csv")
+            # NOTE geojson files require jr://file/{category}.geojson
+            # NOTE csv files require jr://file-csv/{category}.csv
+            instance_elem.set("src", f"jr://file-csv/{category}.csv")
 
     return BytesIO(ElementTree.tostring(root))
 
 
 async def update_survey_xform(
     form_data: BytesIO,
-    form_name: str,
     category: str,
-    task_ids: list,
+    task_ids: list[int],
 ) -> BytesIO:
     """Update fields in the XForm to work with FMTM.
 
-    Updates the 'id' and 'name' fields for the form.
-    Updates the csv filename to match the dataset name.
+    The 'id' field is set to random UUID (xFormId)
+    The 'name' field is set to the category name.
+    The upload media must match the (entity) dataset name (with .csv).
+    The task_id options are populated as choices in the form.
+    The form_category value is also injected to display in the instructions.
 
     Args:
         form_data (str): The input form data.
-        form_name (str): Name of the XForm to set.
         category (str): The form category, used to name the dataset (entity list)
             and the .csv file containing the geometries.
         task_ids (list): List of task IDs to insert as choices in form.
@@ -540,37 +531,76 @@ async def update_survey_xform(
         "entities": "http://www.opendatakit.org/xforms/entities",
     }
 
-    # Parse the XML
+    # Parse the XML from BytesIO obj
     root = ElementTree.fromstring(form_data.getvalue())
 
-    # Update id attribute to equal the form name to be generated
     xform_data = root.findall(".//xforms:data[@id]", namespaces)
     for dt in xform_data:
-        dt.set("id", form_name)
+        # This sets the xFormId in ODK Central (the form reference via API)
+        dt.set("id", category)
 
     # Update the form title (displayed in ODK Collect)
     existing_title = root.find(".//h:title", namespaces)
     if existing_title is not None:
-        existing_title.text = form_name
+        existing_title.text = category
 
     # Update the attachment name to {category}.csv, to link to the entity list
     xform_instance_src = root.findall(".//xforms:instance[@src]", namespaces)
     for inst in xform_instance_src:
         src_value = inst.get("src", "")
-        if src_value.endswith(".csv"):
-            inst.set("src", f"jr://file/{category}.csv")
+        if src_value.endswith(".geojson") or src_value.endswith(".csv"):
+            # NOTE geojson files require jr://file/{category}.geojson
+            # NOTE csv files require jr://file-csv/{category}.csv
+            inst.set("src", f"jr://file-csv/{category}.csv")
 
-    # <instance> must be defined inside <model></model> key
+    # NOTE add the task ID choices to the XML
+    # <instance> must be defined inside <model></model> root element
     model_element = root.find(".//xforms:model", namespaces)
+    # The existing dummy value for task_id must be removed
+    existing_instance = model_element.find(
+        ".//xforms:instance[@id='task_id']", namespaces
+    )
+    if existing_instance is not None:
+        model_element.remove(existing_instance)
+    # Create a new instance element
     instance_task_ids = Element("instance", id="task_id")
-    # Create sub-elements for each task ID, <name> <label> pairs
-    for task_id in task_ids:
-        item = SubElement(instance_task_ids, "item")
-        name = SubElement(item, "name")
-        name.text = str(task_id)
-        label = SubElement(item, "label")
-        label.text = str(task_id)
+    root_element = SubElement(instance_task_ids, "root")
+    # Create sub-elements for each task ID, <itextId> <name> pairs
+    for index, task_id in enumerate(task_ids):
+        item = SubElement(root_element, "item")
+        SubElement(item, "itextId").text = f"task_id-{index}"
+        SubElement(item, "name").text = str(task_id)
     model_element.append(instance_task_ids)
+
+    # Add task_id choice translations (necessary to be visible in form)
+    itext_element = root.find(".//xforms:itext", namespaces)
+    if itext_element is not None:
+        existing_translations = itext_element.findall(
+            ".//xforms:translation", namespaces
+        )
+        for translation in existing_translations:
+            # Remove dummy value from existing translations
+            existing_text = translation.find(
+                ".//xforms:text[@id='task_id-0']", namespaces
+            )
+            if existing_text is not None:
+                translation.remove(existing_text)
+
+            # Append new <text> elements for each task_id
+            for index, task_id in enumerate(task_ids):
+                new_text = Element("text", id=f"task_id-{index}")
+                value_element = Element("value")
+                value_element.text = str(task_id)
+                new_text.append(value_element)
+                translation.append(new_text)
+
+    # Hardcode the form_category value for the start instructions
+    form_category_update = root.find(
+        ".//xforms:bind[@nodeset='/data/all/form_category']", namespaces
+    )
+    log.warning(form_category_update)
+    if form_category_update is not None:
+        form_category_update.set("calculate", f"once('{category}')")
 
     return BytesIO(ElementTree.tostring(root))
 
@@ -751,11 +781,7 @@ async def get_entities_geojson(
     Returns:
         dict: Entity data in OData JSON format.
     """
-    async with OdkEntity(
-        url=odk_creds.odk_central_url,
-        user=odk_creds.odk_central_user,
-        passwd=odk_creds.odk_central_password,
-    ) as odk_central:
+    async with central_deps.get_odk_entity(odk_creds) as odk_central:
         entities = await odk_central.getEntityData(
             odk_id,
             dataset_name,
@@ -784,10 +810,11 @@ async def get_entities_geojson(
     return geojson.FeatureCollection(features=all_features)
 
 
-async def get_entities_mapping_statuses(
+async def get_entities_data(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str,
+    fields: str = "__system/updatedAt, osm_id, status",
 ) -> list:
     """Get all the entity mapping statuses.
 
@@ -797,20 +824,18 @@ async def get_entities_mapping_statuses(
         odk_creds (ODKCentralDecrypted): ODK credentials for a project.
         odk_id (str): The project ID in ODK Central.
         dataset_name (str): The dataset / Entity list name in ODK Central.
+        fields (str): Extra fields to include in $select filter.
+            __id is included by default.
 
     Returns:
-        list: JSON list containing Entity: id, status, updated_at.
-            updated_at is in string format 2022-01-31T23:59:59.999Z.
+        list: JSON list containing Entity info. If updated_at is included,
+            the format is string 2022-01-31T23:59:59.999Z.
     """
-    async with OdkEntity(
-        url=odk_creds.odk_central_url,
-        user=odk_creds.odk_central_user,
-        passwd=odk_creds.odk_central_password,
-    ) as odk_central:
+    async with central_deps.get_odk_entity(odk_creds) as odk_central:
         entities = await odk_central.getEntityData(
             odk_id,
             dataset_name,
-            url_params="$select=__id, __system/updatedAt, osm_id, status",
+            url_params=f"$select=__id{',' if fields else ''} {fields}",
         )
 
     all_entities = []
@@ -869,11 +894,7 @@ async def get_entity_mapping_status(
         dict: JSON containing Entity: id, status, updated_at.
             updated_at is in string format 2022-01-31T23:59:59.999Z.
     """
-    async with OdkEntity(
-        url=odk_creds.odk_central_url,
-        user=odk_creds.odk_central_user,
-        passwd=odk_creds.odk_central_password,
-    ) as odk_central:
+    async with central_deps.get_odk_entity(odk_creds) as odk_central:
         entity = await odk_central.getEntity(
             odk_id,
             dataset_name,
@@ -905,11 +926,7 @@ async def update_entity_mapping_status(
     Returns:
         dict: All Entity data in OData JSON format.
     """
-    async with OdkEntity(
-        url=odk_creds.odk_central_url,
-        user=odk_creds.odk_central_user,
-        passwd=odk_creds.odk_central_password,
-    ) as odk_central:
+    async with central_deps.get_odk_entity(odk_creds) as odk_central:
         entity = await odk_central.updateEntity(
             odk_id,
             dataset_name,

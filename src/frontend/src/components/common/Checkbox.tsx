@@ -8,6 +8,7 @@ type CustomCheckboxType = {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   className?: string;
+  labelClickable?: boolean;
 };
 
 const Checkbox = React.forwardRef<
@@ -29,13 +30,16 @@ const Checkbox = React.forwardRef<
 ));
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export const CustomCheckbox = ({ label, checked, onCheckedChange, className }: CustomCheckboxType) => {
+export const CustomCheckbox = ({ label, checked, onCheckedChange, className, labelClickable }: CustomCheckboxType) => {
+  const labelStyle = labelClickable ? { cursor: 'pointer' } : {};
+
   return (
     <div className="fmtm-flex fmtm-gap-2 sm:fmtm-gap-4">
       <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="fmtm-mt-[2px]" />
       <p
-        style={{ width: 'calc(100% - 32px)' }}
+        style={{ width: 'calc(100% - 32px)', ...labelStyle }}
         className={`fmtm-text-[#7A7676] fmtm-font-archivo fmtm-text-base fmtm-break-words ${className}`}
+        onClick={() => labelClickable && onCheckedChange(!checked)}
       >
         {label}
       </p>

@@ -30,10 +30,10 @@ from fastapi import (
 )
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse, Response
-from osm_fieldwork.OdkCentralAsync import OdkEntity
 from osm_fieldwork.xlsforms import xlsforms_path
 
 from app.auth.osm import AuthUser, login_required
+from app.central import central_deps
 from app.central.central_crud import (
     convert_geojson_to_odk_csv,
     convert_odk_submission_json_to_geojson,
@@ -176,11 +176,7 @@ async def create_entities_from_csv(
     parsed_data = parse_csv(await csv_file.read())
     entities_data_dict = {str(uuid4()): data for data in parsed_data}
 
-    async with OdkEntity(
-        url=odk_creds.odk_central_url,
-        user=odk_creds.odk_central_user,
-        passwd=odk_creds.odk_central_password,
-    ) as odk_central:
+    async with central_deps.get_odk_entity(odk_creds) as odk_central:
         entities = await odk_central.createEntities(
             odk_project_id,
             entity_name,

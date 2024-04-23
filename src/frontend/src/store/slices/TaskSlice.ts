@@ -6,6 +6,7 @@ const initialState: TaskStateTypes = {
   taskLoading: false,
   taskInfo: [],
   selectedTask: null,
+  selectedFeatureProps: null,
   projectBoundaryLoading: false,
   projectBoundary: [],
   convertToOsmLoading: false,
@@ -45,8 +46,13 @@ const TaskSlice = createSlice({
       const tasks = taskInfo.length;
       state.taskData = { ...featureSubmissionCount, task_count: tasks };
     },
+
     SetSelectedTask(state, action) {
       state.selectedTask = action.payload;
+    },
+
+    SetSelectedFeatureProps(state, action) {
+      state.selectedFeatureProps = action.payload;
     },
 
     GetDownloadProjectBoundary(state, action) {

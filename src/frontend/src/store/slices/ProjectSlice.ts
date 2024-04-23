@@ -30,6 +30,7 @@ const initialState: ProjectStateTypes = {
     total_contributors: null,
     last_active: '',
   },
+  entityOsmMap: [],
   projectDashboardLoading: false,
   geolocationStatus: false,
   projectCommentsList: [],
@@ -99,6 +100,13 @@ const ProjectSlice = createSlice({
     },
     SetProjectDashboardDetail(state, action) {
       state.projectDashboardDetail = action.payload;
+    },
+    SetEntityToOsmIdMapping(state, action) {
+      // Convert osm_id to int before mapping to state
+      state.entityOsmMap = action.payload.map((entity) => ({
+        ...entity,
+        osm_id: entity.osm_id ? parseInt(entity.osm_id, 10) : null,
+      }));
     },
     SetProjectDashboardLoading(state, action) {
       state.projectDashboardLoading = action.payload;

@@ -91,6 +91,13 @@ class EntityFeatureCollection(FeatureCollection):
     features: list[EntityFeature]
 
 
+class EntityOsmID(BaseModel):
+    """Map of Entity UUID to OSM Feature ID."""
+
+    id: str
+    osm_id: Optional[str] = None
+
+
 class EntityMappingStatus(BaseModel):
     """The status for mapping an Entity/feature."""
 

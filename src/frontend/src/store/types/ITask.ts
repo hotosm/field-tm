@@ -5,6 +5,7 @@ export type TaskStateTypes = {
   taskLoading: boolean;
   taskInfo: taskInfoType[];
   selectedTask: number | null;
+  selectedFeatureProps: number | null;
   projectBoundaryLoading: boolean;
   projectBoundary: [];
   convertToOsmLoading: boolean;

@@ -78,7 +78,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
             style={{ width: '20px' }}
             className="fmtm-text-primaryRed group-hover:fmtm-text-red-700"
           />
-          <p className="fmtm-text-base fmtm-text-primaryRed group-hover:fmtm-text-red-700">MB TILES</p>
+          <p className="fmtm-text-base fmtm-text-primaryRed group-hover:fmtm-text-red-700">Basemaps</p>
         </div>
         <div title="Close">
           <AssetModules.CloseIcon

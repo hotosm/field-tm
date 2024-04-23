@@ -659,7 +659,7 @@ async def feature_geojson_to_entity_dict(
     properties["status"] = "0"
 
     task_id = properties.get("task_id")
-    entity_label = f"task {task_id} feature {feature_id}"
+    entity_label = f"Task {task_id} Feature {feature_id}"
 
     return {entity_label: {"geometry": javarosa_geom, **properties}}
 

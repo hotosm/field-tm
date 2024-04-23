@@ -197,6 +197,7 @@ const ProjectDetailsForm = ({ flag }) => {
                 handleCustomChange('defaultODKCredentials', !values.defaultODKCredentials);
               }}
               className="fmtm-text-black"
+              labelClickable={true}
             />
           )}
           {((!values.defaultODKCredentials && hasODKCredentials) || !hasODKCredentials) && (
