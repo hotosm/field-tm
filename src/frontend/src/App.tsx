@@ -99,8 +99,10 @@ const GlobalInit = () => {
     window.addEventListener('offline', () => checkStatus('offline'));
     window.addEventListener('online', () => checkStatus('online'));
 
-    // Check current login state
-    checkIfUserLoggedIn();
+    // Check current login state (omit callback url)
+    if (!window.location.pathname.includes('osmauth')) {
+      checkIfUserLoggedIn();
+    }
 
     // Do things when component is unmounted
     return () => {
