@@ -224,7 +224,10 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
                 ) : (
                   <div
                     className="fmtm-text-[#44546a] hover:fmtm-text-[#d73e3e] fmtm-cursor-pointer fmtm-opacity-80"
-                    onClick={() => createLoginWindow('/')}
+                    onClick={() => {
+                      onClose();
+                      dispatch(LoginActions.setLoginModalOpen(true));
+                    }}
                   >
                     Sign In
                   </div>

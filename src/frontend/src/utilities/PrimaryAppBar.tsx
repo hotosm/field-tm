@@ -10,6 +10,7 @@ import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/hotLog.png';
+import LoginPopup from '@/components/LoginPopup';
 
 export default function PrimaryAppBar() {
   const location = useLocation();
@@ -68,6 +69,7 @@ export default function PrimaryAppBar() {
 
   return (
     <CoreModules.Stack sx={{ flexGrow: 0 }}>
+      <LoginPopup />
       <DrawerComponent
         open={open}
         placement={'right'}
@@ -165,7 +167,7 @@ export default function PrimaryAppBar() {
                 className="btnLogin fmtm-truncate"
                 style={appBarInnerStyles.btnLogin}
                 color="info"
-                onClick={() => createLoginWindow('/')}
+                onClick={() => dispatch(LoginActions.setLoginModalOpen(true))}
               >
                 Sign in
               </CoreModules.Button>
