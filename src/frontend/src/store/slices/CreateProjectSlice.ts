@@ -17,6 +17,8 @@ export const initialState: CreateProjectStateTypes = {
     organisation_id: null,
     per_task_instructions: '',
     formWays: 'existing_form',
+    hasCustomTMS: false,
+    custom_tms_url: '',
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,

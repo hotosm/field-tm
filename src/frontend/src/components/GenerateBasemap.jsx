@@ -50,6 +50,13 @@ const GenerateBasemap = ({ projectInfo }) => {
     }
   }, [toggleGenerateMbTilesModal]);
 
+  useEffect(() => {
+    if (projectInfo?.custom_tms_url) {
+      setSelectedTileSource('tms');
+      setTmsUrl(projectInfo?.custom_tms_url);
+    }
+  }, [projectInfo]);
+
   const handleTileSourceChange = (e) => {
     setSelectedTileSource(e.target.value);
     // If 'tms' is selected, clear the TMS URL
