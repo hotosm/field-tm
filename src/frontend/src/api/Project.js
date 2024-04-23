@@ -221,6 +221,20 @@ export const GetProjectDashboard = (url) => {
   };
 };
 
+export const GetEntityInfo = (url) => {
+  return async (dispatch) => {
+    const getEntityOsmMap = async (url) => {
+      try {
+        const response = await CoreModules.axios.get(url);
+        dispatch(ProjectActions.SetEntityToOsmIdMapping(response.data));
+      } catch (error) {
+      } finally {
+      }
+    };
+    await getEntityOsmMap(url);
+  };
+};
+
 export const GetProjectComments = (url) => {
   return async (dispatch) => {
     const getProjectComments = async (url) => {

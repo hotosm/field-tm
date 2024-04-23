@@ -4,7 +4,7 @@ import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
 // import MapDescriptionComponents from '@/components/MapDescriptionComponents';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
-import { ProjectById, GetProjectDashboard } from '@/api/Project';
+import { ProjectById, GetProjectDashboard, GetEntityInfo } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
 import OnScroll from '@/hooks/OnScroll';
@@ -14,6 +14,7 @@ import AssetModules from '@/shared/AssetModules';
 import FmtmLogo from '@/assets/images/hotLog.png';
 import GenerateBasemap from '@/components/GenerateBasemap';
 import TaskSelectionPopup from '@/components/ProjectDetailsV2/TaskSelectionPopup';
+import FeatureSelectionPopup from '@/components/ProjectDetailsV2/FeatureSelectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
 import MobileFooter from '@/components/ProjectDetailsV2/MobileFooter';
 import MobileActivitiesContents from '@/components/ProjectDetailsV2/MobileActivitiesContents';
@@ -54,7 +55,8 @@ const Home = () => {
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
   const [mainView, setView] = useState<any>();
-  const [featuresLayer, setFeaturesLayer] = useState();
+  const [selectedTaskArea, setSelectedTaskArea] = useState();
+  const [selectedTaskFeature, setSelectedTaskFeature] = useState();
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
@@ -72,6 +74,7 @@ const Home = () => {
   const state = CoreModules.useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.home.selectedProject);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
+  const selectedFeatureProps = useAppSelector((state) => state.task.selectedFeatureProps);
   const stateSnackBar = useAppSelector((state) => state.home.snackbar);
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -156,29 +159,12 @@ const Home = () => {
     setTaskBoundariesLayer(taskBoundariesFeatcol);
   }, [state.projectTaskBoundries[0]?.taskBoundries?.length]);
 
-  const dataExtractDataPopup = (properties: dataExtractPropertyType) => {
-    return (
-      <div className="fmtm-h-fit">
-        <h2 className="fmtm-border-b-[2px] fmtm-border-primaryRed fmtm-w-fit fmtm-pr-1">
-          OSM ID: #{properties?.osm_id}
-        </h2>
-        <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
-          <p>
-            Tags: <span className="fmtm-text-primaryRed">{properties?.tags}</span>
-          </p>
-          <p>
-            Timestamp: <span className="fmtm-text-primaryRed">{properties?.timestamp}</span>
-          </p>
-          <p>
-            Changeset: <span className="fmtm-text-primaryRed">{properties?.changeset}</span>
-          </p>
-          <p>
-            Version: <span className="fmtm-text-primaryRed">{properties?.version}</span>
-          </p>
-        </div>
-      </div>
-    );
-  };
+  /**
+   * Sets the data extract URL when the data extract URL in the state changes.
+   */
+  useEffect(() => {
+    setDataExtractUrl(state.projectInfo.data_extract_url);
+  }, [state.projectInfo.data_extract_url]);
 
   const lockedPopup = () => {
     return <p>This task was locked by you</p>;
@@ -190,8 +176,10 @@ const Home = () => {
    * @param {Object} properties - Properties attached to task area boundary feature.
    * @param {Object} feature - The clicked task area feature.
    */
-  const projectClickOnMapTask = (properties, feature) => {
-    setFeaturesLayer(feature);
+  const projectClickOnTaskArea = (properties, feature) => {
+    // Close task feature popup, open task area popup
+    setSelectedTaskFeature(undefined);
+    setSelectedTaskArea(feature);
 
     let extent = properties.geometry.getExtent();
     setDataExtractExtent(properties.geometry);
@@ -217,11 +205,39 @@ const Home = () => {
   };
 
   /**
-   * Sets the data extract URL when the data extract URL in the state changes.
+   * Handles the click event on a task feature (geometry).
+   *
+   * @param {Object} properties - Properties attached to map feature.
+   * @param {Object} feature - The clicked feature.
    */
-  useEffect(() => {
-    setDataExtractUrl(state.projectInfo.data_extract_url);
-  }, [state.projectInfo.data_extract_url]);
+  const projectClickOnTaskFeature = (properties, feature) => {
+    // Close task area popup, open task feature popup
+    setSelectedTaskArea(undefined);
+    setSelectedTaskFeature(feature);
+
+    dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
+
+    // let extent = properties.geometry.getExtent();
+    // setDataExtractExtent(properties.geometry);
+
+    // mapRef.current?.scrollIntoView({
+    //   block: 'center',
+    //   behavior: 'smooth',
+    // });
+
+    dispatch(ProjectActions.ToggleTaskModalStatus(true));
+
+    // // Fit the map view to the clicked feature's extent based on the window size
+    // if (windowSize.width < 768 && map.getView().getZoom() < 17) {
+    //   map.getView().fit(extent, {
+    //     padding: [10, 20, 300, 20],
+    //   });
+    // } else if (windowSize.width > 768 && map.getView().getZoom() < 17) {
+    //   map.getView().fit(extent, {
+    //     padding: [20, 350, 50, 10],
+    //   });
+    // }
+  };
 
   const buildingStyle = {
     ...defaultStyles,
@@ -251,6 +267,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
+    dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
   useEffect(async () => {
@@ -451,7 +468,7 @@ const Home = () => {
                     duration: 2000,
                   }}
                   layerProperties={{ name: 'project-area' }}
-                  mapOnClick={projectClickOnMapTask}
+                  mapOnClick={projectClickOnTaskArea}
                   zoomToLayer
                   zIndex={5}
                   getTaskStatusStyle={(feature) => {
@@ -470,6 +487,7 @@ const Home = () => {
                     constrainResolution: true,
                     duration: 2000,
                   }}
+                  mapOnClick={projectClickOnTaskFeature}
                   zoomToLayer
                   zIndex={5}
                 />
@@ -481,14 +499,6 @@ const Home = () => {
                 showOnHover="pointermove"
                 popupId="locked-popup"
                 className="fmtm-w-[235px]"
-              />
-              <AsyncPopup
-                map={map}
-                popupUI={dataExtractDataPopup}
-                primaryKey={'osm_id'}
-                showOnHover="singleclick"
-                popupId="data-extract-popup"
-                className="fmtm-w-[300px]"
               />
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
@@ -570,17 +580,18 @@ const Home = () => {
           </div>
         )}
       </div>
-      {featuresLayer != undefined && (
+      {selectedTaskArea != undefined && (
         <TaskSelectionPopup
           taskId={selectedTask}
-          feature={featuresLayer}
+          feature={selectedTaskArea}
           body={
             <div>
-              <DialogTaskActions map={map} view={mainView} feature={featuresLayer} taskId={selectedTask} />
+              <DialogTaskActions map={map} view={mainView} feature={selectedTaskArea} taskId={selectedTask} />
             </div>
           }
         />
       )}
+      {selectedTaskFeature != undefined && <FeatureSelectionPopup featureProperties={selectedFeatureProps} />}
     </div>
   );
 };
