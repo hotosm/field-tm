@@ -275,48 +275,6 @@ async def test_generate_project_files(db, client, project):
     assert response.status_code == 200
 
 
-# async def test_update_project_boundary(db, project):
-#     """Test updating project boundary."""
-#     project_id = project.id
-#     log.debug(f"Testing updating boundary for project ID: {project_id}")
-
-#     db_project = await project_crud.get_project_by_id(db, project_id)
-
-#     # Outline
-#     boundary_geojson = json.loads(
-#         json.dumps(
-#             {
-#                 "type": "Polygon",
-#                 "coordinates": [
-#                     [
-#                         [85.317028828, 27.7052522097],
-#                         [85.317028828, 27.7041424888],
-#                         [85.318844411, 27.7041424888],
-#                         [85.318844411, 27.7052522097],
-#                         [85.317028828, 27.7052522097],
-#                     ]
-#                 ],
-#             }
-#         )
-#     )
-#     log.debug(f"Creating project boundary: {boundary_geojson}")
-#     boundary_created = await project_crud.update_project_boundary(
-#         db, project_id, boundary_geojson, 500
-#     )
-#     assert boundary_created is True
-#     project_outline = db_project.outline.data.tobytes()
-#     file_outline = shape(boundary_geojson)
-#     assert wkb.loads(project_outline).wkt == file_outline.wkt
-
-#     # Centroid
-#     project_centroid = wkb.loads(db_project.centroid.data.tobytes()).wkt
-#     file_centroid = file_outline.centroid.wkt
-#     assert project_centroid == file_centroid
-
-#     # Location string
-#     assert db_project.location_str == "Zurich,Switzerland"
-
-
 if __name__ == "__main__":
     """Main func if file invoked directly."""
     pytest.main()

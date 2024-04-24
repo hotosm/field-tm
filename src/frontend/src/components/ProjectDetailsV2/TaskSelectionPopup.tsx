@@ -94,11 +94,11 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
         } fmtm-rounded-t-2xl md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl`}
       >
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-p-3 sm:fmtm-p-5">
-          <h4 className="fmtm-text-lg fmtm-font-bold">Task: {taskId}</h4>
+          <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
           <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_status}</p>
         </div>
         {checkIfTaskAssignedOrNot && task_status !== 'LOCKED_FOR_MAPPING' && (
-          <QrcodeComponent qrcode={qrcode} taskId={taskId} />
+          <QrcodeComponent qrcode={qrcode} projectId={currentProjectId} taskIndex={selectedTask.index} />
         )}
         {body}
       </div>

@@ -296,7 +296,7 @@ async def split_geojson_by_task_areas(
             jsonb_set(
                 jsonb_set(
                     feature->'properties',
-                    '{task_id}', to_jsonb(tasks.id), true
+                    '{task_id}', to_jsonb(tasks.project_task_index), true
                 ),
                 '{project_id}', to_jsonb(tasks.project_id), true
             ) AS properties
@@ -309,7 +309,7 @@ async def split_geojson_by_task_areas(
 
         -- Retrieve task outlines based on the provided project_id
         SELECT
-            tasks.id AS task_id,
+            tasks.project_task_index AS task_id,
             jsonb_build_object(
                 'type', 'FeatureCollection',
                 'features', jsonb_agg(feature)
@@ -337,7 +337,7 @@ async def split_geojson_by_task_areas(
         WHERE
             tasks.project_id = :project_id
         GROUP BY
-            tasks.id;
+            tasks.project_task_index;
         """
     )
 
@@ -588,7 +588,7 @@ async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
 
     coordinates = []
     if geojson_geometry["type"] in ["Point", "LineString", "MultiPoint"]:
-        coordinates = [geojson_geometry.get("coordinates", [])]
+        coordinates = [[geojson_geometry.get("coordinates", [])]]
     elif geojson_geometry["type"] in ["Polygon", "MultiLineString"]:
         coordinates = geojson_geometry.get("coordinates", [])
     elif geojson_geometry["type"] == "MultiPolygon":
@@ -670,7 +670,7 @@ async def task_geojson_dict_to_entity_values(task_geojson_dict):
     for _, geojson_dict in task_geojson_dict.items():
         features = geojson_dict.get("features", [])
         asyncio_tasks.extend(
-            [feature_geojson_to_entity_dict(feature) for feature in features]
+            [feature_geojson_to_entity_dict(feature) for feature in features if feature]
         )
 
     entity_values = await gather(*asyncio_tasks)

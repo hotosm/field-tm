@@ -221,7 +221,7 @@ const TaskSubmissionsMap = () => {
     return (
       <div className="fmtm-h-fit">
         <h2 className="fmtm-border-b-[2px] fmtm-border-primaryRed fmtm-w-fit fmtm-pr-1">
-          Task ID: #{currentTask?.[0]?.task_id}
+          Task ID: #{currentTask?.[0]?.index}
         </h2>
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
           <p>

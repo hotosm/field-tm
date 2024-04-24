@@ -23,11 +23,7 @@ const Comments = () => {
   const projectId = params.id;
 
   useEffect(() => {
-    dispatch(
-      GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/task-history/${projectId}?comment=true&task_id=${selectedTask}`,
-      ),
-    );
+    dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${selectedTask}/history/?comment=true`));
   }, [selectedTask, projectId]);
 
   const clearComment = () => {

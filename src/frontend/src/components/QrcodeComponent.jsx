@@ -2,11 +2,11 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
-const TasksComponent = ({ qrcode, taskId }) => {
+const TasksComponent = ({ qrcode, projectId, taskIndex }) => {
   const downloadQR = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = qrcode;
-    downloadLink.download = `Task_${taskId}`;
+    downloadLink.download = `Project_${projectId}_Task_${taskIndex}`;
     downloadLink.click();
   };
   return (
