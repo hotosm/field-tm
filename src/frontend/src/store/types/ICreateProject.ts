@@ -58,8 +58,8 @@ export type GeoJSONFeatureTypes = {
 
 export type ProjectTaskTypes = {
   id: number;
+  index: number;
   project_id: number;
-  project_task_index: number;
   outline_geojson: GeoJSONFeatureTypes;
   task_status: number;
   locked_by_uid: number | null;

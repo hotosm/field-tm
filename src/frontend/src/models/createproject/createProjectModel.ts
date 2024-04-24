@@ -26,7 +26,7 @@ export interface ProjectDetailsModel {
   tasks: {
     id: number;
     project_id: number;
-    project_task_index: number;
+    index: number;
     outline_geojson: {
       type: string;
       geometry: {

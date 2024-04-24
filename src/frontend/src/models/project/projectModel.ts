@@ -90,9 +90,9 @@ export type projectTaskBoundriesType = {
 export type taskBoundriesTypes = {
   bbox: [number, number];
   id: number;
+  project_task_index: number;
   locked_by_uid: null | string;
   locked_by_username: null | string;
-  odk_token: string;
   outline_geojson: {
     type: string;
     geometry: {
@@ -109,7 +109,6 @@ export type taskBoundriesTypes = {
 
 export type taskBoundriesGeojson = {
   id: number;
-  odk_token: string;
   outline_geojson: {
     type: string;
     geometry: {

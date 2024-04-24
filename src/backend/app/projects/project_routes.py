@@ -209,9 +209,10 @@ async def task_features_count(
     data = []
     feature_count_query = text(
         """
-        SELECT id, feature_count
+        SELECT id, project_task_index, feature_count
         FROM tasks
-        WHERE project_id = :project_id;
+        WHERE project_id = :project_id
+        ORDER BY id;
     """
     )
     result = db.execute(feature_count_query, {"project_id": project_id})
@@ -225,9 +226,10 @@ async def task_features_count(
     data.extend(
         {
             "task_id": record[0],
+            "index": record[1],
             "submission_count": odk_details[0]["submissions"],
             "last_submission": odk_details[0]["lastSubmission"],
-            "feature_count": record[1],
+            "feature_count": record[2],
         }
         for record in feature_counts
     )
@@ -697,47 +699,6 @@ async def task_split(
         no_of_buildings,
         parsed_extract,
     )
-
-
-@router.post("/edit_project_boundary/{project_id}/")
-async def edit_project_boundary(
-    project_id: int,
-    boundary_geojson: UploadFile = File(...),
-    dimension: int = Form(500),
-    db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
-):
-    """Edit the existing project boundary."""
-    # Validating for .geojson File.
-    file_name = os.path.splitext(boundary_geojson.filename)
-    file_ext = file_name[1]
-    allowed_extensions = [".geojson", ".json"]
-    if file_ext not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Provide a valid .geojson file")
-
-    # read entire file
-    content = await boundary_geojson.read()
-    boundary = json.loads(content)
-
-    # Validatiing Coordinate Reference System
-    await check_crs(boundary)
-
-    result = await project_crud.update_project_boundary(
-        db, project_id, boundary, dimension
-    )
-    if not result:
-        raise HTTPException(
-            status_code=428, detail=f"Project with id {project_id} does not exist"
-        )
-
-    # Get the number of tasks in a project
-    task_count = await tasks_crud.get_task_count_in_project(db, project_id)
-
-    return {
-        "message": "Project Boundary Uploaded",
-        "project_id": project_id,
-        "task_count": task_count,
-    }
 
 
 @router.post("/validate-form")

@@ -44,7 +44,7 @@ const TaskSubmissions = () => {
     <div className="fmtm-bg-red-50 fmtm-px-5 fmtm-pb-5 fmtm-pt-2 fmtm-rounded-lg">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-          <p>#{task?.task_id}</p>
+          <p>#{task?.index}</p>
           <div className="fmtm-flex fmtm-justify-between">
             <p>Expected Count</p>
             <p>{task?.feature_count}</p>

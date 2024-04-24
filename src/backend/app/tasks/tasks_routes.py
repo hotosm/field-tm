@@ -181,11 +181,8 @@ async def task_activity(
     )
 
 
-@router.get(
-    "/task-history/{project_id}", response_model=List[tasks_schemas.TaskHistoryOut]
-)
+@router.get("/{task_id}/history/", response_model=List[tasks_schemas.TaskHistoryOut])
 async def task_history(
-    project_id: int,
     task_id: int,
     days: int = 10,
     comment: bool = False,
@@ -194,8 +191,7 @@ async def task_history(
     """Get the detailed task history for a project.
 
     Args:
-        project_id (int): The ID of the project.
-        task_id (int): The task_id of the project.
+        task_id (int): The unique task ID in the database.
         days (int): The number of days to consider for the
             task activity (default: 10).
         comment (bool): True or False, True to get comments
@@ -207,6 +203,4 @@ async def task_history(
         List[TaskHistory]: A list of task history.
     """
     end_date = datetime.now() - timedelta(days=days)
-    return await tasks_crud.get_project_task_history(
-        project_id, task_id, comment, end_date, db
-    )
+    return await tasks_crud.get_project_task_history(task_id, comment, end_date, db)

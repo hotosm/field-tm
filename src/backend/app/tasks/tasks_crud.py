@@ -328,7 +328,6 @@ async def update_task_history(
 
 
 async def get_project_task_history(
-    project_id: int,
     task_id: int,
     comment: bool,
     end_date: datetime,
@@ -349,7 +348,6 @@ async def get_project_task_history(
     Returns:
         A list of task history records for the specified project.
     """
-    # NOTE project_id will be used if we use the task project_task_index instead
     query = """
         SELECT task_history.id, task_history.task_id, task_history.action_text,
             task_history.action_date, users.username,

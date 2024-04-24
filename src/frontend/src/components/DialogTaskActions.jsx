@@ -32,11 +32,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
 
   useEffect(() => {
-    dispatch(
-      GetProjectTaskActivity(
-        `${import.meta.env.VITE_API_URL}/tasks/task-history/${currentProjectId}?comment=false&task_id=${taskId}`,
-      ),
-    );
+    dispatch(GetProjectTaskActivity(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/history/?comment=false`));
   }, [taskId]);
 
   useEffect(() => {

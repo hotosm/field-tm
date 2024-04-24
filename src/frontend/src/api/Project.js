@@ -15,9 +15,9 @@ export const ProjectById = (existingProjectList, projectId) => {
         const persistingValues = projectResp.tasks.map((data) => {
           return {
             id: data.id,
+            index: data.project_task_index,
             outline_geojson: data.outline_geojson,
             task_status: task_priority_str[data.task_status],
-            odk_token: data.odk_token,
             locked_by_uid: data.locked_by_uid,
             locked_by_username: data.locked_by_username,
             task_history: data.task_history,
