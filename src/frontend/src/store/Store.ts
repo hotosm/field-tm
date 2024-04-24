@@ -25,7 +25,7 @@ export default function persist(key, whitelist, reducer) {
 
 const rootReducer = combineReducers({
   project: ProjectSlice.reducer,
-  login: persist('login', ['loginToken', 'authDetails'], LoginSlice.reducer),
+  login: persist('login', ['authDetails'], LoginSlice.reducer),
   //you can persist your auth reducer here similar to project reducer
   home: HomeSlice.reducer,
   theme: ThemeSlice.reducer,

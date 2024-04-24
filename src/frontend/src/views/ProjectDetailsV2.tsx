@@ -82,7 +82,7 @@ const Home = () => {
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const projectOpfsBasemapPath = useAppSelector((state) => state?.project?.projectOpfsBasemapPath);
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   useEffect(() => {
     if (state.projectInfo.title) {
@@ -472,7 +472,11 @@ const Home = () => {
                   zoomToLayer
                   zIndex={5}
                   getTaskStatusStyle={(feature) => {
-                    return getTaskStatusStyle(feature, mapTheme, feature.getProperties()?.locked_by_user == token?.id);
+                    return getTaskStatusStyle(
+                      feature,
+                      mapTheme,
+                      feature.getProperties()?.locked_by_user == authDetails?.id,
+                    );
                   }}
                 />
               )}

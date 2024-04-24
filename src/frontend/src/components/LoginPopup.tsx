@@ -2,8 +2,9 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import { Modal } from '@/components/common/Modal';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
-import { createLoginWindow } from '@/utilfunctions/login';
+import { osmLoginRedirect } from '@/utilfunctions/login';
 import { TemporaryLoginService } from '@/api/Login';
 import AssetModules from '@/shared/AssetModules';
 import OSMImg from '@/assets/images/osm-logo.png';
@@ -33,14 +34,17 @@ const loginOptions: loginOptionsType[] = [
 
 const LoginPopup = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const loginModalOpen = CoreModules.useAppSelector((state) => state.login.loginModalOpen);
 
   const handleSignIn = (selectedOption: string) => {
     if (selectedOption === 'osm_account') {
-      createLoginWindow('/');
+      osmLoginRedirect();
     } else {
       dispatch(TemporaryLoginService(`${import.meta.env.VITE_API_URL}/auth/temp-login`));
+      navigate('/');
+      dispatch(LoginActions.setLoginModalOpen(false));
     }
   };
 

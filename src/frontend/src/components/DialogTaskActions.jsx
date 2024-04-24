@@ -13,7 +13,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   const navigate = useNavigate();
   const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const loading = CoreModules.useAppSelector((state) => state.common.loading);
   const [list_of_task_status, set_list_of_task_status] = useState([]);
   const [task_status, set_task_status] = useState('READY');
@@ -54,10 +54,10 @@ export default function Dialog({ taskId, feature, map, view }) {
 
   const handleOnClick = (event) => {
     const status = task_priority_str[event.currentTarget.dataset.btnid];
-    const body = token != null ? { ...token } : {};
+    const authDetailsCopy = authDetails != null ? { ...authDetails } : {};
     const geoStyle = geojsonStyles[event.currentTarget.dataset.btnid];
     if (event.currentTarget.dataset.btnid != undefined) {
-      if (body.hasOwnProperty('id')) {
+      if (authDetailsCopy.hasOwnProperty('id')) {
         dispatch(
           ProjectTaskStatus(
             `${import.meta.env.VITE_API_URL}/tasks/${taskId}/new-status/${status}`,
@@ -68,7 +68,7 @@ export default function Dialog({ taskId, feature, map, view }) {
             map,
             view,
             taskId,
-            body,
+            authDetailsCopy,
             { project_id: currentProjectId },
           ),
         );
@@ -94,7 +94,7 @@ export default function Dialog({ taskId, feature, map, view }) {
     }
   };
   const checkIfTaskAssignedOrNot =
-    currentStatus?.locked_by_username === token?.username || currentStatus?.locked_by_username === null;
+    currentStatus?.locked_by_username === authDetails?.username || currentStatus?.locked_by_username === null;
 
   return (
     <div className="fmtm-flex fmtm-flex-col">

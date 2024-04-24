@@ -6,7 +6,7 @@ import { user_roles } from '@/types/enums';
 
 const OrganisationGridCard = ({ filteredData, allDataLength }) => {
   const navigate = useNavigate();
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const cardStyle = {
     padding: '20px',
     display: 'flex',
@@ -27,7 +27,7 @@ const OrganisationGridCard = ({ filteredData, allDataLength }) => {
             key={index}
             sx={cardStyle}
             onClick={() => {
-              if (!data?.approved && token && token?.['role'] === user_roles.ADMIN) {
+              if (!data?.approved && authDetails && authDetails?.['role'] === user_roles.ADMIN) {
                 navigate(`/approve-organization/${data?.id}`);
               }
             }}
@@ -60,7 +60,7 @@ const OrganisationGridCard = ({ filteredData, allDataLength }) => {
                   {data.description}
                 </p>
               </div>
-              {token && token['role'] === user_roles.ADMIN && (
+              {authDetails && authDetails['role'] === user_roles.ADMIN && (
                 <div className="fmtm-w-full fmtm-flex fmtm-justify-end">
                   <div
                     className={`fmtm-bottom-5 fmtm-right-5 fmtm-px-2 fmtm-py-1 fmtm-rounded fmtm-w-fit ${

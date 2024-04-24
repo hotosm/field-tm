@@ -4,7 +4,7 @@ import { GetOrganisationDataModel, OrganisationModal } from '@/models/organisati
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { API } from '.';
-import { createLoginWindow } from '@/utilfunctions/login';
+import { LoginActions } from '@/store/slices/LoginSlice';
 
 function appendObjectToFormData(formData, object) {
   for (const [key, value] of Object.entries(object)) {
@@ -52,7 +52,7 @@ export const OrganisationDataService: Function = (url: string) => {
       } catch (error) {
         dispatch(OrganisationAction.GetOrganisationDataLoading(false));
         if (error.response.status === 401) {
-          createLoginWindow('/');
+          dispatch(LoginActions.setLoginModalOpen(true));
         }
       }
     };

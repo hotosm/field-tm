@@ -22,7 +22,7 @@ const Organisation = () => {
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
   const [verifiedTab, setVerifiedTab] = useState<boolean>(true);
   const [myOrgsLoaded, setMyOrgsLoaded] = useState(false);
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
   const organisationData = useAppSelector((state) => state.organisation.organisationData);
@@ -115,7 +115,7 @@ const Organisation = () => {
               className="fmtm-duration-150"
               onClick={() => loadMyOrganisations()}
             />
-            {token && (
+            {authDetails && (
               <CoreModules.Link to={'/create-organization'}>
                 <CoreModules.Button
                   variant="outlined"
@@ -137,7 +137,7 @@ const Organisation = () => {
             )}
           </CoreModules.Tabs>
         </CoreModules.Box>
-        {token !== null && token['role'] && token['role'] === user_roles.ADMIN && activeTab === 0 && (
+        {authDetails && authDetails['role'] && authDetails['role'] === user_roles.ADMIN && activeTab === 0 && (
           <CoreModules.Box>
             <CoreModules.Tabs sx={{ minHeight: 'fit-content' }}>
               <CoreModules.Tab

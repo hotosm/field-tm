@@ -6,7 +6,7 @@ import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { createLoginWindow, revokeCookie } from '@/utilfunctions/login';
+import { revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/hotLog.png';
@@ -18,7 +18,7 @@ export default function PrimaryAppBar() {
   const [open, setOpen] = React.useState<boolean>(false);
   const dispatch = CoreModules.useAppDispatch();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const handleOpenDrawer = () => {
     setOpen(true);
   };
@@ -49,7 +49,7 @@ export default function PrimaryAppBar() {
     setOpen(false);
     try {
       await revokeCookie();
-      dispatch(LoginActions.signOut(null));
+      dispatch(LoginActions.signOut());
       dispatch(ProjectActions.clearProjects([]));
     } catch {
       dispatch(
@@ -126,7 +126,7 @@ export default function PrimaryAppBar() {
           <CoreModules.Stack sx={{ flexGrow: 1 }} />
 
           {/* position changed */}
-          {token != null && (
+          {authDetails && (
             <CoreModules.Stack
               direction={'row'}
               spacing={1}
@@ -134,24 +134,24 @@ export default function PrimaryAppBar() {
               alignItems="center"
               className="fmtm-text-ellipsis fmtm-max-w-[9.5rem]"
             >
-              {token['picture'] !== 'null' && token['picture'] ? (
+              {authDetails['img_url'] !== 'null' && authDetails['img_url'] ? (
                 <CoreModules.Stack
                   className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
                   sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }}
                 >
-                  <img src={token['picture']} alt="Profile Picture" />
+                  <img src={authDetails['img_url']} alt="Profile Picture" />
                 </CoreModules.Stack>
               ) : (
                 <AssetModules.PersonIcon color="success" sx={{ mt: '3%' }} />
               )}
               <CoreModules.Typography variant="typography" color={'info'} noWrap>
-                {token['username']}
+                {authDetails['username']}
               </CoreModules.Typography>
             </CoreModules.Stack>
           )}
 
           <CoreModules.Stack direction={'row'} sx={{ display: { md: 'flex' } }}>
-            {token != null ? (
+            {authDetails ? (
               <CoreModules.Link style={{ textDecoration: 'none' }} className="fmtm-hidden sm:fmtm-flex" to={'/'}>
                 <CoreModules.Button
                   className="btnLogin fmtm-truncate"

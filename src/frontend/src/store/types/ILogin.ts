@@ -1,14 +1,12 @@
 export type LoginStateTypes = {
-  loginToken: logintTokenType | {};
-  authDetails: {} | string;
+  authDetails: authDetailsType | null;
   loginModalOpen: false;
 };
 
-type logintTokenType = {
+type authDetailsType = {
   id: string;
-  osm_oauth_token: string;
-  picture: string;
+  img_url: string;
   role: string;
-  sessionToken: string | null;
   username: string;
+  // sessionToken: string | null;
 };
