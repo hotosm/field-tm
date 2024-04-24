@@ -60,13 +60,13 @@ axios.interceptors.request.use(
 
 const GlobalInit = () => {
   const dispatch = useDispatch();
-  const storeUser = CoreModules.useAppSelector((state) => state.login);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
-  const checkIfUserLoggedIn = () => {
+  const checkIfUserLoginValid = () => {
     fetch(`${import.meta.env.VITE_API_URL}/auth/introspect`, { credentials: 'include' })
       .then((resp) => {
         if (resp.status !== 200) {
-          dispatch(LoginActions.signOut(null));
+          dispatch(LoginActions.signOut());
           return;
         }
         return resp.json();
@@ -74,9 +74,9 @@ const GlobalInit = () => {
       .then((apiUser) => {
         if (!apiUser) return;
 
-        if (apiUser.username !== storeUser?.loginToken?.username) {
+        if (apiUser.username !== authDetails?.username) {
           // Mismatch between store user and logged in user via api
-          dispatch(LoginActions.signOut(null));
+          dispatch(LoginActions.signOut());
         }
       })
       .catch((error) => {
@@ -103,7 +103,9 @@ const GlobalInit = () => {
 
     // Check current login state (omit callback url)
     if (!window.location.pathname.includes('osmauth')) {
-      checkIfUserLoggedIn();
+      // No need for introspect check if user details are not set
+      if (!authDetails) return;
+      checkIfUserLoginValid();
     }
 
     // Do things when component is unmounted

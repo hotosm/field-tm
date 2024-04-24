@@ -26,16 +26,16 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
   //qrcodecomponent
   const projectName = CoreModules.useAppSelector((state) => state.project.projectInfo.title);
   const odkToken = CoreModules.useAppSelector((state) => state.project.projectInfo.odk_token);
-  const loginToken = CoreModules.useAppSelector((state) => state.login.loginToken);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
       return indTask.id == taskId;
     })?.[0],
   };
   const checkIfTaskAssignedOrNot =
-    selectedTask?.locked_by_username === loginToken?.username || selectedTask?.locked_by_username === null;
+    selectedTask?.locked_by_username === authDetails?.username || selectedTask?.locked_by_username === null;
 
-  const { qrcode } = GetProjectQrCode(odkToken, projectName, loginToken?.username);
+  const { qrcode } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
   useEffect(() => {
     if (projectIndex != -1) {
       const currentStatus = {

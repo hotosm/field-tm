@@ -8,7 +8,7 @@ import NotFoundPage from '@/views/NotFound404';
 import Organisation from '@/views/Organisation';
 import CreateEditOrganization from '@/views/CreateEditOrganization';
 import ApproveOrganization from '@/views/ApproveOrganization';
-import Authorized from '@/views/Authorized';
+import OsmAuth from '@/views/OsmAuth';
 import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
 import UnderConstruction from '@/views/UnderConstruction';
@@ -51,24 +51,22 @@ const routes = createBrowserRouter([
       {
         path: '/edit-organization/:id',
         element: (
-          <ErrorBoundary>
-            <CreateEditOrganization />
-          </ErrorBoundary>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <CreateEditOrganization />
+            </ErrorBoundary>
+          </ProtectedRoute>
         ),
       },
       {
         path: '/approve-organization/:id',
         element: (
-          <ErrorBoundary>
-            <ApproveOrganization />
-          </ErrorBoundary>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ApproveOrganization />
+            </ErrorBoundary>
+          </ProtectedRoute>
         ),
-      },
-      // {
-      //     path: '/explore',
-      //     element: <Navigate to="/" />,
-      // },
-      {
         path: '/tabbed',
         element: (
           <ErrorBoundary>
@@ -101,11 +99,6 @@ const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //     path: "/recoveraccess",
-      //     element: <Forgot />,
-      // },
-
       {
         path: '/project/:projectId/tasks/:taskId/submission/:instanceId',
         element: (
@@ -133,11 +126,13 @@ const routes = createBrowserRouter([
       {
         path: '/project/:id',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ErrorBoundary>
-              <ProjectDetailsV2 />
-            </ErrorBoundary>
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ErrorBoundary>
+                <ProjectDetailsV2 />
+              </ErrorBoundary>
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
@@ -217,7 +212,7 @@ const routes = createBrowserRouter([
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <ErrorBoundary>
-              <Authorized />
+              <OsmAuth />
             </ErrorBoundary>
           </Suspense>
         ),

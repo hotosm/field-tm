@@ -1,18 +1,14 @@
-import { Navigate } from 'react-router-dom';
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import CoreModules from '@/shared/CoreModules';
-import { createLoginWindow } from '@/utilfunctions/login';
-import environment from '@/environment';
+import { LoginActions } from '@/store/slices/LoginSlice';
 
-const ProtectedRoute = ({ children }) => {
-  // Bypass check if NODE_ENV=development (local dev)
-  if (import.meta.env.MODE === 'development') {
-    return children;
-  }
+const ProtectedRoute = ({ children, next }) => {
+  const dispatch = CoreModules.useAppDispatch();
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
-  const token = CoreModules.useAppSelector((state) => state.login.loginToken);
-  if (token == null) {
-    createLoginWindow('/');
+  if (authDetails == null) {
+    dispatch(LoginActions.setLoginModalOpen(true));
     return <Navigate to="/" replace />;
   }
 
