@@ -72,6 +72,8 @@ const GlobalInit = () => {
         return resp.json();
       })
       .then((apiUser) => {
+        if (!apiUser) return;
+
         if (apiUser.username !== storeUser?.loginToken?.username) {
           // Mismatch between store user and logged in user via api
           dispatch(LoginActions.signOut(null));

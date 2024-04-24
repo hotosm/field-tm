@@ -26,10 +26,11 @@ from uuid import uuid4
 from fastapi import (
     APIRouter,
     Depends,
+    Request,
     UploadFile,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from osm_fieldwork.xlsforms import xlsforms_path
 
 from app.auth.osm import AuthUser, login_required
@@ -39,6 +40,7 @@ from app.central.central_crud import (
     convert_odk_submission_json_to_geojson,
     read_and_test_xform,
 )
+from app.config import settings
 from app.db.postgis_utils import (
     add_required_geojson_properties,
     javarosa_to_geojson_geom,
@@ -218,3 +220,16 @@ async def convert_odk_submission_json_to_geojson_wrapper(
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.geojson"}
     return Response(submission_geojson.getvalue(), headers=headers)
+
+
+@router.get("/view-auth-token")
+async def view_user_oauth_token(
+    request: Request,
+    current_user: AuthUser = Depends(login_required),
+):
+    """Get the OSM OAuth token for a logged in user."""
+    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={"access_token": request.cookies.get(cookie_name)},
+    )

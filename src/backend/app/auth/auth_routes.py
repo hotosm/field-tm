@@ -29,7 +29,7 @@ from sqlalchemy.orm import Session
 from app.auth.osm import AuthUser, init_osm_auth, login_required
 from app.config import settings
 from app.db import database
-from app.models.enums import UserRole
+from app.models.enums import HTTPStatus, UserRole
 
 router = APIRouter(
     prefix="/auth",
@@ -38,7 +38,7 @@ router = APIRouter(
 )
 
 
-@router.get("/osm_login/")
+@router.get("/osm-login/")
 async def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
     """Get Login URL for OSM Oauth Application.
 
@@ -81,13 +81,13 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     # Get access token
     access_token = osm_auth.callback(callback_url).get("access_token")
     log.debug(f"Access token returned of length {len(access_token)}")
-    response = JSONResponse(content={"access_token": access_token}, status_code=200)
+    response = Response(status_code=HTTPStatus.OK)
 
     # Set cookie
     cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
     log.debug(
         f"Setting cookie in response named '{cookie_name}' with params: "
-        f"max_age=259200 | expires=259200 | path='/' | "
+        f"max_age=31536000 | expires=31536000 | path='/' | "
         f"domain={settings.FMTM_DOMAIN} | httponly=True | samesite='lax' | "
         f"secure={False if settings.DEBUG else True}"
     )
@@ -233,11 +233,8 @@ async def check_login(
     return user_data
 
 
-@router.get("/login/")
-async def temp_login(
-    request: Request,
-    email: Optional[str] = None,
-):
+@router.get("/temp-login")
+async def temp_login(email: Optional[str] = None):
     """Handles the authentication check endpoint.
 
     By creating a temporary access token and
@@ -251,8 +248,23 @@ async def temp_login(
         Response: The response object containing the access token as a cookie.
     """
     access_token = settings.OSM_SVC_ACCOUNT_TOKEN
-    response = JSONResponse(content={"access_token": access_token}, status_code=200)
+
+    if not access_token:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN,
+            detail=(
+                "OSM_SVC_ACCOUNT_TOKEN variable is not set. Temp login not possible."
+            ),
+        )
+
+    response = Response(status_code=HTTPStatus.OK)
     cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    log.debug(
+        f"Setting TEMP cookie in response named '{cookie_name}' with params: "
+        f"max_age=604800 | expires=604800 | path='/' | "
+        f"domain={settings.FMTM_DOMAIN} | httponly=True | samesite='lax' | "
+        f"secure={False if settings.DEBUG else True}"
+    )
     response.set_cookie(
         key=cookie_name,
         value=access_token,

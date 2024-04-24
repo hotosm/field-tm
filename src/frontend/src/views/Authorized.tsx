@@ -27,11 +27,10 @@ function Authorized() {
     const id = params.get('id');
     const username = params.get('username');
     const sessionToken = params.get('session_token');
-    const osm_oauth_token = params.get('osm_oauth_token');
     const picture = params.get('picture');
     const role = params.get('role');
-    dispatch(LoginActions.setAuthDetails(username, sessionToken, osm_oauth_token));
-    dispatch(LoginActions.SetLoginToken({ username, id, sessionToken, osm_oauth_token, picture, role }));
+    dispatch(LoginActions.setAuthDetails(username, sessionToken));
+    dispatch(LoginActions.SetLoginToken({ username, id, sessionToken, picture, role }));
 
     const redirectUrl = params.get('redirect_to') || '/';
     setIsReadyToRedirect(true);
