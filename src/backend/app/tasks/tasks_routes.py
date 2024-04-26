@@ -17,6 +17,7 @@
 #
 """Routes for FMTM tasks."""
 
+import asyncio
 from datetime import datetime, timedelta
 from typing import List
 
@@ -171,10 +172,13 @@ async def task_activity(
 
     """
     end_date = datetime.now() - timedelta(days=days)
-    task_history = await tasks_crud.get_project_task_history(
-        project_id, False, end_date, None, db
-    )
-
+    task_list = await tasks_crud.get_task_id_list(db, project_id)
+    tasks = []
+    for task_id in task_list:
+        tasks.extend(
+            [tasks_crud.get_project_task_history(task_id, False, end_date, db)]
+        )
+    task_history = await asyncio.gather(*tasks)
     return await tasks_crud.count_validated_and_mapped_tasks(
         task_history,
         end_date,
