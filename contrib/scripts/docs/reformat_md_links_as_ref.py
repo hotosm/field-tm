@@ -1,3 +1,15 @@
+"""
+This script was contributed by @cordovez and reforats markdown with references.
+
+For example:
+
+# Title
+
+Some text [1]
+
+[1]: link.to.reference.com
+"""
+
 import re
 
 this_file_in_docs = "User-Manual-For-Project-Managers.md"
