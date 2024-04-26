@@ -31,6 +31,18 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
 > [timeline](./docs/timeline.md) and the [docs](https://fmtm.dev) page.
 
+## How FMTM Works
+
+1. Project is created in an area with three things:
+   a. Data extract: the features you want to map, say building polygons.
+   b. ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
+   c. Task areas divided by feature count and linear features (e.g. rivers, roads).
+2. Users assign a task area for themselves, and generate a QR code that is opened
+   in ODK Collect.
+3. User navigates to the feature and fills out the XLSForm survey, then submits.
+4. The submissions are collected by ODK Central, which feeds the data back into
+   FMTM, for cleaning, conflation with existing data, and pushing back to OSM.
+
 ## Usage of ODK
 
 This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
@@ -41,18 +53,6 @@ This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
   and receive data submissions from users.
 - [ODK Collect](https://github.com/getodk/collect) is a mobile app that the user
   submits data from.
-
-## How FMTM Works
-
-- Project is created in an area with three things:
-  - Data extract: the features you want to map, say building polygons.
-  - ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
-- Task areas divided by feature count and linear features (e.g. rivers, roads).
-- Users assign a task area for themselves, and generate a QR code that is opened
-  in ODK Collect.
-- User navigates to the feature and fills out the XLSForm survey, then submits.
-- The submissions are collected by ODK Central, which feeds the data back into
-  FMTM, for cleaning, conflation with existing data, and pushing back to OSM.
 
 ## Contributing 👍🎉
 
