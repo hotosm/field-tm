@@ -34,9 +34,9 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 ## How FMTM Works
 
 1. Project is created in an area with three things:
-   a. Data extract: the features you want to map, say building polygons.
-   b. ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
-   c. Task areas divided by feature count and linear features (e.g. rivers, roads).
+   - Data extract: the features you want to map, say building polygons.
+   - ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
+   - Task areas divided by feature count and linear features (e.g. rivers, roads).
 2. Users assign a task area for themselves, and generate a QR code that is opened
    in ODK Collect.
 3. User navigates to the feature and fills out the XLSForm survey, then submits.
