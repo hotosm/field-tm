@@ -117,6 +117,7 @@ export type ProjectDetailsTypes = {
   per_task_instructions?: string;
   custom_tms_url: string;
   hasCustomTMS: boolean;
+  hasGeojsonLineString: boolean;
 };
 
 export type ProjectAreaTypes = {
@@ -153,4 +154,11 @@ export type DrawnGeojsonTypes = {
   properties: null;
   geometry: GeometryTypes;
   features?: [];
+};
+
+export type taskSplitOptionsType = {
+  name: string;
+  value: string;
+  label: string;
+  disabled: boolean;
 };

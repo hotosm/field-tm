@@ -17,16 +17,7 @@ import {
 } from '@/api/CreateProjectService';
 import { task_split_type } from '@/types/enums';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-
-const alogrithmList = [
-  { name: 'define_tasks', value: task_split_type['divide_on_square'].toString(), label: 'Divide on square' },
-  { name: 'define_tasks', value: task_split_type['choose_area_as_task'].toString(), label: 'Choose area as task' },
-  {
-    name: 'define_tasks',
-    value: task_split_type['task_splitting_algorithm'].toString(),
-    label: 'Task Splitting Algorithm',
-  },
-];
+import { taskSplitOptionsType } from '@/store/types/ICreateProject';
 
 const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload, customFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
@@ -49,6 +40,30 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
   const isTasksGenerated = useAppSelector((state) => state.createproject.isTasksGenerated);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
   const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
+
+  const taskSplitOptions: taskSplitOptionsType[] = [
+    {
+      name: 'define_tasks',
+      value: task_split_type['divide_on_square'].toString(),
+      label: 'Divide on square',
+      disabled: false,
+    },
+    {
+      name: 'define_tasks',
+      value: task_split_type['choose_area_as_task'].toString(),
+      label: 'Choose area as task',
+      disabled: false,
+    },
+    {
+      name: 'define_tasks',
+      value: task_split_type['task_splitting_algorithm'].toString(),
+      label: 'Task Splitting Algorithm',
+      disabled:
+        !projectDetails?.hasGeojsonLineString && projectDetails?.dataExtractWays === 'custom_data_extract'
+          ? true
+          : false,
+    },
+  ];
 
   const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
@@ -233,7 +248,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
                   <RadioButton
                     value={splitTasksSelection?.toString() || ''}
                     topic="Select an option to split the task"
-                    options={alogrithmList}
+                    options={taskSplitOptions}
                     direction="column"
                     onChangeData={(value) => {
                       handleCustomChange('task_split_type', parseInt(value));

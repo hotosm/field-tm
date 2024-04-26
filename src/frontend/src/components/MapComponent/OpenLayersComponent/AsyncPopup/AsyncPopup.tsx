@@ -148,6 +148,7 @@ const AsyncPopup = ({
   useEffect(() => {
     if (!map || !coordinates || !overlay || !properties || closePopup) return;
     const htmlString = renderToString(popupUI(properties));
+    if (!htmlString) return;
     setPopupHTML(htmlString);
 
     overlay.setPosition([coordinates[0], coordinates[1]]);
