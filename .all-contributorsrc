@@ -220,6 +220,17 @@
         "bug",
         "doc"
       ]
+    },
+    {
+      "login": "susmina94",
+      "name": "Susmina_Manandhar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/108750444?v=4",
+      "profile": "https://github.com/susmina94",
+      "contributions": [
+        "doc",
+        "ideas",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
