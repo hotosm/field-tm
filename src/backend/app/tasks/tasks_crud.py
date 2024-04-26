@@ -332,11 +332,10 @@ async def get_project_task_history(
     comment: bool,
     end_date: datetime,
     db: Session,
-):
+) -> list:
     """Retrieves the task history records for a specific project.
 
     Args:
-        project_id (int): The ID of the project.
         task_id (int): The task_id of the project.
         comment (bool): True or False, True to get comments
             from the project tasks and False by default for
@@ -382,7 +381,7 @@ async def get_project_task_history(
 
 
 async def count_validated_and_mapped_tasks(
-    task_history: list[db_models.DbTaskHistory], end_date: datetime
+    task_history: list, end_date: datetime
 ) -> list[tasks_schemas.TaskHistoryCount]:
     """Counts the number of validated and mapped tasks.
 
@@ -407,16 +406,19 @@ async def count_validated_and_mapped_tasks(
         current_date += timedelta(days=1)
 
     # Populate cumulative_counts with counts from task_history
-    for result in task_history:
-        task_status = (result.get("action_text")).split()[5]
-        date_str = (result.get("action_date")).strftime("%m/%d")
-        entry = next((entry for entry in results if entry["date"] == date_str), None)
+    for history in task_history:
+        for result in history:
+            task_status = result.get("status")
+            date_str = (result.get("action_date")).strftime("%m/%d")
+            entry = next(
+                (entry for entry in results if entry["date"] == date_str), None
+            )
 
-        if entry:
-            if task_status == "VALIDATED":
-                entry["validated"] += 1
-            elif task_status == "MAPPED":
-                entry["mapped"] += 1
+            if entry:
+                if task_status == "VALIDATED":
+                    entry["validated"] += 1
+                elif task_status == "MAPPED":
+                    entry["mapped"] += 1
 
     total_validated = 0
     total_mapped = 0
