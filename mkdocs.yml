@@ -73,6 +73,7 @@ nav:
       - Code of Conduct: https://docs.hotosm.org/code-of-conduct
       - FAQ: FAQ.md
   - User Manuals:
+      - User Types: user-breakdown.md
       - Project Managers: User-Manual-For-Project-Managers.md
   - Utilities:
       - XLSForm Converter: https://getodk.org/xlsform/

@@ -1,6 +1,6 @@
 # Field Mapping Tasking Manager (FMTM)
 
-![HOT Logo](https://github.com/hotosm/fmtm/blob/main/images/hot_logo.png?raw=true)
+![HOT Logo](./docs/images/hot_logo.png)
 
 Coordinated field mapping for Open Mapping campaigns.
 
@@ -16,258 +16,77 @@ Coordinated field mapping for Open Mapping campaigns.
 | **Metrics**     | [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) [![Coverage](https://hotosm.github.io/fmtm/coverage.svg)](https://hotosm.github.io/fmtm/coverage.html)                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | **Other Info**  | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://hotosm.github.io/fmtm/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md)                                     |
 
+---
+
 <!-- markdownlint-restore -->
 
-While we have pretty good field mapping applications,
-we don’t have great tools to coordinate field mapping.
-However, we have most of the elements needed to create a field mapping-oriented
-version of the [HOT Tasking Manager](https://tasks.hotosm.org),
-which allows people to select specific areas and
-complete tasks in a coordinated, organized fashion.
+Building on the success of HOT's [Tasking Manager](https://tasks.hotosm.org), a tool
+for coordinating remote digitization of map features, the FMTM was conceived with
+the purpose of tagging the features with _field-verified_ information.
 
-It’s already possible to implement a sort of Field Mapping Tasking Manager
-workflow using existing tools (mostly based on ODK, particularly the new
-"select from map" functionality),
-but it’s pretty labor-intensive and tricky.
-We’re working on some automation to ease the pain points, which moves us closer
-to a fully-fledged Field Mapping Tasking Manager (FMTM).
+While there are many excellent applications for tagging map features already,
+the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 
-Background and description of the project and idea are here:
-please have a look at this [blog](https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk/)
-if you haven't yet! [Overview, timeline & relevant links](https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0)
-for the Field Mapping Tasking Manager (FMTM)
+> More details can be found in this
+> [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
+> [timeline](./docs/timeline.md) and the [docs](https://fmtm.dev) page.
 
-## FMTM Turkey Earthquake Response Support
+## Usage of ODK
 
-Field mapping, especially for damage assessments, is limited by coordination
-of all the response actors in the affected areas.
-Yer Çizenler, and OSM community in Turkey,
-has reported that there is
-a huge coordination challenge for mapping impacted areas. It is
-nearly impossible to know what has already been mapped,
-and duplications and gaps in mapping pose a
-challenge to building an effective understanding of the impact.
+This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
 
-In the wake of the 2010 Haiti earthquake, seeing a similar coordination challenge
-with mapping affected areas,
-OSM volunteers developed the Tasking Manager,
-which allowed mapping volunteers around the world to support building
-an open-source map of areas without map data.
-Now with over 500,000 volunteer mappers,
-the Tasking Manager is a go-to resource
-for volunteers to contribute to the development of OSM.
+- [XLSForms](https://xlsform.org) are used for the underlying data collection
+  survey. The fields in this survey can be mapped to OpenStreeMap tags.
+- [ODK Central](https://github.com/getodk/central) is used to store the XLSForm
+  and receive data submissions from users.
+- [ODK Collect](https://github.com/getodk/collect) is a mobile app that the user
+  submits data from.
 
-To aid future diaster response, we would reallywelcome developer
-[contributions](https://hotosm.github.io/fmtm/CONTRIBUTING).
+## How FMTM Works
 
-## How to contribute
+- Project is created in an area with three things:
+  - Data extract: the features you want to map, say building polygons.
+  - ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
+- Task areas divided by feature count and linear features (e.g. rivers, roads).
+- Users assign a task area for themselves, and generate a QR code that is opened
+  in ODK Collect.
+- User navigates to the feature and fills out the XLSForm survey, then submits.
+- The submissions are collected by ODK Central, which feeds the data back into
+  FMTM, for cleaning, conflation with existing data, and pushing back to OSM.
 
-👍🎉We are actively looking for contributors for this project - from design,
-user testing and both front and backend developers.
-We have a specific request for volunteer developers at the moment!
-![image](https://user-images.githubusercontent.com/98902727/218812430-3c07b60e-4fd2-4f05-a289-bf37d6f0b9cd.png)
+## Contributing 👍🎉
 
-Please take a look at our
-[Documentation](https://hotosm.github.io/fmtm)
+In the wake of the 2010 Haiti earthquake, volunteer developers created the
+Tasking Manager after seeing a similar coordination challenge for mapping
+areas without existing data.
+
+Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource
+for volunteers to map collaboratively.
+
+To aid future diaster response, we would really welcome contributions for:
+
+- Backend Python development
+- Frontend Typescript development
+- Documentation writers
+- UI / UX designers
+- Testers!
+- XLSForm creators
+- Mobile developers
+
+Please take a look at our [Documentation](https://hotosm.github.io/fmtm)
 and [contributor guidance](https://hotosm.github.io/fmtm/CONTRIBUTING/)
 for more details!
-Reach out to us if any questions! 👍🎉
 
-## Using ODK's Select From Map feature
-
-As of mid-2022, ODK incorporates a new functionality, select from map,
-that allows field mappers to select an object from a map,
-view the existing attributes,
-and fill out a form adding new information and attributes to that object.
-For example, a mapper can approach a building,
-select that building from a map view within ODK on their mobile phone,
-and add the opening hours, number of floors,
-construction material, or any number of useful
-attributes in a well-structured questionnaire format
-
-To prepare the appropriate map files for ODK, we are taking our inspiration
-from the [HOT Tasking Manager](https://tasks.hotosm.org/),
-which allows remote mappers to choose well-defined small "task" areas,
-ensuring full coverage of the project area and no unintended duplication of tasks.
-
-## Users
-
-### Campaign managers
-
-Campaign managers select an Area of Interest (AOI) and organize
-field mappers to go out and collect data. They need to:
-
-- Select an AOI polygon by creating a GeoJSON or by tracing a polygon in a Web map
-- Choose a task division scheme (number of features or area per task,
-  and possibly variations on what features to use as the preferred splitting lines)
-- Provide specific instructions and guidance for field mappers on the project.
-- Provide a URL to a mobile-friendly Web page where field mappers can,
-  from their mobile phone, select a task that is not already "checked out"
-  (or possibly simply allocate areas to the field mappers).
-- See the status of tasks (open, "checked out", completed but not validated,
-  requires rework, validated, etc) in the Web browser on their computer
-
-### Field mappers
-
-Field mappers select (or are allocated) individual tasks within a project
-AOI and use the ODK mobile app to gather data in those areas. They need to:
-
-- Visit a mobile-friendly Web page where they can see available tasks on a map
-- Choose an area and launch ODK Collect
-  with the form corresponding to their allocated area pre-loaded
-
-### Validators
-
-Validators review the data collected by field mappers and assess its quality.
-If the data is good, the validators merge the portion of the data that belongs
-in OpenStreetMap to OSM.
-If it requires more work, the validators either fix it themselves
-(for minor stuff like spelling or capitalization mistakes that don't seem to be systematic)
-or inform the field mappers that they need to fix it. They need to:
-
-- Access completed data sets of "submissions" as Comma Separated Values
-  and/or OSM XML so that they can review it.
-- Mark areas as validated or requiring rework
-- Communicate with field mappers if rework is necessary
-- Merge good-quality data into OSM (probably from JOSM).
-- Mark areas as completed and merged.
+Reach out to us if any questions!
 
 ## Install
 
 To install for a quick test, or on a production instance,
 use the convenience script:
 
-```bash
-curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
-bash install.sh
-```
+`curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash`
 
-## Info For Developers
-
-A breakdown of the components:
-
-### ODK Collect
-
-A mobile data collection tool that functions on almost all Android phones.
-Field mappers use the ODK mobile app to select features such as buildings or amenities,
-and fill out forms with survey questions to collect attributes or data
-about those features (normally at least some of these attributes are intended
-to become OSM tags associated with those features).
-
-The ODK Collect app connects to a back-end server (in this case ODK Central),
-which provides the features to be mapped and the survey form definitions.
-
-### ODK Central Server
-
-An ODK Central server functions as the back end for the field data collectors.
-ODK Collect is an application that can be downloaded on Android phones.
-Devs must have access to an ODK Central server
-with a username and password granting admin credentials.
-
-[Here are the instructions](https://docs.getodk.org/central-install-digital-ocean/)
-for setting up an ODK Central server on Digital Ocean (It's very similar on AWS)
-
-### Field Mapping Tasking Manager Web App
-
-The FMTM web app is a Python/Flask/Leaflet app that serves as a front end for the
-ODK Central server, using the
-[ODK Central API](https://odkcentral.docs.apiary.io/#) to allocate specific
-areas/features to individual mappers, and receive their data submissions.
-
-![image](https://github.com/hotosm/fmtm/assets/97273021/e1bac364-d9dd-47b3-b10f-676e6abab298)
-
-#### Manager Web Interface (with PC browser-friendlymap view)
-
-A computer-screen-optimized web app that allows Campaign Managers to:
-
-- Select AOIs
-- Choose task-splitting schemes
-- Provide instructions and guidance specific to the project
-- View areas that are at various stages of completion
-- Provide a project-specific URL that field mappers
-  can access from their mobile phones to select and map tasks.
-
-#### Steps to create a project in FMTM
-
-- Go to [fmtm](https://fmtm.hotosm.org/) .
-- Sign into your OpenStreetMap account by clicking the top right button.
-- Click the '+ CREATE NEW PROJECT' button.
-- Enter the project details like name, description, instructions, and
-  (optional) ODK credentials.
-
-  ![2](https://github.com/hotosm/fmtm/assets/97273021/9b8d7a83-11e3-4623-a14a-66ac47d91443)
-
-- Draw or Upload Area in the GeoJSON file format.
-
-  ![3](https://github.com/hotosm/fmtm/assets/97273021/892f9051-dbb3-434d-b35a-94e90435a5d8)
-
-- Choose the category of field mapping. If you require a custom
-  XLSForm to be used, upload it at this point.
-
-  ![image](https://github.com/hotosm/fmtm/assets/97273021/02ebb3af-a48f-40eb-b9f8-fd7eec393485)
-
-- Generate a data extract from your category selection, or upload your
-  own geometries inside a custom data extract GeoJSON.
-
-  ![image](https://github.com/hotosm/fmtm/assets/97273021/e4a7f9a6-b411-4f8c-b2ba-9fa9e0d42531)
-
-- Choose the type of task splitting:
-
-  - Divide on square: create a simple grid over your project area.
-  - Choose area as tasks: if you have already determined how tasks
-    should be split (your project area contains multiple polygons), then
-    select this option.
-  - Task Splitting Algorithm: use the FMTM splitting algorithm to split
-    task boundaries by average building and linear features.
-
-  ![image](https://github.com/hotosm/fmtm/assets/97273021/c8a905e2-dd52-49e8-87df-0ac6d9a85077)
-
-- Click on Submit button.
-
-  ![image](https://github.com/hotosm/fmtm/assets/97273021/0c95e324-3365-4d0a-ba91-c9f9b06b2318)
-
-#### FMTM Backend
-
-A back end that converts the project parameters entered by the Campaign Manager in
-the Manager Web Interface into a corresponding ODK Central project.
-Its functions include:
-
-- Convert the AOI into a bounding box and corresponding Overpass API query
-- Download (using the Overpass API) the OSM features that will be mapped in
-  that bounding box
-  (buildings and/or amenities) as well as the OSM line features that will be
-  used as cutlines to subdivide the area
-- Trim the features within the bounding box but outside the AOI polygon
-- Convert the polygon features into centroid points (needed because ODK
-  select from map doesn't yet deal with polygons;
-  this is likely to change in the future but for
-  now we'll work with points only)
-- Use line features as cutlines to create individual tasks (squares don't make sense
-  for field mapping, neighborhoods
-  delineated by large roads, watercourses, and railways do)
-- Split the AOI into those tasks based on parameters set in the Manager Web Interface
-  (number of features or area per task, splitting strategy, etc).
-- Use the ODK Central API to create, on the associated ODK Central server:
-  - A project for the whole AOI
-  - One survey form for each split task (neighborhood)
-    - This might require modifying the xlsforms (to update the version ID
-      of the forms and change the name of the geography file being referred to).
-      This is pretty straightforward using [OpenPyXL](https://openpyxl.readthedocs.io/en/stable/),
-      though we have to be careful to keep the location within the spreadsheet
-      of these two items consistent.
-  - GeoJSON feature collections for each form (the buildings/amenities etc)
-  - An App User for each form, which in turn corresponds to a single task.
-    When the ODK Collect app on a user's phone is configured to function as
-    that App User, they have access to
-    _only_ the form and features/area of that task.
-  - A set of QR Codes and/or configuration files/strings for ODK Collect,
-    one for each App User.
-
-#### Field Mapper Web Interface (with mobile-friendly map view)
-
-Ideally with a link that opens ODK Collect directly from the browser,
-but if that's hard, the fallback is downloading a
-QR code and importing it into ODK Collect.
+Alternatively see the [docs](https://fmtm.dev) for various deployment guides.
 
 ## Contributors ✨
 
