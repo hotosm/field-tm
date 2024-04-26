@@ -5,6 +5,7 @@ interface IRadioButton {
   value: string;
   label: string | number;
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface RadioButtonProps {
@@ -39,23 +40,31 @@ const RadioButton: React.FC<RadioButtonProps> = ({
     <div className={`fmtm-flex ${direction === 'column' ? 'fmtm-flex-col' : 'fmtm-flex-wrap fmtm-gap-x-16'}`}>
       {options.map((option) => {
         return (
-          <div key={option.value} className="fmtm-gap-2 fmtm-flex fmtm-items-center">
+          <div
+            key={option.value}
+            className={`fmtm-gap-2 fmtm-flex fmtm-items-center ${
+              option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''
+            }`}
+          >
             <input
               type="radio"
               id={option.value}
               name={option.name}
               value={option.value}
-              className="fmtm-accent-primaryRed fmtm-cursor-pointer"
+              className={`fmtm-accent-primaryRed fmtm-cursor-pointer ${
+                option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''
+              }`}
               onChange={(e) => {
                 onChangeData(e.target.value);
               }}
               checked={option.value === value}
+              disabled={option?.disabled === true}
             />
             <label
               htmlFor={option.value}
-              className={`fmtm-text-base fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2 ${className}`}
+              className={`fmtm-text-base fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2  ${className}`}
             >
-              <p>{option.label}</p>
+              <p className={`${option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''}`}>{option.label}</p>
               <div>{option.icon && option.icon}</div>
             </label>
           </div>

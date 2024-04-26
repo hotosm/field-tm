@@ -166,8 +166,11 @@ const Home = () => {
     setDataExtractUrl(state.projectInfo.data_extract_url);
   }, [state.projectInfo.data_extract_url]);
 
-  const lockedPopup = () => {
-    return <p>This task was locked by you</p>;
+  const lockedPopup = (properties: Record<string, any>) => {
+    if (properties.locked_by_user === authDetails?.id) {
+      return <p>This task was locked by you</p>;
+    }
+    return null;
   };
 
   /**
