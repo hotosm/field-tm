@@ -187,7 +187,7 @@ async def get_project_summaries(
     project_count, db_projects = await get_projects(
         db, skip, limit, user_id, hashtags, search
     )
-    return project_count, await convert_to_project_summaries(db_projects)
+    return project_count, await convert_to_project_summaries(db, db_projects)
 
 
 async def get_project(db: Session, project_id: int):
@@ -1265,7 +1265,7 @@ async def convert_to_app_projects(
         return []
 
 
-async def convert_to_project_summary(db_project: db_models.DbProject):
+async def convert_to_project_summary(db: Session, db_project: db_models.DbProject):
     """Legacy function to convert db models --> Pydantic.
 
     TODO refactor to use Pydantic model methods instead.
@@ -1274,13 +1274,17 @@ async def convert_to_project_summary(db_project: db_models.DbProject):
         summary: project_schemas.ProjectSummary = db_project
 
         if db_project.project_info:
-            summary.location_str = db_project.location_str
             summary.title = db_project.project_info.name
             summary.description = db_project.project_info.short_description
-
         summary.num_contributors = (
-            db_project.tasks_mapped + db_project.tasks_validated
-        )  # TODO: get real number of contributors
+            db.query(db_models.DbTaskHistory.user_id)
+            .filter(
+                db_models.DbTaskHistory.project_id == db_project.id,
+                db_models.DbTaskHistory.user_id != (None),
+            )
+            .distinct()
+            .count()
+        )
         summary.organisation_logo = (
             db_project.organisation.logo if db_project.organisation else None
         )
@@ -1291,6 +1295,7 @@ async def convert_to_project_summary(db_project: db_models.DbProject):
 
 
 async def convert_to_project_summaries(
+    db: Session,
     db_projects: List[db_models.DbProject],
 ) -> List[project_schemas.ProjectSummary]:
     """Legacy function to convert db models --> Pydantic.
@@ -1299,11 +1304,11 @@ async def convert_to_project_summaries(
     """
     if db_projects and len(db_projects) > 0:
 
-        async def convert_summary(project):
-            return await convert_to_project_summary(project)
+        async def convert_summary(db, project):
+            return await convert_to_project_summary(db, project)
 
         project_summaries = await gather(
-            *[convert_summary(project) for project in db_projects]
+            *[convert_summary(db, project) for project in db_projects]
         )
         return [summary for summary in project_summaries if summary is not None]
     else:
