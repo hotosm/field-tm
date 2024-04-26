@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 
 from dateutil import parser
+from geoalchemy2.elements import WKBElement
 from geojson_pydantic import Feature, FeatureCollection, Polygon
 from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
@@ -31,7 +32,6 @@ from shapely import wkb
 from typing_extensions import Self
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
-from app.db import db_models
 from app.db.postgis_utils import (
     geojson_to_geometry,
     geometry_to_geojson,
@@ -241,11 +241,10 @@ class GeojsonFeature(BaseModel):
 class ProjectSummary(BaseModel):
     """Project summaries."""
 
-    id: int = -1
-    priority: ProjectPriority = ProjectPriority.MEDIUM
-    priority_str: str = priority.name
+    id: int
+    priority: ProjectPriority
     title: Optional[str] = None
-    centroid: Optional[list[float]] = None
+    centroid: Optional[WKBElement] = None
     location_str: Optional[str] = None
     description: Optional[str] = None
     total_tasks: Optional[int] = None
@@ -257,42 +256,17 @@ class ProjectSummary(BaseModel):
     organisation_id: Optional[int] = None
     organisation_logo: Optional[str] = None
 
-    @classmethod
-    def from_db_project(
-        cls,
-        project: db_models.DbProject,
-    ) -> "ProjectSummary":
-        """Generate model from database obj."""
-        priority = project.priority
-        centroid_coords = []
-        if project.centroid:
-            centroid_point = read_wkb(project.centroid)
-            # NOTE format x,y (lon,lat) required for GeoJSON
-            centroid_coords = [centroid_point.x, centroid_point.y]
+    class Config:
+        arbitrary_types_allowed = True
 
-        return cls(
-            id=project.id,
-            priority=priority,
-            priority_str=priority.name,
-            title=project.title,
-            centroid=centroid_coords,
-            location_str=project.location_str,
-            description=project.description,
-            total_tasks=project.total_tasks,
-            tasks_mapped=project.tasks_mapped,
-            num_contributors=project.num_contributors,
-            tasks_validated=project.tasks_validated,
-            tasks_bad=project.tasks_bad,
-            hashtags=project.hashtags,
-            organisation_id=project.organisation_id,
-            organisation_logo=project.organisation_logo,
-        )
-
-    # @field_serializer("centroid")
-    # def get_coord_from_centroid(self, value):
-    #     """Get the cetroid coordinates from WBKElement."""
-    #     if value is None:
-    #         return None
+    @field_serializer("centroid")
+    def get_coord_from_centroid(self, value):
+        """Get the cetroid coordinates from WBKElement."""
+        if value is None:
+            return None
+        centroid_point = read_wkb(value)
+        centroid = [centroid_point.x, centroid_point.y]
+        return centroid
 
 
 class PaginationInfo(BaseModel):

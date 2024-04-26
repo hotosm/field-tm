@@ -31,7 +31,6 @@ export const ProjectById = (existingProjectList, projectId) => {
             id: projectResp.id,
             outline_geojson: projectResp.outline_geojson,
             priority: projectResp.priority || 2,
-            priority_str: projectResp.priority_str || 'MEDIUM',
             title: projectResp.project_info?.name,
             location_str: projectResp.location_str,
             description: projectResp.project_info?.description,

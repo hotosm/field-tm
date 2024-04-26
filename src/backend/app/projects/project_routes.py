@@ -141,7 +141,7 @@ async def read_project_summaries(
     )
 
     project_summaries = [
-        project_schemas.ProjectSummary.from_db_project(project) for project in projects
+        project_schemas.ProjectSummary(**project.__dict__) for project in projects
     ]
 
     response = project_schemas.PaginatedProjectSummaries(
@@ -181,7 +181,7 @@ async def search_project(
         page, project_count, results_per_page, total_projects
     )
     project_summaries = [
-        project_schemas.ProjectSummary.from_db_project(project) for project in projects
+        project_schemas.ProjectSummary(**project.__dict__) for project in projects
     ]
 
     response = project_schemas.PaginatedProjectSummaries(

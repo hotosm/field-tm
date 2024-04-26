@@ -54,7 +54,6 @@ export type projectInfoType = {
     id: number;
   };
   priority: number;
-  priority_str: string;
   title: string;
   location_str: string;
   description: string;
