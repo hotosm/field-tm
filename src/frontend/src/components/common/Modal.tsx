@@ -18,7 +18,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fmtm-fixed fmtm-inset-0 fmtm-z-50 fmtm-bg-black fmtm-opacity-80 fmtm-backdrop-blur-sm data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0',
+      'fmtm-fixed fmtm-inset-0 fmtm-bg-black fmtm-opacity-80 fmtm-backdrop-blur-sm data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0 fmtm-z-[99998]',
       className,
     )}
     {...props}
@@ -44,7 +44,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fmtm-fixed fmtm-left-[50%] fmtm-top-[50%] fmtm-z-50 fmtm-grid fmtm-w-full fmtm-max-w-lg fmtm-translate-x-[-50%] fmtm-translate-y-[-50%] fmtm-gap-4 fmtm-border fmtm-bg-white fmtm-p-6 fmtm-shadow-lg fmtm-duration-200 data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0 data-[state=closed]:fmtm-zoom-out-95 data-[state=open]:fmtm-zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:fmtm-slide-in-from-left-1/2 data-[state=open]:fmtm-slide-in-from-top-[48%] fmtm-sm:rounded-lg fmtm-md:w-full',
+        'fmtm-fixed fmtm-left-[50%] fmtm-top-[50%]  fmtm-grid fmtm-w-full fmtm-max-w-lg fmtm-translate-x-[-50%] fmtm-translate-y-[-50%] fmtm-gap-4 fmtm-border fmtm-bg-white fmtm-p-6 fmtm-shadow-lg fmtm-duration-200 data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out data-[state=closed]:fmtm-fade-out-0 data-[state=open]:fmtm-fade-in-0 data-[state=closed]:fmtm-zoom-out-95 data-[state=open]:fmtm-zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:fmtm-slide-in-from-left-1/2 data-[state=open]:fmtm-slide-in-from-top-[48%] fmtm-sm:rounded-lg fmtm-md:w-full fmtm-z-[99999]',
         className,
       )}
       {...props}

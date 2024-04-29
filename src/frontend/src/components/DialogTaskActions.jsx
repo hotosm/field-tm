@@ -8,6 +8,7 @@ import { task_priority_str } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
+import { Modal } from '@/components/common/Modal';
 
 export default function Dialog({ taskId, feature, map, view }) {
   const navigate = useNavigate();
@@ -15,8 +16,11 @@ export default function Dialog({ taskId, feature, map, view }) {
   const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const loading = CoreModules.useAppSelector((state) => state.common.loading);
+  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const [list_of_task_status, set_list_of_task_status] = useState([]);
   const [task_status, set_task_status] = useState('READY');
+  const [currentTaskInfo, setCurrentTaskInfo] = useState();
+  const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
 
   const geojsonStyles = MapStyles();
   const dispatch = CoreModules.useAppDispatch();
@@ -32,8 +36,18 @@ export default function Dialog({ taskId, feature, map, view }) {
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
 
   useEffect(() => {
-    dispatch(GetProjectTaskActivity(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/history/?comment=false`));
+    if (taskId) {
+      dispatch(GetProjectTaskActivity(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/history/?comment=false`));
+    }
   }, [taskId]);
+
+  useEffect(() => {
+    if (taskInfo?.length === 0) return;
+    const currentTaskInfo = taskInfo?.filter((task) => taskId === task?.task_id);
+    if (currentTaskInfo?.[0]) {
+      setCurrentTaskInfo(currentTaskInfo?.[0]);
+    }
+  }, [taskId, taskInfo]);
 
   useEffect(() => {
     if (projectIndex != -1) {
@@ -94,6 +108,46 @@ export default function Dialog({ taskId, feature, map, view }) {
 
   return (
     <div className="fmtm-flex fmtm-flex-col">
+      <Modal
+        onOpenChange={(openStatus) => setToggleMappedConfirmationModal(openStatus)}
+        open={toggleMappedConfirmationModal}
+        description={
+          <div className="fmtm-flex fmtm-flex-col fmtm-gap-10">
+            <div>
+              <h5 className="fmtm-text-lg">
+                You have only mapped{' '}
+                <span className="fmtm-text-primaryRed fmtm-font-bold">
+                  {currentTaskInfo?.submission_count}/{currentTaskInfo?.feature_count}
+                </span>{' '}
+                features in the task area. <br /> Are you sure you wish to mark this task as complete?
+              </h5>
+            </div>
+            <div className="fmtm-flex fmtm-gap-4 fmtm-items-center fmtm-justify-end">
+              <Button
+                btnText="CONTINUE MAPPING"
+                btnType="primary"
+                type="submit"
+                className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+                onClick={() => {
+                  setToggleMappedConfirmationModal(false);
+                }}
+              />
+              <Button
+                btnId="MAPPED"
+                onClick={(e) => {
+                  handleOnClick(e);
+                  setToggleMappedConfirmationModal(false);
+                }}
+                disabled={loading}
+                btnText="MARK AS FULLY MAPPED"
+                btnType="other"
+                className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center !fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none`}
+              />
+            </div>
+          </div>
+        }
+        className=""
+      />
       {list_of_task_status?.length > 0 && (
         <div
           className={`fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
@@ -106,7 +160,16 @@ export default function Dialog({ taskId, feature, map, view }) {
                 <Button
                   btnId={data.value}
                   key={index}
-                  onClick={handleOnClick}
+                  onClick={(e) => {
+                    if (
+                      data.key === 'Mark as fully mapped' &&
+                      currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
+                    ) {
+                      setToggleMappedConfirmationModal(true);
+                    } else {
+                      handleOnClick(e);
+                    }
+                  }}
                   disabled={loading}
                   btnText={data.key.toUpperCase()}
                   btnType={data.btnBG === 'red' ? 'primary' : 'other'}
