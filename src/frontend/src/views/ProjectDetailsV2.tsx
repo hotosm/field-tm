@@ -45,6 +45,7 @@ import { readFileFromOPFS } from '@/api/Files';
 import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { fetchInfoTask } from '@/api/task';
 
 const Home = () => {
   useDocumentTitle('Project Details');
@@ -91,6 +92,10 @@ const Home = () => {
       document.title = 'HOT Field Mapping Tasking Manager';
     }
   }, [state.projectInfo.title]);
+
+  useEffect(() => {
+    dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/projects/${projectId}/task-completion`));
+  }, []);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
