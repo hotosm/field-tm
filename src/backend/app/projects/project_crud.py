@@ -1280,7 +1280,7 @@ async def convert_to_project_summary(db: Session, db_project: db_models.DbProjec
             db.query(db_models.DbTaskHistory.user_id)
             .filter(
                 db_models.DbTaskHistory.project_id == db_project.id,
-                db_models.DbTaskHistory.user_id != (None),
+                db_models.DbTaskHistory.user_id is not None,
             )
             .distinct()
             .count()

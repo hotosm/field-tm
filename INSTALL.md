@@ -62,7 +62,7 @@ If more details are required, check out the
       - [Build the Frontend](#build-the-frontend)
       - [Start the Containers](#start-the-containers)
     - [Setup ODK Central User (Optional)](#setup-odk-central-user-optional)
-    - [Import Test Data (Optional)](#import-test-data-optional)
+    - [Set Up Monitoring (Optional)](#set-up-monitoring-optional)
     - [Check Authentication (Optional)](#check-authentication-optional)
   - [Alternative Operating Systems](#alternative-operating-systems)
     - [Windows](#windows)
@@ -218,15 +218,21 @@ docker-compose exec central odk-cmd --email YOUREMAIL@ADDRESSHERE.com user-promo
 
 > Note: Alternatively, you may use an external Central server and user.
 
-### Import Test Data (Optional)
+### Set Up Monitoring (Optional)
 
-If running a local test version, test data is available to get started quickly.
+- There is an optional configuration for application monitoring via OpenTelemetry.
+- To enable this set in your `.env` file:
 
-- Navigate to the `import-test-data` endpoint in the API docs page:
+  ```dotenv
+  # For OpenObserve
+  MONITORING="openobserve"
+  # For Sentry
+  MONITORING="sentry"
+  ```
 
-<http://api.fmtm.localhost:7050/docs#/debug/import_test_data_debug_import_test_data_get>
-
-- Click `Try it out`, then `execute`.
+- Check the `.env.example` for additional required parameters.
+- Everything should be configured for you to see endpoint calls in the
+  selected web dashboard, providing full error tracebacks and stats.
 
 ### Check Authentication (Optional)
 

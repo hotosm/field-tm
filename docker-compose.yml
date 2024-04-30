@@ -30,7 +30,7 @@ volumes:
 
 networks:
   fmtm-net:
-    name: fmtm-local
+    name: fmtm-${GIT_BRANCH:-local}
 
 services:
   proxy:
