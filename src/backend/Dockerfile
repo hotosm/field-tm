@@ -52,14 +52,20 @@ COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir pdm==2.6.1
 RUN pdm export --prod > requirements.txt \
-    && pdm export -G debug --no-default \
-    --without-hashes > requirements-debug.txt \
-    && pdm export -G test -G docs -G dev --no-default \
-    --without-hashes > requirements-ci.txt
+    # Export with default deps, as we install one or the other
+    && pdm export -G monitoring \
+    --without-hashes > requirements-monitoring.txt \
+    && pdm export -G debug \
+    --no-default --without-hashes > requirements-debug.txt \
+    && pdm export -G test -G docs -G dev \
+    --no-default --without-hashes > requirements-ci.txt
 
 
 # Build stage will all dependencies required to build Python wheels
 FROM base as build
+# NOTE this argument is specified during production build on Github workflow
+# NOTE only the production API image contains the monitoring dependencies
+ARG WITH_MONITORING
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -74,9 +80,16 @@ RUN set -ex \
         "git" \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=extract-deps \
-    /opt/python/requirements.txt /opt/python/
-RUN pip install --user --no-warn-script-location \
-    --no-cache-dir -r /opt/python/requirements.txt
+    /opt/python/requirements.txt \
+    /opt/python/requirements-monitoring.txt \
+    /opt/python/
+# Install with or without monitoring, depending on flag
+RUN pip install --user --no-warn-script-location --no-cache-dir \
+    $(if [ "$WITH_MONITORING" = "true" ]; then \
+        echo "-r /opt/python/requirements-monitoring.txt"; \
+    else \
+        echo "-r /opt/python/requirements.txt"; \
+    fi)
 
 
 # Run stage will minimal dependencies required to run Python libraries

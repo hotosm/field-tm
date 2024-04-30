@@ -22,7 +22,6 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 
 from dateutil import parser
-from geoalchemy2.elements import WKBElement
 from geojson_pydantic import Feature, FeatureCollection, Polygon
 from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
@@ -244,7 +243,8 @@ class ProjectSummary(BaseModel):
     id: int
     priority: ProjectPriority
     title: Optional[str] = None
-    centroid: Optional[WKBElement] = None
+    # NOTE we cannot be WKBElement element here, as it can't be serialized
+    centroid: Optional[Any]
     location_str: Optional[str] = None
     description: Optional[str] = None
     total_tasks: Optional[int] = None
@@ -256,11 +256,8 @@ class ProjectSummary(BaseModel):
     organisation_id: Optional[int] = None
     organisation_logo: Optional[str] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-
     @field_serializer("centroid")
-    def get_coord_from_centroid(self, value):
+    def get_coord_from_centroid(self, value) -> Optional[list[float]]:
         """Get the cetroid coordinates from WBKElement."""
         if value is None:
             return None

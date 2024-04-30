@@ -26,7 +26,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy import text
@@ -35,10 +35,16 @@ from sqlalchemy.orm import Session
 from app.__version__ import __version__
 from app.auth import auth_routes
 from app.central import central_routes
-from app.config import settings
+from app.config import MonitoringTypes, settings
 from app.db.database import get_db
 from app.helpers import helper_routes
 from app.models.enums import HTTPStatus
+from app.monitoring import (
+    add_endpoint_profiler,
+    instrument_app_otel,
+    set_otel_tracer,
+    set_sentry_otel_tracer,
+)
 from app.organisations import organisation_routes
 from app.organisations.organisation_crud import init_admin_org
 from app.projects import project_routes
@@ -46,6 +52,31 @@ from app.projects.project_crud import read_xlsforms
 from app.submissions import submission_routes
 from app.tasks import tasks_routes
 from app.users import user_routes
+
+
+def get_api() -> FastAPI:
+    """Return the FastAPI app, configured for the environment.
+
+    Add endpoint profiler or monitoring setup based on environment.
+    """
+    api = get_application()
+
+    # Add endpoint profiler to check for bottlenecks
+    if settings.DEBUG:
+        add_endpoint_profiler(api)
+
+    # Add monitoring if flag set
+    if settings.MONITORING == MonitoringTypes.SENTRY:
+        log.info("Adding Sentry OpenTelemetry monitoring config")
+        set_sentry_otel_tracer(settings.monitoring_config.SENTRY_DSN)
+        instrument_app_otel(api)
+    elif settings.MONITORING == MonitoringTypes.OPENOBSERVE:
+        log.info("Adding OpenObserve OpenTelemetry monitoring config")
+        set_otel_tracer(api, settings.monitoring_config.otel_exporter_otpl_endpoint)
+        # set_otel_logger(settings.monitoring_config.otel_exporter_otpl_endpoint)
+        instrument_app_otel(api)
+
+    return api
 
 
 @asynccontextmanager
@@ -125,6 +156,9 @@ def get_logger():
         if logger_name == "sqlalchemy":
             # Don't hook sqlalchemy, very verbose
             continue
+        if logger_name == "urllib3":
+            # Don't hook urllib3, called on each OTEL trace
+            continue
         if "." not in logger_name:
             logging.getLogger(logger_name).addHandler(InterceptHandler())
 
@@ -155,30 +189,12 @@ def get_logger():
         )
 
 
-api = get_application()
-
-
-# Add endpoint profiler to check for bottlenecks
-if settings.DEBUG:
-    from pyinstrument import Profiler
-
-    @api.middleware("http")
-    async def profile_request(request: Request, call_next):
-        """Calculate the execution time for routes."""
-        profiling = request.query_params.get("profile", False)
-        if profiling:
-            profiler = Profiler(interval=0.001, async_mode="enabled")
-            profiler.start()
-            await call_next(request)
-            profiler.stop()
-            return HTMLResponse(profiler.output_html())
-        else:
-            return await call_next(request)
+api = get_api()
 
 
 @api.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Exception handler for more descriptive logging."""
+    """Exception handler for more descriptive logging and traces."""
     status_code = 500
     errors = []
     for error in exc.errors():
