@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
-// import MapDescriptionComponents from '@/components/MapDescriptionComponents';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
 import { ProjectById, GetProjectDashboard, GetEntityInfo } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
@@ -11,7 +10,6 @@ import OnScroll from '@/hooks/OnScroll';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import FmtmLogo from '@/assets/images/hotLog.png';
 import GenerateBasemap from '@/components/GenerateBasemap';
 import TaskSelectionPopup from '@/components/ProjectDetailsV2/TaskSelectionPopup';
 import FeatureSelectionPopup from '@/components/ProjectDetailsV2/FeatureSelectionPopup';
@@ -27,15 +25,13 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import MapControlComponent from '@/components/ProjectDetailsV2/MapControlComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
-import getTaskStatusStyle from '@/utilfunctions/getTaskStatusStyle';
-import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import getTaskStatusStyle, { getFeatureStatusStyle } from '@/utilfunctions/getTaskStatusStyle';
 import MapLegends from '@/components/MapLegends';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import Button from '@/components/common/Button';
 import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
-import { dataExtractPropertyType } from '@/models/project/projectModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { useAppSelector } from '@/types/reduxTypes';
 import Comments from '@/components/ProjectDetailsV2/Comments';
@@ -52,7 +48,7 @@ const Home = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
-  const { windowSize, type } = WindowDimension();
+  const { windowSize } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
   const [mainView, setView] = useState<any>();
@@ -61,14 +57,8 @@ const Home = () => {
   const [dataExtractUrl, setDataExtractUrl] = useState(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
-  const [currentCoordinate, setCurrentCoordinate] = useState<{ latitude: null | number; longitude: null | number }>({
-    latitude: null,
-    longitude: null,
-  });
   // Can pass a File object, or a string URL to be read by PMTiles
   const [customBasemapData, setCustomBasemapData] = useState<File | string>();
-  const [positionGeojson, setPositionGeojson] = useState<any>(null);
-  const [deviceRotation, setDeviceRotation] = useState(0);
   const [viewState, setViewState] = useState('project_info');
   const projectId: string = params.id;
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -84,6 +74,7 @@ const Home = () => {
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const projectOpfsBasemapPath = useAppSelector((state) => state?.project?.projectOpfsBasemapPath);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const entityOsmMap = useAppSelector((state) => state?.project?.entityOsmMap);
 
   useEffect(() => {
     if (state.projectInfo.title) {
@@ -245,12 +236,6 @@ const Home = () => {
     //     padding: [20, 350, 50, 10],
     //   });
     // }
-  };
-
-  const buildingStyle = {
-    ...defaultStyles,
-    lineColor: '#FF0000',
-    fillOpacity: '0',
   };
 
   useEffect(() => {
@@ -492,7 +477,9 @@ const Home = () => {
                 <VectorLayer
                   fgbUrl={dataExtractUrl}
                   fgbExtent={dataExtractExtent}
-                  style={buildingStyle}
+                  getTaskStatusStyle={(feature) => {
+                    return getFeatureStatusStyle(feature?.getProperties()?.osm_id, mapTheme, entityOsmMap);
+                  }}
                   viewProperties={{
                     size: map?.getSize(),
                     padding: [50, 50, 50, 50],

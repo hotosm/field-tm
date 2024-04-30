@@ -115,4 +115,82 @@ const getTaskStatusStyle = (feature, mapTheme, taskLockedByUser) => {
   return geojsonStyles[status];
 };
 
+export const getFeatureStatusStyle = (osmId, mapTheme, entityOsmMap) => {
+  const entity = entityOsmMap?.find((entity) => entity?.osm_id === osmId);
+  const status = task_priority_str[entity?.status];
+  const borderStrokeColor = '#FF0000';
+
+  const lockedPolygonStyle = createPolygonStyle(
+    mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb,
+    borderStrokeColor,
+  );
+  const lockedValidationStyle = createPolygonStyle(
+    mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
+    borderStrokeColor,
+  );
+  const iconStyle = createIconStyle(AssetModules.LockPng);
+  const redIconStyle = createIconStyle(AssetModules.RedLockPng);
+
+  const geojsonStyles = {
+    READY: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.ready_rgb,
+      }),
+    }),
+    LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
+    MAPPED: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.mapped_rgb,
+      }),
+    }),
+    LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
+
+    VALIDATED: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.validated_rgb,
+      }),
+    }),
+    INVALIDATED: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
+      }),
+    }),
+    BAD: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.bad_rgb,
+      }),
+    }),
+    SPLIT: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.split_rgb,
+      }),
+    }),
+  };
+  return geojsonStyles[status];
+};
+
 export default getTaskStatusStyle;
