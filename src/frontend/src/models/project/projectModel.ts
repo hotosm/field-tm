@@ -66,6 +66,8 @@ export type projectInfoType = {
   tasks_mapped: any;
   tasks_validated: any;
   total_tasks: any;
+  organisation_id: number;
+  organisation_logo: string;
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };

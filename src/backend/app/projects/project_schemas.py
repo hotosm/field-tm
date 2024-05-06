@@ -30,7 +30,7 @@ from pydantic.functional_validators import field_validator, model_validator
 from shapely import wkb
 from typing_extensions import Self
 
-from app.config import HttpUrlStr, decrypt_value, encrypt_value
+from app.config import HttpUrlStr, decrypt_value, encrypt_value, settings
 from app.db.postgis_utils import (
     geojson_to_geometry,
     geometry_to_geojson,
@@ -310,6 +310,18 @@ class ProjectBase(BaseModel):
         geometry = wkb.loads(bytes(self.outline.data))
         bbox = geometry.bounds  # Calculate bounding box
         return geometry_to_geojson(self.outline, {"id": self.id, "bbox": bbox}, self.id)
+
+    @computed_field
+    @property
+    def organisation_logo(self) -> Optional[str]:
+        """Get the organisation logo url from the S3 bucket."""
+        if not self.organisation_id:
+            return None
+
+        return (
+            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
+            f"/{self.organisation_id}/logo.png"
+        )
 
 
 class ProjectWithTasks(ProjectBase):

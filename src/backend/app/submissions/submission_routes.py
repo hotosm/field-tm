@@ -36,7 +36,6 @@ from app.db import database, db_models
 from app.models.enums import ReviewStateEnum
 from app.projects import project_crud, project_deps, project_schemas
 from app.submissions import submission_crud, submission_schemas
-from app.tasks import tasks_crud
 
 router = APIRouter(
     prefix="/submission",
@@ -359,11 +358,10 @@ async def get_submission_form_fields(
         Any: The response from the submission form API.
     """
     project = await project_crud.get_project(db, project_id)
-    task_list = await tasks_crud.get_task_id_list(db, project_id)
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     odk_form = central_crud.get_odk_form(odk_credentials)
-    xform = f"{project.project_name_prefix}_task_{task_list[0]}"
-    return odk_form.formFields(project.odkid, xform)
+    xform_name = project.forms[0].odk_form_id
+    return odk_form.formFields(project.odkid, xform_name)
 
 
 @router.get("/submission_table/{project_id}")

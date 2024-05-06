@@ -1,9 +1,8 @@
-import { taskDataTypes } from '@/models/submission/submissionModel';
-import { taskInfoType } from '@/models/task/taskModel';
+import { taskSubmissionInfoType } from '@/models/task/taskModel';
 
 export type TaskStateTypes = {
   taskLoading: boolean;
-  taskInfo: taskInfoType[];
+  taskInfo: taskSubmissionInfoType[];
   selectedTask: number | null;
   selectedFeatureProps: number | null;
   projectBoundaryLoading: boolean;
@@ -13,7 +12,6 @@ export type TaskStateTypes = {
   downloadSubmissionLoading: downloadSubmissionLoadingTypes;
   convertXMLToJOSMLoading: boolean;
   josmEditorError: null | string;
-  taskData: taskDataTypes;
 };
 
 type downloadSubmissionLoadingTypes = {

@@ -21,7 +21,7 @@ import {
   legendColorArrayType,
   taskBoundariesType,
   taskFeaturePropertyType,
-  taskInfoType,
+  taskSubmissionInfoType,
 } from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';

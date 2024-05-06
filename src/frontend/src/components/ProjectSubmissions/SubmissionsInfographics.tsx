@@ -14,9 +14,10 @@ import {
 import {
   submissionContributorsTypes,
   submissionInfographicsTypes,
-  taskDataTypes,
   validatedVsMappedInfographicsTypes,
 } from '@/models/submission/submissionModel';
+import { taskSubmissionInfoType } from '@/models/task/taskModel';
+
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const lineKeyData = [
@@ -118,7 +119,7 @@ const SubmissionsInfographics = ({ toggleView }) => {
   const validatedVsMappedLoading: boolean = CoreModules.useAppSelector(
     (state) => state.submission.validatedVsMappedLoading,
   );
-  const taskData: taskDataTypes = CoreModules.useAppSelector((state) => state.task.taskData);
+  const taskInfo: taskSubmissionInfoType = CoreModules.useAppSelector((state) => state.task.taskInfo);
   const taskLoading: boolean = CoreModules.useAppSelector((state) => state.task.taskLoading);
 
   useEffect(() => {
@@ -160,19 +161,20 @@ const SubmissionsInfographics = ({ toggleView }) => {
     </div>
   );
 
+  const totalFeatureCount = taskInfo.reduce((total, task) => total + task.feature_count, 0);
+  const totalSubmissionCount = taskInfo.reduce((total, task) => total + task.submission_count, 0);
+  const totalTaskCount = taskInfo.length;
   const projectProgressData = [
     {
       names: 'Current',
       value:
-        taskData?.submission_count > taskData?.feature_count ||
-        (taskData?.submission_count === 0 && taskData?.feature_count === 0)
+        totalSubmissionCount > totalFeatureCount || (totalSubmissionCount === 0 && totalFeatureCount === 0)
           ? 100
-          : taskData?.submission_count,
+          : totalSubmissionCount,
     },
     {
       names: 'Remaining',
-      value:
-        taskData?.submission_count > taskData?.feature_count ? 0 : taskData?.feature_count - taskData?.submission_count,
+      value: totalSubmissionCount > totalFeatureCount ? 0 : totalFeatureCount - totalSubmissionCount,
     },
   ];
 
