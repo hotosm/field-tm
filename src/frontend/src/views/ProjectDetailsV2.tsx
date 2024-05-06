@@ -3,7 +3,7 @@ import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
-import { ProjectById, GetProjectDashboard, GetEntityInfo } from '@/api/Project';
+import { ProjectById, GetEntityInfo } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
 import OnScroll from '@/hooks/OnScroll';
@@ -41,7 +41,6 @@ import { readFileFromOPFS } from '@/api/Files';
 import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { fetchInfoTask } from '@/api/task';
 
 const Home = () => {
   useDocumentTitle('Project Details');
@@ -83,10 +82,6 @@ const Home = () => {
       document.title = 'HOT Field Mapping Tasking Manager';
     }
   }, [state.projectInfo.title]);
-
-  useEffect(() => {
-    dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/projects/${projectId}/task-completion`));
-  }, []);
 
   //snackbar handle close funtion
   const handleClose = (event, reason) => {
@@ -259,7 +254,6 @@ const Home = () => {
   }, [taskModalStatus]);
 
   useEffect(() => {
-    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 

@@ -5,7 +5,7 @@ import Button from '@/components/common/Button';
 import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
 import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
-import { taskInfoType } from '@/models/task/taskModel';
+import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
 
@@ -16,7 +16,7 @@ const TaskSubmissions = () => {
   const taskLoading = useAppSelector((state) => state.task.taskLoading);
   const [searchedTaskId, setSearchedTaskId] = useState('');
   const [debouncedSearchedTaskId, setDebouncedSearchedTaskId] = useState('');
-  const [filteredTaskInfo, setFilteredTaskInfo] = useState<taskInfoType[]>([]);
+  const [filteredTaskInfo, setFilteredTaskInfo] = useState<taskSubmissionInfoType[]>([]);
 
   const zoomToTask = (taskId) => {
     dispatch(CoreModules.TaskActions.SetSelectedTask(+taskId));
@@ -40,7 +40,7 @@ const TaskSubmissions = () => {
     }
   }, [debouncedSearchedTaskId, taskInfo]);
 
-  const TaskCard = ({ task }: { task: taskInfoType }) => (
+  const TaskCard = ({ task }: { task: taskSubmissionInfoType }) => (
     <div className="fmtm-bg-red-50 fmtm-px-5 fmtm-pb-5 fmtm-pt-2 fmtm-rounded-lg">
       <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-1">
@@ -92,7 +92,7 @@ const TaskSubmissions = () => {
             </div>
           ) : filteredTaskInfo?.length > 0 ? (
             <div className="fmtm-flex fmtm-flex-col fmtm-gap-4">
-              {filteredTaskInfo?.map((task: taskInfoType) => <TaskCard key={task.task_id} task={task} />)}
+              {filteredTaskInfo?.map((task: taskSubmissionInfoType) => <TaskCard key={task.task_id} task={task} />)}
             </div>
           ) : (
             <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-mt-10">

@@ -4,7 +4,7 @@ export enum task_split_type {
   task_splitting_algorithm = 2,
 }
 
-export enum task_priority_str {
+export enum task_status {
   READY = 0,
   LOCKED_FOR_MAPPING = 1,
   MAPPED = 2,

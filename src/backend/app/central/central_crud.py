@@ -815,7 +815,7 @@ async def get_entities_data(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str,
-    fields: str = "__system/updatedAt, osm_id, status",
+    fields: str = "__system/updatedAt, osm_id, status, task_id",
 ) -> list:
     """Get all the entity mapping statuses.
 

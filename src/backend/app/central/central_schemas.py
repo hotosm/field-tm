@@ -95,16 +95,20 @@ class EntityOsmID(BaseModel):
     """Map of Entity UUID to OSM Feature ID."""
 
     id: str
-    osm_id: Optional[str] = None
+    osm_id: Optional[int] = None
 
 
-class EntityMappingStatus(BaseModel):
+class EntityTaskID(BaseModel):
+    """Map of Entity UUID to FMTM Task ID."""
+
+    id: str
+    task_id: int
+
+
+class EntityMappingStatus(EntityOsmID, EntityTaskID):
     """The status for mapping an Entity/feature."""
 
     updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
-
-    id: str
-    osm_id: Optional[str] = None
     status: Optional[TaskStatus] = None
 
     @computed_field
@@ -112,18 +116,6 @@ class EntityMappingStatus(BaseModel):
     def updated_at(self) -> Optional[str]:
         """Convert updatedAt field to updated_at."""
         return self.updatedAt
-
-    @field_validator("status", mode="before")
-    @classmethod
-    def string_status_to_integer(cls, value: str) -> Optional[TaskStatus]:
-        """Convert string status to enum int value."""
-        if not value:
-            return None
-        try:
-            status_int = int(value)
-            return TaskStatus(status_int)
-        except (ValueError, KeyError) as e:
-            raise ValueError(f"Invalid TaskStatus value: {value}") from e
 
 
 class EntityMappingStatusIn(BaseModel):

@@ -22,12 +22,6 @@ export type validatedVsMappedInfographicsTypes = {
   mapped: number;
 };
 
-export type taskDataTypes = {
-  feature_count: number;
-  submission_count: number;
-  task_count: number;
-};
-
 export type submissionTableDataTypes = {
   results: any[];
   pagination: {

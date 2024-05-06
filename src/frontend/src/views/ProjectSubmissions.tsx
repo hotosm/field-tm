@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import AssetModules from '@/shared/AssetModules';
 import ProjectInfo from '@/components/ProjectSubmissions/ProjectInfo.js';
 import SubmissionsInfographics from '@/components/ProjectSubmissions/SubmissionsInfographics.js';
@@ -6,7 +6,6 @@ import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.j
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById } from '@/api/Project';
-import { fetchInfoTask } from '@/api/task';
 import { GetProjectDashboard } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
 import { projectInfoType } from '@/models/project/projectModel';
@@ -39,13 +38,6 @@ const ProjectSubmissions = () => {
       }
     }
   }, [params.id]);
-
-  useEffect(() => {
-    const fetchData = () => {
-      dispatch(fetchInfoTask(`${import.meta.env.VITE_API_URL}/projects/${projectId}/task-completion`));
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));

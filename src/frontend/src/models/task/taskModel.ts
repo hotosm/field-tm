@@ -1,4 +1,4 @@
-export type taskInfoType = {
+export type taskSubmissionInfoType = {
   task_id: string;
   index: string;
   submission_count: number;
