@@ -4,7 +4,7 @@ import ProjectTaskStatus from '@/api/ProjectTaskStatus';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { task_status } from '@/types/enums';
+import { task_status as taskStatusEnum } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
@@ -63,7 +63,7 @@ export default function Dialog({ taskId, feature, map, view }) {
   }, [projectTaskActivityList, taskId, feature]);
 
   const handleOnClick = (event) => {
-    const status = task_status[event.currentTarget.dataset.btnid];
+    const status = taskStatusEnum[event.currentTarget.dataset.btnid];
     const authDetailsCopy = authDetails != null ? { ...authDetails } : {};
     const geoStyle = geojsonStyles[event.currentTarget.dataset.btnid];
     if (event.currentTarget.dataset.btnid != undefined) {
