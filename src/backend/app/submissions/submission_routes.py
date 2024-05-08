@@ -360,16 +360,17 @@ async def get_submission_form_fields(
     project = await project_crud.get_project(db, project_id)
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     odk_form = central_crud.get_odk_form(odk_credentials)
-    xform_name = project.forms[0].odk_form_id
-    return odk_form.formFields(project.odkid, xform_name)
+    db_xform = await project_deps.get_project_xform(db, project.id)
+
+    return odk_form.formFields(project.odkid, db_xform.odk_form_id)
 
 
 @router.get("/submission_table/{project_id}")
 async def submission_table(
-    background_tasks: BackgroundTasks,
     project_id: int,
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
+    task_id: Optional[int] = None,
     submitted_by: Optional[str] = None,
     review_state: Optional[str] = None,
     submitted_date: Optional[str] = Query(
@@ -387,51 +388,8 @@ async def submission_table(
     task_id: The ID of the task.
     """
     skip = (page - 1) * results_per_page
-    limit = results_per_page
-    count, data = await submission_crud.get_submission_by_project(
-        project_id, skip, limit, db, submitted_by, review_state, submitted_date
-    )
-    background_task_id = await project_crud.insert_background_task_into_database(
-        db, "sync_submission", project_id
-    )
-
-    background_tasks.add_task(
-        submission_crud.update_submission_in_s3, db, project_id, background_task_id
-    )
-    pagination = await project_crud.get_pagination(page, count, results_per_page, count)
-    response = submission_schemas.PaginatedSubmissions(
-        results=data,
-        pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
-    )
-    return response
-
-
-@router.get("/task_submissions/{project_id}")
-async def task_submissions(
-    task_id: int,
-    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
-    page: int = Query(1, ge=1),
-    limit: int = Query(13, le=100),
-    submission_id: Optional[str] = None,
-    submitted_by: Optional[str] = None,
-    review_state: Optional[str] = None,
-    submitted_date: Optional[str] = Query(
-        None, title="Submitted Date", description="Date in format (e.g., 'YYYY-MM-DD')"
-    ),
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """This api returns the submission table of a project.
-
-    It takes two parameter: project_id and task_id.
-
-    project_id: The ID of the project.
-
-    task_id: The ID of the task.
-    """
-    skip = (page - 1) * limit
     filters = {
-        "$top": limit,
+        "$top": results_per_page,
         "$skip": skip,
         "$count": True,
         "$wkt": True,
@@ -455,21 +413,101 @@ async def task_submissions(
         else:
             filters["$filter"] = f"__system/reviewState eq '{review_state}'"
 
-    data, count = await submission_crud.get_submission_by_task(
-        project, task_id, filters, db
+    count, data = await submission_crud.get_submission_by_project(
+        project_id, filters, db, task_id
     )
-    pagination = await project_crud.get_pagination(page, count, limit, count)
+
+    pagination = await project_crud.get_pagination(page, count, results_per_page, count)
     response = submission_schemas.PaginatedSubmissions(
         results=data,
         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
-    if submission_id:
-        submission_detail = await submission_crud.get_submission_detail(
-            project, task_id, submission_id, db
-        )
-        response = submission_detail.get("value", [])[0]
 
     return response
+
+
+# FIXME remove it since separate endpoint is not required now.
+# @router.get("/task_submissions/{project_id}")
+# async def task_submissions(
+#     task_id: int,
+#     project: db_models.DbProject = Depends(project_deps.get_project_by_id),
+#     page: int = Query(1, ge=1),
+#     limit: int = Query(13, le=100),
+#     submission_id: Optional[str] = None,
+#     submitted_by: Optional[str] = None,
+#     review_state: Optional[str] = None,
+#     submitted_date: Optional[str] = Query(
+#       None, title="Submitted Date", description="Date in format (e.g., 'YYYY-MM-DD')"
+#     ),
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(mapper),
+# ):
+#     """This api returns the submission table of a project.
+
+#     It takes two parameter: project_id and task_id.
+
+#     project_id: The ID of the project.
+
+#     task_id: The ID of the task.
+#     """
+#     skip = (page - 1) * limit
+#     filters = {
+#         "$top": limit,
+#         "$skip": skip,
+#         "$count": True,
+#         "$wkt": True,
+#     }
+
+#     if submitted_date:
+#         filters["$filter"] = (
+#             "__system/submissionDate ge {}T00:00:00+00:00 "
+#             "and __system/submissionDate le {}T23:59:59.999+00:00"
+#         ).format(submitted_date, submitted_date)
+
+#     if submitted_by:
+#         if "$filter" in filters:
+#             filters["$filter"] += f"and (username eq '{submitted_by}')"
+#         else:
+#             filters["$filter"] = f"username eq '{submitted_by}'"
+
+#     if review_state:
+#         if "$filter" in filters:
+#             filters["$filter"] += f" and (__system/reviewState eq '{review_state}')"
+#         else:
+#             filters["$filter"] = f"__system/reviewState eq '{review_state}'"
+
+#     data, count = await submission_crud.get_submission_by_task(
+#         project, task_id, filters, db
+#     )
+#     pagination = await project_crud.get_pagination(page, count, limit, count)
+#     response = submission_schemas.PaginatedSubmissions(
+#         results=data,
+#         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
+#     )
+#     if submission_id:
+#         submission_detail = await submission_crud.get_submission_detail(
+#             project, task_id, submission_id, db
+#         )
+#         response = submission_detail.get("value", [])[0]
+
+#     return response
+
+
+@router.get("/submission-detail/{project_id}")
+async def submission_detail(
+    submission_id: str,
+    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
+    db: Session = Depends(database.get_db),
+    current_user: AuthUser = Depends(mapper),
+) -> dict:
+    """This api returns the submission detail of individual submission.
+
+    It takes two parameter: project_id and submission_id.
+    """
+    submission_detail = await submission_crud.get_submission_detail(
+        submission_id, project, db
+    )
+    return submission_detail
 
 
 @router.post("/update_review_state/{project_id}")
@@ -477,7 +515,6 @@ async def update_review_state(
     project_id: int,
     instance_id: str,
     review_state: ReviewStateEnum,
-    task_id: int,
     current_user: AuthUser = Depends(project_admin),
     db: Session = Depends(database.get_db),
 ):
@@ -485,9 +522,8 @@ async def update_review_state(
 
     Args:
         project_id (int): The ID of the project.
-        instance_id (str): The ID of the submission instance.
+        instance_id (str): The uuid of the submission instance.
         review_state (ReviewStateEnum): The new review state to be set.
-        task_id (int): The ID of the task associated with the submission.
         current_user(AuthUser): logged in user.
         db (Session): The database session dependency.
     """
@@ -495,9 +531,11 @@ async def update_review_state(
         project = await project_crud.get_project(db, project_id)
         odk_creds = await project_deps.get_odk_credentials(db, project_id)
         odk_project = central_crud.get_odk_project(odk_creds)
+        db_xform = await project_deps.get_project_xform(db, project.id)
+
         response = odk_project.updateReviewState(
             project.odkid,
-            f"{project.project_name_prefix}_task_{task_id}",
+            db_xform.odk_form_id,
             instance_id,
             {"reviewState": review_state},
         )

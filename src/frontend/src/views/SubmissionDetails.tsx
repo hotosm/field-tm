@@ -16,13 +16,14 @@ const SubmissionDetails = () => {
   const params = CoreModules.useParams();
   const navigate = useNavigate();
   const projectId = params.projectId;
-  const taskId = params.taskId;
   const paramsInstanceId = params.instanceId;
   const projectDashboardDetail = CoreModules.useAppSelector((state) => state.project.projectDashboardDetail);
   const projectDashboardLoading = CoreModules.useAppSelector((state) => state.project.projectDashboardLoading);
 
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
   const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
+
+  const taskId = submissionDetails?.all?.task_id;
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
@@ -31,12 +32,10 @@ const SubmissionDetails = () => {
   useEffect(() => {
     dispatch(
       SubmissionService(
-        `${
-          import.meta.env.VITE_API_URL
-        }/submission/task_submissions/${projectId}?task_id=${taskId}&submission_id=${paramsInstanceId}`,
+        `${import.meta.env.VITE_API_URL}/submission/submission-detail/${projectId}?submission_id=${paramsInstanceId}`,
       ),
     );
-  }, [projectId, taskId, paramsInstanceId]);
+  }, [projectId, paramsInstanceId]);
 
   function removeNullValues(obj) {
     const newObj = {};

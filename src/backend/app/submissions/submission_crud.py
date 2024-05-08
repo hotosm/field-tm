@@ -32,7 +32,6 @@ from typing import Optional
 
 import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
-from dateutil import parser
 from fastapi import HTTPException, Response
 from fastapi.responses import FileResponse
 from loguru import logger as log
@@ -757,12 +756,9 @@ async def get_submissions_by_date(
 
 async def get_submission_by_project(
     project_id: int,
-    skip: 0,
-    limit: 100,
+    filters: dict,
     db: Session,
-    submitted_by: Optional[str] = None,
-    review_state: Optional[str] = None,
-    submitted_date: Optional[str] = None,
+    task_id: Optional[int] = None,
 ):
     """Get submission by project.
 
@@ -770,12 +766,10 @@ async def get_submission_by_project(
 
     Args:
         project_id (int): The ID of the project.
-        skip (int): The number of submissions to skip.
-        limit (int): The maximum number of submissions to retrieve.
+        filters (dict): The filters to apply directly to submissions
+            in odk central.
         db (Session): The database session.
-        submitted_by: username of submitter.
-        review_state: reviewState of the submission.
-        submitted_date: date of submissions.
+        task_id (Optional[int]): The index task of the project.
 
     Returns:
         Tuple[int, List]: A tuple containing the total number of submissions and
@@ -786,81 +780,63 @@ async def get_submission_by_project(
 
     """
     project = await project_crud.get_project(db, project_id)
-    s3_project_path = f"/{project.organisation_id}/{project_id}"
-    s3_submission_path = f"/{s3_project_path}/submission.zip"
+    db_xform = await project_deps.get_project_xform(db, project.id)
+    odk_central = await project_deps.get_odk_credentials(db, project_id)
 
-    try:
-        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
-    except ValueError:
-        return 0, []
-
-    with zipfile.ZipFile(file, "r") as zip_ref:
-        with zip_ref.open("submissions.json") as file_in_zip:
-            content = json.loads(file_in_zip.read())
-    if submitted_by:
-        content = [
-            sub for sub in content if submitted_by.lower() in sub["username"].lower()
-        ]
-    if review_state:
-        content = [
-            sub
-            for sub in content
-            if sub.get("__system", {}).get("reviewState") == review_state
-        ]
-    if submitted_date:
-        content = [
-            sub
-            for sub in content
-            if parser.parse(sub.get("end")).date()
-            == parser.parse(submitted_date).date()
-        ]
-
-    start_index = skip
-    end_index = skip + limit
-    paginated_content = content[start_index:end_index]
-    return len(content), paginated_content
-
-
-async def get_submission_by_task(
-    project: db_models.DbProject,
-    task_id: int,
-    filters: dict,
-    db: Session,
-):
-    """Get submissions and count by task.
-
-    Args:
-        project: The project instance.
-        task_id: The ID of the task.
-        filters: A dictionary of filters.
-        db: The database session.
-
-    Returns:
-        Tuple: A tuple containing the list of submissions and the count.
-    """
-    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
-
-    xform = get_odk_form(odk_credentials)
-    xform_name = f"{project.project_name_prefix}_task_{task_id}"
-    data = xform.listSubmissions(project.odkid, xform_name, filters)
+    xform = get_odk_form(odk_central)
+    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id, filters)
     submissions = data.get("value", [])
     count = data.get("@odata.count", 0)
 
-    return submissions, count
+    if task_id:
+        submissions = [
+            sub
+            for sub in submissions
+            if sub.get("all", {}).get("task_id") == str(task_id)
+        ]
+
+    return count, submissions
+
+
+# FIXME this is not needed now it can be directly filtered from submission table
+# async def get_submission_by_task(
+#     project: db_models.DbProject,
+#     task_id: int,
+#     filters: dict,
+#     db: Session,
+# ):
+#     """Get submissions and count by task.
+
+#     Args:
+#         project: The project instance.
+#         task_id: The ID of the task.
+#         filters: A dictionary of filters.
+#         db: The database session.
+
+#     Returns:
+#         Tuple: A tuple containing the list of submissions and the count.
+#     """
+#     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
+
+#     xform = get_odk_form(odk_credentials)
+#     db_xform = await project_deps.get_project_xform(db, project.id)
+#     data = xform.listSubmissions(project.odkid, db_xform.odk_form_id, filters)
+#     submissions = data.get("value", [])
+#     count = data.get("@odata.count", 0)
+
+#     return submissions, count
 
 
 async def get_submission_detail(
-    project: db_models.DbProject,
-    task_id: int,
     submission_id: str,
+    project: db_models.DbProject,
     db: Session,
 ):
     """Get the details of a submission.
 
     Args:
+        submission_id: The intance uuid of the submission.
         project: The project object representing the project.
-        task_id: The ID of the task associated with the submission.
-        submission_id: The ID of the submission.
         db: The database session.
 
     Returns:
@@ -868,7 +844,8 @@ async def get_submission_detail(
     """
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     odk_form = get_odk_form(odk_credentials)
-    xform = f"{project.project_name_prefix}_task_{task_id}"
-    submission = odk_form.getSubmissions(project.odkid, xform, submission_id)
-
-    return json.loads(submission)
+    db_xform = await project_deps.get_project_xform(db, project.id)
+    submission = json.loads(
+        odk_form.getSubmissions(project.odkid, db_xform.odk_form_id, submission_id)
+    )
+    return submission.get("value", [])[0]

@@ -101,21 +101,12 @@ const SubmissionsTable = ({ toggleView }) => {
   }, []);
 
   useEffect(() => {
-    if (!filter.task_id) {
-      dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
-          page: paginationPage,
-          ...filter,
-        }),
-      );
-    } else {
-      dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${projectId}`, {
-          page: paginationPage,
-          ...filter,
-        }),
-      );
-    }
+    dispatch(
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
+        page: paginationPage,
+        ...filter,
+      }),
+    );
   }, [filter, paginationPage]);
 
   useEffect(() => {
@@ -127,21 +118,12 @@ const SubmissionsTable = ({ toggleView }) => {
       SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${projectId}`),
     );
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
-    if (!filter.task_id) {
-      dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
-          page: paginationPage,
-          ...filter,
-        }),
-      );
-    } else {
-      dispatch(
-        SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/task_submissions/${projectId}`, {
-          page: paginationPage,
-          ...filter,
-        }),
-      );
-    }
+    dispatch(
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
+        page: paginationPage,
+        ...filter,
+      }),
+    );
   };
 
   useEffect(() => {
