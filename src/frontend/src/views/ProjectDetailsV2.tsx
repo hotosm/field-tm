@@ -247,7 +247,7 @@ const Home = () => {
 
   useEffect(() => {
     if (taskModalStatus) {
-      setViewState('comments');
+      setViewState('task_activity');
     } else {
       setViewState('project_info');
     }
@@ -340,18 +340,6 @@ const Home = () => {
               {taskModalStatus && (
                 <button
                   className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                    viewState === 'comments'
-                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                  } fmtm-py-1`}
-                  onClick={() => setViewState('comments')}
-                >
-                  Comments
-                </button>
-              )}
-              {taskModalStatus && (
-                <button
-                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
                     viewState === 'task_activity'
                       ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
                       : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
@@ -359,6 +347,18 @@ const Home = () => {
                   onClick={() => setViewState('task_activity')}
                 >
                   Task Activity
+                </button>
+              )}
+              {taskModalStatus && (
+                <button
+                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
+                    viewState === 'comments'
+                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
+                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
+                  } fmtm-py-1`}
+                  onClick={() => setViewState('comments')}
+                >
+                  Comments
                 </button>
               )}
               <button

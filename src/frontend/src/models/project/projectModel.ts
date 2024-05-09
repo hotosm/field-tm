@@ -106,6 +106,7 @@ export type taskBoundriesTypes = {
   };
   task_history: taskHistoryTypes[];
   task_status: string;
+  index: number;
 };
 
 export type taskBoundriesGeojson = {

@@ -13,18 +13,26 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 const Comments = () => {
   const dispatch = useDispatch();
   const params = useParams();
+  const projectId: any = params.id;
+
   const [comment, setComment] = useState('');
   const [isEditorEmpty, setIsEditorEmpty] = useState(true);
   const projectCommentsList = useAppSelector((state) => state?.project?.projectCommentsList);
   const projectGetCommentsLoading = useAppSelector((state) => state?.project?.projectGetCommentsLoading);
   const projectPostCommentsLoading = useAppSelector((state) => state?.project?.projectPostCommentsLoading);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
-
-  const projectId = params.id;
+  const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectIndex = projectData.findIndex((project) => project.id == +projectId);
+  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const currentStatus = {
+    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
+      return task?.index == selectedTask;
+    })?.[0],
+  };
 
   useEffect(() => {
-    dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${selectedTask}/history/?comment=true`));
-  }, [selectedTask, projectId]);
+    dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?comment=true`));
+  }, [selectedTask, projectId, currentStatus?.id]);
 
   const clearComment = () => {
     dispatch(ProjectActions.ClearEditorContent(true));
@@ -44,8 +52,8 @@ const Comments = () => {
       return;
     }
     dispatch(
-      PostProjectComments(`${import.meta.env.VITE_API_URL}/tasks/task-comments/`, {
-        task_id: selectedTask,
+      PostProjectComments(`${import.meta.env.VITE_API_URL}/tasks/task-comments/?project_id=${projectId}`, {
+        task_id: currentStatus?.id,
         project_id: projectId,
         comment,
       }),
