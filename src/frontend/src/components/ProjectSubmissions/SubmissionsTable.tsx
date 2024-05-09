@@ -395,7 +395,7 @@ const SubmissionsTable = ({ toggleView }) => {
             rowClassName="codeRow"
             dataFormat={(row) => (
               <div className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate">
-                <span>{row?.__system?.reviewState ? camelToFlat(row?.__system?.reviewState) : '-'}</span>
+                <span>{row?.__system?.reviewState ? camelToFlat(row?.__system?.reviewState) : 'Recieved'}</span>
               </div>
             )}
           />
@@ -440,8 +440,8 @@ const SubmissionsTable = ({ toggleView }) => {
                       SubmissionActions.SetUpdateReviewStatusModal({
                         toggleModalStatus: true,
                         instanceId: row?.meta?.instanceID,
-                        taskId: row?.phonenumber,
-                        projectId: decodedId,
+                        taskId: row?.all?.task_id,
+                        projectId: projectId,
                         reviewState: row?.__system?.reviewState,
                       }),
                     );

@@ -30,20 +30,22 @@ export default function Dialog({ taskId, feature, map, view }) {
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return task.id == taskId;
+      return task?.index == taskId;
     })?.[0],
   };
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
 
   useEffect(() => {
     if (taskId) {
-      dispatch(GetProjectTaskActivity(`${import.meta.env.VITE_API_URL}/tasks/${taskId}/history/?comment=false`));
+      dispatch(
+        GetProjectTaskActivity(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?comment=false`),
+      );
     }
   }, [taskId]);
 
   useEffect(() => {
     if (taskInfo?.length === 0) return;
-    const currentTaskInfo = taskInfo?.filter((task) => taskId === task?.task_id);
+    const currentTaskInfo = taskInfo?.filter((task) => taskId == task?.index);
     if (currentTaskInfo?.[0]) {
       setCurrentTaskInfo(currentTaskInfo?.[0]);
     }
@@ -70,7 +72,7 @@ export default function Dialog({ taskId, feature, map, view }) {
       if (authDetailsCopy.hasOwnProperty('id')) {
         dispatch(
           ProjectTaskStatus(
-            `${import.meta.env.VITE_API_URL}/tasks/${taskId}/new-status/${status}`,
+            `${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/new-status/${status}`,
             geoStyle,
             taskBoundaryData,
             currentProjectId,

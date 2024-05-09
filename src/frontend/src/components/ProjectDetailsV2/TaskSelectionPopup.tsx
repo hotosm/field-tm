@@ -29,7 +29,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
-      return indTask.id == taskId;
+      return indTask?.index == taskId;
     })?.[0],
   };
   const checkIfTaskAssignedOrNot =
@@ -40,7 +40,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
     if (projectIndex != -1) {
       const currentStatus = {
         ...projectData[projectIndex].taskBoundries.filter((task) => {
-          return task.id == taskId;
+          return task?.index == taskId;
         })[0],
       };
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
