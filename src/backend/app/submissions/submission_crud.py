@@ -661,36 +661,22 @@ async def get_submission_points(db: Session, project_id: int, task_id: int = Non
 
 async def get_submission_count_of_a_project(db: Session, project_id: int):
     """Return the total number of submissions made for a project."""
-    project_info = await project_crud.get_project(db, project_id)
-
-    odkid = project_info.odkid
-    project_name = project_info.project_name_prefix
-    project_tasks = project_info.tasks
+    project = await project_crud.get_project(db, project_id)
 
     # ODK Credentials
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
+
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
-    files = []
+    db_xform = await project_deps.get_project_xform(db, project.id)
+    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id)
 
-    task_list = [x.id for x in project_tasks]
-    for task_id in task_list:
-        xform_name = f"{project_name}_task_{task_id}"
-        file = xform.getSubmissions(odkid, xform_name, None, False, True)
-        if not file:
-            json_data = None
-        else:
-            json_data = json.loads(file)
-            json_data_value = json_data.get("value")
-            if json_data_value:
-                files.extend(json_data_value)
-
-    return len(files)
+    return data.get("@odata.count", 0)
 
 
 async def get_submissions_by_date(
-    db: Session, project_id: int, days: int, planned_task: int
+    db: Session, project_id: int, days: int, planned_task: Optional[int] = None
 ):
     """Get submissions by date.
 
@@ -710,22 +696,14 @@ async def get_submissions_by_date(
         submissions = await get_submissions_by_date(db, 1, 7)
     """
     project = await project_crud.get_project(db, project_id)
-    s3_project_path = f"/{project.organisation_id}/{project_id}"
-    s3_submission_path = f"/{s3_project_path}/submission.zip"
+    odk_central = await project_deps.get_odk_credentials(db, project.id)
+    xform = get_odk_form(odk_central)
+    db_xform = await project_deps.get_project_xform(db, project.id)
+    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id)
 
-    try:
-        file = get_obj_from_bucket(settings.S3_BUCKET_NAME, s3_submission_path)
-    except ValueError:
-        return []
-
-    with zipfile.ZipFile(file, "r") as zip_ref:
-        with zip_ref.open("submissions.json") as file_in_zip:
-            content = file_in_zip.read()
-
-    content = json.loads(content)
     end_dates = [
         datetime.fromisoformat(entry["end"].split("+")[0])
-        for entry in content
+        for entry in data["value"]
         if entry.get("end")
     ]
 

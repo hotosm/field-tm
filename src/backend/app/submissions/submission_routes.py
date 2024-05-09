@@ -307,7 +307,6 @@ async def get_osm_xml(
 async def get_submission_page(
     project_id: int,
     days: int,
-    background_tasks: BackgroundTasks,
     planned_task: Optional[int] = None,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(mapper),
@@ -315,7 +314,6 @@ async def get_submission_page(
     """Summary submissison details for submission page.
 
     Args:
-        background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
         db (Session): The database session, automatically generated.
         project_id (int): The ID of the project.
         days (int): The number of days to consider for fetching submissions.
@@ -327,15 +325,6 @@ async def get_submission_page(
     """
     data = await submission_crud.get_submissions_by_date(
         db, project_id, days, planned_task
-    )
-
-    # Update submission cache in the background
-    background_task_id = await project_crud.insert_background_task_into_database(
-        db, "sync_submission", project_id
-    )
-
-    background_tasks.add_task(
-        submission_crud.update_submission_in_s3, db, project_id, background_task_id
     )
 
     return data
