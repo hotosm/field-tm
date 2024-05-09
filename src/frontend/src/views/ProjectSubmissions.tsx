@@ -5,7 +5,7 @@ import SubmissionsInfographics from '@/components/ProjectSubmissions/Submissions
 import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.js';
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { ProjectById } from '@/api/Project';
+import { ProjectById, GetEntityInfo } from '@/api/Project';
 import { GetProjectDashboard } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
 import { projectInfoType } from '@/models/project/projectModel';
@@ -41,6 +41,12 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
+  }, []);
+
+  // for hot fix to diplay task-list and show option of task-list for submission table filter
+  // better solution needs to be researched
+  useEffect(() => {
+    dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
   useEffect(() => {

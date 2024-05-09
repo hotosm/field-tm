@@ -134,12 +134,12 @@ export default function PrimaryAppBar() {
               alignItems="center"
               className="fmtm-text-ellipsis fmtm-max-w-[9.5rem]"
             >
-              {authDetails['img_url'] !== 'null' && authDetails['img_url'] ? (
+              {authDetails['profile_img'] !== 'null' && authDetails['profile_img'] ? (
                 <CoreModules.Stack
                   className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
                   sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }}
                 >
-                  <img src={authDetails['img_url']} alt="Profile Picture" />
+                  <img src={authDetails['profile_img']} alt="Profile Picture" />
                 </CoreModules.Stack>
               ) : (
                 <AssetModules.PersonIcon color="success" sx={{ mt: '3%' }} />

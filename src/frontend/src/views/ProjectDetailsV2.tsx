@@ -183,7 +183,7 @@ const Home = () => {
       behavior: 'smooth',
     });
 
-    dispatch(CoreModules.TaskActions.SetSelectedTask(properties.uid));
+    dispatch(CoreModules.TaskActions.SetSelectedTask(properties?.fid));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
 
     // Fit the map view to the clicked feature's extent based on the window size

@@ -40,7 +40,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
     let geojson = {};
     const index = state.findIndex((project) => project.id == params.id);
     if (index != -1) {
-      const taskIndex = state[index]?.taskBoundries.findIndex((task) => task.id == taskId);
+      const taskIndex = state[index]?.taskBoundries.findIndex((task) => task?.index == taskId);
       if (index != -1) {
         geojson = state[index]?.taskBoundries[taskIndex]?.outline_geojson;
       }
