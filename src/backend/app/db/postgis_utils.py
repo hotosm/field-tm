@@ -304,8 +304,11 @@ async def split_geojson_by_task_areas(
             SELECT jsonb_array_elements(CAST(:geojson_featcol AS jsonb)->'features')
             AS feature
         ) AS features
-        CROSS JOIN tasks
-        WHERE tasks.project_id = :project_id;
+        JOIN tasks ON tasks.project_id = :project_id
+        WHERE
+            ST_Within(
+                ST_Centroid(ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326)
+                ), tasks.outline);
 
         -- Retrieve task outlines based on the provided project_id
         SELECT
