@@ -19,8 +19,10 @@
 
 import json
 import os
+from io import BytesIO
 from typing import Optional
 
+import geojson
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
@@ -32,8 +34,8 @@ from app.auth.osm import AuthUser, login_required
 from app.auth.roles import mapper, project_admin
 from app.central import central_crud
 from app.config import settings
-from app.db import database, db_models
-from app.models.enums import ReviewStateEnum
+from app.db import database, db_models, postgis_utils
+from app.models.enums import HTTPStatus, ReviewStateEnum
 from app.projects import project_crud, project_deps, project_schemas
 from app.submissions import submission_crud, submission_schemas
 
@@ -374,7 +376,7 @@ async def submission_table(
 
     project_id: The ID of the project.
 
-    task_id: The ID of the task.
+    task_id: The task index of the project.
     """
     skip = (page - 1) * results_per_page
     filters = {
@@ -531,3 +533,56 @@ async def update_review_state(
         return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.get("/download-submission-geojson/{project_id}")
+async def download_submission_geojson(
+    project_id: int, db: Session = Depends(database.get_db)
+):
+    """Download submission geojson for a specific project.
+
+    Args:
+        project_id (int): The ID of the project to download submission geojson for.
+        db (Session): The database session.
+
+    Returns:
+        Response: A response containing the submission geojson file as an attachment.
+
+    Raises:
+        HTTPException: If loading JSON submission fails.
+    """
+    project = await project_crud.get_project(db, project_id)
+    db_xform = await project_deps.get_project_xform(db, project.id)
+    odk_central = await project_deps.get_odk_credentials(db, project_id)
+
+    xform = central_crud.get_odk_form(odk_central)
+    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id)
+    submission_json = data.get("value", [])
+
+    if not submission_json:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Loading JSON submission failed",
+        )
+
+    all_features = []
+    for submission in submission_json:
+        keys_to_remove = ["meta", "__id", "__system"]
+        for key in keys_to_remove:
+            submission.pop(key)
+
+        data = {}
+        central_crud.flatten_json(submission, data)
+
+        geojson_geom = await postgis_utils.javarosa_to_geojson_geom(
+            data.pop("xlocation", {}), geom_type="Polygon"
+        )
+
+        feature = geojson.Feature(geometry=geojson_geom, properties=data)
+        all_features.append(feature)
+
+    featcol = geojson.FeatureCollection(features=all_features)
+    submission_geojson = BytesIO(json.dumps(featcol).encode("utf-8"))
+    filename = project.project_info.name
+    headers = {"Content-Disposition": f"attachment; filename={filename}.geojson"}
+    return Response(submission_geojson.getvalue(), headers=headers)
