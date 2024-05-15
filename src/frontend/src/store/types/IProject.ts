@@ -35,6 +35,7 @@ export type ProjectStateTypes = {
   projectOpfsBasemapPath: string | null;
   projectTaskActivity: projectTaskActivity[];
   projectActivityLoading: boolean;
+  downloadSubmissionLoading: boolean;
 };
 
 export type EntityOsmMap = {

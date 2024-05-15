@@ -8,7 +8,12 @@ import { useLocation } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
 import useOutsideClick from '@/hooks/useOutsideClick';
 
-const MapControlComponent = ({ map }) => {
+type mapControlComponentType = {
+  map: any;
+  projectName: string;
+};
+
+const MapControlComponent = ({ map, projectName }: mapControlComponentType) => {
   const btnList = [
     {
       id: 'add',
@@ -97,7 +102,7 @@ const MapControlComponent = ({ map }) => {
               : '-fmtm-right-[60rem] fmtm-top-0 sm:fmtm-hidden'
           }`}
         >
-          <ProjectOptions />
+          <ProjectOptions projectName={projectName} />
         </div>
       </div>
     </div>

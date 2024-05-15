@@ -409,11 +409,11 @@ const Home = () => {
                 <div
                   className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-[#F5F5F5] fmtm-p-2 fmtm-rounded-md ${
                     toggle
-                      ? 'fmtm-left-0 fmtm-bottom-0 md:fmtm-top-0'
-                      : '-fmtm-left-[60rem] fmtm-bottom-0 md:fmtm-top-0'
+                      ? 'fmtm-left-0 fmtm-bottom-0 lg:fmtm-top-0'
+                      : '-fmtm-left-[60rem] fmtm-bottom-0 lg:fmtm-top-0'
                   }`}
                 >
-                  <ProjectOptions />
+                  <ProjectOptions projectName={state?.projectInfo?.title} />
                 </div>
               </div>
             </div>
@@ -518,7 +518,7 @@ const Home = () => {
                   className="!fmtm-text-base !fmtm-pr-2"
                 />
               </div>
-              <MapControlComponent map={map} />
+              <MapControlComponent map={map} projectName={state?.projectInfo?.title} />
             </MapComponent>
             <div
               className="fmtm-absolute fmtm-top-4 fmtm-left-4 fmtm-bg-white fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-red-50 fmtm-duration-300 fmtm-border-[1px] sm:fmtm-hidden fmtm-cursor-pointer"
@@ -558,17 +558,6 @@ const Home = () => {
                 onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
               />
             )}
-            {mobileFooterSelection === 'others' && (
-              <BottomSheet
-                body={
-                  <div className="fmtm-mb-[10vh]">
-                    <ProjectOptions />
-                  </div>
-                }
-                onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
-              />
-            )}
-
             <MobileFooter />
           </div>
         )}

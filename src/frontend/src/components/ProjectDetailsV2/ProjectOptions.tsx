@@ -1,20 +1,21 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
+import { DownloadDataExtract, DownloadProjectForm, DownloadSubmissionGeojson } from '@/api/Project';
 import Button from '@/components/common/Button';
-import { downloadProjectFormLoadingType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
-const ProjectOptions = () => {
+type projectOptionPropTypes = {
+  projectName: string;
+};
+
+const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
 
-  const downloadProjectFormLoading: downloadProjectFormLoadingType = CoreModules.useAppSelector(
-    (state) => state.project.downloadProjectFormLoading,
-  );
-  const downloadDataExtractLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.project.downloadDataExtractLoading,
-  );
+  const downloadProjectFormLoading = useAppSelector((state) => state.project.downloadProjectFormLoading);
+  const downloadDataExtractLoading = useAppSelector((state) => state.project.downloadDataExtractLoading);
+  const downloadSubmissionLoading = useAppSelector((state) => state.project.downloadSubmissionLoading);
 
   const projectId: string = params.id;
 
@@ -37,14 +38,25 @@ const ProjectOptions = () => {
       );
     }
   };
+
   const onDataExtractDownload = () => {
     dispatch(
       DownloadDataExtract(`${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`),
     );
   };
+
+  const onSubmissionDownload = () => {
+    dispatch(
+      DownloadSubmissionGeojson(
+        `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson/${projectId}`,
+        projectName,
+      ),
+    );
+  };
+
   return (
     <>
-      <div className="fmtm-flex fmtm-gap-4 fmtm-flex-col md:fmtm-flex-row">
+      <div className="fmtm-flex fmtm-gap-4 fmtm-flex-col lg:fmtm-flex-row">
         <Button
           isLoading={downloadProjectFormLoading.type === 'form' && downloadProjectFormLoading.loading}
           loadingText="FORM"
@@ -89,6 +101,20 @@ const ProjectOptions = () => {
           onClick={(e) => {
             e.stopPropagation();
             onDataExtractDownload();
+          }}
+        />
+        <Button
+          isLoading={downloadSubmissionLoading}
+          loadingText="SUBMISSIONS"
+          btnText="SUBMISSIONS"
+          btnType="other"
+          className={`${
+            downloadSubmissionLoading ? '' : 'hover:fmtm-text-red-700'
+          } fmtm-border-red-700 !fmtm-rounded-md fmtm-truncate`}
+          icon={<AssetModules.FileDownloadIcon style={{ fontSize: '22px' }} />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSubmissionDownload();
           }}
         />
       </div>
