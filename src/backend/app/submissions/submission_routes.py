@@ -23,9 +23,9 @@ from io import BytesIO
 from typing import Optional
 
 import geojson
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from osm_fieldwork.odk_merge import OdkMerge
 from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
@@ -33,10 +33,9 @@ from sqlalchemy.orm import Session
 from app.auth.osm import AuthUser, login_required
 from app.auth.roles import mapper, project_admin
 from app.central import central_crud
-from app.config import settings
 from app.db import database, db_models, postgis_utils
 from app.models.enums import HTTPStatus, ReviewStateEnum
-from app.projects import project_crud, project_deps, project_schemas
+from app.projects import project_crud, project_deps
 from app.submissions import submission_crud, submission_schemas
 
 router = APIRouter(
@@ -49,7 +48,6 @@ router = APIRouter(
 @router.get("/")
 async def read_submissions(
     project_id: int,
-    task_id: int = None,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(mapper),
 ) -> list[dict]:
@@ -57,21 +55,19 @@ async def read_submissions(
 
     Args:
         project_id (int): The ID of the project.
-        task_id (int, optional): The ID of the task.
-            If provided, returns the submissions made for a specific task only.
         db (Session): The database session, automatically provided.
         current_user (AuthUser): Check if user has MAPPER permission.
 
     Returns:
         list[dict]: The list of submissions.
     """
-    return submission_crud.get_submission_of_project(db, project_id, task_id)
+    data = await submission_crud.get_submission_by_project(project_id, {}, db)
+    return data.get("value", [])
 
 
 @router.get("/download")
 async def download_submission(
     project_id: int,
-    task_id: int = None,
     export_json: bool = True,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(mapper),
@@ -82,8 +78,6 @@ async def download_submission(
 
     Args:
         project_id (int): The ID of the project.
-        task_id (int, optional): The ID of the task.
-            If provided, returns the submissions made for a specific task only.
         export_json (bool): Export in JSON format, else returns a file.
         db (Session): The database session, automatically provided.
         current_user (AuthUser): Check if user has MAPPER permission.
@@ -91,19 +85,20 @@ async def download_submission(
     Returns:
         Union[list[dict], File]: JSON of submissions, or submission file.
     """
-    if not (task_id or export_json):
-        file = await submission_crud.gather_all_submission_csvs(db, project_id)
-        return FileResponse(file)
+    project = await project_deps.get_project_by_id(db, project_id)
+    project_name = project.project_name_prefix
+    if not export_json:
+        file_content = await submission_crud.gather_all_submission_csvs(db, project_id)
+        headers = {"Content-Disposition": f"attachment; filename={project_name}.zip"}
+        return Response(file_content, headers=headers)
 
-    return await submission_crud.download_submission(
-        db, project_id, task_id, export_json
-    )
+    return await submission_crud.download_submission_in_json(db, project_id)
 
 
 @router.get("/submission-points")
 async def submission_points(
     project_id: int,
-    task_id: int = None,
+    task_id: Optional[int] = None,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(login_required),
 ):
@@ -125,10 +120,10 @@ async def submission_points(
 @router.get("/convert-to-osm")
 async def convert_to_osm(
     project_id: int,
-    task_id: int = None,
+    task_id: Optional[int] = None,
     db: Session = Depends(database.get_db),
     current_user: AuthUser = Depends(login_required),
-) -> str:
+):
     """Convert JSON submissions to OSM XML for a project.
 
     Args:
@@ -142,10 +137,11 @@ async def convert_to_osm(
         File: an OSM XML of submissions.
     """
     # NOTE runs in separate thread using run_in_threadpool
-    converted = await run_in_threadpool(
-        lambda: submission_crud.convert_to_osm(db, project_id, task_id)
+    return FileResponse(
+        await run_in_threadpool(
+            lambda: submission_crud.convert_to_osm(db, project_id, task_id)
+        )
     )
-    return converted
 
 
 @router.get("/get-submission-count/{project_id}")
@@ -166,6 +162,7 @@ async def conflate_osm_data(
     """Conflate submission data against existing OSM data."""
     # All Submissions JSON
     # NOTE runs in separate thread using run_in_threadpool
+    # FIXME we probably need to change this func
     submission = await run_in_threadpool(
         lambda: submission_crud.get_all_submissions_json(db, project_id)
     )
@@ -217,54 +214,54 @@ async def conflate_osm_data(
     return []
 
 
-@router.post("/download-submission")
-async def download_submission_json(
-    background_tasks: BackgroundTasks,
-    project_id: int,
-    background_task_id: Optional[str] = None,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Download submissions for a project in JSON format.
+# TODO remove this redundant endpoint
+# @router.post("/download-submission")
+# async def download_submission_json(
+#     background_tasks: BackgroundTasks,
+#     project_id: int,
+#     background_task_id: Optional[str] = None,
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(mapper),
+# ):
+#     """Download submissions for a project in JSON format.
 
-    TODO check for redundancy with submission/download endpoint and refactor.
-    """
-    # Get Project
-    project = await project_crud.get_project(db, project_id)
+#     TODO check for redundancy with submission/download endpoint and refactor.
+#     """
+#     # Get Project
+#     project = await project_crud.get_project(db, project_id)
 
-    # Return existing export if complete
-    if background_task_id:
-        # Get the backgrund task status
-        task_status, task_message = await project_crud.get_background_task_status(
-            background_task_id, db
-        )
+#     # Return existing export if complete
+#     if background_task_id:
+#         # Get the backgrund task status
+#         task_status, task_message = await project_crud.get_background_task_status(
+#             background_task_id, db
+#         )
 
-        if task_status != 4:
-            return project_schemas.BackgroundTaskStatus(
-                status=task_status.name, message=task_message or ""
-            )
+#         if task_status != 4:
+#             return project_schemas.BackgroundTaskStatus(
+#                 status=task_status.name, message=task_message or ""
+#             )
 
-        bucket_root = f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
-        return JSONResponse(
-            status_code=200,
-            content=f"{bucket_root}/{project.organisation_id}/{project_id}/submission.zip",
-        )
+#         bucket_root = f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
+#         return JSONResponse(
+#        status_code=200,
+#        content=f"{bucket_root}/{project.organisation_id}/{project_id}/submission.zip",
+#       )
+#     # Create task in db and return uuid
+#     background_task_id = await project_crud.insert_background_task_into_database(
+#         db, "sync_submission", project_id
+#     )
 
-    # Create task in db and return uuid
-    background_task_id = await project_crud.insert_background_task_into_database(
-        db, "sync_submission", project_id
-    )
-
-    background_tasks.add_task(
-        submission_crud.update_submission_in_s3, db, project_id, background_task_id
-    )
-    return JSONResponse(
-        status_code=200,
-        content={
-            "Message": "Submission update process initiated",
-            "task_id": str(background_task_id),
-        },
-    )
+#     background_tasks.add_task(
+#         submission_crud.update_submission_in_s3, db, project_id, background_task_id
+#     )
+#     return JSONResponse(
+#         status_code=200,
+#         content={
+#             "Message": "Submission update process initiated",
+#             "task_id": str(background_task_id),
+#         },
+#     )
 
 
 @router.get("/get_osm_xml/{project_id}")
@@ -286,6 +283,7 @@ async def get_osm_xml(
 
     # All Submissions JSON
     # NOTE runs in separate thread using run_in_threadpool
+    # FIXME we probably need to change this func
     submission = await run_in_threadpool(
         lambda: submission_crud.get_all_submissions_json(db, project_id)
     )
@@ -404,13 +402,22 @@ async def submission_table(
         else:
             filters["$filter"] = f"__system/reviewState eq '{review_state}'"
 
-    count, data = await submission_crud.get_submission_by_project(
+    data = await submission_crud.get_submission_by_project(
         project_id, filters, db, task_id
     )
+    count = data.get("@odata.count", 0)
+    submissions = data.get("value", [])
+
+    if task_id:
+        submissions = [
+            sub
+            for sub in submissions
+            if sub.get("all", {}).get("task_id") == str(task_id)
+        ]
 
     pagination = await project_crud.get_pagination(page, count, results_per_page, count)
     response = submission_schemas.PaginatedSubmissions(
-        results=data,
+        results=submissions,
         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
 
@@ -551,12 +558,8 @@ async def download_submission_geojson(
     Raises:
         HTTPException: If loading JSON submission fails.
     """
-    project = await project_crud.get_project(db, project_id)
-    db_xform = await project_deps.get_project_xform(db, project.id)
-    odk_central = await project_deps.get_odk_credentials(db, project_id)
-
-    xform = central_crud.get_odk_form(odk_central)
-    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id)
+    project = await project_deps.get_project_by_id(db, project_id)
+    data = await submission_crud.get_submission_by_project(project_id, {}, db)
     submission_json = data.get("value", [])
 
     if not submission_json:
@@ -583,6 +586,8 @@ async def download_submission_geojson(
 
     featcol = geojson.FeatureCollection(features=all_features)
     submission_geojson = BytesIO(json.dumps(featcol).encode("utf-8"))
-    filename = project.project_info.name
+    filename = project.project_prefix_name
+
     headers = {"Content-Disposition": f"attachment; filename={filename}.geojson"}
+
     return Response(submission_geojson.getvalue(), headers=headers)
