@@ -298,3 +298,33 @@ export const GetProjectTaskActivity = (url) => {
     await getProjectActivity(url);
   };
 };
+
+export const DownloadSubmissionGeojson = (url, projectName) => {
+  return async (dispatch) => {
+    dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(true));
+
+    const downloadSubmissionGeojson = async (url) => {
+      try {
+        const response = await CoreModules.axios.get(url, { responseType: 'blob' });
+        const a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = `${projectName}.geojson`;
+        a.click();
+        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to download submission geojson.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
+      } finally {
+        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
+      }
+    };
+    await downloadSubmissionGeojson(url);
+  };
+};
