@@ -191,12 +191,14 @@ const SubmissionsTable = ({ toggleView }) => {
       dispatch(
         getDownloadProjectSubmission(
           `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=false`,
+          projectInfo?.title,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
-        getDownloadProjectSubmissionJson(
-          `${import.meta.env.VITE_API_URL}/submission/download-submission?project_id=${projectId}`,
+        getDownloadProjectSubmission(
+          `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=true`,
+          projectInfo?.title,
         ),
       );
     }
