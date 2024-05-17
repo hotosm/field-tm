@@ -586,7 +586,7 @@ async def download_submission_geojson(
 
     featcol = geojson.FeatureCollection(features=all_features)
     submission_geojson = BytesIO(json.dumps(featcol).encode("utf-8"))
-    filename = project.project_prefix_name
+    filename = project.project_name_prefix
 
     headers = {"Content-Disposition": f"attachment; filename={filename}.geojson"}
 
