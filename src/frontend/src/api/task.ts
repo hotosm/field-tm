@@ -1,7 +1,7 @@
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 
-export const getDownloadProjectSubmission: Function = (url: string) => {
+export const getDownloadProjectSubmission: Function = (url: string, projectName: string) => {
   return async (dispatch) => {
     const params = new URLSearchParams(url.split('?')[1]);
     const isExportJson = params.get('export_json');
@@ -20,7 +20,7 @@ export const getDownloadProjectSubmission: Function = (url: string) => {
         });
         var a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = 'Submissions';
+        a.download = isExportJson === 'true' ? `${projectName}.json` : `${projectName}.zip`;
         a.click();
         dispatch(
           CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
