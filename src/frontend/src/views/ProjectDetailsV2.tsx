@@ -271,7 +271,7 @@ const Home = () => {
   const [showDebugConsole, setShowDebugConsole] = useState(false);
 
   return (
-    <div className="fmtm-bg-[#f5f5f5] fmtm-h-[100dvh] sm:fmtm-h-full">
+    <div className="fmtm-bg-[#f5f5f5] !fmtm-h-[100dvh] sm:!fmtm-h-full">
       {/* only used to display debug console */}
 
       <DebugConsole showDebugConsole={showDebugConsole} setShowDebugConsole={setShowDebugConsole} />
@@ -425,7 +425,7 @@ const Home = () => {
               ref={mapRef}
               mapInstance={map}
               className={`map naxatw-relative naxatw-min-h-full naxatw-w-full ${
-                windowSize.width <= 640 ? 'fmtm-h-[100dvh]' : 'fmtm-h-full'
+                windowSize.width <= 640 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
               }`}
             >
               {import.meta.env.MODE === 'development' && (
