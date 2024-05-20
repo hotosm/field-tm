@@ -15,7 +15,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 export const Geolocation = (map, geolocationStatus, dispatch) => {
   if (!map) return;
 
-  // check firefox or safari browser as it doesnt support browser's Sensor API
+  // check firefox or safari browser as it doesn't support browser's Sensor API
   // @ts-ignore
   const isFirefox = typeof InstallTrigger !== 'undefined';
   const isSafari =

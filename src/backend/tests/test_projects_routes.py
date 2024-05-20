@@ -113,7 +113,7 @@ async def test_create_odk_project():
 
 
 async def test_convert_to_app_project():
-    """Test conversion ot app project."""
+    """Test conversion to app project."""
     polygon = Polygon(
         [
             (85.317028828, 27.7052522097),

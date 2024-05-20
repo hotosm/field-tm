@@ -557,7 +557,7 @@ async def get_submission_detail(
     """Get the details of a submission.
 
     Args:
-        submission_id: The intance uuid of the submission.
+        submission_id: The instance uuid of the submission.
         project: The project object representing the project.
         db: The database session.
 
