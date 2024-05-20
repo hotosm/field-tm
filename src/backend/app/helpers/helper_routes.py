@@ -114,7 +114,8 @@ async def convert_xlsform_to_xform(
     allowed_extensions = [".xls", ".xlsx"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=400, detail="Provide a valid .xls or .xlsx file"
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Provide a valid .xls or .xlsx file",
         )
 
     contents = await xlsform.read()
@@ -138,7 +139,8 @@ async def convert_geojson_to_odk_csv_wrapper(
     allowed_extensions = [".json", ".geojson"]
     if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=400, detail="Provide a valid .json or .geojson file"
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="Provide a valid .json or .geojson file",
         )
 
     contents = await geojson.read()
@@ -165,7 +167,9 @@ async def create_entities_from_csv(
     file_ext = filename.suffix.lower()
 
     if file_ext != ".csv":
-        raise HTTPException(status_code=400, detail="Provide a valid .csv")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail="Provide a valid .csv"
+        )
 
     def parse_csv(csv_bytes):
         parsed_data = []
@@ -213,7 +217,9 @@ async def convert_odk_submission_json_to_geojson_wrapper(
 
     allowed_extensions = [".json"]
     if file_ext not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Provide a valid .json file")
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail="Provide a valid .json file"
+        )
 
     contents = await json_file.read()
     submission_geojson = await convert_odk_submission_json_to_geojson(BytesIO(contents))
