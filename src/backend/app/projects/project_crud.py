@@ -454,8 +454,8 @@ async def generate_data_extract(
     pg = PostgresClient(
         "underpass",
         extract_config,
-        auth_token=settings.OSM_SVC_ACCOUNT_TOKEN
-        if settings.OSM_SVC_ACCOUNT_TOKEN
+        auth_token=settings.RAW_DATA_API_AUTH_TOKEN
+        if settings.RAW_DATA_API_AUTH_TOKEN
         else None,
     )
     fgb_url = pg.execQuery(
@@ -463,7 +463,7 @@ async def generate_data_extract(
         extra_params={
             "fileName": (
                 f"fmtm/{settings.FMTM_DOMAIN}/data_extract"
-                if settings.OSM_SVC_ACCOUNT_TOKEN
+                if settings.RAW_DATA_API_AUTH_TOKEN
                 else "fmtm_extract"
             ),
             "outputType": "fgb",
