@@ -35,7 +35,7 @@ END $$;
 
 -- Add extra columns
 ALTER TABLE IF EXISTS public.projects
-    ADD COLUMN IF NOT EXISTS task_split_dimension SMALLINT,
-    ADD COLUMN IF NOT EXISTS task_num_buildings SMALLINT;
+ADD COLUMN IF NOT EXISTS task_split_dimension SMALLINT,
+ADD COLUMN IF NOT EXISTS task_num_buildings SMALLINT;
 -- Commit the transaction
 COMMIT;

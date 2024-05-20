@@ -10,4 +10,3 @@ ADD COLUMN IF NOT EXISTS created_by INTEGER;
 
 -- Commit the transaction
 COMMIT;
-

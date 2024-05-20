@@ -6,7 +6,7 @@ BEGIN;
 
 -- Update field in projects table
 ALTER TABLE IF EXISTS public.projects
-    ADD COLUMN IF NOT EXISTS data_extract_url VARCHAR;
+ADD COLUMN IF NOT EXISTS data_extract_url VARCHAR;
 
 -- Commit the transaction
 COMMIT;
