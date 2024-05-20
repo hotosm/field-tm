@@ -46,7 +46,7 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams === 'true' || (location.pathname.includes('project') && windowSize.width <= 640) ? (
+            {popupInParams === 'true' || (location.pathname.includes('/project/') && windowSize.width <= 640) ? (
               <div></div>
             ) : (
               <div>
