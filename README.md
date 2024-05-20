@@ -63,7 +63,7 @@ areas without existing data.
 Now with over 500,000 volunteer mappers, the Tasking Manager is a go-to resource
 for volunteers to map collaboratively.
 
-To aid future diaster response, we would really welcome contributions for:
+To aid future disaster response, we would really welcome contributions for:
 
 - Backend Python development
 - Frontend Typescript development

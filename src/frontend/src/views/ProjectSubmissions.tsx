@@ -43,7 +43,7 @@ const ProjectSubmissions = () => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
   }, []);
 
-  // for hot fix to diplay task-list and show option of task-list for submission table filter
+  // for hot fix to display task-list and show option of task-list for submission table filter
   // better solution needs to be researched
   useEffect(() => {
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));

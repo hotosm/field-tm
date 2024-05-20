@@ -71,7 +71,7 @@ odk.${FMTM_DOMAIN} --> ODK Central
 s3.${FMTM_DOMAIN} --> S3 / Minio
 ```
 
-These defaults can be overriden with respective environment variables:
+These defaults can be overridden with respective environment variables:
 
 ```dotenv
 FMTM_API_DOMAIN

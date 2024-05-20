@@ -28,10 +28,10 @@ jobs:
           VARS_CONTEXT: ${{ toJson(vars) }}
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          # Random delimeter string for security
+          # Random delimiter string for security
           delim=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
-          # Parse JSON with multiline strings, using delimeter (Github specific)
+          # Parse JSON with multiline strings, using delimiter (Github specific)
           to_envs() { jq -r "to_entries[] | \"\(.key)<<$delim\n\(.value)\n$delim\n\""; }
 
           # Set VARS_CONTEXT if not null

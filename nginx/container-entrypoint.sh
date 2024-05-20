@@ -3,7 +3,7 @@
 set -eo pipefail
 
 echo
-echo "Substituing env vars"
+echo "Substituting env vars"
 echo
 bash /docker-entrypoint.d/20-envsubst-on-templates.sh
 

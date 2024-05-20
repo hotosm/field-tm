@@ -576,7 +576,7 @@ async def project_partial_update(
     Raises:
     - HTTPException with 404 status code if project not found
     """
-    # Update project informations
+    # Update project information
     project = await project_crud.partial_update_project_info(
         db, project_info, project_user_dict["project"]
     )
@@ -1188,7 +1188,7 @@ async def get_task_status(
     db: Session = Depends(database.get_db),
 ):
     """Get the background task status by passing the task UUID."""
-    # Get the backgrund task status
+    # Get the background task status
     task_status, task_message = await project_crud.get_background_task_status(
         task_uuid, db
     )

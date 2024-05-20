@@ -83,7 +83,7 @@ const Home = () => {
     }
   }, [state.projectInfo.title]);
 
-  //snackbar handle close funtion
+  //snackbar handle close function
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;

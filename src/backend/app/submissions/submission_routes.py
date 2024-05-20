@@ -232,7 +232,7 @@ async def conflate_osm_data(
 
 #     # Return existing export if complete
 #     if background_task_id:
-#         # Get the backgrund task status
+#         # Get the background task status
 #         task_status, task_message = await project_crud.get_background_task_status(
 #             background_task_id, db
 #         )
