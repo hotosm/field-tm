@@ -21,9 +21,9 @@ These stages go in order, from local development, through to production deployme
   the updates made on `development` and frozen, tested,
   patched (if required), and merged into the `staging` branch via PR.
 - Once approved, the `staging` branch auto-deploys to the staging server.
-- The purpose of this stage is to reguarly release versions of FMTM that
+- The purpose of this stage is to regularly release versions of FMTM that
   power users (and the project owner) can test.
-- Anyone who doesn't mind occasional breakage is welcome to use this server publically.
+- Anyone who doesn't mind occasional breakage is welcome to use this server publicly.
 - Hot fixes are also possible, if fixing some
   functionality is critical for FMTM to function.
 

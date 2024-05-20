@@ -246,7 +246,7 @@ async def partial_update_project_info(
     # Get project info
     db_project_info = await get_project_info_by_id(db, db_project.id)
 
-    # Update project informations
+    # Update project information
     if db_project and db_project_info:
         if project_metadata.name:
             db_project.project_name_prefix = project_metadata.project_name_prefix
@@ -283,7 +283,7 @@ async def update_project_info(
             detail="No project info passed in",
         )
 
-    # Project meta informations
+    # Project meta information
     project_info = project_metadata.project_info
 
     # Update author of the project
@@ -293,7 +293,7 @@ async def update_project_info(
     # get project info
     db_project_info = await get_project_info_by_id(db, db_project.id)
 
-    # Update projects meta informations (name, descriptions)
+    # Update projects meta information (name, descriptions)
     if db_project and db_project_info:
         db_project_info.name = project_info.name
         db_project_info.short_description = project_info.short_description

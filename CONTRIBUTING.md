@@ -71,7 +71,7 @@ code, wait till the feature is complete and ready for review. A
 preliminary review by other developers can be requested via the
 comments for the issue on github, or via slack or email.
 
-It is prefered that all patches contain any documentation
+It is preferred that all patches contain any documentation
 updates made, and for any new features, a test case is preferred when
 possible. Keep patches focused on a single feature to avoid merging
 complications with other developers. The old free software joke is
@@ -86,7 +86,7 @@ community of people involved with this project.
   typed in, log files, errors messages etc.
 
 - Please open a separate issue for each problem, question, or comment you have.
-  Do not re-use existing issues for other topics, even if they are similar. This
+  Do not reuse existing issues for other topics, even if they are similar. This
   keeps issues small and manageable and makes it much easier to follow through
   and make sure each problem is taken care of.
 
@@ -94,13 +94,13 @@ community of people involved with this project.
 
 Project documentation should be in [Markdown format][6], and in a _docs_
 subdirectory. While it is possible to use HTML in Markdown documents
-for tables and images, it is prefered to use the Markdown style as
+for tables and images, it is preferred to use the Markdown style as
 it's much easier to read.
 
 ### Coding Style
 
 Python enforces a certain amount of style due to indent levels. Unlike
-C/C++, we don't have to worry about curly braces. It is prefered that
+C/C++, we don't have to worry about curly braces. It is preferred that
 all code follows object oriented techniques, with a minimal amount of
 code other than basic control in the main function. This allows code
 to be easily reused and run either standalone, or part of a REST API
@@ -123,7 +123,7 @@ base classes is encouraged so functionality can be shared. Comments in
 the code are encouraged when necessary to explain code that may not be
 obvious, but avoid over commenting as well. Code should be able to be
 read like a book, with descriptive names used, no fancy tricks unless
-required. Always be concious of performance and security.
+required. Always be conscious of performance and security.
 
 [1]: https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0 "slides"
 [2]: https://github.com/orgs/hotosm/projects/22 "Our latest task board"

@@ -93,7 +93,7 @@ Manager** has to consider 3 main activities:
    - Data quality monitoring
 3. **Post-field data collection activities**
    - Daily review of data
-   - Giving and recieving team feedback
+   - Giving and receiving team feedback
    - Updating tools and methodoligies
 
 If you want more information, click on [this][2] virtual whiteboard! to see all
@@ -149,7 +149,7 @@ collected and uploaded to **OSM**:
 - Checks tasks for errors
 - Stops mappers that make mistakes and explains how they can fix their errors
 - Lowers supervision on good mappers in order to spend more time on those who
-  are stuggling
+  are struggling
 - Uploads high quality data to **OSM** and marks completed tasks as **done**
 
 Some of the pain points and struggles faced by the **Validator** include:

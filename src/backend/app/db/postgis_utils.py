@@ -421,7 +421,7 @@ def add_required_geojson_properties(
 def parse_and_filter_geojson(
     geojson_raw: Union[str, bytes], filter: bool = True
 ) -> Optional[geojson.FeatureCollection]:
-    """Parse geojson string and filter out incomaptible geometries."""
+    """Parse geojson string and filter out incompatible geometries."""
     geojson_parsed = geojson.loads(geojson_raw)
 
     if isinstance(geojson_parsed, geojson.FeatureCollection):

@@ -66,7 +66,7 @@ kubectl
 helm upgrade --install fmtm oci://ghcr.io/hotosm/fmtm --namespace fmtm
 ```
 
-Chart values can be overriden using `values.yaml` or the `--set` flag.
+Chart values can be overridden using `values.yaml` or the `--set` flag.
 
 ```bash
 helm upgrade --install fmtm . \
