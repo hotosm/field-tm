@@ -18,7 +18,6 @@
 
 """Auth routes, to login, logout, and get user details."""
 from datetime import datetime, timezone
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -39,7 +38,7 @@ router = APIRouter(
 
 
 @router.get("/osm-login/")
-async def login_url(request: Request, osm_auth=Depends(init_osm_auth)):
+async def login_url(osm_auth=Depends(init_osm_auth)):
     """Get Login URL for OSM Oauth Application.
 
     The application must be registered on openstreetmap.org.
@@ -223,7 +222,6 @@ async def my_data(
 
 @router.get("/introspect", response_model=AuthUser)
 async def check_login(
-    db: Session = Depends(database.get_db),
     user_data: AuthUser = Depends(login_required),
 ):
     """Verifies the validity of login cookies.
@@ -234,7 +232,9 @@ async def check_login(
 
 
 @router.get("/temp-login")
-async def temp_login(email: Optional[str] = None):
+async def temp_login(
+    # email: Optional[str] = None,
+):
     """Handles the authentication check endpoint.
 
     By creating a temporary access token and

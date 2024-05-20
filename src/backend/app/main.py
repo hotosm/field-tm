@@ -23,7 +23,7 @@ import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
@@ -80,7 +80,9 @@ def get_api() -> FastAPI:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(
+    app: FastAPI,  # dead: disable
+):
     """FastAPI startup/shutdown event."""
     log.debug("Starting up FastAPI server.")
     db_conn = next(get_db())
@@ -193,7 +195,10 @@ api = get_api()
 
 
 @api.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(
+    # request: Request,
+    exc: RequestValidationError,
+):
     """Exception handler for more descriptive logging and traces."""
     status_code = 500
     errors = []

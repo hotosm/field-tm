@@ -31,7 +31,7 @@ def add_endpoint_profiler(app: FastAPI):
     from pyinstrument import Profiler
 
     @app.middleware("http")
-    async def _profile_request(request: Request, call_next):
+    async def _profile_request(request: Request, call_next):  # dead: disable
         """Calculate the execution time for routes."""
         profiling = request.query_params.get("profile", False)
         if profiling:
@@ -116,7 +116,10 @@ def set_otel_tracer(app: FastAPI, endpoint: str):
 
     # Ensure the HTTPException text is included in attributes
     @app.exception_handler(HTTPException)
-    async def http_exception_handler(request, exc):
+    async def http_exception_handler(
+        request,  # dead: disable
+        exc,
+    ):  # dead: disable
         current_span = trace.get_current_span()
         current_span.set_attributes(
             {

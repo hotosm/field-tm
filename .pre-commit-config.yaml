@@ -19,6 +19,13 @@ repos:
       - id: ruff-format
         files: ^src/backend/(?:.*/)*.*$
 
+  # # Dead code: Python usused code detection
+  # - repo: https://github.com/asottile/dead
+  #   rev: v1.5.2
+  #   hooks:
+  #     - id: dead
+  #       args: ["--exclude", "contrib"]
+
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
