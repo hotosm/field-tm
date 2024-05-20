@@ -60,18 +60,11 @@ repos:
     rev: 3.0.6
     hooks:
       - id: sqlfluff-lint
-        args: [--dialect, postgres]
         files: ^src/backend/migrations/(?:.*/)*.*$
-        # For dbt projects, this installs the dbt "extras".
-        # You will need to select the relevant dbt adapter for your dialect
-        # (https://docs.getdbt.com/docs/available-adapters):
-        # additional_dependencies: ['<dbt-adapter>', 'sqlfluff-templater-dbt']
+        types: [sql]
       - id: sqlfluff-fix
-        args: [--dialect, postgres]
         files: ^src/backend/migrations/(?:.*/)*.*$
-        # Arbitrary arguments to show an example
-        # args: [--rules, "LT02,CP02"]
-        # additional_dependencies: ['<dbt-adapter>', 'sqlfluff-templater-dbt']
+        types: [sql]
 
   # Lint: Bash scripts
   - repo: https://github.com/openstack-dev/bashate.git
