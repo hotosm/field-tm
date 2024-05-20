@@ -11,7 +11,7 @@ function OsmAuth() {
   const [isReadyToRedirect, setIsReadyToRedirect] = useState(false);
 
   useEffect(() => {
-    // Redirect workaround require for locahost, until PR is merged:
+    // Redirect workaround required for locahost, until PR is merged:
     // https://github.com/openstreetmap/openstreetmap-website/pull/4287
     if (window.location.href.includes('127.0.0.1:7051')) {
       // Pass through same url params

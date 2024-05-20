@@ -134,7 +134,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple,
               className="fmtm-px-3 fmtm-flex fmtm-items-center fmtm-relative fmtm-border-b-regular fmtm-border-border_color"
             >
               <div className="fmtm-h-10 fmtm-w-10 fmtm-rounded-full fmtm-bg-active_bg fmtm-border-regular fmtm-p-2 fmtm-mr-2 fmtm-border-border_color ">
-                <i className="material-icons fmtm-text-active_text">description</i>
+                <AssetModules.DescriptionIcon className="fmtm-text-active_text" />
               </div>
               <div className="fmtm-py-3 fmtm-pr-2 fmtm-w-5/6">
                 <div className="fmtm-text-button-1 fmtm-w-full fmtm-text-ellipsis">{item.name}</div>
@@ -147,7 +147,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple,
                   onClick={() => handleDeleteFile(item.id)}
                   className="fmtm-h-10 fmtm-w-10 fmtm-p-2"
                 >
-                  <i className="material-icons fmtm-text-[#FF4538]">delete</i>
+                  <AssetModules.DeleteIcon className="fmtm-text-[#FF4538]" />
                 </div>
               </div>
             </div>
