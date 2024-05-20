@@ -155,5 +155,5 @@ exclude_rules = "CP05"  # Avoid capitalisation of enums
 
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md"
-# write-changes = true
+write-changes = true
 
