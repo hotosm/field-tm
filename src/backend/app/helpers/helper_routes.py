@@ -30,8 +30,9 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from osm_fieldwork.xlsforms import xlsforms_path
+from requests import get
 
 from app.auth.osm import AuthUser, login_required
 from app.central import central_deps
@@ -228,12 +229,37 @@ async def convert_odk_submission_json_to_geojson_wrapper(
     return Response(submission_geojson.getvalue(), headers=headers)
 
 
-@router.get("/view-auth-token")
+@router.get("/view-raw-data-api-token")
+async def get_raw_data_api_osm_token(
+    request: Request,
+    current_user: AuthUser = Depends(login_required),
+):
+    """Get the OSM OAuth token for a service account for raw-data-api.
+
+    The token returned by this endpoint should be used for the
+    RAW_DATA_API_AUTH_TOKEN environment variable.
+    """
+    response = get(f"{settings.RAW_DATA_API_URL}/auth/login")
+    if not response.ok:
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Could not login to raw-data-api",
+        )
+
+    raw_api_login_url = response.json().get("login_url")
+    return RedirectResponse(raw_api_login_url)
+
+
+@router.get("/view-fmtm-api-token")
 async def view_user_oauth_token(
     request: Request,
     current_user: AuthUser = Depends(login_required),
 ):
-    """Get the OSM OAuth token for a logged in user."""
+    """Get the FMTM OSM (OAuth) token for a logged in user.
+
+    The token is encrypted with a secret key and only usable via
+    this FMTM instance and the osm-login-python module.
+    """
     cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
     return JSONResponse(
         status_code=HTTPStatus.OK,

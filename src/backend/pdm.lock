@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:a1cd565c3d8d2f11a4f3d3738da7eee97399518e3f20de49019dc656c04d7811"
+content_hash = "sha256:8e7a3aa7636a3575425a98fd0d7966c25dece9f6c0a8b25fbbd5a135a136ecfa"
 
 [[package]]
 name = "aiohttp"
@@ -1708,7 +1708,7 @@ files = [
 
 [[package]]
 name = "osm-rawdata"
-version = "0.2.4"
+version = "0.3.0"
 requires_python = ">=3.10"
 summary = "Make data extracts from OSM data."
 dependencies = [
@@ -1724,8 +1724,8 @@ dependencies = [
     "sqlalchemy>=2.0.0",
 ]
 files = [
-    {file = "osm-rawdata-0.2.4.tar.gz", hash = "sha256:5fbf1b91930846a3d6bd1ea3fcedb99b46e2968ef6bad397de8c2f395ba3fbe7"},
-    {file = "osm_rawdata-0.2.4-py3-none-any.whl", hash = "sha256:028968edbe02d53285c721a9c8f6a3e4ed20bcfd1837ad1d8822eed35515a43e"},
+    {file = "osm-rawdata-0.3.0.tar.gz", hash = "sha256:62778c571a1a7d52a91357733deff5bc79466f0c5df5c809d77af7a3259ff7ed"},
+    {file = "osm_rawdata-0.3.0-py3-none-any.whl", hash = "sha256:e803e69ad2980502ebf13586302f51829fa2b1276079bdc3f924f187565076b9"},
 ]
 
 [[package]]
