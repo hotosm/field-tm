@@ -106,7 +106,7 @@ similar on AWS etc)
 
 ### Work on existing projects
 
-If you donot want to create a new project and wish to work on an existing
+If you do not want to create a new project and wish to work on an existing
 project then follow the steps below:
 
 - Go to [fmtm](https://fmtm.hotosm.org/) .
