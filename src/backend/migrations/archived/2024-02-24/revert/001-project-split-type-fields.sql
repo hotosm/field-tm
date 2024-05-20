@@ -16,8 +16,8 @@ BEGIN
 END $$;
 -- Remove extra fields
 ALTER TABLE IF EXISTS public.projects
-    DROP COLUMN IF EXISTS task_split_dimension,
-    DROP COLUMN IF EXISTS task_num_buildings;
+DROP COLUMN IF EXISTS task_split_dimension,
+DROP COLUMN IF EXISTS task_num_buildings;
 -- Remove enum
 DROP TYPE IF EXISTS public.tasksplittype;
 -- Commit the transaction

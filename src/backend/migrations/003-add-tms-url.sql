@@ -5,6 +5,6 @@
 BEGIN;
 
 ALTER TABLE IF EXISTS public.projects
-    ADD COLUMN IF NOT EXISTS custom_tms_url VARCHAR;
+ADD COLUMN IF NOT EXISTS custom_tms_url VARCHAR;
 -- Commit the transaction
 COMMIT;

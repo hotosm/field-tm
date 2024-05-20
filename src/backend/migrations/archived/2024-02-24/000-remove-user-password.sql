@@ -1,4 +1,5 @@
--- ## Migration to remove password field from public.users (replaced with OSM OAuth)
+-- ## Migration to remove password field from public.users
+-- ## (replaced with OSM OAuth)
 
 -- Start a transaction
 BEGIN;

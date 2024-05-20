@@ -22,8 +22,8 @@ ALTER TYPE public.communitytype OWNER TO fmtm;
 
 -- Add the community_type column to organisations table
 ALTER TABLE IF EXISTS public.organisations
-    ADD COLUMN IF NOT EXISTS community_type public.communitytype
-    DEFAULT 'OSM_COMMUNITY';
+ADD COLUMN IF NOT EXISTS community_type public.communitytype
+DEFAULT 'OSM_COMMUNITY';
 
 -- Commit the transaction
 COMMIT;

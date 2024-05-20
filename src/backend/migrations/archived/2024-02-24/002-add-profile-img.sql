@@ -5,6 +5,6 @@
 BEGIN;
 
 ALTER TABLE IF EXISTS public.users
-    ADD COLUMN IF NOT EXISTS profile_img VARCHAR;
+ADD COLUMN IF NOT EXISTS profile_img VARCHAR;
 -- Commit the transaction
 COMMIT;

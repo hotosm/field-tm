@@ -13,8 +13,8 @@ DROP INDEX IF EXISTS ix_tasks_qr_code_id;
 
 -- Update field in tasks table
 ALTER TABLE IF EXISTS public.tasks
-    DROP COLUMN IF EXISTS qr_code_id,
-    ADD COLUMN IF NOT EXISTS odk_token VARCHAR;
+DROP COLUMN IF EXISTS qr_code_id,
+ADD COLUMN IF NOT EXISTS odk_token VARCHAR;
 
 -- Commit the transaction
 COMMIT;

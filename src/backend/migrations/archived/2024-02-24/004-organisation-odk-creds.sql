@@ -9,10 +9,10 @@ BEGIN;
 
 -- Add fields to organisations table
 ALTER TABLE IF EXISTS public.organisations
-    ADD COLUMN IF NOT EXISTS approved BOOLEAN DEFAULT false,
-    ADD COLUMN IF NOT EXISTS odk_central_url VARCHAR,
-    ADD COLUMN IF NOT EXISTS odk_central_user VARCHAR,
-    ADD COLUMN IF NOT EXISTS odk_central_password VARCHAR;
+ADD COLUMN IF NOT EXISTS approved BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS odk_central_url VARCHAR,
+ADD COLUMN IF NOT EXISTS odk_central_user VARCHAR,
+ADD COLUMN IF NOT EXISTS odk_central_password VARCHAR;
 
 -- Create visibility enum if it doesn't exist
 DO $$
@@ -29,9 +29,9 @@ ALTER TYPE public.projectvisibility OWNER TO fmtm;
 
 -- Add field to projects table
 ALTER TABLE IF EXISTS public.projects
-    DROP COLUMN IF EXISTS private,
-    ADD COLUMN IF NOT EXISTS visibility public.projectvisibility
-        NOT NULL DEFAULT 'PUBLIC';
+DROP COLUMN IF EXISTS private,
+ADD COLUMN IF NOT EXISTS visibility public.projectvisibility
+NOT NULL DEFAULT 'PUBLIC';
 
 -- Commit the transaction
 COMMIT;
