@@ -300,7 +300,7 @@ const SubmissionsTable = ({ toggleView }) => {
                         setSubmittedBy(e.target.value);
                       }}
                     ></input>
-                    <i className="material-icons fmtm-text-[#9B9999] fmtm-cursor-pointer">search</i>
+                    <AssetModules.SearchIcon className="fmtm-text-[#9B9999] fmtm-cursor-pointer" />
                   </div>
                 </div>
                 <Button

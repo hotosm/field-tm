@@ -137,7 +137,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }: 
                 placeholder="Search Projects"
                 onChange={(e) => onSearch(e.target.value)}
               ></input>
-              <i className="material-icons">search</i>
+              <AssetModules.SearchIcon />
             </div>
           </div>
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">

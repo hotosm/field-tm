@@ -4,7 +4,6 @@
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
-    "checkJs": true,
     "skipLibCheck": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
@@ -16,13 +15,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    // "jsx": "react-jsx",
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "noImplicitAny": false, //FIXME: Change This "true" to "false" To Integrate Types Instead Of "Any" Types.
+    // Once all (var: any) definitions are removed, enable this for strict checking
+    "noImplicitAny": false,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
@@ -31,14 +30,8 @@
     "strictPropertyInitialization": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["@testing-library/jest-dom"]
+    "types": ["@testing-library/jest-dom", "vite-plugin-pwa/react"]
   },
-  "include": [
-    // ".eslintrc.cjs",
-    // ".eslintrc.js",
-    "src",
-    "src/**/*.ts",
-    "tests"
-  ],
+  "include": ["src", "src/**/*.ts", "tests"],
   "exclude": ["node_modules", "dist"]
 }
