@@ -236,7 +236,6 @@ def create_odk_xform(
 def delete_odk_xform(
     project_id: int,
     xform_id: str,
-    filespec: str,
     odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
 ):
     """Delete an XForm from a remote ODK Central server."""
@@ -954,12 +953,11 @@ def upload_media(
 def download_media(
     project_id: int,
     xform_id: str,
-    filespec: str,
+    filename: str = "test",
     odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
 ):
     """Upload a data file to Central."""
     xform = get_odk_form(odk_central)
-    filename = "test"
     xform.getMedia(project_id, xform_id, filename)
 
 
