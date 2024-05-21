@@ -60,11 +60,10 @@ router = APIRouter(
 @router.get("/download-template-xlsform")
 async def download_template(
     category: XLSFormType,
-    current_user: AuthUser = Depends(login_required),
 ):
     """Download an XLSForm template to fill out."""
     xlsform_path = f"{xlsforms_path}/{category}.xls"
-    if Path(xlsform_path).exists:
+    if Path(xlsform_path).exists():
         return FileResponse(xlsform_path, filename="form.xls")
     else:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Form not found")

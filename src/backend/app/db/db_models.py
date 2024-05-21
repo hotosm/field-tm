@@ -271,10 +271,7 @@ class DbXLSForm(Base):
     # The XLSForm name is the only unique thing we can use for a key
     # so on conflict update works. Otherwise we get multiple entries.
     title = cast(str, Column(String, unique=True))
-    category = cast(str, Column(String))
-    description = cast(str, Column(String))
-    xml = cast(str, Column(String))  # Internal form representation
-    xls = cast(bytes, Column(LargeBinary))  # Human readable representation
+    xls = cast(bytes, Column(LargeBinary))
 
 
 class DbXForm(Base):

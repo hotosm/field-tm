@@ -178,6 +178,8 @@ class Settings(BaseSettings):
         if frontend_domain := info.data.get("FMTM_DOMAIN"):
             default_origins = [
                 f"{url_scheme}://{frontend_domain}{local_server_port}",
+                # Also add the xlsform-editor url
+                "https://xlsforms.fmtm.dev",
             ]
 
         if val is None:
