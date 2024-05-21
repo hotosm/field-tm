@@ -107,7 +107,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
         per_task_instructions: projectDetails.per_task_instructions,
       },
       // Use split task areas, or project area if no task splitting
-      outline_geojson: dividedTaskGeojson || drawnGeojson,
+      outline_geojson: drawnGeojson,
       odk_central_url: projectDetails.odk_central_url,
       odk_central_user: projectDetails.odk_central_user,
       odk_central_password: projectDetails.odk_central_password,
