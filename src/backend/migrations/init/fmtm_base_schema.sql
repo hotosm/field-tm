@@ -540,9 +540,6 @@ ALTER TABLE public.users OWNER TO fmtm;
 CREATE TABLE public.xlsforms (
     id integer NOT NULL,
     title character varying,
-    category character varying,
-    description character varying,
-    xml character varying,
     xls bytea
 );
 ALTER TABLE public.xlsforms OWNER TO fmtm;

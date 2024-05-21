@@ -18,12 +18,11 @@
 """Logic for FMTM project routes."""
 
 import json
-import os
 import subprocess
 import uuid
 from asyncio import gather
-from importlib.resources import files as pkg_files
 from io import BytesIO
+from pathlib import Path
 from typing import List, Optional, Union
 
 import geoalchemy2
@@ -43,8 +42,7 @@ from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import entities_registration, xlsforms_path
 from osm_rawdata.postgres import PostgresClient
 from shapely.geometry import shape
-from sqlalchemy import and_, column, func, inspect, select, table, text
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import and_, column, func, select, table, text
 from sqlalchemy.orm import Session
 
 from app.central import central_crud, central_deps
@@ -524,48 +522,58 @@ async def split_geojson_into_tasks(
 # ---------------------------
 
 
-async def read_xlsforms(
-    db: Session,
-    directory: str,
-):
-    """Read the list of XLSForms from the disk."""
-    xlsforms = list()
-    package_name = "osm_fieldwork"
-    package_files = pkg_files(package_name)
-    for xls in os.listdir(directory):
-        if xls.endswith(".xls") or xls.endswith(".xlsx"):
-            file_name = xls.split(".")[0]
-            yaml_file_name = f"data_models/{file_name}.yaml"
-            if package_files.joinpath(yaml_file_name).is_file():
-                xlsforms.append(xls)
-            else:
-                continue
-
-    inspect(db_models.DbXLSForm)
-    forms = table(
-        "xlsforms", column("title"), column("xls"), column("xml"), column("id")
+async def read_and_insert_xlsforms(db, directory):
+    """Read the list of XLSForms from the disk and insert to DB."""
+    existing_titles = set(
+        title for (title,) in db.query(db_models.DbXLSForm.title).all()
     )
-    # x = Table('xlsforms', MetaData())
-    # x.primary_key.columns.values()
+    xlsforms_on_disk = [
+        file.stem
+        for file in Path(directory).glob("*.xls")
+        if not file.stem.startswith("entities")
+    ]
 
-    for xlsform in xlsforms:
-        infile = f"{directory}/{xlsform}"
-        if os.path.getsize(infile) <= 0:
-            log.warning(f"{infile} is empty!")
+    # Insert new XLSForms to DB and update existing ones
+    for xlsform_name in xlsforms_on_disk:
+        file_path = Path(directory) / f"{xlsform_name}.xls"
+
+        if file_path.stat().st_size == 0:
+            log.warning(f"{file_path} is empty!")
             continue
-        xls = open(infile, "rb")
-        name = xlsform.split(".")[0]
-        data = xls.read()
-        xls.close()
-        # log.info(xlsform)
-        ins = insert(forms).values(title=name, xls=data)
-        sql = ins.on_conflict_do_update(
-            constraint="xlsforms_title_key", set_=dict(title=name, xls=data)
-        )
-        db.execute(sql)
-        db.commit()
 
-    return xlsforms
+        with open(file_path, "rb") as xls:
+            data = xls.read()
+
+        try:
+            insert_query = text(
+                """
+                INSERT INTO xlsforms (title, xls)
+                VALUES (:title, :xls)
+                ON CONFLICT (title) DO UPDATE SET
+                title = EXCLUDED.title, xls = EXCLUDED.xls
+            """
+            )
+            db.execute(insert_query, {"title": xlsform_name, "xls": data})
+            db.commit()
+            log.info(f"Inserted or updated {xlsform_name} xlsform to database")
+
+        except Exception as e:
+            log.error(
+                f"Failed to insert or update {xlsform_name} in the database. Error: {e}"
+            )
+
+    # Delete XLSForms from DB that are not found on disk
+    for title in existing_titles - set(xlsforms_on_disk):
+        delete_query = text(
+            """
+            DELETE FROM xlsforms WHERE title = :title
+        """
+        )
+        db.execute(delete_query, {"title": title})
+        db.commit()
+        log.info(f"Deleted {title} from the database as it was not found on disk.")
+
+    return xlsforms_on_disk
 
 
 async def get_odk_id_for_project(db: Session, project_id: int):

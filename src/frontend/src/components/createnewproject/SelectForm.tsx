@@ -135,7 +135,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 </p>
               </div>
               <CustomCheckbox
-                key="fillODKCredentials"
+                key="uploadCustomXForm"
                 label="Upload a custom XLSForm instead"
                 checked={formValues.formWays === 'custom_form'}
                 onCheckedChange={(status) => {
@@ -146,17 +146,46 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   }
                 }}
                 className="fmtm-text-black"
+                labelClickable
+                disabled={!formValues.formCategorySelection}
               />
               {formValues.formWays === 'custom_form' ? (
-                <FileInputComponent
-                  onChange={changeFileHandler}
-                  onResetFile={resetFile}
-                  customFile={customFormFile}
-                  btnText="Select a Form"
-                  accept=".xls,.xlsx,.xml"
-                  fileDescription="*The supported file formats are .xlsx, .xls, .xml"
-                  errorMsg={errors.customFormUpload}
-                />
+                <div>
+                  <p className="fmtm-text-base fmtm-mt-2">
+                    Please extend upon the existing XLSForm for the selected category:
+                  </p>
+                  <p className="fmtm-text-base fmtm-mt-2">
+                    <a
+                      href={`${import.meta.env.VITE_API_URL}/helper/download-template-xlsform?category=${
+                        formValues.formCategorySelection
+                      }`}
+                      target="_"
+                      className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+                    >
+                      Download Form
+                    </a>
+                  </p>
+                  <p className="fmtm-text-base fmtm-mt-2">
+                    <a
+                      href={`https://xlsforms.fmtm.dev/?url=${
+                        import.meta.env.VITE_API_URL
+                      }/helper/download-template-xlsform?category=${formValues.formCategorySelection}`}
+                      target="_"
+                      className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+                    >
+                      Edit Interactively
+                    </a>
+                  </p>
+                  <FileInputComponent
+                    onChange={changeFileHandler}
+                    onResetFile={resetFile}
+                    customFile={customFormFile}
+                    btnText="Select a Form"
+                    accept=".xls,.xlsx,.xml"
+                    fileDescription="*The supported file formats are .xlsx, .xls, .xml"
+                    errorMsg={errors.customFormUpload}
+                  />
+                </div>
               ) : null}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
