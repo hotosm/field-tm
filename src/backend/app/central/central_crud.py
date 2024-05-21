@@ -358,21 +358,6 @@ async def update_project_xform(
     xform_obj.publishForm(odk_id, form_name)
 
 
-def download_submissions(
-    project_id: int,
-    xform_id: str,
-    submission_id: Optional[str] = None,
-    get_json: bool = True,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
-):
-    """Download all submissions for an XForm."""
-    xform = get_odk_form(odk_central)
-    # FIXME: should probably filter by timestamps or status value
-    data = xform.getSubmissions(project_id, xform_id, submission_id, True, get_json)
-    fixed = str(data, "utf-8")
-    return fixed.splitlines()
-
-
 async def read_and_test_xform(
     input_data: BytesIO,
     form_file_ext: str,
