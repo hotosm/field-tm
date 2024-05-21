@@ -314,48 +314,6 @@ def get_all_submissions_json(db: Session, project_id):
     return submissions
 
 
-# TODO delete me
-# def get_project_submission(db: Session, project_id: int):
-#     """Get."""
-#     get_project_sync = async_to_sync(project_crud.get_project)
-#     project_info = get_project_sync(db, project_id)
-
-#     # Return empty list if project is not found
-#     if not project_info:
-#         raise HTTPException(status_code=404, detail="Project not found")
-
-#     odkid = project_info.odkid
-#     project_name = project_info.project_name_prefix
-#     form_category = project_info.xform_title
-#     project_tasks = project_info.tasks
-
-#     # ODK Credentials
-#     odk_credentials = project_schemas.ODKCentralDecrypted(
-#         odk_central_url=project_info.odk_central_url,
-#         odk_central_user=project_info.odk_central_user,
-#         odk_central_password=project_info.odk_central_password,
-#     )
-
-#     # Get ODK Form with odk credentials from the project.
-#     xform = get_odk_form(odk_credentials)
-
-#     submissions = []
-
-#     task_list = [x.id for x in project_tasks]
-#     for id in task_list:
-#         xml_form_id = f"{project_name}_{form_category}_{id}"
-#         file = xform.getSubmissions(odkid, xml_form_id, None, False, True)
-#         if not file:
-#             json_data = None
-#         else:
-#             json_data = json.loads(file)
-#             json_data_value = json_data.get("value")
-#             if json_data_value:
-#                 submissions.extend(json_data_value)
-
-#     return submissions
-
-
 async def download_submission_in_json(db: Session, project_id: int):
     """Download submission data from ODK Central."""
     project = await project_crud.get_project(db, project_id)
