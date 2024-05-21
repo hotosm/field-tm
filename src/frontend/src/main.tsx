@@ -81,28 +81,24 @@ axios.interceptors.request.use(
   }
   console.log('Adding Matomo');
 
-  // Set matomo tracking id
-  window.site_id = environment.matomoTrackingId;
-
-  // Create optout-form div for banner
-  const optoutDiv = document.createElement('div');
-  optoutDiv.id = 'optout-form'; // Set an ID if needed
-  document.body.appendChild(optoutDiv);
-
-  // Load CDN script
-  const script = document.createElement('script');
-  script.src = 'https://cdn.hotosm.org/tracking-v3.js';
-  document.body.appendChild(script);
-  // Manually trigger DOMContentLoaded, that script hooks
-  // https://github.com/hotosm/matomo-tracking/blob/9b95230cb5f0bf2a902f00379152f3af9204c641/tracking-v3.js#L125
-  script.onload = () => {
-    optoutDiv.dispatchEvent(
-      new Event('DOMContentLoaded', {
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
-  };
+  var _paq = (window._paq = window._paq || []);
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['requireConsent']);
+  _paq.push(['setDomains', ['fmtm.hotosm.org']]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']); // Tracks downloads
+  _paq.push(['trackVisibleContentImpressions']); // Tracks content blocks
+  (function () {
+    var u = '//matomo.hotosm.org/';
+    _paq.push(['setTrackerUrl', u + 'matomo.php']);
+    _paq.push(['setSiteId', environment.matomoTrackingId]);
+    var d = document,
+      g = d.createElement('script'),
+      s = d.getElementsByTagName('script')[0];
+    g.async = true;
+    g.src = u + 'matomo.js';
+    s.parentNode.insertBefore(g, s);
+  })();
 })();
 
 // React 17 setup
