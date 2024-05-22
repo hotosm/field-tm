@@ -86,7 +86,7 @@ nav:
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
       - Production Deployment: dev/Production.md
-      - Deployment Flow: dev/Deployment-Flow.md
+      - Release Cycle: dev/Release-Cycle.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
       - Pre-Commit: https://docs.hotosm.org/dev-guide/pre-commit/
