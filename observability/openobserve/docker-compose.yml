@@ -15,8 +15,6 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-version: "3"
-
 volumes:
   fmtm_monitoring_data:
     name: fmtm-monitoring-data-${GIT_BRANCH:-local}
