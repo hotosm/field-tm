@@ -37,7 +37,8 @@ run-without-central:
 run-with-josm:
   docker compose \
     -f docker-compose.yml \
-    -f josm/docker-compose.yml \
+    -f contrib/josm/docker-compose.yml \
+    up -d
     up -d
 
 stop:
@@ -94,7 +95,7 @@ docs-pdf:
   MDS := \
     docs/dev/Backend.md \
     docs/dev/Database-Tips.md \
-    docs/dev/Deployment-Flow.md \
+    docs/dev/Release-Cycle.md \
     docs/dev/Frontend.md \
     docs/dev/Production.md \
     docs/dev/Version-Control.md \
