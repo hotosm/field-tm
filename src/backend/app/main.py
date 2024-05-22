@@ -23,7 +23,7 @@ import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
@@ -196,7 +196,7 @@ api = get_api()
 
 @api.exception_handler(RequestValidationError)
 async def validation_exception_handler(
-    # request: Request,
+    request: Request,  # dead: disable
     exc: RequestValidationError,
 ):
     """Exception handler for more descriptive logging and traces."""
