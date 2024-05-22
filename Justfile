@@ -39,6 +39,12 @@ run-with-josm:
     -f docker-compose.yml \
     -f contrib/josm/docker-compose.yml \
     up -d
+
+run-with-tunnels:
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/fmtm/docker-compose.yml \
+    -f contrib/tunnel/odk/docker-compose.yml \
     up -d
 
 stop:
