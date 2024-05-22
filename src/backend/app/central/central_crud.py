@@ -583,7 +583,6 @@ async def update_survey_xform(
     form_category_update = root.find(
         ".//xforms:bind[@nodeset='/data/all/form_category']", namespaces
     )
-    log.warning(form_category_update)
     if form_category_update is not None:
         form_category_update.set("calculate", f"once('{category}')")
 
