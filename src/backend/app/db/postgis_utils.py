@@ -537,7 +537,9 @@ def get_address_from_lat_lon(latitude, longitude):
     }
     headers = {"Accept-Language": "en"}  # Set the language to English
 
-    log.debug("Getting Nominatim address from project centroid")
+    log.debug(
+        f"Getting Nominatim address from project lat ({latitude}) lon ({longitude})"
+    )
     response = requests.get(base_url, params=params, headers=headers)
     if (status_code := response.status_code) != 200:
         log.error(f"Getting address string failed: {status_code}")
