@@ -149,8 +149,7 @@ class ProjectIn(BaseModel):
     task_num_buildings: Optional[int] = None
     data_extract_type: Optional[str] = None
     outline_geojson: Union[FeatureCollection, Feature, Polygon]
-    # city: str
-    # country: str
+    location_str: Optional[str] = None
 
     @computed_field
     @property
@@ -172,17 +171,6 @@ class ProjectIn(BaseModel):
 
     @computed_field
     @property
-    def location_str(self) -> Optional[str]:
-        """Compute geocoded location string from centroid."""
-        if not self.centroid:
-            return None
-        geom = read_wkb(self.centroid)
-        latitude, longitude = geom.y, geom.x
-        address = get_address_from_lat_lon(latitude, longitude)
-        return address if address is not None else ""
-
-    @computed_field
-    @property
     def project_name_prefix(self) -> str:
         """Compute project name prefix with underscores."""
         return self.project_info.name.replace(" ", "_").lower()
@@ -200,6 +188,27 @@ class ProjectIn(BaseModel):
             hashtags_with_hash.append("#FMTM")
 
         return hashtags_with_hash
+
+    @model_validator(mode="after")
+    def generate_location_str(self) -> Self:
+        """Generate location string after centroid is generated.
+
+        NOTE chaining computed_field didn't seem to work here so a
+        model_validator was used for final stage validation.
+        """
+        if not self.centroid:
+            log.warning("Project has no centroid, location string not determined")
+            return self
+
+        if self.location_str is not None:
+            # Prevent running triggering multiple times if already set
+            return self
+
+        geom = read_wkb(self.centroid)
+        latitude, longitude = geom.y, geom.x
+        address = get_address_from_lat_lon(latitude, longitude)
+        self.location_str = address if address is not None else ""
+        return self
 
 
 class ProjectUpload(ProjectIn, ODKCentralIn):
