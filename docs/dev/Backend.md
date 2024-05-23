@@ -283,7 +283,7 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
   docker compose \
     -f docker-compose.yml \
     -f contrib/tunnel/fmtm/docker-compose.yml \
-    logs api-tunnel
+    logs fmtm-tunnel
   ```
 
 - Now the final step is to add the provided tunnel URL to the allowed CORS
@@ -320,7 +320,7 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
    (required for form download URLs):
 
    ```bash
-   CENTRAL_DOMAIN_OVERRIDE=tramadol-handbags-protecting-date.trycloudflare.com \
+   CENTRAL_DOMAIN_OVERRIDE=the-domain-without-protocol.trycloudflare.com \
      docker compose restart central
    ```
 
