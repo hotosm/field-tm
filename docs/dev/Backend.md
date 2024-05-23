@@ -286,17 +286,12 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
     logs api-tunnel
   ```
 
-- Now the final step is to add the provided tunnel URL to the allowed CORS origins.
-- Add to your `.env` file:
-
-  ```dotenv
-  EXTRA_CORS_ORIGINS=https://the-url-you-were-given.trycloudflare.com
-  ```
-
-- Then restart your API service:
+- Now the final step is to add the provided tunnel URL to the allowed CORS
+  origins on API startup:
 
   ```bash
-  docker compose restart api
+  EXTRA_CORS_ORIGINS=https://the-url-you-were-given.trycloudflare.com \
+    docker compose restart api
   ```
 
 ### Using local ODK Central on mobile
@@ -326,7 +321,7 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
 
    ```bash
    CENTRAL_DOMAIN_OVERRIDE=tramadol-handbags-protecting-date.trycloudflare.com \
-     docker compose up -d central
+     docker compose restart central
    ```
 
 2. Requirement: During project creation, set the ODK Central server URL to the
