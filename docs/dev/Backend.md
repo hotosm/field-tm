@@ -270,34 +270,34 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
   solution for this (an alternative is Ngrok).
 - To run the tunnel to the FMTM API:
 
-```bash
-docker compose \
-  -f docker-compose.yml \
-  -f contrib/tunnel/fmtm/docker-compose.yml \
-  up -d
-```
+  ```bash
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/fmtm/docker-compose.yml \
+    up -d
+  ```
 
-View the website to access FMTM remotely (e.g. via mobile):
+- View the website to access FMTM remotely (e.g. via mobile):
 
-```bash
-docker compose \
-  -f docker-compose.yml \
-  -f contrib/tunnel/fmtm/docker-compose.yml \
-  logs api-tunnel
-```
+  ```bash
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/fmtm/docker-compose.yml \
+    logs api-tunnel
+  ```
 
 - Now the final step is to add the provided tunnel URL to the allowed CORS origins.
 - Add to your `.env` file:
 
-```dotenv
-EXTRA_CORS_ORIGINS=https://the-url-you-were-given.trycloudflare.com
-```
+  ```dotenv
+  EXTRA_CORS_ORIGINS=https://the-url-you-were-given.trycloudflare.com
+  ```
 
 - Then restart your API service:
 
-```bash
-docker compose restart api
-```
+  ```bash
+  docker compose restart api
+  ```
 
 ### Using local ODK Central on mobile
 
@@ -305,26 +305,36 @@ docker compose restart api
   on your mobile.
 - To run the tunnel to the ODK Central API:
 
-```bash
-docker compose \
-  -f docker-compose.yml \
-  -f contrib/tunnel/odk/docker-compose.yml \
-  up -d
-```
+  ```bash
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/odk/docker-compose.yml \
+    up -d
+  ```
 
-- During project creation, set the ODK Central server URL to the provided tunnel
-  address for the ODK Central API:
+- View the website to access ODK Central remotely (e.g. via mobile):
 
-```bash
-docker compose \
-  -f docker-compose.yml \
-  -f contrib/tunnel/odk/docker-compose.yml \
-  logs central-tunnel
-```
+  ```bash
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/odk/docker-compose.yml \
+    logs central-tunnel
+  ```
 
-> The credentials for the local ODK Central instance are:
-> Username: <admin@hotosm.org>
-> Password: Password1234
+1. Requirement: Restart ODK Central using the domain override
+   (required for form download URLs):
+
+   ```bash
+   CENTRAL_DOMAIN_OVERRIDE=tramadol-handbags-protecting-date.trycloudflare.com \
+     docker compose up -d central
+   ```
+
+2. Requirement: During project creation, set the ODK Central server URL to the
+   provided tunnel URL for the ODK Central API.
+
+   > The credentials for the local ODK Central instance are:
+   > Username: <admin@hotosm.org>
+   > Password: Password1234
 
 - Now when you access the project via a QRCode on mobile, the connection to ODK
   Central should work.
