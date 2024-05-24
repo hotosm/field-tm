@@ -299,6 +299,22 @@ export const GetProjectTaskActivity = (url) => {
   };
 };
 
+export const UpdateEntityStatus = (url, payload) => {
+  return async (dispatch) => {
+    const updateEntityStatus = async (url, payload) => {
+      try {
+        dispatch(ProjectActions.UpdateEntityStatusLoading(true));
+        const response = await CoreModules.axios.post(url, payload);
+        dispatch(ProjectActions.UpdateEntityStatus(response.data));
+        dispatch(ProjectActions.UpdateEntityStatusLoading(false));
+      } catch (error) {
+        dispatch(ProjectActions.UpdateEntityStatusLoading(false));
+      }
+    };
+    await updateEntityStatus(url, payload);
+  };
+};
+
 export const DownloadSubmissionGeojson = (url, projectName) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(true));

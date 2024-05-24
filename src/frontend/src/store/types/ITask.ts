@@ -4,7 +4,7 @@ export type TaskStateTypes = {
   taskLoading: boolean;
   taskInfo: taskSubmissionInfoType[];
   selectedTask: number | null;
-  selectedFeatureProps: number | null;
+  selectedFeatureProps: TaskFeatureSelectionProperties;
   projectBoundaryLoading: boolean;
   projectBoundary: [];
   convertToOsmLoading: boolean;
@@ -17,4 +17,12 @@ export type TaskStateTypes = {
 type downloadSubmissionLoadingTypes = {
   type: '' | 'json' | 'csv';
   loading: boolean;
+};
+
+export type TaskFeatureSelectionProperties = {
+  osm_id: number;
+  tags: string;
+  timestamp: string;
+  version: number;
+  changeset: number;
 };

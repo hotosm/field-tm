@@ -21,6 +21,14 @@ const UpdateTaskStatus = (url, style, existingData, currentProjectId, feature, m
         const updatedProperties = { ...prevProperties, locked_by_user: isTaskLocked ? body.id : null };
         feature.setProperties(updatedProperties);
 
+        dispatch(
+          ProjectActions.UpdateProjectTaskBoundries({
+            projectId: currentProjectId,
+            taskId,
+            locked_by_uid: body?.id,
+            locked_by_username: body?.username,
+          }),
+        );
         dispatch(CommonActions.SetLoading(false));
         dispatch(
           HomeActions.SetSnackBar({

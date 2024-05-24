@@ -1,28 +1,65 @@
 // Popup used to display task feature info & link to ODK Collect
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-
-type TaskFeatureSelectionProperties = {
-  osm_id: number;
-  tags: string;
-  timestamp: string;
-  version: number;
-  changeset: number;
-};
+import environment from '@/environment';
+import { useParams } from 'react-router-dom';
+import { UpdateEntityStatus } from '@/api/Project';
+import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
+import ProjectTaskStatus from '@/api/ProjectTaskStatus';
+import MapStyles from '@/hooks/MapStyles';
 
 type TaskFeatureSelectionPopupPropType = {
   featureProperties: TaskFeatureSelectionProperties | null;
+  taskId: number;
+  taskFeature: Record<string, any>;
+  map: any;
+  view: any;
 };
 
-const TaskFeatureSelectionPopup = ({ featureProperties }: TaskFeatureSelectionPopupPropType) => {
+const TaskFeatureSelectionPopup = ({
+  featureProperties,
+  taskId,
+  taskFeature,
+  map,
+  view,
+}: TaskFeatureSelectionPopupPropType) => {
   const dispatch = CoreModules.useAppDispatch();
+  const params = useParams();
+  const geojsonStyles = MapStyles();
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
   const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const entityOsmMap = CoreModules.useAppSelector((state) => state.project.entityOsmMap);
+
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const currentProjectId = params.id;
+  const [task_status, set_task_status] = useState('READY');
+  const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
+  const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
+  const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const updateEntityStatusLoading = CoreModules.useAppSelector((state) => state.project.updateEntityStatusLoading);
+  const currentTaskInfo = {
+    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
+      return task?.index == taskId;
+    })?.[0],
+  };
+  const geoStyle = geojsonStyles['LOCKED_FOR_MAPPING'];
+  const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
+
+  useEffect(() => {
+    if (projectIndex != -1) {
+      const currentStatus = projectTaskActivityList.length > 0 ? projectTaskActivityList[0].status : 'READY';
+      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex((data) => data?.label == currentStatus);
+      const tasksStatus =
+        taskFeature?.id_ != undefined ? environment?.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
+      set_task_status(tasksStatus);
+    }
+  }, [projectTaskActivityList, taskId, taskFeature, entityOsmMap]);
+
   return (
     <div
       className={`fmtm-duration-1000 fmtm-z-[10002] fmtm-h-fit ${
@@ -76,30 +113,61 @@ const TaskFeatureSelectionPopup = ({ featureProperties }: TaskFeatureSelectionPo
             </p>
           </div>
         </div>
-
-        <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
-          <Button
-            btnText="MAP FEATURE IN ODK"
-            btnType="primary"
-            type="submit"
-            className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
-            onClick={() => {
-              // XForm name is constructed from lower case project title with underscores
-              const projectName = projectInfo.title.toLowerCase().split(' ').join('_');
-              const projectCategory = projectInfo.xform_category;
-              const formName = `${projectName}_${projectCategory}`;
-
-              const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
-              const entityUuid = entity ? entity.id : null;
-
-              if (!formName || !entityUuid) {
-                return;
+        {(task_status === 'READY' || task_status === 'LOCKED_FOR_MAPPING') && (
+          <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
+            <Button
+              btnText="MAP FEATURE IN ODK"
+              btnType="primary"
+              type="submit"
+              className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+              disabled={
+                (task_status === 'LOCKED_FOR_MAPPING' &&
+                  authDetails &&
+                  currentTaskInfo?.locked_by_uid !== authDetails?.id) ||
+                entity?.status !== 0
               }
+              isLoading={updateEntityStatusLoading}
+              onClick={() => {
+                // XForm name is constructed from lower case project title with underscores
+                const projectName = projectInfo.title.toLowerCase().split(' ').join('_');
+                const projectCategory = projectInfo.xform_category;
+                const formName = `${projectName}_${projectCategory}`;
 
-              document.location.href = `odkcollect://form/${formName}?existing=${entityUuid}`;
-            }}
-          />
-        </div>
+                const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
+                const entityUuid = entity ? entity.id : null;
+
+                if (!formName || !entityUuid) {
+                  return;
+                }
+                dispatch(
+                  UpdateEntityStatus(`${import.meta.env.VITE_API_URL}/projects/${currentProjectId}/entity/status`, {
+                    entity_id: entityUuid,
+                    status: 1,
+                    label: '',
+                  }),
+                );
+                if (task_status === 'READY') {
+                  dispatch(
+                    ProjectTaskStatus(
+                      `${import.meta.env.VITE_API_URL}/tasks/${currentTaskInfo?.id}/new-status/1`,
+                      geoStyle,
+                      taskBoundaryData,
+                      currentProjectId,
+                      taskFeature,
+                      map,
+                      view,
+                      taskId,
+                      authDetails,
+                      { project_id: currentProjectId },
+                    ),
+                  );
+                }
+
+                document.location.href = `odkcollect://form/${formName}?existing=${entityUuid}`;
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
