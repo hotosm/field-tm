@@ -17,7 +17,6 @@
 ARG PYTHON_IMG_TAG=3.10
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-01-01T16-36-33Z}
 FROM docker.io/minio/minio:${MINIO_TAG} as minio
-FROM docker.io/protomaps/go-pmtiles:v1.19.0 as go-pmtiles
 
 
 # Includes all labels and timezone info to extend from
@@ -121,9 +120,6 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/
-# Copy go-pmtiles until for mbtiles-->pmtiles conversion
-# FIXME osm-fieldwork should do this, but is currently broken
-COPY --from=go-pmtiles /go-pmtiles /usr/local/bin/pmtiles
 COPY *-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime

@@ -18,7 +18,6 @@
 """Logic for FMTM project routes."""
 
 import json
-import subprocess
 import uuid
 from asyncio import gather
 from io import BytesIO
@@ -1484,32 +1483,15 @@ def get_project_tiles(
             f"tms={tms}"
         )
 
-        # TODO replace this temp workaround with osm-fieldwork code
-        # TODO to generate pmtiles directly instead of with go-pmtiles
-        if output_format == "pmtiles":
-            create_basemap_file(
-                boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
-                outfile=outfile.replace("pmtiles", "mbtiles"),
-                zooms=zooms,
-                outdir=tiles_dir,
-                source=source,
-                xy=False,
-                tms=tms,
-            )
-            subprocess.call(
-                "pmtiles convert " f"{outfile.replace('pmtiles', 'mbtiles')} {outfile}",
-                shell=True,
-            )
-        else:
-            create_basemap_file(
-                boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
-                outfile=outfile,
-                zooms=zooms,
-                outdir=tiles_dir,
-                source=source,
-                xy=False,
-                tms=tms,
-            )
+        create_basemap_file(
+            boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
+            outfile=outfile,
+            zooms=zooms,
+            outdir=tiles_dir,
+            source=source,
+            xy=False,
+            tms=tms,
+        )
 
         log.info(f"Basemap created for project ID {project_id}: {outfile}")
 
