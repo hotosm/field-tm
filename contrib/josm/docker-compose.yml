@@ -22,7 +22,7 @@ services:
   josm:
     image: "ghcr.io/hotosm/fmtm/josm:latest"
     build:
-      context: .
+      context: contrib/josm
     container_name: josm
     environment:
       - DISPLAY=josm-novnc:0.0
@@ -32,13 +32,13 @@ services:
       - fmtm-net
       - x11
     ports:
-      - 8111:80
+      - "8111:80"
     restart: "unless-stopped"
 
   josm-novnc:
     image: "ghcr.io/hotosm/fmtm/josm-novnc:latest"
     build:
-      context: novnc
+      context: contrib/josm/novnc
     container_name: josm_novnc
     environment:
       - DISPLAY_WIDTH=1280

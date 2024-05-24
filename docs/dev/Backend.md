@@ -55,6 +55,9 @@ To run the local development setup without ODK Central (use external server):
 
 ```bash
 dc --profile no-odk up -d
+
+# Or via Just
+just start without-central
 ```
 
 ## 2. Start the API without Docker
@@ -93,6 +96,9 @@ The API should now be accessible at: <http://api.fmtm.localhost:7050/docs>
 
 ```bash
 docker compose up -d migrations
+
+# Or via Just
+just migrate
 ```
 
 ### Type Checking
@@ -166,6 +172,9 @@ To run the backend tests locally, run:
 
 ```bash
 docker compose run --rm api pytest
+
+# Or via Just
+just test backend
 ```
 
 To assess coverage of tests, run:
@@ -173,6 +182,9 @@ To assess coverage of tests, run:
 ```bash
 docker compose run --rm --entrypoint='sh -c' api \
   'coverage run -m pytest && coverage report -m'
+
+# Or via Just
+just test coverage
 ```
 
 To assess performance of endpoints:
@@ -208,19 +220,27 @@ Creating a new release during development may not always be feasible.
 The s3fs tool allows you to mount an S3 bucket on your filesystem,
 to browse like any other directory.
 
-Install:
-
-```bash
-sudo apt update
-sudo apt install s3fs
-```
-
 Create a credentials file:
 
 ```bash
 # Replace ACCESS_KEY_ID and SECRET_ACCESS_KEY
 echo ACCESS_KEY_ID:SECRET_ACCESS_KEY > ${HOME}/.passwd-s3fs
 chmod 600 ${HOME}/.passwd-s3fs
+```
+
+#### Mount local S3 using Just
+
+```bash
+just mount-s3
+```
+
+#### Mount S3 manually
+
+Install s3fs:
+
+```bash
+sudo apt update
+sudo apt install s3fs
 ```
 
 Mount your bucket:
@@ -248,88 +268,39 @@ url=http://s3.fmtm.localhost:7050 0 0`
 
 ### Running JOSM in the dev stack
 
-- Run JOSM with FMTM:
+- Run JOSM with FMTM via Just:
 
 ```bash
-docker compose \
-  -f docker-compose.yml \
-  -f contrib/josm/docker-compose.yml \
-  up -d
+just start josm
 ```
 
 This adds JOSM to the docker compose stack for local development.
-Access the JOSM Remote API: <http://localhost:8111>
-Access the JOSM GUI in browser: <http://localhost:8112>
 
 You can now call the JOSM API from FMTM and changes will be reflected in the GUI.
 
-### Debugging local FMTM on mobile
+### Debugging local services on mobile
 
 - It's difficult to debug services running on localhost from your mobile phone.
 - An easy way to do this is by tunneling: Cloudflare provides a great free
   solution for this (an alternative is Ngrok).
-- To run the tunnel to the FMTM API:
+- We may also wish to debug our local ODK Central instance forms on our mobile ODK
+  Collect.
+- To handle both of these instances set up tunnels for all services with:
 
-  ```bash
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/fmtm/docker-compose.yml \
-    up -d
-  ```
+```bash
+just start tunnel
+```
 
-- View the website to access FMTM remotely (e.g. via mobile):
+To complete this setup, two additional steps must be complete:
 
-  ```bash
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/fmtm/docker-compose.yml \
-    logs fmtm-tunnel
-  ```
+- **Requirement 1**: For login to work, use the temporary login.
 
-- Now the final step is to add the provided tunnel URL to the allowed CORS
-  origins on API startup:
+- **Requirement 2**: During project creation, set the ODK Central server URL
+  to the provided tunnel URL for the ODK Central API.
 
-  ```bash
-  EXTRA_CORS_ORIGINS=https://the-url-you-were-given.trycloudflare.com \
-    docker compose restart api
-  ```
+  > The credentials for the local ODK Central instance are:
+  > Username: <admin@hotosm.org>
+  > Password: Password1234
 
-### Using local ODK Central on mobile
-
-- Sometimes you wish to use a project in your local ODK Central, via ODK Collect
-  on your mobile.
-- To run the tunnel to the ODK Central API:
-
-  ```bash
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/odk/docker-compose.yml \
-    up -d
-  ```
-
-- View the website to access ODK Central remotely (e.g. via mobile):
-
-  ```bash
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/odk/docker-compose.yml \
-    logs central-tunnel
-  ```
-
-1. Requirement: Restart ODK Central using the domain override
-   (required for form download URLs):
-
-   ```bash
-   CENTRAL_DOMAIN_OVERRIDE=the-domain-without-protocol.trycloudflare.com \
-     docker compose restart central
-   ```
-
-2. Requirement: During project creation, set the ODK Central server URL to the
-   provided tunnel URL for the ODK Central API.
-
-   > The credentials for the local ODK Central instance are:
-   > Username: <admin@hotosm.org>
-   > Password: Password1234
-
-- Now when you access the project via a QRCode on mobile, the connection to ODK
-  Central should work.
+Now when you access the project via a QRCode on mobile, the connection to ODK
+Central should work.
