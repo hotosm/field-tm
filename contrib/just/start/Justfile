@@ -1,0 +1,140 @@
+# Copyright (c) 2024 Humanitarian OpenStreetMap Team
+#
+# This file is part of FMTM.
+#
+#     FMTM is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     FMTM is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
+#
+
+# Start FMTM
+[no-cd]
+default:
+  docker compose up -d
+
+# Start backend API only
+[no-cd]
+backend:
+  docker compose up -d api
+
+# Start frontend UI only
+[no-cd]
+frontend:
+  docker compose up -d ui
+
+# Start FMTM without ODK Central
+[no-cd]
+without-central:
+  docker compose --profile no-odk up -d
+
+# Start FMTM with JOSM
+[no-cd]
+josm:
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/josm/docker-compose.yml \
+    up -d
+  
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+  @echo " Access the JOSM Remote API: http://localhost:8111"
+  @echo " Access the JOSM GUI in browser: http://localhost:8112"
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+
+# Start FMTM with tunnels
+[no-cd]
+tunnel:
+  #!/usr/bin/env sh
+
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/docker-compose.yml \
+    up -d --wait
+
+  # Workaround to until PR merged:
+  # https://github.com/cloudflare/cloudflared/pull/1135
+  # Wait until services ready without HEALTHCHECK
+  sleep 5
+
+  fmtm_url=$(just --unstable start _get-tunnel-url 'frontend')
+  api_url=$(just --unstable start _get-tunnel-url 'api')
+  odk_url=$(just --unstable start _get-tunnel-url 'central')
+  s3_url=$(just --unstable start _get-tunnel-url 's3')
+
+  just --unstable dotenv update "EXTRA_CORS_ORIGINS" "${fmtm_url}"
+  just --unstable dotenv update "S3_ENDPOINT" "${s3_url}"
+
+  # Restart the API and UI with environment variables set
+  API_URL_OVERRIDE="${api_url}" docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/docker-compose.yml \
+    up -d api ui
+
+  # Restart ODK Central with domain override (for form download urls)
+  CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
+  docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/docker-compose.yml \
+    up -d central
+
+  just --unstable start _print-tunnel-urls "$fmtm_url" "$api_url" "$odk_url" "$s3_url"
+
+# View the URLs for created tunnels
+[no-cd]
+view-tunnel-urls:
+  #!/usr/bin/env sh
+
+  fmtm_url=$(just --unstable start _get-tunnel-url 'frontend')
+  api_url=$(just --unstable start _get-tunnel-url 'api')
+  odk_url=$(just --unstable start _get-tunnel-url 'central')
+  s3_url=$(just --unstable start _get-tunnel-url 's3')
+
+  just --unstable start _print-tunnel-urls "$fmtm_url" "$api_url" "$odk_url" "$s3_url"
+
+[no-cd]
+_get-tunnel-url service_name:
+  #!/usr/bin/env sh
+
+  service_url=$(docker compose \
+    -f docker-compose.yml \
+    -f contrib/tunnel/docker-compose.yml \
+    logs {{service_name}}-tunnel | \
+    grep 'Your quick Tunnel' -A 1 | tail -n 1 | \
+    sed -n 's/.*| *\(https:\/\/[^ ]*\).*/\1/p')
+
+  echo "$service_url"
+
+[no-cd]
+_print-tunnel-urls fmtm_url api_url odk_url s3_url:
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+  @echo "\033[0;34m FMTM URL: \033[0m"
+  @echo " {{fmtm_url}}"
+  @echo
+  @echo "\033[0;34m API URL: \033[0m"
+  @echo " {{api_url}}"
+  @echo
+  @echo "\033[0;34m ODK Central URL: \033[0m"
+  @echo " {{odk_url}}"
+  @echo
+  @echo "\033[0;34m S3 URL: \033[0m"
+  @echo " {{s3_url}}"
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+
+
+

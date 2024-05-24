@@ -1,4 +1,4 @@
-# Copyright (c) 2020, 2021 Humanitarian OpenStreetMap Team
+# Copyright (c) 2024 Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -16,55 +16,29 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Builds
+mod start 'contrib/just/start/Justfile'
+mod stop 'contrib/just/stop/Justfile'
+mod build 'contrib/just/build/Justfile'
+mod test 'contrib/just/test/Justfile'
+mod dotenv 'contrib/just/dotenv/Justfile'
 
-build-backend:
-  docker compose build api
+# Run the help script
+default:
+  @just --unstable help
 
-build-frontend:
-  docker compose build ui
+# View available commands
+help:
+  @just --unstable --list --justfile {{justfile()}}
 
-build: build-backend build-frontend
+# Run database migrations for backend
+migrate:
+  docker compose up -d migrations
 
-# Run
-
-run:
-  docker compose up -d
-
-run-without-central:
-  docker compose --profile no-odk up -d
-
-run-with-josm:
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/josm/docker-compose.yml \
-    up -d
-
-run-with-tunnels:
-  docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/fmtm/docker-compose.yml \
-    -f contrib/tunnel/odk/docker-compose.yml \
-    up -d
-
-stop:
-  docker compose down
-
-clean-db:
+# Delete local database, S3, and ODK Central data
+clean:
   docker compose down -v
 
-# Tests
-
-test-backend:
-  docker compose run --rm api pytest
-
-test-frontend:
-  docker compose run --rm ui-test
-
-test: test-backend test-frontend
-
-# Maintenance
-
+# Run pre-commit hooks
 lint:
   TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
     --volume $PWD:$PWD --workdir $PWD \
@@ -72,6 +46,7 @@ lint:
     'git config --global --add safe.directory $PWD \
     && pre-commit run --all-files'
 
+# Increment version
 bump:
   TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
     --volume $PWD:$PWD --workdir $PWD \
@@ -82,33 +57,35 @@ bump:
     && cd src/backend \
     && cz bump --check-consistency'
 
-# Docs
+# Run docs website locally
+docs:
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+  @echo
+  @echo "\033[0;34m Access the docs site on: http://localhost:55425 \033[0m"
+  @echo
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
 
-docs-rebuild: docs-clean docs-doxygen docs-uml
+  TAG_OVERRIDE=ci TARGET_OVERRIDE=ci docker compose run --rm --no-deps \
+    --volume $PWD:$PWD --workdir $PWD --publish 55425:3000 \
+    --entrypoint='sh -c' api \
+    'git config --global --add safe.directory $PWD \
+    && mkdocs serve --dev-addr 0.0.0.0:3000'
 
-docs-clean:
-	@rm -rf docs/{apidocs,html,docbook,man} docs/packages.png docs/classes.png
+# Mount an S3 bucket on your filesystem
+mount-s3:
+  #!/usr/bin/env sh
+  fstab_entry="fmtm-data /mnt/fmtm/local fuse.s3fs _netdev,allow_other,\
+  use_path_request_style,passwd_file=/home/$(whoami)/s3-creds/fmtm-local,\
+  url=http://s3.fmtm.localhost:7050 0 0"
 
-docs-doxygen:
-	cd docs && doxygen
-
-docs-uml:
-	cd docs && pyreverse -o png ../src/backend/app
-
-docs-pdf:
-  # Strip any unicode out of the markdown file before converting to PDF
-  # FIXME
-  MDS := \
-    docs/dev/Backend.md \
-    docs/dev/Database-Tips.md \
-    docs/dev/Release-Cycle.md \
-    docs/dev/Frontend.md \
-    docs/dev/Production.md \
-    docs/dev/Version-Control.md \
-    docs/dev/Setup.md \
-    docs/dev/Troubleshooting.md \
-  PDFS := $(MDS:.md=.pdf)
-	@echo "Converting $PDFS to a PDF"
-	@new=$(notdir $(basename $PDFS)); \
-	iconv -f utf-8 -t US $PDFS -c | \
-	pandoc $PDFS -f markdown -t pdf -s -o /tmp/$$new.pdf
+  if ! grep -q "$fstab_entry" /etc/fstab; then
+      echo "Mounting local FMTM S3 permanently in /etc/fstab"
+      echo "$fstab_entry" | sudo tee -a /etc/fstab > /dev/null
+      echo
+  else
+      echo "Local FMTM S3 is already mounted"
+  fi
