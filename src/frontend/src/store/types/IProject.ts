@@ -26,6 +26,7 @@ export type ProjectStateTypes = {
   projectDashboardDetail: projectDashboardDetailTypes;
   entityOsmMap: EntityOsmMap[];
   entityOsmMapLoading: boolean;
+  updateEntityStatusLoading: boolean;
   projectDashboardLoading: boolean;
   geolocationStatus: boolean;
   projectCommentsList: projectCommentsListTypes[];
