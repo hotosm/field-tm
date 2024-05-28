@@ -14,7 +14,7 @@ Coordinated field mapping for Open Mapping campaigns.
 | **Tech Stack**  | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)                                                                                                                                                  |
 | **Code Style**  | ![Backend Style](https://img.shields.io/badge/code%20style-black-black) ![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Metrics**     | [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) [![Coverage](https://hotosm.github.io/fmtm/coverage.svg)](https://hotosm.github.io/fmtm/coverage.html)                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Other Info**  | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://hotosm.github.io/fmtm/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md)                                     |
+| **Other Info**  | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://hotosm.github.io/fmtm/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://docs.fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md)                           |
 
 ---
 
@@ -29,7 +29,7 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 
 > More details can be found in this
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
-> [timeline](./docs/timeline.md) and the [docs](https://fmtm.dev) page.
+> [timeline](./docs/timeline.md) and the [docs](https://docs.fmtm.dev) page.
 
 ## How FMTM Works
 
@@ -88,7 +88,7 @@ use the convenience script:
 curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
 ```
 
-Alternatively see the [docs](https://fmtm.dev) for various deployment guides.
+Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guides.
 
 ## Contributors ✨
 
