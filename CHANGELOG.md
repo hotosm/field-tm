@@ -1,5 +1,75 @@
 # Changelog
 
+## 2024.3.0 (2024-05-28)
+
+### Feat
+
+- add link for interactive xlsform editing during project creation (#1480)
+- update PWA config with 2023 icon requirements and caching (#1474)
+- download submissions in geojson (#1517)
+- add OpenTelemetry configuration for backend API (monitoring) (#1496)
+- prompt user if task area is not fully mapped on mark complete  (#1493)
+- use task index as an user facing task_id (#1470)
+- **frontend**: login options to frontend, OSM or temp auth (#1458)
+- frontend buttons to load Entities in ODK Collect by intent (#1449)
+- distinguish between tasks locked by the current user and tasks locked by others (#1469)
+- append extra hashtag to projects with domain and project id identifier (#1454)
+- endpoints for getting Entity data & updating Entity mapping status (#1445)
+- temporary authentication login for mappers (svcfmtm) (#1410)
+- add /projects/features endpoint for project FeatureCollection (disaster.ninja integration) (#1442)
+- Playwright integration with test cases to be written (#1433)
+- implement ODK Entities for project creation (#1383)
+
+### Fix
+
+- lock map feature if 'Map Feature In ODK' clicked (#1516)
+- pmtile basemap generation and remove temp workarounds (#1535)
+- **backend**: generate location_str in model_validator instead of computed_field (#1534)
+- **backend**: validation_exception_handler pass all required params
+- valid matomo tracking script
+- pass project aoi as a outline geojson (#1533)
+- typo error in project name prefix in submission-download-geojson (#1523)
+- download submissions(csv,json) & refactor submission endpoints (#1519)
+- populate task_id correctly in feature properties (#1515)
+- refactored project dashboard and submission graph (#1509)
+- **dialogTaskActions**: same name variable conflict solve (#1506)
+- **backend**: use task ids to count validated and mapped status (#1485)
+- **backend**: get contributors count in project summary (#1484)
+- task hover popup & disable splitting algo without linestring (#1481)
+- login methods after temp cookie auth (#1471)
+- **frontend**: do not call introspect endpoint on /osmauth callback
+- basemap tile download, refactor to use /{project_id}/name (#1467)
+- **frontend**: invalidate login if mismatch between existing and new user login (#1462)
+- role mapper to login required in data extract (#1450)
+- fix list-forms endpoint logic to return list of dicts
+- activity comment api calls in frontend (#1435)
+- handle multipolygon geometries for project area (#1430)
+- XLSForm template download endpoint for specified categories (#1441)
+- filter task_history endpoint using task_id (#1436)
+- update logic for more flexible submission json --> geojson
+- add optional auth to raw-data-api calls, plus folder structure for persistence (#1431)
+- project details mobile UI, user details in header (#1407)
+- **backend**: allow missing odk_token for project, but log warning
+- add odk_token from projectInfo to qrcode creation
+- project name editing validation (#1416)
+- return proper error message if form edit is invalid (#1415)
+- default UNDERPASS_API_URL no trailing slash
+- more informative browser tab titles/details (#1411)
+- update task activity endpoint (#1406)
+- project edit form update validation (#1397)
+
+### Refactor
+
+- remove missed warning log from update_survey_form
+- remove broken submission code no longer used
+- use HTTPStatus enum for helper route response codes
+- fix ambiguous typos preventing pre-commit codespell passing
+- run codespell spelling fixer
+- replace unecessary outline_centroid for tasks with ol.extent.getCenter (#1447)
+- merged multi polygon to single polygon (#1426)
+- task comment response and schema (#1423)
+- response of update task status and added user info in task history (#1419)
+
 ## 2024.2.0 (2024-04-03)
 
 ### Feat
