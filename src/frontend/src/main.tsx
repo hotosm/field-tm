@@ -50,7 +50,7 @@ axios.interceptors.request.use(
 
 (function sentryInit() {
   // Immediately invoked function to enable Sentry monitoring
-  if (import.meta.env.MODE === 'development' || import.meta.env.BASE_URL !== 'fmtm.hotosm.org') {
+  if (import.meta.env.MODE === 'development' || window.location.hostname !== 'fmtm.hotosm.org') {
     return;
   }
   console.log('Adding Sentry');
@@ -76,7 +76,7 @@ axios.interceptors.request.use(
 
 (function matomoTrackingInit() {
   // Immediately invoked function to enable Matomo tracking
-  if (import.meta.env.MODE === 'development' || import.meta.env.BASE_URL !== 'fmtm.hotosm.org') {
+  if (import.meta.env.MODE === 'development' || window.location.hostname !== 'fmtm.hotosm.org') {
     return;
   }
   console.log('Adding Matomo');
