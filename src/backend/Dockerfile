@@ -84,10 +84,10 @@ COPY --from=extract-deps \
     /opt/python/
 # Install with or without monitoring, depending on flag
 RUN pip install --user --no-warn-script-location --no-cache-dir \
-    $(if [ "$MONITORING" = "true" ]; then \
-        echo "-r /opt/python/requirements-monitoring.txt"; \
-    else \
+    $(if [ -z "$MONITORING" ]; then \
         echo "-r /opt/python/requirements.txt"; \
+    else \
+        echo "-r /opt/python/requirements-monitoring.txt"; \
     fi)
 
 
