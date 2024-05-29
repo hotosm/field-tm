@@ -74,33 +74,6 @@ axios.interceptors.request.use(
   });
 })();
 
-(function matomoTrackingInit() {
-  // Immediately invoked function to enable Matomo tracking
-  if (import.meta.env.MODE === 'development' || window.location.hostname !== 'fmtm.hotosm.org') {
-    return;
-  }
-  console.log('Adding Matomo');
-
-  var _paq = (window._paq = window._paq || []);
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['requireConsent']);
-  _paq.push(['setDomains', ['fmtm.hotosm.org']]);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']); // Tracks downloads
-  _paq.push(['trackVisibleContentImpressions']); // Tracks content blocks
-  (function () {
-    var u = '//matomo.hotosm.org/';
-    _paq.push(['setTrackerUrl', u + 'matomo.php']);
-    _paq.push(['setSiteId', environment.matomoTrackingId]);
-    var d = document,
-      g = d.createElement('script'),
-      s = d.getElementsByTagName('script')[0];
-    g.async = true;
-    g.src = u + 'matomo.js';
-    s.parentNode.insertBefore(g, s);
-  })();
-})();
-
 // React 17 setup
 ReactDOM.render(<App />, document.getElementById('app'));
 
