@@ -64,7 +64,7 @@ RUN pdm export --prod > requirements.txt \
 FROM base as build
 # NOTE this argument is specified during production build on Github workflow
 # NOTE only the production API image contains the monitoring dependencies
-ARG WITH_MONITORING
+ARG MONITORING
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -84,7 +84,7 @@ COPY --from=extract-deps \
     /opt/python/
 # Install with or without monitoring, depending on flag
 RUN pip install --user --no-warn-script-location --no-cache-dir \
-    $(if [ "$WITH_MONITORING" = "true" ]; then \
+    $(if [ "$MONITORING" = "true" ]; then \
         echo "-r /opt/python/requirements-monitoring.txt"; \
     else \
         echo "-r /opt/python/requirements.txt"; \
