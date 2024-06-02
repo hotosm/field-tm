@@ -26,6 +26,7 @@ const FormUpdateTab = ({ projectId }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [error, setError] = useState({ formError: '', categoryError: '' });
 
+  const xFormId = CoreModules.useAppSelector((state) => state.project.projectInfo.xform_id);
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
   const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
@@ -64,6 +65,7 @@ const FormUpdateTab = ({ projectId }) => {
     if (validateForm()) {
       dispatch(
         PostFormUpdate(`${import.meta.env.VITE_API_URL}/projects/update-form?project_id=${projectId}`, {
+          xformId: xFormId,
           category: selectedCategory,
           upload: uploadForm && uploadForm?.[0]?.url,
         }),

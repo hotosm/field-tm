@@ -40,6 +40,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             tasks_mapped: projectResp.tasks_mapped,
             tasks_validated: projectResp.tasks_validated,
             xform_category: projectResp.xform_category,
+            xform_id: projectResp?.xform_id,
             tasks_bad: projectResp.tasks_bad,
             data_extract_url: projectResp.data_extract_url,
             instructions: projectResp?.project_info?.per_task_instructions,

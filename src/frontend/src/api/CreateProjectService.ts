@@ -347,13 +347,10 @@ const PostFormUpdate: Function = (url: string, projectData: any) => {
     const postFormUpdate = async (url, projectData) => {
       try {
         const formFormData = new FormData();
-        formFormData.append('project_id', projectData.project_id);
-        if (projectData.category) {
-          formFormData.append('category', projectData.category);
-        }
-        if (projectData.upload) {
-          formFormData.append('upload', projectData.upload);
-        }
+        formFormData.append('xform_id', projectData.xformId);
+        formFormData.append('category', projectData.category);
+        formFormData.append('upload', projectData.upload);
+
         const postFormUpdateResponse = await axios.post(url, formFormData);
         const resp: ProjectDetailsModel = postFormUpdateResponse.data;
         // dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));

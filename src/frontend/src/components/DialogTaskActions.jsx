@@ -206,13 +206,22 @@ export default function Dialog({ taskId, feature, map, view }) {
             type="submit"
             className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
             onClick={() => {
-              // XForm name is constructed from lower case project title with underscores
-              const projectName = projectInfo.title.toLowerCase().split(' ').join('_');
-              const projectCategory = projectInfo.xform_category;
-              const formName = `${projectName}_${projectCategory}`;
-              document.location.href = `odkcollect://form/${formName}?task_id=${taskId}`;
-              // TODO add this to each feature popup to pre-load a selected entity
-              // document.location.href = `odkcollect://form/${formName}?${geomFieldName}=${entityId}`;
+              const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent,
+              );
+
+              if (isMobile) {
+                document.location.href = `odkcollect://form/${projectInfo.xform_id}?task_id=${taskId}`;
+              } else {
+                dispatch(
+                  CommonActions.SetSnackBar({
+                    open: true,
+                    message: 'Requires a mobile phone with ODK Collect.',
+                    variant: 'warning',
+                    duration: 3000,
+                  }),
+                );
+              }
             }}
           />
         </div>

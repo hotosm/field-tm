@@ -304,7 +304,7 @@ async def set_odk_entities_mapping_status(
     entity_details must be a JSON body with params:
     {
         "entity_id": "string",
-        "label": "task <TASK_ID> feature <FEATURE_ID>",
+        "label": "Task <TASK_ID> Feature <FEATURE_ID>",
         "status": 0
     }
     """
@@ -936,6 +936,7 @@ async def download_form(
 
 @router.post("/update-form")
 async def update_project_form(
+    xform_id: str = Form(...),
     category: str = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
@@ -978,15 +979,14 @@ async def update_project_form(
 
     # Get ODK Central credentials for project
     odk_creds = await project_deps.get_odk_credentials(db, project.id)
-    # Get task id list
-    task_list = await tasks_crud.get_task_id_list(db, project.id)
     # Update ODK Central form data
     await central_crud.update_project_xform(
-        task_list,
+        xform_id,
         project.odkid,
         new_xform_data,
         file_ext,
         category,
+        len(project.tasks),
         odk_creds,
     )
 
