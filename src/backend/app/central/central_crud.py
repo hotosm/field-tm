@@ -317,21 +317,23 @@ async def get_form_list(db: Session) -> list:
 
 
 async def update_project_xform(
-    task_ids: list[int],
+    xform_id: str,
     odk_id: int,
     xform_data: BytesIO,
     form_file_ext: str,
     category: str,
+    task_count: int,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ) -> None:
     """Update and publish the XForm for a project.
 
     Args:
-        task_ids (List[int]): List of task IDs.
+        xform_id (str): The UUID of the existing XForm in ODK Central.
         odk_id (int): ODK Central form ID.
         xform_data (BytesIO): XForm data.
         form_file_ext (str): Extension of the form file.
         category (str): Category of the XForm.
+        task_count (int): The number of tasks in a project.
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
     """
     xform_data = await read_and_test_xform(
@@ -342,20 +344,20 @@ async def update_project_xform(
     updated_xform_data = await update_survey_xform(
         xform_data,
         category,
-        task_ids,
+        task_count,
+        existing_id=xform_id,
     )
 
     xform_obj = get_odk_form(odk_credentials)
 
     # NOTE calling createForm for an existing form will update it
-    form_name = category
     xform_obj.createForm(
         odk_id,
         updated_xform_data,
-        form_name,
+        xform_id,
     )
     # The draft form must be published after upload
-    xform_obj.publishForm(odk_id, form_name)
+    xform_obj.publishForm(odk_id, xform_id)
 
 
 async def read_and_test_xform(
@@ -487,11 +489,12 @@ async def update_entity_registration_xform(
 async def update_survey_xform(
     form_data: BytesIO,
     category: str,
-    task_ids: list[int],
+    task_count: int,
+    existing_id: Optional[str] = None,
 ) -> BytesIO:
     """Update fields in the XForm to work with FMTM.
 
-    The 'id' field is set to random UUID (xFormId)
+    The 'id' field is set to random UUID (xFormId) unless existing_id is specified
     The 'name' field is set to the category name.
     The upload media must match the (entity) dataset name (with .csv).
     The task_id options are populated as choices in the form.
@@ -501,13 +504,18 @@ async def update_survey_xform(
         form_data (str): The input form data.
         category (str): The form category, used to name the dataset (entity list)
             and the .csv file containing the geometries.
-        task_ids (list): List of task IDs to insert as choices in form.
+        task_count (int): The number of tasks in a project.
+        existing_id (str): An existing XForm ID in ODK Central, for updating.
 
     Returns:
         BytesIO: The XForm data.
     """
     log.debug(f"Updating XML keys in survey XForm: {category}")
-    xform_id = uuid.uuid4()
+
+    if existing_id:
+        xform_id = existing_id
+    else:
+        xform_id = uuid.uuid4()
 
     namespaces = {
         "h": "http://www.w3.org/1999/xhtml",
@@ -551,9 +559,9 @@ async def update_survey_xform(
     instance_task_ids = Element("instance", id="task_id")
     root_element = SubElement(instance_task_ids, "root")
     # Create sub-elements for each task ID, <itextId> <name> pairs
-    for index, task_id in enumerate(task_ids):
+    for task_id in range(1, task_count + 1):
         item = SubElement(root_element, "item")
-        SubElement(item, "itextId").text = f"task_id-{index}"
+        SubElement(item, "itextId").text = f"task_id-{task_id}"
         SubElement(item, "name").text = str(task_id)
     model_element.append(instance_task_ids)
 
@@ -572,8 +580,8 @@ async def update_survey_xform(
                 translation.remove(existing_text)
 
             # Append new <text> elements for each task_id
-            for index, task_id in enumerate(task_ids):
-                new_text = Element("text", id=f"task_id-{index}")
+            for task_id in range(1, task_count + 1):
+                new_text = Element("text", id=f"task_id-{task_id}")
                 value_element = Element("value")
                 value_element.text = str(task_id)
                 new_text.append(value_element)
@@ -584,7 +592,10 @@ async def update_survey_xform(
         ".//xforms:bind[@nodeset='/data/all/form_category']", namespaces
     )
     if form_category_update is not None:
-        form_category_update.set("calculate", f"once('{category}')")
+        if category.endswith("s"):
+            # Plural to singular
+            category = category[:-1]
+        form_category_update.set("calculate", f"once('{category.rstrip('s')}')")
 
     return BytesIO(ElementTree.tostring(root))
 

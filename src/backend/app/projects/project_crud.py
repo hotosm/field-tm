@@ -827,7 +827,7 @@ async def generate_odk_central_project_content(
     xlsform: BytesIO,
     form_category: str,
     form_file_ext: str,
-    task_ids: list[int],
+    task_count: int,
     db: Session,
 ) -> str:
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
@@ -886,7 +886,7 @@ async def generate_odk_central_project_content(
     updated_xform = await central_crud.update_survey_xform(
         xform,
         form_category,
-        task_ids,
+        task_count,
     )
     # Upload survey XForm
     log.info("Uploading survey XForm to ODK Central")
@@ -997,7 +997,7 @@ async def generate_project_files(
             xlsform,
             form_category,
             form_file_ext,
-            list(task_extract_dict.keys()),
+            len(task_extract_dict.keys()),
             db,
         )
         log.debug(

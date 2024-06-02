@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
+import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
@@ -13,8 +14,8 @@ import ProjectTaskStatus from '@/api/ProjectTaskStatus';
 import MapStyles from '@/hooks/MapStyles';
 
 type TaskFeatureSelectionPopupPropType = {
-  featureProperties: TaskFeatureSelectionProperties | null;
   taskId: number;
+  featureProperties: TaskFeatureSelectionProperties | null;
   taskFeature: Record<string, any>;
   map: any;
   view: any;
@@ -128,24 +129,22 @@ const TaskFeatureSelectionPopup = ({
               }
               isLoading={updateEntityStatusLoading}
               onClick={() => {
-                // XForm name is constructed from lower case project title with underscores
-                const projectName = projectInfo.title.toLowerCase().split(' ').join('_');
-                const projectCategory = projectInfo.xform_category;
-                const formName = `${projectName}_${projectCategory}`;
-
+                const xformId = projectInfo.xform_id;
                 const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
                 const entityUuid = entity ? entity.id : null;
 
-                if (!formName || !entityUuid) {
+                if (!xformId || !entityUuid) {
                   return;
                 }
+
                 dispatch(
                   UpdateEntityStatus(`${import.meta.env.VITE_API_URL}/projects/${currentProjectId}/entity/status`, {
                     entity_id: entityUuid,
                     status: 1,
-                    label: '',
+                    label: `Task ${taskId} Feature ${entity.osm_id}`,
                   }),
                 );
+
                 if (task_status === 'READY') {
                   dispatch(
                     ProjectTaskStatus(
@@ -163,7 +162,23 @@ const TaskFeatureSelectionPopup = ({
                   );
                 }
 
-                document.location.href = `odkcollect://form/${formName}?existing=${entityUuid}`;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                  navigator.userAgent,
+                );
+
+                if (isMobile) {
+                  // Load entity in ODK Collect by intent
+                  document.location.href = `odkcollect://form/${xformId}?task_id=${taskId}&existing=${entityUuid}`;
+                } else {
+                  dispatch(
+                    CommonActions.SetSnackBar({
+                      open: true,
+                      message: 'Requires a mobile phone with ODK Collect.',
+                      variant: 'warning',
+                      duration: 3000,
+                    }),
+                  );
+                }
               }}
             />
           </div>

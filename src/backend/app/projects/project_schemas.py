@@ -299,6 +299,7 @@ class ProjectBase(BaseModel):
     """Base project model."""
 
     outline: Any = Field(exclude=True)
+    forms: Any = Field(exclude=True)
 
     id: int
     odkid: int
@@ -331,6 +332,14 @@ class ProjectBase(BaseModel):
             f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
             f"/{self.organisation_id}/logo.png"
         )
+
+    @computed_field
+    @property
+    def xform_id(self) -> Optional[str]:
+        """Compute the XForm ID from the linked DbXForm."""
+        if not self.forms:
+            return None
+        return self.forms[0].odk_form_id
 
 
 class ProjectWithTasks(ProjectBase):
