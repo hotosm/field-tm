@@ -29,10 +29,11 @@ MapContainer.defaultProps = {
   mapInstance: null,
 };
 
-MapContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-  mapInstance: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
-};
+// TODO replace with typescript
+// MapContainer.propTypes = {
+//   children: PropTypes.node.isRequired,
+//   mapInstance: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
+// };
 
 MapContainer.displayName = 'MapContainer';
 
