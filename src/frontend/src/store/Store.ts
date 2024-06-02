@@ -10,7 +10,7 @@ import OrganisationSlice from '@/store/slices/organisationSlice';
 import SubmissionSlice from '@/store/slices/SubmissionSlice';
 import TaskSlice from '@/store/slices/TaskSlice';
 import { persistReducer } from 'redux-persist';
-import { combineReducers, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 export default function persist(key, whitelist, reducer) {
   return persistReducer(
@@ -43,10 +43,10 @@ export type AppDispatch = typeof store.dispatch;
 
 let store = configureStore({
   reducer: rootReducer,
-  // middleware: [],
-  middleware: getDefaultMiddleware({
-    serializableCheck: false,
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 let persistor = persistStore(store);

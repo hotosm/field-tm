@@ -30,7 +30,7 @@
     "strictPropertyInitialization": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["@testing-library/jest-dom", "vite-plugin-pwa/react"]
+    "types": ["vite-plugin-pwa/react"]
   },
   "include": ["src", "src/**/*.ts", "tests"],
   "exclude": ["node_modules", "dist"]

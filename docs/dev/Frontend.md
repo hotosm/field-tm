@@ -40,7 +40,7 @@ For details on how to run the API first, please see:
 
 ### 2C. Run the project
 
-Run the frontend with hot-reloading: `npm run start:live`
+Run the frontend with hot-reloading: `npm run dev`
 
 The frontend should now be accessible at: `http://127.0.0.1:<PORT_NUMBER>`
 

@@ -67,7 +67,7 @@ import {
   createBrowserRouter,
 } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { createSlice, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { createSlice, configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import LoadingBar from '@/components/createnewproject/LoadingBar';
 import { TaskActions } from '@/store/slices/TaskSlice';
@@ -94,7 +94,6 @@ export default {
   configureStore,
   combineReducers,
   useLocation,
-  getDefaultMiddleware,
   Dialog,
   DialogActions,
   DialogContent,

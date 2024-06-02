@@ -4,11 +4,8 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import axios from 'axios';
 import React from 'react';
-import ReactDOM from 'react-dom';
-// Uncomment for React 18
-// import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
-import environment from '@/environment';
 import App from './App';
 
 // Added Fix of Console Error of MUI Issue
@@ -74,10 +71,5 @@ axios.interceptors.request.use(
   });
 })();
 
-// React 17 setup
-ReactDOM.render(<App />, document.getElementById('app'));
-
-// // React 18 setup
-// createRoot(document.getElementById('app')!).render(
-//   <App />,
-// );
+// React 18 setup
+createRoot(document.getElementById('app')!).render(<App />);

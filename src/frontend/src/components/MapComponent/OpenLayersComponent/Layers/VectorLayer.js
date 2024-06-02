@@ -44,16 +44,16 @@ const VectorLayer = ({
   geojson,
   fgbUrl,
   fgbExtent,
-  style,
-  zIndex,
+  style = { ...defaultStyles },
+  zIndex = 0,
   zoomToLayer = false,
   visibleOnMap = true,
   properties,
-  viewProperties,
+  viewProperties = layerViewProperties,
   hoverEffect,
-  mapOnClick,
+  mapOnClick = () => {},
   setStyle,
-  onModify,
+  onModify = null,
   onDraw,
   getTaskStatusStyle,
   layerProperties,
@@ -61,7 +61,11 @@ const VectorLayer = ({
   getAOIArea,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
-  useEffect(() => () => map && vectorLayer && map.removeLayer(vectorLayer), [map, vectorLayer]);
+  useEffect(() => {
+    if (map && vectorLayer) {
+      return () => map.removeLayer(vectorLayer);
+    }
+  }, [map, vectorLayer]);
 
   // Modify Feature
   useEffect(() => {
@@ -108,10 +112,10 @@ const VectorLayer = ({
     }
     return output;
   };
+
   // Draw Feature
   useEffect(() => {
     if (!map) return;
-    // if(!vectorLayer) return;
     if (!onDraw) return;
     const source = new VectorSource({ wrapX: false });
 
@@ -135,17 +139,11 @@ const VectorLayer = ({
       const geometry = feature.getGeometry();
       const area = formatArea(geometry);
 
-      // Call your function here with the GeoJSON as an argument
       onDraw(newGeojson, area);
-
-      // var geoJSONString = geoJSONFormat.writeFeatures(vectorLayer.getSource().getFeatures(),{ dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-      // console.log(geoJSONString,'geojsonString');
-      // onDraw(geoJSONString);
     });
     map.addInteraction(draw);
     return () => {
       map.removeInteraction(draw);
-      // map.removeInteraction(snap);
     };
   }, [map, vectorLayer, onDraw]);
 
@@ -242,7 +240,7 @@ const VectorLayer = ({
     const vlFeature = vectorLyr?.getSource().getFeatures();
     if (!vlFeature || (vlFeature && vlFeature?.length === 0)) return;
 
-    map.on('click', (evt) => {
+    const handleClick = (evt) => {
       var pixel = evt.pixel;
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
         if (layer === vectorLyr) {
@@ -251,12 +249,14 @@ const VectorLayer = ({
       });
 
       triggerMapClick(feature);
-    });
+    };
+
+    map.on('click', handleClick);
 
     setVectorLayer(vectorLyr);
     return () => {
       setVectorLayer(null);
-      map.un('click', () => {});
+      map.un('click', handleClick);
     };
   }, [map, geojson]);
 
@@ -271,7 +271,7 @@ const VectorLayer = ({
       }),
     });
 
-    map.on('click', (evt) => {
+    const handleClick = (evt) => {
       const pixel = evt.pixel;
 
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
@@ -281,14 +281,15 @@ const VectorLayer = ({
       });
 
       triggerMapClick(feature);
-    });
+    };
 
-    // map.addLayer(vectorLyr);
+    map.on('click', handleClick);
+
     setVectorLayer(vectorLyr);
 
     return () => {
       setVectorLayer(null);
-      map.un('click', () => {});
+      map.un('click', handleClick);
     };
   }, [fgbUrl, fgbExtent]);
 
@@ -336,8 +337,9 @@ const VectorLayer = ({
   }, [vectorLayer, style, setStyle, onModify]);
 
   useEffect(() => {
-    if (!vectorLayer) return;
-    vectorLayer.setZIndex(zIndex);
+    if (vectorLayer) {
+      vectorLayer.setZIndex(zIndex);
+    }
   }, [vectorLayer, zIndex]);
 
   useEffect(() => {
@@ -365,22 +367,18 @@ const VectorLayer = ({
 
   // style on hover
   useEffect(() => {
-    if (!map) return null;
-    if (!vectorLayer) return null;
-    if (!hoverEffect) return null;
+    if (!map || !vectorLayer || !hoverEffect) return;
     const selectionLayer = new OLVectorLayer({
       map,
       renderMode: 'vector',
       source: vectorLayer.getSource(),
-      // eslint-disable-next-line consistent-return
       style: (feature) => {
         if (feature.getId() in selection) {
           return selectedCountry;
         }
-        // return stylex;
       },
     });
-    function pointerMovefn(event) {
+    const pointerMovefn = (event) => {
       vectorLayer.getFeatures(event.pixel).then((features) => {
         if (!features.length) {
           selection = {};
@@ -403,18 +401,18 @@ const VectorLayer = ({
 
         selectionLayer.changed();
       });
-    }
+    };
     map.on('pointermove', pointerMovefn);
     return () => {
       map.un('pointermove', pointerMovefn);
     };
-  }, [vectorLayer]);
+  }, [vectorLayer, hoverEffect]);
 
   // ROTATE ICON IMAGE ACCORDING TO ORIENTATION
   useEffect(() => {
     if (!map) return;
     if (typeof rotation === 'number') {
-      const mapRotation = map.getView().getRotation();
+      // const mapRotation = map.getView().getRotation();
       setStyle?.getImage().setRotation(rotation);
     }
   }, [rotation, map, geojson]);
@@ -436,41 +434,32 @@ const VectorLayer = ({
   return null;
 };
 
-VectorLayer.defaultProps = {
-  zIndex: 0,
-  style: { ...defaultStyles },
-  zoomToLayer: false,
-  viewProperties: layerViewProperties,
-  mapOnClick: () => {},
-  onModify: null,
-};
-
-VectorLayer.propTypes = {
-  // Ensure either geojson or fgbUrl is provided
-  geojson: (props, propName, componentName) => {
-    if (!props.geojson && !props.fgbUrl) {
-      return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
-    }
-    if (props.geojson && props.fgbUrl) {
-      return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
-    }
-  },
-  fgbUrl: (props, propName, componentName) => {
-    if (!props.geojson && !props.fgbUrl) {
-      return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
-    }
-    if (props.geojson && props.fgbUrl) {
-      return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
-    }
-  },
-  fgbExtent: PropTypes.object,
-  style: PropTypes.object,
-  zIndex: PropTypes.number,
-  zoomToLayer: PropTypes.bool,
-  viewProperties: PropTypes.object,
-  mapOnClick: PropTypes.func,
-  onModify: PropTypes.func,
-  // Context: PropTypes.object.isRequired,
-};
+// TODO replace with typescript
+// VectorLayer.propTypes = {
+//   // Ensure either geojson or fgbUrl is provided
+//   geojson: (props, propName, componentName) => {
+//     if (!props.geojson && !props.fgbUrl) {
+//       return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
+//     }
+//     if (props.geojson && props.fgbUrl) {
+//       return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
+//     }
+//   },
+//   fgbUrl: (props, propName, componentName) => {
+//     if (!props.geojson && !props.fgbUrl) {
+//       return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
+//     }
+//     if (props.geojson && props.fgbUrl) {
+//       return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
+//     }
+//   },
+//   fgbExtent: PropTypes.object,
+//   style: PropTypes.object,
+//   zIndex: PropTypes.number,
+//   zoomToLayer: PropTypes.bool,
+//   viewProperties: PropTypes.object,
+//   mapOnClick: PropTypes.func,
+//   onModify: PropTypes.func,
+// };
 
 export default VectorLayer;

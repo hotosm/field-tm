@@ -257,15 +257,16 @@ const Home = () => {
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
-  useEffect(async () => {
+  const getPmtilesBasemap = async () => {
     if (!projectOpfsBasemapPath) {
       return;
     }
-
     const opfsPmtilesData = await readFileFromOPFS(projectOpfsBasemapPath);
     setCustomBasemapData(opfsPmtilesData);
     // setCustomBasemapData(projectOpfsBasemapPath);
-
+  };
+  useEffect(() => {
+    getPmtilesBasemap();
     return () => {};
   }, [projectOpfsBasemapPath]);
   const [showDebugConsole, setShowDebugConsole] = useState(false);

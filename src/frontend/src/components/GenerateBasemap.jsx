@@ -11,8 +11,8 @@ const GenerateBasemap = ({ projectInfo }) => {
   const params = CoreModules.useParams();
   const id = params.id;
 
-  const [selectedTileSource, setSelectedTileSource] = useState(null);
-  const [selectedOutputFormat, setSelectedOutputFormat] = useState(null);
+  const [selectedTileSource, setSelectedTileSource] = useState('');
+  const [selectedOutputFormat, setSelectedOutputFormat] = useState('');
   const [tmsUrl, setTmsUrl] = useState('');
   const [error, setError] = useState([]);
 
@@ -350,7 +350,5 @@ const GenerateBasemap = ({ projectInfo }) => {
     </CoreModules.CustomizedModal>
   );
 };
-
-GenerateBasemap.propTypes = {};
 
 export default GenerateBasemap;

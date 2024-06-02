@@ -1,4 +1,4 @@
-FROM docker.io/node:18 as builder
+FROM docker.io/node:20 as builder
 
 ARG VITE_API_URL
 ENV VITE_API_URL="${VITE_API_URL}"
