@@ -17,7 +17,6 @@
 #
 """Routes to relay requests to ODK Central server."""
 
-
 from fastapi import APIRouter, Depends
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse

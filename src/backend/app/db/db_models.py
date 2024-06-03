@@ -358,7 +358,7 @@ class DbTaskMappingIssue(Base):
 
 
 class DbMappingIssueCategory(Base):
-    """Represents a category of task mapping issues identified during validaton."""
+    """Represents a category of task mapping issues identified during validation."""
 
     __tablename__ = "mapping_issue_categories"
 
