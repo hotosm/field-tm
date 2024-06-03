@@ -17,7 +17,6 @@
 #
 """Logic for user routes."""
 
-
 from sqlalchemy.orm import Session
 
 from app.db import db_models

@@ -107,16 +107,17 @@ target-versions = ["py310", "py311"]
 [tool.ruff]
 target-version = "py310"
 line-length = 88
-select = ["I", "E", "W", "D", "B", "F", "N", "Q"]
-ignore = ["N805", "B008"]
 exclude = [
     ".ruff_cache",
     "__pypackages__",
     "app/__version__.py",
 ]
-[tool.ruff.pydocstyle]
+[tool.ruff.lint]
+select = ["I", "E", "W", "D", "B", "F", "N", "Q"]
+ignore = ["N805", "B008"]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = [
     "fastapi.Depends",
     "fastapi.params.Depends",
@@ -155,5 +156,5 @@ exclude_rules = "CP05"  # Avoid capitalisation of enums
 
 [tool.codespell]
 skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md"
+ignore-words-list = "ProjectIn"
 write-changes = true
-

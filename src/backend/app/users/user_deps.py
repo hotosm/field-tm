@@ -18,7 +18,6 @@
 
 """User dependencies for use in Depends."""
 
-
 from typing import Union
 
 from fastapi import Depends

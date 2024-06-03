@@ -17,6 +17,7 @@
 #
 
 """Auth routes, to login, logout, and get user details."""
+
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
