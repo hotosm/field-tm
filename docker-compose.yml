@@ -283,6 +283,10 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    # Hardcode some vars for dev, as not necessarily present in the .env file
+    environment:
+      - S3_ENDPOINT=${S3_ENDPOINT:-"http://s3:9000"}
+      - S3_BACKUP_BUCKET_NAME=${S3_BACKUP_BUCKET_NAME:-"fmtm-db-backups"}
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
