@@ -100,13 +100,10 @@ build-backend = "pdm.pep517.api"
 source-includes = ["../../CHANGELOG.md", "../../LICENSE", "../../README.md"]
 version = {from = "app/__version__.py"}
 
-[tool.black]
-line-length = 88
-target-versions = ["py310", "py311"]
-
 [tool.ruff]
-target-version = "py310"
+fix = true
 line-length = 88
+target-version = "py310"
 exclude = [
     ".ruff_cache",
     "__pypackages__",
