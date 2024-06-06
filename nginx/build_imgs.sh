@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NGINX_TAG="${NGINX_TAG:-1.25.3}"
+NGINX_TAG="${NGINX_TAG:-1.27.0}"
 
 # Dev certs init
 echo "Building proxy:certs-init-development"
