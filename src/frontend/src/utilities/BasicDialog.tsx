@@ -3,14 +3,15 @@ import { TransitionProps } from '@mui/material/transitions';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
-const Transition = React.forwardRef(function Transition(
+const Transition = function Transition(
+  ref,
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
+    ref?: React.Ref<unknown>;
   },
-  ref: React.Ref<unknown>,
 ) {
   return <CoreModules.Slide direction="up" ref={ref} {...props} />;
-});
+};
 
 export default function BasicDialog({ open, onClose, title, iconCloseMode, actionsButton, element }) {
   return (

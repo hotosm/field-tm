@@ -12,24 +12,23 @@ type CustomCheckboxType = {
   disabled?: boolean;
 };
 
-const Checkbox = React.forwardRef<
-  React.ElementRef<typeof CheckboxPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <CheckboxPrimitive.Root
-    ref={ref}
-    className={cn(
-      'fmtm-peer fmtm-h-4 fmtm-w-4 fmtm-shrink-0 fmtm-rounded-sm fmtm-border fmtm-border-[#7A7676] fmtm-shadow focus-visible:fmtm-outline-none focus-visible:fmtm-ring-1 disabled:fmtm-cursor-not-allowed disabled:fmtm-opacity-50  data-[state=checked]:fmtm-text-primary-[#7A7676]',
-      { 'disabled:fmtm-cursor-not-allowed': props.disabled },
-      className,
-    )}
-    {...props}
-  >
-    <CheckboxPrimitive.Indicator className={cn('fmtm-flex fmtm-items-center fmtm-justify-center fmtm-text-current')}>
-      <Check className="fmtm-h-4 fmtm-w-4 fmtm-text-primaryRed" strokeWidth={4} />
-    </CheckboxPrimitive.Indicator>
-  </CheckboxPrimitive.Root>
-));
+const Checkbox = ({ className, ref, ...props }) => {
+  return (
+    <CheckboxPrimitive.Root
+      ref={ref}
+      className={cn(
+        'fmtm-peer fmtm-h-4 fmtm-w-4 fmtm-shrink-0 fmtm-rounded-sm fmtm-border fmtm-border-[#7A7676] fmtm-shadow focus-visible:fmtm-outline-none focus-visible:fmtm-ring-1 disabled:fmtm-cursor-not-allowed disabled:fmtm-opacity-50  data-[state=checked]:fmtm-text-primary-[#7A7676]',
+        { 'disabled:fmtm-cursor-not-allowed': props.disabled },
+        className,
+      )}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator className={cn('fmtm-flex fmtm-items-center fmtm-justify-center fmtm-text-current')}>
+        <Check className="fmtm-h-4 fmtm-w-4 fmtm-text-primaryRed" strokeWidth={4} />
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Root>
+  );
+};
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 export const CustomCheckbox = ({

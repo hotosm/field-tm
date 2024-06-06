@@ -2,12 +2,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/jsx-no-useless-fragment */
 import React from 'react';
-import PropTypes from 'prop-types';
 import '../map.scss';
 
-const { Children, cloneElement, forwardRef } = React;
+const { Children, cloneElement } = React;
 
-const MapContainer = forwardRef(({ children, mapInstance, ...rest }, ref) => {
+const MapContainer = ({ children, mapInstance = null, ref, ...rest }) => {
   const childrenCount = Children.count(children);
   const props = {
     map: mapInstance,
@@ -17,16 +16,12 @@ const MapContainer = forwardRef(({ children, mapInstance, ...rest }, ref) => {
       {childrenCount < 1 ? (
         <></>
       ) : childrenCount > 1 ? (
-        Children.map(children, (child) => (child ? cloneElement(child, { ...props }) : <></>))
+        Children.map(children, (child) => (child ? cloneElement(child, { ...props, ref: null }) : <></>))
       ) : (
-        cloneElement(children, { ...props })
+        cloneElement(children, { ...props, ref: null })
       )}
     </div>
   );
-});
-
-MapContainer.defaultProps = {
-  mapInstance: null,
 };
 
 // TODO replace with typescript

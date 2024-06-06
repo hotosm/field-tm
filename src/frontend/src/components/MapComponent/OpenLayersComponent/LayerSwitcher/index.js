@@ -1,9 +1,7 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 // import "../../node_modules/ol-layerswitcher/dist/ol-layerswitcher.css";
 import LayerGroup from 'ol/layer/Group';
-import Collection from 'ol/Collection.js';
 import LayerTile from 'ol/layer/Tile';
 import SourceOSM from 'ol/source/OSM';
 import LayerSwitcher from 'ol-layerswitcher';

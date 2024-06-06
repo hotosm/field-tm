@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import windowDimention from '@/hooks/WindowDimension';
 import CoreModules from '@/shared/CoreModules';
 

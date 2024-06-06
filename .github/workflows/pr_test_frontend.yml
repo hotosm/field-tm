@@ -21,6 +21,6 @@ jobs:
   e2e-tests:
     uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@main
     with:
-      container_config: '{"image": "mcr.microsoft.com/playwright:v1.43.0"}'
+      container_config: '{"image": "mcr.microsoft.com/playwright:v1.44.1"}'
       working_dir: src/frontend
       run_command: "test:e2e"

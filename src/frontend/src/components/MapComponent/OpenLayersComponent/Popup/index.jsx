@@ -1,4 +1,3 @@
-// /* eslint-disable react/prop-types */
 // /* eslint-disable jsx-a11y/anchor-has-content */
 // /* eslint-disable func-names */
 // /* eslint-disable jsx-a11y/control-has-associated-label */

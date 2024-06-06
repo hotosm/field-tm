@@ -21,10 +21,13 @@ export default function CustomizedModal({ style = defaultStyle, children, isOpen
   );
 }
 
-const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean; className: string }>((props, ref) => {
-  const { open, className, ...other } = props;
+interface BackdropProps extends React.HTMLAttributes<HTMLDivElement> {
+  open: boolean;
+}
+
+const Backdrop: React.FC<BackdropProps> = ({ open, className, ref, ...other }) => {
   return <div className={clsx({ 'MuiBackdrop-open': open }, className)} ref={ref} {...other} />;
-});
+};
 Backdrop.displayName = 'ModalBackdrop';
 
 const StyledModal = styled(Modal)`
