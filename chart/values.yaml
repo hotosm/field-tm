@@ -114,7 +114,7 @@ s3:
   replicas: 1
   image:
     repository: quay.io/minio/minio
-    tag: RELEASE.2024-01-01T16-36-33Z
+    tag: RELEASE.2024-06-06T09-36-42Z
   environment:
     MINIO_BROWSER: "off"
   mountPath: /mnt/data
