@@ -39,6 +39,25 @@ check_all_db_vars_present() {
     fi
 }
 
+check_all_s3_vars_present() {
+    if [ -z "${S3_ENDPOINT}" ]; then
+        echo "Environment variable S3_ENDPOINT is not set."
+        exit 1
+    fi
+    if [ -z "${S3_ACCESS_KEY}" ]; then
+        echo "Environment variable S3_ACCESS_KEY is not set."
+        exit 1
+    fi
+    if [ -z "${S3_SECRET_KEY}" ]; then
+        echo "Environment variable S3_SECRET_KEY is not set."
+        exit 1
+    fi
+    if [ -z "${S3_BACKUP_BUCKET_NAME}" ]; then
+        echo "Environment variable S3_BACKUP_BUCKET_NAME is not set."
+        exit 1
+    fi
+}
+
 wait_for_db() {
     max_retries=30
     retry_interval=5
@@ -138,9 +157,9 @@ backup_db() {
     gzip --force "$db_backup_file"
     db_backup_file="${db_backup_file}.gz"
 
-    BUCKET_NAME="fmtm-db-backups"
+    BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
-    mc alias set s3 "$S3_ENDPOINT" "$S3_ACCESS_KEY" "$S3_SECRET_KEY"
+    mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
     mc mb "s3/${BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BUCKET_NAME}"
     mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/pre-migrate/"
@@ -185,6 +204,7 @@ scripts_to_execute=()
 
 # DB startup
 check_all_db_vars_present
+check_all_s3_vars_present
 wait_for_db
 db_url="postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST}/${FMTM_DB_NAME}"
 
