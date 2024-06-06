@@ -46,7 +46,6 @@ export default {
     { id: 1, label: 'ESRI', value: 'esri' },
     { id: 2, label: 'Bing', value: 'bing' },
     { id: 3, label: 'Google', value: 'google' },
-    { id: 4, label: 'Topo', value: 'topo' },
     { id: 5, label: 'Custom TMS', value: 'tms' },
   ],
   tileOutputFormats: [
