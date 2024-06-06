@@ -268,7 +268,7 @@ class BackgroundTaskStatus(IntEnum, Enum):
     SUCCESS = 4
 
 
-TILES_SOURCE = ["esri", "bing", "google", "topo"]
+TILES_SOURCE = ["esri", "bing", "google"]
 TILES_FORMATS = ["mbtiles", "sqlitedb", "sqlite3", "sqlite", "pmtiles"]
 
 

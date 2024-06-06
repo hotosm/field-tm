@@ -1431,7 +1431,7 @@ def get_project_tiles(
         db (Session): SQLAlchemy db session.
         project_id (int): ID of project to create tiles for.
         background_task_id (uuid.UUID): UUID of background task to track.
-        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
+        source (str): Tile source ("esri", "bing", "google", "custom" (tms)).
         output_format (str, optional): Default "mbtiles".
             Other options: "pmtiles", "sqlite3".
         tms (str, optional): Default None. Custom TMS provider URL.

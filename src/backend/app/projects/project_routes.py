@@ -388,7 +388,7 @@ async def generate_project_tiles(
     Args:
         background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
         project_id (int): ID of project to create tiles for.
-        source (str): Tile source ("esri", "bing", "topo", "google", "oam").
+        source (str): Tile source ("esri", "bing", "google", "custom" (tms)).
         format (str, optional): Default "mbtiles". Other options: "pmtiles", "sqlite3".
         tms (str, optional): Default None. Custom TMS provider URL.
         db (Session): The database session, provided automatically.
