@@ -270,24 +270,24 @@ const GenerateBasemap = ({ projectInfo }) => {
               <CoreModules.TableHead>
                 <CoreModules.TableRow>
                   {/* <CoreModules.TableCell>Id</CoreModules.TableCell> */}
-                  <CoreModules.TableCell>S.N.</CoreModules.TableCell>
                   <CoreModules.TableCell align="center">Source</CoreModules.TableCell>
+                  <CoreModules.TableCell align="center">Format</CoreModules.TableCell>
                   <CoreModules.TableCell align="center">Status</CoreModules.TableCell>
                   <CoreModules.TableCell align="center"></CoreModules.TableCell>
                 </CoreModules.TableRow>
               </CoreModules.TableHead>
+
               <CoreModules.TableBody>
                 {tilesList.map((list, i) => (
-                  <CoreModules.TableRow key={list.name}>
-                    {/* <CoreModules.TableCell component="th" scope="row">
-                      {list.id}
-                    </CoreModules.TableCell> */}
-                    <CoreModules.TableCell component="th" scope="row">
-                      {i + 1}
+                  <CoreModules.TableRow key={list.id}>
+                    <CoreModules.TableCell align="center">
+                      <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
+                        {list.source}
+                      </div>
                     </CoreModules.TableCell>
                     <CoreModules.TableCell align="center">
                       <div className="fmtm-text-primaryRed fmtm-border-primaryRed fmtm-border-[1px] fmtm-rounded-full fmtm-px-4 fmtm-py-1 fmtm-w-fit fmtm-mx-auto">
-                        {list.tile_source}
+                        {list.format}
                       </div>
                     </CoreModules.TableCell>
                     <CoreModules.TableCell align="center" sx={{ color: environment.statusColors[list.status] }}>
@@ -310,19 +310,19 @@ const GenerateBasemap = ({ projectInfo }) => {
                     </CoreModules.TableCell>
                     <CoreModules.TableCell align="center">
                       <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
+                        {list.status === 'SUCCESS' && list.format === 'pmtiles' && (
+                          <AssetModules.BoltIcon
+                            sx={{ cursor: 'pointer', fontSize: '22px' }}
+                            onClick={() => downloadBasemap(list.id, true)}
+                            className="fmtm-text-red-500 hover:fmtm-text-red-700"
+                          />
+                        )}
                         {list.status === 'SUCCESS' && (
-                          <>
-                            <AssetModules.FileDownloadIcon
-                              sx={{ cursor: 'pointer', fontSize: '22px' }}
-                              onClick={() => downloadBasemap(list.id)}
-                              className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
-                            />
-                            <AssetModules.BoltIcon
-                              sx={{ cursor: 'pointer', fontSize: '22px' }}
-                              onClick={() => downloadBasemap(list.id, true)}
-                              className="fmtm-text-red-500 hover:fmtm-text-red-700"
-                            />
-                          </>
+                          <AssetModules.FileDownloadIcon
+                            sx={{ cursor: 'pointer', fontSize: '22px' }}
+                            onClick={() => downloadBasemap(list.id)}
+                            className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
+                          />
                         )}
                         <AssetModules.DeleteIcon
                           sx={{ cursor: 'pointer', fontSize: '22px' }}
@@ -343,6 +343,7 @@ const GenerateBasemap = ({ projectInfo }) => {
                   </CoreModules.TableRow>
                 ))}
               </CoreModules.TableBody>
+
             </CoreModules.Table>
           </CoreModules.TableContainer>
         </CoreModules.Grid>
