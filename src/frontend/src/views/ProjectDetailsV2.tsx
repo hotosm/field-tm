@@ -57,7 +57,7 @@ const Home = () => {
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
   // Can pass a File object, or a string URL to be read by PMTiles
-  const [customBasemapData, setCustomBasemapData] = useState<File | string>();
+  const [customBasemapData, setCustomBasemapData] = useState<File | string | null>();
   const [viewState, setViewState] = useState('project_info');
   const projectId: string = params.id;
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -263,10 +263,24 @@ const Home = () => {
     }
     const opfsPmtilesData = await readFileFromOPFS(projectOpfsBasemapPath);
     setCustomBasemapData(opfsPmtilesData);
-    // setCustomBasemapData(projectOpfsBasemapPath);
   };
   useEffect(() => {
-    getPmtilesBasemap();
+    if (!projectOpfsBasemapPath) {
+      return;
+    }
+
+    // Extract project id from projectOpfsBasemapPath
+    const projectOpfsBasemapPathParts = projectOpfsBasemapPath.split('/');
+    const projectOpfsBasemapProjectId = projectOpfsBasemapPathParts[0];
+
+    // Check if project id from projectOpfsBasemapPath matches current projectId
+    if (projectOpfsBasemapProjectId !== projectId) {
+      // If they don't match, set CustomBasemapData to null
+      setCustomBasemapData(null);
+    } else {
+      // If they match, fetch the basemap data
+      getPmtilesBasemap();
+    }
     return () => {};
   }, [projectOpfsBasemapPath]);
   const [showDebugConsole, setShowDebugConsole] = useState(false);
