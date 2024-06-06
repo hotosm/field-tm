@@ -51,7 +51,8 @@ type tilesListTypes = {
   id: number;
   project_id: number;
   status: string;
-  tile_source: string;
+  source: string;
+  format: string;
 };
 
 type projectCommentsListTypes = {

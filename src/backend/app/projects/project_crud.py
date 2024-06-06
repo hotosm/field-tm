@@ -1524,6 +1524,7 @@ async def get_mbtiles_list(db: Session, project_id: int):
                 db_models.DbTilesPath.id,
                 db_models.DbTilesPath.project_id,
                 db_models.DbTilesPath.status,
+                db_models.DbTilesPath.path,
                 db_models.DbTilesPath.tile_source,
             )
             .filter(db_models.DbTilesPath.project_id == str(project_id))
@@ -1535,7 +1536,8 @@ async def get_mbtiles_list(db: Session, project_id: int):
                 "id": x.id,
                 "project_id": x.project_id,
                 "status": x.status.name,
-                "tile_source": x.tile_source,
+                "source": x.tile_source,
+                "format": Path(x.path).suffix[1:],
             }
             for x in tiles_list
         ]
