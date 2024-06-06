@@ -37,6 +37,12 @@ check_all_db_vars_present() {
         echo "Environment variable FMTM_DB_NAME is not set."
         exit 1
     fi
+
+    # Strip any extra unrequired "quotes"
+    export FMTM_DB_HOST="${FMTM_DB_HOST//\"/}"
+    export FMTM_DB_USER="${FMTM_DB_USER//\"/}"
+    export FMTM_DB_PASSWORD="${FMTM_DB_PASSWORD//\"/}"
+    export FMTM_DB_NAME="${FMTM_DB_NAME//\"/}"
 }
 
 check_all_s3_vars_present() {
@@ -56,6 +62,12 @@ check_all_s3_vars_present() {
         echo "Environment variable S3_BACKUP_BUCKET_NAME is not set."
         exit 1
     fi
+
+    # Strip any extra unrequired "quotes"
+    export S3_ENDPOINT="${S3_ENDPOINT//\"/}"
+    export S3_ACCESS_KEY="${S3_ACCESS_KEY//\"/}"
+    export S3_SECRET_KEY="${S3_SECRET_KEY//\"/}"
+    export S3_BACKUP_BUCKET_NAME="${S3_BACKUP_BUCKET_NAME//\"/}"
 }
 
 wait_for_db() {
@@ -159,7 +171,9 @@ backup_db() {
 
     BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
+    # Sed required to strip additional "quotes"
     mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
+
     mc mb "s3/${BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BUCKET_NAME}"
     mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/pre-migrate/"
