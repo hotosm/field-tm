@@ -180,7 +180,10 @@ services:
     restart: "unless-stopped"
 
   pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v2.0.2"
+    image: "ghcr.io/getodk/pyxform-http:v2.0.3"
+    # Temp workaround until multiarch support
+    build:
+      context: https://github.com/getodk/pyxform-http.git#v2.0.3
     depends_on:
       central-db:
         condition: service_healthy
@@ -228,6 +231,9 @@ services:
 
   fmtm-db:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
+    build:
+      context: https://github.com/postgis/docker-postgis.git#master:14-3.4/alpine
     command: -c 'max_connections=300'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
