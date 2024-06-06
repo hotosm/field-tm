@@ -1,7 +1,5 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable react/self-closing-comp */
-/* eslint-disable react/no-unused-prop-types */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-unused-vars */

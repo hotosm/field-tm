@@ -18,16 +18,16 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
 
   const onMouseEnter = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
-    element != null ? (element.style.color = `${defaultTheme.palette.error['main']}`) : null;
+    if (element) element.style.color = defaultTheme.palette.error.main;
   };
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const onMouseLeave = (event) => {
     const element = document.getElementById(`text${event.target.id}`);
-    element != null ? (element.style.color = `${defaultTheme.palette.info['main']}`) : null;
+    if (element) element.style.color = defaultTheme.palette.info.main;
   };
   const Drawerstyles = {
     list: {
-      width: type == 'xs' ? size.width - 48 : type == 'sm' ? size.width - 48 : 350,
+      width: type === 'xs' || type === 'sm' ? size.width - 48 : 350,
     },
     outlineBtn: {
       padding: 8,

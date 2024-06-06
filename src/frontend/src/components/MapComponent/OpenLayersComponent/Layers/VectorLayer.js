@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
-/* eslint-disable react/forbid-prop-types */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'ol/proj';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 import GeoJSON from 'ol/format/GeoJSON';

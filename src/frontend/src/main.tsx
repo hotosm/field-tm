@@ -72,4 +72,14 @@ axios.interceptors.request.use(
 })();
 
 // React 18 setup
-createRoot(document.getElementById('app')!).render(<App />);
+createRoot(document.getElementById('app')!, {
+  // // React 19 exposes hooks for Sentry
+  // // Callback called when an error is thrown and not caught by an Error Boundary.
+  // onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+  //   console.warn('Uncaught error', error, errorInfo.componentStack);
+  // }),
+  // // Callback called when React catches an error in an Error Boundary.
+  // onCaughtError: Sentry.reactErrorHandler(),
+  // // Callback called when React automatically recovers from errors.
+  // onRecoverableError: Sentry.reactErrorHandler(),
+}).render(<App />);

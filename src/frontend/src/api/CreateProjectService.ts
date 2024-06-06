@@ -7,7 +7,7 @@ import {
   OrganisationListModel,
 } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { ValidateCustomFormResponse } from 'store/types/ICreateProject';
+import { ValidateCustomFormResponse } from '@/store/types/ICreateProject';
 import { task_split_type } from '@/types/enums';
 
 const CreateProjectService: Function = (

@@ -40,10 +40,10 @@ const ProjectInfo: React.FC = () => {
         <p className="fmtm-font-bold">Description</p>
         {projectDetailsLoading ? (
           <div>
-            {Array.from({ length: 7 }).map((i) => (
-              <CoreModules.Skeleton key={i} />
+            {Array.from({ length: 7 }).map((_, index) => (
+              <CoreModules.Skeleton key={index} />
             ))}
-            <CoreModules.Skeleton className="!fmtm-w-[80px]" />
+            <CoreModules.Skeleton key="last" className="!fmtm-w-[80px]" />
           </div>
         ) : (
           <div>

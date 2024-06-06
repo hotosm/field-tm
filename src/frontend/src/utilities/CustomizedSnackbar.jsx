@@ -1,8 +1,9 @@
 import * as React from 'react';
 import CoreModules from '@/shared/CoreModules';
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <CoreModules.MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+
+function Alert(props, ref) {
+  return <CoreModules.MuiAlert ref={ref} elevation={6} variant="filled" {...props} />;
+}
 
 function SlideTransition(props) {
   return <CoreModules.Slide {...props} direction="up" />;
