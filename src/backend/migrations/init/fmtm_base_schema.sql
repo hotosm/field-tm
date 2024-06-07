@@ -340,7 +340,7 @@ CREATE TABLE public.projects (
     project_name_prefix character varying,
     task_type_prefix character varying,
     location_str character varying,
-    outline GEOMETRY (POLYGON, 4326),
+    outline public.GEOMETRY (POLYGON, 4326),
     last_updated timestamp without time zone,
     status public.projectstatus NOT NULL,
     total_tasks integer,
@@ -361,7 +361,7 @@ CREATE TABLE public.projects (
     id_presets character varying [],
     extra_id_params character varying,
     license_id integer,
-    centroid GEOMETRY (POINT, 4326),
+    centroid public.GEOMETRY (POINT, 4326),
     odk_central_url character varying,
     odk_central_user character varying,
     odk_central_password character varying,
@@ -460,7 +460,7 @@ CREATE TABLE public.tasks (
     project_id integer NOT NULL,
     project_task_index integer,
     project_task_name character varying,
-    outline GEOMETRY (POLYGON, 4326),
+    outline public.GEOMETRY (POLYGON, 4326),
     geometry_geojson character varying,
     feature_count integer,
     task_status public.taskstatus,
@@ -661,9 +661,6 @@ ADD CONSTRAINT project_teams_pkey PRIMARY KEY (team_id, project_id);
 
 ALTER TABLE ONLY public.projects
 ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.splitpolygons
-ADD CONSTRAINT splitpolygons_pkey PRIMARY KEY (polyid);
 
 ALTER TABLE ONLY public.task_history
 ADD CONSTRAINT task_history_pkey PRIMARY KEY (id);
