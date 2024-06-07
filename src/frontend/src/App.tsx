@@ -6,7 +6,7 @@ import CoreModules from '@/shared/CoreModules';
 import { LoginActions } from '@/store/slices/LoginSlice';
 
 // import '@hotosm/ui/components/Tracking';
-import '@hotosm/ui/dist/styles.css';
+import '@hotosm/ui/dist/style.css';
 import '@hotosm/ui/dist/components';
 
 import environment from '@/environment';
