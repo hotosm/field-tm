@@ -5,6 +5,11 @@ import { PersistGate } from 'redux-persist/integration/react';
 import CoreModules from '@/shared/CoreModules';
 import { LoginActions } from '@/store/slices/LoginSlice';
 
+// import '@hotosm/ui/components/Tracking';
+import '@hotosm/ui/dist/styles.css';
+import '@hotosm/ui/dist/components';
+
+import environment from '@/environment';
 import AppRoutes from '@/routes';
 import { store, persistor } from '@/store/Store';
 import OfflineReadyPrompt from '@/components/OfflineReadyPrompt';
@@ -54,6 +59,7 @@ const App = () => {
         <RouterProvider router={AppRoutes} />
         <CheckLoginState />
         <OfflineReadyPrompt />
+        <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.localhost'}></hot-tracking>
       </PersistGate>
     </Provider>
   );

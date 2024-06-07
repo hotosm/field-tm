@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@hotosm/ui':
-        specifier: 0.2.0-b2
-        version: 0.2.0-b2
+        specifier: 0.2.0-b3
+        version: 0.2.0-b3
       '@mui/base':
         specifier: 5.0.0-beta.40
         version: 5.0.0-beta.40(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522)(types-react@19.0.0-rc.0)
@@ -1111,8 +1111,8 @@ packages:
   '@floating-ui/utils@0.2.1':
     resolution: {integrity: sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==}
 
-  '@hotosm/ui@0.2.0-b2':
-    resolution: {integrity: sha512-Ci2Pyrr+m3saXB4Uq0PYrucNhpuSQm22ll6dIX6mWQC32jo4yuzorKND2NFM3tYxOfphSXxk68uBUXLC4sa0Cw==}
+  '@hotosm/ui@0.2.0-b3':
+    resolution: {integrity: sha512-cMnoJABuFyMegw4vD545uAvtF9Jlify8w+uCjfC1yD9W7M/p+Tb6+BK+Knjn/0LPzAQ//SdgkFsUq2dncdrb0g==}
     engines: {node: '>=14.17'}
 
   '@humanwhocodes/config-array@0.11.14':
@@ -5780,7 +5780,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.1': {}
 
-  '@hotosm/ui@0.2.0-b2': {}
+  '@hotosm/ui@0.2.0-b3': {}
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

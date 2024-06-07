@@ -47,7 +47,7 @@
     "@types/react-dom": "npm:types-react-dom@rc"
   },
   "dependencies": {
-    "@hotosm/ui": "0.2.0-b2",
+    "@hotosm/ui": "0.2.0-b4",
     "@mui/base": "5.0.0-beta.40",
     "@mui/icons-material": "^5.15.19",
     "@mui/lab": "^5.0.0-alpha.170",
@@ -100,8 +100,5 @@
     "redux-persist": "^6.0.0",
     "tailwind-merge": "2.3.0",
     "uuid": "^9.0.1"
-  },
-  "peerDependencies": {
-    "@shoelace-style/shoelace": "^2.15.1"
   }
 }
