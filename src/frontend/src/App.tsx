@@ -59,7 +59,7 @@ const App = () => {
         <RouterProvider router={AppRoutes} />
         <CheckLoginState />
         <OfflineReadyPrompt />
-        <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.localhost'}></hot-tracking>
+        <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.hotosm.org'}></hot-tracking>
       </PersistGate>
     </Provider>
   );
