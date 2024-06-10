@@ -192,23 +192,34 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       );
     }
   };
+
   useEffect(() => {
-    if (generateQrSuccess) {
-      const projectId = projectDetailsResponse?.id;
-      dispatch(
-        CommonActions.SetSnackBar({
-          open: true,
-          message: 'QR Generation Completed.',
-          variant: 'success',
-          duration: 2000,
-        }),
-      );
-      dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
-      navigate(`/project/${projectId}`);
-      dispatch(CreateProjectActions.ClearCreateProjectFormData());
-      dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
-    }
-  }, [generateQrSuccess]);
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  
+    const handleQRGeneration = async () => {
+      if (generateQrSuccess) {
+        const projectId = projectDetailsResponse?.id; 
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'QR Generation Completed. Redirecting...',
+            variant: 'success',
+            duration: 2000,
+          }),
+        );
+
+        // Add 5-second delay to allow backend Entity generation to catch up
+        await delay(5000);
+
+        dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
+        navigate(`/project/${projectId}`);
+        dispatch(CreateProjectActions.ClearCreateProjectFormData());
+        dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
+      }
+    };
+  
+    handleQRGeneration();
+  }, [generateQrSuccess]); 
 
   const renderTraceback = (errorText: string) => {
     if (!errorText) {

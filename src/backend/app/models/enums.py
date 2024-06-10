@@ -315,12 +315,19 @@ class GeometryType(str, Enum):
 
 
 class XLSFormType(str, Enum):
-    """Enum for XLSForm categories."""
+    """Enum for XLSForm categories.
 
-    BUILDING = "buildings"
-    HIGHWAYS = "highways"
-    HEALTH = "health"
-    TOILETS = "toilets"
-    RELIGIOUS = "religious"
-    LANDUSAGE = "landusage"
-    WATERWAYS = "waterways"
+    The key is the name of the XLSForm file for internal use.
+    This cannot match an existing OSM tag value, so some words are replaced
+    (e.g. OSM=healthcare, XLSForm=health).
+
+    The the value is the user facing form name (e.g. healthcare).
+    """
+
+    buildings = "buildings"
+    # highways = "highways"
+    health = "healthcare"
+    # toilets = "toilets"
+    # religious = "religious"
+    # landusage = "landusage"
+    # waterways = "waterways"

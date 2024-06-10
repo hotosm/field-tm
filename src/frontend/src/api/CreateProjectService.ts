@@ -71,13 +71,7 @@ const CreateProjectService: Function = (
             formUpload,
           ),
         );
-
-        dispatch(CommonActions.SetLoading(false));
-        dispatch(CreateProjectActions.CreateProjectLoading(true));
       } catch (error: any) {
-        dispatch(CommonActions.SetLoading(false));
-        dispatch(CreateProjectActions.CreateProjectLoading(true));
-
         // Added Snackbar toast for error message
         dispatch(
           CommonActions.SetSnackBar({
@@ -87,9 +81,9 @@ const CreateProjectService: Function = (
             duration: 2000,
           }),
         );
-        //END
-        dispatch(CreateProjectActions.CreateProjectLoading(false));
+
       } finally {
+        dispatch(CommonActions.SetLoading(false));
         dispatch(CreateProjectActions.CreateProjectLoading(false));
       }
     };
@@ -97,6 +91,7 @@ const CreateProjectService: Function = (
     await postCreateProjectDetails(url, projectData, taskAreaGeojson, formUpload);
   };
 };
+
 const FormCategoryService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.GetFormCategoryLoading(true));

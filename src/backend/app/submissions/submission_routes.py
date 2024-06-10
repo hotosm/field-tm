@@ -18,7 +18,6 @@
 """Routes associated with data submission to and from ODK Central."""
 
 import json
-import os
 from io import BytesIO
 from typing import Optional
 
@@ -26,8 +25,6 @@ import geojson
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
-from osm_fieldwork.odk_merge import OdkMerge
-from osm_fieldwork.osmfile import OsmFile
 from sqlalchemy.orm import Session
 
 from app.auth.osm import AuthUser, login_required
@@ -153,65 +150,66 @@ async def get_submission_count(
     return await submission_crud.get_submission_count_of_a_project(db, project_id)
 
 
-@router.post("/conflate_data")
-async def conflate_osm_data(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
-):
-    """Conflate submission data against existing OSM data."""
-    # All Submissions JSON
-    # NOTE runs in separate thread using run_in_threadpool
-    # FIXME we probably need to change this func
-    submission = await run_in_threadpool(
-        lambda: submission_crud.get_all_submissions_json(db, project_id)
-    )
+# FIXME 07/06/2024 since osm-fieldwork update
+# @router.post("/conflate_data")
+# async def conflate_osm_data(
+#     project_id: int,
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(login_required),
+# ):
+#     """Conflate submission data against existing OSM data."""
+#     # All Submissions JSON
+#     # NOTE runs in separate thread using run_in_threadpool
+#     # FIXME we probably need to change this func
+#     submission = await run_in_threadpool(
+#         lambda: submission_crud.get_all_submissions_json(db, project_id)
+#     )
 
-    # Data extracta file
-    data_extracts_file = "/tmp/data_extracts_file.geojson"
+#     # Data extracta file
+#     data_extracts_file = "/tmp/data_extracts_file.geojson"
 
-    await project_crud.get_extracted_data_from_db(db, project_id, data_extracts_file)
+#     await project_crud.get_extracted_data_from_db(db, project_id, data_extracts_file)
 
-    # Output file
-    outfile = "/tmp/output_file.osm"
-    # JSON FILE PATH
-    jsoninfile = "/tmp/json_infile.json"
+#     # Output file
+#     outfile = "/tmp/output_file.osm"
+#     # JSON FILE PATH
+#     jsoninfile = "/tmp/json_infile.json"
 
-    # # Delete if these files already exist
-    if os.path.exists(outfile):
-        os.remove(outfile)
-    if os.path.exists(jsoninfile):
-        os.remove(jsoninfile)
+#     # # Delete if these files already exist
+#     if os.path.exists(outfile):
+#         os.remove(outfile)
+#     if os.path.exists(jsoninfile):
+#         os.remove(jsoninfile)
 
-    # Write the submission to a file
-    with open(jsoninfile, "w") as f:
-        f.write(json.dumps(submission))
+#     # Write the submission to a file
+#     with open(jsoninfile, "w") as f:
+#         f.write(json.dumps(submission))
 
-    # Convert the submission to osm xml format
-    osmoutfile = await submission_crud.convert_json_to_osm(jsoninfile)
+#     # Convert the submission to osm xml format
+#     osmoutfile = await submission_crud.convert_json_to_osm(jsoninfile)
 
-    # Remove the extra closing </osm> tag from the end of the file
-    with open(osmoutfile, "r") as f:
-        osmoutfile_data = f.read()
-        # Find the last index of the closing </osm> tag
-        last_osm_index = osmoutfile_data.rfind("</osm>")
-        # Remove the extra closing </osm> tag from the end
-        processed_xml_string = (
-            osmoutfile_data[:last_osm_index]
-            + osmoutfile_data[last_osm_index + len("</osm>") :]
-        )
+#     # Remove the extra closing </osm> tag from the end of the file
+#     with open(osmoutfile, "r") as f:
+#         osmoutfile_data = f.read()
+#         # Find the last index of the closing </osm> tag
+#         last_osm_index = osmoutfile_data.rfind("</osm>")
+#         # Remove the extra closing </osm> tag from the end
+#         processed_xml_string = (
+#             osmoutfile_data[:last_osm_index]
+#             + osmoutfile_data[last_osm_index + len("</osm>") :]
+#         )
 
-    # Write the modified XML data back to the file
-    with open(osmoutfile, "w") as f:
-        f.write(processed_xml_string)
+#     # Write the modified XML data back to the file
+#     with open(osmoutfile, "w") as f:
+#         f.write(processed_xml_string)
 
-    odkf = OsmFile(outfile)
-    osm = odkf.loadFile(osmoutfile)
-    if osm:
-        odk_merge = OdkMerge(data_extracts_file, None)
-        data = odk_merge.conflateData(osm)
-        return data
-    return []
+#     odkf = OsmFile(outfile)
+#     osm = odkf.loadFile(osmoutfile)
+#     if osm:
+#         odk_merge = OdkMerge(data_extracts_file, None)
+#         data = odk_merge.conflateData(osm)
+#         return data
+#     return []
 
 
 # TODO remove this redundant endpoint
@@ -264,43 +262,44 @@ async def conflate_osm_data(
 #     )
 
 
-@router.get("/get_osm_xml/{project_id}")
-async def get_osm_xml(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
-):
-    """Get the submissions in OSM XML format for a project.
+# FIXME 07/06/2024 since osm-fieldwork update
+# @router.get("/get_osm_xml/{project_id}")
+# async def get_osm_xml(
+#     project_id: int,
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(login_required),
+# ):
+#     """Get the submissions in OSM XML format for a project.
 
-    TODO refactor to put logic in crud for easier testing.
-    """
-    # JSON FILE PATH
-    jsoninfile = f"/tmp/{project_id}_json_infile.json"
+#     TODO refactor to put logic in crud for easier testing.
+#     """
+#     # JSON FILE PATH
+#     jsoninfile = f"/tmp/{project_id}_json_infile.json"
 
-    # # Delete if these files already exist
-    if os.path.exists(jsoninfile):
-        os.remove(jsoninfile)
+#     # # Delete if these files already exist
+#     if os.path.exists(jsoninfile):
+#         os.remove(jsoninfile)
 
-    # All Submissions JSON
-    # NOTE runs in separate thread using run_in_threadpool
-    # FIXME we probably need to change this func
-    submission = await run_in_threadpool(
-        lambda: submission_crud.get_all_submissions_json(db, project_id)
-    )
+#     # All Submissions JSON
+#     # NOTE runs in separate thread using run_in_threadpool
+#     # FIXME we probably need to change this func
+#     submission = await run_in_threadpool(
+#         lambda: submission_crud.get_all_submissions_json(db, project_id)
+#     )
 
-    # Write the submission to a file
-    with open(jsoninfile, "w") as f:
-        f.write(json.dumps(submission))
+#     # Write the submission to a file
+#     with open(jsoninfile, "w") as f:
+#         f.write(json.dumps(submission))
 
-    # Convert the submission to osm xml format
-    osmoutfile = await submission_crud.convert_json_to_osm(jsoninfile)
+#     # Convert the submission to osm xml format
+#     osmoutfile = await submission_crud.convert_json_to_osm(jsoninfile)
 
-    # Remove the extra closing </osm> tag from the end of the file
-    with open(osmoutfile, "r") as f:
-        osmoutfile_data = f.read()
+#     # Remove the extra closing </osm> tag from the end of the file
+#     with open(osmoutfile, "r") as f:
+#         osmoutfile_data = f.read()
 
-    # Create a plain XML response
-    return Response(content=osmoutfile_data, media_type="application/xml")
+#     # Create a plain XML response
+#     return Response(content=osmoutfile_data, media_type="application/xml")
 
 
 @router.get("/submission_page/{project_id}")
