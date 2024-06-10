@@ -62,7 +62,8 @@ async def download_template(
     category: XLSFormType,
 ):
     """Download an XLSForm template to fill out."""
-    xlsform_path = f"{xlsforms_path}/{category}.xls"
+    filename = XLSFormType(category).name
+    xlsform_path = f"{xlsforms_path}/{filename}.xls"
     if Path(xlsform_path).exists():
         return FileResponse(xlsform_path, filename="form.xls")
     else:

@@ -169,7 +169,7 @@ export const DownloadTile = (url, payload, toOpfs = false) => {
           responseType: 'arraybuffer',
         });
 
-        // Get filename from content-disposition header
+        // Get filename from Content-Disposition header
         const tileData = response.data;
 
         if (toOpfs) {
@@ -182,9 +182,9 @@ export const DownloadTile = (url, payload, toOpfs = false) => {
           return;
         }
 
-        const filename = response.headers['content-disposition'].split('filename=')[1];
+        const filename = response.headers['Content-Disposition'].split('filename=')[1];
         // Create Blob from ArrayBuffer
-        const blob = new Blob([tileData], { type: response.headers['content-type'] });
+        const blob = new Blob([tileData], { type: response.headers['Content-Type'] });
         const downloadUrl = URL.createObjectURL(blob);
 
         const a = document.createElement('a');

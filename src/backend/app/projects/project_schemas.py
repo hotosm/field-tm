@@ -39,7 +39,7 @@ from app.db.postgis_utils import (
     read_wkb,
     write_wkb,
 )
-from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType
+from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType, XLSFormType
 from app.tasks import tasks_schemas
 from app.users.user_schemas import User
 
@@ -307,7 +307,7 @@ class ProjectBase(BaseModel):
     project_info: ProjectInfo
     status: ProjectStatus
     # location_str: str
-    xform_category: Optional[str] = None
+    xform_category: Optional[XLSFormType] = None
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
 

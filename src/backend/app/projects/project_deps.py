@@ -18,6 +18,7 @@
 
 """Project dependencies for use in Depends."""
 
+from functools import lru_cache
 from typing import Optional
 
 from fastapi import Depends
@@ -57,6 +58,7 @@ async def get_project_by_id(
     return db_project
 
 
+@lru_cache(maxsize=None)
 async def get_odk_credentials(db: Session, project_id: int):
     """Get ODK credentials of a project, or default organization credentials."""
     sql = text(

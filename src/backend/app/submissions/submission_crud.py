@@ -21,7 +21,6 @@ import csv
 import hashlib
 import io
 import json
-import os
 import uuid
 from collections import Counter
 from datetime import datetime, timedelta
@@ -32,7 +31,8 @@ import sozipfile.sozipfile as zipfile
 from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Response
 from loguru import logger as log
-from osm_fieldwork.json2osm import json2osm
+
+# from osm_fieldwork.json2osm import json2osm
 from sqlalchemy.orm import Session
 
 from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
@@ -43,16 +43,10 @@ from app.projects import project_crud, project_deps
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 from app.tasks import tasks_crud
 
-
-async def convert_json_to_osm(file_path):
-    """Wrapper for osm-fieldwork json2osm.
-
-    FIXME add json output to osm2json (in addition to default OSM XML output)
-    """
-    # TODO check speed of json2osm
-    # TODO if slow response, use run_in_threadpool
-    osm_xml_path = json2osm(file_path)
-    return osm_xml_path
+# async def convert_json_to_osm(file_path):
+#     """Wrapper for osm-fieldwork json2osm."""
+#     osm_xml_path = json2osm(file_path)
+#     return osm_xml_path
 
 
 # TODO remove this
@@ -74,63 +68,64 @@ async def convert_json_to_osm(file_path):
 #     return osmoutfile
 
 
-def convert_to_osm(db: Session, project_id: int, task_id: Optional[int]):
-    """Convert submissions to OSM XML format."""
-    project_sync = async_to_sync(project_deps.get_project_by_id)
-    project = project_sync(db, project_id)
+# # FIXME 07/06/2024 since osm-fieldwork update
+# def convert_to_osm(db: Session, project_id: int, task_id: Optional[int]):
+#     """Convert submissions to OSM XML format."""
+#     project_sync = async_to_sync(project_deps.get_project_by_id)
+#     project = project_sync(db, project_id)
 
-    get_submission_sync = async_to_sync(get_submission_by_project)
-    data = get_submission_sync(project_id, {}, db)
+#     get_submission_sync = async_to_sync(get_submission_by_project)
+#     data = get_submission_sync(project_id, {}, db)
 
-    submissions = data.get("value", [])
+#     submissions = data.get("value", [])
 
-    # Create a new ZIP file for the extracted files
-    final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
+#     # Create a new ZIP file for the extracted files
+#     final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
 
-    # Remove the ZIP file if it already exists
-    if os.path.exists(final_zip_file_path):
-        os.remove(final_zip_file_path)
+#     # Remove the ZIP file if it already exists
+#     if os.path.exists(final_zip_file_path):
+#         os.remove(final_zip_file_path)
 
-    # filter submission by task_id
-    if task_id:
-        submissions = [
-            sub
-            for sub in submissions
-            if sub.get("all", {}).get("task_id") == str(task_id)
-        ]
+#     # filter submission by task_id
+#     if task_id:
+#         submissions = [
+#             sub
+#             for sub in submissions
+#             if sub.get("all", {}).get("task_id") == str(task_id)
+#         ]
 
-    if not submissions:
-        raise HTTPException(status_code=404, detail="Submission not found")
+#     if not submissions:
+#         raise HTTPException(status_code=404, detail="Submission not found")
 
-    # JSON FILE PATH
-    jsoninfile = "/tmp/json_infile.json"
+#     # JSON FILE PATH
+#     jsoninfile = "/tmp/json_infile.json"
 
-    # Write the submission to a file
-    with open(jsoninfile, "w") as f:
-        f.write(json.dumps(submissions))
+#     # Write the submission to a file
+#     with open(jsoninfile, "w") as f:
+#         f.write(json.dumps(submissions))
 
-    # Convert the submission to osm xml format
-    convert_json_to_osm_sync = async_to_sync(convert_json_to_osm)
+#     # Convert the submission to osm xml format
+#     convert_json_to_osm_sync = async_to_sync(convert_json_to_osm)
 
-    if osm_file_path := convert_json_to_osm_sync(jsoninfile):
-        with open(osm_file_path, "r") as osm_file:
-            osm_data = osm_file.read()
-            last_osm_index = osm_data.rfind("</osm>")
-            processed_xml_string = (
-                osm_data[:last_osm_index] + osm_data[last_osm_index + len("</osm>") :]
-            )
+#     if osm_file_path := convert_json_to_osm_sync(jsoninfile):
+#         with open(osm_file_path, "r") as osm_file:
+#             osm_data = osm_file.read()
+#             last_osm_index = osm_data.rfind("</osm>")
+#             processed_xml_string = (
+#                 osm_data[:last_osm_index] + osm_data[last_osm_index + len("</osm>") :]
+#             )
 
-        with open(osm_file_path, "w") as osm_file:
-            osm_file.write(processed_xml_string)
+#         with open(osm_file_path, "w") as osm_file:
+#             osm_file.write(processed_xml_string)
 
-        final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
-        if os.path.exists(final_zip_file_path):
-            os.remove(final_zip_file_path)
+#         final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
+#         if os.path.exists(final_zip_file_path):
+#             os.remove(final_zip_file_path)
 
-        with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
-            final_zip_file.write(osm_file_path)
+#         with zipfile.ZipFile(final_zip_file_path, mode="a") as final_zip_file:
+#             final_zip_file.write(osm_file_path)
 
-    return final_zip_file_path
+#     return final_zip_file_path
 
 
 async def gather_all_submission_csvs(db, project_id):

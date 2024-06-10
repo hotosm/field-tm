@@ -61,6 +61,7 @@ from app.models.enums import (
     TILES_SOURCE,
     HTTPStatus,
     ProjectVisibility,
+    XLSFormType,
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -208,7 +209,6 @@ async def get_odk_entities_geojson(
     return await central_crud.get_entities_geojson(
         odk_credentials,
         project.odkid,
-        project.xform_category,
         minimal=minimal,
     )
 
@@ -226,7 +226,6 @@ async def get_odk_entities_mapping_statuses(
     return await central_crud.get_entities_data(
         odk_credentials,
         project.odkid,
-        project.xform_category,
     )
 
 
@@ -248,7 +247,6 @@ async def get_odk_entities_osm_ids(
     return await central_crud.get_entities_data(
         odk_credentials,
         project.odkid,
-        project.xform_category,
         fields="osm_id",
     )
 
@@ -266,7 +264,6 @@ async def get_odk_entities_task_ids(
     return await central_crud.get_entities_data(
         odk_credentials,
         project.odkid,
-        project.xform_category,
         fields="task_id",
     )
 
@@ -285,7 +282,6 @@ async def get_odk_entity_mapping_status(
     return await central_crud.get_entity_mapping_status(
         odk_credentials,
         project.odkid,
-        project.xform_category,
         entity_id,
     )
 
@@ -312,7 +308,6 @@ async def set_odk_entities_mapping_status(
     return await central_crud.update_entity_mapping_status(
         odk_credentials,
         project.odkid,
-        project.xform_category,
         entity_details.entity_id,
         entity_details.label,
         entity_details.status,
@@ -346,23 +341,37 @@ async def download_tiles(
 ):
     """Download the basemap tile archive for a project."""
     log.debug("Getting tile archive path from DB")
-    tiles_path = (
+    dbtile_obj = (
         db.query(db_models.DbTilesPath)
         .filter(db_models.DbTilesPath.id == str(tile_id))
         .first()
     )
-    log.info(f"User requested download for tiles: {tiles_path.path}")
+    if not dbtile_obj:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Basemap ID does not exist!"
+        )
+    log.info(f"User requested download for tiles: {dbtile_obj.path}")
 
-    project_id = tiles_path.project_id
+    project_id = dbtile_obj.project_id
     project = await project_crud.get_project(db, project_id)
-    filename = Path(tiles_path.path).name.replace(
+    filename = Path(dbtile_obj.path).name.replace(
         f"{project_id}_", f"{project.project_name_prefix}_"
     )
     log.debug(f"Sending tile archive to user: {filename}")
 
+    if (tiles_path := Path(filename).suffix) == ".mbtiles":
+        tiles_mime_type = "application/vnd.mapbox-vector-tile"
+    elif tiles_path == ".pmtiles":
+        tiles_mime_type = "application/vnd.pmtiles"
+    else:
+        tiles_mime_type = "application/vnd.sqlite3"
+
     return FileResponse(
-        tiles_path.path,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        dbtile_obj.path,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": tiles_mime_type,
+        },
     )
 
 
@@ -818,7 +827,7 @@ async def preview_split_by_square(
 @router.post("/generate-data-extract/")
 async def get_data_extract(
     geojson_file: UploadFile = File(...),
-    form_category: Optional[str] = Form(None),
+    form_category: Optional[XLSFormType] = Form(None),
     # config_file: Optional[str] = Form(None),
     current_user: AuthUser = Depends(login_required),
 ):
@@ -831,7 +840,8 @@ async def get_data_extract(
 
     # Get extract config file from existing data_models
     if form_category:
-        data_model = f"{data_models_path}/{form_category}.yaml"
+        config_filename = XLSFormType(form_category).name
+        data_model = f"{data_models_path}/{config_filename}.yaml"
         with open(data_model, "rb") as data_model_yaml:
             extract_config = BytesIO(data_model_yaml.read())
     else:
@@ -926,7 +936,8 @@ async def download_form(
         "Content-Type": "application/media",
     }
     if not project.form_xls:
-        xlsform_path = f"{xlsforms_path}/{project.xform_category}.xls"
+        form_filename = XLSFormType(project.xform_category).name
+        xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
         if os.path.exists(xlsform_path):
             return FileResponse(xlsform_path, filename="form.xls")
         else:
@@ -937,7 +948,7 @@ async def download_form(
 @router.post("/update-form")
 async def update_project_form(
     xform_id: str = Form(...),
-    category: str = Form(...),
+    category: XLSFormType = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
     project_user_dict: dict = Depends(project_admin),
@@ -967,7 +978,8 @@ async def update_project_form(
         project.form_xls = new_xform_data
         new_xform_data = BytesIO(new_xform_data)
     else:
-        xlsform_path = Path(f"{xlsforms_path}/{category}.xls")
+        form_filename = XLSFormType(project.xform_category).name
+        xlsform_path = Path(f"{xlsforms_path}/{form_filename}.xls")
         file_ext = xlsform_path.suffix.lower()
         with open(xlsform_path, "rb") as f:
             new_xform_data = BytesIO(f.read())
@@ -1120,35 +1132,35 @@ async def convert_fgb_to_geojson(
     return Response(content=json.dumps(data_extract_geojson), headers=headers)
 
 
-@router.get("/boundary_in_osm/{project_id}/")
-async def download_task_boundary_osm(
-    project_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
-):
-    """Downloads the boundary of a task as a OSM file.
+# @router.get("/boundary_in_osm/{project_id}/")
+# async def download_task_boundary_osm(
+#     project_id: int,
+#     db: Session = Depends(database.get_db),
+#     current_user: AuthUser = Depends(mapper),
+# ):
+#     """Downloads the boundary of a task as a OSM file.
 
-    Args:
-        project_id (int): The id of the project.
-        db (Session): The database session, provided automatically.
-        current_user (AuthUser): Check if user has MAPPER permission.
+#     Args:
+#         project_id (int): The id of the project.
+#         db (Session): The database session, provided automatically.
+#         current_user (AuthUser): Check if user has MAPPER permission.
 
-    Returns:
-        Response: The HTTP response object containing the downloaded file.
-    """
-    out = await project_crud.get_task_geometry(db, project_id)
-    file_path = f"/tmp/{project_id}_task_boundary.geojson"
+#     Returns:
+#         Response: The HTTP response object containing the downloaded file.
+#     """
+#     out = await project_crud.get_task_geometry(db, project_id)
+#     file_path = f"/tmp/{project_id}_task_boundary.geojson"
 
-    # Write the response content to the file
-    with open(file_path, "w") as f:
-        f.write(out)
-    result = await project_crud.convert_geojson_to_osm(file_path)
+#     # Write the response content to the file
+#     with open(file_path, "w") as f:
+#         f.write(out)
+#     result = await project_crud.convert_geojson_to_osm(file_path)
 
-    with open(result, "r") as f:
-        content = f.read()
+#     with open(result, "r") as f:
+#         content = f.read()
 
-    response = Response(content=content, media_type="application/xml")
-    return response
+#     response = Response(content=content, media_type="application/xml")
+#     return response
 
 
 @router.get("/centroid/")

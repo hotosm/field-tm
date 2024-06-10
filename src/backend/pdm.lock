@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:cc2c7bfe8ad025999c448bbef3e0f75dffbcb7eef9fe015e022b9436363f310b"
+content_hash = "sha256:3dfb8a9f5d6fb72d99be33d0576d5649f08da14be9108063f0dc1d1352e6bf51"
 
 [[package]]
 name = "aiohttp"
@@ -658,7 +658,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.2.1"
+version = "1.2.2"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
@@ -669,8 +669,8 @@ dependencies = [
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.2.1.tar.gz", hash = "sha256:51e79cc8f15e4e2ad571d5bff4403dcfff2c0d0a75f4c0a26c4469557708403c"},
-    {file = "fmtm_splitter-1.2.1-py3-none-any.whl", hash = "sha256:80d2ae657a2596668a19f193a874d091b153d203415c9e87d76b7f76810b6180"},
+    {file = "fmtm-splitter-1.2.2.tar.gz", hash = "sha256:9384dbf00c0e53e24e1f13046ae6693e13567ff3dc0f59f29f4a96ac4a54105e"},
+    {file = "fmtm_splitter-1.2.2-py3-none-any.whl", hash = "sha256:bbef78cf0e1f2b67f8c8aeaadb7fd2927bfd333d216927059a12abbbb04a5742"},
 ]
 
 [[package]]
@@ -1662,7 +1662,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.10.1"
+version = "0.11.2"
 requires_python = ">=3.10"
 summary = "Processing field data from ODK to OpenStreetMap format."
 dependencies = [
@@ -1687,8 +1687,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.10.1.tar.gz", hash = "sha256:a437e46e4e8e63f5bd5fedef7830d5648995ee9c896993e70dd63551af30766e"},
-    {file = "osm_fieldwork-0.10.1-py3-none-any.whl", hash = "sha256:1f03c63ac482a558bc2a43f6d05ab66c092b2cfee57d7a838e5e744b00042e53"},
+    {file = "osm-fieldwork-0.11.2.tar.gz", hash = "sha256:472edd6873a173d526b636a01abb39cb558609d9df14da19cfe82413945954db"},
+    {file = "osm_fieldwork-0.11.2-py3-none-any.whl", hash = "sha256:be919fc058811253c7ee9276822d9160e2dff170d777bbf3e95d7fc40ec26def"},
 ]
 
 [[package]]

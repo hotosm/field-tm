@@ -22,7 +22,7 @@ import json
 import os
 import uuid
 from io import BytesIO, StringIO
-from typing import Optional, Union
+from typing import Optional
 from xml.etree.ElementTree import Element, SubElement
 
 import geojson
@@ -43,7 +43,7 @@ from app.db.postgis_utils import (
     javarosa_to_geojson_geom,
     parse_and_filter_geojson,
 )
-from app.models.enums import HTTPStatus, XLSFormType
+from app.models.enums import HTTPStatus, TaskStatus, XLSFormType
 from app.projects import project_schemas
 
 
@@ -341,7 +341,7 @@ async def update_project_xform(
         form_file_ext,
         return_form_data=True,
     )
-    updated_xform_data = await update_survey_xform(
+    updated_xform_data = await modify_xform_xml(
         xform_data,
         category,
         task_count,
@@ -364,7 +364,7 @@ async def read_and_test_xform(
     input_data: BytesIO,
     form_file_ext: str,
     return_form_data: bool = False,
-) -> Union[BytesIO, dict]:
+) -> BytesIO | dict:
     """Read and validate an XForm.
 
     Args:
@@ -441,52 +441,7 @@ async def read_and_test_xform(
         ) from e
 
 
-async def update_entity_registration_xform(
-    form_data: BytesIO,
-    category: str,
-) -> BytesIO:
-    """Update fields in entity registration to name dataset.
-
-    The CSV media must be named the same as the dataset (entity list).
-
-    Args:
-        form_data (str): The input registration form data.
-        category (str): The form category, used to name the dataset (entity list)
-            and the .csv file containing the geometries.
-
-    Returns:
-        BytesIO: The XForm data.
-    """
-    log.debug(f"Updating XML keys in Entity Registration XForm: {category}")
-
-    # Parse the XML
-    root = ElementTree.fromstring(form_data.getvalue())
-
-    # Define namespaces
-    namespaces = {
-        "h": "http://www.w3.org/1999/xhtml",
-        "xforms": "http://www.w3.org/2002/xforms",
-        "jr": "http://openrosa.org/javarosa",
-        "ns3": "http://www.opendatakit.org/xforms/entities",
-        "odk": "http://www.opendatakit.org/xforms",
-    }
-
-    # Update the dataset name within the meta section
-    for meta_elem in root.findall(".//xforms:entity[@dataset]", namespaces):
-        meta_elem.set("dataset", category)
-
-    # Update the attachment name to {category}.csv, to link to the entity list
-    for instance_elem in root.findall(".//xforms:instance[@src]", namespaces):
-        src_value = instance_elem.get("src", "")
-        if src_value.endswith(".csv"):
-            # NOTE geojson files require jr://file/{category}.geojson
-            # NOTE csv files require jr://file-csv/{category}.csv
-            instance_elem.set("src", f"jr://file-csv/{category}.csv")
-
-    return BytesIO(ElementTree.tostring(root))
-
-
-async def update_survey_xform(
+async def modify_xform_xml(
     form_data: BytesIO,
     category: str,
     task_count: int,
@@ -496,7 +451,7 @@ async def update_survey_xform(
 
     The 'id' field is set to random UUID (xFormId) unless existing_id is specified
     The 'name' field is set to the category name.
-    The upload media must match the (entity) dataset name (with .csv).
+    The upload media must be equal to 'features.csv'.
     The task_id options are populated as choices in the form.
     The form_category value is also injected to display in the instructions.
 
@@ -542,9 +497,9 @@ async def update_survey_xform(
     for inst in xform_instance_src:
         src_value = inst.get("src", "")
         if src_value.endswith(".geojson") or src_value.endswith(".csv"):
-            # NOTE geojson files require jr://file/{category}.geojson
-            # NOTE csv files require jr://file-csv/{category}.csv
-            inst.set("src", f"jr://file-csv/{category}.csv")
+            # NOTE geojson files require jr://file/features.geojson
+            # NOTE csv files require jr://file-csv/features.csv
+            inst.set("src", "jr://file-csv/features.csv")
 
     # NOTE add the task ID choices to the XML
     # <instance> must be defined inside <model></model> root element
@@ -713,7 +668,7 @@ async def convert_odk_submission_json_to_geojson(
 async def get_entities_geojson(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
-    dataset_name: str,
+    dataset_name: str = "features",
     minimal: Optional[bool] = False,
 ) -> geojson.FeatureCollection:
     """Get the Entity details for a dataset / Entity list.
@@ -808,7 +763,7 @@ async def get_entities_geojson(
 async def get_entities_data(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
-    dataset_name: str,
+    dataset_name: str = "features",
     fields: str = "__system/updatedAt, osm_id, status, task_id",
 ) -> list:
     """Get all the entity mapping statuses.
@@ -846,7 +801,10 @@ async def get_entities_data(
 
 
 def entity_to_flat_dict(
-    entity: Optional[dict], odk_id: int, dataset_name: str, entity_uuid: str
+    entity: Optional[dict],
+    odk_id: int,
+    entity_uuid: str,
+    dataset_name: str = "features",
 ) -> dict:
     """Convert returned Entity from ODK Central to flattened dict."""
     if not entity:
@@ -872,8 +830,8 @@ def entity_to_flat_dict(
 async def get_entity_mapping_status(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
-    dataset_name: str,
     entity_uuid: str,
+    dataset_name: str = "features",
 ) -> dict:
     """Get an single entity mapping status.
 
@@ -895,16 +853,16 @@ async def get_entity_mapping_status(
             dataset_name,
             entity_uuid,
         )
-    return entity_to_flat_dict(entity, odk_id, dataset_name, entity_uuid)
+    return entity_to_flat_dict(entity, odk_id, entity_uuid, dataset_name)
 
 
 async def update_entity_mapping_status(
     odk_creds: project_schemas.ODKCentralDecrypted,
     odk_id: int,
-    dataset_name: str,
     entity_uuid: str,
     label: str,
-    status: str,
+    status: TaskStatus,
+    dataset_name: str = "features",
 ) -> dict:
     """Update the Entity mapping status.
 
@@ -913,10 +871,10 @@ async def update_entity_mapping_status(
     Args:
         odk_creds (ODKCentralDecrypted): ODK credentials for a project.
         odk_id (str): The project ID in ODK Central.
-        dataset_name (str): The dataset / Entity list name in ODK Central.
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
-        status (str): New TaskStatus to assign, in string form.
+        status (TaskStatus): New TaskStatus to assign, in string form.
+        dataset_name (str): Override the default dataset / Entity list name 'features'.
 
     Returns:
         dict: All Entity data in OData JSON format.
@@ -931,7 +889,7 @@ async def update_entity_mapping_status(
                 "status": status,
             },
         )
-    return entity_to_flat_dict(entity, odk_id, dataset_name, entity_uuid)
+    return entity_to_flat_dict(entity, odk_id, entity_uuid, dataset_name)
 
 
 def upload_media(
