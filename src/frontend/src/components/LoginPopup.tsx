@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CoreModules from '@/shared/CoreModules';
 import { Modal } from '@/components/common/Modal';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { osmLoginRedirect } from '@/utilfunctions/login';
 import { TemporaryLoginService } from '@/api/Login';
@@ -35,16 +35,19 @@ const loginOptions: loginOptionsType[] = [
 const LoginPopup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
 
   const loginModalOpen = CoreModules.useAppSelector((state) => state.login.loginModalOpen);
 
-  const handleSignIn = (selectedOption: string) => {
+  const handleSignIn = async (selectedOption: string) => {
     if (selectedOption === 'osm_account') {
+      localStorage.setItem('requestedPath', from);
       osmLoginRedirect();
     } else {
-      dispatch(TemporaryLoginService(`${import.meta.env.VITE_API_URL}/auth/temp-login`));
-      navigate('/');
+      await dispatch(TemporaryLoginService(`${import.meta.env.VITE_API_URL}/auth/temp-login`, from));
       dispatch(LoginActions.setLoginModalOpen(false));
+      navigate(from);
     }
   };
 

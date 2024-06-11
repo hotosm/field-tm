@@ -35,17 +35,21 @@ const routes = createBrowserRouter([
       {
         path: '/organisation',
         element: (
-          <ErrorBoundary>
-            <Organisation />
-          </ErrorBoundary>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <Organisation />
+            </ErrorBoundary>
+          </ProtectedRoute>
         ),
       },
       {
         path: '/create-organization',
         element: (
-          <ErrorBoundary>
-            <CreateEditOrganization />
-          </ErrorBoundary>
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <CreateEditOrganization />
+            </ErrorBoundary>
+          </ProtectedRoute>
         ),
       },
       {
