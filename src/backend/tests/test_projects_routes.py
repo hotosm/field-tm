@@ -275,6 +275,52 @@ async def test_generate_project_files(db, client, project):
     assert response.status_code == 200
 
 
+async def test_update_project(client, admin_user, project):
+    """Test update project metadata."""
+    updated_project_data = {
+        "project_info": {
+            "name": f"Updated Test Project {randint(1, 1000000)}",
+            "short_description": "updated short description",
+            "description": "updated description",
+        },
+        "xform_category": "buildings",
+        "hashtags": ["#FMTM"],
+        "outline_geojson": {
+            "coordinates": [
+                [
+                    [85.317028828, 27.7052522097],
+                    [85.317028828, 27.7041424888],
+                    [85.318844411, 27.7041424888],
+                    [85.318844411, 27.7052522097],
+                    [85.317028828, 27.7052522097],
+                ]
+            ],
+            "type": "Polygon",
+        },
+    }
+
+    response = client.put(f"/projects/{project.id}", json=updated_project_data)
+
+    if response.status_code != 200:
+        log.error(response.json())
+    assert response.status_code == 200
+
+    response_data = response.json()
+    # Assert that project_info in response_data matches updated_project_data
+    assert (
+        response_data["project_info"]["name"]
+        == updated_project_data["project_info"]["name"]
+    )
+    assert (
+        response_data["project_info"]["short_description"]
+        == updated_project_data["project_info"]["short_description"]
+    )
+    assert (
+        response_data["project_info"]["description"]
+        == updated_project_data["project_info"]["description"]
+    )
+
+
 if __name__ == "__main__":
     """Main func if file invoked directly."""
     pytest.main()
