@@ -16,6 +16,7 @@ import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { checkGeomTypeInGeojson } from '@/utilfunctions/checkGeomTypeInGeojson';
 import { task_split_type } from '@/types/enums';
+import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Use OSM data extract' },
@@ -97,8 +98,20 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
       const uint8ArrayData = new Uint8Array(binaryData);
       // Deserialize the binary data
       const geojsonExtract = await fgbGeojson.deserialize(uint8ArrayData);
-      dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
-      await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
+      if ((geojsonExtract && (geojsonExtract as dataExtractGeojsonType))?.features?.length > 0) {
+        dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
+        await dispatch(CreateProjectActions.setDataExtractGeojson(geojsonExtract));
+      } else {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Data extract has no features. Please try adjusting your AOI.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+        dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
+      }
     } catch (error) {
       dispatch(
         CommonActions.SetSnackBar({
@@ -179,20 +192,28 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
       setDataExtractToState(geojsonFile);
     }
     const hasGeojsonLineString = checkGeomTypeInGeojson(extractFeatCol, 'LineString');
-    handleCustomChange('hasGeojsonLineString', hasGeojsonLineString);
-    handleCustomChange('task_split_type', task_split_type['choose_area_as_task'].toString());
-    if (!hasGeojsonLineString) {
-      dispatch(
-        CommonActions.SetSnackBar({
-          open: true,
-          message: 'Data extract must contain a LineString otherwise the task splitting algorithm will not work.',
-          variant: 'warning',
-          duration: 8000,
-        }),
-      );
+    if (extractFeatCol && extractFeatCol?.features?.length > 0) {
+      handleCustomChange('customDataExtractUpload', event.target.files[0]);
+      handleCustomChange('hasGeojsonLineString', hasGeojsonLineString);
+      handleCustomChange('task_split_type', task_split_type['choose_area_as_task'].toString());
+      if (!hasGeojsonLineString) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Data extract must contain a LineString otherwise the task splitting algorithm will not work.',
+            variant: 'warning',
+            duration: 8000,
+          }),
+        );
+      }
+      // View on map
+      await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
+      return;
     }
-    // View on map
-    await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
+    dispatch(CommonActions.SetSnackBar({ open: true, message: 'Invalid GeoJSON', variant: 'error', duration: 4000 }));
+    handleCustomChange('customDataExtractUpload', null);
+    dispatch(CreateProjectActions.setDataExtractGeojson(null));
+    return;
   };
 
   useEffect(() => {
@@ -256,7 +277,6 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
                   <FileInputComponent
                     onChange={(e) => {
                       changeFileHandler(e, setCustomDataExtractUpload);
-                      handleCustomChange('customDataExtractUpload', e.target.files[0]);
                     }}
                     onResetFile={() => {
                       resetFile(setCustomDataExtractUpload);
