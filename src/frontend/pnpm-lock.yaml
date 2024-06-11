@@ -129,13 +129,13 @@ importers:
         specifier: ^1.4.4
         version: 1.4.4
       react:
-        specifier: ^19.0.0-rc-6d3110b4d9-20240531
+        specifier: ^19.0.0-rc-6230622a1a-20240610
         version: 19.0.0-rc-f994737d14-20240522
       react-datepicker:
         specifier: ^6.9.0
         version: 6.9.0(react-dom@19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522))(react@19.0.0-rc-f994737d14-20240522)
       react-dom:
-        specifier: ^19.0.0-rc-6d3110b4d9-20240531
+        specifier: ^19.0.0-rc-6230622a1a-20240610
         version: 19.0.0-rc-f994737d14-20240522(react@19.0.0-rc-f994737d14-20240522)
       react-lazy-load-image-component:
         specifier: ^1.6.0
