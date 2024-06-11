@@ -162,3 +162,8 @@ export type taskSplitOptionsType = {
   label: string;
   disabled: boolean;
 };
+
+export type dataExtractGeojsonType = {
+  type: string;
+  features: Record<string, any>[];
+};
