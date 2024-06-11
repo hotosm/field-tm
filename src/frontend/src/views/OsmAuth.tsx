@@ -9,6 +9,7 @@ function OsmAuth() {
   const location = useLocation();
   const dispatch = CoreModules.useAppDispatch();
   const [isReadyToRedirect, setIsReadyToRedirect] = useState(false);
+  const requestedPath = localStorage.getItem('requestedPath');
 
   useEffect(() => {
     // Redirect workaround required for localhost, until PR is merged:
@@ -23,22 +24,30 @@ function OsmAuth() {
     let authCode = params.get('code');
     let state = params.get('state');
 
-    // authCode is passed from OpenStreetMap redirect, so get cookie, then redirect
-    if (authCode) {
-      const callbackUrl = `${import.meta.env.VITE_API_URL}/auth/callback/?code=${authCode}&state=${state}`;
+    const loginRedirect = async () => {
+      // authCode is passed from OpenStreetMap redirect, so get cookie, then redirect
+      if (authCode) {
+        const callbackUrl = `${import.meta.env.VITE_API_URL}/auth/callback/?code=${authCode}&state=${state}`;
 
-      const completeLogin = async () => {
-        // NOTE this encapsulates async methods to call sequentially
-        // Sets a cookie in the browser that is used for auth
-        await fetch(callbackUrl, { credentials: 'include' });
-        const apiUser = await getUserDetailsFromApi();
-        dispatch(LoginActions.setAuthDetails(apiUser));
-      };
-      completeLogin();
-    }
+        const completeLogin = async () => {
+          // NOTE this encapsulates async methods to call sequentially
+          // Sets a cookie in the browser that is used for auth
+          await fetch(callbackUrl, { credentials: 'include' });
+          const apiUser = await getUserDetailsFromApi();
+          dispatch(LoginActions.setAuthDetails(apiUser));
+        };
+        await completeLogin();
+      }
 
-    setIsReadyToRedirect(true);
-    navigate('/');
+      setIsReadyToRedirect(true);
+      dispatch(LoginActions.setLoginModalOpen(false));
+
+      if (requestedPath) {
+        navigate(`${requestedPath}`);
+        localStorage.removeItem('requestedPath');
+      }
+    };
+    loginRedirect();
   }, [dispatch, location.search, navigate]);
 
   return <>{!isReadyToRedirect ? null : <div>redirecting</div>}</>;
