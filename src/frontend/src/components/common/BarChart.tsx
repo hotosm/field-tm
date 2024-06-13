@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const CustomBarChart = ({ data, xLabel, yLabel, dataKey, nameKey }) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer
+      width="100%"
+      height="100%"
+      onResize={(containerWidth, containerHeight) => {
+        setSize({ width: containerWidth, height: containerHeight });
+      }}
+    >
       <BarChart
-        width={500}
-        height={300}
+        width={size.width}
+        height={size.height}
         data={data}
         margin={{
           top: 5,
