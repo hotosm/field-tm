@@ -6,17 +6,45 @@ import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules.js';
 import { TaskCardSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
 
 const TaskSubmissions = () => {
+  const params = useParams();
   const dispatch = CoreModules.useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const taskLoading = useAppSelector((state) => state.task.taskLoading);
   const [searchedTaskId, setSearchedTaskId] = useState('');
   const [debouncedSearchedTaskId, setDebouncedSearchedTaskId] = useState('');
+  const [taskInfoList, setTaskInfoList] = useState<taskSubmissionInfoType[]>([]);
   const [filteredTaskInfo, setFilteredTaskInfo] = useState<taskSubmissionInfoType[]>([]);
+  const projectData = CoreModules.useAppSelector((state) => state?.project?.projectTaskBoundries);
+  const projectIndex = projectData.findIndex((project) => project.id == params?.projectId);
+  const projectTaskLength = projectData[projectIndex]?.taskBoundries?.length;
+
+  useEffect(() => {
+    if (taskInfo?.length === 0 && !projectTaskLength) return;
+    if (taskInfo.length === projectTaskLength) {
+      setTaskInfoList(taskInfo);
+    } else {
+      const updatedTask: taskSubmissionInfoType[] = Array.from({ length: projectTaskLength })?.map((_, i) => {
+        const task = taskInfo?.find((task) => parseInt(task?.index) === i + 1);
+        if (task) {
+          return task;
+        } else {
+          return {
+            index: (i + 1).toString(),
+            task_id: (i + 1).toString(),
+            feature_count: 0,
+            submission_count: 0,
+            last_submission: null,
+          };
+        }
+      });
+      setTaskInfoList(updatedTask);
+    }
+  }, [taskInfo, projectTaskLength]);
 
   const zoomToTask = (taskId) => {
     dispatch(CoreModules.TaskActions.SetSelectedTask(+taskId));
@@ -31,14 +59,14 @@ const TaskSubmissions = () => {
 
   useEffect(() => {
     if (debouncedSearchedTaskId) {
-      const searchedTaskInfoList = taskInfo?.filter((task): boolean => {
+      const searchedTaskInfoList = taskInfoList?.filter((task): boolean => {
         return task.task_id.includes(debouncedSearchedTaskId);
       });
       setFilteredTaskInfo(searchedTaskInfoList);
     } else {
-      setFilteredTaskInfo(taskInfo);
+      setFilteredTaskInfo(taskInfoList);
     }
-  }, [debouncedSearchedTaskId, taskInfo]);
+  }, [debouncedSearchedTaskId, taskInfoList]);
 
   const TaskCard = ({ task }: { task: taskSubmissionInfoType }) => (
     <div className="fmtm-bg-red-50 fmtm-px-5 fmtm-pb-5 fmtm-pt-2 fmtm-rounded-lg">
@@ -55,11 +83,13 @@ const TaskSubmissions = () => {
           </div>
         </div>
         <div className="fmtm-flex fmtm-flex-wrap fmtm-flex-row md:fmtm-flex-col lg:fmtm-flex-row fmtm-justify-between lg:fmtm-items-center fmtm-gap-2">
-          <Button
-            btnText="View Submissions"
-            btnType="primary"
-            onClick={() => setSearchParams({ tab: 'table', task_id: task?.task_id })}
-          />
+          {!(task?.submission_count === 0 && task?.feature_count === 0) && (
+            <Button
+              btnText="View Submissions"
+              btnType="primary"
+              onClick={() => setSearchParams({ tab: 'table', task_id: task?.task_id })}
+            />
+          )}
           <button
             className="fmtm-border-primaryRed fmtm-border-[2px] fmtm-flex fmtm-w-fit fmtm-px-2 fmtm-py-1 fmtm-rounded-md fmtm-items-center fmtm-gap-2 fmtm-bg-white hover:fmtm-bg-gray-100 fmtm-duration-150"
             onClick={() => zoomToTask(task?.task_id)}
