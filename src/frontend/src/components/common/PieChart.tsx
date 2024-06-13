@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#F19C3C', '#D73F3F', '#FFB74D', '#EC407A'];
@@ -46,9 +46,17 @@ const CustomLegend = ({ payload }) => (
 );
 
 const CustomPieChart = ({ data, dataKey, nameKey }) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
   return (
-    <ResponsiveContainer width="100%" height="105%">
-      <PieChart width={400} height={400}>
+    <ResponsiveContainer
+      width="100%"
+      height="105%"
+      onResize={(containerWidth, containerHeight) => {
+        setSize({ width: containerWidth, height: containerHeight });
+      }}
+    >
+      <PieChart width={size.width} height={size.height}>
         <Pie
           data={data}
           cx="50%"

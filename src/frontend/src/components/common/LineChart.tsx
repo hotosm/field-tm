@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const CustomLineChart = ({ data, xAxisDataKey, lineOneKey, lineTwoKey, xLabel, yLabel }) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer
+      width="100%"
+      height="100%"
+      onResize={(containerWidth, containerHeight) => {
+        setSize({ width: containerWidth, height: containerHeight });
+      }}
+    >
       <LineChart
-        width={500}
-        height={300}
+        width={size.width}
+        height={size.height}
         data={data}
         margin={{
           right: 30,
