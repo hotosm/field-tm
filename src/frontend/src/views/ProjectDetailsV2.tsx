@@ -42,7 +42,7 @@ import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
-const Home = () => {
+const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
@@ -473,6 +473,7 @@ const Home = () => {
                   mapOnClick={projectClickOnTaskArea}
                   zoomToLayer
                   zIndex={5}
+                  style=""
                   getTaskStatusStyle={(feature) => {
                     return getTaskStatusStyle(
                       feature,
@@ -495,6 +496,7 @@ const Home = () => {
                     constrainResolution: true,
                     duration: 2000,
                   }}
+                  style=""
                   mapOnClick={projectClickOnTaskFeature}
                   zoomToLayer
                   zIndex={5}
@@ -601,4 +603,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default ProjectDetailsV2;
