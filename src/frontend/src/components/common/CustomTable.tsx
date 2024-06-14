@@ -115,7 +115,7 @@ export default class Table extends Component<TableProps> {
       );
 
       if (tableChildWithSameFieldAndDataHeader) {
-        return tableChildWithSameFieldAndDataHeader.props.dataHeader;
+        return tableChildWithSameFieldAndDataHeader.props.dataField;
       }
 
       return field;
