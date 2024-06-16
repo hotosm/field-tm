@@ -167,7 +167,9 @@ export default class Table extends Component<TableProps> {
                 maxWidth: headerWidths[index],
               },
             })}
-          className={`fmtm-px-5 fmtm-pt-4 fmtm-pb-4 fmtm-bg-black-100 fmtm-align-middle fmtm-text-body-sm fmtm-leading-5 fmtm-text-left fmtm-capitalize fmtm-font-bold fmtm-border-[1px] fmtm-text-sm fmtm-max-w-[11rem] ${
+          className={`${
+            headClassName[index]
+          } fmtm-px-5 fmtm-pt-4 fmtm-pb-4 fmtm-bg-black-100 fmtm-align-middle fmtm-text-body-sm fmtm-leading-5 fmtm-text-left fmtm-capitalize fmtm-font-bold fmtm-border-[1px] fmtm-text-sm fmtm-max-w-[11rem] ${
             flag?.toLowerCase() === 'primarytable'
               ? 'fmtm-bg-primaryRed fmtm-text-white fmtm-border-white'
               : 'fmtm-bg-[#F0F0F0] fmtm-border-[#B9B9B9]'
