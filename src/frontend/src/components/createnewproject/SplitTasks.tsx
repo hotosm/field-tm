@@ -194,11 +194,11 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
   };
 
   useEffect(() => {
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const handleQRGeneration = async () => {
       if (generateQrSuccess) {
-        const projectId = projectDetailsResponse?.id; 
+        const projectId = projectDetailsResponse?.id;
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -210,16 +210,16 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
 
         // Add 5-second delay to allow backend Entity generation to catch up
         await delay(5000);
-
+        dispatch(CreateProjectActions.CreateProjectLoading(false));
         dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
         navigate(`/project/${projectId}`);
         dispatch(CreateProjectActions.ClearCreateProjectFormData());
         dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
       }
     };
-  
+
     handleQRGeneration();
-  }, [generateQrSuccess]); 
+  }, [generateQrSuccess]);
 
   const renderTraceback = (errorText: string) => {
     if (!errorText) {
