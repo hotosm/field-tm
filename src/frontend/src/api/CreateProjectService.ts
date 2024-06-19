@@ -8,7 +8,6 @@ import {
 } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { ValidateCustomFormResponse } from '@/store/types/ICreateProject';
-import { task_split_type } from '@/types/enums';
 
 const CreateProjectService: Function = (
   url: string,
@@ -81,10 +80,9 @@ const CreateProjectService: Function = (
             duration: 2000,
           }),
         );
-
+        dispatch(CreateProjectActions.CreateProjectLoading(false));
       } finally {
         dispatch(CommonActions.SetLoading(false));
-        dispatch(CreateProjectActions.CreateProjectLoading(false));
       }
     };
 
