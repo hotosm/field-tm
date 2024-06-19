@@ -29,7 +29,7 @@ import geojson
 from defusedxml import ElementTree
 from fastapi import HTTPException
 from loguru import logger as log
-from osm_fieldwork.CSVDump import CSVDump
+from osm_fieldwork.csvdump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.xls2json import parse_file_to_json
@@ -354,7 +354,7 @@ async def update_project_xform(
     xform_obj.createForm(
         odk_id,
         updated_xform_data,
-        xform_id,
+        form_name=xform_id,
     )
     # The draft form must be published after upload
     xform_obj.publishForm(odk_id, xform_id)
@@ -544,7 +544,7 @@ async def modify_xform_xml(
 
     # Hardcode the form_category value for the start instructions
     form_category_update = root.find(
-        ".//xforms:bind[@nodeset='/data/all/form_category']", namespaces
+        ".//xforms:bind[@nodeset='/data/essential/form_category']", namespaces
     )
     if form_category_update is not None:
         if category.endswith("s"):
