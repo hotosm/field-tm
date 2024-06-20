@@ -408,11 +408,7 @@ async def submission_table(
     submissions = data.get("value", [])
 
     if task_id:
-        submissions = [
-            sub
-            for sub in submissions
-            if sub.get("all", {}).get("task_id") == str(task_id)
-        ]
+        submissions = [sub for sub in submissions if sub.get("task_id") == str(task_id)]
 
     pagination = await project_crud.get_pagination(page, count, results_per_page, count)
     response = submission_schemas.PaginatedSubmissions(
