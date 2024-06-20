@@ -124,7 +124,7 @@ project then follow the steps below:
 If you encounter any issues or need assistance while using FMTM, you can access
 the following resources:
 
-- Check the [FAQs](https://hotosm.github.io/fmtm/FAQ/) .
+- Check the [FAQs](https://docs.fmtm.dev/FAQ/) .
 - Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
 
 ### Thank you
@@ -165,7 +165,7 @@ The FMTM Team
 ### FMTM frontend
 
 _To view details about the frontend click
-[here](https://hotosm.github.io/fmtm/dev/Frontend/)_
+[here](https://docs.fmtm.dev/dev/Frontend/)_
 
 #### Field Mapper Web Interface (with mobile-friendly map view)
 
@@ -176,7 +176,7 @@ Collect.
 ### FMTM backend
 
 _To in details about the backend click
-[here](https://hotosm.github.io/fmtm/dev/backend/)_
+[here](https://docs.fmtm.dev/dev/backend/)_
 
 A backend that converts the project parameters entered by the Campaign Manager
 in the Manager Web Interface into a corresponding ODK Central project. It's
@@ -216,9 +216,9 @@ functions include:
 #### 1. Review documentation
 
 Don't forget to review the
-[Contribution](https://hotosm.github.io/fmtm/CONTRIBUTING/)
+[Contribution](https://docs.fmtm.dev/CONTRIBUTING/)
 guidelines and our
-[Code of Conduct](https://hotosm.github.io/fmtm/CODE_OF_CONDUCT/)
+[Code of Conduct](https://docs.fmtm.dev/CODE_OF_CONDUCT/)
 before contributing!
 
 Here are the steps to contribute to the frontend of Field Mapping Tasking
@@ -362,7 +362,7 @@ bash scripts/gen-env.sh
 #### Check Deployment
 
 For details on how to run this project locally for development, please look at:
-[Backend Docs](https://hotosm.github.io/fmtm/dev/Backend)
+[Backend Docs](https://docs.fmtm.dev/dev/Backend)
 
 #### Check Authentication
 
@@ -402,9 +402,9 @@ authenticate.
 ### Start Developing
 
 Don't forget to review the
-[Contribution](https://hotosm.github.io/fmtm/CONTRIBUTING/)
+[Contribution](https://docs.fmtm.dev/CONTRIBUTING/)
 guidelines and our
-[Code of Conduct](https://hotosm.github.io/fmtm/CODE_OF_CONDUCT/)
+[Code of Conduct](https://docs.fmtm.dev/CODE_OF_CONDUCT/)
 before contributing!
 
 Happy coding!

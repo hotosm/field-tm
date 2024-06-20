@@ -316,7 +316,7 @@ in a Linux operating system!
 [3]: https://git-scm.com/ "Git"
 [4]: https://docs.docker.com/engine/install/ "Docker"
 [5]: https://docs.docker.com/compose/install "Docker Compose"
-[6]: https://hotosm.github.io/fmtm/dev/Setup/ "dev docs"
+[6]: https://docs.fmtm.dev/dev/Setup/ "dev docs"
 [28]: https://www.openstreetmap.org/login "Login to OSM"
 [29]: https://user-images.githubusercontent.com/36752999/216319298-1444a62f-ba6b-4439-bb4f-2075fdf03291.png "image"
 [30]: https://learn.microsoft.com/en-us/windows/wsl/install "official instructions"

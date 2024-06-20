@@ -78,7 +78,7 @@ export default function CustomDrawer({ open, placement, size, type, onClose, onS
     },
     {
       name: 'About',
-      ref: 'https://hotosm.github.io/fmtm/About/',
+      ref: 'https://docs.fmtm.dev/About/',
       isExternalLink: true,
       isActive: true,
     },
