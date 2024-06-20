@@ -69,7 +69,6 @@ nav:
       - About: About.md
       - Installation: INSTALL.md
       - Contribution Guidelines: CONTRIBUTING.md
-      - Documentation Contribution: Guide-On-Improving-Documentation.md
       - Code of Conduct: https://docs.hotosm.org/code-of-conduct
       - FAQ: FAQ.md
   - User Manuals:

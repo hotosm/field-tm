@@ -97,6 +97,9 @@ subdirectory. While it is possible to use HTML in Markdown documents
 for tables and images, it is preferred to use the Markdown style as
 it's much easier to read.
 
+See a detailed guide on documentation contributions
+[here](https://docs.hotosm.org/techdoc).
+
 ### Coding Style
 
 Python enforces a certain amount of style due to indent levels. Unlike
