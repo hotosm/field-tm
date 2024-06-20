@@ -91,7 +91,7 @@ from app.tasks import tasks_crud
 #         submissions = [
 #             sub
 #             for sub in submissions
-#             if sub.get("all", {}).get("task_id") == str(task_id)
+#             if sub.get("task_id") == str(task_id)
 #         ]
 
 #     if not submissions:

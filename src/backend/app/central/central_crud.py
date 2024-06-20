@@ -452,7 +452,7 @@ async def modify_xform_xml(
     The 'id' field is set to random UUID (xFormId) unless existing_id is specified
     The 'name' field is set to the category name.
     The upload media must be equal to 'features.csv'.
-    The task_id options are populated as choices in the form.
+    The task_filter options are populated as choices in the form.
     The form_category value is also injected to display in the instructions.
 
     Args:
@@ -504,23 +504,23 @@ async def modify_xform_xml(
     # NOTE add the task ID choices to the XML
     # <instance> must be defined inside <model></model> root element
     model_element = root.find(".//xforms:model", namespaces)
-    # The existing dummy value for task_id must be removed
+    # The existing dummy value for task_filter must be removed
     existing_instance = model_element.find(
-        ".//xforms:instance[@id='task_id']", namespaces
+        ".//xforms:instance[@id='task_filter']", namespaces
     )
     if existing_instance is not None:
         model_element.remove(existing_instance)
     # Create a new instance element
-    instance_task_ids = Element("instance", id="task_id")
-    root_element = SubElement(instance_task_ids, "root")
+    instance_task_filters = Element("instance", id="task_filter")
+    root_element = SubElement(instance_task_filters, "root")
     # Create sub-elements for each task ID, <itextId> <name> pairs
     for task_id in range(1, task_count + 1):
         item = SubElement(root_element, "item")
-        SubElement(item, "itextId").text = f"task_id-{task_id}"
+        SubElement(item, "itextId").text = f"task_filter-{task_id}"
         SubElement(item, "name").text = str(task_id)
-    model_element.append(instance_task_ids)
+    model_element.append(instance_task_filters)
 
-    # Add task_id choice translations (necessary to be visible in form)
+    # Add task_filter choice translations (necessary to be visible in form)
     itext_element = root.find(".//xforms:itext", namespaces)
     if itext_element is not None:
         existing_translations = itext_element.findall(
@@ -529,14 +529,14 @@ async def modify_xform_xml(
         for translation in existing_translations:
             # Remove dummy value from existing translations
             existing_text = translation.find(
-                ".//xforms:text[@id='task_id-0']", namespaces
+                ".//xforms:text[@id='task_filter-0']", namespaces
             )
             if existing_text is not None:
                 translation.remove(existing_text)
 
             # Append new <text> elements for each task_id
             for task_id in range(1, task_count + 1):
-                new_text = Element("text", id=f"task_id-{task_id}")
+                new_text = Element("text", id=f"task_filter-{task_id}")
                 value_element = Element("value")
                 value_element.text = str(task_id)
                 new_text.append(value_element)
