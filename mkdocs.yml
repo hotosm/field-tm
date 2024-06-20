@@ -1,7 +1,7 @@
 site_name: FMTM
 site_description: Coordinated field mapping for Open Mapping campaigns.
 # strict: true
-site_url: "https://hotosm.github.io/fmtm/"
+site_url: "https://docs.fmtm.dev/"
 
 repo_name: "hotosm/fmtm"
 repo_url: "https://github.com/hotosm/fmtm/"
@@ -80,7 +80,7 @@ nav:
       - QRCode Converter: qrcode-util.md
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: example-xlsforms/README.md
-  - API Docs: https://hotosm.github.io/swagger/?url=https://hotosm.github.io/fmtm/openapi.json
+  - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi.json
   - Dev:
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md

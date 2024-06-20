@@ -310,5 +310,5 @@ The FMTM Team
 [18]: https://github.com/hotosm/fmtm/assets/97789856/f9a4bed7-d1a9-44dd-b2d4-b55f428f9416 "project creation status"
 [19]: https://github.com/hotosm/fmtm/assets/97789856/162af2e0-dbfa-4787-8037-f03e71417df8 "select task"
 [20]: https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c "map legend"
-[21]: https://hotosm.github.io/fmtm/FAQ "FAQs"
+[21]: https://docs.fmtm.dev/FAQ "FAQs"
 [22]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #fmtm-field-pilots"
