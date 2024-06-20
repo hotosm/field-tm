@@ -544,7 +544,7 @@ async def modify_xform_xml(
 
     # Hardcode the form_category value for the start instructions
     form_category_update = root.find(
-        ".//xforms:bind[@nodeset='/data/essential/form_category']", namespaces
+        ".//xforms:bind[@nodeset='/data/form_category']", namespaces
     )
     if form_category_update is not None:
         if category.endswith("s"):
