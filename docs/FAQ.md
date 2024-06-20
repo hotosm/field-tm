@@ -12,9 +12,11 @@ humanitarian organizations.
 
 **Q:** Do I need to create an account to use the FMTM Web App?
 
-**A:** No, you can use the FMTM Web App without creating an account, but
-creating an account allows you to contribute to mapping projects and
-access additional features.
+**A:** Mappers have no requirement to sign up, easing the process of mapping
+for those that are impatient to get started! However, to use the FMTM project
+management site it is recommended to sign in with OSM. This is so data uploaded
+to OSM can be attributed to a user. Notifications are also sent via OpenStreetMap
+messages/emails.
 
 ---
 
@@ -130,17 +132,17 @@ into your language.
 
 **Q:** What technologies are used in FMTM?
 
-**A:** FMTM is built using several technologies, including Django,
-Postgres, Redis, Celery, and Vue.js. The codebase is written in
-Python, HTML, CSS, and JavaScript.
+**A:** FMTM is built using several technologies, including FastAPI,
+Postgres, React, and web components. The codebase is written in
+Python, HTML, CSS, and TypeScript.
 
 ---
 
 **Q:** How do I set up FMTM locally?
 
-**A:** To set up FMTM locally, you need to have Python, Postgres, Redis,
-and Node.js installed on your system. You can follow the instructions
-in the README file of the FMTM repository to set up the project.
+**A:** To set up FMTM locally, the simplest approach is likely using Docker.
+If you are an advanced user, it is possible to run each service individually too.
+Please follow the instructions in the setup guide on this site.
 
 ---
 
@@ -211,11 +213,3 @@ project managers or experienced contributors for additional feedback.
 **A:** The FMTM provides training and resources to help you improve your
 mapping skills. You can also join mapping communities and forums to
 connect with other contributors and learn from their experiences.
-
----
-
-**Q:** Can I use the mapping data for my own research or projects?
-
-**A:** The mapping data on the FMTM is generally open and available for
-use, but it is important to check the specific project requirements
-and licenses before using the data for your own research or projects.
