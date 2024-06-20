@@ -442,7 +442,7 @@ const SubmissionsTable = ({ toggleView }) => {
                       SubmissionActions.SetUpdateReviewStatusModal({
                         toggleModalStatus: true,
                         instanceId: row?.meta?.instanceID,
-                        taskId: row?.all?.task_id,
+                        taskId: row?.task_id,
                         projectId: projectId,
                         reviewState: row?.__system?.reviewState,
                       }),
