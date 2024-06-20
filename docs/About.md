@@ -11,24 +11,17 @@ volunteers interested in the project.
 HOT uses ODK heavily, but most of the data never makes it into OSM because all
 the data processing is manual and slow, so it doesn't get done.
 
-<img
-  align="right"
-  width="300px"
-  src="https://github.com/hotosm/osm-fieldwork/assets/97789856/afc791c7-6cc9-4496-aa93-ab02733f30b8"
-  alt="fmtm-splash"
-/>
-
-Ivan Gayton(Senior Humanitarian Advisor at Humanitarian OpenStreetMap Team)
+Ivan Gayton (Senior Humanitarian Advisor at Humanitarian OpenStreetMap Team)
 heard about what Rob was working on and goes "That's the missing piece I
 needed!". He'd been wanting to build FMTM for years, but lacked the ability to
 process the data.
+
 A [webinar][1] then took place in September 2022
 that showcased the high interest from the community and the need for
 collaborative field mapping that really kicked off the starting point for
-building the Field Mapping Tasking Manager. It was Ivan who got HOT interested
-enough to direct some resources to his idea, so FMTM was born.
+building the Field Mapping Tasking Manager.
 
-**Want to know about OSM-fieldwork project?** click [here][2]
+**Want to know about OSM-Fieldwork project?** click [here][2]
 
 ## A project to provide tools for Open Mapping campaigns
 
@@ -52,8 +45,7 @@ analytics and reporting features, allowing users to gain insights into mapping
 campaigns and adjust their strategies accordingly.
 
 Background and description of the project and idea are
-[here][3]:
-please have a look at this blog if you haven't yet!
+[here][3]: please have a look at this blog if you haven't yet!
 
 ## How to contribute
 
@@ -143,8 +135,8 @@ that they need to fix it. They need to:
 For this visit the [Getting Started Page][6]
 
 [1]: https://www.youtube.com/watch?v=GiLKRZpbtrc&\ab_channel=HumanitarianOpenStreetMapTeam
-[2]: https://github.com/hotosm/osm-fieldwork/wiki
+[2]: https://hotosm.github.io/osm-fieldwork/
 [3]: https://www.hotosm.org/updates/field-mapping-is-the-future-a-tasking-manager-workflow-using-odk
-[4]: https://github.com/hotosm/fmtm/blob/main/CONTRIBUTING.md
+[4]: https://docs.fmtm.dev/CONTRIBUTING/
 [5]: https://tasks.hotosm.org/
-[6]: https://hotosm.github.io/fmtm/dev/Setup/
+[6]: https://docs.fmtm.dev/dev/Setup/
