@@ -211,7 +211,7 @@ export default function Dialog({ taskId, feature, map, view }) {
               );
 
               if (isMobile) {
-                document.location.href = `odkcollect://form/${projectInfo.xform_id}?task_id=${taskId}`;
+                document.location.href = `odkcollect://form/${projectInfo.xform_id}?task_filter=${taskId}`;
               } else {
                 dispatch(
                   CommonActions.SetSnackBar({
