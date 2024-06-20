@@ -7,7 +7,7 @@ They never forget the people they are building for (^^) :smiley:
 So who are we building field mapping solutions for? In short, we build solutions
 for:
 
-## The field mapping manager (coordinating field mapping)
+### The field mapping manager (coordinating field mapping)
 
 The field mapping manager is responsible for coordinating field
 mapping activities, ensuring the accuracy and completeness of the data
@@ -33,7 +33,7 @@ steps, including:
       alt="coordination"
     />
 
-## The field mapper (collecting data)
+### The field mapper (collecting data)
 
 The field mapper is responsible for collecting data in the field. To
 ensure the success of the field mapper, we must consider a number of key
@@ -51,7 +51,7 @@ factors. These include:
   completeness of the data they collect, as well as identify and address
   any errors or issues that arise.
 
-## The validator (quality checking the data)
+### The validator (quality checking the data)
 
 The validator is responsible for quality checking the data collected by
 the field mapper, ensuring that it is accurate, complete, and free from
@@ -68,13 +68,15 @@ errors. The validator faces a number of challenges and issues, including:
   validation protocols and guidelines, ensuring that the data meets a high
   level of quality and accuracy.
 
+## Detailed role breakdown
+
 [Click here][1] to see an overview of who you are building for, which actions
 they take and some ideas for solutions!
 
 Below is an overview of the user flow of the **Field Mapper**, the
 **Mapping Coordinator / Field Mapping Manager** and the **Validator**.
 
-## The Field Mapping Manager (The person who coordinates field mapping)
+### The Field Mapping Manager (The person who coordinates field mapping)
 
 The **Field Mapping Manager** is tasked with coordinating all mapping
 activities, ensuring that **Field Mappers** are safe and qualified to
@@ -104,7 +106,7 @@ Here's a sneak-peek:
 
 ![Field mapping coordinator][4]
 
-## The Field Mapper (The person who collects data)
+### The Field Mapper (The person who collects data)
 
 The **Field Mapper** surveys locations and collects data from them. The basic
 work flow that a **Field Mapper** has to consider is as follows:
@@ -137,7 +139,7 @@ Here's a sneak-peek:
   alt="fmtm-workflow"
 />
 
-## The Validator (The person who checks the quality of data collected)
+### The Validator (The person who checks the quality of data collected)
 
 ![osm data collection][6]
 
