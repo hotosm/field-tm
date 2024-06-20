@@ -125,6 +125,73 @@ obvious, but avoid over commenting as well. Code should be able to be
 read like a book, with descriptive names used, no fancy tricks unless
 required. Always be conscious of performance and security.
 
+## Additional Notes On Our Processes
+
+### Issues
+
+#### Issue Labels
+
+- Label issues where appropriate, for example as backend or frontend.
+- If the issue is blocking other work, add the blocker label.
+- Priorities can be assigned as 'Nice to', 'Should', or 'Must'.
+- Difficulty can be estimated using 'Effort: 1' 'Effort: 2' 'Effort: 3' labels.
+(equivalent to story points to estimate relative effort required for a dev).
+
+#### Issue Assignment
+
+- Assign issues to the dev who will work on it.
+
+### PRs
+
+#### PR Drafts
+
+- Create a draft PR for works in progress.
+- Push as early as possible to draft, especially if there is a chance you may get
+  sidetracked on other work (so another dev could feasibly pick up where you left
+  off).
+
+#### PR Assignment
+
+- Assign yourself if you are working on the issue.
+- Assign another dev if you need to pass off the development to them.
+- The re-assigned dev can then assign the task back to the original dev for validation.
+
+#### PR Review
+
+- Any developer can review a PR, **as long as one dev reviews** prior to merge.
+- Assign devs for review - frontend can review backend and vice versa.
+- Once review is complete and the PR is out of draft state, then any dev can merge.
+
+### Milestones
+
+- Encapsulates a set of issues into a logical bigger task, with an assigned end date.
+- Discussed in team meetings and decided on via priorities.
+- Project owner decides on priorities, tech lead decides on which tasks are required
+  to achieve that goal.
+
+### Roadmap
+
+- Higher level roadmap based on milestones.
+- A couple of milestones per release.
+- We no longer use the task board on Github, but we do manage the roadmap there.
+- The roadmap should include:
+  - Milestones spanning the work start and end date.
+  - Releases labelled over the top, showing the anticipated next release date
+    and how it relates to the milestones.
+
+### Discussions
+
+- To discuss more general topics in the public, so that anyone can contribute.
+- Partly used to document the design decisions we have taken.
+- Tag people specially for input, as it makes them more likely to add ideas.
+- We can also use these for the staging server tests on each release cycle: <https://github.com/hotosm/fmtm/discussions/1335>
+
+### Release Notes
+
+- No technical details, move those to a dropdown in markdown.
+- Higher level info on bugs fixed, new features added, things improved.
+- Add screenshots throughout.
+
 [1]: https://docs.google.com/presentation/d/1UrBG1X4MXwVd8Ps498FDlAYvesIailjjPPJfR_B4SUs/edit#slide=id.g15c1f409958_0_0 "slides"
 [2]: https://github.com/orgs/hotosm/projects/22 "Our latest task board"
 [3]: https://github.com/hotosm/fmtm/issues "issue queue"
