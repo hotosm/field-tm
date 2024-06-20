@@ -168,7 +168,7 @@ const TaskFeatureSelectionPopup = ({
 
                 if (isMobile) {
                   // Load entity in ODK Collect by intent
-                  document.location.href = `odkcollect://form/${xformId}?task_id=${taskId}&existing=${entityUuid}`;
+                  document.location.href = `odkcollect://form/${xformId}?existing=${entityUuid}`;
                 } else {
                   dispatch(
                     CommonActions.SetSnackBar({
