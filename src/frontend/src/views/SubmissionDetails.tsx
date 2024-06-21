@@ -23,7 +23,7 @@ const SubmissionDetails = () => {
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
   const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
 
-  const taskId = submissionDetails?.all?.task_id;
+  const taskId = submissionDetails?.task_id;
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
