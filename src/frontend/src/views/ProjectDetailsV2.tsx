@@ -49,6 +49,7 @@ const ProjectDetailsV2 = () => {
   const navigate = useNavigate();
   const { windowSize } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
+  const [legendRef, legendToggle, handleLegendToggle] = useOutsideClick();
 
   const [mainView, setView] = useState<any>();
   const [selectedTaskArea, setSelectedTaskArea] = useState();
@@ -512,6 +513,7 @@ const ProjectDetailsV2 = () => {
               />
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
+                  ref={legendRef}
                   body={<MapLegends defaultTheme={defaultTheme} />}
                   header={
                     <div className="fmtm-flex fmtm-items-center fmtm-gap-1 sm:fmtm-gap-2">
@@ -519,9 +521,11 @@ const ProjectDetailsV2 = () => {
                       <p className="fmtm-text-lg fmtm-font-normal">Legend</p>
                     </div>
                   }
-                  onToggle={() => {}}
+                  onToggle={() => {
+                    handleLegendToggle();
+                  }}
                   className="fmtm-py-0 !fmtm-pb-0 fmtm-rounded-lg hover:fmtm-bg-gray-50"
-                  collapsed={true}
+                  collapsed={!legendToggle}
                 />
               </div>
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-right-3 fmtm-z-50 fmtm-h-fit">

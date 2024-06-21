@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
 
 interface IAccordion {
+  ref?: string | null;
   collapsed?: boolean;
   header: any;
   body: any;
@@ -12,6 +13,7 @@ interface IAccordion {
 }
 
 export default function Accordion({
+  ref = null,
   collapsed: isCollapsed,
   header,
   body,
@@ -27,7 +29,7 @@ export default function Accordion({
   }, [isCollapsed]);
 
   return (
-    <div className={`fmtm-bg-white fmtm-p-2 fmtm-pb-3 ${className} `}>
+    <div ref={ref} className={`fmtm-bg-white fmtm-p-2 fmtm-pb-3 ${className} `}>
       <div className="">
         <div
           className={`fmtm-flex fmtm-items-center fmtm-justify-between
