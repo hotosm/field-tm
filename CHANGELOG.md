@@ -1,5 +1,43 @@
 # Changelog
 
+## 2024.3.1 (2024-06-24)
+
+### Feat
+
+- add healthcare form category & minor fixes (#1555)
+- use Matomo tracking web component, with accept/disagree prompt (#1546)
+- **frontend**: upgrade React v17 --> v18 (#1542)
+
+### Fix
+
+- **submissionDetails**: retrieve task_id directly from submissionDetails (#1595)
+- **frontend**: set submission table task_id from submission task_id
+- ensure task_id field is always included with submissions (#1589)
+- **frontend**: replace getting task_id from submission with url param
+- ensure `status` Entity field is updated alongside survey form `status` field (#1586)
+- **createProject**: disable submit btn until redirection to details page (#1585)
+- **customTable**: misalignment via classname add (#1578)
+- **frontend**: recharts UI misalignment (#1575)
+- **taskSubmissions**: show task card of tasks even if no features, view submissions btn hide if no features (#1571)
+- **charts**: size state to track responsive container to fix charts misalignment (#1570)
+- **projectDetailsV2**: taskLayer color not update issue solve (#1569)
+- **frontend**: block project create if no extract features (#1561)
+- **frontend**: redirect user to requested page after login (#1559)
+- **frontend**: only display matomo tracking banner in prod
+- **frontend**: do not display pmtiles generated for another project
+- **frontend**: add tile format to basemaps table, only show cache icon if pmtile
+- **backend**: loading entity by intent using uuid xformid (#1538)
+- **frontend**: correctly invoke matomo & sentry tracking in prod
+
+### Refactor
+
+- **frontend**: update links for odk collect by intent task_id --> task_filter
+- **frontend**: update download url for custom ODK Collect APK
+- **frontend**: update link to custom odk collect from intent apk
+- **frontend**: import hotosm/ui styles.css --> style.css change
+- remove reference to 'topo' basemap imagery provider (usgs)
+- rename fmtm.dev --> docs.fmtm.dev for docs site
+
 ## 2024.3.0 (2024-05-28)
 
 ### Feat
