@@ -73,7 +73,7 @@ nav:
       - FAQ: FAQ.md
   - User Manuals:
       - User Types: user-breakdown.md
-      - Project Managers: User-Manual-For-Project-Managers.md
+      - Project Managers: manuals/project-managers.md
   - Dev:
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
