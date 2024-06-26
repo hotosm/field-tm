@@ -92,7 +92,8 @@ nav:
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: example-xlsforms/README.md
   - Roadmap:
-      - Users: user-roadmap.md
-      - Developers: https://roadmap.fmtm.dev
+      - User: user-roadmap.md
+      - Development: https://roadmap.fmtm.dev
+      - Task Board: https://github.com/orgs/hotosm/projects/22/views/1?sliceBy%5BcolumnId%5D=Milestone
   - Timeline: timeline.md
   - API Docs: https://hotosm.github.io/swagger/?url=https://docs.fmtm.dev/openapi.json
