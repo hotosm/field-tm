@@ -47,7 +47,7 @@ const NewDefineAreaMap = ({
           width: '100%',
         }}
       >
-        <LayerSwitcherControl />
+        <LayerSwitcherControl visible={'osm'} />
         <MapControlComponent map={map} hasEditUndo={hasEditUndo} />
         {splittedGeojson && (
           <VectorLayer

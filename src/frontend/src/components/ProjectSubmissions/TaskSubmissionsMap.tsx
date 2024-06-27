@@ -254,7 +254,7 @@ const TaskSubmissionsMap = () => {
           width: '100%',
         }}
       >
-        <LayerSwitcherControl />
+        <LayerSwitcherControl visible={'osm'} />
         {taskBoundaries && (
           <VectorLayer
             setStyle={(feature, resolution) =>

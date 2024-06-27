@@ -89,7 +89,7 @@ const ProjectListMap = () => {
             width: '100%',
           }}
         >
-          <LayerSwitcherControl visible={'outdoors'} />
+          <LayerSwitcherControl visible={'osm'} />
           {projectGeojson && projectGeojson?.features?.length > 0 && (
             <ClusterLayer
               map={map}

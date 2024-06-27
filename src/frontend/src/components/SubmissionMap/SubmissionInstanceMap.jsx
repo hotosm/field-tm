@@ -30,7 +30,7 @@ const SubmissionInstanceMap = ({ featureGeojson }) => {
           width: '100%',
         }}
       >
-        <LayerSwitcherControl />
+        <LayerSwitcherControl visible={'osm'} />
         {featureGeojson?.type && (
           <VectorLayer
             geojson={featureGeojson}

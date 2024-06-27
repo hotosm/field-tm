@@ -23,7 +23,7 @@ const EditProjectArea = ({ geojson }) => {
           width: '100%',
         }}
       >
-        <LayerSwitcherControl />
+        <LayerSwitcherControl visible={'osm'} />
         {geojson && (
           <VectorLayer
             geojson={geojson}
