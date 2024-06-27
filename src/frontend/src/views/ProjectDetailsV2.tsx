@@ -457,7 +457,7 @@ const ProjectDetailsV2 = () => {
                 </div>
               )}
               <LayerSwitcherControl
-                visible={customBasemapData ? 'custom' : 'outdoors'}
+                visible={customBasemapData ? 'custom' : 'osm'}
                 pmTileLayerData={customBasemapData}
               />
 

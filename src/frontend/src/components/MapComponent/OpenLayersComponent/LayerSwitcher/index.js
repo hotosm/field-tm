@@ -178,8 +178,8 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
       layers: [
         bingMaps(visible),
         osm(visible),
-        mapboxMap(visible),
-        mapboxOutdoors(visible),
+        // mapboxMap(visible),
+        // mapboxOutdoors(visible),
         none(visible),
         // pmTileLayer(pmTileLayerData, visible),
       ],
