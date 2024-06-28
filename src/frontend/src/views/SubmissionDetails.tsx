@@ -15,14 +15,13 @@ const SubmissionDetails = () => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
+
   const projectId = params.projectId;
   const paramsInstanceId = params.instanceId;
-  const projectDashboardDetail = CoreModules.useAppSelector((state) => state.project.projectDashboardDetail);
-  const projectDashboardLoading = CoreModules.useAppSelector((state) => state.project.projectDashboardLoading);
-
+  const projectDashboardDetail = useAppSelector((state) => state.project.projectDashboardDetail);
+  const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
   const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
-
   const taskId = submissionDetails?.task_id;
 
   useEffect(() => {
@@ -37,7 +36,7 @@ const SubmissionDetails = () => {
     );
   }, [projectId, paramsInstanceId]);
 
-  function removeNullValues(obj) {
+  function removeNullValues(obj: Record<string, any>) {
     const newObj = {};
     for (const [key, value] of Object.entries(obj)) {
       if (value !== null) {
@@ -55,18 +54,18 @@ const SubmissionDetails = () => {
   }
   const filteredData = submissionDetails ? removeNullValues(submissionDetails) : {};
 
-  var coordinatesArray = submissionDetails?.all?.xlocation?.split(';').map(function (coord) {
+  var coordinatesArray: [number, number][] = submissionDetails?.xlocation?.split(';').map(function (coord: string) {
     let coordinate = coord
       .trim()
       .split(' ')
       .slice(0, 2)
-      .map((value) => {
+      .map((value: string) => {
         return parseFloat(value);
       });
     return [coordinate[1], coordinate[0]];
   });
 
-  const geojsonFeature = {
+  const geojsonFeature: Record<string, any> = {
     type: 'FeatureCollection',
     features: [
       {
@@ -80,7 +79,7 @@ const SubmissionDetails = () => {
     ],
   };
 
-  const renderValue = (value, key = '') => {
+  const renderValue = (value: any, key: string = '') => {
     if (key === 'start' || key === 'end') {
       return (
         <p>

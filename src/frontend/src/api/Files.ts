@@ -6,14 +6,22 @@ import { deflate } from 'pako/lib/deflate';
 //   return new TextDecoder().decode(inflate(Uint8Array.from(window.atob(string), (c) => c.codePointAt(0))))
 // }
 
-function base64zlibencode(string) {
+function base64zlibencode(string: string) {
   return window.btoa(String.fromCodePoint(...deflate(new TextEncoder().encode(string))));
 }
 
-export const GetProjectQrCode = (odkToken, projectName, osmUser) => {
+export const GetProjectQrCode = (
+  odkToken: string | undefined,
+  projectName: string | undefined,
+  osmUser: string,
+): { qrcode: string } => {
   const [qrcode, setQrcode] = useState('');
   useEffect(() => {
-    const fetchProjectFileById = async (odkToken, projectName, osmUser) => {
+    const fetchProjectFileById = async (
+      odkToken: string | undefined,
+      projectName: string | undefined,
+      osmUser: string,
+    ) => {
       if (odkToken === '') {
         setQrcode('');
         return;
@@ -54,7 +62,7 @@ export const GetProjectQrCode = (odkToken, projectName, osmUser) => {
   return { qrcode };
 };
 
-export async function readFileFromOPFS(filePath) {
+export async function readFileFromOPFS(filePath: string) {
   const opfsRoot = await navigator.storage.getDirectory();
   const directories = filePath.split('/');
 
@@ -72,7 +80,7 @@ export async function readFileFromOPFS(filePath) {
 
   // Get file within final directory handle
   try {
-    const filename = directories.pop();
+    const filename: any = directories.pop();
     console.log(`Getting OPFS file: ${filename}`);
     const fileHandle = await currentDirectoryHandle.getFileHandle(filename);
     const fileData = await fileHandle.getFile(); // Read the file
@@ -82,14 +90,14 @@ export async function readFileFromOPFS(filePath) {
   }
 }
 
-export async function writeBinaryToOPFS(filePath, data) {
+export async function writeBinaryToOPFS(filePath: string, data: any) {
   console.log(`Starting write to OPFS file: ${filePath}`);
 
   const opfsRoot = await navigator.storage.getDirectory();
 
   // Split the filePath into directories and filename
   const directories = filePath.split('/');
-  const filename = directories.pop();
+  const filename: any = directories.pop();
 
   // Start with the root directory handle
   let currentDirectoryHandle = opfsRoot;

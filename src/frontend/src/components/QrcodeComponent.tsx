@@ -2,7 +2,13 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
-const TasksComponent = ({ qrcode, projectId, taskIndex }) => {
+type tasksComponentType = {
+  qrcode: string;
+  projectId: string;
+  taskIndex: number;
+};
+
+const TasksComponent = ({ qrcode, projectId, taskIndex }: tasksComponentType) => {
   const downloadQR = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = qrcode;

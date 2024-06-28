@@ -2,7 +2,19 @@ import React from 'react';
 import cardImg from '@/assets/images/project_icon.png';
 import logo from '@/assets/images/hotLog.png';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-const Switcher = ({ status, width, height }) => {
+
+type switcherType = {
+  status: 'card' | 'logo';
+  width: number;
+  height: number;
+};
+
+type CustomizedImageType = {
+  status: 'card' | 'logo';
+  style: { width: number; height: number };
+};
+
+const Switcher = ({ status, width, height }: switcherType) => {
   switch (status) {
     case 'card':
       return <LazyLoadImage src={cardImg} width={width} height={height} alt="Image Alt" effect="blur" />;
@@ -11,7 +23,7 @@ const Switcher = ({ status, width, height }) => {
   }
 };
 
-const CustomizedImage = ({ status, style }) => {
+const CustomizedImage = ({ status, style }: CustomizedImageType) => {
   return <Switcher status={status} width={style.width} height={style.height} />;
 };
 

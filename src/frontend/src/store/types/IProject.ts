@@ -67,9 +67,8 @@ type projectCommentsListTypes = {
   status: any;
 };
 
-type projectTaskActivity = {
+export type projectTaskActivity = {
   id: number;
-  project_id: number;
   task_id: number;
   action: string;
   action_text: string;

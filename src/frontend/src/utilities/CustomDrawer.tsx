@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Button from '@/components/common/Button';
-import { Modal } from '@/components/common/Modal';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { NavLink } from 'react-router-dom';
@@ -10,21 +9,35 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import DebugConsole from '@/utilities/DebugConsole';
+import { useAppSelector } from '@/types/reduxTypes';
 
-export default function CustomDrawer({ open, placement, size, type, onClose, onSignOut, setOpen }) {
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+type customDrawerType = {
+  open: boolean;
+  size: { width: number; height: number };
+  type: string;
+  onClose: () => void;
+  setOpen: (open: boolean) => void;
+};
+
+export default function CustomDrawer({ open, size, type, onClose, setOpen }: customDrawerType) {
   const dispatch = CoreModules.useAppDispatch();
-  const [showDebugConsole, setShowDebugConsole] = useState(false);
 
-  const onMouseEnter = (event) => {
-    const element = document.getElementById(`text${event.target.id}`);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
+  const [showDebugConsole, setShowDebugConsole] = useState(false);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+
+  const onMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    const targetElement = event.target as HTMLElement;
+    const element = document.getElementById(`text${targetElement.id}`);
     if (element) element.style.color = defaultTheme.palette.error.main;
   };
-  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const onMouseLeave = (event) => {
-    const element = document.getElementById(`text${event.target.id}`);
+
+  const onMouseLeave = (event: React.MouseEvent<HTMLElement>) => {
+    const targetElement = event.target as HTMLElement;
+    const element = document.getElementById(`text${targetElement.id}`);
     if (element) element.style.color = defaultTheme.palette.info.main;
   };
+
   const Drawerstyles = {
     list: {
       width: type === 'xs' || type === 'sm' ? size.width - 48 : 350,

@@ -4,29 +4,34 @@ import AssetModules from '@/shared/AssetModules';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
 import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
-import { taskHistoryListType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
-import { useDispatch } from 'react-redux';
+import { projectTaskActivity } from '@/store/types/IProject';
+import { projectTaskBoundriesType } from '@/models/project/projectModel';
 
-const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion, states }) => {
-  const dispatch = useDispatch();
-  const id = params.id;
+type activitiesPanelType = {
+  defaultTheme: any;
+  state: projectTaskBoundriesType[];
+  params: Record<string, any>;
+  map: any;
+};
+
+const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelType) => {
   const [searchText, setSearchText] = useState<string>('');
-  const [taskHistories, setTaskHistories] = useState<taskHistoryListType[]>([]);
+  const [taskHistories, setTaskHistories] = useState<projectTaskActivity[]>([]);
   const [allActivities, setAllActivities] = useState(0);
   const projectActivityLoading = useAppSelector((state) => state?.project?.projectActivityLoading);
   const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
 
-  const handleOnchange = (event) => {
+  const handleOnchange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
   };
 
   useEffect(() => {
-    let taskHistories: taskHistoryListType[] = projectTaskActivityList;
+    let taskHistories: projectTaskActivity[] = projectTaskActivityList;
 
     setAllActivities(projectTaskActivityList.length);
-    let finalTaskHistory: taskHistoryListType[] = taskHistories.filter((task) => {
+    let finalTaskHistory: projectTaskActivity[] = taskHistories.filter((task) => {
       return task.action_text.split(':')[1].replace(/\s+/g, '').toString().includes(searchText.toString());
     });
     if (searchText != '') {
@@ -36,8 +41,8 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
     }
   }, [state, searchText, projectTaskActivityList, selectedTask]);
 
-  const zoomToTask = (taskId) => {
-    let geojson = {};
+  const zoomToTask = (taskId: number | null) => {
+    let geojson: Record<string, any> = {};
     const index = state.findIndex((project) => project.id == params.id);
     if (index != -1) {
       const taskIndex = state[index]?.taskBoundries.findIndex((task) => task?.index == taskId);
@@ -56,7 +61,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map, view, mapDivPostion
     });
   };
 
-  const ActivitiesCard = ({ taskHistory }: { taskHistory: taskHistoryListType }) => {
+  const ActivitiesCard = ({ taskHistory }: { taskHistory: projectTaskActivity }) => {
     const actionDate = taskHistory?.action_date?.split('T')[0];
     const actionTime = `${taskHistory?.action_date?.split('T')[1].split(':')[0]}:${taskHistory?.action_date
       ?.split('T')[1]

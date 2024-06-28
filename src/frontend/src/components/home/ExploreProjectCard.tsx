@@ -2,17 +2,18 @@ import * as React from 'react';
 import CustomizedImage from '@/utilities/CustomizedImage';
 import CustomizedProgressBar from '@/utilities/CustomizedProgressBar';
 import { HomeActions } from '@/store/slices/HomeSlice';
-import { HomeProjectCardModel, projectType } from '@/models/home/homeModel';
+import { projectType } from '@/models/home/homeModel';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
+import { useAppSelector } from '@/types/reduxTypes';
 
 //Explore Project Card Model to be rendered in home view
 export default function ExploreProjectCard({ data }: { data: projectType }) {
-  const [shadowBox, setShadowBox] = React.useState<number>(0);
-  const dispatch = CoreModules.useAppDispatch();
-  const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  //use navigate hook for from react router dom for rounting purpose
   const navigate = CoreModules.useNavigate();
+  const dispatch = CoreModules.useAppDispatch();
+
+  const [shadowBox, setShadowBox] = React.useState<number>(0);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
   //on mounse enter an Element set shadow to 3
   const onHoverIn = () => {
@@ -31,13 +32,10 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
       marginTop: '5%',
       position: 'absolute',
       fontFamily: defaultTheme.typography.h3.fontFamily,
-      // backgroundColor: defaultTheme.palette.error['main'],
-      // color: defaultTheme.palette.primary['main'],
       right: 6,
       borderRadius: '0px',
     },
     card: {
-      // border: `1px solid #e1e0e0`,
       marginLeft: '0.1%',
       marginRight: '0.1%',
       marginTop: '0.7%',
@@ -46,18 +44,17 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
       opacity: 0.9,
       position: 'relative',
     },
-
     location: {
       icon: {
         fontSize: 22,
       },
     },
   };
+
   return (
     <CoreModules.Card
       onClick={() => {
         const project: projectType = data;
-        // dispatch(ProjectActions.SetProjectTaskBoundries([]))
         dispatch(HomeActions.SetSelectedProject(project));
         navigate(`/project/${data.id}`);
       }}
@@ -78,27 +75,10 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
               ) : (
                 <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
               )}
-
-              {/*Id Number*/}
               <CoreModules.Typography variant="h4" right={7} top={5} gutterBottom>
                 #{data.id}
               </CoreModules.Typography>
-              {/* <======End======> */}
             </div>
-            {/*Priority Button and Image*/}
-            {/* <div>
-          <CoreModules.Button
-            size="small"
-            variant="outlined"
-            color="error"
-            style={cardInnerStyles.outlinedButton}
-            // disabled
-          >
-            {data.priority_str}
-          </CoreModules.Button>
-          <CustomizedImage status={'card'} style={{ width: 50, height: 50 }} />
-          </div> */}
-            {/* <======End======> */}
 
             {/*Project Info and description*/}
             <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
@@ -122,11 +102,9 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
                 </p>
               </div>
             </CoreModules.Stack>
-            {/* <======End======> */}
           </div>
 
           <div>
-            {/* Contributors */}
             <CoreModules.Stack direction={'row'}>
               <CoreModules.Typography
                 mt={'7%'}
@@ -149,11 +127,9 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
                 contributors
               </CoreModules.Typography>
             </CoreModules.Stack>
-            {/* <======End======> */}
 
             {/* Contribution Progress Bar */}
             <CustomizedProgressBar data={data} height={7} />
-            {/* <======End======> */}
           </div>
         </div>
       </CoreModules.CardContent>

@@ -1,15 +1,29 @@
 import * as React from 'react';
 import CoreModules from '@/shared/CoreModules';
 
-function Alert(props, ref) {
+type customizedSnackbarPropType = {
+  duration: number;
+  open: boolean;
+  message: string;
+  variant: string;
+  handleClose: () => void;
+};
+
+function Alert(props: Record<string, any>, ref: any) {
   return <CoreModules.MuiAlert ref={ref} elevation={6} variant="filled" {...props} />;
 }
 
-function SlideTransition(props) {
+function SlideTransition(props: Record<string, any>) {
   return <CoreModules.Slide {...props} direction="up" />;
 }
 
-export default function CustomizedSnackbars({ open, message, variant, handleClose, duration }) {
+export default function CustomizedSnackbars({
+  open,
+  message,
+  variant,
+  handleClose,
+  duration,
+}: customizedSnackbarPropType) {
   return (
     <CoreModules.Stack spacing={2} sx={{ width: '100%' }}>
       <CoreModules.Snackbar

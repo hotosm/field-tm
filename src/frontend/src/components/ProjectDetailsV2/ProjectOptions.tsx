@@ -6,7 +6,7 @@ import Button from '@/components/common/Button';
 import { useAppSelector } from '@/types/reduxTypes';
 
 type projectOptionPropTypes = {
-  projectName: string;
+  projectName: string | undefined;
 };
 
 const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {

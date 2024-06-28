@@ -9,25 +9,38 @@ import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
 import { Modal } from '@/components/common/Modal';
+import { useAppSelector } from '@/types/reduxTypes';
+import { taskSubmissionInfoType } from '@/models/task/taskModel';
 
-export default function Dialog({ taskId, feature, map, view }) {
+type dialogPropType = {
+  taskId: number;
+  feature: Record<string, any>;
+};
+
+type taskListstatusType = {
+  value: string;
+  key: string;
+  btnBG: string;
+};
+
+export default function Dialog({ taskId, feature }: dialogPropType) {
   const navigate = useNavigate();
-  const projectInfo = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
+  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const loading = CoreModules.useAppSelector((state) => state.common.loading);
-  const taskInfo = CoreModules.useAppSelector((state) => state.task.taskInfo);
-  const [list_of_task_status, set_list_of_task_status] = useState([]);
+  const loading = useAppSelector((state) => state.common.loading);
+  const taskInfo = useAppSelector((state) => state.task.taskInfo);
+  const [list_of_task_status, set_list_of_task_status] = useState<taskListstatusType[]>([]);
   const [task_status, set_task_status] = useState('READY');
-  const [currentTaskInfo, setCurrentTaskInfo] = useState();
+  const [currentTaskInfo, setCurrentTaskInfo] = useState<taskSubmissionInfoType>();
   const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
 
   const geojsonStyles = MapStyles();
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
-  const currentProjectId = params.id;
-  const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
-  const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
+  const currentProjectId: string = params.id;
+  const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectIndex = projectData.findIndex((project) => project.id == parseInt(currentProjectId));
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task?.index == taskId;
@@ -45,7 +58,7 @@ export default function Dialog({ taskId, feature, map, view }) {
 
   useEffect(() => {
     if (taskInfo?.length === 0) return;
-    const currentTaskInfo = taskInfo?.filter((task) => taskId == task?.index);
+    const currentTaskInfo = taskInfo?.filter((task) => taskId.toString() === task?.index);
     if (currentTaskInfo?.[0]) {
       setCurrentTaskInfo(currentTaskInfo?.[0]);
     }
@@ -77,8 +90,6 @@ export default function Dialog({ taskId, feature, map, view }) {
             taskBoundaryData,
             currentProjectId,
             feature,
-            map,
-            view,
             taskId,
             authDetailsCopy,
             { project_id: currentProjectId },
@@ -165,6 +176,7 @@ export default function Dialog({ taskId, feature, map, view }) {
                   onClick={(e) => {
                     if (
                       data.key === 'Mark as fully mapped' &&
+                      currentTaskInfo &&
                       currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
                     ) {
                       setToggleMappedConfirmationModal(true);

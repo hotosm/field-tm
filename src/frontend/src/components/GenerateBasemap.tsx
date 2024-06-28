@@ -5,23 +5,25 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import environment from '@/environment';
 import { DownloadTile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
+import { projectInfoType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
-const GenerateBasemap = ({ projectInfo }) => {
+const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
   const dispatch = CoreModules.useAppDispatch();
   const params = CoreModules.useParams();
-  const id = params.id;
+  const id: string = params.id;
 
   const [selectedTileSource, setSelectedTileSource] = useState('');
   const [selectedOutputFormat, setSelectedOutputFormat] = useState('');
   const [tmsUrl, setTmsUrl] = useState('');
-  const [error, setError] = useState([]);
+  const [error, setError] = useState<string[]>([]);
 
-  const toggleGenerateMbTilesModal = CoreModules.useAppSelector((state) => state.project.toggleGenerateMbTilesModal);
-  const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
-  const generateProjectTilesLoading = CoreModules.useAppSelector((state) => state.project.generateProjectTilesLoading);
-  const tilesList = CoreModules.useAppSelector((state) => state.project.tilesList);
+  const toggleGenerateMbTilesModal = useAppSelector((state) => state.project.toggleGenerateMbTilesModal);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
+  const generateProjectTilesLoading = useAppSelector((state) => state.project.generateProjectTilesLoading);
+  const tilesList = useAppSelector((state) => state.project.tilesList);
 
-  const modalStyle = (theme) => ({
+  const modalStyle = (theme: Record<string, any>) => ({
     width: '90vw', // Responsive modal width using vw
     // height: '90vh',
     bgcolor: theme.palette.mode === 'dark' ? '#0A1929' : 'white',
@@ -57,7 +59,7 @@ const GenerateBasemap = ({ projectInfo }) => {
     }
   }, [projectInfo]);
 
-  const handleTileSourceChange = (e) => {
+  const handleTileSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedTileSource(e.target.value);
     // If 'tms' is selected, clear the TMS URL
     if (e.target.value !== 'tms') {
@@ -65,12 +67,12 @@ const GenerateBasemap = ({ projectInfo }) => {
     }
   };
 
-  const handleTmsUrlChange = (e) => {
+  const handleTmsUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTmsUrl(e.target.value);
   };
 
   const generateProjectTilesValidation = () => {
-    const currentError = [];
+    const currentError: string[] = [];
     if (!selectedTileSource) {
       currentError.push('selectedTileSource');
     }
@@ -343,7 +345,6 @@ const GenerateBasemap = ({ projectInfo }) => {
                   </CoreModules.TableRow>
                 ))}
               </CoreModules.TableBody>
-
             </CoreModules.Table>
           </CoreModules.TableContainer>
         </CoreModules.Grid>
