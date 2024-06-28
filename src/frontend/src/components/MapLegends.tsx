@@ -2,8 +2,15 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
-const MapLegends = ({ iconBtnProps, defaultTheme }) => {
-  const MapDetails = [
+type mapDetialsType = {
+  value: string;
+  color: string;
+  status: string;
+  type?: string;
+};
+
+const MapLegends = ({ defaultTheme }: { defaultTheme: any }) => {
+  const MapDetails: mapDetialsType[] = [
     {
       value: 'Ready',
       color: defaultTheme.palette.mapFeatureColors.ready,
@@ -42,14 +49,13 @@ const MapLegends = ({ iconBtnProps, defaultTheme }) => {
     },
   ];
 
-  const LegendListItem = ({ data }) => {
+  const LegendListItem = ({ data }: { data: mapDetialsType }) => {
     return (
       <div className="fmtm-flex fmtm-items-center fmtm-gap-3">
         <div className="fmtm-border-[1px] fmtm-border-gray-200">
           {data.type !== 'locked' ? (
             <CoreModules.IconButton
               style={{ backgroundColor: data.color, borderRadius: 0 }}
-              {...iconBtnProps}
               color="primary"
               component="label"
               className="fmtm-w-7 fmtm-h-7 sm:fmtm-w-10 sm:fmtm-h-10"

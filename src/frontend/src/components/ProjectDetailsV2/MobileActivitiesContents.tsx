@@ -3,22 +3,18 @@ import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
 import CoreModules from '@/shared/CoreModules';
 import { useAppSelector } from '@/types/reduxTypes';
 
-const MobileActivitiesContents = ({ map, mainView, mapDivPostion }) => {
-  const params = CoreModules.useParams();
+type mobileActivitiesContentsType = {
+  map: any;
+};
+
+const MobileActivitiesContents = ({ map }: mobileActivitiesContentsType) => {
+  const params: Record<string, any> = CoreModules.useParams();
   const state = useAppSelector((state) => state.project);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 
   return (
     <div className="fmtm-w-full fmtm-bg-white fmtm-mb-[10vh]">
-      <ActivitiesPanel
-        params={params}
-        state={state.projectTaskBoundries}
-        defaultTheme={defaultTheme}
-        map={map}
-        view={mainView}
-        mapDivPostion={mapDivPostion}
-        states={state}
-      />
+      <ActivitiesPanel params={params} state={state.projectTaskBoundries} defaultTheme={defaultTheme} map={map} />
     </div>
   );
 };

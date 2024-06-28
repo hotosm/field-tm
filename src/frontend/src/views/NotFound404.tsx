@@ -1,6 +1,7 @@
 import React from 'react';
 import pageNoFound from '@/assets/images/notFound.png';
 import CoreModules from '@/shared/CoreModules';
+
 const NotFoundPage = () => {
   return (
     <CoreModules.Stack
@@ -17,7 +18,7 @@ const NotFoundPage = () => {
       <CoreModules.Typography style={{ wordWrap: 'break-word' }} variant="h3">
         You may have mistyped the address or the page may have moved.
       </CoreModules.Typography>
-      <img src={pageNoFound} style={{ widh: '25%', height: '22%' }} />
+      <img src={pageNoFound} style={{ height: '22%' }} />
     </CoreModules.Stack>
   );
 };

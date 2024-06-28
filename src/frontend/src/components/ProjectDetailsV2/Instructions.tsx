@@ -1,7 +1,7 @@
 import React from 'react';
 import RichTextEditor from '@/components/common/Editor/Editor';
 
-const Instructions = ({ instructions }: { instructions: string }) => {
+const Instructions = ({ instructions }: { instructions: string | undefined }) => {
   return (
     <div className="fmtm-overflow-y-scroll scrollbar">
       {instructions ? (

@@ -4,7 +4,7 @@ import { projectInfoType } from '@/models/project/projectModel';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 
-const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: projectInfoType }) => {
+const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
   const navigate = useNavigate();
 
   return (

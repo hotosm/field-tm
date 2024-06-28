@@ -7,16 +7,18 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import Loader from '@/utilities/AppLoader';
 import MappingHeader from '@/utilities/MappingHeader';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const MainView = () => {
   const dispatch = CoreModules.useAppDispatch();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { windowSize } = windowDimention();
-  const checkTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
+  const checkTheme = useAppSelector((state) => state.theme.hotTheme);
   const theme = CoreModules.createTheme(checkTheme);
-  const stateSnackBar = CoreModules.useAppSelector((state) => state.common.snackbar);
-  const handleClose = (event, reason) => {
+  const stateSnackBar = useAppSelector((state) => state.common.snackbar);
+
+  const handleClose = (event: React.SyntheticEvent, reason: string) => {
     if (reason === 'clickaway') {
       return;
     }

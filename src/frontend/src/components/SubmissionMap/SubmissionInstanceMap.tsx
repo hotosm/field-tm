@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useOLMap from '@/hooks/useOlMap';
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
-const SubmissionInstanceMap = ({ featureGeojson }) => {
-  const { mapRef, map } = useOLMap({
+type submissionInstanceMapPropType = {
+  featureGeojson: Record<string, any>;
+};
+
+const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType) => {
+  const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
     zoom: 4,
     maxZoom: 25,

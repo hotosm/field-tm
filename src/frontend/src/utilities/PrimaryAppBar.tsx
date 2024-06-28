@@ -70,15 +70,7 @@ export default function PrimaryAppBar() {
   return (
     <CoreModules.Stack sx={{ flexGrow: 0 }}>
       <LoginPopup />
-      <DrawerComponent
-        open={open}
-        placement={'right'}
-        onClose={handleOnCloseDrawer}
-        size={windowSize}
-        type={type}
-        onSignOut={handleOnSignOut}
-        setOpen={setOpen}
-      />
+      <DrawerComponent open={open} onClose={handleOnCloseDrawer} size={windowSize} type={type} setOpen={setOpen} />
       <CoreModules.AppBar
         position="static"
         sx={{ boxShadow: 0, borderBottom: '1px solid #e1e0e0', borderTop: '1px solid #e1e0e0' }}
