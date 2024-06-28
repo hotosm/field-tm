@@ -36,7 +36,6 @@ from geoalchemy2.shape import to_shape
 from geojson.feature import Feature, FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.basemapper import create_basemap_file
-from osm_fieldwork.OdkCentral import OdkAppUser
 from osm_fieldwork.xlsforms import entities_registration, xlsforms_path
 from osm_rawdata.postgres import PostgresClient
 from shapely.geometry import shape
@@ -44,7 +43,7 @@ from sqlalchemy import and_, column, func, select, table, text
 from sqlalchemy.orm import Session
 
 from app.central import central_crud, central_deps
-from app.config import encrypt_value, settings
+from app.config import settings
 from app.db import db_models
 from app.db.postgis_utils import (
     check_crs,
@@ -832,32 +831,6 @@ async def generate_odk_central_project_content(
 ) -> str:
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
     project_odk_id = project.odkid
-    # Create an app user (i.e. QR Code) for the project
-    appuser_name = "fmtm_user"
-    log.info(
-        f"Creating ODK appuser ({appuser_name}) for ODK project ({project_odk_id})"
-    )
-    appuser = OdkAppUser(
-        odk_credentials.odk_central_url,
-        odk_credentials.odk_central_user,
-        odk_credentials.odk_central_password,
-    )
-    appuser_json = appuser.create(project_odk_id, appuser_name)
-
-    # If app user could not be created, raise an exception.
-    if not appuser_json:
-        msg = f"Couldn't create appuser {appuser_name} for project"
-        log.error(msg)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-        ) from None
-    if not (appuser_token := appuser_json.get("token")):
-        msg = f"Couldn't get token for appuser {appuser_name}"
-        log.error(msg)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-        ) from None
-    appuser_id = appuser_json.get("id")
 
     # NOTE Entity Registration form: this may be removed with future Central
     # API changes to allow Entity creation
@@ -892,28 +865,6 @@ async def generate_odk_central_project_content(
         odk_credentials,
     )
 
-    log.info("Updating XForm role for appuser in ODK Central")
-    # Update the user role for the created xform
-    response = appuser.updateRole(
-        projectId=project_odk_id,
-        xform=xform_id,
-        actorId=appuser_id,
-    )
-    if not response.ok:
-        try:
-            json_data = response.json()
-            log.error(json_data)
-        except json.decoder.JSONDecodeError:
-            log.error(
-                "Could not parse response json during appuser update. "
-                f"status_code={response.status_code}"
-            )
-        finally:
-            msg = f"Failed to update appuser for formId: ({xform_id})"
-            log.error(msg)
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-            ) from None
     sql = text(
         """
                 INSERT INTO xforms (
@@ -929,8 +880,9 @@ async def generate_odk_central_project_content(
         {"project_id": project.id, "xform_id": xform_id, "category": form_category},
     )
     db.commit()
-    odk_url = odk_credentials.odk_central_url
-    return encrypt_value(f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}")
+    return await central_crud.get_appuser_token(
+        xform_id, project_odk_id, odk_credentials, db
+    )
 
 
 async def generate_project_files(

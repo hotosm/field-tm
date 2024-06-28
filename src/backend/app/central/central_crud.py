@@ -37,7 +37,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.central import central_deps
-from app.config import settings
+from app.config import encrypt_value, settings
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
@@ -956,3 +956,76 @@ def convert_csv(
     csvin.finishGeoJson()
 
     return True
+
+
+async def get_appuser_token(
+    xform_id: str,
+    project_odk_id: int,
+    odk_credentials: project_schemas.ODKCentralDecrypted,
+    db: Session,
+):
+    """Get the app user token for a specific project.
+
+    Args:
+        db: The database session to use.
+        odk_credentials: ODK credentials for the project.
+        project_odk_id: The ODK ID of the project.
+        xform_id: The ID of the XForm.
+
+    Returns:
+        The app user token.
+    """
+    try:
+        appuser = get_odk_app_user(odk_credentials)
+        odk_project = get_odk_project(odk_credentials)
+        odk_app_user = odk_project.listAppUsers(project_odk_id)
+
+        # delete if app_user already exists
+        if odk_app_user:
+            app_user_id = odk_app_user[0].get("id")
+            appuser.delete(project_odk_id, app_user_id)
+
+        # create new app_user
+        appuser_name = "fmtm_user"
+        log.info(
+            f"Creating ODK appuser ({appuser_name}) for ODK project ({project_odk_id})"
+        )
+        appuser_json = appuser.create(project_odk_id, appuser_name)
+        appuser_token = appuser_json.get("token")
+        appuser_id = appuser_json.get("id")
+
+        odk_url = odk_credentials.odk_central_url
+
+        # Update the user role for the created xform
+        log.info("Updating XForm role for appuser in ODK Central")
+        response = appuser.updateRole(
+            projectId=project_odk_id,
+            xform=xform_id,
+            actorId=appuser_id,
+        )
+        if not response.ok:
+            try:
+                json_data = response.json()
+                log.error(json_data)
+            except json.decoder.JSONDecodeError:
+                log.error(
+                    "Could not parse response json during appuser update. "
+                    f"status_code={response.status_code}"
+                )
+            finally:
+                msg = f"Failed to update appuser for formId: ({xform_id})"
+                log.error(msg)
+                raise HTTPException(
+                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+                ) from None
+        odk_token = encrypt_value(
+            f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
+        )
+        return odk_token
+
+    except Exception as e:
+        log.error(f"An error occurred: {str(e)}")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the app user token.",
+        ) from e
