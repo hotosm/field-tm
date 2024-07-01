@@ -113,12 +113,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
               btnType="primary"
               type="submit"
               className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
-              disabled={
-                (task_status === 'LOCKED_FOR_MAPPING' &&
-                  authDetails &&
-                  currentTaskInfo?.locked_by_uid !== authDetails?.id) ||
-                entity?.status !== 0
-              }
+              disabled={entity?.status !== 0}
               isLoading={updateEntityStatusLoading}
               onClick={() => {
                 const xformId = projectInfo.xform_id;
