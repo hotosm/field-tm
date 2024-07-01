@@ -92,12 +92,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
     dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
 
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
-    const hashtags = projectDetails.hashtags;
-    const arrayHashtag = hashtags
-      ?.split('#')
-      .map((item) => item.trim())
-      .filter(Boolean);
-
     // Project POST data
     let projectData = {
       project_info: {
@@ -116,7 +110,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       task_split_type: splitTasksSelection,
       form_ways: projectDetails.formWays,
       // "uploaded_form": projectDetails.uploaded_form,
-      hashtags: arrayHashtag,
+      hashtags: projectDetails.hashtags,
       data_extract_url: projectDetails.data_extract_url,
       custom_tms_url: projectDetails.custom_tms_url,
     };

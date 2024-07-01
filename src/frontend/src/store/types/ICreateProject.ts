@@ -83,7 +83,7 @@ type EditProjectResponseTypes = {
   outline_geojson: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
   xform_category: string;
-  hashtags: string[];
+  hashtags: string;
 };
 export type EditProjectDetailsTypes = {
   name: string;

@@ -57,7 +57,7 @@ async def test_create_project(client, admin_user, organisation):
             "description": "test",
         },
         "xform_category": "buildings",
-        "hashtags": ["#FMTM"],
+        "hashtags": "#FMTM",
         "outline_geojson": {
             "coordinates": [
                 [
@@ -283,8 +283,8 @@ async def test_update_project(client, admin_user, project):
             "short_description": "updated short description",
             "description": "updated description",
         },
-        "xform_category": "buildings",
-        "hashtags": ["#FMTM"],
+        "xform_category": "healthcare",
+        "hashtags": "#FMTM anothertag",
         "outline_geojson": {
             "coordinates": [
                 [
@@ -319,6 +319,9 @@ async def test_update_project(client, admin_user, project):
         response_data["project_info"]["description"]
         == updated_project_data["project_info"]["description"]
     )
+
+    assert response_data["xform_category"] == "healthcare"
+    assert response_data["hashtags"] == ["#FMTM", "#anothertag"]
 
 
 async def test_project_summaries(client, project):
