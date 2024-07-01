@@ -58,12 +58,6 @@ const ProjectDetailsForm = ({ flag }) => {
     };
   }, []);
 
-  // Checks if hashtag value starts with hotosm-fmtm'
-  const handleHashtagOnChange = (e) => {
-    let enteredText = e.target.value;
-    handleCustomChange('hashtags', enteredText);
-  };
-
   const handleInputChanges = (e) => {
     handleChange(e);
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
@@ -240,7 +234,7 @@ const ProjectDetailsForm = ({ flag }) => {
               label="Hashtags"
               value={values?.hashtags}
               onChange={(e) => {
-                handleHashtagOnChange(e);
+                handleCustomChange('hashtags', e.target.value);
               }}
               fieldType="text"
               errorMsg={errors.hashtag}

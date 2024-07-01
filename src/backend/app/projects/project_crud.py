@@ -263,7 +263,7 @@ async def partial_update_project_info(
     return await convert_to_app_project(db_project)
 
 
-async def update_project_info(
+async def update_project_with_project_info(
     db: Session,
     project_metadata: project_schemas.ProjectUpdate,
     db_project: db_models.DbProject,
@@ -278,24 +278,20 @@ async def update_project_info(
             detail="No project info passed in",
         )
 
-    # Project meta information
-    project_info = project_metadata.project_info
+    for key, value in project_metadata.model_dump(
+        exclude=["project_info", "outline_geojson"]
+    ).items():
+        setattr(db_project, key, value)
 
-    # Update author of the project
-    db_project.author_id = db_user.id
-    db_project.project_name_prefix = project_metadata.project_name_prefix
-
-    # get project info
     db_project_info = await get_project_info_by_id(db, db_project.id)
-
-    # Update projects meta information (name, descriptions)
-    if db_project and db_project_info:
-        db_project_info.name = project_info.name
-        db_project_info.short_description = project_info.short_description
-        db_project_info.description = project_info.description
+    # Update project's meta information (name, descriptions)
+    if db_project_info:
+        for key, value in project_info.model_dump(exclude_unset=True).items():
+            setattr(db_project_info, key, value)
 
     db.commit()
     db.refresh(db_project)
+    db.refresh(db_project_info)
 
     return await convert_to_app_project(db_project)
 

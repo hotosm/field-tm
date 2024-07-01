@@ -557,7 +557,7 @@ async def update_project(
     Raises:
     - HTTPException with 404 status code if project not found
     """
-    project = await project_crud.update_project_info(
+    project = await project_crud.update_project_with_project_info(
         db, project_info, project_user_dict["project"], project_user_dict["user"]
     )
     if not project:
