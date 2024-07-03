@@ -63,6 +63,12 @@ class AuthUser(BaseModel):
         return int(sub.split("|")[1])
 
 
+class AuthUserWithToken(AuthUser):
+    """Add the JWT token variable to AuthUser response."""
+
+    token: str
+
+
 class FMTMUser(BaseModel):
     """User details returned to the frontend.
 
