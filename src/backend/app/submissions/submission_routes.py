@@ -27,8 +27,9 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser, login_required
-from app.auth.roles import mapper, project_admin
+from app.auth.auth_schemas import AuthUser
+from app.auth.osm import login_required
+from app.auth.roles import mapper, project_manager
 from app.central import central_crud
 from app.db import database, db_models, postgis_utils
 from app.models.enums import HTTPStatus, ReviewStateEnum
@@ -508,7 +509,7 @@ async def update_review_state(
     project_id: int,
     instance_id: str,
     review_state: ReviewStateEnum,
-    current_user: AuthUser = Depends(project_admin),
+    current_user: AuthUser = Depends(project_manager),
     db: Session = Depends(database.get_db),
 ):
     """Updates the review state of a project submission.

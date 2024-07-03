@@ -27,7 +27,8 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser, login_required
+from app.auth.auth_schemas import AuthUser, OrgUserDict
+from app.auth.osm import login_required
 from app.auth.roles import org_admin, super_admin
 from app.db import database
 from app.db.db_models import DbOrganisation, DbUser
@@ -65,7 +66,7 @@ async def get_my_organisations(
 @router.get("/unapproved/", response_model=list[organisation_schemas.OrganisationOut])
 async def list_unapproved_organisations(
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(super_admin),
+    current_user: DbUser = Depends(super_admin),
 ) -> list[DbOrganisation]:
     """Get a list of all organisations."""
     return await organisation_crud.get_unapproved_organisations(db)
@@ -75,7 +76,7 @@ async def list_unapproved_organisations(
 async def unapproved_org_detail(
     org_id: int,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(super_admin),
+    current_user: DbUser = Depends(super_admin),
 ):
     """Get a detail of an unapproved organisations."""
     return await organisation_crud.get_unapproved_org_detail(db, org_id)
@@ -112,7 +113,7 @@ async def update_organisation(
     logo: UploadFile = File(None),
     organisation: DbOrganisation = Depends(org_exists),
     db: Session = Depends(database.get_db),
-    org_user_dict: DbUser = Depends(org_admin),
+    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Partial update for an existing organisation."""
     return await organisation_crud.update_organisation(
@@ -123,7 +124,7 @@ async def update_organisation(
 @router.delete("/{org_id}")
 async def delete_org(
     db: Session = Depends(database.get_db),
-    org_user_dict: DbUser = Depends(org_admin),
+    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Delete an organisation."""
     return await organisation_crud.delete_organisation(db, org_user_dict["org"])
@@ -169,7 +170,7 @@ async def add_new_organisation_admin(
     db: Session = Depends(database.get_db),
     user: DbUser = Depends(user_exists_in_db),
     org: DbOrganisation = Depends(org_exists),
-    org_user_dict: DbUser = Depends(org_admin),
+    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Add a new organisation admin.
 

@@ -241,8 +241,10 @@ class ProjectPartialUpdate(BaseModel):
 
     @computed_field
     @property
-    def project_name_prefix(self) -> str:
+    def project_name_prefix(self) -> Optional[str]:
         """Compute project name prefix with underscores."""
+        if not self.name:
+            return None
         return self.name.replace(" ", "_").lower()
 
 

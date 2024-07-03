@@ -34,7 +34,8 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Resp
 from osm_fieldwork.xlsforms import xlsforms_path
 from requests import get
 
-from app.auth.osm import AuthUser, login_required
+from app.auth.auth_schemas import AuthUser
+from app.auth.osm import login_required
 from app.central import central_deps
 from app.central.central_crud import (
     convert_geojson_to_odk_csv,
