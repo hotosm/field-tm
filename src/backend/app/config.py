@@ -150,6 +150,9 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     ENCRYPTION_KEY: str
+    # NOTE HS384 is used for simplicity of implementation and compatibility with
+    # existing Fernet based database value encryption
+    JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
     FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = "7050"
@@ -279,10 +282,6 @@ class Settings(BaseSettings):
             return None
         return v
 
-    ALGORITHM: str = "RS256"
-    AUTH_PRIVATE_KEY: str
-    AUTH_PUBLIC_KEY: str
-
     MONITORING: Optional[MonitoringTypes] = None
 
     @computed_field
@@ -302,16 +301,21 @@ def get_settings():
     _settings = Settings()
 
     if _settings.DEBUG:
-        print(
-            "Loaded settings: "
-            f"{_settings.model_dump(exclude=['AUTH_PRIVATE_KEY', 'AUTH_PUBLIC_KEY'])}"
-        )
+        print("Loaded settings: " f"{_settings.model_dump()}")
     return _settings
 
 
 @lru_cache
 def get_cipher_suite():
     """Cache cypher suite."""
+    # Fernet is used by cryptography as a simple and effective default
+    # it enforces a 32 char secret.
+    #
+    # In the future we could migrate this to HS384 encryption, which we also
+    # use for our JWT signing. Ideally this needs 48 characters, but for now
+    # we are stuck at 32 char to maintain support with Fernet (reuse the same key).
+    #
+    # However this would require a migration for all existing instances of FMTM.
     return Fernet(settings.ENCRYPTION_KEY)
 
 

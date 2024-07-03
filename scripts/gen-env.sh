@@ -342,28 +342,6 @@ check_change_port() {
     fi
 }
 
-generate_auth_keys() {
-    pretty_echo "Generating Auth Keys"
-
-    if ! AUTH_PRIVATE_KEY=$(openssl genrsa 4096 2>/dev/null); then
-        echo "Error generating private key. Aborting."
-        return 1
-    fi
-
-    if ! AUTH_PUBLIC_KEY=$(echo "$AUTH_PRIVATE_KEY" | openssl rsa -pubout 2>/dev/null); then
-        echo "Error generating public key. Aborting."
-        return 1
-    fi
-
-    # Quotes are required around key variables, else dotenv does not load
-    export AUTH_PRIVATE_KEY="\"$AUTH_PRIVATE_KEY\""
-    export AUTH_PUBLIC_KEY="\"$AUTH_PUBLIC_KEY\""
-
-    echo
-    echo "Auth keys generated."
-    echo
-}
-
 generate_dotenv() {
     pretty_echo "Generating Dotenv File"
 
@@ -412,7 +390,6 @@ prompt_user_gen_dotenv() {
     fi
 
     set_osm_credentials
-    generate_auth_keys
     generate_dotenv
 
     pretty_echo "Completed dotenv file generation"

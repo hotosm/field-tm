@@ -43,7 +43,7 @@ const CheckLoginState = () => {
   useEffect(() => {
     // Check current login state (omit callback url)
     if (!window.location.pathname.includes('osmauth')) {
-      // No need for introspect check if user details are not set
+      // No need for token refresh check if user details are not set
       if (!authDetails) return;
       checkIfUserLoginValid();
     }

@@ -101,11 +101,14 @@ def create_tokens(payload: dict) -> tuple[str, str]:
     access_token_payload["exp"] = (
         int(time.time()) + 86400
     )  # set access token expiry to 1 day
-    private_key = settings.AUTH_PRIVATE_KEY
     access_token = jwt.encode(
-        access_token_payload, str(private_key), algorithm=settings.ALGORITHM
+        access_token_payload,
+        settings.ENCRYPTION_KEY,
+        algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
-    refresh_token = jwt.encode(payload, str(private_key), algorithm=settings.ALGORITHM)
+    refresh_token = jwt.encode(
+        payload, settings.ENCRYPTION_KEY, algorithm=settings.JWT_ENCRYPTION_ALGORITHM
+    )
     return access_token, refresh_token
 
 
@@ -116,9 +119,10 @@ def refresh_access_token(payload: dict) -> str:
         int(time.time()) + 60
     )  # Access token valid for 15 minutes
 
-    private_key = settings.AUTH_PRIVATE_KEY
     return jwt.encode(
-        access_token_payload, str(private_key), algorithm=settings.ALGORITHM
+        access_token_payload,
+        settings.ENCRYPTION_KEY,
+        algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
 
 
@@ -134,12 +138,11 @@ def verify_token(token: str):
     Raises:
         HTTPException: If the token has expired or credentials could not be validated.
     """
-    public_key = settings.AUTH_PUBLIC_KEY
     try:
         return jwt.decode(
             token,
-            str(public_key),
-            algorithms=[settings.ALGORITHM],
+            settings.ENCRYPTION_KEY,
+            algorithms=[settings.JWT_ENCRYPTION_ALGORITHM],
             audience=settings.FMTM_DOMAIN,
         )
     except jwt.ExpiredSignatureError as e:
