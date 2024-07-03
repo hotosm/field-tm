@@ -22,13 +22,14 @@ import os
 import time
 
 import jwt
-from fastapi import Header, HTTPException, Request, Response
+from fastapi import Header, HTTPException, Request
+from fastapi.responses import JSONResponse
 from loguru import logger as log
 from osm_login_python.core import Auth
 
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
-from app.models.enums import UserRole
+from app.models.enums import HTTPStatus, UserRole
 
 if settings.DEBUG:
     # Required as callback url is http during dev
@@ -88,27 +89,32 @@ def extract_refresh_token_from_cookie(request: Request) -> str:
     return request.cookies.get(f"{cookie_name}_refresh")
 
 
-def create_tokens(payload: dict) -> tuple[str, str]:
+def create_tokens(jwt_data: dict) -> tuple[str, str]:
     """Generates tokens for the specified user.
 
     Args:
-        payload (dict): user data for which the access token is being generated.
+        jwt_data (dict): user data for which the access token is being generated.
 
     Returns:
         Tuple: The generated access tokens.
     """
-    access_token_payload = payload
-    access_token_payload["exp"] = (
-        int(time.time()) + 86400
-    )  # set access token expiry to 1 day
+    access_token_data = jwt_data
     access_token = jwt.encode(
-        access_token_payload,
+        access_token_data,
         settings.ENCRYPTION_KEY,
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
+
+    refresh_token_data = jwt_data
+    refresh_token_data["exp"] = (
+        int(time.time()) + 86400 * 7
+    )  # set refresh token expiry to 7 days
     refresh_token = jwt.encode(
-        payload, settings.ENCRYPTION_KEY, algorithm=settings.JWT_ENCRYPTION_ALGORITHM
+        refresh_token_data,
+        settings.ENCRYPTION_KEY,
+        algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
+
     return access_token, refresh_token
 
 
@@ -158,15 +164,24 @@ def set_cookies(access_token: str, refresh_token: str):
         refresh_token (str): The refresh token to be stored in the cookie.
 
     Returns:
-        Response: A response object with the cookies set.
+        JSONResponse: A response object with the cookies set.
+
+    TODO we can refactor this to remove setting the access_token cookie
+    TODO only the refresh token should be stored in the httpOnly cookie
+    TODO the access token is used in memory in the browser (not stored)
     """
-    response = Response(status_code=200)
+    # NOTE we return the access token to the frontend for electric-sql
+    # as the expiry is set to 1hr and is relatively safe
+    response = JSONResponse(
+        status_code=HTTPStatus.OK,
+        content={"token": access_token},
+    )
     cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
     response.set_cookie(
         key=cookie_name,
         value=access_token,
-        max_age=86400,
-        expires=86400,  # expiry set for 1 day
+        max_age=3600,
+        expires=3600,  # expiry set for 1 hour
         path="/",
         domain=settings.FMTM_DOMAIN,
         secure=False if settings.DEBUG else True,
