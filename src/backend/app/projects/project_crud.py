@@ -1620,10 +1620,10 @@ def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:
     return contributions_count
 
 
-async def add_project_admin(
+async def add_project_manager(
     db: Session, user: db_models.DbUser, project: db_models.DbProject
 ):
-    """Adds a user as an admin to the specified organisation.
+    """Adds a user as an manager to the specified project.
 
     Args:
         db (Session): The database session.

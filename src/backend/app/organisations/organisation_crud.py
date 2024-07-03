@@ -25,7 +25,7 @@ from loguru import logger as log
 from sqlalchemy import text, update
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser
+from app.auth.auth_schemas import AuthUser
 from app.config import encrypt_value, settings
 from app.db import db_models
 from app.models.enums import HTTPStatus

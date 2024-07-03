@@ -18,7 +18,7 @@
 
 """Auth routes, to login, logout, and get user details."""
 
-from datetime import datetime, timezone
+import time
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -26,7 +26,16 @@ from loguru import logger as log
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser, init_osm_auth, login_required
+from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.osm import (
+    create_tokens,
+    extract_refresh_token_from_cookie,
+    init_osm_auth,
+    login_required,
+    refresh_access_token,
+    set_cookies,
+    verify_token,
+)
 from app.config import settings
 from app.db import database
 from app.models.enums import HTTPStatus, UserRole
@@ -73,36 +82,32 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
     Returns:
         access_token (string): The access token provided by the login URL request.
     """
-    log.debug(f"Callback url requested: {request.url}")
+    try:
+        log.debug(f"Callback url requested: {request.url}")
 
-    # Enforce https callback url for openstreetmap.org
-    callback_url = str(request.url).replace("http://", "https://")
+        # Enforce https callback url for openstreetmap.org
+        callback_url = str(request.url).replace("http://", "https://")
 
-    # Get access token
-    access_token = osm_auth.callback(callback_url).get("access_token")
-    log.debug(f"Access token returned of length {len(access_token)}")
-    response = Response(status_code=HTTPStatus.OK)
-
-    # Set cookie
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
-    log.debug(
-        f"Setting cookie in response named '{cookie_name}' with params: "
-        f"max_age=31536000 | expires=31536000 | path='/' | "
-        f"domain={settings.FMTM_DOMAIN} | httponly=True | samesite='lax' | "
-        f"secure={False if settings.DEBUG else True}"
-    )
-    response.set_cookie(
-        key=cookie_name,
-        value=access_token,
-        max_age=31536000,  # OSM currently has no expiry
-        expires=31536000,  # OSM currently has no expiry
-        path="/",
-        domain=settings.FMTM_DOMAIN,
-        secure=False if settings.DEBUG else True,
-        httponly=True,
-        samesite="lax",
-    )
-    return response
+        # Get access token
+        access_token = osm_auth.callback(callback_url).get("access_token")
+        log.debug(f"Access token returned of length {len(access_token)}")
+        osm_user = osm_auth.deserialize_access_token(access_token)
+        user_data = {
+            "sub": f"fmtm|{osm_user['id']}",
+            "aud": settings.FMTM_DOMAIN,
+            "iat": int(time.time()),
+            "exp": int(time.time()) + 86400,  # expiry set to 1 day
+            "username": osm_user["username"],
+            "email": osm_user.get("email"),
+            "picture": osm_user.get("img_url"),
+            "role": UserRole.MAPPER,
+        }
+        access_token, refresh_token = create_tokens(user_data)
+        return set_cookies(access_token, refresh_token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED, detail=f"Invalid OSM token: {e}"
+        ) from e
 
 
 @router.get("/logout/")
@@ -132,79 +137,73 @@ async def get_or_create_user(
 ):
     """Get user from User table if exists, else create."""
     try:
-        update_sql = text(
+        upsert_sql = text(
             """
-            INSERT INTO users (
+            WITH upserted_user AS (
+                INSERT INTO users (
                     id, username, profile_img, role, mapping_level,
                     is_email_verified, is_expert, tasks_mapped, tasks_validated,
                     tasks_invalidated, date_registered, last_validation_date
-                    )
-                VALUES (
+                ) VALUES (
                     :user_id, :username, :profile_img, :role,
-                    :mapping_level, FALSE, FALSE, 0, 0, 0,
-                    :current_date, :current_date
-                    )
-            ON CONFLICT (id)
-                DO UPDATE SET profile_img = :profile_img;
+                    'BEGINNER', FALSE, FALSE, 0, 0, 0, NOW(), NOW()
+                )
+                ON CONFLICT (id)
+                DO UPDATE SET
+                    profile_img = EXCLUDED.profile_img
+                RETURNING id, username, profile_img, role
+            )
+            SELECT
+                u.id, u.username, u.profile_img, u.role,
+                array_agg(
+                    DISTINCT om.organisation_id
+                ) FILTER (WHERE om.organisation_id IS NOT NULL) as orgs_managed,
+                jsonb_object_agg(
+                    ur.project_id,
+                    COALESCE(ur.role, 'MAPPER')
+                ) FILTER (WHERE ur.project_id IS NOT NULL) as project_roles
+            FROM upserted_user u
+            LEFT JOIN user_roles ur ON u.id = ur.user_id
+            LEFT JOIN organisation_managers om ON u.id = om.user_id
+            GROUP BY u.id, u.username, u.profile_img, u.role;
             """
         )
-        role = UserRole(user_data.role).name
-        db.execute(
-            update_sql,
-            {
-                "user_id": user_data.id,
-                "username": user_data.username,
-                "profile_img": user_data.img_url,
-                "role": role,
-                "mapping_level": "BEGINNER",
-                "current_date": datetime.now(timezone.utc),
-            },
-        )
+
+        parameters = {
+            "user_id": user_data.id,
+            "username": user_data.username,
+            "profile_img": user_data.picture or "",
+            "role": UserRole(user_data.role).name,
+        }
+        result = db.execute(upsert_sql, parameters)
         db.commit()
 
-        get_sql = text(
-            """
-            SELECT users.*,
-                user_roles.project_id as project_id,
-                organisation_managers.organisation_id as created_org,
-                COALESCE(user_roles.role, 'MAPPER') as project_role
-            FROM users
-            LEFT JOIN user_roles ON users.id = user_roles.user_id
-            LEFT JOIN organisation_managers on users.id = organisation_managers.user_id
-            WHERE users.id = :user_id;
-            """
-        )
-        result = db.execute(
-            get_sql,
-            {"user_id": user_data.id},
-        )
-        db_user = result.first()
+        db_user_details = result.first()
+        if not db_user_details:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User ID ({user_data.id}) could not be inserted in db",
+            )
 
-        user = {
-            "id": db_user.id,
-            "username": db_user.username,
-            "profile_img": db_user.profile_img,
-            "role": db_user.role,
-            "project_id": db_user.project_id,
-            "project_role": db_user.project_role,
-            "created_org": db_user.created_org,
-        }
-        return user
+        return db_user_details
 
     except Exception as e:
-        # Check if the exception is due to username already existing
+        db.rollback()
+        log.error(f"Exception occurred: {e}")
         if 'duplicate key value violates unique constraint "users_username_key"' in str(
             e
         ):
             raise HTTPException(
-                status_code=400,
+                status_code=HTTPStatus.BAD_REQUEST,
                 detail=f"User with this username {user_data.username} already exists.",
             ) from e
         else:
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail=str(e)
+            ) from e
 
 
-@router.get("/me/")
+@router.get("/me/", response_model=FMTMUser)
 async def my_data(
     db: Session = Depends(database.get_db),
     user_data: AuthUser = Depends(login_required),
@@ -221,15 +220,40 @@ async def my_data(
     return await get_or_create_user(db, user_data)
 
 
-@router.get("/introspect", response_model=AuthUser)
-async def check_login(
-    user_data: AuthUser = Depends(login_required),
-):
+@router.get("/refresh")
+async def refresh_token(
+    request: Request, user_data: AuthUser = Depends(login_required)
+) -> AuthUser:
     """Verifies the validity of login cookies.
 
     Returns True if authenticated, False otherwise.
     """
-    return user_data
+    try:
+        refresh_token = extract_refresh_token_from_cookie(request)
+        if not refresh_token:
+            raise HTTPException(status_code=401, detail="No tokens provided")
+
+        token_data = verify_token(refresh_token)
+        access_token = refresh_access_token(token_data)
+        response = JSONResponse(content=user_data.dict(), status_code=200)
+        cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+        response.set_cookie(
+            key=cookie_name,
+            value=access_token,
+            max_age=86400,
+            expires=86400,
+            path="/",
+            domain=settings.FMTM_DOMAIN,
+            secure=False if settings.DEBUG else True,
+            httponly=True,
+            samesite="lax",
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"fail to refresh the access token: {e}",
+        ) from e
 
 
 @router.get("/temp-login")
@@ -248,33 +272,15 @@ async def temp_login(
     Returns:
         Response: The response object containing the access token as a cookie.
     """
-    access_token = settings.OSM_SVC_ACCOUNT_TOKEN
-
-    if not access_token:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail=(
-                "OSM_SVC_ACCOUNT_TOKEN variable is not set. Temp login not possible."
-            ),
-        )
-
-    response = Response(status_code=HTTPStatus.OK)
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
-    log.debug(
-        f"Setting TEMP cookie in response named '{cookie_name}' with params: "
-        f"max_age=604800 | expires=604800 | path='/' | "
-        f"domain={settings.FMTM_DOMAIN} | httponly=True | samesite='lax' | "
-        f"secure={False if settings.DEBUG else True}"
-    )
-    response.set_cookie(
-        key=cookie_name,
-        value=access_token,
-        max_age=604800,
-        expires=604800,  # expiry set to 7 days,
-        path="/",
-        domain=settings.FMTM_DOMAIN,
-        secure=False if settings.DEBUG else True,
-        httponly=True,
-        samesite="lax",
-    )
-    return response
+    username = "svcfmtm"
+    user_data = {
+        "sub": "fmtm|20386219",
+        "aud": settings.FMTM_DOMAIN,
+        "iat": int(time.time()),
+        "exp": int(time.time()) + 86400 * 7,  # expiry set to 7 days
+        "username": username,
+        "picture": None,
+        "role": UserRole.MAPPER,
+    }
+    access_token, refresh_token = create_tokens(user_data)
+    return set_cookies(access_token, refresh_token)

@@ -50,6 +50,8 @@ kubectl
   - key: OSM_CLIENT_ID
   - key: OSM_CLIENT_SECRET
   - key: OSM_SECRET_KEY
+  - key: AUTH_PUBLIC_KEY
+  - key: AUTH_PRIVATE_KEY
 
   ```bash
   kubectl create secret generic api-fmtm-vars --namespace fmtm \
@@ -57,7 +59,9 @@ kubectl
     --from-literal=FMTM_DOMAIN=some.domain.com \
     --from-literal=OSM_CLIENT_ID=xxxxxxx \
     --from-literal=OSM_CLIENT_SECRET=xxxxxxx \
-    --from-literal=OSM_SECRET_KEY=xxxxxxx
+    --from-literal=OSM_SECRET_KEY=xxxxxxx \
+    --from-file=AUTH_PUBLIC_KEY=/path/to/pub/key.pem \
+    --from-file=AUTH_PRIVATE_KEY=/path/to/priv/key.pem
   ```
 
 ## Deployment

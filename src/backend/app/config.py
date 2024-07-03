@@ -270,21 +270,18 @@ class Settings(BaseSettings):
     @field_validator("RAW_DATA_API_AUTH_TOKEN", mode="before")
     @classmethod
     def set_raw_data_api_auth_none(cls, v: Optional[str]) -> Optional[str]:
-        """Set RAW_DATA_API_AUTH_TOKEN to None if set to empty string."""
+        """Set RAW_DATA_API_AUTH_TOKEN to None if set to empty string.
+
+        This variable is used by HOTOSM to track raw-data-api usage.
+        It is not required if running your own instance.
+        """
         if v == "":
             return None
         return v
 
-    # Used for temporary auth feature
-    OSM_SVC_ACCOUNT_TOKEN: Optional[str] = None
-
-    @field_validator("OSM_SVC_ACCOUNT_TOKEN", mode="before")
-    @classmethod
-    def set_osm_svc_account_none(cls, v: Optional[str]) -> Optional[str]:
-        """Set OSM_SVC_ACCOUNT_TOKEN to None if set to empty string."""
-        if v == "":
-            return None
-        return v
+    ALGORITHM: str = "RS256"
+    AUTH_PRIVATE_KEY: str
+    AUTH_PUBLIC_KEY: str
 
     MONITORING: Optional[MonitoringTypes] = None
 
@@ -305,7 +302,10 @@ def get_settings():
     _settings = Settings()
 
     if _settings.DEBUG:
-        print("Loaded settings: " f"{_settings.model_dump()}")
+        print(
+            "Loaded settings: "
+            f"{_settings.model_dump(exclude=['AUTH_PRIVATE_KEY', 'AUTH_PUBLIC_KEY'])}"
+        )
     return _settings
 
 

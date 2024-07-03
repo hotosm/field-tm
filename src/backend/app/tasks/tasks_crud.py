@@ -24,7 +24,6 @@ from loguru import logger as log
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.auth.osm import AuthUser
 from app.db import database, db_models
 from app.models.enums import (
     TaskStatus,
@@ -253,14 +252,14 @@ async def create_task_history_for_status_change(
 
 
 async def add_task_comments(
-    db: Session, comment: tasks_schemas.TaskCommentRequest, user_data: AuthUser
+    db: Session, comment: tasks_schemas.TaskCommentRequest, user_id: int
 ):
     """Add a comment to a task.
 
     Parameters:
     - db: SQLAlchemy database session
     - comment: TaskCommentBase instance containing the comment details
-    - user_data: AuthUser instance containing the user details
+    - user_id: OAuth user id.
 
     Returns:
     - Dictionary with the details of the added comment
@@ -293,7 +292,7 @@ async def add_task_comments(
         "task_id": comment.task_id,
         "comment_text": comment.comment,
         "current_date": currentdate,
-        "user_id": user_data.id,
+        "user_id": user_id,
     }
 
     # Execute the query with the named parameters and commit the transaction

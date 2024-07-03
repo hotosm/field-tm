@@ -38,6 +38,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 
+from app.config import settings
+
 log = logging.getLogger(__name__)
 
 
@@ -535,7 +537,13 @@ def get_address_from_lat_lon(latitude, longitude):
         "lon": longitude,
         "zoom": 18,
     }
-    headers = {"Accept-Language": "en"}  # Set the language to English
+    headers = {
+        # Set the language to English
+        "Accept-Language": "en",
+        # Referer or User-Agent required as per usage policy:
+        # https://operations.osmfoundation.org/policies/nominatim
+        "Referer": settings.FMTM_DOMAIN,
+    }
 
     log.debug(
         f"Getting Nominatim address from project lat ({latitude}) lon ({longitude})"

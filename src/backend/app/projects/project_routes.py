@@ -45,8 +45,9 @@ from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.auth.osm import AuthUser, login_required
-from app.auth.roles import mapper, org_admin, project_admin
+from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
+from app.auth.osm import login_required
+from app.auth.roles import mapper, org_admin, project_manager
 from app.central import central_crud, central_schemas
 from app.db import database, db_models
 from app.db.postgis_utils import (
@@ -441,11 +442,10 @@ async def read_project(
 @router.delete("/{project_id}")
 async def delete_project(
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(org_admin),
+    project: db_models.DbProject = Depends(project_deps.get_project_by_id),
+    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Delete a project from both ODK Central and the local database."""
-    project = org_user_dict.get("project")
-
     log.info(
         f"User {org_user_dict.get('user').username} attempting "
         f"deletion of project {project.id}"
@@ -463,7 +463,7 @@ async def delete_project(
 @router.post("/create_project", response_model=project_schemas.ProjectOut)
 async def create_project(
     project_info: project_schemas.ProjectUpload,
-    org_user_dict: db_models.DbUser = Depends(org_admin),
+    org_user_dict: OrgUserDict = Depends(org_admin),
     db: Session = Depends(database.get_db),
 ):
     """Create a project in ODK Central and the local database.
@@ -476,6 +476,7 @@ async def create_project(
     TODO but first check doesn't break other endpoints
     """
     db_user = org_user_dict.get("user")
+
     db_org = org_user_dict.get("org")
     project_info.organisation_id = db_org.id
 
@@ -510,7 +511,7 @@ async def create_project(
             """
     )
     result = db.execute(sql, {"project_name": project_info.project_info.name.lower()})
-    project_exists = result.fetchone()[0]
+    project_exists = result.scalar()
     if project_exists:
         raise HTTPException(
             status_code=400,
@@ -539,7 +540,7 @@ async def create_project(
 async def update_project(
     project_info: project_schemas.ProjectUpdate,
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Update an existing project by ID.
 
@@ -549,7 +550,7 @@ async def update_project(
     Parameters:
     - id: ID of the project to update
     - project_info: Updated project information
-    - current_user (DbUser): Check if user is project_admin
+    - current_user (DbUser): Check if user is project_manager
 
     Returns:
     - Updated project information
@@ -569,7 +570,7 @@ async def update_project(
 async def project_partial_update(
     project_info: project_schemas.ProjectPartialUpdate,
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Partial Update an existing project by ID.
 
@@ -600,7 +601,7 @@ async def upload_project_task_boundaries(
     project_id: int,
     task_geojson: UploadFile = File(...),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(org_admin),
+    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Set project task boundaries using split GeoJSON from frontend.
 
@@ -706,7 +707,7 @@ async def generate_files(
     background_tasks: BackgroundTasks,
     xls_form_upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
-    org_user_dict: db_models.DbUser = Depends(org_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Generate additional content to initialise the project.
 
@@ -730,12 +731,12 @@ async def generate_files(
         xls_form_upload (UploadFile, optional): A custom XLSForm to use in the project.
             A file should be provided if user wants to upload a custom xls form.
         db (Session): Database session, provided automatically.
-        org_user_dict (AuthUser): Current logged in user. Must be org admin.
+        project_user_dict (ProjectUserDict): Project admin role.
 
     Returns:
         json (JSONResponse): A success message containing the project ID.
     """
-    project = org_user_dict.get("project")
+    project = project_user_dict.get("project")
 
     log.debug(f"Generating media files tasks for project: {project.id}")
 
@@ -860,7 +861,7 @@ async def get_or_set_data_extract(
     url: Optional[str] = None,
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Get or set the data extract URL for a project."""
     fgb_url = await project_crud.get_or_set_data_extract_url(
@@ -877,7 +878,7 @@ async def upload_custom_extract(
     custom_extract_file: UploadFile = File(...),
     project_id: int = Query(..., description="Project ID"),
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Upload a custom data extract geojson for a project.
 
@@ -951,7 +952,7 @@ async def update_project_form(
     category: XLSFormType = Form(...),
     upload: Optional[UploadFile] = File(None),
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ) -> project_schemas.ProjectBase:
     """Update the XForm data in ODK Central.
 
@@ -1256,15 +1257,15 @@ async def get_contributors(
     return project_users
 
 
-@router.post("/add_admin/")
-async def add_new_project_admin(
+@router.post("/add-manager/")
+async def add_new_project_manager(
     db: Session = Depends(database.get_db),
-    project_user_dict: dict = Depends(project_admin),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
     """Add a new project manager.
 
     The logged in user must be either the admin of the organisation or a super admin.
     """
-    return await project_crud.add_project_admin(
+    return await project_crud.add_project_manager(
         db, project_user_dict["user"], project_user_dict["project"]
     )

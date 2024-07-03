@@ -93,3 +93,6 @@ envsubst
 
 # Chart dependencies
 chart/charts
+
+# Secrets / keys
+**/**/*.pem

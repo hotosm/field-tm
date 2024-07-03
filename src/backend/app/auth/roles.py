@@ -29,7 +29,8 @@ from loguru import logger as log
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.auth.osm import AuthUser, login_required
+from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
+from app.auth.osm import login_required
 from app.db.database import get_db
 from app.db.db_models import DbProject, DbUser
 from app.models.enums import HTTPStatus, ProjectRole, ProjectVisibility
@@ -152,7 +153,7 @@ async def super_admin(
         return db_user
 
     log.error(
-        f"User {user_data.username} requested an admin endpoint, " "but is not admin"
+        f"User {user_data.username} requested an admin endpoint, but is not admin"
     )
     raise HTTPException(
         status_code=HTTPStatus.FORBIDDEN, detail="User must be an administrator"
@@ -163,7 +164,7 @@ async def check_org_admin(
     db: Session,
     user: Union[AuthUser, int],
     org_id: int,
-) -> dict:
+) -> OrgUserDict:
     """Database check to determine if org admin role.
 
     Returns:
@@ -234,29 +235,71 @@ async def org_admin(
     return org_user_dict
 
 
-async def project_admin(
-    project: DbProject = Depends(get_project_by_id),
-    db: Session = Depends(get_db),
-    user_data: AuthUser = Depends(login_required),
-) -> dict:
-    """Project admin role."""
+async def wrap_check_access(
+    project: DbProject,
+    db: Session,
+    user_data: AuthUser,
+    role: ProjectRole,
+) -> ProjectUserDict:
+    """Wrap check_access call with HTTPException."""
     db_user = await check_access(
         user_data,
         db,
         project_id=project.id,
-        role=ProjectRole.PROJECT_MANAGER,
+        role=role,
     )
 
-    if db_user:
-        project_user_dict = {
-            "user": db_user,
-            "project": project,
-        }
-        return project_user_dict
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN,
+            detail="User is not a project manager",
+        )
 
-    raise HTTPException(
-        status_code=HTTPStatus.FORBIDDEN,
-        detail="User is not a project manager",
+    return {
+        "user": db_user,
+        "project": project,
+    }
+
+
+async def project_manager(
+    project: DbProject = Depends(get_project_by_id),
+    db: Session = Depends(get_db),
+    user_data: AuthUser = Depends(login_required),
+) -> ProjectUserDict:
+    """A project manager for a specific project."""
+    return await wrap_check_access(
+        project,
+        db,
+        user_data,
+        ProjectRole.PROJECT_MANAGER,
+    )
+
+
+async def associate_project_manager(
+    project: DbProject = Depends(get_project_by_id),
+    db: Session = Depends(get_db),
+    user_data: AuthUser = Depends(login_required),
+) -> ProjectUserDict:
+    """An associate project manager for a specific project."""
+    return await wrap_check_access(
+        project,
+        db,
+        user_data,
+        ProjectRole.ASSOCIATE_PROJECT_MANAGER,
+    )
+
+
+async def field_manager(
+    project: DbProject = Depends(get_project_by_id),
+    db: Session = Depends(get_db),
+    user_data: AuthUser = Depends(login_required),
+) -> ProjectUserDict:
+    """A field manager for a specific project."""
+    return await wrap_check_access(
+        project,
+        db,
+        user_data,
+        ProjectRole.FIELD_MANAGER,
     )
 
 
@@ -264,21 +307,13 @@ async def validator(
     project: DbProject = Depends(get_project_by_id),
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
-) -> DbUser:
+) -> ProjectUserDict:
     """A validator for a specific project."""
-    db_user = await check_access(
-        user_data,
+    return await wrap_check_access(
+        project,
         db,
-        project_id=project.id,
-        role=ProjectRole.VALIDATOR,
-    )
-
-    if db_user:
-        return db_user
-
-    raise HTTPException(
-        status_code=HTTPStatus.FORBIDDEN,
-        detail="User does not have validator permission",
+        user_data,
+        ProjectRole.VALIDATOR,
     )
 
 
@@ -286,24 +321,17 @@ async def mapper(
     project: DbProject = Depends(get_project_by_id),
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
-) -> Optional[DbUser]:
+) -> AuthUser:
     """A mapper for a specific project."""
     # If project is public, skip permission check
     if project.visibility == ProjectVisibility.PUBLIC:
-        # FIXME this is a different type than DbUser
         return user_data
 
-    db_user = await check_access(
-        user_data,
+    await wrap_check_access(
+        project,
         db,
-        project_id=project.id,
-        role=ProjectRole.MAPPER,
+        user_data,
+        ProjectRole.MAPPER,
     )
 
-    if db_user:
-        return db_user
-
-    raise HTTPException(
-        status_code=HTTPStatus.FORBIDDEN,
-        detail="User does not have mapper permission",
-    )
+    return user_data

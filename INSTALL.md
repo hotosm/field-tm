@@ -126,6 +126,10 @@ bash scripts/gen-env.sh
 > Note: If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
 > <http://fmtm.localhost:7050,http://some.other.domain>
+>
+> Note: It is possible to generate the auth pub/priv key manually using:
+> openssl genrsa -out fmtm-private.pem 4096
+> openssl rsa -in fmtm-private.pem -pubout -out fmtm-private.pem
 
 ### Start the API with Docker
 

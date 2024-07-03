@@ -19,7 +19,7 @@ const CheckLoginState = () => {
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   const checkIfUserLoginValid = () => {
-    fetch(`${import.meta.env.VITE_API_URL}/auth/introspect`, { credentials: 'include' })
+    fetch(`${import.meta.env.VITE_API_URL}/auth/refresh`, { credentials: 'include' })
       .then((resp) => {
         if (resp.status !== 200) {
           dispatch(LoginActions.signOut());
