@@ -114,13 +114,10 @@ def create_tokens(payload: dict) -> tuple[str, str]:
 
 def refresh_access_token(payload: dict) -> str:
     """Generate a new access token."""
-    access_token_payload = payload
-    access_token_payload["exp"] = (
-        int(time.time()) + 60
-    )  # Access token valid for 15 minutes
+    payload["exp"] = int(time.time()) + 60  # Access token valid for 15 minutes
 
     return jwt.encode(
-        access_token_payload,
+        payload,
         settings.ENCRYPTION_KEY,
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
