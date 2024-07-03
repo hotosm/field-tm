@@ -26,7 +26,7 @@ from loguru import logger as log
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.auth_schemas import AuthUser, AuthUserWithToken, FMTMUser
 from app.auth.osm import (
     create_tokens,
     extract_refresh_token_from_cookie,
@@ -220,28 +220,32 @@ async def my_data(
     return await get_or_create_user(db, user_data)
 
 
-@router.get("/refresh", response_model=AuthUser)
+@router.get("/refresh", response_model=AuthUserWithToken)
 async def refresh_token(
     request: Request, user_data: AuthUser = Depends(login_required)
 ):
-    """Verifies the validity of login cookies.
-
-    Returns True if authenticated, False otherwise.
-    """
+    """Uses the refresh token to generate a new access token."""
     try:
         refresh_token = extract_refresh_token_from_cookie(request)
         if not refresh_token:
-            raise HTTPException(status_code=401, detail="No tokens provided")
+            raise HTTPException(status_code=401, detail="No refresh token provided")
 
         token_data = verify_token(refresh_token)
         access_token = refresh_access_token(token_data)
-        response = JSONResponse(content=user_data.model_dump(), status_code=200)
+
+        response = JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={
+                "token": access_token,
+                **user_data.model_dump(),
+            },
+        )
         cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
         response.set_cookie(
             key=cookie_name,
             value=access_token,
-            max_age=86400,
-            expires=86400,
+            max_age=3600,
+            expires=3600,
             path="/",
             domain=settings.FMTM_DOMAIN,
             secure=False if settings.DEBUG else True,
@@ -249,6 +253,7 @@ async def refresh_token(
             samesite="lax",
         )
         return response
+
     except Exception as e:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -273,14 +278,14 @@ async def temp_login(
         Response: The response object containing the access token as a cookie.
     """
     username = "svcfmtm"
-    user_data = {
+    jwt_data = {
         "sub": "fmtm|20386219",
         "aud": settings.FMTM_DOMAIN,
         "iat": int(time.time()),
-        "exp": int(time.time()) + 86400 * 7,  # expiry set to 7 days
+        "exp": int(time.time()) + 3600,  # set token expiry to 1hr
         "username": username,
         "picture": None,
         "role": UserRole.MAPPER,
     }
-    access_token, refresh_token = create_tokens(user_data)
+    access_token, refresh_token = create_tokens(jwt_data)
     return set_cookies(access_token, refresh_token)
