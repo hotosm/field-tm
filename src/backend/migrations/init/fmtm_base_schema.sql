@@ -216,7 +216,7 @@ CREATE TABLE public.mapping_issue_categories (
     id integer NOT NULL,
     name character varying NOT NULL,
     description character varying,
-    archived boolean NOT NULL
+    archived boolean NOT NULL DEFAULT false
 );
 ALTER TABLE public.mapping_issue_categories OWNER TO fmtm;
 CREATE SEQUENCE public.mapping_issue_categories_id_seq
@@ -238,7 +238,7 @@ CREATE TABLE public.mbtiles_path (
     path character varying,
     tile_source character varying,
     background_task_id character varying,
-    created_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now()
 );
 ALTER TABLE public.mbtiles_path OWNER TO fmtm;
 CREATE SEQUENCE public.mbtiles_path_id_seq
@@ -297,7 +297,7 @@ CREATE TABLE public.project_chat (
     id bigint NOT NULL,
     project_id integer NOT NULL,
     user_id integer NOT NULL,
-    time_stamp timestamp without time zone NOT NULL,
+    time_stamp timestamp without time zone NOT NULL DEFAULT now(),
     message character varying NOT NULL
 );
 ALTER TABLE public.project_chat OWNER TO fmtm;
@@ -336,21 +336,21 @@ CREATE TABLE public.projects (
     organisation_id integer,
     odkid integer,
     author_id bigint NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created timestamp without time zone NOT NULL DEFAULT now(),
     project_name_prefix character varying,
     task_type_prefix character varying,
     location_str character varying,
     outline public.GEOMETRY (POLYGON, 4326),
-    last_updated timestamp without time zone,
-    status public.projectstatus NOT NULL,
+    last_updated timestamp without time zone DEFAULT now(),
+    status public.projectstatus NOT NULL DEFAULT 'DRAFT',
     total_tasks integer,
     xform_category character varying,
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
-    mapper_level public.mappinglevel NOT NULL,
-    priority public.projectpriority,
-    featured boolean,
-    mapping_permission public.mappingpermission,
-    validation_permission public.validationpermission,
+    mapper_level public.mappinglevel NOT NULL DEFAULT 'INTERMEDIATE',
+    priority public.projectpriority DEFAULT 'MEDIUM',
+    featured boolean DEFAULT false,
+    mapping_permission public.mappingpermission DEFAULT 'ANY',
+    validation_permission public.validationpermission DEFAULT 'LEVEL',
     due_date timestamp without time zone,
     changeset_comment character varying,
     osmcha_filter_id character varying,
@@ -393,7 +393,7 @@ CREATE TABLE public.task_history (
     task_id integer NOT NULL,
     action public.taskaction NOT NULL,
     action_text character varying,
-    action_date timestamp without time zone NOT NULL,
+    action_date timestamp without time zone NOT NULL DEFAULT now(),
     user_id bigint NOT NULL
 );
 ALTER TABLE public.task_history OWNER TO fmtm;
@@ -412,7 +412,7 @@ CREATE TABLE public.task_invalidation_history (
     id integer NOT NULL,
     project_id integer NOT NULL,
     task_id integer NOT NULL,
-    is_closed boolean,
+    is_closed boolean DEFAULT false,
     mapper_id bigint,
     mapped_date timestamp without time zone,
     invalidator_id bigint,
@@ -420,7 +420,7 @@ CREATE TABLE public.task_invalidation_history (
     invalidation_history_id integer,
     validator_id bigint,
     validated_date timestamp without time zone,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone DEFAULT now()
 );
 ALTER TABLE public.task_invalidation_history OWNER TO fmtm;
 CREATE SEQUENCE public.task_invalidation_history_id_seq
@@ -463,7 +463,7 @@ CREATE TABLE public.tasks (
     outline public.GEOMETRY (POLYGON, 4326),
     geometry_geojson character varying,
     feature_count integer,
-    task_status public.taskstatus,
+    task_status public.taskstatus DEFAULT 'READY',
     locked_by bigint,
     mapped_by bigint,
     validated_by bigint
@@ -486,8 +486,8 @@ CREATE TABLE public.teams (
     name character varying(512) NOT NULL,
     logo character varying,
     description character varying,
-    invite_only boolean NOT NULL,
-    visibility public.teamvisibility NOT NULL
+    invite_only boolean NOT NULL DEFAULT false,
+    visibility public.teamvisibility NOT NULL DEFAULT 'PUBLIC'
 );
 ALTER TABLE public.teams OWNER TO fmtm;
 CREATE SEQUENCE public.teams_id_seq
@@ -511,7 +511,7 @@ ALTER TABLE public.user_licenses OWNER TO fmtm;
 CREATE TABLE public.user_roles (
     user_id bigint NOT NULL,
     project_id integer NOT NULL,
-    role public.projectrole NOT NULL
+    role public.projectrole NOT NULL DEFAULT 'MAPPER'
 );
 ALTER TABLE public.user_roles OWNER TO fmtm;
 
@@ -519,21 +519,21 @@ ALTER TABLE public.user_roles OWNER TO fmtm;
 CREATE TABLE public.users (
     id bigint NOT NULL,
     username character varying,
-    role public.userrole NOT NULL,
+    role public.userrole NOT NULL DEFAULT 'MAPPER',
     name character varying,
     city character varying,
     country character varying,
     profile_img character varying,
     email_address character varying,
-    is_email_verified boolean,
-    is_expert boolean,
-    mapping_level public.mappinglevel NOT NULL,
-    tasks_mapped integer NOT NULL,
-    tasks_validated integer NOT NULL,
-    tasks_invalidated integer NOT NULL,
+    is_email_verified boolean DEFAULT false,
+    is_expert boolean DEFAULT false,
+    mapping_level public.mappinglevel NOT NULL DEFAULT 'BEGINNER',
+    tasks_mapped integer NOT NULL DEFAULT 0,
+    tasks_validated integer NOT NULL DEFAULT 0,
+    tasks_invalidated integer NOT NULL DEFAULT 0,
     projects_mapped integer [],
-    date_registered timestamp without time zone,
-    last_validation_date timestamp without time zone
+    date_registered timestamp without time zone DEFAULT now(),
+    last_validation_date timestamp without time zone DEFAULT now()
 );
 ALTER TABLE public.users OWNER TO fmtm;
 
