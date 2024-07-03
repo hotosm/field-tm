@@ -241,6 +241,8 @@ def get_action_for_status_change(task_status: TaskStatus):
             return TaskAction.MARKED_BAD
         case TaskStatus.SPLIT:
             return TaskAction.SPLIT_NEEDED
+        case TaskStatus.INVALIDATED:
+            return TaskAction.MARKED_INVALID
 
 
 class TaskType(IntEnum, Enum):
