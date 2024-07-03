@@ -22,7 +22,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.auth.roles import project_admin
+from app.auth.roles import project_manager
 from app.central import central_crud
 from app.db import database, db_models
 from app.models.enums import HTTPStatus
@@ -59,9 +59,9 @@ async def get_form_lists(
     return forms
 
 
-@router.post("/refresh_appuser_token")
+@router.post("/refresh-appuser-token")
 async def refresh_appuser_token(
-    current_user: db_models.DbUser = Depends(project_admin),
+    current_user: db_models.DbUser = Depends(project_manager),
     db: Session = Depends(database.get_db),
 ):
     """Refreshes the token for the app user associated with a specific project.
