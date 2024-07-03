@@ -34,10 +34,6 @@ OSM_SCOPE
   field required (type=value_error.missing)
 OSM_LOGIN_REDIRECT_URI
   field required (type=value_error.missing)
-AUTH_PUBLIC_KEY
-  field required (type=value_error.missing)
-AUTH_PRIVATE_KEY
-  field required (type=value_error.missing)
 ```
 
 Then you need to set the env variables on your system.
@@ -48,7 +44,6 @@ an alternative can be to feed them into the pdm command:
 ```bash
 FMTM_DOMAIN="" \
 OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" OSM_SECRET_KEY="" \
-S3_ACCESS_KEY="" S3_SECRET_KEY="" \
-AUTH_PUBLIC_KEY="" AUTH_PRIVATE_KEY="" \
+S3_ACCESS_KEY="" S3_SECRET_KEY="" ENCRYPTION_KEY="" \
 pdm run uvicorn app.main:api --host 0.0.0.0 --port 8000
 ```
