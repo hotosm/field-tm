@@ -220,10 +220,10 @@ async def my_data(
     return await get_or_create_user(db, user_data)
 
 
-@router.get("/refresh")
+@router.get("/refresh", response_model=AuthUser)
 async def refresh_token(
     request: Request, user_data: AuthUser = Depends(login_required)
-) -> AuthUser:
+):
     """Verifies the validity of login cookies.
 
     Returns True if authenticated, False otherwise.
@@ -235,7 +235,7 @@ async def refresh_token(
 
         token_data = verify_token(refresh_token)
         access_token = refresh_access_token(token_data)
-        response = JSONResponse(content=user_data.dict(), status_code=200)
+        response = JSONResponse(content=user_data.model_dump(), status_code=200)
         cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
         response.set_cookie(
             key=cookie_name,
