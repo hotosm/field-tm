@@ -72,7 +72,8 @@ nav:
       - Code of Conduct: https://docs.hotosm.org/code-of-conduct
       - FAQ: FAQ.md
   - User Manuals:
-      - User Types: user-breakdown.md
+      - Videos: manuals/videos.md
+      - Types of User: user-breakdown.md
       - Project Managers: manuals/project-managers.md
   - Dev:
       - Setup: dev/Setup.md
