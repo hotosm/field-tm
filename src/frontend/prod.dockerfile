@@ -17,7 +17,7 @@ RUN pnpm run build --mode ${NODE_ENV}
 
 
 
-FROM docker.io/rclone/rclone:1.64 as prod
+FROM docker.io/rclone/rclone:1 as prod
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG VITE_API_URL
