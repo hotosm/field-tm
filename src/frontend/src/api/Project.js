@@ -182,9 +182,10 @@ export const DownloadTile = (url, payload, toOpfs = false) => {
           return;
         }
 
-        const filename = response.headers['Content-Disposition'].split('filename=')[1];
+        const filename = response.headers['content-disposition'].split('filename=')[1];
+        console.log(filename)
         // Create Blob from ArrayBuffer
-        const blob = new Blob([tileData], { type: response.headers['Content-Type'] });
+        const blob = new Blob([tileData], { type: response.headers['content-type'] });
         const downloadUrl = URL.createObjectURL(blob);
 
         const a = document.createElement('a');

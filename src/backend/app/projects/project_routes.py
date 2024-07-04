@@ -370,7 +370,7 @@ async def download_tiles(
     return FileResponse(
         dbtile_obj.path,
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f"attachment; filename={filename}",
             "Content-Type": tiles_mime_type,
         },
     )

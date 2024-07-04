@@ -1368,7 +1368,7 @@ def get_project_tiles(
     background_task_id: uuid.UUID,
     source: str,
     output_format: str = "mbtiles",
-    tms: str = None,
+    tms: Optional[str] = None,
 ):
     """Get the tiles for a project.
 
@@ -1381,7 +1381,12 @@ def get_project_tiles(
             Other options: "pmtiles", "sqlite3".
         tms (str, optional): Default None. Custom TMS provider URL.
     """
-    zooms = "12-19"
+    # TODO update this for user input or automatic
+    # maxzoom can be determined from OAM: https://tiles.openaerialmap.org/663
+    # c76196049ef00013b8494/0/663c76196049ef00013b8495
+    # TODO xy should also be user configurable
+    # NOTE mbtile max supported zoom level is 22 (in GDAL at least)
+    zooms = "12-22" if tms else "12-19"
     tiles_dir = f"{TILESDIR}/{project_id}"
     outfile = f"{tiles_dir}/{project_id}_{source}tiles.{output_format}"
 
@@ -1415,7 +1420,9 @@ def get_project_tiles(
         if project_bbox:
             min_lon, min_lat, max_lon, max_lat = project_bbox
         else:
-            log.error(f"Failed to get bbox from project: {project_id}")
+            msg = f"Failed to get bbox from project: {project_id}"
+            log.error(msg)
+            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
         log.debug(
             "Creating basemap with params: "
@@ -1424,7 +1431,7 @@ def get_project_tiles(
             f"zooms={zooms} | "
             f"outdir={tiles_dir} | "
             f"source={source} | "
-            f"xy={False} | "
+            f"xy={True if tms else False} | "
             f"tms={tms}"
         )
 
@@ -1434,7 +1441,7 @@ def get_project_tiles(
             zooms=zooms,
             outdir=tiles_dir,
             source=source,
-            xy=False,
+            xy=True if tms else False,
             tms=tms,
         )
 
