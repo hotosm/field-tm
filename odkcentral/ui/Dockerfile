@@ -35,7 +35,7 @@ RUN VUE_APP_OIDC_ENABLED="false" npm run build
 
 
 
-FROM docker.io/rclone/rclone:1.64 as prod
+FROM docker.io/rclone/rclone:1 as prod
 VOLUME /frontend
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
