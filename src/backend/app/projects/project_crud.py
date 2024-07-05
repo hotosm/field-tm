@@ -229,7 +229,7 @@ async def delete_one_project(db: Session, db_project: db_models.DbProject) -> No
         log.info(f"Deleted project with ID: {project_id}")
     except Exception as e:
         log.exception(e)
-        raise HTTPException(e) from e
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=e) from e
 
 
 async def partial_update_project_info(
@@ -395,7 +395,7 @@ async def create_tasks_from_geojson(
         return True
     except Exception as e:
         log.exception(e)
-        raise HTTPException(e) from e
+        raise HTTPException(HTTPStatus.UNPROCESSABLE_ENTITY, detail=e) from e
 
 
 async def preview_split_by_square(boundary: str, meters: int):

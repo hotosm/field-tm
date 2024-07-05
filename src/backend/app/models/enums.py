@@ -54,13 +54,6 @@ class HTTPStatus(IntEnum):
     NOT_IMPLEMENTED = 501
 
 
-class TeamVisibility(IntEnum, Enum):
-    """Describes the visibility associated with an Team."""
-
-    PUBLIC = 0
-    PRIVATE = 1
-
-
 class OrganisationType(IntEnum, Enum):
     """Describes an organisation's subscription type."""
 
@@ -124,24 +117,6 @@ class MappingLevel(IntEnum, Enum):
     BEGINNER = 1
     INTERMEDIATE = 2
     ADVANCED = 3
-
-
-class MappingPermission(IntEnum, Enum):
-    """Describes a set of permissions for mapping on a project."""
-
-    ANY = 0
-    LEVEL = 1
-    TEAMS = 2
-    TEAMS_LEVEL = 3
-
-
-class ValidationPermission(IntEnum, Enum):
-    """Describes a set of permissions for validating on a project."""
-
-    ANY = 0
-    LEVEL = 1
-    TEAMS = 2
-    TEAMS_LEVEL = 3
 
 
 class TaskStatus(IntEnum, Enum):
