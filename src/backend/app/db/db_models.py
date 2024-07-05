@@ -54,7 +54,6 @@ from app.models.enums import (
     BackgroundTaskStatus,
     CommunityType,
     MappingLevel,
-    MappingPermission,
     OrganisationType,
     ProjectPriority,
     ProjectRole,
@@ -63,9 +62,7 @@ from app.models.enums import (
     TaskAction,
     TaskSplitType,
     TaskStatus,
-    TeamVisibility,
     UserRole,
-    ValidationPermission,
 )
 
 
@@ -127,9 +124,6 @@ class DbUser(Base):
     # projects_notifications = Column(Boolean, default=True, nullable=False)
     # tasks_notifications = Column(Boolean, default=True, nullable=False)
     # tasks_comments_notifications = Column(Boolean, default=False, nullable=False)
-    # teams_announcement_notifications = Column(
-    #     Boolean, default=True, nullable=False
-    # )
 
     date_registered = cast(datetime, Column(DateTime, default=timestamp))
     # Represents the date the user last had one of their tasks validated
@@ -184,48 +178,6 @@ class DbOrganisation(Base):
     )
 
 
-class DbTeam(Base):
-    """Describes a team."""
-
-    __tablename__ = "teams"
-
-    # Columns
-    id = cast(int, Column(Integer, primary_key=True))
-    organisation_id = cast(
-        int,
-        Column(
-            Integer,
-            ForeignKey("organisations.id", name="fk_organisations"),
-            nullable=False,
-        ),
-    )
-    name = cast(str, Column(String(512), nullable=False))
-    logo = cast(str, Column(String))  # URL of a logo
-    description = cast(str, Column(String))
-    invite_only = cast(bool, Column(Boolean, default=False, nullable=False))
-    visibility = cast(
-        TeamVisibility,
-        Column(Enum(TeamVisibility), default=TeamVisibility.PUBLIC, nullable=False),
-    )
-    organisation = relationship(DbOrganisation, backref="teams")
-
-
-class DbProjectTeams(Base):
-    """Link table between teams and projects."""
-
-    __tablename__ = "project_teams"
-    team_id = cast(int, Column(Integer, ForeignKey("teams.id"), primary_key=True))
-    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), primary_key=True))
-    role = cast(int, Column(Integer, nullable=False))
-
-    project = relationship(
-        "DbProject", backref=backref("teams", cascade="all, delete-orphan")
-    )
-    team = relationship(
-        DbTeam, backref=backref("projects", cascade="all, delete-orphan")
-    )
-
-
 class DbProjectInfo(Base):
     """Contains all project info localized into supported languages."""
 
@@ -245,22 +197,6 @@ class DbProjectInfo(Base):
         Index("textsearch_idx", "text_searchable"),
         {},
     )
-
-
-class DbProjectChat(Base):
-    """Contains all project info localized into supported languages."""
-
-    __tablename__ = "project_chat"
-    id = cast(int, Column(BigInteger, primary_key=True))
-    project_id = cast(
-        int, Column(Integer, ForeignKey("projects.id"), index=True, nullable=False)
-    )
-    user_id = cast(int, Column(Integer, ForeignKey("users.id"), nullable=False))
-    time_stamp = cast(datetime, Column(DateTime, nullable=False, default=timestamp))
-    message = cast(str, Column(String, nullable=False))
-
-    # Relationships
-    posted_by = relationship(DbUser, foreign_keys=[user_id])
 
 
 class DbXLSForm(Base):
@@ -291,83 +227,6 @@ class DbXForm(Base):
     category = cast(str, Column(String))
 
 
-class DbTaskInvalidationHistory(Base):
-    """Information on task invalidation.
-
-    Describes the most recent history of task invalidation and subsequent validation.
-    """
-
-    __tablename__ = "task_invalidation_history"
-    id = cast(int, Column(Integer, primary_key=True))
-    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), nullable=False))
-    task_id = cast(int, Column(Integer, nullable=False))
-    is_closed = cast(bool, Column(Boolean, default=False))
-    mapper_id = cast(int, Column(BigInteger, ForeignKey("users.id", name="fk_mappers")))
-    mapped_date = cast(datetime, Column(DateTime))
-    invalidator_id = cast(
-        int, Column(BigInteger, ForeignKey("users.id", name="fk_invalidators"))
-    )
-    invalidated_date = cast(datetime, Column(DateTime))
-    invalidation_history_id = cast(
-        int,
-        Column(Integer, ForeignKey("task_history.id", name="fk_invalidation_history")),
-    )
-    validator_id = cast(
-        int, Column(BigInteger, ForeignKey("users.id", name="fk_validators"))
-    )
-    validated_date = cast(datetime, Column(DateTime))
-    updated_date = cast(datetime, Column(DateTime, default=timestamp))
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [task_id, project_id], ["tasks.id", "tasks.project_id"], name="fk_tasks"
-        ),
-        Index("idx_task_validation_history_composite", "task_id", "project_id"),
-        Index(
-            "idx_task_validation_validator_status_composite",
-            "invalidator_id",
-            "is_closed",
-        ),
-        Index("idx_task_validation_mapper_status_composite", "mapper_id", "is_closed"),
-        {},
-    )
-
-
-class DbTaskMappingIssue(Base):
-    """Describes mapping issues.
-
-    An issue (along with an occurrence count) with a
-    task mapping that contributed to invalidation of the task.
-    """
-
-    __tablename__ = "task_mapping_issues"
-    id = cast(int, Column(Integer, primary_key=True))
-    task_history_id = cast(
-        int, Column(Integer, ForeignKey("task_history.id"), nullable=False, index=True)
-    )
-    issue = cast(str, Column(String, nullable=False))
-    mapping_issue_category_id = cast(
-        int,
-        Column(
-            Integer,
-            ForeignKey("mapping_issue_categories.id", name="fk_issue_category"),
-            nullable=False,
-        ),
-    )
-    count = cast(int, Column(Integer, nullable=False))
-
-
-class DbMappingIssueCategory(Base):
-    """Represents a category of task mapping issues identified during validation."""
-
-    __tablename__ = "mapping_issue_categories"
-
-    id = cast(int, Column(Integer, primary_key=True))
-    name = cast(str, Column(String, nullable=False, unique=True))
-    description = cast(str, Column(String, nullable=True))
-    archived = cast(bool, Column(Boolean, default=False, nullable=False))
-
-
 class DbTaskHistory(Base):
     """Describes the history associated with a task."""
 
@@ -391,11 +250,7 @@ class DbTaskHistory(Base):
 
     # Define relationships
     user = relationship(DbUser, uselist=False, backref="task_history_user")
-    invalidation_history = relationship(
-        DbTaskInvalidationHistory, lazy="dynamic", cascade="all"
-    )
     actioned_by = relationship(DbUser, overlaps="task_history_user,user")
-    task_mapping_issues = relationship(DbTaskMappingIssue, cascade="all")
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -623,14 +478,6 @@ class DbProject(Base):
     featured = cast(
         bool, Column(Boolean, default=False)
     )  # Only admins can set a project as featured
-    mapping_permission = cast(
-        MappingPermission,
-        Column(Enum(MappingPermission), default=MappingPermission.ANY),
-    )
-    validation_permission = cast(
-        ValidationPermission,
-        Column(Enum(ValidationPermission), default=ValidationPermission.LEVEL),
-    )  # Means only users with validator role can validate
     changeset_comment = cast(str, Column(String))
 
     # Odk central server
@@ -665,9 +512,6 @@ class DbProject(Base):
     josm_preset = cast(str, Column(String))
     id_presets = cast(list, Column(ARRAY(String)))
     extra_id_params = cast(str, Column(String))
-    license_id = cast(
-        int, Column(Integer, ForeignKey("licenses.id", name="fk_licenses"))
-    )
 
     # GEOMETRY
     # country = Column(ARRAY(String), default=[])
@@ -677,31 +521,6 @@ class DbProject(Base):
         str, Column(String)
     )  # Optional custom filter id for filtering on OSMCha
     due_date = cast(datetime, Column(DateTime))
-
-
-# Secondary table defining the many-to-many join
-user_licenses_table = Table(
-    "user_licenses",
-    FmtmMetadata,
-    Column("user", BigInteger, ForeignKey("users.id")),
-    Column("license", Integer, ForeignKey("licenses.id")),
-)
-
-
-class DbLicense(Base):
-    """Describes an individual license."""
-
-    __tablename__ = "licenses"
-
-    id = cast(int, Column(Integer, primary_key=True))
-    name = cast(str, Column(String, unique=True))
-    description = cast(str, Column(String))
-    plain_text = cast(str, Column(String))
-
-    projects = relationship(DbProject, backref="license")
-    users = relationship(
-        DbUser, secondary=user_licenses_table
-    )  # Many to Many relationship
 
 
 class BackgroundTasks(Base):

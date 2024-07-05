@@ -257,7 +257,7 @@ async def refresh_token(
     except Exception as e:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail=f"fail to refresh the access token: {e}",
+            detail=f"Failed to refresh the access token: {e}",
         ) from e
 
 

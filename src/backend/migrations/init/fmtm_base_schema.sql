@@ -58,14 +58,6 @@ CREATE TYPE public.mappinglevel AS ENUM (
 );
 ALTER TYPE public.mappinglevel OWNER TO fmtm;
 
-CREATE TYPE public.mappingpermission AS ENUM (
-    'ANY',
-    'LEVEL',
-    'TEAMS',
-    'TEAMS_LEVEL'
-);
-ALTER TYPE public.mappingpermission OWNER TO fmtm;
-
 CREATE TYPE public.organisationtype AS ENUM (
     'FREE',
     'DISCOUNTED',
@@ -115,12 +107,6 @@ CREATE TYPE public.taskstatus AS ENUM (
 );
 ALTER TYPE public.taskstatus OWNER TO fmtm;
 
-CREATE TYPE public.teamvisibility AS ENUM (
-    'PUBLIC',
-    'PRIVATE'
-);
-ALTER TYPE public.teamvisibility OWNER TO fmtm;
-
 CREATE TYPE public.userrole AS ENUM (
     'READ_ONLY',
     'MAPPER',
@@ -136,14 +122,6 @@ CREATE TYPE public.projectrole AS ENUM (
     'PROJECT_MANAGER'
 );
 ALTER TYPE public.projectrole OWNER TO fmtm;
-
-CREATE TYPE public.validationpermission AS ENUM (
-    'ANY',
-    'LEVEL',
-    'TEAMS',
-    'TEAMS_LEVEL'
-);
-ALTER TYPE public.validationpermission OWNER TO fmtm;
 
 CREATE TYPE public.projectvisibility AS ENUM (
     'PUBLIC',
@@ -192,43 +170,6 @@ CREATE TABLE public.background_tasks (
     message character varying
 );
 ALTER TABLE public.background_tasks OWNER TO fmtm;
-
-
-CREATE TABLE public.licenses (
-    id integer NOT NULL,
-    name character varying,
-    description character varying,
-    plain_text character varying
-);
-ALTER TABLE public.licenses OWNER TO fmtm;
-CREATE SEQUENCE public.licenses_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.licenses_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.licenses_id_seq OWNED BY public.licenses.id;
-
-
-CREATE TABLE public.mapping_issue_categories (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    description character varying,
-    archived boolean NOT NULL DEFAULT false
-);
-ALTER TABLE public.mapping_issue_categories OWNER TO fmtm;
-CREATE SEQUENCE public.mapping_issue_categories_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.mapping_issue_categories_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.mapping_issue_categories_id_seq
-OWNED BY public.mapping_issue_categories.id;
 
 
 CREATE TABLE public.mbtiles_path (
@@ -293,24 +234,6 @@ ALTER TABLE public.organisations_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.organisations_id_seq OWNED BY public.organisations.id;
 
 
-CREATE TABLE public.project_chat (
-    id bigint NOT NULL,
-    project_id integer NOT NULL,
-    user_id integer NOT NULL,
-    time_stamp timestamp without time zone NOT NULL DEFAULT now(),
-    message character varying NOT NULL
-);
-ALTER TABLE public.project_chat OWNER TO fmtm;
-CREATE SEQUENCE public.project_chat_id_seq
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.project_chat_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.project_chat_id_seq OWNED BY public.project_chat.id;
-
-
 CREATE TABLE public.project_info (
     project_id integer NOT NULL,
     project_id_str character varying,
@@ -321,14 +244,6 @@ CREATE TABLE public.project_info (
     per_task_instructions character varying
 );
 ALTER TABLE public.project_info OWNER TO fmtm;
-
-
-CREATE TABLE public.project_teams (
-    team_id integer NOT NULL,
-    project_id integer NOT NULL,
-    role integer NOT NULL
-);
-ALTER TABLE public.project_teams OWNER TO fmtm;
 
 
 CREATE TABLE public.projects (
@@ -349,8 +264,6 @@ CREATE TABLE public.projects (
     mapper_level public.mappinglevel NOT NULL DEFAULT 'INTERMEDIATE',
     priority public.projectpriority DEFAULT 'MEDIUM',
     featured boolean DEFAULT false,
-    mapping_permission public.mappingpermission DEFAULT 'ANY',
-    validation_permission public.validationpermission DEFAULT 'LEVEL',
     due_date timestamp without time zone,
     changeset_comment character varying,
     osmcha_filter_id character varying,
@@ -360,7 +273,6 @@ CREATE TABLE public.projects (
     josm_preset character varying,
     id_presets character varying [],
     extra_id_params character varying,
-    license_id integer,
     centroid public.GEOMETRY (POINT, 4326),
     odk_central_url character varying,
     odk_central_user character varying,
@@ -408,53 +320,6 @@ ALTER TABLE public.task_history_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.task_history_id_seq OWNED BY public.task_history.id;
 
 
-CREATE TABLE public.task_invalidation_history (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
-    task_id integer NOT NULL,
-    is_closed boolean DEFAULT false,
-    mapper_id bigint,
-    mapped_date timestamp without time zone,
-    invalidator_id bigint,
-    invalidated_date timestamp without time zone,
-    invalidation_history_id integer,
-    validator_id bigint,
-    validated_date timestamp without time zone,
-    updated_date timestamp without time zone DEFAULT now()
-);
-ALTER TABLE public.task_invalidation_history OWNER TO fmtm;
-CREATE SEQUENCE public.task_invalidation_history_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.task_invalidation_history_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.task_invalidation_history_id_seq
-OWNED BY public.task_invalidation_history.id;
-
-
-CREATE TABLE public.task_mapping_issues (
-    id integer NOT NULL,
-    task_history_id integer NOT NULL,
-    issue character varying NOT NULL,
-    mapping_issue_category_id integer NOT NULL,
-    count integer NOT NULL
-);
-ALTER TABLE public.task_mapping_issues OWNER TO fmtm;
-CREATE SEQUENCE public.task_mapping_issues_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.task_mapping_issues_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.task_mapping_issues_id_seq
-OWNED BY public.task_mapping_issues.id;
-
-
 CREATE TABLE public.tasks (
     id integer NOT NULL,
     project_id integer NOT NULL,
@@ -478,34 +343,6 @@ NO MAXVALUE
 CACHE 1;
 ALTER TABLE public.tasks_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
-
-
-CREATE TABLE public.teams (
-    id integer NOT NULL,
-    organisation_id integer NOT NULL,
-    name character varying(512) NOT NULL,
-    logo character varying,
-    description character varying,
-    invite_only boolean NOT NULL DEFAULT false,
-    visibility public.teamvisibility NOT NULL DEFAULT 'PUBLIC'
-);
-ALTER TABLE public.teams OWNER TO fmtm;
-CREATE SEQUENCE public.teams_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.teams_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.teams_id_seq OWNED BY public.teams.id;
-
-
-CREATE TABLE public.user_licenses (
-    "user" bigint,
-    license integer
-);
-ALTER TABLE public.user_licenses OWNER TO fmtm;
 
 
 CREATE TABLE public.user_roles (
@@ -572,21 +409,11 @@ ALTER SEQUENCE public.xforms_id_seq OWNED BY public.xforms.id;
 
 -- nextval for primary keys (autoincrement)
 
-ALTER TABLE ONLY public.licenses ALTER COLUMN id SET DEFAULT nextval(
-    'public.licenses_id_seq'::regclass
-);
-ALTER TABLE ONLY public.mapping_issue_categories ALTER COLUMN id
-SET DEFAULT nextval(
-    'public.mapping_issue_categories_id_seq'::regclass
-);
 ALTER TABLE ONLY public.mbtiles_path ALTER COLUMN id SET DEFAULT nextval(
     'public.mbtiles_path_id_seq'::regclass
 );
 ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval(
     'public.organisations_id_seq'::regclass
-);
-ALTER TABLE ONLY public.project_chat ALTER COLUMN id SET DEFAULT nextval(
-    'public.project_chat_id_seq'::regclass
 );
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
     'public.projects_id_seq'::regclass
@@ -594,18 +421,8 @@ ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
 ALTER TABLE ONLY public.task_history ALTER COLUMN id SET DEFAULT nextval(
     'public.task_history_id_seq'::regclass
 );
-ALTER TABLE ONLY public.task_invalidation_history ALTER COLUMN id
-SET DEFAULT nextval(
-    'public.task_invalidation_history_id_seq'::regclass
-);
-ALTER TABLE ONLY public.task_mapping_issues ALTER COLUMN id SET DEFAULT nextval(
-    'public.task_mapping_issues_id_seq'::regclass
-);
 ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval(
     'public.tasks_id_seq'::regclass
-);
-ALTER TABLE ONLY public.teams ALTER COLUMN id SET DEFAULT nextval(
-    'public.teams_id_seq'::regclass
 );
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval(
     'public.xlsforms_id_seq'::regclass
@@ -623,18 +440,6 @@ ADD CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name);
 ALTER TABLE ONLY public.background_tasks
 ADD CONSTRAINT background_tasks_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.licenses
-ADD CONSTRAINT licenses_name_key UNIQUE (name);
-
-ALTER TABLE ONLY public.licenses
-ADD CONSTRAINT licenses_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.mapping_issue_categories
-ADD CONSTRAINT mapping_issue_categories_name_key UNIQUE (name);
-
-ALTER TABLE ONLY public.mapping_issue_categories
-ADD CONSTRAINT mapping_issue_categories_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.mbtiles_path
 ADD CONSTRAINT mbtiles_path_pkey PRIMARY KEY (id);
 
@@ -650,14 +455,8 @@ ADD CONSTRAINT organisations_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY public.organisations
 ADD CONSTRAINT organisations_slug_key UNIQUE (slug);
 
-ALTER TABLE ONLY public.project_chat
-ADD CONSTRAINT project_chat_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.project_info
 ADD CONSTRAINT project_info_pkey PRIMARY KEY (project_id);
-
-ALTER TABLE ONLY public.project_teams
-ADD CONSTRAINT project_teams_pkey PRIMARY KEY (team_id, project_id);
 
 ALTER TABLE ONLY public.projects
 ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
@@ -665,17 +464,8 @@ ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY public.task_history
 ADD CONSTRAINT task_history_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT task_invalidation_history_pkey PRIMARY KEY (id);
-
-ALTER TABLE ONLY public.task_mapping_issues
-ADD CONSTRAINT task_mapping_issues_pkey PRIMARY KEY (id);
-
 ALTER TABLE ONLY public.tasks
 ADD CONSTRAINT tasks_pkey PRIMARY KEY (id, project_id);
-
-ALTER TABLE ONLY public.teams
-ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.user_roles
 ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, project_id);
@@ -707,25 +497,7 @@ CREATE INDEX idx_task_history_project_id_user_id ON public.task_history
 USING btree (
     user_id, project_id
 );
-CREATE INDEX idx_task_validation_history_composite
-ON public.task_invalidation_history
-USING btree (
-    task_id, project_id
-);
-CREATE INDEX idx_task_validation_mapper_status_composite
-ON public.task_invalidation_history
-USING btree (
-    mapper_id, is_closed
-);
-CREATE INDEX idx_task_validation_validator_status_composite
-ON public.task_invalidation_history
-USING btree (
-    invalidator_id, is_closed
-);
 CREATE INDEX idx_tasks_outline ON public.tasks USING gist (outline);
-CREATE INDEX ix_project_chat_project_id ON public.project_chat USING btree (
-    project_id
-);
 CREATE INDEX ix_projects_mapper_level ON public.projects USING btree (
     mapper_level
 );
@@ -737,11 +509,6 @@ CREATE INDEX ix_task_history_project_id ON public.task_history USING btree (
 );
 CREATE INDEX ix_task_history_user_id ON public.task_history USING btree (
     user_id
-);
-CREATE INDEX ix_task_mapping_issues_task_history_id
-ON public.task_mapping_issues
-USING btree (
-    task_history_id
 );
 CREATE INDEX ix_tasks_locked_by ON public.tasks USING btree (locked_by);
 CREATE INDEX ix_tasks_mapped_by ON public.tasks USING btree (mapped_by);
@@ -760,45 +527,12 @@ CREATE INDEX idx_org_managers ON public.organisation_managers USING btree (
 
 -- Foreign keys
 
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT fk_invalidation_history FOREIGN KEY (
-    invalidation_history_id
-) REFERENCES public.task_history (id);
-
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT fk_invalidators FOREIGN KEY (
-    invalidator_id
-) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.task_mapping_issues
-ADD CONSTRAINT fk_issue_category FOREIGN KEY (
-    mapping_issue_category_id
-) REFERENCES public.mapping_issue_categories (id);
-
-ALTER TABLE ONLY public.projects
-ADD CONSTRAINT fk_licenses FOREIGN KEY (
-    license_id
-) REFERENCES public.licenses (id);
-
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT fk_mappers FOREIGN KEY (mapper_id) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.teams
-ADD CONSTRAINT fk_organisations FOREIGN KEY (
-    organisation_id
-) REFERENCES public.organisations (id);
-
 ALTER TABLE ONLY public.projects
 ADD CONSTRAINT fk_organisations FOREIGN KEY (
     organisation_id
 ) REFERENCES public.organisations (id);
 
 ALTER TABLE ONLY public.task_history
-ADD CONSTRAINT fk_tasks FOREIGN KEY (
-    task_id, project_id
-) REFERENCES public.tasks (id, project_id);
-
-ALTER TABLE ONLY public.task_invalidation_history
 ADD CONSTRAINT fk_tasks FOREIGN KEY (
     task_id, project_id
 ) REFERENCES public.tasks (id, project_id);
@@ -824,11 +558,6 @@ ADD CONSTRAINT fk_users_validator FOREIGN KEY (
     validated_by
 ) REFERENCES public.users (id);
 
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT fk_validators FOREIGN KEY (
-    validator_id
-) REFERENCES public.users (id);
-
 ALTER TABLE ONLY public.organisation_managers
 ADD CONSTRAINT organisation_managers_organisation_id_fkey FOREIGN KEY (
     organisation_id
@@ -839,60 +568,20 @@ ADD CONSTRAINT organisation_managers_user_id_fkey FOREIGN KEY (
     user_id
 ) REFERENCES public.users (id);
 
-ALTER TABLE ONLY public.project_chat
-ADD CONSTRAINT project_chat_project_id_fkey FOREIGN KEY (
-    project_id
-) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.project_chat
-ADD CONSTRAINT project_chat_user_id_fkey FOREIGN KEY (
-    user_id
-) REFERENCES public.users (id);
-
 ALTER TABLE ONLY public.project_info
 ADD CONSTRAINT project_info_project_id_fkey FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.project_teams
-ADD CONSTRAINT project_teams_project_id_fkey FOREIGN KEY (
-    project_id
-) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.project_teams
-ADD CONSTRAINT project_teams_team_id_fkey FOREIGN KEY (
-    team_id
-) REFERENCES public.teams (id);
 
 ALTER TABLE ONLY public.task_history
 ADD CONSTRAINT task_history_project_id_fkey FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
 
-ALTER TABLE ONLY public.task_invalidation_history
-ADD CONSTRAINT task_invalidation_history_project_id_fkey FOREIGN KEY (
-    project_id
-) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.task_mapping_issues
-ADD CONSTRAINT task_mapping_issues_task_history_id_fkey FOREIGN KEY (
-    task_history_id
-) REFERENCES public.task_history (id);
-
 ALTER TABLE ONLY public.tasks
 ADD CONSTRAINT tasks_project_id_fkey FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.user_licenses
-ADD CONSTRAINT user_licenses_license_fkey FOREIGN KEY (
-    license
-) REFERENCES public.licenses (id);
-
-ALTER TABLE ONLY public.user_licenses
-ADD CONSTRAINT user_licenses_user_fkey FOREIGN KEY (
-    "user"
-) REFERENCES public.users (id);
 
 ALTER TABLE ONLY public.user_roles
 ADD CONSTRAINT user_roles_project_id_fkey FOREIGN KEY (
