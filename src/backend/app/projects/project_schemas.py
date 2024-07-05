@@ -321,6 +321,7 @@ class ProjectBase(BaseModel):
     author: User
     project_info: ProjectInfo
     status: ProjectStatus
+    created: datetime
     # location_str: str
     xform_category: Optional[XLSFormType] = None
     hashtags: Optional[List[str]] = None
