@@ -35,11 +35,12 @@ from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.central import central_crud
 from app.config import settings
 from app.db.database import Base, get_db
-from app.db.db_models import DbOrganisation
+from app.db.db_models import DbOrganisation, DbTaskHistory
 from app.main import get_application
-from app.models.enums import CommunityType, UserRole
+from app.models.enums import CommunityType, TaskStatus, UserRole
 from app.projects import project_crud
 from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
+from app.users.user_crud import get_user
 
 engine = create_engine(settings.FMTM_DB_URL.unicode_string())
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -186,6 +187,65 @@ async def project(db, admin_user, organisation):
         pytest.fail(f"Test failed with exception: {str(e)}")
 
     return new_project
+
+
+@pytest.fixture(scope="function")
+async def task(project, db):
+    """A test task, using the test project."""
+    boundaries = {
+        "type": "Feature",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.3012091, 27.7122369],
+                    [85.3012129, 27.7121403],
+                    [85.3013408, 27.7121442],
+                    [85.3013371, 27.7122408],
+                    [85.3012441, 27.712238],
+                    [85.3012091, 27.7122369],
+                ]
+            ],
+        },
+        "properties": {
+            "osm_id": 650958368,
+            "version": 2,
+            "tags": {"building": "yes"},
+            "changeset": 99124278,
+            "timestamp": "2021-02-11T17:21:06",
+        },
+    }
+    try:
+        tasks = await project_crud.create_tasks_from_geojson(
+            db=db, project_id=project.id, boundaries=boundaries
+        )
+
+        assert tasks is True
+
+        # Refresh the project to include the tasks
+        db.refresh(project)
+    except Exception as e:
+        log.exception(e)
+        pytest.fail(f"Test failed with exception: {str(e)}")
+    return project.tasks[0]
+
+
+@pytest.fixture(scope="function")
+async def task_history(db, project, task, admin_user):
+    """A test task history using the test user, project and task."""
+    user = await get_user(db, admin_user.id)
+    task_history_entry = DbTaskHistory(
+        project_id=project.id,
+        task_id=task.id,
+        action=TaskStatus.READY,
+        action_text=f"Task created with action {TaskStatus.READY} by {user.username}",
+        actioned_by=user,
+        user_id=user.id,
+    )
+    db.add(task_history_entry)
+    db.commit()
+    db.refresh(task_history_entry)
+    return task_history_entry
 
 
 # @pytest.fixture(scope="function")
