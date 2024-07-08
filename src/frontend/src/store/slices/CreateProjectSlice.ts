@@ -28,10 +28,11 @@ export const initialState: CreateProjectStateTypes = {
   projectAreaLoading: false,
   formCategoryList: [],
   formCategoryLoading: false,
-  generateQrLoading: false,
+  generateProjectLoading: false,
+  generateProjectSuccess: false,
+  generateProjectError: false,
   organisationList: [],
   organisationListLoading: false,
-  generateQrSuccess: null,
   createProjectStep: 1,
   dividedTaskLoading: false,
   dividedTaskGeojson: null,
@@ -94,6 +95,9 @@ const CreateProject = createSlice({
       state.uploadAreaSelection = '';
       state.dividedTaskGeojson = null;
       state.dividedTaskLoading = false;
+      state.generateProjectSuccess = false;
+      state.generateProjectError = false;
+      state.drawToggle = false;
     },
     UploadAreaLoading(state, action) {
       state.projectAreaLoading = action.payload;
@@ -110,24 +114,20 @@ const CreateProject = createSlice({
     SetIndividualProjectDetailsData(state, action) {
       state.projectDetails = action.payload;
     },
-    GenerateProjectQRLoading(state, action) {
-      state.generateQrLoading = action.payload;
+    GenerateProjectLoading(state, action) {
+      state.generateProjectLoading = action.payload;
+    },
+    GenerateProjectSuccess(state, action) {
+      state.generateProjectSuccess = action.payload;
+    },
+    GenerateProjectError(state, action) {
+      state.generateProjectError = action.payload;
     },
     GetOrganisationList(state, action) {
       state.organisationList = action.payload;
     },
     GetOrganisationListLoading(state, action) {
       state.organisationListLoading = action.payload;
-    },
-    GenerateProjectQRSuccess(state, action) {
-      if (action.payload.status === 'SUCCESS') {
-        state.generateQrSuccess = null;
-      } else {
-        state.generateQrSuccess = action.payload;
-      }
-    },
-    SetGenerateProjectQRSuccess(state, action) {
-      state.generateQrSuccess = action.payload;
     },
     SetCreateProjectFormStep(state, action) {
       state.createProjectStep = action.payload;

@@ -11,10 +11,11 @@ export type CreateProjectStateTypes = {
   projectAreaLoading: boolean;
   formCategoryList: FormCategoryListTypes[] | [];
   formCategoryLoading: boolean;
-  generateQrLoading: boolean;
+  generateProjectLoading: boolean;
+  generateProjectSuccess: boolean;
+  generateProjectError: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
-  generateQrSuccess: GenerateQrSuccessTypes | null;
   createProjectStep: number;
   dividedTaskLoading: boolean;
   dividedTaskGeojson: null | GeoJSONFeatureTypes;
@@ -127,11 +128,6 @@ export type ProjectAreaTypes = {
 export type FormCategoryListTypes = {
   id: number;
   title: string;
-};
-
-export type GenerateQrSuccessTypes = {
-  Message: string;
-  task_id: string;
 };
 
 export type OrganisationListTypes = {

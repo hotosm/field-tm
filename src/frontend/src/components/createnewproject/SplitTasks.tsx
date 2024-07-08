@@ -31,7 +31,8 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
 
-  const generateQrSuccess = useAppSelector((state) => state.createproject.generateQrSuccess);
+  const generateProjectSuccess = useAppSelector((state) => state.createproject.generateProjectSuccess);
+  const generateProjectError = useAppSelector((state) => state.createproject.generateProjectError);
   const projectDetailsResponse = useAppSelector((state) => state.createproject.projectDetailsResponse);
   const dividedTaskGeojson = useAppSelector((state) => state.createproject.dividedTaskGeojson);
   const projectDetailsLoading = useAppSelector((state) => state.createproject.projectDetailsLoading);
@@ -191,12 +192,12 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const handleQRGeneration = async () => {
-      if (generateQrSuccess) {
+      if (!generateProjectError && generateProjectSuccess) {
         const projectId = projectDetailsResponse?.id;
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'QR Generation Completed. Redirecting...',
+            message: 'Project Generation Completed. Redirecting...',
             variant: 'success',
             duration: 2000,
           }),
@@ -205,7 +206,6 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
         // Add 5-second delay to allow backend Entity generation to catch up
         await delay(5000);
         dispatch(CreateProjectActions.CreateProjectLoading(false));
-        dispatch(CreateProjectActions.SetGenerateProjectQRSuccess(null));
         navigate(`/project/${projectId}`);
         dispatch(CreateProjectActions.ClearCreateProjectFormData());
         dispatch(CreateProjectActions.SetCanSwitchCreateProjectSteps(false));
@@ -213,7 +213,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
     };
 
     handleQRGeneration();
-  }, [generateQrSuccess]);
+  }, [generateProjectSuccess, generateProjectError]);
 
   const renderTraceback = (errorText: string) => {
     if (!errorText) {
