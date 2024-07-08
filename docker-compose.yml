@@ -129,7 +129,7 @@ services:
 
   ui-test:
     profiles: ["ui-test"]
-    image: mcr.microsoft.com/playwright:v1.44.1
+    image: mcr.microsoft.com/playwright:v1.45.1
     working_dir: /app
     environment:
       - DISPLAY=:0

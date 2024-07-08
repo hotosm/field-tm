@@ -8,6 +8,7 @@ import {
 } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { ValidateCustomFormResponse } from '@/store/types/ICreateProject';
+import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 
 const CreateProjectService: Function = (
   url: string,
@@ -21,72 +22,91 @@ const CreateProjectService: Function = (
     dispatch(CreateProjectActions.CreateProjectLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
-    const postCreateProjectDetails = async (url, projectData, taskAreaGeojson, formUpload) => {
-      try {
-        // Create project
-        const postNewProjectDetails = await axios.post(url, projectData);
-        const resp: ProjectDetailsModel = postNewProjectDetails.data;
-        await dispatch(CreateProjectActions.PostProjectDetails(resp));
+    let projectId: null | number = null;
+    try {
+      // halt project creation if any api call fails
+      let hasAPISuccess = false;
 
-        // Submit task boundaries
-        await dispatch(
-          UploadTaskAreasService(
-            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/upload-task-boundaries`,
-            taskAreaGeojson,
-          ),
-        );
+      const postNewProjectDetails = await API.post(url, projectData);
+      hasAPISuccess = isStatusSuccess(postNewProjectDetails.status);
 
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: 'Project Successfully Created Now Generating QR For Project',
-            variant: 'success',
-            duration: 2000,
-          }),
-        );
+      const projectCreateResp: ProjectDetailsModel = postNewProjectDetails.data;
+      await dispatch(CreateProjectActions.PostProjectDetails(projectCreateResp));
 
-        if (isOsmExtract) {
-          // Upload data extract generated from raw-data-api
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${resp.id}&url=${
-              projectData.data_extract_url
-            }`,
-          );
-        } else if (dataExtractFile) {
-          // Upload custom data extract from user
-          const dataExtractFormData = new FormData();
-          dataExtractFormData.append('custom_extract_file', dataExtractFile);
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract/?project_id=${resp.id}`,
-            dataExtractFormData,
-          );
-        }
-
-        // Generate QR codes
-        await dispatch(
-          GenerateProjectQRService(
-            `${import.meta.env.VITE_API_URL}/projects/${resp.id}/generate-project-data`,
-            projectData,
-            formUpload,
-          ),
-        );
-      } catch (error: any) {
-        // Added Snackbar toast for error message
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong.',
-            variant: 'error',
-            duration: 2000,
-          }),
-        );
-        dispatch(CreateProjectActions.CreateProjectLoading(false));
-      } finally {
-        dispatch(CommonActions.SetLoading(false));
+      if (!hasAPISuccess) {
+        throw new Error(`Request failed with status ${projectCreateResp.status}`);
       }
-    };
+      projectId = projectCreateResp.id;
 
-    await postCreateProjectDetails(url, projectData, taskAreaGeojson, formUpload);
+      // Submit task boundaries
+      hasAPISuccess = await dispatch(
+        UploadTaskAreasService(
+          `${import.meta.env.VITE_API_URL}/projects/${projectId}/upload-task-boundaries`,
+          taskAreaGeojson,
+        ),
+      );
+
+      if (!hasAPISuccess) {
+        throw new Error(`Request failed`);
+      }
+
+      // Upload data extract
+      let extractResponse;
+      if (isOsmExtract) {
+        // Generated extract from raw-data-api
+        extractResponse = await API.get(
+          `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${projectId}&url=${
+            projectData.data_extract_url
+          }`,
+        );
+      } else if (dataExtractFile) {
+        // Custom data extract from user
+        const dataExtractFormData = new FormData();
+        dataExtractFormData.append('custom_extract_file', dataExtractFile);
+        extractResponse = await API.post(
+          `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract/?project_id=${projectId}`,
+          dataExtractFormData,
+        );
+      }
+      hasAPISuccess = isStatusSuccess(extractResponse.status);
+
+      if (!hasAPISuccess) {
+        throw new Error(`Request failed with status ${extractResponse.status}`);
+      }
+
+      // Generate project files
+      const generateProjectFile = await dispatch(
+        GenerateProjectFilesService(
+          `${import.meta.env.VITE_API_URL}/projects/${projectId}/generate-project-data`,
+          projectData,
+          formUpload,
+        ),
+      );
+
+      hasAPISuccess = generateProjectFile;
+      if (!hasAPISuccess) {
+        throw new Error(`Request failed`);
+      }
+      dispatch(CreateProjectActions.GenerateProjectError(false));
+      // dispatch(CreateProjectActions.CreateProjectLoading(false));
+    } catch (error: any) {
+      if (projectId) {
+        await dispatch(DeleteProjectService(`${import.meta.env.VITE_API_URL}/projects/${projectId}`, false));
+      }
+
+      await dispatch(CreateProjectActions.GenerateProjectError(true));
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong. Please try again.',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+      dispatch(CreateProjectActions.CreateProjectLoading(false));
+    } finally {
+      dispatch(CommonActions.SetLoading(false));
+    }
   };
 };
 
@@ -107,10 +127,12 @@ const FormCategoryService: Function = (url: string) => {
     await getFormCategoryList(url);
   };
 };
+
 const UploadTaskAreasService: Function = (url: string, filePayload: any, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.UploadAreaLoading(true));
     const postUploadArea = async (url, filePayload) => {
+      let isAPISuccess = true;
       try {
         const areaFormData = new FormData();
         areaFormData.append('task_geojson', filePayload);
@@ -119,10 +141,17 @@ const UploadTaskAreasService: Function = (url: string, filePayload: any, project
             'Content-Type': 'multipart/form-data',
           },
         });
-        // const resp: UploadAreaDetailsModel = postNewProjectDetails.data;
-        await dispatch(CreateProjectActions.UploadAreaLoading(false));
-        await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data));
+        isAPISuccess = isStatusSuccess(postNewProjectDetails.status);
+
+        if (isAPISuccess) {
+          await dispatch(CreateProjectActions.UploadAreaLoading(false));
+          await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data));
+        } else {
+          throw new Error(`Request failed with status ${postNewProjectDetails.status}`);
+        }
       } catch (error: any) {
+        isAPISuccess = false;
+        await dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -133,39 +162,48 @@ const UploadTaskAreasService: Function = (url: string, filePayload: any, project
         );
         dispatch(CreateProjectActions.UploadAreaLoading(false));
       }
+      return isAPISuccess;
     };
 
-    await postUploadArea(url, filePayload);
+    return await postUploadArea(url, filePayload);
   };
 };
-const GenerateProjectQRService: Function = (url: string, projectData: any, formUpload: any) => {
+
+const GenerateProjectFilesService: Function = (url: string, projectData: any, formUpload: any) => {
   return async (dispatch) => {
-    dispatch(CreateProjectActions.GenerateProjectQRLoading(true));
+    dispatch(CreateProjectActions.GenerateProjectLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
     const postUploadArea = async (url, projectData: any, formUpload) => {
+      let isAPISuccess = true;
       try {
-        let postNewProjectDetails;
+        let response;
 
         if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
           const generateApiFormData = new FormData();
           generateApiFormData.append('xls_form_upload', formUpload);
-          postNewProjectDetails = await axios.post(url, generateApiFormData, {
+          response = await axios.post(url, generateApiFormData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
         } else {
-          postNewProjectDetails = await axios.post(url, {});
+          response = await axios.post(url, {});
+        }
+        isAPISuccess = isStatusSuccess(response.status);
+        if (!isAPISuccess) {
+          throw new Error(`Request failed with status ${response.status}`);
         }
 
-        const resp: string = postNewProjectDetails.data;
-        await dispatch(CreateProjectActions.GenerateProjectQRLoading(false));
+        await dispatch(CreateProjectActions.GenerateProjectLoading(false));
         dispatch(CommonActions.SetLoading(false));
-        await dispatch(CreateProjectActions.GenerateProjectQRSuccess(resp));
+        // Trigger the watcher and redirect after success
+        await dispatch(CreateProjectActions.GenerateProjectSuccess(true));
       } catch (error: any) {
+        isAPISuccess = false;
         dispatch(CommonActions.SetLoading(false));
+        await dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -174,11 +212,12 @@ const GenerateProjectQRService: Function = (url: string, projectData: any, formU
             duration: 2000,
           }),
         );
-        dispatch(CreateProjectActions.GenerateProjectQRLoading(false));
+        dispatch(CreateProjectActions.GenerateProjectLoading(false));
       }
+      return isAPISuccess;
     };
 
-    await postUploadArea(url, projectData, formUpload);
+    return await postUploadArea(url, projectData, formUpload);
   };
 };
 
@@ -333,6 +372,7 @@ const PatchProjectDetails: Function = (url: string, projectData: any) => {
     await patchProjectDetails(url, projectData);
   };
 };
+
 const PostFormUpdate: Function = (url: string, projectData: any) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.SetPostFormUpdateLoading(true));
@@ -452,7 +492,7 @@ const ValidateCustomForm: Function = (url: string, formUpload: any) => {
   };
 };
 
-const DeleteProjectService: Function = (url: string) => {
+const DeleteProjectService: Function = (url: string, hasRedirect: boolean = true) => {
   return async (dispatch) => {
     const deleteProject = async (url: string) => {
       try {
@@ -460,15 +500,17 @@ const DeleteProjectService: Function = (url: string) => {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'Project deleted. Redirecting...',
+            message: `Project deleted. ${hasRedirect && 'Redirecting...'}`,
             variant: 'success',
             duration: 2000,
           }),
         );
         // Redirect to homepage
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+        if (hasRedirect) {
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        }
       } catch (error) {
         if (error.response.status === 404) {
           dispatch(
@@ -492,7 +534,7 @@ export {
   UploadTaskAreasService,
   CreateProjectService,
   FormCategoryService,
-  GenerateProjectQRService,
+  GenerateProjectFilesService,
   OrganisationService,
   GetDividedTaskFromGeojson,
   TaskSplittingPreviewService,
