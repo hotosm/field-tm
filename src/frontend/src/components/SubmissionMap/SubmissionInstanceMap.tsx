@@ -38,9 +38,16 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
         {featureGeojson?.type && (
           <VectorLayer
             geojson={featureGeojson}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 2000,
+              maxZoom: 20,
+            }}
             zIndex={10}
             zoomToLayer
-            style={{ ...defaultStyles, lineColor: '#D73F37', lineThickness: 2 }}
+            style={{ ...defaultStyles, lineColor: '#D73F37', lineThickness: 2, circleRadius: 10, fillColor: '#D73F37' }}
           />
         )}
       </MapComponent>
