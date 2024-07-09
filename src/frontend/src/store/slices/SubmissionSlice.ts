@@ -4,8 +4,6 @@ import { SubmissionStateTypes } from '@/store/types/ISubmissions';
 const initialState: SubmissionStateTypes = {
   submissionDetailsLoading: true,
   submissionDetails: null,
-  submissionInfographics: [],
-  submissionInfographicsLoading: false,
   submissionContributors: [],
   submissionContributorsLoading: true,
   submissionFormFields: [],
@@ -23,8 +21,6 @@ const initialState: SubmissionStateTypes = {
   submissionFormFieldsLoading: false,
   submissionTableDataLoading: false,
   submissionTableRefreshing: false,
-  validatedVsMappedInfographics: [],
-  validatedVsMappedLoading: false,
   updateReviewStatusModal: {
     toggleModalStatus: false,
     instanceId: null,
@@ -44,18 +40,6 @@ const SubmissionSlice = createSlice({
     },
     SetSubmissionDetails(state, action) {
       state.submissionDetails = action.payload;
-    },
-    SetSubmissionInfographics(state, action) {
-      state.submissionInfographics = action.payload;
-    },
-    SetSubmissionInfographicsLoading(state, action) {
-      state.submissionInfographicsLoading = action.payload;
-    },
-    SetValidatedVsMappedInfographics(state, action) {
-      state.validatedVsMappedInfographics = action.payload;
-    },
-    SetValidatedVsMappedLoading(state, action) {
-      state.validatedVsMappedLoading = action.payload;
     },
     SetSubmissionContributors(state, action) {
       state.submissionContributors = action.payload;

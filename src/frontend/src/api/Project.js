@@ -48,6 +48,7 @@ export const ProjectById = (existingProjectList, projectId) => {
             custom_tms_url: projectResp?.custom_tms_url,
             organisation_id: projectResp?.organisation_id,
             organisation_logo: projectResp?.organisation_logo,
+            created: projectResp?.created,
           }),
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
@@ -183,7 +184,7 @@ export const DownloadTile = (url, payload, toOpfs = false) => {
         }
 
         const filename = response.headers['content-disposition'].split('filename=')[1];
-        console.log(filename)
+        console.log(filename);
         // Create Blob from ArrayBuffer
         const blob = new Blob([tileData], { type: response.headers['content-type'] });
         const downloadUrl = URL.createObjectURL(blob);

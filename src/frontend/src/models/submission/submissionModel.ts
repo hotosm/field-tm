@@ -1,8 +1,3 @@
-export type submissionInfographicsTypes = {
-  date: string;
-  count: 1;
-};
-
 export type submissionContributorsTypes = {
   user: string;
   contributions: number;
@@ -14,12 +9,6 @@ export type submissionFormFieldsTypes = {
   type: string;
   binary: any;
   selectMultiple: any;
-};
-
-export type validatedVsMappedInfographicsTypes = {
-  date: string;
-  validated: number;
-  mapped: number;
 };
 
 export type submissionTableDataTypes = {
@@ -40,3 +29,6 @@ export type reviewListType = {
   className: string;
   hoverClass: string;
 };
+
+export type formSubmissionType = { date: string; count: number; label: string };
+export type validatedMappedType = { date: string; Validated: number; Mapped: number; label: string };

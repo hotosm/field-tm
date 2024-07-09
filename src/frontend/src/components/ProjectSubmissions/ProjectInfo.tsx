@@ -2,32 +2,46 @@ import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { useNavigate } from 'react-router-dom';
-import { projectDashboardDetailTypes, projectInfoType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
 
-const ProjectInfo = () => {
+const ProjectInfo = ({ entities }) => {
   const navigate = useNavigate();
   const params = CoreModules.useParams();
   const projectId = params.projectId;
-  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
-  const projectDashboardDetail: projectDashboardDetailTypes = CoreModules.useAppSelector(
-    (state) => state.project.projectDashboardDetail,
-  );
-  const projectDashboardLoading: boolean = CoreModules.useAppSelector((state) => state.project.projectDashboardLoading);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
+  // const projectDashboardDetail = useAppSelector((state) => state.project.projectDashboardDetail);
+  // const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
+  const submissionContributorsData = useAppSelector((state) => state.submission.submissionContributors);
+
+  const projectTaskList = useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectIndex = projectTaskList.findIndex((project) => project.id == +projectId);
+  const taskActivities = projectTaskList?.[projectIndex]?.taskBoundries;
+  const projectDetailsLoading = useAppSelector((state) => state.project.projectDetailsLoading);
+  const entityOsmMapLoading = useAppSelector((state) => state.project.entityOsmMapLoading);
+  const projectCreationDate = projectInfo?.created ? projectInfo?.created?.split('T')[0] : '-';
+  const submissionContributorsLoading = useAppSelector((state) => state.submission.submissionContributorsLoading);
+
+  const latestDateSorted = entities
+    ?.map((entry) => new Date(entry?.updated_at)) // Convert to Date objects
+    .sort((a, b) => b - a)?.[0]
+    ?.toISOString();
+
+  const updatedDateTime = latestDateSorted ? latestDateSorted?.split('T')[0] : '-';
 
   const dataCard = [
     {
       title: 'Tasks',
-      count: projectDashboardDetail?.total_tasks,
+      count: taskActivities?.length,
       icon: <AssetModules.TaskIcon sx={{ color: 'white', fontSize: { xs: '35px', xl: '40px' } }} />,
     },
     {
       title: 'Contributors',
-      count: projectDashboardDetail?.total_contributors,
+      count: submissionContributorsData?.length,
       icon: <AssetModules.PeopleAltIcon sx={{ color: 'white', fontSize: { xs: '35px', xl: '40px' } }} />,
     },
     {
       title: 'Submissions',
-      count: projectDashboardDetail?.total_submission,
+      count: entities?.length,
       icon: <AssetModules.SubmissionIcon sx={{ color: 'white', fontSize: { xs: '35px', xl: '40px' } }} />,
     },
   ];
@@ -48,7 +62,7 @@ const ProjectInfo = () => {
 
   return (
     <div className="fmtm-w-full sm:fmtm-ml-2 fmtm-border-b-[1px] fmtm-border-gray-300 fmtm-pb-10">
-      {projectDashboardLoading ? (
+      {projectDetailsLoading ? (
         <CoreModules.Skeleton style={{ width: '150px' }} className="fmtm-mb-1" />
       ) : (
         <div className="fmtm-pb-4">
@@ -65,31 +79,22 @@ const ProjectInfo = () => {
         </div>
       )}
       <div className=" fmtm-flex fmtm-flex-col xl:fmtm-flex-row fmtm-w-full sm:fmtm-items-center fmtm-gap-10 fmtm-mt-3">
-        {projectDashboardLoading ? (
+        {projectDetailsLoading || entityOsmMapLoading ? (
           <CoreModules.Skeleton className="!fmtm-w-full sm:!fmtm-w-[30rem] 2xl:!fmtm-w-[34rem] !fmtm-h-[8rem] !fmtm-rounded-xl" />
         ) : (
           <div className="fmtm-w-full fmtm-min-w-0 sm:fmtm-max-w-[37rem] fmtm-bg-white fmtm-rounded-lg fmtm-p-5 fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)]">
             <h2 className="fmtm-text-2xl fmtm-text-[#545454] fmtm-font-bold">{projectInfo?.title}</h2>
             <div>
               <p className="fmtm-text-base fmtm-text-[#706E6E]">
-                Created On:{' '}
-                <span>
-                  {projectDashboardDetail?.created
-                    ? `${projectDashboardDetail?.created?.split('T')[0]} ${projectDashboardDetail?.created
-                        ?.split('T')[1]
-                        ?.split('.')[0]}`
-                    : '-'}
-                </span>
+                Created On:
+                <span>{projectCreationDate}</span>
               </p>
-              <p className="fmtm-text-base fmtm-text-[#706E6E]">
-                Last active:{' '}
-                <span>{projectDashboardDetail?.last_active ? projectDashboardDetail?.last_active : '-'}</span>
-              </p>
+              <p className="fmtm-text-base fmtm-text-[#706E6E]">Last active: {updatedDateTime}</p>
             </div>
           </div>
         )}
         <div className="fmtm-w-full fmtm-overflow-x-scroll scrollbar fmtm-pb-1 md:fmtm-pb-0 md:fmtm-overflow-x-visible">
-          {projectDashboardLoading ? (
+          {projectDetailsLoading || submissionContributorsLoading || entityOsmMapLoading ? (
             <div className="fmtm-w-full fmtm-flex sm:fmtm-justify-center fmtm-gap-5">
               {Array.from({ length: 3 }).map((i) => (
                 <CoreModules.Skeleton key={i} className="!fmtm-w-[12.5rem] fmtm-h-[6.25rem] !fmtm-rounded-xl" />
