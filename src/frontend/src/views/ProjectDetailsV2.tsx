@@ -509,14 +509,14 @@ const ProjectDetailsV2 = () => {
                 popupId="locked-popup"
                 className="fmtm-w-[235px]"
               />
-              <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
+              <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-3 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
                 <Accordion
                   ref={legendRef}
                   body={<MapLegends defaultTheme={defaultTheme} />}
                   header={
                     <div className="fmtm-flex fmtm-items-center fmtm-gap-1 sm:fmtm-gap-2">
-                      <AssetModules.LegendToggleIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '30px' }} />
-                      <p className="fmtm-text-lg fmtm-font-normal">Legend</p>
+                      <AssetModules.LegendToggleIcon className=" fmtm-text-primaryRed" sx={{ fontSize: '25px' }} />
+                      <p className="fmtm-text-base fmtm-font-normal">LEGEND</p>
                     </div>
                   }
                   onToggle={() => {
