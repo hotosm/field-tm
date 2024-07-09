@@ -72,9 +72,10 @@ nav:
       - Code of Conduct: https://docs.hotosm.org/code-of-conduct
       - FAQ: FAQ.md
   - User Manuals:
-      - Videos: manuals/videos.md
-      - Types of User: user-breakdown.md
-      - Project Managers: manuals/project-managers.md
+      - Video Guides: manuals/videos.md
+      - User Types Explanation: user-breakdown.md
+      - Workflow Diagrams: manuals/workflow-diagrams.md
+      - Project Manager Guide: manuals/project-managers.md
   - Dev:
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
