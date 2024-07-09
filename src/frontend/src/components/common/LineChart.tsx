@@ -49,8 +49,8 @@ const CustomLineChart = ({ data, xAxisDataKey, lineOneKey, lineTwoKey, xLabel, y
         )}
         <Tooltip />
         <Legend iconSize={10} iconType="circle" align="left" verticalAlign="top" height={45} />
-        <Line type="linear" dataKey={lineOneKey} stroke="#D73F3F" activeDot={{ r: 6 }} strokeWidth={1.5} />
-        <Line type="linear" dataKey={lineTwoKey} stroke="#F19C3C" activeDot={{ r: 6 }} strokeWidth={1.5} />
+        <Line dot={false} type="linear" dataKey={lineOneKey} stroke="#D73F3F" activeDot={{ r: 6 }} strokeWidth={1.5} />
+        <Line dot={false} type="linear" dataKey={lineTwoKey} stroke="#F19C3C" activeDot={{ r: 6 }} strokeWidth={1.5} />
       </LineChart>
     </ResponsiveContainer>
   );

@@ -54,7 +54,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const submissionTableDataLoading = useAppSelector((state) => state.submission.submissionTableDataLoading);
   const submissionTableRefreshing = useAppSelector((state) => state.submission.submissionTableRefreshing);
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
-  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);

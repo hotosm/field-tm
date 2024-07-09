@@ -16,3 +16,28 @@ export const isStatusSuccess = (status: number) => {
   }
   return false;
 };
+
+// get date N days ago
+export const dateNDaysAgo = (NDays: number) => {
+  return new Date(new Date().getTime() - NDays * 24 * 60 * 60 * 1000).toISOString();
+};
+
+// extract month & day in MM/DD format for chart date labels
+export const getMonthDate = (date: string) => {
+  const splittedDate = date?.split('T')[0]?.split('-');
+  return `${splittedDate[1]}/${splittedDate[2]}`;
+};
+
+// generates an array of date strings for last 30 days
+export const generateLast30Days = (): string[] => {
+  const last30Days: string[] = [];
+  const today = new Date();
+
+  for (let i = 0; i < 30; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() - i);
+    last30Days.push(date.toISOString().split('T')[0]);
+  }
+
+  return last30Days;
+};

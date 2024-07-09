@@ -71,6 +71,7 @@ export type projectInfoType = {
   organisation_logo: string;
   instructions: string;
   custom_tms_url: string;
+  created: string;
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };

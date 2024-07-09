@@ -24,40 +24,6 @@ export const ProjectSubmissionService: Function = (url: string) => {
   };
 };
 
-export const ProjectSubmissionInfographicsService: Function = (url: string) => {
-  return async (dispatch) => {
-    const fetchProjectSubmission = async (url: string) => {
-      try {
-        dispatch(SubmissionActions.SetSubmissionInfographicsLoading(true));
-        const fetchSubmissionData = await CoreModules.axios.get(url);
-        const resp: any = fetchSubmissionData.data;
-        dispatch(SubmissionActions.SetSubmissionInfographicsLoading(false));
-        dispatch(SubmissionActions.SetSubmissionInfographics(resp));
-      } catch (error) {}
-    };
-
-    await fetchProjectSubmission(url);
-  };
-};
-
-export const ValidatedVsMappedInfographicsService: Function = (url: string) => {
-  return async (dispatch) => {
-    const fetchProjectSubmission = async (url: string) => {
-      try {
-        dispatch(SubmissionActions.SetValidatedVsMappedLoading(true));
-        const validatedVsMappedData = await CoreModules.axios.get(url);
-        const resp: any = validatedVsMappedData.data;
-        dispatch(SubmissionActions.SetValidatedVsMappedInfographics(resp));
-        dispatch(SubmissionActions.SetValidatedVsMappedLoading(false));
-      } catch (error) {
-        dispatch(SubmissionActions.SetValidatedVsMappedLoading(false));
-      }
-    };
-
-    await fetchProjectSubmission(url);
-  };
-};
-
 export const ProjectContributorsService: Function = (url: string) => {
   return async (dispatch) => {
     const fetchProjectContributor = async (url: string) => {

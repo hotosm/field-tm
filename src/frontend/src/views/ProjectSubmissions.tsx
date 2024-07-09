@@ -6,9 +6,9 @@ import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.j
 import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityInfo } from '@/api/Project';
-import { GetProjectDashboard } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
-import { projectInfoType } from '@/models/project/projectModel';
+import { useAppSelector } from '@/types/reduxTypes';
+import { ProjectContributorsService } from '@/api/SubmissionService';
 
 const ProjectSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -17,8 +17,10 @@ const ProjectSubmissions = () => {
 
   const projectId = params.projectId;
 
-  const state = CoreModules.useAppSelector((state) => state.project);
-  const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
+  const state = useAppSelector((state) => state.project);
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
+  const entityList = useAppSelector((state) => state.project.entityOsmMap);
+  const updatedEntities = entityList?.filter((entity) => entity?.updated_at && entity?.status > 1);
 
   //Fetch project for the first time
   useEffect(() => {
@@ -39,14 +41,14 @@ const ProjectSubmissions = () => {
     }
   }, [params.id]);
 
-  useEffect(() => {
-    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
-  }, []);
-
   // for hot fix to display task-list and show option of task-list for submission table filter
   // better solution needs to be researched
   useEffect(() => {
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
+  }, []);
+
+  useEffect(() => {
+    dispatch(ProjectContributorsService(`${import.meta.env.VITE_API_URL}/projects/contributors/${projectId}`));
   }, []);
 
   useEffect(() => {
@@ -85,11 +87,11 @@ const ProjectSubmissions = () => {
   return (
     <div className="fmtm-bg-[#F5F5F5] fmtm-px-5 sm:fmtm-px-5 lg:fmtm-px-8 xl:fmtm-px-16 fmtm-pb-5">
       <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-my-4 fmtm-w-full">
-        <ProjectInfo />
+        <ProjectInfo entities={updatedEntities} />
       </div>
       <div className="fmtm-w-full">
         {searchParams.get('tab') === 'infographics' ? (
-          <SubmissionsInfographics toggleView={<ToggleView />} />
+          <SubmissionsInfographics toggleView={<ToggleView />} entities={updatedEntities} />
         ) : (
           <SubmissionsTable toggleView={<ToggleView />} />
         )}

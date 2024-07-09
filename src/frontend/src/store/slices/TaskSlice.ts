@@ -41,7 +41,7 @@ const TaskSlice = createSlice({
     },
 
     SetTaskSubmissionStates(state, action) {
-      const groupedPayload: Record<string, EntityOsmMap[]> = action.payload.reduce((acc, item) => {
+      const groupedPayload: Record<string, EntityOsmMap[]> = action.payload?.reduce((acc, item) => {
         if (!acc[item.task_id]) {
           acc[item.task_id] = [];
         }
@@ -57,7 +57,7 @@ const TaskSlice = createSlice({
         let submissionCount = 0;
         let lastSubmission: string | null = null;
         items.forEach((item) => {
-          if (item.status === task_status.MAPPED) {
+          if (item.status > 1) {
             submissionCount++;
           }
           if (item.updated_at && (!lastSubmission || item.updated_at > lastSubmission)) {
