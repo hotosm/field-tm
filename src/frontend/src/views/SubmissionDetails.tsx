@@ -22,7 +22,11 @@ const SubmissionDetails = () => {
   const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
   const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
-  const taskId = submissionDetails?.task_id;
+  const taskId = submissionDetails?.task_id
+    ? submissionDetails?.task_id
+    : submissionDetails?.task_filter
+      ? submissionDetails?.task_filter
+      : '-';
 
   useEffect(() => {
     dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
@@ -54,7 +58,7 @@ const SubmissionDetails = () => {
   }
   const filteredData = submissionDetails ? removeNullValues(submissionDetails) : {};
 
-  var coordinatesArray: [number, number][] = submissionDetails?.xlocation?.split(';').map(function (coord: string) {
+  const coordinatesArray: [number, number][] = submissionDetails?.xlocation?.split(';').map(function (coord: string) {
     let coordinate = coord
       .trim()
       .split(' ')
@@ -77,6 +81,14 @@ const SubmissionDetails = () => {
         properties: {},
       },
     ],
+  };
+
+  const pointFeature = {
+    type: 'Feature',
+    geometry: {
+      ...submissionDetails?.point,
+    },
+    properties: {},
   };
 
   const renderValue = (value: any, key: string = '') => {
@@ -169,7 +181,9 @@ const SubmissionDetails = () => {
         </div>
         <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center">
           <div className="fmtm-w-full fmtm-my-10 xl:fmtm-my-0 xl:fmtm-w-[500px] 2xl:fmtm-w-[700px] fmtm-h-[300px] fmtm-rounded-lg fmtm-overflow-hidden">
-            <SubmissionInstanceMap featureGeojson={geojsonFeature} />
+            <SubmissionInstanceMap
+              featureGeojson={coordinatesArray ? geojsonFeature : submissionDetails?.point ? pointFeature : {}}
+            />
           </div>
         </div>
       </div>
