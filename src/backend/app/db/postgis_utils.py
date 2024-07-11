@@ -728,11 +728,15 @@ def multipolygon_to_polygon(features: Union[Feature, FeatCol, MultiPolygon, Poly
     return geojson.FeatureCollection(geojson_feature)
 
 
-def merge_multipolygon(features: Union[Feature, FeatCol, MultiPolygon, Polygon]):
+def merge_multipolygon(
+    features: Union[Feature, FeatCol, MultiPolygon, Polygon],
+    dissolve_polygon: bool = True,
+):
     """Merge multiple Polygons or MultiPolygons into a single Polygon.
 
     Args:
         features: geojson features to merge.
+        dissolve_polygon: True to dissolve polygons to single polygon.
 
     Returns:
         A GeoJSON FeatureCollection containing the merged Polygon.
@@ -755,15 +759,16 @@ def merge_multipolygon(features: Union[Feature, FeatCol, MultiPolygon, Polygon])
             multi_polygons.append(polygon)
 
         merged_polygon = unary_union(multi_polygons)
-        if isinstance(merged_polygon, MultiPolygon):
-            merged_polygon = merged_polygon.convex_hull
-
         merged_geojson = mapping(merged_polygon)
         if merged_geojson["type"] == "MultiPolygon":
-            log.error(
-                "Resulted GeoJSON contains disjoint Polygons. "
-                "Adjacent polygons are preferred."
-            )
+            if dissolve_polygon:
+                merged_polygon = merged_polygon.convex_hull
+                merged_geojson = mapping(merged_polygon)
+                log.error(
+                    "Resulted GeoJSON contains disjoint Polygons. "
+                    "Adjacent polygons are preferred."
+                )
+            merged_geojson = merged_geojson
         return geojson.FeatureCollection([geojson.Feature(geometry=merged_geojson)])
     except Exception as e:
         raise HTTPException(
