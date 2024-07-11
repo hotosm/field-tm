@@ -660,7 +660,7 @@ async def task_split(
     """
     # read project boundary
     boundary = geojson.loads(await project_geojson.read())
-    parsed_boundary = merge_multipolygon(boundary)
+    parsed_boundary = merge_multipolygon(boundary, False)
     # Validatiing Coordinate Reference Systems
     await check_crs(parsed_boundary)
 
