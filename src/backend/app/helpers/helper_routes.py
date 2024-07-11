@@ -225,9 +225,10 @@ async def convert_odk_submission_json_to_geojson_wrapper(
 
     contents = await json_file.read()
     submission_geojson = await convert_odk_submission_json_to_geojson(BytesIO(contents))
+    submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.geojson"}
-    return Response(submission_geojson.getvalue(), headers=headers)
+    return Response(submission_data.getvalue(), headers=headers)
 
 
 @router.get("/view-raw-data-api-token")

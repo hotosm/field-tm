@@ -22,7 +22,7 @@ import json
 import os
 import uuid
 from io import BytesIO, StringIO
-from typing import Optional
+from typing import Optional, Union
 from xml.etree.ElementTree import Element, SubElement
 
 import geojson
@@ -624,8 +624,8 @@ def flatten_json(data: dict, target: dict):
 
 
 async def convert_odk_submission_json_to_geojson(
-    input_json: BytesIO,
-) -> BytesIO:
+    input_json: Union[BytesIO, list],
+) -> geojson.FeatureCollection:
     """Convert ODK submission JSON file to GeoJSON.
 
     Used for loading into QGIS.
@@ -636,7 +636,10 @@ async def convert_odk_submission_json_to_geojson(
     Returns:
         geojson (BytesIO): GeoJSON format ODK submission.
     """
-    submission_json = json.loads(input_json.getvalue())
+    if isinstance(input_json, list):
+        submission_json = input_json
+    else:
+        submission_json = json.loads(input_json.getvalue())
 
     if not submission_json:
         raise HTTPException(
@@ -660,9 +663,7 @@ async def convert_odk_submission_json_to_geojson(
         feature = geojson.Feature(geometry=geojson_geom, properties=data)
         all_features.append(feature)
 
-    featcol = geojson.FeatureCollection(features=all_features)
-
-    return BytesIO(json.dumps(featcol).encode("utf-8"))
+    return geojson.FeatureCollection(features=all_features)
 
 
 async def get_entities_geojson(

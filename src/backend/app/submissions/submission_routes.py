@@ -32,9 +32,10 @@ from app.auth.osm import login_required
 from app.auth.roles import mapper, project_manager
 from app.central import central_crud
 from app.db import database, db_models, postgis_utils
-from app.models.enums import HTTPStatus, ReviewStateEnum
+from app.models.enums import ReviewStateEnum
 from app.projects import project_crud, project_deps
 from app.submissions import submission_crud, submission_schemas
+from app.tasks.task_deps import get_task_by_id
 
 router = APIRouter(
     prefix="/submission",
@@ -558,32 +559,56 @@ async def download_submission_geojson(
     data = await submission_crud.get_submission_by_project(project_id, {}, db)
     submission_json = data.get("value", [])
 
-    if not submission_json:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Loading JSON submission failed",
-        )
-
-    all_features = []
-    for submission in submission_json:
-        keys_to_remove = ["meta", "__id", "__system"]
-        for key in keys_to_remove:
-            submission.pop(key)
-
-        data = {}
-        central_crud.flatten_json(submission, data)
-
-        geojson_geom = await postgis_utils.javarosa_to_geojson_geom(
-            data.pop("xlocation", {}), geom_type="Polygon"
-        )
-
-        feature = geojson.Feature(geometry=geojson_geom, properties=data)
-        all_features.append(feature)
-
-    featcol = geojson.FeatureCollection(features=all_features)
-    submission_geojson = BytesIO(json.dumps(featcol).encode("utf-8"))
+    submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
+        submission_json
+    )
+    submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
     filename = project.project_name_prefix
 
     headers = {"Content-Disposition": f"attachment; filename={filename}.geojson"}
 
-    return Response(submission_geojson.getvalue(), headers=headers)
+    return Response(submission_data.getvalue(), headers=headers)
+
+
+@router.get("/conflate_submission_geojson/")
+async def conflate_geojson(
+    task_id: int,
+    current_user: dict = Depends(mapper),  # FIXME change this validator
+    remove_conflated=False,
+    db: Session = Depends(database.get_db),
+):
+    """Conflates the input GeoJSON with OpenStreetMap data.
+
+    Args:
+        task_id(int): task index of project.
+        current_user(dict): Check if user is mapper.
+        remove_conflated(bool): returns geojson which are not overlapped with osm data.
+        db (Session): The database session.
+
+    Returns:
+        str: Updated GeoJSON string with conflated features.
+    """
+    try:
+        project = current_user["project"]
+        db_task = await get_task_by_id(project.id, task_id, db)
+        task_aoi = postgis_utils.geometry_to_geojson(db_task.outline)
+        task_geojson = geojson.dumps(task_aoi, indent=2)
+
+        data = await submission_crud.get_submission_by_project(project.id, {}, db)
+        submission_json = data.get("value", [])
+
+        submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
+            submission_json
+        )
+        form_category = project.xform_category
+        input_features = submission_geojson["features"]
+        osm_features = postgis_utils.get_osm_geometries(form_category, task_geojson)
+        submission_geojson["features"] = postgis_utils.conflate_features(
+            input_features, osm_features.get("features", []), remove_conflated
+        )
+
+        return submission_geojson
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to process conflation: {str(e)}"
+        ) from e

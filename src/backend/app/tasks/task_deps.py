@@ -25,7 +25,7 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.db_models import DbProject
+from app.db.db_models import DbProject, DbTask
 from app.models.enums import HTTPStatus
 
 
@@ -34,7 +34,7 @@ async def get_xform_name(
     task_id: int,
     db: Session = Depends(get_db),
 ) -> str:
-    """Get a single project by id."""
+    """Get a project xform name."""
     if isinstance(project, int):
         db_project = db.query(DbProject).filter(DbProject.id == project).first()
         if not db_project:
@@ -51,3 +51,22 @@ async def get_xform_name(
     # TODO this in the new xforms.category field/table.
     form_name = project_name
     return form_name
+
+
+async def get_task_by_id(
+    project_id: int,
+    task_id: int,
+    db: Session = Depends(get_db),
+):
+    """Get a single task by task index."""
+    if (
+        db_task := db.query(DbTask)
+        .filter(DbTask.project_task_index == task_id, DbTask.project_id == project_id)
+        .first()
+    ):
+        return db_task
+    else:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"Task with ID {task_id} does not exist",
+        )
