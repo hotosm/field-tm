@@ -316,7 +316,10 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(1, '/create-project')}
+                onClick={() => {
+                  dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
+                  toggleStep(1, '/create-project');
+                }}
                 className="fmtm-font-bold"
               />
               <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />

@@ -195,7 +195,10 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(2, '/upload-area')}
+                onClick={() => {
+                  dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
+                  toggleStep(2, '/upload-area');
+                }}
                 className="fmtm-font-bold"
               />
               <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
