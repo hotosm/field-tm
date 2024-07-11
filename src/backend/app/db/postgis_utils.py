@@ -21,6 +21,7 @@ import json
 import logging
 from asyncio import gather
 from datetime import datetime, timezone
+from io import BytesIO
 from random import getrandbits
 from typing import Optional, Union
 
@@ -32,15 +33,20 @@ from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape, to_shape
 from geojson_pydantic import Feature, MultiPolygon, Polygon
 from geojson_pydantic import FeatureCollection as FeatCol
+from osm_fieldwork.data_models import data_models_path
+from osm_rawdata.postgres import PostgresClient
 from shapely.geometry import mapping, shape
+from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.models.enums import XLSFormType
 
 log = logging.getLogger(__name__)
+API_URL = settings.RAW_DATA_API_URL
 
 
 def timestamp():
@@ -785,3 +791,119 @@ def parse_featcol(features: Union[Feature, FeatCol, MultiPolygon, Polygon]):
     elif isinstance(features, Feature):
         feat_col = geojson.FeatureCollection([feat_col])
     return feat_col
+
+
+def get_osm_geometries(form_category, geometry):
+    """Request a snapshot based on the provided geometry.
+
+    Args:
+        form_category(str): feature category type (eg: buildings).
+        geometry (str): The geometry data in JSON format.
+
+    Returns:
+        dict: The JSON response containing the snapshot data.
+    """
+    config_filename = XLSFormType(form_category).name
+    data_model = f"{data_models_path}/{config_filename}.yaml"
+
+    with open(data_model, "rb") as data_model_yaml:
+        extract_config = BytesIO(data_model_yaml.read())
+
+    pg = PostgresClient(
+        "underpass",
+        extract_config,
+        auth_token=settings.RAW_DATA_API_AUTH_TOKEN
+        if settings.RAW_DATA_API_AUTH_TOKEN
+        else None,
+    )
+    return pg.execQuery(
+        geometry,
+        extra_params={
+            "outputType": "geojson",
+            "bind_zip": True,
+            "useStWithin": False,
+        },
+    )
+
+
+def geometries_almost_equal(
+    geom1: BaseGeometry, geom2: BaseGeometry, tolerance: float = 1e-6
+) -> bool:
+    """Determine if two geometries are almost equal within a tolerance.
+
+    Args:
+        geom1 (BaseGeometry): First geometry.
+        geom2 (BaseGeometry): Second geometry.
+        tolerance (float): Tolerance level for almost equality.
+
+    Returns:
+        bool: True if geometries are almost equal else False.
+    """
+    return geom1.equals_exact(geom2, tolerance)
+
+
+def check_partial_overlap(geom1: BaseGeometry, geom2: BaseGeometry) -> bool:
+    """Determine if two geometries have a partial overlap.
+
+    Args:
+        geom1 (BaseGeometry): First geometry.
+        geom2 (BaseGeometry): Second geometry.
+
+    Returns:
+        bool: True if geometries have a partial overlap, else False.
+    """
+    intersection = geom1.intersection(geom2)
+    return not intersection.is_empty and (
+        0 < intersection.area < geom1.area and 0 < intersection.area < geom2.area
+    )
+
+
+def conflate_features(
+    input_features: list, osm_features: list, remove_conflated=False, tolerance=1e-6
+):
+    """Conflate input features with OSM features to identify overlaps.
+
+    Args:
+        input_features (list): A list of input features with geometries.
+        osm_features (list): A list of OSM features with geometries.
+        remove_conflated (bool): Flag to remove conflated features.
+        tolerance (float): Tolerance level for almost equality.
+
+    Returns:
+        list: A list of features after conflation with OSM features.
+    """
+    osm_geometries = [shape(feature["geometry"]) for feature in osm_features]
+    return_features = []
+
+    for input_feature in input_features:
+        input_geometry = shape(input_feature["geometry"])
+        is_duplicate = False
+        is_partial_overlap = False
+
+        for osm_feature, osm_geometry in zip(
+            osm_features, osm_geometries, strict=False
+        ):
+            if geometries_almost_equal(input_geometry, osm_geometry, tolerance):
+                is_duplicate = True
+                input_feature["properties"].update(osm_feature["properties"])
+                break
+
+            if check_partial_overlap(input_geometry, osm_geometry):
+                is_partial_overlap = True
+                new_feature = {
+                    "type": "Feature",
+                    "geometry": mapping(osm_feature["geometry"]),
+                    "properties": osm_feature["properties"],
+                }
+                return_features.append(new_feature)
+                break
+
+        input_feature["properties"]["is_duplicate"] = is_duplicate
+        input_feature["properties"]["is_partial_overlap"] = is_partial_overlap
+
+        if (is_duplicate or is_partial_overlap) and remove_conflated is True:
+            continue
+
+        return_features.append(input_feature)
+
+    return return_features

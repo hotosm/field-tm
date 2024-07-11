@@ -35,7 +35,11 @@ from loguru import logger as log
 # from osm_fieldwork.json2osm import json2osm
 from sqlalchemy.orm import Session
 
-from app.central.central_crud import get_odk_form, get_odk_project, list_odk_xforms
+from app.central.central_crud import (
+    get_odk_form,
+    get_odk_project,
+    list_odk_xforms,
+)
 from app.config import settings
 from app.db import db_models
 from app.models.enums import HTTPStatus
@@ -524,3 +528,45 @@ async def get_submission_detail(
         odk_form.getSubmissions(project.odkid, db_xform.odk_form_id, submission_id)
     )
     return submission.get("value", [])[0]
+
+
+# FIXME might not needed
+# async def get_submission_geojson(
+#     project_id: int,
+#     db: Session,
+# ):
+#     """Retrieve GeoJSON data for a submission associated with a project.
+
+#     Args:
+#         project_id (int): The ID of the project.
+#         db (Session): The database session.
+
+#     Returns:
+#         FeatCol: A GeoJSON FeatCol containing the submission features.
+#     """
+#     data = await get_submission_by_project(project_id, {}, db)
+#     submission_json = data.get("value", [])
+
+#     if not submission_json:
+#         raise HTTPException(
+#             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+#             detail="Loading JSON submission failed",
+#         )
+
+#     all_features = []
+#     for submission in submission_json:
+#         keys_to_remove = ["meta", "__id", "__system"]
+#         for key in keys_to_remove:
+#             submission.pop(key)
+
+#         data = {}
+#         flatten_json(submission, data)
+
+#         geojson_geom = await postgis_utils.javarosa_to_geojson_geom(
+#             data.pop("xlocation", {}), geom_type="Polygon"
+#         )
+
+#         feature = geojson.Feature(geometry=geojson_geom, properties=data)
+#         all_features.append(feature)
+
+#     return geojson.FeatureCollection(features=all_features)

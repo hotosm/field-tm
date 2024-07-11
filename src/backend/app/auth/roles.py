@@ -252,7 +252,7 @@ async def wrap_check_access(
     if not db_user:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN,
-            detail="User is not a project manager",
+            detail="User do not have permission to access the project.",
         )
 
     return {
@@ -321,17 +321,29 @@ async def mapper(
     project: DbProject = Depends(get_project_by_id),
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
-) -> AuthUser:
+) -> ProjectUserDict:
     """A mapper for a specific project."""
     # If project is public, skip permission check
     if project.visibility == ProjectVisibility.PUBLIC:
-        return user_data
+        user_id = user_data.id
+        sql = text("SELECT * FROM users WHERE id = :user_id;")
+        result = db.execute(sql, {"user_id": user_id})
+        db_user = result.first()
 
-    await wrap_check_access(
+        if not db_user:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"User ({user_id}) does not exist in database",
+            )
+
+        return {
+            "user": DbUser(**db_user._asdict()),
+            "project": project,
+        }
+
+    return await wrap_check_access(
         project,
         db,
         user_data,
         ProjectRole.MAPPER,
     )
-
-    return user_data
