@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
 import { CustomSelect } from '@/components/common/Select';
 import { useNavigate } from 'react-router-dom';
-import RadioButton from '@/components/common/RadioButton';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
 import { useAppSelector } from '@/types/reduxTypes';
@@ -87,19 +86,22 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
         <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Select Category</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>You may choose an existing category or upload a custom XLS form.</span>
           <span>
-            {' '}
-            You may learn more about XLSforms{' '}
+            You may choose a pre-configured form, or upload a custom XLS form. Click{' '}
             <a
               href="https://hotosm.github.io/osm-fieldwork/about/xlsforms/"
               target="_"
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer"
             >
               here
-            </a>
-            .
-          </span>{' '}
+            </a>{' '}
+            to learn more about XLSForm building.{' '}
+          </span>
+          <span>
+            For creating a custom XLS form, there are few essential fields that must be present for FMTM to function.
+            You may either download the sample XLS file and modify all fields that are not hidden, or edit the sample
+            form interactively in the browser.
+          </span>
         </p>
       </div>
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] lg:fmtm-h-[60vh] xl:fmtm-h-[58vh] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
