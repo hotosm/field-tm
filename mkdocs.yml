@@ -77,11 +77,11 @@ nav:
       - Workflow Diagrams: manuals/workflow-diagrams.md
       - Project Manager Guide: manuals/project-managers.md
   - Dev:
+      - Dev Practices: https://docs.hotosm.org/dev-practices
       - Setup: dev/Setup.md
       - Backend: dev/Backend.md
       - Frontend: dev/Frontend.md
       - Production Deployment: dev/Production.md
-      - Release Cycle: dev/Release-Cycle.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
       - Pre-Commit: https://docs.hotosm.org/dev-guide/pre-commit/
