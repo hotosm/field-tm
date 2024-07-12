@@ -398,7 +398,11 @@ async def create_tasks_from_geojson(
         raise HTTPException(HTTPStatus.UNPROCESSABLE_ENTITY, detail=e) from e
 
 
-async def preview_split_by_square(boundary: str, meters: int):
+async def preview_split_by_square(
+    boundary: str,
+    meters: int,
+    extract_geojson: Optional[FeatureCollection] = None,
+):
     """Preview split by square for a project boundary.
 
     Use a lambda function to remove the "z" dimension from each
@@ -409,6 +413,7 @@ async def preview_split_by_square(boundary: str, meters: int):
     return await run_in_threadpool(
         lambda: split_by_square(
             boundary,
+            osm_extract=extract_geojson,
             meters=meters,
         )
     )

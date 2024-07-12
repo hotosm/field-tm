@@ -172,6 +172,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       dispatch(
         GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square/`, {
           geojson: drawnGeojsonFile,
+          extract_geojson: formValues.dataExtractWays === 'osm_data_extract' ? null : dataExtractFile,
           dimension: formValues?.dimension,
         }),
       );
