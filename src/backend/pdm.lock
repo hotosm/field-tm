@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:498635b56dc6a5c8266b8580ec0b4e7bc794c92de8693ff9028f413ac147fe2b"
+content_hash = "sha256:21738350d12719a1b135d272098df6b389ebdfdac51ea377cd59adaade624aac"
 
 [[package]]
 name = "aiohttp"
@@ -671,7 +671,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.2.2"
+version = "1.3.0"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
@@ -682,8 +682,8 @@ dependencies = [
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.2.2.tar.gz", hash = "sha256:9384dbf00c0e53e24e1f13046ae6693e13567ff3dc0f59f29f4a96ac4a54105e"},
-    {file = "fmtm_splitter-1.2.2-py3-none-any.whl", hash = "sha256:bbef78cf0e1f2b67f8c8aeaadb7fd2927bfd333d216927059a12abbbb04a5742"},
+    {file = "fmtm-splitter-1.3.0.tar.gz", hash = "sha256:047ecc3d71234b8949ddb9422039ef900a128b2417d6f5c8e22c5e14eab84ae4"},
+    {file = "fmtm_splitter-1.3.0-py3-none-any.whl", hash = "sha256:194ea5dca1e5ffd0d8944ae9566c7c752c8bb95a648bca19cea3df7d4a6e0487"},
 ]
 
 [[package]]

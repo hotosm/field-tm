@@ -801,7 +801,9 @@ async def get_categories(current_user: AuthUser = Depends(login_required)):
 
 @router.post("/preview-split-by-square/")
 async def preview_split_by_square(
-    project_geojson: UploadFile = File(...), dimension: int = Form(100)
+    project_geojson: UploadFile = File(...),
+    extract_geojson: UploadFile = File(None),
+    dimension: int = Form(100),
 ):
     """Preview splitting by square.
 
@@ -820,9 +822,18 @@ async def preview_split_by_square(
 
     # Validatiing Coordinate Reference System
     await check_crs(boundary)
+    parsed_extract = None
+    if extract_geojson:
+        geojson_data = await extract_geojson.read()
+        parsed_extract = parse_and_filter_geojson(geojson_data, filter=False)
+        if parsed_extract:
+            await check_crs(parsed_extract)
+        else:
+            log.warning("Parsed geojson file contained no geometries")
 
-    result = await project_crud.preview_split_by_square(boundary, dimension)
-    return result
+    return await project_crud.preview_split_by_square(
+        boundary, dimension, parsed_extract
+    )
 
 
 @router.post("/generate-data-extract/")
