@@ -27,7 +27,7 @@ def reformat_links_as_refs(file_name: str) -> None:
     pattern = r"\[([^\]]+)\]\(([^)]+)\)"
 
     # Read the original markdown document
-    with open(f"./docs/{this_file_in_docs}", "r") as file:
+    with open(f"./docs/{this_file_in_docs}") as file:
         lines = file.readlines()
 
     # Create a list to store the footnotes

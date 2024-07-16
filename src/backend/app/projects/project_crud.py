@@ -557,10 +557,10 @@ async def read_and_insert_xlsforms(db, directory) -> None:
                 f"Failed to insert or update {category} in the database. Error: {e}"
             )
 
-    existing_db_forms = set(
+    existing_db_forms = {
         title for (title,) in db.query(db_models.DbXLSForm.title).all()
-    )
-    required_forms = set(xls_type.value for xls_type in XLSFormType)
+    }
+    required_forms = {xls_type.value for xls_type in XLSFormType}
     # Delete XLSForms from DB that are not found on disk
     for title in existing_db_forms - required_forms:
         delete_query = text(
