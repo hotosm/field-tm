@@ -231,7 +231,7 @@ async def deployment_details():
 
     version_path = Path("/opt/version.json")
     if version_path.exists():
-        with open(version_path, "r") as version_file:
+        with open(version_path) as version_file:
             details = json.load(version_file)
     commit = details.get("commit", "commit key was not found in file!")
     build = details.get("build", "build key was not found in file!")
