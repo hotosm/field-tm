@@ -1,5 +1,6 @@
 # User Roadmap
 
+<!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 
 | In Progress | Next | Future |
@@ -15,3 +16,4 @@
 |
 
 <!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
