@@ -46,6 +46,7 @@ from app.config import settings
 from app.db.postgis_utils import (
     add_required_geojson_properties,
     javarosa_to_geojson_geom,
+    multipolygon_to_polygon,
     parse_and_filter_geojson,
 )
 from app.models.enums import GeometryType, HTTPStatus, XLSFormType
@@ -266,4 +267,30 @@ async def view_user_oauth_token(
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={"access_token": request.cookies.get(cookie_name)},
+    )
+
+
+@router.post("/multipolygons-to-polygons")
+async def flatten_multipolygons_to_polygons(
+    geojson: UploadFile,
+    current_user: AuthUser = Depends(login_required),
+):
+    """If any MultiPolygons are present, replace with multiple Polygons."""
+    featcol = parse_and_filter_geojson(await geojson.read(), filter=False)
+    if not featcol:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No geometries present"
+        )
+    multi_to_single_polygons = multipolygon_to_polygon(featcol)
+
+    if multi_to_single_polygons:
+        headers = {
+            "Content-Disposition": ("attachment; filename=flattened_polygons.geojson"),
+            "Content-Type": "application/media",
+        }
+        return Response(content=json.dumps(multi_to_single_polygons), headers=headers)
+
+    raise HTTPException(
+        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        detail="Your geojson file is invalid.",
     )
