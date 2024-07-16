@@ -19,6 +19,12 @@ repos:
       - id: ruff-format
         files: ^src/backend/(?:.*/)*.*$
 
+  # Upgrade: upgrade Python syntax
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.16.0
+    hooks:
+      - id: pyupgrade
+
   # # Dead code: Python usused code detection
   # - repo: https://github.com/asottile/dead
   #   rev: v1.5.2
