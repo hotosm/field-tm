@@ -35,7 +35,7 @@ const SubmissionDetails = () => {
   useEffect(() => {
     dispatch(
       SubmissionService(
-        `${import.meta.env.VITE_API_URL}/submission/submission-detail/${projectId}?submission_id=${paramsInstanceId}`,
+        `${import.meta.env.VITE_API_URL}/submission/submission-detail?submission_id=${paramsInstanceId}&project_id=${projectId}`,
       ),
     );
   }, [projectId, paramsInstanceId]);

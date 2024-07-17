@@ -22,7 +22,7 @@ These methods use FastAPI Depends for dependency injection
 and always return an AuthUser object in a standard format.
 """
 
-from typing import Optional, Union
+from typing import Optional
 
 from fastapi import Depends, HTTPException
 from loguru import logger as log
@@ -38,20 +38,23 @@ from app.organisations.organisation_deps import check_org_exists
 from app.projects.project_deps import get_project_by_id
 
 
-async def get_uid(user_data: AuthUser) -> int:
+async def get_uid(user_data: AuthUser | DbUser) -> int:
     """Extract user id from returned OSM user."""
-    if user_id := user_data.id:
+    try:
+        user_id = user_data.id
         return user_id
-    else:
+
+    except Exception as e:
+        log.error(e)
         log.error(f"Failed to get user id from auth object: {user_data}")
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail="Auth failed. No user id present",
-        )
+        ) from e
 
 
 async def check_access(
-    user: Union[AuthUser, int],
+    user: AuthUser,
     db: Session,
     org_id: Optional[int] = None,
     project_id: Optional[int] = None,
@@ -77,7 +80,7 @@ async def check_access(
     Returns:
         Optional[DbUser]: The user details if access is granted, otherwise None.
     """
-    user_id = user if isinstance(user, int) else await get_uid(user)
+    user_id = await get_uid(user)
 
     sql = text(
         """
@@ -162,7 +165,7 @@ async def super_admin(
 
 async def check_org_admin(
     db: Session,
-    user: Union[AuthUser, int],
+    user: AuthUser,
     org_id: int,
 ) -> OrgUserDict:
     """Database check to determine if org admin role.
@@ -180,7 +183,7 @@ async def check_org_admin(
     )
 
     if db_user:
-        return {"user": db_user, "org": db_org}
+        return {"user": db_user, "org": db_org, "project": None}
 
     raise HTTPException(
         status_code=HTTPStatus.FORBIDDEN,
@@ -193,7 +196,7 @@ async def org_admin(
     org_id: Optional[int] = None,
     db: Session = Depends(get_db),
     user_data: AuthUser = Depends(login_required),
-) -> dict:
+) -> OrgUserDict:
     """Organisation admin with full permission for projects in an organisation.
 
     Returns:

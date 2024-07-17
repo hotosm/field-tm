@@ -30,6 +30,7 @@ class OrgUserDict(TypedDict):
 
     user: DbUser
     org: DbOrganisation
+    project: Optional[DbProject]
 
 
 class ProjectUserDict(TypedDict):

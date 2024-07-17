@@ -48,7 +48,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
   const onSubmissionDownload = () => {
     dispatch(
       DownloadSubmissionGeojson(
-        `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson/${projectId}`,
+        `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson?project_id=${projectId}`,
         projectName,
       ),
     );

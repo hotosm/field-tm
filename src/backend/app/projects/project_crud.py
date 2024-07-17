@@ -24,7 +24,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import List, Optional, Union
 
-import geoalchemy2
 import geojson
 import requests
 import shapely.wkb as wkblib
@@ -47,20 +46,20 @@ from app.config import settings
 from app.db import db_models
 from app.db.postgis_utils import (
     check_crs,
-    flatgeobuf_to_geojson,
-    geojson_to_flatgeobuf,
-    geometry_to_geojson,
-    get_featcol_main_geom_type,
-    merge_multipolygon,
-    parse_and_filter_geojson,
+    featcol_keep_dominant_geom_type,
+    featcol_to_flatgeobuf,
+    flatgeobuf_to_featcol,
+    get_featcol_dominant_geom_type,
+    merge_polygons,
+    parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
     task_geojson_dict_to_entity_values,
+    wkb_geom_to_feature,
 )
 from app.models.enums import HTTPStatus, ProjectRole, ProjectVisibility, XLSFormType
 from app.projects import project_deps, project_schemas
 from app.s3 import add_obj_to_bucket
 from app.tasks import tasks_crud
-from app.users import user_crud
 
 TILESDIR = "/opt/tiles"
 
@@ -399,7 +398,7 @@ async def create_tasks_from_geojson(
 
 
 async def preview_split_by_square(
-    boundary: str,
+    boundary: FeatureCollection,
     meters: int,
     extract_geojson: Optional[FeatureCollection] = None,
 ):
@@ -408,7 +407,7 @@ async def preview_split_by_square(
     Use a lambda function to remove the "z" dimension from each
     coordinate in the feature's geometry.
     """
-    boundary = merge_multipolygon(boundary)
+    boundary = merge_polygons(boundary)
 
     return await run_in_threadpool(
         lambda: split_by_square(
@@ -482,7 +481,7 @@ async def generate_data_extract(
 
 async def split_geojson_into_tasks(
     db: Session,
-    project_geojson: Union[dict, FeatureCollection],
+    project_geojson: FeatureCollection,
     no_of_buildings: int,
     extract_geojson: Optional[FeatureCollection] = None,
 ):
@@ -490,8 +489,8 @@ async def split_geojson_into_tasks(
 
     Args:
         db (Session): A database session.
-        project_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
-            boundary.
+        project_geojson (FeatureCollection): A FeatureCollection containing a
+            single project boundary geometry.
         extract_geojson (Union[dict, FeatureCollection]): A GeoJSON of the project
             boundary osm data extract (features).
         extract_geojson (FeatureCollection): A GeoJSON of the project
@@ -718,7 +717,7 @@ async def upload_custom_fgb_extract(
     Returns:
         str: URL to fgb file in S3.
     """
-    featcol = await flatgeobuf_to_geojson(db, fgb_content)
+    featcol = await flatgeobuf_to_featcol(db, fgb_content)
 
     if not featcol:
         msg = f"Failed extracting geojson from flatgeobuf for project ({project_id})"
@@ -737,7 +736,7 @@ async def upload_custom_fgb_extract(
 
 async def get_data_extract_type(featcol: FeatureCollection) -> str:
     """Determine predominant geometry type for extract."""
-    geom_type = get_featcol_main_geom_type(featcol)
+    geom_type = get_featcol_dominant_geom_type(featcol)
     if geom_type not in ["Polygon", "Polyline", "Point"]:
         msg = (
             "Extract does not contain valid geometry types, from 'Polygon' "
@@ -773,22 +772,24 @@ async def upload_custom_geojson_extract(
     project = await get_project(db, project_id)
     log.debug(f"Uploading custom data extract for project: {project}")
 
-    featcol_filtered = parse_and_filter_geojson(geojson_raw)
-    if not featcol_filtered:
+    featcol = parse_geojson_file_to_featcol(geojson_raw)
+    featcol_single_geom_type = featcol_keep_dominant_geom_type(featcol)
+
+    if not featcol_single_geom_type:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Could not process geojson input",
         )
 
-    await check_crs(featcol_filtered)
+    await check_crs(featcol_single_geom_type)
 
-    data_extract_type = await get_data_extract_type(featcol_filtered)
+    data_extract_type = await get_data_extract_type(featcol_single_geom_type)
 
     log.debug(
         "Generating fgb object from geojson with "
-        f"{len(featcol_filtered.get('features', []))} features"
+        f"{len(featcol_single_geom_type.get('features', []))} features"
     )
-    fgb_data = await geojson_to_flatgeobuf(db, featcol_filtered)
+    fgb_data = await featcol_to_flatgeobuf(db, featcol_single_geom_type)
 
     if not fgb_data:
         msg = f"Failed converting geojson to flatgeobuf for project ({project_id})"
@@ -1003,30 +1004,6 @@ async def generate_project_files(
             raise e
 
 
-async def get_project_geometry(db: Session, project_id: int):
-    """Retrieves the geometry of a project.
-
-    Args:
-        db (Session): The database session.
-        project_id (int): The ID of the project.
-
-    Returns:
-        str: A geojson of the project outline.
-    """
-    projects = table("projects", column("outline"), column("id"))
-    where = f"projects.id={project_id}"
-    sql = select(geoalchemy2.functions.ST_AsGeoJSON(projects.c.outline)).where(
-        text(where)
-    )
-    result = db.execute(sql)
-    # There should only be one match
-    if result.rowcount != 1:
-        log.warning(str(sql))
-        return False
-    row = eval(result.first()[0])
-    return json.dumps(row)
-
-
 async def get_task_geometry(db: Session, project_id: int):
     """Retrieves the geometry of tasks associated with a project.
 
@@ -1055,14 +1032,10 @@ async def get_task_geometry(db: Session, project_id: int):
 
 async def get_project_features_geojson(
     db: Session,
-    project: Union[db_models.DbProject, int],
+    db_project: db_models.DbProject,
     task_id: Optional[int] = None,
 ) -> FeatureCollection:
     """Get a geojson of all features for a task."""
-    if isinstance(project, int):
-        db_project = await get_project(db, project)
-    else:
-        db_project = project
     project_id = db_project.id
 
     data_extract_url = db_project.data_extract_url
@@ -1088,7 +1061,7 @@ async def get_project_features_geojson(
                 detail=msg,
             )
         log.debug("Converting download flatgeobuf to geojson")
-        data_extract_geojson = await flatgeobuf_to_geojson(db, response.content)
+        data_extract_geojson = await flatgeobuf_to_featcol(db, response.content)
 
     if not data_extract_geojson:
         msg = "Failed to convert flatgeobuf --> geojson for " f"project ({project_id})"
@@ -1126,28 +1099,6 @@ async def get_json_from_zip(zip, filename: str, error_detail: str):
         ) from e
 
 
-async def get_outline_from_geojson_file_in_zip(
-    zip, filename: str, error_detail: str, feature_index: int = 0
-):
-    """Parse geojson outline within a zip."""
-    try:
-        with zip.open(filename) as file:
-            data = file.read()
-            json_dump = json.loads(data)
-            await check_crs(json_dump)  # Validatiing Coordinate Reference System
-            feature_collection = FeatureCollection(json_dump)
-            feature = feature_collection["features"][feature_index]
-            geom = feature["geometry"]
-            shape_from_geom = shape(geom)
-            return shape_from_geom
-    except Exception as e:
-        log.exception(e)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{error_detail} ----- Error: {e} ----",
-        ) from e
-
-
 async def get_shape_from_json_str(feature: str, error_detail: str):
     """Parse geojson outline within a zip to shapely geom."""
     try:
@@ -1180,7 +1131,7 @@ async def convert_to_app_project(db_project: db_models.DbProject):
     app_project = db_project
 
     if db_project.outline:
-        app_project.outline_geojson = geometry_to_geojson(
+        app_project.outline_geojson = wkb_geom_to_feature(
             db_project.outline, {"id": db_project.id}, db_project.id
         )
 
@@ -1577,18 +1528,21 @@ async def get_dashboard_detail(
     return project
 
 
-async def get_project_users(db: Session, project_id: int):
+async def get_project_users(db: Session, project_id: int, db_user: db_models.DbUser):
     """Get the users and their contributions for a project.
 
     Args:
         db (Session): The database session.
         project_id (int): The ID of the project.
+        db_user (DbUser): User that called the endpoint.
 
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing
             the username and the number of contributions made by each user
             for the specified project.
     """
+    # TODO refactor this
+    # TODO it could probably just be a single raw SQL statement
     contributors = (
         db.query(db_models.DbTaskHistory)
         .filter(db_models.DbTaskHistory.project_id == project_id)
@@ -1601,7 +1555,6 @@ async def get_project_users(db: Session, project_id: int):
 
     for user_id in unique_user_ids:
         contributions = count_user_contributions(db, user_id, project_id)
-        db_user = await user_crud.get_user(db, user_id)
         response.append({"user": db_user.username, "contributions": contributions})
 
     response = sorted(response, key=lambda x: x["contributions"], reverse=True)

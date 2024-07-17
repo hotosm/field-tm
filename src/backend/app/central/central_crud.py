@@ -41,7 +41,7 @@ from app.config import encrypt_value, settings
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
-    parse_and_filter_geojson,
+    parse_geojson_file_to_featcol,
 )
 from app.models.enums import HTTPStatus, TaskStatus, XLSFormType
 from app.projects import project_schemas
@@ -568,7 +568,7 @@ async def convert_geojson_to_odk_csv(
     Returns:
         feature_csv (StringIO): CSV of features in XLSForm format for ODK.
     """
-    parsed_geojson = parse_and_filter_geojson(input_geojson.getvalue(), filter=False)
+    parsed_geojson = parse_geojson_file_to_featcol(input_geojson.getvalue())
 
     if not parsed_geojson:
         raise HTTPException(

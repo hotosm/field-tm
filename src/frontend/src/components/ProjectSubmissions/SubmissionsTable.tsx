@@ -96,13 +96,15 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     dispatch(
-      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${projectId}`),
+      SubmissionFormFieldsService(
+        `${import.meta.env.VITE_API_URL}/submission/submission_form_fields?project_id=${projectId}`,
+      ),
     );
   }, []);
 
   useEffect(() => {
     dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
@@ -115,11 +117,13 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const refreshTable = () => {
     dispatch(
-      SubmissionFormFieldsService(`${import.meta.env.VITE_API_URL}/submission/submission_form_fields/${projectId}`),
+      SubmissionFormFieldsService(
+        `${import.meta.env.VITE_API_URL}/submission/submission_form_fields?project_id=${projectId}`,
+      ),
     );
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table/${projectId}`, {
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
