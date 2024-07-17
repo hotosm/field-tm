@@ -714,7 +714,12 @@ def multipolygon_to_polygon(features: Union[Feature, FeatCol, MultiPolygon, Poly
 
     for feature in features:
         properties = feature["properties"]
-        geom = shape(feature["geometry"])
+        try:
+            geom = shape(feature["geometry"])
+        except ValueError:
+            log.warning(f"Geometry is not valid, so was skipped: {feature['geometry']}")
+            continue
+
         if geom.geom_type == "Polygon":
             geojson_feature.append(
                 geojson.Feature(geometry=geom, properties=properties)
