@@ -24,7 +24,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.auth.auth_schemas import AuthUser
+from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import get_uid, mapper
 from app.db import database
 from app.models.enums import TaskStatus
@@ -125,10 +125,10 @@ async def update_task_status(
     task_id: int,
     new_status: TaskStatus,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
+    project_user: ProjectUserDict = Depends(mapper),
 ):
     """Update the task status."""
-    user_id = await get_uid(current_user)
+    user_id = await get_uid(project_user.get("user"))
     task = await tasks_crud.update_task_status(db, user_id, task_id, new_status)
     if not task:
         raise HTTPException(status_code=404, detail="Task status could not be updated.")
@@ -139,19 +139,19 @@ async def update_task_status(
 async def add_task_comments(
     comment: tasks_schemas.TaskCommentRequest,
     db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(mapper),
+    project_user: ProjectUserDict = Depends(mapper),
 ):
     """Create a new task comment.
 
     Parameters:
         comment (TaskCommentRequest): The task comment to be created.
         db (Session): The database session.
-        user_data (AuthUser): The authenticated user.
+        user_data (ProjectUserDict): The authenticated user.
 
     Returns:
         TaskCommentResponse: The created task comment.
     """
-    user_id = await get_uid(current_user)
+    user_id = await get_uid(project_user.get("user"))
     task_comment_list = await tasks_crud.add_task_comments(db, comment, user_id)
     return task_comment_list
 

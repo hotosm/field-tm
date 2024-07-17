@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 
 from dateutil import parser
-from geojson_pydantic import Feature, FeatureCollection, Polygon
+from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Polygon
 from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
 from pydantic.functional_serializers import field_serializer
@@ -32,11 +32,12 @@ from typing_extensions import Self
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value, settings
 from app.db.postgis_utils import (
-    geojson_to_geometry,
-    geometry_to_geojson,
+    featcol_to_wkb_geom,
+    geojson_to_featcol,
     get_address_from_lat_lon,
-    merge_multipolygon,
+    merge_polygons,
     read_wkb,
+    wkb_geom_to_feature,
     write_wkb,
 )
 from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType, XLSFormType
@@ -148,7 +149,7 @@ class ProjectIn(BaseModel):
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
     data_extract_type: Optional[str] = None
-    outline_geojson: Union[FeatureCollection, Feature, Polygon]
+    outline_geojson: Union[FeatureCollection, Feature, MultiPolygon, Polygon]
     location_str: Optional[str] = None
 
     @computed_field
@@ -157,9 +158,11 @@ class ProjectIn(BaseModel):
         """Compute WKBElement geom from geojson."""
         if not self.outline_geojson:
             return None
-        outline = merge_multipolygon(self.outline_geojson)
 
-        return geojson_to_geometry(outline)
+        outline = geojson_to_featcol(self.outline_geojson.model_dump())
+        outline_merged = merge_polygons(outline)
+
+        return featcol_to_wkb_geom(outline_merged)
 
     @computed_field
     @property
@@ -335,7 +338,12 @@ class ProjectBase(BaseModel):
             return None
         geometry = wkb.loads(bytes(self.outline.data))
         bbox = geometry.bounds  # Calculate bounding box
-        return geometry_to_geojson(self.outline, {"id": self.id, "bbox": bbox}, self.id)
+        geom_geojson = wkb_geom_to_feature(
+            geometry=self.outline,
+            properties={"id": self.id, "bbox": bbox},
+            id=self.id,
+        )
+        return Feature(**geom_geojson)
 
     @computed_field
     @property

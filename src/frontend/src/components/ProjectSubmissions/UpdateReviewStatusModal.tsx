@@ -52,9 +52,7 @@ const UpdateReviewStatusModal = () => {
     }
     dispatch(
       UpdateReviewStateService(
-        `${import.meta.env.VITE_API_URL}/submission/update_review_state/${
-          updateReviewStatusModal.projectId
-        }?project_id=${updateReviewStatusModal.projectId}&task_id=${parseInt(
+        `${import.meta.env.VITE_API_URL}/submission/update_review_state?project_id=${updateReviewStatusModal.projectId}&task_id=${parseInt(
           updateReviewStatusModal.taskId,
         )}&instance_id=${updateReviewStatusModal.instanceId}&review_state=${reviewStatus}`,
       ),

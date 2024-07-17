@@ -20,12 +20,11 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
-from geojson_pydantic import Feature as GeojsonFeature
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, computed_field
+from geojson_pydantic import Feature
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 from pydantic.functional_serializers import field_serializer
-from pydantic.functional_validators import field_validator
 
-from app.db.postgis_utils import geometry_to_geojson
+from app.db.postgis_utils import wkb_geom_to_feature
 from app.models.enums import TaskStatus
 
 
@@ -69,25 +68,28 @@ class Task(BaseModel):
     project_id: int
     project_task_index: int
     project_task_name: Optional[str]
-    outline_geojson: Optional[GeojsonFeature] = None
     feature_count: Optional[int] = None
     task_status: TaskStatus
     locked_by_uid: Optional[int] = None
     locked_by_username: Optional[str] = None
     task_history: Optional[List[TaskHistoryBase]] = None
 
-    @field_validator("outline_geojson", mode="before")
-    @classmethod
-    def get_geojson_from_outline(cls, value: Any, info: ValidationInfo) -> str:
-        """Get outline_geojson from Shapely geom."""
-        if outline := info.data.get("outline"):
-            properties = {
-                "fid": info.data.get("project_task_index"),
-                "uid": info.data.get("id"),
-                "name": info.data.get("project_task_name"),
-            }
-            return geometry_to_geojson(outline, properties, info.data.get("id"))
-        return None
+    @computed_field
+    @property
+    def outline_geojson(self) -> Optional[Feature]:
+        """Compute the geojson outline from WKBElement outline."""
+        if not self.outline:
+            return None
+        geom_geojson = wkb_geom_to_feature(
+            geometry=self.outline,
+            properties={
+                "fid": self.project_task_index,
+                "uid": self.id,
+                "name": self.project_task_name,
+            },
+            id=self.id,
+        )
+        return Feature(**geom_geojson)
 
     @field_serializer("locked_by_uid")
     def get_locked_by_uid(self, value: str) -> Optional[str]:
