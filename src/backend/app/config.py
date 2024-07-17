@@ -157,13 +157,13 @@ class Settings(BaseSettings):
     FMTM_DOMAIN: str
     FMTM_DEV_PORT: Optional[str] = "7050"
 
-    EXTRA_CORS_ORIGINS: Optional[Union[str, list[str]]] = []
+    EXTRA_CORS_ORIGINS: Optional[str | list[str]] = []
 
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
         cls,
-        val: Union[str, list[str]],
+        val: Optional[str | list[str]],
         info: ValidationInfo,
     ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
@@ -171,19 +171,16 @@ class Settings(BaseSettings):
         By default, the provided frontend URLs are included in the origins list.
         If this variable used, the provided urls are appended to the list.
         """
-        default_origins = []
-
         # Build default origins from env vars
         url_scheme = "http" if info.data.get("DEBUG") else "https"
         local_server_port = (
             f":{info.data.get('FMTM_DEV_PORT')}" if info.data.get("DEBUG") else ""
         )
-        if frontend_domain := info.data.get("FMTM_DOMAIN"):
-            default_origins = [
-                f"{url_scheme}://{frontend_domain}{local_server_port}",
-                # Also add the xlsform-editor url
-                "https://xlsforms.fmtm.dev",
-            ]
+        default_origins = [
+            f"{url_scheme}://{info.data.get('FMTM_DOMAIN')}{local_server_port}",
+            # Also add the xlsform-editor url
+            "https://xlsforms.fmtm.dev",
+        ]
 
         if val is None:
             return default_origins
