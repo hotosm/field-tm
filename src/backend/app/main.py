@@ -145,7 +145,7 @@ class InterceptHandler(logging.Handler):
         This happens to be in the 6th frame upward.
         """
         logger_opt = log.opt(depth=6, exception=record.exc_info)
-        logger_opt.log(record.levelno, record.getMessage())
+        logger_opt.log(logging.getLevelName(record.levelno), record.getMessage())
 
 
 def get_logger():
@@ -153,7 +153,7 @@ def get_logger():
     # Hook all other loggers into ours
     logger_name_list = [name for name in logging.root.manager.loggerDict]
     for logger_name in logger_name_list:
-        logging.getLogger(logger_name).setLevel(10)
+        logging.getLogger(logger_name).setLevel(settings.LOG_LEVEL)
         logging.getLogger(logger_name).handlers = []
         if logger_name == "sqlalchemy":
             # Don't hook sqlalchemy, very verbose
