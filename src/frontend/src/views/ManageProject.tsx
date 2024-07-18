@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
 
 const tabList = [
-  { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
+  // { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
   { id: 'edit', name: 'EDIT', icon: <AssetModules.EditIcon style={{ fontSize: '20px' }} /> },
   { id: 'delete', name: 'DELETE', icon: <AssetModules.DeleteIcon style={{ fontSize: '20px' }} /> },
 ];
@@ -18,7 +18,7 @@ const ManageProject = () => {
   const params = CoreModules.useParams();
   const navigate = useNavigate();
   const projectId = params.id;
-  const [tabView, setTabView] = useState<'users' | 'edit' | string>('users');
+  const [tabView, setTabView] = useState<'users' | 'edit' | string>('edit');
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
 
   useEffect(() => {
