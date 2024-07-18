@@ -161,42 +161,41 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
         }
         className=""
       />
-      {list_of_task_status?.length > 0 && (
+      {list_of_task_status?.length > 0 && checkIfTaskAssignedOrNot && (
         <div
           className={`fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
             list_of_task_status?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
           }`}
         >
-          {checkIfTaskAssignedOrNot &&
-            list_of_task_status?.map((data, index) => {
-              return list_of_task_status?.length != 0 ? (
-                <Button
-                  btnId={data.value}
-                  key={index}
-                  onClick={(e) => {
-                    if (
-                      data.key === 'Mark as fully mapped' &&
-                      currentTaskInfo &&
-                      currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
-                    ) {
-                      setToggleMappedConfirmationModal(true);
-                    } else {
-                      handleOnClick(e);
-                    }
-                  }}
-                  disabled={loading}
-                  btnText={data.key.toUpperCase()}
-                  btnType={data.btnBG === 'red' ? 'primary' : 'other'}
-                  className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center ${
-                    data.btnBG === 'gray'
-                      ? '!fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none'
-                      : data.btnBG === 'transparent'
-                        ? '!fmtm-bg-transparent !fmtm-text-primaryRed !fmtm-border-none !fmtm-w-fit fmtm-mx-auto hover:!fmtm-text-red-700'
-                        : ''
-                  }`}
-                />
-              ) : null;
-            })}
+          {list_of_task_status?.map((data, index) => {
+            return list_of_task_status?.length != 0 ? (
+              <Button
+                btnId={data.value}
+                key={index}
+                onClick={(e) => {
+                  if (
+                    data.key === 'Mark as fully mapped' &&
+                    currentTaskInfo &&
+                    currentTaskInfo?.submission_count < currentTaskInfo?.feature_count
+                  ) {
+                    setToggleMappedConfirmationModal(true);
+                  } else {
+                    handleOnClick(e);
+                  }
+                }}
+                disabled={loading}
+                btnText={data.key.toUpperCase()}
+                btnType={data.btnBG === 'red' ? 'primary' : 'other'}
+                className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center ${
+                  data.btnBG === 'gray'
+                    ? '!fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none'
+                    : data.btnBG === 'transparent'
+                      ? '!fmtm-bg-transparent !fmtm-text-primaryRed !fmtm-border-none !fmtm-w-fit fmtm-mx-auto hover:!fmtm-text-red-700'
+                      : ''
+                }`}
+              />
+            ) : null;
+          })}
         </div>
       )}
       {task_status !== 'READY' && task_status !== 'LOCKED_FOR_MAPPING' && (
