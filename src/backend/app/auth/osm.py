@@ -104,7 +104,6 @@ def create_tokens(jwt_data: dict) -> tuple[str, str]:
         settings.ENCRYPTION_KEY,
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
-
     refresh_token_data = jwt_data
     refresh_token_data["exp"] = (
         int(time.time()) + 86400 * 7
@@ -120,7 +119,7 @@ def create_tokens(jwt_data: dict) -> tuple[str, str]:
 
 def refresh_access_token(payload: dict) -> str:
     """Generate a new access token."""
-    payload["exp"] = int(time.time()) + 3600  # Access token valid for 1 hour
+    payload["exp"] = int(time.time()) + 86400  # Access token valid for 1 day
 
     return jwt.encode(
         payload,
@@ -180,8 +179,8 @@ def set_cookies(access_token: str, refresh_token: str):
     response.set_cookie(
         key=cookie_name,
         value=access_token,
-        max_age=3600,
-        expires=3600,  # expiry set for 1 hour
+        max_age=86400,
+        expires=86400,  # expiry set for 1 day
         path="/",
         domain=settings.FMTM_DOMAIN,
         secure=False if settings.DEBUG else True,
