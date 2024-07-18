@@ -244,8 +244,8 @@ async def refresh_token(
         response.set_cookie(
             key=cookie_name,
             value=access_token,
-            max_age=3600,
-            expires=3600,
+            max_age=86400,
+            expires=86400,
             path="/",
             domain=settings.FMTM_DOMAIN,
             secure=False if settings.DEBUG else True,
@@ -282,7 +282,7 @@ async def temp_login(
         "sub": "fmtm|20386219",
         "aud": settings.FMTM_DOMAIN,
         "iat": int(time.time()),
-        "exp": int(time.time()) + 3600,  # set token expiry to 1hr
+        "exp": int(time.time()) + 86400,  # set token expiry to 1 day
         "username": username,
         "picture": None,
         "role": UserRole.MAPPER,
