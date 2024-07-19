@@ -198,6 +198,17 @@ button {
   animation: move 2s linear infinite;
 }
 
+.layer-switcher .panel .layer-switcher-base-group .layer {
+  display: flex;
+  align-items: center;
+}
+.layer-switcher li input {
+  left: 0 !important;
+}
+.layer-switcher li label {
+  padding-left: 1.5em !important;
+}
+
 @-webkit-keyframes pulse {
   0% {
     -webkit-box-shadow: 0 0 0 0 rgb(244, 22, 22, 0.8);
