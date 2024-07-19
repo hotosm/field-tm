@@ -1,21 +1,32 @@
-# Field Mapping Tasking Manager (FMTM)
+<!-- markdownlint-disable -->
+<p align="center">
+    <!-- github-banner-start -->
+    <img src="https://raw.githubusercontent.com/hotosm/fmtm/main/docs/images/hot_logo.png" alt="HOTOSM Logo" width="25%" height="auto" />
+    <!-- github-banner-end -->
+</p>
 
-![HOT Logo](./docs/images/hot_logo.png)
+<div align="center">
+    <b style="font-size: 2rem;">Field Mapping Tasking Manager (FMTM)</b>
+    <p>Coordinated field mapping for Open Mapping campaigns.</p>
+    <a href="https://github.com/hotosm/fmtm/releases">
+        <img src="https://img.shields.io/github/v/release/hotosm/fmtm?logo=github" alt="HOTOSM Logo" />
+    </a>
+</div>
 
-Coordinated field mapping for Open Mapping campaigns.
+</br>
 
 <!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
+<div align="center">
 
-| **Version** | [![Version](https://img.shields.io/github/v/release/hotosm/fmtm?logo=github)](https://github.com/hotosm/fmtm/releases) |
-| :--- | :--- |
-| **Deployments** | [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml?query=branch%3Amain) **Production** <br> [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=staging)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml?query=branch%3Astaging) **Staging** <br> [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml?query=branch%3Adevelopment) **Development** |
-| **Images** | [![Build CI Img](https://github.com/hotosm/fmtm/actions/workflows/build_ci_img.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_ci_img.yml) [![Build ODK Images](https://github.com/hotosm/fmtm/actions/workflows/build_odk_imgs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_odk_imgs.yml) [![🔧 Build Proxy Images](https://github.com/hotosm/fmtm/actions/workflows/build_proxy_imgs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_proxy_imgs.yml) |
-| **Docs** | [![Publish Docs](https://github.com/hotosm/fmtm/actions/workflows/docs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/docs.yml) [![Publish Docs to Wiki](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/wiki.yml) |
-| **Tech Stack** | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
-| **Code Style** | ![Backend Style](https://img.shields.io/badge/code%20style-black-black) ![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white) |
-| **Metrics** | [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) |
-| **Other Info** | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://docs.fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md) |
+| **CI/CD** | | [![Build and Deploy](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml/badge.svg?branch=main)](https://github.com/hotosm/fmtm/actions/workflows/build_and_deploy.yml?query=branch%3Amain) [![Build CI Img](https://github.com/hotosm/fmtm/actions/workflows/build_ci_img.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_ci_img.yml) [![Build ODK Images](https://github.com/hotosm/fmtm/actions/workflows/build_odk_imgs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_odk_imgs.yml) <br> [![🔧 Build Proxy Images](https://github.com/hotosm/fmtm/actions/workflows/build_proxy_imgs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/build_proxy_imgs.yml) [![Publish Docs](https://github.com/hotosm/fmtm/actions/workflows/docs.yml/badge.svg?branch=development)](https://github.com/hotosm/fmtm/actions/workflows/docs.yml) |
+| :--- | :--- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tech Stack** | | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) |
+| **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com) |
+| **Quality** | | [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) |
+| **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) |
+| **Other Info** | | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://docs.fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md) |
+
+</div>
 
 ---
 
