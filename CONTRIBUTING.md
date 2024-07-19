@@ -50,6 +50,13 @@ following [label categories][4].
 If you are wondering where to start, you can filter by the
 **good first issue label**.
 
+## Report security vulnerabilities
+
+Please inform a maintainer as soon as possible, including the CVE code.
+
+Message via the [HOTOSM Slack][9] or [direct email][10] would be preferred,
+but via Github issue is also possible.
+
 ## :handshake: Thank you
 
 Thank you very much in advance for your contributions!! Please ensure you refer
@@ -117,3 +124,5 @@ please visit [this page](https://docs.hotosm.org/dev-practices)
 [6]: https://www.markdownguide.org/ "Markdown format"
 [7]: https://docs.hotosm.org/dev-guide/repo-management/pre-commit "Pre-commit"
 [8]: https://docs.hotosm.org/dev-guide/repo-management/git/#git-flow "Git Flow"
+[9]: https://slack.hotosm.org "HOT Slack"
+[10]: mailto:sysadmin@hotosm.org "Sysadmin email"
