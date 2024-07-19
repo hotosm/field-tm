@@ -32,21 +32,21 @@ Skills with the following would be beneficial:
 
 - Python
 - FastAPI
-- Javascript
+- TypeScript / JavaScript
 - React
 - Docker
 - CI/CD workflows
 
-Our latest task board can be found
-[here][2].
+Our latest task board can be found [here][2].
 
 ## Report bugs and suggest improvements
 
-The [issue queue][3] is the best way to get
-started. There are issue templates for BUGs and FEATURES that you can use, you
-could also create your own. Once you have submitted an issue, it will be
-assigned one label from the following
-[label categories][4].
+The [issue queue][3] is the best way to get started. There are issue templates
+for BUGs and FEATURES that you can use, you could also create your own.
+
+Once you have submitted an issue, it will be assigned one label from the
+following [label categories][4].
+
 If you are wondering where to start, you can filter by the
 **good first issue label**.
 
@@ -63,20 +63,7 @@ Github, please reach out to us via our Slack **#geospatial-tech-and-innovation**
 
 We operate the "Fork & Pull" model explained at [About Pull Requests][5]
 
-You should fork the project into your own repo, create a topic branch
-there and then make one or more pull requests back to the repository.
-Your pull requests will then be reviewed and discussed by other
-developers. Don't submit a Pull Request while still developing the
-code, wait till the feature is complete and ready for review. A
-preliminary review by other developers can be requested via the
-comments for the issue on github, or via slack or email.
-
-It is preferred that all patches contain any documentation
-updates made, and for any new features, a test case is preferred when
-possible. Keep patches focused on a single feature to avoid merging
-complications with other developers. The old free software joke is
-"patches are better than bug reports" is how we contribute to the
-community of people involved with this project.
+Further details of our development workflow can be found [here][8]
 
 ### If you are reporting a problem
 
@@ -100,33 +87,22 @@ it's much easier to read.
 See a detailed guide on documentation contributions
 [here](https://docs.hotosm.org/techdoc).
 
-### Coding Style
+### Pre-Commit Hooks
 
-Python enforces a certain amount of style due to indent levels. Unlike
-C/C++, we don't have to worry about curly braces. It is preferred that
-all code follows object oriented techniques, with a minimal amount of
-code other than basic control in the main function. This allows code
-to be easily reused and run either standalone, or part of a REST API
-backend. Code that is not designed to be run standalone can have a
-main function to do simple testing during development. That test code
-should be moved to a standalone test case when possible.
-[Pytest][7] is used as the test framework for
-standalone test cases.
+[Pre-Commit Hooks][7] are used in this repo to enforce coding style:
 
-Code follows a [CamelCase][8]
-style. Classes use an Upper Case for the first word, method use a
-lower case for the first word. Variable names are all lower case with
-an underbar as a word separator. Properly naming everything makes it
-much easier to read the code and get an idea of what it is doing. This
-enables people new to this project to contribute easier.
+- Python adheres mostly to PEP8 convention, amongst others, using the
+  tool `ruff`.
+- TypeScript / JavaScript code is formatted using `prettier`.
+- Markdown files are formatted using `markdownlint`.
+- Raq SQL is formatted using `sqlfluff`.
 
-All methods should have a comment that can be used by
-[pydoc][9]. The usage of
-base classes is encouraged so functionality can be shared. Comments in
-the code are encouraged when necessary to explain code that may not be
-obvious, but avoid over commenting as well. Code should be able to be
-read like a book, with descriptive names used, no fancy tricks unless
-required. Always be conscious of performance and security.
+Please install the pre-commit hooks before contributing:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
 
 ## Our Development Practices
 
@@ -139,6 +115,5 @@ please visit [this page](https://docs.hotosm.org/dev-practices)
 [4]: https://github.com/hotosm/fmtm/labels "label categories"
 [5]: https://help.github.com/articles/about-pull-requests/ "About Pull Requests"
 [6]: https://www.markdownguide.org/ "Markdown format"
-[7]: https://pytest.org/ "Pytest"
-[8]: https://en.wikipedia.org/wiki/Camel_case "CamelCase"
-[9]: https://docs.python.org/3/library/pydoc.html "pydoc"
+[7]: https://docs.hotosm.org/dev-guide/repo-management/pre-commit "Pre-commit"
+[8]: https://docs.hotosm.org/dev-guide/repo-management/git/#git-flow "Git Flow"
