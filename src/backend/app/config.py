@@ -193,7 +193,7 @@ class Settings(BaseSettings):
             default_origins += val
             return default_origins
 
-    API_PREFIX: str = "/"
+    API_PREFIX: str = ""
 
     FMTM_DB_HOST: Optional[str] = "fmtm-db"
     FMTM_DB_USER: Optional[str] = "fmtm"

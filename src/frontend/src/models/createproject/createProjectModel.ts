@@ -21,7 +21,7 @@ export interface ProjectDetailsModel {
     };
     properties: Record<string, any>;
     id: string;
-    bbox: [string, string, string, string];
+    bbox: null | number[];
   };
   tasks: {
     id: number;
@@ -35,7 +35,7 @@ export interface ProjectDetailsModel {
       };
       properties: Record<string, any>;
       id: string;
-      bbox: [string, string, string, string];
+      bbox: null | number[];
     };
     task_status: number;
     locked_by_uid: number;

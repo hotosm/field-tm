@@ -111,7 +111,7 @@ just migrate
 
 ```json
 {
-  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.10/lib/"]
+  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.11/lib/"]
 }
 ```
 
@@ -205,7 +205,7 @@ Creating a new release during development may not always be feasible.
 - Uncomment the line in docker-compose.yml
 
 ```yaml
-- ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.10/site-packages/osm_fieldwork
+- ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.11/site-packages/osm_fieldwork
 ```
 
 - Run the docker container with your local version of osm-fieldwork.
