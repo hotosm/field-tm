@@ -14,7 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-ARG PYTHON_IMG_TAG=3.10
+ARG PYTHON_IMG_TAG=3.11
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-06-06T09-36-42Z}
 FROM docker.io/minio/minio:${MINIO_TAG} as minio
 
@@ -166,8 +166,8 @@ RUN pip install --user --upgrade --no-warn-script-location \
     -r /opt/python/requirements-debug.txt \
     -r /opt/python/requirements-ci.txt \
     && rm -r /opt/python
-CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", \
-    "-m", "uvicorn", "app.main:api", \
+CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
+    "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
     "--reload", "--log-level", "critical", "--no-access-log"]
 

@@ -52,6 +52,7 @@ export type projectInfoType = {
       bbox: [number, number, number, number];
     };
     id: number;
+    bbox: null | number[];
   };
   priority: number;
   title: string;
@@ -93,7 +94,6 @@ export type projectTaskBoundriesType = {
 };
 
 export type taskBoundriesTypes = {
-  bbox: [number, number];
   id: number;
   project_task_index: number;
   locked_by_uid: null | string;
@@ -106,7 +106,7 @@ export type taskBoundriesTypes = {
     };
     properties: Record<string, any>;
     id: string;
-    bbox: [string, string, string, string];
+    bbox: null | number[];
   };
   task_history: taskHistoryTypes[];
   task_status: string;
@@ -132,6 +132,6 @@ export type taskBoundriesGeojson = {
     };
     properties: Record<string, any>;
     id: string;
-    bbox: [string, string, string, string];
+    bbox: null | number[];
   };
 };

@@ -24,25 +24,25 @@ authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
 dependencies = [
-    "uvicorn==0.24.0",
-    "fastapi==0.104.1",
-    "pydantic==2.5.2",
-    "pydantic-settings==2.1.0",
-    "geojson-pydantic==1.0.1",
-    "python-multipart==0.0.6",
-    "sqlalchemy==2.0.23",
-    "SQLAlchemy-Utils==0.41.1",
+    "uvicorn==0.30.1",
+    "fastapi==0.111.1",
+    "pydantic==2.8.1",
+    "pydantic-settings==2.3.4",
+    "geojson-pydantic==1.1.0",
+    "python-multipart==0.0.9",
+    "sqlalchemy==2.0.31",
+    "SQLAlchemy-Utils==0.41.2",
     "psycopg2==2.9.9",
-    "geoalchemy2==0.14.2",
+    "geoalchemy2==0.15.2",
     "geojson==3.1.0",
-    "shapely==2.0.2",
-    "pyxform==2.0.2",
+    "shapely==2.0.5",
+    "pyxform==2.0.3",
     "loguru==0.7.2",
-    "minio==7.2.0",
+    "minio==7.2.7",
     "pyproj==3.6.1",
-    "asgiref==3.7.2",
+    "asgiref==3.8.1",
     "sozipfile==0.3.2",
-    "cryptography>=42.0.1",
+    "cryptography>=42.0.8",
     "defusedxml>=0.7.1",
     "pyjwt>=2.8.0",
     "async-lru>=2.0.4",
@@ -51,46 +51,45 @@ dependencies = [
     "osm-rawdata==0.3.0",
     "fmtm-splitter==1.3.0",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}
 
 [project.optional-dependencies]
 dev = [
-    "pre-commit>=3.5.0",
-    "black>=23.11.0",
-    "commitizen>=3.13.0",
+    "pre-commit>=3.7.1",
+    "commitizen>=3.27.0",
 ]
 test = [
-    "pytest==7.4.3",
-    "httpx==0.25.2",
-    "pytest-asyncio==0.23.2",
-    "pyinstrument==4.6.1",
-    "coverage>=7.4.0",
-    "coverage-badge>=1.1.0",
+    "pytest==8.2.1",
+    "httpx==0.27.0",
+    "pytest-asyncio==0.23.7",
+    "pyinstrument==4.6.2",
+    "coverage>=7.5.3",
+    "coverage-badge>=1.1.1",
 ]
 debug = [
     "ipdb>=0.13.13",
-    "debugpy>=1.8.0",
+    "debugpy>=1.8.1",
 ]
 docs = [
-    "mkdocs==1.5.3",
-    "mkdocs-material==9.4.14",
-    "mkdocstrings-python==1.7.5",
+    "mkdocs==1.6.0",
+    "mkdocs-material==9.5.25",
+    "mkdocstrings-python==1.10.3",
     "mkdocs-exclude==1.0.2",
-    "python-dotenv==1.0.0",
-    "mkdocs-git-revision-date-localized-plugin>=1.2.2",
+    "python-dotenv==1.0.1",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.6",
     "mdx-truly-sane-lists>=1.3",
 ]
 monitoring = [
-    "sentry-sdk[opentelemetry]>=2.0.1",
-    #"opentelemetry-sdk>=1.23.0",
-    #"opentelemetry-api>=1.23.0",
-    #"opentelemetry-exporter-otlp>=1.23.0",
-    "opentelemetry-instrumentation-fastapi>=0.44b0",
-    "opentelemetry-instrumentation-logging>=0.44b0",
-    "opentelemetry-instrumentation-psycopg2>=0.44b0",
-    "opentelemetry-instrumentation-requests>=0.44b0",
+    "sentry-sdk[opentelemetry]>=2.3.1",
+    #"opentelemetry-sdk>=1.25.0",
+    #"opentelemetry-api>=1.25.0",
+    #"opentelemetry-exporter-otlp>=1.25.0",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-instrumentation-logging>=0.46b0",
+    "opentelemetry-instrumentation-psycopg2>=0.46b0",
+    "opentelemetry-instrumentation-requests>=0.46b0",
 ]
 
 [build-system]
@@ -104,7 +103,7 @@ version = {from = "app/__version__.py"}
 [tool.ruff]
 fix = true
 line-length = 88
-target-version = "py310"
+target-version = "py311"
 exclude = [
     ".ruff_cache",
     "__pypackages__",
@@ -126,7 +125,7 @@ extend-immutable-calls = [
 ]
 
 [tool.pyright]
-extraPaths = ["__pypackages__/3.10/lib/"]
+extraPaths = ["__pypackages__/3.11/lib/"]
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"

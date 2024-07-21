@@ -206,7 +206,7 @@ async def flatgeobuf_to_featcol(
             SELECT jsonb_build_object(
                 'type', 'Feature',
                 'geometry', ST_AsGeoJSON(ST_GeometryN(fgb_data.geom, 1))::jsonb,
-                'id', fgb_data.osm_id,
+                'id', fgb_data.osm_id::VARCHAR,
                 'properties', jsonb_build_object(
                     'osm_id', fgb_data.osm_id,
                     'tags', fgb_data.tags,
@@ -312,7 +312,7 @@ async def split_geojson_by_task_areas(
                 jsonb_build_object(
                     'type', 'Feature',
                     'geometry', ST_AsGeoJSON(temp_features.geometry)::jsonb,
-                    'id', temp_features.id,
+                    'id', temp_features.id::VARCHAR,
                     'properties', temp_features.properties
                 ) AS feature
             FROM (
@@ -376,21 +376,21 @@ def add_required_geojson_properties(
         # Check for id type embedded in properties
         if osm_id := properties.get("osm_id"):
             # osm_id property exists, set top level id
-            feature["id"] = osm_id
+            feature["id"] = f"{osm_id}"
         else:
             if prop_id := properties.get("id"):
                 # id is nested in properties, use that
-                feature["id"] = prop_id
+                feature["id"] = f"{prop_id}"
                 properties["osm_id"] = prop_id
             elif fid := properties.get("fid"):
                 # The default from QGIS
-                feature["id"] = fid
+                feature["id"] = f"{fid}"
                 properties["osm_id"] = fid
             else:
                 # Random id
                 # NOTE 32-bit int is max supported by standard postgres Integer
                 random_id = getrandbits(30)
-                feature["id"] = random_id
+                feature["id"] = f"{random_id}"
                 properties["osm_id"] = random_id
 
         # Other required fields
