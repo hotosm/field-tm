@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:814e8f79ea684019659e10d1b853abb7744881c10be3d276cb5b5c84ae4d45a1"
+content_hash = "sha256:eb7decd06266cdc5d8441f9e947f54d0e7f9b99affccb18234ffaf6c500de681"
 
 [[package]]
 name = "aiohttp"
@@ -1579,7 +1579,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.12.4"
+version = "0.13.0"
 requires_python = ">=3.10"
 summary = "Processing field data from ODK to OpenStreetMap format."
 dependencies = [
@@ -1600,12 +1600,11 @@ dependencies = [
     "requests>=2.26.0",
     "segno>=1.5.2",
     "shapely>=1.8.5",
-    "thefuzz>=0.19.0",
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.12.4.tar.gz", hash = "sha256:d7ecc68080030c092bfbcd4df61b9bb6cfc7aa03e1a7a03e5b73065c552dbe70"},
-    {file = "osm_fieldwork-0.12.4-py3-none-any.whl", hash = "sha256:5d9f10c87f0247fddbed6db9a87bf6023ecd294e01c563fbeb5b829ee6f9dc36"},
+    {file = "osm-fieldwork-0.13.0.tar.gz", hash = "sha256:69b07a47619394171277dba5b39f6044954310b07ea84f0a83a067242d2e5bbd"},
+    {file = "osm_fieldwork-0.13.0-py3-none-any.whl", hash = "sha256:1217f940e2647410a544c5d032efed0598cb47006d8864305b21a5e00818fe90"},
 ]
 
 [[package]]
@@ -2565,19 +2564,6 @@ summary = "ANSI color formatting for output in terminal"
 files = [
     {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
     {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
-]
-
-[[package]]
-name = "thefuzz"
-version = "0.22.1"
-requires_python = ">=3.8"
-summary = "Fuzzy string matching in python"
-dependencies = [
-    "rapidfuzz<4.0.0,>=3.0.0",
-]
-files = [
-    {file = "thefuzz-0.22.1-py3-none-any.whl", hash = "sha256:59729b33556850b90e1093c4cf9e618af6f2e4c985df193fdf3c5b5cf02ca481"},
-    {file = "thefuzz-0.22.1.tar.gz", hash = "sha256:7138039a7ecf540da323792d8592ef9902b1d79eb78c147d4f20664de79f3680"},
 ]
 
 [[package]]
