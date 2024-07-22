@@ -29,7 +29,6 @@ import geojson
 from defusedxml import ElementTree
 from fastapi import HTTPException
 from loguru import logger as log
-from osm_fieldwork.csvdump import CSVDump
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.xls2json import parse_file_to_json
@@ -915,48 +914,49 @@ def download_media(
     xform.getMedia(project_id, xform_id, filename)
 
 
-def convert_csv(
-    filespec: str,
-    data: bytes,
-):
-    """Convert ODK CSV to OSM XML and GeoJson."""
-    csvin = CSVDump("/xforms.yaml")
+# FIXME replace osm_fieldwork.CSVDump with osm_fieldwork.ODKParsers
+# def convert_csv(
+#     filespec: str,
+#     data: bytes,
+# ):
+#     """Convert ODK CSV to OSM XML and GeoJson."""
+#     csvin = CSVDump("/xforms.yaml")
 
-    osmoutfile = f"{filespec}.osm"
-    csvin.createOSM(osmoutfile)
+#     osmoutfile = f"{filespec}.osm"
+#     csvin.createOSM(osmoutfile)
 
-    jsonoutfile = f"{filespec}.geojson"
-    csvin.createGeoJson(jsonoutfile)
+#     jsonoutfile = f"{filespec}.geojson"
+#     csvin.createGeoJson(jsonoutfile)
 
-    if len(data) == 0:
-        log.debug("Parsing csv file %r" % filespec)
-        # The yaml file is in the package files for osm_fieldwork
-        data = csvin.parse(filespec)
-    else:
-        csvdata = csvin.parse(filespec, data)
-        for entry in csvdata:
-            log.debug(f"Parsing csv data {entry}")
-            if len(data) <= 1:
-                continue
-            feature = csvin.createEntry(entry)
-            # Sometimes bad entries, usually from debugging XForm design, sneak in
-            if len(feature) > 0:
-                if "tags" not in feature:
-                    log.warning("Bad record! %r" % feature)
-                else:
-                    if "lat" not in feature["attrs"]:
-                        import epdb
+#     if len(data) == 0:
+#         log.debug("Parsing csv file %r" % filespec)
+#         # The yaml file is in the package files for osm_fieldwork
+#         data = csvin.parse(filespec)
+#     else:
+#         csvdata = csvin.parse(filespec, data)
+#         for entry in csvdata:
+#             log.debug(f"Parsing csv data {entry}")
+#             if len(data) <= 1:
+#                 continue
+#             feature = csvin.createEntry(entry)
+#             # Sometimes bad entries, usually from debugging XForm design, sneak in
+#             if len(feature) > 0:
+#                 if "tags" not in feature:
+#                     log.warning("Bad record! %r" % feature)
+#                 else:
+#                     if "lat" not in feature["attrs"]:
+#                         import epdb
 
-                        epdb.st()
-                    csvin.writeOSM(feature)
-                    # This GeoJson file has all the data values
-                    csvin.writeGeoJson(feature)
-                    pass
+#                         epdb.st()
+#                     csvin.writeOSM(feature)
+#                     # This GeoJson file has all the data values
+#                     csvin.writeGeoJson(feature)
+#                     pass
 
-    csvin.finishOSM()
-    csvin.finishGeoJson()
+#     csvin.finishOSM()
+#     csvin.finishGeoJson()
 
-    return True
+#     return True
 
 
 async def get_appuser_token(
