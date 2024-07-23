@@ -331,10 +331,11 @@ export const DownloadSubmissionGeojson = (url, projectName) => {
         a.click();
         dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
       } catch (error) {
+        const errortxt = JSON.parse(await error.response.data.text()).detail;
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'Failed to download submission geojson.',
+            message: errortxt || 'Failed to download submission geojson.',
             variant: 'error',
             duration: 2000,
           }),
