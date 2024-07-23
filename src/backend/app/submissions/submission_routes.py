@@ -24,7 +24,7 @@ from typing import Annotated, Optional
 import geojson
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from sqlalchemy.orm import Session
 
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -32,7 +32,7 @@ from app.auth.osm import login_required
 from app.auth.roles import mapper, project_manager
 from app.central import central_crud
 from app.db import database, postgis_utils
-from app.models.enums import ReviewStateEnum
+from app.models.enums import HTTPStatus, ReviewStateEnum
 from app.projects import project_crud, project_deps
 from app.submissions import submission_crud, submission_schemas
 from app.tasks.task_deps import get_task_by_id
@@ -544,18 +544,31 @@ async def conflate_geojson(
 
         data = await submission_crud.get_submission_by_project(project, {}, db)
         submission_json = data.get("value", [])
+        task_submission = [
+            sub for sub in submission_json if sub["task_id"] == str(task_id)
+        ]
+
+        if not task_submission:
+            return JSONResponse(
+                status_code=HTTPStatus.NOT_FOUND,
+                content=f"No Submissions found within the task {task_id}",
+            )
 
         submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
-            submission_json
+            task_submission
         )
         form_category = project.xform_category
         input_features = submission_geojson["features"]
+
         osm_features = postgis_utils.get_osm_geometries(form_category, task_geojson)
-        submission_geojson["features"] = postgis_utils.conflate_features(
+        conflated_features = postgis_utils.conflate_features(
             input_features, osm_features.get("features", []), remove_conflated
         )
+        submission_geojson["features"] = conflated_features
 
         return submission_geojson
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to process conflation: {str(e)}"
