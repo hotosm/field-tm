@@ -85,7 +85,7 @@ A few terms should be explained:
   List must first exist in ODK Central.
 - There are two ways described below.
 
-### From The ODK Central UI
+### 1. From The ODK Central UI
 
 - Easiest approach via the user interface of ODK Collect.
 - First we generate the Entity List via the UI, with all the fields we
@@ -116,12 +116,7 @@ The example CSV can be downloaded
 
 - Now this CSV can be uploaded via the UI and the Entity List will be populated.
 
-<!-- markdownlint-disable -->
-<details>
-  <summary>Other Options</summary>
-<!-- markdownlint-enable -->
-
-### Via Entity List XLSForm Upload
+### 2. Via Entity List XLSForm Upload
 
 - This is quite a convoluted approach, as a **separate** XLSForm must be
   uploaded to do this.
@@ -145,10 +140,6 @@ The example CSV can be downloaded
 
 ![Entities Create UI](../images/xlsform-design/odk-central-entity-reg.png)
 
-### From Code (API)
+### 3. From Code (API)
 
 -
-
-<!-- markdownlint-disable -->
-</details>
-<!-- markdownlint-enable -->
