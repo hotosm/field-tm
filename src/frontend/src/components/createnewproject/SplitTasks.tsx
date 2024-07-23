@@ -130,7 +130,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
 
     dispatch(
       CreateProjectService(
-        `${import.meta.env.VITE_API_URL}/projects/create_project?org_id=${projectDetails.organisation_id}`,
+        `${import.meta.env.VITE_API_URL}/projects/create-project?org_id=${projectDetails.organisation_id}`,
         projectData,
         taskAreaGeojsonFile,
         customFormFile,

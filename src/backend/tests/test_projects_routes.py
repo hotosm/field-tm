@@ -75,7 +75,7 @@ async def test_create_project(client, admin_user, organisation):
     project_data.update(**odk_creds_models.model_dump())
 
     response = client.post(
-        f"/projects/create_project?org_id={organisation.id}", json=project_data
+        f"/projects/create-project?org_id={organisation.id}", json=project_data
     )
 
     if response.status_code != 200:

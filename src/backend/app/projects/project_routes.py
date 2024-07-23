@@ -442,7 +442,7 @@ async def delete_project(
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
-@router.post("/create_project", response_model=project_schemas.ProjectOut)
+@router.post("/create-project", response_model=project_schemas.ProjectOut)
 async def create_project(
     project_info: project_schemas.ProjectUpload,
     org_user_dict: OrgUserDict = Depends(org_admin),

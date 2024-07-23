@@ -643,7 +643,7 @@ async def convert_odk_submission_json_to_geojson(
     if not submission_json:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Loading JSON submission failed",
+            detail="Project contains no submissions yet",
         )
 
     all_features = []
