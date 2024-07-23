@@ -91,7 +91,7 @@ A few terms should be explained:
 - First we generate the Entity List via the UI, with all the fields we
   want included:
 
-![Entities Create UI](../images/xlsform-design/odk-collect-entity-creation.png)
+![Entities Create UI](../images/xlsform-design/odk-central-entity-creation.png)
 
 > A single field `geometry` would be acceptable, but it can be useful to add
 > other fields as references, for example including a mapping `status` field.
@@ -141,6 +141,9 @@ The example CSV can be downloaded
   - A field label to display to the user.
   - A `save_to` field to specify which Entity field / property the data will be
     saved to when submitted. This should probably match the field name.
+- The form to create the Entity List is then uploaded to ODK Central:
+
+![Entities Create UI](../images/xlsform-design/odk-central-entity-reg.png)
 
 ### From Code (API)
 
