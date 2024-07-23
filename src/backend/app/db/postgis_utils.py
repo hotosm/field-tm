@@ -831,23 +831,23 @@ def get_osm_geometries(form_category, geometry):
     )
 
 
-def geometries_almost_equal(
-    geom1: BaseGeometry, geom2: BaseGeometry, tolerance: float = 1e-6
-) -> bool:
-    """Determine if two geometries are almost equal within a tolerance.
+# def geometries_almost_equal(
+#     geom1: BaseGeometry, geom2: BaseGeometry, tolerance: float = 1e-6
+# ) -> bool:
+#     """Determine if two geometries are almost equal within a tolerance.
 
-    Args:
-        geom1 (BaseGeometry): First geometry.
-        geom2 (BaseGeometry): Second geometry.
-        tolerance (float): Tolerance level for almost equality.
+#     Args:
+#         geom1 (BaseGeometry): First geometry.
+#         geom2 (BaseGeometry): Second geometry.
+#         tolerance (float): Tolerance level for almost equality.
 
-    Returns:
-        bool: True if geometries are almost equal else False.
-    """
-    return geom1.equals_exact(geom2, tolerance)
+#     Returns:
+#         bool: True if geometries are almost equal else False.
+#     """
+#     return geom1.equals_exact(geom2, tolerance)
 
 
-def check_partial_overlap(geom1: BaseGeometry, geom2: BaseGeometry) -> bool:
+def check_overlap(geom1: BaseGeometry, geom2: BaseGeometry) -> float:
     """Determine if two geometries have a partial overlap.
 
     Args:
@@ -858,9 +858,15 @@ def check_partial_overlap(geom1: BaseGeometry, geom2: BaseGeometry) -> bool:
         bool: True if geometries have a partial overlap, else False.
     """
     intersection = geom1.intersection(geom2)
-    return not intersection.is_empty and (
-        0 < intersection.area < geom1.area and 0 < intersection.area < geom2.area
-    )
+    intersection_area = intersection.area
+
+    geom1_area = geom1.area
+    geom2_area = geom2.area
+
+    # Calculate overlap percentage with respect to the smaller geometry
+    smaller_area = min(geom1_area, geom2_area)
+    overlap_percentage = (intersection_area / smaller_area) * 100
+    return round(overlap_percentage, 2)
 
 
 def conflate_features(
@@ -877,38 +883,46 @@ def conflate_features(
     Returns:
         list: A list of features after conflation with OSM features.
     """
-    osm_geometries = [shape(feature["geometry"]) for feature in osm_features]
+    osm_ids_in_subs = {int(feature["properties"]["xid"]) for feature in input_features}
+
+    # filter and create a json with key osm_id and its feature
+    osm_id_to_feature = {
+        feature["properties"]["osm_id"]: feature
+        for feature in osm_features
+        if feature["properties"]["osm_id"] in osm_ids_in_subs
+    }
     return_features = []
 
     for input_feature in input_features:
-        input_geometry = shape(input_feature["geometry"])
-        is_duplicate = False
-        is_partial_overlap = False
-
-        for osm_feature, osm_geometry in zip(
-            osm_features, osm_geometries, strict=False
-        ):
-            if geometries_almost_equal(input_geometry, osm_geometry, tolerance):
-                is_duplicate = True
-                input_feature["properties"].update(osm_feature["properties"])
-                break
-
-            if check_partial_overlap(input_geometry, osm_geometry):
-                is_partial_overlap = True
-                new_feature = {
-                    "type": "Feature",
-                    "geometry": mapping(osm_feature["geometry"]),
-                    "properties": osm_feature["properties"],
-                }
-                return_features.append(new_feature)
-                break
-
-        input_feature["properties"]["is_duplicate"] = is_duplicate
-        input_feature["properties"]["is_partial_overlap"] = is_partial_overlap
-
-        if (is_duplicate or is_partial_overlap) and remove_conflated is True:
+        osm_id = int(input_feature["properties"]["xid"])
+        osm_feature = osm_id_to_feature.get(osm_id)  # get same feature from osm
+        if not osm_feature:
             continue
 
-        return_features.append(input_feature)
+        input_geometry = shape(input_feature["geometry"])
+        osm_geometry = shape(osm_feature["geometry"])
+        overlap_percent = check_overlap(input_geometry, osm_geometry)
+
+        updated_input_feature = {
+            "type": input_feature["type"],
+            "id": input_feature["properties"]["xid"],
+            "geometry": input_feature["geometry"],
+            "properties": {
+                **input_feature["properties"],
+                "overlap_percent": overlap_percent,
+            },
+        }
+        updated_input_feature |= osm_feature["properties"]
+
+        if overlap_percent < 90:
+            corresponding_feature = {
+                "type": "Feature",
+                "id": osm_feature["properties"].pop("osm_id"),
+                "geometry": mapping(osm_geometry),
+                "properties": osm_feature["properties"],
+            }
+            return_features.append(corresponding_feature)
+
+        return_features.append(updated_input_feature)
 
     return return_features
