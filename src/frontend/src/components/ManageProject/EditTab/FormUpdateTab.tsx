@@ -31,6 +31,7 @@ const FormUpdateTab = ({ projectId }) => {
   const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
   const validateCustomFormLoading = useAppSelector((state) => state.createproject.validateCustomFormLoading);
+  const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
 
   useEffect(() => {
     dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
@@ -91,7 +92,7 @@ const FormUpdateTab = ({ projectId }) => {
           label="title"
           value={selectedCategory}
           onValueChange={(value) => {
-            setSelectedCategory(value);
+            if (value) setSelectedCategory(value?.toString());
           }}
           className="fmtm-max-w-[13.5rem]"
         />
@@ -130,7 +131,14 @@ const FormUpdateTab = ({ projectId }) => {
         {error.formError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.formError}</p>}
       </div>
       <div className="fmtm-flex fmtm-justify-center">
-        <Button onClick={onSave} btnText="UPDATE" btnType="primary" className="fmtm-rounded-md" />
+        <Button
+          isLoading={formUpdateLoading}
+          loadingText="UPDATE"
+          onClick={onSave}
+          btnText="UPDATE"
+          btnType="primary"
+          className="fmtm-rounded-md"
+        />
       </div>
     </div>
   );
