@@ -5,7 +5,10 @@
 <h1>The FMTM Team</h1>
 
 <p>FMTM is developed as a collaboration between HOT's Tech Team &
-[NAXA](https://naxa.com.np)</p>
+<a
+  href="https://naxa.com.np"
+  target="_blank"
+>NAXA</a></p>
 
 <p>The key staff working on FMTM are listed below.</p>
 
@@ -60,7 +63,10 @@
 </div>
 
 <p>To see a list of all our contributors and their roles, please see our
-[Contributors](https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-)
+<a
+  href="https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-"
+  target="_blank"
+>contributors</a>
 list in the README.md file.</p>
 
 </div>
