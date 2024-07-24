@@ -86,8 +86,8 @@ nav:
       - Production Deployment: dev/Production.md
       - Database Tips: dev/Database-Tips.md
       - Troubleshooting: dev/Troubleshooting.md
-      - Pre-Commit: https://docs.hotosm.org/dev-guide/pre-commit/
-      - Versioning: https://docs.hotosm.org/dev-guide/version-control/#creating-releases
+      - Pre-Commit: https://docs.hotosm.org/dev-guide/repo-management/pre-commit/
+      - Versioning: https://docs.hotosm.org/dev-guide/repo-management/version-control/#creating-releases
       - Class Hierarchy: apidocs/html/inherits.html
       - Code Coverage: coverage.html
   - Utilities:
