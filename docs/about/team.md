@@ -2,12 +2,12 @@
 
 <div align="center">
 
-# The FMTM Team
+<h1>The FMTM Team</h1>
 
-FMTM is developed as a collaboration between HOT's Tech Team &
-[NAXA](https://naxa.com.np).
+<p>FMTM is developed as a collaboration between HOT's Tech Team &
+[NAXA](https://naxa.com.np)</p>
 
-The key staff working on FMTM are listed below:
+<p>The key staff working on FMTM are listed below.</p>
 
 <div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/12103383?v=4" width="100" style="border-radius: 50%;" alt="Ramya">
@@ -59,9 +59,9 @@ The key staff working on FMTM are listed below:
   <i>Frontend development advisory role</i>
 </div>
 
-To see a list of all our contributors and their roles, please see our
+<p>To see a list of all our contributors and their roles, please see our
 [Contributors](https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-)
-list in the README.md file.
+list in the README.md file.</p>
 
 </div>
 <!-- markdownlint-restore -->
