@@ -111,6 +111,14 @@ pip install pre-commit
 pre-commit install
 ```
 
+### Commit Sign-Off Policy
+
+- In order to commit to this repository, please read and accept our
+  [commit sign-off policy](https://developercertificate.org)
+- This is simply to verify that you are the author of the commits you make.
+- If possible, please add to your commit footer the `Signed-of-by` info:
+  `Signed-off-by: John Doe <joe.doe@example.com>`
+
 ## Our Development Practices
 
 To see more detail on the development practices used at HOT,
