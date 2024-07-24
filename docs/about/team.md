@@ -1,3 +1,7 @@
+<!-- markdownlint-disable -->
+
+<div align="center">
+
 # The FMTM Team
 
 FMTM is developed as a collaboration between HOT's Tech Team &
@@ -5,14 +9,59 @@ FMTM is developed as a collaboration between HOT's Tech Team &
 
 The key staff working on FMTM are listed below:
 
-- Ramya: Product Owner and general product vision.
-- Manjita: Product Manager and development coordination.
-- Sam: Tech Lead for the development team.
-- Sujan: Primary backend developer.
-- Niraj: Backend development advisory role.
-- Nishit: Primary frontend developer.
-- Varun: Frontend development advisory role.
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/12103383?v=4" width="100" style="border-radius: 50%;" alt="Ramya">
+  <br>
+  <b>Ramya</b>
+  <br>
+  <i>Product Owner and general product vision</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/97273021?v=4" width="100" style="border-radius: 50%;" alt="Manjita Pandey">
+  <br>
+  <b>Manjita Pandey</b>
+  <br>
+  <i>Product Manager and development coordination</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/78538841?v=4" width="100" style="border-radius: 50%;" alt="Sam">
+  <br>
+  <b>Sam</b>
+  <br>
+  <i>Tech Lead for the development team</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/109404840?v=4" width="100" style="border-radius: 50%;" alt="Sujan Adhikari">
+  <br>
+  <b>Sujan Adhikari</b>
+  <br>
+  <i>Primary backend developer</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/41701707?v=4" width="100" style="border-radius: 50%;" alt="Niraj Adhikari">
+  <br>
+  <b>Niraj Adhikari</b>
+  <br>
+  <i>Backend development advisory role</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/81785002?v=4" width="100" style="border-radius: 50%;" alt="Nishit Suwal">
+  <br>
+  <b>Nishit Suwal</b>
+  <br>
+  <i>Primary frontend developer</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/37866666?v=4" width="100" style="border-radius: 50%;" alt="Deepak Pradhan (Varun)">
+  <br>
+  <b>Deepak Pradhan (Varun)</b>
+  <br>
+  <i>Frontend development advisory role</i>
+</div>
 
 To see a list of all our contributors and their roles, please see our
 [Contributors](https://github.com/hotosm/fmtm?tab=readme-ov-file#contributors-)
 list in the README.md file.
+
+</div>
+<!-- markdownlint-restore -->
