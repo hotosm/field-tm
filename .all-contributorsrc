@@ -20,15 +20,64 @@
       "login": "robsavoye",
       "name": "Rob Savoye",
       "avatar_url": "https://avatars.githubusercontent.com/u/71342768?v=4",
-      "profile": "https://www.hotosm.org",
+      "profile": "https://github.com/robsavoye",
       "contributions": ["maintenance", "mentoring", "code", "review", "ideas"]
+    },
+    {
+      "login": "ramyaragupathy",
+      "name": "Ramya",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12103383?v=4",
+      "profile": "https://github.com/ramyaragupathy",
+      "contributions": ["bug"]
     },
     {
       "login": "spwoodcock",
       "name": "Sam",
       "avatar_url": "https://avatars.githubusercontent.com/u/78538841?v=4",
-      "profile": "https://github.com/spwoodcock",
-      "contributions": ["code", "review", "infra", "ideas", "maintenance"]
+      "profile": "https://spwoodcock.dev",
+      "contributions": [
+        "code",
+        "review",
+        "infra",
+        "ideas",
+        "maintenance",
+        "mentoring"
+      ]
+    },
+    {
+      "login": "susmina94",
+      "name": "Susmina_Manandhar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/108750444?v=4",
+      "profile": "https://github.com/susmina94",
+      "contributions": ["doc", "ideas", "bug", "mentoring"]
+    },
+    {
+      "login": "manjitapandey",
+      "name": "Manjita Pandey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97273021?v=4",
+      "profile": "https://github.com/manjitapandey",
+      "contributions": [
+        "bug",
+        "doc",
+        "ideas",
+        "content",
+        "design",
+        "projectManagement"
+      ]
+    },
+    {
+      "login": "Sujanadh",
+      "name": "Sujan Adhikari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/109404840?v=4",
+      "profile": "https://github.com/Sujanadh",
+      "contributions": ["code", "maintenance"]
+    },
+    {
+      "login": "NSUWAL123",
+      "name": "Nishit Suwal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/81785002?v=4",
+      "profile": "https://github.com/NSUWAL123",
+      "contributions": ["code", "maintenance"]
     },
     {
       "login": "varun2948",
@@ -59,25 +108,11 @@
       "contributions": ["doc", "eventOrganizing", "ideas"]
     },
     {
-      "login": "Sujanadh",
-      "name": "Sujan Adhikari",
-      "avatar_url": "https://avatars.githubusercontent.com/u/109404840?v=4",
-      "profile": "https://github.com/Sujanadh",
-      "contributions": ["code", "maintenance"]
-    },
-    {
       "login": "Mudi-business",
       "name": "Mohamed Bakari Mohamed",
       "avatar_url": "https://avatars.githubusercontent.com/u/52991565?v=4",
       "profile": "http://zanrevenue.org",
       "contributions": ["code"]
-    },
-    {
-      "login": "NSUWAL123",
-      "name": "Nishit Suwal",
-      "avatar_url": "https://avatars.githubusercontent.com/u/81785002?v=4",
-      "profile": "https://github.com/NSUWAL123",
-      "contributions": ["code", "maintenance"]
     },
     {
       "login": "biomassives",
@@ -150,18 +185,81 @@
       "contributions": ["code"]
     },
     {
-      "login": "manjitapandey",
-      "name": "Manjita Pandey",
-      "avatar_url": "https://avatars.githubusercontent.com/u/97273021?v=4",
-      "profile": "https://github.com/manjitapandey",
-      "contributions": ["bug", "doc", "ideas"]
+      "login": "shushila21",
+      "name": "shushila21",
+      "avatar_url": "https://avatars.githubusercontent.com/u/77854807?v=4",
+      "profile": "https://github.com/shushila21",
+      "contributions": ["code"]
     },
     {
-      "login": "susmina94",
-      "name": "Susmina_Manandhar",
-      "avatar_url": "https://avatars.githubusercontent.com/u/108750444?v=4",
-      "profile": "https://github.com/susmina94",
-      "contributions": ["doc", "ideas", "bug"]
+      "login": "kshitijrajsharma",
+      "name": "Kshitij Raj Sharma",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36752999?v=4",
+      "profile": "https://github.com/kshitijrajsharma",
+      "contributions": ["code"]
+    },
+    {
+      "login": "mahesh-naxa",
+      "name": "Mahesh-wor 'Invoron'",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72002075?v=4",
+      "profile": "https://github.com/mahesh-naxa",
+      "contributions": ["infra"]
+    },
+    {
+      "login": "azharcodeit",
+      "name": "Azhar Ismagulova",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31756707?v=4",
+      "profile": "https://github.com/azharcodeit",
+      "contributions": ["code", "test"]
+    },
+    {
+      "login": "synneolsen",
+      "name": "synneolsen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/107098623?v=4",
+      "profile": "https://github.com/synneolsen",
+      "contributions": ["ideas"]
+    },
+    {
+      "login": "Freedisch",
+      "name": "Freedisch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82499435?v=4",
+      "profile": "https://github.com/Freedisch",
+      "contributions": ["code"]
+    },
+    {
+      "login": "prasidha1",
+      "name": "prasidha1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32433336?v=4",
+      "profile": "https://github.com/prasidha1",
+      "contributions": ["code"]
+    },
+    {
+      "login": "iamrajbhattarai",
+      "name": "Raj Bhattarai",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75742784?v=4",
+      "profile": "https://github.com/iamrajbhattarai",
+      "contributions": ["code"]
+    },
+    {
+      "login": "sijandh35",
+      "name": "Sijan Dhungana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29759582?v=4",
+      "profile": "https://github.com/sijandh35",
+      "contributions": ["code"]
+    },
+    {
+      "login": "khushishikhu",
+      "name": "Khushi Gautam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/65439761?v=4",
+      "profile": "https://github.com/khushishikhu",
+      "contributions": ["doc"]
+    },
+    {
+      "login": "Seckrel",
+      "name": "Aayam Ojha",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43112525?v=4",
+      "profile": "https://github.com/Seckrel",
+      "contributions": ["code"]
     }
   ],
   "contributorsPerLine": 7,
