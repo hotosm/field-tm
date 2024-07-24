@@ -66,11 +66,12 @@ plugins:
 nav:
   - Home: index.md
   - Get Started:
-      - About: About.md
+      - About: about/about.md
       - Installation: INSTALL.md
       - Contribution Guidelines: CONTRIBUTING.md
       - Code of Conduct: https://docs.hotosm.org/code-of-conduct
-      - FAQ: FAQ.md
+      - FAQ: about/faq.md
+      - The Team: about/team.md
   - User Manuals:
       - Video Guides: manuals/videos.md
       - User Types Explanation: user-breakdown.md

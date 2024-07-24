@@ -122,8 +122,9 @@ project then follow the steps below:
 If you encounter any issues or need assistance while using FMTM, you can access
 the following resources:
 
-- Check the [FAQs](https://docs.fmtm.dev/FAQ/) .
-- Ask your doubts in the [Slack channel: #fmtm-field-pilots](https://hotosm.slack.com/archives/C04PCBFDEGN)
+- Check the [FAQs](https://docs.fmtm.dev/faq/) .
+- Ask your doubts in the
+  [Slack channel: #field-mapping-tasking-manager](https://hotosm.slack.com/archives/C04PCBFDEGN)
 
 ### Thank you
 
