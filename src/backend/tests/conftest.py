@@ -41,7 +41,7 @@ from app.config import encrypt_value, settings
 from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbTaskHistory
 from app.main import get_application
-from app.models.enums import CommunityType, TaskStatus, UserRole
+from app.models.enums import TaskStatus, UserRole
 from app.projects import project_crud
 from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
 from app.users.user_crud import get_user
@@ -120,18 +120,11 @@ async def admin_user(db):
 @pytest.fixture(scope="function")
 def organisation(db):
     """A test organisation."""
-    db_org = DbOrganisation(
-        name="test_org_qwerty",
-        slug="test_qwerty",
-        description="test org",
-        url="https://test.org",
-        logo="none",
-        approved=True,
-        community_type=CommunityType.OSM_COMMUNITY,
+    return (
+        db.query(DbOrganisation)
+        .filter(DbOrganisation.name == "FMTM Public Beta")
+        .first()
     )
-    db.add(db_org)
-    db.commit()
-    return db_org
 
 
 @pytest.fixture(scope="function")

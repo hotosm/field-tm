@@ -422,6 +422,26 @@ def compare_entities(response_entity, expected_entity):
     assert str(response_entity["status"]) == str(expected_entity["status"])
 
 
+def test_project_task_split(client):
+    """Test project task split."""
+    with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as project_file:
+        project_geojson = project_file.read()
+
+    response = client.post(
+        "/projects/task-split",
+        files={"project_geojson": ("data_extract_kathmandu.geojson", project_geojson)},
+        data={"no_of_buildings": 40},
+    )
+
+    assert response.status_code == 200
+    assert response.json() is not None
+    assert "features" in response.json()
+
+    # Test without required value should cause validation error
+    response = client.post("/projects/task-split")
+    assert response.status_code == 422
+
+
 if __name__ == "__main__":
     """Main func if file invoked directly."""
     pytest.main()
