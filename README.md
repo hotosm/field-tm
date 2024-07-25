@@ -6,7 +6,7 @@
 </p>
 
 <div align="center">
-    <b style="font-size: 2rem;">Field Mapping Tasking Manager (FMTM)</b>
+    <h1>Field Mapping Tasking Manager (FMTM)</h1>
     <p>Coordinated field mapping for Open Mapping campaigns.</p>
     <a href="https://github.com/hotosm/fmtm/releases">
         <img src="https://img.shields.io/github/v/release/hotosm/fmtm?logo=github" alt="HOTOSM Logo" />
