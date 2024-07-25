@@ -889,7 +889,7 @@ async def generate_odk_central_project_content(
 
 async def generate_project_files(
     db: Session,
-    project: db_models.DbProject,
+    project_id: int,
     custom_form: Optional[BytesIO],
     form_file_ext: str,
     background_task_id: Optional[uuid.UUID] = None,
@@ -900,13 +900,13 @@ async def generate_project_files(
 
     Args:
         db (Session): the database session.
-        project (DbProject): FMTM database project.
+        project_id(int): id of the FMTM project.
         custom_form (BytesIO): the xls file to upload if we have a custom form
         form_file_ext (str): weather the form is xls, xlsx or xml
         background_task_id (uuid): the task_id of the background task.
     """
     try:
-        project_id = project.id
+        project = await get_project_by_id(db, project_id)
         form_category = project.xform_category
         log.info(f"Starting generate_project_files for project {project_id}")
         odk_credentials = await project_deps.get_odk_credentials(db, project_id)

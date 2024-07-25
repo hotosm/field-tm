@@ -714,6 +714,7 @@ async def generate_files(
         json (JSONResponse): A success message containing the project ID.
     """
     project = project_user_dict.get("project")
+    project_id = project.id
 
     log.debug(f"Generating media files tasks for project: {project.id}")
 
@@ -738,16 +739,16 @@ async def generate_files(
         db.commit()
 
     # Create task in db and return uuid
-    log.debug(f"Creating export background task for project ID: {project.id}")
+    log.debug(f"Creating export background task for project ID: {project_id}")
     background_task_id = await project_crud.insert_background_task_into_database(
-        db, project_id=str(project.id)
+        db, project_id=project_id
     )
 
     log.debug(f"Submitting {background_task_id} to background tasks stack")
     background_tasks.add_task(
         project_crud.generate_project_files,
         db,
-        project,
+        project_id,
         BytesIO(custom_xls_form) if custom_xls_form else None,
         file_ext,
         background_task_id,
