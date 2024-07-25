@@ -11,14 +11,13 @@ import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useAppSelector } from '@/types/reduxTypes';
 
 const ProjectDescriptionTab = ({ projectId }) => {
   useDocumentTitle('Manage Project: Project Description');
   const dispatch = CoreModules.useAppDispatch();
-  const editProjectDetails: any = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails);
-  const editProjectDetailsLoading: boolean = CoreModules.useAppSelector(
-    (state) => state.createproject.editProjectDetailsLoading,
-  );
+  const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
+  const editProjectDetailsLoading = useAppSelector((state) => state.createproject.editProjectDetailsLoading);
 
   const submission = () => {
     const changedValues = diffObject(editProjectDetails, values);
