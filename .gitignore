@@ -19,6 +19,7 @@
 .Python
 env/
 build/
+!contrib/just/build
 develop-eggs/
 dist/
 dev-dist/
