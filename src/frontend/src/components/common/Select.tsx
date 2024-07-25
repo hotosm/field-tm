@@ -97,13 +97,14 @@ interface ICustomSelect {
   placeholder: string;
   data: any;
   dataKey: string;
-  value?: string | null;
+  value?: string | undefined;
   valueKey: string;
   label: string;
-  onValueChange: (value: string | null | number) => void;
+  onValueChange?: (value: string | null | number) => void;
   errorMsg?: string;
   className?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export const CustomSelect = ({
@@ -118,6 +119,7 @@ export const CustomSelect = ({
   errorMsg,
   className,
   required,
+  disabled = false,
 }: ICustomSelect) => {
   return (
     <div className="fmtm-w-full">
@@ -129,7 +131,13 @@ export const CustomSelect = ({
       )}
       <div className="fmtm-flex fmtm-items-end">
         <div className={`fmtm-w-full ${className}`}>
-          <Select value={value} onValueChange={(value) => onValueChange(value)}>
+          <Select
+            disabled={disabled}
+            value={value}
+            onValueChange={(value) => {
+              if (onValueChange) return onValueChange(value);
+            }}
+          >
             <SelectTrigger className="fmtm-h-[2.35rem]">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>

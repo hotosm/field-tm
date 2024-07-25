@@ -1,7 +1,7 @@
 import { task_split_type } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
-  editProjectDetails: EditProjectDetailsTypes;
+  editProjectDetails: ProjectDetailsTypes;
   editProjectResponse?: EditProjectResponseTypes | null;
   projectDetails: Partial<ProjectDetailsTypes>;
   projectDetailsResponse: EditProjectResponseTypes | null;
@@ -85,11 +85,6 @@ type EditProjectResponseTypes = {
   tasks: ProjectTaskTypes[];
   xform_category: string;
   hashtags: string;
-};
-export type EditProjectDetailsTypes = {
-  name: string;
-  description: string;
-  short_description: string;
 };
 
 export type ProjectDetailsTypes = {
