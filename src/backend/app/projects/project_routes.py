@@ -935,7 +935,7 @@ async def download_form(
 async def update_project_form(
     xform_id: str = Form(...),
     category: XLSFormType = Form(...),
-    upload: Optional[UploadFile] = File(None),
+    upload: UploadFile = File(...),
     db: Session = Depends(database.get_db),
     project_user_dict: ProjectUserDict = Depends(project_manager),
 ) -> project_schemas.ProjectBase:
@@ -946,32 +946,32 @@ async def update_project_form(
     # TODO migrate most logic to project_crud
     project = project_user_dict["project"]
 
-    if project.xform_category == category and not upload:
+    # TODO we currently do nothing with the provided category
+    # TODO allowing for category updates is disabled due to complexity
+    # TODO as it would mean also updating data extracts,
+    # TODO so perhaps we just remove this?
+    # form_filename = XLSFormType(project.xform_category).name
+    # xlsform_path = Path(f"{xlsforms_path}/{form_filename}.xls")
+    # file_ext = xlsform_path.suffix.lower()
+    # with open(xlsform_path, "rb") as f:
+    #     new_xform_data = BytesIO(f.read())
+
+    file_ext = Path(upload.filename or "x.xls").suffix.lower()
+    allowed_extensions = [".xls", ".xlsx", ".xml"]
+    if file_ext not in allowed_extensions:
         raise HTTPException(
-            status_code=400, detail="Current category is same as new category"
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Provide a valid .xls, .xlsx, .xml file.",
         )
+    new_xform_data = await upload.read()
+    # Update the XLSForm blob in the database
+    project.form_xls = new_xform_data
+    new_xform_data = BytesIO(new_xform_data)
 
-    if upload:
-        file_ext = Path(upload.filename).suffix.lower()
-        allowed_extensions = [".xls", ".xlsx", ".xml"]
-        if file_ext not in allowed_extensions:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Provide a valid .xls, .xlsx, .xml file.",
-            )
-        new_xform_data = await upload.read()
-        # Update the XLSForm blob in the database
-        project.form_xls = new_xform_data
-        new_xform_data = BytesIO(new_xform_data)
-    else:
-        form_filename = XLSFormType(project.xform_category).name
-        xlsform_path = Path(f"{xlsforms_path}/{form_filename}.xls")
-        file_ext = xlsform_path.suffix.lower()
-        with open(xlsform_path, "rb") as f:
-            new_xform_data = BytesIO(f.read())
+    # TODO related to above info about category updating
+    # # Update form category in database
+    # project.xform_category = category
 
-    # Update form category in database
-    project.xform_category = category
     # Commit changes to db
     db.commit()
 
