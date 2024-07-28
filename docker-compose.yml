@@ -92,7 +92,7 @@ services:
     env_file:
       - .env
     ports:
-      - "7052-7053:8000"
+      - "7052-7055:8000"
     #   - "5678-5679:5678" # Debugger port
     networks:
       - fmtm-net
