@@ -536,11 +536,8 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
             raise HTTPException(status_code=400, detail=error_message)
         return
 
-    log.warning(input_geojson)
-    log.warning(input_geojson.get("type"))
     if (input_geojson_type := input_geojson.get("type")) == "FeatureCollection":
         features = input_geojson.get("features", [])
-        log.warning(features)
         coordinates = (
             features[-1].get("geometry", {}).get("coordinates", []) if features else []
         )
@@ -555,7 +552,6 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
             first_coordinate = coordinates
             coordinates = coordinates[0]
 
-    log.warning(coordinates)
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
         raise HTTPException(status_code=400, detail=error_message)
