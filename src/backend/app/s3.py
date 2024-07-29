@@ -8,6 +8,7 @@ from typing import Any
 from loguru import logger as log
 from minio import Minio
 from minio.commonconfig import CopySource
+from minio.deleteobjects import DeleteObject
 
 from app.config import settings
 
@@ -135,7 +136,7 @@ def get_obj_from_bucket(bucket_name: str, s3_path: str) -> BytesIO:
 
 def copy_obj_bucket_to_bucket(
     source_bucket: str, source_path: str, dest_bucket: str, dest_path: str
-) -> BytesIO:
+) -> bool:
     """Copy an object from one bucket to another, without downloading.
 
     Occurs entirely on the server side.
@@ -154,7 +155,7 @@ def copy_obj_bucket_to_bucket(
     client = s3_client()
 
     try:
-        log.error(
+        log.info(
             f"Copying {source_path} from bucket {source_bucket} "
             f"to {dest_path} on bucket {dest_bucket}"
         )
@@ -169,6 +170,51 @@ def copy_obj_bucket_to_bucket(
         log.error(f"Failed to copy object {source_path} to new bucket: {dest_bucket}")
         return False
 
+    return True
+
+
+def delete_all_objs_under_prefix(bucket_name: str, s3_path: str) -> bool:
+    """Delete all objects under a certain path.
+
+    For example, delete all items in a project folder.
+
+    Args:
+        bucket_name (str): The name of the S3 bucket.
+        s3_path (str): The path to for which everything will be deleted recursively.
+
+    Returns:
+        bool: True if the objects were successfully deleted.
+    """
+    # Strip "/" from start of s3_path (not required for delete object)
+    if s3_path.startswith("/"):
+        s3_path = s3_path.lstrip("/")
+    # However, we should append a tailing slash
+    if not s3_path.endswith("/"):
+        s3_path = f"{s3_path}/"
+
+    client = s3_client()
+
+    try:
+        log.info(f"Deleting all items for bucket ({bucket_name}) under path: {s3_path}")
+        # Get all objects under path, recursively
+        objects = list(client.list_objects(bucket_name, s3_path, recursive=True))
+        delete_object_list = [DeleteObject(obj.object_name) for obj in objects]
+        log.debug(f"S3 items to delete: {[obj.object_name for obj in objects]}")
+
+        errors = client.remove_objects(bucket_name, delete_object_list)
+        for error in errors:
+            log.error(f"Error during deletion: {error}")
+        if errors:
+            return False
+
+    except Exception as e:
+        log.exception(e)
+        log.error(
+            f"Failed to delete bucket ({bucket_name}) files under path: {s3_path}"
+        )
+        return False
+
+    log.debug("Successfully deleted S3 objects")
     return True
 
 
