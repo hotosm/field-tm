@@ -85,6 +85,7 @@ import {
   IntegrationInstructions as IntegrationInstructionsIcon,
   QrCode2Outlined as QrCode2OutlinedIcon,
   BarChart as BarChartIcon,
+  CalendarTodayOutlined as CalendarTodayOutlinedIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -180,4 +181,5 @@ export default {
   IntegrationInstructionsIcon,
   QrCode2OutlinedIcon,
   BarChartIcon,
+  CalendarTodayOutlinedIcon,
 };

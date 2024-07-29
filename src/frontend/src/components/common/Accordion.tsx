@@ -10,6 +10,7 @@ interface IAccordion {
   onToggle: any;
   description?: string;
   disableHeaderClickToggle?: boolean;
+  hasSeperator?: boolean;
 }
 
 export default function Accordion({
@@ -21,6 +22,7 @@ export default function Accordion({
   onToggle,
   description,
   disableHeaderClickToggle,
+  hasSeperator = true,
 }: IAccordion) {
   const [collapsed, setCollapsed] = useState(isCollapsed);
 
@@ -34,7 +36,7 @@ export default function Accordion({
         <div
           className={`fmtm-flex fmtm-items-center fmtm-justify-between
             fmtm-w-full fmtm-font-bold fmtm-gap-3 fmtm-cursor-pointer fmtm-text-2xl fmtm-py-[0px] sm:fmtm-py-1  fmtm-border-[#929DB3] ${
-              collapsed ? 'fmtm-border-b-[0px]' : 'fmtm-border-b-[2px]'
+              collapsed || (!collapsed && !hasSeperator) ? 'fmtm-border-b-[0px]' : 'fmtm-border-b-[2px]'
             }`}
           onClick={() => {
             if (disableHeaderClickToggle) return;

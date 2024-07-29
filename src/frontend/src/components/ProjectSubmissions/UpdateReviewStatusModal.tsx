@@ -7,6 +7,7 @@ import { UpdateReviewStateService } from '@/api/SubmissionService';
 import TextArea from '../common/TextArea';
 import Button from '../common/Button';
 import { useAppSelector } from '@/types/reduxTypes';
+import { PostProjectComments } from '@/api/Project';
 
 const reviewList: reviewListType[] = [
   {
@@ -41,22 +42,48 @@ const UpdateReviewStatusModal = () => {
     setReviewStatus(updateReviewStatusModal.reviewState);
   }, [updateReviewStatusModal.reviewState]);
 
-  const handleStatusUpdate = () => {
+  const handleStatusUpdate = async () => {
     if (!updateReviewStatusModal.instanceId || !updateReviewStatusModal.projectId || !updateReviewStatusModal.taskId) {
       return;
     }
 
     if (!reviewStatus) {
       setError('Review state needs to be selected.');
-      return;
+    } else if (updateReviewStatusModal.reviewState !== reviewStatus) {
+      await dispatch(
+        UpdateReviewStateService(
+          `${import.meta.env.VITE_API_URL}/submission/update_review_state?project_id=${
+            updateReviewStatusModal.projectId
+          }&task_id=${parseInt(updateReviewStatusModal.taskId)}&instance_id=${
+            updateReviewStatusModal.instanceId
+          }&review_state=${reviewStatus}`,
+        ),
+      );
+    }
+    if (noteComments.trim().length > 0) {
+      await dispatch(
+        PostProjectComments(
+          `${import.meta.env.VITE_API_URL}/tasks/task-comments/?project_id=${updateReviewStatusModal?.projectId}`,
+          {
+            task_id: updateReviewStatusModal?.taskUId,
+            project_id: updateReviewStatusModal?.projectId,
+            comment: `${updateReviewStatusModal?.instanceId}-SUBMISSION_INST-${noteComments}`,
+          },
+        ),
+      );
+      setNoteComments('');
     }
     dispatch(
-      UpdateReviewStateService(
-        `${import.meta.env.VITE_API_URL}/submission/update_review_state?project_id=${updateReviewStatusModal.projectId}&task_id=${parseInt(
-          updateReviewStatusModal.taskId,
-        )}&instance_id=${updateReviewStatusModal.instanceId}&review_state=${reviewStatus}`,
-      ),
+      SubmissionActions.SetUpdateReviewStatusModal({
+        toggleModalStatus: false,
+        projectId: null,
+        instanceId: null,
+        taskId: null,
+        reviewState: '',
+        taskUId: null,
+      }),
     );
+    dispatch(SubmissionActions.UpdateReviewStateLoading(false));
   };
 
   return (
@@ -106,6 +133,7 @@ const UpdateReviewStatusModal = () => {
                     instanceId: null,
                     taskId: null,
                     reviewState: '',
+                    taskUId: null,
                   }),
                 );
               }}
@@ -131,6 +159,7 @@ const UpdateReviewStatusModal = () => {
             instanceId: null,
             taskId: null,
             reviewState: '',
+            taskUId: null,
           }),
         );
       }}
