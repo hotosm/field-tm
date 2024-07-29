@@ -21,17 +21,17 @@
 from contextlib import asynccontextmanager
 
 from fastapi.exceptions import HTTPException
-from osm_fieldwork.OdkCentralAsync import OdkEntity
+from osm_fieldwork.OdkCentralAsync import OdkDataset
 
 from app.models.enums import HTTPStatus
 from app.projects.project_schemas import ODKCentralDecrypted
 
 
 @asynccontextmanager
-async def get_odk_entity(odk_creds: ODKCentralDecrypted):
-    """Wrap getting an OdkEntity object with ConnectionError handling."""
+async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
+    """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
-        async with OdkEntity(
+        async with OdkDataset(
             url=odk_creds.odk_central_url,
             user=odk_creds.odk_central_user,
             passwd=odk_creds.odk_central_password,

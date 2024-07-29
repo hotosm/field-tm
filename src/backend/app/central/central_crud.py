@@ -731,7 +731,7 @@ async def get_entities_geojson(
     Returns:
         dict: Entity data in OData JSON format.
     """
-    async with central_deps.get_odk_entity(odk_creds) as odk_central:
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         entities = await odk_central.getEntityData(
             odk_id,
             dataset_name,
@@ -781,7 +781,7 @@ async def get_entities_data(
         list: JSON list containing Entity info. If updated_at is included,
             the format is string 2022-01-31T23:59:59.999Z.
     """
-    async with central_deps.get_odk_entity(odk_creds) as odk_central:
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         entities = await odk_central.getEntityData(
             odk_id,
             dataset_name,
@@ -847,7 +847,7 @@ async def get_entity_mapping_status(
         dict: JSON containing Entity: id, status, updated_at.
             updated_at is in string format 2022-01-31T23:59:59.999Z.
     """
-    async with central_deps.get_odk_entity(odk_creds) as odk_central:
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         entity = await odk_central.getEntity(
             odk_id,
             dataset_name,
@@ -879,7 +879,7 @@ async def update_entity_mapping_status(
     Returns:
         dict: All Entity data in OData JSON format.
     """
-    async with central_deps.get_odk_entity(odk_creds) as odk_central:
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         entity = await odk_central.updateEntity(
             odk_id,
             dataset_name,

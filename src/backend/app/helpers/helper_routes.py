@@ -192,7 +192,7 @@ async def create_entities_from_csv(
     parsed_data = parse_csv(await csv_file.read())
     entities_data_dict = {str(uuid4()): data for data in parsed_data}
 
-    async with central_deps.get_odk_entity(odk_creds) as odk_central:
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         entities = await odk_central.createEntities(
             odk_project_id,
             entity_name,
