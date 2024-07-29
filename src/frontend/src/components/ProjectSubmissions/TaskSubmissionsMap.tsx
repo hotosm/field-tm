@@ -10,18 +10,16 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
 import environment from '@/environment';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/TaskSubmissionsMapLegend';
 import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import {
   colorCodesType,
-  federalWiseProjectCount,
+  taskWiseSubmissionCount,
   legendColorArrayType,
   taskBoundariesType,
   taskFeaturePropertyType,
-  taskSubmissionInfoType,
 } from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
@@ -122,13 +120,13 @@ const TaskSubmissionsMap = () => {
   );
 
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
-  const federalWiseProjectCount: federalWiseProjectCount[] = taskInfo?.map((task) => ({
+  const taskWiseSubmissionCount: taskWiseSubmissionCount[] = taskInfo?.map((task) => ({
     code: task.task_id,
     count: task.submission_count,
   }));
 
   const selectedTask: number = CoreModules.useAppSelector((state) => state.task.selectedTask);
-  const legendColorArray: legendColorArrayType[] = colorRange(federalWiseProjectCount, '4');
+  const legendColorArray: legendColorArrayType[] = colorRange(taskWiseSubmissionCount, '4');
   const { mapRef, map } = useOLMap({
     center: [0, 0],
     zoom: 4,
@@ -191,13 +189,11 @@ const TaskSubmissionsMap = () => {
     (style, feature, resolution) => {
       const stylex = { ...style };
       stylex.fillOpacity = 80;
-      const getFederal = federalWiseProjectCount?.find((d) => d.code == feature.getProperties().uid);
-      const getFederalCount = getFederal?.count;
+      const getTask = taskWiseSubmissionCount?.find((d) => d.code == feature.getProperties().fid);
+      const getTaskSubmissionCount = getTask?.count;
       stylex.labelMaxResolution = 1000;
       stylex.showLabel = true;
-      // stylex.labelField = 'district_code';
-      // stylex.customLabelText = getFederalName;
-      const choroplethColor = getChoroplethColor(getFederalCount, legendColorArray);
+      const choroplethColor = getChoroplethColor(getTaskSubmissionCount, legendColorArray);
       stylex.fillColor = choroplethColor;
       return getStyles({
         style: stylex,
@@ -205,7 +201,7 @@ const TaskSubmissionsMap = () => {
         resolution,
       });
     },
-    [federalWiseProjectCount],
+    [taskWiseSubmissionCount],
   );
 
   map?.on('loadstart', function () {

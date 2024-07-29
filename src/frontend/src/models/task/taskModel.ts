@@ -13,7 +13,7 @@ export type taskFeaturePropertyType = {
   uid: number;
 };
 
-export type federalWiseProjectCount = {
+export type taskWiseSubmissionCount = {
   code: string;
   count: number;
 };
