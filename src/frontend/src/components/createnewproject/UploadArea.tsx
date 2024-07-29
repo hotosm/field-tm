@@ -255,7 +255,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                     type="button"
                     onClick={() => resetFile()}
                     className=""
-                    disabled={drawnGeojson && !geojsonFile ? false : true}
+                    disabled={drawnGeojson ? false : true}
                   />
                   <p className="fmtm-text-gray-700 fmtm-mt-5">
                     Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
