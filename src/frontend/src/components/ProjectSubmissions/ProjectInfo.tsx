@@ -96,7 +96,7 @@ const ProjectInfo = ({ entities }) => {
         <div className="fmtm-w-full fmtm-overflow-x-scroll scrollbar fmtm-pb-1 md:fmtm-pb-0 md:fmtm-overflow-x-visible">
           {projectDetailsLoading || submissionContributorsLoading || entityOsmMapLoading ? (
             <div className="fmtm-w-full fmtm-flex sm:fmtm-justify-center fmtm-gap-5">
-              {Array.from({ length: 3 }).map((i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <CoreModules.Skeleton key={i} className="!fmtm-w-[12.5rem] fmtm-h-[6.25rem] !fmtm-rounded-xl" />
               ))}
             </div>

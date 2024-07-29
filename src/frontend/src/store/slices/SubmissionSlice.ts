@@ -27,6 +27,7 @@ const initialState: SubmissionStateTypes = {
     taskId: null,
     projectId: null,
     reviewState: '',
+    taskUId: null,
   },
   updateReviewStateLoading: false,
 };

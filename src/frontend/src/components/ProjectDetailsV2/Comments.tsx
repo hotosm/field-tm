@@ -29,6 +29,9 @@ const Comments = () => {
       return task?.index == selectedTask;
     })?.[0],
   };
+  const filteredProjectCommentsList = projectCommentsList?.filter(
+    (comment) => !comment?.action_text?.includes('-SUBMISSION_INST-'),
+  );
 
   useEffect(() => {
     dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?comment=true`));
@@ -72,9 +75,9 @@ const Comments = () => {
           </div>
         ) : (
           <div>
-            {projectCommentsList?.length > 0 ? (
+            {filteredProjectCommentsList?.length > 0 ? (
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-mb-1">
-                {projectCommentsList?.map((projectComment, i) => (
+                {filteredProjectCommentsList?.map((projectComment, i) => (
                   <div
                     key={i}
                     className="fmtm-flex fmtm-w-full fmtm-gap-4 fmtm-px-2 fmtm-border-b fmtm-border-[#e9e9e9] sm:fmtm-border-white fmtm-pb-3"

@@ -89,16 +89,6 @@ export const UpdateReviewStateService: Function = (url: string) => {
         dispatch(SubmissionActions.UpdateReviewStateLoading(true));
         const response = await CoreModules.axios.post(url);
         dispatch(SubmissionActions.UpdateSubmissionTableDataReview(response.data));
-        dispatch(
-          SubmissionActions.SetUpdateReviewStatusModal({
-            toggleModalStatus: false,
-            projectId: null,
-            instanceId: null,
-            taskId: null,
-            reviewState: '',
-          }),
-        );
-        dispatch(SubmissionActions.UpdateReviewStateLoading(false));
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
