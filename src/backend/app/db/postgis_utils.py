@@ -696,6 +696,11 @@ async def feature_geojson_to_entity_dict(
     feature_id = feature.get("id")
 
     geometry = feature.get("geometry", {})
+    if not geometry:
+        msg = "'geometry' data field is mandatory"
+        log.debug(msg)
+        raise ValueError(msg)
+
     javarosa_geom = await geojson_to_javarosa_geom(geometry)
 
     # NOTE all properties MUST be string values for Entities, convert
@@ -708,7 +713,7 @@ async def feature_geojson_to_entity_dict(
     task_id = properties.get("task_id")
     entity_label = f"Task {task_id} Feature {feature_id}"
 
-    return {entity_label: {"geometry": javarosa_geom, **properties}}
+    return {"label": entity_label, "data": {"geometry": javarosa_geom, **properties}}
 
 
 async def task_geojson_dict_to_entity_values(task_geojson_dict):
@@ -720,9 +725,7 @@ async def task_geojson_dict_to_entity_values(task_geojson_dict):
             [feature_geojson_to_entity_dict(feature) for feature in features if feature]
         )
 
-    entity_values = await gather(*asyncio_tasks)
-    # Merge all dicts into a single dict
-    return {k: v for result in entity_values for k, v in result.items()}
+    return await gather(*asyncio_tasks)
 
 
 def multipolygon_to_polygon(
