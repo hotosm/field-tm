@@ -51,9 +51,10 @@ async def test_create_project(client, admin_user, organisation):
     }
     odk_creds_models = project_schemas.ODKCentralDecrypted(**odk_credentials)
 
+    project_name = f"Test Project {uuid4()}"
     project_data = {
         "project_info": {
-            "name": f"Test Project {uuid4()}",
+            "name": project_name,
             "short_description": "test",
             "description": "test",
         },
@@ -84,6 +85,19 @@ async def test_create_project(client, admin_user, organisation):
 
     response_data = response.json()
     assert "id" in response_data
+
+    # Duplicate response to test error condition: project name already exists
+    response_duplicate = client.post(
+        f"/projects/create-project?org_id={organisation.id}", json=project_data
+    )
+
+    assert response_duplicate.status_code == 400
+    response_duplicate_data = response_duplicate.json()
+    assert "detail" in response_duplicate_data
+    assert (
+        response_duplicate_data["detail"]
+        == f"Project already exists with the name {project_name}"
+    )
 
 
 async def test_delete_project(client, admin_user, project):
