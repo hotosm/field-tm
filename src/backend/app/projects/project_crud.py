@@ -58,7 +58,7 @@ from app.db.postgis_utils import (
 )
 from app.models.enums import HTTPStatus, ProjectRole, ProjectVisibility, XLSFormType
 from app.projects import project_deps, project_schemas
-from app.s3 import add_obj_to_bucket
+from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 from app.tasks import tasks_crud
 
 TILESDIR = "/opt/tiles"
@@ -219,8 +219,8 @@ async def get_project_info_by_id(db: Session, project_id: int):
     return await convert_to_app_project_info(db_project_info)
 
 
-async def delete_one_project(db: Session, db_project: db_models.DbProject) -> None:
-    """Delete a project by id."""
+async def delete_fmtm_project(db: Session, db_project: db_models.DbProject) -> None:
+    """Delete a FMTM project by id."""
     try:
         project_id = db_project.id
         db.delete(db_project)
@@ -229,6 +229,18 @@ async def delete_one_project(db: Session, db_project: db_models.DbProject) -> No
     except Exception as e:
         log.exception(e)
         raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=e) from e
+
+
+async def delete_fmtm_s3_objects(db_project: db_models.DbProject) -> None:
+    """Delete objects on S3 for an FMTM project."""
+    project_id = db_project.id
+    org_id = db_project.organisation_id
+    project_s3_path = f"/{org_id}/{project_id}/"
+
+    delete_all_objs_under_prefix(
+        settings.S3_BUCKET_NAME,
+        project_s3_path,
+    )
 
 
 async def partial_update_project_info(

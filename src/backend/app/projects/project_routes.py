@@ -435,8 +435,10 @@ async def delete_project(
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     # Delete ODK Central project
     await central_crud.delete_odk_project(project.odkid, odk_credentials)
+    # Delete S3 resources
+    await project_crud.delete_fmtm_s3_objects(project)
     # Delete FMTM project
-    await project_crud.delete_one_project(db, project)
+    await project_crud.delete_fmtm_project(db, project)
 
     log.info(f"Deletion of project {project.id} successful")
     return Response(status_code=HTTPStatus.NO_CONTENT)
