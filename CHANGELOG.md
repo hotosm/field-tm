@@ -1,5 +1,70 @@
 # Changelog
 
+## 2024.3.2 (2024-07-31)
+
+### Feat
+
+- **backend**: delete s3 objects on project deletion (#1718)
+- **backend**: updated generate_project_files to bulk upload entities (#1714)
+- **frontend**: working submission comments to submission page  (#1709)
+- **backend**: calculate overlap percentage for the conflation (#1687)
+- **frontend**: add user to task popup (#1670)
+- **backend**: add helper route to convert multipolygon geojson --> polygons
+- **backend**: update split-by-square to avoid creating tasks with no features in it (#1642)
+- **backend**: endpoint to conflate the submission with osm data (#1594)
+- implement global jwt token authentication for login (#1574)
+- add new endpoint to refresh the app user token (#1583)
+
+### Fix
+
+- **frontend**: increase maxZoom if project details map 20 --> 22 (drone imagery)
+- xlsform question ordering + pmtile generation when custom TMS (#1721)
+- **frontend**: submission map chloropeth updating (#1716)
+- **uploadArea**: allow to reset polygon even if its a geojson file on draw option selection (#1713)
+- **projectTaskStatus**: dialog task_status text update on task update (#1712)
+- **backend**: remove option for updating form category type
+- **frontend**: disable form category updates (#1704)
+- **backend**: generating project files passing project id to background task (#1708)
+- **project**: display error generated on the backend (#1693)
+- **frontend**: button click feedback on form update (#1692)
+- **frontend**: reduce task overlay opacity (#1682)
+- increased expiry of access token to 1 day (#1672)
+- **manageProject**: hide user tab until its api integration (#1669)
+- **backend**: ensure log level name is used (not Level 10, etc)
+- **backend**: ProjectUserDict usage and standardise geojson parsing/usage throughout (#1659)
+- **backend**: better handle invalid multipolygon geoms
+- **backend**: allow multipolygons to choose as task area (#1645)
+- **backend**: add hashtag to #domain-project_id during proj create
+- **createNewProject**: save current form step state on previous btn click (#1643)
+- **selectForm**: update select category description (#1644)
+- **frontend**: display submission point feature if feature not in extract  (#1638)
+- **frontend**: avoid map legend overlay on small screens (dynamic size) (#1637)
+- prevent project generation if api failure (#1627)
+- replace lru_cache with async for getting odk creds
+- **backend**: addded created date on the project response, set expiry of access token to 1 hour (#1633)
+- **hotfix**: download of basemaps in ui, max zoom level 22 used for tms
+- **backend**: add INVALIDATED status option back in (#1618)
+- **featureSelectionPopup**: allow any users to map feature (#1612)
+- **backend**: parsing of hashtags (allow separation by comma, space, or semicolon) (#1607)
+- **enums**: uncomment previous get_action_for_status_change code (#1609)
+- **map**: set default baseLayer to OSM (#1600)
+
+### Refactor
+
+- **backend**: remove additional warning logs from check_crs function
+- **backend**: improve error message if no project submissions present (#1696)
+- **backend**: simplify logic for EXTRA_CORS_ORIGINS validation
+- run latest pre-commit hooks
+- run pyupgrade pre-commit hook
+- **frontend**: simplify infographics API usage (reuse Entities data) (#1601)
+- return access_token response to browser (in memory only)
+- access_token expiry --> 1hr, refresh_token expiry --> 7 days
+- remove redundant logic for refresh token func
+- use pydantic model_dump over .json method
+- replace RS256 jwt signing with simpler HS384 (#1622)
+- fix refs to project_admin --> project_manager after PR merge
+- **frontend**: update remaining JavaScript files to TypeScript (#1602)
+
 ## 2024.3.1 (2024-06-24)
 
 ### Feat
