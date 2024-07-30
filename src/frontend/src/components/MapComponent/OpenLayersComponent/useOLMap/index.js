@@ -8,7 +8,7 @@ import VectorLayer from 'ol/layer/Vector';
 const defaultProps = {
   center: [0, 0],
   zoom: 2,
-  maxZoom: 20,
+  maxZoom: 22,
 };
 
 const useOLMap = (props) => {
