@@ -47,7 +47,7 @@ dependencies = [
     "pyjwt>=2.8.0",
     "async-lru>=2.0.4",
     "osm-login-python==1.0.3",
-    "osm-fieldwork==0.14.0",
+    "osm-fieldwork==0.14.1",
     "osm-rawdata==0.3.0",
     "fmtm-splitter==1.3.0",
 ]
