@@ -1374,6 +1374,11 @@ def get_project_tiles(
             log.error(msg)
             raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
+        # Overwrite source with OAM provider
+        if tms and "openaerialmap" in tms:
+            # NOTE the 'xy' param is set automatically by source=oam
+            source = "oam"
+
         log.debug(
             "Creating basemap with params: "
             f"boundary={min_lon},{min_lat},{max_lon},{max_lat} | "
@@ -1381,7 +1386,6 @@ def get_project_tiles(
             f"zooms={zooms} | "
             f"outdir={tiles_dir} | "
             f"source={source} | "
-            f"xy={True if tms else False} | "
             f"tms={tms}"
         )
 
@@ -1391,7 +1395,6 @@ def get_project_tiles(
             zooms=zooms,
             outdir=tiles_dir,
             source=source,
-            xy=True if tms else False,
             tms=tms,
         )
 
