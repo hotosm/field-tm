@@ -41,18 +41,25 @@
   <i>Primary backend developer</i>
 </div>
 <div style="margin-bottom: 20px;">
-  <img src="https://avatars.githubusercontent.com/u/41701707?v=4" width="100" style="border-radius: 50%;" alt="Niraj Adhikari">
-  <br>
-  <b>Niraj Adhikari</b>
-  <br>
-  <i>Backend development advisory role</i>
-</div>
-<div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/81785002?v=4" width="100" style="border-radius: 50%;" alt="Nishit Suwal">
   <br>
   <b>Nishit Suwal</b>
   <br>
   <i>Primary frontend developer</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/108750444?v=4?s=100" width="100" style="border-radius: 50%;" alt="Susmina Manandhar">
+  <br>
+  <b>Susmina Manandhar</b>
+  <br>
+  <i>Product Manager advisory role</i>
+</div>
+<div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/41701707?v=4" width="100" style="border-radius: 50%;" alt="Niraj Adhikari">
+  <br>
+  <b>Niraj Adhikari</b>
+  <br>
+  <i>Backend development advisory role</i>
 </div>
 <div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/37866666?v=4" width="100" style="border-radius: 50%;" alt="Deepak Pradhan (Varun)">
