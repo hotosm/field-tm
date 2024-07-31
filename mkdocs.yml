@@ -74,7 +74,7 @@ nav:
       - The Team: about/team.md
   - User Manuals:
       - Video Guides: manuals/videos.md
-      - User Types Explanation: user-breakdown.md
+      - User Types Explanation: manuals/user-breakdown.md
       - Workflow Diagrams: manuals/workflow-diagrams.md
       - Project Manager Guide: manuals/project-managers.md
       - XLSForm Design: manuals/xlsform-design.md
