@@ -117,6 +117,7 @@ echo "Waiting 5 minutes (for migrations) before first backup."
 sleep 600
 
 while true; do
+    ### FMTM Backup ###
     pretty_echo "### Backup FMTM $(date +%Y-%m-%d_%H:%M:%S) ###"
     check_fmtm_db_vars_present
     wait_for_db "${FMTM_DB_HOST:-fmtm-db}"
@@ -124,15 +125,18 @@ while true; do
         "${FMTM_DB_NAME:-fmtm}" "${FMTM_DB_PASSWORD}"
     pretty_echo "### Backup FMTM Complete ###"
 
-    # Only run ODK Central DB Backups if CENTRAL_DB_HOST is set and not 
-    # equal to default value from .env.example: 'central-db'
-    if [ -n "${CENTRAL_DB_HOST}" ] && [ "${CENTRAL_DB_HOST}" != "central-db" ]; then
+    ### ODK Backup ###
+    # Only run ODK Central DB Backups if the database is included in the stack
+    # Exec is used to wrap the error messages / suppress output
+    if (exec 3>/dev/tcp/"${CENTRAL_DB_HOST}"/5432) 2>/dev/null; then
         pretty_echo "### Backup ODK Central $(date +%Y-%m-%d_%H:%M:%S) ###"
         check_central_db_vars_present
-        wait_for_db "${CENTRAL_DB_HOST:-central-db}"
+        # wait_for_db "${CENTRAL_DB_HOST:-central-db}"
         backup_db "${CENTRAL_DB_HOST:-central-db}" "${CENTRAL_DB_USER:-odk}" \
             "${CENTRAL_DB_NAME:-odk}" "${CENTRAL_DB_PASSWORD}"
         pretty_echo "### Backup ODK Central Complete ###"
+    else
+        echo "Skipping ODK DB Backup (instance is remote)."
     fi
 
     echo "Waiting 24hrs until next backup."
