@@ -13,7 +13,7 @@
   - "Justfile"
 "migration":
   - "src/backend/migrations/**/*"
-"documentation":
+"docs":
   - "docs/**/*"
   - "images/**/*"
   - "mkdocs.yml"
