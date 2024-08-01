@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/labeler@v4
+      - uses: actions/labeler@v5
         # Uses .github/labeler.yml definitions
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
