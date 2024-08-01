@@ -10,6 +10,6 @@ on:
 
 jobs:
   publish-docs-to-wiki:
-    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@1.6.0
+    uses: hotosm/gh-workflows/.github/workflows/wiki.yml@2.0.5
     with:
       homepage_path: "wiki_redirect.md"

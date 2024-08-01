@@ -128,6 +128,20 @@ async def logout():
         httponly=True,
         samesite="lax",
     )
+    # Remove refresh cookie
+    refresh_cookie_name = f"{cookie_name}_refresh"
+    log.debug(f"Resetting cookie in response named '{refresh_cookie_name}'")
+    response.set_cookie(
+        key=refresh_cookie_name,
+        value="",
+        max_age=0,  # Set to expire immediately
+        expires=0,  # Set to expire immediately
+        path="/",
+        domain=settings.FMTM_DOMAIN,
+        secure=False if settings.DEBUG else True,
+        httponly=True,
+        samesite="lax",
+    )
     return response
 
 

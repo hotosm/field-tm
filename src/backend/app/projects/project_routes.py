@@ -485,15 +485,13 @@ async def create_project(
         )
         odk_creds_decrypted = await organisation_deps.get_org_odk_creds(db_org)
 
-    sql = text(
-        """
-            SELECT EXISTS (
-                SELECT 1
-                FROM project_info
-                WHERE LOWER(name) = :project_name
-            )
-            """
-    )
+    sql = text("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM project_info
+            WHERE LOWER(name) = :project_name
+        )
+    """)
     result = db.execute(sql, {"project_name": project_info.project_info.name.lower()})
     project_exists = result.scalar()
     if project_exists:
