@@ -14,13 +14,19 @@ on:
 
 jobs:
   unit-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@1.6.0
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.5
     with:
       working_dir: src/frontend
 
   e2e-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@main
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.5
     with:
-      container_config: '{"image": "mcr.microsoft.com/playwright:v1.45.1"}'
-      working_dir: src/frontend
-      run_command: "test:e2e"
+      playwright: true
+      cache_image: false
+      compose_file: docker-compose.yml -f contrib/playwright/docker-compose.yml
+      compose_service: ui-test
+      cache_extra_imgs: |
+        "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"
+        "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
+        "ghcr.io/hotosm/fmtm/frontend:playwright-${{ vars.PLAYWRIGHT_TAG }}"
+    secrets: inherit

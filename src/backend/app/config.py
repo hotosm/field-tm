@@ -172,10 +172,17 @@ class Settings(BaseSettings):
         If this variable used, the provided urls are appended to the list.
         """
         # Build default origins from env vars
-        url_scheme = "http" if info.data.get("DEBUG") else "https"
-        local_server_port = (
-            f":{info.data.get('FMTM_DEV_PORT')}" if info.data.get("DEBUG") else ""
-        )
+        if info.data.get("DEBUG"):
+            url_scheme = "http"
+            dev_port = info.data.get("FMTM_DEV_PORT", "false")
+            if dev_port.lower() in ("0", "no", "false"):
+                local_server_port = ""
+            else:
+                local_server_port = f":{dev_port}"
+        else:
+            url_scheme = "https"
+            local_server_port = ""
+
         default_origins = [
             f"{url_scheme}://{info.data.get('FMTM_DOMAIN')}{local_server_port}",
             # Also add the xlsform-editor url

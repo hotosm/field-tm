@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pytest:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@1.6.0
+  backend-test:
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.5
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
@@ -28,22 +28,35 @@ jobs:
       coverage: true
     secrets: inherit
 
-  frontend-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@1.6.0
+  frontend-unit-test:
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.5
     with:
       working_dir: src/frontend
 
+  frontend-e2e-test:
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.5
+    with:
+      playwright: true
+      cache_image: false
+      compose_file: docker-compose.yml -f contrib/playwright/docker-compose.yml
+      compose_service: ui-test
+      cache_extra_imgs: |
+        "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"
+        "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
+        "ghcr.io/hotosm/fmtm/frontend:playwright-${{ vars.PLAYWRIGHT_TAG }}"
+    secrets: inherit
+
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.6.0
-    needs: [pytest]
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.5
+    needs: [backend-test]
     with:
       context: src/backend
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@1.6.0
-    needs: [frontend-tests]
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.5
+    needs: [frontend-unit-test, frontend-e2e-test]
     with:
       context: src/frontend
       dockerfile: prod.dockerfile
@@ -152,7 +165,7 @@ jobs:
     needs:
       - smoke-test-backend
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy.yml@1.6.0
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@2.0.5
     with:
       environment: ${{ github.ref_name }}
       docker_compose_file: "docker-compose.${{ github.ref_name }}.yml"

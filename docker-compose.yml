@@ -120,26 +120,12 @@ services:
       - /app/node_modules/
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
-      - VITE_API_URL=${API_URL_OVERRIDE:-http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}}
+      - VITE_API_URL=${API_URL:-http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}}
     ports:
       - "7051:7051"
     networks:
       - fmtm-net
     restart: "unless-stopped"
-
-  ui-test:
-    profiles: ["ui-test"]
-    image: mcr.microsoft.com/playwright:v1.45.1
-    working_dir: /app
-    environment:
-      - DISPLAY=:0
-    volumes:
-      - ./src/frontend:/app
-      - /tmp/.X11-unix:/tmp/.X11-unix
-    command: npm run test:e2e
-    networks:
-      - fmtm-net
-    restart: "never"
 
   central:
     profiles: ["", "central"]

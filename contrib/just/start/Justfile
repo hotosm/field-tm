@@ -19,12 +19,29 @@
 # Start FMTM
 [no-cd]
 default:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
   docker compose up -d
 
 # Start backend API only
 [no-cd]
 backend:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
   docker compose up -d api
+
+# Start backend API only
+[no-cd]
+backend-no-docker:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}/src/backend
+
+  FMTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
+  OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
+    pdm run uvicorn app.main:api --host 0.0.0.0 --port 8000
 
 # Start frontend UI only
 [no-cd]
@@ -77,7 +94,7 @@ tunnel:
   just --unstable dotenv update "S3_ENDPOINT" "${s3_url}"
 
   # Restart the API and UI with environment variables set
-  API_URL_OVERRIDE="${api_url}" docker compose \
+  API_URL="${api_url}" docker compose \
     -f docker-compose.yml \
     -f contrib/tunnel/docker-compose.yml \
     up -d api ui
