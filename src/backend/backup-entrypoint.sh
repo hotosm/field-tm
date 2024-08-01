@@ -124,8 +124,9 @@ while true; do
         "${FMTM_DB_NAME:-fmtm}" "${FMTM_DB_PASSWORD}"
     pretty_echo "### Backup FMTM Complete ###"
 
-    # Only run ODK Central DB Backups if variables set
-    if [ -n "${CENTRAL_DB_PASSWORD}" ]; then
+    # Only run ODK Central DB Backups if CENTRAL_DB_HOST is set and not 
+    # equal to default value from .env.example: 'central-db'
+    if [ -n "${CENTRAL_DB_HOST}" ] && [ "${CENTRAL_DB_HOST}" != "central-db" ]; then
         pretty_echo "### Backup ODK Central $(date +%Y-%m-%d_%H:%M:%S) ###"
         check_central_db_vars_present
         wait_for_db "${CENTRAL_DB_HOST:-central-db}"
