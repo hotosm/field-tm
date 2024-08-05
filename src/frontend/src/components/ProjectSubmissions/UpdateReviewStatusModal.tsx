@@ -33,7 +33,6 @@ const reviewList: reviewListType[] = [
 const UpdateReviewStatusModal = () => {
   const dispatch = useDispatch();
   const [noteComments, setNoteComments] = useState('');
-  const [error, setError] = useState('');
   const [reviewStatus, setReviewStatus] = useState('');
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
   const updateReviewStateLoading = useAppSelector((state) => state.submission.updateReviewStateLoading);
@@ -47,9 +46,7 @@ const UpdateReviewStatusModal = () => {
       return;
     }
 
-    if (!reviewStatus) {
-      setError('Review state needs to be selected.');
-    } else if (updateReviewStatusModal.reviewState !== reviewStatus) {
+    if (updateReviewStatusModal.reviewState !== reviewStatus) {
       await dispatch(
         UpdateReviewStateService(
           `${import.meta.env.VITE_API_URL}/submission/update_review_state?project_id=${
@@ -112,7 +109,6 @@ const UpdateReviewStatusModal = () => {
                 </button>
               ))}
             </div>
-            {error && <p className="fmtm-mt-1 fmtm-text-left fmtm-text-primaryRed">{error}</p>}
           </div>
           <TextArea
             rows={4}
@@ -141,6 +137,7 @@ const UpdateReviewStatusModal = () => {
             <Button
               loadingText="Updating"
               isLoading={updateReviewStateLoading}
+              disabled={!reviewStatus}
               btnText="Update"
               btnType="primary"
               className="fmtm-w-full fmtm-justify-center !fmtm-rounded fmtm-font-bold fmtm-text-sm !fmtm-py-2"
@@ -151,7 +148,6 @@ const UpdateReviewStatusModal = () => {
       }
       open={updateReviewStatusModal.toggleModalStatus}
       onOpenChange={(value) => {
-        setError('');
         dispatch(
           SubmissionActions.SetUpdateReviewStatusModal({
             toggleModalStatus: value,
