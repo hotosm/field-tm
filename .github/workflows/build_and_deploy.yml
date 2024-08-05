@@ -43,7 +43,7 @@ jobs:
       cache_extra_imgs: |
         "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"
         "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
-        "ghcr.io/hotosm/fmtm/frontend:playwright-${{ vars.PLAYWRIGHT_TAG }}"
+        "mcr.microsoft.com/playwright-${{ vars.PLAYWRIGHT_TAG }}"
     secrets: inherit
 
   backend-build:
