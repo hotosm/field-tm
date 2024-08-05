@@ -23,6 +23,7 @@ import os
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Generator
+from uuid import uuid4
 
 import pytest
 import requests
@@ -42,7 +43,7 @@ from app.db.database import Base, get_db
 from app.db.db_models import DbOrganisation, DbTaskHistory
 from app.main import get_application
 from app.models.enums import TaskStatus, UserRole
-from app.projects import project_crud
+from app.projects import project_crud, project_schemas
 from app.projects.project_schemas import ODKCentralDecrypted, ProjectInfo, ProjectUpload
 from app.users.user_crud import get_user
 from tests.test_data import test_data_path
@@ -309,6 +310,43 @@ async def entities(odk_project):
         odk_project.odkid,
     )
     yield entities
+
+
+@pytest.fixture(scope="function")
+def project_data():
+    """Sample data for creating a project."""
+    project_name = f"Test Project {uuid4()}"
+    data = {
+        "project_info": {
+            "name": project_name,
+            "short_description": "test",
+            "description": "test",
+        },
+        "xform_category": "buildings",
+        "hashtags": "#FMTM",
+        "outline_geojson": {
+            "coordinates": [
+                [
+                    [85.317028828, 27.7052522097],
+                    [85.317028828, 27.7041424888],
+                    [85.318844411, 27.7041424888],
+                    [85.318844411, 27.7052522097],
+                    [85.317028828, 27.7052522097],
+                ]
+            ],
+            "type": "Polygon",
+        },
+    }
+    odk_credentials = {
+        "odk_central_url": odk_central_url,
+        "odk_central_user": odk_central_user,
+        "odk_central_password": odk_central_password,
+    }
+
+    odk_creds_models = project_schemas.ODKCentralDecrypted(**odk_credentials)
+
+    data.update(**odk_creds_models.model_dump())
+    return data
 
 
 # @pytest.fixture(scope="function")
