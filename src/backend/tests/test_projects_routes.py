@@ -196,6 +196,25 @@ async def test_unsupported_crs(project_data, crs):
     assert exc_info.value.status_code == 400
 
 
+@pytest.mark.parametrize(
+    "hashtag_input, expected_output",
+    [
+        ("tag1, tag2, tag3", ["#tag1", "#tag2", "#tag3", "#FMTM"]),
+        ("tag1   tag2    tag3", ["#tag1", "#tag2", "#tag3", "#FMTM"]),
+        ("tag1, tag2 tag3    tag4", ["#tag1", "#tag2", "#tag3", "#tag4", "#FMTM"]),
+        ("TAG1, tag2 #TAG3", ["#TAG1", "#tag2", "#TAG3", "#FMTM"]),
+    ],
+)
+def test_hashtags(client, organisation, project_data, hashtag_input, expected_output):
+    """Test hashtag parsing."""
+    project_data["hashtags"] = hashtag_input
+    response_data = create_project(client, organisation.id, project_data)
+    project_id = response_data["id"]
+    assert "id" in response_data
+    assert response_data["hashtags"][:-1] == expected_output
+    assert response_data["hashtags"][-1] == f"#{settings.FMTM_DOMAIN}-{project_id}"
+
+
 async def test_delete_project(client, admin_user, project):
     """Test deleting a FMTM project, plus ODK Central project."""
     response = client.delete(f"/projects/{project.id}")
@@ -430,7 +449,7 @@ async def test_update_project(client, admin_user, project):
         == updated_project_data["project_info"]["description"]
     )
 
-    assert response_data["xform_category"] == "healthcare"
+    assert response_data["xform_category"] == updated_project_data["xform_category"]
     assert response_data["hashtags"] == ["#FMTM", "#anothertag"]
 
 
