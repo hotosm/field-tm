@@ -138,7 +138,7 @@ The example CSV can be downloaded
     saved to when submitted. This should probably match the field name.
 - The form to create the Entity List is then uploaded to ODK Central:
 
-![Entities Create UI](../images/xlsform-design/odk-central-entity-reg.png)
+![Entities Create UI](../images/xlsform-design/odk-central-entity-registration.png)
 
 ### 3. From Code (API)
 
