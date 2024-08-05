@@ -1,29 +1,46 @@
-"frontend":
-  - "src/frontend/**/*"
-"backend":
-  - "src/backend/**/*"
-"devops":
-  - ".github/**/*"
-  - "nginx/**/*"
-  - "scripts/**/*"
-  - "docker-*.yml"
-  - "**/Dockerfile"
-  - "**/*.dockerfile"
-  - "**/*entrypoint.sh"
-  - "Justfile"
-"migration":
-  - "src/backend/migrations/**/*"
-"docs":
-  - "docs/**/*"
-  - "images/**/*"
-  - "mkdocs.yml"
-  - "README.md"
-  - "INSTALL.md"
-"ODK":
-  - "odkcentral/**/*"
-"contrib":
-  - "contrib/**/*"
-"tests":
-  - "src/backend/tests/**/*"
-  - "src/frontend/tests/**/*"
-  - "src/frontend/e2e/**/*"
+bug:
+  # Branch starts with `fix` or has a `fix` in the name
+  - head-branch: ["^fix", "fix"]
+enhancement:
+  - head-branch:
+      ["^feature", "feature", "^feat", "feat", "^refactor", "refactor"]
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: src/frontend/**
+backend:
+  - changed-files:
+      - any-glob-to-any-file: src/backend/**
+devops:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+          - nginx/**
+          - scripts/**
+          - docker-*.yml
+          - ./**/Dockerfile
+          - ./**/.dockerfile
+          - ./**/*entrypoint.sh
+          - ./**/Justfile
+migration":
+  - changed-files:
+      - any-glob-to-any-file: src/backend/migrations/**
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - images/**
+          - mkdocs.yml
+          - README.md
+          - INSTALL.md
+ODK:
+  - changed-files:
+      - any-glob-to-any-file: odkcentral/**
+contrib:
+  - changed-files:
+      - any-glob-to-any-file: contrib/**
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/backend/tests/**
+          - src/frontend/tests/**
+          - src/frontend/e2e/**
