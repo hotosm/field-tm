@@ -19,9 +19,7 @@ In reverse chronological order, with most recent events first.
 >         <div class="timeline-date">2024-07</div>
 >         <h3>Demo: Alpa Corral, Argentina </h3>
 >         🚀 Field test with over 100 users for fire hazard assessment
-
-          and prevention mapping.
-
+>         and prevention mapping.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
@@ -117,7 +115,6 @@ In reverse chronological order, with most recent events first.
 >         🔬 [Concept Note][1] written for a 'Field Mapping Tasking Manager'.
 >         <div class="timeline-dot"></div>
 >     </div>
->
 > </div>
 
 <!-- markdownlint-restore -->
