@@ -23,3 +23,7 @@
   - "odkcentral/**/*"
 "contrib":
   - "contrib/**/*"
+"tests":
+  - "src/backend/tests/**/*"
+  - "src/frontend/tests/**/*"
+  - "src/frontend/e2e/**/*"
