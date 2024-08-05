@@ -26,6 +26,7 @@ from uuid import uuid4
 
 import pytest
 import requests
+from fastapi import HTTPException
 from geoalchemy2.elements import WKBElement
 from loguru import logger as log
 from shapely import Polygon
@@ -34,6 +35,7 @@ from app.central.central_crud import create_odk_project
 from app.central.central_schemas import TaskStatus
 from app.config import encrypt_value, settings
 from app.db import db_models
+from app.db.postgis_utils import check_crs
 from app.projects import project_crud, project_schemas
 from tests.test_data import test_data_path
 
@@ -42,25 +44,37 @@ odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
 
 
-async def test_create_project(client, admin_user, organisation):
-    """Test project creation endpoint."""
-    odk_credentials = {
-        "odk_central_url": odk_central_url,
-        "odk_central_user": odk_central_user,
-        "odk_central_password": odk_central_password,
-    }
-    odk_creds_models = project_schemas.ODKCentralDecrypted(**odk_credentials)
+def create_project(client, organisation_id, project_data):
+    """Create a new project."""
+    response = client.post(
+        f"/projects/create-project?org_id={organisation_id}", json=project_data
+    )
+    assert response.status_code == 200
+    return response.json()
 
-    project_name = f"Test Project {uuid4()}"
-    project_data = {
-        "project_info": {
-            "name": project_name,
-            "short_description": "test",
-            "description": "test",
-        },
-        "xform_category": "buildings",
-        "hashtags": "#FMTM",
-        "outline_geojson": {
+
+def test_create_project(client, organisation, project_data):
+    """Test project creation endpoint."""
+    response_data = create_project(client, organisation.id, project_data)
+    project_name = project_data["project_info"]["name"]
+    assert "id" in response_data
+
+    # Duplicate response to test error condition: project name already exists
+    response_duplicate = client.post(
+        f"/projects/create-project?org_id={organisation.id}", json=project_data
+    )
+    assert response_duplicate.status_code == 400
+    assert (
+        response_duplicate.json()["detail"]
+        == f"Project already exists with the name {project_name}"
+    )
+
+
+@pytest.mark.parametrize(
+    "geojson_type",
+    [
+        {
+            "type": "Polygon",
             "coordinates": [
                 [
                     [85.317028828, 27.7052522097],
@@ -70,34 +84,116 @@ async def test_create_project(client, admin_user, organisation):
                     [85.317028828, 27.7052522097],
                 ]
             ],
-            "type": "Polygon",
         },
-    }
-    project_data.update(**odk_creds_models.model_dump())
+        {
+            "type": "MultiPolygon",
+            "coordinates": [
+                [
+                    [
+                        [85.317028828, 27.7052522097],
+                        [85.317028828, 27.7041424888],
+                        [85.318844411, 27.7041424888],
+                        [85.318844411, 27.7052522097],
+                        [85.317028828, 27.7052522097],
+                    ]
+                ]
+            ],
+        },
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.317028828, 27.7052522097],
+                        [85.317028828, 27.7041424888],
+                        [85.318844411, 27.7041424888],
+                        [85.318844411, 27.7052522097],
+                        [85.317028828, 27.7052522097],
+                    ]
+                ],
+            },
+        },
+        {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [85.317028828, 27.7052522097],
+                                [85.317028828, 27.7041424888],
+                                [85.318844411, 27.7041424888],
+                                [85.318844411, 27.7052522097],
+                                [85.317028828, 27.7052522097],
+                            ]
+                        ],
+                    },
+                }
+            ],
+        },
+    ],
+)
+def test_valid_geojson_types(client, organisation, project_data, geojson_type):
+    """Test valid geojson types."""
+    project_data["outline_geojson"] = geojson_type
+    response_data = create_project(client, organisation.id, project_data)
+    assert "id" in response_data
 
+
+@pytest.mark.parametrize(
+    "geojson_type",
+    [
+        {
+            "type": "LineString",
+            "coordinates": [
+                [85.317028828, 27.7052522097],
+                [85.318844411, 27.7041424888],
+            ],
+        },
+        {
+            "type": "MultiLineString",
+            "coordinates": [
+                [[85.317028828, 27.7052522097], [85.318844411, 27.7041424888]]
+            ],
+        },
+        {"type": "Point", "coordinates": [85.317028828, 27.7052522097]},
+        {
+            "type": "MultiPoint",
+            "coordinates": [
+                [85.317028828, 27.7052522097],
+                [85.318844411, 27.7041424888],
+            ],
+        },
+    ],
+)
+def test_invalid_geojson_types(client, organisation, project_data, geojson_type):
+    """Test invalid geojson types."""
+    project_data["outline_geojson"] = geojson_type
     response = client.post(
         f"/projects/create-project?org_id={organisation.id}", json=project_data
     )
+    assert response.status_code == 422
 
-    if response.status_code != 200:
-        log.error(response.json())
-    assert response.status_code == 200
 
-    response_data = response.json()
-    assert "id" in response_data
-
-    # Duplicate response to test error condition: project name already exists
-    response_duplicate = client.post(
-        f"/projects/create-project?org_id={organisation.id}", json=project_data
-    )
-
-    assert response_duplicate.status_code == 400
-    response_duplicate_data = response_duplicate.json()
-    assert "detail" in response_duplicate_data
-    assert (
-        response_duplicate_data["detail"]
-        == f"Project already exists with the name {project_name}"
-    )
+@pytest.mark.parametrize(
+    "crs",
+    [
+        {"type": "name", "properties": {"name": "GGRS87"}},
+        {"type": "name", "properties": {"name": "NAD83"}},
+        {"type": "name", "properties": {"name": "NAD27"}},
+    ],
+)
+async def test_unsupported_crs(project_data, crs):
+    """Test unsupported CRS in GeoJSON."""
+    project_data["outline_geojson"]["crs"] = crs
+    with pytest.raises(HTTPException) as exc_info:
+        await check_crs(project_data["outline_geojson"])
+    assert exc_info.value.status_code == 400
 
 
 async def test_delete_project(client, admin_user, project):
