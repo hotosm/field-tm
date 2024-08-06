@@ -33,7 +33,6 @@ from geojson_pydantic import Polygon
 from loguru import logger as log
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import create_database, database_exists
 
 from app.auth.auth_routes import get_or_create_user
 from app.auth.auth_schemas import AuthUser, FMTMUser
@@ -74,10 +73,6 @@ def app() -> Generator[FastAPI, Any, None]:
 def db_engine():
     """The SQLAlchemy database engine to init."""
     engine = create_engine(settings.FMTM_DB_URL.unicode_string())
-    if not database_exists:
-        create_database(engine.url)
-
-    Base.metadata.create_all(bind=engine)
     yield engine
 
 
