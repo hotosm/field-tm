@@ -31,7 +31,6 @@ dependencies = [
     "geojson-pydantic==1.1.0",
     "python-multipart==0.0.9",
     "sqlalchemy==2.0.31",
-    "SQLAlchemy-Utils==0.41.2",
     "psycopg2==2.9.9",
     "geoalchemy2==0.15.2",
     "geojson==3.1.0",
