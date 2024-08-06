@@ -23,6 +23,7 @@ all: backend frontend
 # Test backend with pytest
 [no-cd]
 backend:
+  docker compose up -d
   docker compose run --rm api pytest
 
 # Test frontend with Playwright
