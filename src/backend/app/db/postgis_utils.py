@@ -904,7 +904,6 @@ def conflate_features(
 
         updated_input_feature = {
             "type": input_feature["type"],
-            "id": input_feature["properties"]["xid"],
             "geometry": input_feature["geometry"],
             "properties": {
                 **input_feature["properties"],
@@ -916,7 +915,6 @@ def conflate_features(
         if overlap_percent < 90:
             corresponding_feature = {
                 "type": "Feature",
-                "id": osm_feature["properties"].pop("osm_id"),
                 "geometry": mapping(osm_geometry),
                 "properties": osm_feature["properties"],
             }
