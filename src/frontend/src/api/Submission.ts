@@ -4,7 +4,7 @@ import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 export const SubmissionService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(SubmissionActions.SetSubmissionDetailsLoading(true));
-    const getSubmissionDetails = async (url) => {
+    const getSubmissionDetails = async (url: string) => {
       try {
         const getSubmissionDetailsResponse = await axios.get(url);
         const response: any = getSubmissionDetailsResponse.data;

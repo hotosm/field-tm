@@ -2,17 +2,17 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
 import { task_status } from '@/types/enums';
-import axios from 'axios';
 import { writeBinaryToOPFS } from '@/api/Files';
+import { projectInfoType } from '@/models/project/projectModel';
 
-export const ProjectById = (existingProjectList, projectId) => {
+export const ProjectById = (projectId: string) => {
   return async (dispatch) => {
-    const fetchProjectById = async (projectId, existingProjectList) => {
+    const fetchProjectById = async (projectId: string) => {
       try {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
         const project = await CoreModules.axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}`);
-        const projectResp = project.data;
-        const persistingValues = projectResp.tasks.map((data) => {
+        const projectResp: Record<string, any> = project.data;
+        const persistingValues: Record<string, any> = projectResp.tasks.map((data) => {
           return {
             id: data.id,
             index: data.project_task_index,
@@ -65,19 +65,19 @@ export const ProjectById = (existingProjectList, projectId) => {
       }
     };
 
-    await fetchProjectById(projectId, existingProjectList);
+    await fetchProjectById(projectId);
     dispatch(ProjectActions.SetNewProjectTrigger());
   };
 };
 
-export const DownloadProjectForm = (url, payload, projectId) => {
+export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
   return async (dispatch) => {
-    dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: true }));
+    dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: true }));
 
-    const fetchProjectForm = async (url, payload, projectId) => {
+    const fetchProjectForm = async (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
       try {
         let response;
-        if (payload === 'form') {
+        if (downloadType === 'form') {
           response = await CoreModules.axios.get(url, { responseType: 'blob' });
         } else {
           response = await CoreModules.axios.get(url, {
@@ -86,26 +86,28 @@ export const DownloadProjectForm = (url, payload, projectId) => {
         }
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = `${payload === 'form' ? `project_form_${projectId}.xls` : `task_polygons_${projectId}.geojson`}`;
+        a.download = `${
+          downloadType === 'form' ? `project_form_${projectId}.xls` : `task_polygons_${projectId}.geojson`
+        }`;
         a.click();
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
       } catch (error) {
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
       } finally {
-        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));
       }
     };
-    await fetchProjectForm(url, payload, projectId);
+    await fetchProjectForm(url, downloadType, projectId);
   };
 };
-export const DownloadDataExtract = (url, payload) => {
+
+export const DownloadDataExtract = (url: string) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadDataExtractLoading(true));
 
-    const getDownloadExtract = async (url, payload) => {
+    const getDownloadExtract = async (url: string) => {
       try {
         let response;
-
         response = await CoreModules.axios.get(url, {
           responseType: 'blob',
         });
@@ -120,14 +122,15 @@ export const DownloadDataExtract = (url, payload) => {
         dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
       }
     };
-    await getDownloadExtract(url, payload);
+    await getDownloadExtract(url);
   };
 };
-export const GetTilesList = (url) => {
+
+export const GetTilesList = (url: string) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetTilesListLoading(true));
 
-    const fetchTilesList = async (url) => {
+    const fetchTilesList = async (url: string) => {
       try {
         const response = await CoreModules.axios.get(url);
         dispatch(ProjectActions.SetTilesList(response.data));
@@ -141,11 +144,12 @@ export const GetTilesList = (url) => {
     await fetchTilesList(url);
   };
 };
-export const GenerateProjectTiles = (url, payload) => {
+
+export const GenerateProjectTiles = (url: string, payload: string) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetGenerateProjectTilesLoading(true));
 
-    const generateProjectTiles = async (url, payload) => {
+    const generateProjectTiles = async (url: string, payload: string) => {
       try {
         const response = await CoreModules.axios.get(url);
         dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${payload}/tiles-list/`));
@@ -160,11 +164,11 @@ export const GenerateProjectTiles = (url, payload) => {
   };
 };
 
-export const DownloadTile = (url, payload, toOpfs = false) => {
+export const DownloadTile = (url: string, payload: Partial<projectInfoType>, toOpfs: boolean = false) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: true }));
 
-    const getDownloadTile = async (url, payload, toOpfs) => {
+    const getDownloadTile = async (url: string, payload: Partial<projectInfoType>, toOpfs: boolean) => {
       try {
         const response = await CoreModules.axios.get(url, {
           responseType: 'arraybuffer',
@@ -208,9 +212,9 @@ export const DownloadTile = (url, payload, toOpfs = false) => {
   };
 };
 
-export const GetProjectDashboard = (url) => {
+export const GetProjectDashboard = (url: string) => {
   return async (dispatch) => {
-    const getProjectDashboard = async (url) => {
+    const getProjectDashboard = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectDashboardLoading(true));
         const response = await CoreModules.axios.get(url);
@@ -226,9 +230,9 @@ export const GetProjectDashboard = (url) => {
   };
 };
 
-export const GetEntityInfo = (url) => {
+export const GetEntityInfo = (url: string) => {
   return async (dispatch) => {
-    const getEntityOsmMap = async (url) => {
+    const getEntityOsmMap = async (url: string) => {
       try {
         dispatch(ProjectActions.SetEntityToOsmIdMappingLoading(true));
         dispatch(CoreModules.TaskActions.SetTaskSubmissionStatesLoading(true));
@@ -248,9 +252,9 @@ export const GetEntityInfo = (url) => {
   };
 };
 
-export const GetProjectComments = (url) => {
+export const GetProjectComments = (url: string) => {
   return async (dispatch) => {
-    const getProjectComments = async (url) => {
+    const getProjectComments = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectGetCommentsLoading(true));
         const response = await CoreModules.axios.get(url);
@@ -266,9 +270,9 @@ export const GetProjectComments = (url) => {
   };
 };
 
-export const PostProjectComments = (url, payload) => {
+export const PostProjectComments = (url: string, payload: { task_id: number; project_id: any; comment: string }) => {
   return async (dispatch) => {
-    const postProjectComments = async (url) => {
+    const postProjectComments = async (url: string) => {
       try {
         dispatch(ProjectActions.SetPostProjectCommentsLoading(true));
         const response = await CoreModules.axios.post(url, payload);
@@ -284,9 +288,9 @@ export const PostProjectComments = (url, payload) => {
   };
 };
 
-export const GetProjectTaskActivity = (url) => {
+export const GetProjectTaskActivity = (url: string) => {
   return async (dispatch) => {
-    const getProjectActivity = async (url) => {
+    const getProjectActivity = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectTaskActivityLoading(true));
         const response = await CoreModules.axios.get(url);
@@ -302,9 +306,9 @@ export const GetProjectTaskActivity = (url) => {
   };
 };
 
-export const UpdateEntityStatus = (url, payload) => {
+export const UpdateEntityStatus = (url: string, payload: { entity_id: string; status: number; label: string }) => {
   return async (dispatch) => {
-    const updateEntityStatus = async (url, payload) => {
+    const updateEntityStatus = async (url: string, payload: { entity_id: string; status: number; label: string }) => {
       try {
         dispatch(ProjectActions.UpdateEntityStatusLoading(true));
         const response = await CoreModules.axios.post(url, payload);
@@ -318,11 +322,11 @@ export const UpdateEntityStatus = (url, payload) => {
   };
 };
 
-export const DownloadSubmissionGeojson = (url, projectName) => {
+export const DownloadSubmissionGeojson = (url: string, projectName: string) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(true));
 
-    const downloadSubmissionGeojson = async (url) => {
+    const downloadSubmissionGeojson = async (url: string) => {
       try {
         const response = await CoreModules.axios.get(url, { responseType: 'blob' });
         const a = document.createElement('a');

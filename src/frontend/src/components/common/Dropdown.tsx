@@ -39,10 +39,9 @@ const DropdownMenuSubContent = ({ className, ref, ...props }) => (
 );
 DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
 
-const DropdownMenuContent = ({ className, sideOffset = 4, ref, ...props }) => (
+const DropdownMenuContent = ({ className, sideOffset = 4, ...props }) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
-      ref={ref}
       sideOffset={sideOffset}
       className={cn(
         '.fmtm-z-50 fmtm-min-w-[8rem] fmtm-overflow-hidden fmtm-rounded-md fmtm-border fmtm-bg-popover fmtm-p-1 fmtm-text-popover-foreground fmtm-shadow-md data-[state=open]:fmtm-animate-in data-[state=closed]:fmtm-animate-out fmtm-data-[state=closed]:fade-out-0 fmtm-data-[state=open]:fade-in-0 data-[state=closed]:fmtm-zoom-out-95 data-[state=open]:fmtm-zoom-in-95 data-[side=bottom]:fmtm-slide-in-from-top-2 data-[side=left]:fmtm-slide-in-from-right-2 data-[side=right]:fmtm-slide-in-from-left-2 data-[side=top]:fmtm-slide-in-from-bottom-2',
@@ -54,13 +53,10 @@ const DropdownMenuContent = ({ className, sideOffset = 4, ref, ...props }) => (
 );
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
-const DropdownMenuItem = ({ className, inset, ref, ...props }) => (
+const DropdownMenuItem = ({ ...props }) => (
   <DropdownMenuPrimitive.Item
-    ref={ref}
     className={cn(
       'fmtm-relative fmtm-flex fmtm-cursor-pointer fmtm-select-none fmtm-items-center fmtm-rounded-sm fmtm-px-2 fmtm-py-1.5 fmtm-text-sm fmtm-outline-none fmtm-transition-colors focus:fmtm-bg-red-100 focus:fmtm-text-black data-[disabled]:fmtm-pointer-events-none data-[disabled]:fmtm-opacity-50',
-      inset && 'fmtm-pl-8',
-      className,
     )}
     {...props}
   />

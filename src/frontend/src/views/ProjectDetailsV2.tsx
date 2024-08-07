@@ -105,10 +105,10 @@ const ProjectDetailsV2 = () => {
     dispatch(ProjectActions.SetNewProjectTrigger());
     if (state.projectTaskBoundries.findIndex((project) => project.id.toString() === projectId) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, projectId));
+      dispatch(ProjectById(projectId));
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, projectId));
+      dispatch(ProjectById(projectId));
     }
     if (Object.keys(state.projectInfo)?.length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));

@@ -5,7 +5,7 @@ export const HomeSummaryService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(HomeActions.HomeProjectLoading(true));
 
-    const fetchHomeSummaries = async (url) => {
+    const fetchHomeSummaries = async (url: string) => {
       try {
         const fetchHomeData = await axios.get(url);
         const projectSummaries: any = fetchHomeData.data.results;
