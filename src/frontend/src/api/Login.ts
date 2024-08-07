@@ -5,7 +5,7 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 
 export const TemporaryLoginService: Function = (url: string) => {
   return async (dispatch) => {
-    const getTemporaryLogin = async (url) => {
+    const getTemporaryLogin = async (url: string) => {
       // Sets a cookie in the browser that is used for auth
       await axios.get(url);
 

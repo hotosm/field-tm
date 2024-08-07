@@ -6,7 +6,7 @@ import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { API } from '.';
 import { LoginActions } from '@/store/slices/LoginSlice';
 
-function appendObjectToFormData(formData, object) {
+function appendObjectToFormData(formData: FormData, object: Record<string, any>) {
   for (const [key, value] of Object.entries(object)) {
     // if (key === 'logo') {
     //     formData.append(key, value[0])
@@ -19,7 +19,7 @@ export const OrganisationService: Function = (url: string, payload: Organisation
   return async (dispatch) => {
     dispatch(CommonActions.PostOrganisationLoading(true));
 
-    const postOrganisation = async (url, payload) => {
+    const postOrganisation = async (url: string, payload: OrganisationModal) => {
       try {
         const generateApiFormData = new FormData();
         appendObjectToFormData(generateApiFormData, payload);
@@ -43,7 +43,7 @@ export const OrganisationService: Function = (url: string, payload: Organisation
 export const OrganisationDataService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(OrganisationAction.GetOrganisationDataLoading(true));
-    const getOrganisationData = async (url) => {
+    const getOrganisationData = async (url: string) => {
       try {
         const getOrganisationDataResponse = await API.get(url);
         const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
@@ -63,7 +63,7 @@ export const OrganisationDataService: Function = (url: string) => {
 export const MyOrganisationDataService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(OrganisationAction.GetMyOrganisationDataLoading(true));
-    const getMyOrganisationData = async (url) => {
+    const getMyOrganisationData = async (url: string) => {
       try {
         const getMyOrganisationDataResponse = await API.get(url);
         const response: GetOrganisationDataModel[] = getMyOrganisationDataResponse.data;
@@ -126,7 +126,7 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
 export const GetIndividualOrganizationService: Function = (url: string) => {
   return async (dispatch) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));
-    const getOrganisationData = async (url) => {
+    const getOrganisationData = async (url: string) => {
       try {
         const getOrganisationDataResponse = await axios.get(url);
         const response: GetOrganisationDataModel = getOrganisationDataResponse.data;

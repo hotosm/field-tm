@@ -26,3 +26,10 @@ type updateReviewStatusModal = {
   reviewState: string;
   taskUId: string | null;
 };
+
+export type filterType = {
+  task_id: string | null;
+  submitted_by: string | null;
+  review_state: string | null;
+  submitted_date: string | null;
+};

@@ -13,22 +13,15 @@ import CustomDatePicker from '@/components/common/CustomDatePicker';
 import { format } from 'date-fns';
 import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { ConvertXMLToJOSM, getDownloadProjectSubmission, getDownloadProjectSubmissionJson } from '@/api/task';
+import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
 import { Modal } from '@/components/common/Modal';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
-import { projectInfoType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-
-type filterType = {
-  task_id: string | null;
-  submitted_by: string | null;
-  review_state: string | null;
-  submitted_date: string | null;
-};
+import { filterType } from '@/store/types/ISubmissions';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -262,7 +255,7 @@ const SubmissionsTable = ({ toggleView }) => {
                     placeholder="Select"
                     data={taskInfo}
                     dataKey="value"
-                    value={filter?.task_id?.toString() || null}
+                    value={filter?.task_id?.toString() || undefined}
                     valueKey="task_id"
                     label="task_id"
                     onValueChange={(value) => value && setFilter((prev) => ({ ...prev, task_id: value.toString() }))}
@@ -275,7 +268,7 @@ const SubmissionsTable = ({ toggleView }) => {
                     placeholder="Select"
                     data={reviewStateData}
                     dataKey="value"
-                    value={filter?.review_state}
+                    value={filter?.review_state || undefined}
                     valueKey="value"
                     label="label"
                     onValueChange={(value) =>

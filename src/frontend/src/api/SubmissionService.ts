@@ -1,9 +1,8 @@
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-// import { HomeProjectCardModel } from '@/models/home/homeModel';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
-import { basicGeojsonTemplate } from '@/utilities/mapUtils';
+import { filterType } from '@/store/types/ISubmissions';
 
 export const ProjectSubmissionService: Function = (url: string) => {
   return async (dispatch) => {
@@ -62,9 +61,9 @@ export const SubmissionFormFieldsService: Function = (url: string) => {
   };
 };
 
-export const SubmissionTableService: Function = (url: string, payload) => {
+export const SubmissionTableService: Function = (url: string, payload: filterType) => {
   return async (dispatch) => {
-    const fetchSubmissionTable = async (url: string, payload) => {
+    const fetchSubmissionTable = async (url: string, payload: filterType) => {
       try {
         dispatch(SubmissionActions.SetSubmissionTableLoading(true));
         const response = await CoreModules.axios.get(url, { params: payload });

@@ -15,7 +15,7 @@ const UpdateTaskStatus = (
   params: { project_id: string },
 ) => {
   return async (dispatch) => {
-    const updateTask = async (url: string, body: any, feature: Record<string, any>, params: string) => {
+    const updateTask = async (url: string, body: any, feature: Record<string, any>, params: { project_id: string }) => {
       try {
         dispatch(CommonActions.SetLoading(true));
 

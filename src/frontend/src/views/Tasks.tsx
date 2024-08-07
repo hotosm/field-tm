@@ -44,7 +44,7 @@ const TasksSubmission = () => {
   //Fetch project for the first time
   useEffect(() => {
     if (state.projectTaskBoundries.findIndex((project) => project.id == projectId) == -1) {
-      dispatch(ProjectById(state.projectTaskBoundries, projectId));
+      dispatch(ProjectById(projectId));
       // dispatch(
       //   ProjectDataExtractService(
       //     `${import.meta.env.VITE_API_URL}/projects/${projectId}/features`,
@@ -52,7 +52,7 @@ const TasksSubmission = () => {
       // );
     } else {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
-      dispatch(ProjectById(state.projectTaskBoundries, projectId));
+      dispatch(ProjectById(projectId));
     }
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
