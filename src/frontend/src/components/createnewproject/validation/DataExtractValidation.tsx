@@ -17,7 +17,7 @@ function DataExtractValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
   if (!values?.dataExtractWays) {
-    errors.dataExtractWays = 'Data Extract Selection is Required.';
+    errors.dataExtractWays = 'Map Features Selection is Required.';
   }
 
   if (values.dataExtractWays && values.dataExtractWays === 'custom_data_extract' && !values.customDataExtractUpload) {

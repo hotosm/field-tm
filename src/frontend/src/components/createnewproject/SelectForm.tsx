@@ -38,7 +38,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
       return;
     }
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 4 }));
-    navigate('/data-extract');
+    navigate('/map-features');
   };
   const {
     handleSubmit,

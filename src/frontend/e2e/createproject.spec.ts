@@ -70,11 +70,11 @@ test('Project Creation', async ({ browserName, page }) => {
   await page.getByLabel('buildings').click();
   await page.getByRole('button', { name: 'NEXT' }).click();
 
-  // 4. Data Extract Step
-  const dataExtractRadio = await page.getByText('Use OSM data extract');
+  // 4. Map Features Step
+  const dataExtractRadio = await page.getByText('Use OSM map features');
   await dataExtractRadio.click();
   await expect(dataExtractRadio).toBeChecked();
-  await page.getByRole('button', { name: 'Generate Data Extract' }).click();
+  await page.getByRole('button', { name: 'Generate Map Features' }).click();
   await page.getByRole('button', { name: 'NEXT' }).click();
 
   // 5. Split Tasks Step

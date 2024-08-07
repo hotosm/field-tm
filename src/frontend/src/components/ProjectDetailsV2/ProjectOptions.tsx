@@ -91,8 +91,8 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
         />
         <Button
           isLoading={downloadDataExtractLoading}
-          loadingText="DATA EXTRACT"
-          btnText="DATA EXTRACT"
+          loadingText="MAP FEATURES"
+          btnText="MAP FEATURES"
           btnType="other"
           className={`${
             downloadDataExtractLoading ? '' : 'hover:fmtm-text-red-700'

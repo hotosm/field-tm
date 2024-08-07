@@ -235,7 +235,7 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
       location.pathname.includes('project/') ||
       location.pathname.includes('upload-area') ||
       location.pathname.includes('select-category') ||
-      location.pathname.includes('data-extract') ||
+      location.pathname.includes('map-features') ||
       location.pathname.includes('split-tasks')
     ) {
       const olZoom = document.querySelector('.ol-zoom');

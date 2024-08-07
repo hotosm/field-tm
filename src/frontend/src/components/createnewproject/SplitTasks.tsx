@@ -346,7 +346,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
                     type="button"
                     onClick={() => {
                       dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
-                      toggleStep(3, '/data-extract');
+                      toggleStep(3, '/map-features');
                     }}
                     className="fmtm-font-bold"
                   />
