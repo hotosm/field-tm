@@ -25,10 +25,10 @@ export const createProjectSteps: ICreateProjectSteps[] = [
     name: 'Select Category',
   },
   {
-    url: '/data-extract',
+    url: '/map-features',
     step: 4,
     label: '04',
-    name: 'Data Extract',
+    name: 'Map Features',
   },
   {
     url: '/split-tasks',
