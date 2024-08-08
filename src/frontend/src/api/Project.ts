@@ -101,11 +101,11 @@ export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson
   };
 };
 
-export const DownloadDataExtract = (url: string) => {
+export const DownloadDataExtract = (url: string, projectId: string) => {
   return async (dispatch) => {
     dispatch(ProjectActions.SetDownloadDataExtractLoading(true));
 
-    const getDownloadExtract = async (url: string) => {
+    const getDownloadExtract = async (url: string, projectId: string) => {
       try {
         let response;
         response = await CoreModules.axios.get(url, {
@@ -113,7 +113,7 @@ export const DownloadDataExtract = (url: string) => {
         });
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = `Data_Extract.geojson`;
+        a.download = `${projectId}_map_features.geojson`;
         a.click();
         dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
       } catch (error) {
@@ -122,7 +122,7 @@ export const DownloadDataExtract = (url: string) => {
         dispatch(ProjectActions.SetDownloadDataExtractLoading(false));
       }
     };
-    await getDownloadExtract(url);
+    await getDownloadExtract(url, projectId);
   };
 };
 

@@ -41,7 +41,10 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
 
   const onDataExtractDownload = () => {
     dispatch(
-      DownloadDataExtract(`${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`),
+      DownloadDataExtract(
+        `${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`,
+        projectId,
+      ),
     );
   };
 
