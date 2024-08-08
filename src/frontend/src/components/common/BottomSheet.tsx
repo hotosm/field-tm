@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import FmtmLogo from '@/assets/images/hotLog.png';
 
-const BottomSheet = ({ body, onClose }) => {
+type bottomSheetType = {
+  body: React.ReactElement;
+  onClose: () => void;
+};
+
+const BottomSheet = ({ body, onClose }: bottomSheetType) => {
   const sheetContentRef: any = useRef(null);
   const bottomSheetRef: any = useRef(null);
   const logoRef: any = useRef(null);
@@ -19,7 +24,7 @@ const BottomSheet = ({ body, onClose }) => {
     updateSheetHeight(50);
   }, []);
 
-  const updateSheetHeight = (height) => {
+  const updateSheetHeight = (height: number) => {
     if (sheetContentRef.current) {
       sheetContentRef.current.style.height = `${height}vh`;
       const top = sheetContentRef.current.getBoundingClientRect().top;

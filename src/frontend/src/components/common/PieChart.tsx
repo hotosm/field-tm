@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
+type customPieChartType = {
+  data: Record<string, string | number>[];
+  dataKey: string;
+  nameKey: string;
+};
+
 const COLORS = ['#F19C3C', '#D73F3F', '#FFB74D', '#EC407A'];
 
 const RADIAN = Math.PI / 180;
@@ -17,7 +23,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
-const renderColorfulLegendText = (value, entry) => (
+const renderColorfulLegendText = (value: string, entry: any) => (
   <span style={{ color: '#596579', fontWeight: 500, padding: '10px' }}>{value}</span>
 );
 
@@ -45,7 +51,7 @@ const CustomLegend = ({ payload }) => (
   </div>
 );
 
-const CustomPieChart = ({ data, dataKey, nameKey }) => {
+const CustomPieChart = ({ data, dataKey, nameKey }: customPieChartType) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   return (
@@ -79,7 +85,7 @@ const CustomPieChart = ({ data, dataKey, nameKey }) => {
           verticalAlign="bottom"
           iconSize={10}
           formatter={renderColorfulLegendText}
-          content={<CustomLegend payload={data?.map((index) => COLORS[index % COLORS.length])} />}
+          content={<CustomLegend payload={data?.map((_, index) => COLORS[index % COLORS.length])} />}
         />
       </PieChart>
     </ResponsiveContainer>

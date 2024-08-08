@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { CommonActions } from '../../store/slices/CommonSlice';
-import AssetModules from '../../shared/AssetModules.js';
+import { CommonActions } from '@/store/slices/CommonSlice';
+import AssetModules from '@/shared/AssetModules';
 import { v4 as uuidv4 } from 'uuid';
 
 type FileType = {
@@ -11,7 +11,17 @@ type FileType = {
   isDeleted: boolean;
 };
 
-const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple, filterKey }) => {
+type uploadAreaPropType = {
+  title: string;
+  label: string;
+  multiple: boolean;
+  data: FileType[];
+  filterKey: string;
+  onUploadFile: (updatedFiles: FileType[]) => void;
+  acceptedInput: string;
+};
+
+const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple, filterKey }: uploadAreaPropType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
   const [selectedFiles, setSelectedFiles] = useState<FileType[]>([]);
@@ -83,7 +93,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple,
                 const id = uuidv4();
                 return fileList.push({ id, name, [filterKey]: file, isDeleted });
               }
-              if (acceptedInput.includes(fileType)) {
+              if (fileType && acceptedInput.includes(fileType)) {
                 const id = uuidv4();
                 const isDeleted = false;
                 return fileList.push({ id, name, [filterKey]: file, isDeleted });
@@ -102,7 +112,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple,
               if (multiple) {
                 onUploadFile([...fileList, ...data]);
               } else {
-                onUploadFile([fileList.at(fileList.length - 1)]);
+                onUploadFile([fileList.at(fileList.length - 1) as FileType]);
               }
             } else {
               onUploadFile(data);

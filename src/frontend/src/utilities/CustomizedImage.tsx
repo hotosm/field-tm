@@ -5,13 +5,13 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 type switcherType = {
   status: 'card' | 'logo';
-  width: number;
-  height: number;
+  width: string | number;
+  height?: string | number;
 };
 
 type CustomizedImageType = {
   status: 'card' | 'logo';
-  style: { width: number; height: number };
+  style: { width: string | number; height?: string | number };
 };
 
 const Switcher = ({ status, width, height }: switcherType) => {

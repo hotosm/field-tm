@@ -1,4 +1,4 @@
-interface ICreateProjectSteps {
+export interface ICreateProjectSteps {
   url: string;
   step: number;
   label: string;

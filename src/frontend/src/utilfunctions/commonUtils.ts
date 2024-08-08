@@ -10,7 +10,7 @@ export const camelToFlat = (word: string): string => (
   (word = word.replace(/[A-Z]/g, ' $&')), word[0].toUpperCase() + word.slice(1)
 );
 
-export const isStatusSuccess = (status: number) => {
+export const isStatusSuccess = (status: number): boolean => {
   if (status < 300) {
     return true;
   }
@@ -18,12 +18,12 @@ export const isStatusSuccess = (status: number) => {
 };
 
 // get date N days ago
-export const dateNDaysAgo = (NDays: number) => {
+export const dateNDaysAgo = (NDays: number): string => {
   return new Date(new Date().getTime() - NDays * 24 * 60 * 60 * 1000).toISOString();
 };
 
 // extract month & day in MM/DD format for chart date labels
-export const getMonthDate = (date: string) => {
+export const getMonthDate = (date: string): string => {
   const splittedDate = date?.split('T')[0]?.split('-');
   return `${splittedDate[1]}/${splittedDate[2]}`;
 };
