@@ -226,13 +226,11 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6">
         <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Map Features</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>
-            You may either choose to use OSM data, or upload your own data for the mapping project.
-          </span>
+          <span>You may either choose to use OSM data, or upload your own data for the mapping project.</span>
           <span> The relevant map features that exist on OSM are imported based on the select map area.</span>{' '}
           <span>
-            You can use these map features to use the 'select from map' functionality from ODK that allows you
-            to select the feature to collect data for.
+            You can use these map features to use the 'select from map' functionality from ODK that allows you to select
+            the feature to collect data for.
           </span>{' '}
         </p>
       </div>

@@ -1,8 +1,9 @@
 import OLVectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source';
+import { DrawnGeojsonTypes } from '@/store/types/ICreateProject';
 
-function checkWGS84Projection(drawnGeojson) {
+function checkWGS84Projection(drawnGeojson: DrawnGeojsonTypes | null) {
   const vectorLyr = new OLVectorLayer({
     source: new VectorSource({
       features: new GeoJSON().readFeatures(drawnGeojson),
@@ -13,7 +14,7 @@ function checkWGS84Projection(drawnGeojson) {
   const extent = vectorLyr.getSource()?.getExtent();
 
   try {
-    if (extent?.length > 0) {
+    if (extent && extent?.length > 0) {
       const longitude = extent[0];
       const latitude = extent[1];
       if (

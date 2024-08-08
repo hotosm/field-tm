@@ -52,7 +52,13 @@ export const CustomCheckbox = ({
 
   return (
     <div className="fmtm-flex fmtm-gap-2 sm:fmtm-gap-4">
-      <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="fmtm-mt-[2px]" disabled={disabled} />
+      <Checkbox
+        ref={null}
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        className="fmtm-mt-[2px]"
+        disabled={disabled}
+      />
       <p
         style={labelStyle}
         className={`fmtm-text-[#7A7676] fmtm-font-archivo fmtm-text-base fmtm-break-words ${className}`}

@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const CustomLineChart = ({ data, xAxisDataKey, lineOneKey, lineTwoKey, xLabel, yLabel }) => {
+type customLineChartType = {
+  data: Record<string, string | number>[];
+  xAxisDataKey: string;
+  lineOneKey: string;
+  lineTwoKey: string;
+  xLabel?: string;
+  yLabel?: string;
+};
+
+const CustomLineChart = ({ data, xAxisDataKey, lineOneKey, lineTwoKey, xLabel, yLabel }: customLineChartType) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   return (

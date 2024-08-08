@@ -1,4 +1,4 @@
-function filterParams(params: {}): {} {
+const filterParams = (params: Record<string, any>): Record<string, any> => {
   const filteredParams = {};
   Object.keys(params).forEach((key: string) => {
     if (params[key] !== null && params[key] !== '') {
@@ -6,6 +6,6 @@ function filterParams(params: {}): {} {
     }
   });
   return filteredParams;
-}
+};
 
 export default filterParams;

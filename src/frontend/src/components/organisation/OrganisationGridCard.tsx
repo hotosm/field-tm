@@ -3,8 +3,14 @@ import CoreModules from '@/shared/CoreModules';
 import CustomizedImage from '@/utilities/CustomizedImage';
 import { useNavigate } from 'react-router-dom';
 import { user_roles } from '@/types/enums';
+import { GetOrganisationDataModel } from '@/models/organisation/organisationModel';
 
-const OrganisationGridCard = ({ filteredData, allDataLength }) => {
+type organizationGridCardType = {
+  filteredData: GetOrganisationDataModel[];
+  allDataLength: number;
+};
+
+const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridCardType) => {
   const navigate = useNavigate();
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const cardStyle = {

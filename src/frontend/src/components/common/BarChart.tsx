@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const CustomBarChart = ({ data, xLabel, yLabel, dataKey, nameKey }) => {
+type customBarChartType = {
+  data: Record<string, string | number>[];
+  xLabel: string;
+  yLabel: string;
+  dataKey: string;
+  nameKey: string;
+};
+
+const CustomBarChart = ({ data, xLabel, yLabel, dataKey, nameKey }: customBarChartType) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   return (

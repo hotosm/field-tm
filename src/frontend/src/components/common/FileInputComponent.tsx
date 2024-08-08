@@ -1,6 +1,16 @@
 import React, { useRef } from 'react';
 import AssetModules from '@/shared/AssetModules.js';
 
+type fileInputComponentType = {
+  accept: string;
+  customFile: any;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onResetFile: () => void;
+  btnText: string;
+  fileDescription: string;
+  errorMsg: string;
+};
+
 const FileInputComponent = ({
   accept = '.geojson, .json',
   customFile,
@@ -9,7 +19,7 @@ const FileInputComponent = ({
   btnText = 'Select File',
   fileDescription = '*The supported file formats are zipped shapefile, geojson or kml files.',
   errorMsg,
-}) => {
+}: fileInputComponentType) => {
   const customFileRef = useRef<any>(null);
   return (
     <div className="fmtm-mt-3 fmtm-pb-3">

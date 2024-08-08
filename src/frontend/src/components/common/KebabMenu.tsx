@@ -3,17 +3,19 @@ import AssetModules from '../../shared/AssetModules.js';
 
 type optionType = { id: number | string; icon: React.ReactNode; label: string; onClick: any };
 
+type directionType = 'left-top' | 'left-bottom' | 'right-bottom' | 'right-top' | 'top-left' | 'top-right';
+
 type kebabMenuType = {
   options: optionType[];
   stopPropagation: boolean;
-  direction?: 'left-top' | 'left-bottom' | 'right-bottom' | 'right-top' | 'top-left' | 'top-right';
+  direction?: directionType;
   data: {};
   pid: string | number;
   openedModalId: string | number;
   onDropdownOpen: () => void;
 };
 
-function getPosition(direction) {
+function getPosition(direction: directionType) {
   switch (direction) {
     case 'left-top':
       return 'fmtm-top-[2px] fmtm-right-[40px]';

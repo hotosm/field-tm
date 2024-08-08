@@ -3,8 +3,9 @@ import { getCenter } from 'ol/extent';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
 import { task_status } from '@/types/enums';
+import { EntityOsmMap } from '@/store/types/IProject';
 
-function createPolygonStyle(fillColor, strokeColor) {
+function createPolygonStyle(fillColor: string, strokeColor: string) {
   return new Style({
     stroke: new Stroke({
       color: strokeColor,
@@ -16,7 +17,8 @@ function createPolygonStyle(fillColor, strokeColor) {
     zIndex: 10,
   });
 }
-function createIconStyle(iconSrc) {
+
+function createIconStyle(iconSrc: string) {
   return new Style({
     image: new Icon({
       anchor: [0.5, 1],
@@ -35,7 +37,7 @@ function createIconStyle(iconSrc) {
 const strokeColor = 'rgb(0,0,0,0.3)';
 const secondaryStrokeColor = 'rgb(0,0,0,1)';
 
-const getTaskStatusStyle = (feature, mapTheme, taskLockedByUser) => {
+const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<string, any>, taskLockedByUser: boolean) => {
   let id = feature.getId().toString().replace('_', ',');
   const status = id.split(',')[1];
 
@@ -115,9 +117,10 @@ const getTaskStatusStyle = (feature, mapTheme, taskLockedByUser) => {
   return geojsonStyles[status];
 };
 
-export const getFeatureStatusStyle = (osmId, mapTheme, entityOsmMap) => {
-  const entity = entityOsmMap?.find((entity) => entity?.osm_id === osmId);
-  const status = task_status[entity?.status];
+export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, any>, entityOsmMap: EntityOsmMap[]) => {
+  const entity = entityOsmMap?.find((entity) => entity?.osm_id === osmId) as EntityOsmMap;
+  let status = task_status[entity?.status];
+
   const borderStrokeColor = '#FF0000';
 
   const lockedPolygonStyle = createPolygonStyle(

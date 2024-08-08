@@ -110,7 +110,7 @@ const FormUpdateTab = ({ projectId }) => {
           multiple={false}
           data={uploadForm || []}
           filterKey="url"
-          onUploadFile={(updatedFiles) => {
+          onUploadFile={(updatedFiles: FileType[]) => {
             dispatch(CreateProjectActions.SetCustomFileValidity(false));
             setUploadForm(updatedFiles);
           }}

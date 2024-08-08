@@ -3,7 +3,14 @@ import clsx from 'clsx';
 import { styled, Box, Theme } from '@mui/system';
 import { Modal } from '@mui/base/Modal';
 
-export default function CustomizedModal({ style = defaultStyle, children, isOpen, toggleOpen }) {
+type customizeModal = {
+  style: Record<string, any>;
+  children: React.ReactNode;
+  isOpen: boolean;
+  toggleOpen: (flag: boolean) => void;
+};
+
+export default function CustomizedModal({ style = defaultStyle, children, isOpen, toggleOpen }: customizeModal) {
   const handleClose = () => toggleOpen(false);
 
   return (

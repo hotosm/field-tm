@@ -4,23 +4,12 @@ import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLaye
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import CoreModules from '@/shared/CoreModules';
-import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
-import { defaultStyles, getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { geojsonObjectModel, geojsonObjectModelType } from '@/constants/geojsonObjectModal';
+import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import MarkerIcon from '@/assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
 import { Style, Text, Icon, Fill } from 'ol/style';
 import { projectType } from '@/models/home/homeModel';
-
-type HomeProjectSummaryType = {
-  features: { geometry: any; properties: any; type: any }[];
-  type: string;
-  SRID: {
-    type: string;
-    properties: {
-      name: string;
-    };
-  };
-};
 
 const getIndividualStyle = (featureProperty) => {
   const style = new Style({
@@ -43,7 +32,7 @@ const getIndividualStyle = (featureProperty) => {
 const ProjectListMap = () => {
   const navigate = useNavigate();
 
-  const [projectGeojson, setProjectGeojson] = useState<HomeProjectSummaryType | null>(null);
+  const [projectGeojson, setProjectGeojson] = useState<geojsonObjectModelType | null>(null);
   const { mapRef, map } = useOLMap({
     // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
@@ -54,7 +43,7 @@ const ProjectListMap = () => {
   const homeProjectSummary: projectType[] = CoreModules.useAppSelector((state) => state.home.homeProjectSummary);
   useEffect(() => {
     if (homeProjectSummary?.length === 0) return;
-    const convertedHomeProjectSummaryGeojson: HomeProjectSummaryType = {
+    const convertedHomeProjectSummaryGeojson: geojsonObjectModelType = {
       ...geojsonObjectModel,
       features: homeProjectSummary.map((project) => ({
         type: 'Feature',

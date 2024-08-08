@@ -19,7 +19,7 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
   const [imageURL, setImageURL] = useState('');
   const [imageDropdownOpen, setImageDropdownOpen] = useState(false);
 
-  const isEditorActive = (editorItem) => {
+  const isEditorActive = (editorItem: string) => {
     if (editor?.isActive(editorItem)) {
       return 'fmtm-text-primaryRed fmtm-bg-red-100';
     }

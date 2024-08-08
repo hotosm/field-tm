@@ -1,16 +1,5 @@
 import React from 'react';
-import { useState, CSSProperties } from 'react';
-import ClipLoader from 'react-spinners/ClipLoader';
-import {
-  SyncLoader,
-  PropagateLoader,
-  ClockLoader,
-  RotateLoader,
-  MoonLoader,
-  PulseLoader,
-  ScaleLoader,
-  DotLoader,
-} from 'react-spinners';
+import { DotLoader } from 'react-spinners';
 import CoreModules from '@/shared/CoreModules';
 
 const override = {
@@ -18,6 +7,7 @@ const override = {
   margin: '2 auto',
   borderColor: 'red',
 };
+
 const Loader = () => {
   const appLoading = CoreModules.useAppSelector((state) => state.common.loading);
   const defaultTheme = CoreModules.useAppSelector((state) => state.theme.hotTheme);
