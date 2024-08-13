@@ -18,3 +18,10 @@ organisations.
 - Used in the Karangasem region.
 - Particular attention was paid to the unique temple structures in Bali, often
   situated within a complex/compound area.
+
+## Simple Building Widfires Assessment (Alpa Corral, Argentina)
+
+- [XLSForm](simple_building_survey_wildfires.xlsx)
+- Generated with help from firefighters from rural towns of Argentina.
+- Used for wildfire prevention and response.
+- Particular attention was paid to place names and building materials.
