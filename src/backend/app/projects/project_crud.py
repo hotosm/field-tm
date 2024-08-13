@@ -1525,37 +1525,31 @@ async def get_dashboard_detail(
     return project
 
 
-async def get_project_users(db: Session, project_id: int, db_user: db_models.DbUser):
+async def get_project_users(db: Session, project_id: int):
     """Get the users and their contributions for a project.
 
     Args:
         db (Session): The database session.
         project_id (int): The ID of the project.
-        db_user (DbUser): User that called the endpoint.
 
     Returns:
         List[Dict[str, Union[str, int]]]: A list of dictionaries containing
             the username and the number of contributions made by each user
             for the specified project.
     """
-    # TODO refactor this
-    # TODO it could probably just be a single raw SQL statement
-    contributors = (
-        db.query(db_models.DbTaskHistory)
-        .filter(db_models.DbTaskHistory.project_id == project_id)
-        .all()
-    )
-    unique_user_ids = {
-        user.user_id for user in contributors if user.user_id is not None
-    }
-    response = []
+    query = text("""
+        SELECT u.username, COUNT(th.user_id) as contributions
+        FROM users u
+        JOIN task_history th ON u.id = th.user_id
+        WHERE th.project_id = :project_id
+        GROUP BY u.username
+        ORDER BY contributions DESC
+    """)
+    result = db.execute(query, {"project_id": project_id}).fetchall()
 
-    for user_id in unique_user_ids:
-        contributions = count_user_contributions(db, user_id, project_id)
-        response.append({"user": db_user.username, "contributions": contributions})
-
-    response = sorted(response, key=lambda x: x["contributions"], reverse=True)
-    return response
+    return [
+        {"user": row.username, "contributions": row.contributions} for row in result
+    ]
 
 
 def count_user_contributions(db: Session, user_id: int, project_id: int) -> int:

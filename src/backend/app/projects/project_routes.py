@@ -1187,7 +1187,6 @@ async def project_dashboard(
 
 @router.get("/contributors/{project_id}")
 async def get_contributors(
-    project_id: int,
     db: Session = Depends(database.get_db),
     project_user: ProjectUserDict = Depends(mapper),
 ):
@@ -1195,9 +1194,8 @@ async def get_contributors(
 
     TODO use a pydantic model for return type
     """
-    db_user = project_user.get("user")
-    project_users = await project_crud.get_project_users(db, project_id, db_user)
-    return project_users
+    project = project_user.get("project")
+    return await project_crud.get_project_users(db, project.id)
 
 
 @router.post("/add-manager/")
