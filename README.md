@@ -24,7 +24,7 @@
 | **Code Style** | | [![Backend Style](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json&labelColor=202235)](https://github.com/astral-sh/ruff) [![Frontend Style](https://img.shields.io/badge/code%20style-prettier-F7B93E?logo=Prettier)](https://github.com/prettier/prettier) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com) |
 | **Quality** | | [![Coverage](https://docs.fmtm.dev/coverage.svg)](https://docs.fmtm.dev/coverage.html) [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9218/badge)](https://www.bestpractices.dev/projects/9218) |
 | **Community** | | [![Slack](https://img.shields.io/badge/Slack-Join%20the%20community!-d63f3f?style=for-the-badge&logo=slack&logoColor=d63f3f)](https://slack.hotosm.org) [![All Contributors](https://img.shields.io/github/all-contributors/hotosm/fmtm?color=ee8449&style=flat-square)](#contributors-) |
-| **Other Info** | | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![user-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/user_roadmap_badge.svg?raw=true)](https://docs.fmtm.dev/user-roadmap) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md) |
+| **Other Info** | | [![docs](https://github.com/hotosm/fmtm/blob/development/docs/images/docs_badge.svg?raw=true)](https://docs.fmtm.dev/) [![dev-roadmap](https://github.com/hotosm/fmtm/blob/development/docs/images/dev_roadmap_badge.svg?raw=true)](https://roadmap.fmtm.dev) [![timeline](https://github.com/hotosm/fmtm/blob/development/docs/images/timeline_badge.svg?raw=true)](https://docs.fmtm.dev/timeline) [![license](https://img.shields.io/github/license/hotosm/fmtm.svg)](https://github.com/hotosm/fmtm/blob/main/LICENSE.md) |
 
 </div>
 
@@ -102,6 +102,35 @@ curl --proto '=https' --tlsv1.2 -sSf https://get.fmtm.dev | bash
 ```
 
 Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guides.
+
+## Roadmap
+
+<!-- prettier-ignore-start -->
+| Status | Feature |
+|:--:| :-- |
+|✅| 🖥️ project area splitting with field considerations |
+|✅| 🖥️ XLSForm generation in ODK Central |
+|✅| 📱 mapping of project via survey in ODK Collect mobile app |
+|✅| 📱 locking & unlocking of tasks to coordinate mapping |
+|✅| 📱 download base imagery & geolocation for in the field |
+|✅| 🖥️ view mapper submissions in the FMTM dashboard |
+|✅| 📢 Beta Release |
+|✅| 🖥️ & 📱 basic user tutorials and usage guides |
+|⚙️| 📱 open ODK Collect with feature already selected |
+|⚙️| 📱 live updates during mapping (if online) |
+| | 🖥️ export (+merge) the final data to OpenStreetMap |
+| | 🖥️ organization creation |
+| | 🖥️ simplify project creation with basic / advanced workflows |
+| | 🖥️ refinements to task splitting algorithm |
+| | 🖥️ improvements to the validation criteria and workflow |
+| | 🖥️ Field Admin role |
+| | 📱 fully offline FMTM (± small field-based device) |
+<!-- prettier-ignore-end -->
+
+> [!Note]
+> 📱 for mobile / mappers
+>
+> 🖥️ for desktop / managers / validators
 
 ## Contributors ✨
 

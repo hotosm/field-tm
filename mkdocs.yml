@@ -98,7 +98,7 @@ nav:
       - Helpers: https://api.stage.fmtm.hotosm.org/docs#/helper
   - Example XLSForms: example-xlsforms/README.md
   - Roadmap:
-      - User: user-roadmap.md
+      - User: https://github.com/hotosm/fmtm?tab=readme-ov-file#roadmap
       - Development: https://roadmap.fmtm.dev
       - Task Board: https://github.com/orgs/hotosm/projects/22/views/1?sliceBy%5BcolumnId%5D=Milestone
   - Timeline: timeline.md
