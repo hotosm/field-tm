@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:4b1626a832ba685892800364ae31a55a7c3c3371df8eba9666ce7567d06640b2"
+content_hash = "sha256:1b0017840650015f8efced253cc803b34421ffb2cc011374bdba335a02807203"
 
 [[package]]
 name = "aiohttp"
@@ -1579,7 +1579,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.14.2"
+version = "0.14.3"
 requires_python = ">=3.10"
 summary = "Processing field data from ODK to OpenStreetMap format."
 dependencies = [
@@ -1603,23 +1603,23 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.14.2.tar.gz", hash = "sha256:81b6619f3091eebe5680808ec65d7f408c8cfe6e09a5bb9ff0e708f5bc1aa663"},
-    {file = "osm_fieldwork-0.14.2-py3-none-any.whl", hash = "sha256:425493df136b099652fda4b0195600990a63c26188b5abb32dd680c442c5c12c"},
+    {file = "osm-fieldwork-0.14.3.tar.gz", hash = "sha256:1c323de6db8faa65c0a1b4ec9fe25e1a79c465887f5ae744d8f753231386e678"},
+    {file = "osm_fieldwork-0.14.3-py3-none-any.whl", hash = "sha256:98094f8fe0d4655bfe112720adb0754105ed0eb84b764b3a5ac03199bc631318"},
 ]
 
 [[package]]
 name = "osm-login-python"
-version = "1.0.3"
+version = "2.0.0"
 requires_python = ">=3.9"
-summary = "Use OSM Token exchange with OAuth2.0 for python projects."
+summary = "Package to manage OAuth 2.0 login for OSM in Python."
 dependencies = [
     "itsdangerous>=2.0.0",
     "pydantic>=2.0.0",
     "requests-oauthlib>=1.3.0",
 ]
 files = [
-    {file = "osm-login-python-1.0.3.tar.gz", hash = "sha256:b9737e74b2daf63b3e5e06032013ea3fd0f9bedf618e3581db84bdc2b791b865"},
-    {file = "osm_login_python-1.0.3-py3-none-any.whl", hash = "sha256:64c37a7d1c7cac211551a589a6f8ffafc641b29e27d608c94e52ab6cb531f937"},
+    {file = "osm-login-python-2.0.0.tar.gz", hash = "sha256:01fa35402e1342820c725068f4e41c81dcce064e07058f8a206d98a8b6f04bb9"},
+    {file = "osm_login_python-2.0.0-py3-none-any.whl", hash = "sha256:1289410fb1967f584ee52b02d96c85ff2cb104068481fa6530d5f3b138ec7afc"},
 ]
 
 [[package]]

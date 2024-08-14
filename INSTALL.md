@@ -107,7 +107,10 @@ To properly configure your FMTM project, you will need to create keys for OSM.
 
    ![image][29]
 
-3. Only the _read user preferences permission_ is required as of now.
+3. Add required permissions:
+
+   - 'Read user preferences' (`read_prefs`)
+   - 'Send private messages to other users' (`send_messages`)
 
 4. Now save your Client ID and Client Secret for the next step.
 

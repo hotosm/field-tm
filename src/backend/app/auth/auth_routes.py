@@ -28,7 +28,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.auth_schemas import AuthUser, AuthUserWithToken, FMTMUser
 from app.auth.osm import (
-    create_tokens,
+    create_jwt_tokens,
     extract_refresh_token_from_cookie,
     init_osm_auth,
     login_required,
@@ -68,7 +68,7 @@ async def login_url(osm_auth=Depends(init_osm_auth)):
 
 
 @router.get("/callback/")
-async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
+async def callback(request: Request, osm_auth=Depends(init_osm_auth)) -> JSONResponse:
     """Performs oauth token exchange with OpenStreetMap.
 
     Provides an access token that can be used for authenticating other endpoints.
@@ -80,7 +80,7 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
         osm_auth: The Auth object from osm-login-python.
 
     Returns:
-        access_token (string): The access token provided by the login URL request.
+        JSONResponse: A response including cookies that will be set in-browser.
     """
     try:
         log.debug(f"Callback url requested: {request.url}")
@@ -88,10 +88,11 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
         # Enforce https callback url for openstreetmap.org
         callback_url = str(request.url).replace("http://", "https://")
 
-        # Get access token
-        access_token = osm_auth.callback(callback_url).get("access_token")
-        log.debug(f"Access token returned of length {len(access_token)}")
-        osm_user = osm_auth.deserialize_access_token(access_token)
+        # Get user data from response
+        tokens = osm_auth.callback(callback_url)
+        serialised_user_data = tokens.get("user_data")
+        log.debug(f"Access token returned of length {len(serialised_user_data)}")
+        osm_user = osm_auth.deserialize_data(serialised_user_data)
         user_data = {
             "sub": f"fmtm|{osm_user['id']}",
             "aud": settings.FMTM_DOMAIN,
@@ -102,8 +103,28 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
             "picture": osm_user.get("img_url"),
             "role": UserRole.MAPPER,
         }
-        access_token, refresh_token = create_tokens(user_data)
-        return set_cookies(access_token, refresh_token)
+        # Create our JWT tokens from user data
+        fmtm_token, refresh_token = create_jwt_tokens(user_data)
+        response_plus_cookies = set_cookies(fmtm_token, refresh_token)
+
+        # Get OSM token from response (serialised in cookie, deserialise to use)
+        serialised_osm_token = tokens.get("oauth_token")
+        cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+        osm_cookie_name = f"{cookie_name}_osm"
+        log.debug(f"Creating cookie '{osm_cookie_name}' with OSM token")
+        response_plus_cookies.set_cookie(
+            key=osm_cookie_name,
+            value=serialised_osm_token,
+            max_age=864000,
+            expires=864000,  # expiry set for 10 days
+            path="/",
+            domain=settings.FMTM_DOMAIN,
+            secure=False if settings.DEBUG else True,
+            httponly=True,
+            samesite="lax",
+        )
+
+        return response_plus_cookies
     except Exception as e:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED, detail=f"Invalid OSM token: {e}"
@@ -114,34 +135,24 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)):
 async def logout():
     """Reset httpOnly cookie to sign out user."""
     response = Response(status_code=200)
-    # Reset cookie (logout)
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
-    log.debug(f"Resetting cookie in response named '{cookie_name}'")
-    response.set_cookie(
-        key=cookie_name,
-        value="",
-        max_age=0,  # Set to expire immediately
-        expires=0,  # Set to expire immediately
-        path="/",
-        domain=settings.FMTM_DOMAIN,
-        secure=False if settings.DEBUG else True,
-        httponly=True,
-        samesite="lax",
-    )
-    # Remove refresh cookie
-    refresh_cookie_name = f"{cookie_name}_refresh"
-    log.debug(f"Resetting cookie in response named '{refresh_cookie_name}'")
-    response.set_cookie(
-        key=refresh_cookie_name,
-        value="",
-        max_age=0,  # Set to expire immediately
-        expires=0,  # Set to expire immediately
-        path="/",
-        domain=settings.FMTM_DOMAIN,
-        secure=False if settings.DEBUG else True,
-        httponly=True,
-        samesite="lax",
-    )
+    # Reset all cookies (logout)
+    fmtm_cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    refresh_cookie_name = f"{fmtm_cookie_name}_refresh"
+    osm_cookie_name = f"{fmtm_cookie_name}_osm"
+
+    for cookie_name in [fmtm_cookie_name, refresh_cookie_name, osm_cookie_name]:
+        log.debug(f"Resetting cookie in response named '{cookie_name}'")
+        response.set_cookie(
+            key=cookie_name,
+            value="",
+            max_age=0,  # Set to expire immediately
+            expires=0,  # Set to expire immediately
+            path="/",
+            domain=settings.FMTM_DOMAIN,
+            secure=False if settings.DEBUG else True,
+            httponly=True,
+            samesite="lax",
+        )
     return response
 
 
@@ -301,5 +312,5 @@ async def temp_login(
         "picture": None,
         "role": UserRole.MAPPER,
     }
-    access_token, refresh_token = create_tokens(jwt_data)
+    access_token, refresh_token = create_jwt_tokens(jwt_data)
     return set_cookies(access_token, refresh_token)
