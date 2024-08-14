@@ -133,6 +133,9 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 >
 > 🖥️ for desktop / managers / validators
 
+A more developer-facing roadmap can be found
+[here](https://roadmap.fmtm.dev).
+
 ## Contributors ✨
 
 Here's how you can contribute:
