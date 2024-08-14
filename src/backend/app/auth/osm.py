@@ -89,22 +89,22 @@ def extract_refresh_token_from_cookie(request: Request) -> str:
     return request.cookies.get(f"{cookie_name}_refresh")
 
 
-def create_tokens(jwt_data: dict) -> tuple[str, str]:
+def create_jwt_tokens(input_data: dict) -> tuple[str, str]:
     """Generates tokens for the specified user.
 
     Args:
-        jwt_data (dict): user data for which the access token is being generated.
+        input_data (dict): user data for which the access token is being generated.
 
     Returns:
         Tuple: The generated access tokens.
     """
-    access_token_data = jwt_data
+    access_token_data = input_data
     access_token = jwt.encode(
         access_token_data,
         settings.ENCRYPTION_KEY,
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
-    refresh_token_data = jwt_data
+    refresh_token_data = input_data
     refresh_token_data["exp"] = (
         int(time.time()) + 86400 * 7
     )  # set refresh token expiry to 7 days
@@ -155,7 +155,7 @@ def verify_token(token: str):
         ) from e
 
 
-def set_cookies(access_token: str, refresh_token: str):
+def set_cookies(access_token: str, refresh_token: str) -> JSONResponse:
     """Sets cookies for the access token and refresh token.
 
     Args:

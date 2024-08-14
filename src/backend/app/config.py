@@ -35,6 +35,7 @@ from pydantic import (
 from pydantic.networks import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# NOTE this validator also appends a trailing slash to a URL
 HttpUrlStr = Annotated[
     str,
     BeforeValidator(
@@ -231,8 +232,10 @@ class Settings(BaseSettings):
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: str
     OSM_SECRET_KEY: str
+    # NOTE www is required for now
+    # https://github.com/openstreetmap/operations/issues/951#issuecomment-1748717154
     OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
-    OSM_SCOPE: str = "read_prefs"
+    OSM_SCOPE: list[str] = ["read_prefs", "send_messages"]
     OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth/"
 
     S3_ENDPOINT: str = "http://s3:9000"

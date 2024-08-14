@@ -45,8 +45,8 @@ dependencies = [
     "defusedxml>=0.7.1",
     "pyjwt>=2.8.0",
     "async-lru>=2.0.4",
-    "osm-login-python==1.0.3",
-    "osm-fieldwork==0.14.2",
+    "osm-login-python==2.0.0",
+    "osm-fieldwork==0.14.3",
     "osm-rawdata==0.3.0",
     "fmtm-splitter==1.3.0",
 ]
