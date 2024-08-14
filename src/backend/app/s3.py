@@ -5,12 +5,15 @@ import sys
 from io import BytesIO
 from typing import Any
 
+from fastapi import HTTPException
 from loguru import logger as log
 from minio import Minio
 from minio.commonconfig import CopySource
 from minio.deleteobjects import DeleteObject
+from minio.error import S3Error
 
 from app.config import settings
+from app.models.enums import HTTPStatus
 
 
 def s3_client():
@@ -36,6 +39,32 @@ def s3_client():
     # creds = provider.retrieve()
     # print(creds.access_key)
     # print(creds.secret_key)
+
+
+def object_exists(bucket_name: str, s3_path: str) -> bool:
+    """Check if an object exists in an S3 bucket using stat_object.
+
+    Args:
+        bucket_name (str): The name of the S3 bucket.
+        s3_path (str): The path of the object in the S3 bucket.
+
+    Returns:
+        bool: True if the object exists, False otherwise.
+    """
+    client = s3_client()
+
+    try:
+        # stat_object will return metadata if the object exists
+        client.stat_object(bucket_name, s3_path)
+        return True
+    except S3Error as e:
+        if e.code == "NoSuchKey":
+            return False
+        else:
+            # Handle other exceptions
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail=str(e)
+            ) from e
 
 
 def add_file_to_bucket(bucket_name: str, file_path: str, s3_path: str):

@@ -551,3 +551,15 @@ class DbTilesPath(Base):
     tile_source = cast(str, Column(String))
     background_task_id = cast(str, Column(String))
     created_at = cast(datetime, Column(DateTime, default=timestamp))
+
+
+class DbSubmissionPhotos(Base):
+    """Keeping track of submission photos for a project."""
+
+    __tablename__ = "submission_photos"
+
+    id = cast(int, Column(Integer, primary_key=True))
+    project_id = cast(int, Column(Integer))
+    task_id = cast(int, Column(Integer))
+    submission_id = cast(str, Column(String))
+    s3_path = cast(str, Column(String))

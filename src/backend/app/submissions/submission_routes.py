@@ -18,13 +18,15 @@
 """Routes associated with data submission to and from ODK Central."""
 
 import json
+import uuid
 from io import BytesIO
 from typing import Annotated, Optional
 
 import geojson
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse, Response
+from loguru import logger as log
 from sqlalchemy.orm import Session
 
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -333,8 +335,10 @@ async def get_submission_form_fields(
 
 @router.get("/submission_table")
 async def submission_table(
+    background_tasks: BackgroundTasks,
     page: int = Query(1, ge=1),
     results_per_page: int = Query(13, le=100),
+    background_task_id: Optional[uuid.UUID] = None,
     task_id: Optional[int] = None,
     submitted_by: Optional[str] = None,
     review_state: Optional[str] = None,
@@ -379,6 +383,23 @@ async def submission_table(
     data = await submission_crud.get_submission_by_project(project, filters, db)
     count = data.get("@odata.count", 0)
     submissions = data.get("value", [])
+    instance_ids = []
+    for submission in submissions:
+        if submission["__system"]["attachmentsPresent"] != 0:
+            instance_ids.append(submission["__id"])
+
+    if instance_ids:
+        background_task_id = await project_crud.insert_background_task_into_database(
+            db, "upload_submission_photos", project.id
+        )
+        log.info("uploading submission photos to s3")
+        background_tasks.add_task(
+            submission_crud.upload_attachment_to_s3,
+            project.id,
+            instance_ids,
+            background_task_id,
+            db,
+        )
 
     if task_id:
         submissions = [sub for sub in submissions if sub.get("task_id") == str(task_id)]
