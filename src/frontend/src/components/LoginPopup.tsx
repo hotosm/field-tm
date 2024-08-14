@@ -78,7 +78,7 @@ const LoginPopup = () => {
   };
 
   return (
-    <div>
+    <>
       <Modal
         open={loginModalOpen}
         description={<LoginDescription />}
@@ -87,7 +87,7 @@ const LoginPopup = () => {
         }}
         className="!fmtm-max-w-[35rem]"
       />
-    </div>
+    </>
   );
 };
 

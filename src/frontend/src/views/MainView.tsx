@@ -11,7 +11,7 @@ import { useAppSelector } from '@/types/reduxTypes';
 
 const MainView = () => {
   const dispatch = CoreModules.useAppDispatch();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { windowSize } = windowDimention();
   const checkTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -48,7 +48,7 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams === 'true' || (location.pathname.includes('/project/') && windowSize.width <= 640) ? (
+            {popupInParams === 'true' || (pathname.includes('/project/') && windowSize.width <= 640) ? (
               <div></div>
             ) : (
               <div>
@@ -57,15 +57,13 @@ const MainView = () => {
               </div>
             )}
             <CoreModules.Stack
-              className={`mainview ${
-                location.pathname.includes('project/')
-                  ? 'fmtm-px-0 sm:fmtm-px-[1.3rem] sm:fmtm-py-[1.3rem]'
-                  : 'fmtm-px-[1.3rem] fmtm-py-[1.3rem]'
-              }`}
+              className={`${
+                pathname.includes('/project/') && windowSize.width < 640 ? '' : 'fmtm-p-6'
+              } fmtm-bg-[#f5f5f5]`}
               sx={{
                 height: popupInParams
                   ? '100vh'
-                  : location.pathname.includes('project/') && windowSize.width <= 640
+                  : pathname.includes('project/') && windowSize.width <= 640
                     ? '100vh'
                     : windowSize.width <= 599
                       ? '90vh'

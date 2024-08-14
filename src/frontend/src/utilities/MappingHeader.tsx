@@ -1,20 +1,17 @@
 import React from 'react';
-import CoreModules from '@/shared/CoreModules';
 
 const MappingHeader = () => {
   return (
-    <CoreModules.Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', fontSize: '14px' }}>
-      <CoreModules.Typography color="error" sx={{ fontSize: '14px' }}>
-        Mapping our world together
-      </CoreModules.Typography>
-      <CoreModules.Link
-        to="https://www.hotosm.org/"
-        style={{ textDecoration: 'none', color: '#d73f3e' }}
-        target="_blank"
+    <div className="fmtm-flex fmtm-justify-between fmtm-px-[0.938rem] fmtm-py-[0.625rem]">
+      <p className="fmtm-text-[0.813rem] fmtm-text-primaryRed">Mapping our world together</p>
+      <a
+        href="https://www.hotosm.org/"
+        className="fmtm-text-[0.813rem] fmtm-text-primaryRed fmtm-cursor-pointer"
+        target="_"
       >
         hotosm.org
-      </CoreModules.Link>
-    </CoreModules.Box>
+      </a>
+    </div>
   );
 };
 

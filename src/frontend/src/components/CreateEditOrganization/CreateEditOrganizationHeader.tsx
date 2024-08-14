@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 const CreateEditOrganizationHeader = ({ organizationId }: { organizationId: string }) => {
   const navigate = useNavigate();
   return (
-    <div className="fmtm-px-5 fmtm-border-b-white fmtm-border-[1px] fmtm-bg-[#F5F5F5]">
+    <div className="fmtm-border-b-white fmtm-border-b-[1px] fmtm-bg-[#F5F5F5]">
       <div className="fmtm-flex fmtm-justify-between fmtm-items-center">
-        <div className="fmtm-pt-3 fmtm-pb-1">
+        <div className="fmtm-pb-1">
           <h1 className="sm:fmtm-text-xl md:fmtm-text-2xl">
             {organizationId ? 'EDIT YOUR ORGANIZATION' : 'REGISTER YOUR ORGANIZATION'}
           </h1>

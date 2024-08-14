@@ -26,7 +26,7 @@ const ManageProject = () => {
   }, [projectId]);
 
   return (
-    <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-bg-[#F5F5F5] fmtm-p-5 fmtm-gap-8 fmtm-flex-1">
+    <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-bg-[#F5F5F5] fmtm-gap-8 fmtm-flex-1">
       <div className="sm:fmtm-w-[15%] sm:fmtm-min-w-[7.3rem] fmtm-flex sm:fmtm-flex-col fmtm-items-center sm:fmtm-items-start fmtm-gap-4 sm:fmtm-gap-0 ">
         <div
           onClick={() => navigate(`/project/${params?.id}`)}

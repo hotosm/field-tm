@@ -85,8 +85,8 @@ const ProjectSubmissions = () => {
   );
 
   return (
-    <div className="fmtm-bg-[#F5F5F5] fmtm-px-5 sm:fmtm-px-5 lg:fmtm-px-8 xl:fmtm-px-16 fmtm-pb-5">
-      <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-my-4 fmtm-w-full">
+    <div className="fmtm-bg-[#F5F5F5]">
+      <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row fmtm-mb-4 fmtm-w-full">
         <ProjectInfo entities={updatedEntities} />
       </div>
       <div className="fmtm-w-full">
