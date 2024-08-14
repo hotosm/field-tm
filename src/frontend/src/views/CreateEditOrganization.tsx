@@ -34,7 +34,7 @@ const CreateEditOrganization = () => {
   return (
     <div className="fmtm-bg-[#F5F5F5]">
       <CreateEditOrganizationHeader organizationId={organizationId} />
-      <div className="fmtm-box-border fmtm-border-[1px] fmtm-border-t-white fmtm-border-t-[0px] fmtm-px-5 fmtm-py-4">
+      <div className="fmtm-box-border fmtm-pt-4">
         {organizationId || (!organizationId && consentApproval) ? (
           <CreateEditOrganizationForm organizationId={organizationId} />
         ) : (

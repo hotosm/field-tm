@@ -68,11 +68,10 @@ const Organisation = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        background: '#f0efef',
+        background: '#f5f5f5',
         flex: 1,
         gap: 2,
       }}
-      className="fmtm-p-5"
     >
       <div className="md:fmtm-hidden fmtm-border-b-white fmtm-border-b-[1px]">
         <div className="fmtm-flex fmtm-justify-between fmtm-items-center">

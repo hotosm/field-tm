@@ -114,7 +114,7 @@ const HomePageFilters = ({ onSearch, filteredProjectCount, totalProjectCount }: 
       {/* full Searchables container in md,lg,xl size */}
 
       {/* Create New Project Button  */}
-      <div className="fmtm-px-4 fmtm-py-3 ">
+      <div>
         <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-items-center fmtm-gap-4">
           <h5 className="fmtm-text-2xl">PROJECTS</h5>
           <CoreModules.Link

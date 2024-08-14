@@ -160,116 +160,118 @@ const SubmissionDetails = () => {
   };
 
   return (
-    <div className="fmtm-bg-gray-100 fmtm-box-border fmtm-border-[1px] fmtm-border-t-white fmtm-border-t-[0px] fmtm-px-[1.5rem] md:fmtm-px-[3.5rem]">
+    <>
       <UpdateReviewStatusModal />
-      {projectDashboardLoading ? (
-        <CoreModules.Skeleton style={{ width: '250px' }} className="fmtm-mb-4" />
-      ) : (
-        <div className="fmtm-pb-4">
-          <p className="fmtm-text-[#706E6E] fmtm-text-base">
-            <span
-              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
-              onClick={() => navigate(`/project/${projectId}`)}
-            >
-              {projectDashboardDetail?.project_name_prefix}
-            </span>
-            <span> &gt; </span>
-            <span
-              className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
-              onClick={() => navigate(`/project-submissions/${projectId}?tab=table`)}
-            >
-              Dashboard
-            </span>
-            <span> &gt; </span>
-            <span className="fmtm-text-black">Submissions</span>
-          </p>
-        </div>
-      )}
-      <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8">
-        <div>
+      <div className="fmtm-bg-[#F5F5F5] fmtm-box-border">
+        {projectDashboardLoading ? (
+          <CoreModules.Skeleton style={{ width: '250px' }} className="fmtm-mb-4" />
+        ) : (
+          <div className="fmtm-pb-4">
+            <p className="fmtm-text-[#706E6E] fmtm-text-base">
+              <span
+                className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
+                onClick={() => navigate(`/project/${projectId}`)}
+              >
+                {projectDashboardDetail?.project_name_prefix}
+              </span>
+              <span> &gt; </span>
+              <span
+                className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
+                onClick={() => navigate(`/project-submissions/${projectId}?tab=table`)}
+              >
+                Dashboard
+              </span>
+              <span> &gt; </span>
+              <span className="fmtm-text-black">Submissions</span>
+            </p>
+          </div>
+        )}
+        <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8">
           <div>
-            {projectDashboardLoading ? (
-              <CoreModules.Skeleton className="md:!fmtm-w-full fmtm-h-[9rem]" />
+            <div>
+              {projectDashboardLoading ? (
+                <CoreModules.Skeleton className="md:!fmtm-w-full fmtm-h-[9rem]" />
+              ) : (
+                <div className="fmtm-bg-white fmtm-rounded-lg fmtm-w-full fmtm-h-fit fmtm-p-2 fmtm-px-4 md:fmtm-py-5 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-flex-col">
+                  <h2 className="fmtm-text-base fmtm-text-[#545454] fmtm-font-bold fmtm-mb-4 fmtm-break-words">
+                    {projectDashboardDetail?.project_name_prefix}
+                  </h2>
+                  <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454]">Task: {taskId}</h2>
+                  <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">
+                    Submission Id: {paramsInstanceId}
+                  </h2>
+                </div>
+              )}
+              <Button
+                btnText="Update Review Status"
+                disabled={submissionDetailsLoading}
+                btnType="primary"
+                className="fmtm-w-fit fmtm-justify-center !fmtm-rounded fmtm-font-bold fmtm-text-sm !fmtm-py-2 fmtm-mt-8"
+                onClick={() => {
+                  dispatch(
+                    SubmissionActions.SetUpdateReviewStatusModal({
+                      toggleModalStatus: true,
+                      instanceId: paramsInstanceId,
+                      projectId: projectId,
+                      taskId: taskId,
+                      reviewState: restSubmissionDetails?.__system?.reviewState,
+                      taskUId: taskUId,
+                    }),
+                  );
+                }}
+              />
+            </div>
+            {/* start, end, today, deviceid values */}
+            {submissionDetailsLoading ? (
+              <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6 fmtm-gap-0">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="fmtm-border-b fmtm-py-3">
+                    <CoreModules.Skeleton key={i} className="fmtm-h-[51px] !fmtm-w-[90%]" />
+                  </div>
+                ))}
+              </div>
             ) : (
-              <div className="fmtm-bg-white fmtm-rounded-lg fmtm-w-full fmtm-h-fit fmtm-p-2 fmtm-px-4 md:fmtm-py-5 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-flex-col">
-                <h2 className="fmtm-text-base fmtm-text-[#545454] fmtm-font-bold fmtm-mb-4 fmtm-break-words">
-                  {projectDashboardDetail?.project_name_prefix}
-                </h2>
-                <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454]">Task: {taskId}</h2>
-                <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">
-                  Submission Id: {paramsInstanceId}
-                </h2>
+              <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6">
+                {Object.entries(dateDeviceDetails).map(([key, value]) => (
+                  <div key={key}>
+                    <div className="fmtm-border-b fmtm-border-[#e2e2e2] fmtm-py-3">{renderValue(value, key)}</div>
+                  </div>
+                ))}
               </div>
             )}
-            <Button
-              btnText="Update Review Status"
-              disabled={submissionDetailsLoading}
-              btnType="primary"
-              className="fmtm-w-fit fmtm-justify-center !fmtm-rounded fmtm-font-bold fmtm-text-sm !fmtm-py-2 fmtm-mt-8"
-              onClick={() => {
-                dispatch(
-                  SubmissionActions.SetUpdateReviewStatusModal({
-                    toggleModalStatus: true,
-                    instanceId: paramsInstanceId,
-                    projectId: projectId,
-                    taskId: taskId,
-                    reviewState: restSubmissionDetails?.__system?.reviewState,
-                    taskUId: taskUId,
-                  }),
-                );
-              }}
-            />
           </div>
-          {/* start, end, today, deviceid values */}
+          <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center fmtm-mt-10 md:fmtm-mt-0">
+            <div className="fmtm-w-full fmtm-h-[20rem] md:fmtm-h-full fmtm-rounded-lg fmtm-overflow-hidden">
+              <SubmissionInstanceMap
+                featureGeojson={coordinatesArray ? geojsonFeature : restSubmissionDetails?.point ? pointFeature : {}}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8 fmtm-mt-10 fmtm-gap-y-10">
           {submissionDetailsLoading ? (
-            <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6 fmtm-gap-0">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="fmtm-border-b fmtm-py-3">
-                  <CoreModules.Skeleton key={i} className="fmtm-h-[51px] !fmtm-w-[90%]" />
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-mt-5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="fmtm-border-b-[1px] fmtm-pb-4">
+                  <CoreModules.Skeleton key={i} className="fmtm-h-[100px]" />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6">
-              {Object.entries(dateDeviceDetails).map(([key, value]) => (
+            <div>
+              {Object.entries(filteredData).map(([key, value]) => (
                 <div key={key}>
                   <div className="fmtm-border-b fmtm-border-[#e2e2e2] fmtm-py-3">{renderValue(value, key)}</div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-        <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center fmtm-mt-10 md:fmtm-mt-0">
-          <div className="fmtm-w-full fmtm-h-[20rem] md:fmtm-h-full fmtm-rounded-lg fmtm-overflow-hidden">
-            <SubmissionInstanceMap
-              featureGeojson={coordinatesArray ? geojsonFeature : restSubmissionDetails?.point ? pointFeature : {}}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="fmtm-grid fmtm-grid-cols-1 md:fmtm-grid-cols-2 fmtm-gap-x-8 fmtm-mt-10 fmtm-gap-y-10">
-        {submissionDetailsLoading ? (
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-mt-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="fmtm-border-b-[1px] fmtm-pb-4">
-                <CoreModules.Skeleton key={i} className="fmtm-h-[100px]" />
-              </div>
-            ))}
-          </div>
-        ) : (
           <div>
-            {Object.entries(filteredData).map(([key, value]) => (
-              <div key={key}>
-                <div className="fmtm-border-b fmtm-border-[#e2e2e2] fmtm-py-3">{renderValue(value, key)}</div>
-              </div>
-            ))}
+            <SubmissionComments />
           </div>
-        )}
-        <div>
-          <SubmissionComments />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

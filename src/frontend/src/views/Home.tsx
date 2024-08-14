@@ -73,10 +73,7 @@ const Home = () => {
   }, [paginationPage, debouncedSearch]);
 
   return (
-    <div
-      style={{ padding: 7, flex: 1, background: '#F5F5F5' }}
-      className="fmtm-flex fmtm-flex-col fmtm-justify-between"
-    >
+    <div style={{ flex: 1, background: '#F5F5F5' }} className="fmtm-flex fmtm-flex-col fmtm-justify-between">
       <div className="fmtm-h-full">
         <HomePageFilters
           onSearch={handleSearch}
@@ -90,7 +87,7 @@ const Home = () => {
                 <div>
                   <div>
                     <div
-                      className={`fmtm-px-[1rem] fmtm-grid fmtm-gap-5 ${
+                      className={`fmtm-grid fmtm-gap-5 ${
                         !showMapStatus
                           ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
                           : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[75vh] lg:fmtm-overflow-y-scroll lg:scrollbar'

@@ -35,7 +35,7 @@ const ProjectInfo: React.FC = () => {
   ).length;
 
   return (
-    <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-mt-3  fmtm-h-[50vh] fmtm-overflow-y-scroll scrollbar fmtm-pr-1">
+    <div className="fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-mt-3  fmtm-overflow-y-scroll scrollbar fmtm-pr-1">
       <div>
         <p className="fmtm-font-bold">Description</p>
         {projectDetailsLoading ? (

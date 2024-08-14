@@ -8,7 +8,7 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { revokeCookie } from '@/utilfunctions/login';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/hotLog.png';
 import LoginPopup from '@/components/LoginPopup';
 
@@ -75,46 +75,31 @@ export default function PrimaryAppBar() {
         position="static"
         sx={{ boxShadow: 0, borderBottom: '1px solid #e1e0e0', borderTop: '1px solid #e1e0e0' }}
       >
-        <CoreModules.Toolbar>
-          <img src={logo} alt="FMTM Logo" onClick={() => navigate('/')} className="fmtm-w-[5.5rem] sm:fmtm-w-28" />
-
-          {/* Tabs switch added */}
-          <CoreModules.Tabs
-            sx={{
-              marginLeft: '2%',
-              flexGrow: 20,
-              display: {
-                xs: 'none',
-                sm: 'none',
-                md: 'block',
-                lg: 'block',
-              },
-            }}
-            className="header-tabs"
-          >
-            <CoreModules.Link to={'/'} style={{ color: defaultTheme.palette.black }}>
-              <CoreModules.Tab
-                label="EXPLORE PROJECTS"
-                sx={{
-                  borderBottom: activeTab === 0 ? '2.5px solid #2c3038' : 'none',
-                  '&:hover': { backgroundColor: '#ffff' },
-                  fontSize: 16,
-                }}
-                onClick={() => setActiveTab(0)}
-              />
-            </CoreModules.Link>
-            <CoreModules.Link to={'/organisation'} style={{ color: defaultTheme.palette.black }}>
-              <CoreModules.Tab
-                label="MANAGE ORGANIZATIONS"
-                sx={{
-                  borderBottom: activeTab === 1 ? '2.5px solid #2c3038' : 'none',
-                  '&:hover': { backgroundColor: '#fff' },
-                  fontSize: 16,
-                }}
-                onClick={() => setActiveTab(1)}
-              />
-            </CoreModules.Link>
-          </CoreModules.Tabs>
+        <div className="fmtm-flex fmtm-items-center fmtm-px-4">
+          <img
+            src={logo}
+            alt="FMTM Logo"
+            onClick={() => navigate('/')}
+            className="fmtm-w-[5.188rem] fmtm-min-w-[5.188rem] fmtm-cursor-pointer"
+          />
+          <div className="fmtm-hidden lg:fmtm-flex fmtm-items-center fmtm-gap-8 fmtm-ml-8">
+            <Link
+              to="/"
+              className={`fmtm-uppercase fmtm-text-base fmtm-text-[#717171] hover:fmtm-text-[#3f3d3d] fmtm-duration-200 ${
+                activeTab === 0 ? 'fmtm-border-[#706E6E]' : 'fmtm-border-white'
+              } fmtm-pb-1 fmtm-border-b-2`}
+            >
+              Explore Projects
+            </Link>
+            <Link
+              to="/organisation"
+              className={`fmtm-uppercase fmtm-text-base fmtm-text-[#717171] hover:fmtm-text-[#3f3d3d] fmtm-duration-200 ${
+                activeTab === 1 ? 'fmtm-border-[#706E6E]' : 'fmtm-border-white'
+              } fmtm-pb-1 fmtm-border-b-2`}
+            >
+              Manage Organizations
+            </Link>
+          </div>
           <CoreModules.Stack sx={{ flexGrow: 1 }} />
 
           {/* position changed */}
@@ -176,7 +161,7 @@ export default function PrimaryAppBar() {
               <AssetModules.MenuIcon />
             </CoreModules.IconButton>
           </CoreModules.Stack>
-        </CoreModules.Toolbar>
+        </div>
       </CoreModules.AppBar>
     </CoreModules.Stack>
   );
