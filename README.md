@@ -109,7 +109,7 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 <!-- prettier-ignore-start -->
 | Status | Feature |
 |:--:| :-- |
-|✅| 🖥️ project area splitting avoiding for roads, rivers, railways |
+|✅| 🖥️ project area splitting avoiding roads, rivers, railways |
 |✅| 🖥️ XLSForm generation in ODK Central |
 |✅| 📱 mapping of project via survey in ODK Collect mobile app |
 |✅| 📱 locking & unlocking of tasks to coordinate mapping |
