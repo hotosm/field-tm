@@ -389,7 +389,7 @@ async def read_and_test_xform(
         try:
             log.debug("Converting xlsform -> xform")
             json_data = parse_file_to_json(
-                path="/dummy/path/with/file/ext.xls",
+                path=f"/dummy/path/with/file{file_ext}",
                 file_object=input_data,
             )
             generated_xform = create_survey_element_from_dict(json_data)
