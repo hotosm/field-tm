@@ -1,14 +1,91 @@
 # ❓ Frequently Asked Questions ❓
 
-## For Users
+## General
 
-Q: What is FMTM?
+**Q:** What is the Field Mapping Tasking Manager (FMTM)?
 
-**A:** FMTM stands for Field Monitoring Task Manager. It is a web-based
-application that facilitates remote monitoring of field activities for
-humanitarian organizations.
+**A:** The Field Mapping Tasking Manager (FMTM) is an online platform that
+allows contributors to participate in mapping projects related to
+humanitarian and development work.
 
 ---
+
+Q: What problem does it solve?
+
+**A:** There are a few great tools for adding tags to OpenStreetMap in the field
+already. FMTM is not aiming to compete with these tools, but instead has two goals:
+
+    1. To solve the challenge of effectively coordinating mappers to work together
+    when mapping an entire area of interest. It can be difficult to **subdivide tasks**
+    and know **who is working on what tasks.**. FMTM should solve this problem.
+
+    2. Allow for coordinated field mapping outside of OpenStreetMap. Sometimes
+    OpenStreetMap is not an appropriate target for the collected data, so a data
+    flow outside of this ecosystem should be possible too.
+
+---
+
+Q: Don't other tools do similar things?
+
+**A:**
+
+!!! note
+
+    The following is the personal opinion from HOT staff members, and provides some
+    context for the reasoning behind creating the FMTM.
+
+- _Fulcrum_: proprietary / paid. Appears to be more focused on data collection in
+  engineering and environmental contexts, mostly for for-profit companies.
+  We could possibly learn from them, but they are closed-source.
+
+- _ArcGIS Field Maps_: proprietary / paid, similar applications to Fulcrum, but not
+  necessarily designed for text/question based surveys.
+
+- _ArcGIS Survey123_: proprietary / paid, more appropriate for our use case of field
+  survey data collection. However, not an option due to it's closed nature.
+
+- _KoboCollect_: fork of ODK, same mobile app essentially, but different back end.
+  Has a slightly complicated relationship with ODK, formerly taking from the
+  community and not giving back. However, they now contribute financially to ODK,
+  and definitely have some great ideas in this field. In our opinion, ODK is more
+  innovative in pushing field data collection forward though. Kobo do provide a
+  free public server backed by the UN, as a general public good, and is widely
+  adopted as a result.
+
+- _Ona_: proprietary software, with a slightly shady history of building open-source
+  tools using NGO money, then changing the license to a closed model. Were legally
+  forced to open-source the original work done, but everything since has been closed.
+  Have since done some great work around data management and analytics, however,
+  their main objective is not the same as FMTM: coordinating field mapping.
+
+- _MapCampaigner_: a now dead project. In our opinion, this tool certainly helped
+  the Monitoring & Evaluation team for field data collection projects, but did not
+  add anything innovative in terms of user experience for the the field mapper.
+
+- _POSM_ (+ OpenMapKit): a now dead project. However, this was an excellent technical
+  advancement and concept for the open mapping sector. It was arguably the first
+  good solution for field mobile data collection (using ODK and other tools
+  underneath). OpenMapKit was the data collection system, while POSM was the offline
+  server supporting it in the field. Unfortunately, the architecture around this
+  was poorly designed, making it difficult to maintain into the future, meaning
+  the project failed between 2014-2017.
+
+!!! note
+
+    The gap left by this only started to be filled with the advent of the
+    'Select From Map' functionality in ODK in 2018 (partly originally written by
+    Ping @ ODK, with support from HOT and Ramani Huria @ OMDTZ). It is still useful
+    to learn from the legacy of this tool around offline deployment on a small
+    field-based device (e.g. RaspberryPI), and is currently in our roadmap to explore
+    this approach further.
+
+- _CommCare_: technically open-source, developed by Dimagi, but built in such a way
+  to make it quite difficult to self-host. Very good at collection of "longitudinal
+  data" (data over time), which ODK has only recently began to address with Entities.
+  We should definitely look for opportunities to learn from / collaborate into the
+  future.
+
+## For Users
 
 **Q:** Do I need to create an account to use the FMTM Web App?
 
@@ -17,15 +94,6 @@ for those that are impatient to get started! However, to use the FMTM project
 management site it is recommended to sign in with OSM. This is so data uploaded
 to OSM can be attributed to a user. Notifications are also sent via OpenStreetMap
 messages/emails.
-
----
-
-**Q:** How do I browse and select mapping projects on the FMTM Web App?
-
-**A:** You can browse and select mapping projects on the FMTM Web App by
-clicking on the "Projects" tab and selecting a project of
-interest. You can view project details, tasks, and mapping data on the
-project page.
 
 ---
 
@@ -81,14 +149,6 @@ or projects.
 
 ## For Contributors
 
-**Q:** What is the Field Mapping Tasking Manager (FMTM)?
-
-**A:** The Field Mapping Tasking Manager (FMTM) is an online platform that
-allows contributors to participate in mapping projects related to
-humanitarian and development work.
-
----
-
 **Q:** How can I become a contributor to the FMTM?
 
 **A:** To become a contributor to the FMTM, you can create an account on
@@ -134,7 +194,7 @@ into your language.
 
 **A:** FMTM is built using several technologies, including FastAPI,
 Postgres, React, and web components. The codebase is written in
-Python, HTML, CSS, and TypeScript.
+Python & TypeScript mostly.
 
 ---
 
