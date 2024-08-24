@@ -10,22 +10,22 @@ humanitarian and development work.
 
 ---
 
-Q: What problem does it solve?
+**Q:**: What problem does it solve?
 
 **A:** There are a few great tools for adding tags to OpenStreetMap in the field
 already. FMTM is not aiming to compete with these tools, but instead has two goals:
 
-    1. To solve the challenge of effectively coordinating mappers to work together
-    when mapping an entire area of interest. It can be difficult to **subdivide tasks**
-    and know **who is working on what tasks.**. FMTM should solve this problem.
+1. To solve the challenge of effectively coordinating mappers to work together
+   when mapping an entire area of interest. It can be difficult to **subdivide tasks**
+   and know **who is working on what tasks.**. FMTM should solve this problem.
 
-    2. Allow for coordinated field mapping outside of OpenStreetMap. Sometimes
-    OpenStreetMap is not an appropriate target for the collected data, so a data
-    flow outside of this ecosystem should be possible too.
+2. Allow for coordinated field mapping outside of OpenStreetMap. Sometimes
+   OpenStreetMap is not an appropriate target for the collected data, so a data
+   flow outside of this ecosystem should be possible too.
 
 ---
 
-Q: Don't other tools do similar things?
+**Q:**: Don't other tools do similar things?
 
 **A:**
 
@@ -70,20 +70,58 @@ Q: Don't other tools do similar things?
   was poorly designed, making it difficult to maintain into the future, meaning
   the project failed between 2014-2017.
 
-!!! note
+  !!! note
 
-    The gap left by this only started to be filled with the advent of the
-    'Select From Map' functionality in ODK in 2018 (partly originally written by
-    Ping @ ODK, with support from HOT and Ramani Huria @ OMDTZ). It is still useful
-    to learn from the legacy of this tool around offline deployment on a small
-    field-based device (e.g. RaspberryPI), and is currently in our roadmap to explore
-    this approach further.
+        The gap left by this only started to be filled with the advent of the
+        'Select From Map' functionality in ODK in 2018 (partly originally written
+        by Ping @ ODK, with support from HOT and Ramani Huria @ OMDTZ).
+
+        It is still useful to learn from the legacy of this tool around offline
+        deployment on a small field-based device (e.g. RaspberryPI), and is
+        currently in our roadmap to explore this approach further.
 
 - _CommCare_: technically open-source, developed by Dimagi, but built in such a way
   to make it quite difficult to self-host. Very good at collection of "longitudinal
   data" (data over time), which ODK has only recently began to address with Entities.
   We should definitely look for opportunities to learn from / collaborate into the
   future.
+
+---
+
+**Q:**: What is the relationship between FMTM and Kobo?
+
+**A:**:
+
+- Kobo is not an FMTM competitor, it's an ODK competitor.
+- FMTM uses ODK underneath for reasons explained above, but due to the popularity
+  of Kobo, could (and should) probably support the Kobo data collection app going
+  forward.
+- This does raise challenges, as new features integrated in ODK Collect take approx
+  3 months to be integrated into KoboCollect.
+
+  !!! note
+
+        The adoption barrier for migrating from KoboCollect to ODK Collect should
+        be minimal due to KoboCollect essentially being a re-branded version of
+        ODK.
+
+- Kobo does provide a free data collection server, supported by UN OCHA, meaning
+  Kobo adoption in developing countries is currently a lot higher.
+
+  !!! note
+
+        HOT also aims to provide am equivalent free ODK data collection server:
+        [https://odk.hotosm.org](https://odk.hotosm.org)
+
+- The Kobo backend is currently (2024) a Python application based on the original
+  ODK Aggregate backend of ODK. The Kobo backend became much better than ODK's over
+  time. However, ODK have since completely overhauled their backend to a Node server
+  called ODK Collect, which is rock-solid and much more advanced than the competition.
+- The Kobo web-based form builder is still a big differentiator between the tools,
+  as it is much more user-friendly (less technical) than ODK's requirement to know
+  XLSForm language. However the capability of the web form builder is much less
+  sophisticated than directly using XLSForms. It's nevertheless very useful for
+  beginners.
 
 ## For Users
 
