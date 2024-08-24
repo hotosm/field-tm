@@ -31,8 +31,8 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
 
 !!! note
 
-    The following is the personal opinion from HOT staff members, and provides some
-    context for the reasoning behind creating the FMTM.
+      The following is the personal opinion from HOT staff members, and provides
+      some context for the reasoning behind creating the FMTM.
 
 - _Fulcrum_: proprietary / paid. Appears to be more focused on data collection in
   engineering and environmental contexts, mostly for for-profit companies.
