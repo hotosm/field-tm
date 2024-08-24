@@ -42,9 +42,9 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 
 > More details can be found here:
 > [overview](https://www.hotosm.org/updates/field-mapping-tasking-manager-fmtm),
-> [timeline](https://docs.fmtm.dev/timeline) and the
-> [docs](https://docs.fmtm.dev) page.
-> [faq](https://docs.fmtm.dev/faq) page.
+> [timeline](https://docs.fmtm.dev/timeline),
+> [docs](https://docs.fmtm.dev) page, and the
+> [FAQ](https://docs.fmtm.dev/about/faq).
 
 ## How FMTM Works
 
