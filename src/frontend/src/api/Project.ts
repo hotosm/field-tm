@@ -53,6 +53,9 @@ export const ProjectById = (projectId: string) => {
         );
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
       } catch (error) {
+        if (error.response.status === 404) {
+          dispatch(CommonActions.SetProjectNotFound(true));
+        }
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
@@ -221,6 +224,9 @@ export const GetProjectDashboard = (url: string) => {
         dispatch(ProjectActions.SetProjectDashboardDetail(response.data));
         dispatch(ProjectActions.SetProjectDashboardLoading(false));
       } catch (error) {
+        if (error.response.status === 404) {
+          dispatch(CommonActions.SetProjectNotFound(true));
+        }
         dispatch(ProjectActions.SetProjectDashboardLoading(false));
       } finally {
         dispatch(ProjectActions.SetProjectDashboardLoading(false));

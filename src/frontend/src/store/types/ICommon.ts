@@ -7,6 +7,7 @@ export type CommonStateTypes = {
       step: number;
     };
   };
+  projectNotFound: boolean;
 };
 
 type snackbarTypes = {

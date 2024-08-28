@@ -434,7 +434,9 @@ const SubmissionsTable = ({ toggleView }) => {
                   <AssetModules.VisibilityOutlinedIcon
                     className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
                     onClick={() => {
-                      navigate(`/project/${projectId}/tasks/${taskUId}/submission/${row?.meta?.instanceID}`);
+                      navigate(
+                        `/project-submissions/${projectId}/tasks/${taskUId}/submission/${row?.meta?.instanceID}`,
+                      );
                     }}
                   />{' '}
                   <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
