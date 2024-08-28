@@ -286,6 +286,9 @@ const GetIndividualProjectDetails = (url: string) => {
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));
         dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } catch (error) {
+        if (error.response.status === 404) {
+          dispatch(CommonActions.SetProjectNotFound(true));
+        }
         dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));
       } finally {
         dispatch(CreateProjectActions.SetIndividualProjectDetailsLoading(false));

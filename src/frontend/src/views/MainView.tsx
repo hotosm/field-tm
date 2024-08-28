@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import windowDimention from '@/hooks/WindowDimension';
 import PrimaryAppBar from '@/utilities/PrimaryAppBar';
 import CoreModules from '@/shared/CoreModules';
@@ -8,6 +8,7 @@ import Loader from '@/utilities/AppLoader';
 import MappingHeader from '@/utilities/MappingHeader';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
+import ProjectNotFound from './ProjectNotFound';
 
 const MainView = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -17,6 +18,7 @@ const MainView = () => {
   const checkTheme = useAppSelector((state) => state.theme.hotTheme);
   const theme = CoreModules.createTheme(checkTheme);
   const stateSnackBar = useAppSelector((state) => state.common.snackbar);
+  const projectNotFound = useAppSelector((state) => state.common.projectNotFound);
 
   const handleClose = (event: React.SyntheticEvent, reason: string) => {
     if (reason === 'clickaway') {
@@ -33,6 +35,11 @@ const MainView = () => {
   };
 
   const popupInParams = searchParams.get('popup');
+
+  useEffect(() => {
+    if (!projectNotFound) return;
+    dispatch(CommonActions.SetProjectNotFound(false));
+  }, [pathname]);
 
   return (
     <CoreModules.ThemeProvider theme={theme}>
@@ -56,25 +63,29 @@ const MainView = () => {
                 <PrimaryAppBar />
               </div>
             )}
-            <CoreModules.Stack
-              className={`${
-                pathname.includes('/project/') && windowSize.width < 640 ? '' : 'fmtm-p-6'
-              } fmtm-bg-[#f5f5f5]`}
-              sx={{
-                height: popupInParams
-                  ? '100vh'
-                  : pathname.includes('project/') && windowSize.width <= 640
+            {projectNotFound ? (
+              <ProjectNotFound />
+            ) : (
+              <CoreModules.Stack
+                className={`${
+                  pathname.includes('/project/') && windowSize.width < 640 ? '' : 'fmtm-p-6'
+                } fmtm-bg-[#f5f5f5]`}
+                sx={{
+                  height: popupInParams
                     ? '100vh'
-                    : windowSize.width <= 599
-                      ? '90vh'
-                      : '92vh',
-                overflow: 'auto',
-                // p: '1.3rem',
-              }}
-            >
-              <CoreModules.Outlet />
-              {/* Footer */}
-            </CoreModules.Stack>
+                    : pathname.includes('project/') && windowSize.width <= 640
+                      ? '100vh'
+                      : windowSize.width <= 599
+                        ? '90vh'
+                        : '92vh',
+                  overflow: 'auto',
+                  // p: '1.3rem',
+                }}
+              >
+                <CoreModules.Outlet />
+                {/* Footer */}
+              </CoreModules.Stack>
+            )}
           </CoreModules.Stack>
         </CoreModules.Container>
       </CoreModules.Paper>

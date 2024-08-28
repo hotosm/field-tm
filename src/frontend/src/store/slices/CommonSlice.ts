@@ -15,6 +15,7 @@ const initialState: CommonStateTypes = {
       step: 1,
     },
   },
+  projectNotFound: false,
 };
 
 const CommonSlice = createSlice({
@@ -32,6 +33,9 @@ const CommonSlice = createSlice({
     },
     SetCurrentStepFormStep(state, action) {
       state.currentStepFormStep[action.payload.flag] = { step: action.payload.step };
+    },
+    SetProjectNotFound(state, action) {
+      state.projectNotFound = action.payload;
     },
   },
 });

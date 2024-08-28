@@ -81,7 +81,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/project/:projectId/tasks/:taskId/submission/:instanceId',
+        path: '/project-submissions/:projectId/tasks/:taskId/submission/:instanceId',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div></div>}>
