@@ -10,7 +10,7 @@ import environment from '@/environment';
 import { useParams } from 'react-router-dom';
 import { UpdateEntityStatus } from '@/api/Project';
 import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
-import ProjectTaskStatus from '@/api/ProjectTaskStatus';
+import { UpdateTaskStatus } from '@/api/ProjectTaskStatus';
 import MapStyles from '@/hooks/MapStyles';
 
 type TaskFeatureSelectionPopupPropType = {
@@ -28,7 +28,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
   const entityOsmMap = CoreModules.useAppSelector((state) => state.project.entityOsmMap);
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const currentProjectId = params.id;
+  const currentProjectId = params.id || '';
   const [task_status, set_task_status] = useState('READY');
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
@@ -134,15 +134,15 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
 
                 if (task_status === 'READY') {
                   dispatch(
-                    ProjectTaskStatus(
+                    UpdateTaskStatus(
                       `${import.meta.env.VITE_API_URL}/tasks/${currentTaskInfo?.id}/new-status/1`,
-                      geoStyle,
-                      taskBoundaryData,
                       currentProjectId,
-                      taskFeature,
-                      taskId,
+                      taskId.toString(),
                       authDetails,
                       { project_id: currentProjectId },
+                      geoStyle,
+                      taskBoundaryData,
+                      taskFeature,
                     ),
                   );
                 }

@@ -99,7 +99,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 const Modal = ({ dialogOpen, title, description, open, onOpenChange, className }: IModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger>{dialogOpen}</DialogTrigger>
+      {dialogOpen && <DialogTrigger>{dialogOpen}</DialogTrigger>}
       <DialogContent className={`${className}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
