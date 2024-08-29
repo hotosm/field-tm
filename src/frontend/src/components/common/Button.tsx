@@ -52,7 +52,7 @@ const Button = ({
       data-testid="test-button"
       type={type === 'submit' ? 'submit' : 'button'}
       onClick={onClick}
-      className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 ${btnStyle(
+      className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-outline-none ${btnStyle(
         isLoading || disabled ? 'disabled' : btnType,
         className,
       )}`}

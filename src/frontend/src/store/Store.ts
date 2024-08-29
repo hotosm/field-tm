@@ -9,6 +9,7 @@ import LoginSlice from '@/store/slices/LoginSlice';
 import OrganisationSlice from '@/store/slices/organisationSlice';
 import SubmissionSlice from '@/store/slices/SubmissionSlice';
 import TaskSlice from '@/store/slices/TaskSlice';
+import DataConflationSlice from '@/store/slices/DataConflationSlice';
 import { persistReducer } from 'redux-persist';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   common: CommonSlice.reducer,
   submission: SubmissionSlice.reducer,
   task: TaskSlice.reducer,
+  dataconflation: DataConflationSlice.reducer,
 });
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

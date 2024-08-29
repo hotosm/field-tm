@@ -21,6 +21,7 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateRevie
 import { useAppSelector } from '@/types/reduxTypes';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { UpdateTaskStatus } from '@/api/ProjectTaskStatus';
 import { filterType } from '@/store/types/ISubmissions';
 
 const SubmissionsTable = ({ toggleView }) => {
@@ -28,7 +29,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilterState: filterType = {
-    task_id: searchParams.get('task_id') ? searchParams?.get('task_id') : null,
+    task_id: searchParams.get('task_id') ? searchParams?.get('task_id') || null : null,
     submitted_by: searchParams.get('submitted_by'),
     review_state: searchParams.get('review_state'),
     submitted_date: searchParams.get('submitted_date'),
@@ -50,9 +51,18 @@ const SubmissionsTable = ({ toggleView }) => {
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
-  const projectTaskBoundries = useAppSelector((state) => state.project.projectTaskBoundries);
-  const projectIndex = projectTaskBoundries.findIndex((project) => project.id == +projectId);
-  const taskList = projectTaskBoundries[projectIndex]?.taskBoundries;
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const updateTaskStatusLoading = useAppSelector((state) => state.common.loading);
+
+  const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const projectIndex = projectData.findIndex((project) => project.id == +projectId);
+  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const currentStatus = {
+    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
+      return task?.index === +filter.task_id;
+    })?.[0],
+  };
+  const taskList = projectData[projectIndex]?.taskBoundries;
 
   const [numberOfFilters, setNumberOfFilters] = useState<number>(0);
   const [paginationPage, setPaginationPage] = useState<number>(1);
@@ -150,7 +160,7 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const clearFilters = () => {
     setSearchParams({ tab: 'table' });
-    setFilter({ task_id: null, submitted_by: null, review_state: null, submitted_date: null });
+    setFilter({ task_id: '', submitted_by: null, review_state: null, submitted_date: null });
   };
 
   function getValueByPath(obj: any, path: string) {
@@ -205,6 +215,19 @@ const SubmissionsTable = ({ toggleView }) => {
     }
   };
 
+  const handleTaskMap = async () => {
+    await dispatch(
+      UpdateTaskStatus(
+        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus.id}/new-status/4`,
+        projectId,
+        filter?.task_id || '',
+        authDetails || {},
+        { project_id: projectId },
+      ),
+    );
+    navigate(`/project/${projectId}`);
+  };
+
   useEffect(() => {
     const filteredParams = filterParams(filter);
     setSearchParams({ tab: 'table', ...filteredParams });
@@ -228,7 +251,7 @@ const SubmissionsTable = ({ toggleView }) => {
         }}
       />
       <UpdateReviewStatusModal />
-      <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col md:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
+      <div className="fmtm-flex xl:fmtm-items-end xl:fmtm-justify-between fmtm-flex-col lg:fmtm-flex-row fmtm-gap-4 fmtm-mb-6">
         <div
           className={`${
             windowSize.width < 2000 ? 'fmtm-w-full md:fmtm-w-fit' : 'fmtm-w-fit'
@@ -360,25 +383,37 @@ const SubmissionsTable = ({ toggleView }) => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <button
+              className={`fmtm-px-4 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
+                submissionTableDataLoading || submissionFormFieldsLoading
+                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
+                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
+              }`}
+              onClick={refreshTable}
+              disabled={submissionTableDataLoading || submissionFormFieldsLoading}
+            >
+              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
+                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
+              ) : (
+                <AssetModules.ReplayIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
+              )}
+              <p className="fmtm-text-white fmtm-text-base">REFRESH</p>
+            </button>
           </div>
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
-          <button
-            className={`fmtm-px-4 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
-              submissionTableDataLoading || submissionFormFieldsLoading
-                ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
-                : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
-            }`}
-            onClick={refreshTable}
-            disabled={submissionTableDataLoading || submissionFormFieldsLoading}
-          >
-            {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
-              <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
-            ) : (
-              <AssetModules.ReplayIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
+          {filter?.task_id &&
+            taskBoundaryData?.[projectIndex]?.taskBoundries?.find((task) => task?.index === +filter?.task_id)
+              ?.task_status === 'LOCKED_FOR_VALIDATION' && (
+              <Button
+                isLoading={updateTaskStatusLoading}
+                loadingText="FULLY MAPPED"
+                btnText="FULLY MAPPED"
+                btnType="primary"
+                className="!fmtm-rounded !fmtm-text-base"
+                onClick={handleTaskMap}
+              />
             )}
-            <p className="fmtm-text-white fmtm-text-base">REFRESH</p>
-          </button>
           {toggleView}
         </div>
       </div>

@@ -244,7 +244,9 @@ export default class Table extends Component<TableProps> {
             style: { cursor: 'pointer' },
           })}
           className={`${trClassName && trClassName(row)} ${
-            flag?.toLowerCase() === 'primarytable' ? 'hover:fmtm-bg-[#F2E3E3]' : ''
+            flag?.toLowerCase() === 'primarytable'
+              ? `${(index + 1) % 2 === 0 ? '!fmtm-bg-[#F3F3F3]' : 'fmtm-bg-white'}`
+              : ''
           } fmtm-cursor-pointer fmtm-ease-in fmtm-duration-100 fmtm-h-[50px]
           fmtm-items-baseline fmtm-relative fmtm-bg-white`}
         >
