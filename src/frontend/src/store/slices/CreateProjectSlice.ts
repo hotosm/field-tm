@@ -19,7 +19,6 @@ export const initialState: CreateProjectStateTypes = {
     formWays: 'existing_form',
     hasCustomTMS: false,
     custom_tms_url: '',
-    hasGeojsonLineString: true,
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,

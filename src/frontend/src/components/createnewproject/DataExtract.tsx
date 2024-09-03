@@ -191,22 +191,9 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
       const geojsonFile = new File([extractFeatCol], 'custom_extract.geojson', { type: 'application/json' });
       setDataExtractToState(geojsonFile);
     }
-    const hasGeojsonLineString = checkGeomTypeInGeojson(extractFeatCol, 'LineString');
     if (extractFeatCol && extractFeatCol?.features?.length > 0) {
       handleCustomChange('customDataExtractUpload', event.target.files[0]);
-      handleCustomChange('hasGeojsonLineString', hasGeojsonLineString);
       handleCustomChange('task_split_type', task_split_type['choose_area_as_task'].toString());
-      if (!hasGeojsonLineString) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message:
-              'Features must contain line data (roads, rivers) otherwise the task splitting algorithm will not work.',
-            variant: 'warning',
-            duration: 8000,
-          }),
-        );
-      }
       // View on map
       await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
       return;

@@ -113,7 +113,6 @@ export type ProjectDetailsTypes = {
   per_task_instructions?: string;
   custom_tms_url: string;
   hasCustomTMS: boolean;
-  hasGeojsonLineString: boolean;
 };
 
 export type ProjectAreaTypes = {
