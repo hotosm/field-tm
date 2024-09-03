@@ -59,10 +59,7 @@ const SplitTasks = ({ flag, geojsonFile, setGeojsonFile, customDataExtractUpload
       name: 'define_tasks',
       value: task_split_type['task_splitting_algorithm'].toString(),
       label: 'Task Splitting Algorithm',
-      disabled:
-        !projectDetails?.hasGeojsonLineString && projectDetails?.dataExtractWays === 'custom_data_extract'
-          ? true
-          : false,
+      disabled: false,
     },
   ];
 
