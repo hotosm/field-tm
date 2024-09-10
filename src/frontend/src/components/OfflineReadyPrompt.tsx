@@ -31,19 +31,21 @@ function OfflineReadyPrompt() {
   }, [offlineReady]);
 
   return (
-    <div className="OfflineReadyPrompt-container">
+    <>
       {offlineReady && (
-        <div className="OfflineReadyPrompt-toast">
-          <div className="OfflineReadyPrompt-message">
-            <span>App ready to work offline</span>
+        <div className="OfflineReadyPrompt-container">
+          <div className="OfflineReadyPrompt-toast">
+            <div className="OfflineReadyPrompt-message">
+              <span>App ready to work offline</span>
+            </div>
+            <button className="OfflineReadyPrompt-toast-button" onClick={() => close()}>
+              Close
+            </button>
           </div>
-          <button className="OfflineReadyPrompt-toast-button" onClick={() => close()}>
-            Close
-          </button>
+          <div className="OfflineReadyPrompt-date">{buildDate}</div>
         </div>
       )}
-      <div className="OfflineReadyPrompt-date">{buildDate}</div>
-    </div>
+    </>
   );
 }
 
