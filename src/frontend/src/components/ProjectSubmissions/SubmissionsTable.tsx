@@ -407,8 +407,8 @@ const SubmissionsTable = ({ toggleView }) => {
               ?.task_status === 'LOCKED_FOR_VALIDATION' && (
               <Button
                 isLoading={updateTaskStatusLoading}
-                loadingText="FULLY MAPPED"
-                btnText="FULLY MAPPED"
+                loadingText="MARK AS VALIDATED"
+                btnText="MARK AS VALIDATED"
                 btnType="primary"
                 className="!fmtm-rounded !fmtm-text-base"
                 onClick={handleTaskMap}

@@ -32,7 +32,7 @@ export default {
     {
       label: 'LOCKED_FOR_VALIDATION',
       action: [
-        { key: 'Confirm fully Mapped', value: 'VALIDATED', btnBG: 'gray' },
+        { key: 'Mark as validated', value: 'VALIDATED', btnBG: 'gray' },
         { key: 'Mapping Needed', value: 'INVALIDATED', btnBG: 'transparent' },
       ],
     },
