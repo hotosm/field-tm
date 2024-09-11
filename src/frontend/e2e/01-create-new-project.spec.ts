@@ -3,7 +3,7 @@
 
 import { test, expect } from '@playwright/test';
 
-test('Project Creation', async ({ browserName, page }) => {
+test('create new project', async ({ browserName, page }) => {
   // Specific for this large test, only run in one browser
   // Run other tests in all browsers
   test.skip(browserName !== 'chromium', 'Test only for chromium!');
@@ -83,5 +83,8 @@ test('Project Creation', async ({ browserName, page }) => {
   await page.getByRole('spinbutton').fill('3');
   await page.getByRole('button', { name: 'Click to generate task' }).click();
   await page.getByRole('button', { name: 'SUBMIT' }).click();
-  await expect(page.getByText('Project Generation Completed. Redirecting...')).toBeVisible();
+
+  const projectCreationSuccessToast = page.getByText('Project Generation Completed. Redirecting...');
+  await projectCreationSuccessToast.waitFor({ state: 'visible' });
+  await expect(projectCreationSuccessToast).toBeVisible();
 });

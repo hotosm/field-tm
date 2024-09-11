@@ -159,7 +159,7 @@ const ProjectSlice = createSlice({
       const updatedProjectTaskBoundries = state.projectTaskBoundries?.map((boundary) => {
         if (boundary.id == action.payload.projectId) {
           const updatedBoundary = boundary?.taskBoundries?.map((taskBoundary) => {
-            if (taskBoundary?.index === action.payload.taskId) {
+            if (taskBoundary?.index === +action.payload.taskId) {
               return {
                 ...taskBoundary,
                 task_status: action.payload.task_status,
