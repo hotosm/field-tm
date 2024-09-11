@@ -6,7 +6,7 @@ interface ProjectValues {
 interface ValidationErrors {
   formCategorySelection?: string;
   formWays?: string;
-  customFormUpload?: string;
+  customFormUpload?: any;
 }
 
 function SelectFormValidation(values: ProjectValues) {

@@ -89,10 +89,8 @@ const CreateNewProject = () => {
         return (
           <SplitTasks
             flag="create_project"
-            geojsonFile={geojsonFile}
             setGeojsonFile={setGeojsonFile}
             customDataExtractUpload={customDataExtractUpload}
-            customFormFile={customFormFile}
           />
         );
       default:

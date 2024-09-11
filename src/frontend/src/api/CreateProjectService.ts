@@ -462,14 +462,17 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
         const formUploadFormData = new FormData();
         formUploadFormData.append('form', formUpload);
 
-        const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
-        const resp: ValidateCustomFormResponse = getTaskSplittingResponse.data;
-        dispatch(CreateProjectActions.ValidateCustomForm(resp));
+        // response is in file format so we need to convert it to blob
+        const getTaskSplittingResponse = await axios.post(url, formUploadFormData, {
+          responseType: 'blob',
+        });
+        const resp = getTaskSplittingResponse.data;
+        dispatch(CreateProjectActions.SetValidatedCustomFile(new File([resp], 'form.xlsx', { type: resp.type })));
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: JSON.stringify(resp.message),
+            message: 'Your Form is Valid',
             variant: 'success',
             duration: 2000,
           }),
@@ -479,7 +482,7 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: error?.response?.data?.detail || 'Something Went Wrong',
+            message: JSON.parse(await error?.response?.data.text())?.detail || 'Something Went Wrong',
             variant: 'error',
             duration: 5000,
           }),

@@ -40,6 +40,7 @@ from geojson_pydantic import Feature, FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
+from osm_fieldwork.update_form import update_xls_form
 from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
@@ -676,7 +677,19 @@ async def validate_form(form: UploadFile):
         )
 
     contents = await form.read()
-    return await central_crud.read_and_test_xform(BytesIO(contents), file_ext)
+    updated_file_bytes = update_xls_form(BytesIO(contents))
+
+    # open bytes again to avoid I/O error on closed bytes
+    form_data = BytesIO(updated_file_bytes.getvalue())
+
+    await central_crud.read_and_test_xform(updated_file_bytes, file_ext)
+
+    # Return the updated form as a StreamingResponse
+    return StreamingResponse(
+        form_data,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={form.filename}"},
+    )
 
 
 @router.post("/{project_id}/generate-project-data")
