@@ -13,6 +13,7 @@ import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectServ
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { CustomCheckbox } from '../common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { Loader2 } from 'lucide-react';
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
   useDocumentTitle('Create Project: Select Category');
@@ -21,8 +22,9 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const drawnGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
-  const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const customFileValidity = useAppSelector((state) => state.createproject.customFileValidity);
+  const validatedCustomForm = useAppSelector((state) => state.createproject.validatedCustomForm);
+  const validateCustomFormLoading = useAppSelector((state) => state.createproject.validateCustomFormLoading);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
@@ -60,12 +62,12 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
     const { files } = event.target;
     // Set the selected file as the customFormFile state
     setCustomFormFile(files[0]);
-    handleCustomChange('customFormUpload', files[0]);
   };
   const resetFile = (): void => {
     handleCustomChange('customFormUpload', null);
     dispatch(CreateProjectActions.SetCustomFileValidity(false));
     setCustomFormFile(null);
+    dispatch(CreateProjectActions.SetValidatedCustomFile(null));
   };
 
   useEffect(() => {
@@ -81,10 +83,17 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
       dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate-form`, customFormFile));
     }
   }, [customFormFile]);
+
+  //add validated form to state
+  useEffect(() => {
+    if (!validatedCustomForm) return;
+    handleCustomChange('customFormUpload', validatedCustomForm);
+  }, [validatedCustomForm]);
+
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Select Category</h6>
+        <h6 className="fmtm-text-xl fm  tm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Select Category</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
           <span>
             You may choose a pre-configured form, or upload a custom XLS form. Click{' '}
@@ -101,6 +110,10 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
             For creating a custom XLS form, there are few essential fields that must be present for FMTM to function.
             You may either download the sample XLS file and modify all fields that are not hidden, or edit the sample
             form interactively in the browser.
+          </span>
+          <span>
+            <b>Note:</b> Additional questions will be incorporated into your custom form to assess the digitization
+            status.
           </span>
         </p>
       </div>
@@ -187,6 +200,12 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                     fileDescription="*The supported file formats are .xlsx, .xls, .xml"
                     errorMsg={errors.customFormUpload}
                   />
+                  {validateCustomFormLoading && (
+                    <div className="fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-mt-2">
+                      <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
+                      <p className="fmtm-text-base">Validating form...</p>
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -201,7 +220,13 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                 }}
                 className="fmtm-font-bold"
               />
-              <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
+              <Button
+                btnText="NEXT"
+                btnType="primary"
+                type="submit"
+                className="fmtm-font-bold"
+                disabled={validateCustomFormLoading}
+              />
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
