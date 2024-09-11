@@ -20,7 +20,7 @@ const ProjectSubmissions = () => {
   const state = useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const entityList = useAppSelector((state) => state.project.entityOsmMap);
-  const updatedEntities = entityList?.filter((entity) => entity?.updated_at && entity?.status > 1);
+  const updatedEntities = entityList?.filter((entity) => entity?.status > 1);
 
   //Fetch project for the first time
   useEffect(() => {
