@@ -103,7 +103,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     },
     {
       name: 'Download Custom ODK Collect',
-      ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.0-signed/ODK-Collect-v2024.2.0-signed.apk',
+      ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-entity-select.apk',
       isExternalLink: true,
       isActive: true,
     },
