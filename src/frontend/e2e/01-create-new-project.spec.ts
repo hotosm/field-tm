@@ -3,15 +3,15 @@
 
 import { test, expect } from '@playwright/test';
 
+import { tempLogin } from './helpers';
+
 test('create new project', async ({ browserName, page }) => {
   // Specific for this large test, only run in one browser
-  // Run other tests in all browsers
+  // (playwright.config.ts is configured to run all browsers by default)
   test.skip(browserName !== 'chromium', 'Test only for chromium!');
 
   // 0. Temp Login
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await page.getByText('Temporary Account').click();
+  await tempLogin(page);
   await page.getByRole('button', { name: '+ Create New Project' }).click();
 
   // 1. Project Details Step
