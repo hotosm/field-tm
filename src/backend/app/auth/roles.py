@@ -65,7 +65,7 @@ async def check_access(
     Access is determined based on the user's role and permissions:
     - If the user has an 'ADMIN' role, access is granted.
     - If the user has a 'READ_ONLY' role, access is denied.
-    - If the organisation is the public beta, then grant access.
+    - If the organisation is HOTOSM, then grant access.
     - For other roles, access is granted if the user is an organisation manager
       for the specified organisation (org_id) or has the specified role
       in the specified project (project_id).
@@ -95,13 +95,13 @@ async def check_access(
                         SELECT 1
                         FROM organisations
                         WHERE (organisations.id = :org_id
-                            AND organisations.slug = 'fmtm-public-beta')
+                            AND organisations.slug = 'hotosm')
                         OR EXISTS (
                             SELECT 1
                             FROM projects
                             JOIN organisations AS org
                                 ON projects.organisation_id = org.id
-                            WHERE org.slug = 'fmtm-public-beta'
+                            WHERE org.slug = 'hotosm'
                                 AND projects.id = :project_id
                         )
                     ) THEN true

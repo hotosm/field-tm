@@ -44,7 +44,7 @@ async def init_admin_org(db: Session):
         -- Start a transaction
         BEGIN;
 
-        -- Insert FMTM Public Beta organisation
+        -- Insert HOTOSM organisation
         INSERT INTO public.organisations (
             name,
             slug,
@@ -58,10 +58,10 @@ async def init_admin_org(db: Session):
             odk_central_password
         )
         VALUES (
-            'FMTM Public Beta',
-            'fmtm-public-beta',
+            'HOTOSM',
+            'hotosm',
             'https://avatars.githubusercontent.com/u/458752?s=280&v=4',
-            'HOTOSM Public Beta for FMTM.',
+            'Humanitarian OpenStreetMap Team.',
             'https://hotosm.org',
             'FREE',
             true,
@@ -106,7 +106,7 @@ async def init_admin_org(db: Session):
         -- Set localadmin user as org admin
         WITH org_cte AS (
             SELECT id FROM public.organisations
-            WHERE name = 'FMTM Public Beta'
+            WHERE name = 'HOTOSM'
         )
         INSERT INTO public.organisation_managers (organisation_id, user_id)
         SELECT (SELECT id FROM org_cte), :admin_user_id

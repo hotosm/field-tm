@@ -116,11 +116,7 @@ async def admin_user(db):
 @pytest.fixture(scope="function")
 def organisation(db):
     """A test organisation."""
-    return (
-        db.query(DbOrganisation)
-        .filter(DbOrganisation.name == "FMTM Public Beta")
-        .first()
-    )
+    return db.query(DbOrganisation).filter(DbOrganisation.name == "HOTOSM").first()
 
 
 @pytest.fixture(scope="function")
