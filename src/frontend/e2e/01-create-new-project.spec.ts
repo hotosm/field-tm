@@ -30,7 +30,7 @@ test('create new project', async ({ browserName, page }) => {
   await page.locator('#description').click();
   await page.locator('#description').fill('desc');
   await page.getByRole('combobox').click();
-  await page.getByLabel('FMTM Public Beta').click();
+  await page.getByLabel('HOTOSM').click();
   await page.getByRole('button', { name: 'NEXT' }).click();
 
   // 2. Upload Area Step
