@@ -1,16 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+import { tempLogin } from './helpers';
+
 test.describe('mapper flow', () => {
-  test('mapper flow', async ({ page }) => {
-    await page.goto('/');
-    // await page.goto('http://fmtm.localhost:7050/');
-    await page.getByRole('button', { name: 'Sign in' }).click();
-    await page
-      .getByLabel('', { exact: true })
-      .locator('div')
-      .filter({ hasText: "Temporary AccountIf you're" })
-      .nth(3)
-      .click();
+  test('mapper flow', async ({ browserName, page }) => {
+    // Specific for this large test, only run in one browser
+    // (playwright.config.ts is configured to run all browsers by default)
+    test.skip(browserName !== 'chromium', 'Test only for chromium!');
+
+    await tempLogin(page);
 
     // click first project card on the home page
     await page.locator('.MuiCardContent-root').first().click();
@@ -26,7 +24,8 @@ test.describe('mapper flow', () => {
     await expect(page.getByText('Status: READY')).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
     await page.getByTitle('Close').getByTestId('CloseIcon').click();
-    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('ready.png');
+    // Use maxDiffPixelRatio to avoid issues with OSM tile loading delay
+    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('ready.png', { maxDiffPixelRatio: 0.05 });
 
     await page.locator('canvas').click({
       position: {
@@ -46,7 +45,10 @@ test.describe('mapper flow', () => {
     ).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
     await page.getByTitle('Close').getByTestId('CloseIcon').click();
-    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('locked-for-mapping.png');
+    // Use maxDiffPixelRatio to avoid issues with OSM tile loading delay
+    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('locked-for-mapping.png', {
+      maxDiffPixelRatio: 0.05,
+    });
 
     await page.locator('canvas').click({
       position: {
@@ -66,7 +68,8 @@ test.describe('mapper flow', () => {
     ).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
     await page.getByTitle('Close').getByTestId('CloseIcon').click();
-    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('mapped.png');
+    // Use maxDiffPixelRatio to avoid issues with OSM tile loading delay
+    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('mapped.png', { maxDiffPixelRatio: 0.05 });
 
     await page.locator('canvas').click({
       position: {
@@ -76,14 +79,18 @@ test.describe('mapper flow', () => {
     });
     // STATUS: MAPPED
     await page.getByRole('button', { name: 'START VALIDATION' }).click();
-    await page.getByRole('button', { name: 'FULLY MAPPED' }).click();
+    // Wait for redirect to validation page
+    await page.waitForTimeout(2000);
+    // Click 'Fully Mapped' button on validation page
+    await page.getByRole('button', { name: 'MARK AS VALIDATED' }).click();
 
     await page.getByText('has been updated to VALIDATED').waitFor({ state: 'visible' });
     await expect(page.getByText('has been updated to VALIDATED')).toBeVisible();
 
-    // click on validated task after map renders
+    // wait for map to render before continuing
     await page.waitForTimeout(4000);
-    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('validated.png');
+    // Use maxDiffPixelRatio to avoid issues with OSM tile loading delay
+    expect(await page.locator('canvas').screenshot()).toMatchSnapshot('validated.png', { maxDiffPixelRatio: 0.05 });
     await page.locator('canvas').click({
       position: {
         x: 445,
@@ -93,16 +100,12 @@ test.describe('mapper flow', () => {
     await expect(page.getByText('Status: VALIDATED')).toBeVisible();
   });
 
-  test('comment section', async ({ page }) => {
-    await page.goto('/');
-    // await page.goto('http://fmtm.localhost:7050/');
-    await page.getByRole('button', { name: 'Sign in' }).click();
-    await page
-      .getByLabel('', { exact: true })
-      .locator('div')
-      .filter({ hasText: "Temporary AccountIf you're" })
-      .nth(3)
-      .click();
+  test('comment section', async ({ browserName, page }) => {
+    // Specific for this large test, only run in one browser
+    // (playwright.config.ts is configured to run all browsers by default)
+    test.skip(browserName !== 'chromium', 'Test only for chromium!');
+
+    await tempLogin(page);
 
     // click first project card on the home page
     await page.locator('.MuiCardContent-root').first().click();

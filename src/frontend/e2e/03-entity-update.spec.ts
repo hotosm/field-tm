@@ -1,14 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-test('entity update', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await page
-    .getByLabel('', { exact: true })
-    .locator('div')
-    .filter({ hasText: "Temporary AccountIf you're" })
-    .nth(3)
-    .click();
+import { tempLogin } from './helpers';
+
+test('entity update', async ({ browserName, page }) => {
+  // Specific for this large test, only run in one browser
+  // (playwright.config.ts is configured to run all browsers by default)
+  test.skip(browserName !== 'chromium', 'Test only for chromium!');
+
+  await tempLogin(page);
 
   // click first project card on the home page
   await page.locator('.MuiCardContent-root').first().click();
