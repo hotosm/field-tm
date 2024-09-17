@@ -10,6 +10,7 @@ import MarkerIcon from '@/assets/images/red_marker.png';
 import { useNavigate } from 'react-router-dom';
 import { Style, Text, Icon, Fill } from 'ol/style';
 import { projectType } from '@/models/home/homeModel';
+import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 const getIndividualStyle = (featureProperty) => {
   const style = new Style({
@@ -78,6 +79,9 @@ const ProjectListMap = () => {
             width: '100%',
           }}
         >
+          <div className="fmtm-absolute fmtm-right-2 fmtm-top-2 fmtm-z-20">
+            <LayerSwitchMenu map={map} />
+          </div>
           <LayerSwitcherControl visible={'osm'} />
           {projectGeojson && projectGeojson?.features?.length > 0 && (
             <ClusterLayer

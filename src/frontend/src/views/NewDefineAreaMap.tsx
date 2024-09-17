@@ -5,6 +5,7 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { DrawnGeojsonTypes, GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
 import MapControlComponent from '@/components/createnewproject/MapControlComponent';
+import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 type NewDefineAreaMapProps = {
   drawToggle?: boolean;
@@ -47,6 +48,9 @@ const NewDefineAreaMap = ({
           width: '100%',
         }}
       >
+        <div className="fmtm-absolute fmtm-right-2 fmtm-top-5 fmtm-z-20">
+          <LayerSwitchMenu map={map} />
+        </div>
         <LayerSwitcherControl visible={'osm'} />
         <MapControlComponent map={map} hasEditUndo={hasEditUndo} />
         {splittedGeojson && (

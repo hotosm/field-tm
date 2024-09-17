@@ -5,7 +5,6 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
-import { GetProjectQrCode } from '@/api/Files';
 import QrcodeComponent from '@/components/QrcodeComponent';
 import { useAppSelector } from '@/types/reduxTypes';
 
@@ -23,9 +22,6 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
   const currentProjectId: string = params.id;
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id.toString() === currentProjectId);
-
-  const projectName = useAppSelector((state) => state.project.projectInfo.title);
-  const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const selectedTask = {
     ...projectData?.[projectIndex]?.taskBoundries?.filter((indTask, i) => {
@@ -35,7 +31,6 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
   const checkIfTaskAssignedOrNot =
     selectedTask?.locked_by_username === authDetails?.username || selectedTask?.locked_by_username === null;
 
-  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
   useEffect(() => {
     if (projectIndex != -1) {
       const currentStatus = {
@@ -100,9 +95,12 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
             <p className="fmtm-text-base fmtm-text-[#757575]">Locked By: {selectedTask?.locked_by_username}</p>
           )}
         </div>
-        {checkIfTaskAssignedOrNot && task_status !== 'LOCKED_FOR_MAPPING' && (
-          <QrcodeComponent qrcode={qrcode} projectId={currentProjectId} taskIndex={selectedTask.index} />
-        )}
+        {/* only display qr code component render inside taskPopup on mobile screen */}
+        <div className="sm:fmtm-hidden">
+          {checkIfTaskAssignedOrNot && task_status !== 'LOCKED_FOR_MAPPING' && (
+            <QrcodeComponent projectId={currentProjectId} taskIndex={selectedTask.index} />
+          )}
+        </div>
         {body}
       </div>
     </div>

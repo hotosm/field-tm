@@ -7,6 +7,7 @@ import { useAppSelector } from '@/types/reduxTypes';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { useDispatch } from 'react-redux';
 import { DataConflationActions } from '@/store/slices/DataConflationSlice';
+import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 const ConflationMap = () => {
   const dispatch = useDispatch();
@@ -47,6 +48,9 @@ const ConflationMap = () => {
             );
           }}
         />
+        <div className="fmtm-absolute fmtm-right-2 fmtm-top-16 fmtm-z-20">
+          <LayerSwitchMenu map={map} />
+        </div>
         <LayerSwitcherControl visible="osm" />
         <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-3 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
           <MapLegend />

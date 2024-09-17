@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
+// @ts-ignore
 import VectorLayer from 'ol/layer/Vector';
 import CoreModules from '@/shared/CoreModules.js';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
@@ -7,13 +8,16 @@ import { useAppSelector } from '@/types/reduxTypes';
 import { useLocation } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
 import useOutsideClick from '@/hooks/useOutsideClick';
+import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
+import { Tooltip } from '@mui/material';
 
 type mapControlComponentType = {
   map: any;
   projectName: string;
+  pmTileLayerData: any;
 };
 
-const MapControlComponent = ({ map, projectName }: mapControlComponentType) => {
+const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlComponentType) => {
   const btnList = [
     {
       id: 'add',
@@ -71,20 +75,20 @@ const MapControlComponent = ({ map, projectName }: mapControlComponentType) => {
   };
 
   return (
-    <div className="fmtm-absolute fmtm-top-16 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
+    <div className="fmtm-absolute fmtm-top-4 sm:fmtm-top-56 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
       {btnList.map((btn) => (
-        <div key={btn.id}>
+        <Tooltip title={btn.title} placement="left">
           <div
-            className={`fmtm-bg-white fmtm-rounded-full fmtm-p-2 hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 ${
+            className={`fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center ${
               geolocationStatus && btn.id === 'currentLocation' ? 'fmtm-text-primaryRed' : ''
             }`}
             onClick={() => handleOnClick(btn.id)}
-            title={btn.title}
           >
-            {btn.icon}
+            <div>{btn.icon}</div>
           </div>
-        </div>
+        </Tooltip>
       ))}
+      <LayerSwitchMenu map={map} pmTileLayerData={pmTileLayerData} />
       <div
         className={`fmtm-relative ${!pathname.includes('project/') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}
         ref={divRef}
