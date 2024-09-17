@@ -35,7 +35,7 @@ dependencies = [
     "geoalchemy2==0.15.2",
     "geojson==3.1.0",
     "shapely==2.0.5",
-    "pyxform==2.0.3",
+    "pyxform==2.1.0",
     "loguru==0.7.2",
     "minio==7.2.7",
     "pyproj==3.6.1",
