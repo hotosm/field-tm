@@ -155,7 +155,7 @@ const pmTileLayer = (pmTileLayerData, visible) => {
     return image;
   }
   return new TileLayer({
-    title: `${pmTileLayerData.name}`,
+    title: `PMTile`,
     type: 'raster pm tiles',
     visible: true,
     source: new DataTile({
@@ -220,17 +220,7 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
     map.addLayer(basemapLayers);
     map.addControl(layerSwitcherControl);
     const layerSwitcher = document.querySelector('.layer-switcher');
-    if (layerSwitcher) {
-      const layerSwitcherButton = layerSwitcher.querySelector('button');
-      if (layerSwitcherButton) {
-        layerSwitcherButton.style.width = '38px';
-        layerSwitcherButton.style.height = '38px';
-      }
-      layerSwitcher.style.backgroundColor = 'white';
-      layerSwitcher.style.display = 'flex';
-      layerSwitcher.style.justifyContent = 'center';
-      layerSwitcher.style.alignItems = 'center';
-    }
+    layerSwitcher.style.display = 'none';
     if (
       location.pathname.includes('project/') ||
       location.pathname.includes('upload-area') ||

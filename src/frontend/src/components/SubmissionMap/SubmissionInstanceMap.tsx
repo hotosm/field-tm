@@ -4,6 +4,7 @@ import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLaye
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index.js';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 type submissionInstanceMapPropType = {
   featureGeojson: Record<string, any>;
@@ -34,6 +35,9 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
           width: '100%',
         }}
       >
+        <div className="fmtm-absolute fmtm-right-2 fmtm-top-2 fmtm-z-20">
+          <LayerSwitchMenu map={map} />
+        </div>
         <LayerSwitcherControl visible={'osm'} />
         {featureGeojson?.type && (
           <VectorLayer

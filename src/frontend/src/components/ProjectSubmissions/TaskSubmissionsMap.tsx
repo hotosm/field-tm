@@ -24,6 +24,7 @@ import {
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
+import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 export const defaultStyles = {
   lineColor: '#000000',
@@ -250,6 +251,9 @@ const TaskSubmissionsMap = () => {
           width: '100%',
         }}
       >
+        <div className="fmtm-absolute fmtm-right-2 fmtm-top-3 fmtm-z-20">
+          <LayerSwitchMenu map={map} />
+        </div>
         <LayerSwitcherControl visible={'osm'} />
         {taskBoundaries && (
           <VectorLayer

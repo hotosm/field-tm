@@ -1,39 +1,36 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
+import { useAppSelector } from '@/types/reduxTypes';
+import { GetProjectQrCode } from '@/api/Files';
 
 type tasksComponentType = {
-  qrcode: string;
-  projectId: string;
-  taskIndex: number;
+  projectId?: string;
+  taskIndex?: number;
 };
 
-const TasksComponent = ({ qrcode, projectId, taskIndex }: tasksComponentType) => {
+const QrcodeComponent = ({ projectId, taskIndex }: tasksComponentType) => {
   const downloadQR = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = qrcode;
     downloadLink.download = `Project_${projectId}_Task_${taskIndex}`;
     downloadLink.click();
   };
+
+  const projectName = useAppSelector((state) => state.project.projectInfo.title);
+  const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
+
   return (
     <div className="fmtm-flex fmtm-justify-center sm:fmtm-py-5 fmtm-border-t-[1px]">
-      <div className="fmtm-p-5 fmtm-border-[1px] fmtm-rounded-lg fmtm-relative fmtm-hidden sm:fmtm-block">
+      <div className="fmtm-relative fmtm-hidden sm:fmtm-block fmtm-bg-white fmtm-p-2 !fmtm-w-[8.5rem] fmtm-rounded-tl-lg fmtm-rounded-bl-lg">
         {qrcode == '' ? (
           <CoreModules.Skeleton width={170} height={170} />
         ) : (
-          <img id="qrcodeImg" src={qrcode} alt="qrcode" />
+          <img id="qrcodeImg" src={qrcode} alt="qrcode" className="" />
         )}
-        <div className="fmtm-rounded-full fmtm-w-10 fmtm-h-10 fmtm-flex fmtm-justify-center fmtm-items-center fmtm-shadow-xl fmtm-absolute fmtm-bottom-0 -fmtm-right-5 fmtm-bg-white ">
-          <button
-            onClick={downloadQR}
-            disabled={qrcode == '' ? true : false}
-            aria-label="download qrcode"
-            className={` ${qrcode === '' ? 'fmtm-cursor-not-allowed fmtm-opacity-50' : 'fmtm-cursor-pointer'}`}
-            title="Download QR Code"
-          >
-            <AssetModules.FileDownloadIcon />
-          </button>
-        </div>
+        <p className="fmtm-text-center fmtm-leading-4 fmtm-text-sm fmtm-mt-2">Scan to load project on ODK</p>
       </div>
       <div className="fmtm-block sm:fmtm-hidden">
         <button
@@ -53,4 +50,4 @@ const TasksComponent = ({ qrcode, projectId, taskIndex }: tasksComponentType) =>
   );
 };
 
-export default TasksComponent;
+export default QrcodeComponent;
