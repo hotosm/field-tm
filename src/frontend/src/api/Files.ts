@@ -58,7 +58,7 @@ export const GetProjectQrCode = (
     };
 
     return cleanUp;
-  }, []);
+  }, [projectName, odkToken, osmUser]);
   return { qrcode };
 };
 
