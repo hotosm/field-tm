@@ -125,6 +125,25 @@ const ProjectDetailsForm = ({ flag }) => {
               are the instructions for setting up a Central ODK Server on Digital Ocean, if you haven’t already.
             </span>
           </div>
+          <div>
+            You can use the 'Custom TMS URL' option to integrate high-resolution aerial imagery like OpenAerialMap{' '}
+            <a
+              href="https://openaerialmap.org/"
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
+              target="_"
+            >
+              (OAM)
+            </a>
+            . Simply obtain the TMS URL and paste it into the custom TMS field. More details:{' '}
+            <a
+              href="https://docs.openaerialmap.org/"
+              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
+              target="_"
+            >
+              OpenAerialMap Documentation
+            </a>
+            .
+          </div>
         </div>
       </div>
       <form
