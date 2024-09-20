@@ -9,8 +9,6 @@ const ProjectInfo = ({ entities }) => {
   const params = CoreModules.useParams();
   const projectId = params.projectId;
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
-  // const projectDashboardDetail = useAppSelector((state) => state.project.projectDashboardDetail);
-  // const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
   const submissionContributorsData = useAppSelector((state) => state.submission.submissionContributors);
 
   const projectTaskList = useAppSelector((state) => state.project.projectTaskBoundries);

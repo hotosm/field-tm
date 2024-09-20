@@ -17,30 +17,30 @@ type mapControlComponentType = {
   pmTileLayerData: any;
 };
 
-const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlComponentType) => {
-  const btnList = [
-    {
-      id: 'add',
-      icon: <AssetModules.AddIcon />,
-      title: 'Zoom In',
-    },
-    {
-      id: 'minus',
-      icon: <AssetModules.RemoveIcon />,
-      title: 'Zoom Out',
-    },
-    {
-      id: 'currentLocation',
-      icon: <AssetModules.MyLocationIcon />,
-      title: 'My Location',
-    },
-    {
-      id: 'taskBoundries',
-      icon: <AssetModules.CropFreeIcon />,
-      title: 'Zoom to Project',
-    },
-  ];
+const btnList = [
+  {
+    id: 'add',
+    icon: <AssetModules.AddIcon />,
+    title: 'Zoom In',
+  },
+  {
+    id: 'minus',
+    icon: <AssetModules.RemoveIcon />,
+    title: 'Zoom Out',
+  },
+  {
+    id: 'currentLocation',
+    icon: <AssetModules.MyLocationIcon />,
+    title: 'My Location',
+  },
+  {
+    id: 'taskBoundries',
+    icon: <AssetModules.CropFreeIcon />,
+    title: 'Zoom to Project',
+  },
+];
 
+const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlComponentType) => {
   const { pathname } = useLocation();
   const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
@@ -48,11 +48,10 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
   const handleOnClick = (btnId) => {
+    const actualZoom = map.getView().getZoom();
     if (btnId === 'add') {
-      const actualZoom = map.getView().getZoom();
       map.getView().setZoom(actualZoom + 1);
     } else if (btnId === 'minus') {
-      const actualZoom = map.getView().getZoom();
       map.getView().setZoom(actualZoom - 1);
     } else if (btnId === 'currentLocation') {
       setToggleCurrentLoc(!toggleCurrentLoc);

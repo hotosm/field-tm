@@ -19,6 +19,57 @@ type customDrawerType = {
   setOpen: (open: boolean) => void;
 };
 
+const MenuItems = [
+  {
+    name: 'Explore Projects',
+    ref: '/',
+    isExternalLink: false,
+    isActive: true,
+  },
+  {
+    name: 'Manage Organizations',
+    ref: '/organisation',
+    isExternalLink: false,
+    isActive: true,
+  },
+  {
+    name: 'Manage Category',
+    ref: '/',
+    isExternalLink: false,
+    isActive: true,
+  },
+  {
+    name: 'My Contributions',
+    ref: 'TBD',
+    isExternalLink: false,
+    isActive: false,
+  },
+  {
+    name: 'Learn',
+    ref: 'https://hotosm.github.io/fmtm',
+    isExternalLink: true,
+    isActive: true,
+  },
+  {
+    name: 'About',
+    ref: 'https://docs.fmtm.dev/About/',
+    isExternalLink: true,
+    isActive: true,
+  },
+  {
+    name: 'Support',
+    ref: 'https://github.com/hotosm/fmtm/issues/',
+    isExternalLink: true,
+    isActive: true,
+  },
+  {
+    name: 'Download Custom ODK Collect',
+    ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-entity-select.apk',
+    isExternalLink: true,
+    isActive: true,
+  },
+];
+
 export default function CustomDrawer({ open, size, type, onClose, setOpen }: customDrawerType) {
   const dispatch = CoreModules.useAppDispatch();
 
@@ -57,57 +108,6 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
       fontFamily: defaultTheme.typography.subtitle2.fontFamily,
     },
   };
-
-  const MenuItems = [
-    {
-      name: 'Explore Projects',
-      ref: '/',
-      isExternalLink: false,
-      isActive: true,
-    },
-    {
-      name: 'Manage Organizations',
-      ref: '/organisation',
-      isExternalLink: false,
-      isActive: true,
-    },
-    {
-      name: 'Manage Category',
-      ref: '/',
-      isExternalLink: false,
-      isActive: true,
-    },
-    {
-      name: 'My Contributions',
-      ref: 'TBD',
-      isExternalLink: false,
-      isActive: false,
-    },
-    {
-      name: 'Learn',
-      ref: 'https://hotosm.github.io/fmtm',
-      isExternalLink: true,
-      isActive: true,
-    },
-    {
-      name: 'About',
-      ref: 'https://docs.fmtm.dev/About/',
-      isExternalLink: true,
-      isActive: true,
-    },
-    {
-      name: 'Support',
-      ref: 'https://github.com/hotosm/fmtm/issues/',
-      isExternalLink: true,
-      isActive: true,
-    },
-    {
-      name: 'Download Custom ODK Collect',
-      ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-entity-select.apk',
-      isExternalLink: true,
-      isActive: true,
-    },
-  ];
 
   const handleOnSignOut = async () => {
     setOpen(false);

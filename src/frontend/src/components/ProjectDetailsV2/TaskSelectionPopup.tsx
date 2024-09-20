@@ -15,11 +15,13 @@ type TaskSelectionPopupPropType = {
 };
 
 const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropType) => {
-  const dispatch = CoreModules.useAppDispatch();
-  const [task_status, set_task_status] = useState('READY');
-  const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
   const params = CoreModules.useParams();
+  const dispatch = CoreModules.useAppDispatch();
+
   const currentProjectId: string = params.id;
+  const [task_status, set_task_status] = useState('READY');
+
+  const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id.toString() === currentProjectId);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
