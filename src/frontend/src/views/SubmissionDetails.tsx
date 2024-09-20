@@ -159,6 +159,14 @@ const SubmissionDetails = () => {
     properties: {},
   };
 
+  const newFeaturePoint = {
+    type: 'Feature',
+    geometry: {
+      ...restSubmissionDetails?.new_feature_point,
+    },
+    properties: {},
+  };
+
   return (
     <>
       <UpdateReviewStatusModal />
@@ -243,7 +251,17 @@ const SubmissionDetails = () => {
           <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center fmtm-mt-10 md:fmtm-mt-0">
             <div className="fmtm-w-full fmtm-h-[20rem] md:fmtm-h-full fmtm-rounded-lg fmtm-overflow-hidden">
               <SubmissionInstanceMap
-                featureGeojson={coordinatesArray ? geojsonFeature : restSubmissionDetails?.point ? pointFeature : {}}
+                featureGeojson={
+                  submissionDetailsLoading
+                    ? {}
+                    : restSubmissionDetails?.new_feature === 'yes'
+                      ? newFeaturePoint
+                      : coordinatesArray
+                        ? geojsonFeature
+                        : restSubmissionDetails?.point
+                          ? pointFeature
+                          : {}
+                }
               />
             </div>
           </div>
