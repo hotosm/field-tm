@@ -385,7 +385,7 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
         const formFormData = new FormData();
         formFormData.append('xform_id', projectData.xformId);
         formFormData.append('category', projectData.category);
-        formFormData.append('upload', projectData.upload);
+        formFormData.append('xlsform', projectData.upload);
 
         const postFormUpdateResponse = await axios.post(url, formFormData);
         const resp: ProjectDetailsModel = postFormUpdateResponse.data;
@@ -460,7 +460,7 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
     const validateCustomForm = async (url: any, formUpload: any) => {
       try {
         const formUploadFormData = new FormData();
-        formUploadFormData.append('form', formUpload);
+        formUploadFormData.append('xlsform', formUpload);
 
         // response is in file format so we need to convert it to blob
         const getTaskSplittingResponse = await axios.post(url, formUploadFormData, {

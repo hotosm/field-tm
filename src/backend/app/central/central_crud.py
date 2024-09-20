@@ -19,17 +19,15 @@
 
 import csv
 import json
-import os
-import uuid
 from io import BytesIO, StringIO
 from typing import Optional, Union
-from xml.etree.ElementTree import Element, SubElement
 
 import geojson
 from defusedxml import ElementTree
 from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
+from osm_fieldwork.update_xlsform import append_mandatory_fields
 from pyxform.xls2xform import convert as xform_convert
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -314,11 +312,70 @@ async def get_form_list(db: Session) -> list:
         ) from e
 
 
+async def read_and_test_xform(input_data: BytesIO) -> None:
+    """Read and validate an XForm.
+
+    Args:
+        input_data (BytesIO): form to be tested.
+
+    Returns:
+        BytesIO: the converted XML representation of the XForm.
+    """
+    try:
+        log.debug("Parsing XLSForm --> XML data")
+        # NOTE pyxform.xls2xform.convert returns a ConvertResult object
+        return BytesIO(xform_convert(input_data).xform.encode("utf-8"))
+    except Exception as e:
+        log.error(e)
+        msg = f"XLSForm is invalid: {str(e)}"
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
+        ) from e
+
+
+async def append_fields_to_user_xlsform(
+    xlsform: BytesIO,
+    form_category: str = "buildings",
+    additional_entities: list[str] = None,
+    task_count: int = None,
+    existing_id: str = None,
+) -> BytesIO:
+    """Helper to return the intermediate XLSForm prior to convert."""
+    log.debug("Appending mandatory FMTM fields to XLSForm")
+    return await append_mandatory_fields(
+        xlsform,
+        form_category=form_category,
+        additional_entities=additional_entities,
+        task_count=task_count,
+        existing_id=existing_id,
+    )
+
+
+async def validate_and_update_user_xlsform(
+    xlsform: BytesIO,
+    form_category: str = "buildings",
+    additional_entities: list[str] = None,
+    task_count: int = None,
+    existing_id: str = None,
+) -> BytesIO:
+    """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
+    updated_file_bytes = await append_fields_to_user_xlsform(
+        xlsform,
+        form_category=form_category,
+        additional_entities=additional_entities,
+        task_count=task_count,
+        existing_id=existing_id,
+    )
+
+    # Validate and return the form
+    log.debug("Validating uploaded XLS form")
+    return await read_and_test_xform(updated_file_bytes)
+
+
 async def update_project_xform(
     xform_id: str,
     odk_id: int,
-    xform_data: BytesIO,
-    form_file_ext: str,
+    xlsform: BytesIO,
     category: str,
     task_count: int,
     odk_credentials: project_schemas.ODKCentralDecrypted,
@@ -328,218 +385,27 @@ async def update_project_xform(
     Args:
         xform_id (str): The UUID of the existing XForm in ODK Central.
         odk_id (int): ODK Central form ID.
-        xform_data (BytesIO): XForm data.
-        form_file_ext (str): Extension of the form file.
+        xlsform (UploadFile): XForm data.
         category (str): Category of the XForm.
         task_count (int): The number of tasks in a project.
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+
+    Returns: None
     """
-    xform_data = await read_and_test_xform(
-        xform_data,
-        form_file_ext,
-        return_form_data=True,
-    )
-    updated_xform_data = await modify_xform_xml(
-        xform_data,
-        category,
-        task_count,
-        existing_id=xform_id,
-    )
+    xform_bytesio = await read_and_test_xform(xlsform)
 
     xform_obj = get_odk_form(odk_credentials)
 
     # NOTE calling createForm for an existing form will update it
     xform_obj.createForm(
         odk_id,
-        updated_xform_data,
+        xform_bytesio,
         form_name=xform_id,
     )
     # The draft form must be published after upload
+    # NOTE we can't directly publish existing forms
+    # in createForm and need 2 steps
     xform_obj.publishForm(odk_id, xform_id)
-
-
-async def read_and_test_xform(
-    input_data: BytesIO,
-    form_file_ext: str,
-    return_form_data: bool = False,
-) -> BytesIO | dict:
-    """Read and validate an XForm.
-
-    Args:
-        input_data (BytesIO): form to be tested.
-        form_file_ext (str): type of form (.xls, .xlsx, or .xml).
-        return_form_data (bool): return the XForm data.
-    """
-    # Read from BytesIO object
-    file_ext = form_file_ext.lower()
-
-    if file_ext == ".xml":
-        xform_bytesio = input_data
-        # Parse / validate XForm
-        try:
-            ElementTree.fromstring(xform_bytesio.getvalue())
-        except ElementTree.ParseError as e:
-            log.error(e)
-            msg = f"Error parsing XForm XML: Possible reason: {str(e)}"
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-            ) from e
-    else:
-        try:
-            log.debug("Parsing XLSForm --> XML data")
-            xform_bytesio = BytesIO(xform_convert(input_data).xform.encode("utf-8"))
-        except Exception as e:
-            log.error(e)
-            msg = f"XLSForm is invalid: {str(e)}"
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-            ) from e
-
-    # Return immediately
-    if return_form_data:
-        return xform_bytesio
-
-    # Load XML
-    xform_xml = ElementTree.fromstring(xform_bytesio.getvalue())
-
-    # Extract csv filenames
-    try:
-        namespaces = {"xforms": "http://www.w3.org/2002/xforms"}
-        csv_list = [
-            os.path.splitext(inst.attrib["src"].split("/")[-1])[0]
-            for inst in xform_xml.findall(".//xforms:instance[@src]", namespaces)
-            if inst.attrib.get("src", "").endswith(".csv")
-        ]
-
-        # No select_one_from_file defined
-        if not csv_list:
-            msg = (
-                "The form has no select_one_from_file or "
-                "select_multiple_from_file field defined for a CSV."
-            )
-            raise ValueError(msg) from None
-
-        return {"required_media": csv_list, "message": "Your form is valid"}
-
-    except Exception as e:
-        log.error(e)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e)
-        ) from e
-
-
-async def modify_xform_xml(
-    form_data: BytesIO,
-    category: str,
-    task_count: int,
-    existing_id: Optional[str] = None,
-) -> BytesIO:
-    """Update fields in the XForm to work with FMTM.
-
-    The 'id' field is set to random UUID (xFormId) unless existing_id is specified
-    The 'name' field is set to the category name.
-    The upload media must be equal to 'features.csv'.
-    The task_filter options are populated as choices in the form.
-    The form_category value is also injected to display in the instructions.
-
-    Args:
-        form_data (str): The input form data.
-        category (str): The form category, used to name the dataset (entity list)
-            and the .csv file containing the geometries.
-        task_count (int): The number of tasks in a project.
-        existing_id (str): An existing XForm ID in ODK Central, for updating.
-
-    Returns:
-        BytesIO: The XForm data.
-    """
-    log.debug(f"Updating XML keys in survey XForm: {category}")
-
-    if existing_id:
-        xform_id = existing_id
-    else:
-        xform_id = uuid.uuid4()
-
-    namespaces = {
-        "h": "http://www.w3.org/1999/xhtml",
-        "odk": "http://www.opendatakit.org/xforms",
-        "xforms": "http://www.w3.org/2002/xforms",
-        "entities": "http://www.opendatakit.org/xforms/entities",
-    }
-
-    # Parse the XML from BytesIO obj
-    root = ElementTree.fromstring(form_data.getvalue())
-
-    xform_data = root.findall(".//xforms:data[@id]", namespaces)
-    for dt in xform_data:
-        # This sets the xFormId in ODK Central (the form reference via API)
-        dt.set("id", str(xform_id))
-
-    # Update the form title (displayed in ODK Collect)
-    existing_title = root.find(".//h:title", namespaces)
-    if existing_title is not None:
-        existing_title.text = category
-
-    # Update the attachment name to {category}.csv, to link to the entity list
-    xform_instance_src = root.findall(".//xforms:instance[@src]", namespaces)
-    for inst in xform_instance_src:
-        src_value = inst.get("src", "")
-        if src_value.endswith(".geojson") or src_value.endswith(".csv"):
-            # NOTE geojson files require jr://file/features.geojson
-            # NOTE csv files require jr://file-csv/features.csv
-            inst.set("src", "jr://file-csv/features.csv")
-
-    # NOTE add the task ID choices to the XML
-    # <instance> must be defined inside <model></model> root element
-    model_element = root.find(".//xforms:model", namespaces)
-    # The existing dummy value for task_filter must be removed
-    existing_instance = model_element.find(
-        ".//xforms:instance[@id='task_filter']", namespaces
-    )
-    if existing_instance is not None:
-        model_element.remove(existing_instance)
-    # Create a new instance element
-    instance_task_filters = Element("instance", id="task_filter")
-    root_element = SubElement(instance_task_filters, "root")
-    # Create sub-elements for each task ID, <itextId> <name> pairs
-    for task_id in range(1, task_count + 1):
-        item = SubElement(root_element, "item")
-        SubElement(item, "itextId").text = f"task_filter-{task_id}"
-        SubElement(item, "name").text = str(task_id)
-    model_element.append(instance_task_filters)
-
-    # Add task_filter choice translations (necessary to be visible in form)
-    itext_element = root.find(".//xforms:itext", namespaces)
-    if itext_element is not None:
-        existing_translations = itext_element.findall(
-            ".//xforms:translation", namespaces
-        )
-        for translation in existing_translations:
-            # Remove dummy value from existing translations
-            existing_text = translation.find(
-                ".//xforms:text[@id='task_filter-0']", namespaces
-            )
-            if existing_text is not None:
-                translation.remove(existing_text)
-
-            # Append new <text> elements for each task_id
-            for task_id in range(1, task_count + 1):
-                new_text = Element("text", id=f"task_filter-{task_id}")
-                value_element = Element("value")
-                value_element.text = str(task_id)
-                new_text.append(value_element)
-                translation.append(new_text)
-
-    # Hardcode the form_category value for the start instructions
-    form_category_update = root.find(
-        ".//xforms:bind[@nodeset='/data/form_category']", namespaces
-    )
-    if form_category_update is not None:
-        if category.endswith("s"):
-            # Plural to singular
-            category = category[:-1]
-        form_category_update.set("calculate", f"once('{category.rstrip('s')}')")
-
-    return BytesIO(ElementTree.tostring(root))
 
 
 async def convert_geojson_to_odk_csv(

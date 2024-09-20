@@ -40,7 +40,6 @@ from geojson_pydantic import Feature, FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
-from osm_fieldwork.update_form import update_xls_form
 from osm_fieldwork.xlsforms import xlsforms_path
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
@@ -48,7 +47,7 @@ from sqlalchemy.sql import text
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.osm import login_required
 from app.auth.roles import mapper, org_admin, project_manager
-from app.central import central_crud, central_schemas
+from app.central import central_crud, central_deps, central_schemas
 from app.db import database, db_models
 from app.db.postgis_utils import (
     check_crs,
@@ -661,41 +660,39 @@ async def task_split(
 
 
 @router.post("/validate-form")
-async def validate_form(form: UploadFile):
-    """Tests the validity of the xls form uploaded.
+async def validate_form(
+    xlsform: BytesIO = Depends(central_deps.read_xlsform),
+    debug: bool = False,
+):
+    """Basic validity check for uploaded XLSForm.
 
-    Parameters:
-        - form: The xls form to validate
+    Does not append all addition values to make this a valid FMTM form for mapping.
     """
-    file = Path(form.filename)
-    file_ext = file.suffix.lower()
-
-    allowed_extensions = [".xls", ".xlsx", ".xml"]
-    if file_ext not in allowed_extensions:
-        raise HTTPException(
-            status_code=400, detail="Provide a valid .xls,.xlsx,.xml file"
+    if debug:
+        updated_form = await central_crud.append_fields_to_user_xlsform(
+            xlsform,
+            task_count=1,  # NOTE this must be included to append task_filter choices
         )
-
-    contents = await form.read()
-    updated_file_bytes = update_xls_form(BytesIO(contents))
-
-    # open bytes again to avoid I/O error on closed bytes
-    form_data = BytesIO(updated_file_bytes.getvalue())
-
-    await central_crud.read_and_test_xform(updated_file_bytes, file_ext)
-
-    # Return the updated form as a StreamingResponse
-    return StreamingResponse(
-        form_data,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={form.filename}"},
-    )
+        return StreamingResponse(
+            updated_form,
+            media_type=(
+                "application/vnd.openxmlformats-" "officedocument.spreadsheetml.sheet"
+            ),
+            headers={"Content-Disposition": "attachment; filename=updated_form.xlsx"},
+        )
+    else:
+        await central_crud.validate_and_update_user_xlsform(
+            xlsform,
+            task_count=1,  # NOTE this must be included to append task_filter choices
+        )
+        return Response(status_code=HTTPStatus.OK)
 
 
 @router.post("/{project_id}/generate-project-data")
 async def generate_files(
     background_tasks: BackgroundTasks,
-    xls_form_upload: Optional[UploadFile] = File(None),
+    xlsform_upload: Optional[BytesIO] = Depends(central_deps.read_optional_xlsform),
+    additional_entities: list[str] = None,
     db: Session = Depends(database.get_db),
     project_user_dict: ProjectUserDict = Depends(project_manager),
 ):
@@ -718,8 +715,10 @@ async def generate_files(
 
     Args:
         background_tasks (BackgroundTasks): FastAPI bg tasks, provided automatically.
-        xls_form_upload (UploadFile, optional): A custom XLSForm to use in the project.
+        xlsform_upload (UploadFile, optional): A custom XLSForm to use in the project.
             A file should be provided if user wants to upload a custom xls form.
+        additional_entities (list[str]): If additional Entity lists need to be
+            created (i.e. the project form references multiple geometries).
         db (Session): Database session, provided automatically.
         project_user_dict (ProjectUserDict): Project admin role.
 
@@ -728,28 +727,40 @@ async def generate_files(
     """
     project = project_user_dict.get("project")
     project_id = project.id
+    form_category = project.xform_category
+    task_count = len(project.tasks)
 
-    log.debug(f"Generating media files tasks for project: {project.id}")
+    log.debug(f"Generating additional files for project: {project.id}")
 
-    custom_xls_form = None
-    file_ext = ".xls"
-    if xls_form_upload:
-        log.debug("Validating uploaded XLS form")
+    if xlsform_upload:
+        log.debug("User provided custom XLSForm")
 
-        file_path = Path(xls_form_upload.filename)
-        file_ext = file_path.suffix.lower()
-        allowed_extensions = {".xls", ".xlsx", ".xml"}
-        if file_ext not in allowed_extensions:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Invalid file extension, must be {allowed_extensions}",
-            )
+        # Validate uploaded form
+        await central_crud.validate_and_update_user_xlsform(
+            xlsform=xlsform_upload,
+            form_category=form_category,
+            task_count=task_count,
+            additional_entities=additional_entities,
+        )
+        xlsform = xlsform_upload
 
-        custom_xls_form = await xls_form_upload.read()
+    else:
+        log.debug(f"Using default XLSForm for category: '{form_category}'")
 
-        # Write XLS form content to db
-        project.form_xls = custom_xls_form
-        db.commit()
+        form_filename = XLSFormType(form_category).name
+        xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
+        with open(xlsform_path, "rb") as f:
+            xlsform = BytesIO(f.read())
+
+    project_xlsform = await central_crud.append_fields_to_user_xlsform(
+        xlsform=xlsform,
+        form_category=form_category,
+        task_count=task_count,
+        additional_entities=additional_entities,
+    )
+    # Write XLS form content to db
+    project.form_xls = project_xlsform.getvalue()
+    db.commit()
 
     # Create task in db and return uuid
     log.debug(f"Creating export background task for project ID: {project_id}")
@@ -762,8 +773,6 @@ async def generate_files(
         project_crud.generate_project_files,
         db,
         project_id,
-        BytesIO(custom_xls_form) if custom_xls_form else None,
-        file_ext,
         background_task_id,
     )
 
@@ -934,13 +943,6 @@ async def download_form(
         "Content-Disposition": "attachment; filename=submission_data.xls",
         "Content-Type": "application/media",
     }
-    if not project.form_xls:
-        form_filename = XLSFormType(project.xform_category).name
-        xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
-        if os.path.exists(xlsform_path):
-            return FileResponse(xlsform_path, filename="form.xls")
-        else:
-            raise HTTPException(status_code=404, detail="Form not found")
     return Response(content=project.form_xls, headers=headers)
 
 
@@ -948,7 +950,7 @@ async def download_form(
 async def update_project_form(
     xform_id: str = Form(...),
     category: XLSFormType = Form(...),
-    upload: UploadFile = File(...),
+    xlsform: BytesIO = Depends(central_deps.read_xlsform),
     db: Session = Depends(database.get_db),
     project_user_dict: ProjectUserDict = Depends(project_manager),
 ) -> project_schemas.ProjectBase:
@@ -956,7 +958,6 @@ async def update_project_form(
 
     Also updates the category and custom XLSForm data in the database.
     """
-    # TODO migrate most logic to project_crud
     project = project_user_dict["project"]
 
     # TODO we currently do nothing with the provided category
@@ -969,37 +970,21 @@ async def update_project_form(
     # with open(xlsform_path, "rb") as f:
     #     new_xform_data = BytesIO(f.read())
 
-    file_ext = Path(upload.filename or "x.xls").suffix.lower()
-    allowed_extensions = [".xls", ".xlsx", ".xml"]
-    if file_ext not in allowed_extensions:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="Provide a valid .xls, .xlsx, .xml file.",
-        )
-    new_xform_data = await upload.read()
-    # Update the XLSForm blob in the database
-    project.form_xls = new_xform_data
-    new_xform_data = BytesIO(new_xform_data)
-
-    # TODO related to above info about category updating
-    # # Update form category in database
-    # project.xform_category = category
-
-    # Commit changes to db
-    db.commit()
-
     # Get ODK Central credentials for project
     odk_creds = await project_deps.get_odk_credentials(db, project.id)
     # Update ODK Central form data
     await central_crud.update_project_xform(
         xform_id,
         project.odkid,
-        new_xform_data,
-        file_ext,
+        xlsform,
         category,
         len(project.tasks),
         odk_creds,
     )
+
+    # Commit changes to db
+    project.form_xls = xlsform.getvalue()
+    db.commit()
 
     return project
 
