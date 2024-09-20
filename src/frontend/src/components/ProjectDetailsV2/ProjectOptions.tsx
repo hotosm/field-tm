@@ -19,7 +19,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
 
   const projectId: string = params.id;
 
-  const handleDownload = (downloadType: 'form' | 'geojson') => {
+  const handleDownload = (downloadType: 'form' | 'geojson' | 'extract' | 'submission') => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
@@ -36,25 +36,21 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
           projectId,
         ),
       );
+    } else if (downloadType === 'extract') {
+      dispatch(
+        DownloadDataExtract(
+          `${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`,
+          projectId,
+        ),
+      );
+    } else if (downloadType === 'submission') {
+      dispatch(
+        DownloadSubmissionGeojson(
+          `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson?project_id=${projectId}`,
+          projectName,
+        ),
+      );
     }
-  };
-
-  const onDataExtractDownload = () => {
-    dispatch(
-      DownloadDataExtract(
-        `${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`,
-        projectId,
-      ),
-    );
-  };
-
-  const onSubmissionDownload = () => {
-    dispatch(
-      DownloadSubmissionGeojson(
-        `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson?project_id=${projectId}`,
-        projectName,
-      ),
-    );
   };
 
   return (
@@ -103,7 +99,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
           icon={<AssetModules.FileDownloadIcon style={{ fontSize: '22px' }} />}
           onClick={(e) => {
             e.stopPropagation();
-            onDataExtractDownload();
+            handleDownload('extract');
           }}
         />
         <Button
@@ -117,7 +113,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
           icon={<AssetModules.FileDownloadIcon style={{ fontSize: '22px' }} />}
           onClick={(e) => {
             e.stopPropagation();
-            onSubmissionDownload();
+            handleDownload('submission');
           }}
         />
       </div>

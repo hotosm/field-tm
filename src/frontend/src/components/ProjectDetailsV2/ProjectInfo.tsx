@@ -101,12 +101,10 @@ const ProjectInfo: React.FC = () => {
         ) : (
           <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
             <div className="fmtm-w-10 fmtm-h-10 fmtm-overflow-hidden fmtm-rounded-full fmtm-bg-white fmtm-flex fmtm-justify-center fmtm-items-center">
-              {/* <a href={`/organizations/${projectInfo.organisation_id}`}> */}
               <img
                 src={projectInfo?.organisation_logo ? projectInfo?.organisation_logo : ProjectIcon}
                 alt="Organization Photo"
               />
-              {/* </a> */}
             </div>
           </div>
         )}

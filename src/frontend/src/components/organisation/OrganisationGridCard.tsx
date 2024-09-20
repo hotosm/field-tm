@@ -10,18 +10,20 @@ type organizationGridCardType = {
   allDataLength: number;
 };
 
+const cardStyle = {
+  padding: '20px',
+  display: 'flex',
+  flexDirection: 'row',
+  cursor: 'pointer',
+  gap: '20px',
+  boxShadow: 'none',
+  borderRadius: '0px',
+};
+
 const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridCardType) => {
   const navigate = useNavigate();
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const cardStyle = {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'row',
-    cursor: 'pointer',
-    gap: '20px',
-    boxShadow: 'none',
-    borderRadius: '0px',
-  };
+
   return (
     <div>
       <p className="fmtm-text-[#9B9999]">

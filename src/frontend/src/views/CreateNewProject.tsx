@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { useAppSelector } from '@/types/reduxTypes';
 import Prompt from '@/hooks/Prompt';
+
 const CreateNewProject = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -23,7 +24,6 @@ const CreateNewProject = () => {
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customDataExtractUpload, setCustomDataExtractUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
-  const [dataExtractFile] = useState(null);
 
   useEffect(() => {
     if (location.pathname !== '/create-project' && !projectDetails.name && !projectDetails.odk_central_url) {

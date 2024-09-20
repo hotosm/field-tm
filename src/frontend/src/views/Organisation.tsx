@@ -13,10 +13,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 const Organisation = () => {
   useDocumentTitle('Organizations');
   const dispatch = CoreModules.useAppDispatch();
-  //dispatch function to perform redux state mutation
-
   const { type } = windowDimention();
-  //get window dimension
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [activeTab, setActiveTab] = useState<0 | 1>(0);

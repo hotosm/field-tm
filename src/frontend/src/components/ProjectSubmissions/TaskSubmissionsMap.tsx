@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect } from 'react';
-
 import CoreModules from '@/shared/CoreModules';
 import { MapContainer as MapComponent } from '@/components/MapComponent/OpenLayersComponent';
 import { useOLMap } from '@/components/MapComponent/OpenLayersComponent';
@@ -8,7 +7,6 @@ import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layer
 import { Vector as VectorSource } from 'ol/source';
 import GeoJSON from 'ol/format/GeoJSON';
 import { get } from 'ol/proj';
-import environment from '@/environment';
 import { getStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { basicGeojsonTemplate } from '@/utilities/mapUtils';
 import TaskSubmissionsMapLegend from '@/components/ProjectSubmissions/TaskSubmissionsMapLegend';
@@ -25,42 +23,7 @@ import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
-
-export const defaultStyles = {
-  lineColor: '#000000',
-  lineOpacity: 70,
-  fillColor: '#1a2fa2',
-  fillOpacity: 50,
-  lineThickness: 1,
-  circleRadius: 5,
-  dashline: 0,
-  showLabel: false,
-  customLabelText: null,
-  labelField: '',
-  labelFont: 'Calibri',
-  labelFontSize: 14,
-  labelColor: '#000000',
-  labelOpacity: 100,
-  labelOutlineWidth: 3,
-  labelOutlineColor: '#ffffff',
-  labelOffsetX: 0,
-  labelOffsetY: 0,
-  labelText: 'normal',
-  labelMaxResolution: 400,
-  labelAlign: 'center',
-  labelBaseline: 'middle',
-  labelRotationDegree: 0,
-  labelFontWeight: 'normal',
-  labelPlacement: 'point',
-  labelMaxAngleDegree: 45.0,
-  labelOverflow: false,
-  labelLineHeight: 1,
-  visibleOnMap: true,
-  icon: {},
-  showSublayer: false,
-  sublayerColumnName: '',
-  sublayer: {},
-};
+import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
 export const municipalStyles = {
   ...defaultStyles,
@@ -76,14 +39,13 @@ const colorCodes: colorCodesType = {
   '#4A90D9': { min: 100, max: 130 },
   '#0062AC': { min: 130, max: 160 },
 };
+
 function colorRange(data, noOfRange) {
   if (data?.length === 0) return [];
   const actualCodes = [{ min: 0, max: 0, color: '#FF4538' }];
   const maxVal = Math.max(...data?.map((d) => d.count));
   const maxValue = maxVal <= noOfRange ? 10 : maxVal;
-  // const minValue = Math.min(...data?.map((d) => d.count)) 0;
   const minValue = 1;
-  // const firstValue = minValue;
   const colorCodesKeys = Object.keys(colorCodes);
   const interval = (maxValue - minValue) / noOfRange;
   let currentValue = minValue;
@@ -98,6 +60,7 @@ function colorRange(data, noOfRange) {
   });
   return actualCodes;
 }
+
 const getChoroplethColor = (value, colorCodesOutput) => {
   let toReturn = '#FF4538';
   colorCodesOutput?.map((obj) => {
@@ -112,22 +75,24 @@ const getChoroplethColor = (value, colorCodesOutput) => {
 
 const TaskSubmissionsMap = () => {
   const dispatch = CoreModules.useAppDispatch();
+
   const [taskBoundaries, setTaskBoundaries] = useState<taskBoundariesType | null>(null);
   const [dataExtractUrl, setDataExtractUrl] = useState<string | null>(null);
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
+
   const projectInfo: projectInfoType = CoreModules.useAppSelector((state) => state.project.projectInfo);
   const projectTaskBoundries: projectTaskBoundriesType[] = CoreModules.useAppSelector(
     (state) => state.project.projectTaskBoundries,
   );
-
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const taskWiseSubmissionCount: taskWiseSubmissionCount[] = taskInfo?.map((task) => ({
     code: task.task_id,
     count: task.submission_count,
   }));
-
   const selectedTask: number = CoreModules.useAppSelector((state) => state.task.selectedTask);
+
   const legendColorArray: legendColorArrayType[] = colorRange(taskWiseSubmissionCount, '4');
+
   const { mapRef, map } = useOLMap({
     center: [0, 0],
     zoom: 4,
@@ -171,12 +136,9 @@ const TaskSubmissionsMap = () => {
     setDataExtractUrl(projectInfo.data_extract_url);
 
     map.getView().fit(extent, {
-      // easing: elastic,
       animate: true,
       size: map?.getSize(),
-      // maxZoom: 15,
       padding: [50, 50, 50, 50],
-      // duration: 900,
       constrainResolution: true,
       duration: 2000,
     });

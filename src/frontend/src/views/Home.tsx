@@ -14,7 +14,6 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 const Home = () => {
   useDocumentTitle('Explore Projects');
   const dispatch = CoreModules.useAppDispatch();
-
   const { type } = windowDimention();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,16 +23,13 @@ const Home = () => {
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
-
   const stateHome = useAppSelector((state) => state.home);
-  //we use use selector from redux to get all state of home from home slice
 
   const filteredProjectCards = stateHome.homeProjectSummary;
 
   let cardsPerRow = new Array(
     type == 'xl' ? 7 : type == 'lg' ? 5 : type == 'md' ? 4 : type == 'sm' ? 3 : type == 's' ? 2 : 1,
   ).fill(0);
-  //calculating number of cards to to display per row in order to fit our window dimension respectively and then convert it into dummy array
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -75,11 +71,7 @@ const Home = () => {
   return (
     <div style={{ flex: 1, background: '#F5F5F5' }} className="fmtm-flex fmtm-flex-col fmtm-justify-between">
       <div className="fmtm-h-full">
-        <HomePageFilters
-          onSearch={handleSearch}
-          filteredProjectCount={filteredProjectCards?.length}
-          totalProjectCount={stateHome.homeProjectSummary.length}
-        />
+        <HomePageFilters onSearch={handleSearch} filteredProjectCount={filteredProjectCards?.length} />
         {stateHome.homeProjectLoading == false ? (
           <div style={{ height: 'calc(100% - 174px)' }} className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
             <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>

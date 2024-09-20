@@ -18,6 +18,7 @@ type NewDefineAreaMapProps = {
   hasEditUndo?: boolean;
   getAOIArea?: ((area?: number) => void) | null;
 };
+
 const NewDefineAreaMap = ({
   drawToggle,
   uploadedOrDrawnGeojsonFile,
@@ -30,7 +31,6 @@ const NewDefineAreaMap = ({
   getAOIArea,
 }: NewDefineAreaMapProps) => {
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
-    // center: fromLonLat([85.3, 27.7]),
     center: [0, 0],
     zoom: 1,
     maxZoom: 25,
@@ -84,20 +84,9 @@ const NewDefineAreaMap = ({
         {buildingExtractedGeojson && (
           <VectorLayer
             geojson={buildingExtractedGeojson}
-            // stylestyle={{
-            //     ...getStyles,
-            //     fillOpacity: 100,
-            //     lineColor: getStyles.fillColor,
-            //     lineThickness: 7,
-            //     lineOpacity: 40,
-            // }}
             viewProperties={{
-              // easing: elastic,
-              // animate: true,
               size: map?.getSize(),
-              // maxZoom: 15,
               padding: [50, 50, 50, 50],
-              // duration: 900,
               constrainResolution: true,
               duration: 500,
             }}
@@ -107,20 +96,9 @@ const NewDefineAreaMap = ({
         {lineExtractedGeojson && (
           <VectorLayer
             geojson={lineExtractedGeojson}
-            // stylestyle={{
-            //     ...getStyles,
-            //     fillOpacity: 100,
-            //     lineColor: getStyles.fillColor,
-            //     lineThickness: 7,
-            //     lineOpacity: 40,
-            // }}
             viewProperties={{
-              // easing: elastic,
-              // animate: true,
               size: map?.getSize(),
-              // maxZoom: 15,
               padding: [50, 50, 50, 50],
-              // duration: 900,
               constrainResolution: true,
               duration: 500,
             }}

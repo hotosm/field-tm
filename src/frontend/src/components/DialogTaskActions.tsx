@@ -25,28 +25,32 @@ type taskListstatusType = {
 
 export default function Dialog({ taskId, feature }: dialogPropType) {
   const navigate = useNavigate();
-  const projectInfo = useAppSelector((state) => state.project.projectInfo);
-  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
-  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-  const loading = useAppSelector((state) => state.common.loading);
-  const taskInfo = useAppSelector((state) => state.task.taskInfo);
+  const dispatch = CoreModules.useAppDispatch();
+  const params = CoreModules.useParams();
+  const geojsonStyles = MapStyles();
+
   const [list_of_task_status, set_list_of_task_status] = useState<taskListstatusType[]>([]);
   const [task_status, set_task_status] = useState('READY');
   const [currentTaskInfo, setCurrentTaskInfo] = useState<taskSubmissionInfoType>();
   const [toggleMappedConfirmationModal, setToggleMappedConfirmationModal] = useState(false);
 
-  const geojsonStyles = MapStyles();
-  const dispatch = CoreModules.useAppDispatch();
-  const params = CoreModules.useParams();
-  const currentProjectId: string = params.id;
+  const projectInfo = useAppSelector((state) => state.project.projectInfo);
+  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const loading = useAppSelector((state) => state.common.loading);
+  const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
+
+  const currentProjectId: string = params.id;
   const projectIndex = projectData.findIndex((project) => project.id == parseInt(currentProjectId));
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task?.index == taskId;
     })?.[0],
   };
-  const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
+  const checkIfTaskAssignedOrNot =
+    currentStatus?.locked_by_username === authDetails?.username || currentStatus?.locked_by_username === null;
 
   useEffect(() => {
     if (taskId) {
@@ -124,8 +128,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
       );
     }
   };
-  const checkIfTaskAssignedOrNot =
-    currentStatus?.locked_by_username === authDetails?.username || currentStatus?.locked_by_username === null;
 
   return (
     <div className="fmtm-flex fmtm-flex-col">

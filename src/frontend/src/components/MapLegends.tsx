@@ -1,5 +1,4 @@
 import React from 'react';
-import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 
 type mapDetialsType = {
