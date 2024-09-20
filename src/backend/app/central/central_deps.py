@@ -19,7 +19,11 @@
 """ODK Central dependency wrappers."""
 
 from contextlib import asynccontextmanager
+from io import BytesIO
+from pathlib import Path
+from typing import Optional
 
+from fastapi import File, UploadFile
 from fastapi.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset
 
@@ -41,3 +45,30 @@ async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
         ) from conn_error
+
+
+async def validate_xlsform_extension(xlsform: UploadFile):
+    """Validate an XLSForm has .xls or .xlsx extension."""
+    file = Path(xlsform.filename)
+    file_ext = file.suffix.lower()
+
+    allowed_extensions = [".xls", ".xlsx"]
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Provide a valid .xls or .xlsx file",
+        )
+    return BytesIO(await xlsform.read())
+
+
+async def read_xlsform(xlsform: UploadFile) -> BytesIO:
+    """Read an XLSForm, validate extension, return wrapped in BytesIO."""
+    return await validate_xlsform_extension(xlsform)
+
+
+async def read_optional_xlsform(
+    xlsform: Optional[UploadFile] = File(None),
+) -> Optional[BytesIO]:
+    """Read an XLSForm, validate extension, return wrapped in BytesIO."""
+    if xlsform:
+        return await validate_xlsform_extension(xlsform)

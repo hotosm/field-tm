@@ -42,7 +42,6 @@ from app.central import central_deps
 from app.central.central_crud import (
     convert_geojson_to_odk_csv,
     convert_odk_submission_json_to_geojson,
-    read_and_test_xform,
 )
 from app.config import settings
 from app.db.postgis_utils import (
@@ -112,31 +111,6 @@ async def append_required_geojson_properties(
         status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         detail="Your geojson file is invalid.",
     )
-
-
-@router.post("/convert-xlsform-to-xform")
-async def convert_xlsform_to_xform(
-    xlsform: UploadFile,
-    current_user: AuthUser = Depends(login_required),
-):
-    """Convert XLSForm to XForm XML."""
-    filename = Path(xlsform.filename)
-    file_ext = filename.suffix.lower()
-
-    allowed_extensions = [".xls", ".xlsx"]
-    if file_ext not in allowed_extensions:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Provide a valid .xls or .xlsx file",
-        )
-
-    contents = await xlsform.read()
-    xform_data = await read_and_test_xform(
-        BytesIO(contents), file_ext, return_form_data=True
-    )
-
-    headers = {"Content-Disposition": f"attachment; filename={filename.stem}.xml"}
-    return Response(xform_data.getvalue(), headers=headers)
 
 
 @router.post("/convert-geojson-to-odk-csv")
