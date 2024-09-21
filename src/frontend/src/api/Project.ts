@@ -90,7 +90,7 @@ export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
         a.download = `${
-          downloadType === 'form' ? `project_form_${projectId}.xls` : `task_polygons_${projectId}.geojson`
+          downloadType === 'form' ? `project_form_${projectId}.xlsx` : `task_polygons_${projectId}.geojson`
         }`;
         a.click();
         dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: false }));

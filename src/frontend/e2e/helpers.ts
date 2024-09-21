@@ -6,8 +6,11 @@ export async function tempLogin(page: Page) {
   await page.getByText('Temporary Account').click();
 }
 
-export async function openFirstProject(page: Page) {
-  // click first project card on the home page
-  await page.locator('.MuiCardContent-root').first().click();
+export async function openTestProject(page: Page) {
+  // open project card with regex text 'Project Create Playwright xxx'
+  await page
+    .getByText(/^Project Create Playwright/)
+    .first()
+    .click();
   await page.waitForTimeout(4000);
 }

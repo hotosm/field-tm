@@ -54,6 +54,7 @@ from app.db.postgis_utils import (
     flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
+    split_geojson_by_task_areas,
     wkb_geom_to_feature,
 )
 from app.models.enums import (
@@ -624,8 +625,7 @@ async def task_split(
     """Split a task into subtasks.
 
     Args:
-        project_geojson (UploadFile): The geojson to split.
-            Should be a FeatureCollection.
+        project_geojson (UploadFile): The geojson (AOI) to split.
         extract_geojson (UploadFile, optional): Custom data extract geojson
             containing osm features (should be a FeatureCollection).
             If not included, an extract is generated automatically.
@@ -782,6 +782,42 @@ async def generate_files(
     )
 
 
+@router.post("/{project_id}/additional-entity")
+async def add_additional_entity_list(
+    geojson: UploadFile = File(...),
+    db: Session = Depends(database.get_db),
+    project_user_dict: ProjectUserDict = Depends(project_manager),
+):
+    """Add an additional Entity list for the project in ODK.
+
+    Note that the Entity list will be named from the filename
+    of the GeoJSON uploaded.
+    """
+    project = project_user_dict.get("project")
+    project_id = project.id
+    project_odk_id = project.odkid
+    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
+    # NOTE the Entity name is extracted from the filename (without extension)
+    entity_name = Path(geojson.filename).stem
+
+    # Parse geojson + divide by task
+    # (not technically required, but also appends properties in correct format)
+    featcol = parse_geojson_file_to_featcol(await geojson.read())
+    feature_split_by_task = await split_geojson_by_task_areas(db, featcol, project_id)
+    entities_list = await central_crud.task_geojson_dict_to_entity_values(
+        feature_split_by_task
+    )
+
+    await central_crud.create_entity_list(
+        odk_credentials,
+        project_odk_id,
+        dataset_name=entity_name,
+        entities_list=entities_list,
+    )
+
+    return Response(status_code=HTTPStatus.OK)
+
+
 @router.get("/categories/")
 async def get_categories(current_user: AuthUser = Depends(login_required)):
     """Get api for fetching all the categories.
@@ -802,7 +838,7 @@ async def get_categories(current_user: AuthUser = Depends(login_required)):
 @router.post("/preview-split-by-square/")
 async def preview_split_by_square(
     project_geojson: UploadFile = File(...),
-    extract_geojson: UploadFile = File(None),
+    extract_geojson: Optional[UploadFile] = File(None),
     dimension: int = Form(100),
 ):
     """Preview splitting by square.
@@ -940,7 +976,7 @@ async def download_form(
     project = project_user.get("project")
 
     headers = {
-        "Content-Disposition": "attachment; filename=submission_data.xls",
+        "Content-Disposition": f"attachment; filename={project.id}_xlsform.xlsx",
         "Content-Type": "application/media",
     }
     return Response(content=project.form_xls, headers=headers)

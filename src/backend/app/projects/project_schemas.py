@@ -18,7 +18,6 @@
 """Pydantic schemas for Projects."""
 
 import uuid
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, List, Optional, Union
 
@@ -437,39 +436,3 @@ class ProjectDashboard(BaseModel):
             return f'{days_difference} day{"s" if days_difference > 1 else ""} ago'
         else:
             return last_active.strftime("%d %b %Y")
-
-
-@dataclass
-class Field:
-    """A data class representing a field with a name and type.
-
-    Args:
-        name (str): The name of the field.
-        type (str): The type of the field.
-
-    Returns:
-        None
-    """
-
-    name: str
-    type: str
-
-
-def entity_fields_to_list() -> List[str]:
-    """Converts a list of Field objects to a list of field names.
-
-    Returns:
-        List[str]: A list of fields.
-    """
-    fields: List[Field] = [
-        Field(name="geometry", type="geopoint"),
-        Field(name="project_id", type="string"),
-        Field(name="task_id", type="string"),
-        Field(name="osm_id", type="string"),
-        Field(name="tags", type="string"),
-        Field(name="version", type="string"),
-        Field(name="changeset", type="string"),
-        Field(name="timestamp", type="datetime"),
-        Field(name="status", type="string"),
-    ]
-    return [field.name for field in fields]

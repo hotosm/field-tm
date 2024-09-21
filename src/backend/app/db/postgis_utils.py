@@ -19,7 +19,6 @@
 
 import json
 import logging
-from asyncio import gather
 from datetime import datetime, timezone
 from io import BytesIO
 from random import getrandbits
@@ -84,7 +83,7 @@ def featcol_to_wkb_geom(
     features = featcol.get("features", [])
 
     if len(features) > 1 and features[0].get("type") == "MultiPolygon":
-        featcol = multipolygon_to_polygon(featcol)
+        featcol = multigeom_to_singlegeom(featcol)
         features = featcol.get("features", [])
 
     geometry = features[0].get("geometry")
@@ -347,7 +346,7 @@ async def split_geojson_by_task_areas(
         log.error("Attempted geojson task splitting failed")
         return None
 
-    if feature_collections:
+    if feature_collections and len(feature_collections[0]) > 1:
         # NOTE the feature collections are nested in a tuple, first remove
         task_geojson_dict = {
             record[0]: geojson.loads(json.dumps(record[1]))
@@ -407,11 +406,11 @@ def add_required_geojson_properties(
 
 
 def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureCollection:
-    """Normalise a FeatureCollection into a standadised format.
+    """Normalise a FeatureCollection into a standardised format.
 
     The final FeatureCollection will only contain:
     - Polygon
-    - Polyline
+    - LineString
     - Point
 
     Processed:
@@ -441,7 +440,7 @@ def normalise_featcol(featcol: geojson.FeatureCollection) -> geojson.FeatureColl
             coords.pop()
 
     # Convert MultiPolygon type --> individual Polygons
-    return multipolygon_to_polygon(featcol)
+    return multigeom_to_singlegeom(featcol)
 
 
 def geojson_to_featcol(geojson_obj: dict) -> geojson.FeatureCollection:
@@ -498,7 +497,7 @@ def featcol_keep_dominant_geom_type(
 
 def get_featcol_dominant_geom_type(featcol: geojson.FeatureCollection) -> str:
     """Get the predominant geometry type in a FeatureCollection."""
-    geometry_counts = {"Polygon": 0, "Point": 0, "Polyline": 0}
+    geometry_counts = {"Polygon": 0, "Point": 0, "LineString": 0}
 
     for feature in featcol.get("features", []):
         geometry_type = feature.get("geometry", {}).get("type", "")
@@ -552,6 +551,10 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
             first_coordinate = coordinates
             coordinates = coordinates[0]
 
+    error_message = (
+        "ERROR: The coordinates within the GeoJSON file are not valid. "
+        "Is the file empty?"
+    )
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
         raise HTTPException(status_code=400, detail=error_message)
@@ -629,20 +632,30 @@ async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
     if geojson_geometry is None:
         return ""
 
-    coordinates = []
-    if geojson_geometry["type"] in ["Point", "LineString", "MultiPoint"]:
-        coordinates = [[geojson_geometry.get("coordinates", [])]]
-    elif geojson_geometry["type"] in ["Polygon", "MultiLineString"]:
-        coordinates = geojson_geometry.get("coordinates", [])
-    elif geojson_geometry["type"] == "MultiPolygon":
-        # Flatten the list structure to get coordinates of all polygons
-        coordinates = sum(geojson_geometry.get("coordinates", []), [])
-    else:
-        raise ValueError("Unsupported GeoJSON geometry type")
+    coordinates = geojson_geometry.get("coordinates", [])
+    geometry_type = geojson_geometry["type"]
 
+    # Normalise single geometries into the same structure as multi-geometries
+    # We end up with three levels of nesting for the processing below
+    if geometry_type == "Point":
+        # Format [x, y]
+        coordinates = [[coordinates]]
+    elif geometry_type in ["LineString", "MultiPoint"]:
+        # Format [[x, y], [x, y]]
+        coordinates = [coordinates]
+    elif geometry_type in ["Polygon", "MultiLineString"]:
+        # Format [[[x, y], [x, y]]]
+        pass
+    elif geometry_type == "MultiPolygon":
+        # Format [[[[x, y], [x, y]]]], flatten coords
+        coordinates = [coord for poly in coordinates for coord in poly]
+    else:
+        raise ValueError(f"Unsupported GeoJSON geometry type: {geometry_type}")
+
+    # Prepare the JavaRosa format by iterating over coordinates
     javarosa_geometry = []
-    for polygon in coordinates:
-        for lon, lat in polygon:
+    for polygon_or_line in coordinates:
+        for lon, lat in polygon_or_line:
             javarosa_geometry.append(f"{lat} {lon} 0.0 0.0")
 
     return ";".join(javarosa_geometry)
@@ -664,7 +677,7 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str, geom_type: str) ->
     if geom_type == "Point":
         lat, lon, _, _ = map(float, javarosa_geom_string.split())
         geojson_geometry = {"type": "Point", "coordinates": [lon, lat]}
-    elif geom_type == "Polyline":
+    elif geom_type == "LineString":
         coordinates = [
             [float(coord) for coord in reversed(point.split()[:2])]
             for point in javarosa_geom_string.split(";")
@@ -685,56 +698,26 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str, geom_type: str) ->
     return geojson_geometry
 
 
-async def feature_geojson_to_entity_dict(
-    feature: dict,
-) -> dict:
-    """Convert a single GeoJSON to an Entity dict for upload."""
-    feature_id = feature.get("id")
-
-    geometry = feature.get("geometry", {})
-    if not geometry:
-        msg = "'geometry' data field is mandatory"
-        log.debug(msg)
-        raise ValueError(msg)
-
-    javarosa_geom = await geojson_to_javarosa_geom(geometry)
-
-    # NOTE all properties MUST be string values for Entities, convert
-    properties = {
-        str(key): str(value) for key, value in feature.get("properties", {}).items()
-    }
-    # Set to TaskStatus enum READY value (0)
-    properties["status"] = "0"
-
-    task_id = properties.get("task_id")
-    entity_label = f"Task {task_id} Feature {feature_id}"
-
-    return {"label": entity_label, "data": {"geometry": javarosa_geom, **properties}}
-
-
-async def task_geojson_dict_to_entity_values(task_geojson_dict):
-    """Convert a dict of task GeoJSONs into data for ODK Entity upload."""
-    asyncio_tasks = []
-    for _, geojson_dict in task_geojson_dict.items():
-        features = geojson_dict.get("features", [])
-        asyncio_tasks.extend(
-            [feature_geojson_to_entity_dict(feature) for feature in features if feature]
-        )
-
-    return await gather(*asyncio_tasks)
-
-
-def multipolygon_to_polygon(
+def multigeom_to_singlegeom(
     featcol: geojson.FeatureCollection,
 ) -> geojson.FeatureCollection:
-    """Converts a GeoJSON FeatureCollection of MultiPolygons to Polygons.
+    """Converts any Multi(xxx) geometry types to individual geometries.
 
     Args:
-        featcol : A GeoJSON FeatureCollection containing MultiPolygons/Polygons.
+        featcol : A GeoJSON FeatureCollection of geometries.
 
     Returns:
-        geojson.FeatureCollection: A GeoJSON FeatureCollection containing Polygons.
+        geojson.FeatureCollection: A GeoJSON FeatureCollection containing
+            single geometry types only: Polygon, LineString, Point.
     """
+
+    def split_multigeom(geom, properties):
+        """Splits multi-geometries into individual geometries."""
+        return [
+            geojson.Feature(geometry=mapping(single_geom), properties=properties)
+            for single_geom in geom.geoms
+        ]
+
     final_features = []
 
     for feature in featcol.get("features", []):
@@ -745,12 +728,16 @@ def multipolygon_to_polygon(
             log.warning(f"Geometry is not valid, so was skipped: {feature['geometry']}")
             continue
 
-        if geom.geom_type == "Polygon":
-            final_features.append(geojson.Feature(geometry=geom, properties=properties))
-        elif geom.geom_type == "MultiPolygon":
-            final_features.extend(
-                geojson.Feature(geometry=polygon_coords, properties=properties)
-                for polygon_coords in geom.geoms
+        if geom.geom_type.startswith("Multi"):
+            # Handle all MultiXXX types
+            final_features.extend(split_multigeom(geom, properties))
+        else:
+            # Handle single geometry types
+            final_features.append(
+                geojson.Feature(
+                    geometry=mapping(geom),
+                    properties=properties,
+                )
             )
 
     return geojson.FeatureCollection(final_features)

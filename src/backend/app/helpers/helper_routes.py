@@ -48,7 +48,7 @@ from app.db.postgis_utils import (
     add_required_geojson_properties,
     featcol_keep_dominant_geom_type,
     javarosa_to_geojson_geom,
-    multipolygon_to_polygon,
+    multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
 from app.models.enums import GeometryType, HTTPStatus, XLSFormType
@@ -264,7 +264,7 @@ async def flatten_multipolygons_to_polygons(
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No geometries present"
         )
-    multi_to_single_polygons = multipolygon_to_polygon(featcol)
+    multi_to_single_polygons = multigeom_to_singlegeom(featcol)
 
     if multi_to_single_polygons:
         headers = {

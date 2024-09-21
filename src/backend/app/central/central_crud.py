@@ -19,6 +19,7 @@
 
 import csv
 import json
+from asyncio import gather
 from io import BytesIO, StringIO
 from typing import Optional, Union
 
@@ -32,7 +33,7 @@ from pyxform.xls2xform import convert as xform_convert
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.central import central_deps
+from app.central import central_deps, central_schemas
 from app.config import encrypt_value, settings
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -517,6 +518,81 @@ async def convert_odk_submission_json_to_geojson(
         all_features.append(feature)
 
     return geojson.FeatureCollection(features=all_features)
+
+
+async def feature_geojson_to_entity_dict(
+    feature: geojson.Feature,
+) -> central_schemas.EntityDict:
+    """Convert a single GeoJSON to an Entity dict for upload."""
+    if not isinstance(feature, (dict, geojson.Feature)):
+        log.error(f"Feature not in correct format: {feature}")
+        raise ValueError(f"Feature not in correct format: {type(feature)}")
+
+    feature_id = feature.get("id")
+
+    geometry = feature.get("geometry", {})
+    if not geometry:
+        msg = "'geometry' data field is mandatory"
+        log.debug(msg)
+        raise ValueError(msg)
+
+    javarosa_geom = await geojson_to_javarosa_geom(geometry)
+
+    # NOTE all properties MUST be string values for Entities, convert
+    properties = {
+        str(key): str(value) for key, value in feature.get("properties", {}).items()
+    }
+    # Set to TaskStatus enum READY value (0)
+    properties["status"] = "0"
+
+    task_id = properties.get("task_id")
+    entity_label = f"Task {task_id} Feature {feature_id}"
+
+    return {"label": entity_label, "data": {"geometry": javarosa_geom, **properties}}
+
+
+async def task_geojson_dict_to_entity_values(
+    task_geojson_dict: dict[int, geojson.Feature],
+) -> list[central_schemas.EntityDict]:
+    """Convert a dict of task GeoJSONs into data for ODK Entity upload."""
+    log.debug("Converting dict of task GeoJSONs to Entity upload format")
+
+    asyncio_tasks = []
+    for _, geojson_dict in task_geojson_dict.items():
+        # Extract the features list and pass each Feature through
+        features = geojson_dict.get("features", [])
+        asyncio_tasks.extend(
+            [feature_geojson_to_entity_dict(feature) for feature in features if feature]
+        )
+
+    return await gather(*asyncio_tasks)
+
+
+async def create_entity_list(
+    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_id: int,
+    dataset_name: str = "features",
+    properties: list[str] = None,
+    entities_list: list[central_schemas.EntityDict] = None,
+) -> None:
+    """Create a new Entity list in ODK."""
+    if properties is None:
+        # Get the default properties for FMTM project
+        properties = central_schemas.entity_fields_to_list()
+        log.debug(f"Using default FMTM properties for Entity creation: {properties}")
+
+    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
+        # Step 1: create the Entity list, with properties
+        await odk_central.createDataset(
+            odk_id, datasetName=dataset_name, properties=properties
+        )
+        # Step 2: populate the Entities
+        if entities_list:
+            await odk_central.createEntities(
+                odk_id,
+                dataset_name,
+                entities_list,
+            )
 
 
 async def get_entities_geojson(

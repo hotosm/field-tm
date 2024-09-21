@@ -3,7 +3,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { tempLogin, openFirstProject } from './helpers';
+import { tempLogin, openTestProject } from './helpers';
 
 test.describe('mapper flow', () => {
   test('task actions', async ({ browserName, page }) => {
@@ -13,7 +13,7 @@ test.describe('mapper flow', () => {
 
     // 0. Temp Login
     await tempLogin(page);
-    await openFirstProject(page);
+    await openTestProject(page);
 
     // 1. Click on task area on map
     await page.locator('canvas').click({
@@ -59,6 +59,7 @@ test.describe('mapper flow', () => {
 
     // 3. Mark task as fully mapped
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
+    // Required again for the confirmation dialog (0/4 features mapped)
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
     await page.waitForSelector('div:has-text("updated status to MAPPED"):nth-of-type(1)');
     await expect(
@@ -108,7 +109,7 @@ test.describe('mapper flow', () => {
 
     // 0. Temp Login
     await tempLogin(page);
-    await openFirstProject(page);
+    await openTestProject(page);
 
     // 1. Click on task area on map
     // click on task & assert task popup visibility
@@ -177,7 +178,7 @@ test.describe('mapper flow', () => {
 
     // 0. Temp Login
     await tempLogin(page);
-    await openFirstProject(page);
+    await openTestProject(page);
 
     await page.locator('canvas').click({
       position: {

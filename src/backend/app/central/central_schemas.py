@@ -17,14 +17,57 @@
 #
 """Schemas for returned ODK Central objects."""
 
+from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, TypedDict
 
 from geojson_pydantic import Feature, FeatureCollection
 from pydantic import BaseModel, Field, ValidationInfo, computed_field
 from pydantic.functional_validators import field_validator
 
 from app.models.enums import TaskStatus
+
+
+@dataclass
+class NameTypeMapping:
+    """A simple dataclass mapping field name to field type."""
+
+    name: str
+    type: str
+
+
+ENTITY_FIELDS: list[NameTypeMapping] = [
+    NameTypeMapping(name="geometry", type="geopoint"),
+    NameTypeMapping(name="project_id", type="string"),
+    NameTypeMapping(name="task_id", type="string"),
+    NameTypeMapping(name="osm_id", type="string"),
+    NameTypeMapping(name="tags", type="string"),
+    NameTypeMapping(name="version", type="string"),
+    NameTypeMapping(name="changeset", type="string"),
+    NameTypeMapping(name="timestamp", type="datetime"),
+    NameTypeMapping(name="status", type="string"),
+]
+
+
+def entity_fields_to_list() -> list[str]:
+    """Converts a list of Field objects to a list of field names."""
+    return [field.name for field in ENTITY_FIELDS]
+
+
+# Dynamically generate EntityPropertyDict using ENTITY_FIELDS
+def create_entity_property_dict() -> dict[str, type]:
+    """Dynamically create a TypedDict using the defined fields."""
+    return {field.name: str for field in ENTITY_FIELDS}
+
+
+EntityPropertyDict = TypedDict("EntityPropertyDict", create_entity_property_dict())
+
+
+class EntityDict(TypedDict):
+    """Dict of Entity label and data."""
+
+    label: str
+    data: EntityPropertyDict
 
 
 class CentralBase(BaseModel):
