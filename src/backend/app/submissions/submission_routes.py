@@ -27,6 +27,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse, Response
 from loguru import logger as log
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.auth.auth_schemas import AuthUser, ProjectUserDict
@@ -413,74 +414,7 @@ async def submission_table(
     return response
 
 
-# FIXME remove it since separate endpoint is not required now.
-# @router.get("/task_submissions/{project_id}")
-# async def task_submissions(
-#     task_id: int,
-#     project: db_models.DbProject = Depends(project_deps.get_project_by_id),
-#     page: int = Query(1, ge=1),
-#     limit: int = Query(13, le=100),
-#     submission_id: Optional[str] = None,
-#     submitted_by: Optional[str] = None,
-#     review_state: Optional[str] = None,
-#     submitted_date: Optional[str] = Query(
-#       None, title="Submitted Date", description="Date in format (e.g., 'YYYY-MM-DD')"
-#     ),
-#     db: Session = Depends(database.get_db),
-#     current_user: AuthUser = Depends(mapper),
-# ):
-#     """This api returns the submission table of a project.
-
-#     It takes two parameter: project_id and task_id.
-
-#     project_id: The ID of the project.
-
-#     task_id: The ID of the task.
-#     """
-#     skip = (page - 1) * limit
-#     filters = {
-#         "$top": limit,
-#         "$skip": skip,
-#         "$count": True,
-#         "$wkt": True,
-#     }
-
-#     if submitted_date:
-#         filters["$filter"] = (
-#             "__system/submissionDate ge {}T00:00:00+00:00 "
-#             "and __system/submissionDate le {}T23:59:59.999+00:00"
-#         ).format(submitted_date, submitted_date)
-
-#     if submitted_by:
-#         if "$filter" in filters:
-#             filters["$filter"] += f"and (username eq '{submitted_by}')"
-#         else:
-#             filters["$filter"] = f"username eq '{submitted_by}'"
-
-#     if review_state:
-#         if "$filter" in filters:
-#             filters["$filter"] += f" and (__system/reviewState eq '{review_state}')"
-#         else:
-#             filters["$filter"] = f"__system/reviewState eq '{review_state}'"
-
-#     data, count = await submission_crud.get_submission_by_task(
-#         project, task_id, filters, db
-#     )
-#     pagination = await project_crud.get_pagination(page, count, limit, count)
-#     response = submission_schemas.PaginatedSubmissions(
-#         results=data,
-#         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
-#     )
-#     if submission_id:
-#         submission_detail = await submission_crud.get_submission_detail(
-#             project, task_id, submission_id, db
-#         )
-#         response = submission_detail.get("value", [])[0]
-
-#     return response
-
-
-@router.get("/submission-detail")
+@router.get("/{submission_id}")
 async def submission_detail(
     submission_id: str,
     db: Session = Depends(database.get_db),
@@ -593,4 +527,51 @@ async def conflate_geojson(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to process conflation: {str(e)}"
+        ) from e
+
+
+@router.get("/{submission_id}/photos")
+async def submission_photo(
+    submission_id: str,
+    db: Session = Depends(database.get_db),
+) -> dict:
+    """Get submission photos.
+
+    Retrieves the S3 paths of the submission photos for the given submission ID.
+
+    Args:
+        submission_id (str): The ID of the submission.
+        db (Session): The database session.
+
+    Returns:
+        dict: A dictionary containing the S3 path of the submission photo.
+            If no photo is found,
+            the dictionary will contain a None value for the S3 path.
+
+    Raises:
+        HTTPException: If an error occurs while retrieving the submission photo.
+    """
+    try:
+        sql = text("""
+            SELECT
+                s3_path
+            FROM
+                submission_photos
+            WHERE
+                submission_id = :submission_id;
+        """)
+        results = db.execute(sql, {"submission_id": submission_id}).fetchall()
+
+        # Extract the s3_path from each result and return as a list
+        s3_paths = [result.s3_path for result in results] if results else []
+
+        return {"image_urls": s3_paths}
+
+    except Exception as e:
+        log.warning(
+            f"Failed to get submission photos for submission {submission_id}: {e}"
+        )
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Failed to get submission photos",
         ) from e
