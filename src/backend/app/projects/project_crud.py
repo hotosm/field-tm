@@ -22,6 +22,7 @@ import uuid
 from asyncio import gather
 from io import BytesIO
 from pathlib import Path
+from traceback import extract_tb
 from typing import List, Optional, Union
 
 import geojson
@@ -40,7 +41,7 @@ from shapely.geometry import shape
 from sqlalchemy import and_, column, func, select, table, text
 from sqlalchemy.orm import Session
 
-from app.central import central_crud, central_deps
+from app.central import central_crud
 from app.config import settings
 from app.db import db_models
 from app.db.postgis_utils import (
@@ -52,7 +53,6 @@ from app.db.postgis_utils import (
     merge_polygons,
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
-    task_geojson_dict_to_entity_values,
     wkb_geom_to_feature,
 )
 from app.models.enums import HTTPStatus, ProjectRole, ProjectVisibility, XLSFormType
@@ -748,17 +748,17 @@ async def upload_custom_fgb_extract(
 async def get_data_extract_type(featcol: FeatureCollection) -> str:
     """Determine predominant geometry type for extract."""
     geom_type = get_featcol_dominant_geom_type(featcol)
-    if geom_type not in ["Polygon", "Polyline", "Point"]:
+    if geom_type not in ["Polygon", "LineString", "Point"]:
         msg = (
             "Extract does not contain valid geometry types, from 'Polygon' "
-            ", 'Polyline' and 'Point'."
+            ", 'LineString' and 'Point'."
         )
         log.error(msg)
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
     geom_name_map = {
         "Polygon": "polygon",
         "Point": "centroid",
-        "Polyline": "line",
+        "LineString": "line",
     }
     data_extract_type = geom_name_map.get(geom_type, "polygon")
 
@@ -837,29 +837,24 @@ async def generate_odk_central_project_content(
     project: db_models.DbProject,
     odk_credentials: project_schemas.ODKCentralDecrypted,
     xlsform: BytesIO,
-    task_extract_dict: dict,
+    task_extract_dict: dict[int, geojson.FeatureCollection],
     db: Session,
 ) -> str:
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
     project_odk_id = project.odkid
 
     # The ODK Dataset (Entity List) must exist prior to main XLSForm
-    entities_list = await task_geojson_dict_to_entity_values(task_extract_dict)
-    fields_list = project_schemas.entity_fields_to_list()
+    entities_list = await central_crud.task_geojson_dict_to_entity_values(
+        task_extract_dict
+    )
 
-    async with central_deps.get_odk_dataset(odk_credentials) as odk_central:
-        await odk_central.createDataset(
-            project_odk_id, datasetName="features", properties=fields_list
-        )
-        await odk_central.createEntities(
-            project_odk_id,
-            "features",
-            entities_list,
-        )
-
-    # TODO add here additional upload of Entities
-    # TODO add code here
-    # additional_entities = ["roads"]
+    log.debug("Creating main ODK Entity list for project: features")
+    await central_crud.create_entity_list(
+        odk_credentials,
+        project_odk_id,
+        dataset_name="features",
+        entities_list=entities_list,
+    )
 
     # Do final check of XLSForm validity + return parsed XForm
     xform = await central_crud.read_and_test_xform(xlsform)
@@ -967,6 +962,19 @@ async def generate_project_files(
             )  # 4 is COMPLETED
 
     except Exception as e:
+        # Get the traceback details for easier debugging
+        tb = extract_tb(e.__traceback__)
+        if tb:
+            last_entry = tb[-1]
+            function_name = last_entry.name
+            line_number = last_entry.lineno
+            file_name = last_entry.filename
+
+            log.warning(
+                f"Error occurred in function {function_name} | line {line_number}"
+                f" | file {file_name}"
+            )
+
         log.warning(str(e))
 
         if background_task_id:

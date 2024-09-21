@@ -552,13 +552,31 @@ def compare_entities(response_entity, expected_entity):
 
 
 def test_project_task_split(client):
-    """Test project task split."""
-    with open(f"{test_data_path}/data_extract_kathmandu.geojson", "rb") as project_file:
-        project_geojson = project_file.read()
+    """Test project AOI splitting into tasks."""
+    aoi_geojson = json.dumps(
+        {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [85.317028828, 27.7052522097],
+                    [85.317028828, 27.7041424888],
+                    [85.318844411, 27.7041424888],
+                    [85.318844411, 27.7052522097],
+                    [85.317028828, 27.7052522097],
+                ]
+            ],
+        }
+    ).encode("utf-8")
+    aoi_geojson_file = {
+        "project_geojson": (
+            "kathmandu_aoi.geojson",
+            BytesIO(aoi_geojson).read(),
+        )
+    }
 
     response = client.post(
         "/projects/task-split",
-        files={"project_geojson": ("data_extract_kathmandu.geojson", project_geojson)},
+        files=aoi_geojson_file,
         data={"no_of_buildings": 40},
     )
 
