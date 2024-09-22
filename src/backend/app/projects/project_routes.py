@@ -666,7 +666,11 @@ async def validate_form(
 ):
     """Basic validity check for uploaded XLSForm.
 
-    Does not append all addition values to make this a valid FMTM form for mapping.
+    Parses the form using ODK pyxform to check that it is valid.
+
+    If the `debug` param is used, the form is returned for inspection.
+    NOTE that this debug form has additional fields appended and should
+        not be used for FMTM project creation.
     """
     if debug:
         updated_form = await central_crud.append_fields_to_user_xlsform(
@@ -685,7 +689,10 @@ async def validate_form(
             xlsform,
             task_count=1,  # NOTE this must be included to append task_filter choices
         )
-        return Response(status_code=HTTPStatus.OK)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={"message": "Your form is valid"},
+        )
 
 
 @router.post("/{project_id}/generate-project-data")
