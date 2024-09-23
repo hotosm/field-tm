@@ -209,3 +209,36 @@ pg_restore --verbose -U fmtm -d fmtm
 # Run the entire docker compose stack
 docker compose -f docker-compose.$GIT_BRANCH.yml up -d
 ```
+
+## Help! FMTM Prod Is Broken 😨
+
+### Debugging
+
+- Log into the production server, fmtm.hotosm.org and view the container logs:
+
+  ```bash
+  docker logs fmtm-main-api-1
+  docker logs fmtm-main-api-2
+  docker logs fmtm-main-api-3
+  docker logs fmtm-main-api-4
+  ```
+
+  They often provide useful traceback information, including timestamps.
+
+- View error reports on Sentry: <https://humanitarian-openstreetmap-tea.sentry.io>
+  You can get very detailed tracebacks here, even with the SQL executed on
+  the database amongst other things.
+
+- Reproduce the error on your local machine!
+
+### Making a hotfix
+
+- Sometimes fixes just can't wait to go through the development -->
+  staging --> production cycle. We need the fix now!
+
+- In this case, a `hotfix` can be made directly to the `main` branch:
+  - Create a branch `hotfix/something-i-fixed`, add your code and test
+    it works locally.
+  - Push your branch, then create a PR against the `main` branch in Github.
+  - Merge in the PR and wait for the deployment.
+  - Later the code can be pulled back into develop / staging.
