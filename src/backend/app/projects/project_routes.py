@@ -675,7 +675,6 @@ async def validate_form(
     if debug:
         xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
             xlsform,
-            task_count=1,  # NOTE this must be included to append task_filter choices
         )
         return StreamingResponse(
             updated_form,
@@ -687,7 +686,6 @@ async def validate_form(
     else:
         await central_crud.validate_and_update_user_xlsform(
             xlsform,
-            task_count=1,  # NOTE this must be included to append task_filter choices
         )
         return JSONResponse(
             status_code=HTTPStatus.OK,
@@ -735,7 +733,6 @@ async def generate_files(
     project = project_user_dict.get("project")
     project_id = project.id
     form_category = project.xform_category
-    task_count = len(project.tasks)
 
     log.debug(f"Generating additional files for project: {project.id}")
 
@@ -746,7 +743,6 @@ async def generate_files(
         await central_crud.validate_and_update_user_xlsform(
             xlsform=xlsform_upload,
             form_category=form_category,
-            task_count=task_count,
             additional_entities=additional_entities,
         )
         xlsform = xlsform_upload
@@ -762,7 +758,6 @@ async def generate_files(
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform,
         form_category=form_category,
-        task_count=task_count,
         additional_entities=additional_entities,
     )
     # Write XLS form content to db

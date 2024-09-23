@@ -232,7 +232,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
               );
 
               if (isMobile) {
-                document.location.href = `odkcollect://form/${projectInfo.xform_id}?task_filter=${taskId}`;
+                document.location.href = `odkcollect://form/${projectInfo.xform_id}`;
               } else {
                 dispatch(
                   CommonActions.SetSnackBar({

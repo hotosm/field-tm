@@ -321,7 +321,6 @@ async def append_fields_to_user_xlsform(
     xlsform: BytesIO,
     form_category: str = "buildings",
     additional_entities: list[str] = None,
-    task_count: int = None,
     existing_id: str = None,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -330,7 +329,6 @@ async def append_fields_to_user_xlsform(
         xlsform,
         form_category=form_category,
         additional_entities=additional_entities,
-        task_count=task_count,
         existing_id=existing_id,
     )
 
@@ -339,7 +337,6 @@ async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
     form_category: str = "buildings",
     additional_entities: list[str] = None,
-    task_count: int = None,
     existing_id: str = None,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
@@ -347,7 +344,6 @@ async def validate_and_update_user_xlsform(
         xlsform,
         form_category=form_category,
         additional_entities=additional_entities,
-        task_count=task_count,
         existing_id=existing_id,
     )
 
@@ -361,7 +357,6 @@ async def update_project_xform(
     odk_id: int,
     xlsform: BytesIO,
     category: str,
-    task_count: int,
     odk_credentials: project_schemas.ODKCentralDecrypted,
 ) -> None:
     """Update and publish the XForm for a project.
@@ -371,7 +366,6 @@ async def update_project_xform(
         odk_id (int): ODK Central form ID.
         xlsform (UploadFile): XForm data.
         category (str): Category of the XForm.
-        task_count (int): The number of tasks in a project.
         odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
 
     Returns: None
