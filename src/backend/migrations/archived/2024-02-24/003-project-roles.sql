@@ -21,10 +21,10 @@ END $$;
 ALTER TYPE public.projectrole OWNER TO fmtm;
 
 ALTER TABLE public.user_roles
-ALTER COLUMN "role" TYPE VARCHAR(24);
+ALTER COLUMN role TYPE VARCHAR(24);
 
 ALTER TABLE public.user_roles
-ALTER COLUMN "role" TYPE public.projectrole USING role::public.projectrole;
+ALTER COLUMN role TYPE public.projectrole USING role::public.projectrole;
 
 -- Commit the transaction
 COMMIT;
