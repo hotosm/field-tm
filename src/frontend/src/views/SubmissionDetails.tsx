@@ -94,11 +94,7 @@ const SubmissionDetails = () => {
   const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
   const submissionDetailsLoading = useAppSelector((state) => state.submission.submissionDetailsLoading);
-  const taskId = submissionDetails?.task_id
-    ? submissionDetails?.task_id
-    : submissionDetails?.task_filter
-      ? submissionDetails?.task_filter
-      : '-';
+  const taskId = submissionDetails?.task_id ? submissionDetails?.task_id : '-';
 
   const { start, end, today, deviceid, ...restSubmissionDetails } = submissionDetails || {};
   const dateDeviceDetails = { start, end, today, deviceid };
@@ -158,7 +154,7 @@ const SubmissionDetails = () => {
   const newFeaturePoint = {
     type: 'Feature',
     geometry: {
-      ...restSubmissionDetails?.new_feature_point,
+      ...restSubmissionDetails?.new_feature,
     },
     properties: {},
   };
@@ -250,7 +246,7 @@ const SubmissionDetails = () => {
                 featureGeojson={
                   submissionDetailsLoading
                     ? {}
-                    : restSubmissionDetails?.new_feature === 'yes'
+                    : restSubmissionDetails?.new_feature
                       ? newFeaturePoint
                       : coordinatesArray
                         ? geojsonFeature
