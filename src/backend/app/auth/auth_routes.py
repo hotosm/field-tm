@@ -250,6 +250,14 @@ async def refresh_token(
     request: Request, user_data: AuthUser = Depends(login_required)
 ):
     """Uses the refresh token to generate a new access token."""
+    if settings.DEBUG:
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={
+                "token": "debugtoken",
+                **user_data.model_dump(),
+            },
+        )
     try:
         refresh_token = extract_refresh_token_from_cookie(request)
         if not refresh_token:
