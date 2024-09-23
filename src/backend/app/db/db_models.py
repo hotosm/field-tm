@@ -536,8 +536,7 @@ class DbSubmissionPhotos(Base):
     project_id = cast(
         int, Column(Integer, ForeignKey("projects.id"), name="project_id", index=True)
     )
-    task_id = cast(
-        int, Column(Integer, ForeignKey("tasks.id"), name="task_id", index=True)
-    )
+    # Note this is not a DbTask, but an ODK task_id
+    task_id = cast(int, Column(Integer))
     submission_id = cast(str, Column(String))
     s3_path = cast(str, Column(String))

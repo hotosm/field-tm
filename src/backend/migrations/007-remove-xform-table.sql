@@ -21,17 +21,6 @@ BEGIN
         ADD CONSTRAINT fk_project_id FOREIGN KEY (project_id)
         REFERENCES public.projects (id);
     END IF;
-    
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.table_constraints
-        WHERE constraint_name = 'fk_tasks'
-          AND table_name = 'submission_photos'
-    ) THEN
-        ALTER TABLE ONLY public.submission_photos
-        ADD CONSTRAINT fk_tasks FOREIGN KEY (
-            task_id, project_id
-        ) REFERENCES public.tasks (id, project_id);
-    END IF;
 END $$;
 
 -- Update public.projects table

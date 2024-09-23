@@ -393,6 +393,7 @@ ALTER SEQUENCE public.xlsforms_id_seq OWNED BY public.xlsforms.id;
 CREATE TABLE public.submission_photos (
     id integer NOT NULL,
     project_id integer NOT NULL,
+    -- Note this is not public.tasks, but an ODK task_id
     task_id integer NOT NULL,
     submission_id character varying NOT NULL,
     s3_path character varying NOT NULL
@@ -599,11 +600,6 @@ ALTER TABLE ONLY public.submission_photos
 ADD CONSTRAINT fk_project_id FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.submission_photos
-ADD CONSTRAINT fk_tasks FOREIGN KEY (
-    task_id, project_id
-) REFERENCES public.tasks (id, project_id);
 
 -- Finalise
 
