@@ -329,9 +329,7 @@ async def get_submission_form_fields(
     project = project_user.get("project")
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     odk_form = central_crud.get_odk_form(odk_credentials)
-    db_xform = await project_deps.get_project_xform(db, project.id)
-
-    return odk_form.formFields(project.odkid, db_xform.odk_form_id)
+    return odk_form.formFields(project.odkid, project.odk_form_id)
 
 
 @router.get("/submission_table")
@@ -440,11 +438,10 @@ async def update_review_state(
         project = current_user.get("project")
         odk_creds = await project_deps.get_odk_credentials(db, project.id)
         odk_project = central_crud.get_odk_project(odk_creds)
-        db_xform = await project_deps.get_project_xform(db, project.id)
 
         response = odk_project.updateReviewState(
             project.odkid,
-            db_xform.odk_form_id,
+            project.odk_form_id,
             instance_id,
             {"reviewState": review_state},
         )

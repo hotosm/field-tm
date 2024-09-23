@@ -38,7 +38,6 @@ from sqlalchemy.orm import Session
 
 from app.central.central_crud import (
     get_odk_form,
-    get_odk_project,
     list_odk_xforms,
 )
 from app.config import settings
@@ -46,7 +45,6 @@ from app.db import db_models
 from app.models.enums import HTTPStatus
 from app.projects import project_crud, project_deps
 from app.s3 import add_obj_to_bucket, get_obj_from_bucket
-from app.tasks import tasks_crud
 
 # async def convert_json_to_osm(file_path):
 #     """Wrapper for osm-fieldwork json2osm."""
@@ -144,8 +142,7 @@ async def gather_all_submission_csvs(db: Session, project: db_models.DbProject):
 
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     xform = get_odk_form(odk_credentials)
-    db_xform = await project_deps.get_project_xform(db, project.id)
-    file = xform.getSubmissionMedia(odkid, db_xform.odk_form_id)
+    file = xform.getSubmissionMedia(odkid, project.odk_form_id)
     return file.content
 
 
@@ -290,28 +287,6 @@ def update_submission_in_s3(
         update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
 
 
-def get_all_submissions_json(db: Session, project_id):
-    """Get all submissions for a project in JSON format."""
-    get_project_sync = async_to_sync(project_crud.get_project)
-    project_info = get_project_sync(db, project_id)
-
-    # ODK Credentials
-    odk_sync = async_to_sync(project_deps.get_odk_credentials)
-    odk_credentials = odk_sync(db, project_id)
-    project = get_odk_project(odk_credentials)
-
-    get_task_id_list_sync = async_to_sync(tasks_crud.get_task_id_list)
-    task_list = get_task_id_list_sync(db, project_id)
-
-    # FIXME use db_xform
-    xform_list = [
-        f"{project_info.project_name_prefix}_task_{task}" for task in task_list
-    ]
-    # FIXME use separate func
-    submissions = project.getAllSubmissions(project_info.odkid, xform_list)
-    return submissions
-
-
 async def download_submission_in_json(db: Session, project: db_models.DbProject):
     """Download submission data from ODK Central."""
     project_name = project.project_name_prefix
@@ -329,7 +304,10 @@ async def download_submission_in_json(db: Session, project: db_models.DbProject)
 
 
 async def get_submission_points(db: Session, project_id: int, task_id: Optional[int]):
-    """Get submission points for a project."""
+    """Get submission points for a project.
+
+    FIXME refactor to pass through project object via auth.
+    """
     project_info = await project_crud.get_project_by_id(db, project_id)
     if not project_info:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -337,9 +315,8 @@ async def get_submission_points(db: Session, project_id: int, task_id: Optional[
     odk_id = project_info.odkid
     odk_credentials = await project_deps.get_odk_credentials(db, project_id)
     xform = get_odk_form(odk_credentials)
-    db_xform = await project_deps.get_project_xform(db, project_id)
 
-    response_file = xform.getSubmissionMedia(odk_id, db_xform.odk_form_id)
+    response_file = xform.getSubmissionMedia(odk_id, project_info.odk_form_id)
     response_file_bytes = response_file.content
 
     try:
@@ -382,8 +359,7 @@ async def get_submission_count_of_a_project(db: Session, project: db_models.DbPr
     # Get ODK Form with odk credentials from the project.
     xform = get_odk_form(odk_credentials)
 
-    db_xform = await project_deps.get_project_xform(db, project.id)
-    data = xform.listSubmissions(project.odkid, db_xform.odk_form_id, {})
+    data = xform.listSubmissions(project.odkid, project.odk_form_id, {})
     return len(data["value"])
 
 
@@ -466,40 +442,10 @@ async def get_submission_by_project(
         ValueError: If the submission file cannot be found.
 
     """
-    db_xform = await project_deps.get_project_xform(db, project.id)
     odk_central = await project_deps.get_odk_credentials(db, project.id)
 
     xform = get_odk_form(odk_central)
-    return xform.listSubmissions(project.odkid, db_xform.odk_form_id, filters)
-
-
-# FIXME this is not needed now it can be directly filtered from submission table
-# async def get_submission_by_task(
-#     project: db_models.DbProject,
-#     task_id: int,
-#     filters: dict,
-#     db: Session,
-# ):
-#     """Get submissions and count by task.
-
-#     Args:
-#         project: The project instance.
-#         task_id: The ID of the task.
-#         filters: A dictionary of filters.
-#         db: The database session.
-
-#     Returns:
-#         Tuple: A tuple containing the list of submissions and the count.
-#     """
-#     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
-
-#     xform = get_odk_form(odk_credentials)
-#     db_xform = await project_deps.get_project_xform(db, project.id)
-#     data = xform.listSubmissions(project.odkid, db_xform.odk_form_id, filters)
-#     submissions = data.get("value", [])
-#     count = data.get("@odata.count", 0)
-
-#     return submissions, count
+    return xform.listSubmissions(project.odkid, project.odk_form_id, filters)
 
 
 async def get_submission_detail(
@@ -519,9 +465,8 @@ async def get_submission_detail(
     """
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     odk_form = get_odk_form(odk_credentials)
-    db_xform = await project_deps.get_project_xform(db, project.id)
     submission = json.loads(
-        odk_form.getSubmissions(project.odkid, db_xform.odk_form_id, submission_id)
+        odk_form.getSubmissions(project.odkid, project.odk_form_id, submission_id)
     )
     return submission.get("value", [])[0]
 
@@ -587,7 +532,6 @@ async def upload_attachment_to_s3(
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
-        db_xform = await project_deps.get_project_xform(db, project_id)
         odk_central = await project_deps.get_odk_credentials(db, project_id)
         xform = get_odk_form(odk_central)
         s3_bucket = settings.S3_BUCKET_NAME
@@ -631,7 +575,7 @@ async def upload_attachment_to_s3(
                     attachment = xform.getSubmissionPhoto(
                         project.odkid,
                         str(instance_id),
-                        db_xform.odk_form_id,
+                        project.odk_form_id,
                         str(filename),
                     )
                     if attachment:

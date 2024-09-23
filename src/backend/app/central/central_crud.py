@@ -24,7 +24,6 @@ from io import BytesIO, StringIO
 from typing import Optional, Union
 
 import geojson
-from defusedxml import ElementTree
 from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
@@ -190,7 +189,7 @@ def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
     odk_credentials: project_schemas.ODKCentralDecrypted,
-) -> str:
+) -> None:
     """Create an XForm on a remote ODK Central server.
 
     Args:
@@ -198,8 +197,7 @@ def create_odk_xform(
         xform_data (BytesIO): XForm data to set.
         odk_credentials (ODKCentralDecrypted): Creds for ODK Central.
 
-    Returns:
-        form_name (str): ODK Central form name for the API.
+    Returns: None
     """
     try:
         xform = get_odk_form(odk_credentials)
@@ -209,25 +207,7 @@ def create_odk_xform(
             status_code=500, detail={"message": "Connection failed to odk central"}
         ) from e
 
-    xform_id = xform.createForm(odk_id, xform_data, publish=True)
-    if not xform_id:
-        namespaces = {
-            "h": "http://www.w3.org/1999/xhtml",
-            "odk": "http://www.opendatakit.org/xforms",
-            "xforms": "http://www.w3.org/2002/xforms",
-        }
-        # Get the form id from the XML
-        root = ElementTree.fromstring(xform_data.getvalue())
-        xml_data = root.findall(".//xforms:data[@id]", namespaces)
-        extracted_name = "Not Found"
-        for dt in xml_data:
-            extracted_name = dt.get("id")
-        msg = f"Failed to create form on ODK Central: ({extracted_name})"
-        log.error(msg)
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
-        ) from None
-    return xform_id
+    xform.createForm(odk_id, xform_data, publish=True)
 
 
 def delete_odk_xform(
@@ -323,7 +303,10 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         BytesIO: the converted XML representation of the XForm.
     """
     try:
-        log.debug("Parsing XLSForm --> XML data")
+        log.debug(
+            f"Parsing XLSForm --> XML data: input type {type(input_data)} | "
+            f"data length {input_data.getbuffer().nbytes}"
+        )
         # NOTE pyxform.xls2xform.convert returns a ConvertResult object
         return BytesIO(xform_convert(input_data).xform.encode("utf-8"))
     except Exception as e:
@@ -340,7 +323,7 @@ async def append_fields_to_user_xlsform(
     additional_entities: list[str] = None,
     task_count: int = None,
     existing_id: str = None,
-) -> BytesIO:
+) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory FMTM fields to XLSForm")
     return await append_mandatory_fields(
@@ -360,7 +343,7 @@ async def validate_and_update_user_xlsform(
     existing_id: str = None,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
-    updated_file_bytes = await append_fields_to_user_xlsform(
+    xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
         xlsform,
         form_category=form_category,
         additional_entities=additional_entities,
@@ -899,12 +882,10 @@ async def get_appuser_token(
     xform_id: str,
     project_odk_id: int,
     odk_credentials: project_schemas.ODKCentralDecrypted,
-    db: Session,
 ):
     """Get the app user token for a specific project.
 
     Args:
-        db: The database session to use.
         odk_credentials: ODK credentials for the project.
         project_odk_id: The ODK ID of the project.
         xform_id: The ID of the XForm.

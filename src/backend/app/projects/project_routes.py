@@ -673,7 +673,7 @@ async def validate_form(
         not be used for FMTM project creation.
     """
     if debug:
-        updated_form = await central_crud.append_fields_to_user_xlsform(
+        xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
             xlsform,
             task_count=1,  # NOTE this must be included to append task_filter choices
         )
@@ -682,7 +682,7 @@ async def validate_form(
             media_type=(
                 "application/vnd.openxmlformats-" "officedocument.spreadsheetml.sheet"
             ),
-            headers={"Content-Disposition": "attachment; filename=updated_form.xlsx"},
+            headers={"Content-Disposition": f"attachment; filename={xform_id}.xlsx"},
         )
     else:
         await central_crud.validate_and_update_user_xlsform(
@@ -759,14 +759,21 @@ async def generate_files(
         with open(xlsform_path, "rb") as f:
             xlsform = BytesIO(f.read())
 
-    project_xlsform = await central_crud.append_fields_to_user_xlsform(
+    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform,
         form_category=form_category,
         task_count=task_count,
         additional_entities=additional_entities,
     )
     # Write XLS form content to db
-    project.form_xls = project_xlsform.getvalue()
+    xlsform_bytes = project_xlsform.getvalue()
+    if not xlsform_bytes:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="There was an error with the XLSForm!",
+        )
+    project.odk_form_id = xform_id
+    project.xlsform_content = xlsform_bytes
     db.commit()
 
     # Create task in db and return uuid
@@ -986,7 +993,7 @@ async def download_form(
         "Content-Disposition": f"attachment; filename={project.id}_xlsform.xlsx",
         "Content-Type": "application/media",
     }
-    return Response(content=project.form_xls, headers=headers)
+    return Response(content=project.xlsform_content, headers=headers)
 
 
 @router.post("/update-form")
@@ -1026,7 +1033,7 @@ async def update_project_form(
     )
 
     # Commit changes to db
-    project.form_xls = xlsform.getvalue()
+    project.xlsform_content = xlsform.getvalue()
     db.commit()
 
     return project

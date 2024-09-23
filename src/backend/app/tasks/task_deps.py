@@ -18,39 +18,13 @@
 
 """Task dependencies for use in Depends."""
 
-from typing import Union
-
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.db_models import DbProject, DbTask
+from app.db.db_models import DbTask
 from app.models.enums import HTTPStatus
-
-
-async def get_xform_name(
-    project: Union[int, DbProject],
-    task_id: int,
-    db: Session = Depends(get_db),
-) -> str:
-    """Get a project xform name."""
-    if isinstance(project, int):
-        db_project = db.query(DbProject).filter(DbProject.id == project).first()
-        if not db_project:
-            raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND,
-                detail=f"Project with ID ({project}) does not exist",
-            )
-    else:
-        db_project = project
-
-    project_name = db_project.project_name_prefix
-    # TODO in the future we may possibly support multiple forms per project.
-    # TODO to facilitate this we need to add the _{category} suffix and track.
-    # TODO this in the new xforms.category field/table.
-    form_name = project_name
-    return form_name
 
 
 async def get_task_by_id(
