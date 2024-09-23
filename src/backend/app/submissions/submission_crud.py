@@ -465,9 +465,18 @@ async def get_submission_detail(
     """
     odk_credentials = await project_deps.get_odk_credentials(db, project.id)
     odk_form = get_odk_form(odk_credentials)
-    submission = json.loads(
-        odk_form.getSubmissions(project.odkid, project.odk_form_id, submission_id)
+
+    project_submissions = odk_form.getSubmissions(
+        project.odkid, project.odk_form_id, submission_id
     )
+    if not project_submissions:
+        log.warning("Failed to download submissions due to unknown error")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Failed to download submissions",
+        )
+
+    submission = json.loads(project_submissions)
     return submission.get("value", [])[0]
 
 
