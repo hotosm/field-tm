@@ -223,6 +223,9 @@ docker compose -f docker-compose.$GIT_BRANCH.yml up -d
   docker logs fmtm-main-api-4
   ```
 
+  > Note there are four replica containers running, and any one of them
+  > could have handled the request. You should check them all.
+
   They often provide useful traceback information, including timestamps.
 
 - View error reports on Sentry: <https://humanitarian-openstreetmap-tea.sentry.io>
