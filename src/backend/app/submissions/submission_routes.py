@@ -412,20 +412,6 @@ async def submission_table(
     return response
 
 
-@router.get("/{submission_id}")
-async def submission_detail(
-    submission_id: str,
-    db: Session = Depends(database.get_db),
-    project_user: ProjectUserDict = Depends(mapper),
-) -> dict:
-    """This api returns the submission detail of individual submission."""
-    project = project_user.get("project")
-    submission_detail = await submission_crud.get_submission_detail(
-        submission_id, project, db
-    )
-    return submission_detail
-
-
 @router.post("/update_review_state")
 async def update_review_state(
     instance_id: str,
@@ -525,6 +511,20 @@ async def conflate_geojson(
         raise HTTPException(
             status_code=500, detail=f"Failed to process conflation: {str(e)}"
         ) from e
+
+
+@router.get("/{submission_id}")
+async def submission_detail(
+    submission_id: str,
+    db: Session = Depends(database.get_db),
+    project_user: ProjectUserDict = Depends(mapper),
+) -> dict:
+    """This api returns the submission detail of individual submission."""
+    project = project_user.get("project")
+    submission_detail = await submission_crud.get_submission_detail(
+        submission_id, project, db
+    )
+    return submission_detail
 
 
 @router.get("/{submission_id}/photos")
