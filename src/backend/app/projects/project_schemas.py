@@ -317,7 +317,7 @@ class ProjectBase(BaseModel):
     """Base project model."""
 
     outline: Any = Field(exclude=True)
-    forms: Any = Field(exclude=True)
+    odk_form_id: Optional[str] = Field(exclude=True)
 
     id: int
     odkid: int
@@ -360,10 +360,13 @@ class ProjectBase(BaseModel):
     @computed_field
     @property
     def xform_id(self) -> Optional[str]:
-        """Compute the XForm ID from the linked DbXForm."""
-        if not self.forms:
+        """Generate from odk_form_id.
+
+        TODO this could be refactored out in future.
+        """
+        if not self.odk_form_id:
             return None
-        return self.forms[0].odk_form_id
+        return self.odk_form_id
 
 
 class ProjectWithTasks(ProjectBase):

@@ -260,6 +260,8 @@ CREATE TABLE public.projects (
     status public.projectstatus NOT NULL DEFAULT 'DRAFT',
     total_tasks integer,
     xform_category character varying,
+    xlsform_content bytea,
+    odk_form_id character varying,
     visibility public.projectvisibility NOT NULL DEFAULT 'PUBLIC',
     mapper_level public.mappinglevel NOT NULL DEFAULT 'INTERMEDIATE',
     priority public.projectpriority DEFAULT 'MEDIUM',
@@ -278,8 +280,6 @@ CREATE TABLE public.projects (
     odk_central_user character varying,
     odk_central_password character varying,
     odk_token character varying,
-    form_xls bytea,
-    form_config_file bytea,
     data_extract_type character varying,
     data_extract_url character varying,
     task_split_type public.tasksplittype,
@@ -390,22 +390,24 @@ CACHE 1;
 ALTER TABLE public.xlsforms_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.xlsforms_id_seq OWNED BY public.xlsforms.id;
 
-CREATE TABLE public.xforms (
+CREATE TABLE public.submission_photos (
     id integer NOT NULL,
-    project_id integer,
-    odk_form_id character varying,
-    category character varying
+    project_id integer NOT NULL,
+    task_id integer NOT NULL,
+    submission_id character varying NOT NULL,
+    s3_path character varying NOT NULL
 );
-ALTER TABLE public.xforms OWNER TO fmtm;
-CREATE SEQUENCE public.xforms_id_seq
+ALTER TABLE public.submission_photos OWNER TO fmtm;
+CREATE SEQUENCE public.submission_photos_id_seq
 AS integer
 START WITH 1
 INCREMENT BY 1
 NO MINVALUE
 NO MAXVALUE
 CACHE 1;
-ALTER TABLE public.xforms_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.xforms_id_seq OWNED BY public.xforms.id;
+ALTER TABLE public.submission_photos_id_seq OWNER TO fmtm;
+ALTER SEQUENCE public.submission_photos_id_seq
+OWNED BY public.submission_photos.id;
 
 -- nextval for primary keys (autoincrement)
 
@@ -427,8 +429,8 @@ ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval(
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval(
     'public.xlsforms_id_seq'::regclass
 );
-ALTER TABLE ONLY public.xforms ALTER COLUMN id SET DEFAULT nextval(
-    'public.xforms_id_seq'::regclass
+ALTER TABLE ONLY public.submission_photos ALTER COLUMN id SET DEFAULT nextval(
+    'public.submission_photos_id_seq'::regclass
 );
 
 
@@ -482,8 +484,8 @@ ADD CONSTRAINT xlsforms_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY public.xlsforms
 ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
 
-ALTER TABLE ONLY public.xforms
-ADD CONSTRAINT xforms_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.submission_photos
+ADD CONSTRAINT submission_photos_pkey PRIMARY KEY (id);
 
 -- Indexing
 
@@ -593,11 +595,15 @@ ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (
     user_id
 ) REFERENCES public.users (id);
 
-ALTER TABLE ONLY public.xforms
+ALTER TABLE ONLY public.submission_photos
 ADD CONSTRAINT fk_project_id FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
 
+ALTER TABLE ONLY public.submission_photos
+ADD CONSTRAINT fk_tasks FOREIGN KEY (
+    task_id, project_id
+) REFERENCES public.tasks (id, project_id);
 
 -- Finalise
 

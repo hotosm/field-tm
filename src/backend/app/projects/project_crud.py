@@ -834,15 +834,13 @@ def flatten_dict(d, parent_key="", sep="_"):
 
 
 async def generate_odk_central_project_content(
-    project: db_models.DbProject,
+    project_odk_id: int,
+    project_odk_form_id: str,
     odk_credentials: project_schemas.ODKCentralDecrypted,
     xlsform: BytesIO,
     task_extract_dict: dict[int, geojson.FeatureCollection],
-    db: Session,
 ) -> str:
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
-    project_odk_id = project.odkid
-
     # The ODK Dataset (Entity List) must exist prior to main XLSForm
     entities_list = await central_crud.task_geojson_dict_to_entity_values(
         task_extract_dict
@@ -861,33 +859,16 @@ async def generate_odk_central_project_content(
 
     # Upload survey XForm
     log.info("Uploading survey XForm to ODK Central")
-    xform_id = central_crud.create_odk_xform(
+    central_crud.create_odk_xform(
         project_odk_id,
         xform,
         odk_credentials,
     )
 
-    sql = text(
-        """
-        INSERT INTO xforms (
-            project_id, odk_form_id, category
-        )
-        VALUES (
-            :project_id, :xform_id, :category
-        )
-        """
-    )
-    db.execute(
-        sql,
-        {
-            "project_id": project.id,
-            "xform_id": xform_id,
-            "category": project.xform_category,
-        },
-    )
-    db.commit()
     return await central_crud.get_appuser_token(
-        xform_id, project_odk_id, odk_credentials, db
+        project_odk_form_id,
+        project_odk_id,
+        odk_credentials,
     )
 
 
@@ -929,13 +910,15 @@ async def generate_project_files(
 
         # Get ODK Project ID
         project_odk_id = project.odkid
+        project_xlsform = project.xlsform_content
+        project_odk_form_id = project.odk_form_id
 
         encrypted_odk_token = await generate_odk_central_project_content(
-            project,
+            project_odk_id,
+            project_odk_form_id,
             odk_credentials,
-            BytesIO(project.form_xls),
+            BytesIO(project_xlsform),
             task_extract_dict,
-            db,
         )
         log.debug(
             f"Setting odk token for FMTM project ({project_id}) "
@@ -1488,9 +1471,8 @@ async def get_dashboard_detail(
     """Get project details for project dashboard."""
     odk_central = await project_deps.get_odk_credentials(db, project.id)
     xform = central_crud.get_odk_form(odk_central)
-    db_xform = await project_deps.get_project_xform(db, project.id)
 
-    submission_meta_data = xform.getFullDetails(project.odkid, db_xform.odk_form_id)
+    submission_meta_data = xform.getFullDetails(project.odkid, project.odk_form_id)
     project.total_submission = submission_meta_data.get("submissions", 0)
     project.last_active = submission_meta_data.get("lastSubmission")
 

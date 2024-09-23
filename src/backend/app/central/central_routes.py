@@ -79,9 +79,8 @@ async def refresh_appuser_token(
     try:
         odk_credentials = await project_deps.get_odk_credentials(db, project_id)
         project_odk_id = project.odkid
-        db_xform = await project_deps.get_project_xform(db, project_id)
         odk_token = await central_crud.get_appuser_token(
-            db_xform.odk_form_id, project_odk_id, odk_credentials, db
+            project.odk_form_id, project_odk_id, odk_credentials, db
         )
         project.odk_token = odk_token
         db.commit()
