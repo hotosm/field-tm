@@ -42,7 +42,6 @@ dependencies = [
     "asgiref==3.8.1",
     "sozipfile==0.3.2",
     "cryptography>=42.0.8",
-    "defusedxml>=0.7.1",
     "pyjwt>=2.8.0",
     "async-lru>=2.0.4",
     "osm-fieldwork>=0.16.4",
