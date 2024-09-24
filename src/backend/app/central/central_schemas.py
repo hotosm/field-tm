@@ -79,7 +79,7 @@ class CentralBase(BaseModel):
 class Central(CentralBase):
     """ODK Central return, with extras."""
 
-    geometry_geojson: str
+    pass
 
 
 class CentralOut(CentralBase):

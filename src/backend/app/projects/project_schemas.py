@@ -17,17 +17,16 @@
 #
 """Pydantic schemas for Projects."""
 
-import uuid
 from datetime import datetime
 from typing import Any, List, Optional, Union
 
 from dateutil import parser
+from geoalchemy2 import WKBElement
 from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Polygon
 from loguru import logger as log
 from pydantic import BaseModel, Field, computed_field
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator, model_validator
-from shapely import wkb
 from typing_extensions import Self
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value, settings
@@ -135,6 +134,73 @@ class ProjectInfo(BaseModel):
     short_description: str
     description: str
     per_task_instructions: Optional[str] = None
+
+
+class DbProject(BaseModel):
+    """Project from database."""
+
+    outline: Any = Field(exclude=True)
+    odk_form_id: Optional[str] = Field(exclude=True)
+
+    id: int
+    odkid: int
+    author: User
+    project_info: ProjectInfo
+    status: ProjectStatus | str
+    created_at: datetime
+    # location_str: str
+    xform_category: Optional[XLSFormType] = None
+    hashtags: Optional[List[str]] = None
+    organisation_id: Optional[int] = None
+    tasks: Optional[List[tasks_schemas.Task]]
+
+    @field_serializer("status")
+    def status_enum_str_to_int(self, value: ProjectStatus | str) -> ProjectStatus:
+        """Get the the int value from a string enum."""
+        if isinstance(value, ProjectStatus):
+            return ProjectStatus[value.name]
+        else:
+            return ProjectStatus[value]
+
+    @computed_field
+    @property
+    def outline_geojson(self) -> Optional[Feature]:
+        """TODO this is now the same as self.outline."""
+        if not self.outline:
+            return None
+
+        # TODO refactor to remove outline_geojson
+        # TODO possibly also generate bbox for geojson in project_deps SQL?
+        feat = {
+            "type": "Feature",
+            "geometry": self.outline,
+            "id": self.id,
+            "properties": {"id": self.id, "bbox": None},
+        }
+        return Feature(**feat)
+
+    @computed_field
+    @property
+    def organisation_logo(self) -> Optional[str]:
+        """Get the organisation logo url from the S3 bucket."""
+        if not self.organisation_id:
+            return None
+
+        return (
+            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
+            f"/{self.organisation_id}/logo.png"
+        )
+
+    @computed_field
+    @property
+    def xform_id(self) -> Optional[str]:
+        """Generate from odk_form_id.
+
+        TODO this could be refactored out in future.
+        """
+        if not self.odk_form_id:
+            return None
+        return self.odk_form_id
 
 
 class ProjectIn(BaseModel):
@@ -275,8 +341,8 @@ class ProjectSummary(BaseModel):
     location_str: Optional[str] = None
     description: Optional[str] = None
     total_tasks: Optional[int] = None
-    tasks_mapped: Optional[int] = None
     num_contributors: Optional[int] = None
+    tasks_mapped: Optional[int] = None
     tasks_validated: Optional[int] = None
     tasks_bad: Optional[int] = None
     hashtags: Optional[List[str]] = None
@@ -323,27 +389,46 @@ class ProjectBase(BaseModel):
     odkid: int
     author: User
     project_info: ProjectInfo
-    status: ProjectStatus
-    created: datetime
+    status: ProjectStatus | str
+    created_at: datetime
     # location_str: str
     xform_category: Optional[XLSFormType] = None
     hashtags: Optional[List[str]] = None
     organisation_id: Optional[int] = None
 
+    @field_serializer("status")
+    def status_enum_str_to_int(self, value: ProjectStatus | str) -> ProjectStatus:
+        """Get the the int value from a string enum."""
+        if isinstance(value, ProjectStatus):
+            return ProjectStatus[value.name]
+        else:
+            return ProjectStatus[value]
+
     @computed_field
     @property
     def outline_geojson(self) -> Optional[Feature]:
-        """Compute the geojson outline from WKBElement outline."""
+        """TODO this is now the same as self.outline."""
         if not self.outline:
             return None
-        geometry = wkb.loads(bytes(self.outline.data))
-        bbox = geometry.bounds  # Calculate bounding box
-        geom_geojson = wkb_geom_to_feature(
-            geometry=self.outline,
-            properties={"id": self.id, "bbox": bbox},
-            id=self.id,
-        )
-        return Feature(**geom_geojson)
+
+        # FIXME this is a workaround until geoalchemy is removed
+        if isinstance(self.outline, WKBElement):
+            feat = wkb_geom_to_feature(
+                self.outline,
+                id=self.id,
+                properties={"id": self.id, "bbox": None},
+            )
+            return Feature(**feat)
+
+        # TODO refactor to remove outline_geojson
+        # TODO possibly also generate bbox for geojson in project_deps SQL?
+        feat = {
+            "type": "Feature",
+            "geometry": self.outline,
+            "id": self.id,
+            "properties": {"id": self.id, "bbox": None},
+        }
+        return Feature(**feat)
 
     @computed_field
     @property
@@ -375,17 +460,10 @@ class ProjectWithTasks(ProjectBase):
     tasks: Optional[List[tasks_schemas.Task]]
 
 
-class ProjectOut(ProjectWithTasks):
-    """Project display to user."""
-
-    project_uuid: uuid.UUID = uuid.uuid4()
-
-
 class ReadProject(ProjectWithTasks):
     """Redundant model for refactor."""
 
     odk_token: Optional[str] = None
-    project_uuid: uuid.UUID = uuid.uuid4()
     location_str: Optional[str] = None
     data_extract_url: Optional[str] = None
     custom_tms_url: Optional[str] = None
@@ -412,7 +490,7 @@ class ProjectDashboard(BaseModel):
     project_name_prefix: str
     organisation_name: str
     total_tasks: int
-    created: datetime
+    created_at: datetime
     organisation_logo: Optional[str] = None
     total_submission: Optional[int] = None
     total_contributors: Optional[int] = None

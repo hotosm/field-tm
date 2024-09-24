@@ -91,29 +91,6 @@ def featcol_to_wkb_geom(
     return write_wkb(shapely_geom)
 
 
-def get_centroid(
-    geometry: WKBElement,
-    properties: Optional[dict] = None,
-    id: Optional[int] = None,
-) -> dict:
-    """Convert SQLAlchemy geometry to Centroid GeoJSON.
-
-    If no id or properties fields are passed, returns the coordinate only.
-    Else returns a Feature GeoJSON.
-    """
-    shape = to_shape(geometry)
-    point = shape.centroid
-    if not properties and not id:
-        return point
-    geojson = {
-        "type": "Feature",
-        "geometry": mapping(point),
-        "properties": properties,
-        "id": id,
-    }
-    return geojson
-
-
 async def featcol_to_flatgeobuf(
     db: Session, geojson: geojson.FeatureCollection
 ) -> Optional[bytes]:

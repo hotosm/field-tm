@@ -19,10 +19,12 @@
 
 from datetime import datetime
 from typing import cast
+from uuid import uuid4
 
 from geoalchemy2 import Geometry, WKBElement
 from sqlalchemy import (
     ARRAY,
+    UUID,
     BigInteger,
     Boolean,
     Column,
@@ -37,14 +39,13 @@ from sqlalchemy import (
     String,
     Table,
     UniqueConstraint,
-    desc,
+    inspect,
 )
 from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQLArray  # noqa: N811
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import (
     # declarative_base,
     backref,
-    object_session,
     relationship,
 )
 
@@ -61,7 +62,6 @@ from app.models.enums import (
     ProjectVisibility,
     TaskAction,
     TaskSplitType,
-    TaskStatus,
     UserRole,
 )
 
@@ -125,9 +125,7 @@ class DbUser(Base):
     # tasks_notifications = Column(Boolean, default=True, nullable=False)
     # tasks_comments_notifications = Column(Boolean, default=False, nullable=False)
 
-    date_registered = cast(datetime, Column(DateTime, default=timestamp))
-    # Represents the date the user last had one of their tasks validated
-    last_validation_date = cast(datetime, Column(DateTime, default=timestamp))
+    registered_at = cast(datetime, Column(DateTime, default=timestamp))
 
 
 # Secondary table defining many-to-many relationship between organisations and managers
@@ -215,8 +213,8 @@ class DbTaskHistory(Base):
 
     __tablename__ = "task_history"
 
-    id = cast(int, Column(Integer, primary_key=True))
-    project_id = cast(int, Column(Integer, ForeignKey("projects.id"), index=True))
+    event_id = cast(str, Column(UUID, primary_key=True, default=uuid4()))
+    project_id = cast(int, Column(Integer, index=True))
     task_id = cast(int, Column(Integer, nullable=False))
     action = cast(TaskAction, Column(Enum(TaskAction), nullable=False))
     action_text = cast(str, Column(String))
@@ -225,20 +223,12 @@ class DbTaskHistory(Base):
         int,
         Column(
             BigInteger,
-            ForeignKey("users.id", name="fk_users"),
             index=True,
             nullable=False,
         ),
     )
 
-    # Define relationships
-    user = relationship(DbUser, uselist=False, backref="task_history_user")
-    actioned_by = relationship(DbUser, overlaps="task_history_user,user")
-
     __table_args__ = (
-        ForeignKeyConstraint(
-            [task_id, project_id], ["tasks.id", "tasks.project_id"], name="fk_tasks"
-        ),
         Index("idx_task_history_composite", "task_id", "project_id"),
         Index("idx_task_history_project_id_user_id", "user_id", "project_id"),
         {},
@@ -282,32 +272,8 @@ class DbTask(Base):
         int, Column(Integer, ForeignKey("projects.id"), index=True, primary_key=True)
     )
     project_task_index = cast(int, Column(Integer))
-    project_task_name = cast(str, Column(String))
     outline = cast(WKBElement, Column(Geometry("POLYGON", srid=4326)))
-    geometry_geojson = cast(str, Column(String))
     feature_count = cast(int, Column(Integer))
-    task_status = cast(TaskStatus, Column(Enum(TaskStatus), default=TaskStatus.READY))
-    locked_by = cast(
-        int,
-        Column(BigInteger, ForeignKey("users.id", name="fk_users_locked"), index=True),
-    )
-    mapped_by = cast(
-        int,
-        Column(BigInteger, ForeignKey("users.id", name="fk_users_mapper"), index=True),
-    )
-    validated_by = cast(
-        int,
-        Column(
-            BigInteger, ForeignKey("users.id", name="fk_users_validator"), index=True
-        ),
-    )
-
-    # Define relationships
-    task_history = relationship(
-        DbTaskHistory, cascade="all", order_by=desc(DbTaskHistory.action_date)
-    )
-    lock_holder = relationship(DbUser, foreign_keys=[locked_by])
-    mapper = relationship(DbUser, foreign_keys=[mapped_by])
 
     ## ---------------------------------------------- ##
     # FOR REFERENCE: OTHER ATTRIBUTES IN TASKING MANAGER
@@ -324,6 +290,27 @@ class DbProject(Base):
     """Describes a HOT Mapping Project."""
 
     __tablename__ = "projects"
+
+    def __init__(self, **kw):
+        """NOTE this is a workaround for raw SQL queries.
+
+        The raw SQL .execute returns a Row.
+        We must manually define the relationship models.
+        """
+        mapper = inspect(self).mapper
+
+        for relationship_key in mapper.relationships.keys():
+            if relationship_key in kw:
+                related_class = mapper.relationships[relationship_key].entity.class_
+                if isinstance(kw[relationship_key], dict):
+                    kw[relationship_key] = related_class(**kw[relationship_key])
+                elif isinstance(kw[relationship_key], list):
+                    kw[relationship_key] = [
+                        related_class(**item) if isinstance(item, dict) else item
+                        for item in kw[relationship_key]
+                    ]
+
+        super().__init__(**kw)
 
     # Columns
     id = cast(int, Column(Integer, primary_key=True))
@@ -349,7 +336,7 @@ class DbProject(Base):
         ),
     )
     author = relationship(DbUser, uselist=False, backref="user")
-    created = cast(datetime, Column(DateTime, default=timestamp, nullable=False))
+    created_at = cast(datetime, Column(DateTime, default=timestamp, nullable=False))
 
     task_split_type = Column(Enum(TaskSplitType), nullable=True)
     # split_strategy = Column(Integer)
@@ -359,7 +346,6 @@ class DbProject(Base):
 
     # PROJECT DETAILS
     project_name_prefix = cast(str, Column(String))
-    task_type_prefix = cast(str, Column(String))
     project_info = relationship(
         DbProjectInfo,
         cascade="all, delete, delete-orphan",
@@ -375,7 +361,7 @@ class DbProject(Base):
     centroid = cast(WKBElement, Column(Geometry("POINT", srid=4326)))
 
     # PROJECT STATUS
-    last_updated = cast(datetime, Column(DateTime, default=timestamp))
+    updated_at = cast(datetime, Column(DateTime, default=timestamp))
     status = cast(
         ProjectStatus,
         Column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False),
@@ -404,35 +390,23 @@ class DbProject(Base):
     @property
     def tasks_mapped(self):
         """Get the number of tasks mapped for a project."""
-        return (
-            object_session(self)
-            .query(DbTask)
-            .filter(DbTask.task_status == TaskStatus.MAPPED)
-            .with_parent(self)
-            .count()
-        )
+        # FIXME add to Pydantic model to extract from task_history info
+        # all non duplicate entries for MAPPED, VALIDATED, etc
+        return
 
     @property
     def tasks_validated(self):
         """Get the number of tasks validated for a project."""
-        return (
-            object_session(self)
-            .query(DbTask)
-            .filter(DbTask.task_status == TaskStatus.VALIDATED)
-            .with_parent(self)
-            .count()
-        )
+        # FIXME add to Pydantic model to extract from task_history info
+        # all non duplicate entries for MAPPED, VALIDATED, etc
+        return
 
     @property
     def tasks_bad(self):
         """Get the number of tasks marked bad for a project."""
-        return (
-            object_session(self)
-            .query(DbTask)
-            .filter(DbTask.task_status == TaskStatus.BAD)
-            .with_parent(self)
-            .count()
-        )
+        # FIXME add to Pydantic model to extract from task_history info
+        # all non duplicate entries for MAPPED, VALIDATED, etc
+        return
 
     # XForm category specified
     xform_category = cast(str, Column(String))

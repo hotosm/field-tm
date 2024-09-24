@@ -1,0 +1,63 @@
+{
+	"name": "fmtm-mapper",
+	"version": "0.0.1",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"prepare": "svelte-kit sync",
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"test": "npm run test:integration && npm run test:unit",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --plugin prettier-plugin-svelte --check . && eslint .",
+		"format": "prettier --plugin prettier-plugin-svelte --write .",
+		"test:integration": "playwright test",
+		"test:unit": "vitest",
+		"electric:migrations": "electric-sql generate"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.44.1",
+		"@sveltejs/adapter-auto": "^3.2.2",
+		"@sveltejs/kit": "^2.5.24",
+		"@sveltejs/vite-plugin-svelte": "3.1.2",
+		"@types/eslint": "^8.56.10",
+		"@types/geojson": "^7946.0.14",
+		"@types/node": "^20.14.8",
+		"@typescript-eslint/eslint-plugin": "^7.13.1",
+		"@typescript-eslint/parser": "^7.13.1",
+		"@unocss/extractor-svelte": "^0.61.3",
+		"eslint": "^8.57.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-svelte": "^2.40.0",
+		"prettier": "^3.3.2",
+		"prettier-plugin-svelte": "^3.2.5",
+		"svelte": "4.2.19",
+		"svelte-check": "^3.8.6",
+		"tslib": "^2.6.3",
+		"typescript": "^5.5.2",
+		"unocss": "^0.61.3",
+		"vite": "^5.3.1",
+		"vitest": "^1.6.0"
+	},
+	"dependencies": {
+		"@electric-sql/client": "^0.3.1",
+		"@electric-sql/pglite": "^0.2.4",
+		"@hotosm/ui": "0.2.0-b5",
+		"@prisma/client": "4.8.1",
+		"@turf/bbox": "^7.0.0",
+		"@turf/buffer": "^7.0.0",
+		"@turf/helpers": "^7.0.0",
+		"drizzle-orm": "^0.33.0",
+		"pako": "^2.1.0",
+		"prisma": "4.8.1",
+		"svelte-maplibre": "^0.9.13",
+		"uuid": "^10.0.0",
+		"zod": "3.21.1"
+	},
+	"peerDependencies": {
+		"@shoelace-style/shoelace": "^2.15.1"
+	},
+	"packageManager": "pnpm@9.3.0+sha512.ee7b93e0c2bd11409c6424f92b866f31d3ea1bef5fbe47d3c7500cdc3c9668833d2e55681ad66df5b640c61fa9dc25d546efa54d76d7f8bf54b13614ac293631"
+}

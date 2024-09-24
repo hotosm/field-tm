@@ -150,6 +150,6 @@ large_file_skip_byte_limit = 30000  # Required to process fmtm_base_schema.sql
 exclude_rules = "CP05, RF02"  # Avoid capitalisation of enums
 
 [tool.codespell]
-skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md"
+skip = "contrib/*.py,*languages_and_countries.py,*pnpm-lock.yaml,*CHANGELOG.md,src/mapper/src/lib/migrations/*"
 ignore-words-list = "ProjectIn"
 write-changes = true

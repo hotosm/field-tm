@@ -168,10 +168,10 @@ async def get_or_create_user(
                 INSERT INTO users (
                     id, username, profile_img, role, mapping_level,
                     is_email_verified, is_expert, tasks_mapped, tasks_validated,
-                    tasks_invalidated, date_registered, last_validation_date
+                    tasks_invalidated, registered_at
                 ) VALUES (
                     :user_id, :username, :profile_img, :role,
-                    'BEGINNER', FALSE, FALSE, 0, 0, 0, NOW(), NOW()
+                    'BEGINNER', FALSE, FALSE, 0, 0, 0, NOW()
                 )
                 ON CONFLICT (id)
                 DO UPDATE SET

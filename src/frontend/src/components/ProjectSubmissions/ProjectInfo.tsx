@@ -16,7 +16,7 @@ const ProjectInfo = ({ entities }) => {
   const taskActivities = projectTaskList?.[projectIndex]?.taskBoundries;
   const projectDetailsLoading = useAppSelector((state) => state.project.projectDetailsLoading);
   const entityOsmMapLoading = useAppSelector((state) => state.project.entityOsmMapLoading);
-  const projectCreationDate = projectInfo?.created ? projectInfo?.created?.split('T')[0] : '-';
+  const projectCreationDate = projectInfo?.created_at ? projectInfo?.created_at?.split('T')[0] : '-';
   const submissionContributorsLoading = useAppSelector((state) => state.submission.submissionContributorsLoading);
 
   const latestDateSorted = entities

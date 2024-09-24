@@ -84,7 +84,7 @@ async def read_projects_to_featcol(
     return await project_crud.get_projects_featcol(db, bbox)
 
 
-@router.get("/", response_model=list[project_schemas.ProjectOut])
+@router.get("/", response_model=list[project_schemas.ProjectWithTasks])
 async def read_projects(
     user_id: int = None,
     skip: int = 0,
@@ -439,13 +439,13 @@ async def delete_project(
     # Delete S3 resources
     await project_crud.delete_fmtm_s3_objects(project)
     # Delete FMTM project
-    await project_crud.delete_fmtm_project(db, project)
+    await project_crud.delete_fmtm_project(db, project.id)
 
     log.info(f"Deletion of project {project.id} successful")
     return Response(status_code=HTTPStatus.NO_CONTENT)
 
 
-@router.post("/create-project", response_model=project_schemas.ProjectOut)
+@router.post("/create-project", response_model=project_schemas.ProjectWithTasks)
 async def create_project(
     project_info: project_schemas.ProjectUpload,
     org_user_dict: OrgUserDict = Depends(org_admin),
@@ -519,7 +519,7 @@ async def create_project(
     return project
 
 
-@router.put("/{project_id}", response_model=project_schemas.ProjectOut)
+@router.put("/{project_id}", response_model=project_schemas.ProjectWithTasks)
 async def update_project(
     project_info: project_schemas.ProjectUpdate,
     db: Session = Depends(database.get_db),
@@ -549,7 +549,7 @@ async def update_project(
     return project
 
 
-@router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
+@router.patch("/{project_id}", response_model=project_schemas.ProjectWithTasks)
 async def project_partial_update(
     project_info: project_schemas.ProjectPartialUpdate,
     db: Session = Depends(database.get_db),
@@ -762,14 +762,27 @@ async def generate_files(
     )
     # Write XLS form content to db
     xlsform_bytes = project_xlsform.getvalue()
-    if not xlsform_bytes:
+    if len(xlsform_bytes) == 0 or not xform_id:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail="There was an error with the XLSForm!",
+            detail="There was an error modifying the XLSForm!",
         )
-    project.odk_form_id = xform_id
-    project.xlsform_content = xlsform_bytes
-    db.commit()
+    log.debug(f"Setting project XLSForm db data for xFormId: {xform_id}")
+    query = text("""
+        UPDATE public.projects
+        SET
+            odk_form_id = :odk_form_id,
+            xlsform_content = :xlsform_content
+        WHERE id = :project_id;
+    """)
+    db.execute(
+        query,
+        {
+            "project_id": project_id,
+            "odk_form_id": xform_id,
+            "xlsform_content": xlsform_bytes,
+        },
+    )
 
     # Create task in db and return uuid
     log.debug(f"Creating export background task for project ID: {project_id}")

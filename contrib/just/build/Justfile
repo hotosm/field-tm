@@ -16,17 +16,27 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-# Start all containers
+# Build backend & frontend containers
 [no-cd]
-default:
-  docker compose build
+all: backend frontend
 
-# Build backend API only
-[no-cd]
-frontend:
-  docker compose build api
-
-# Build frontend UI only
+# Build backend container
 [no-cd]
 backend:
+  docker compose build api
+
+# Build frontend container
+[no-cd]
+frontend:
   docker compose build ui
+
+# Set 'dc' alias for docker compose
+alias:
+  #!/usr/bin/env sh
+  dc_alias_cmd="alias dc='docker compose'"
+  if ! grep -q "$dc_alias_cmd" ~/.bashrc; then
+      echo "Adding 'dc' alias to ~/.bashrc."
+      echo "$dc_alias_cmd" | tee -a ~/.bashrc > /dev/null
+  else
+      echo "'dc' alias already exists in ~/.bashrc."
+  fi

@@ -41,7 +41,7 @@ export interface ProjectDetailsModel {
     locked_by_uid: number;
     locked_by_username: string;
     task_history: {
-      id: number;
+      event_id: string;
       action_text: string;
       action_date: string;
     }[];

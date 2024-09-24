@@ -14,6 +14,7 @@ SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
+SET TIME ZONE 'UTC';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
@@ -22,7 +23,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 ALTER SCHEMA public OWNER TO fmtm;
-
 
 -- PostGIS
 
@@ -156,8 +156,8 @@ SET default_table_access_method = heap;
 -- Tables
 
 CREATE TABLE IF NOT EXISTS public._migrations (
-    date_executed TIMESTAMP,
-    script_name TEXT
+    script_name text,
+    date_executed timestamp with time zone
 );
 ALTER TABLE public._migrations OWNER TO fmtm;
 
@@ -179,7 +179,7 @@ CREATE TABLE public.mbtiles_path (
     path character varying,
     tile_source character varying,
     background_task_id character varying,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp with time zone DEFAULT now()
 );
 ALTER TABLE public.mbtiles_path OWNER TO fmtm;
 CREATE SEQUENCE public.mbtiles_path_id_seq
@@ -193,16 +193,9 @@ ALTER TABLE public.mbtiles_path_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.mbtiles_path_id_seq OWNED BY public.mbtiles_path.id;
 
 
-CREATE TABLE public._migrations (
-    script_name text,
-    date_executed timestamp without time zone
-);
-ALTER TABLE public._migrations OWNER TO fmtm;
-
-
 CREATE TABLE public.organisation_managers (
     organisation_id integer NOT NULL,
-    user_id bigint NOT NULL
+    user_id integer NOT NULL
 );
 ALTER TABLE public.organisation_managers OWNER TO fmtm;
 
@@ -250,13 +243,10 @@ CREATE TABLE public.projects (
     id integer NOT NULL,
     organisation_id integer,
     odkid integer,
-    author_id bigint NOT NULL,
-    created timestamp without time zone NOT NULL DEFAULT now(),
+    author_id integer NOT NULL,
     project_name_prefix character varying,
-    task_type_prefix character varying,
     location_str character varying,
     outline public.GEOMETRY (POLYGON, 4326),
-    last_updated timestamp without time zone DEFAULT now(),
     status public.projectstatus NOT NULL DEFAULT 'DRAFT',
     total_tasks integer,
     xform_category character varying,
@@ -266,7 +256,7 @@ CREATE TABLE public.projects (
     mapper_level public.mappinglevel NOT NULL DEFAULT 'INTERMEDIATE',
     priority public.projectpriority DEFAULT 'MEDIUM',
     featured boolean DEFAULT false,
-    due_date timestamp without time zone,
+    due_date timestamp with time zone,
     changeset_comment character varying,
     osmcha_filter_id character varying,
     imagery character varying,
@@ -285,7 +275,10 @@ CREATE TABLE public.projects (
     task_split_type public.tasksplittype,
     task_split_dimension smallint,
     task_num_buildings smallint,
-    hashtags character varying []
+    hashtags character varying [],
+    custom_tms_url character varying,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
 );
 ALTER TABLE public.projects OWNER TO fmtm;
 CREATE SEQUENCE public.projects_id_seq
@@ -300,38 +293,23 @@ ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
 
 
 CREATE TABLE public.task_history (
-    id integer NOT NULL,
+    event_id UUID NOT NULL,
     project_id integer,
     task_id integer NOT NULL,
     action public.taskaction NOT NULL,
     action_text character varying,
-    action_date timestamp without time zone NOT NULL DEFAULT now(),
-    user_id bigint NOT NULL
+    action_date timestamp with time zone NOT NULL,
+    user_id integer NOT NULL
 );
 ALTER TABLE public.task_history OWNER TO fmtm;
-CREATE SEQUENCE public.task_history_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.task_history_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.task_history_id_seq OWNED BY public.task_history.id;
 
 
 CREATE TABLE public.tasks (
     id integer NOT NULL,
     project_id integer NOT NULL,
     project_task_index integer,
-    project_task_name character varying,
     outline public.GEOMETRY (POLYGON, 4326),
-    geometry_geojson character varying,
-    feature_count integer,
-    task_status public.taskstatus DEFAULT 'READY',
-    locked_by bigint,
-    mapped_by bigint,
-    validated_by bigint
+    feature_count integer
 );
 ALTER TABLE public.tasks OWNER TO fmtm;
 CREATE SEQUENCE public.tasks_id_seq
@@ -346,7 +324,7 @@ ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
 
 
 CREATE TABLE public.user_roles (
-    user_id bigint NOT NULL,
+    user_id integer NOT NULL,
     project_id integer NOT NULL,
     role public.projectrole NOT NULL DEFAULT 'MAPPER'
 );
@@ -354,7 +332,7 @@ ALTER TABLE public.user_roles OWNER TO fmtm;
 
 
 CREATE TABLE public.users (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     username character varying,
     role public.userrole NOT NULL DEFAULT 'MAPPER',
     name character varying,
@@ -369,8 +347,7 @@ CREATE TABLE public.users (
     tasks_validated integer NOT NULL DEFAULT 0,
     tasks_invalidated integer NOT NULL DEFAULT 0,
     projects_mapped integer [],
-    date_registered timestamp without time zone DEFAULT now(),
-    last_validation_date timestamp without time zone DEFAULT now()
+    registered_at timestamp with time zone DEFAULT now()
 );
 ALTER TABLE public.users OWNER TO fmtm;
 
@@ -421,9 +398,6 @@ ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval(
 ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval(
     'public.projects_id_seq'::regclass
 );
-ALTER TABLE ONLY public.task_history ALTER COLUMN id SET DEFAULT nextval(
-    'public.task_history_id_seq'::regclass
-);
 ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval(
     'public.tasks_id_seq'::regclass
 );
@@ -465,7 +439,7 @@ ALTER TABLE ONLY public.projects
 ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.task_history
-ADD CONSTRAINT task_history_pkey PRIMARY KEY (id);
+ADD CONSTRAINT task_history_pkey PRIMARY KEY (event_id);
 
 ALTER TABLE ONLY public.tasks
 ADD CONSTRAINT tasks_pkey PRIMARY KEY (id, project_id);
@@ -500,6 +474,12 @@ CREATE INDEX idx_task_history_project_id_user_id ON public.task_history
 USING btree (
     user_id, project_id
 );
+CREATE INDEX ix_task_history_project_id ON public.task_history USING btree (
+    project_id
+);
+CREATE INDEX ix_task_history_user_id ON public.task_history USING btree (
+    user_id
+);
 CREATE INDEX idx_tasks_outline ON public.tasks USING gist (outline);
 CREATE INDEX ix_projects_mapper_level ON public.projects USING btree (
     mapper_level
@@ -507,16 +487,7 @@ CREATE INDEX ix_projects_mapper_level ON public.projects USING btree (
 CREATE INDEX ix_projects_organisation_id ON public.projects USING btree (
     organisation_id
 );
-CREATE INDEX ix_task_history_project_id ON public.task_history USING btree (
-    project_id
-);
-CREATE INDEX ix_task_history_user_id ON public.task_history USING btree (
-    user_id
-);
-CREATE INDEX ix_tasks_locked_by ON public.tasks USING btree (locked_by);
-CREATE INDEX ix_tasks_mapped_by ON public.tasks USING btree (mapped_by);
 CREATE INDEX ix_tasks_project_id ON public.tasks USING btree (project_id);
-CREATE INDEX ix_tasks_validated_by ON public.tasks USING btree (validated_by);
 CREATE INDEX ix_users_id ON public.users USING btree (id);
 CREATE INDEX textsearch_idx ON public.project_info USING btree (
     text_searchable
@@ -535,31 +506,8 @@ ADD CONSTRAINT fk_organisations FOREIGN KEY (
     organisation_id
 ) REFERENCES public.organisations (id);
 
-ALTER TABLE ONLY public.task_history
-ADD CONSTRAINT fk_tasks FOREIGN KEY (
-    task_id, project_id
-) REFERENCES public.tasks (id, project_id);
-
 ALTER TABLE ONLY public.projects
 ADD CONSTRAINT fk_users FOREIGN KEY (author_id) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.task_history
-ADD CONSTRAINT fk_users FOREIGN KEY (user_id) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.tasks
-ADD CONSTRAINT fk_users_locked FOREIGN KEY (
-    locked_by
-) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.tasks
-ADD CONSTRAINT fk_users_mapper FOREIGN KEY (
-    mapped_by
-) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.tasks
-ADD CONSTRAINT fk_users_validator FOREIGN KEY (
-    validated_by
-) REFERENCES public.users (id);
 
 ALTER TABLE ONLY public.organisation_managers
 ADD CONSTRAINT organisation_managers_organisation_id_fkey FOREIGN KEY (
@@ -573,11 +521,6 @@ ADD CONSTRAINT organisation_managers_user_id_fkey FOREIGN KEY (
 
 ALTER TABLE ONLY public.project_info
 ADD CONSTRAINT project_info_project_id_fkey FOREIGN KEY (
-    project_id
-) REFERENCES public.projects (id);
-
-ALTER TABLE ONLY public.task_history
-ADD CONSTRAINT task_history_project_id_fkey FOREIGN KEY (
     project_id
 ) REFERENCES public.projects (id);
 
