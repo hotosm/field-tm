@@ -17,6 +17,7 @@ type NewDefineAreaMapProps = {
   onModify?: ((geojson: any, area?: number) => void) | null;
   hasEditUndo?: boolean;
   getAOIArea?: ((area?: number) => void) | null;
+  additionalFeatureGeojson?: GeoJSONFeatureTypes | null;
 };
 
 const NewDefineAreaMap = ({
@@ -29,6 +30,7 @@ const NewDefineAreaMap = ({
   onModify,
   hasEditUndo,
   getAOIArea,
+  additionalFeatureGeojson,
 }: NewDefineAreaMapProps) => {
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
@@ -81,6 +83,18 @@ const NewDefineAreaMap = ({
           />
         )}
 
+        {additionalFeatureGeojson && (
+          <VectorLayer
+            geojson={additionalFeatureGeojson}
+            viewProperties={{
+              size: map?.getSize(),
+              padding: [50, 50, 50, 50],
+              constrainResolution: true,
+              duration: 500,
+            }}
+            zoomToLayer
+          />
+        )}
         {buildingExtractedGeojson && (
           <VectorLayer
             geojson={buildingExtractedGeojson}

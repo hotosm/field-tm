@@ -7,7 +7,6 @@ import {
   OrganisationListModel,
 } from '@/models/createproject/createProjectModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { ValidateCustomFormResponse } from '@/store/types/ICreateProject';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 
 const CreateProjectService = (
@@ -17,6 +16,7 @@ const CreateProjectService = (
   formUpload: any,
   dataExtractFile: any,
   isOsmExtract: boolean,
+  additionalFeature: any,
 ) => {
   return async (dispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
@@ -74,11 +74,26 @@ const CreateProjectService = (
         throw new Error(`Request failed with status ${extractResponse.status}`);
       }
 
+      // post additional feature if available
+      const postAdditionalFeature = await dispatch(
+        PostAdditionalFeatureService(
+          `${import.meta.env.VITE_API_URL}/projects/${projectId}/additional-entity`,
+          additionalFeature,
+        ),
+      );
+
+      hasAPISuccess = postAdditionalFeature;
+      if (!hasAPISuccess) {
+        throw new Error(`Request failed`);
+      }
+
       // Generate project files
       const generateProjectFile = await dispatch(
         GenerateProjectFilesService(
           `${import.meta.env.VITE_API_URL}/projects/${projectId}/generate-project-data`,
-          projectData,
+          additionalFeature
+            ? { ...projectData, additional_entities: [additionalFeature?.name?.split('.')?.[0]] }
+            : projectData,
           formUpload,
         ),
       );
@@ -218,6 +233,39 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
     };
 
     return await postUploadArea(url, projectData, formUpload);
+  };
+};
+
+const PostAdditionalFeatureService = (url: string, file: File) => {
+  return async (dispatch) => {
+    const PostAdditionalFeature = async (url, file) => {
+      let isAPISuccess = true;
+
+      try {
+        const additionalFeatureFormData = new FormData();
+        additionalFeatureFormData.append('geojson', file);
+
+        const response = await axios.post(url, additionalFeatureFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        isAPISuccess = isStatusSuccess(response.status);
+      } catch (error: any) {
+        isAPISuccess = false;
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: JSON.stringify(error?.response?.data?.detail),
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+      return isAPISuccess;
+    };
+    return await PostAdditionalFeature(url, file);
   };
 };
 

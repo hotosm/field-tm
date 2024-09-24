@@ -57,7 +57,7 @@ const FileInputComponent = ({
           <p>{customFile?.name}</p>
         </div>
       )}
-      <p className="fmtm-text-gray-700 fmtm-mt-5">{fileDescription}</p>
+      <p className="fmtm-text-gray-700 fmtm-mt-2">{fileDescription}</p>
     </div>
   );
 };

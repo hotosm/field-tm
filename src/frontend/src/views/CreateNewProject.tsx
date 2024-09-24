@@ -24,6 +24,7 @@ const CreateNewProject = () => {
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customDataExtractUpload, setCustomDataExtractUpload] = useState(null);
   const [customFormFile, setCustomFormFile] = useState(null);
+  const [additionalFeature, setAdditionalFeature] = useState(null);
 
   useEffect(() => {
     if (location.pathname !== '/create-project' && !projectDetails.name && !projectDetails.odk_central_url) {
@@ -83,6 +84,8 @@ const CreateNewProject = () => {
             flag="create_project"
             customDataExtractUpload={customDataExtractUpload}
             setCustomDataExtractUpload={setCustomDataExtractUpload}
+            additionalFeature={additionalFeature}
+            setAdditionalFeature={setAdditionalFeature}
           />
         );
       case '/split-tasks':
@@ -91,6 +94,7 @@ const CreateNewProject = () => {
             flag="create_project"
             setGeojsonFile={setGeojsonFile}
             customDataExtractUpload={customDataExtractUpload}
+            additionalFeature={additionalFeature}
           />
         );
       default:

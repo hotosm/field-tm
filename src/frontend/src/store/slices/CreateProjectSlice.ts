@@ -54,6 +54,7 @@ export const initialState: CreateProjectStateTypes = {
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
   validatedCustomForm: null,
+  additionalFeatureGeojson: null,
 };
 
 const CreateProject = createSlice({
@@ -224,6 +225,9 @@ const CreateProject = createSlice({
     },
     SetValidatedCustomFile(state, action) {
       state.validatedCustomForm = action.payload;
+    },
+    SetAdditionalFeatureGeojson(state, action) {
+      state.additionalFeatureGeojson = action.payload;
     },
   },
 });
