@@ -91,5 +91,5 @@ async def refresh_appuser_token(
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail={f"failed to refresh the appuser token for project{project_id}"},
+            detail={f"failed to refresh the appuser token for project {project_id}"},
         ) from e

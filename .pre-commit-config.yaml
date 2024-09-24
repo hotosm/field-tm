@@ -53,6 +53,8 @@ repos:
             "!CHANGELOG.md",
             "!CONTRIBUTING.md",
             "!src/frontend/pnpm-lock.yaml",
+            "!src/mapper/pnpm-lock.yaml",
+            "!src/mapper/src/lib/migrations/**",
             "!src/backend/tests/test_data/**",
           ]
 
@@ -74,10 +76,10 @@ repos:
     rev: 3.2.0
     hooks:
       - id: sqlfluff-lint
-        files: ^src/backend/migrations/(?:.*/)*.*$
+        files: ^src/backend/migrations/.*\.sql$
         types: [sql]
       - id: sqlfluff-fix
-        files: ^src/backend/migrations/(?:.*/)*.*$
+        files: ^src/backend/migrations/.*\.sql$
         types: [sql]
 
   # Lint: Bash scripts

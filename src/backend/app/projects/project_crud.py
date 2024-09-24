@@ -22,7 +22,7 @@ import uuid
 from asyncio import gather
 from io import BytesIO
 from pathlib import Path
-from traceback import extract_tb
+from traceback import format_exc
 from typing import List, Optional, Union
 
 import geojson
@@ -112,7 +112,19 @@ async def get_projects(
         )
         project_count = db.query(db_models.DbProject).count()
 
-    filtered_projects = await convert_to_app_projects(db_projects)
+    # TODO refactor to use Pydantic model methods instead.
+    if db_projects and len(db_projects) > 0:
+
+        async def convert_project(project):
+            return await convert_to_app_project(project)
+
+        app_projects = await gather(
+            *[convert_project(project) for project in db_projects]
+        )
+        filtered_projects = [project for project in app_projects if project is not None]
+    else:
+        filtered_projects = []
+
     return project_count, filtered_projects
 
 
@@ -149,7 +161,7 @@ async def get_projects_featcol(
                     'name', pi.name,
                     'percentMapped', 0,
                     'percentValidated', 0,
-                    'created', p.created,
+                    'created', p.created_at,
                     'link', concat('https://', :domain, '/project/', p.id)
                 )
             ) AS feature
@@ -215,19 +227,33 @@ async def get_project_info_by_id(db: Session, project_id: int):
         .order_by(db_models.DbProjectInfo.project_id)
         .first()
     )
-    return await convert_to_app_project_info(db_project_info)
+
+    # TODO refactor to use Pydantic model methods instead.
+    if db_project_info:
+        app_project_info: project_schemas.ProjectInfo = db_project_info
+        return app_project_info
+    else:
+        return None
 
 
-async def delete_fmtm_project(db: Session, db_project: db_models.DbProject) -> None:
+async def delete_fmtm_project(db: Session, project_id: int) -> None:
     """Delete a FMTM project by id."""
     try:
-        project_id = db_project.id
-        db.delete(db_project)
+        sql = text("""
+            DELETE FROM background_tasks WHERE project_id = :project_id;
+            DELETE FROM mbtiles_path WHERE project_id = :project_id;
+            DELETE FROM user_roles WHERE project_id = :project_id;
+            DELETE FROM task_history WHERE project_id = :project_id;
+            DELETE FROM tasks WHERE project_id = :project_id;
+            DELETE FROM project_info WHERE project_id = :project_id;
+            DELETE FROM projects WHERE id = :project_id;
+        """)
+        db.execute(sql, {"project_id": project_id})
         db.commit()
         log.info(f"Deleted project with ID: {project_id}")
     except Exception as e:
         log.exception(e)
-        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=e) from e
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=str(e)) from e
 
 
 async def delete_fmtm_s3_objects(db_project: db_models.DbProject) -> None:
@@ -897,6 +923,8 @@ async def generate_project_files(
 
         # Split extract by task area
         log.debug("Splitting data extract per task area")
+        # TODO in future this splitting could be removed as the task_id is
+        # no longer used in the XLSForm
         task_extract_dict = await split_geojson_by_task_areas(
             db, feature_collection, project_id
         )
@@ -908,7 +936,7 @@ async def generate_project_files(
                 detail="Failed splitting extract by tasks.",
             )
 
-        # Get ODK Project ID
+        # Get ODK Project details
         project_odk_id = project.odkid
         project_xlsform = project.xlsform_content
         project_odk_form_id = project.odk_form_id
@@ -921,22 +949,55 @@ async def generate_project_files(
             task_extract_dict,
         )
         log.debug(
-            f"Setting odk token for FMTM project ({project_id}) "
-            f"ODK project {project_odk_id}"
+            f"Setting encrypted odk token for FMTM project ({project_id}) "
+            f"ODK project {project_odk_id}: {encrypted_odk_token}"
         )
-        project.odk_token = encrypted_odk_token
+        query = text("""
+            UPDATE public.projects
+            SET
+                odk_token = :encrypted_odk_token
+            WHERE id = :project_id;
+        """)
+        db.execute(
+            query,
+            {
+                "project_id": project_id,
+                "encrypted_odk_token": encrypted_odk_token,
+            },
+        )
 
-        for task in project.tasks:
-            # Add task feature count to task
-            task_features = task_extract_dict.get(task.project_task_index, {})
-            feature_count = len(task_features.get("features", []))
-            task.feature_count = feature_count
-            log.debug(
-                f"{feature_count} features added for task {task.project_task_index}"
+        # Add the feature counts for each task
+        # FIXME this logic could probably be better
+        task_feature_counts = [
+            (
+                task.id,
+                len(
+                    task_extract_dict.get(task.project_task_index, {}).get(
+                        "features", []
+                    )
+                ),
             )
-
-        # Commit all updated database records
-        db.commit()
+            for task in project.tasks
+        ]
+        sql = """
+            WITH task_update(id, feature_count) AS (
+                VALUES {}
+            )
+            UPDATE
+                public.tasks t
+            SET
+                feature_count = tu.feature_count
+            FROM
+                task_update tu
+            WHERE
+                t.id = tu.id;
+        """
+        value_placeholders = ", ".join(
+            f"({task_id}, {feature_count})"
+            for task_id, feature_count in task_feature_counts
+        )
+        formatted_sql = sql.format(value_placeholders)
+        db.execute(text(formatted_sql))
 
         if background_task_id:
             # Update background task status to COMPLETED
@@ -945,19 +1006,7 @@ async def generate_project_files(
             )  # 4 is COMPLETED
 
     except Exception as e:
-        # Get the traceback details for easier debugging
-        tb = extract_tb(e.__traceback__)
-        if tb:
-            last_entry = tb[-1]
-            function_name = last_entry.name
-            line_number = last_entry.lineno
-            file_name = last_entry.filename
-
-            log.warning(
-                f"Error occurred in function {function_name} | line {line_number}"
-                f" | file {file_name}"
-            )
-
+        log.debug(str(format_exc()))
         log.warning(str(e))
 
         if background_task_id:
@@ -1104,38 +1153,6 @@ async def convert_to_app_project(db_project: db_models.DbProject):
     app_project.tasks = db_project.tasks
 
     return app_project
-
-
-async def convert_to_app_project_info(db_project_info: db_models.DbProjectInfo):
-    """Legacy function to convert db models --> Pydantic.
-
-    TODO refactor to use Pydantic model methods instead.
-    """
-    if db_project_info:
-        app_project_info: project_schemas.ProjectInfo = db_project_info
-        return app_project_info
-    else:
-        return None
-
-
-async def convert_to_app_projects(
-    db_projects: List[db_models.DbProject],
-) -> List[project_schemas.ProjectOut]:
-    """Legacy function to convert db models --> Pydantic.
-
-    TODO refactor to use Pydantic model methods instead.
-    """
-    if db_projects and len(db_projects) > 0:
-
-        async def convert_project(project):
-            return await convert_to_app_project(project)
-
-        app_projects = await gather(
-            *[convert_project(project) for project in db_projects]
-        )
-        return [project for project in app_projects if project is not None]
-    else:
-        return []
 
 
 async def convert_to_project_summary(db: Session, db_project: db_models.DbProject):
@@ -1382,6 +1399,7 @@ def get_project_tiles(
         log.info(f"Tiles generation process completed for project id {project_id}")
 
     except Exception as e:
+        log.debug(str(format_exc()))
         log.exception(str(e))
         log.error(f"Tiles generation process failed for project id {project_id}")
 

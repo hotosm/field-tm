@@ -72,7 +72,7 @@ export type projectInfoType = {
   organisation_logo: string;
   instructions: string;
   custom_tms_url: string;
-  created: string;
+  created_at: string;
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
@@ -81,7 +81,7 @@ export type projectDashboardDetailTypes = {
   project_name_prefix: string;
   organisation_name: string;
   total_tasks: number | null;
-  created: string;
+  created_at: string;
   organisation_logo: string;
   total_submission: number | null;
   total_contributors: number | null;

@@ -242,7 +242,7 @@ services:
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:3"
+    restart: "on-failure:2"
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"

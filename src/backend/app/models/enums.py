@@ -198,9 +198,8 @@ def is_status_change_action(task_action):
     ]
 
 
-def get_action_for_status_change(task_status: TaskStatus):
+def get_action_for_status_change(task_status: TaskStatus) -> TaskAction:
     """Update task action inferred from previous state."""
-    # return TaskAction.RELEASED_FOR_MAPPING
     match task_status:
         case TaskStatus.READY:
             return TaskAction.RELEASED_FOR_MAPPING
@@ -218,6 +217,31 @@ def get_action_for_status_change(task_status: TaskStatus):
             return TaskAction.SPLIT_NEEDED
         case TaskStatus.INVALIDATED:
             return TaskAction.MARKED_INVALID
+        case _:
+            return TaskAction.RELEASED_FOR_MAPPING
+
+
+def get_status_for_action(task_action: TaskAction) -> TaskStatus:
+    """Get the task status inferred from the action."""
+    match task_action:
+        case TaskAction.RELEASED_FOR_MAPPING:
+            return TaskStatus.READY
+        case TaskAction.LOCKED_FOR_MAPPING:
+            return TaskStatus.LOCKED_FOR_MAPPING
+        case TaskAction.MARKED_MAPPED:
+            return TaskStatus.MAPPED
+        case TaskAction.LOCKED_FOR_VALIDATION:
+            return TaskStatus.LOCKED_FOR_VALIDATION
+        case TaskAction.VALIDATED:
+            return TaskStatus.VALIDATED
+        case TaskAction.MARKED_BAD:
+            return TaskStatus.BAD
+        case TaskAction.SPLIT_NEEDED:
+            return TaskStatus.SPLIT
+        case TaskAction.MARKED_INVALID:
+            return TaskStatus.INVALIDATED
+        case _:
+            return TaskStatus.READY
 
 
 class TaskType(IntEnum, Enum):

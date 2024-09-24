@@ -37,13 +37,16 @@ router = APIRouter(
 )
 
 
-@router.get("/task-list", response_model=List[tasks_schemas.ReadTask])
+@router.get("/task-list", response_model=List[tasks_schemas.Task])
 async def read_task_list(
     project_id: int,
     limit: int = 1000,
     db: Session = Depends(database.get_db),
 ):
-    """Get the task list for a project."""
+    """Get the task list for a project.
+
+    FIXME this is broken
+    """
     tasks = await tasks_crud.get_tasks(db, project_id, limit)
     updated_tasks = await tasks_crud.update_task_history(tasks, db)
     if not tasks:
@@ -121,18 +124,16 @@ async def get_specific_task(task_id: int, db: Session = Depends(database.get_db)
 @router.post(
     "/{task_id}/new-status/{new_status}", response_model=tasks_schemas.TaskHistoryOut
 )
-async def update_task_status(
+async def add_new_task_event(
     task_id: int,
     new_status: TaskStatus,
     db: Session = Depends(database.get_db),
     project_user: ProjectUserDict = Depends(mapper),
 ):
-    """Update the task status."""
+    """Add a new event to the events table / update task status."""
+    project_id = project_user.get("project").id
     user_id = await get_uid(project_user.get("user"))
-    task = await tasks_crud.update_task_status(db, user_id, task_id, new_status)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task status could not be updated.")
-    return await tasks_crud.update_task_history(task, db)
+    return await tasks_crud.new_task_event(db, project_id, task_id, user_id, new_status)
 
 
 @router.post("/task-comments/", response_model=tasks_schemas.TaskCommentResponse)

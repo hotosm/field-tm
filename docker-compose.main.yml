@@ -162,7 +162,7 @@ services:
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:3"
+    restart: "on-failure:2"
 
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:main"
@@ -174,7 +174,7 @@ services:
     networks:
       - fmtm-net
     entrypoint: ["/backup-entrypoint.sh"]
-    restart: "on-failure:3"
+    restart: "on-failure:2"
     healthcheck:
       test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
       start_period: 5s

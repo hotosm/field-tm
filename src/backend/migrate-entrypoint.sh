@@ -112,8 +112,8 @@ create_migrations_table_if_missing() {
     DO \$\$
     BEGIN
         CREATE TABLE public."_migrations" (
-            script_name TEXT,
-            date_executed TIMESTAMP,
+            script_name text,
+            date_executed timestamp without time zone,
             CONSTRAINT "_migrations_pkey" PRIMARY KEY (script_name)
         );
         ALTER TABLE IF EXISTS public."_migrations" OWNER TO fmtm;
@@ -182,7 +182,9 @@ backup_db() {
 }
 
 execute_migrations() {
-    for script_name in "${scripts_to_execute[@]}"; do
+    mapfile -t ordered_scripts < <(for script in "${scripts_to_execute[@]}"; do echo "$script"; done | sort)
+
+    for script_name in "${ordered_scripts[@]}"; do
         script_file="/opt/migrations/$script_name"
         pretty_echo "Executing migration: $script_name"
         # Apply migration with env vars substituted & if succeeds,

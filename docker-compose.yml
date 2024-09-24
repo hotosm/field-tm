@@ -118,11 +118,29 @@ services:
     volumes:
       - ./src/frontend:/app
       - /app/node_modules/
-      # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
       - VITE_API_URL=${API_URL:-http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}}
     ports:
       - "7051:7051"
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
+  ui-mapper:
+    image: "ghcr.io/hotosm/fmtm/frontend:mapper"
+    build:
+      context: src/mapper
+      dockerfile: debug.dockerfile
+    depends_on:
+      api:
+        condition: service_started
+    volumes:
+      - ./src/mapper:/app
+      - /app/node_modules/
+      - /app/.svelte-kit/
+      # - ../ui:/app/node_modules/@hotosm/ui:ro
+    environment:
+      - VITE_API_URL=${API_URL:-http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}}
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -220,7 +238,7 @@ services:
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
     build:
       context: https://github.com/postgis/docker-postgis.git#master:14-3.4/alpine
-    command: -c 'max_connections=300'
+    command: -c 'max_connections=300' -c 'wal_level=logical'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
     environment:
@@ -238,6 +256,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  electric:
+    image: "electricsql/electric:${ELECTRIC_TAG:-0.3.4}"
+    depends_on:
+      fmtm-db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}
+      # OTEL_EXPORT: otlp
+      # OTLP_ENDPOINT: https://...
+
+      # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
+      # AUTH_JWT_ALG: HS384
+      # AUTH_JWT_KEY: ${ENCRYPTION_KEY}
+      # AUTH_JWT_AUD: ${FMTM_DOMAIN}
+    ports:
+      - "7055:3000"
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
 
   central-db:
     profiles: ["", "central"]
@@ -276,6 +316,6 @@ services:
     networks:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:3"
+    restart: "on-failure:2"
     healthcheck:
       test: [] # Set the health check test to an empty value to disable it

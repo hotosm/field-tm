@@ -18,20 +18,21 @@
 """Logic for FMTM tasks."""
 
 from datetime import datetime, timedelta
+from uuid import uuid4
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from loguru import logger as log
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
-from app.db import database, db_models
+from app.db import db_models
+from app.db.postgis_utils import timestamp
 from app.models.enums import (
+    HTTPStatus,
     TaskStatus,
     get_action_for_status_change,
-    verify_valid_status_update,
 )
 from app.tasks import tasks_schemas
-from app.users import user_crud
 
 
 async def get_task_count_in_project(db: Session, project_id: int):
@@ -71,6 +72,7 @@ async def get_tasks(
             .limit(limit)
             .all()
         )
+    # TODO update this logic to filter events related to user (locked_by removed)
     elif user_id:
         db_tasks = (
             db.query(db_models.DbTask)
@@ -90,84 +92,96 @@ async def get_task(db: Session, task_id: int) -> db_models.DbTask:
     return db.query(db_models.DbTask).filter(db_models.DbTask.id == task_id).first()
 
 
-async def update_task_status(
-    db: Session, user_id: int, task_id: int, new_status: TaskStatus
+async def new_task_event(
+    db: Session, project_id: int, task_id: int, user_id: int, new_status: TaskStatus
 ):
-    """Update the status of a task."""
-    log.debug(f"Updating task ID {task_id} to status {new_status}")
-    if not user_id:
-        log.error(f"User id is not present: {user_id}")
-        raise HTTPException(status_code=400, detail="User id required.")
+    """Add a new entry to the task events."""
+    log.debug(f"Checking if task ({task_id}) is already locked")
+    query = text("""
+        SELECT
+            th.action,
+            th.user_id,
+            u.username
+        FROM
+            task_history th
+        LEFT JOIN
+            users u ON th.user_id = u.id
+        WHERE
+            th.task_id = :task_id
+        ORDER BY
+            th.action_date DESC
+        LIMIT 1
+    """)
 
-    db_user = await user_crud.get_user(db, user_id)
-    if not db_user:
-        msg = f"User with id {user_id} does not exist."
-        log.error(msg)
-        raise HTTPException(status_code=400, detail=msg)
+    result = db.execute(query, {"task_id": task_id})
+    history_entry = result.fetchone()
 
-    db_task = await get_task(db, task_id)
-    log.debug(f"Returned task from db: {db_task}")
-
-    if db_task:
-        if db_task.task_status in [
-            TaskStatus.LOCKED_FOR_MAPPING,
-            TaskStatus.LOCKED_FOR_VALIDATION,
-        ]:
-            log.debug(f"Task {task_id} currently locked")
-            if user_id != db_task.locked_by:
-                msg = (
-                    f"User {user_id} with username {db_user.username} "
-                    "has not locked this task."
-                )
-                log.error(msg)
-                raise HTTPException(
-                    status_code=403,
-                    detail=msg,
-                )
-
-        if not verify_valid_status_update(db_task.task_status, new_status):
-            msg = f"{new_status} is not a valid task status"
+    if history_entry and history_entry.action in [
+        TaskStatus.LOCKED_FOR_MAPPING.value,
+        TaskStatus.LOCKED_FOR_VALIDATION.value,
+    ]:
+        if history_entry.user_id != user_id:
+            msg = f"Task is locked by user {history_entry.username}"
             log.error(msg)
-            raise HTTPException(
-                status_code=422,
-                detail=msg,
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=msg)
+
+    log.info(f"Updating task ID {task_id} to status {new_status}")
+    query = text("""
+        WITH new_history AS (
+            INSERT INTO task_history (
+                event_id,
+                project_id,
+                task_id,
+                user_id,
+                action,
+                action_text,
+                action_date
+            ) VALUES (
+                gen_random_uuid(),
+                :project_id,
+                :task_id,
+                :user_id,
+                :new_status,
+                'CHANGED TO MAPPED by svcfmtm',
+                NOW()
             )
-
-        # update history prior to updating task
-        update_history = await create_task_history_for_status_change(
-            db_task, new_status, db_user
+            RETURNING *
         )
-        db.add(update_history)
+        SELECT
+            nh.event_id,
+            nh.project_id,
+            nh.task_id,
+            nh.user_id,
+            nh.action,
+            nh.action_text,
+            nh.action_date,
+            u.username,
+            u.profile_img
+        FROM
+            new_history nh
+        LEFT JOIN
+            users u ON nh.user_id = u.id;
+    """)
 
-        db_task.task_status = new_status
+    result = db.execute(
+        query,
+        {
+            "project_id": project_id,
+            "task_id": task_id,
+            "user_id": user_id,
+            "new_status": new_status.name,
+        },
+    )
 
-        if new_status in [
-            TaskStatus.LOCKED_FOR_MAPPING,
-            TaskStatus.LOCKED_FOR_VALIDATION,
-        ]:
-            db_task.locked_by = db_user.id
-        else:
-            db_task.locked_by = None
+    history_entry = result.fetchone()
 
-        if new_status == TaskStatus.MAPPED:
-            db_task.mapped_by = db_user.id
-        if new_status == TaskStatus.VALIDATED:
-            db_task.validated_by = db_user.id
-        if new_status == TaskStatus.INVALIDATED:
-            db_task.mapped_by = None
-
-        db.commit()
-        db.refresh(db_task)
-        return update_history
-
-    else:
+    if not history_entry:
         raise HTTPException(
-            status_code=400,
-            detail=(
-                f"Not a valid status update: "
-                f"{db_task.task_status.name} to {new_status.name}"
-            ),
+            status_code=400, detail="Failed to create task history entry."
         )
+
+    db.commit()
+    return history_entry
 
 
 # ---------------------------
@@ -180,29 +194,20 @@ async def create_task_history_for_status_change(
 ):
     """Append task status change to task history."""
     msg = (
-        f"Status changed from {db_task.task_status.name} "
-        f"to {new_status.name} by: {db_user.username}"
+        f"Task {db_task.id} changed from {db_task.task_status.name} "
+        f"to {new_status.name} by {db_user.username}"
     )
     log.info(msg)
 
     new_task_history = db_models.DbTaskHistory(
+        event_id=uuid4(),
         project_id=db_task.project_id,
         task_id=db_task.id,
         action=get_action_for_status_change(new_status),
         action_text=msg,
-        actioned_by=db_user,
+        action_date=timestamp(),
         user_id=db_user.id,
     )
-
-    # TODO add invalidation history
-    # if new_status == TaskStatus.INVALIDATED:
-    #     new_invalidation_history = db_models.DbTaskInvalidationHistory(
-    #         project_id=db_task.project_id,
-    #         task_id=db_task.id,
-    #     )
-
-    # TODO add mapping issue
-    # if new_status == TaskStatus.BAD:
 
     return new_task_history
 
@@ -212,43 +217,6 @@ async def create_task_history_for_status_change(
 # --------------------
 
 # TODO: write tests for these
-
-# TODO: remove it
-# async def get_task_comments(db: Session, project_id: int, task_id: int):
-#     """Get a list of tasks id for a project."""
-#     query = text(
-#         """
-#         SELECT
-#             task_history.id, task_history.task_id, users.username,
-#             task_history.action_text, task_history.action_date
-#         FROM
-#             task_history
-#         LEFT JOIN
-#             users ON task_history.user_id = users.id
-#         WHERE
-#             project_id = :project_id
-#             AND task_id = :task_id
-#             AND action = 'COMMENT'
-#     """
-#     )
-
-#     params = {"project_id": project_id, "task_id": task_id}
-
-#     result = db.execute(query, params)
-
-#     # Convert the result to a list of dictionaries
-#     result_dict_list = [
-#         {
-#             "id": row[0],
-#             "task_id": row[1],
-#             "commented_by": row[2],
-#             "comment": row[3],
-#             "created_at": row[4],
-#         }
-#         for row in result.fetchall()
-#     ]
-
-#     return result_dict_list
 
 
 async def add_task_comments(
@@ -264,21 +232,19 @@ async def add_task_comments(
     Returns:
     - Dictionary with the details of the added comment
     """
-    currentdate = datetime.now()
     # Construct the query to insert the comment and retrieve inserted comment details
     query = text(
         """
-        INSERT INTO task_history (
-            project_id, task_id, action, action_text,
-            action_date, user_id
+        INSERT INTO public.task_history (
+            event_id, project_id, task_id, action,
+            action_text, action_date, user_id
         )
         VALUES (
-            :project_id, :task_id, 'COMMENT', :comment_text,
-            :current_date, :user_id
+            gen_random_uuid(), :project_id, :task_id, 'COMMENT',
+            :comment_text, :current_date, :user_id
         )
         RETURNING
-            task_history.id,
-            task_history.task_id,
+            task_history.event_id,
             task_history.action_text,
             task_history.action_date,
             (SELECT username FROM users WHERE id = :user_id) AS username,
@@ -291,7 +257,7 @@ async def add_task_comments(
         "project_id": comment.project_id,
         "task_id": comment.task_id,
         "comment_text": comment.comment,
-        "current_date": currentdate,
+        "current_date": timestamp(),
         "user_id": user_id,
     }
 
@@ -304,26 +270,13 @@ async def add_task_comments(
 
     # Return the details of the added comment as a dictionary
     return {
-        "id": row[0],
-        "action_text": row[2],
-        "action_date": row[3],
-        "username": row[4],
-        "profile_img": row[5],
+        "event_id": row[0],
+        "action": "COMMENT",
+        "action_text": row[1],
+        "action_date": row[2],
+        "username": row[3],
+        "profile_img": row[4],
     }
-
-
-async def update_task_history(
-    task: db_models.DbTaskHistory, db: Session = Depends(database.get_db)
-):
-    """Update task history with username and user profile image."""
-    status = task.action_text.split()
-    task.status = status[5]
-    if user_id := task.user_id:
-        user = db.query(db_models.DbUser).filter_by(id=user_id).first()
-        if user:
-            task.username = user.username
-            task.profile_img = user.profile_img
-    return task
 
 
 async def get_project_task_history(
@@ -347,31 +300,29 @@ async def get_project_task_history(
         A list of task history records for the specified project.
     """
     query = """
-        SELECT task_history.id, task_history.task_id, task_history.action_text,
-            task_history.action_date, users.username,
-            users.profile_img
-            FROM task_history
-            LEFT JOIN users on users.id = task_history.user_id
-            WHERE task_id = :task_id
-            AND  action_date >= :end_date
+        SELECT
+            th.event_id, th.action, th.action_text, th.action_date,
+            u.username, u.profile_img
+        FROM public.task_history th
+        LEFT JOIN users u
+            ON u.id = th.user_id
+        WHERE task_id = :task_id AND  action_date >= :end_date
     """
 
     query += " AND action = 'COMMENT'" if comment else " AND action != 'COMMENT'"
-    query += " ORDER BY id DESC"
-
-    query += ";"
+    query += " ORDER BY id DESC;"
 
     result = db.execute(
         text(query), {"task_id": task_id, "end_date": end_date}
     ).fetchall()
     task_history = [
         {
-            "id": row[0],
+            "event_id": row[0],
+            "action": "COMMENT" if comment else row[1],
             "action_text": row[2],
             "action_date": row[3],
             "username": row[4],
             "profile_img": row[5],
-            "status": None if comment else row[2].split()[5],
         }
         for row in result
     ]
