@@ -1023,7 +1023,6 @@ async def update_project_form(
         project.odkid,
         xlsform,
         category,
-        len(project.tasks),
         odk_creds,
     )
 

@@ -71,24 +71,28 @@ const FormUpdateTab = ({ projectId }) => {
           {`if uploading the final submissions to OSM.`}
         </p>
       </div>
-      <p className="fmtm-text-base fmtm-mt-2">
-        Please{' '}
-        <a
-          className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
-          onClick={() =>
-            dispatch(
-              DownloadProjectForm(
-                `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}/`,
-                'form',
-                projectId,
-              ),
-            )
-          }
-        >
-          download
-        </a>{' '}
-        {`your form, modify it, before re-uploading below:`}
-      </p>
+      <div>
+        <p className="fmtm-text-base">⚠️ IMPORTANT ⚠️</p>
+        <p className="fmtm-text-base fmtm-mt-2">
+          Please{' '}
+          <a
+            className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
+            onClick={() =>
+              dispatch(
+                DownloadProjectForm(
+                  `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}/`,
+                  'form',
+                  projectId,
+                ),
+              )
+            }
+          >
+            download
+          </a>{' '}
+          {`your form and modify it, before re-uploading below.`}
+        </p>
+        <p className="fmtm-text-base fmtm-mt-2">Do not upload the original form, as it has since been updated.</p>
+      </div>
       <div>
         <UploadArea
           title="Upload Form"
