@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "test", "monitoring"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:d4ec67a7c937dd88ba1bf8178ee1f56b8c87bd1f3d43638d4845f4d53d07580c"
+content_hash = "sha256:53dd41a2dd0858c651adc1c6d8de4027476ca6af5c2c604ac8246968bf508374"
 
 [[package]]
 name = "aiohttp"
@@ -1579,7 +1579,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.16.6"
+version = "0.16.7"
 requires_python = ">=3.10"
 summary = "Processing field data from ODK to OpenStreetMap format."
 dependencies = [
@@ -1605,8 +1605,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.16.6.tar.gz", hash = "sha256:452bcc31c8910addb9392ec5506295c8143afb1663c9909ea78e4cc457601a47"},
-    {file = "osm_fieldwork-0.16.6-py3-none-any.whl", hash = "sha256:acdbf4c735c9b033d3905b054a84a74c3473ca3f03963313b1db2f8a03660163"},
+    {file = "osm-fieldwork-0.16.7.tar.gz", hash = "sha256:654b9975b2333b6f812bad5c971577a0a8544e298d0236ecd1befbb5768214e5"},
+    {file = "osm_fieldwork-0.16.7-py3-none-any.whl", hash = "sha256:2847230f2defee4f699648be8651a9437c24c56c93dc01389f164f1a845ea4cc"},
 ]
 
 [[package]]
