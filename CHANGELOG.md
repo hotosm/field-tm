@@ -1,5 +1,57 @@
 # Changelog
 
+## 2024.4.0 (2024-09-24)
+
+### Feat
+
+- **frontend**: allow selection of additional features during project creation (#1806)
+- **backend**: endpoint to create additional Entity lists on a project (#1799)
+- **backend**: endpoint to retreive submission photos (#1794)
+- **backend**: use XLSForm injection during project creation (#1792)
+- **submissionDetails**: if new feature point add then zoom to the point (#1797)
+- **projectDetailsForm**: tms url description text add (#1795)
+- update form by injecting mandatory fields and validate it (#1763)
+- **frontend**: project not found page (#1768)
+- mark tasks validated + start conflation UI (#1743)
+- add project not found page (#1762)
+- **backend**: capability to send messages to OSM users (notified via email) (#1747)
+- **backend**: ODK submission user photos to S3 for easy access (#1744)
+- **frontend**: add Playwright test for project creation workflow (#1700)
+
+### Fix
+
+- updating form, with disclaimer to use original form
+- **frontend**: only call additional-feature API if one is set by user
+- **backend**: submission route ordering causing 500 error
+- **backend**: error handling if submission download fails
+- **backend**: add DEBUG override to /refresh for tunnel testing
+- **files**: add pname, odkToken, osmUser as dependency (#1796)
+- **backend**: use latest pyxform syntax for xlsform conversion (fix xls ext usage) (#1789)
+- **frontend**: correct text in validation table to show the marked as validated (#1777)
+- **backend**: allow empty task id and osm id for new geopoint (#1774)
+- **frontend**: map ui alignment on various devices (#1772)
+- **createProject**: lineString validation remove (#1767)
+- **backend**: pyxform usage only allowing xls file extension (#1758)
+- remove id from the conflated geojson (#1735)
+- **updateReviewStatusModal**: remove error display & disable btn if no status selected (#1728)
+
+### Refactor
+
+- **frontend**: do not use debug=true flag on form validation
+- **backend**: remove task_id and task_filter params from XLSForm (#1805)
+- **backend**: remove xforms table from database, refactor project creation (#1804)
+- **frontend**: move QR code & improve base map layer selection component (#1788)
+- **backend**: rename public beta org to `hotosm` (#1784)
+- update link to custom odk collect v2024.2.4 download
+- update link to custom odk collect signed 2024.2.0
+- **frontend**: ui padding tweak & enhancements (#1750)
+- **backend**: correct username of contributors  (#1751)
+- **frontend**: rename data extract file download (project id + 'map features')
+- **frontend**: further upgrades from JavaScript to TypeScript (#1746)
+- **frontend**: additional upgrades javascript --> typescript (#1737)
+- reword Data Extract --> Map Features  (#1736)
+- remove usage of sqlalchemy-utils (db init done by sql script)
+
 ## 2024.3.2 (2024-07-31)
 
 ### Feat
