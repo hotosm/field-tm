@@ -75,16 +75,18 @@ const CreateProjectService = (
       }
 
       // post additional feature if available
-      const postAdditionalFeature = await dispatch(
-        PostAdditionalFeatureService(
-          `${import.meta.env.VITE_API_URL}/projects/${projectId}/additional-entity`,
-          additionalFeature,
-        ),
-      );
+      if (additionalFeature) {
+        const postAdditionalFeature = await dispatch(
+          PostAdditionalFeatureService(
+            `${import.meta.env.VITE_API_URL}/projects/${projectId}/additional-entity`,
+            additionalFeature,
+          ),
+        );
 
-      hasAPISuccess = postAdditionalFeature;
-      if (!hasAPISuccess) {
-        throw new Error(`Request failed`);
+        hasAPISuccess = postAdditionalFeature;
+        if (!hasAPISuccess) {
+          throw new Error(`Request failed`);
+        }
       }
 
       // Generate project files
