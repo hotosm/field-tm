@@ -80,7 +80,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   };
   useEffect(() => {
     if (customFormFile && !customFileValidity) {
-      dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate-form?debug=true`, customFormFile));
+      dispatch(ValidateCustomForm(`${import.meta.env.VITE_API_URL}/projects/validate-form`, customFormFile));
     }
   }, [customFormFile]);
 
