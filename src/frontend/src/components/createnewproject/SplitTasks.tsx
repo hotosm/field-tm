@@ -19,7 +19,7 @@ import { task_split_type } from '@/types/enums';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
 
-const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload }) => {
+const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,6 +41,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload }) => {
   const isTasksGenerated = useAppSelector((state) => state.createproject.isTasksGenerated);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
   const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
+  const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
   const taskSplitOptions: taskSplitOptionsType[] = [
     {
@@ -133,6 +134,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload }) => {
         projectDetails.customFormUpload,
         customDataExtractUpload,
         projectDetails.dataExtractWays === 'osm_data_extract',
+        additionalFeature,
       ),
     );
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
@@ -373,6 +375,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload }) => {
                   }
                   // toggleSplittedGeojsonEdit
                   hasEditUndo
+                  additionalFeatureGeojson={additionalFeatureGeojson}
                 />
               </div>
             </div>

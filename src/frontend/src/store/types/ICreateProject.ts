@@ -38,6 +38,7 @@ export type CreateProjectStateTypes = {
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
   validatedCustomForm: any;
+  additionalFeatureGeojson: GeoJSONFeatureTypes | null;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -114,6 +115,7 @@ export type ProjectDetailsTypes = {
   custom_tms_url: string;
   hasCustomTMS: boolean;
   customFormUpload: any;
+  hasAdditionalFeature: boolean;
 };
 
 export type ProjectAreaTypes = {

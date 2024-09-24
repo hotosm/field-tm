@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { geojson as fgbGeojson } from 'flatgeobuf';
-import React, { useEffect, useState } from 'react';
 import Button from '@/components/common/Button';
 import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -14,16 +14,22 @@ import FileInputComponent from '@/components/common/FileInputComponent';
 import DataExtractValidation from '@/components/createnewproject/validation/DataExtractValidation';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { checkGeomTypeInGeojson } from '@/utilfunctions/checkGeomTypeInGeojson';
 import { task_split_type } from '@/types/enums';
 import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
+import { CustomCheckbox } from '@/components/common/Checkbox';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Use OSM map features' },
   { name: 'data_extract', value: 'custom_data_extract', label: 'Upload custom map features' },
 ];
 
-const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload }) => {
+const DataExtract = ({
+  flag,
+  customDataExtractUpload,
+  setCustomDataExtractUpload,
+  additionalFeature,
+  setAdditionalFeature,
+}) => {
   useDocumentTitle('Create Project: Map Features');
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,6 +38,7 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
   const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
+  const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
@@ -247,7 +254,7 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
                     resetFile(setCustomDataExtractUpload);
                     generateDataExtract();
                   }}
-                  className="fmtm-mt-6"
+                  className="fmtm-mt-4 !fmtm-mb-8 fmtm-text-base"
                   isLoading={isFgbFetching}
                   loadingText="Generating Map Features..."
                   disabled={dataExtractGeojson && customDataExtractUpload ? true : false}
@@ -271,6 +278,48 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
                     errorMsg={errors.customDataExtractUpload}
                   />
                 </>
+              )}
+              {extractWays && (
+                <div className="fmtm-mt-4">
+                  <CustomCheckbox
+                    key="uploadAdditionalFeature"
+                    label="Upload Additional Features"
+                    checked={formValues?.hasAdditionalFeature}
+                    onCheckedChange={(status) => {
+                      handleCustomChange('hasAdditionalFeature', status);
+                      handleCustomChange('additionalFeature', null);
+                      dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
+                      setAdditionalFeature(null);
+                    }}
+                    className="fmtm-text-black"
+                    labelClickable
+                  />
+                  {formValues?.hasAdditionalFeature && (
+                    <>
+                      <FileInputComponent
+                        onChange={async (e) => {
+                          if (e?.target?.files) {
+                            const uploadedFile = e?.target?.files[0];
+                            setAdditionalFeature(uploadedFile);
+                            handleCustomChange('additionalFeature', uploadedFile);
+                            const additionalFeatureGeojson = await convertFileToFeatureCol(uploadedFile);
+                            dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(additionalFeatureGeojson));
+                          }
+                        }}
+                        onResetFile={() => {
+                          resetFile(setAdditionalFeature);
+                          dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
+                          handleCustomChange('additionalFeature', null);
+                        }}
+                        customFile={additionalFeature}
+                        btnText="Upload Additional Features"
+                        accept=".geojson"
+                        fileDescription="*The supported file formats are .geojson"
+                        errorMsg={errors.additionalFeature}
+                      />
+                    </>
+                  )}
+                </div>
               )}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
@@ -299,6 +348,7 @@ const DataExtract = ({ flag, customDataExtractUpload, setCustomDataExtractUpload
             <NewDefineAreaMap
               uploadedOrDrawnGeojsonFile={projectAoiGeojson}
               buildingExtractedGeojson={dataExtractGeojson}
+              additionalFeatureGeojson={additionalFeatureGeojson}
             />
           </div>
         </div>
