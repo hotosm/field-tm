@@ -95,6 +95,7 @@ const CreateNewProject = () => {
             setGeojsonFile={setGeojsonFile}
             customDataExtractUpload={customDataExtractUpload}
             additionalFeature={additionalFeature}
+            customFormFile={customFormFile}
           />
         );
       default:

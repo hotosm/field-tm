@@ -199,7 +199,7 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
         if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
           const generateApiFormData = new FormData();
-          generateApiFormData.append('xls_form_upload', formUpload);
+          generateApiFormData.append('xlsform', formUpload);
           response = await axios.post(url, generateApiFormData, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -512,17 +512,13 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
         const formUploadFormData = new FormData();
         formUploadFormData.append('xlsform', formUpload);
 
-        // response is in file format so we need to convert it to blob
-        const getTaskSplittingResponse = await axios.post(url, formUploadFormData, {
-          responseType: 'blob',
-        });
+        const getTaskSplittingResponse = await axios.post(url, formUploadFormData);
         const resp = getTaskSplittingResponse.data;
-        dispatch(CreateProjectActions.SetValidatedCustomFile(new File([resp], 'form.xlsx', { type: resp.type })));
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: 'Your Form is Valid',
+            message: JSON.stringify(resp.message),
             variant: 'success',
             duration: 2000,
           }),
@@ -532,7 +528,7 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
-            message: JSON.parse(await error?.response?.data.text())?.detail || 'Something Went Wrong',
+            message: error?.response?.data?.detail || 'Something Went Wrong',
             variant: 'error',
             duration: 5000,
           }),
