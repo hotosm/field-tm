@@ -74,7 +74,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
   };
 
   return (
-    <div className="fmtm-absolute fmtm-top-4 sm:fmtm-top-56 fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
+    <div className="fmtm-absolute fmtm-top-4 sm:fmtm-top-[14.5rem] fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
       {btnList.map((btn) => (
         <Tooltip title={btn.title} placement="left">
           <div
