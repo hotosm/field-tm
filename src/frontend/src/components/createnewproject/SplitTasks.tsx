@@ -19,7 +19,7 @@ import { task_split_type } from '@/types/enums';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
 
-const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature }) => {
+const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, customFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -131,7 +131,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         `${import.meta.env.VITE_API_URL}/projects/create-project?org_id=${projectDetails.organisation_id}`,
         projectData,
         taskAreaGeojsonFile,
-        projectDetails.customFormUpload,
+        customFormFile,
         customDataExtractUpload,
         projectDetails.dataExtractWays === 'osm_data_extract',
         additionalFeature,

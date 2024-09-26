@@ -37,7 +37,6 @@ export type CreateProjectStateTypes = {
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
-  validatedCustomForm: any;
   additionalFeatureGeojson: GeoJSONFeatureTypes | null;
 };
 export type ValidateCustomFormResponse = {

@@ -53,7 +53,6 @@ export const initialState: CreateProjectStateTypes = {
   isFgbFetching: false,
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
-  validatedCustomForm: null,
   additionalFeatureGeojson: null,
 };
 
@@ -222,9 +221,6 @@ const CreateProject = createSlice({
     },
     SetCustomFileValidity(state, action) {
       state.customFileValidity = action.payload;
-    },
-    SetValidatedCustomFile(state, action) {
-      state.validatedCustomForm = action.payload;
     },
     SetAdditionalFeatureGeojson(state, action) {
       state.additionalFeatureGeojson = action.payload;
