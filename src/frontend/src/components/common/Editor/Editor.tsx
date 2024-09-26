@@ -57,7 +57,15 @@ const RichTextEditor = ({
     },
     editable,
   });
+
   const clearEditorContent = useAppSelector((state) => state?.project?.clearEditorContent);
+
+  // on first render set content to editor if initial content present
+  useEffect(() => {
+    if (editor && editorHtmlContent && editor.isEmpty) {
+      editor.commands.setContent(editorHtmlContent);
+    }
+  }, [editorHtmlContent, editor]);
 
   useEffect(() => {
     if (editable && clearEditorContent) {
