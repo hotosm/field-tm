@@ -59,7 +59,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return task?.index === +filter.task_id;
+      return filter.task_id && task?.index === +filter.task_id;
     })?.[0],
   };
   const taskList = projectData[projectIndex]?.taskBoundries;
@@ -160,7 +160,7 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const clearFilters = () => {
     setSearchParams({ tab: 'table' });
-    setFilter({ task_id: '', submitted_by: null, review_state: null, submitted_date: null });
+    setFilter({ task_id: null, submitted_by: null, review_state: null, submitted_date: null });
   };
 
   function getValueByPath(obj: any, path: string) {
