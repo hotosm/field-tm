@@ -26,7 +26,7 @@ const QrcodeComponent = ({ projectId, taskIndex }: tasksComponentType) => {
     <div className="fmtm-flex fmtm-justify-center sm:fmtm-py-5 fmtm-border-t-[1px]">
       <div className="fmtm-relative fmtm-hidden sm:fmtm-block fmtm-bg-white fmtm-p-2 !fmtm-w-[9rem] fmtm-rounded-tl-lg fmtm-rounded-bl-lg">
         {qrcode == '' ? (
-          <CoreModules.Skeleton width={170} height={170} />
+          <CoreModules.Skeleton width={128} height={128} />
         ) : (
           <img id="qrcodeImg" src={qrcode} alt="qrcode" className="" />
         )}
