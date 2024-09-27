@@ -16,13 +16,14 @@ export const GetProjectQrCode = (
   osmUser: string,
 ): { qrcode: string } => {
   const [qrcode, setQrcode] = useState('');
+
   useEffect(() => {
     const fetchProjectFileById = async (
       odkToken: string | undefined,
       projectName: string | undefined,
       osmUser: string,
     ) => {
-      if (odkToken === '') {
+      if (!odkToken || !projectName) {
         setQrcode('');
         return;
       }
@@ -46,18 +47,11 @@ export const GetProjectQrCode = (
       // Note: pako.deflate zlib encodes to content
       code.addData(base64zlibencode(odkCollectJson));
       code.make();
-
       // Note: cell size = 3, margin = 5
       setQrcode(code.createDataURL(3, 5));
     };
 
     fetchProjectFileById(odkToken, projectName, osmUser);
-
-    const cleanUp = () => {
-      setQrcode('');
-    };
-
-    return cleanUp;
   }, [projectName, odkToken, osmUser]);
   return { qrcode };
 };
