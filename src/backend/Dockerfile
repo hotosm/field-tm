@@ -16,11 +16,11 @@
 #
 ARG PYTHON_IMG_TAG=3.11
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-06-06T09-36-42Z}
-FROM docker.io/minio/minio:${MINIO_TAG} as minio
+FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
 # Includes all labels and timezone info to extend from
-FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm as base
+FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm AS base
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG PYTHON_IMG_TAG
@@ -39,13 +39,13 @@ RUN set -ex \
     && update-ca-certificates
 # Set locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 
 # Extract dependencies from PDM lock to standard requirements.txt
-FROM base as extract-deps
+FROM base AS extract-deps
 WORKDIR /opt/python
 COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
@@ -61,7 +61,7 @@ RUN pdm export --prod > requirements.txt \
 
 
 # Build stage will all dependencies required to build Python wheels
-FROM base as build
+FROM base AS build
 # NOTE this argument is specified during production build on Github workflow
 # NOTE only the production API image contains the monitoring dependencies
 ARG MONITORING
@@ -92,7 +92,7 @@ RUN pip install --user --no-warn-script-location --no-cache-dir \
 
 
 # Run stage will minimal dependencies required to run Python libraries
-FROM base as runtime
+FROM base AS runtime
 ARG PYTHON_IMG_TAG
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -146,7 +146,7 @@ HEALTHCHECK --start-period=10s --interval=5s --retries=20 --timeout=5s \
 
 
 # Add certificates to use ODK Central over SSL (HTTPS, required)
-FROM runtime as add-odk-certs
+FROM runtime AS add-odk-certs
 USER root
 # Add the SSL cert for debug odkcentral
 COPY --from=ghcr.io/hotosm/fmtm/proxy:debug \
@@ -155,7 +155,7 @@ RUN update-ca-certificates
 
 
 # Stage to use during local development
-FROM add-odk-certs as debug
+FROM add-odk-certs AS debug
 USER appuser
 COPY --from=extract-deps --chown=appuser \
     /opt/python/requirements-debug.txt \
@@ -173,7 +173,7 @@ CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
 
 
 # Used during CI workflows (as root), with docs/test dependencies pre-installed
-FROM add-odk-certs as ci
+FROM add-odk-certs AS ci
 ARG PYTHON_IMG_TAG
 COPY --from=extract-deps \
     /opt/python/requirements-ci.txt /opt/python/
@@ -201,7 +201,7 @@ CMD ["sleep", "infinity"]
 
 
 # Final stage used during deployment
-FROM runtime as prod
+FROM runtime AS prod
 # Pre-compile packages to .pyc (init speed gains)
 RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Note: 1 worker (process) per container, behind load balancer
