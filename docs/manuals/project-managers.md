@@ -88,37 +88,29 @@ and improve the effectiveness of humanitarian efforts.
 
 ## Video Tutorial
 
-<https://github.com/hotosm/fmtm/assets/97789856/6ad200e7-3af9-418b-bb6e-6666bbab9a15>
 
-<https://github.com/hotosm/fmtm/assets/97789856/62646dd8-6130-4612-99fe-4df29ae432d9>
+https://github.com/user-attachments/assets/963e7b22-5752-4158-b12d-e67c643235b8
 
-<https://github.com/hotosm/fmtm/assets/97789856/8677062c-981c-4ea3-964f-3348c4953f82>
+https://github.com/user-attachments/assets/969e87e1-581c-4f76-93a7-0b4524b2db3a
 
-<https://github.com/hotosm/fmtm/assets/97789856/02355809-2f40-470c-856f-afe56250883f>
+https://github.com/user-attachments/assets/82b200bc-620a-4712-8d2e-3dcc4c553230
 
-<https://github.com/hotosm/fmtm/assets/97789856/084ce707-95ba-4d51-a650-132be84fbe68>
+https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed
 
-<https://github.com/hotosm/fmtm/assets/97789856/6711badb-c93e-4109-9090-0ad1f1554699>
+https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
 
-<https://github.com/hotosm/fmtm/assets/97789856/b2af3c7d-5392-4e10-bf83-853b2f517c9a>
-
-<https://github.com/hotosm/fmtm/assets/97789856/d8b2bf72-e8e0-41bc-a568-77854f45efa6>
 
 ## Steps to create a project in FMTM
 
 1. Go to [fmtm][11] .
-2. In the header, you'll find three tabs: Explore Projects, Manage Organization,
-   and Manage Categories.
+2. In the header, you'll find two tabs: Explore Projects and Manage Organization.
 
-   ![fmtm dashboard][12]
+  ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
+
 
 3. Start by exploring the projects listed by different nations and world
    communities for field mapping exercises.
-4. Use the filters or search option to narrow down the project cards based on
-   your preferences.
-
-   ![project filters][13]
-
+4. Use the search option to narrow down the project cards or find the project of your choice. 
 5. If you are not logged into the system, the "Create new project" button will
    be disabled.
 6. If you are new then on the top right cornor click on Sign up and create an
@@ -129,7 +121,7 @@ and improve the effectiveness of humanitarian efforts.
 9. Start by filling in the project details, including the organization name,
    project name, description, and other relevant information.
 
-   ![project details 2][14]
+   ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
 
 10. If your organization's name is not listed, you can add it through the
     "Manage Organization" tab.
@@ -140,12 +132,13 @@ and improve the effectiveness of humanitarian efforts.
     file format.
     Review the displayed map that corresponds to your selected area and click
     on "Next".
+    
+    ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
-    ![project create info][15]
 
-13. Define the tasks of the project.
+14. Define the tasks of the project.
 
-    ![project create area][16]
+   
 
     If you choose "Divide on Square," specify the dimensions of the square tasks.
 
@@ -153,7 +146,7 @@ and improve the effectiveness of humanitarian efforts.
 
     ![project task split][17]
 
-14. Select Form . Select the form category you want to use for the field
+15. Select Form . Select the form category you want to use for the field
     mapping, such as "Data Extract" or any other relevant category.
 
     Choose a specific form from the existing categories or upload a custom form
@@ -162,9 +155,9 @@ and improve the effectiveness of humanitarian efforts.
 
     ![project creation status][18]
 
-15. Wait for the system to generate QR codes for each task, which will be used
+16. Wait for the system to generate QR codes for each task, which will be used
     later in the field mapping process.
-16. After the QR codes are generated, you can find your project in the project
+17. After the QR codes are generated, you can find your project in the project
     dashboard.
 
 ## Steps to start access your project and Start mapping or a mapping campaign
