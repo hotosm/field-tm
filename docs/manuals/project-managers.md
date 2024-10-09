@@ -221,20 +221,32 @@ Click on "Next" to proceed.
 2. You have to provide your consent and fill up the form by providing
    necessary details like Organization name, URL, Description of
    organization, type of organization etc.
-3. Now submit the form. The request will reach the Admin who will create your
+   ![image](https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d)
+
+4. Now submit the form. The request will reach the Admin who will create your
    organization and inform you through the email.
+   ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
+
 
 ## Steps to view your submissions and infographics
 
 1. Go to the respective project. On the bottom left side,
    you will see the view infographics button.
 2. Click on the button will lead you to the infographics page.
-3. On the right side there is an icon which will switch the layout to
+   ![image](https://github.com/user-attachments/assets/6d48dd40-1be6-4063-9d1c-0276633c6d7a)
+
+4. On the right side there is an icon which will switch the layout to
    table view, meaning you can see the submissions in table format.
-4. Users can also download the submission in Json or CSV format.
-5. The submission can also be uploaded to JOSM. For that, you should
+5. You can see the details of submission and also review the submission
+    and set the submission as accepted, rejected or has issues. Moreover,
+   you can also comment to the submission for mappers.
+    ![image](https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a)
+
+6. Users can also download the submission in Json or CSV format.
+7. The submission can also be uploaded to JOSM. For that, you should
    have JOSM software installed in your device and should have your remote
    control enabled.
+  ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
 
 ## Steps to Edit project details
 
@@ -242,14 +254,9 @@ Click on "Next" to proceed.
    details like name, description, instructions as well as XLS form.
 
 2. Go to the respective project you want to edit. Click on the
-   manage button
-
-3. Users can also edit a few fields after project creation like basic
-   details like name, description, instructions as well as XLS form.
-4. Go to the respective project you want to edit. Click on the manage button.
-5. Go to the edit section. And you can edit project details from there.
-   You can also switch to the form update tab and upload a
-   custom updated form.
+   manage button to edit basic details and XLS form.
+   
+   ![image](https://github.com/user-attachments/assets/a3225885-c6cd-4fa9-9352-ccd4a8709eff)
 
 ## Help and Support
 
