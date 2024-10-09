@@ -99,7 +99,6 @@ https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed
 
 https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
 
-
 ## Steps to create a project in FMTM
 
 1. Go to [fmtm][11] .
@@ -136,29 +135,31 @@ https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
     ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
 
-14. Define the tasks of the project.
+14. The step 3 is to choose the form category of the project. Meaning if you want 
+to survey each household or healthcare or educational institutes. 
+You can upload the custom XLS form by clicking on the checkbox.
+Click on "Next" to proceed.
 
-   
+![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
-    If you choose "Divide on Square," specify the dimensions of the square tasks.
+16. In step 4, you can either generate the map features from osm or upload the custom map features. 
+    You can also upload additional map feature to have multiple feature selection supported.
+    
+    ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
-    Click on "Next" to proceed.
+17. The final step is task splitting which can be performed on three different ways. You can
+     split the task on square of size you want. The second option is to choose area as task
+    where you can use single polygon as a task. And the task splitting algorithm which splits 
+    the tasks with average number of features which is provided by project creator.
+    The task splitting may take few seconds to few minutes considering the feature count and size of AOI.
+    Click on "Submit" to create project.
+    
+    ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 
-    ![project task split][17]
-
-15. Select Form . Select the form category you want to use for the field
-    mapping, such as "Data Extract" or any other relevant category.
-
-    Choose a specific form from the existing categories or upload a custom form
-    if needed.
-    Click on "Submit" to proceed.
-
-    ![project creation status][18]
-
-16. Wait for the system to generate QR codes for each task, which will be used
+18. Wait for the system to generate QR codes for each task, which will be used
     later in the field mapping process.
-17. After the QR codes are generated, you can find your project in the project
-    dashboard.
+19. After the project creation is successful and  QR codes are generated, you are
+ redirected to the project details page of the project.
 
 ## Steps to start access your project and Start mapping or a mapping campaign
 
@@ -166,7 +167,7 @@ https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
    next step.
 2. Select one of the available tasks and start the field mapping exercise.
 
-   ![select task][19]
+   ![image](https://github.com/user-attachments/assets/513a189d-04d9-4a30-9793-7cdfbb333069)
 
 3. If a task is already locked by another user, choose a different task that is
    available for mapping.If a task is already locked by another user, choose a
@@ -191,7 +192,7 @@ https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
    > Note: 'task' refers to each section of the map enclosed in the dotted
    > lines and each task has a corresponding number tag.
 
-   ![map legend][20]
+   ![image](https://github.com/user-attachments/assets/280fd927-b71e-4336-a89a-1672e8de687b)
 
    - To begin mapping, click on a task closest to you that has the color
      code associated with **READY** and change it's status from **READY**
