@@ -88,28 +88,27 @@ and improve the effectiveness of humanitarian efforts.
 
 ## Video Tutorial
 
+<https://github.com/user-attachments/assets/963e7b22-5752-4158-b12d-e67c643235b8>
 
-https://github.com/user-attachments/assets/963e7b22-5752-4158-b12d-e67c643235b8
+<https://github.com/user-attachments/assets/969e87e1-581c-4f76-93a7-0b4524b2db3a>
 
-https://github.com/user-attachments/assets/969e87e1-581c-4f76-93a7-0b4524b2db3a
+<https://github.com/user-attachments/assets/82b200bc-620a-4712-8d2e-3dcc4c553230>
 
-https://github.com/user-attachments/assets/82b200bc-620a-4712-8d2e-3dcc4c553230
+<https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed>
 
-https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed
-
-https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
+<https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8>
 
 ## Steps to create a project in FMTM
 
 1. Go to [fmtm][11] .
 2. In the header, you'll find two tabs: Explore Projects and Manage Organization.
 
-  ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
-
+   ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
 
 3. Start by exploring the projects listed by different nations and world
    communities for field mapping exercises.
-4. Use the search option to narrow down the project cards or find the project of your choice. 
+4. Use the search option to narrow down the project cards or find the project
+   of your choice.
 5. If you are not logged into the system, the "Create new project" button will
    be disabled.
 6. If you are new then on the top right cornor click on Sign up and create an
@@ -131,35 +130,37 @@ https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8
     file format.
     Review the displayed map that corresponds to your selected area and click
     on "Next".
-    
+
     ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
+13. The step 3 is to choose the form category of the project. Meaning if you want
+    to survey each household or healthcare or educational institutes.
+    You can upload the custom XLS form by clicking on the checkbox.
+    Click on "Next" to proceed.
 
-14. The step 3 is to choose the form category of the project. Meaning if you want 
-to survey each household or healthcare or educational institutes. 
-You can upload the custom XLS form by clicking on the checkbox.
-Click on "Next" to proceed.
+    ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
-![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
+14. In step 4, you can either generate the map features from osm or upload the
+    custom map features.
+    You can also upload additional map feature to have multiple feature
+    selection supported.
 
-16. In step 4, you can either generate the map features from osm or upload the custom map features. 
-    You can also upload additional map feature to have multiple feature selection supported.
-    
     ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
-17. The final step is task splitting which can be performed on three different ways. You can
-     split the task on square of size you want. The second option is to choose area as task
-    where you can use single polygon as a task. And the task splitting algorithm which splits 
-    the tasks with average number of features which is provided by project creator.
-    The task splitting may take few seconds to few minutes considering the feature count and size of AOI.
+15. The final step is task splitting which can be performed on three different
+    ways. You can split the task on square of size you want. The second option
+    is to choose area as task where you can use single polygon as a task. And
+    the task splitting algorithm which splits the tasks with average number of
+    features which is provided by project creator. The task splitting may take
+    few seconds to few minutes considering the feature count and size of AOI.
     Click on "Submit" to create project.
-    
+
     ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 
-18. Wait for the system to generate QR codes for each task, which will be used
+16. Wait for the system to generate QR codes for each task, which will be used
     later in the field mapping process.
-19. After the project creation is successful and  QR codes are generated, you are
- redirected to the project details page of the project.
+17. After the project creation is successful and QR codes are generated, you are
+    redirected to the project details page of the project.
 
 ## Steps to start access your project and Start mapping or a mapping campaign
 
@@ -223,10 +224,9 @@ Click on "Next" to proceed.
    organization, type of organization etc.
    ![image](https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d)
 
-4. Now submit the form. The request will reach the Admin who will create your
+3. Now submit the form. The request will reach the Admin who will create your
    organization and inform you through the email.
    ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
-
 
 ## Steps to view your submissions and infographics
 
@@ -235,18 +235,18 @@ Click on "Next" to proceed.
 2. Click on the button will lead you to the infographics page.
    ![image](https://github.com/user-attachments/assets/6d48dd40-1be6-4063-9d1c-0276633c6d7a)
 
-4. On the right side there is an icon which will switch the layout to
+3. On the right side there is an icon which will switch the layout to
    table view, meaning you can see the submissions in table format.
-5. You can see the details of submission and also review the submission
-    and set the submission as accepted, rejected or has issues. Moreover,
+4. You can see the details of submission and also review the submission
+   and set the submission as accepted, rejected or has issues. Moreover,
    you can also comment to the submission for mappers.
-    ![image](https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a)
+   ![image](https://github.com/user-attachments/assets/9a53611b-8c03-4aa8-84f9-299d538f696a)
 
-6. Users can also download the submission in Json or CSV format.
-7. The submission can also be uploaded to JOSM. For that, you should
+5. Users can also download the submission in Json or CSV format.
+6. The submission can also be uploaded to JOSM. For that, you should
    have JOSM software installed in your device and should have your remote
    control enabled.
-  ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
+   ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
 
 ## Steps to Edit project details
 
@@ -255,7 +255,7 @@ Click on "Next" to proceed.
 
 2. Go to the respective project you want to edit. Click on the
    manage button to edit basic details and XLS form.
-   
+
    ![image](https://github.com/user-attachments/assets/a3225885-c6cd-4fa9-9352-ccd4a8709eff)
 
 ## Help and Support
@@ -302,14 +302,5 @@ The FMTM Team
 [9]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
 [10]: https://docs.getodk.org/central-install-digital-ocean/ "Account on ODK Central Server"
 [11]: https://fmtm.hotosm.org/ "fmtm"
-[12]: https://github.com/hotosm/fmtm/assets/97789856/c0d272f0-c69c-483f-9e9d-83dd75b9e748 "fmtm dashboard"
-[13]: https://github.com/hotosm/fmtm/assets/97789856/a5d61628-70e6-426c-a860-b9c7968b4dea "project filters"
-[14]: https://github.com/hotosm/fmtm/assets/97789856/97c38c80-aa0e-4fe2-b8a5-f4ee43a9a63a "project details 2"
-[15]: https://github.com/hotosm/fmtm/assets/97789856/680eb831-790a-48f1-8997-c20b5213909d "project create info"
-[16]: https://github.com/hotosm/fmtm/assets/97789856/177d8258-900e-447f-906a-28aeb1fd6b03 "project create area"
-[17]: https://github.com/hotosm/fmtm/assets/97789856/f53d76b4-e6cc-44a4-8c7c-00082eb72693 "project task split"
-[18]: https://github.com/hotosm/fmtm/assets/97789856/f9a4bed7-d1a9-44dd-b2d4-b55f428f9416 "project creation status"
-[19]: https://github.com/hotosm/fmtm/assets/97789856/162af2e0-dbfa-4787-8037-f03e71417df8 "select task"
-[20]: https://github.com/hotosm/fmtm/assets/97789856/2c0397b0-1829-420a-982e-3d971b514f2c "map legend"
 [21]: https://docs.fmtm.dev/faq "FAQs"
 [22]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
