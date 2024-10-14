@@ -6,9 +6,8 @@ You can also develop on your local machine outside of Docker,
 see below.
 
 > NOTE: If you haven't yet downloaded the Repository and
-> setup your environment variables, please check the
-> [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1-Getting-Started.md)
-> wiki page.
+> setup your local environment, please check the docs
+> [here](../INSTALL.md#setup-your-local-environment).
 
 Now let's get started :thumbsup:
 
@@ -29,7 +28,7 @@ URLs defined in the docker-compose file and your env file.
 3. From the command line run: `docker-compose pull`.
    This will pull the latest container builds from **main** branch.
 4. Make sure you have a `.env` file with all required variables, see
-   [Getting Started](https://github.com/hotosm/fmtm/blob/main/docs/DEV-1.-Getting-Started.md).
+   [here](../INSTALL.md#2-create-an-env-file).
 5. Once everything is pulled, from the command line run:
    `docker compose up -d api`
 6. If everything goes well you should now be able to
