@@ -112,11 +112,9 @@ In reverse chronological order, with most recent events first.
 >     <div class="timeline-entry">
 >         <div class="timeline-date">2022-09</div>
 >         <h3>Initial Research & Concept</h3>
->         🔬 [Concept Note][1] written for a 'Field Mapping Tasking Manager'.
+>         🔬 <a href="https://docs.google.com/document/d/1adG2pXuMXI0wPbR_09ASORMx2gcVn0H6nsCNNGG7tpM/edit#heading=h.k45v77hc1cu1">Concept Note</a> written for a 'Field Mapping Tasking Manager'.
 >         <div class="timeline-dot"></div>
 >     </div>
 > </div>
 
 <!-- markdownlint-restore -->
-
-[1]: https://docs.google.com/document/d/1adG2pXuMXI0wPbR_09ASORMx2gcVn0H6nsCNNGG7tpM/edit#heading=h.k45v77hc1cu1
