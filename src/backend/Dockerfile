@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 ARG PYTHON_IMG_TAG=3.11
-ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-06-06T09-36-42Z}
+ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-10-13T13-34-11Z}
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
