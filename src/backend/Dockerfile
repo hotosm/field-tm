@@ -131,7 +131,7 @@ WORKDIR /opt
 COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
 # Add non-root user, permissions
-RUN useradd -u 1001 -m -c "hotosm account" -d /home/appuser -s /bin/false appuser \
+RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs /opt/tiles \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
