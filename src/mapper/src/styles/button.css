@@ -1,0 +1,28 @@
+sl-button.primary::part(base) {
+	background-color: #d73f37;
+	color: white;
+	border: 0px;
+}
+sl-button.primary::part(base):hover {
+	background-color: #b91c1c;
+}
+
+sl-button.secondary::part(base) {
+	background-color: white;
+	color: #d73f37;
+	border-width: 1px;
+	border-color: #d73f37;
+}
+sl-button.secondary::part(base):hover {
+	color: #b91c1c;
+	border-color: #b91c1c;
+}
+
+sl-button.gray::part(base) {
+	background-color: #4c4c4c;
+	color: white;
+	border-width: 0px;
+}
+sl-button.gray::part(base):hover {
+	background-color: #5f5f5f;
+}

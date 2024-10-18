@@ -46,6 +46,7 @@ const BottomSheet = ({ body, onClose }: bottomSheetType) => {
   };
 
   const dragStart = (e) => {
+    e.preventDefault();
     const pagesY = e.pageY || e.changedTouches[0].screenY;
     setStartY(pagesY);
     setStartHeight(parseInt(sheetContentRef.current.style.height));
@@ -54,6 +55,7 @@ const BottomSheet = ({ body, onClose }: bottomSheetType) => {
   };
 
   const dragging = (e) => {
+    if (!isDragging) return;
     const delta = startY - (e.pageY || e.changedTouches[0].screenY);
     const newHeight = startHeight + (delta / window.innerHeight) * 100;
     bottomSheetRef.current.style.height = `100vh`;
@@ -88,22 +90,21 @@ const BottomSheet = ({ body, onClose }: bottomSheetType) => {
         </div>
         <div
           ref={sheetContentRef}
-          className={`bottom-sheet-content fmtm-shadow-[30px_-10px_10px_5px_rgba(0,0,0,0.1)] fmtm-w-full fmtm-relative fmtm-bg-white fmtm-max-h-[100vh] fmtm-h-[50vh] fmtm-max-w-[1150px] fmtm-py-6 fmtm-px-4 fmtm-duration-300 fmtm-ease-in-out fmtm-overflow-hidden ${
+          className={`bottom-sheet-content fmtm-shadow-[30px_-10px_10px_5px_rgba(0,0,0,0.1)] fmtm-w-full fmtm-relative fmtm-bg-white fmtm-max-h-[100vh] fmtm-h-[50vh] fmtm-max-w-[1150px] fmtm-pb-6 fmtm-px-4 fmtm-duration-300 fmtm-ease-in-out fmtm-overflow-hidden ${
             !show ? 'fmtm-translate-y-[100%]' : 'fmtm-translate-y-[0%]'
           } ${isDragging ? 'fmtm-transition-none' : ''} ${isFullScreen ? 'fmtm-rounded-none' : 'fmtm-rounded-t-2xl'}`}
         >
-          <div className="header fmtm-flex fmtm-justify-center">
-            <div
-              className="drag-icon fmtm-cursor-grab fmtm-select-none fmtm-p-4 -fmtm-mt-4 fmtm-z-[9999]"
-              onMouseDown={dragStart}
-              onTouchStart={dragStart}
-              onMouseMove={dragging}
-              onTouchMove={dragging}
-              onMouseUp={dragStop}
-              onTouchEnd={dragStop}
-            >
-              <span className="fmtm-h-1 fmtm-w-[2.5rem] fmtm-block fmtm-bg-[#c7d0e1] fmtm-rounded-full hover:fmtm-bg-primaryRed"></span>
-            </div>
+          <div
+            className="header fmtm-group fmtm-flex fmtm-justify-center fmtm-py-4 drag-icon fmtm-cursor-grab fmtm-select-none fmtm-z-[9999]"
+            onMouseDown={dragStart}
+            onTouchStart={dragStart}
+            onMouseMove={dragging}
+            onTouchMove={dragging}
+            onMouseUp={dragStop}
+            onTouchEnd={dragStop}
+            onMouseOut={dragStop}
+          >
+            <span className="fmtm-h-1 fmtm-w-[2.5rem] fmtm-block fmtm-bg-[#c7d0e1] fmtm-rounded-full  group-hover:fmtm-bg-primaryRed fmtm-pointer-events-none"></span>
           </div>
           <div className="body fmtm-overflow-y-scroll scrollbar fmtm-h-full fmtm-p-[1px]">{body}</div>
         </div>
