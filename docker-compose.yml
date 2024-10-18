@@ -265,7 +265,7 @@ services:
       migrations:
         condition: service_completed_successfully
     environment:
-      DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}
+      DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
       # OTEL_EXPORT: otlp
       # OTLP_ENDPOINT: https://...
 
