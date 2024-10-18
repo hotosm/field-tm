@@ -140,12 +140,34 @@ class EntityOsmID(BaseModel):
     id: str
     osm_id: Optional[int] = None
 
+    @field_validator("osm_id", mode="before")
+    @classmethod
+    def convert_osm_id(cls, value):
+        """Set osm_id to None if empty or invalid."""
+        if value in ("", " "):  # Treat empty strings as None
+            return None
+        try:
+            return int(value)  # Convert to integer if possible
+        except ValueError:
+            return value
+
 
 class EntityTaskID(BaseModel):
     """Map of Entity UUID to FMTM Task ID."""
 
     id: str
-    task_id: int
+    task_id: Optional[int] = None
+
+    @field_validator("task_id", mode="before")
+    @classmethod
+    def convert_task_id(cls, value):
+        """Set task_id to None if empty or invalid."""
+        if value in ("", " "):  # Treat empty strings as None
+            return None
+        try:
+            return int(value)  # Convert to integer if possible
+        except ValueError:
+            return value
 
 
 class EntityMappingStatus(EntityOsmID, EntityTaskID):

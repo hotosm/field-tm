@@ -444,7 +444,8 @@ async def preview_split_by_square(
     Use a lambda function to remove the "z" dimension from each
     coordinate in the feature's geometry.
     """
-    boundary = merge_polygons(boundary)
+    if len(boundary["features"]) == 0:
+        boundary = merge_polygons(boundary)
 
     return await run_in_threadpool(
         lambda: split_by_square(
