@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "monitoring", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.5.0"
-content_hash = "sha256:5a67da9d57a05b45616376bdb01ec9255959867a5f6de8469c3f334a3d0d011e"
+content_hash = "sha256:0b251742ddfa49d9c69695eac81b46b2debdb020ef2992836851a2dfb0ad6be7"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -627,7 +627,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.3.1"
+version = "1.3.2"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
@@ -638,8 +638,8 @@ dependencies = [
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.3.1.tar.gz", hash = "sha256:90b739df69c1ab8ad18d615423ef230665e0b43b94c3e6c1ce345f8e4021e18f"},
-    {file = "fmtm_splitter-1.3.1-py3-none-any.whl", hash = "sha256:409795cbb6c2d261544e2dcf6314aabdd0b63c47af7996a26958356003b345fe"},
+    {file = "fmtm-splitter-1.3.2.tar.gz", hash = "sha256:2112ef9a904ea33662047469036d314885a4ceeefaf3910507406a884710d4ab"},
+    {file = "fmtm_splitter-1.3.2-py3-none-any.whl", hash = "sha256:2596ac3db423337d4bbc1244da7082d8e9c12ad22c6890a369fb78b12aa23786"},
 ]
 
 [[package]]
@@ -1639,7 +1639,7 @@ files = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.16.8"
+version = "0.16.9"
 requires_python = ">=3.10"
 summary = "Processing field data from ODK to OpenStreetMap format."
 dependencies = [
@@ -1665,8 +1665,8 @@ dependencies = [
     "xmltodict>=0.13.0",
 ]
 files = [
-    {file = "osm-fieldwork-0.16.8.tar.gz", hash = "sha256:7863f421643963f16a5c6c72a7989b172e142209bde001e6e12c4f89433ef6ff"},
-    {file = "osm_fieldwork-0.16.8-py3-none-any.whl", hash = "sha256:7faa939efe477c92d847f73d725ffcca6fab7fd03fb07b838bd7c87821c846a4"},
+    {file = "osm-fieldwork-0.16.9.tar.gz", hash = "sha256:113e2f2091eec54dea9ee29e1b14681bc881a2770591337773cd0ea1bdabd110"},
+    {file = "osm_fieldwork-0.16.9-py3-none-any.whl", hash = "sha256:d38c1789a62abbe0e385e3750255d06fcbc22a885cbbdb69b4e29aee17519ff3"},
 ]
 
 [[package]]
@@ -1686,7 +1686,7 @@ files = [
 
 [[package]]
 name = "osm-rawdata"
-version = "0.3.2"
+version = "0.3.3"
 requires_python = ">=3.10"
 summary = "Make data extracts from OSM data."
 dependencies = [
@@ -1702,8 +1702,8 @@ dependencies = [
     "sqlalchemy>=2.0.0",
 ]
 files = [
-    {file = "osm-rawdata-0.3.2.tar.gz", hash = "sha256:9e715c41ea0d7c306d984eee00859cb3414f5a705ed3578d43a5910e3d04a545"},
-    {file = "osm_rawdata-0.3.2-py3-none-any.whl", hash = "sha256:97395ceb0ef9a5444a2cdf7cfcbcb95917bc35df4a395de0f30437d7b60e28b5"},
+    {file = "osm-rawdata-0.3.3.tar.gz", hash = "sha256:9756174dc09ed026d2f14468d521f9c4d4f302054be6fa394c789a346b3e7525"},
+    {file = "osm_rawdata-0.3.3-py3-none-any.whl", hash = "sha256:2c24381479a60ab6460e6606d25fba2c83ae379af1fec98bb460734eb36092f8"},
 ]
 
 [[package]]
