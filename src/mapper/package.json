@@ -42,22 +42,20 @@
 		"vitest": "^1.6.0"
 	},
 	"dependencies": {
-		"@electric-sql/client": "^0.3.1",
-		"@electric-sql/pglite": "^0.2.4",
+		"@electric-sql/client": "^0.6.4",
+		"@electric-sql/pglite": "^0.2.12",
 		"@hotosm/ui": "0.2.0-b5",
-		"@prisma/client": "4.8.1",
 		"@tiptap/core": "^2.8.0",
 		"@tiptap/pm": "^2.8.0",
 		"@tiptap/starter-kit": "^2.8.0",
 		"@turf/bbox": "^7.0.0",
 		"@turf/buffer": "^7.0.0",
 		"@turf/helpers": "^7.0.0",
-		"drizzle-orm": "^0.33.0",
+		"drizzle-orm": "^0.35.2",
 		"pako": "^2.1.0",
 		"prisma": "4.8.1",
-		"svelte-maplibre": "^0.9.13",
-		"uuid": "^10.0.0",
-		"zod": "3.21.1"
+		"svelte-maplibre": "^0.9.14",
+		"uuid": "^10.0.0"
 	},
 	"peerDependencies": {
 		"@shoelace-style/shoelace": "^2.15.1"
