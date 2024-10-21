@@ -23,6 +23,10 @@ export default defineConfig({
 			$lib: path.resolve('./src/lib'),
 			$components: path.resolve('./src/components'),
 			$static: path.resolve('./static'),
+			$store: path.resolve('./src/store'),
+			$styles: path.resolve('./src/styles'),
+			$assets: path.resolve('./src/assets'),
+			$utilFunctions: path.resolve('./src/utilFunctions'),
 		},
 	},
 	test: {
