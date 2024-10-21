@@ -9,17 +9,14 @@ importers:
   .:
     dependencies:
       '@electric-sql/client':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.6.4
+        version: 0.6.4
       '@electric-sql/pglite':
-        specifier: ^0.2.4
-        version: 0.2.4
+        specifier: ^0.2.12
+        version: 0.2.12
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
-      '@prisma/client':
-        specifier: 4.8.1
-        version: 4.8.1(prisma@4.8.1)
       '@shoelace-style/shoelace':
         specifier: ^2.15.1
         version: 2.15.1(@types/react@18.3.3)
@@ -42,8 +39,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       drizzle-orm:
-        specifier: ^0.33.0
-        version: 0.33.0(@electric-sql/pglite@0.2.4)(@prisma/client@4.8.1(prisma@4.8.1))(@types/react@18.3.3)(prisma@4.8.1)
+        specifier: ^0.35.2
+        version: 0.35.2(@electric-sql/pglite@0.2.12)(@prisma/client@4.8.1(prisma@4.8.1))(@types/react@18.3.3)(prisma@4.8.1)
       pako:
         specifier: ^2.1.0
         version: 2.1.0
@@ -51,14 +48,11 @@ importers:
         specifier: 4.8.1
         version: 4.8.1
       svelte-maplibre:
-        specifier: ^0.9.13
-        version: 0.9.13(svelte@4.2.19)
+        specifier: ^0.9.14
+        version: 0.9.14(svelte@4.2.19)
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
-      zod:
-        specifier: 3.21.1
-        version: 3.21.1
     devDependencies:
       '@playwright/test':
         specifier: ^1.44.1
@@ -292,11 +286,11 @@ packages:
     resolution: {integrity: sha512-WyOx8cJQ+FQus4Mm4uPIZA64gbk3Wxh0so5Lcii0aJifqwoVOlfFtorjLE0Hen4OYyHZMXDWqMmaQemBhgxFRQ==}
     engines: {node: '>=14'}
 
-  '@electric-sql/client@0.3.1':
-    resolution: {integrity: sha512-algV8ntk6KjWg8x4SggkQGMCN1MnYxFYdK160XIic+b2PCQ51+0uCxr8ouEGdNY+IJzvyNePilWvIGtT9pZd+w==}
+  '@electric-sql/client@0.6.4':
+    resolution: {integrity: sha512-94YE1K9wIJbParXv8JMAqnHxQILwZgiSXOqo7/4HdZV6Jpi7w0yz308px2HElxQHNC1Qax5f5EDjWbIKVvNMwg==}
 
-  '@electric-sql/pglite@0.2.4':
-    resolution: {integrity: sha512-NN1ATH9aYTCD4257wZH1CjAKdro8jDd5r/BumxZtEVTDNDztBmPYYtBd4TEIHWdi0+QuM7SWk2JRCLvAYCSEWg==}
+  '@electric-sql/pglite@0.2.12':
+    resolution: {integrity: sha512-J/X42ujcoFEbOkgRyoNqZB5qcqrnJRWVlwpH3fKYoJkTz49N91uAK/rDSSG/85WRas9nC9mdV4FnMTxnQWE/rw==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -1364,13 +1358,13 @@ packages:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
 
-  drizzle-orm@0.33.0:
-    resolution: {integrity: sha512-SHy72R2Rdkz0LEq0PSG/IdvnT3nGiWuRk+2tXZQ90GVq/XQhpCzu/EFT3V2rox+w8MlkBQxifF8pCStNYnERfA==}
+  drizzle-orm@0.35.2:
+    resolution: {integrity: sha512-bLQtRchl8QvRo2MyG6kcZC90UDzR7Ubir4YwOHV3cZPdJbF+4jU/Yt0QOczsoXe25wLRt6CtCWLXtSDQKft3yg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
       '@electric-sql/pglite': '>=0.1.1'
-      '@libsql/client': '*'
+      '@libsql/client': '>=0.10.0'
       '@neondatabase/serverless': '>=0.1'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
@@ -2563,8 +2557,8 @@ packages:
     peerDependencies:
       svelte: ^3.19.0 || ^4.0.0
 
-  svelte-maplibre@0.9.13:
-    resolution: {integrity: sha512-XHQFKE86dKQ0PqjPGZ97jcHi83XdQRa4RW3hXDqmuxJ4yi2yvawdbO1Y0b2raAemCVERTcIU9HYgx0TAvqJgrA==}
+  svelte-maplibre@0.9.14:
+    resolution: {integrity: sha512-5HBvibzU/Uf3g8eEz4Hty5XAwoBhW9Tp7NQEvb80U/glR/M1IHyzUKss6XMq8Zbci2wtsASeoPc6dA5R4+0e0w==}
     peerDependencies:
       '@deck.gl/core': ^8.8.0
       '@deck.gl/layers': ^8.8.0
@@ -2846,9 +2840,6 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
 
-  zod@3.21.1:
-    resolution: {integrity: sha512-+dTu2m6gmCbO9Ahm4ZBDapx2O6ZY9QSPXst2WXjcznPMwf2YNpn3RevLx4KkZp1OPW/ouFcoBtBzFz/LeY69oA==}
-
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -3086,11 +3077,11 @@ snapshots:
 
   '@ctrl/tinycolor@4.1.0': {}
 
-  '@electric-sql/client@0.3.1':
+  '@electric-sql/client@0.6.4':
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.20.0
 
-  '@electric-sql/pglite@0.2.4': {}
+  '@electric-sql/pglite@0.2.12': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -3313,8 +3304,10 @@ snapshots:
       '@prisma/engines-version': 4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe
     optionalDependencies:
       prisma: 4.8.1
+    optional: true
 
-  '@prisma/engines-version@4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe': {}
+  '@prisma/engines-version@4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe':
+    optional: true
 
   '@prisma/engines@4.8.1': {}
 
@@ -4250,9 +4243,9 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  drizzle-orm@0.33.0(@electric-sql/pglite@0.2.4)(@prisma/client@4.8.1(prisma@4.8.1))(@types/react@18.3.3)(prisma@4.8.1):
+  drizzle-orm@0.35.2(@electric-sql/pglite@0.2.12)(@prisma/client@4.8.1(prisma@4.8.1))(@types/react@18.3.3)(prisma@4.8.1):
     optionalDependencies:
-      '@electric-sql/pglite': 0.2.4
+      '@electric-sql/pglite': 0.2.12
       '@prisma/client': 4.8.1(prisma@4.8.1)
       '@types/react': 18.3.3
       prisma: 4.8.1
@@ -5454,7 +5447,7 @@ snapshots:
     dependencies:
       svelte: 4.2.19
 
-  svelte-maplibre@0.9.13(svelte@4.2.19):
+  svelte-maplibre@0.9.14(svelte@4.2.19):
     dependencies:
       d3-geo: 3.1.1
       dequal: 2.0.3
@@ -5720,5 +5713,3 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.0.0: {}
-
-  zod@3.21.1: {}
