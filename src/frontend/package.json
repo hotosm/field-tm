@@ -23,7 +23,7 @@
     "email": "sysadmin@hotosm.org"
   },
   "devDependencies": {
-    "@playwright/test": "1.44.1",
+    "@playwright/test": "1.48.1",
     "@types/node": "^22.0.2",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
