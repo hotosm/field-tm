@@ -64,7 +64,7 @@ const MenuItems = [
   },
   {
     name: 'Download Custom ODK Collect',
-    ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-entity-select.apk',
+    ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-FMTM.apk',
     isExternalLink: true,
     isActive: true,
   },
