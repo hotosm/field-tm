@@ -1,5 +1,31 @@
 # Changelog
 
+## 2024.4.1 (2024-10-24)
+
+### Fix
+
+- **backend**: allow empty task id in entity statuses for new geopoint (#1822)
+- dockerfile warning such as Casing and whitespace separator (#1815)
+- updated osm-fieldwork -> 0.16.8 (#1814)
+- **files**: cleanup function remove
+- **QrcodeComponent**: reduce qrcode skeleton size
+- **e2e**: comment out test until CI fixed
+- **dialogTaskActions**: add task id filter on odk redirect
+- **qrcode**: increase qrcode size
+- **createProject**: xlsform key update, fix customForm upload issue
+- **editor**: solve editor empty issue on manageProject on initial render
+- **submissionsTable**: on filter reset, set task_id to null
+- **backend**: pyxform usage only allowing xls file extension (#1758)
+- **backend**: pyxform usage only allowing xls file extension (#1758)
+- **map**: set default baseLayer to OSM (#1600)
+
+### Refactor
+
+- update link to custom ODK build (renamed to -FMTM)
+- update link to custom ODK build (renamed to -FMTM)
+- update link to custom odk collect signed 2024.2.0
+- update link to custom odk collect signed 2024.2.0
+
 ## 2024.4.0 (2024-09-24)
 
 ### Feat

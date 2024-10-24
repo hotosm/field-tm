@@ -134,7 +134,7 @@ asyncio_mode="auto"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "2024.4.0"
+version = "2024.4.1"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
