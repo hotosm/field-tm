@@ -21,8 +21,8 @@
 	onMount(() => {
 		show = true;
 		document.body.style.overflowY = 'hidden';
-		bottomSheetRef.style.height = `50vh`;
-		updateSheetHeight(50);
+		bottomSheetRef.style.height = `85vh`;
+		updateSheetHeight(85);
 	});
 
 	const hideBottomSheet = () => {
