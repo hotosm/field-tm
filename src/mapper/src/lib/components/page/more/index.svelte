@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Editor from '$lib/components/common/Editor/editor.svelte';
+	import Comment from '$lib/components/page/more/comment.svelte';
+	import Activities from '$lib/components/page/more/activities.svelte';
 
 	type stackType = '' | 'Comment' | 'Instructions' | 'Activities';
 	const stackGroup: { icon: string; title: stackType }[] = [
@@ -17,14 +19,15 @@
 		},
 	];
 
-	let activeStack: stackType = 'Comment';
+	let activeStack: stackType = 'Activities';
+	export let instructions;
 </script>
 
 <div class="font-barlow-medium h-full">
 	{#if activeStack === ''}
 		{#each stackGroup as stack}
 			<div
-				class="group flex items-center justify-between hover:bg-red-50 rounded-md px-2 duration-200 cursor-pointer"
+				class="group flex items-center justify-between hover:bg-red-50 rounded-md p-2 duration-200 cursor-pointer"
 				on:click={() => (activeStack = stack.title)}
 			>
 				<div class="flex items-center gap-3">
@@ -38,35 +41,24 @@
 
 	<!-- header -->
 	{#if activeStack !== ''}
-		<div class="flex items-center gap-x-2 sticky top-0 bg-white">
+		<div class="flex items-center gap-x-2 sticky top-0 bg-white pb-2 z-50">
 			<hot-icon
 				name="chevron-left"
 				class="text-[1rem] hover:-translate-x-[2px] duration-200 cursor-pointer text-[1.125rem] text-black hover:text-red-600 duration-200"
 				on:click={() => (activeStack = '')}
 			></hot-icon>
-			<p class="text-[1.125rem] font-barlow-semibold leading-0">{activeStack}</p>
+			<p class="text-[1.125rem] font-barlow-semibold">{activeStack}</p>
 		</div>
 	{/if}
 	<!-- body -->
 	{#if activeStack === 'Comment'}
-		<div class="h-[calc(100%-2.25rem)] sm:h-[calc(100%-2.6rem)]">
-			<div class="h-[calc(100%-11.875rem)] overflow-y-scroll"></div>
-
-			<div class="">
-				<Editor />
-			</div>
-		</div>
+		<Comment />
 	{/if}
+
 	{#if activeStack === 'Instructions'}
-		<div class="">
-			<p>Instructions</p>
-		</div>
+		<Editor editable={false} content={instructions} />
 	{/if}
 	{#if activeStack === 'Activities'}
-		<div>
-			<p>Activities</p>
-		</div>
+		<Activities />
 	{/if}
 </div>
-
-<style></style>

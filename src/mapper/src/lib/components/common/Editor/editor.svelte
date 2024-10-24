@@ -8,14 +8,21 @@
 
 	let element;
 	let editor;
+	export let editable;
+	export let content;
+	export let setEditorHtmlContent;
 
 	onMount(() => {
 		editor = new Editor({
 			element: element,
 			extensions: [StarterKit],
-			content: '',
+			content: content,
 			onTransaction: () => {
 				editor = editor;
+			},
+			editable: editable,
+			onUpdate: ({ editor }) => {
+				setEditorHtmlContent && setEditorHtmlContent(editor.getHTML());
 			},
 		});
 	});
@@ -28,23 +35,14 @@
 </script>
 
 <div>
-	<div style="border: 1px solid #c2c2c2;" class="rounded-md">
-		{#if editor}
+	<div style={`border: ${editable ? '1px' : '0px'} solid #c2c2c2;`} class="rounded-md">
+		{#if editor && editable}
 			<Toolbar {editor} />
 		{/if}
 
-		<div bind:this={element} />
-	</div>
-	<div class="w-full flex justify-end my-2 gap-2">
-		<sl-button
-			on:click={editor?.commands.clearContent(true)}
-			variant="default"
-			size="small"
-			class="secondary col-span-2 sm:col-span-1"><span class="font-barlow-medium text-sm">CLEAR</span></sl-button
-		>
-		<sl-button variant="default" size="small" class="primary col-span-2 sm:col-span-1"
-			><span class="font-barlow-medium text-sm">COMMENT</span></sl-button
-		>
+		<div class={`${editable ? 'h-[80px]' : 'h-full'}`}>
+			<div bind:this={element} />
+		</div>
 	</div>
 </div>
 
