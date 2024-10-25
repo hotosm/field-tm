@@ -1,23 +1,24 @@
 export enum task_split_type {
-  divide_on_square = 0,
-  choose_area_as_task = 1,
-  task_splitting_algorithm = 2,
+  divide_on_square = 'DIVIDE_ON_SQUARE',
+  choose_area_as_task = 'CHOOSE_AREA_AS_TASK',
+  task_splitting_algorithm = 'TASK_SPLITTING_ALGORITHM',
 }
 
 export enum task_status {
-  READY = 0,
-  LOCKED_FOR_MAPPING = 1,
-  MAPPED = 2,
-  LOCKED_FOR_VALIDATION = 3,
-  VALIDATED = 4,
-  INVALIDATED = 5,
-  BAD = 6,
-  SPLIT = 7,
-  ARCHIVED = 8,
+  RELEASED_FOR_MAPPING = 'RELEASED_FOR_MAPPING',
+  LOCKED_FOR_MAPPING = 'LOCKED_FOR_MAPPING',
+  MARKED_MAPPED = 'MARKED_MAPPED',
+  LOCKED_FOR_VALIDATION = 'LOCKED_FOR_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  MARKED_INVALID = 'MARKED_INVALID',
+  MARKED_BAD = 'MARKED_BAD',
+  SPLIT_NEEDED = 'SPLIT_NEEDED',
+  RECREATED = 'RECREATED',
+  COMMENT = 'COMMENT',
 }
 
 export enum user_roles {
-  READ_ONLY = '-1',
-  MAPPER = '0',
-  ADMIN = '1',
+  READ_ONLY = 'READ_ONLY',
+  MAPPER = 'MAPPER',
+  ADMIN = 'ADMIN',
 }

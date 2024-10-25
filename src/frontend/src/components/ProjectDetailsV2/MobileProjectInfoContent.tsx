@@ -27,7 +27,7 @@ const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: Partial<projec
       </div>
       <div className="fmtm-flex fmtm-gap-3">
         <p className="fmtm-text-xl">Name: </p>
-        <p className="fmtm-text-xl">{projectInfo?.title}</p>
+        <p className="fmtm-text-xl">{projectInfo.name}</p>
       </div>
       <div className="fmtm-flex fmtm-flex-col">
         <p className="fmtm-text-xl">Short Description:</p>

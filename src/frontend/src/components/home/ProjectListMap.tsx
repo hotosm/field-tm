@@ -52,10 +52,7 @@ const ProjectListMap = () => {
           ...project,
           project_id: `#${project.id}`,
         },
-        geometry: {
-          type: 'Point',
-          coordinates: project.centroid || [],
-        },
+        geometry: project.centroid || [],
       })),
     };
 

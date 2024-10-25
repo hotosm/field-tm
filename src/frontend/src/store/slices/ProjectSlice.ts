@@ -21,12 +21,12 @@ const initialState: ProjectStateTypes = {
   mobileFooterSelection: 'explore',
   projectDetailsLoading: true,
   projectDashboardDetail: {
-    project_name_prefix: '',
+    slug: '',
     organisation_name: '',
     total_tasks: null,
     created_at: '',
     organisation_logo: '',
-    total_submission: null,
+    total_submissions: null,
     total_contributors: null,
     last_active: '',
   },
@@ -163,8 +163,8 @@ const ProjectSlice = createSlice({
               return {
                 ...taskBoundary,
                 task_status: action.payload.task_status,
-                locked_by_uid: action.payload.locked_by_uid,
-                locked_by_username: action.payload.locked_by_username,
+                actioned_by_uid: action.payload.actioned_by_uid,
+                actioned_by_username: action.payload.actioned_by_username,
               };
             }
             return taskBoundary;

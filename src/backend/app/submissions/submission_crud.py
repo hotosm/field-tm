@@ -17,8 +17,6 @@
 #
 """Functions for task submissions."""
 
-import csv
-import hashlib
 import io
 import json
 import uuid
@@ -27,24 +25,20 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from typing import Optional
 
-import sozipfile.sozipfile as zipfile
-from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Response
 from loguru import logger as log
+from psycopg import Connection
+from psycopg.rows import class_row
 
 # from osm_fieldwork.json2osm import json2osm
-from sqlalchemy import text
-from sqlalchemy.orm import Session
-
 from app.central.central_crud import (
     get_odk_form,
-    list_odk_xforms,
 )
 from app.config import settings
-from app.db import db_models
-from app.models.enums import HTTPStatus
-from app.projects import project_crud, project_deps
-from app.s3 import add_obj_to_bucket, get_obj_from_bucket
+from app.db.enums import BackgroundTaskStatus, HTTPStatus
+from app.db.models import DbBackgroundTask, DbProject, DbSubmissionPhoto
+from app.projects import project_deps, project_schemas
+from app.s3 import add_obj_to_bucket
 
 # async def convert_json_to_osm(file_path):
 #     """Wrapper for osm-fieldwork json2osm."""
@@ -52,38 +46,19 @@ from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 #     return osm_xml_path
 
 
-# TODO remove this
-# async def convert_to_osm_for_task(odk_id: int, form_id: int, xform: any):
-#     """Convert JSON --> OSM XML for a specific XForm/Task."""
-#     # This file stores the submission data.
-#     file_path = f"/tmp/{odk_id}_{form_id}.json"
-
-#     # Get the submission data from ODK Central
-#     file = xform.getSubmissions(odk_id, form_id, None, False, True)
-
-#     if file is None:
-#         return None, None
-
-#     with open(file_path, "wb") as f:
-#         f.write(file)
-
-#     osmoutfile = await convert_json_to_osm(file_path)
-#     return osmoutfile
-
-
 # # FIXME 07/06/2024 since osm-fieldwork update
-# def convert_to_osm(db: Session, project_id: int, task_id: Optional[int]):
+# def convert_to_osm(project_id: int, task_id: Optional[int]):
 #     """Convert submissions to OSM XML format."""
 #     project_sync = async_to_sync(project_deps.get_project_by_id)
 #     project = project_sync(db, project_id)
 
 #     get_submission_sync = async_to_sync(get_submission_by_project)
-#     data = get_submission_sync(project_id, {}, db)
+#     data = get_submission_sync(project_id, {})
 
 #     submissions = data.get("value", [])
 
 #     # Create a new ZIP file for the extracted files
-#     final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
+#     final_zip_file_path = f"/tmp/{project.slug}_osm.zip"
 
 #     # Remove the ZIP file if it already exists
 #     if os.path.exists(final_zip_file_path):
@@ -98,7 +73,9 @@ from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 #         ]
 
 #     if not submissions:
-#         raise HTTPException(status_code=404, detail="Submission not found")
+#         raise HTTPException(
+#              status_code=HTTPStatus.NOT_FOUND,
+#              detail="Submission not found")
 
 #     # JSON FILE PATH
 #     jsoninfile = "/tmp/json_infile.json"
@@ -121,7 +98,7 @@ from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 #         with open(osm_file_path, "w") as osm_file:
 #             osm_file.write(processed_xml_string)
 
-#         final_zip_file_path = f"/tmp/{project.project_name_prefix}_osm.zip"
+#         final_zip_file_path = f"/tmp/{project.slug}_osm.zip"
 #         if os.path.exists(final_zip_file_path):
 #             os.remove(final_zip_file_path)
 
@@ -131,241 +108,41 @@ from app.s3 import add_obj_to_bucket, get_obj_from_bucket
 #     return final_zip_file_path
 
 
-async def gather_all_submission_csvs(db: Session, project: db_models.DbProject):
+async def gather_all_submission_csvs(project: DbProject):
     """Gather all of the submission CSVs for a project.
 
     Generate a single zip with all submissions.
     """
     log.info(f"Downloading all CSV submissions for project {project.id}")
-
-    odkid = project.odkid
-
-    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
-    xform = get_odk_form(odk_credentials)
-    file = xform.getSubmissionMedia(odkid, project.odk_form_id)
+    xform = get_odk_form(project.odk_credentials)
+    file = xform.getSubmissionMedia(project.odkid, project.odk_form_id)
     return file.content
 
 
-# FIXME not needed if the performance to retrieve submissions is good enough
-def update_submission_in_s3(
-    db: Session, project_id: int, background_task_id: uuid.UUID
-):
-    """Update or create new submission JSON in S3 for a project."""
-    try:
-        # Get Project
-        get_project_sync = async_to_sync(project_crud.get_project)
-        project = get_project_sync(db, project_id)
-
-        # Gather metadata
-        odk_sync = async_to_sync(project_deps.get_odk_credentials)
-        odk_credentials = odk_sync(db, project_id)
-        odk_forms = list_odk_xforms(project.odkid, odk_credentials, True)
-
-        if not odk_forms:
-            msg = f"No odk forms returned for project ({project_id})"
-            log.warning(msg)
-            return HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=msg,
-            )
-
-        # Get latest submission date
-        valid_datetimes = [
-            form["lastSubmission"]
-            for form in odk_forms
-            if form["lastSubmission"] is not None
-        ]
-
-        review_states = [
-            form["reviewStates"]
-            for form in odk_forms
-            if form["reviewStates"] is not None
-        ]
-
-        last_submission = (
-            max(
-                valid_datetimes,
-                key=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ"),
-            )
-            if valid_datetimes
-            else None
-        )
-        if not last_submission:
-            msg = f"Could not identify last submission for project ({project_id})"
-            log.warning(msg)
-            return HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=msg,
-            )
-
-        # Check if the file already exists in s3
-        s3_project_path = f"/{project.organisation_id}/{project_id}"
-        metadata_s3_path = f"/{s3_project_path}/submissions.meta.json"
-        try:
-            # Get the last submission date and review state from the metadata
-            data = get_obj_from_bucket(settings.S3_BUCKET_NAME, metadata_s3_path)
-            submission_metadata = json.loads(data.getvalue())
-
-            zip_file_last_submission = submission_metadata["last_submission"]
-            zip_file_review_states = (
-                submission_metadata["review_states"]
-                if "review_states" in submission_metadata
-                else None
-            )
-
-            # converting list into hash str to compare them easily
-            odk_review_state_hash = hashlib.sha256(
-                json.dumps(review_states).encode()
-            ).hexdigest()
-            s3_review_state_hash = hashlib.sha256(
-                json.dumps(zip_file_review_states).encode()
-            ).hexdigest()
-
-            if (
-                last_submission <= zip_file_last_submission
-                and odk_review_state_hash == s3_review_state_hash
-            ):
-                # Update background task status to COMPLETED
-                update_bg_task_sync = async_to_sync(
-                    project_crud.update_background_task_status_in_database
-                )
-                update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
-                return
-
-        except Exception as e:
-            log.warning(str(e))
-
-        # Zip file is outdated, regenerate
-        metadata = {
-            "last_submission": last_submission,
-            "review_states": review_states,
-        }
-
-        # Get submissions from ODK Central
-        get_submission_sync = async_to_sync(get_submission_by_project)
-        submissions = get_submission_sync(project_id, {}, db)
-
-        submissions_zip = BytesIO()
-        # Create a sozipfile with metadata and submissions
-        with zipfile.ZipFile(
-            submissions_zip,
-            "w",
-            compression=zipfile.ZIP_DEFLATED,
-            chunk_size=zipfile.SOZIP_DEFAULT_CHUNK_SIZE,
-        ) as myzip:
-            myzip.writestr("submissions.json", json.dumps(submissions))
-
-        # Add zipfile to the s3 bucket
-        add_obj_to_bucket(
-            settings.S3_BUCKET_NAME,
-            submissions_zip,
-            f"/{s3_project_path}/submission.zip",
-        )
-
-        # Upload metadata to s3
-        metadata_obj = BytesIO(json.dumps(metadata).encode())
-        add_obj_to_bucket(
-            settings.S3_BUCKET_NAME,
-            metadata_obj,
-            metadata_s3_path,
-        )
-
-        # Update background task status to COMPLETED
-        update_bg_task_sync = async_to_sync(
-            project_crud.update_background_task_status_in_database
-        )
-        update_bg_task_sync(db, background_task_id, 4)  # 4 is COMPLETED
-
-        return True
-
-    except Exception as e:
-        log.warning(str(e))
-        # Update background task status to FAILED
-        update_bg_task_sync = async_to_sync(
-            project_crud.update_background_task_status_in_database
-        )
-        update_bg_task_sync(db, background_task_id, 2, str(e))  # 2 is FAILED
-
-
-async def download_submission_in_json(db: Session, project: db_models.DbProject):
+async def download_submission_in_json(project: DbProject):
     """Download submission data from ODK Central."""
-    project_name = project.project_name_prefix
-
-    if data := await get_submission_by_project(project, {}, db):
+    if data := await get_submission_by_project(project, {}):
         json_data = data
     else:
         json_data = None
 
     json_bytes = BytesIO(json.dumps(json_data).encode("utf-8"))
     headers = {
-        "Content-Disposition": f"attachment; filename={project_name}_submissions.json"
+        "Content-Disposition": f"attachment; filename={project.slug}_submissions.json"
     }
     return Response(content=json_bytes.getvalue(), headers=headers)
 
 
-async def get_submission_points(db: Session, project_id: int, task_id: Optional[int]):
-    """Get submission points for a project.
-
-    FIXME refactor to pass through project object via auth.
-    """
-    project_info = await project_crud.get_project_by_id(db, project_id)
-    if not project_info:
-        raise HTTPException(status_code=404, detail="Project not found")
-
-    odk_id = project_info.odkid
-    odk_credentials = await project_deps.get_odk_credentials(db, project_id)
-    xform = get_odk_form(odk_credentials)
-
-    response_file = xform.getSubmissionMedia(odk_id, project_info.odk_form_id)
-    response_file_bytes = response_file.content
-
-    try:
-        with zipfile.ZipFile(io.BytesIO(response_file_bytes), "r") as zip_ref:
-            csv_filenames = [f for f in zip_ref.namelist() if f.endswith(".csv")]
-            if not csv_filenames:
-                print("No CSV files found in the zip archive.")
-                return None
-
-            csv_filename = csv_filenames[0]
-            with zip_ref.open(csv_filename) as csv_file:
-                csv_reader = csv.DictReader(io.TextIOWrapper(csv_file))
-                geometry = []
-
-                for row in csv_reader:
-                    if not task_id or int(row["all-task_id"]) == task_id:
-                        latitude = row.get("warmup-Latitude")
-                        longitude = row.get("warmup-Longitude")
-                        if latitude and longitude:
-                            point = (latitude, longitude)
-                            geometry.append(
-                                {
-                                    "type": "Feature",
-                                    "geometry": {"type": "Point", "coordinates": point},
-                                }
-                            )
-
-                return geometry
-
-    except zipfile.BadZipFile:
-        print("The file is not a valid zip file.")
-        return None
-
-
-async def get_submission_count_of_a_project(db: Session, project: db_models.DbProject):
+async def get_submission_count_of_a_project(project: DbProject):
     """Return the total number of submissions made for a project."""
-    # ODK Credentials
-    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
-
     # Get ODK Form with odk credentials from the project.
-    xform = get_odk_form(odk_credentials)
-
+    xform = get_odk_form(project.odk_credentials)
     data = xform.listSubmissions(project.odkid, project.odk_form_id, {})
     return len(data["value"])
 
 
 async def get_submissions_by_date(
-    db: Session,
-    project: db_models.DbProject,
+    project: DbProject,
     days: int,
     planned_task: Optional[int] = None,
 ):
@@ -374,7 +151,6 @@ async def get_submissions_by_date(
     Fetches the submissions for a given project within a specified number of days.
 
     Args:
-        db (Session): The database session.
         project (DbProject): The database project object.
         days (int): The number of days to consider for fetching submissions.
         planned_task (int): Associated task id.
@@ -384,9 +160,9 @@ async def get_submissions_by_date(
 
     Examples:
         # Fetch submissions for project with ID 1 within the last 7 days
-        submissions = await get_submissions_by_date(db, 1, 7)
+        submissions = await get_submissions_by_date(1, 7)
     """
-    data = await get_submission_by_project(project, {}, db)
+    data = await get_submission_by_project(project, {})
 
     end_dates = [
         datetime.fromisoformat(entry["end"].split("+")[0])
@@ -420,9 +196,8 @@ async def get_submissions_by_date(
 
 
 async def get_submission_by_project(
-    project: db_models.DbProject,
+    project: DbProject,
     filters: dict,
-    db: Session,
 ):
     """Get submission by project.
 
@@ -432,7 +207,6 @@ async def get_submission_by_project(
         project (DbProject): The database project object.
         filters (dict): The filters to apply directly to submissions
             in odk central.
-        db (Session): The database session.
 
     Returns:
         Tuple[int, List]: A tuple containing the total number of submissions and
@@ -442,29 +216,24 @@ async def get_submission_by_project(
         ValueError: If the submission file cannot be found.
 
     """
-    odk_central = await project_deps.get_odk_credentials(db, project.id)
-
-    xform = get_odk_form(odk_central)
+    xform = get_odk_form(project.odk_credentials)
     return xform.listSubmissions(project.odkid, project.odk_form_id, filters)
 
 
 async def get_submission_detail(
     submission_id: str,
-    project: db_models.DbProject,
-    db: Session,
+    project: DbProject,
 ):
     """Get the details of a submission.
 
     Args:
         submission_id: The instance uuid of the submission.
         project: The project object representing the project.
-        db: The database session.
 
     Returns:
         The details of the submission as a JSON object.
     """
-    odk_credentials = await project_deps.get_odk_credentials(db, project.id)
-    odk_form = get_odk_form(odk_credentials)
+    odk_form = get_odk_form(project.odk_credentials)
 
     project_submissions = odk_form.getSubmissions(
         project.odkid, project.odk_form_id, submission_id
@@ -480,50 +249,8 @@ async def get_submission_detail(
     return submission.get("value", [])[0]
 
 
-# FIXME might not needed
-# async def get_submission_geojson(
-#     project_id: int,
-#     db: Session,
-# ):
-#     """Retrieve GeoJSON data for a submission associated with a project.
-
-#     Args:
-#         project_id (int): The ID of the project.
-#         db (Session): The database session.
-
-#     Returns:
-#         FeatCol: A GeoJSON FeatCol containing the submission features.
-#     """
-#     data = await get_submission_by_project(project_id, {}, db)
-#     submission_json = data.get("value", [])
-
-#     if not submission_json:
-#         raise HTTPException(
-#             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-#             detail="Loading JSON submission failed",
-#         )
-
-#     all_features = []
-#     for submission in submission_json:
-#         keys_to_remove = ["meta", "__id", "__system"]
-#         for key in keys_to_remove:
-#             submission.pop(key)
-
-#         data = {}
-#         flatten_json(submission, data)
-
-#         geojson_geom = await postgis_utils.javarosa_to_geojson_geom(
-#             data.pop("xlocation", {}), geom_type="Polygon"
-#         )
-
-#         feature = geojson.Feature(geometry=geojson_geom, properties=data)
-#         all_features.append(feature)
-
-#     return geojson.FeatureCollection(features=all_features)
-
-
 async def upload_attachment_to_s3(
-    project_id: int, instance_ids: list, background_task_id: uuid.UUID, db: Session
+    project_id: int, instance_ids: list, background_task_id: uuid.UUID, db: Connection
 ):
     """Uploads attachments to S3 for a given project and instance IDs.
 
@@ -531,7 +258,7 @@ async def upload_attachment_to_s3(
         project_id (int): The ID of the project.
         instance_ids (list): List of instance IDs.
         background_task_id (uuid.UUID): The ID of the background task.
-        db (Session): The database session.
+        db (Connection): The database connection.
 
     Returns:
         bool: True if the upload is successful.
@@ -541,20 +268,23 @@ async def upload_attachment_to_s3(
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
-        odk_central = await project_deps.get_odk_credentials(db, project_id)
-        xform = get_odk_form(odk_central)
+        xform = get_odk_form(project.odk_credentials)
         s3_bucket = settings.S3_BUCKET_NAME
         s3_base_path = f"{project.organisation_id}/{project_id}"
 
-        # Fetch existing photos from the database
-        existing_photos = db.execute(
-            text("""
-            SELECT submission_id, s3_path
-            FROM submission_photos
-            WHERE project_id = :project_id
-            """),
-            {"project_id": project_id},
-        ).fetchall()
+        async with db.cursor(row_factory=class_row(DbSubmissionPhoto)) as cur:
+            await cur.execute(
+                """
+                    SELECT
+                        submission_id, s3_path
+                    FROM
+                        submission_photos
+                    WHERE
+                        project_id = %(project_id)s;
+                """,
+                {"project_id": project_id},
+            )
+            existing_photos = await cur.fetchall()
 
         existing_photos_dict = {}
         for submission_id, s3_path in existing_photos:
@@ -562,7 +292,7 @@ async def upload_attachment_to_s3(
 
         batch_insert_data = []
         for instance_id in instance_ids:
-            submission_detail = await get_submission_detail(instance_id, project, db)
+            submission_detail = await get_submission_detail(instance_id, project)
             attachments = submission_detail["verification"]["image"]
 
             if not isinstance(attachments, list):
@@ -612,26 +342,31 @@ async def upload_attachment_to_s3(
                     continue
 
         # Perform batch insert if there are new records to insert
-        if batch_insert_data:
-            sql = text("""
-            INSERT INTO submission_photos (
-                    project_id,
-                    task_id,
-                    submission_id,
-                    s3_path
-                )
-            VALUES (:project_id, :task_id, :submission_id, :s3_path)
-            """)
-            db.execute(sql, batch_insert_data)
-
-        db.commit()
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                    INSERT INTO submission_photos (
+                        project_id,
+                        task_id,
+                        submission_id,
+                        s3_path
+                    )
+                    VALUES (
+                        %(project_id)s, %(task_id)s,
+                        %(submission_id)s, %(s3_path)s);
+                """,
+                batch_insert_data,
+            )
         return True
 
     except Exception as e:
         log.warning(str(e))
-        # Update background task status to FAILED
-        update_bg_task_sync = async_to_sync(
-            project_crud.update_background_task_status_in_database
+        await DbBackgroundTask.update(
+            db,
+            background_task_id,
+            project_schemas.BackgroundTaskUpdate(
+                status=BackgroundTaskStatus.FAILED,
+                message=str(e),
+            ),
         )
-        update_bg_task_sync(db, background_task_id, 2, str(e))
         return False

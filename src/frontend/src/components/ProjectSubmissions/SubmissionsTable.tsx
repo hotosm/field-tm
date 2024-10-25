@@ -59,7 +59,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return filter.task_id && task?.index === +filter.task_id;
+      return filter.task_id && task?.id === +filter.task_id;
     })?.[0],
   };
   const taskList = projectData[projectIndex]?.taskBoundries;
@@ -111,7 +111,7 @@ const SubmissionsTable = ({ toggleView }) => {
 
   useEffect(() => {
     dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table?project_id=${projectId}`, {
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
@@ -130,7 +130,7 @@ const SubmissionsTable = ({ toggleView }) => {
     );
     dispatch(SubmissionActions.SetSubmissionTableRefreshing(true));
     dispatch(
-      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission_table?project_id=${projectId}`, {
+      SubmissionTableService(`${import.meta.env.VITE_API_URL}/submission/submission-table?project_id=${projectId}`, {
         page: paginationPage,
         ...filter,
       }),
@@ -192,7 +192,7 @@ const SubmissionsTable = ({ toggleView }) => {
     dispatch(
       ConvertXMLToJOSM(
         `${import.meta.env.VITE_API_URL}/submission/get_osm_xml/${projectId}`,
-        projectInfo?.outline_geojson?.bbox,
+        projectInfo?.outline?.bbox,
       ),
     );
   };
@@ -202,14 +202,14 @@ const SubmissionsTable = ({ toggleView }) => {
       dispatch(
         getDownloadProjectSubmission(
           `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=false`,
-          projectInfo?.title,
+          projectInfo.name,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
         getDownloadProjectSubmission(
           `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=true`,
-          projectInfo?.title,
+          projectInfo.name,
         ),
       );
     }
@@ -403,7 +403,7 @@ const SubmissionsTable = ({ toggleView }) => {
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
           {filter?.task_id &&
-            taskBoundaryData?.[projectIndex]?.taskBoundries?.find((task) => task?.index === +filter?.task_id)
+            taskBoundaryData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +filter?.task_id)
               ?.task_status === 'LOCKED_FOR_VALIDATION' && (
               <Button
                 isLoading={updateTaskStatusLoading}
@@ -463,7 +463,7 @@ const SubmissionsTable = ({ toggleView }) => {
             headerClassName="updatedHeader !fmtm-sticky fmtm-right-0 fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)] fmtm-text-center"
             rowClassName="updatedRow !fmtm-sticky fmtm-right-0 fmtm-bg-white fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)]"
             dataFormat={(row) => {
-              const taskUId = taskList?.find((task) => task?.index == row?.task_id)?.id;
+              const taskUId = taskList?.find((task) => task?.id == row?.task_id)?.id;
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
                   <AssetModules.VisibilityOutlinedIcon

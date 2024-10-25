@@ -54,7 +54,7 @@ def odktoken_to_qr():
     projects = db.query(DbProject).all()
 
     for project in projects:
-        project_name = project.project_name_prefix
+        project_name = project.slug
         tasks = project.tasks
 
         for task in tasks:

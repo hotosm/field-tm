@@ -111,7 +111,11 @@ const SubmissionDetails = () => {
 
   useEffect(() => {
     if (!taskUId) return;
-    dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUId)}/history/?comment=true`));
+    dispatch(
+      GetProjectComments(
+        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUId)}/history/?project_id=${projectId}&comment=true`,
+      ),
+    );
   }, [taskUId]);
 
   const filteredData = restSubmissionDetails ? removeNullValues(restSubmissionDetails) : {};
@@ -172,7 +176,7 @@ const SubmissionDetails = () => {
                 className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
                 onClick={() => navigate(`/project/${projectId}`)}
               >
-                {projectDashboardDetail?.project_name_prefix}
+                {projectDashboardDetail?.slug}
               </span>
               <span> &gt; </span>
               <span
@@ -194,7 +198,7 @@ const SubmissionDetails = () => {
               ) : (
                 <div className="fmtm-bg-white fmtm-rounded-lg fmtm-w-full fmtm-h-fit fmtm-p-2 fmtm-px-4 md:fmtm-py-5 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-flex-col">
                   <h2 className="fmtm-text-base fmtm-text-[#545454] fmtm-font-bold fmtm-mb-4 fmtm-break-words">
-                    {projectDashboardDetail?.project_name_prefix}
+                    {projectDashboardDetail?.slug}
                   </h2>
                   <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454]">Task: {taskId}</h2>
                   <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">

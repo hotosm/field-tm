@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import { TaskStateTypes } from '@/store/types/ITask';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
 import { EntityOsmMap } from '@/store/types/IProject';
-import { task_status } from '@/types/enums';
 
 const initialState: TaskStateTypes = {
   taskLoading: false,

@@ -145,9 +145,8 @@ const FormCategoryService = (url: string) => {
   };
 };
 
-const UploadTaskAreasService = (url: string, filePayload: any, projectData: any) => {
+const UploadTaskAreasService = (url: string, filePayload: any) => {
   return async (dispatch) => {
-    dispatch(CreateProjectActions.UploadAreaLoading(true));
     const postUploadArea = async (url: string, filePayload: any) => {
       let isAPISuccess = true;
       try {
@@ -160,10 +159,7 @@ const UploadTaskAreasService = (url: string, filePayload: any, projectData: any)
         });
         isAPISuccess = isStatusSuccess(postNewProjectDetails.status);
 
-        if (isAPISuccess) {
-          await dispatch(CreateProjectActions.UploadAreaLoading(false));
-          await dispatch(CreateProjectActions.PostUploadAreaSuccess(postNewProjectDetails.data));
-        } else {
+        if (!isAPISuccess) {
           throw new Error(`Request failed with status ${postNewProjectDetails.status}`);
         }
       } catch (error: any) {
@@ -177,7 +173,6 @@ const UploadTaskAreasService = (url: string, filePayload: any, projectData: any)
             duration: 2000,
           }),
         );
-        dispatch(CreateProjectActions.UploadAreaLoading(false));
       }
       return isAPISuccess;
     };
@@ -323,14 +318,14 @@ const GetIndividualProjectDetails = (url: string) => {
       try {
         const getIndividualProjectDetailsResponse = await axios.get(url);
         const resp: ProjectDetailsModel = getIndividualProjectDetailsResponse.data;
-        const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline_geojson, id: 1 }] };
+        const formattedOutlineGeojson = { type: 'FeatureCollection', features: [{ ...resp.outline, id: 1 }] };
         const modifiedResponse = {
           ...resp,
-          name: resp.project_info?.name,
-          description: resp.project_info?.description,
-          short_description: resp.project_info?.short_description,
-          outline_geojson: formattedOutlineGeojson,
-          per_task_instructions: resp.project_info?.per_task_instructions,
+          name: resp.name,
+          description: resp.description,
+          short_description: resp.short_description,
+          outline: formattedOutlineGeojson,
+          per_task_instructions: resp.per_task_instructions,
         };
 
         dispatch(CreateProjectActions.SetIndividualProjectDetails(modifiedResponse));

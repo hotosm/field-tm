@@ -29,6 +29,7 @@ const TaskSubmissions = () => {
       setTaskInfoList(taskInfo);
     } else {
       const updatedTask: taskSubmissionInfoType[] = Array.from({ length: projectTaskLength })?.map((_, i) => {
+        // TODO check this logic should be id or index for task?
         const task = taskInfo?.find((task) => parseInt(task?.index) === i + 1);
         if (task) {
           return task;

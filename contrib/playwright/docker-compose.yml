@@ -30,6 +30,12 @@ services:
         "critical",
         "--no-access-log",
       ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
+      start_period: 60s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   ui:
     # This hostname is used for Playwright test internal networking
@@ -53,8 +59,8 @@ services:
       api:
         # Override: must be healthy before tests run
         condition: service_healthy
-        # Override: must be healthy before tests run
       ui:
+        # Override: must be healthy before tests run
         condition: service_healthy
     working_dir: /app
     environment:

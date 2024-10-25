@@ -14,19 +14,19 @@ interface ValidationErrors {
 function DefineTaskValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
   if (
-    values?.task_split_type !== task_split_type['choose_area_as_task'] &&
-    values?.task_split_type !== task_split_type['divide_on_square'] &&
-    values?.task_split_type !== task_split_type['task_splitting_algorithm']
+    values?.task_split_type !== task_split_type.choose_area_as_task &&
+    values?.task_split_type !== task_split_type.divide_on_square &&
+    values?.task_split_type !== task_split_type.task_splitting_algorithm
   ) {
     errors.task_split_type = 'Splitting Algorithm is required.';
   }
-  if (values?.task_split_type === task_split_type['divide_on_square'] && !values?.dimension) {
+  if (values?.task_split_type === task_split_type.divide_on_square && !values?.dimension) {
     errors.dimension = 'Dimension is Required.';
   }
-  if (values?.task_split_type === task_split_type['divide_on_square'] && values?.dimension && values.dimension < 9) {
+  if (values?.task_split_type === task_split_type.divide_on_square && values?.dimension && values.dimension < 9) {
     errors.dimension = 'Dimension should be greater than 10 or equal to 10.';
   }
-  if (values?.task_split_type === task_split_type['task_splitting_algorithm'] && !values?.average_buildings_per_task) {
+  if (values?.task_split_type === task_split_type.task_splitting_algorithm && !values?.average_buildings_per_task) {
     errors.average_buildings_per_task = 'Average number of buildings per task is required.';
   }
 

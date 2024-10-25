@@ -10,16 +10,18 @@ export const ProjectById = (projectId: string) => {
     const fetchProjectById = async (projectId: string) => {
       try {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
-        const project = await CoreModules.axios.get(`${import.meta.env.VITE_API_URL}/projects/${projectId}`);
+        const project = await CoreModules.axios.get(
+          `${import.meta.env.VITE_API_URL}/projects/${projectId}?project_id=${projectId}`,
+        );
         const projectResp: Record<string, any> = project.data;
         const persistingValues: Record<string, any> = projectResp.tasks.map((data) => {
           return {
             id: data.id,
             index: data.project_task_index,
-            outline_geojson: data.outline_geojson,
+            outline: data.outline,
             task_status: task_status[data.task_status],
-            locked_by_uid: data.locked_by_uid,
-            locked_by_username: data.locked_by_username,
+            actioned_by_uid: data.actioned_by_uid,
+            actioned_by_username: data.actioned_by_username,
             task_history: data.task_history,
           };
         });
@@ -29,21 +31,21 @@ export const ProjectById = (projectId: string) => {
         dispatch(
           ProjectActions.SetProjectInfo({
             id: projectResp.id,
-            outline_geojson: projectResp.outline_geojson,
+            outline: projectResp.outline,
             priority: projectResp.priority || 2,
-            title: projectResp.project_info?.name,
+            name: projectResp.name,
             location_str: projectResp.location_str,
-            description: projectResp.project_info?.description,
-            short_description: projectResp.project_info?.short_description,
+            description: projectResp.description,
+            short_description: projectResp.short_description,
             num_contributors: projectResp.num_contributors,
             total_tasks: projectResp.total_tasks,
             tasks_mapped: projectResp.tasks_mapped,
             tasks_validated: projectResp.tasks_validated,
             xform_category: projectResp.xform_category,
-            xform_id: projectResp?.xform_id,
+            odk_form_id: projectResp?.odk_form_id,
             tasks_bad: projectResp.tasks_bad,
             data_extract_url: projectResp.data_extract_url,
-            instructions: projectResp?.project_info?.per_task_instructions,
+            instructions: projectResp?.per_task_instructions,
             odk_token: projectResp?.odk_token,
             custom_tms_url: projectResp?.custom_tms_url,
             organisation_id: projectResp?.organisation_id,
@@ -155,7 +157,7 @@ export const GenerateProjectTiles = (url: string, payload: string) => {
     const generateProjectTiles = async (url: string, payload: string) => {
       try {
         const response = await CoreModules.axios.get(url);
-        dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${payload}/tiles-list/`));
+        dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${payload}/tiles/`));
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));
       } catch (error) {
         dispatch(ProjectActions.SetGenerateProjectTilesLoading(false));

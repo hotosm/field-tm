@@ -18,14 +18,96 @@
 """Schemas for returned ODK Central objects."""
 
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional, TypedDict
+from typing import Optional, Self, TypedDict
 
 from geojson_pydantic import Feature, FeatureCollection
+from loguru import logger as log
 from pydantic import BaseModel, Field, ValidationInfo, computed_field
-from pydantic.functional_validators import field_validator
+from pydantic.functional_validators import field_validator, model_validator
 
-from app.models.enums import TaskStatus
+from app.config import HttpUrlStr, decrypt_value, encrypt_value
+from app.db.enums import EntityStatus
+
+
+class ODKCentral(BaseModel):
+    """ODK Central credentials."""
+
+    odk_central_url: Optional[HttpUrlStr] = None
+    odk_central_user: Optional[str] = None
+    odk_central_password: Optional[str] = None
+
+    @field_validator("odk_central_url", mode="after")
+    @classmethod
+    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
+        """Remove trailing slash from ODK Central URL."""
+        if not value:
+            return None
+        if value.endswith("/"):
+            return value[:-1]
+        return value
+
+    @model_validator(mode="after")
+    def all_odk_vars_together(self) -> Self:
+        """Ensure if one ODK variable is set, then all are."""
+        if any(
+            [
+                self.odk_central_url,
+                self.odk_central_user,
+                self.odk_central_password,
+            ]
+        ) and not all(
+            [
+                self.odk_central_url,
+                self.odk_central_user,
+                self.odk_central_password,
+            ]
+        ):
+            err = "All ODK details are required together: url, user, password"
+            log.debug(err)
+            raise ValueError(err)
+        return self
+
+
+class ODKCentralIn(ODKCentral):
+    """ODK Central credentials inserted to database."""
+
+    @field_validator("odk_central_password", mode="after")
+    @classmethod
+    def encrypt_odk_password(cls, value: str) -> Optional[str]:
+        """Encrypt the ODK Central password before db insertion."""
+        if not value:
+            return None
+        return encrypt_value(value)
+
+
+class ODKCentralDecrypted(BaseModel):
+    """ODK Central credentials extracted from database.
+
+    WARNING never return this as a response model.
+    WARNING or log to the terminal.
+    """
+
+    odk_central_url: Optional[HttpUrlStr] = None
+    odk_central_user: Optional[str] = None
+    odk_central_password: Optional[str] = None
+
+    def model_post_init(self, ctx):
+        """Run logic after model object instantiated."""
+        # Decrypt odk central password from database
+        if self.odk_central_password:
+            if isinstance(self.odk_central_password, str):
+                encrypted_pass = self.odk_central_password
+                self.odk_central_password = decrypt_value(encrypted_pass)
+
+    @field_validator("odk_central_url", mode="after")
+    @classmethod
+    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
+        """Remove trailing slash from ODK Central URL."""
+        if not value:
+            return None
+        if value.endswith("/"):
+            return value[:-1]
+        return value
 
 
 @dataclass
@@ -68,37 +150,6 @@ class EntityDict(TypedDict):
 
     label: str
     data: EntityPropertyDict
-
-
-class CentralBase(BaseModel):
-    """ODK Central return."""
-
-    central_url: str
-
-
-class Central(CentralBase):
-    """ODK Central return, with extras."""
-
-    pass
-
-
-class CentralOut(CentralBase):
-    """ODK Central output."""
-
-    pass
-
-
-class CentralFileType(BaseModel):
-    """ODK Central file return."""
-
-    filetype: Enum("FileType", ["xform", "extract", "zip", "xlsform", "all"])
-    pass
-
-
-class CentralDetails(CentralBase):
-    """ODK Central details."""
-
-    pass
 
 
 class EntityProperties(BaseModel):
@@ -174,7 +225,7 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
     """The status for mapping an Entity/feature."""
 
     updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
-    status: Optional[TaskStatus] = None
+    status: Optional[EntityStatus] = None
 
     @computed_field
     @property
@@ -187,19 +238,18 @@ class EntityMappingStatusIn(BaseModel):
     """Update the mapping status for an Entity."""
 
     entity_id: str
-    status: TaskStatus
+    status: EntityStatus
     label: str
 
     @field_validator("label", mode="before")
     @classmethod
     def append_status_emoji(cls, value: str, info: ValidationInfo) -> str:
         """Add 🔒 (locked), ✅ (complete) or ❌ (invalid) emojis."""
-        status = info.data.get("status", TaskStatus.READY.value)
+        status = info.data.get("status", EntityStatus.UNLOCKED.value)
         emojis = {
-            str(TaskStatus.LOCKED_FOR_MAPPING.value): "🔒",
-            str(TaskStatus.MAPPED.value): "✅",
-            str(TaskStatus.INVALIDATED.value): "❌",
-            str(TaskStatus.BAD.value): "❌",
+            str(EntityStatus.LOCKED.value): "🔒",
+            str(EntityStatus.MAPPED.value): "✅",
+            str(EntityStatus.BAD.value): "❌",
         }
 
         # Remove any existing emoji at the start of the label
@@ -215,6 +265,6 @@ class EntityMappingStatusIn(BaseModel):
 
     @field_validator("status", mode="after")
     @classmethod
-    def integer_status_to_string(cls, value: TaskStatus) -> str:
+    def integer_status_to_string(cls, value: EntityStatus) -> str:
         """Convert integer status to string for ODK Entity data."""
         return str(value.value)

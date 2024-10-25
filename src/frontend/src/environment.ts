@@ -11,19 +11,19 @@ export default {
   matomoTrackingId: '28',
   tasksStatus: [
     {
-      label: 'READY',
+      label: 'RELEASED_FOR_MAPPING',
       action: [{ key: 'Start Mapping', value: 'LOCKED_FOR_MAPPING', btnBG: 'red' }],
       btnBG: 'red',
     },
     {
       label: 'LOCKED_FOR_MAPPING',
       action: [
-        { key: 'Mark as fully mapped', value: 'MAPPED', btnBG: 'gray' },
-        { key: 'Stop Mapping', value: 'READY', btnBG: 'transparent' },
+        { key: 'Mark as fully mapped', value: 'MARKED_MAPPED', btnBG: 'gray' },
+        { key: 'Stop Mapping', value: 'RELEASED_FOR_MAPPING', btnBG: 'transparent' },
       ],
     },
     {
-      label: 'MAPPED',
+      label: 'MARKED_MAPPED',
       action: [
         { key: 'Start Validation', value: 'LOCKED_FOR_VALIDATION', btnBG: 'gray' },
         // { key: 'Return to Mapping', value: 'LOCKED_FOR_MAPPING' },
@@ -33,13 +33,13 @@ export default {
       label: 'LOCKED_FOR_VALIDATION',
       action: [
         { key: 'Mark as validated', value: 'VALIDATED', btnBG: 'gray' },
-        { key: 'Mapping Needed', value: 'INVALIDATED', btnBG: 'transparent' },
+        { key: 'Mapping Needed', value: 'MARKED_INVALID', btnBG: 'transparent' },
       ],
     },
     { label: 'VALIDATED', action: [] },
     // { label: 'VALIDATED', action: [{ key: 'Merge data with OSM', value: 'MERGE_WITH_OSM', btnBG: 'gray' }] },
-    { label: 'INVALIDATED', action: [{ key: 'Map Again', value: 'LOCKED_FOR_MAPPING', btnBG: 'gray' }] },
-    { label: 'BAD', action: [] },
+    { label: 'MARKED_INVALID', action: [{ key: 'Map Again', value: 'LOCKED_FOR_MAPPING', btnBG: 'gray' }] },
+    { label: 'MARKED_BAD', action: [] },
     // "SPLIT",
     // "ARCHIVED",
   ],

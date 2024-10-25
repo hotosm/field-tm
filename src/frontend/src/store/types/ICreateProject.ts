@@ -7,8 +7,6 @@ export type CreateProjectStateTypes = {
   projectDetailsResponse: EditProjectResponseTypes | null;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  projectArea: ProjectAreaTypes | null;
-  projectAreaLoading: boolean;
   formCategoryList: FormCategoryListTypes[] | [];
   formCategoryLoading: boolean;
   generateProjectLoading: boolean;
@@ -61,27 +59,22 @@ export type ProjectTaskTypes = {
   id: number;
   index: number;
   project_id: number;
-  outline_geojson: GeoJSONFeatureTypes;
+  outline: GeoJSONFeatureTypes;
   task_status: number;
-  locked_by_uid: number | null;
-  locked_by_username: string | null;
+  actioned_by_uid: number | null;
+  actioned_by_username: string | null;
   task_history: any[];
   qr_code_base64: string;
-  task_status_str: string;
-};
-
-export type ProjectInfoTypes = {
-  name: string;
-  short_description: string;
-  description: string;
 };
 
 type EditProjectResponseTypes = {
   id: number;
   odkid: number;
-  project_info: ProjectInfoTypes[];
+  name: string;
+  short_description: string;
+  description: string;
   status: number;
-  outline_geojson: GeoJSONFeatureTypes;
+  outline: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
   xform_category: string;
   hashtags: string;
@@ -115,10 +108,6 @@ export type ProjectDetailsTypes = {
   hasCustomTMS: boolean;
   customFormUpload: any;
   hasAdditionalFeature: boolean;
-};
-
-export type ProjectAreaTypes = {
-  // Define properties related to the project area here
 };
 
 export type FormCategoryListTypes = {

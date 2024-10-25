@@ -22,7 +22,9 @@ const ManageProject = () => {
   const editProjectDetails = useAppSelector((state) => state.createproject.editProjectDetails);
 
   useEffect(() => {
-    dispatch(GetIndividualProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${projectId}`));
+    dispatch(
+      GetIndividualProjectDetails(`${import.meta.env.VITE_API_URL}/projects/${projectId}?project_id=${projectId}`),
+    );
   }, [projectId]);
 
   return (

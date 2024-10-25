@@ -23,8 +23,6 @@ export const initialState: CreateProjectStateTypes = {
   projectDetailsResponse: null,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  projectArea: null,
-  projectAreaLoading: false,
   formCategoryList: [],
   formCategoryLoading: false,
   generateProjectLoading: false,
@@ -84,7 +82,6 @@ const CreateProject = createSlice({
         organisation_id: null,
         form_ways: 'existing_form',
       };
-      state.projectArea = null;
       state.totalAreaSelection = null;
       state.splitTasksSelection = null;
       state.dataExtractGeojson = null;
@@ -97,12 +94,6 @@ const CreateProject = createSlice({
       state.generateProjectSuccess = false;
       state.generateProjectError = false;
       state.drawToggle = false;
-    },
-    UploadAreaLoading(state, action) {
-      state.projectAreaLoading = action.payload;
-    },
-    PostUploadAreaSuccess(state, action) {
-      state.projectArea = action.payload;
     },
     GetFormCategoryLoading(state, action) {
       state.formCategoryLoading = action.payload;

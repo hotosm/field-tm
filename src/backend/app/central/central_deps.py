@@ -27,8 +27,8 @@ from fastapi import File, UploadFile
 from fastapi.exceptions import HTTPException
 from osm_fieldwork.OdkCentralAsync import OdkDataset
 
-from app.models.enums import HTTPStatus
-from app.projects.project_schemas import ODKCentralDecrypted
+from app.central.central_schemas import ODKCentralDecrypted
+from app.db.enums import HTTPStatus
 
 
 @asynccontextmanager

@@ -24,7 +24,7 @@ const FormUpdateTab = ({ projectId }) => {
   const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);
   const [error, setError] = useState({ formError: '', categoryError: '' });
 
-  const xFormId = CoreModules.useAppSelector((state) => state.project.projectInfo.xform_id);
+  const xFormId = CoreModules.useAppSelector((state) => state.project.projectInfo.odk_form_id);
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
   const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
   const selectedCategory = useAppSelector((state) => state.createproject.editProjectDetails.xform_category);

@@ -48,7 +48,7 @@ const Home = () => {
         HomeSummaryService(
           `${
             import.meta.env.VITE_API_URL
-          }/projects/search-projects?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
+          }/projects/search?page=${paginationPage}&results_per_page=12&search=${debouncedSearch}`,
         ),
       );
     }

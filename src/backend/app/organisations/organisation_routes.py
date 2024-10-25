@@ -17,24 +17,31 @@
 #
 """Routes for organisation management."""
 
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastapi import (
     APIRouter,
     Depends,
     File,
+    Response,
     UploadFile,
 )
-from sqlalchemy.orm import Session
+from loguru import logger as log
+from psycopg import Connection
 
 from app.auth.auth_schemas import AuthUser, OrgUserDict
 from app.auth.osm import login_required
 from app.auth.roles import org_admin, super_admin
-from app.db import database
-from app.db.db_models import DbOrganisation, DbUser
-from app.organisations import organisation_crud, organisation_schemas
+from app.db.database import db_conn
+from app.db.enums import HTTPStatus
+from app.db.models import DbOrganisation, DbOrganisationManagers
+from app.organisations import organisation_crud
 from app.organisations.organisation_deps import org_exists
-from app.users.user_deps import user_exists_in_db
+from app.organisations.organisation_schemas import (
+    OrganisationIn,
+    OrganisationOut,
+    OrganisationUpdate,
+)
 
 router = APIRouter(
     prefix="/organisation",
@@ -43,139 +50,148 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[organisation_schemas.OrganisationOut])
+@router.get("/", response_model=list[OrganisationOut])
 async def get_organisations(
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ) -> list[DbOrganisation]:
     """Get a list of all organisations."""
-    return await organisation_crud.get_organisations(db, current_user)
+    return await DbOrganisation.all(db, current_user.id)
 
 
-@router.get(
-    "/my-organisations", response_model=list[organisation_schemas.OrganisationOut]
-)
+@router.get("/my-organisations", response_model=list[OrganisationOut])
 async def get_my_organisations(
-    db: Session = Depends(database.get_db),
-    current_user: AuthUser = Depends(login_required),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ) -> list[DbOrganisation]:
     """Get a list of all organisations."""
     return await organisation_crud.get_my_organisations(db, current_user)
 
 
-@router.get("/unapproved/", response_model=list[organisation_schemas.OrganisationOut])
+@router.get("/unapproved/", response_model=list[OrganisationOut])
 async def list_unapproved_organisations(
-    db: Session = Depends(database.get_db),
-    current_user: DbUser = Depends(super_admin),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ) -> list[DbOrganisation]:
-    """Get a list of all organisations."""
-    return await organisation_crud.get_unapproved_organisations(db)
+    """Get a list of unapproved organisations."""
+    return await DbOrganisation.unapproved(db)
 
 
-@router.get("/unapproved/{org_id}", response_model=organisation_schemas.OrganisationOut)
-async def unapproved_org_detail(
-    org_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: DbUser = Depends(super_admin),
-):
-    """Get a detail of an unapproved organisations."""
-    return await organisation_crud.get_unapproved_org_detail(db, org_id)
-
-
-@router.get("/{org_id}", response_model=organisation_schemas.OrganisationOut)
+@router.get("/{org_id}", response_model=OrganisationOut)
 async def get_organisation_detail(
-    organisation: DbOrganisation = Depends(org_exists),
-    current_user: AuthUser = Depends(login_required),
+    organisation: Annotated[DbOrganisation, Depends(org_exists)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Get a specific organisation by id or name."""
     return organisation
 
 
-@router.post("/", response_model=organisation_schemas.OrganisationOut)
+@router.post("/", response_model=OrganisationOut)
 async def create_organisation(
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
     # Depends required below to allow logo upload
-    org: organisation_schemas.OrganisationIn = Depends(),
+    org_in: OrganisationIn = Depends(),
     logo: Optional[UploadFile] = File(None),
-    db: Session = Depends(database.get_db),
-    current_user: DbUser = Depends(login_required),
-) -> organisation_schemas.OrganisationOut:
+) -> OrganisationOut:
     """Create an organisation with the given details.
 
-    TODO refactor to use base64 encoded logo / no upload file.
-    TODO then we can use the pydantic model as intended.
+    Either a logo can be uploaded, or a link to the logo provided
+    in the Organisation JSON ('logo': 'https://your.link.to.logo.png').
     """
-    return await organisation_crud.create_organisation(db, org, current_user, logo)
+    return DbOrganisation.create(db, org_in, current_user.id, logo)
 
 
-@router.patch("/{org_id}/", response_model=organisation_schemas.OrganisationOut)
+@router.patch("/{org_id}/", response_model=OrganisationOut)
 async def update_organisation(
-    new_values: organisation_schemas.OrganisationEdit = Depends(),
+    db: Annotated[Connection, Depends(db_conn)],
+    org_user_dict: Annotated[AuthUser, Depends(org_admin)],
+    new_values: OrganisationUpdate = Depends(),
     logo: UploadFile = File(None),
-    organisation: DbOrganisation = Depends(org_exists),
-    db: Session = Depends(database.get_db),
-    org_user_dict: OrgUserDict = Depends(org_admin),
 ):
     """Partial update for an existing organisation."""
-    return await organisation_crud.update_organisation(
-        db, organisation, new_values, logo
-    )
+    org_id = org_user_dict.get("org").id
+    return DbOrganisation.update(db, org_id, new_values, logo)
 
 
 @router.delete("/{org_id}")
 async def delete_org(
-    db: Session = Depends(database.get_db),
-    org_user_dict: OrgUserDict = Depends(org_admin),
+    db: Annotated[Connection, Depends(db_conn)],
+    org_user_dict: Annotated[AuthUser, Depends(org_admin)],
 ):
     """Delete an organisation."""
-    return await organisation_crud.delete_organisation(db, org_user_dict["org"])
+    org = org_user_dict.get("org")
+    deleted_org_id = await DbOrganisation.delete(db, org.id)
+
+    if not deleted_org_id:
+        return Response(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            details=f"Failed deleting org {(org.name)}.",
+        )
+
+    return Response(
+        status_code=HTTPStatus.NO_CONTENT,
+        details=f"Deleted org {(org.deleted_org_id)}.",
+    )
 
 
 @router.delete("/unapproved/{org_id}")
 async def delete_unapproved_org(
     org_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: DbUser = Depends(super_admin),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(super_admin)],
 ):
     """Delete an unapproved organisation.
 
-    ADMIN ONLY ENDPOINT.
+    NOTE this endpoint is required as
+        org_user_dict: Annotated[AuthUser, Depends(org_admin)]
+    will also check if the organisation is approved and error if it's not.
+    This is an ADMIN-only endpoint for deleting unapproved orgs.
     """
-    organisation = db.query(DbOrganisation).filter(DbOrganisation.id == org_id).first()
-    return await organisation_crud.delete_organisation(db, organisation)
+    await DbOrganisation.delete(db, org_id)
+    return Response(
+        status_code=HTTPStatus.NO_CONTENT,
+        detail=f"Deleted org ({org_id}).",
+    )
 
 
-@router.post("/approve/", response_model=organisation_schemas.OrganisationOut)
+@router.post("/approve/", response_model=OrganisationOut)
 async def approve_organisation(
     org_id: int,
-    db: Session = Depends(database.get_db),
-    current_user: DbUser = Depends(super_admin),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(super_admin)],
 ):
     """Approve the organisation request made by the user.
 
     The logged in user must be super admin to perform this action .
     """
-    approved_org = await organisation_crud.approve_organisation(db, org_id)
-
+    log.info(f"Approving organisation ({org_id}).")
+    approved_org = await DbOrganisation.update(
+        db,
+        org_id,
+        OrganisationUpdate(approved=True),
+    )
     # Set organisation requester as organisation manager
     if approved_org.created_by:
-        await organisation_crud.add_organisation_admin(
+        await DbOrganisationManagers.create(
             db, approved_org.id, approved_org.created_by
         )
 
     return approved_org
 
 
-@router.post("/add_admin/")
+@router.post("/new-admin/")
 async def add_new_organisation_admin(
-    db: Session = Depends(database.get_db),
-    user: DbUser = Depends(user_exists_in_db),
-    org: DbOrganisation = Depends(org_exists),
-    org_user_dict: OrgUserDict = Depends(org_admin),
+    db: Annotated[Connection, Depends(db_conn)],
+    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+    user_id: int,
 ):
     """Add a new organisation admin.
 
     The logged in user must be either the owner of the organisation or a super admin.
     """
-    # NOTE extracting the org this way means org_id is not a mandatory URL param
-    # org_id = org_user_dict["organisation"].id
-    return await organisation_crud.add_organisation_admin(db, org.id, user.id)
+    await DbOrganisationManagers.create(
+        db,
+        org_user_dict.get("org").id,
+        user_id,
+    )

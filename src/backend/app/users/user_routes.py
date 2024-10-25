@@ -17,14 +17,17 @@
 #
 """Endpoints for users and role."""
 
-from typing import List
+from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
+from psycopg import Connection
 
-from app.db import database
-from app.models.enums import UserRole as UserRoleEnum
-from app.users import user_crud, user_schemas
+from app.auth.roles import mapper, super_admin
+from app.db.database import db_conn
+from app.db.enums import UserRole as UserRoleEnum
+from app.db.models import DbUser
+from app.users import user_schemas
+from app.users.user_deps import get_user
 
 router = APIRouter(
     prefix="/users",
@@ -35,49 +38,29 @@ router = APIRouter(
 
 @router.get("/", response_model=List[user_schemas.UserOut])
 async def get_users(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(database.get_db),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[DbUser, Depends(super_admin)],
 ):
     """Get all user details."""
-    users = await user_crud.get_users(db, skip=skip, limit=limit)
-
-    if not users:
-        raise HTTPException(status_code=404, detail="No users found")
-
-    return users
+    return await DbUser.all(db)
 
 
 @router.get("/{id}", response_model=user_schemas.UserOut)
-async def get_user_by_identifier(id: str, db: Session = Depends(database.get_db)):
+async def get_user_by_identifier(
+    user: Annotated[DbUser, Depends(get_user)],
+    current_user: Annotated[DbUser, Depends(super_admin)],
+):
     """Get a single users details.
 
     The OSM ID should be used.
     If this is not known, the endpoint falls back to searching
     for the username.
     """
-    user = None
-    # Search by ID
-    try:
-        osm_id = int(id)
-        user = await user_crud.get_user(db, user_id=osm_id)
-    except ValueError:
-        # Skip if not a valid integer
-        pass
-
-    if not user:
-        # Search by Username
-        user = await user_crud.get_user_by_username(db, username=id)
-
-        # No user found
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
     return user
 
 
 @router.get("/user-role-options/")
-async def get_user_roles():
+async def get_user_roles(current_user: Annotated[DbUser, Depends(mapper)]):
     """Check for available user role options."""
     user_roles = {}
     for role in UserRoleEnum:

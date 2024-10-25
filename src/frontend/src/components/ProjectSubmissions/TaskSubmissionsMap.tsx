@@ -111,8 +111,8 @@ const TaskSubmissionsMap = () => {
       ...basicGeojsonTemplate,
       features: [
         ...projectTaskBoundries?.[0]?.taskBoundries?.map((task) => ({
-          ...task.outline_geojson,
-          id: task?.outline_geojson?.properties?.fid,
+          ...task.outline,
+          id: task?.outline?.properties?.fid,
         })),
       ],
     };
