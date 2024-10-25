@@ -28,22 +28,21 @@ from fastapi import HTTPException
 from loguru import logger as log
 from osm_fieldwork.OdkCentral import OdkAppUser, OdkForm, OdkProject
 from osm_fieldwork.update_xlsform import append_mandatory_fields
+from psycopg import Connection
 from pyxform.xls2xform import convert as xform_convert
-from sqlalchemy import text
-from sqlalchemy.orm import Session
 
 from app.central import central_deps, central_schemas
-from app.config import encrypt_value, settings
+from app.config import settings
+from app.db.enums import EntityStatus, HTTPStatus
+from app.db.models import DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
     javarosa_to_geojson_geom,
     parse_geojson_file_to_featcol,
 )
-from app.models.enums import HTTPStatus, TaskStatus, XLSFormType
-from app.projects import project_schemas
 
 
-def get_odk_project(odk_central: Optional[project_schemas.ODKCentralDecrypted] = None):
+def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
     """Helper function to get the OdkProject with credentials."""
     if odk_central:
         url = odk_central.odk_central_url
@@ -63,21 +62,23 @@ def get_odk_project(odk_central: Optional[project_schemas.ODKCentralDecrypted] =
     except ValueError as e:
         log.error(e)
         raise HTTPException(
-            status_code=401,
-            detail="""
-            ODK credentials are invalid, or may have been updated. Please update them.
-            """,
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail=(
+                "ODK credentials are invalid, or may have been updated. "
+                "Please update them."
+            ),
         ) from e
     except Exception as e:
         log.exception(e)
         raise HTTPException(
-            status_code=500, detail=f"Error creating project on ODK Central: {e}"
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
     return project
 
 
-def get_odk_form(odk_central: project_schemas.ODKCentralDecrypted):
+def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
     """Helper function to get the OdkForm with credentials."""
     url = odk_central.odk_central_url
     user = odk_central.odk_central_user
@@ -89,13 +90,14 @@ def get_odk_form(odk_central: project_schemas.ODKCentralDecrypted):
     except Exception as e:
         log.error(e)
         raise HTTPException(
-            status_code=500, detail=f"Error creating project on ODK Central: {e}"
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
     return form
 
 
-def get_odk_app_user(odk_central: Optional[project_schemas.ODKCentralDecrypted] = None):
+def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] = None):
     """Helper function to get the OdkAppUser with credentials."""
     if odk_central:
         url = odk_central.odk_central_url
@@ -114,14 +116,15 @@ def get_odk_app_user(odk_central: Optional[project_schemas.ODKCentralDecrypted] 
     except Exception as e:
         log.error(e)
         raise HTTPException(
-            status_code=500, detail=f"Error creating project on ODK Central: {e}"
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
     return form
 
 
 def list_odk_projects(
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """List all projects on a remote ODK Server."""
     project = get_odk_project(odk_central)
@@ -129,7 +132,7 @@ def list_odk_projects(
 
 
 def create_odk_project(
-    name: str, odk_central: Optional[project_schemas.ODKCentralDecrypted] = None
+    name: str, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
 ):
     """Create a project on a remote ODK Server.
 
@@ -145,7 +148,7 @@ def create_odk_project(
         if isinstance(result, dict):
             if result.get("code") == 401.2:
                 raise HTTPException(
-                    status_code=500,
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
                     detail="Could not authenticate to odk central.",
                 )
 
@@ -155,12 +158,13 @@ def create_odk_project(
     except Exception as e:
         log.error(e)
         raise HTTPException(
-            status_code=500, detail=f"Error creating project on ODK Central: {e}"
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=f"Error creating project on ODK Central: {e}",
         ) from e
 
 
 async def delete_odk_project(
-    project_id: int, odk_central: Optional[project_schemas.ODKCentralDecrypted] = None
+    project_id: int, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
 ):
     """Delete a project from a remote ODK Server."""
     # FIXME: when a project is deleted from Central, we have to update the
@@ -177,7 +181,7 @@ async def delete_odk_project(
 def delete_odk_app_user(
     project_id: int,
     name: str,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """Delete an app-user from a remote ODK Server."""
     odk_app_user = get_odk_app_user(odk_central)
@@ -188,7 +192,7 @@ def delete_odk_app_user(
 def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
-    odk_credentials: project_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
 ) -> None:
     """Create an XForm on a remote ODK Central server.
 
@@ -204,7 +208,8 @@ def create_odk_xform(
     except Exception as e:
         log.error(e)
         raise HTTPException(
-            status_code=500, detail={"message": "Connection failed to odk central"}
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail={"message": "Connection failed to odk central"},
         ) from e
 
     xform.createForm(odk_id, xform_data, publish=True)
@@ -213,7 +218,7 @@ def create_odk_xform(
 def delete_odk_xform(
     project_id: int,
     xform_id: str,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """Delete an XForm from a remote ODK Central server."""
     xform = get_odk_form(odk_central)
@@ -224,7 +229,7 @@ def delete_odk_xform(
 
 def list_odk_xforms(
     project_id: int,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
     metadata: bool = False,
 ):
     """List all XForms in an ODK Central project."""
@@ -237,7 +242,7 @@ def list_odk_xforms(
 def get_form_full_details(
     odk_project_id: int,
     form_id: str,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """Get additional metadata for ODK Form."""
     form = get_odk_form(odk_central)
@@ -246,7 +251,7 @@ def get_form_full_details(
 
 
 def get_odk_project_full_details(
-    odk_project_id: int, odk_central: project_schemas.ODKCentralDecrypted
+    odk_project_id: int, odk_central: central_schemas.ODKCentralDecrypted
 ):
     """Get additional metadata for ODK project."""
     project = get_odk_project(odk_central)
@@ -255,7 +260,7 @@ def get_odk_project_full_details(
 
 
 def list_submissions(
-    project_id: int, odk_central: Optional[project_schemas.ODKCentralDecrypted] = None
+    project_id: int, odk_central: Optional[central_schemas.ODKCentralDecrypted] = None
 ):
     """List all submissions for a project, aggregated from associated users."""
     project = get_odk_project(odk_central)
@@ -268,23 +273,10 @@ def list_submissions(
     return submissions
 
 
-async def get_form_list(db: Session) -> list:
+async def get_form_list(db: Connection) -> list:
     """Returns the list of {id:title} for XLSForms in the database."""
     try:
-        include_categories = [category.value for category in XLSFormType]
-
-        sql_query = text(
-            """
-            SELECT id, title FROM xlsforms
-            WHERE title IN
-                (SELECT UNNEST(:categories));
-            """
-        )
-
-        result = db.execute(sql_query, {"categories": include_categories}).fetchall()
-        result_list = [{"id": row.id, "title": row.title} for row in result]
-        return result_list
-
+        return await DbXLSForm.all(db)
     except Exception as e:
         log.error(e)
         raise HTTPException(
@@ -357,7 +349,7 @@ async def update_project_xform(
     odk_id: int,
     xlsform: BytesIO,
     category: str,
-    odk_credentials: project_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
 ) -> None:
     """Update and publish the XForm for a project.
 
@@ -366,7 +358,7 @@ async def update_project_xform(
         odk_id (int): ODK Central form ID.
         xlsform (UploadFile): XForm data.
         category (str): Category of the XForm.
-        odk_credentials (project_schemas.ODKCentralDecrypted): ODK Central creds.
+        odk_credentials (central_schemas.ODKCentralDecrypted): ODK Central creds.
 
     Returns: None
     """
@@ -546,7 +538,7 @@ async def task_geojson_dict_to_entity_values(
 
 
 async def create_entity_list(
-    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str = "features",
     properties: list[str] = None,
@@ -573,7 +565,7 @@ async def create_entity_list(
 
 
 async def get_entities_geojson(
-    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str = "features",
     minimal: Optional[bool] = False,
@@ -668,7 +660,7 @@ async def get_entities_geojson(
 
 
 async def get_entities_data(
-    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     dataset_name: str = "features",
     fields: str = "__system/updatedAt, osm_id, status, task_id",
@@ -688,12 +680,20 @@ async def get_entities_data(
         list: JSON list containing Entity info. If updated_at is included,
             the format is string 2022-01-31T23:59:59.999Z.
     """
-    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-        entities = await odk_central.getEntityData(
-            odk_id,
-            dataset_name,
-            url_params=f"$select=__id{',' if fields else ''} {fields}",
-        )
+    try:
+        async with central_deps.get_odk_dataset(odk_creds) as odk_central:
+            entities = await odk_central.getEntityData(
+                odk_id,
+                dataset_name,
+                url_params=f"$select=__id{',' if fields else ''} {fields}",
+            )
+    except Exception as e:
+        msg = f"Getting entity data failed for ODK project ({odk_id})"
+        log.error(msg)
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=msg,
+        ) from e
 
     all_entities = []
     for entity in entities:
@@ -736,7 +736,7 @@ def entity_to_flat_dict(
 
 
 async def get_entity_mapping_status(
-    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     entity_uuid: str,
     dataset_name: str = "features",
@@ -765,11 +765,11 @@ async def get_entity_mapping_status(
 
 
 async def update_entity_mapping_status(
-    odk_creds: project_schemas.ODKCentralDecrypted,
+    odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
     entity_uuid: str,
     label: str,
-    status: TaskStatus,
+    status: EntityStatus,
     dataset_name: str = "features",
 ) -> dict:
     """Update the Entity mapping status.
@@ -781,7 +781,7 @@ async def update_entity_mapping_status(
         odk_id (str): The project ID in ODK Central.
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
-        status (TaskStatus): New TaskStatus to assign, in string form.
+        status (EntityStatus): New EntityStatus to assign, in string form.
         dataset_name (str): Override the default dataset / Entity list name 'features'.
 
     Returns:
@@ -804,7 +804,7 @@ def upload_media(
     project_id: int,
     xform_id: str,
     filespec: str,
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """Upload a data file to Central."""
     xform = get_odk_form(odk_central)
@@ -815,7 +815,7 @@ def download_media(
     project_id: int,
     xform_id: str,
     filename: str = "test",
-    odk_central: Optional[project_schemas.ODKCentralDecrypted] = None,
+    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
 ):
     """Upload a data file to Central."""
     xform = get_odk_form(odk_central)
@@ -870,7 +870,7 @@ def download_media(
 async def get_appuser_token(
     xform_id: str,
     project_odk_id: int,
-    odk_credentials: project_schemas.ODKCentralDecrypted,
+    odk_credentials: central_schemas.ODKCentralDecrypted,
 ):
     """Get the app user token for a specific project.
 
@@ -925,10 +925,7 @@ async def get_appuser_token(
                 raise HTTPException(
                     status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
                 ) from None
-        odk_token = encrypt_value(
-            f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
-        )
-        return odk_token
+        return f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
 
     except Exception as e:
         log.error(f"An error occurred: {str(e)}")

@@ -1,19 +1,18 @@
+import { task_status as taskStatusEnum } from '@/types/enums';
+
 export interface ProjectDetailsModel {
   id: number;
   odkid: number;
   default_locale: string;
-  project_info: {
-    locale: string;
-    name: string;
-    short_description: string;
-    description: string;
-    instructions: string;
-    per_task_instructions: string;
-  };
+  name: string;
+  short_description: string;
+  description: string;
+  instructions: string;
+  per_task_instructions: string;
   status: number;
   xform_category: string;
   location_str: string;
-  outline_geojson: {
+  outline: {
     type: string;
     geometry: {
       coordinates: [string, string];
@@ -27,7 +26,7 @@ export interface ProjectDetailsModel {
     id: number;
     project_id: number;
     index: number;
-    outline_geojson: {
+    outline: {
       type: string;
       geometry: {
         coordinates: [string, string];
@@ -37,16 +36,15 @@ export interface ProjectDetailsModel {
       id: string;
       bbox: null | number[];
     };
-    task_status: number;
-    locked_by_uid: number;
-    locked_by_username: string;
+    task_status: taskStatusEnum;
+    actioned_by_uid: number;
+    actioned_by_username: string;
     task_history: {
       event_id: string;
       action_text: string;
       action_date: string;
     }[];
     qr_code_base64: string;
-    task_status_str: string;
   }[];
 }
 

@@ -1,21 +1,9 @@
-type ProjectInfo = {
-	name: string;
-	short_description: string;
-	description: string;
-	per_task_instructions: string;
-};
-
-type ProjectAuthor = {
-	username: string;
-	id: number;
-};
-
 export type ProjectTask = {
 	id: number;
 	project_id: number;
 	project_task_index: number;
 	feature_count: number;
-	outline_geojson: {
+	outline: {
 		type: string;
 		geometry: {
 			type: string;
@@ -33,8 +21,11 @@ export type ProjectTask = {
 export interface ProjectData {
 	id: number;
 	odkid: number;
-	project_info: ProjectInfo;
-	outline_geojson: {
+	name: string;
+	short_description: string;
+	description: string;
+	per_task_instructions: string;
+	outline: {
 		type: string;
 		geometry: {
 			type: string;
@@ -48,13 +39,13 @@ export interface ProjectData {
 	};
 	location_str: string;
 	xform_category: string;
-	xform_id: string;
+	odk_form_id: string;
 	data_extract_url: string;
 	odk_token: string;
 	organisation_id: number;
 	organisation_logo: string;
+	author_id: number;
 	custom_tms_url: string;
-	author: ProjectAuthor;
 	status: number;
 	hashtags: string[];
 	tasks: ProjectTask[];

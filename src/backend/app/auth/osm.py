@@ -29,7 +29,7 @@ from osm_login_python.core import Auth
 
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
-from app.models.enums import HTTPStatus, UserRole
+from app.db.enums import HTTPStatus, UserRole
 
 if settings.DEBUG:
     # Required as callback url is http during dev
@@ -64,14 +64,20 @@ async def login_required(
         access_token = extract_token_from_cookie(request)
 
     if not access_token:
-        raise HTTPException(status_code=401, detail="No access token provided")
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="No access token provided",
+        )
 
     try:
         token_data = verify_token(access_token)
     except ValueError as e:
         log.error(e)
         log.error("Failed to deserialise access token")
-        raise HTTPException(status_code=401, detail="Access token not valid") from e
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Access token not valid",
+        ) from e
 
     return AuthUser(**token_data)
 
@@ -148,10 +154,14 @@ def verify_token(token: str):
             audience=settings.FMTM_DOMAIN,
         )
     except jwt.ExpiredSignatureError as e:
-        raise HTTPException(status_code=401, detail="Refresh token has expired") from e
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Refresh token has expired",
+        ) from e
     except Exception as e:
         raise HTTPException(
-            status_code=401, detail="Could not validate refresh token"
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Could not validate refresh token",
         ) from e
 
 

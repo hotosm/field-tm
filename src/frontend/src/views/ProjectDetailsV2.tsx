@@ -41,6 +41,7 @@ import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import QrcodeComponent from '@/components/QrcodeComponent';
+import { createDropdownMenuScope } from '@radix-ui/react-dropdown-menu';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
@@ -77,12 +78,12 @@ const ProjectDetailsV2 = () => {
   const entityOsmMap = useAppSelector((state) => state?.project?.entityOsmMap);
 
   useEffect(() => {
-    if (state.projectInfo.title) {
-      document.title = `${state.projectInfo.title} - HOT Field Mapping Tasking Manager`;
+    if (state.projectInfo.name) {
+      document.title = `${state.projectInfo.name} - HOT Field Mapping Tasking Manager`;
     } else {
       document.title = 'HOT Field Mapping Tasking Manager';
     }
-  }, [state.projectInfo.title]);
+  }, [state.projectInfo.name]);
 
   //snackbar handle close function
   const handleClose = (event, reason) => {
@@ -132,14 +133,17 @@ const ProjectDetailsV2 = () => {
   useEffect(() => {
     if (!map) return;
 
+    // FIXME should the feature id be an int, not a string?
     const features = state.projectTaskBoundries[0]?.taskBoundries?.map((taskObj) => ({
       type: 'Feature',
-      geometry: { ...taskObj.outline_geojson.geometry },
+      id: taskObj.id,
+      geometry: { ...taskObj.outline },
       properties: {
-        ...taskObj.outline_geojson.properties,
-        locked_by_user: taskObj?.locked_by_uid,
+        ...taskObj.outline.properties,
+        task_status: taskObj?.task_status,
+        actioned_by_uid: taskObj?.actioned_by_uid,
+        actioned_by_username: taskObj?.actioned_by_username,
       },
-      id: `${taskObj.id}_${taskObj.task_status}`,
     }));
 
     const taskBoundariesFeatcol = {
@@ -157,7 +161,7 @@ const ProjectDetailsV2 = () => {
   }, [state.projectInfo.data_extract_url]);
 
   const lockedPopup = (properties: Record<string, any>) => {
-    if (properties.locked_by_user === authDetails?.id) {
+    if (properties.actioned_by_uid === authDetails?.id) {
       return <p>This task was locked by you</p>;
     }
     return null;
@@ -182,7 +186,7 @@ const ProjectDetailsV2 = () => {
       behavior: 'smooth',
     });
 
-    dispatch(CoreModules.TaskActions.SetSelectedTask(properties?.fid));
+    dispatch(CoreModules.TaskActions.SetSelectedTask(feature.getId()));
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
 
     // Fit the map view to the clicked feature's extent based on the window size
@@ -331,9 +335,9 @@ const ProjectDetailsV2 = () => {
               <div className="fmtm-relative">
                 <p
                   className="fmtm-text-xl fmtm-font-archivo fmtm-line-clamp-3 fmtm-mr-4"
-                  title={state.projectInfo.title}
+                  title={state.projectInfo.name}
                 >
-                  {state.projectInfo.title}
+                  {state.projectInfo.name}
                 </p>
               </div>
             )}
@@ -424,7 +428,7 @@ const ProjectDetailsV2 = () => {
                       : '-fmtm-left-[60rem] fmtm-bottom-0 lg:fmtm-top-0'
                   }`}
                 >
-                  <ProjectOptions projectName={state?.projectInfo?.title} />
+                  <ProjectOptions projectName={state?.projectInfo?.name} />
                 </div>
               </div>
             </div>
@@ -474,7 +478,7 @@ const ProjectDetailsV2 = () => {
                     return getTaskStatusStyle(
                       feature,
                       mapTheme,
-                      feature.getProperties()?.locked_by_user == authDetails?.id,
+                      feature.getProperties()?.actioned_by_uid == authDetails?.id,
                     );
                   }}
                 />
@@ -501,7 +505,7 @@ const ProjectDetailsV2 = () => {
               <AsyncPopup
                 map={map}
                 popupUI={lockedPopup}
-                primaryKey={'locked_by_user'}
+                primaryKey={'actioned_by_uid'}
                 showOnHover="pointermove"
                 popupId="locked-popup"
                 className="fmtm-w-[235px]"
@@ -538,7 +542,7 @@ const ProjectDetailsV2 = () => {
               </div>
               <MapControlComponent
                 map={map}
-                projectName={state?.projectInfo?.title || ''}
+                projectName={state?.projectInfo?.name || ''}
                 pmTileLayerData={customBasemapData}
               />
             </MapComponent>

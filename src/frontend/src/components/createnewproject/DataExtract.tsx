@@ -200,7 +200,7 @@ const DataExtract = ({
     }
     if (extractFeatCol && extractFeatCol?.features?.length > 0) {
       handleCustomChange('customDataExtractUpload', event.target.files[0]);
-      handleCustomChange('task_split_type', task_split_type['choose_area_as_task'].toString());
+      handleCustomChange('task_split_type', task_split_type.choose_area_as_task.toString());
       // View on map
       await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
       return;

@@ -22,7 +22,7 @@ import pytest
 
 async def test_get_organisation(client, organisation):
     """Test get list of organisations."""
-    response = client.get("/organisation/")
+    response = await client.get("/organisation/")
     assert response.status_code == 200
 
     data = response.json()[-1]

@@ -18,29 +18,26 @@
 
 """Task dependencies for use in Depends."""
 
+from typing import Annotated
+
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
-from sqlalchemy.orm import Session
+from psycopg import Connection
 
-from app.db.database import get_db
-from app.db.db_models import DbTask
-from app.models.enums import HTTPStatus
+from app.db.database import db_conn
+from app.db.enums import HTTPStatus
+from app.db.models import DbTask
 
 
-async def get_task_by_id(
-    project_id: int,
+async def get_task(
+    db: Annotated[Connection, Depends(db_conn)],
     task_id: int,
-    db: Session = Depends(get_db),
 ):
-    """Get a single task by task index."""
-    if (
-        db_task := db.query(DbTask)
-        .filter(DbTask.project_task_index == task_id, DbTask.project_id == project_id)
-        .first()
-    ):
-        return db_task
-    else:
+    """Get a task by it's ID, used as route dependency."""
+    try:
+        return await DbTask.one(db, task_id)
+    except KeyError as e:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f"Task with ID {task_id} does not exist",
-        )
+            detail=str(e),
+        ) from e

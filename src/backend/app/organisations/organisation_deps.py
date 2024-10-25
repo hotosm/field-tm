@@ -18,75 +18,61 @@
 
 """Organisation dependencies for use in Depends."""
 
-from typing import Union
+from typing import Annotated
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
-from loguru import logger as log
-from sqlalchemy.orm import Session
+from psycopg import Connection
 
-from app.db.database import get_db
-from app.db.db_models import DbOrganisation, DbProject
-from app.models.enums import HTTPStatus
-from app.projects import project_deps, project_schemas
+from app.central import central_schemas
+from app.db.database import db_conn
+from app.db.enums import HTTPStatus
+from app.db.models import DbOrganisation, DbProject
+from app.projects.project_deps import get_project
 
 
-async def get_organisation_by_name(
-    db: Session, org_name: str, check_approved: bool = True
+async def get_organisation(
+    db: Annotated[Connection, Depends(db_conn)],
+    id: str | int,
+    check_approved: bool = True,
 ) -> DbOrganisation:
-    """Get an organisation from the db by name.
+    """Return an organisation from the DB, else exception.
 
     Args:
-        db (Session): database session
-        org_name (int): id of the organisation
-        check_approved (bool): first check if the organisation is approved
+        id (str | int): The organisation ID (integer) or name (string) to check.
+        db (Connection): The database connection.
+        check_approved (bool): Throw error if org is not approved yet.
 
     Returns:
-        DbOrganisation: organisation with the given id
-    """
-    # # For getting org with LIKE match
-    # org_obj = (
-    #     db.query(DbOrganisation)
-    #     .filter(func.lower(DbOrganisation.name).like(func.lower(f"%{org_name}%")))
-    #     .first()
-    # )
-    org_obj = db.query(DbOrganisation).filter_by(name=org_name).first()
+        DbOrganisation: The organisation if found.
 
-    if org_obj and check_approved and org_obj.approved is False:
+    Raises:
+        HTTPException: Raised with a 404 status code if the user is not found.
+    """
+    try:
+        try:
+            # Is ID (int)
+            id = int(id)
+        except ValueError:
+            # Is name (str)
+            pass
+        db_org = await DbOrganisation.one(db, id)
+
+    except KeyError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
+
+    if check_approved and db_org.approved is False:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN,
-            detail=f"Organisation ({org_obj.id}) is not approved yet",
+            detail=f"Organisation ({id}) is not approved yet.",
         )
 
-    return org_obj
-
-
-async def get_organisation_by_id(
-    db: Session, org_id: int, check_approved: bool = True
-) -> DbOrganisation:
-    """Get an organisation from the db by id.
-
-    Args:
-        db (Session): database session
-        org_id (int): id of the organisation
-        check_approved (bool): first check if the organisation is approved
-
-    Returns:
-        DbOrganisation: organisation with the given id
-    """
-    org_obj = db.query(DbOrganisation).filter_by(id=org_id).first()
-
-    if org_obj and check_approved and org_obj.approved is False:
-        raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN,
-            detail=f"Organisation ({org_id}) is not approved yet",
-        )
-    return org_obj
+    return db_org
 
 
 async def get_org_odk_creds(
     org: DbOrganisation,
-) -> project_schemas.ODKCentralDecrypted:
+) -> central_schemas.ODKCentralDecrypted:
     """Get odk credentials for an organisation, else error."""
     url = org.odk_central_url
     user = org.odk_central_user
@@ -98,21 +84,20 @@ async def get_org_odk_creds(
             detail="Organisation does not have ODK Central credentials configured",
         )
 
-    return project_schemas.ODKCentralDecrypted(
+    return central_schemas.ODKCentralDecrypted(
         odk_central_url=org.odk_central_url,
         odk_central_user=org.odk_central_user,
         odk_central_password=org.odk_central_password,
     )
 
 
-async def check_org_exists(
-    db: Session,
-    org_id: Union[str, int, None],
-    check_approved: bool = True,
+async def org_exists(
+    org_id: int | str,
+    db: Annotated[Connection, Depends(db_conn)],
 ) -> DbOrganisation:
-    """Check if organisation name exists, else error.
+    """Wrapper for to check an org exists in a route dependency.
 
-    The org_id can also be an org name.
+    Requires Depends from a route.
     """
     if not org_id:
         raise HTTPException(
@@ -120,43 +105,12 @@ async def check_org_exists(
             detail="Organisation id not provided",
         )
 
-    try:
-        org_id = int(org_id)
-    except ValueError:
-        pass
-
-    if isinstance(org_id, int):
-        log.debug(f"Getting organisation by id: {org_id}")
-        db_organisation = await get_organisation_by_id(db, org_id, check_approved)
-
-    else:  # is string
-        log.debug(f"Getting organisation by name: {org_id}")
-        db_organisation = await get_organisation_by_name(db, org_id, check_approved)
-
-    if not db_organisation:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail=f"Organisation ({org_id}) does not exist",
-        )
-
-    log.debug(f"Organisation match: {db_organisation}")
-    return db_organisation
-
-
-async def org_exists(
-    org_id: Union[str, int],
-    db: Session = Depends(get_db),
-) -> DbOrganisation:
-    """Wrapper for check_org_exists to be used as a route dependency.
-
-    Requires Depends from a route.
-    """
-    return await check_org_exists(db, org_id)
+    return await get_organisation(db, org_id, check_approved=False)
 
 
 async def org_from_project(
-    project: DbProject = Depends(project_deps.get_project_by_id),
-    db: Session = Depends(get_db),
+    project: Annotated[DbProject, Depends(get_project)],
+    db: Annotated[Connection, Depends(db_conn)],
 ) -> DbOrganisation:
     """Get an organisation from a project id."""
-    return await check_org_exists(db, project.organisation_id)
+    return await get_organisation(db, project.organisation_id)

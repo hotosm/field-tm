@@ -26,7 +26,7 @@ const Comments = () => {
   const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
   const currentStatus = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return task?.index == selectedTask;
+      return task?.id == selectedTask;
     })?.[0],
   };
   const filteredProjectCommentsList = projectCommentsList?.filter(
@@ -34,7 +34,12 @@ const Comments = () => {
   );
 
   useEffect(() => {
-    dispatch(GetProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?comment=true`));
+    console.log(currentStatus);
+    dispatch(
+      GetProjectComments(
+        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?project_id=${projectId}&comment=true`,
+      ),
+    );
   }, [selectedTask, projectId, currentStatus?.id]);
 
   const clearComment = () => {
@@ -55,11 +60,12 @@ const Comments = () => {
       return;
     }
     dispatch(
-      PostProjectComments(`${import.meta.env.VITE_API_URL}/tasks/task-comments/?project_id=${projectId}`, {
-        task_id: currentStatus?.id,
-        project_id: projectId,
-        comment,
-      }),
+      PostProjectComments(
+        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/comment/?project_id=${projectId}`,
+        {
+          comment,
+        },
+      ),
     );
     clearComment();
   };

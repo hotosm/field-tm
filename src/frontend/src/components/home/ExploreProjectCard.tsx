@@ -84,9 +84,9 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
             <CoreModules.Stack direction={'column'} minHeight={190} mt={'2%'} justifyContent={'left'}>
               <p
                 className="fmtm-line-clamp-3 fmtm-text-xl fmtm-capitalize fmtm-font-bold fmtm-ml-[2%] fmtm-mt-[5%]"
-                title={data.title}
+                title={data.name}
               >
-                {data.title}
+                {data.name}
               </p>
 
               <p

@@ -83,6 +83,12 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
+      start_period: 60s
+      interval: 10s
+      timeout: 5s
+      retries: 10
     deploy:
       replicas: ${API_REPLICAS:-4}
       resources:
@@ -130,7 +136,7 @@ services:
       timeout: 5s
 
   fmtm-db:
-    image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
     command: -c 'max_connections=300'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/

@@ -234,7 +234,7 @@ services:
       timeout: 5s
 
   fmtm-db:
-    image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
     build:
       context: https://github.com/postgis/docker-postgis.git#master:14-3.4/alpine
@@ -281,7 +281,7 @@ services:
 
   central-db:
     profiles: ["", "central"]
-    image: "postgis/postgis:${POSTGIS_TAG:-14-3.4-alpine}"
+    image: "postgis/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
     volumes:
       - central_db_data:/var/lib/postgresql/data/
     environment:

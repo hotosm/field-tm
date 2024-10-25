@@ -19,12 +19,12 @@
 
 import pytest
 
-from app.models.enums import XLSFormType
+from app.db.enums import XLSFormType
 
 
 async def test_list_forms(client):
     """Test get a list of all XLSForms available in FMTM."""
-    response = client.get("/central/list-forms")
+    response = await client.get("/central/list-forms")
     assert response.status_code == 200
 
     forms_json = response.json()

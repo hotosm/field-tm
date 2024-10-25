@@ -17,9 +17,10 @@ const QrcodeComponent = ({ projectId, taskIndex }: tasksComponentType) => {
     downloadLink.click();
   };
 
-  const projectName = useAppSelector((state) => state.project.projectInfo.title);
+  const projectName = useAppSelector((state) => state.project.projectInfo.name);
   const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+
   const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
 
   return (

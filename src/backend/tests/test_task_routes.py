@@ -17,39 +17,45 @@
 #
 """Tests for task routes."""
 
+from uuid import UUID
+
 import pytest
 
-from app.models.enums import TaskStatus
+from app.db.enums import TaskStatus
 
 
-def test_read_task_history(client, task_history):
+async def test_read_task_history(client, task_event):
     """Test task history for a project."""
-    task_id = task_history.task_id
+    task_id = task_event.task_id
 
     assert task_id is not None
 
-    response = client.get(f"/tasks/{task_id}/history/")
+    response = await client.get(
+        f"/tasks/{task_id}/history?project_id={task_event.project_id}"
+    )
     data = response.json()[0]
 
     assert response.status_code == 200
-    assert data["id"] == task_history.id
-    assert data["username"] == task_history.actioned_by.username
+    # NOTE the json return is a string, so we must wrap in UUID
+    assert UUID(data["event_id"]) == task_event.event_id
+    assert data["username"] == task_event.username
+    assert data["profile_img"] == task_event.profile_img
+    assert data["action_text"] == task_event.action_text
+    assert data["status"] == TaskStatus.READY
 
 
-def test_update_task_status(client, tasks):
+async def test_update_task_status(client, tasks):
     """Test update the task status."""
     task_id = tasks[0].id
     project_id = tasks[0].project_id
     new_status = TaskStatus.LOCKED_FOR_MAPPING
 
-    response = client.post(
+    response = await client.post(
         f"tasks/{task_id}/new-status/{new_status.value}?project_id={project_id}"
     )
-
     assert response.status_code == 200
 
     data = response.json()
-
     assert "status" in data
     assert data["status"] == new_status.name
 

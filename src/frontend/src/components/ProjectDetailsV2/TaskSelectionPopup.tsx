@@ -19,7 +19,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
   const dispatch = CoreModules.useAppDispatch();
 
   const currentProjectId: string = params.id;
-  const [task_status, set_task_status] = useState('READY');
+  const [task_status, set_task_status] = useState('RELEASED_FOR_MAPPING');
 
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
@@ -31,18 +31,18 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
     })?.[0],
   };
   const checkIfTaskAssignedOrNot =
-    selectedTask?.locked_by_username === authDetails?.username || selectedTask?.locked_by_username === null;
+    selectedTask?.actioned_by_username === authDetails?.username || selectedTask?.actioned_by_username === null;
 
   useEffect(() => {
     if (projectIndex != -1) {
       const currentStatus = {
         ...projectData[projectIndex].taskBoundries.filter((task) => {
-          return task?.index == taskId;
+          return task?.id == taskId;
         })[0],
       };
-      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex(
-        (data) => data.label == currentStatus.task_status,
-      );
+      const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex((data) => {
+        return data.label == currentStatus.task_status;
+      });
       const tasksStatus =
         feature.id_ != undefined ? environment.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
       set_task_status(tasksStatus);
@@ -93,8 +93,8 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-p-3 sm:fmtm-p-5">
           <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
           <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_status}</p>
-          {selectedTask?.locked_by_username && (
-            <p className="fmtm-text-base fmtm-text-[#757575]">Locked By: {selectedTask?.locked_by_username}</p>
+          {selectedTask?.actioned_by_username && (
+            <p className="fmtm-text-base fmtm-text-[#757575]">Locked By: {selectedTask?.actioned_by_username}</p>
           )}
         </div>
         {/* only display qr code component render inside taskPopup on mobile screen */}

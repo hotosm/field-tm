@@ -15,31 +15,29 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic models for Users and Roles."""
+"""Pydantic models overriding base DbUser fields."""
 
-from typing import Optional
+from typing import Annotated, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from app.models.enums import UserRole
-
-
-class UserBase(BaseModel):
-    """Username only."""
-
-    username: str
+from app.db.enums import UserRole
+from app.db.models import DbUser, DbUserRole
 
 
-class User(UserBase):
-    """User with ID."""
+class UserIn(DbUser):
+    """User details for insert into DB."""
 
-    id: int
+    # Only id and username are mandatory
+    # NOTE this is a unique case where the primary key is not auto-generated
+    # NOTE we use the OSM ID in most cases, which is unique from OSM
+    pass
 
 
-class UserOut(UserBase):
+class UserOut(DbUser):
     """User with ID and role."""
 
-    id: int
+    # Mandatory user role field
     role: UserRole
 
 
@@ -49,9 +47,11 @@ class UserRole(BaseModel):
     role: UserRole
 
 
-class UserRoles(BaseModel):
-    """User details with role, org, and associated project."""
+# Models for DbUserRole
 
-    user_id: int
-    project_id: Optional[int] = None
-    role: UserRole
+
+class UserRolesOut(DbUserRole):
+    """User role for a specific project."""
+
+    # project_id is redundant if the user specified it in the endpoint
+    project_id: Annotated[Optional[int], Field(exclude=True)] = None

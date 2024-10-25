@@ -13,7 +13,7 @@ from minio.deleteobjects import DeleteObject
 from minio.error import S3Error
 
 from app.config import settings
-from app.models.enums import HTTPStatus
+from app.db.enums import HTTPStatus
 
 
 def s3_client():
@@ -202,7 +202,7 @@ def copy_obj_bucket_to_bucket(
     return True
 
 
-def delete_all_objs_under_prefix(bucket_name: str, s3_path: str) -> bool:
+async def delete_all_objs_under_prefix(bucket_name: str, s3_path: str) -> bool:
     """Delete all objects under a certain path.
 
     For example, delete all items in a project folder.

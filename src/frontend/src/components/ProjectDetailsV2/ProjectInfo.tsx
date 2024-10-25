@@ -31,6 +31,7 @@ const ProjectInfo: React.FC = () => {
   const projectTotalFeatures: number = projectEntities.length;
 
   const projectMappedFeatures: number = projectEntities.filter(
+    // FIXME this needs updating as entity status is numerical
     (entity: EntityOsmMap) => entity.status === task_status.MAPPED,
   ).length;
 

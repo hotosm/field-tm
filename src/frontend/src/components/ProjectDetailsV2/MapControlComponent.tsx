@@ -76,7 +76,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
   return (
     <div className="fmtm-absolute fmtm-top-4 sm:fmtm-top-[14.5rem] fmtm-right-3 fmtm-z-[99] fmtm-flex fmtm-flex-col fmtm-gap-4">
       {btnList.map((btn) => (
-        <Tooltip title={btn.title} placement="left">
+        <Tooltip title={btn.title} placement="left" key={btn.title}>
           <div
             className={`fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center ${
               geolocationStatus && btn.id === 'currentLocation' ? 'fmtm-text-primaryRed' : ''

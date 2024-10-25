@@ -21,8 +21,8 @@ from typing import Any, Optional, TypedDict
 from pydantic import BaseModel, ConfigDict, PrivateAttr, computed_field
 from pydantic.functional_validators import field_validator
 
-from app.db.db_models import DbOrganisation, DbProject, DbUser
-from app.models.enums import ProjectRole, UserRole
+from app.db.enums import ProjectRole, UserRole
+from app.db.models import DbOrganisation, DbProject, DbUser
 
 
 class OrgUserDict(TypedDict):
@@ -30,7 +30,6 @@ class OrgUserDict(TypedDict):
 
     user: DbUser
     org: DbOrganisation
-    project: Optional[DbProject]
 
 
 class ProjectUserDict(TypedDict):

@@ -22,6 +22,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Annotated, AsyncIterator
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -29,16 +30,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+from psycopg import Connection
 
 from app.__version__ import __version__
 from app.auth import auth_routes
 from app.central import central_routes
 from app.config import MonitoringTypes, settings
-from app.db.database import get_db
+from app.db.database import db_conn, get_db_connection_pool
+from app.db.enums import HTTPStatus
 from app.helpers import helper_routes
-from app.models.enums import HTTPStatus
 from app.monitoring import (
     add_endpoint_profiler,
     instrument_app_otel,
@@ -50,7 +50,7 @@ from app.organisations.organisation_crud import init_admin_org
 from app.projects import project_routes
 from app.projects.project_crud import read_and_insert_xlsforms
 from app.submissions import submission_routes
-from app.tasks import tasks_routes
+from app.tasks import task_routes
 from app.users import user_routes
 
 
@@ -82,19 +82,30 @@ def get_api() -> FastAPI:
 @asynccontextmanager
 async def lifespan(
     app: FastAPI,  # dead: disable
-):
+) -> AsyncIterator[None]:
     """FastAPI startup/shutdown event."""
     log.debug("Starting up FastAPI server.")
-    db_conn = next(get_db())
-    log.debug("Initialising admin org and user in DB.")
-    await init_admin_org(db_conn)
-    log.debug("Reading XLSForms from DB.")
-    await read_and_insert_xlsforms(db_conn, xlsforms_path)
 
-    yield
+    # Create a pooled db connection and make available in lifespan state
+    # https://asgi.readthedocs.io/en/latest/specs/lifespan.html#lifespan-state
+    # NOTE to use within a request (this is wrapped in database.py already):
+    # from typing import cast
+    # db_pool = cast(AsyncConnectionPool, request.state.db_pool)
+    # async with db_pool.connection() as conn:
+    db_pool = get_db_connection_pool()
+    await db_pool.open()
+
+    async with db_pool.connection() as conn:
+        log.debug("Initialising admin org and user in DB.")
+        await init_admin_org(conn)
+        log.debug("Reading XLSForms from DB.")
+        await read_and_insert_xlsforms(conn, xlsforms_path)
+
+    yield {"db_pool": db_pool}
 
     # Shutdown events
     log.debug("Shutting down FastAPI server.")
+    await db_pool.close()
 
 
 def get_application() -> FastAPI:
@@ -126,7 +137,7 @@ def get_application() -> FastAPI:
 
     _app.include_router(user_routes.router)
     _app.include_router(project_routes.router)
-    _app.include_router(tasks_routes.router)
+    _app.include_router(task_routes.router)
     _app.include_router(central_routes.router)
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
@@ -155,9 +166,6 @@ def get_logger():
     for logger_name in logger_name_list:
         logging.getLogger(logger_name).setLevel(settings.LOG_LEVEL)
         logging.getLogger(logger_name).handlers = []
-        if logger_name == "sqlalchemy":
-            # Don't hook sqlalchemy, very verbose
-            continue
         if logger_name == "urllib3":
             # Don't hook urllib3, called on each OTEL trace
             continue
@@ -248,10 +256,11 @@ async def deployment_details():
 
 
 @api.get("/__heartbeat__")
-async def heartbeat_plus_db(db: Session = Depends(get_db)):
+async def heartbeat_plus_db(db: Annotated[Connection, Depends(db_conn)]):
     """Heartbeat that checks that API and DB are both up and running."""
     try:
-        db.execute(text("SELECT 1"))
+        async with db.cursor() as cur:
+            await cur.execute("SELECT 1")
         return Response(status_code=HTTPStatus.OK)
     except Exception as e:
         log.warning(e)

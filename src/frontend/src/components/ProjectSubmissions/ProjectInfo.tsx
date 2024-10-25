@@ -48,9 +48,7 @@ const ProjectInfo = ({ entities }) => {
     <div className="fmtm-bg-white fmtm-rounded-lg fmtm-min-w-[12.5rem] fmtm-p-2 fmtm-px-4 md:fmtm-p-4 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-items-center fmtm-gap-4">
       <div className="fmtm-bg-primaryRed fmtm-rounded-full fmtm-p-2">{data.icon}</div>
       <div className="fmtm-flex fmtm-flex-col fmtm-items-start">
-        <h2 className="fmtm-text-lg sm:fmtm-text-xl md:fmtm-text-xl fmtm-text-[#706E6E] fmtm-font-bold">
-          {data.title}
-        </h2>
+        <h2 className="fmtm-text-lg sm:fmtm-text-xl md:fmtm-text-xl fmtm-text-[#706E6E] fmtm-font-bold">{data.name}</h2>
         <h2 className="fmtm-text-xl sm:fmtm-text-2xl md:fmtm-text-2xl fmtm-font-bold fmtm-text-primaryRed">
           {data.count}
         </h2>
@@ -69,7 +67,7 @@ const ProjectInfo = ({ entities }) => {
               className="hover:fmtm-text-primaryRed fmtm-cursor-pointer fmtm-duration-200"
               onClick={() => navigate(`/project/${projectId}`)}
             >
-              {projectInfo?.title}{' '}
+              {projectInfo.name}{' '}
             </span>
             <span> &gt; </span>
             <span className="fmtm-text-black">Dashboard</span>
@@ -81,7 +79,7 @@ const ProjectInfo = ({ entities }) => {
           <CoreModules.Skeleton className="!fmtm-w-full sm:!fmtm-w-[30rem] 2xl:!fmtm-w-[34rem] !fmtm-h-[8rem] !fmtm-rounded-xl" />
         ) : (
           <div className="fmtm-w-full fmtm-min-w-0 sm:fmtm-max-w-[37rem] fmtm-bg-white fmtm-rounded-lg fmtm-p-5 fmtm-flex fmtm-flex-col fmtm-gap-5 fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)]">
-            <h2 className="fmtm-text-2xl fmtm-text-[#545454] fmtm-font-bold">{projectInfo?.title}</h2>
+            <h2 className="fmtm-text-2xl fmtm-text-[#545454] fmtm-font-bold">{projectInfo.name}</h2>
             <div>
               <p className="fmtm-text-base fmtm-text-[#706E6E]">
                 Created On:

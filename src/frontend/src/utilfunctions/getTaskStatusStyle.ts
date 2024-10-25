@@ -38,8 +38,7 @@ const strokeColor = 'rgb(0,0,0,0.3)';
 const secondaryStrokeColor = 'rgb(0,0,0,1)';
 
 const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<string, any>, taskLockedByUser: boolean) => {
-  let id = feature.getId().toString().replace('_', ',');
-  const status = id.split(',')[1];
+  const status = feature.getProperties().task_status;
 
   const isTaskStatusLocked = ['LOCKED_FOR_MAPPING', 'LOCKED_FOR_VALIDATION'].includes(status);
   const borderStrokeColor = isTaskStatusLocked && taskLockedByUser ? secondaryStrokeColor : strokeColor;
@@ -56,7 +55,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
   const redIconStyle = createIconStyle(AssetModules.RedLockPng);
 
   const geojsonStyles = {
-    READY: new Style({
+    RELEASED_FOR_MAPPING: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
         width: 3,
@@ -66,7 +65,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
       }),
     }),
     LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
-    MAPPED: new Style({
+    MARKED_MAPPED: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
         width: 3,
@@ -86,7 +85,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         color: mapTheme.palette.mapFeatureColors.validated_rgb,
       }),
     }),
-    INVALIDATED: new Style({
+    MARKED_INVALID: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
         width: 3,
@@ -95,7 +94,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
       }),
     }),
-    BAD: new Style({
+    MARKED_BAD: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
         width: 3,
@@ -104,7 +103,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         color: mapTheme.palette.mapFeatureColors.bad_rgb,
       }),
     }),
-    SPLIT: new Style({
+    SPLIT_NEEDED: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
         width: 3,

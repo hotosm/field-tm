@@ -22,6 +22,7 @@ import json
 from io import BytesIO, StringIO
 from pathlib import Path
 from textwrap import dedent
+from typing import Annotated
 from uuid import uuid4
 
 import requests
@@ -35,6 +36,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
+from osm_login_python.core import Auth
 
 from app.auth.auth_schemas import AuthUser
 from app.auth.osm import init_osm_auth, login_required
@@ -43,16 +45,16 @@ from app.central.central_crud import (
     convert_geojson_to_odk_csv,
     convert_odk_submission_json_to_geojson,
 )
+from app.central.central_schemas import ODKCentral
 from app.config import settings
+from app.db.enums import GeometryType, HTTPStatus, XLSFormType
 from app.db.postgis_utils import (
     add_required_geojson_properties,
-    featcol_keep_dominant_geom_type,
+    featcol_keep_single_geom_type,
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
     parse_geojson_file_to_featcol,
 )
-from app.models.enums import GeometryType, HTTPStatus, XLSFormType
-from app.projects.project_schemas import ODKCentral
 
 router = APIRouter(
     prefix="/helper",
@@ -77,7 +79,7 @@ async def download_template(
 @router.post("/append-geojson-properties")
 async def append_required_geojson_properties(
     geojson: UploadFile,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Append required properties to a GeoJSON file.
 
@@ -97,7 +99,7 @@ async def append_required_geojson_properties(
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail="No geometries present"
         )
-    featcol_single_geom_type = featcol_keep_dominant_geom_type(featcol)
+    featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if featcol_single_geom_type:
         processed_featcol = add_required_geojson_properties(featcol_single_geom_type)
@@ -116,7 +118,7 @@ async def append_required_geojson_properties(
 @router.post("/convert-geojson-to-odk-csv")
 async def convert_geojson_to_odk_csv_wrapper(
     geojson: UploadFile,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Convert GeoJSON upload media to ODK CSV upload media."""
     filename = Path(geojson.filename)
@@ -141,8 +143,8 @@ async def create_entities_from_csv(
     csv_file: UploadFile,
     odk_project_id: int,
     entity_name: str,
+    current_user: Annotated[AuthUser, Depends(login_required)],
     odk_creds: ODKCentral = Depends(),
-    current_user: AuthUser = Depends(login_required),
 ):
     """Upload a CSV file to create new ODK Entities in a project.
 
@@ -182,7 +184,7 @@ async def create_entities_from_csv(
 async def convert_javarosa_geom_to_geojson(
     javarosa_string: str,
     geometry_type: GeometryType,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Convert a JavaRosa geometry string to GeoJSON."""
     return await javarosa_to_geojson_geom(javarosa_string, geometry_type)
@@ -191,7 +193,7 @@ async def convert_javarosa_geom_to_geojson(
 @router.post("/convert-odk-submission-json-to-geojson")
 async def convert_odk_submission_json_to_geojson_wrapper(
     json_file: UploadFile,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Convert the ODK submission output JSON to GeoJSON.
 
@@ -218,7 +220,7 @@ async def convert_odk_submission_json_to_geojson_wrapper(
 @router.get("/view-raw-data-api-token")
 async def get_raw_data_api_osm_token(
     request: Request,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Get the OSM OAuth token for a service account for raw-data-api.
 
@@ -239,7 +241,7 @@ async def get_raw_data_api_osm_token(
 @router.get("/view-fmtm-api-token")
 async def view_user_oauth_token(
     request: Request,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Get the FMTM OSM (OAuth) token for a logged in user.
 
@@ -256,7 +258,7 @@ async def view_user_oauth_token(
 @router.post("/multipolygons-to-polygons")
 async def flatten_multipolygons_to_polygons(
     geojson: UploadFile,
-    current_user: AuthUser = Depends(login_required),
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """If any MultiPolygons are present, replace with multiple Polygons."""
     featcol = parse_geojson_file_to_featcol(await geojson.read())
@@ -282,8 +284,9 @@ async def flatten_multipolygons_to_polygons(
 @router.post("/send-test-osm-message")
 async def send_test_osm_message(
     request: Request,
-    current_user: AuthUser = Depends(login_required),
-    osm_auth=Depends(init_osm_auth),
+    current_user: Annotated[AuthUser, Depends(login_required)],
+    # NOTE this is duplicated to access the 'deserialize_data' method
+    osm_auth: Annotated[Auth, Depends(init_osm_auth)],
 ):
     """Sends a test message to currently logged in OSM user."""
     cookie_name = f"{settings.FMTM_DOMAIN.replace('.', '_')}_osm"

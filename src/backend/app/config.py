@@ -308,6 +308,8 @@ def get_settings():
     _settings = Settings()
 
     if _settings.DEBUG:
+        # Enable detailed Python async debugger
+        os.environ["PYTHONASYNCIODEBUG"] = "1"
         print("Loaded settings: " f"{_settings.model_dump()}")
     return _settings
 

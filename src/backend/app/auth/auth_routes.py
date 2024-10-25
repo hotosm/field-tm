@@ -18,13 +18,14 @@
 
 """Auth routes, to login, logout, and get user details."""
 
-import time
+from time import time
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from loguru import logger as log
-from sqlalchemy import text
-from sqlalchemy.orm import Session
+from psycopg import Connection
+from psycopg.rows import class_row
 
 from app.auth.auth_schemas import AuthUser, AuthUserWithToken, FMTMUser
 from app.auth.osm import (
@@ -37,8 +38,9 @@ from app.auth.osm import (
     verify_token,
 )
 from app.config import settings
-from app.db import database
-from app.models.enums import HTTPStatus, UserRole
+from app.db.database import db_conn
+from app.db.enums import HTTPStatus, UserRole
+from app.db.models import DbUser
 
 router = APIRouter(
     prefix="/auth",
@@ -64,11 +66,13 @@ async def login_url(osm_auth=Depends(init_osm_auth)):
     """
     login_url = osm_auth.login()
     log.debug(f"Login URL returned: {login_url}")
-    return JSONResponse(content=login_url, status_code=200)
+    return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
 
 
 @router.get("/callback/")
-async def callback(request: Request, osm_auth=Depends(init_osm_auth)) -> JSONResponse:
+async def callback(
+    request: Request, osm_auth: Annotated[AuthUser, Depends(init_osm_auth)]
+) -> JSONResponse:
     """Performs oauth token exchange with OpenStreetMap.
 
     Provides an access token that can be used for authenticating other endpoints.
@@ -96,8 +100,8 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)) -> JSONRes
         user_data = {
             "sub": f"fmtm|{osm_user['id']}",
             "aud": settings.FMTM_DOMAIN,
-            "iat": int(time.time()),
-            "exp": int(time.time()) + 86400,  # expiry set to 1 day
+            "iat": int(time()),
+            "exp": int(time()) + 86400,  # expiry set to 1 day
             "username": osm_user["username"],
             "email": osm_user.get("email"),
             "picture": osm_user.get("img_url"),
@@ -134,7 +138,7 @@ async def callback(request: Request, osm_auth=Depends(init_osm_auth)) -> JSONRes
 @router.get("/logout/")
 async def logout():
     """Reset httpOnly cookie to sign out user."""
-    response = Response(status_code=200)
+    response = Response(status_code=HTTPStatus.OK)
     # Reset all cookies (logout)
     fmtm_cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
     refresh_cookie_name = f"{fmtm_cookie_name}_refresh"
@@ -157,21 +161,17 @@ async def logout():
 
 
 async def get_or_create_user(
-    db: Session,
+    db: Connection,
     user_data: AuthUser,
 ):
     """Get user from User table if exists, else create."""
     try:
-        upsert_sql = text(
-            """
+        upsert_sql = """
             WITH upserted_user AS (
                 INSERT INTO users (
-                    id, username, profile_img, role, mapping_level,
-                    is_email_verified, is_expert, tasks_mapped, tasks_validated,
-                    tasks_invalidated, registered_at
+                    id, username, profile_img, role, registered_at
                 ) VALUES (
-                    :user_id, :username, :profile_img, :role,
-                    'BEGINNER', FALSE, FALSE, 0, 0, 0, NOW()
+                    %(user_id)s, %(username)s, %(profile_img)s, %(role)s, NOW()
                 )
                 ON CONFLICT (id)
                 DO UPDATE SET
@@ -191,19 +191,20 @@ async def get_or_create_user(
             LEFT JOIN user_roles ur ON u.id = ur.user_id
             LEFT JOIN organisation_managers om ON u.id = om.user_id
             GROUP BY u.id, u.username, u.profile_img, u.role;
-            """
-        )
+        """
 
-        parameters = {
-            "user_id": user_data.id,
-            "username": user_data.username,
-            "profile_img": user_data.picture or "",
-            "role": UserRole(user_data.role).name,
-        }
-        result = db.execute(upsert_sql, parameters)
-        db.commit()
+        async with db.cursor(row_factory=class_row(DbUser)) as cur:
+            await cur.execute(
+                upsert_sql,
+                {
+                    "user_id": user_data.id,
+                    "username": user_data.username,
+                    "profile_img": user_data.picture or "",
+                    "role": UserRole(user_data.role).name,
+                },
+            )
+            db_user_details = await cur.fetchone()
 
-        db_user_details = result.first()
         if not db_user_details:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
@@ -213,7 +214,7 @@ async def get_or_create_user(
         return db_user_details
 
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         log.error(f"Exception occurred: {e}")
         if 'duplicate key value violates unique constraint "users_username_key"' in str(
             e
@@ -230,24 +231,25 @@ async def get_or_create_user(
 
 @router.get("/me/", response_model=FMTMUser)
 async def my_data(
-    db: Session = Depends(database.get_db),
-    user_data: AuthUser = Depends(login_required),
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Read access token and get user details from OSM.
 
     Args:
-        db: The db session.
-        user_data: User data provided by osm-login-python Auth.
+        db (Connection): The db connection.
+        current_user (AuthUser): User data provided by osm-login-python Auth.
 
     Returns:
-        user_data(dict): The dict of user data.
+        FMTMUser: The dict of user data.
     """
-    return await get_or_create_user(db, user_data)
+    return await get_or_create_user(db, current_user)
 
 
 @router.get("/refresh", response_model=AuthUserWithToken)
 async def refresh_token(
-    request: Request, user_data: AuthUser = Depends(login_required)
+    request: Request,
+    current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Uses the refresh token to generate a new access token."""
     if settings.DEBUG:
@@ -255,13 +257,16 @@ async def refresh_token(
             status_code=HTTPStatus.OK,
             content={
                 "token": "debugtoken",
-                **user_data.model_dump(),
+                **current_user.model_dump(),
             },
         )
     try:
         refresh_token = extract_refresh_token_from_cookie(request)
         if not refresh_token:
-            raise HTTPException(status_code=401, detail="No refresh token provided")
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                detail="No refresh token provided",
+            )
 
         token_data = verify_token(refresh_token)
         access_token = refresh_access_token(token_data)
@@ -270,7 +275,7 @@ async def refresh_token(
             status_code=HTTPStatus.OK,
             content={
                 "token": access_token,
-                **user_data.model_dump(),
+                **current_user.model_dump(),
             },
         )
         cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
@@ -314,8 +319,8 @@ async def temp_login(
     jwt_data = {
         "sub": "fmtm|20386219",
         "aud": settings.FMTM_DOMAIN,
-        "iat": int(time.time()),
-        "exp": int(time.time()) + 86400,  # set token expiry to 1 day
+        "iat": int(time()),
+        "exp": int(time()) + 86400,  # set token expiry to 1 day
         "username": username,
         "picture": None,
         "role": UserRole.MAPPER,

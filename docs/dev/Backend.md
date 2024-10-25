@@ -110,7 +110,7 @@ just migrate
 
 ```json
 {
-  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.11/lib/"]
+  "python.analysis.extraPaths": ["src/backend/__pypackages__/3.12/lib/"]
 }
 ```
 

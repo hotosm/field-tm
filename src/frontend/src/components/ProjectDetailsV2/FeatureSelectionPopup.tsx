@@ -29,7 +29,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const currentProjectId = params.id || '';
-  const [task_status, set_task_status] = useState('READY');
+  const [task_status, set_task_status] = useState('RELEASED_FOR_MAPPING');
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
@@ -37,15 +37,17 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
   const updateEntityStatusLoading = CoreModules.useAppSelector((state) => state.project.updateEntityStatusLoading);
   const currentTaskInfo = {
     ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
-      return task?.index == taskId;
+      return task?.id == taskId;
     })?.[0],
   };
   const geoStyle = geojsonStyles['LOCKED_FOR_MAPPING'];
   const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
 
   useEffect(() => {
+    console.log(currentTaskInfo);
     if (projectIndex != -1) {
-      const currentStatus = projectTaskActivityList.length > 0 ? projectTaskActivityList[0].status : 'READY';
+      const currentStatus =
+        projectTaskActivityList.length > 0 ? projectTaskActivityList[0].status : 'RELEASED_FOR_MAPPING';
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex((data) => data?.label == currentStatus);
       const tasksStatus =
         taskFeature?.id_ != undefined ? environment?.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
@@ -106,7 +108,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
             </p>
           </div>
         </div>
-        {(task_status === 'READY' || task_status === 'LOCKED_FOR_MAPPING') && (
+        {(task_status === 'RELEASED_FOR_MAPPING' || task_status === 'LOCKED_FOR_MAPPING') && (
           <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
             <Button
               btnText="MAP FEATURE IN ODK"
@@ -116,7 +118,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
               disabled={entity?.status !== 0}
               isLoading={updateEntityStatusLoading}
               onClick={() => {
-                const xformId = projectInfo.xform_id;
+                const xformId = projectInfo.odk_form_id;
                 const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
                 const entityUuid = entity ? entity.id : null;
 
@@ -132,7 +134,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
                   }),
                 );
 
-                if (task_status === 'READY') {
+                if (task_status === 'RELEASED_FOR_MAPPING') {
                   dispatch(
                     UpdateTaskStatus(
                       `${import.meta.env.VITE_API_URL}/tasks/${currentTaskInfo?.id}/new-status/1`,

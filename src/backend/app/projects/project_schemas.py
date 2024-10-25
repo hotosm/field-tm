@@ -15,348 +15,231 @@
 #     You should have received a copy of the GNU General Public License
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Pydantic schemas for Projects."""
+"""Pydantic schemas for Projects for usage in endpoints."""
 
 from datetime import datetime
-from typing import Any, List, Optional, Union
+from pathlib import Path
+from typing import Annotated, Optional, Self
+from uuid import UUID
 
-from dateutil import parser
-from geoalchemy2 import WKBElement
-from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Polygon
-from loguru import logger as log
-from pydantic import BaseModel, Field, computed_field
+from geojson_pydantic import Feature, FeatureCollection, MultiPolygon, Point, Polygon
+from pydantic import (
+    BaseModel,
+    Field,
+    computed_field,
+)
 from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator, model_validator
-from typing_extensions import Self
 
-from app.config import HttpUrlStr, decrypt_value, encrypt_value, settings
+from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
+from app.config import decrypt_value, encrypt_value, settings
+from app.db.enums import (
+    BackgroundTaskStatus,
+    ProjectPriority,
+)
+from app.db.models import DbBackgroundTask, DbBasemap, DbProject, slugify
 from app.db.postgis_utils import (
-    featcol_to_wkb_geom,
     geojson_to_featcol,
     get_address_from_lat_lon,
     merge_polygons,
-    read_wkb,
-    wkb_geom_to_feature,
-    write_wkb,
+    polygon_to_centroid,
+    timestamp,
 )
-from app.models.enums import ProjectPriority, ProjectStatus, TaskSplitType, XLSFormType
-from app.tasks import tasks_schemas
-from app.users.user_schemas import User
 
 
-class ODKCentral(BaseModel):
-    """ODK Central credentials."""
+class ProjectInBase(DbProject):
+    """Base model for project insert / update (validators)."""
 
-    odk_central_url: Optional[HttpUrlStr] = None
-    odk_central_user: Optional[str] = None
-    odk_central_password: Optional[str] = None
+    # Override hashtag input to allow a single string input
+    hashtags: Annotated[
+        Optional[list[str] | str],
+        Field(validate_default=True),
+    ] = None
 
-    @field_validator("odk_central_url", mode="after")
+    # Exclude (do not allow update)
+    id: Annotated[Optional[int], Field(exclude=True)] = None
+    outline: Annotated[Optional[dict], Field(exclude=True)] = None
+    # Exclude (calculated fields)
+    centroid: Annotated[Optional[dict], Field(exclude=True)] = None
+    tasks: Annotated[Optional[list], Field(exclude=True)] = None
+    organisation_name: Annotated[Optional[str], Field(exclude=True)] = None
+    organisation_logo: Annotated[Optional[str], Field(exclude=True)] = None
+    bbox: Annotated[Optional[list[float]], Field(exclude=True)] = None
+    last_active: Annotated[Optional[datetime], Field(exclude=True)] = None
+    odk_credentials: Annotated[
+        Optional[ODKCentralDecrypted],
+        Field(exclude=True, validate_default=True),
+    ] = None
+
+    # @field_validator("slug", mode="after")
+    # @classmethod
+    # def set_project_slug(
+    #     cls,
+    #     value: Optional[str],
+    #     info: ValidationInfo,
+    # ) -> str:
+    #     """Set the slug attribute from the name.
+
+    #     NOTE this is a bit of a hack.
+    #     """
+    #     if (name := info.data.get("name")) is None:
+    #         return None
+    #     return name.replace(" ", "_").lower()
+
+    @field_validator("hashtags", mode="before")
     @classmethod
-    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
-        """Remove trailing slash from ODK Central URL."""
-        if not value:
-            return None
-        if value.endswith("/"):
-            return value[:-1]
-        return value
-
-    @model_validator(mode="after")
-    def all_odk_vars_together(self) -> Self:
-        """Ensure if one ODK variable is set, then all are."""
-        if any(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ) and not all(
-            [
-                self.odk_central_url,
-                self.odk_central_user,
-                self.odk_central_password,
-            ]
-        ):
-            err = "All ODK details are required together: url, user, password"
-            log.debug(err)
-            raise ValueError(err)
-        return self
-
-
-class ODKCentralIn(ODKCentral):
-    """ODK Central credentials inserted to database."""
-
-    @field_validator("odk_central_password", mode="after")
-    @classmethod
-    def encrypt_odk_password(cls, value: str) -> Optional[str]:
-        """Encrypt the ODK Central password before db insertion."""
-        if not value:
-            return None
-        return encrypt_value(value)
-
-
-class ODKCentralDecrypted(BaseModel):
-    """ODK Central credentials extracted from database.
-
-    WARNING never return this as a response model.
-    WARNING or log to the terminal.
-    """
-
-    odk_central_url: Optional[HttpUrlStr] = None
-    odk_central_user: Optional[str] = None
-    odk_central_password: Optional[str] = None
-
-    def model_post_init(self, ctx):
-        """Run logic after model object instantiated."""
-        # Decrypt odk central password from database
-        if self.odk_central_password:
-            if isinstance(self.odk_central_password, str):
-                password = self.odk_central_password
-            else:
-                password = self.odk_central_password
-            self.odk_central_password = decrypt_value(password)
-
-    @field_validator("odk_central_url", mode="after")
-    @classmethod
-    def remove_trailing_slash(cls, value: HttpUrlStr) -> Optional[HttpUrlStr]:
-        """Remove trailing slash from ODK Central URL."""
-        if not value:
-            return None
-        if value.endswith("/"):
-            return value[:-1]
-        return value
-
-
-class ProjectInfo(BaseModel):
-    """Basic project info."""
-
-    name: str
-    short_description: str
-    description: str
-    per_task_instructions: Optional[str] = None
-
-
-class DbProject(BaseModel):
-    """Project from database."""
-
-    outline: Any = Field(exclude=True)
-    odk_form_id: Optional[str] = Field(exclude=True)
-
-    id: int
-    odkid: int
-    author: User
-    project_info: ProjectInfo
-    status: ProjectStatus | str
-    created_at: datetime
-    # location_str: str
-    xform_category: Optional[XLSFormType] = None
-    hashtags: Optional[List[str]] = None
-    organisation_id: Optional[int] = None
-    tasks: Optional[List[tasks_schemas.Task]]
-
-    @field_serializer("status")
-    def status_enum_str_to_int(self, value: ProjectStatus | str) -> ProjectStatus:
-        """Get the the int value from a string enum."""
-        if isinstance(value, ProjectStatus):
-            return ProjectStatus[value.name]
-        else:
-            return ProjectStatus[value]
-
-    @computed_field
-    @property
-    def outline_geojson(self) -> Optional[Feature]:
-        """TODO this is now the same as self.outline."""
-        if not self.outline:
-            return None
-
-        # TODO refactor to remove outline_geojson
-        # TODO possibly also generate bbox for geojson in project_deps SQL?
-        feat = {
-            "type": "Feature",
-            "geometry": self.outline,
-            "id": self.id,
-            "properties": {"id": self.id, "bbox": None},
-        }
-        return Feature(**feat)
-
-    @computed_field
-    @property
-    def organisation_logo(self) -> Optional[str]:
-        """Get the organisation logo url from the S3 bucket."""
-        if not self.organisation_id:
-            return None
-
-        return (
-            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
-            f"/{self.organisation_id}/logo.png"
-        )
-
-    @computed_field
-    @property
-    def xform_id(self) -> Optional[str]:
-        """Generate from odk_form_id.
-
-        TODO this could be refactored out in future.
-        """
-        if not self.odk_form_id:
-            return None
-        return self.odk_form_id
-
-
-class ProjectIn(BaseModel):
-    """Upload new project."""
-
-    project_info: ProjectInfo
-    xform_category: str
-    custom_tms_url: Optional[str] = None
-    organisation_id: Optional[int] = None
-    hashtags: Optional[str] = None
-    task_split_type: Optional[TaskSplitType] = None
-    task_split_dimension: Optional[int] = None
-    task_num_buildings: Optional[int] = None
-    data_extract_type: Optional[str] = None
-    outline_geojson: Union[FeatureCollection, Feature, MultiPolygon, Polygon]
-    location_str: Optional[str] = None
-
-    @computed_field
-    @property
-    def outline(self) -> Optional[Any]:
-        """Compute WKBElement geom from geojson."""
-        if not self.outline_geojson:
-            return None
-
-        outline = geojson_to_featcol(self.outline_geojson.model_dump())
-        outline_merged = merge_polygons(outline)
-
-        return featcol_to_wkb_geom(outline_merged)
-
-    @computed_field
-    @property
-    def centroid(self) -> Optional[Any]:
-        """Compute centroid for project outline."""
-        if not self.outline:
-            return None
-        return write_wkb(read_wkb(self.outline).centroid)
-
-    @computed_field
-    @property
-    def project_name_prefix(self) -> str:
-        """Compute project name prefix with underscores."""
-        return self.project_info.name.replace(" ", "_").lower()
-
-    @field_validator("hashtags", mode="after")
-    @classmethod
-    def validate_hashtags(cls, hashtags: Optional[str]) -> List[str]:
+    def validate_hashtags(
+        cls,
+        hashtags: Optional[str | list[str]],
+    ) -> Optional[list[str]]:
         """Validate hashtags.
 
         - Receives a string and parsed as a list of tags.
         - Commas or semicolons are replaced with spaces before splitting.
         - Add '#' to hashtag if missing.
-        - Also add default '#FMTM' tag.
         """
         if hashtags is None:
-            return ["#FMTM"]
+            return None
 
-        hashtags = hashtags.replace(",", " ").replace(";", " ")
-        hashtags_list = hashtags.split()
+        if isinstance(hashtags, str):
+            hashtags = hashtags.replace(",", " ").replace(";", " ")
+            hashtags_list = hashtags.split()
+        else:
+            hashtags_list = hashtags
 
         # Add '#' to hashtag strings if missing
-        hashtags_with_hash = [
+        return [
             f"#{hashtag}" if hashtag and not hashtag.startswith("#") else hashtag
             for hashtag in hashtags_list
         ]
 
-        if "#FMTM" not in hashtags_with_hash:
-            hashtags_with_hash.append("#FMTM")
+    @field_validator("odk_token", mode="after")
+    @classmethod
+    def encrypt_token(cls, value: str) -> Optional[str]:
+        """Encrypt the ODK Token for insertion into the db."""
+        if not value:
+            return None
+        return encrypt_value(value)
 
-        return hashtags_with_hash
+    @field_validator("outline", mode="before")
+    @classmethod
+    def parse_input_geojson(
+        cls,
+        value: FeatureCollection | Feature | MultiPolygon | Polygon,
+    ) -> Optional[Polygon]:
+        """Parse any format geojson into a single Polygon.
+
+        NOTE we run this in mode='before' to allow parsing as Feature first.
+        """
+        if value is None:
+            return None
+        # FIXME also handle geometry collection type here
+        # geojson_pydantic.GeometryCollection
+        # FIXME update this to remove the Featcol parsing at some point
+        featcol = geojson_to_featcol(value)
+        merged = merge_polygons(featcol)
+        return merged.get("features")[0].get("geometry")
+
+    @model_validator(mode="after")
+    def append_fmtm_hashtag_and_slug(self) -> Self:
+        """Append the #FMTM hashtag and add URL slug."""
+        # NOTE the slug is set here as the field_validator above
+        # does not seem to work?
+        self.slug = slugify(self.name)
+
+        if not self.hashtags:
+            self.hashtags = ["#FMTM"]
+        elif "#FMTM" not in self.hashtags:
+            self.hashtags.append("#FMTM")
+        return self
+
+
+class ProjectIn(ProjectInBase, ODKCentralIn):
+    """Upload new project."""
+
+    # Mandatory
+    xform_category: str
+    # Ensure geojson_pydantic.Polygon
+    outline: Polygon
 
     @model_validator(mode="after")
     def generate_location_str(self) -> Self:
         """Generate location string after centroid is generated.
 
-        NOTE chaining computed_field didn't seem to work here so a
-        model_validator was used for final stage validation.
+        NOTE we use a model_validator as it's guaranteed to only run once.
+        NOTE if we use computed then nominatim is called multiple times,
+        NOTE as computed fields cannot wait for a http call async.
         """
-        if not self.centroid:
-            log.warning("Project has no centroid, location string not determined")
+        if settings.DEBUG:
+            # NOTE we add this to avoid spamming Nominatim during tests
+            # Required until https://github.com/hotosm/fmtm/issues/1827
             return self
 
-        if self.location_str is not None:
-            # Prevent running triggering multiple times if already set
-            return self
-
-        geom = read_wkb(self.centroid)
-        latitude, longitude = geom.y, geom.x
+        centroid = polygon_to_centroid(self.outline.model_dump())
+        latitude, longitude = centroid.y, centroid.x
         address = get_address_from_lat_lon(latitude, longitude)
         self.location_str = address if address is not None else ""
         return self
 
 
-class ProjectUpload(ProjectIn, ODKCentralIn):
-    """Project upload details, plus ODK credentials."""
+class ProjectUpdate(ProjectInBase, ODKCentralIn):
+    """Update a project, where all fields are optional."""
 
-    pass
-
-
-class ProjectPartialUpdate(BaseModel):
-    """Update projects metadata."""
-
+    # Allow updating the name field
     name: Optional[str] = None
-    short_description: Optional[str] = None
-    description: Optional[str] = None
-    hashtags: Optional[List[str]] = None
-    per_task_instructions: Optional[str] = None
+    # Override dict type to parse as Polygon
+    outline: Optional[Polygon] = None
 
-    @computed_field
-    @property
-    def project_name_prefix(self) -> Optional[str]:
-        """Compute project name prefix with underscores."""
-        if not self.name:
+
+class ProjectOut(DbProject):
+    """Converters for DbProject serialisation & display."""
+
+    # Parse as geojson_pydantic.Polygon
+    outline: Polygon
+    # Parse as geojson_pydantic.Point (sometimes not present, e.g. during create)
+    centroid: Optional[Point] = None
+    bbox: Optional[list[float]] = None
+    # Ensure the ODK password is omitted
+    odk_central_password: Annotated[Optional[str], Field(exclude=True)] = None
+    # We need validate_default to run the validator and set to None
+    odk_credentials: Annotated[
+        Optional[ODKCentralDecrypted],
+        Field(exclude=True, validate_default=True),
+    ] = None
+    # We shouldn't attempt to serialise the xlsform_content bytes
+    xlsform_content: Annotated[Optional[bytes], Field(exclude=True)] = None
+
+    @field_serializer("odk_token")
+    def decrypt_token(self, value: str) -> Optional[str]:
+        """Decrypt the ODK Token extracted from the db."""
+        if not value:
             return None
-        return self.name.replace(" ", "_").lower()
+        return decrypt_value(value)
 
 
-class ProjectUpdate(ProjectUpload):
-    """Update project."""
-
-    pass
-
-
-class GeojsonFeature(BaseModel):
-    """Features used for Task definitions."""
-
-    id: int
-    geometry: Optional[Feature] = None
+# Models for specific endpoints
 
 
 class ProjectSummary(BaseModel):
     """Project summaries."""
 
     id: int
+    name: str
+    organisation_id: int
     priority: ProjectPriority
-    title: Optional[str] = None
-    # NOTE we cannot be WKBElement element here, as it can't be serialized
-    centroid: Optional[Any]
+
+    hashtags: Optional[list[str]]
     location_str: Optional[str] = None
     description: Optional[str] = None
+
+    # Calculated
+    outline: Optional[Polygon]
+    centroid: Optional[Point]
     total_tasks: Optional[int] = None
     num_contributors: Optional[int] = None
     tasks_mapped: Optional[int] = None
     tasks_validated: Optional[int] = None
     tasks_bad: Optional[int] = None
-    hashtags: Optional[List[str]] = None
-    organisation_id: Optional[int] = None
-    organisation_logo: Optional[str] = None
-
-    @field_serializer("centroid")
-    def get_coord_from_centroid(self, value) -> Optional[list[float]]:
-        """Get the cetroid coordinates from WBKElement."""
-        if value is None:
-            return None
-        centroid_point = read_wkb(value)
-        centroid = [centroid_point.x, centroid_point.y]
-        return centroid
 
 
 class PaginationInfo(BaseModel):
@@ -375,138 +258,30 @@ class PaginationInfo(BaseModel):
 class PaginatedProjectSummaries(BaseModel):
     """Project summaries + Pagination info."""
 
-    results: List[ProjectSummary]
+    results: list[ProjectSummary]
     pagination: PaginationInfo
-
-
-class ProjectBase(BaseModel):
-    """Base project model."""
-
-    outline: Any = Field(exclude=True)
-    odk_form_id: Optional[str] = Field(exclude=True)
-
-    id: int
-    odkid: int
-    author: User
-    project_info: ProjectInfo
-    status: ProjectStatus | str
-    created_at: datetime
-    # location_str: str
-    xform_category: Optional[XLSFormType] = None
-    hashtags: Optional[List[str]] = None
-    organisation_id: Optional[int] = None
-
-    @field_serializer("status")
-    def status_enum_str_to_int(self, value: ProjectStatus | str) -> ProjectStatus:
-        """Get the the int value from a string enum."""
-        if isinstance(value, ProjectStatus):
-            return ProjectStatus[value.name]
-        else:
-            return ProjectStatus[value]
-
-    @computed_field
-    @property
-    def outline_geojson(self) -> Optional[Feature]:
-        """TODO this is now the same as self.outline."""
-        if not self.outline:
-            return None
-
-        # FIXME this is a workaround until geoalchemy is removed
-        if isinstance(self.outline, WKBElement):
-            feat = wkb_geom_to_feature(
-                self.outline,
-                id=self.id,
-                properties={"id": self.id, "bbox": None},
-            )
-            return Feature(**feat)
-
-        # TODO refactor to remove outline_geojson
-        # TODO possibly also generate bbox for geojson in project_deps SQL?
-        feat = {
-            "type": "Feature",
-            "geometry": self.outline,
-            "id": self.id,
-            "properties": {"id": self.id, "bbox": None},
-        }
-        return Feature(**feat)
-
-    @computed_field
-    @property
-    def organisation_logo(self) -> Optional[str]:
-        """Get the organisation logo url from the S3 bucket."""
-        if not self.organisation_id:
-            return None
-
-        return (
-            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}"
-            f"/{self.organisation_id}/logo.png"
-        )
-
-    @computed_field
-    @property
-    def xform_id(self) -> Optional[str]:
-        """Generate from odk_form_id.
-
-        TODO this could be refactored out in future.
-        """
-        if not self.odk_form_id:
-            return None
-        return self.odk_form_id
-
-
-class ProjectWithTasks(ProjectBase):
-    """Project plus list of tasks objects."""
-
-    tasks: Optional[List[tasks_schemas.Task]]
-
-
-class ReadProject(ProjectWithTasks):
-    """Redundant model for refactor."""
-
-    odk_token: Optional[str] = None
-    location_str: Optional[str] = None
-    data_extract_url: Optional[str] = None
-    custom_tms_url: Optional[str] = None
-
-    @field_serializer("odk_token")
-    def decrypt_password(self, value: str) -> Optional[str]:
-        """Decrypt the ODK Token extracted from the db."""
-        if not value:
-            return ""
-
-        return decrypt_value(value)
-
-
-class BackgroundTaskStatus(BaseModel):
-    """Background task status for project related tasks."""
-
-    status: str
-    message: Optional[str] = None
 
 
 class ProjectDashboard(BaseModel):
     """Project details dashboard."""
 
-    project_name_prefix: str
+    slug: str
     organisation_name: str
     total_tasks: int
     created_at: datetime
     organisation_logo: Optional[str] = None
-    total_submission: Optional[int] = None
+    total_submissions: Optional[int] = None
     total_contributors: Optional[int] = None
-    last_active: Optional[Union[str, datetime]] = None
+    last_active: Optional[str | datetime] = None
 
     @field_serializer("last_active")
-    def get_last_active(self, value, values):
+    def get_last_active(self, last_active: Optional[str | datetime]):
         """Date of last activity on project."""
-        if value is None:
+        if last_active is None:
             return None
 
-        last_active = parser.parse(value).replace(tzinfo=None)
-        current_date = datetime.now()
-
+        current_date = timestamp()
         time_difference = current_date - last_active
-
         days_difference = time_difference.days
 
         if days_difference == 0:
@@ -517,3 +292,82 @@ class ProjectDashboard(BaseModel):
             return f'{days_difference} day{"s" if days_difference > 1 else ""} ago'
         else:
             return last_active.strftime("%d %b %Y")
+
+
+class ProjectUserContributions(BaseModel):
+    """Users for a project, plus contribution count."""
+
+    user: str
+    contributions: int
+
+
+class BasemapIn(DbBasemap):
+    """Basemap tile creation."""
+
+    # Exclude, as the uuid is generated in the database
+    id: Annotated[Optional[UUID], Field(exclude=True)] = None
+    project_id: int
+    tile_source: str
+    url: str
+    background_task_id: UUID
+    status: BackgroundTaskStatus
+
+
+class BasemapUpdate(DbBasemap):
+    """Update a background task."""
+
+    id: Annotated[Optional[int], Field(exclude=True)] = None
+
+
+class BasemapOut(DbBasemap):
+    """Basemap tile list for a project."""
+
+    # project_id not needed as called for a specific project
+    project_id: Annotated[Optional[int], Field(exclude=True)] = None
+
+    @computed_field
+    @property
+    def format(self) -> Optional[str]:
+        """Get the basemap format from file extension."""
+        if not self.url:
+            return None
+        return Path(self.url).suffix[1:]
+
+    @computed_field
+    @property
+    def mimetype(self) -> Optional[str]:
+        """Set the mimetype based on the extension."""
+        if not self.url:
+            return None
+
+        file_format = Path(self.url).suffix[1:]
+        if file_format == "mbtiles":
+            return "application/vnd.mapbox-vector-tile"
+        elif file_format == "pmtiles":
+            return "application/vnd.pmtiles"
+        else:
+            return "application/vnd.sqlite3"
+
+
+class BackgroundTaskIn(DbBackgroundTask):
+    """Insert a background task."""
+
+    # Exclude, as the uuid is generated in the database
+    id: Annotated[Optional[UUID], Field(exclude=True)] = None
+    # Make related project_id mandatory
+    project_id: int
+
+
+class BackgroundTaskUpdate(DbBackgroundTask):
+    """Update a background task."""
+
+    id: Annotated[Optional[int], Field(exclude=True)] = None
+    # Make status update mandatory
+    status: BackgroundTaskStatus
+
+
+class BackgroundTaskStatus(BaseModel):
+    """Background task status for project related tasks."""
+
+    status: str
+    message: Optional[str] = None

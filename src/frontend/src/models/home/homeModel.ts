@@ -1,7 +1,7 @@
 export interface HomeProjectCardModel {
   id: number;
+  name: string;
   priority: number;
-  title: string;
   location_str: string;
   description: string;
   total_tasks: number;
@@ -22,6 +22,7 @@ export type homeProjectPaginationTypes = {
 };
 
 export type projectType = {
+  name: string;
   centroid: [number, number];
   description: string;
   hashtags: string | null;
@@ -34,7 +35,6 @@ export type projectType = {
   tasks_bad: number;
   tasks_mapped: number;
   tasks_validated: number;
-  title: string;
   total_tasks: number;
 };
 
