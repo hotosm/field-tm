@@ -65,7 +65,7 @@
 	// *** Task history sync *** //
 	const taskFeatcolStore = writable<FeatureCollection>({ type: 'FeatureCollection', features: [] });
 	const taskHistoryStream = new ShapeStream({
-		url: 'http://localhost:7055/v1/shape/task_history',
+		url: 'http://localhost:7055/v1/shape/task_events',
 		where: `project_id=${data.projectId}`,
 	});
 	const taskHistoryEvents = new Shape(taskHistoryStream);
@@ -86,7 +86,7 @@
 
 		for (const taskData of taskEventArrayFromApi) {
 			// Use the task_id as the key and action as the value
-			latestActions.set(taskData.task_id, taskData.action);
+			latestActions.set(taskData.task_id, taskData.event);
 		}
 
 		return latestActions;
@@ -130,7 +130,7 @@
 		if (task && task.id) {
 			const latestActions = await getLatestEventForTasks();
 			const statusLabel = latestActions.get(task.id);
-			selectedTaskStatus.set(statusLabel ? statusLabel : 'RELEASED_FOR_MAPPING');
+			selectedTaskStatus.set(statusLabel ? statusLabel : 'UNLOCKED_TO_MAP');
 		} else {
 			selectedTaskStatus.set('');
 		}
@@ -293,12 +293,12 @@
 
 {#if $latestEvent}
 	<hot-card id="notification-banner" class="absolute z-10 top-18 right-0 font-sans hidden sm:flex">
-		Latest: {$latestEvent.action_text}
+		Latest: {$latestEvent.comment}
 	</hot-card>
 {/if}
 
 {#if $selectedTaskId}
-	{#if $selectedTaskStatus == 'RELEASED_FOR_MAPPING'}
+	{#if $selectedTaskStatus == 'UNLOCKED_TO_MAP'}
 		<sl-tooltip content="MAP">
 			<hot-icon-button
 				name="play"
@@ -316,7 +316,7 @@
 				on:click={finishTask(data.projectId, $selectedTaskId)}
 			></hot-icon-button>
 		</sl-tooltip>
-	{:else if $selectedTaskStatus == 'MARKED_MAPPED'}
+	{:else if $selectedTaskStatus == 'UNLOCKED_TO_VALIDATE'}
 		<sl-tooltip content="RESET">
 			<hot-icon-button
 				name="arrow-counterclockwise"
@@ -441,7 +441,7 @@
 		</div>
 	</MapLibre>
 
-	{#if $selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && ($selectedTaskStatus === 'RELEASED_FOR_MAPPING' || $selectedTaskStatus === 'LOCKED_FOR_MAPPING')}
+	{#if $selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && ($selectedTaskStatus === 'UNLOCKED_TO_MAP' || $selectedTaskStatus === 'LOCKED_FOR_MAPPING')}
 		<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
 			<div
 				class="bg-white w-[100vw] h-fit font-barlow-regular w-[100vw] md:max-w-[580px] pointer-events-auto px-4 pb-3 sm:pb-4 rounded-t-3xl"
@@ -455,7 +455,7 @@
 					></hot-icon>
 				</div>
 
-				{#if $selectedTaskStatus == 'RELEASED_FOR_MAPPING'}
+				{#if $selectedTaskStatus == 'UNLOCKED_TO_MAP'}
 					<p class="my-4 sm:my-6">Do you want to start mapping task #{$selectedTaskId}?</p>
 					<div class="flex justify-center gap-x-2">
 						<sl-button

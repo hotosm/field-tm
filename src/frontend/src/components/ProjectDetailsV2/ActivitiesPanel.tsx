@@ -31,11 +31,11 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelTy
     let taskHistories: projectTaskActivity[] = projectTaskActivityList;
 
     setAllActivities(projectTaskActivityList.length);
-    let finalTaskHistory: projectTaskActivity[] = taskHistories.filter((task) => {
+    let finalTaskEvents: projectTaskActivity[] = taskHistories.filter((task) => {
       return task.username.replace(/\s+/g, '').toString().includes(searchText.toString());
     });
     if (searchText != '') {
-      setTaskHistories(finalTaskHistory);
+      setTaskHistories(finalTaskEvents);
     } else {
       setTaskHistories(taskHistories);
     }
@@ -61,17 +61,17 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelTy
     });
   };
 
-  const ActivitiesCard = ({ taskHistory }: { taskHistory: projectTaskActivity }) => {
-    const actionDate = taskHistory?.action_date?.split('T')[0];
-    const actionTime = `${taskHistory?.action_date?.split('T')[1].split(':')[0]}:${
-      taskHistory?.action_date?.split('T')[1].split(':')[1]
+  const ActivitiesCard = ({ taskEvent }: { taskEvent: projectTaskActivity }) => {
+    const actionDate = taskEvent?.created_at?.split('T')[0];
+    const actionTime = `${taskEvent?.created_at?.split('T')[1].split(':')[0]}:${
+      taskEvent?.created_at?.split('T')[1].split(':')[1]
     }`;
     return (
       <div className="fmtm-flex fmtm-gap-2 fmtm-items-center fmtm-justify-between fmtm-px-1 fmtm-border-b-[2px] fmtm-border-white fmtm-py-3">
         <div className="fmtm-flex fmtm-items-center">
           <div className="fmtm-w-[2.81rem] fmtm-h-[2.81rem] fmtm-border fmtm-rounded-full fmtm-overflow-hidden fmtm-mr-4">
-            {taskHistory?.profile_img ? (
-              <img src={taskHistory?.profile_img} alt="Profile Picture" />
+            {taskEvent?.profile_img ? (
+              <img src={taskEvent?.profile_img} alt="Profile Picture" />
             ) : (
               <div className="fmtm-w-full fmtm-h-full fmtm-flex fmtm-justify-center fmtm-items-center fmtm-bg-white">
                 <AssetModules.PersonIcon color="success" sx={{ fontSize: '30px' }} />
@@ -79,12 +79,12 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelTy
             )}
           </div>
           <div className="fmtm-text-base">
-            <span className="fmtm-text-[#555555] fmtm-font-medium fmtm-font-archivo">{taskHistory?.username} </span>
+            <span className="fmtm-text-[#555555] fmtm-font-medium fmtm-font-archivo">{taskEvent?.username} </span>
             <span className="fmtm-text-[#7A7676] fmtm-font-extralight fmtm-italic fmtm-font-archivo">
               updated status to{' '}
             </span>
-            <p style={{ color: defaultTheme.statusTextTheme[taskHistory?.status] }} className="fmtm-font-archivo">
-              {taskHistory?.status}
+            <p style={{ color: defaultTheme.statusTextTheme[taskEvent?.state] }} className="fmtm-font-archivo">
+              {taskEvent?.state}
             </p>
             <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
               <p className="fmtm-font-archivo fmtm-text-sm fmtm-text-[#7A7676]">#{selectedTask}</p>
@@ -138,7 +138,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelTy
         ) : taskHistories?.length === 0 ? (
           <p className="fmtm-mt-5 fmtm-text-center fmtm-text-xl fmtm-text-gray-400">No Task History!</p>
         ) : (
-          <div>{taskHistories?.map((taskHistory) => <ActivitiesCard taskHistory={taskHistory} />)}</div>
+          <div>{taskHistories?.map((taskEvent) => <ActivitiesCard taskEvent={taskEvent} />)}</div>
         )}
       </div>
     </div>

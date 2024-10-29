@@ -84,12 +84,11 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     const currentErrors = generateProjectTilesValidation();
     if (currentErrors.length === 0) {
       dispatch(
-        GenerateProjectTiles(
-          `${
-            import.meta.env.VITE_API_URL
-          }/projects/${id}/tiles-generate?source=${selectedTileSource}&format=${selectedOutputFormat}&tms=${tmsUrl}`,
-          id,
-        ),
+        GenerateProjectTiles(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles-generate`, id, {
+          tile_source: selectedTileSource,
+          file_format: selectedOutputFormat,
+          tms_url: tmsUrl,
+        }),
       );
     }
   };

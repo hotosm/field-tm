@@ -33,7 +33,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import EntityStatus, HTTPStatus
+from app.db.enums import EntityState, HTTPStatus
 from app.db.models import DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -511,7 +511,7 @@ async def feature_geojson_to_entity_dict(
     properties = {
         str(key): str(value) for key, value in feature.get("properties", {}).items()
     }
-    # Set to TaskStatus enum READY value (0)
+    # Set to MappingState enum READY value (0)
     properties["status"] = "0"
 
     task_id = properties.get("task_id")
@@ -769,7 +769,7 @@ async def update_entity_mapping_status(
     odk_id: int,
     entity_uuid: str,
     label: str,
-    status: EntityStatus,
+    status: EntityState,
     dataset_name: str = "features",
 ) -> dict:
     """Update the Entity mapping status.
@@ -781,7 +781,7 @@ async def update_entity_mapping_status(
         odk_id (str): The project ID in ODK Central.
         entity_uuid (str): The unique entity UUID for ODK Central.
         label (str): New label, with emoji prepended for status.
-        status (EntityStatus): New EntityStatus to assign, in string form.
+        status (EntityState): New EntityState to assign, in string form.
         dataset_name (str): Override the default dataset / Entity list name 'features'.
 
     Returns:

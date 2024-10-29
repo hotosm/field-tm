@@ -45,16 +45,16 @@
     <!-- Action Text and Task ID -->
     <div class="text-base">
       <span class="text-[#555555] font-medium font-archivo">
-        {record?.action} by {record.action_text?.split(' ').at(-1)}
+        {record?.event} by {record.comment?.split(' ').at(-1)}
       </span>
-      
+
       <!-- Date and Time -->
       <div class="flex items-center justify-between mt-2">
         <p class="font-archivo text-sm text-[#7A7676]">#{record?.task_id}</p>
         <div class="flex items-center font-archivo text-sm text-[#7A7676] ml-2">
           <sl-icon name="clock" class="text-[20px] mr-2"></sl-icon>
-          {#if record?.action_date}
-            {@const formattedDate = formatDate(record.action_date)}
+          {#if record?.created_at}
+            {@const formattedDate = formatDate(record.created_at)}
             <span class="mr-2">{formattedDate.date}</span>
             <span>{formattedDate.time}</span>
           {:else}

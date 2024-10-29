@@ -22,7 +22,7 @@ test.describe('mapper flow', () => {
         y: 95,
       },
     });
-    await expect(page.getByText('Status: READY')).toBeVisible();
+    await expect(page.getByText('Status: UNLOCKED_TO_MAP')).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
     await page.getByTitle('Close').getByTestId('CloseIcon').click();
     // Use maxDiffPixelRatio to avoid issues with OSM tile loading delay
@@ -61,11 +61,11 @@ test.describe('mapper flow', () => {
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
     // Required again for the confirmation dialog (0/4 features mapped)
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
-    await page.waitForSelector('div:has-text("updated status to MAPPED"):nth-of-type(1)');
+    await page.waitForSelector('div:has-text("updated status to UNLOCKED_TO_VALIDATE"):nth-of-type(1)');
     await expect(
       page
         .locator('div')
-        .filter({ hasText: /updated status to MAPPED/ })
+        .filter({ hasText: /updated status to UNLOCKED_TO_VALIDATE/ })
         .first(),
     ).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
@@ -86,8 +86,8 @@ test.describe('mapper flow', () => {
     // Click 'Fully Mapped' button on validation page
     await page.getByRole('button', { name: 'MARK AS VALIDATED' }).click();
 
-    await page.getByText('has been updated to VALIDATED').waitFor({ state: 'visible' });
-    await expect(page.getByText('has been updated to VALIDATED')).toBeVisible();
+    await page.getByText('has been updated to UNLOCKED_DONE').waitFor({ state: 'visible' });
+    await expect(page.getByText('has been updated to UNLOCKED_DONE')).toBeVisible();
 
     // wait for map to render before continuing
     await page.waitForTimeout(4000);
@@ -99,7 +99,7 @@ test.describe('mapper flow', () => {
         y: 95,
       },
     });
-    await expect(page.getByText('Status: VALIDATED')).toBeVisible();
+    await expect(page.getByText('Status: UNLOCKED_DONE')).toBeVisible();
   });
 
   test('open feature (Entity) in ODK', async ({ browserName, page }) => {
@@ -119,7 +119,7 @@ test.describe('mapper flow', () => {
         y: 220,
       },
     });
-    await expect(page.getByText('Status: READY')).toBeVisible();
+    await expect(page.getByText('Status: UNLOCKED_TO_MAP')).toBeVisible();
     await expect(page.getByRole('button', { name: 'START MAPPING' })).toBeVisible();
 
     // 2. Click on a specific feature / Entity within a task

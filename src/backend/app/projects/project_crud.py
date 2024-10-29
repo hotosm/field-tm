@@ -810,7 +810,7 @@ def generate_project_basemap(
 #     return json2osm(geojson_file)
 
 
-def get_pagination(page: int, count: int, results_per_page: int, total: int):
+async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     """Pagination result for splash page."""
     total_pages = (count + results_per_page - 1) // results_per_page
     has_next = (page * results_per_page) < count  # noqa: N806
@@ -857,25 +857,11 @@ async def get_paginated_projects(
         total_project_count = await cur.fetchone()
         total_project_count = total_project_count[0]
 
-    pagination = get_pagination(
+    pagination = await get_pagination(
         page, len(projects), results_per_page, total_project_count
     )
 
     return {"results": projects, "pagination": pagination}
-
-
-async def get_dashboard_detail(db: Connection, project: DbProject):
-    """Get project details for project dashboard."""
-    xform = central_crud.get_odk_form(project.odk_credentials)
-    submission_meta_data = xform.getFullDetails(project.odkid, project.odk_form_id)
-
-    contributors_dict = await get_project_users_plus_contributions(db, project.id)
-    return {
-        "total_submission": submission_meta_data.get("submissions", 0),
-        "last_active": submission_meta_data.get("lastSubmission"),
-        "total_tasks": len(project.tasks),
-        "total_contributors": len(contributors_dict),
-    }
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
@@ -897,7 +883,7 @@ async def get_project_users_plus_contributions(db: Connection, project_id: int):
         FROM
             users u
         JOIN
-            task_history th ON u.id = th.user_id
+            task_events th ON u.id = th.user_id
         WHERE
             th.project_id = %(project_id)s
         GROUP BY u.username

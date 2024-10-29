@@ -2,7 +2,7 @@ import CoreModules from '@/shared/CoreModules.js';
 import React, { useEffect } from 'react';
 import { SubmissionService } from '@/api/Submission';
 import SubmissionInstanceMap from '@/components/SubmissionMap/SubmissionInstanceMap';
-import { GetProjectDashboard } from '@/api/Project';
+import { GetSubmissionDashboard } from '@/api/Project';
 import Button from '@/components/common/Button';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
@@ -89,7 +89,7 @@ const SubmissionDetails = () => {
 
   const projectId = params.projectId;
   const paramsInstanceId = params.instanceId;
-  const taskUId = params.taskId;
+  const taskUid = params.taskId;
   const projectDashboardDetail = useAppSelector((state) => state.project.projectDashboardDetail);
   const projectDashboardLoading = useAppSelector((state) => state.project.projectDashboardLoading);
   const submissionDetails = useAppSelector((state) => state.submission.submissionDetails);
@@ -100,7 +100,7 @@ const SubmissionDetails = () => {
   const dateDeviceDetails = { start, end, today, deviceid };
 
   useEffect(() => {
-    dispatch(GetProjectDashboard(`${import.meta.env.VITE_API_URL}/projects/project_dashboard/${projectId}`));
+    dispatch(GetSubmissionDashboard(`${import.meta.env.VITE_API_URL}/submission/${projectId}/dashboard`));
   }, []);
 
   useEffect(() => {
@@ -110,13 +110,14 @@ const SubmissionDetails = () => {
   }, [projectId, paramsInstanceId]);
 
   useEffect(() => {
-    if (!taskUId) return;
+    // Note here taskUid is coerced to string so we have to check that
+    if (taskUid == 'undefined') return;
     dispatch(
       GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUId)}/history/?project_id=${projectId}&comment=true`,
+        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUid)}/history/?project_id=${projectId}&comments=true`,
       ),
     );
-  }, [taskUId]);
+  }, [taskUid]);
 
   const filteredData = restSubmissionDetails ? removeNullValues(restSubmissionDetails) : {};
 
@@ -219,7 +220,7 @@ const SubmissionDetails = () => {
                       projectId: projectId,
                       taskId: taskId,
                       reviewState: restSubmissionDetails?.__system?.reviewState,
-                      taskUId: taskUId,
+                      taskUid: taskUid,
                     }),
                   );
                 }}

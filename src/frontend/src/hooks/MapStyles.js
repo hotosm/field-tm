@@ -54,7 +54,7 @@ export default function MapStyles() {
     const redIconStyle = createIconStyle(AssetModules.RedLockPng);
 
     const geojsonStyles = {
-      READY: new Style({
+      UNLOCKED_TO_MAP: new Style({
         stroke: new Stroke({
           color: strokeColor,
           width: 3,
@@ -64,7 +64,7 @@ export default function MapStyles() {
         }),
       }),
       LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
-      MAPPED: new Style({
+      UNLOCKED_TO_VALIDATE: new Style({
         stroke: new Stroke({
           color: strokeColor,
           width: 3,
@@ -74,8 +74,7 @@ export default function MapStyles() {
         }),
       }),
       LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
-
-      VALIDATED: new Style({
+      UNLOCKED_DONE: new Style({
         stroke: new Stroke({
           color: strokeColor,
           width: 3,
@@ -84,33 +83,24 @@ export default function MapStyles() {
           color: mapTheme.palette.mapFeatureColors.validated_rgb,
         }),
       }),
-      INVALIDATED: new Style({
-        stroke: new Stroke({
-          color: strokeColor,
-          width: 3,
-        }),
-        fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
-        }),
-      }),
-      BAD: new Style({
-        stroke: new Stroke({
-          color: strokeColor,
-          width: 3,
-        }),
-        fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.bad_rgb,
-        }),
-      }),
-      SPLIT: new Style({
-        stroke: new Stroke({
-          color: strokeColor,
-          width: 3,
-        }),
-        fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.split_rgb,
-        }),
-      }),
+      // INVALIDATED: new Style({
+      //   stroke: new Stroke({
+      //     color: strokeColor,
+      //     width: 3,
+      //   }),
+      //   fill: new Fill({
+      //     color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
+      //   }),
+      // }),
+      // BAD: new Style({
+      //   stroke: new Stroke({
+      //     color: strokeColor,
+      //     width: 3,
+      //   }),
+      //   fill: new Fill({
+      //     color: mapTheme.palette.mapFeatureColors.bad_rgb,
+      //   }),
+      // }),
     };
     setStyle(geojsonStyles);
   }, []);

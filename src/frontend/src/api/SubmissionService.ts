@@ -81,12 +81,12 @@ export const SubmissionTableService: Function = (url: string, payload: filterTyp
   };
 };
 
-export const UpdateReviewStateService: Function = (url: string) => {
+export const UpdateReviewStateService: Function = (url: string, payload: object) => {
   return async (dispatch) => {
     const UpdateReviewState = async (url: string) => {
       try {
         dispatch(SubmissionActions.UpdateReviewStateLoading(true));
-        const response = await CoreModules.axios.post(url);
+        const response = await CoreModules.axios.post(url, payload);
         dispatch(SubmissionActions.UpdateSubmissionTableDataReview(response.data));
       } catch (error) {
         dispatch(

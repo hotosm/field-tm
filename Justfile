@@ -16,6 +16,8 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+set dotenv-load
+
 mod start 'contrib/just/start/Justfile'
 mod stop 'contrib/just/stop/Justfile'
 mod build 'contrib/just/build/Justfile'

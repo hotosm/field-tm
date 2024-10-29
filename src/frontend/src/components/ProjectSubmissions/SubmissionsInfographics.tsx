@@ -41,33 +41,33 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
     const projectIndex = projectTaskList.findIndex((project) => project.id == +projectId);
     // task activities history list
     const taskActivities = projectTaskList?.[projectIndex]?.taskBoundries?.reduce((acc: taskHistoryTypes[], task) => {
-      return [...acc, ...task?.task_history];
+      return [...acc, ...(task?.task_history ?? [])];
     }, []);
 
     // filter activities for last 30 days
     const taskActivities30Days = taskActivities?.filter((activity) => {
-      const actionDate = new Date(activity?.action_date).toISOString();
+      const actionDate = new Date(activity?.created_at).toISOString();
       return actionDate >= dateNDaysAgo(30) && actionDate <= today;
     });
 
     // only filter MAPPED & VALIDATED activities
     const groupedData: validatedMappedType[] = taskActivities30Days?.reduce((acc: validatedMappedType[], activity) => {
-      const date = activity?.action_date.split('T')[0];
+      const date = activity?.created_at.split('T')[0];
       const index = acc.findIndex((submission) => submission.date === date);
       if (acc?.find((submission) => submission.date === date)) {
-        if (activity?.action_text?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
+        if (activity?.comment?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
           acc[index].Mapped += 1;
         }
-        if (activity?.action_text?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
+        if (activity?.comment?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
           acc[index].Validated += 1;
         }
       } else {
         const splittedDate = date?.split('-');
         const label = `${splittedDate[1]}/${splittedDate[2]}`;
-        if (activity?.action_text?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
+        if (activity?.comment?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
           acc.push({ date: date, Validated: 0, Mapped: 1, label });
         }
-        if (activity?.action_text?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
+        if (activity?.comment?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
           acc.push({ date: date, Validated: 1, Mapped: 0, label });
         }
       }

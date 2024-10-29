@@ -8,10 +8,11 @@ import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
 import { useParams } from 'react-router-dom';
-import { UpdateEntityStatus } from '@/api/Project';
+import { UpdateEntityState } from '@/api/Project';
 import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
-import { UpdateTaskStatus } from '@/api/ProjectTaskStatus';
+import { CreateTaskEvent } from '@/api/TaskEvent';
 import MapStyles from '@/hooks/MapStyles';
+import { task_event, task_state as taskStateEnum } from '@/types/enums';
 
 type TaskFeatureSelectionPopupPropType = {
   taskId: number;
@@ -29,29 +30,27 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
 
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const currentProjectId = params.id || '';
-  const [task_status, set_task_status] = useState('RELEASED_FOR_MAPPING');
+  const [task_state, set_task_state] = useState(taskStateEnum.UNLOCKED_TO_MAP);
   const projectData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == currentProjectId);
   const projectTaskActivityList = CoreModules.useAppSelector((state) => state?.project?.projectTaskActivity);
-  const taskBoundaryData = CoreModules.useAppSelector((state) => state.project.projectTaskBoundries);
-  const updateEntityStatusLoading = CoreModules.useAppSelector((state) => state.project.updateEntityStatusLoading);
+  const updateEntityStateLoading = CoreModules.useAppSelector((state) => state.project.updateEntityStateLoading);
   const currentTaskInfo = {
-    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
+    ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return task?.id == taskId;
     })?.[0],
   };
-  const geoStyle = geojsonStyles['LOCKED_FOR_MAPPING'];
+  const geoStyle = geojsonStyles[taskStateEnum.LOCKED_FOR_MAPPING];
   const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
 
   useEffect(() => {
-    console.log(currentTaskInfo);
     if (projectIndex != -1) {
       const currentStatus =
-        projectTaskActivityList.length > 0 ? projectTaskActivityList[0].status : 'RELEASED_FOR_MAPPING';
+        projectTaskActivityList.length > 0 ? projectTaskActivityList[0].state : taskStateEnum.UNLOCKED_TO_MAP;
       const findCorrectTaskStatusIndex = environment.tasksStatus.findIndex((data) => data?.label == currentStatus);
       const tasksStatus =
         taskFeature?.id_ != undefined ? environment?.tasksStatus[findCorrectTaskStatusIndex]?.['label'] : '';
-      set_task_status(tasksStatus);
+      set_task_state(tasksStatus);
     }
   }, [projectTaskActivityList, taskId, taskFeature, entityOsmMap]);
 
@@ -108,7 +107,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
             </p>
           </div>
         </div>
-        {(task_status === 'RELEASED_FOR_MAPPING' || task_status === 'LOCKED_FOR_MAPPING') && (
+        {(task_state === taskStateEnum.UNLOCKED_TO_MAP || task_state === taskStateEnum.LOCKED_FOR_MAPPING) && (
           <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
             <Button
               btnText="MAP FEATURE IN ODK"
@@ -116,7 +115,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
               type="submit"
               className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
               disabled={entity?.status !== 0}
-              isLoading={updateEntityStatusLoading}
+              isLoading={updateEntityStateLoading}
               onClick={() => {
                 const xformId = projectInfo.odk_form_id;
                 const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
@@ -127,23 +126,23 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
                 }
 
                 dispatch(
-                  UpdateEntityStatus(`${import.meta.env.VITE_API_URL}/projects/${currentProjectId}/entity/status`, {
+                  UpdateEntityState(`${import.meta.env.VITE_API_URL}/projects/${currentProjectId}/entity/status`, {
                     entity_id: entityUuid,
                     status: 1,
                     label: `Task ${taskId} Feature ${entity.osm_id}`,
                   }),
                 );
 
-                if (task_status === 'RELEASED_FOR_MAPPING') {
+                if (task_state === taskStateEnum.UNLOCKED_TO_MAP) {
                   dispatch(
-                    UpdateTaskStatus(
-                      `${import.meta.env.VITE_API_URL}/tasks/${currentTaskInfo?.id}/new-status/1`,
+                    CreateTaskEvent(
+                      `${import.meta.env.VITE_API_URL}/tasks/${currentTaskInfo?.id}/event`,
+                      task_event.MAP,
                       currentProjectId,
                       taskId.toString(),
                       authDetails,
                       { project_id: currentProjectId },
                       geoStyle,
-                      taskBoundaryData,
                       taskFeature,
                     ),
                   );

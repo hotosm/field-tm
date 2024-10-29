@@ -6,12 +6,12 @@
 BEGIN;
 
 -- Drop default from action_date
-ALTER TABLE public.task_history ALTER COLUMN action_date DROP DEFAULT;
+ALTER TABLE IF EXISTS public.task_history ALTER COLUMN action_date DROP DEFAULT;
 
 -- Add event_id field
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_history' AND column_name = 'event_id') THEN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_history' AND column_name = 'id') THEN
         -- Add new event_id UUID field with values
         ALTER TABLE public.task_history ADD COLUMN event_id UUID;
         UPDATE public.task_history SET event_id = gen_random_uuid() WHERE event_id IS NULL;

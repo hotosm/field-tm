@@ -27,7 +27,7 @@ upstream mapper {
     # Enable sticky sessions based on an incoming client IP address
     ip_hash;
 
-    server ui-mapper:3000;
+    server ui-mapper:7055;
 }
 
 server {
