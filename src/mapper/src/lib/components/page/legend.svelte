@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { clickOutside } from '../../../utilFunctions/clickOutside.ts';
-	import LockImg from '../../../assets/images/black-lock.png';
-	import '../../../styles/page.css';
+	import { clickOutside } from '$lib/utils/clickOutside.ts';
+	import LockImg from '$assets/images/black-lock.png';
+	import '$styles/page.css';
 
 	type taskStatusesType = { status: string; color?: string; icon?: string };
 

@@ -160,7 +160,7 @@ SET default_table_access_method = heap;
 
 -- Tables
 
-CREATE TABLE IF NOT EXISTS public._migrations (
+CREATE TABLE public._migrations (
     script_name text,
     date_executed timestamp with time zone
 );
@@ -339,6 +339,14 @@ CREATE TABLE public.users (
 );
 ALTER TABLE public.users OWNER TO fmtm;
 
+CREATE TABLE public.odk_entities (
+    entity_id UUID NOT NULL,
+    status entitystate NOT NULL,
+    project_id integer NOT NULL,
+    task_id integer
+);
+ALTER TABLE public.odk_entities OWNER TO fmtm;
+
 CREATE TABLE public.xlsforms (
     id integer NOT NULL,
     title character varying,
@@ -435,6 +443,9 @@ ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY public.users
 ADD CONSTRAINT users_username_key UNIQUE (username);
 
+ALTER TABLE ONLY public.odk_entities
+ADD CONSTRAINT odk_entities_pkey PRIMARY KEY (entity_id);
+
 ALTER TABLE ONLY public.xlsforms
 ADD CONSTRAINT xlsforms_pkey PRIMARY KEY (id);
 
@@ -447,16 +458,16 @@ ADD CONSTRAINT submission_photos_pkey PRIMARY KEY (id);
 -- Indexing
 
 CREATE INDEX idx_projects_outline ON public.projects USING gist (outline);
-CREATE INDEX IF NOT EXISTS idx_projects_mapper_level
+CREATE INDEX idx_projects_mapper_level
 ON public.projects USING btree (
     mapper_level
 );
-CREATE INDEX IF NOT EXISTS idx_projects_organisation_id
+CREATE INDEX idx_projects_organisation_id
 ON public.projects USING btree (
     organisation_id
 );
 CREATE INDEX idx_tasks_outline ON public.tasks USING gist (outline);
-CREATE INDEX IF NOT EXISTS idx_tasks_composite
+CREATE INDEX idx_tasks_composite
 ON public.tasks USING btree (
     id, project_id
 );
@@ -466,25 +477,33 @@ CREATE INDEX idx_user_roles ON public.user_roles USING btree (
 CREATE INDEX idx_org_managers ON public.organisation_managers USING btree (
     user_id, organisation_id
 );
-CREATE INDEX IF NOT EXISTS idx_task_event_composite
+CREATE INDEX idx_task_event_composite
 ON public.task_events USING btree (
     task_id, project_id
 );
-CREATE INDEX IF NOT EXISTS idx_task_event_project_user
+CREATE INDEX idx_task_event_project_user
 ON public.task_events USING btree (
     user_id, project_id
 );
-CREATE INDEX IF NOT EXISTS idx_task_event_project_id
+CREATE INDEX idx_task_event_project_id
 ON public.task_events USING btree (
     task_id, project_id
 );
-CREATE INDEX IF NOT EXISTS idx_task_event_user_id
+CREATE INDEX idx_task_event_user_id
 ON public.task_events USING btree (
     task_id, user_id
 );
-CREATE INDEX IF NOT EXISTS idx_task_history_date
+CREATE INDEX idx_task_history_date
 ON public.task_history USING btree (
     task_id, created_at
+);
+CREATE INDEX idx_entities_project_id
+ON public.odk_entities USING btree (
+    entity_id, project_id
+);
+CREATE INDEX idx_entities_task_id
+ON public.odk_entities USING btree (
+    entity_id, task_id
 );
 
 -- Foreign keys

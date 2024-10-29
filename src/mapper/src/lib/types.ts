@@ -1,3 +1,5 @@
+import type { UUID } from 'crypto';
+
 export type ProjectTask = {
 	id: number;
 	project_id: number;
@@ -74,12 +76,39 @@ export const TaskStatusEnum: TaskStatus = Object.freeze({
 	UNLOCKED_DONE: 'UNLOCKED_DONE',
 });
 
-// TODO fix me
 export type TaskEvent = {
+	MAP: string;
+	FINISH: string;
+	VALIDATE: string;
+	GOOD: string;
+	BAD: string;
+	// SPLIT: string;
+	// MERGE: string;
+	// ASSIGN: string;
+	// COMMENT: string;
+};
+export const TaskEventEnum: TaskEvent = Object.freeze({
+	MAP: 'MAP',
+	FINISH: 'FINISH',
+	VALIDATE: 'VALIDATE',
+	GOOD: 'GOOD',
+	BAD: 'BAD',
+});
+
+export type TaskEventResponse = {
 	event_id: string;
+	event: TaskEvent;
+	task_id: number;
 	comment: string;
 	created_at: string;
 	username: string;
 	profile_img: string;
 	status: TaskStatus;
+};
+
+export type NewEvent = {
+	event_id: UUID;
+	event: TaskEvent;
+	task_id: number;
+	comment?: string | null;
 };

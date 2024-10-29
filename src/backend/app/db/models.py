@@ -41,6 +41,7 @@ from app.config import settings
 from app.db.enums import (
     BackgroundTaskStatus,
     CommunityType,
+    EntityState,
     HTTPStatus,
     MappingLevel,
     MappingState,
@@ -842,7 +843,7 @@ class DbTask(BaseModel):
 
         Args:
             db (Connection): The database connection.
-            project_id (int): The organisation ID.
+            project_id (int): The project ID.
             tasks (geojson.FeatureCollection): FeatureCollection of task areas.
 
         Returns:
@@ -1294,6 +1295,79 @@ class DbProject(BaseModel):
             """,
                 {"project_id": project_id},
             )
+
+
+class DbOdkEntities(BaseModel):
+    """Table odk_entities.
+
+    Mirror tracking the status of Entities in ODK.
+    """
+
+    entity_id: UUID
+    status: EntityState
+    project_id: int
+    task_id: int
+
+    @classmethod
+    async def upsert(
+        cls,
+        db: Connection,
+        project_id: int,
+        entities: list[Self],
+    ) -> bool:
+        """Update or insert Entity data, with statuses.
+
+        Args:
+            db (Connection): The database connection.
+            project_id (int): The project ID.
+            entities (list[Self]): List of DbOdkEntities objects.
+
+        Returns:
+            bool: Success or failure.
+        """
+        log.info(
+            f"Updating FMTM database Entities for project {project_id} "
+            f"with ({len(entities)}) features"
+        )
+
+        sql = """
+            INSERT INTO public.odk_entities
+                (entity_id, status, project_id, task_id)
+            VALUES
+        """
+
+        # Prepare data for bulk insert
+        values = []
+        data = {}
+        for index, entity in enumerate(entities):
+            entity_index = f"entity_{index}"
+            values.append(
+                f"(%({entity_index}_entity_id)s, "
+                f"%({entity_index}_status)s, "
+                f"%({entity_index}_project_id)s, "
+                f"%({entity_index}_task_id)s)"
+            )
+            data[f"{entity_index}_entity_id"] = entity["id"]
+            data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
+            data[f"{entity_index}_project_id"] = project_id
+            task_id = entity["task_id"]
+            data[f"{entity_index}_task_id"] = int(task_id) if task_id else None
+
+        sql += (
+            ", ".join(values)
+            + """
+            ON CONFLICT (entity_id) DO UPDATE SET
+                status = EXCLUDED.status,
+                task_id = EXCLUDED.task_id
+            RETURNING True;
+        """
+        )
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, data)
+            result = await cur.fetchall()
+
+        return bool(result)
 
 
 class DbBackgroundTask(BaseModel):

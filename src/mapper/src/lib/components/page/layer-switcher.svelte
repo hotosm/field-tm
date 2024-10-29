@@ -1,5 +1,5 @@
 <script>
-	import { clickOutside } from '../../../utilFunctions/clickOutside.ts';
+	import { clickOutside } from '$lib/utils/clickOutside.ts';
 
 	let isOpen = false;
 </script>

@@ -27,8 +27,12 @@ const config = {
 	},
 
 	alias: {
+		$lib: 'src/lib',
 		$components: 'src/components',
 		$static: 'static',
+		$store: 'src/store',
+		$styles: 'styles',
+		$assets: 'assets',
 	},
 };
 
