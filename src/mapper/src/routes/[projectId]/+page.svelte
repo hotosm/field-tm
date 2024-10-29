@@ -24,7 +24,6 @@
 	import { bbox } from '@turf/bbox';
 
 	import type { ProjectData, ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
-	import { statusEnumLabelToValue, statusEnumValueToLabel } from '$lib/task-events';
 	import {
 		mapTask,
 		finishTask,
@@ -45,7 +44,7 @@
 	import RedLockImg from '$assets/images/red-lock.png';
 	import More from '$lib/components/page/more/index.svelte';
 	import '$styles/button.css';
-	import { GetDeviceRotation } from '$utilFunctions/getDeviceRotation';
+	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
 	import { setAlert } from '$store/common';
@@ -68,6 +67,7 @@
 		url: 'http://localhost:7055/v1/shape/task_events',
 		where: `project_id=${data.projectId}`,
 	});
+
 	const taskHistoryEvents = new Shape(taskHistoryStream);
 	const taskEventArray = writable([]);
 	const latestEvent = writable();
@@ -75,37 +75,40 @@
 		updateTaskFeatures();
 	}
 
-	async function getLatestEventForTasks() {
+	async function getLatestStatePerTask() {
 		const taskEventMap = await taskHistoryEvents.value;
 		const taskEventArrayFromApi = Array.from(taskEventMap.values());
 
 		// Update the taskEventArray writable store
 		taskEventArray.set(taskEventArrayFromApi);
 
-		const latestActions = new Map();
+		const currentTaskStates = new Map();
 
 		for (const taskData of taskEventArrayFromApi) {
-			// Use the task_id as the key and action as the value
-			latestActions.set(taskData.task_id, taskData.event);
+			// Use the task_id as the key and state as the value
+			currentTaskStates.set(taskData.task_id, {
+				state: taskData.state || 'UNLOCKED_TO_MAP',
+				actioned_by_uid: taskData.user_id || null,
+			});
 		}
 
-		return latestActions;
+		return currentTaskStates;
 	}
 
 	async function updateTaskFeatures() {
-		const latestActions = await getLatestEventForTasks();
+		const latestTaskStates = await getLatestStatePerTask();
 
 		const features = data.project.tasks.map((x: ProjectTask) => {
-			const taskId = x.outline.id;
-			const statusString = latestActions.get(taskId);
-			const status = statusString ? statusEnumLabelToValue(statusString) : '0';
-
+			const taskId = x.id;
+			const taskDetails = latestTaskStates.get(taskId) || {
+				state: 'UNLOCKED_TO_MAP',
+				actioned_by_uid: null,
+			};
 			return {
-				...x.outline,
-				properties: {
-					...x.outline.properties,
-					status,
-				},
+				type: 'Feature',
+				id: taskId,
+				geometry: x.outline,
+				properties: taskDetails
 			};
 		});
 
@@ -121,18 +124,18 @@
 	let selectedTaskId = writable<number | null>(null);
 	let featureClicked = writable(false);
 	let selectedTask = writable<any>(null);
-	let selectedTaskStatus = writable<string>('');
+	let selectedTaskState = writable<string>('');
 
 	$: selectedTask.set(data.project.tasks.find((task: ProjectTask) => task.id === $selectedTaskId));
 
 	$: (async () => {
 		const task = $selectedTask;
 		if (task && task.id) {
-			const latestActions = await getLatestEventForTasks();
-			const statusLabel = latestActions.get(task.id);
-			selectedTaskStatus.set(statusLabel ? statusLabel : 'UNLOCKED_TO_MAP');
+			const latestTaskStates = await getLatestStatePerTask();
+			const latestTaskDetails = latestTaskStates.get(task.id);
+			selectedTaskState.set(latestTaskDetails?.state || 'UNLOCKED_TO_MAP');
 		} else {
-			selectedTaskStatus.set('');
+			selectedTaskState.set('');
 		}
 	})();
 
@@ -298,7 +301,7 @@
 {/if}
 
 {#if $selectedTaskId}
-	{#if $selectedTaskStatus == 'UNLOCKED_TO_MAP'}
+	{#if $selectedTaskState == 'UNLOCKED_TO_MAP'}
 		<sl-tooltip content="MAP">
 			<hot-icon-button
 				name="play"
@@ -307,7 +310,7 @@
 				on:click={mapTask(data.projectId, $selectedTaskId)}
 			></hot-icon-button>
 		</sl-tooltip>
-	{:else if $selectedTaskStatus == 'LOCKED_FOR_MAPPING'}
+	{:else if $selectedTaskState == 'LOCKED_FOR_MAPPING'}
 		<sl-tooltip content="FINISH">
 			<hot-icon-button
 				name="stop"
@@ -316,7 +319,7 @@
 				on:click={finishTask(data.projectId, $selectedTaskId)}
 			></hot-icon-button>
 		</sl-tooltip>
-	{:else if $selectedTaskStatus == 'UNLOCKED_TO_VALIDATE'}
+	{:else if $selectedTaskState == 'UNLOCKED_TO_VALIDATE'}
 		<sl-tooltip content="RESET">
 			<hot-icon-button
 				name="arrow-counterclockwise"
@@ -347,8 +350,8 @@
 			});
 		}}
 		images={[
-			{ id: '1', url: BlackLockImg },
-			{ id: '3', url: RedLockImg },
+			{ id: 'LOCKED_FOR_MAPPING', url: BlackLockImg },
+			{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
 			{ id: 'locationArc', url: LocationArcImg },
 			{ id: 'locationDot', url: LocationDotImg },
 		]}
@@ -390,19 +393,17 @@
 				paint={{
 					'fill-color': [
 						'match',
-						['get', 'status'],
-						'0',
+						['get', 'state'],
+						'UNLOCKED_TO_MAP',
 						'#ffffff',
-						'1',
+						'LOCKED_FOR_MAPPING',
 						'#008099',
-						'2',
+						'UNLOCKED_TO_VALIDATE',
 						'#ade6ef',
-						'3',
+						'LOCKED_FOR_VALIDATION',
 						'#fceca4',
-						'4',
+						'UNLOCKED_DONE',
 						'#40ac8c',
-						'5',
-						'#d73f3e',
 						'#c5fbf5', // default color if no match is found
 					],
 					'fill-opacity': hoverStateFilter(0.5, 0),
@@ -430,7 +431,9 @@
 				applyToClusters={false}
 				hoverCursor="pointer"
 				layout={{
-					'icon-image': ['case', ['==', ['get', 'status'], '1'], '1', ['==', ['get', 'status'], '3'], '3', ''],
+					'icon-image': ['case', 
+					['==', ['get', 'state'], 'LOCKED_FOR_MAPPING'], 'LOCKED_FOR_MAPPING', 
+					 ['==', ['get', 'status'],'LOCKED_FOR_VALIDATION'], 'LOCKED_FOR_VALIDATION', ''],
 					'icon-allow-overlap': true,
 				}}
 			/>
@@ -441,7 +444,7 @@
 		</div>
 	</MapLibre>
 
-	{#if $selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && ($selectedTaskStatus === 'UNLOCKED_TO_MAP' || $selectedTaskStatus === 'LOCKED_FOR_MAPPING')}
+	{#if $selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && ($selectedTaskState === 'UNLOCKED_TO_MAP' || $selectedTaskState === 'LOCKED_FOR_MAPPING')}
 		<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
 			<div
 				class="bg-white w-[100vw] h-fit font-barlow-regular w-[100vw] md:max-w-[580px] pointer-events-auto px-4 pb-3 sm:pb-4 rounded-t-3xl"
@@ -455,7 +458,7 @@
 					></hot-icon>
 				</div>
 
-				{#if $selectedTaskStatus == 'UNLOCKED_TO_MAP'}
+				{#if $selectedTaskState == 'UNLOCKED_TO_MAP'}
 					<p class="my-4 sm:my-6">Do you want to start mapping task #{$selectedTaskId}?</p>
 					<div class="flex justify-center gap-x-2">
 						<sl-button
@@ -477,7 +480,7 @@
 							</div>
 						</sl-button>
 					</div>
-				{:else if $selectedTaskStatus == 'LOCKED_FOR_MAPPING'}
+				{:else if $selectedTaskState == 'LOCKED_FOR_MAPPING'}
 					<p class="my-4 sm:my-6">Task #{$selectedTaskId} has been locked, Is the task completely mapped?</p>
 					<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
 						<sl-button

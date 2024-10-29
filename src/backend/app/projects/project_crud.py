@@ -532,8 +532,8 @@ async def generate_project_files(
 
     # Split extract by task area
     log.debug("Splitting data extract per task area")
-    # TODO in future this splitting could be removed as the task_id is
-    # no longer used in the XLSForm
+    # TODO in future this splitting could be removed if the task_id is
+    # no longer used in the XLSForm for the map filter
     task_extract_dict = await split_geojson_by_task_areas(
         db, feature_collection, project_id
     )

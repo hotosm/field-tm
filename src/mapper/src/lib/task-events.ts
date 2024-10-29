@@ -1,50 +1,31 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TaskStatusEnum } from '$lib/types';
-import type { MappingState, TaskEvent } from '$lib/types';
+import { TaskEventEnum } from '$lib/types';
+import type { TaskEvent, TaskEventResponse, NewEvent } from '$lib/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-export function statusEnumLabelToValue(statusLabel: string): string {
-	console.log(statusLabel);
-	// Check if the statusLabel exists in TaskStatusEnum
-	if (!(statusLabel in TaskStatusEnum)) {
-		throw new Error(`Invalid status string: ${statusLabel}`);
-	}
-	const statusValue = TaskStatusEnum[statusLabel as keyof MappingState];
-
-	return statusValue;
-}
-
-export function statusEnumValueToLabel(statusValue: string): keyof MappingState {
-	// Validate if statusValue exists in TaskStatusEnum
-	const statusEntry = Object.entries(TaskStatusEnum).find(([_, value]) => value === statusValue);
-
-	if (statusEntry) {
-		return statusEntry[0] as keyof MappingState;
-	} else {
-		throw new Error(`Invalid status value: ${statusValue}`);
-	}
-}
-
-// // interface NewEvent {
-// //   project_id: number;
-// //   task_id: number;
-// //   user_id: number;
-// // }
 
 async function add_event(
 	// db,
 	projectId: number,
 	taskId: number,
 	// userId: number,
-	actionId: string,
+	eventType: TaskEvent,
 	// comment: string = '',
 	// ): Promise<void> {
-): Promise<TaskEvent | false> {
+): Promise<TaskEventResponse | false> {
 	// const eventId = uuidv4()
-	const resp = await fetch(`${API_URL}/tasks/${taskId}/new-status/${actionId}?project_id=${projectId}`, {
+	const newEvent: NewEvent = {
+		event_id: uuidv4(),
+		event: eventType,
+		task_id: taskId,
+	};
+	const resp = await fetch(`${API_URL}/tasks/${taskId}/event/?project_id=${projectId}`, {
 		method: 'POST',
 		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(newEvent),
 	});
 
 	if (resp.status !== 200) {
@@ -52,8 +33,8 @@ async function add_event(
 		return false;
 	}
 
-	const newEvent = await resp.json();
-	return newEvent;
+	const response = await resp.json();
+	return response;
 
 	// // Uncomment this for local first approach
 	// await db.task_events.create({
@@ -70,19 +51,15 @@ async function add_event(
 }
 
 export async function mapTask(/* db, */ projectId: number, taskId: number): Promise<void> {
-	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.LOCKED_FOR_MAPPING);
+	await add_event(/* db, */ projectId, taskId, TaskEventEnum.MAP);
 }
 
 export async function finishTask(/* db, */ projectId: number, taskId: number): Promise<void> {
-	// TODO the backend /new-status endpoint is actually posting MappingState
-	// TODO it should likely be posting TaskEvent (TaskEvent) to the endpoint
-	// TODO then we handle the status of the task internally
-	// i.e. it's duplicated info!
-	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.UNLOCKED_TO_VALIDATE);
+	await add_event(/* db, */ projectId, taskId, TaskEventEnum.FINISH);
 }
 
 export async function resetTask(/* db, */ projectId: number, taskId: number): Promise<void> {
-	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.UNLOCKED_TO_MAP);
+	await add_event(/* db, */ projectId, taskId, TaskEventEnum.BAD);
 }
 
 // async function finishTask(db, projectId: number, taskId: number, userId: number): Promise<void> {

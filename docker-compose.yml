@@ -282,7 +282,7 @@ services:
       # AUTH_JWT_KEY: ${ENCRYPTION_KEY}
       # AUTH_JWT_AUD: ${FMTM_DOMAIN}
     ports:
-      - "7055:7055"
+      - "7055:3000"
     networks:
       - fmtm-net
     restart: "unless-stopped"

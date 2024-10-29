@@ -57,7 +57,14 @@ from app.db.enums import (
     ProjectRole,
     XLSFormType,
 )
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbTask, DbUserRole
+from app.db.models import (
+    DbBackgroundTask,
+    DbBasemap,
+    DbOdkEntities,
+    DbProject,
+    DbTask,
+    DbUserRole,
+)
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -174,14 +181,20 @@ async def get_odk_entities_geojson(
     response_model=list[central_schemas.EntityMappingStatus],
 )
 async def get_odk_entities_mapping_statuses(
+    project_id: int,
     project: Annotated[DbProject, Depends(project_deps.get_project)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the ODK entities mapping statuses, i.e. in progress or complete."""
-    return await central_crud.get_entities_data(
+    entities = await central_crud.get_entities_data(
         project.odk_credentials,
         project.odkid,
     )
+    # First update the Entity statuses in the db
+    # FIXME this is a hack and in the long run should be replaced
+    # https://github.com/hotosm/fmtm/issues/1841
+    await DbOdkEntities.upsert(db, project_id, entities)
+    return entities
 
 
 @router.get(
