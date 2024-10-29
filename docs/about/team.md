@@ -48,6 +48,13 @@
   <i>Primary frontend developer</i>
 </div>
 <div style="margin-bottom: 20px;">
+  <img src="https://avatars.githubusercontent.com/u/84966248?v=4" width="100" style="border-radius: 50%;" alt="Anuj Gupta">
+  <br>
+  <b>Anuj Gupta</b>
+  <br>
+  <i>Support backend developer</i>
+</div>
+<div style="margin-bottom: 20px;">
   <img src="https://avatars.githubusercontent.com/u/108750444?v=4?s=100" width="100" style="border-radius: 50%;" alt="Susmina Manandhar">
   <br>
   <b>Susmina Manandhar</b>
