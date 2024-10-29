@@ -20,15 +20,15 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import get_uid, mapper
+from app.auth.roles import mapper
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus, TaskAction, TaskStatus
-from app.db.models import DbTask, DbTaskHistory
+from app.db.enums import HTTPStatus
+from app.db.models import DbTask, DbTaskEvent
 from app.tasks import task_crud, task_schemas
-from app.tasks.task_deps import get_task
 
 router = APIRouter(
     prefix="/tasks",
@@ -68,57 +68,23 @@ async def get_specific_task(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
 
-# TODO SQL update this to be something like /next
-@router.post(
-    "/{task_id}/new-status/{new_status}", response_model=task_schemas.TaskHistoryOut
-)
+@router.post("/{task_id}/event", response_model=task_schemas.TaskEventOut)
 async def add_new_task_event(
-    db_task: Annotated[DbTask, Depends(get_task)],
+    task_id: int,
+    new_event: task_schemas.TaskEventIn,
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    new_status: TaskStatus,
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Add a new event to the events table / update task status."""
-    user_id = await get_uid(project_user.get("user"))
-    return await task_crud.new_task_event(
-        db,
-        db_task.id,
-        user_id,
-        new_status,
-    )
+    user_id = project_user.get("user").id
+    log.info(f"Task {task_id} event: {new_event.event.name} (by user {user_id})")
+
+    new_event.user_id = user_id
+    new_event.task_id = task_id
+    return await DbTaskEvent.create(db, new_event)
 
 
-@router.post("/{task_id}/comment/", response_model=task_schemas.TaskHistoryOut)
-async def add_task_comment(
-    comment: str,
-    db_task: Annotated[DbTask, Depends(get_task)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Create a new task comment.
-
-    Parameters:
-        comment (str): The task comment to add.
-        db_task (DbTask): The database task entry.
-            Retrieving this ensures the task exists before updating.
-        project_user (ProjectUserDict): The authenticated user.
-        db (Connection): The database connection.
-
-    Returns:
-        TaskHistoryOut: The created task comment.
-    """
-    user_id = await get_uid(project_user.get("user"))
-    new_comment = task_schemas.TaskHistoryIn(
-        task_id=db_task.id,
-        user_id=user_id,
-        action=TaskAction.COMMENT,
-        action_text=comment,
-    )
-    return await DbTaskHistory.create(db, new_comment)
-
-
-# NOTE this endpoint isn't used?
-@router.get("/activity/", response_model=list[task_schemas.TaskHistoryCount])
+@router.get("/activity/", response_model=list[task_schemas.TaskEventCount])
 async def task_activity(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
@@ -139,13 +105,13 @@ async def task_activity(
     return await task_crud.get_project_task_activity(db, project_id, days)
 
 
-@router.get("/{task_id}/history/", response_model=list[task_schemas.TaskHistoryOut])
-async def task_history(
+@router.get("/{task_id}/history/", response_model=list[task_schemas.TaskEventOut])
+async def get_task_event_history(
+    task_id: int,
     db: Annotated[Connection, Depends(db_conn)],
-    db_task: Annotated[DbTask, Depends(get_task)],
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
     days: int = 10,
     comments: bool = False,
 ):
     """Get the detailed history for a task."""
-    return await DbTaskHistory.all(db, task_id=db_task.id, days=days, comments=comments)
+    return await DbTaskEvent.all(db, task_id=task_id, days=days, comments=comments)

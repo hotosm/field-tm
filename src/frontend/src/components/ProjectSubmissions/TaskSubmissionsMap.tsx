@@ -111,8 +111,12 @@ const TaskSubmissionsMap = () => {
       ...basicGeojsonTemplate,
       features: [
         ...projectTaskBoundries?.[0]?.taskBoundries?.map((task) => ({
-          ...task.outline,
-          id: task?.outline?.properties?.fid,
+          type: 'Feature',
+          geometry: { ...task.outline, id: task?.outline?.properties?.fid },
+          properties: {
+            fid: task?.index,
+            uid: task?.id,
+          },
         })),
       ],
     };
@@ -121,6 +125,7 @@ const TaskSubmissionsMap = () => {
 
   useEffect(() => {
     if (!taskBoundaries) return;
+    if (!selectedTask) return;
     const filteredSelectedTaskGeojson = {
       ...basicGeojsonTemplate,
       features: taskBoundaries?.features?.filter((task) => task?.properties?.fid === selectedTask),
@@ -142,6 +147,7 @@ const TaskSubmissionsMap = () => {
       constrainResolution: true,
       duration: 2000,
     });
+    dispatch(CoreModules.TaskActions.SetSelectedTask(null));
   }, [selectedTask]);
 
   const taskOnSelect = (properties, feature) => {

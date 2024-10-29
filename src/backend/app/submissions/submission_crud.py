@@ -37,7 +37,8 @@ from app.central.central_crud import (
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus
 from app.db.models import DbBackgroundTask, DbProject, DbSubmissionPhoto
-from app.projects import project_deps, project_schemas
+from app.db.postgis_utils import timestamp
+from app.projects import project_crud, project_deps, project_schemas
 from app.s3 import add_obj_to_bucket
 
 # async def convert_json_to_osm(file_path):
@@ -173,7 +174,7 @@ async def get_submissions_by_date(
     dates = [
         date.strftime("%m/%d")
         for date in end_dates
-        if datetime.now() - date <= timedelta(days=days)
+        if timestamp() - date <= timedelta(days=days)
     ]
 
     submission_counts = Counter(sorted(dates))
@@ -370,3 +371,20 @@ async def upload_attachment_to_s3(
             ),
         )
         return False
+
+
+async def get_dashboard_detail(db: Connection, project: DbProject):
+    """Get project details for project dashboard."""
+    xform = get_odk_form(project.odk_credentials)
+    submission_meta_data = xform.getFullDetails(project.odkid, project.odk_form_id)
+
+    contributors_dict = await project_crud.get_project_users_plus_contributions(
+        db,
+        project.id,
+    )
+    return {
+        "total_submission": submission_meta_data.get("submissions", 0),
+        "last_active": submission_meta_data.get("lastSubmission"),
+        "total_tasks": len(project.tasks),
+        "total_contributors": len(contributors_dict),
+    }

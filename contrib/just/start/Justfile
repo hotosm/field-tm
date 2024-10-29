@@ -78,7 +78,7 @@ tunnel:
   docker compose \
     -f docker-compose.yml \
     -f contrib/tunnel/docker-compose.yml \
-    up -d --wait
+    up --wait
 
   # Workaround to until PR merged:
   # https://github.com/cloudflare/cloudflared/pull/1135
@@ -93,18 +93,14 @@ tunnel:
   just --unstable dotenv update "EXTRA_CORS_ORIGINS" "${fmtm_url}"
   just --unstable dotenv update "S3_ENDPOINT" "${s3_url}"
 
-  # Restart the API and UI with environment variables set
-  API_URL="${api_url}" docker compose \
-    -f docker-compose.yml \
-    -f contrib/tunnel/docker-compose.yml \
-    up -d api ui
-
-  # Restart ODK Central with domain override (for form download urls)
+  # Restart the containers with env vars set
+  # (API url for frontend, domain for Central form download urls)
   CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
+  API_URL="$(echo "${api_url}" | sed 's|^https://||')" \
   docker compose \
     -f docker-compose.yml \
     -f contrib/tunnel/docker-compose.yml \
-    up -d central
+    up -d api ui central
 
   just --unstable start _print-tunnel-urls "$fmtm_url" "$api_url" "$odk_url" "$s3_url"
 

@@ -53,8 +53,6 @@ from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import (
-    TILES_FORMATS,
-    TILES_SOURCE,
     HTTPStatus,
     ProjectRole,
     XLSFormType,
@@ -326,24 +324,16 @@ async def download_tiles(
     )
 
 
-@router.get("/{project_id}/tiles-generate")
+@router.post("/{project_id}/tiles-generate")
 async def generate_project_basemap(
     background_tasks: BackgroundTasks,
-    project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    source: str = Query(
-        ..., description="Select a source for tiles", enum=TILES_SOURCE
-    ),
-    format: str = Query(
-        "mbtiles", description="Select an output format", enum=TILES_FORMATS
-    ),
-    tms: str = Query(
-        None,
-        description="Provide a custom TMS URL, optional",
-    ),
+    basemap_in: project_schemas.BasemapGenerate,
 ):
     """Returns basemap tiles for a project."""
+    project_id = project_user.get("project").id
+
     # Create task in db and return uuid
     log.debug(
         "Creating generate_project_basemap background task "
@@ -357,24 +347,14 @@ async def generate_project_basemap(
         ),
     )
 
-    # # FIXME delete this
-    # project_crud.generate_project_basemap(
-    #     db,
-    #     project_id,
-    #     background_task_id,
-    #     source,
-    #     format,
-    #     tms
-    # )
-
     background_tasks.add_task(
         project_crud.generate_project_basemap,
         db,
         project_id,
         background_task_id,
-        source,
-        format,
-        tms,
+        basemap_in.tile_source,
+        basemap_in.file_format,
+        basemap_in.tms_url,
     )
 
     return {"Message": "Tile generation started"}
@@ -1006,37 +986,19 @@ async def convert_fgb_to_geojson(
 
 
 @router.get(
-    "/task-status/{task_id}",
+    "/task-status/{bg_task_id}",
     response_model=project_schemas.BackgroundTaskStatus,
 )
 async def get_task_status(
-    task_id: str,
+    bg_task_id: str,
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the background task status by passing the task ID."""
     try:
-        return await DbBackgroundTask.one(db, task_id)
+        return await DbBackgroundTask.one(db, bg_task_id)
     except KeyError as e:
         log.warning(str(e))
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
-
-
-@router.get(
-    "/project_dashboard/{project_id}", response_model=project_schemas.ProjectDashboard
-)
-async def project_dashboard(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    db: Annotated[Connection, Depends(db_conn)],
-):
-    """Get the project dashboard details."""
-    project = project_user.get("project")
-    details = await project_crud.get_dashboard_detail(db, project)
-    details["slug"] = project.slug
-    details["organisation_name"] = project.organisation_name
-    details["created_at"] = project.created_at
-    details["organisation_logo"] = project.organisation_logo
-    details["last_active"] = project.last_active
-    return details
 
 
 @router.get("/contributors/{project_id}")

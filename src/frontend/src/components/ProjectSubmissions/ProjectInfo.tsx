@@ -48,7 +48,9 @@ const ProjectInfo = ({ entities }) => {
     <div className="fmtm-bg-white fmtm-rounded-lg fmtm-min-w-[12.5rem] fmtm-p-2 fmtm-px-4 md:fmtm-p-4 md:fmtm-shadow-[0px_10px_20px_0px_rgba(96,96,96,0.1)] fmtm-flex fmtm-items-center fmtm-gap-4">
       <div className="fmtm-bg-primaryRed fmtm-rounded-full fmtm-p-2">{data.icon}</div>
       <div className="fmtm-flex fmtm-flex-col fmtm-items-start">
-        <h2 className="fmtm-text-lg sm:fmtm-text-xl md:fmtm-text-xl fmtm-text-[#706E6E] fmtm-font-bold">{data.name}</h2>
+        <h2 className="fmtm-text-lg sm:fmtm-text-xl md:fmtm-text-xl fmtm-text-[#706E6E] fmtm-font-bold">
+          {data.title}
+        </h2>
         <h2 className="fmtm-text-xl sm:fmtm-text-2xl md:fmtm-text-2xl fmtm-font-bold fmtm-text-primaryRed">
           {data.count}
         </h2>

@@ -30,12 +30,6 @@ services:
         "critical",
         "--no-access-log",
       ]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
-      start_period: 60s
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   ui:
     # This hostname is used for Playwright test internal networking
@@ -49,6 +43,19 @@ services:
       retries: 3
       start_period: 5s
       timeout: 5s
+
+  # ui-mapper:
+  #   # This hostname is used for Playwright test internal networking
+  #   hostname: fmtm.dev.test
+  #   environment:
+  #     VITE_API_URL: "http://fmtm.dev.test:8000"
+  #   command: --port 80
+  #   healthcheck:
+  #     test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/80' || exit 1
+  #     interval: 5s
+  #     retries: 3
+  #     start_period: 5s
+  #     timeout: 5s
 
   ui-test:
     image: "mcr.microsoft.com/playwright:${PLAYWRIGHT_TAG:-v1.48.1}"

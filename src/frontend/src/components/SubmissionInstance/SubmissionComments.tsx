@@ -10,8 +10,8 @@ const SubmissionComments = () => {
 
   const taskCommentsList = useAppSelector((state) => state?.project?.projectCommentsList);
   const filteredTaskCommentsList = taskCommentsList
-    ?.filter((comment) => comment?.action_text.includes('-SUBMISSION_INST-'))
-    .filter((comment) => comment.action_text.split('-SUBMISSION_INST-')[0] === submissionInstanceId);
+    ?.filter((entry) => entry?.comment.includes('-SUBMISSION_INST-'))
+    .filter((entry) => entry.comment.split('-SUBMISSION_INST-')[0] === submissionInstanceId);
   const taskGetCommentsLoading = useAppSelector((state) => state?.project?.projectGetCommentsLoading);
 
   return (
@@ -33,16 +33,16 @@ const SubmissionComments = () => {
           ))}
         </div>
       ) : filteredTaskCommentsList?.length > 0 ? (
-        filteredTaskCommentsList?.map((comment) => (
+        filteredTaskCommentsList?.map((entry) => (
           <div className="fmtm-py-[0.875rem] fmtm-border-b fmtm-border-[#D4D4D4] fmtm-flex fmtm-flex-col fmtm-gap-2">
             <div className="fmtm-flex fmtm-justify-between fmtm-items-center">
-              <p className="fmtm-text-base fmtm-font-bold fmtm-text-[#555]">{comment?.username}</p>
+              <p className="fmtm-text-base fmtm-font-bold fmtm-text-[#555]">{entry?.username}</p>
               <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
                 <AssetModules.CalendarTodayOutlinedIcon style={{ fontSize: '12px' }} className="fmtm-text-[#D73F37]" />
-                <p className="fmtm-text-xs fmtm-text-[#555]">{comment?.action_date?.split('T')[0]}</p>
+                <p className="fmtm-text-xs fmtm-text-[#555]">{entry?.created_at?.split('T')[0]}</p>
               </div>
             </div>
-            <p className="fmtm-text-[#555] fmtm-text-sm">{comment?.action_text?.split('-SUBMISSION_INST-')[1]}</p>
+            <p className="fmtm-text-[#555] fmtm-text-sm">{entry?.comment?.split('-SUBMISSION_INST-')[1]}</p>
           </div>
         ))
       ) : (

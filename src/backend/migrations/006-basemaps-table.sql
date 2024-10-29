@@ -4,7 +4,6 @@
 -- * Update default background task status to 'PENDING'.
 -- * Update background_tasks.id --> UUID type.
 -- * Update basemaps.id --> UUID type.
--- * Also add a composite index to task_history on task_id and action_date
 
 -- Start a transaction
 BEGIN;
@@ -76,13 +75,6 @@ BEGIN
         ADD CONSTRAINT background_tasks_pkey PRIMARY KEY (id);
     END IF;
 END $$;
-
--- Create extra index on task_history
-
-CREATE INDEX IF NOT EXISTS idx_task_history_date
-ON public.task_history USING btree (
-    task_id, action_date
-);
 
 -- Commit the transaction
 COMMIT;

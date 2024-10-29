@@ -226,7 +226,7 @@ const VectorLayer = ({
     if (!geojson) return;
     if (!valid(geojson)) return;
 
-    const vectorLyr = new OLVectorLayer({
+    const geoJsonVectorLyr = new OLVectorLayer({
       source: new VectorSource({
         features: new GeoJSON().readFeatures(geojson, {
           featureProjection: get('EPSG:3857'),
@@ -235,13 +235,13 @@ const VectorLayer = ({
       declutter: true,
     });
 
-    const vlFeature = vectorLyr?.getSource().getFeatures();
+    const vlFeature = geoJsonVectorLyr?.getSource().getFeatures();
     if (!vlFeature || (vlFeature && vlFeature?.length === 0)) return;
 
     const handleClick = (evt) => {
       var pixel = evt.pixel;
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-        if (layer === vectorLyr) {
+        if (layer === geoJsonVectorLyr) {
           return feature;
         }
       });
@@ -251,7 +251,7 @@ const VectorLayer = ({
 
     map.on('click', handleClick);
 
-    setVectorLayer(vectorLyr);
+    setVectorLayer(geoJsonVectorLyr);
     return () => {
       setVectorLayer(null);
       map.un('click', handleClick);
@@ -261,7 +261,7 @@ const VectorLayer = ({
   useEffect(() => {
     if (!map || !fgbUrl || !isValidUrl(fgbUrl)) return;
 
-    const vectorLyr = new OLVectorLayer({
+    const fgbVectorLayer = new OLVectorLayer({
       source: new VectorSource({
         useSpatialIndex: true,
         strategy: OLBbox,
@@ -273,7 +273,7 @@ const VectorLayer = ({
       const pixel = evt.pixel;
 
       const feature = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-        if (layer === vectorLyr) {
+        if (layer === fgbVectorLayer) {
           return feature;
         }
       });
@@ -283,7 +283,7 @@ const VectorLayer = ({
 
     map.on('click', handleClick);
 
-    setVectorLayer(vectorLyr);
+    setVectorLayer(fgbVectorLayer);
 
     return () => {
       setVectorLayer(null);

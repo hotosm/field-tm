@@ -43,6 +43,8 @@ services:
         condition: service_started
       ui:
         condition: service_started
+      ui-mapper:
+        condition: service_started
       central:
         condition: service_started
         required: false
@@ -97,6 +99,12 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
+      start_period: 60s
+      interval: 10s
+      timeout: 5s
+      retries: 10
     deploy:
       replicas: ${API_REPLICAS:-1}
       resources:
@@ -237,7 +245,7 @@ services:
     image: "postgis/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
     # Temp workaround until https://github.com/postgis/docker-postgis/issues/216
     build:
-      context: https://github.com/postgis/docker-postgis.git#master:14-3.4/alpine
+      context: https://github.com/postgis/docker-postgis.git#master:14-3.5/alpine
     command: -c 'max_connections=300' -c 'wal_level=logical'
     volumes:
       - fmtm_db_data:/var/lib/postgresql/data/
@@ -274,7 +282,7 @@ services:
       # AUTH_JWT_KEY: ${ENCRYPTION_KEY}
       # AUTH_JWT_AUD: ${FMTM_DOMAIN}
     ports:
-      - "7055:3000"
+      - "7055:7055"
     networks:
       - fmtm-net
     restart: "unless-stopped"

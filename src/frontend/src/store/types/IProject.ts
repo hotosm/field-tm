@@ -26,7 +26,7 @@ export type ProjectStateTypes = {
   projectDashboardDetail: projectDashboardDetailTypes;
   entityOsmMap: EntityOsmMap[];
   entityOsmMapLoading: boolean;
-  updateEntityStatusLoading: boolean;
+  updateEntityStateLoading: boolean;
   projectDashboardLoading: boolean;
   geolocationStatus: boolean;
   projectCommentsList: projectCommentsListTypes[];
@@ -57,23 +57,20 @@ type tilesListTypes = {
 
 type projectCommentsListTypes = {
   id: number;
-  project_id: number;
-  action: string;
-  action_text: string;
-  action_date: string;
-  username: string;
   task_id: number;
+  comment: string;
+  created_at: string;
+  username: string;
   profile_img: string;
-  status: any;
 };
 
 export type projectTaskActivity = {
-  id: number;
+  event_id: string;
   task_id: number;
-  action: string;
-  action_text: string;
-  action_date: string;
-  status: string;
+  event: string;
+  state: string;
+  comment: string;
   profile_img: null | string;
   username: string;
+  created_at: string;
 };

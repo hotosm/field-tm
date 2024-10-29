@@ -56,32 +56,29 @@ export interface ZoomToTaskEventDetail {
 }
 
 export type TaskStatus = {
-	RELEASED_FOR_MAPPING: string;
+	UNLOCKED_TO_MAP: string;
 	LOCKED_FOR_MAPPING: string;
-	MARKED_MAPPED: string;
+	UNLOCKED_TO_VALIDATE: string;
 	LOCKED_FOR_VALIDATION: string;
-	VALIDATED: string;
-	INVALIDATED: string;
-	BAD: string;
-	SPLIT: string;
-	ARCHIVED: string;
+	UNLOCKED_DONE: string;
+	// INVALIDATED: string;
+	// BAD: string;
+	// SPLIT: string;
+	// ARCHIVED: string;
 };
 export const TaskStatusEnum: TaskStatus = Object.freeze({
-	RELEASED_FOR_MAPPING: '0',
-	LOCKED_FOR_MAPPING: '1',
-	MARKED_MAPPED: '2',
-	LOCKED_FOR_VALIDATION: '3',
-	VALIDATED: '4',
-	INVALIDATED: '5',
-	BAD: '6',
-	SPLIT: '7',
-	ARCHIVED: '8',
+	UNLOCKED_TO_MAP: 'UNLOCKED_TO_MAP',
+	LOCKED_FOR_MAPPING: 'LOCKED_FOR_MAPPING',
+	UNLOCKED_TO_VALIDATE: 'UNLOCKED_TO_VALIDATE',
+	LOCKED_FOR_VALIDATION: 'LOCKED_FOR_VALIDATION',
+	UNLOCKED_DONE: 'UNLOCKED_DONE',
 });
 
+// TODO fix me
 export type TaskEvent = {
 	event_id: string;
-	action_text: string;
-	action_date: string;
+	comment: string;
+	created_at: string;
 	username: string;
 	profile_img: string;
 	status: TaskStatus;

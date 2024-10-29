@@ -11,32 +11,13 @@ export type dataExtractPropertyType = {
 };
 
 export type taskHistoryTypes = {
-  action_date: string;
-  action_text: string;
-  id: number;
-  profile_img: null | string;
-  status: string;
+  event_id: string;
+  event: number;
+  state: string;
+  comment: string;
   username: string;
-};
-
-export type taskHistoryListType = {
-  action: string;
-  action_date: string;
-  action_text: string;
-  project_id: number;
-  outlineGeojson: {
-    type: string;
-    geometry: {
-      coordinates: [];
-      type: string;
-    };
-    properties: Record<string, any>;
-    id: string;
-  };
   profile_img: null | string;
-  status: string;
-  task_id: number;
-  username: string;
+  created_at: string;
 };
 
 export type projectInfoType = {
@@ -111,7 +92,7 @@ export type taskBoundriesTypes = {
     bbox: null | number[];
   };
   task_history: taskHistoryTypes[];
-  task_status: string;
+  task_state: string;
 };
 
 export type taskBoundriesGeojson = {

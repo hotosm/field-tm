@@ -21,8 +21,9 @@ import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateRevie
 import { useAppSelector } from '@/types/reduxTypes';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { UpdateTaskStatus } from '@/api/ProjectTaskStatus';
+import { CreateTaskEvent } from '@/api/TaskEvent';
 import { filterType } from '@/store/types/ISubmissions';
+import { task_state, task_event } from '@/types/enums';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -56,9 +57,8 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const projectIndex = projectData.findIndex((project) => project.id == +projectId);
-  const taskBoundaryData = useAppSelector((state) => state.project.projectTaskBoundries);
   const currentStatus = {
-    ...taskBoundaryData?.[projectIndex]?.taskBoundries?.filter((task) => {
+    ...projectData?.[projectIndex]?.taskBoundries?.filter((task) => {
       return filter.task_id && task?.id === +filter.task_id;
     })?.[0],
   };
@@ -217,8 +217,9 @@ const SubmissionsTable = ({ toggleView }) => {
 
   const handleTaskMap = async () => {
     await dispatch(
-      UpdateTaskStatus(
-        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus.id}/new-status/4`,
+      CreateTaskEvent(
+        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus.id}/event`,
+        task_event.MAP,
         projectId,
         filter?.task_id || '',
         authDetails || {},
@@ -403,8 +404,8 @@ const SubmissionsTable = ({ toggleView }) => {
         </div>
         <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
           {filter?.task_id &&
-            taskBoundaryData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +filter?.task_id)
-              ?.task_status === 'LOCKED_FOR_VALIDATION' && (
+            projectData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +filter?.task_id)?.task_state ===
+              task_state.LOCKED_FOR_VALIDATION && (
               <Button
                 isLoading={updateTaskStatusLoading}
                 loadingText="MARK AS VALIDATED"
@@ -463,14 +464,14 @@ const SubmissionsTable = ({ toggleView }) => {
             headerClassName="updatedHeader !fmtm-sticky fmtm-right-0 fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)] fmtm-text-center"
             rowClassName="updatedRow !fmtm-sticky fmtm-right-0 fmtm-bg-white fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)]"
             dataFormat={(row) => {
-              const taskUId = taskList?.find((task) => task?.id == row?.task_id)?.id;
+              const taskUid = taskList?.find((task) => task?.id == row?.task_id)?.id;
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
                   <AssetModules.VisibilityOutlinedIcon
                     className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
                     onClick={() => {
                       navigate(
-                        `/project-submissions/${projectId}/tasks/${taskUId}/submission/${row?.meta?.instanceID}`,
+                        `/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`,
                       );
                     }}
                   />{' '}
@@ -485,7 +486,7 @@ const SubmissionsTable = ({ toggleView }) => {
                           taskId: row?.task_id,
                           projectId: projectId,
                           reviewState: row?.__system?.reviewState,
-                          taskUId: taskUId,
+                          taskUid: taskUid,
                         }),
                       );
                     }}

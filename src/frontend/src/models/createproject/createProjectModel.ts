@@ -1,4 +1,4 @@
-import { task_status as taskStatusEnum } from '@/types/enums';
+import { task_state as taskStateEnum } from '@/types/enums';
 
 export interface ProjectDetailsModel {
   id: number;
@@ -36,13 +36,13 @@ export interface ProjectDetailsModel {
       id: string;
       bbox: null | number[];
     };
-    task_status: taskStatusEnum;
+    task_state: taskStateEnum;
     actioned_by_uid: number;
     actioned_by_username: string;
     task_history: {
       event_id: string;
-      action_text: string;
-      action_date: string;
+      state: string;
+      comment: string;
     }[];
     qr_code_base64: string;
   }[];

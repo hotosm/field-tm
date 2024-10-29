@@ -55,3 +55,37 @@ frontend-interactive:
 coverage:
   docker compose run --rm --entrypoint='sh -c' api \
     'coverage run -m pytest && coverage report -m'
+
+# Load prod data into current database (WARNING: deletes local db data)
+[no-cd]
+load-prod-data:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}
+
+  docker compose up --wait
+  # We cannot have electric using a logical replication slot though
+  docker compose down electric
+
+  # Get latest db dump filename
+  docker compose exec --no-TTY s3 mc alias set prod https://s3.fmtm.hotosm.org "" ""
+  latest_file=$(docker compose exec --no-TTY s3 mc ls prod/fmtm-db-backups/fmtm \
+    | awk '{print $NF}' | sort | tail -n 1)
+  echo "Latest backup file: $latest_file"
+
+  # Copy file to current machine
+  docker compose exec --no-TTY s3 \
+    mc cp prod/fmtm-db-backups/fmtm/"$latest_file" /tmp/"$latest_file"
+  docker compose cp s3:/tmp/"$latest_file" /tmp/"$latest_file"
+
+  echo "Dropping existing database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
+  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
+    dropdb --echo --if-exists --force -U ${FMTM_DB_USER}  ${FMTM_DB_NAME}
+
+  echo "Creating new database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
+  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
+    createdb --echo -U ${FMTM_DB_USER} -O ${FMTM_DB_USER} ${FMTM_DB_NAME}
+
+  echo "Loading data into database ${FMTM_DB_NAME} as user ${FMTM_DB_USER}"
+  gunzip -c /tmp/"$latest_file" | \
+  docker compose exec --no-TTY -e PGPASSWORD=${FMTM_DB_PASSWORD} ${FMTM_DB_HOST} \
+    pg_restore --verbose -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}

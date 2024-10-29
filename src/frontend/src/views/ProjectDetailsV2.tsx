@@ -140,7 +140,7 @@ const ProjectDetailsV2 = () => {
       geometry: { ...taskObj.outline },
       properties: {
         ...taskObj.outline.properties,
-        task_status: taskObj?.task_status,
+        task_state: taskObj?.task_state,
         actioned_by_uid: taskObj?.actioned_by_uid,
         actioned_by_username: taskObj?.actioned_by_username,
       },

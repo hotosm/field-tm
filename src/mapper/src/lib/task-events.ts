@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TaskStatusEnum } from '$lib/types';
-import type { TaskStatus, TaskEvent } from '$lib/types';
+import type { MappingState, TaskEvent } from '$lib/types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,17 +10,17 @@ export function statusEnumLabelToValue(statusLabel: string): string {
 	if (!(statusLabel in TaskStatusEnum)) {
 		throw new Error(`Invalid status string: ${statusLabel}`);
 	}
-	const statusValue = TaskStatusEnum[statusLabel as keyof TaskStatus];
+	const statusValue = TaskStatusEnum[statusLabel as keyof MappingState];
 
 	return statusValue;
 }
 
-export function statusEnumValueToLabel(statusValue: string): keyof TaskStatus {
+export function statusEnumValueToLabel(statusValue: string): keyof MappingState {
 	// Validate if statusValue exists in TaskStatusEnum
 	const statusEntry = Object.entries(TaskStatusEnum).find(([_, value]) => value === statusValue);
 
 	if (statusEntry) {
-		return statusEntry[0] as keyof TaskStatus;
+		return statusEntry[0] as keyof MappingState;
 	} else {
 		throw new Error(`Invalid status value: ${statusValue}`);
 	}
@@ -38,7 +38,7 @@ async function add_event(
 	taskId: number,
 	// userId: number,
 	actionId: string,
-	// action_text: string = '',
+	// comment: string = '',
 	// ): Promise<void> {
 ): Promise<TaskEvent | false> {
 	// const eventId = uuidv4()
@@ -56,14 +56,14 @@ async function add_event(
 	return newEvent;
 
 	// // Uncomment this for local first approach
-	// await db.task_history.create({
+	// await db.task_events.create({
 	// 	data: {
 	// 		event_id: uuidv4(),
 	// 		project_id: projectId,
 	// 		task_id: taskId,
-	// 		action: action,
-	// 		action_text: action_text,
-	// 		action_date: new Date().toISOString(),
+	// 		event: action,
+	// 		comment: comment,
+	// 		created_at: new Date().toISOString(),
 	// 		user_id: userId,
 	// 	},
 	// });
@@ -74,22 +74,22 @@ export async function mapTask(/* db, */ projectId: number, taskId: number): Prom
 }
 
 export async function finishTask(/* db, */ projectId: number, taskId: number): Promise<void> {
-	// TODO the backend /new-status endpoint is actually posting TaskStatus
-	// TODO it should likely be posting TaskAction (TaskEvent) to the endpoint
+	// TODO the backend /new-status endpoint is actually posting MappingState
+	// TODO it should likely be posting TaskEvent (TaskEvent) to the endpoint
 	// TODO then we handle the status of the task internally
 	// i.e. it's duplicated info!
-	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.MARKED_MAPPED);
+	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.UNLOCKED_TO_VALIDATE);
 }
 
 export async function resetTask(/* db, */ projectId: number, taskId: number): Promise<void> {
-	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.RELEASED_FOR_MAPPING);
+	await add_event(/* db, */ projectId, taskId, TaskStatusEnum.UNLOCKED_TO_MAP);
 }
 
 // async function finishTask(db, projectId: number, taskId: number, userId: number): Promise<void> {
 // 	// const query = `
 // 	//     WITH last AS (
 // 	//         SELECT *
-// 	//         FROM task_history
+// 	//         FROM task_events
 // 	//         WHERE project_id = ? AND task_id = ?
 // 	//         ORDER BY aid DESC
 // 	//         LIMIT 1
@@ -99,15 +99,15 @@ export async function resetTask(/* db, */ projectId: number, taskId: number): Pr
 // 	//         FROM last
 // 	//         WHERE user_id = ? AND action = 'LOCKED_FOR_MAPPING'
 // 	//     )
-// 	//     INSERT INTO task_history (
+// 	//     INSERT INTO task_events (
 // 	//         event_id, project_id, task_id, action,
-// 	//         action_text, action_date, user_id
+// 	//         comment, created_at, user_id
 // 	//     )
 // 	//     SELECT
 // 	//         ?, -- event_id
 // 	//         ?, -- project_id
 // 	//         ?, -- task_id
-// 	//         'MARKED_MAPPED',
+// 	//         'UNLOCKED_TO_VALIDATE',
 // 	//         'Note: Mapping finished',
 // 	//         ?
 // 	//         user_id
@@ -136,7 +136,7 @@ export async function resetTask(/* db, */ projectId: number, taskId: number): Pr
 // 	// assert(newEvent.task_id === taskId);
 // 	// assert(newEvent.user_id === userId);
 
-// 	await add_event(db, projectId, taskId, userId, 'MARKED_MAPPED');
+// 	await add_event(db, projectId, taskId, userId, 'UNLOCKED_TO_VALIDATE');
 // }
 
 // async function validateTask(db, projectId: number, taskId: number, userId: number): Promise<void> {
