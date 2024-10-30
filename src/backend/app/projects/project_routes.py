@@ -160,7 +160,6 @@ async def search_project(
 )
 async def get_odk_entities_geojson(
     project: Annotated[DbProject, Depends(project_deps.get_project)],
-    db: Annotated[Connection, Depends(db_conn)],
     minimal: bool = False,
 ):
     """Get the ODK entities for a project in GeoJSON format.
@@ -203,7 +202,6 @@ async def get_odk_entities_mapping_statuses(
 )
 async def get_odk_entities_osm_ids(
     project: Annotated[DbProject, Depends(project_deps.get_project)],
-    db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the ODK entities linked OSM IDs.
 
@@ -224,7 +222,6 @@ async def get_odk_entities_osm_ids(
 )
 async def get_odk_entities_task_ids(
     project: Annotated[DbProject, Depends(project_deps.get_project)],
-    db: Annotated[Connection, Depends(db_conn)],
 ):
     """Get the ODK entities linked FMTM Task IDs."""
     return await central_crud.get_entities_data(
