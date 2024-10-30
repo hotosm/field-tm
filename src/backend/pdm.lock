@@ -5,7 +5,7 @@
 groups = ["default", "debug", "dev", "docs", "monitoring", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.5.0"
-content_hash = "sha256:18612067414ee0288fba94cd9316e233378587ed5eeb0bbf81d6503132f8fe69"
+content_hash = "sha256:6996832580461cf13308942f864917ce9c01e85d9ea4f0afd8795ddb3893c7f6"
 
 [[metadata.targets]]
 requires_python = ">=3.12"
@@ -548,7 +548,7 @@ files = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.5.0"
+version = "1.5.1"
 requires_python = ">=3.10"
 summary = "A utility for splitting an AOI into multiple tasks."
 dependencies = [
@@ -559,8 +559,8 @@ dependencies = [
     "shapely>=1.8.1",
 ]
 files = [
-    {file = "fmtm-splitter-1.5.0.tar.gz", hash = "sha256:43ff7bf46d184e7e8b5fd83363ce394f3454da722e089d9ddef4eca5636e5f7a"},
-    {file = "fmtm_splitter-1.5.0-py3-none-any.whl", hash = "sha256:aa95f10d898b25ed5acfef7ba1e765d36d49b87b774a1eca86ebb4b732da0f84"},
+    {file = "fmtm-splitter-1.5.1.tar.gz", hash = "sha256:d1b9463479e8c656c7309d36215b2b0ccf36116ef21bb513c16fcb99c4991f22"},
+    {file = "fmtm_splitter-1.5.1-py3-none-any.whl", hash = "sha256:e5023cd935550d873f4ebca3ac66ac2eec4bb9e932e36df1341c733ef57be771"},
 ]
 
 [[package]]
