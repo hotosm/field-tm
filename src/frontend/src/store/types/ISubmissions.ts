@@ -16,6 +16,8 @@ export type SubmissionStateTypes = {
   submissionTableRefreshing: boolean;
   updateReviewStatusModal: updateReviewStatusModal;
   updateReviewStateLoading: boolean;
+  mappedVsValidatedTask: mappedVsValidatedTaskType[];
+  mappedVsValidatedTaskLoading: boolean;
 };
 
 type updateReviewStatusModal = {
@@ -32,4 +34,11 @@ export type filterType = {
   submitted_by: string | null;
   review_state: string | null;
   submitted_date: string | null;
+};
+
+type mappedVsValidatedTaskType = {
+  date: string;
+  mapped: number;
+  validated: number;
+  label: string;
 };

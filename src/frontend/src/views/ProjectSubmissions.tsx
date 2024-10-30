@@ -8,7 +8,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityInfo } from '@/api/Project';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/types/reduxTypes';
-import { ProjectContributorsService } from '@/api/SubmissionService';
+import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
 
 const ProjectSubmissions = () => {
   const dispatch = CoreModules.useAppDispatch();
@@ -49,6 +49,12 @@ const ProjectSubmissions = () => {
 
   useEffect(() => {
     dispatch(ProjectContributorsService(`${import.meta.env.VITE_API_URL}/projects/contributors/${projectId}`));
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      MappedVsValidatedTaskService(`${import.meta.env.VITE_API_URL}/tasks/activity/?project_id=${projectId}&days=30`),
+    );
   }, []);
 
   useEffect(() => {

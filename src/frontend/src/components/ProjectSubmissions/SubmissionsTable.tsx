@@ -219,7 +219,7 @@ const SubmissionsTable = ({ toggleView }) => {
     await dispatch(
       CreateTaskEvent(
         `${import.meta.env.VITE_API_URL}/tasks/${currentStatus.id}/event`,
-        task_event.MAP,
+        task_event.GOOD,
         projectId,
         filter?.task_id || '',
         authDetails || {},

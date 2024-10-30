@@ -8,9 +8,8 @@ import CoreModules from '@/shared/CoreModules';
 import InfographicsCard from '@/components/ProjectSubmissions/InfographicsCard';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { useAppSelector } from '@/types/reduxTypes';
-import { taskHistoryTypes } from '@/models/project/projectModel';
-import { formSubmissionType, validatedMappedType } from '@/models/submission/submissionModel';
-import { dateNDaysAgo, generateLast30Days, getMonthDate } from '@/utilfunctions/commonUtils';
+import { formSubmissionType } from '@/models/submission/submissionModel';
+import { dateNDaysAgo, getMonthDate } from '@/utilfunctions/commonUtils';
 
 const SubmissionsInfographics = ({ toggleView, entities }) => {
   useDocumentTitle('Submission Infographics');
@@ -19,98 +18,17 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
   const totalContributorsRef = useRef(null);
   const plannedVsActualRef = useRef(null);
 
-  const params = CoreModules.useParams();
-  const projectId = params.projectId;
-
   const submissionContributorsData = useAppSelector((state) => state.submission.submissionContributors);
   const submissionContributorsLoading = useAppSelector((state) => state.submission.submissionContributorsLoading);
   const [submissionProjection, setSubmissionProjection] = useState<10 | 30>(10);
   const taskInfo = useAppSelector((state) => state.task.taskInfo);
   const taskLoading = useAppSelector((state) => state.task.taskLoading);
   const entityOsmMapLoading = useAppSelector((state) => state.project.entityOsmMapLoading);
-  const projectTaskList = useAppSelector((state) => state.project.projectTaskBoundries);
-  const projectDetailsLoading = useAppSelector((state) => state.project.projectDetailsLoading);
+  const mappedVsValidatedTaskList = useAppSelector((state) => state.submission.mappedVsValidatedTask);
+  const mappedVsValidatedTaskLoading = useAppSelector((state) => state.submission.mappedVsValidatedTaskLoading);
 
   const today = new Date().toISOString();
   const [formSubmissionsData, setFormSubmissionsData] = useState<formSubmissionType[]>([]);
-  const [validatedVsMappedInfographics, setValidatedVsMappedInfographics] = useState<validatedMappedType[]>([]);
-
-  useEffect(() => {
-    if (!projectTaskList || (projectTaskList && projectTaskList?.length === 0)) return;
-
-    const projectIndex = projectTaskList.findIndex((project) => project.id == +projectId);
-    // task activities history list
-    const taskActivities = projectTaskList?.[projectIndex]?.taskBoundries?.reduce((acc: taskHistoryTypes[], task) => {
-      return [...acc, ...(task?.task_history ?? [])];
-    }, []);
-
-    // filter activities for last 30 days
-    const taskActivities30Days = taskActivities?.filter((activity) => {
-      const actionDate = new Date(activity?.created_at).toISOString();
-      return actionDate >= dateNDaysAgo(30) && actionDate <= today;
-    });
-
-    // only filter MAPPED & VALIDATED activities
-    const groupedData: validatedMappedType[] = taskActivities30Days?.reduce((acc: validatedMappedType[], activity) => {
-      const date = activity?.created_at.split('T')[0];
-      const index = acc.findIndex((submission) => submission.date === date);
-      if (acc?.find((submission) => submission.date === date)) {
-        if (activity?.comment?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
-          acc[index].Mapped += 1;
-        }
-        if (activity?.comment?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
-          acc[index].Validated += 1;
-        }
-      } else {
-        const splittedDate = date?.split('-');
-        const label = `${splittedDate[1]}/${splittedDate[2]}`;
-        if (activity?.comment?.includes('LOCKED_FOR_MAPPING to MAPPED')) {
-          acc.push({ date: date, Validated: 0, Mapped: 1, label });
-        }
-        if (activity?.comment?.includes('LOCKED_FOR_VALIDATION to VALIDATED')) {
-          acc.push({ date: date, Validated: 1, Mapped: 0, label });
-        }
-      }
-      return acc;
-    }, []);
-
-    // generate validatedMapped data for last 30 days
-    const last30Days = generateLast30Days().map((datex) => {
-      const mappedVsValidatedValue = groupedData?.find((group) => {
-        return group?.date === datex;
-      });
-
-      if (mappedVsValidatedValue) {
-        return mappedVsValidatedValue;
-      } else {
-        // if no validated-mapped date - return count of 0 for both
-        const splittedDate = datex?.split('-');
-        const label = `${splittedDate[1]}/${splittedDate[2]}`;
-        return { date: datex, Validated: 0, Mapped: 0, label: label };
-      }
-    });
-
-    // sort by ascending date
-    const sortedValidatedMapped = last30Days?.sort((a, b) => {
-      const date1: any = new Date(a.date);
-      const date2: any = new Date(b.date);
-      return date1 - date2;
-    });
-
-    const cumulativeCount = {
-      validated: 0,
-      mapped: 0,
-    };
-
-    // generate cumulative count data
-    const finalData = sortedValidatedMapped?.map((submission) => {
-      cumulativeCount.validated += submission.Validated;
-      cumulativeCount.mapped += submission.Mapped;
-      return { ...submission, Validated: cumulativeCount.validated, Mapped: cumulativeCount.mapped };
-    });
-
-    setValidatedVsMappedInfographics(finalData);
-  }, [projectTaskList]);
 
   // data for validated vs mapped graph
   useEffect(() => {
@@ -231,14 +149,14 @@ const SubmissionsInfographics = ({ toggleView, entities }) => {
             cardRef={plannedVsActualRef}
             header="Validated vs Mapped Task"
             body={
-              projectDetailsLoading ? (
+              mappedVsValidatedTaskLoading ? (
                 <CoreModules.Skeleton className="!fmtm-w-full fmtm-h-full" />
-              ) : validatedVsMappedInfographics.length > 0 ? (
+              ) : mappedVsValidatedTaskList.length > 0 ? (
                 <CustomLineChart
-                  data={validatedVsMappedInfographics}
+                  data={mappedVsValidatedTaskList}
                   xAxisDataKey="label"
-                  lineOneKey="Validated"
-                  lineTwoKey="Mapped"
+                  lineOneKey="validated"
+                  lineTwoKey="mapped"
                   xLabel="Submission Date"
                   yLabel="Task Count"
                 />

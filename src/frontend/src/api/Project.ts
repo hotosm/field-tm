@@ -329,6 +329,14 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
         dispatch(ProjectActions.UpdateEntityState(response.data));
         dispatch(ProjectActions.UpdateEntityStateLoading(false));
       } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: error?.response?.data?.detail || 'Failed to update entity state.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
         dispatch(ProjectActions.UpdateEntityStateLoading(false));
       }
     };
