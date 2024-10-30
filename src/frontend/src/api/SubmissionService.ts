@@ -104,3 +104,20 @@ export const UpdateReviewStateService: Function = (url: string, payload: object)
     await UpdateReviewState(url);
   };
 };
+
+export const MappedVsValidatedTaskService: Function = (url: string) => {
+  return async (dispatch) => {
+    const MappedVsValidatedTask = async (url: string) => {
+      try {
+        dispatch(SubmissionActions.SetMappedVsValidatedTaskLoading(true));
+        const response = await CoreModules.axios.get(url);
+        dispatch(SubmissionActions.SetMappedVsValidatedTask(response.data));
+        dispatch(SubmissionActions.SetMappedVsValidatedTaskLoading(false));
+      } catch (error) {
+        dispatch(SubmissionActions.SetMappedVsValidatedTaskLoading(false));
+      }
+    };
+
+    await MappedVsValidatedTask(url);
+  };
+};

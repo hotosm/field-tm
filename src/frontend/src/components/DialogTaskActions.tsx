@@ -4,7 +4,7 @@ import { CreateTaskEvent } from '@/api/TaskEvent';
 import MapStyles from '@/hooks/MapStyles';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { task_event as taskEventEnum, task_state as taskStateEnum } from '@/types/enums';
+import { task_event as taskEventEnum, task_state as taskStateEnum, task_event } from '@/types/enums';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
@@ -109,8 +109,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
             feature,
           ),
         );
-        if (btnId === taskStateEnum.LOCKED_FOR_VALIDATION)
-          navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
+        if (btnId === task_event.VALIDATE) navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`);
       } else {
         dispatch(
           CommonActions.SetSnackBar({

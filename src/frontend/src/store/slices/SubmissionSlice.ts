@@ -30,6 +30,8 @@ const initialState: SubmissionStateTypes = {
     taskUid: null,
   },
   updateReviewStateLoading: false,
+  mappedVsValidatedTask: [],
+  mappedVsValidatedTaskLoading: false,
 };
 
 const SubmissionSlice = createSlice({
@@ -93,6 +95,16 @@ const SubmissionSlice = createSlice({
           __system: { ...state.submissionDetails.__system, reviewState: updatedSubmission.reviewState },
         };
       }
+    },
+    SetMappedVsValidatedTask(state, action) {
+      const MappedVsValidatedTask = action.payload;
+      state.mappedVsValidatedTask = MappedVsValidatedTask?.map((task) => ({
+        ...task,
+        label: task?.date?.split('/').slice(0, 2).join('/'),
+      }));
+    },
+    SetMappedVsValidatedTaskLoading(state, action) {
+      state.mappedVsValidatedTaskLoading = action.payload;
     },
   },
 });

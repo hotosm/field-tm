@@ -40,7 +40,6 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
       return task?.id == taskId;
     })?.[0],
   };
-  const geoStyle = geojsonStyles[taskStateEnum.LOCKED_FOR_MAPPING];
   const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
 
   useEffect(() => {
@@ -142,7 +141,7 @@ const TaskFeatureSelectionPopup = ({ featureProperties, taskId, taskFeature }: T
                       taskId.toString(),
                       authDetails,
                       { project_id: currentProjectId },
-                      geoStyle,
+                      geojsonStyles,
                       taskFeature,
                     ),
                   );
