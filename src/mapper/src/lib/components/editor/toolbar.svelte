@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let editor;
+	let { editor } = $props();
 
 	const iconClassName = 'text-[1.2rem] text-[#52525B] hover:bg-[#f7d9d8] p-[2px] rounded cursor-pointer duration-200';
 </script>
@@ -10,7 +10,7 @@
 			name="bold"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('bold')}
-			on:click={() => editor?.chain()?.focus()?.toggleBold().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleBold().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Italic" placement="bottom">
@@ -18,7 +18,7 @@
 			name="italic"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('italic')}
-			on:click={() => editor?.chain()?.focus()?.toggleItalic().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleItalic().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Strike" placement="bottom">
@@ -26,7 +26,7 @@
 			name="strike"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('strike')}
-			on:click={() => editor?.chain()?.focus()?.toggleStrike().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleStrike().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 1" placement="bottom">
@@ -34,7 +34,7 @@
 			name="h1"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 1 })}
-			on:click={() => editor?.chain()?.focus()?.toggleHeading({ level: 1 }).run()}
+			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 1 }).run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 2" placement="bottom">
@@ -42,7 +42,7 @@
 			name="h2"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 2 })}
-			on:click={() => editor?.chain()?.focus()?.toggleHeading({ level: 2 }).run()}
+			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 2 }).run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 3" placement="bottom">
@@ -50,7 +50,7 @@
 			name="h3"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 3 })}
-			on:click={() => editor?.chain()?.focus()?.toggleHeading({ level: 3 }).run()}
+			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 3 }).run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Unordered List" placement="bottom">
@@ -58,7 +58,7 @@
 			name="list-ul"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('bulletList')}
-			on:click={() => editor?.chain()?.focus()?.toggleBulletList().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleBulletList().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Ordered List" placement="bottom">
@@ -66,7 +66,7 @@
 			name="list-ol"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('orderedList')}
-			on:click={() => editor?.chain()?.focus()?.toggleOrderedList().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleOrderedList().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Code" placement="bottom">
@@ -74,7 +74,7 @@
 			name="code"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('codeBlock')}
-			on:click={() => editor?.chain()?.focus()?.toggleCodeBlock().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleCodeBlock().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Quote" placement="bottom">
@@ -82,18 +82,18 @@
 			name="quote"
 			class={`${iconClassName}`}
 			class:active={editor.isActive('blockquote')}
-			on:click={() => editor?.chain()?.focus()?.toggleBlockquote().run()}
+			onclick={() => editor?.chain()?.focus()?.toggleBlockquote().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Horizontal Ruler" placement="bottom">
-		<hot-icon name="hr" class={`${iconClassName}`} on:click={() => editor?.chain()?.focus()?.setHorizontalRule().run()}
+		<hot-icon name="hr" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.setHorizontalRule().run()}
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Undo" placement="bottom">
-		<hot-icon name="undo" class={`${iconClassName}`} on:click={() => editor?.chain()?.focus()?.undo().run()}></hot-icon>
+		<hot-icon name="undo" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.undo().run()}></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Redo" placement="bottom">
-		<hot-icon name="redo" class={`${iconClassName}`} on:click={() => editor?.chain()?.focus()?.redo().run()}></hot-icon>
+		<hot-icon name="redo" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.redo().run()}></hot-icon>
 	</sl-tooltip>
 </div>
 

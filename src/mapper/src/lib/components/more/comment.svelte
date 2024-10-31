@@ -1,6 +1,6 @@
 <script>
-	import Editor from '$lib/components/common/Editor/editor.svelte';
-	import CommentSkeleton from '$lib/components/skeleton/comment.svelte';
+	import Editor from '$lib/components/editor/editor.svelte';
+	import CommentSkeleton from '$lib/components/more/skeleton/comment.svelte';
 </script>
 
 <div class="h-[calc(100%-2.25rem)] sm:h-[calc(100%-2.6rem)]">

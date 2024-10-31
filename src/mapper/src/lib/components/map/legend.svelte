@@ -1,11 +1,11 @@
 <script lang="ts">
+	import '$styles/page.css';
 	import { clickOutside } from '$lib/utils/clickOutside.ts';
 	import LockImg from '$assets/images/black-lock.png';
-	import '$styles/page.css';
 
 	type taskStatusesType = { status: string; color?: string; icon?: string };
 
-	let isOpen = false;
+	let isOpen = $state(false);
 
 	const taskStatuses: taskStatusesType[] = [
 		{ status: 'Ready', color: '#ffffff' },
@@ -18,8 +18,8 @@
 	];
 </script>
 
-<div use:clickOutside on:click_outside={() => (isOpen = false)} class="relative">
-	<div class="group absolute bottom-0 right-0 text-nowrap cursor-pointer" on:click={() => (isOpen = !isOpen)}>
+<div use:clickOutside onclick_outside={() => (isOpen = false)} class="relative">
+	<div class="group absolute bottom-0 right-0 text-nowrap cursor-pointer" onclick={() => (isOpen = !isOpen)}>
 		<hot-icon
 			style="border: 1px solid #D7D7D7;"
 			name="legend-toggle"
@@ -37,7 +37,7 @@
 						<img src={taskStatus.icon} class="w-4" />
 					</div>
 				{:else}
-					<div style="background-color: {taskStatus.color}; border: 1px solid #D0D0D0;" class={`w-5 h-5 opacity-40`} />
+					<div style="background-color: {taskStatus.color}; border: 1px solid #D0D0D0;" class={`w-5 h-5 opacity-40`}></div>
 				{/if}
 				<p class="font-barlow-regular text-[#494949] text-nowrap leading-0">{taskStatus?.status}</p>
 			</div>

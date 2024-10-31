@@ -1,16 +1,14 @@
 <script>
+	import '$styles/button.css';
 	import { onMount, onDestroy } from 'svelte';
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Toolbar from './toolbar.svelte';
 	import './editor.css';
-	import '../../../../styles/button.css';
 
-	let element;
-	let editor;
-	export let editable;
-	export let content;
-	export let setEditorHtmlContent;
+	let element = $state();
+	let editor = $state();
+	let { editable, content, setEditorHtmlContent } = $props();
 
 	onMount(() => {
 		editor = new Editor({
@@ -41,7 +39,7 @@
 		{/if}
 
 		<div class={`${editable ? 'h-[80px]' : 'h-full'}`}>
-			<div bind:this={element} />
+			<div bind:this={element}></div>
 		</div>
 	</div>
 </div>

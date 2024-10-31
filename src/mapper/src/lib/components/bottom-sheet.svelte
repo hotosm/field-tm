@@ -1,16 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let bottomSheetRef: any;
-	let sheetContentRef: any;
+	let bottomSheetRef: any = $state();
+	let sheetContentRef: any = $state();
 
 	let startY: number;
 	let startHeight: number;
-	let currSheetHeight: number;
-	let show: boolean;
-	let isDragging: boolean = false;
+	let currSheetHeight: number = $state();
+	let show: boolean = $state();
+	let isDragging: boolean = $state(false);
 
-	export let onClose: () => void;
+	interface Props {
+		onClose: () => void;
+		children?: import('svelte').Snippet;
+	}
+
+	let { onClose, children }: Props = $props();
 
 	const updateSheetHeight = (height: number) => {
 		if (sheetContentRef) {
@@ -64,9 +69,11 @@
 		}
 	};
 
-	$: if (currSheetHeight) {
-		dragStop();
-	}
+	$effect(() => {
+		if (currSheetHeight) {
+			dragStop();
+		}
+	});
 </script>
 
 <div>
@@ -88,13 +95,13 @@
 			<div
 				style={' border-top-left-radius: 1rem;'}
 				class="flex justify-center py-4 sm:py-8 cursor-grab select-none w-full"
-				on:mousedown={dragStart}
-				on:touchstart={dragStart}
-				on:mousemove={dragging}
-				on:touchmove={dragging}
-				on:touchend={dragStop}
-				on:mouseup={dragStop}
-				on:mouseout={dragStop}
+				onmousedown={dragStart}
+				ontouchstart={dragStart}
+				onmousemove={dragging}
+				ontouchmove={dragging}
+				ontouchend={dragStop}
+				onmouseup={dragStop}
+				onmouseout={dragStop}
 			>
 				<span class="h-[6px] w-[3.25rem] block bg-[#d2d2d4] rounded-full pointer-events-none"></span>
 			</div>
@@ -102,7 +109,7 @@
 
 			<!-- body -->
 			<div class="overflow-y-scroll scrollbar h-[calc(100%-5rem)] sm:h-[calc(100%-6.7rem)] px-4 relative">
-				<slot />
+				{@render children?.()}
 			</div>
 		</div>
 	</div>
