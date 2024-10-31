@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Editor from '$lib/components/common/Editor/editor.svelte';
-	import Comment from '$lib/components/page/more/comment.svelte';
-	import Activities from '$lib/components/page/more/activities.svelte';
+	import Editor from '$lib/components/editor/editor.svelte';
+	import Comment from '$lib/components/more/comment.svelte';
+	import Activities from '$lib/components/more/activities.svelte';
 
 	type stackType = '' | 'Comment' | 'Instructions' | 'Activities';
 	const stackGroup: { icon: string; title: stackType }[] = [
@@ -19,8 +19,8 @@
 		},
 	];
 
-	let activeStack: stackType = 'Activities';
-	export let instructions;
+	let activeStack: stackType = $state('Activities');
+	let { instructions } = $props();
 </script>
 
 <div class="font-barlow-medium h-full">
@@ -28,7 +28,7 @@
 		{#each stackGroup as stack}
 			<div
 				class="group flex items-center justify-between hover:bg-red-50 rounded-md p-2 duration-200 cursor-pointer"
-				on:click={() => (activeStack = stack.title)}
+				onclick={() => (activeStack = stack.title)}
 			>
 				<div class="flex items-center gap-3">
 					<hot-icon name={stack.icon} class="text-[1.25rem]"></hot-icon>
@@ -45,7 +45,7 @@
 			<hot-icon
 				name="chevron-left"
 				class="text-[1rem] hover:-translate-x-[2px] duration-200 cursor-pointer text-[1.125rem] text-black hover:text-red-600 duration-200"
-				on:click={() => (activeStack = '')}
+				onclick={() => (activeStack = '')}
 			></hot-icon>
 			<p class="text-[1.125rem] font-barlow-semibold">{activeStack}</p>
 		</div>

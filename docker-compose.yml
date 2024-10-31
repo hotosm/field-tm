@@ -266,7 +266,7 @@ services:
       retries: 3
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-0.7.6}"
+    image: "electricsql/electric:${ELECTRIC_TAG:-0.7.7}"
     depends_on:
       fmtm-db:
         condition: service_healthy

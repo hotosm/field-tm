@@ -1,5 +1,5 @@
 <script>
-	import ActivitiesSkeleton from '$lib/components/skeleton/activities.svelte';
+	import ActivitiesSkeleton from '$lib/components/more/skeleton/activities.svelte';
 </script>
 
 <div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-2 pb-2">

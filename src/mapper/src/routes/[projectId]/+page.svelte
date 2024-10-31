@@ -1,27 +1,21 @@
 <script lang="ts">
+	import '$styles/page.css';
+	import '$styles/button.css';
 	import '@hotosm/ui/dist/hotosm-ui';
-	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	import type { PageData } from '../$types';
 	import { onMount, onDestroy } from 'svelte';
-	import { writable } from 'svelte/store';
-	import { Shape, ShapeStream } from '@electric-sql/client';
-	import {
-		MapLibre,
-		GeoJSON,
-		FillLayer,
-		LineLayer,
-		hoverStateFilter,
-		SymbolLayer,
-		NavigationControl,
-		ScaleControl,
-		Control,
-		ControlGroup,
-		ControlButton,
-	} from 'svelte-maplibre';
-	import type { FeatureCollection } from 'geojson';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
+
+	import type { MapLibre } from 'svelte-maplibre';
+	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
+	import Error from './+error.svelte';
+
+	import EventCard from '$lib/components/event-card.svelte';
+	import BottomSheet from '$lib/components/bottom-sheet.svelte';
+	import TaskActionDialog from '$lib/components/task-action-dialog.svelte';
+	import MapComponent from '$lib/components/map/main.svelte';
 
 	import type { ProjectData, ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
 	import {
@@ -31,113 +25,50 @@
 		// validateTask,
 		// goodTask,
 		// commentTask,
-	} from '$lib/task-events';
-	// import { createLiveQuery } from '$lib/live-query';
-	import { generateQrCode, downloadQrCode } from '$lib/qrcode';
-	import EventCard from '$lib/components/event-card.svelte';
-	import Legend from '$lib/components/page/legend.svelte';
-	import LayerSwitcher from '$lib/components/page/layer-switcher.svelte';
-	import BottomSheet from '$lib/components/common/bottom-sheet.svelte';
-	import Error from './+error.svelte';
-	import '$styles/page.css';
-	import BlackLockImg from '$assets/images/black-lock.png';
-	import RedLockImg from '$assets/images/red-lock.png';
-	import More from '$lib/components/page/more/index.svelte';
-	import '$styles/button.css';
-	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
-	import LocationArcImg from '$assets/images/locationArc.png';
-	import LocationDotImg from '$assets/images/locationDot.png';
-	import { setAlert } from '$store/common';
+	} from '$lib/db/events';
+	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
+	import { convertDateToTimeAgo } from '$lib/utils/datetime';
+	import {
+		getTaskStore,
+		getTaskEventStream,
+	} from '$store/tasks.svelte.ts';
+	import { 
+		entitiesStatusStore,
+		selectedEntity,
+		getEntityStatusStream,
+		subscribeToEntityStatusUpdates,
+	} from '$store/entities.svelte.ts';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	// $: ({ electric, project } = data)
-	let map: maplibregl.Map | undefined;
-	let loaded: boolean;
+	let { data }: Props = $props();
+	// $effect: ({ electric, project } = data)
+
+	let mapComponent: MapLibre;
 	let tabGroup: SlTabGroup;
+	let selectedTab: string = $state('map');
+	let toggleTaskActionModal = $state(false);
 
-	let selectedTab: string = 'map';
-	let panelDisplay: string = 'none';
-	$: panelDisplay = selectedTab === 'map' ? 'none' : 'block';
-	let toggleTaskActionModal = false;
-
-	// *** Task history sync *** //
-	const taskFeatcolStore = writable<FeatureCollection>({ type: 'FeatureCollection', features: [] });
-	const taskHistoryStream = new ShapeStream({
-		url: 'http://localhost:7055/v1/shape/task_events',
-		where: `project_id=${data.projectId}`,
+	const taskStore = getTaskStore();
+	console.log(data.project.data_extract_url)
+	const taskEventStream = getTaskEventStream(data.projectId);
+	// Update the geojson task states when a new event is added
+	$effect(() => {
+		if (taskStore.latestEvent) {
+			taskStore.appendTaskStatesToFeatcol(data.project.tasks);
+		}
 	});
+	// const entityStatusStream = getEntityStatusStream(data.projectId);
+	// $effect(() => {
+	// 	if ($entitiesStatusStore) {
+	// 		// TODO replace this with updating the entities geojson
+	// 		console.log($entitiesStatusStore)
+	// 	}
+	// });
 
-	const taskHistoryEvents = new Shape(taskHistoryStream);
-	const taskEventArray = writable([]);
-	const latestEvent = writable();
-	$: if ($latestEvent) {
-		updateTaskFeatures();
-	}
-
-	async function getLatestStatePerTask() {
-		const taskEventMap = await taskHistoryEvents.value;
-		const taskEventArrayFromApi = Array.from(taskEventMap.values());
-
-		// Update the taskEventArray writable store
-		taskEventArray.set(taskEventArrayFromApi);
-
-		const currentTaskStates = new Map();
-
-		for (const taskData of taskEventArrayFromApi) {
-			// Use the task_id as the key and state as the value
-			currentTaskStates.set(taskData.task_id, {
-				state: taskData.state || 'UNLOCKED_TO_MAP',
-				actioned_by_uid: taskData.user_id || null,
-			});
-		}
-
-		return currentTaskStates;
-	}
-
-	async function updateTaskFeatures() {
-		const latestTaskStates = await getLatestStatePerTask();
-
-		const features = data.project.tasks.map((x: ProjectTask) => {
-			const taskId = x.id;
-			const taskDetails = latestTaskStates.get(taskId) || {
-				state: 'UNLOCKED_TO_MAP',
-				actioned_by_uid: null,
-			};
-			return {
-				type: 'Feature',
-				id: taskId,
-				geometry: x.outline,
-				properties: taskDetails
-			};
-		});
-
-		taskFeatcolStore.set({
-			type: 'FeatureCollection',
-			features: features,
-		});
-	}
-
-	// *** Selected task *** //
-	$: qrCodeData = generateQrCode(data.project.name, data.project.odk_token, 'TEMP');
-
-	let selectedTaskId = writable<number | null>(null);
-	let featureClicked = writable(false);
-	let selectedTask = writable<any>(null);
-	let selectedTaskState = writable<string>('');
-
-	$: selectedTask.set(data.project.tasks.find((task: ProjectTask) => task.id === $selectedTaskId));
-
-	$: (async () => {
-		const task = $selectedTask;
-		if (task && task.id) {
-			const latestTaskStates = await getLatestStatePerTask();
-			const latestTaskDetails = latestTaskStates.get(task.id);
-			selectedTaskState.set(latestTaskDetails?.state || 'UNLOCKED_TO_MAP');
-		} else {
-			selectedTaskState.set('');
-		}
-	})();
+	let qrCodeData = $derived(generateQrCode(data.project.name, data.project.odk_token, 'REPLACE_ME_WITH_A_USERNAME'));
 
 	function zoomToTask(event: CustomEvent<ZoomToTaskEventDetail>) {
 		const taskId = event.detail.taskId;
@@ -146,394 +77,108 @@
 		if (!taskObj) return;
 
 		// Set as selected task for buttons
-		selectedTaskId.set(taskObj.id);
+		taskStore.setSelectedTaskId(taskObj.id);
 
 		const taskPolygon = polygon(taskObj.outline.coordinates);
 		const taskBuffer = buffer(taskPolygon, 5, { units: 'meters' });
-		if (taskBuffer && map) {
+		if (taskBuffer && mapComponent.map) {
 			const taskBbox: [number, number, number, number] = bbox(taskBuffer) as [number, number, number, number];
-			map.fitBounds(taskBbox, { duration: 500 });
+			mapComponent.map.fitBounds(taskBbox, { duration: 500 });
 		}
 
 		// Open the map tab
 		tabGroup.show('map');
 	}
 
-	// const mapStyle = {
-	// 			"version": 8,
-	// 			"name": "OpenStreetMap",
-	// 			"sources": {
-	// 			"osm": {
-	// 				"type": "raster",
-	// 				"tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
-	// 				"tileSize": 256,
-	// 				"attribution": "&copy; OpenStreetMap Contributors",
-	// 				"maxzoom": 19
-	// 			}
-	// 			},
-	// 			"layers": [
-	// 			{
-	// 				"id": "osm",
-	// 				"type": "raster",
-	// 				"source": "osm"
-	// 			}
-	// 			]
-	// 		}
-
 	onMount(async () => {
-		const projectPolygon = polygon(data.project.outline.coordinates);
-		const projectBuffer = buffer(projectPolygon, 100, { units: 'meters' });
-		if (projectBuffer && map) {
-			const projectBbox: [number, number, number, number] = bbox(projectBuffer) as [number, number, number, number];
-			map.fitBounds(projectBbox, { duration: 0 });
-		}
+		// In store/tasks.svelte.ts
+		await taskStore.subscribeToEvents(taskEventStream);
+		await taskStore.appendTaskStatesToFeatcol(data.project.tasks);
 
-		taskHistoryEvents.subscribe((taskHistoryEvent) => {
-			let newEvent;
-			for (newEvent of taskHistoryEvent);
-			if (newEvent) {
-				latestEvent.set(newEvent[1]);
-			}
-		});
-		// Do initial load of task features
-		await updateTaskFeatures();
+		// In store/entities.ts
+		// await subscribeToEntityStatusUpdates(entityStatusStream);
 	});
 
-	// geolocation
-	let coords: [number, number];
-	let rotationDeg: number | undefined;
-	let toggleGeolocationStatus = false;
-	let watchId;
-
-	$: if (map && toggleGeolocationStatus) {
-		// zoom to user's current location
-		navigator.geolocation.getCurrentPosition((position) => {
-			const currentCoordinate = [position.coords.longitude, position.coords.latitude];
-			map.flyTo({
-				center: currentCoordinate,
-				essential: true,
-				zoom: 18,
-			});
-		});
-
-		// track users location
-		watchId = navigator.geolocation.watchPosition(
-			function (pos) {
-				coords = [pos.coords.longitude, pos.coords.latitude];
-			},
-			function (error) {
-				alert(`ERROR: ${error.message}`);
-			},
-			{
-				enableHighAccuracy: true,
-			},
-		);
-	} else {
-		// stop tracking user's location on location toggle off
-		navigator.geolocation.clearWatch(watchId);
-	}
-	const isFirefox = typeof InstallTrigger !== 'undefined';
-	const isSafari =
-		/constructor/i.test(window.HTMLElement) ||
-		(function (p) {
-			return p.toString() === '[object SafariRemoteNotification]';
-			// @ts-ignore
-		})(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
-
-	// locationGeojson: to display point on the map
-	let locationGeojson: FeatureCollection;
-	$: locationGeojson = {
-		type: 'FeatureCollection',
-		features: [
-			{
-				type: 'Feature',
-				geometry: {
-					type: 'Point',
-					coordinates: coords,
-				},
-				// firefox & safari doesn't support device orientation sensor, so if the browser any of the two set orientation to false
-				properties: { orientation: !(isFirefox || isSafari) },
-			},
-		],
-	};
-
-	$: if (map && toggleGeolocationStatus) {
-		if (isFirefox || isSafari) {
-			// firefox & safari doesn't support device orientation sensor
-			setAlert.set({
-				variant: 'warning',
-				message: "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
-			});
-		} else {
-			// See the API specification at: https://w3c.github.io/orientation-sensor
-			// We use referenceFrame: 'screen' because the web page will rotate when
-			// the phone switches from portrait to landscape.
-			const sensor = new AbsoluteOrientationSensor({
-				frequency: 60,
-				referenceFrame: 'screen',
-			});
-			sensor.addEventListener('reading', (event) => {
-				rotationDeg = GetDeviceRotation(sensor.quaternion);
-			});
-
-			Promise.all([
-				navigator.permissions.query({ name: 'accelerometer' }),
-				navigator.permissions.query({ name: 'magnetometer' }),
-				navigator.permissions.query({ name: 'gyroscope' }),
-			]).then((results) => {
-				if (results.every((result) => result.state === 'granted')) {
-					sensor.start();
-				} else {
-				}
-			});
-		}
-	}
-
 	onDestroy(() => {
-		taskHistoryStream.unsubscribeAll();
+		taskEventStream.unsubscribeAll();
 	});
 </script>
 
-{#if $latestEvent}
+<!-- There is a new event to display in the top right corner -->
+{#if taskStore.latestEvent}
 	<hot-card id="notification-banner" class="absolute z-10 top-18 right-0 font-sans hidden sm:flex">
-		Latest: {$latestEvent.comment}
+		{convertDateToTimeAgo(taskStore.latestEvent.created_at)}: {taskStore.latestEvent.event} on task {taskStore.latestEvent.task_id} by {taskStore.latestEvent.username}
 	</hot-card>
 {/if}
 
-{#if $selectedTaskId}
-	{#if $selectedTaskState == 'UNLOCKED_TO_MAP'}
-		<sl-tooltip content="MAP">
-			<hot-icon-button
-				name="play"
-				class="fixed top-30 left-1/2 transform -translate-x-1/2 text-5xl z-10 bg-green-500 text-white rounded-full p-1"
-				label="MAP"
-				on:click={mapTask(data.projectId, $selectedTaskId)}
-			></hot-icon-button>
-		</sl-tooltip>
-	{:else if $selectedTaskState == 'LOCKED_FOR_MAPPING'}
-		<sl-tooltip content="FINISH">
-			<hot-icon-button
-				name="stop"
-				class="fixed top-30 left-1/2 transform -translate-x-1/2 text-5xl z-10 bg-blue-500 text-white rounded-full p-1"
-				label="FINISH"
-				on:click={finishTask(data.projectId, $selectedTaskId)}
-			></hot-icon-button>
-		</sl-tooltip>
-	{:else if $selectedTaskState == 'UNLOCKED_TO_VALIDATE'}
-		<sl-tooltip content="RESET">
-			<hot-icon-button
-				name="arrow-counterclockwise"
-				class="fixed top-30 left-1/2 transform -translate-x-1/2 text-5xl z-10 bg-yellow-500 text-white rounded-full p-1"
-				label="RESET"
-				on:click={resetTask(data.projectId, $selectedTaskId)}
-			></hot-icon-button>
-		</sl-tooltip>
-	{/if}
+<!-- The dialog should overlay with actions for a task -->
+{#if taskStore.selectedTaskId}
+	<TaskActionDialog state={taskStore.selectedTaskState} projectId={data.projectId} taskId={taskStore.selectedTaskId} />
 {/if}
 
+<!-- The main page -->
 <div class="h-[calc(100vh-4.625rem)]">
-	<MapLibre
-		bind:map
-		bind:loaded
-		style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-		class="flex-auto w-full sm:aspect-video h-[calc(100%-4rem)]"
-		center={[0, 0]}
-		zoom={2}
-		attributionControl={false}
-		on:click={(e) => {
-			featureClicked.subscribe((fClicked) => {
-				if (!fClicked) {
-					selectedTaskId.set(null);
-				}
-				featureClicked.set(false);
-				toggleTaskActionModal = false;
-			});
-		}}
-		images={[
-			{ id: 'LOCKED_FOR_MAPPING', url: BlackLockImg },
-			{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
-			{ id: 'locationArc', url: LocationArcImg },
-			{ id: 'locationDot', url: LocationDotImg },
-		]}
-	>
-		<NavigationControl position="top-left" />
-		<ScaleControl />
-		<Control class="flex flex-col gap-y-2" position="top-left">
-			<ControlGroup>
-				<ControlButton on:click={() => (toggleGeolocationStatus = !toggleGeolocationStatus)}
-					><hot-icon
-						name="geolocate"
-						class={`!text-[1.2rem] cursor-pointer  duration-200 ${toggleGeolocationStatus ? 'text-red-600' : 'text-[#52525B]'}`}
-					></hot-icon></ControlButton
-				>
-			</ControlGroup></Control
-		>
-		{#if toggleGeolocationStatus}
-			<GeoJSON data={locationGeojson} id="point">
-				<SymbolLayer
-					applyToClusters={false}
-					hoverCursor="pointer"
-					layout={{
-						// if orientation true (meaning the browser supports device orientation sensor show location dot with orientation sign)
-						'icon-image': ['case', ['==', ['get', 'orientation'], true], 'locationArc', 'locationDot'],
-						'icon-allow-overlap': true,
-						'text-field': '{mag}',
-						'text-offset': [0, -2],
-						'text-size': 12,
-						'icon-rotate': rotationDeg || 0, // rotate location icon acc to device orientation
-						'icon-rotation-alignment': 'map',
-						'icon-size': 0.5,
-					}}
-				/>
-			</GeoJSON>
-		{/if}
-		<GeoJSON id="states" data={$taskFeatcolStore} promoteId="TASKS">
-			<FillLayer
-				hoverCursor="pointer"
-				paint={{
-					'fill-color': [
-						'match',
-						['get', 'state'],
-						'UNLOCKED_TO_MAP',
-						'#ffffff',
-						'LOCKED_FOR_MAPPING',
-						'#008099',
-						'UNLOCKED_TO_VALIDATE',
-						'#ade6ef',
-						'LOCKED_FOR_VALIDATION',
-						'#fceca4',
-						'UNLOCKED_DONE',
-						'#40ac8c',
-						'#c5fbf5', // default color if no match is found
-					],
-					'fill-opacity': hoverStateFilter(0.5, 0),
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-				on:click={(e) => {
-					featureClicked.set(true);
-					const clickedTask = e.detail.features?.[0]?.properties?.uid;
-					selectedTaskId.set(clickedTask);
-					toggleTaskActionModal = true;
-				}}
-			/>
-			<LineLayer
-				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-				paint={{
-					'line-color': ['case', ['==', ['get', 'uid'], $selectedTaskId], '#fa1100', '#0fffff'],
-					'line-width': 3,
-					'line-opacity': ['case', ['==', ['get', 'uid'], $selectedTaskId], 1, 0.35],
-				}}
-				beforeLayerType="symbol"
-				manageHoverState
-			/>
-			<SymbolLayer
-				applyToClusters={false}
-				hoverCursor="pointer"
-				layout={{
-					'icon-image': ['case', 
-					['==', ['get', 'state'], 'LOCKED_FOR_MAPPING'], 'LOCKED_FOR_MAPPING', 
-					 ['==', ['get', 'status'],'LOCKED_FOR_VALIDATION'], 'LOCKED_FOR_VALIDATION', ''],
-					'icon-allow-overlap': true,
-				}}
-			/>
-		</GeoJSON>
-		<div class="absolute right-3 bottom-3 sm:right-5 sm:bottom-5">
-			<LayerSwitcher />
-			<Legend />
-		</div>
-	</MapLibre>
+	<MapComponent
+		bind:this={mapComponent}
+		bind:toggleTaskActionModal={toggleTaskActionModal}
+		projectOutlineCoords={data.project.outline.coordinates}
+	/>
 
-	{#if $selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && ($selectedTaskState === 'UNLOCKED_TO_MAP' || $selectedTaskState === 'LOCKED_FOR_MAPPING')}
+	{#if taskStore.selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}
 		<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
-			<div
-				class="bg-white w-[100vw] h-fit font-barlow-regular w-[100vw] md:max-w-[580px] pointer-events-auto px-4 pb-3 sm:pb-4 rounded-t-3xl"
-			>
+			<div class="bg-white w-fit font-barlow-regular md:max-w-[580px] pointer-events-auto px-4 pb-3 sm:pb-4 rounded-t-3xl">
 				<div class="flex justify-between items-center">
-					<p class="text-[#333] text-xl font-barlow-semibold leading-0 pt-2">Task #{$selectedTaskId}</p>
+					<p class="text-[#333] text-xl font-barlow-semibold leading-0 pt-2">Task #{taskStore.selectedTaskId}</p>
 					<hot-icon
 						name="close"
 						class="!text-[1.5rem] text-[#52525B] cursor-pointer hover:text-red-600 duration-200"
-						on:click={() => (toggleTaskActionModal = false)}
+						onclick={() => (toggleTaskActionModal = false)}
 					></hot-icon>
 				</div>
 
-				{#if $selectedTaskState == 'UNLOCKED_TO_MAP'}
-					<p class="my-4 sm:my-6">Do you want to start mapping task #{$selectedTaskId}?</p>
+				{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
+					<p class="my-4 sm:my-6">Do you want to start mapping task #{taskStore.selectedTaskId}?</p>
 					<div class="flex justify-center gap-x-2">
-						<sl-button
-							size="small"
-							variant="default"
-							class="secondary"
-							on:click={() => (toggleTaskActionModal = false)}
-							outline><span class="font-barlow-medium text-sm">CANCEL</span></sl-button
-						>
-						<sl-button
-							variant="default"
-							size="small"
-							class="primary"
-							on:click={mapTask(data.projectId, $selectedTaskId)}
-						>
+						<sl-button size="small" variant="default" class="secondary" onclick={() => (toggleTaskActionModal = false)} outline>
+							<span class="font-barlow-medium text-sm">CANCEL</span>
+						</sl-button>
+						<sl-button variant="default" size="small" class="primary" onclick={() => mapTask(data.projectId, taskStore.selectedTaskId)}>
 							<div class="flex items-center gap-1">
 								<hot-icon name="location" class="!text-[1rem] text-white cursor-pointer duration-200"></hot-icon>
 								<p class="font-barlow-medium text-sm leading-[0]">START MAPPING</p>
 							</div>
 						</sl-button>
 					</div>
-				{:else if $selectedTaskState == 'LOCKED_FOR_MAPPING'}
-					<p class="my-4 sm:my-6">Task #{$selectedTaskId} has been locked, Is the task completely mapped?</p>
+				{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
+					<p class="my-4 sm:my-6">Task #{taskStore.selectedTaskId} has been locked. Is the task completely mapped?</p>
 					<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-						<sl-button
-							on:click={resetTask(data.projectId, $selectedTaskId)}
-							variant="default"
-							outline
-							size="small"
-							class="secondary"
-						>
+						<sl-button onclick={() => resetTask(data.projectId, taskStore.selectedTaskId)} variant="default" outline size="small" class="secondary">
 							<div class="flex items-center gap-1">
-								<hot-icon
-									name="close"
-									class="!text-[1rem] text-[#d73f37] cursor-pointer duration-200 hover:text-[#b91c1c]"
-									on:click={() => (toggleTaskActionModal = false)}
-								></hot-icon>
+								<hot-icon name="close" class="!text-[1rem] text-[#d73f37] cursor-pointer duration-200 hover:text-[#b91c1c]"></hot-icon>
 								<p class="font-barlow-medium text-sm leading-[0]">CANCEL MAPPING</p>
-							</div></sl-button
-						>
-						<sl-button
-							on:click={finishTask(data.projectId, $selectedTaskId)}
-							variant="default"
-							size="small"
-							class="primary"
-							><div class="flex items-center gap-1">
-								<hot-icon
-									name="check"
-									class="!text-[1rem] text-white cursor-pointer duration-200"
-									on:click={() => (toggleTaskActionModal = false)}
-								></hot-icon>
+							</div>
+						</sl-button>
+						<sl-button onclick={() => finishTask(data.projectId, taskStore.selectedTaskId)} variant="default" size="small" class="primary">
+							<div class="flex items-center gap-1">
+								<hot-icon name="check" class="!text-[1rem] text-white cursor-pointer duration-200"></hot-icon>
 								<p class="font-barlow-medium text-sm leading-[0]">COMPLETE MAPPING</p>
-							</div></sl-button
-						>
+							</div>
+						</sl-button>
 						<sl-button variant="default" size="small" class="gray col-span-2 sm:col-span-1">
 							<p class="font-barlow-medium text-sm leading-[0]">GO TO ODK</p>
 						</sl-button>
 					</div>
-					<div class="flex justify-center gap-2"></div>
 				{/if}
 			</div>
 		</div>
 	{/if}
 
 	{#if selectedTab !== 'map'}
-		<BottomSheet
-			onClose={() => {
-				tabGroup.show('map');
-			}}
-		>
+		<BottomSheet onClose={() => tabGroup.show('map')}>
 			{#if selectedTab === 'events'}
-				{#if $taskEventArray.length > 0}
-					{#each $taskEventArray as record}
-						<EventCard {record} highlight={record.task_id === $selectedTaskId} on:zoomToTask={(e) => zoomToTask(e)}
-						></EventCard>
+				{#if taskStore.events.length > 0}
+					{#each taskStore.events as record}
+						<EventCard {record} highlight={record.task_id === taskStore.selectedTaskId} on:zoomToTask={(e) => zoomToTask(e)} />
 					{/each}
 				{/if}
 
@@ -541,38 +186,31 @@
 				<!-- <More instructions={data?.project?.project_info?.per_task_instructions} /> -->
 			{/if}
 			{#if selectedTab === 'offline'}
-				<div>TODO stuff here</div>
+				<span class="font-barlow-medium text-base">Coming soon!</span>
 			{/if}
 			{#if selectedTab === 'qrcode'}
 				<div class="flex flex-col items-center p-4 space-y-4">
 					<!-- Text above the QR code -->
 					<div class="text-center w-full">
-						<div class=" font-bold text-lg font-barlow-medium">Scan this QR Code in ODK Collect</div>
+						<div class="font-bold text-lg font-barlow-medium">Scan this QR Code in ODK Collect</div>
 					</div>
 
 					<!-- QR Code Container -->
 					<div class="flex justify-center w-full max-w-sm">
-						<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250" radius="0.5" errorCorrection="L"
-						></hot-qr-code>
+						<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250"></hot-qr-code>
 					</div>
 
 					<!-- Download Button -->
-					<div class="w-full max-w-sm text-center">
-						<hot-icon-button
-							name="download"
-							label="Download QRCode"
-							on:click={downloadQrCode(data.project.name, qrCodeData)}>Download</hot-icon-button
-						>
-					</div>
+					<sl-button onclick={downloadQrCode} size="small" class="primary w-full max-w-[200px]">
+						<span class="font-barlow-medium text-base">Download QR Code</span>
+					</sl-button>
 
 					<!-- Open ODK Button -->
-					<div class="w-full max-w-sm text-center">
-						<sl-button
-							class="primary"
-							href="odkcollect://form/{data.project.odk_form_id}{$selectedTaskId ? `?task_filter=${$selectedTaskId}` : ''}"
-							><span class="font-barlow-medium text-base">Open ODK</span></sl-button
-						>
-					</div>
+					<sl-button size="small" class="primary w-full max-w-[200px]"
+						href="odkcollect://form/{data.project.odk_form_id}{taskStore.selectedTaskId ? `?task_filter=${taskStore.selectedTaskId}` : ''}"
+					>
+						<span class="font-barlow-medium text-base">Open ODK</span></sl-button
+					>
 				</div>
 			{/if}
 		</BottomSheet>
@@ -582,7 +220,7 @@
 		class="z-9999 fixed bottom-0 left-0 right-0"
 		placement="bottom"
 		no-scroll-controls
-		on:sl-tab-show={(e) => {
+		onsl-tab-show={(e) => {
 			selectedTab = e.detail.name;
 		}}
 		style="--panel-display: none"

@@ -1,11 +1,11 @@
 <script>
 	import { clickOutside } from '$lib/utils/clickOutside.ts';
 
-	let isOpen = false;
+	let isOpen = $state(false);
 </script>
 
-<div use:clickOutside on:click_outside={() => (isOpen = false)} class="relative">
-	<div class="group absolute bottom-16 right-0 text-nowrap cursor-pointer" on:click={() => (isOpen = !isOpen)}>
+<div use:clickOutside onclick_outside={() => (isOpen = false)} class="relative">
+	<div class="group absolute bottom-16 right-0 text-nowrap cursor-pointer" onclick={() => (isOpen = !isOpen)}>
 		<hot-icon
 			style="border: 1px solid #D7D7D7;"
 			name="layer"
