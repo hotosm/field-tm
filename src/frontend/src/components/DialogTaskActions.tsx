@@ -63,11 +63,11 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
 
   useEffect(() => {
     if (taskInfo?.length === 0) return;
-    const currentTaskInfo = taskInfo?.filter((task) => taskId.toString() === task?.task_id);
+    const currentTaskInfo = taskInfo?.filter((task) => selectedTask?.index === +task?.task_id);
     if (currentTaskInfo?.[0]) {
       setCurrentTaskInfo(currentTaskInfo?.[0]);
     }
-  }, [taskId, taskInfo]);
+  }, [taskId, taskInfo, selectedTask]);
 
   useEffect(() => {
     if (projectIndex != -1) {

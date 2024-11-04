@@ -37,11 +37,11 @@ test.describe('mapper flow', () => {
     // 2. Lock task for mapping
     await expect(page.getByRole('button', { name: 'START MAPPING' })).toBeVisible();
     await page.getByRole('button', { name: 'START MAPPING' }).click();
-    await page.waitForSelector('div:has-text("updated status to LOCKED_FOR_MAPPING"):nth-of-type(1)');
+    await page.waitForSelector('div:has-text("updated to LOCKED_FOR_MAPPING"):nth-of-type(1)');
     await expect(
       page
         .locator('div')
-        .filter({ hasText: /updated status to LOCKED_FOR_MAPPING/ })
+        .filter({ hasText: /updated to LOCKED_FOR_MAPPING/ })
         .first(),
     ).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
@@ -61,11 +61,11 @@ test.describe('mapper flow', () => {
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
     // Required again for the confirmation dialog (0/4 features mapped)
     await page.getByRole('button', { name: 'MARK AS FULLY MAPPED' }).click();
-    await page.waitForSelector('div:has-text("updated status to UNLOCKED_TO_VALIDATE"):nth-of-type(1)');
+    await page.waitForSelector('div:has-text("has been updated to UNLOCKED_TO_VALIDATE"):nth-of-type(1)');
     await expect(
       page
         .locator('div')
-        .filter({ hasText: /updated status to UNLOCKED_TO_VALIDATE/ })
+        .filter({ hasText: /has been updated to UNLOCKED_TO_VALIDATE/ })
         .first(),
     ).toBeVisible();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
@@ -141,11 +141,11 @@ test.describe('mapper flow', () => {
 
     // 3. Validate feature status updated / locked
     // check if task status is updated to locked_for_mapping on entity map
-    await page.waitForSelector('div:has-text("updated status to LOCKED_FOR_MAPPING"):nth-of-type(1)');
+    await page.waitForSelector('div:has-text("has been updated to LOCKED_FOR_MAPPING"):nth-of-type(1)');
     await expect(
       page
         .locator('div')
-        .filter({ hasText: /updated status to LOCKED_FOR_MAPPING/ })
+        .filter({ hasText: /has been updated to LOCKED_FOR_MAPPING/ })
         .first(),
     ).toBeVisible();
 
