@@ -49,7 +49,7 @@
     <!-- Action Text and Task ID -->
     <div class="text-base mr-4">
       <span class="text-[#555555] font-medium font-archivo">
-        {record?.event} by {record.username}
+        {record?.event} by {record.username || 'anon'}
       </span>
 
       <!-- Date and Time -->

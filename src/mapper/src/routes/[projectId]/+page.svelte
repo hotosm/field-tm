@@ -52,7 +52,6 @@
 	let toggleTaskActionModal = $state(false);
 
 	const taskStore = getTaskStore();
-	console.log(data.project.data_extract_url)
 	const taskEventStream = getTaskEventStream(data.projectId);
 	// Update the geojson task states when a new event is added
 	$effect(() => {
@@ -107,7 +106,8 @@
 <!-- There is a new event to display in the top right corner -->
 {#if taskStore.latestEvent}
 	<hot-card id="notification-banner" class="absolute z-10 top-18 right-0 font-sans hidden sm:flex">
-		{convertDateToTimeAgo(taskStore.latestEvent.created_at)}: {taskStore.latestEvent.event} on task {taskStore.latestEvent.task_id} by {taskStore.latestEvent.username}
+		<b>{convertDateToTimeAgo(taskStore.latestEvent.created_at)}</b> | {taskStore.latestEvent.event} 
+		on task {taskStore.latestEvent.task_id} by {taskStore.latestEvent.username || 'anon'}
 	</hot-card>
 {/if}
 
@@ -122,6 +122,7 @@
 		bind:this={mapComponent}
 		bind:toggleTaskActionModal={toggleTaskActionModal}
 		projectOutlineCoords={data.project.outline.coordinates}
+		entitiesUrl={data.project.data_extract_url}
 	/>
 
 	{#if taskStore.selectedTaskId && selectedTab === 'map' && toggleTaskActionModal && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}

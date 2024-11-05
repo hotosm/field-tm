@@ -1,5 +1,6 @@
 import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData, Row } from '@electric-sql/client';
+import type { GeoJSON } from 'geosjon';
 
 import type { ProjectTask } from '$lib/types';
 
@@ -10,6 +11,7 @@ let events = $state([]);
 let selectedTaskId: number | null = $state(null);
 let selectedTask: any = $state(null);
 let selectedTaskState: string = $state('');
+let selectedTaskGeom: GeoJSON | null = $state(null);
 
 function getTaskEventStream(projectId: number): ShapeStream | undefined {
 	if (!projectId) {
@@ -75,14 +77,17 @@ function getTaskStore() {
 		const allTasksCurrentStates = await getLatestStatePerTask();
 		selectedTask = allTasksCurrentStates.get(newId);
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
+		selectedTaskGeom = featcol.features.find((x) => x.properties.fid === newId)?.geometry || null;
 	}
 
 	return {
+		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
 		get featcol() {
 			return featcol;
 		},
 
+		// The latest event to display in notifications bar
 		subscribeToEvents: subscribeToTaskEvents,
 		get latestEvent() {
 			return latestEvent;
@@ -91,6 +96,7 @@ function getTaskStore() {
 			return events;
 		},
 
+		// The selected task to display mapping dialog
 		setSelectedTaskId: setSelectedTaskId,
 		get selectedTaskId() {
 			return selectedTaskId;
@@ -100,6 +106,9 @@ function getTaskStore() {
 		},
 		get selectedTaskState() {
 			return selectedTaskState;
+		},
+		get selectedTaskGeom() {
+			return selectedTaskGeom;
 		},
 	};
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { onMount } from 'svelte';
 
 	let bottomSheetRef: any = $state();
@@ -12,7 +13,7 @@
 
 	interface Props {
 		onClose: () => void;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { onClose, children }: Props = $props();
