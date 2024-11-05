@@ -33,6 +33,9 @@ function getTaskStore() {
 			if (newEvent) {
 				latestEvent = newEvent[1];
 			}
+			if (newEvent?.[1]?.task_id === selectedTaskId) {
+				selectedTaskState = newEvent[1].state;
+			}
 		});
 	}
 
