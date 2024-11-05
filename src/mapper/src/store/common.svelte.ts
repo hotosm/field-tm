@@ -4,6 +4,7 @@ interface AlertDetails {
 }
 
 let alert: AlertDetails | undefined = $state({ variant: null, message: '' });
+let projectSetupStep: number | null = $state(null);
 
 function getAlertStore() {
 	return {
@@ -16,4 +17,13 @@ function getAlertStore() {
 	};
 }
 
-export { getAlertStore };
+function getProjectSetupStepStore() {
+	return {
+		get projectSetupStep() {
+			return projectSetupStep;
+		},
+		setProjectSetupStep: (step: string) => (projectSetupStep = step),
+	};
+}
+
+export { getAlertStore, getProjectSetupStepStore };

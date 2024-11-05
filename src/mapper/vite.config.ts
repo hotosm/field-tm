@@ -27,6 +27,7 @@ export default defineConfig({
 			$routes: path.resolve('./src/routes'),
 			$styles: path.resolve('./src/styles'),
 			$assets: path.resolve('./src/assets'),
+			$constants: path.resolve('./src/constants'),
 		},
 	},
 	test: {

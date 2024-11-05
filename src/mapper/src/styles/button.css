@@ -26,3 +26,12 @@ sl-button.gray::part(base) {
 sl-button.gray::part(base):hover {
 	background-color: #5f5f5f;
 }
+
+sl-button.green::part(base) {
+	background-color: #3fa24f;
+	color: white;
+	border: 0px;
+}
+sl-button.green::part(base):hover {
+	background-color: #378f46;
+}
