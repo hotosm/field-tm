@@ -124,11 +124,11 @@ END$$;
 
 
 
--- Update action field values --> taskevent enum
+-- Update event field values --> taskevent enum
 
 DO $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_events' AND column_name = 'action') THEN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_events' AND column_name = 'event') THEN
         -- Change from taskaction --> taskevent
         ALTER TABLE task_events
             ALTER COLUMN event TYPE public.taskevent
