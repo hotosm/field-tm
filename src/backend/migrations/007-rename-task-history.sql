@@ -149,6 +149,23 @@ END$$;
 
 
 
+-- Manually populate states for existing data
+UPDATE task_events
+SET state = CASE event
+    WHEN 'MAP' THEN 'LOCKED_FOR_MAPPING'
+    WHEN 'FINISH' THEN 'UNLOCKED_TO_VALIDATE'
+    WHEN 'VALIDATE' THEN 'LOCKED_FOR_VALIDATION'
+    WHEN 'GOOD' THEN 'UNLOCKED_DONE'
+    WHEN 'BAD' THEN 'UNLOCKED_TO_MAP'
+    WHEN 'SPLIT' THEN 'UNLOCKED_DONE'
+    WHEN 'MERGE' THEN 'UNLOCKED_DONE'
+    WHEN 'ASSIGN' THEN 'LOCKED_FOR_MAPPING'
+    WHEN 'COMMENT' THEN state -- Preserve the existing state
+END;
+
+
+
+
 -- Add task_events foreign keys
 
 DO $$
