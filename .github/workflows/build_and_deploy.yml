@@ -58,8 +58,8 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.6
     needs: [frontend-unit-test, frontend-e2e-test]
     with:
-      context: src/frontend
-      dockerfile: prod.dockerfile
+      context: src
+      dockerfile: Dockerfile.ui.prod
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/frontend
 

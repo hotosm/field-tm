@@ -49,7 +49,7 @@ FROM base AS extract-deps
 WORKDIR /opt/python
 COPY pyproject.toml pdm.lock /opt/python/
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir pdm==2.6.1
+    && pip install --no-cache-dir pdm==2.19.3
 RUN pdm export --prod > requirements.txt \
     # Export with default deps, as we install one or the other
     && pdm export -G monitoring \

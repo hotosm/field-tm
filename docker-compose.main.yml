@@ -20,6 +20,8 @@ name: fmtm-main
 volumes:
   fmtm_frontend:
     name: fmtm-frontend-main
+  fmtm_mapper_frontend:
+    name: fmtm-mapper-frontend-main
   fmtm_db_data:
     name: fmtm-db-data-main
   fmtm_data:
@@ -52,7 +54,8 @@ services:
       ui:
         condition: service_completed_successfully
     volumes:
-      - fmtm_frontend:/usr/share/nginx/html/fmtm/
+      - fmtm_frontend:/usr/share/nginx/html/fmtm-manager/
+      - fmtm_frontend:/usr/share/nginx/html/fmtm-mapper/
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
     environment:
@@ -104,14 +107,15 @@ services:
     # accessible to the proxy, then shuts down
     image: "ghcr.io/hotosm/fmtm/frontend:main"
     build:
-      context: src/frontend
-      dockerfile: prod.dockerfile
+      context: src
+      dockerfile: Dockerfile.ui.prod
       args:
         APP_VERSION: main
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
         NODE_ENV: production
     volumes:
-      - fmtm_frontend:/frontend
+      - fmtm_frontend:/frontend/fmtm-manager
+      - fmtm_mapper_frontend:/frontend/fmtm-mapper
     network_mode: none
     restart: "on-failure:2"
 
