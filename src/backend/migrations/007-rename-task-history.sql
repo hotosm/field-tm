@@ -62,17 +62,43 @@ ALTER TYPE public.mappingstate OWNER TO fmtm;
 
 
 
--- Update task_event fields prior to trigger addition
+-- Update task_events table
 
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_events' AND column_name = 'action') THEN
+        -- Change from taskaction --> taskevent enum
+        ALTER TABLE task_events
+            ALTER COLUMN action TYPE public.taskevent
+            USING CASE action
+                WHEN 'RELEASED_FOR_MAPPING' THEN 'BAD'::public.taskevent
+                WHEN 'LOCKED_FOR_MAPPING' THEN 'MAP'::public.taskevent
+                WHEN 'MARKED_MAPPED' THEN 'FINISH'::public.taskevent
+                WHEN 'LOCKED_FOR_VALIDATION' THEN 'VALIDATE'::public.taskevent
+                WHEN 'VALIDATED' THEN 'GOOD'::public.taskevent
+                WHEN 'MARKED_INVALID' THEN 'BAD'::public.taskevent
+                WHEN 'MARKED_BAD' THEN 'BAD'::public.taskevent
+                WHEN 'SPLIT_NEEDED' THEN 'SPLIT'::public.taskevent
+                WHEN 'RECREATED' THEN 'BAD'::public.taskevent
+                WHEN 'COMMENT' THEN 'COMMENT'::public.taskevent
+                ELSE NULL
+            END;
+
+        -- Update task_event fields prior to trigger addition
         ALTER TABLE public.task_events ADD COLUMN state public.mappingstate;
         ALTER TABLE public.task_events RENAME COLUMN action TO event;
         ALTER TABLE public.task_events RENAME COLUMN action_text TO comment;
         ALTER TABLE public.task_events RENAME COLUMN action_date TO created_at;
     END IF;
 END $$;
+
+
+
+-- Drop old enums
+
+DROP TYPE IF EXISTS public.taskaction;
+-- Note this no longer used
+DROP TYPE IF EXISTS public.taskstatus;
 
 
 
@@ -120,41 +146,6 @@ EXCEPTION
     WHEN duplicate_object THEN
         RAISE NOTICE 'Trigger task_event_state_trigger already exists. Ignoring...';
 END$$;
-
-
-
-
--- Update event field values --> taskevent enum
-
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'task_events' AND column_name = 'event') THEN
-        -- Change from taskaction --> taskevent
-        ALTER TABLE task_events
-            ALTER COLUMN event TYPE public.taskevent
-            USING CASE event
-                WHEN 'RELEASED_FOR_MAPPING' THEN 'BAD'::public.taskevent
-                WHEN 'LOCKED_FOR_MAPPING' THEN 'MAP'::public.taskevent
-                WHEN 'MARKED_MAPPED' THEN 'FINISH'::public.taskevent
-                WHEN 'LOCKED_FOR_VALIDATION' THEN 'VALIDATE'::public.taskevent
-                WHEN 'VALIDATED' THEN 'GOOD'::public.taskevent
-                WHEN 'MARKED_INVALID' THEN 'BAD'::public.taskevent
-                WHEN 'MARKED_BAD' THEN 'BAD'::public.taskevent
-                WHEN 'SPLIT_NEEDED' THEN 'SPLIT'::public.taskevent
-                WHEN 'RECREATED' THEN 'BAD'::public.taskevent
-                WHEN 'COMMENT' THEN 'COMMENT'::public.taskevent
-                ELSE NULL
-            END;
-    END IF;
-END $$;
-
-
-
--- Drop old enums
-
-DROP TYPE IF EXISTS public.taskaction;
--- Note this no longer used
-DROP TYPE IF EXISTS public.taskstatus;
 
 
 
