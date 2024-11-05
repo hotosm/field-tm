@@ -41,13 +41,13 @@ server {
 
     location /mapnow {
         # Serve FMTM mapper frontend under /usr/share/nginx/html
-        root /usr/share/nginx/html/fmtm-mapper;
+        root /usr/share/nginx/html/fmtm/mapper;
         try_files $uri $uri/ /index.html;
     }
 
     location / {
         # Serve FMTM management frontend under /usr/share/nginx/html
-        root /usr/share/nginx/html/fmtm-manager;
+        root /usr/share/nginx/html/fmtm/manager;
         try_files $uri $uri/ /index.html;
     }
 

@@ -20,8 +20,6 @@ name: fmtm-dev
 volumes:
   fmtm_frontend:
     name: fmtm-frontend-${GIT_BRANCH}
-  fmtm_mapper_frontend:
-    name: fmtm-mapper-frontend-${GIT_BRANCH}
   fmtm_db_data:
     name: fmtm-db-data-${GIT_BRANCH}
   fmtm_data:
@@ -62,8 +60,7 @@ services:
       ui:
         condition: service_completed_successfully
     volumes:
-      - fmtm_frontend:/usr/share/nginx/html/fmtm-manager/
-      - fmtm_frontend:/usr/share/nginx/html/fmtm-mapper/
+      - fmtm_frontend:/usr/share/nginx/html/fmtm
       - central_frontend:/usr/share/nginx/html/central/
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
@@ -124,8 +121,7 @@ services:
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
         NODE_ENV: development
     volumes:
-      - fmtm_frontend:/frontend/fmtm-manager
-      - fmtm_mapper_frontend:/frontend/fmtm-mapper
+      - fmtm_frontend:/frontend
     network_mode: none
     restart: "on-failure:2"
 
