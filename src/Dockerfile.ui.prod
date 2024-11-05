@@ -1,20 +1,26 @@
-FROM docker.io/node:20 as builder
-
-ARG VITE_API_URL
-ENV VITE_API_URL="${VITE_API_URL}"
-
-WORKDIR /app
-COPY ./package.json ./pnpm-lock.yaml ./
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack use pnpm@9.3.0
-RUN pnpm install
-
+FROM docker.io/node:20 as base
 ARG NODE_ENV
-ENV NODE_ENV ${NODE_ENV}
-COPY . .
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL} \
+    NODE_ENV=${NODE_ENV} \
+    PNPM_HOME="/pnpm" \
+    PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack use pnpm@9.3.0
+WORKDIR /app
+
+
+FROM base as manager-frontend
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install
+COPY frontend/ .
 RUN pnpm run build --mode ${NODE_ENV}
 
+
+FROM base as mapper-frontend
+COPY mapper/package.json mapper/pnpm-lock.yaml ./
+RUN pnpm install
+COPY mapper/ .
+RUN pnpm run build --mode ${NODE_ENV}
 
 
 FROM docker.io/rclone/rclone:1 as prod
@@ -31,4 +37,5 @@ COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
 ENTRYPOINT ["/container-entrypoint.sh"]
 WORKDIR /app
-COPY --from=builder /app/dist .
+COPY --from=manager-frontend /app/dist ./manager-frontend
+COPY --from=mapper-frontend /app/build ./mapper-frontend

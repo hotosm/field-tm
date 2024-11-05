@@ -39,9 +39,15 @@ server {
     # For opentelemetry
     add_header 'Access-Control-Allow-Headers' 'traceparent,tracestate';
 
+    location /mapnow {
+        # Serve FMTM mapper frontend under /usr/share/nginx/html
+        root /usr/share/nginx/html/fmtm-mapper;
+        try_files $uri $uri/ /index.html;
+    }
+
     location / {
-        # Serve FMTM frontend under /usr/share/nginx/html
-        root /usr/share/nginx/html/fmtm;
+        # Serve FMTM management frontend under /usr/share/nginx/html
+        root /usr/share/nginx/html/fmtm-manager;
         try_files $uri $uri/ /index.html;
     }
 

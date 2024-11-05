@@ -118,8 +118,10 @@ services:
   ui:
     image: "ghcr.io/hotosm/fmtm/frontend:debug"
     build:
-      context: src/frontend
-      dockerfile: debug.dockerfile
+      context: src
+      additional_contexts:
+        - code=src/frontend
+      dockerfile: Dockerfile.ui.debug
     depends_on:
       api:
         condition: service_started
@@ -137,8 +139,10 @@ services:
   ui-mapper:
     image: "ghcr.io/hotosm/fmtm/frontend:mapper"
     build:
-      context: src/mapper
-      dockerfile: debug.dockerfile
+      context: src
+      additional_contexts:
+        - code=src/frontend
+      dockerfile: Dockerfile.ui.debug
     depends_on:
       api:
         condition: service_started
