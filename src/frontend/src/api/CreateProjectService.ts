@@ -292,7 +292,7 @@ const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>
       try {
         const dividedTaskFormData = new FormData();
         dividedTaskFormData.append('project_geojson', projectData.geojson);
-        dividedTaskFormData.append('dimension', projectData.dimension);
+        dividedTaskFormData.append('dimension_meters', projectData.dimension);
         const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
         const resp: OrganisationListModel = getGetDividedTaskFromGeojsonResponse.data;
         dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: true }));

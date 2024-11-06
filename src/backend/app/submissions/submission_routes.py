@@ -321,6 +321,7 @@ async def submission_table(
             project.id,
             instance_ids,
             background_task_id,
+            db,
         )
 
     if task_id:
