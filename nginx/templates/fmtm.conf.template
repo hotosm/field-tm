@@ -41,8 +41,11 @@ server {
 
     location /mapnow {
         # Serve FMTM mapper frontend under /usr/share/nginx/html
-        root /usr/share/nginx/html/fmtm/mapper;
-        try_files $uri $uri/ /index.html;
+        # NOTE here we use alias instead of root
+        # to ensure the location part is replaced by the alias part
+        # i.e. they don't stack as mapnow/mapnow and cause a loop
+        alias /usr/share/nginx/html/fmtm/mapper;
+        try_files $uri $uri/ /mapnow/index.html;
     }
 
     location / {
