@@ -1620,7 +1620,7 @@ class DbSubmissionPhoto(BaseModel):
     TODO SQL this will be replace by ODK Central direct S3 upload.
     """
 
-    id: int
+    id: Optional[int] = None
     project_id: Optional[int] = None
     task_id: Optional[int] = None  # Note this is not a DbTask, but an ODK task_id
     submission_id: Optional[str] = None

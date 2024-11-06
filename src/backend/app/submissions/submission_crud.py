@@ -344,7 +344,7 @@ async def upload_attachment_to_s3(
 
         # Perform batch insert if there are new records to insert
         async with db.cursor() as cur:
-            await cur.execute(
+            await cur.executemany(  # executes multiple inserts (batch insert)
                 """
                     INSERT INTO submission_photos (
                         project_id,
@@ -358,6 +358,7 @@ async def upload_attachment_to_s3(
                 """,
                 batch_insert_data,
             )
+            db.commit()
         return True
 
     except Exception as e:
