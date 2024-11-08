@@ -141,7 +141,7 @@ services:
     build:
       context: src
       additional_contexts:
-        - code=src/frontend
+        - code=src/mapper
       dockerfile: Dockerfile.ui.debug
     depends_on:
       api:
