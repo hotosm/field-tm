@@ -34,6 +34,13 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
       The following is the personal opinion from HOT staff members, and provides
       some context for the reasoning behind creating the FMTM.
 
+- _QField_: the mobile extension of QGIS, literally a GIS on your phone.
+  This is an excellent tool for what it does: collecting geometries in the
+  field, alongside unstructured attributes like any other GIS.
+  This is in contrast to tools such as ODK or Kobo that mostly
+  collect structured survey data, by asking the user sets of predefined
+  questions.
+
 - _Fulcrum_: proprietary / paid. Appears to be more focused on data collection in
   engineering and environmental contexts, mostly for for-profit companies.
   We could possibly learn from them, but they are closed-source.
@@ -85,6 +92,20 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
   data" (data over time), which ODK has only recently began to address with Entities.
   We should definitely look for opportunities to learn from / collaborate into the
   future.
+
+---
+
+**Q:**: So why should I use FMTM over these other tools?
+
+**A:**
+
+You might not need to! It depends if you are simply collecting data
+in the field as an individual, or are trying to coordinate amongst
+a team of enumerators.
+
+FMTM does not attempt to compete within the very rich field data
+collection ecosystem. Instead, it is a higher level tool, aimed at
+**coordination** of enumerators using one of these tools.
 
 ---
 
