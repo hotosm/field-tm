@@ -222,6 +222,41 @@ class DbUser(BaseModel):
             return await cur.fetchall()
 
     @classmethod
+    async def delete(cls, db: Connection, user_id: int) -> bool:
+        """Delete a user and their related data."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                UPDATE task_events SET user_id = NULL WHERE user_id = %(user_id)s;
+            """,
+                {"user_id": user_id},
+            )
+            await cur.execute(
+                """
+                UPDATE projects SET author_id = NULL WHERE author_id = %(user_id)s;
+            """,
+                {"user_id": user_id},
+            )
+            await cur.execute(
+                """
+                DELETE FROM organisation_managers WHERE user_id = %(user_id)s;
+            """,
+                {"user_id": user_id},
+            )
+            await cur.execute(
+                """
+                DELETE FROM user_roles WHERE user_id = %(user_id)s;
+            """,
+                {"user_id": user_id},
+            )
+            await cur.execute(
+                """
+                DELETE FROM users WHERE id = %(user_id)s;
+            """,
+                {"user_id": user_id},
+            )
+
+    @classmethod
     async def create(
         cls,
         db: Connection,
@@ -605,11 +640,11 @@ class DbTaskEvent(BaseModel):
 
     project_id: Annotated[Optional[int], Field(gt=0)] = None
     user_id: Annotated[Optional[int], Field(gt=0)] = None
+    username: Optional[str] = None
     comment: Optional[str] = None
     created_at: Optional[AwareDatetime] = None
 
     # Computed
-    username: Optional[str] = None
     profile_img: Optional[str] = None
     # Computed via database trigger
     state: Optional[MappingState] = None
@@ -662,13 +697,12 @@ class DbTaskEvent(BaseModel):
 
         sql = f"""
             SELECT
-                *,
-                u.username,
+                the.*,
                 u.profile_img
             FROM
-                public.task_events
-            JOIN
-                users u ON u.id = task_events.user_id
+                public.task_events the
+            LEFT JOIN
+                users u ON u.id = the.user_id
             WHERE {filters_joined}
             ORDER BY created_at DESC;
         """
@@ -696,18 +730,19 @@ class DbTaskEvent(BaseModel):
                         INSERT INTO public.task_events (
                             event_id,
                             project_id,
+                            username,
                             {columns}
                         )
                         VALUES (
                             gen_random_uuid(),
                             (SELECT project_id FROM tasks WHERE id = %(task_id)s),
+                            (SELECT username FROM users WHERE id = %(user_id)s),
                             {value_placeholders}
                         )
                         RETURNING *
                     )
                     SELECT
                         inserted.*,
-                        u.username,
                         u.profile_img
                     FROM inserted
                     JOIN users u ON u.id = inserted.user_id;
