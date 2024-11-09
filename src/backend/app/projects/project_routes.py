@@ -652,15 +652,18 @@ async def add_additional_entity_list(
     # Parse geojson + divide by task
     # (not technically required, but also appends properties in correct format)
     featcol = parse_geojson_file_to_featcol(await geojson.read())
+    properties = list(featcol.get("features")[0].get("properties").keys())
     feature_split_by_task = await split_geojson_by_task_areas(db, featcol, project_id)
     entities_list = await central_crud.task_geojson_dict_to_entity_values(
         feature_split_by_task
     )
+    dataset_name = entity_name.replace(" ", "_")
 
     await central_crud.create_entity_list(
         project_odk_creds,
         project_odk_id,
-        dataset_name=entity_name,
+        properties=properties,
+        dataset_name=dataset_name,
         entities_list=entities_list,
     )
 

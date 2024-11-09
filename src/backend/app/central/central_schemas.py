@@ -17,6 +17,7 @@
 #
 """Schemas for returned ODK Central objects."""
 
+import re
 from dataclasses import dataclass
 from typing import Optional, Self, TypedDict
 
@@ -130,10 +131,39 @@ ENTITY_FIELDS: list[NameTypeMapping] = [
     NameTypeMapping(name="status", type="string"),
 ]
 
+RESERVED_KEYS = {
+    "name",
+    "label",
+    "uuid",
+}  # Add any other reserved keys of odk central in here as needed
+ALLOWED_PROPERTY_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
 
-def entity_fields_to_list() -> list[str]:
+
+def is_valid_property_name(name: str) -> bool:
+    """Check if a property name is valid according to allowed characters pattern."""
+    return bool(ALLOWED_PROPERTY_PATTERN.match(name))
+
+
+def sanitize_key(key: str) -> str:
+    """Rename reserved keys to avoid conflicts with ODK Central's schema."""
+    if key in RESERVED_KEYS:
+        return f"custom_{key}"
+    return key
+
+
+def entity_fields_to_list(properties: list[str]) -> list[str]:
     """Converts a list of Field objects to a list of field names."""
-    return [field.name for field in ENTITY_FIELDS]
+    sanitized_properties = []
+    for property in properties:
+        if not is_valid_property_name(property):
+            log.warning(f"Invalid property name: {property},Excluding from properties.")
+            continue
+        sanitized_properties.append(sanitize_key(property))
+    default_properties = [field.name for field in ENTITY_FIELDS]
+    for item in default_properties:
+        if item not in sanitized_properties:
+            sanitized_properties.append(item)
+    return sanitized_properties
 
 
 # Dynamically generate EntityPropertyDict using ENTITY_FIELDS
