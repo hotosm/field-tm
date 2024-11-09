@@ -506,12 +506,14 @@ async def feature_geojson_to_entity_dict(
         raise ValueError(msg)
 
     javarosa_geom = await geojson_to_javarosa_geom(geometry)
+    properties = {}
+    for key, value in feature.get("properties", {}).items():
+        if not central_schemas.is_valid_property_name(key):
+            log.warning(f"Invalid property name: {key},Excluding from properties.")
+            continue
+        # NOTE all properties MUST be string values for Entities, convert
+        properties.update({str(central_schemas.sanitize_key(key)): str(value)})
 
-    # NOTE all properties MUST be string values for Entities, convert
-    properties = {
-        str(key): str(value) for key, value in feature.get("properties", {}).items()
-    }
-    # Set to MappingState enum READY value (0)
     properties["status"] = "0"
 
     task_id = properties.get("task_id")
@@ -540,15 +542,13 @@ async def task_geojson_dict_to_entity_values(
 async def create_entity_list(
     odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
+    properties: list[str],
     dataset_name: str = "features",
-    properties: list[str] = None,
     entities_list: list[central_schemas.EntityDict] = None,
 ) -> None:
     """Create a new Entity list in ODK."""
-    if properties is None:
-        # Get the default properties for FMTM project
-        properties = central_schemas.entity_fields_to_list()
-        log.debug(f"Using default FMTM properties for Entity creation: {properties}")
+    log.info("Creating ODK Entity properties list")
+    properties = central_schemas.entity_fields_to_list(properties)
 
     async with central_deps.get_odk_dataset(odk_creds) as odk_central:
         # Step 1: create the Entity list, with properties

@@ -474,6 +474,7 @@ async def generate_odk_central_project_content(
     odk_credentials: central_schemas.ODKCentralDecrypted,
     xlsform: BytesIO,
     task_extract_dict: dict[int, geojson.FeatureCollection],
+    entity_properties: list[str],
 ) -> str:
     """Populate the project in ODK Central with XForm, Appuser, Permissions."""
     # The ODK Dataset (Entity List) must exist prior to main XLSForm
@@ -485,6 +486,7 @@ async def generate_odk_central_project_content(
     await central_crud.create_entity_list(
         odk_credentials,
         project_odk_id,
+        properties=entity_properties,
         dataset_name="features",
         entities_list=entities_list,
     )
@@ -530,6 +532,11 @@ async def generate_project_files(
     log.debug("Getting data extract geojson from flatgeobuf")
     feature_collection = await get_project_features_geojson(db, project)
 
+    # Get properties to create datasets
+    entity_properties = list(
+        feature_collection.get("features")[0].get("properties").keys()
+    )
+
     # Split extract by task area
     log.debug("Splitting data extract per task area")
     # TODO in future this splitting could be removed if the task_id is
@@ -550,6 +557,7 @@ async def generate_project_files(
         project_odk_creds,
         BytesIO(project_xlsform),
         task_extract_dict,
+        entity_properties,
     )
     log.debug(
         f"Setting encrypted odk token for FMTM project ({project_id}) "
