@@ -19,11 +19,13 @@
 
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
+from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.roles import mapper, super_admin
 from app.db.database import db_conn
+from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
 from app.db.models import DbUser
 from app.users import user_schemas
@@ -66,3 +68,18 @@ async def get_user_roles(current_user: Annotated[DbUser, Depends(mapper)]):
     for role in UserRoleEnum:
         user_roles[role.name] = role.value
     return user_roles
+
+
+@router.delete("/{id}")
+async def delete_user_by_identifier(
+    user: Annotated[DbUser, Depends(get_user)],
+    current_user: Annotated[DbUser, Depends(super_admin)],
+    db: Annotated[Connection, Depends(db_conn)],
+):
+    """Delete a single user."""
+    log.info(
+        f"User {current_user.username} attempting deletion of user {user.username}"
+    )
+    await DbUser.delete(db, user.id)
+    log.info(f"User {user.id} deleted successfully.")
+    return Response(status_code=HTTPStatus.NO_CONTENT)
