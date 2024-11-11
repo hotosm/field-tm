@@ -191,7 +191,9 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
       try {
         let response;
         const additional_entities: string[] =
-          projectData?.additional_entities?.length > 0 ? [projectData?.additional_entities?.[0].replace(' ', '_')] : [];
+          projectData?.additional_entities?.length > 0
+            ? [projectData?.additional_entities?.[0]?.replaceAll(' ', '_')]
+            : [];
         if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
           const generateApiFormData = new FormData();
