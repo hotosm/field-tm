@@ -7,7 +7,6 @@ import CoreModules from '@/shared/CoreModules';
 import { FormCategoryService } from '@/api/CreateProjectService';
 import { DownloadProjectForm } from '@/api/Project';
 import { PostFormUpdate } from '@/api/CreateProjectService';
-import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 type FileType = {
@@ -24,7 +23,7 @@ const FormUpdateTab = ({ projectId }) => {
   const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);
   const [error, setError] = useState({ formError: '', categoryError: '' });
 
-  const xFormId = CoreModules.useAppSelector((state) => state.project.projectInfo.odk_form_id);
+  const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
   const sortedFormCategoryList = formCategoryList.slice().sort((a, b) => a.title.localeCompare(b.title));
   const selectedCategory = useAppSelector((state) => state.createproject.editProjectDetails.xform_category);
