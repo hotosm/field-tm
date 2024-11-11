@@ -66,7 +66,6 @@ async def check_access(
     Access is determined based on the user's role and permissions:
     - If the user has an 'ADMIN' role, access is granted.
     - If the user has a 'READ_ONLY' role, access is denied.
-    - If the organisation is HOTOSM, then grant access.
     - For other roles, access is granted if the user is an organisation manager
       for the specified organisation (org_id) or has the specified role
       in the specified project (project_id).
@@ -92,20 +91,6 @@ async def check_access(
                 CASE
                     WHEN role = 'ADMIN' THEN true
                     WHEN role = 'READ_ONLY' THEN false
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM organisations
-                        WHERE (organisations.id = %(org_id)s
-                            AND organisations.slug = 'hotosm')
-                        OR EXISTS (
-                            SELECT 1
-                            FROM projects
-                            JOIN organisations AS org
-                                ON projects.organisation_id = org.id
-                            WHERE org.slug = 'hotosm'
-                                AND projects.id = %(project_id)s
-                        )
-                    ) THEN true
                     ELSE
                         EXISTS (
                             SELECT 1
