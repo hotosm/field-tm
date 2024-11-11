@@ -18,6 +18,8 @@ export type SubmissionStateTypes = {
   updateReviewStateLoading: boolean;
   mappedVsValidatedTask: mappedVsValidatedTaskType[];
   mappedVsValidatedTaskLoading: boolean;
+  submissionPhotos: string[];
+  submissionPhotosLoading: boolean;
 };
 
 type updateReviewStatusModal = {

@@ -53,8 +53,8 @@ const DialogContent = ({
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="fmtm-absolute fmtm-right-4 fmtm-top-4 fmtm-rounded-sm fmtm-opacity-70 fmtm-ring-offset-black fmtm-transition-opacity hover:fmtm-opacity-100 focus:fmtm-outline-none disabled:fmtm-pointer-events-none data-[state=open]:fmtm-bg-white data-[state=open]:fmtm-text-black  fmtm-w-fit">
-        <X className="fmtm-h-4 fmtm-w-4" />
+      <DialogPrimitive.Close className="fmtm-absolute fmtm-z-50 fmtm-right-4 fmtm-top-4 fmtm-rounded-sm fmtm-opacity-70 fmtm-ring-offset-black fmtm-transition-opacity hover:fmtm-opacity-100 focus:fmtm-outline-none disabled:fmtm-pointer-events-none data-[state=open]:fmtm-bg-white data-[state=open]:fmtm-text-black  fmtm-w-fit">
+        <X className="fmtm-h-6 fmtm-w-6 fmtm-text-black fmtm-cursor-pointer hover:fmtm-scale-110 fmtm-duration-150 fmtm-bg-white fmtm-rounded-full fmtm-p-1" />
         <span className="fmtm-sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

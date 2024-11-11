@@ -19,3 +19,21 @@ export const SubmissionService: Function = (url: string) => {
     await getSubmissionDetails(url);
   };
 };
+
+export const GetSubmissionPhotosService: Function = (url: string) => {
+  return async (dispatch) => {
+    dispatch(SubmissionActions.SetSubmissionPhotosLoading(true));
+    const getSubmissionPhotos = async (url: string) => {
+      try {
+        const response = await axios.get(url);
+        dispatch(SubmissionActions.SetSubmissionPhotos(response?.data?.image_urls));
+        dispatch(SubmissionActions.SetSubmissionPhotosLoading(false));
+      } catch (error) {
+        dispatch(SubmissionActions.SetSubmissionPhotosLoading(false));
+      } finally {
+        dispatch(SubmissionActions.SetSubmissionPhotosLoading(false));
+      }
+    };
+    await getSubmissionPhotos(url);
+  };
+};

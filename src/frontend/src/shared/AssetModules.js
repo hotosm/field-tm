@@ -86,6 +86,10 @@ import {
   QrCode2Outlined as QrCode2OutlinedIcon,
   BarChart as BarChartIcon,
   CalendarTodayOutlined as CalendarTodayOutlinedIcon,
+  ChevronRight as ChevronRightIcon,
+  ChevronLeft as ChevronLeftIcon,
+  RotateLeft as RotateLeftIcon,
+  RotateRight as RotateRightIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -182,4 +186,8 @@ export default {
   QrCode2OutlinedIcon,
   BarChartIcon,
   CalendarTodayOutlinedIcon,
+  ChevronRightIcon,
+  ChevronLeftIcon,
+  RotateLeftIcon,
+  RotateRightIcon,
 };
