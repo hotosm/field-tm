@@ -425,7 +425,7 @@ const ProjectDetailsV2 = () => {
                   className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-[#F5F5F5] fmtm-p-2 fmtm-rounded-md ${
                     toggle
                       ? 'fmtm-left-0 fmtm-bottom-0 lg:fmtm-top-0'
-                      : '-fmtm-left-[60rem] fmtm-bottom-0 lg:fmtm-top-0'
+                      : '-fmtm-left-[65rem] fmtm-bottom-0 lg:fmtm-top-0'
                   }`}
                 >
                   <ProjectOptions projectName={state?.projectInfo?.name} />

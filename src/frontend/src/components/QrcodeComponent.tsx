@@ -6,14 +6,13 @@ import { GetProjectQrCode } from '@/api/Files';
 
 type tasksComponentType = {
   projectId?: string;
-  taskIndex?: number;
 };
 
-const QrcodeComponent = ({ projectId, taskIndex }: tasksComponentType) => {
+const QrcodeComponent = ({ projectId }: tasksComponentType) => {
   const downloadQR = () => {
     const downloadLink = document.createElement('a');
     downloadLink.href = qrcode;
-    downloadLink.download = `Project_${projectId}_Task_${taskIndex}`;
+    downloadLink.download = `Project_${projectId}`;
     downloadLink.click();
   };
 
