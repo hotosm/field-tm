@@ -100,7 +100,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
         {/* only display qr code component render inside taskPopup on mobile screen */}
         <div className="sm:fmtm-hidden">
           {checkIfTaskAssignedOrNot && task_state !== 'LOCKED_FOR_MAPPING' && (
-            <QrcodeComponent projectId={currentProjectId} taskIndex={selectedTask.index} />
+            <QrcodeComponent projectId={currentProjectId} />
           )}
         </div>
         {body}

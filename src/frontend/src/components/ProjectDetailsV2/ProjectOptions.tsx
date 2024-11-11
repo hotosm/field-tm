@@ -4,6 +4,7 @@ import AssetModules from '@/shared/AssetModules';
 import { DownloadDataExtract, DownloadProjectForm, DownloadSubmissionGeojson } from '@/api/Project';
 import Button from '@/components/common/Button';
 import { useAppSelector } from '@/types/reduxTypes';
+import { GetProjectQrCode } from '@/api/Files';
 
 type projectOptionPropTypes = {
   projectName: string;
@@ -19,7 +20,11 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
 
   const projectId: string = params.id;
 
-  const handleDownload = (downloadType: 'form' | 'geojson' | 'extract' | 'submission') => {
+  const odkToken = useAppSelector((state) => state.project.projectInfo.odk_token);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+  const { qrcode }: { qrcode: string } = GetProjectQrCode(odkToken, projectName, authDetails?.username);
+
+  const handleDownload = (downloadType: 'form' | 'geojson' | 'extract' | 'submission' | 'qr') => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
@@ -50,6 +55,11 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
           projectName,
         ),
       );
+    } else if (downloadType === 'qr') {
+      const downloadLink = document.createElement('a');
+      downloadLink.href = qrcode;
+      downloadLink.download = `Project_${projectId}`;
+      downloadLink.click();
     }
   };
 
@@ -114,6 +124,17 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
           onClick={(e) => {
             e.stopPropagation();
             handleDownload('submission');
+          }}
+        />
+        <Button
+          loadingText="QR CODE"
+          btnText="QR CODE"
+          btnType="other"
+          className={`fmtm-border-red-700 !fmtm-rounded-md fmtm-truncate`}
+          icon={<AssetModules.FileDownloadIcon style={{ fontSize: '22px' }} />}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDownload('qr');
           }}
         />
       </div>
