@@ -32,6 +32,8 @@ const initialState: SubmissionStateTypes = {
   updateReviewStateLoading: false,
   mappedVsValidatedTask: [],
   mappedVsValidatedTaskLoading: false,
+  submissionPhotos: [],
+  submissionPhotosLoading: false,
 };
 
 const SubmissionSlice = createSlice({
@@ -105,6 +107,12 @@ const SubmissionSlice = createSlice({
     },
     SetMappedVsValidatedTaskLoading(state, action) {
       state.mappedVsValidatedTaskLoading = action.payload;
+    },
+    SetSubmissionPhotos(state, action) {
+      state.submissionPhotos = action.payload;
+    },
+    SetSubmissionPhotosLoading(state, action) {
+      state.submissionPhotosLoading = action.payload;
     },
   },
 });
