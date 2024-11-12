@@ -2,12 +2,12 @@ import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData, Row } from '@electric-sql/client';
 import type { GeoJSON } from 'geosjon';
 
-import type { ProjectTask } from '$lib/types';
+import type { ProjectTask, TaskEventType } from '$lib/types';
 
 let taskEventShape: Shape;
 let featcol = $state({ type: 'FeatureCollection', features: [] });
 let latestEvent = $state(null);
-let events = $state([]);
+let events: TaskEventType[] = $state([]);
 let selectedTaskId: number | null = $state(null);
 let selectedTask: any = $state(null);
 let selectedTaskState: string = $state('');
@@ -57,8 +57,7 @@ function getTaskStore() {
 
 	async function getLatestStatePerTask() {
 		const taskEventData: ShapeData = await taskEventShape.value;
-		const taskEventRows = Array.from(taskEventData.values());
-
+		const taskEventRows = Array.from(taskEventData.values()) as TaskEventType[];
 		// Update the events in taskStore
 		events = taskEventRows;
 

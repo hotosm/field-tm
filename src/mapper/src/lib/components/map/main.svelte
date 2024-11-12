@@ -39,11 +39,12 @@
 	interface Props {
 		projectOutlineCoords: Position[][];
 		entitiesUrl: string;
-		toggleTaskActionModal: (value: boolean) => {};
+		toggleTaskActionModal: (value: boolean) => void;
 		projectId: number;
+		setMapRef: (map: maplibregl.Map | undefined) => void;
 	}
 
-	let { projectOutlineCoords, entitiesUrl, toggleTaskActionModal, projectId }: Props = $props();
+	let { projectOutlineCoords, entitiesUrl, toggleTaskActionModal, projectId, setMapRef }: Props = $props();
 
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -56,6 +57,13 @@
 
 	$effect(() => {
 		projectSetupStep = +projectSetupStepStore.projectSetupStep;
+	});
+
+	// set the map ref to parent component
+	$effect(() => {
+		if (map) {
+			setMapRef(map);
+		}
 	});
 
 	// Fit the map bounds to the project area
@@ -160,7 +168,7 @@
 					'#40ac8c',
 					'#c5fbf5', // default color if no match is found
 				],
-				'fill-opacity': hoverStateFilter(0.1, 0),
+				'fill-opacity': hoverStateFilter(0.3, 0),
 			}}
 			beforeLayerType="symbol"
 			manageHoverState
@@ -193,7 +201,7 @@
 					'case',
 					['==', ['get', 'state'], 'LOCKED_FOR_MAPPING'],
 					'LOCKED_FOR_MAPPING',
-					['==', ['get', 'status'], 'LOCKED_FOR_VALIDATION'],
+					['==', ['get', 'state'], 'LOCKED_FOR_VALIDATION'],
 					'LOCKED_FOR_VALIDATION',
 					'',
 				],

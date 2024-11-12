@@ -112,3 +112,15 @@ export type NewEvent = {
 	task_id: number;
 	comment?: string | null;
 };
+
+export type TaskEventType = {
+	comment: string | null;
+	created_at: string;
+	event: TaskEvent | 'COMMENT';
+	event_id: string;
+	project_id: number;
+	state: TaskStatus | null;
+	task_id: number;
+	user_id: number;
+	username: string;
+};
