@@ -43,6 +43,8 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
       The following is the personal opinion from HOT staff members, and provides
       some context for the reasoning behind creating the FMTM.
 
+Generic field mapping:
+
 - **QField**: the mobile extension of QGIS, literally a GIS on your phone.
   This is an excellent tool for what it does: collecting geometries in the
   field, alongside unstructured attributes like any other GIS.
@@ -57,9 +59,7 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
 - **ArcGIS Field Maps**: proprietary / paid, similar applications to Fulcrum,
   but not necessarily designed for text/question based surveys.
 
-- **ArcGIS Survey123**: proprietary / paid, more appropriate for our use case
-  of field survey data collection. However, not an option due to it's closed
-  nature.
+Field survey-based data collection:
 
 - **KoboCollect**: fork of ODK, same mobile app essentially, but different back end.
   Has a slightly complicated relationship with ODK, formerly taking from the
@@ -74,6 +74,21 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
   forced to open-source the original work done, but everything since has been closed.
   Have since done some great work around data management and analytics, however,
   their main objective is not the same as FMTM: coordinating field mapping.
+
+- **ODK**: I won't cover much here, as we talk about it a lot elsewhere.
+  If you are collected mobile survey data then this is a tool at the forefront
+  of that space. Many other tools replicate what ODK do.
+
+- **ArcGIS Survey123**: proprietary / paid, more appropriate for our use case
+  over ArcGIS Field Maps. However, not an option due to it's closed nature.
+
+- **CommCare**: technically open-source, developed by Dimagi, but built in such
+  a way to make it quite difficult to self-host. Very good at collection of
+  "longitudinal data" (data over time), which ODK has only recently began to
+  address with Entities. We should definitely look for opportunities to learn
+  from / collaborate into the future.
+
+Unmaintained projects:
 
 - **MapCampaigner**: a now dead project. In our opinion, this tool certainly helped
   the Monitoring & Evaluation team for field data collection projects, but did not
@@ -96,12 +111,6 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
         It is still useful to learn from the legacy of this tool around offline
         deployment on a small field-based device (e.g. RaspberryPI), and is
         currently in our roadmap to explore this approach further.
-
-- **CommCare**: technically open-source, developed by Dimagi, but built in such
-  a way to make it quite difficult to self-host. Very good at collection of
-  "longitudinal data" (data over time), which ODK has only recently began to
-  address with Entities. We should definitely look for opportunities to learn
-  from / collaborate into the future.
 
 ---
 
