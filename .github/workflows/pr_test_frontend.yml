@@ -14,12 +14,12 @@ on:
 
 jobs:
   unit-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.7
     with:
       working_dir: src/frontend
 
   e2e-tests:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.7
     with:
       playwright: true
       cache_image: false

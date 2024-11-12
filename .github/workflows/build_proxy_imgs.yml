@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-cert-init-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.7
     with:
       context: nginx
       build_target: certs-init-main
@@ -21,7 +21,7 @@ jobs:
       multi_arch: true
 
   build-cert-init-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.7
     with:
       context: nginx
       build_target: certs-init-development
@@ -33,7 +33,7 @@ jobs:
       multi_arch: true
 
   build-proxy-main:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.7
     with:
       context: nginx
       build_target: main
@@ -44,7 +44,7 @@ jobs:
       multi_arch: true
 
   build-proxy-dev:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.6
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.7
     with:
       context: nginx
       build_target: development
