@@ -85,8 +85,11 @@ Field survey-based data collection:
 - **CommCare**: technically open-source, developed by Dimagi, but built in such
   a way to make it quite difficult to self-host. Very good at collection of
   "longitudinal data" (data over time), which ODK has only recently began to
-  address with Entities. We should definitely look for opportunities to learn
-  from / collaborate into the future.
+  address with Entities. However the key thing missing here is that it's not
+  well set up to handle geospatial data. It is possible to collect a GPS point
+  of users in the field, but not possible to select geometries to map. Despite
+  this we will definitely look for opportunities to learn from / collaborate
+  into the future.
 
 Unmaintained projects:
 
