@@ -32,7 +32,7 @@ const ActivitiesPanel = ({ defaultTheme, state, params, map }: activitiesPanelTy
 
     setAllActivities(projectTaskActivityList.length);
     let finalTaskEvents: projectTaskActivity[] = taskHistories.filter((task) => {
-      return task.username.replace(/\s+/g, '').toString().includes(searchText.toString());
+      return task?.username?.replace(/\s+/g, '')?.toString().includes(searchText.toString());
     });
     if (searchText != '') {
       setTaskHistories(finalTaskEvents);

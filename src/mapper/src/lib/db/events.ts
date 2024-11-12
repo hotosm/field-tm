@@ -10,7 +10,7 @@ async function add_event(
 	taskId: number,
 	// userId: number,
 	eventType: TaskEvent,
-	// comment: string = '',
+	comment: string | null = null,
 	// ): Promise<void> {
 ): Promise<TaskEventResponse | false> {
 	// const eventId = uuidv4()
@@ -18,6 +18,7 @@ async function add_event(
 		event_id: uuidv4(),
 		event: eventType,
 		task_id: taskId,
+		comment: comment,
 	};
 	const resp = await fetch(`${API_URL}/tasks/${taskId}/event/?project_id=${projectId}`, {
 		method: 'POST',
@@ -60,6 +61,10 @@ export async function finishTask(/* db, */ projectId: number, taskId: number): P
 
 export async function resetTask(/* db, */ projectId: number, taskId: number): Promise<void> {
 	await add_event(/* db, */ projectId, taskId, TaskEventEnum.BAD);
+}
+
+export async function commentTask(/* db, */ projectId: number, taskId: number, comment: string): Promise<void> {
+	await add_event(/* db, */ projectId, taskId, 'COMMENT', comment);
 }
 
 // async function finishTask(db, projectId: number, taskId: number, userId: number): Promise<void> {

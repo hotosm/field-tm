@@ -10,23 +10,13 @@
 
 	import type { MapLibre } from 'svelte-maplibre';
 	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
-	import Error from './+error.svelte';
-
-	import EventCard from '$lib/components/event-card.svelte';
+	// import EventCard from '$lib/components/event-card.svelte';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import TaskActionDialog from '$lib/components/task-action-dialog.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 
-	import type { ProjectData, ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
-	import {
-		mapTask,
-		finishTask,
-		resetTask,
-		// validateTask,
-		// goodTask,
-		// commentTask,
-	} from '$lib/db/events';
+	import type { ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
 	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
@@ -47,7 +37,7 @@
 	let { data }: Props = $props();
 	// $effect: ({ electric, project } = data)
 
-	let mapComponent: MapLibre;
+	let mapComponent: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
 	let selectedTab: string = $state('map');
 	let isTaskActionModalOpen = $state(false);
@@ -70,8 +60,7 @@
 
 	let qrCodeData = $derived(generateQrCode(data.project.name, data.project.odk_token, 'REPLACE_ME_WITH_A_USERNAME'));
 
-	function zoomToTask(event: CustomEvent<ZoomToTaskEventDetail>) {
-		const taskId = event.detail.taskId;
+	function zoomToTask(taskId: number) {
 		const taskObj = data.project.tasks.find((task: ProjectTask) => task.id === taskId);
 
 		if (!taskObj) return;
@@ -81,9 +70,9 @@
 
 		const taskPolygon = polygon(taskObj.outline.coordinates);
 		const taskBuffer = buffer(taskPolygon, 5, { units: 'meters' });
-		if (taskBuffer && mapComponent.map) {
+		if (taskBuffer && mapComponent) {
 			const taskBbox: [number, number, number, number] = bbox(taskBuffer) as [number, number, number, number];
-			mapComponent.map.fitBounds(taskBbox, { duration: 500 });
+			mapComponent.fitBounds(taskBbox, { duration: 500 });
 		}
 
 		// Open the map tab
@@ -138,7 +127,9 @@
 <!-- The main page -->
 <div class="h-[calc(100vh-4.625rem)]">
 	<MapComponent
-		bind:this={mapComponent}
+		setMapRef={(map) => {
+			mapComponent = map;
+		}}
 		toggleTaskActionModal={(value) => {
 			isTaskActionModalOpen = value;
 		}}
@@ -159,7 +150,7 @@
 	{#if selectedTab !== 'map'}
 		<BottomSheet onClose={() => tabGroup.show('map')}>
 			{#if selectedTab === 'events'}
-				{#if taskStore.events.length > 0}
+				<!-- {#if taskStore.events.length > 0}
 					{#each taskStore.events as record}
 						<EventCard
 							{record}
@@ -167,10 +158,9 @@
 							on:zoomToTask={(e) => zoomToTask(e)}
 						/>
 					{/each}
-				{/if}
+				{/if} -->
 
-				<!-- uncomment More to view stacked component containing comment, instructions, activities -->
-				<!-- <More instructions={data?.project?.per_task_instructions} /> -->
+				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)} />
 			{/if}
 			{#if selectedTab === 'offline'}
 				<span class="font-barlow-medium text-base">Coming soon!</span>
@@ -213,7 +203,7 @@
 		class="z-9999 fixed bottom-0 left-0 right-0"
 		placement="bottom"
 		no-scroll-controls
-		onsl-tab-show={(e) => {
+		onsl-tab-show={(e:  CustomEvent<{ name: string }>) => {
 			selectedTab = e.detail.name;
 			if (
 				e.detail.name !== 'qrcode' &&

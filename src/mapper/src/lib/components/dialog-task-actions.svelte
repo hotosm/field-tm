@@ -4,7 +4,7 @@
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
-		toggleTaskActionModal: (value: boolean) => {};
+		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
 		projectId: number;
 	};
