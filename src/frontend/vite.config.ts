@@ -7,18 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 
 const pwaOptions: Partial<VitePWAOptions> = {
-  registerType: 'autoUpdate',
-  devOptions: {
-    enabled: true,
-  },
-  // // add this to cache all the imports, including favicon
-  workbox: {
-    globPatterns: ['**/*.{js,css,html}', '**/*.{ico,svg,png,jpg,gif}'],
-    // maximumFileSizeToCacheInBytes: 3000000,
-    // navigateFallback: null,
-  },
-  // add this to cache all the static assets in the public folder
-  includeAssets: ['**/*'],
+  // this is temporary to remove the existing service worker
+  // prior to complete PWA removal
+  selfDestroying: true,
   manifest: {
     name: 'Field Mapping Tasking Manager',
     short_name: 'FMTM',
