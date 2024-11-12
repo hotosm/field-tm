@@ -31,10 +31,10 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
 - Manages both **coordination** and **data collection\*** in one framework.
 - Roadmapping input from the rich HOTOSM community.
 
-!!! note
+  !!! note
 
-      *The data collection portion is outsourced to the excellent
-      ecosystem of ODK tools underneath.
+        The data collection* portion is outsourced to the excellent
+        ecosystem of ODK tools underneath.
 
 ---
 

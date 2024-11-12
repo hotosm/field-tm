@@ -15,30 +15,25 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-ARG node_version=20.10
+# An image to copy the built ODK Central dist into an rclone
+# container for copying to nginx at runtime
 
-
-
-FROM docker.io/bitnami/git:2 as repo
 ARG ODK_CENTRAL_TAG
-RUN git clone --depth 1 --branch ${ODK_CENTRAL_TAG} \
-    "https://github.com/getodk/central.git" \
-    && cd central && git submodule update --init
-
-
-
-FROM docker.io/node:${node_version}-slim as build
-WORKDIR /frontend
-COPY --from=repo central/client/ /frontend/
-RUN npm ci --no-audit --fund=false --update-notifier=false
-RUN VUE_APP_OIDC_ENABLED="false" npm run build
-
+FROM ghcr.io/getodk/central-nginx:${ODK_CENTRAL_TAG} as frontend
 
 
 FROM docker.io/rclone/rclone:1 as prod
+ARG ODK_CENTRAL_TAG
+# Disable OIDC when we generate client config json below
+ENV OIDC_ENABLED="false"
 VOLUME /frontend
-COPY container-entrypoint.sh /
-RUN chmod +x /container-entrypoint.sh
-ENTRYPOINT ["/container-entrypoint.sh"]
 WORKDIR /app
-COPY --from=build /frontend/dist .
+COPY container-entrypoint.sh /
+RUN apk add --no-cache envsubst \
+    && chmod +x /container-entrypoint.sh
+ADD https://raw.githubusercontent.com/getodk/central/${ODK_CENTRAL_TAG}/files/nginx/client-config.json.template .
+# See https://github.com/getodk/central/blob/2d95a612218e7c73ee8b3e715749401f08fc00ac/files/nginx/setup-odk.sh#L10
+RUN envsubst < ./client-config.json.template > ./client-config.json \
+    && rm ./client-config.json.template
+COPY --from=frontend /usr/share/nginx/html .
+ENTRYPOINT ["/container-entrypoint.sh"]
