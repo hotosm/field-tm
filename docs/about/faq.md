@@ -19,9 +19,20 @@ already. FMTM is not aiming to compete with these tools, but instead has two goa
    when mapping an entire area of interest. It can be difficult to **subdivide tasks**
    and know **who is working on what tasks.**. FMTM should solve this problem.
 
-2. Allow for coordinated field mapping outside of OpenStreetMap. Sometimes
-   OpenStreetMap is not an appropriate target for the collected data, so a data
-   flow outside of this ecosystem should be possible too.
+2. Allow for coordinated field mapping **both inside and outside of OpenStreetMap**.
+   Sometimes OpenStreetMap is not an appropriate target for the collected data,
+   so a data flow outside of this ecosystem should be possible too.
+
+---
+
+### What makes FMTM unique in this space?
+
+- Fully open-source.
+- Manages both **coordination** and **data collection\*** in one framework.
+- Roadmapping input from the rich HOTOSM community.
+
+- Note that the data collection portion is outsourced to the excellent
+  ecosystem of ODK tools.
 
 ---
 
