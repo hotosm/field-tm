@@ -82,13 +82,16 @@ Field survey-based data collection:
 - **ArcGIS Survey123**: proprietary / paid, more appropriate for our use case
   over ArcGIS Field Maps. However, not an option due to it's closed nature.
 
-- **CommCare**: technically open-source, developed by Dimagi, but built in such
-  a way to make it quite difficult to self-host. Very good at collection of
-  "longitudinal data" (data over time), which ODK has only recently began to
-  address with Entities. However the key thing missing here is that it's not
-  well set up to handle geospatial data. It is possible to collect a GPS point
-  of users in the field, but not possible to select geometries to map. Despite
-  this we will definitely look for opportunities to learn from / collaborate
+- **CommCare**: open-source, developed by Dimagi, and good for collecting survey
+  data. It does not, however, use the open XForm / XLSForm standards like ODK,
+  Kobo, and Ona. Very good at collection of "longitudinal data" (data over time),
+  which ODK has only recently began to address with Entities.
+  However there are two key missing features:
+  (1) it's not well set up to handle geospatial data. It is possible to collect a
+  GPS point of users in the field, but not possible to select geometries to map.
+  (2) it's not configured to coordinate a team of users for field mapping, but more
+  for individual users to map.
+  Despite this we will definitely look for opportunities to learn from / collaborate
   into the future.
 
 Unmaintained projects:
