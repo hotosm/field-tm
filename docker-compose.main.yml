@@ -51,6 +51,8 @@ services:
         condition: service_started
       ui:
         condition: service_completed_successfully
+      electric:
+        condition: service_started
     volumes:
       - fmtm_frontend:/usr/share/nginx/html/fmtm
       - certs:/etc/letsencrypt
@@ -59,6 +61,7 @@ services:
       FMTM_DOMAIN: ${FMTM_DOMAIN}
       FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
       FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
+      FMTM_SYNC_DOMAIN: ${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
     ports:
       - 80:80
       - 443:443
@@ -109,6 +112,7 @@ services:
       args:
         APP_VERSION: main
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
+        VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
         NODE_ENV: production
     volumes:
       - fmtm_frontend:/frontend
@@ -155,6 +159,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  electric:
+    image: "electricsql/electric:${ELECTRIC_TAG:-0.7.7}"
+    depends_on:
+      fmtm-db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
+      # OTEL_EXPORT: otlp
+      # OTLP_ENDPOINT: https://...
+      # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
 
   migrations:
     image: "ghcr.io/hotosm/fmtm/backend:main"

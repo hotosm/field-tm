@@ -53,6 +53,8 @@ services:
         required: false
       s3:
         condition: service_started
+      electric:
+        condition: service_started
     volumes:
       - central_frontend:/usr/share/nginx/html/central
     ports:
@@ -153,6 +155,7 @@ services:
       # - ../ui:/app/node_modules/@hotosm/ui:ro
     environment:
       - VITE_API_URL=${API_URL:-http://api.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}}
+      - VITE_SYNC_URL=http://sync.${FMTM_DOMAIN}:${FMTM_DEV_PORT:-7050}
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -280,13 +283,7 @@ services:
       DATABASE_URL: postgresql://${FMTM_DB_USER:-fmtm}:${FMTM_DB_PASSWORD:-fmtm}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
       # OTEL_EXPORT: otlp
       # OTLP_ENDPOINT: https://...
-
       # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
-      # AUTH_JWT_ALG: HS384
-      # AUTH_JWT_KEY: ${ENCRYPTION_KEY}
-      # AUTH_JWT_AUD: ${FMTM_DOMAIN}
-    ports:
-      - "7055:3000"
     networks:
       - fmtm-net
     restart: "unless-stopped"

@@ -92,6 +92,7 @@ COPY templates/dev/fmtm.conf.template \
      templates/dev/api.conf.template \
      templates/dev/odk.conf.template \
      templates/dev/minio.conf.template \
+     templates/dev/sync.conf.template \
      /etc/nginx/templates/
 
 
@@ -103,6 +104,7 @@ RUN chmod +x /docker-entrypoint.sh
 COPY templates/cert-init/fmtm.conf.template \
      templates/cert-init/api.conf.template \
      templates/cert-init/minio.conf.template \
+     templates/cert-init/sync.conf.template \
      /etc/nginx/templates/
 
 
@@ -118,6 +120,7 @@ FROM base as main
 COPY templates/fmtm.conf.template \
      templates/api.conf.template \
      templates/minio.conf.template \
+     templates/sync.conf.template \
      /etc/nginx/templates/
 
 

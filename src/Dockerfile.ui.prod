@@ -1,7 +1,9 @@
 FROM docker.io/node:20 as base
 ARG NODE_ENV
 ARG VITE_API_URL
+ARG VITE_SYNC_URL
 ENV VITE_API_URL=${VITE_API_URL} \
+    VITE_SYNC_URL=${VITE_SYNC_URL} \
     NODE_ENV=${NODE_ENV} \
     PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH"
@@ -27,11 +29,13 @@ FROM docker.io/rclone/rclone:1 as prod
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG VITE_API_URL
+ARG VITE_SYNC_URL
 LABEL org.hotosm.fmtm.app-name="frontend" \
       org.hotosm.fmtm.app-version="${APP_VERSION}" \
       org.hotosm.fmtm.git-commit-ref="${COMMIT_REF:-none}" \
       org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
-      org.hotosm.fmtm.api-url="${VITE_API_URL}"
+      org.hotosm.fmtm.api-url="${VITE_API_URL}" \
+      org.hotosm.fmtm.sync-url="${VITE_SYNC_URL}"
 VOLUME /frontend
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
