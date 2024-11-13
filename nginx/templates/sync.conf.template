@@ -30,7 +30,7 @@ server {
 
 server {
     # Default handler for port 443
-    listen 443 ssl reuseport;
+    listen 443 ssl;
     server_name ${FMTM_SYNC_DOMAIN};
     
     ssl_certificate /etc/letsencrypt/live/${FMTM_DOMAIN}/fullchain.pem;
