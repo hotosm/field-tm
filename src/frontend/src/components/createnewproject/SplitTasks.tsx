@@ -265,6 +265,15 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                     }}
                     errorMsg={errors.task_split_type}
                   />
+                  <div>
+                    <p className="fmtm-text-gray-500 fmtm-mt-5">
+                      Total number of features:{' '}
+                      <span className="fmtm-font-bold">
+                        {(dataExtractGeojson?.features?.length || 0) +
+                          (additionalFeatureGeojson?.features?.length || 0)}
+                      </span>
+                    </p>
+                  </div>
                   {splitTasksSelection === task_split_type.DIVIDE_ON_SQUARE && (
                     <>
                       <div className="fmtm-mt-6 fmtm-flex fmtm-items-center fmtm-gap-4">
