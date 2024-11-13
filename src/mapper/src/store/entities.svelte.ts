@@ -11,7 +11,7 @@ function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 		return;
 	}
 	return new ShapeStream({
-		url: 'http://localhost:7055/v1/shape/odk_entities',
+		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape/odk_entities`,
 		where: `project_id=${projectId}`,
 	});
 }

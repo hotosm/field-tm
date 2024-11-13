@@ -62,6 +62,12 @@ if [ -n "${FMTM_S3_DOMAIN}" ]; then
     certbot_args+=("-d" "${FMTM_S3_DOMAIN}")
 fi
 
+# Add FMTM_SYNC_DOMAIN if present
+if [ -n "${FMTM_SYNC_DOMAIN}" ]; then
+    echo "Adding ${FMTM_SYNC_DOMAIN} to certificate for domain ${FMTM_DOMAIN}."
+    certbot_args+=("-d" "${FMTM_SYNC_DOMAIN}")
+fi
+
 # Run certbot with the constructed arguments
 echo "Running command: certbot --non-interactive certonly ${certbot_args[*]}"
 certbot --non-interactive certonly "${certbot_args[@]}"

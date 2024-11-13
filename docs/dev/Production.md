@@ -77,6 +77,7 @@ These defaults can be overridden with respective environment variables:
 FMTM_API_DOMAIN
 FMTM_ODK_DOMAIN
 FMTM_S3_DOMAIN
+FMTM_SYNC_DOMAIN
 ```
 
 ### Connecting to a remote database
