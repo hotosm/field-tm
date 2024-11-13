@@ -70,7 +70,7 @@ fi
 
 # Run certbot with the constructed arguments
 echo "Running command: certbot --non-interactive certonly ${certbot_args[*]}"
-certbot --non-interactive certonly "${certbot_args[@]}"
+certbot --non-interactive --cert-name "${FMTM_DOMAIN}" certonly "${certbot_args[@]}"
 echo "Certificate generated under: /etc/letsencrypt/live/${FMTM_DOMAIN}/"
 
 # Successful exit (stop container)
