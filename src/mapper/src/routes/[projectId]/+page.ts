@@ -6,26 +6,25 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const load: PageLoad = async ({ parent, params, fetch }) => {
 	// const { db } = await parent();
 
-	const { projectId } = params;
-	const project = await fetch(`${API_URL}/projects/${projectId}`);
-
-	if (project.status == 404) {
-		error(404, {
-			message: `Project with ID (${projectId}) not found`,
-		});
-	}
-
-	const user = await fetch(`${API_URL}/auth/refresh`, { credentials: 'include' });
-	if (user.status != 200) {
+	const userResponse = await fetch(`${API_URL}/auth/refresh`, { credentials: 'include' });
+	if (userResponse.status === 401) {
 		// TODO redirect to different error page to handle login
-		error(401, {
-			message: `You must log in first`,
-		});
+		throw error(401, { message: `You must log in first` });
 	}
-	const userObj = await user.json();
+	const userObj = await userResponse.json();
+
+	const { projectId } = params;
+	const projectResponse = await fetch(`${API_URL}/projects/${projectId}`, { credentials: 'include' });
+	if (projectResponse.status === 401) {
+		// TODO redirect to different error page to handle login
+		throw error(401, { message: `You must log in first` });
+	}
+	if (projectResponse.status === 404) {
+		throw error(404, { message: `Project with ID (${projectId}) not found` });
+	}
 
 	return {
-		project: await project.json(),
+		project: await projectResponse.json(),
 		projectId: parseInt(projectId),
 		userId: userObj.id,
 		// db: db,

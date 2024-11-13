@@ -8,7 +8,6 @@
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
 
-	import type { MapLibre } from 'svelte-maplibre';
 	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	// import EventCard from '$lib/components/event-card.svelte';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
