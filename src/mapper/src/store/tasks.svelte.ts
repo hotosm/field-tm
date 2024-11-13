@@ -29,13 +29,16 @@ function getTaskStore() {
 		taskEventShape = new Shape(taskEventStream);
 
 		taskEventShape.subscribe((taskEvent: ShapeData) => {
-			let newEvent: Row;
-			for (newEvent of taskEvent);
-			if (newEvent) {
-				latestEvent = newEvent[1];
-			}
-			if (newEvent?.[1]?.task_id === selectedTaskId) {
-				selectedTaskState = newEvent[1].state;
+			const rows: Row[] = taskEvent.rows;
+			if (rows && Array.isArray(rows)) {
+				for (const newEvent of rows) {
+					if (newEvent) {
+						latestEvent = newEvent;
+					}
+					if (newEvent.task_id === selectedTaskId) {
+						selectedTaskState = newEvent.state;
+					}
+				}
 			}
 		});
 	}
