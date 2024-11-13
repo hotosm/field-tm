@@ -18,7 +18,8 @@ function getTaskEventStream(projectId: number): ShapeStream | undefined {
 		return;
 	}
 	return new ShapeStream({
-		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape/task_events`,
+		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
+		table: 'task_events',
 		where: `project_id=${projectId}`,
 	});
 }

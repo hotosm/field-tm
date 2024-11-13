@@ -41,7 +41,7 @@ server {
     # Max upload size 1GB
     client_max_body_size 1G;
 
-    # Response headers (Access-Control-Allow-Origin set by FastAPI, not required)
+    # Response headers
     add_header 'Content-Security-Policy' 'upgrade-insecure-requests';
     # For opentelemetry
     add_header 'Access-Control-Allow-Headers' 'traceparent,tracestate';
