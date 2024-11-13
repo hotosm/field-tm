@@ -12,5 +12,5 @@
 <main class="flex flex-col h-screen overflow-hidden">
 	<hot-header></hot-header>
 	<Toast />
-	{@render children?.({ data, })}
+	{@render children?.({ data })}
 </main>
