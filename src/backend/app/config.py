@@ -164,7 +164,7 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(
         cls,
-        val: Optional[str | list[str]],
+        extra_origins: Optional[str | list[str]],
         info: ValidationInfo,
     ) -> Union[list[str], str]:
         """Build and validate CORS origins list.
@@ -172,33 +172,34 @@ class Settings(BaseSettings):
         By default, the provided frontend URLs are included in the origins list.
         If this variable used, the provided urls are appended to the list.
         """
-        # Build default origins from env vars
-        if info.data.get("DEBUG"):
-            url_scheme = "http"
+        # If a string is passed, convert to list
+        if isinstance(extra_origins, str):
+            default_origins = [i.strip() for i in extra_origins.split(",")]
+        else:
+            default_origins = []
+
+        # Add XLSForm editor url by default
+        default_origins += ["https://xlsforms.fmtm.dev"]
+
+        # Handle localhost / testing scenario
+        if "localhost" in (domain := info.data.get("FMTM_DOMAIN")):
             dev_port = info.data.get("FMTM_DEV_PORT", "false")
-            if dev_port.lower() in ("0", "no", "false"):
+            if dev_port.lower() in ("0", "no", "false", ""):
                 local_server_port = ""
             else:
                 local_server_port = f":{dev_port}"
+            default_origins.append(f"http://{domain}{local_server_port}")
+            return default_origins
+
+        # Add the main FMTM domain
+        default_origins.append(f"https://{domain}")
+
+        # If no extra origins, return frontend + XLSForm editor URLs
+        if extra_origins is None:
+            return default_origins
+        # Else add extra origins to defaults
         else:
-            url_scheme = "https"
-            local_server_port = ""
-
-        default_origins = [
-            f"{url_scheme}://{info.data.get('FMTM_DOMAIN')}{local_server_port}",
-            # Also add the xlsform-editor url
-            "https://xlsforms.fmtm.dev",
-        ]
-
-        if val is None:
-            return default_origins
-
-        if isinstance(val, str):
-            default_origins += [i.strip() for i in val.split(",")]
-            return default_origins
-
-        elif isinstance(val, list):
-            default_origins += val
+            default_origins.append(extra_origins)
             return default_origins
 
     API_PREFIX: str = ""
