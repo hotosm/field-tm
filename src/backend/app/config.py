@@ -172,9 +172,10 @@ class Settings(BaseSettings):
         default_origins = ["https://xlsforms.fmtm.dev"]
 
         # Handle localhost/testing scenario
-        domain = info.data.get("FMTM_DOMAIN", "localhost")
+        domain = info.data.get("FMTM_DOMAIN", "fmtm.localhost")
         dev_port = info.data.get("FMTM_DEV_PORT", "")
-        if "localhost" in domain:
+        # NOTE fmtm.dev.test is used as the Playwright test domain
+        if "localhost" in domain or "fmtm.dev.test" in domain:
             local_server_port = (
                 f":{dev_port}"
                 if dev_port and dev_port.lower() not in ("0", "no", "false")
