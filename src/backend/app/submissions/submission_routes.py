@@ -30,7 +30,7 @@ from psycopg import Connection
 from psycopg.rows import class_row
 
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import mapper, project_manager
+from app.auth.roles import mapper, project_contributors, project_manager
 from app.central import central_crud
 from app.db import postgis_utils
 from app.db.database import db_conn
@@ -63,7 +63,7 @@ async def read_submissions(
 
 @router.get("/download")
 async def download_submission(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
     export_json: bool = True,
 ):
     """Download the submissions for a given project.
@@ -365,7 +365,7 @@ async def update_review_state(
 
 @router.get("/download-submission-geojson")
 async def download_submission_geojson(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
 ):
     """Download submission geojson for a specific project."""
     project = project_user.get("project")
