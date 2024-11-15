@@ -32,6 +32,7 @@ import geojson
 from fastapi import HTTPException, UploadFile
 from loguru import logger as log
 from psycopg import Connection
+from psycopg.errors import UniqueViolation
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel, Field, ValidationInfo
 from pydantic.functional_validators import field_validator
@@ -352,9 +353,8 @@ class DbOrganisation(BaseModel):
                 )
                 db_org = await cur.fetchone()
 
-        if db_org is None:
-            raise KeyError(f"Organisation ({org_identifier}) not found.")
-
+            if db_org is None:
+                raise KeyError(f"Organisation ({org_identifier}) not found.")
         return db_org
 
     @classmethod
@@ -397,11 +397,6 @@ class DbOrganisation(BaseModel):
         # Set requesting user to the org owner
         org_in.created_by = user_id
 
-        if not ignore_conflict and cls.one(db, org_in.name):
-            msg = f"Organisation named ({org_in.name}) already exists!"
-            log.warning(f"User ({user_id}) failed organisation creation: {msg}")
-            raise HTTPException(status_code=HTTPStatus.CONFLICT, detail=msg)
-
         model_dump = dump_and_check_model(org_in)
         columns = ", ".join(model_dump.keys())
         value_placeholders = ", ".join(f"%({key})s" for key in model_dump.keys())
@@ -415,24 +410,33 @@ class DbOrganisation(BaseModel):
             RETURNING *;
         """
 
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, model_dump)
-            new_org = await cur.fetchone()
+        try:
+            async with db.cursor(row_factory=class_row(cls)) as cur:
+                await cur.execute(sql, model_dump)
+                new_org = await cur.fetchone()
 
-        if new_org is None and not ignore_conflict:
+            if new_org and new_org.logo is None and new_logo:
+                from app.organisations.organisation_schemas import OrganisationUpdate
+
+                logo_url = await cls.upload_logo(new_org.id, new_logo)
+                await cls.update(db, new_org.id, OrganisationUpdate(logo=logo_url))
+
+            return new_org
+        except UniqueViolation as e:
+            # Return conflict error when organisation name already exists
+            log.error(f"Organisation named ({org_in.name}) already exists!")
+            raise HTTPException(
+                status_code=HTTPStatus.CONFLICT,
+                detail=f"Organisation named ({org_in.name}) already exists!",
+            ) from e
+
+        except Exception as e:
+            # Log errors only for actual failures (e.g., DB errors)
             msg = f"Unknown SQL error for data: {model_dump}"
-            log.error(f"User ({user_id}) failed organisation creation: {msg}")
+            log.error(f"User ({user_id}) failed organisation creation: {e}")
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
-            )
-
-        if new_org and new_org.logo is None and new_logo:
-            from app.organisations.organisation_schemas import OrganisationUpdate
-
-            logo_url = await cls.upload_logo(new_org.id, new_logo)
-            await cls.update(db, new_org.id, OrganisationUpdate(logo=logo_url))
-
-        return new_org
+            ) from e
 
     @classmethod
     async def upload_logo(
@@ -519,7 +523,11 @@ class DbOrganisation(BaseModel):
                 DELETE FROM projects
                 WHERE organisation_id = %(org_id)s
                 RETURNING organisation_id
-            ), deleted_org AS (
+            ), deleted_org_managers AS (
+                DELETE FROM organisation_managers
+                WHERE organisation_id = %(org_id)s
+                RETURNING organisation_id
+            ),deleted_org AS (
                 DELETE FROM organisations
                 WHERE id = %(org_id)s
                 RETURNING id
@@ -536,6 +544,7 @@ class DbOrganisation(BaseModel):
                 settings.S3_BUCKET_NAME,
                 f"/{org_id}/",
             )
+            return True
 
     @classmethod
     async def unapproved(cls, db: Connection) -> Optional[list[Self]]:
