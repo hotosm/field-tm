@@ -19,12 +19,13 @@
 
 from fastapi import UploadFile
 from psycopg import Connection
+from psycopg.rows import class_row
 
 from app.auth.auth_schemas import AuthUser
 from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
-from app.organisations.organisation_schemas import OrganisationIn
+from app.organisations.organisation_schemas import OrganisationIn, OrganisationOut
 from app.users.user_schemas import UserIn
 
 
@@ -97,14 +98,12 @@ async def get_my_organisations(
     Returns:
         list[dict]: A list of organisation objects to be serialised.
     """
-    user_id = current_user.id
-
     sql = """
         SELECT DISTINCT org.*
         FROM organisations org
         JOIN organisation_managers managers
             ON managers.organisation_id = org.id
-        WHERE managers.user_id = :user_id
+        WHERE managers.user_id = %(user_id)s
 
         UNION
 
@@ -114,7 +113,6 @@ async def get_my_organisations(
             ON project.organisation_id = org.id
         WHERE project.author_id = %(user_id)s;
     """
-    async with db.cursor() as cur:
-        await cur.execute(sql, {"user_id": user_id})
-        orgs = cur.fetchall()
-    return orgs
+    async with db.cursor(row_factory=class_row(OrganisationOut)) as cur:
+        await cur.execute(sql, {"user_id": current_user.id})
+        return await cur.fetchall()

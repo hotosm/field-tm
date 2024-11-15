@@ -19,11 +19,12 @@
 
 from typing import Annotated, Optional, Self
 
+from fastapi import Form
 from pydantic import BaseModel, Field
 from pydantic.functional_validators import model_validator
 
 from app.central.central_schemas import ODKCentralIn
-from app.db.enums import OrganisationType
+from app.db.enums import CommunityType, OrganisationType
 from app.db.models import DbOrganisation, slugify
 
 
@@ -57,6 +58,41 @@ class OrganisationUpdate(OrganisationInBase):
 
     # Allow the name field to be omitted / not updated
     name: Optional[str] = None
+
+
+def parse_organisation_input(
+    name: Optional[str] = Form(None),
+    slug: Optional[str] = Form(None),
+    created_by: Optional[int] = Form(None),
+    community_type: CommunityType = Form(None),
+    type: OrganisationType = Form(None, alias="type"),
+    odk_central_url: Optional[str] = Form(None),
+    odk_central_user: Optional[str] = Form(None),
+    odk_central_password: Optional[str] = Form(None),
+) -> OrganisationUpdate:
+    """Parse organisation input data from a FastAPI Form.
+
+    The organisation fields are passed as keyword arguments. The
+    ODKCentralIn model is used to parse the ODK credential fields, and
+    the OrganisationIn model is used to parse the organisation fields.
+
+    The parsed data is returned as an OrganisationIn instance, with the
+    ODKCentralIn fields merged in.
+    """
+    odk_central_data = ODKCentralIn(
+        odk_central_url=odk_central_url,
+        odk_central_user=odk_central_user,
+        odk_central_password=odk_central_password,
+    )
+    org_data = OrganisationUpdate(
+        name=name,
+        slug=slug,
+        created_by=created_by,
+        community_type=community_type,
+        type=type,
+        **odk_central_data.dict(exclude_unset=True),
+    )
+    return org_data
 
 
 class OrganisationOut(BaseModel):
