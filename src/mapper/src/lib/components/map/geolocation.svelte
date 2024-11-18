@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { GeoJSON, SymbolLayer } from 'svelte-maplibre';
-    import type { FeatureCollection } from 'geojson';
+	import { GeoJSON, SymbolLayer } from 'svelte-maplibre';
+	import type { FeatureCollection } from 'geojson';
 
-    import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
+	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
 	import { getAlertStore } from '$store/common.svelte.ts';
 
 	const alertStore = getAlertStore();
@@ -12,10 +12,7 @@
 		toggleGeolocationStatus?: boolean;
 	}
 
-	let {
-		map=$bindable(),
-		toggleGeolocationStatus = $bindable(false),
-	}: Props = $props();
+	let { map = $bindable(), toggleGeolocationStatus = $bindable(false) }: Props = $props();
 
 	let coords: [number, number] | undefined = $state();
 	let rotationDeg: number | undefined = $state();
@@ -75,7 +72,6 @@
 			},
 		],
 	});
-	
 
 	$effect(() => {
 		if (map && toggleGeolocationStatus) {
@@ -112,20 +108,19 @@
 	});
 </script>
 
-<GeoJSON data={locationGeojson} id="point">
-    <SymbolLayer
-        applyToClusters={false}
-        hoverCursor="pointer"
-        layout={{
-            // if orientation true (meaning the browser supports device orientation sensor show location dot with orientation sign)
-            'icon-image': ['case', ['==', ['get', 'orientation'], true], 'locationArc', 'locationDot'],
-            'icon-allow-overlap': true,
-            'text-field': '{mag}',
-            'text-offset': [0, -2],
-            'text-size': 12,
-            'icon-rotate': rotationDeg || 0, // rotate location icon acc to device orientation
-            'icon-rotation-alignment': 'map',
-            'icon-size': 0.5,
-        }}
-    />
+<GeoJSON data={locationGeojson} id="geolocation">
+	<SymbolLayer
+		applyToClusters={false}
+		hoverCursor="pointer"
+		layout={{
+			// if orientation true (meaning the browser supports device orientation sensor show location dot with orientation sign)
+			'icon-image': ['case', ['==', ['get', 'orientation'], true], 'locationArc', 'locationDot'],
+			'icon-allow-overlap': true,
+			'text-offset': [0, -2],
+			'text-size': 12,
+			'icon-rotate': rotationDeg || 0, // rotate location icon acc to device orientation
+			'icon-rotation-alignment': 'map',
+			'icon-size': 0.5,
+		}}
+	/>
 </GeoJSON>
