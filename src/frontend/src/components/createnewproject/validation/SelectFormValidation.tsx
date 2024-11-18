@@ -13,7 +13,7 @@ function SelectFormValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
   if (!values?.formCategorySelection) {
-    errors.formCategorySelection = 'Form Category is Required.';
+    errors.formCategorySelection = 'Survey Type is Required.';
   }
   if (values?.formWays === 'custom_form' && !values?.customFormUpload) {
     errors.customFormUpload = 'Form needs to be Uploaded.';

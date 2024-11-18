@@ -16,7 +16,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { Loader2 } from 'lucide-react';
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
-  useDocumentTitle('Create Project: Select Category');
+  useDocumentTitle('Create Project: Upload Survey');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -86,7 +86,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Select Category</h6>
+        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Upload Survey</h6>
         <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
           <span>
             You may choose a pre-configured form, or upload a custom XLS form. Click{' '}
@@ -116,8 +116,8 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
             <div className="fmtm-flex fmtm-flex-col  fmtm-gap-6">
               <div className="">
                 <CustomSelect
-                  title="Select category"
-                  placeholder="Select category"
+                  title="Select Survey Type"
+                  placeholder="Select Survey Type"
                   data={sortedFormCategoryList}
                   dataKey="id"
                   valueKey="title"
@@ -131,7 +131,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   className="fmtm-max-w-[13.5rem]"
                 />
                 <p className="fmtm-text-base fmtm-mt-2">
-                  The category will be used to set the OpenStreetMap{' '}
+                  The survey type will be used to set the OpenStreetMap{' '}
                   <a
                     href="https://wiki.openstreetmap.org/wiki/Tags"
                     target="_"

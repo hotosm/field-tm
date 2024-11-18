@@ -140,7 +140,7 @@ const DataExtract = ({
   }, [formValues?.dataExtractWays]);
 
   const toggleStep = (step, url) => {
-    if (url === '/select-category') {
+    if (url === '/upload-survey') {
       dispatch(
         CreateProjectActions.SetIndividualProjectDetailsData({
           ...formValues,
@@ -226,6 +226,12 @@ const DataExtract = ({
             You can use these map features to use the 'select from map' functionality from ODK that allows you to select
             the feature to collect data for.
           </span>{' '}
+          <span>
+            Additional datasets might be important if your survey consists of more than one feature to select. For
+            example, selecting a building as the primary feature, with an associated road, or nearby hospital. In this
+            case, the roads or hospital features would be uploaded separately. Note that these features will not be
+            factored in when dividing the primary features into task areas.
+          </span>
         </p>
       </div>
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
@@ -327,7 +333,7 @@ const DataExtract = ({
                 btnText="PREVIOUS"
                 btnType="secondary"
                 type="button"
-                onClick={() => toggleStep(3, '/select-category')}
+                onClick={() => toggleStep(3, '/upload-survey')}
                 className="fmtm-font-bold"
               />
               <Button
