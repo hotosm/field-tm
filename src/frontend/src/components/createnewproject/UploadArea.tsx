@@ -14,7 +14,6 @@ import FileInputComponent from '@/components/common/FileInputComponent';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
 import { valid } from 'geojson-validation';
-import { DivideSquareIcon } from 'lucide-react';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const uploadAreaOptions = [
@@ -64,7 +63,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     }
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: 3 }));
-    navigate('/select-category');
+    navigate('/upload-survey');
     dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
   const {
@@ -214,6 +213,9 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
             <p>Click on the reset button to redraw the AOI.</p>
           </div>
           <span>The total area of the AOI is also calculated and displayed on the screen.</span>
+          <span>
+            <b>Note:</b> The uploaded geojson should be in EPSG:4326 coordinate system.
+          </span>
         </div>
       </div>
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] fmtm-h-full fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">

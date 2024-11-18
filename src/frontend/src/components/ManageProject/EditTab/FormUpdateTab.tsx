@@ -47,8 +47,8 @@ const FormUpdateTab = ({ projectId }) => {
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-10">
       <div className="">
         <CustomSelect
-          title="Select category"
-          placeholder="Select category"
+          title="Select Survey Type"
+          placeholder="Select Survey Type"
           data={sortedFormCategoryList}
           dataKey="id"
           valueKey="title"
@@ -59,7 +59,7 @@ const FormUpdateTab = ({ projectId }) => {
         />
         {error.categoryError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.categoryError}</p>}
         <p className="fmtm-text-base fmtm-mt-2">
-          The category will be used to set the OpenStreetMap{' '}
+          The survey type will be used to set the OpenStreetMap{' '}
           <a
             href="https://wiki.openstreetmap.org/wiki/Tags"
             target="_"

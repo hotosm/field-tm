@@ -65,7 +65,7 @@ test('create new project', async ({ browserName, page }) => {
 
   // 3. Select Category Step
   await page.getByRole('button', { name: 'NEXT' }).click();
-  await expect(page.getByText('Form Category is Required.')).toBeVisible();
+  await expect(page.getByText('Survey Type is Required.')).toBeVisible();
   await page.getByRole('combobox').click();
   await page.getByLabel('buildings').click();
   await page.getByRole('button', { name: 'NEXT' }).click();

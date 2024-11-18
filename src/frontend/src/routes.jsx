@@ -154,7 +154,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/select-category',
+        path: '/upload-survey',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
