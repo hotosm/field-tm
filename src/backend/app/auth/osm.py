@@ -72,8 +72,9 @@ async def login_required(
     try:
         token_data = verify_token(access_token)
     except ValueError as e:
-        log.error(e)
-        log.error("Failed to deserialise access token")
+        log.exception(
+            f"Failed to deserialise access token. Error: {e}", stack_info=True
+        )
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail="Access token not valid",
