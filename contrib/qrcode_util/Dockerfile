@@ -18,7 +18,7 @@ ARG PYTHON_IMG_TAG=3.10
 
 
 # Includes all labels and timezone info to extend from
-FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm as base
+FROM docker.io/python:${PYTHON_IMG_TAG}-slim-bookworm AS base
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -34,7 +34,7 @@ ENV LC_ALL en_US.UTF-8
 
 
 # Build stage will all dependencies required to build Python wheels
-FROM base as build
+FROM base AS build
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -48,7 +48,7 @@ RUN pip install --user --no-warn-script-location \
 
 
 # Run stage will minimal dependencies required to run Python libraries
-FROM base as runtime
+FROM base AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONFAULTHANDLER=1

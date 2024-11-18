@@ -1,4 +1,4 @@
-FROM docker.io/node:20 as base
+FROM docker.io/node:20 AS base
 ARG NODE_ENV
 ARG VITE_API_URL
 ARG VITE_SYNC_URL
@@ -6,26 +6,26 @@ ENV VITE_API_URL=${VITE_API_URL} \
     VITE_SYNC_URL=${VITE_SYNC_URL} \
     NODE_ENV=${NODE_ENV} \
     PNPM_HOME="/pnpm" \
-    PATH="$PNPM_HOME:$PATH"
+    PATH="$PATH:/pnpm"
 RUN corepack enable && corepack use pnpm@9.3.0
 WORKDIR /app
 
 
-FROM base as manager-frontend
+FROM base AS manager-frontend
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN pnpm install
 COPY frontend/ .
 RUN pnpm run build --mode ${NODE_ENV}
 
 
-FROM base as mapper-frontend
+FROM base AS mapper-frontend
 COPY mapper/package.json mapper/pnpm-lock.yaml ./
 RUN pnpm install
 COPY mapper/ .
 RUN pnpm run build --mode ${NODE_ENV}
 
 
-FROM docker.io/rclone/rclone:1 as prod
+FROM docker.io/rclone/rclone:1 AS prod
 ARG APP_VERSION
 ARG COMMIT_REF
 ARG VITE_API_URL

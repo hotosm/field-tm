@@ -15,7 +15,7 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-FROM docker.io/debian:bookworm as base
+FROM docker.io/debian:bookworm AS base
 LABEL org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
       org.hotosm.fmtm.josm-port="8111" \
       org.hotosm.fmtm.nginx-port="80"
@@ -34,7 +34,7 @@ ENV LC_ALL en_US.UTF-8
 
 
 
-FROM base as gpg-key
+FROM base AS gpg-key
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -47,7 +47,7 @@ RUN curl -sS https://josm.openstreetmap.de/josm-apt.key \
 
 
 
-FROM base as runtime
+FROM base AS runtime
 COPY --from=gpg-key \
     /opt/josm.gpg /etc/apt/trusted.gpg.d/josm.gpg
 RUN echo \
