@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -18,11 +18,12 @@
 
 [project]
 name = "fmtm"
-dynamic = ["version"]
+version = "2024.4.1"
 description = "Field Mapping Tasking Manager - coordinated field mapping."
 authors = [
     {name = "HOTOSM", email = "sysadmin@hotosm.org"},
 ]
+requires-python = ">=3.12"
 dependencies = [
     "uvicorn==0.32.0",
     "uvloop==0.21.0",
@@ -48,15 +49,11 @@ dependencies = [
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.0",
     "fmtm-splitter==1.5.1",
-    # Temporarily add the 'packaging' downstream dep
-    # see https://github.com/dimastbk/python-calamine/pull/93
-    "packaging==24.1",
 ]
-requires-python = ">=3.12"
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pre-commit>=4.0.1",
     "commitizen>=3.30.0",
@@ -92,18 +89,10 @@ monitoring = [
     "opentelemetry-instrumentation-requests>=0.48b0",
 ]
 
-[build-system]
-requires = ["pdm-pep517==1.1.4"]
-build-backend = "pdm.pep517.api"
-
-[tool.pdm]
-source-includes = ["../../CHANGELOG.md", "../../LICENSE", "../../README.md"]
-version = {from = "app/__version__.py"}
-
 [tool.ruff]
 fix = true
 line-length = 88
-target-version = "py311"
+target-version = "py312"
 exclude = [
     ".ruff_cache",
     "__pypackages__",
