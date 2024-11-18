@@ -275,14 +275,14 @@ async def test_upload_data_extracts(client, project):
         )
     }
     response = await client.post(
-        f"/projects/upload-custom-extract/?project_id={project.id}",
+        f"/projects/upload-custom-extract?project_id={project.id}",
         files=fgb_file,
     )
 
     assert response.status_code == 200
 
     response = await client.get(
-        f"/projects/data-extract-url/?project_id={project.id}",
+        f"/projects/data-extract-url?project_id={project.id}",
     )
     assert "url" in response.json()
 
@@ -294,14 +294,14 @@ async def test_upload_data_extracts(client, project):
         )
     }
     response = await client.post(
-        f"/projects/upload-custom-extract/?project_id={project.id}",
+        f"/projects/upload-custom-extract?project_id={project.id}",
         files=geojson_file,
     )
 
     assert response.status_code == 200
 
     response = await client.get(
-        f"/projects/data-extract-url/?project_id={project.id}",
+        f"/projects/data-extract-url?project_id={project.id}",
     )
     assert "url" in response.json()
 

@@ -17,7 +17,7 @@ const DataConflation = () => {
       SubmissionConflationGeojsonService(
         `${
           import.meta.env.VITE_API_URL
-        }/submission/conflate-submission-geojson/?project_id=${projectId}&task_id=${taskId}`,
+        }/submission/conflate-submission-geojson?project_id=${projectId}&task_id=${taskId}`,
       ),
     );
   }, []);

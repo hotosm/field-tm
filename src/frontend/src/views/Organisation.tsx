@@ -46,9 +46,9 @@ const Organisation = () => {
 
   useEffect(() => {
     if (verifiedTab) {
-      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`));
+      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation`));
     } else {
-      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/`));
+      dispatch(OrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/unapproved`));
     }
   }, [verifiedTab]);
 

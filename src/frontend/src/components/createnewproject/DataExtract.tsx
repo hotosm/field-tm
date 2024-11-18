@@ -84,7 +84,7 @@ const DataExtract = ({
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/projects/generate-data-extract/`,
+        `${import.meta.env.VITE_API_URL}/projects/generate-data-extract`,
         dataExtractRequestFormData,
       );
 

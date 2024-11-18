@@ -43,7 +43,7 @@ const ProjectDetailsForm = ({ flag }) => {
   );
 
   const onFocus = () => {
-    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation/`));
+    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation`));
   };
 
   useEffect(() => {

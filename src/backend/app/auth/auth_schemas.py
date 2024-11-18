@@ -16,10 +16,9 @@
 #
 """Pydantic models for Auth."""
 
-from typing import Any, Optional, TypedDict
+from typing import Optional, TypedDict
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr, computed_field
-from pydantic.functional_validators import field_validator
 
 from app.db.enums import ProjectRole, UserRole
 from app.db.models import DbOrganisation, DbProject, DbUser
@@ -80,30 +79,5 @@ class FMTMUser(BaseModel):
     username: str
     profile_img: str
     role: UserRole
-    project_roles: Optional[dict[int, ProjectRole]] = {}
-    orgs_managed: Optional[list[int]] = []
-
-    @field_validator("role", mode="before")
-    @classmethod
-    def convert_user_role_str_to_ints(cls, role: Any) -> Optional[UserRole]:
-        """User role strings returned from db converted to enum integers."""
-        if not role:
-            return None
-        if isinstance(role, str):
-            return UserRole[role]
-        return role
-
-    @field_validator("project_roles", mode="before")
-    @classmethod
-    def convert_project_role_str_to_ints(
-        cls, roles: dict[int, Any]
-    ) -> Optional[dict[int, ProjectRole]]:
-        """User project strings returned from db converted to enum integers."""
-        if not roles:
-            return {}
-
-        first_value = next(iter(roles.values()), None)
-        if isinstance(first_value, str):
-            return {id: ProjectRole[role] for id, role in roles.items()}
-
-        return roles
+    project_roles: Optional[dict[int, ProjectRole]] = None
+    orgs_managed: Optional[list[int]] = None

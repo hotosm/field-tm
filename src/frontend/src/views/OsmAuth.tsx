@@ -27,7 +27,7 @@ function OsmAuth() {
     const loginRedirect = async () => {
       // authCode is passed from OpenStreetMap redirect, so get cookie, then redirect
       if (authCode) {
-        const callbackUrl = `${import.meta.env.VITE_API_URL}/auth/callback/?code=${authCode}&state=${state}`;
+        const callbackUrl = `${import.meta.env.VITE_API_URL}/auth/callback?code=${authCode}&state=${state}`;
 
         const completeLogin = async () => {
           // NOTE this encapsulates async methods to call sequentially

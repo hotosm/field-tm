@@ -36,7 +36,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   };
 
   const getTilesList = () => {
-    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles/`));
+    dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles`));
   };
 
   useEffect(() => {

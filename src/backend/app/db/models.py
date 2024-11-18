@@ -158,7 +158,7 @@ class DbUser(BaseModel):
     registered_at: Optional[AwareDatetime] = None
 
     # Relationships
-    project_roles: Optional[list[DbUserRole]] = None
+    project_roles: Optional[dict[int, ProjectRole]] = None  # project:role pairs
     orgs_managed: Optional[list[int]] = None
 
     @classmethod
@@ -168,13 +168,18 @@ class DbUser(BaseModel):
             sql = """
                 SELECT
                     u.*,
-                    array_agg(
-                        DISTINCT om.organisation_id
-                    ) FILTER (WHERE om.organisation_id IS NOT NULL) AS orgs_managed,
-                    jsonb_object_agg(
-                        ur.project_id,
-                        COALESCE(ur.role, 'MAPPER')
-                    ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
+
+                -- Aggregate organisation IDs managed by the user
+                array_agg(
+                    DISTINCT om.organisation_id
+                ) FILTER (WHERE om.organisation_id IS NOT NULL) AS orgs_managed,
+
+                -- Aggregate project roles for the user, as project:role pairs
+                jsonb_object_agg(
+                    ur.project_id,
+                    COALESCE(ur.role, 'MAPPER')
+                ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
+
                 FROM users u
                 LEFT JOIN user_roles ur ON u.id = ur.user_id
                 LEFT JOIN organisation_managers om ON u.id = om.user_id

@@ -42,16 +42,13 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   const submission = () => {
     if (!organizationId) {
       const { fillODKCredentials, ...filteredValues } = values;
-      dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation/`, filteredValues));
+      dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation`, filteredValues));
     } else {
       const { fillODKCredentials, ...filteredValues } = values;
       const changedValues = diffObject(organisationFormData, filteredValues);
       if (Object.keys(changedValues).length > 0) {
         dispatch(
-          PatchOrganizationDataService(
-            `${import.meta.env.VITE_API_URL}/organisation/${organizationId}/`,
-            changedValues,
-          ),
+          PatchOrganizationDataService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`, changedValues),
         );
       }
     }

@@ -49,7 +49,7 @@ router = APIRouter(
 )
 
 
-@router.get("/osm-login/")
+@router.get("/osm-login")
 async def login_url(osm_auth=Depends(init_osm_auth)):
     """Get Login URL for OSM Oauth Application.
 
@@ -69,7 +69,7 @@ async def login_url(osm_auth=Depends(init_osm_auth)):
     return JSONResponse(content=login_url, status_code=HTTPStatus.OK)
 
 
-@router.get("/callback/")
+@router.get("/callback")
 async def callback(
     request: Request, osm_auth: Annotated[AuthUser, Depends(init_osm_auth)]
 ) -> JSONResponse:
@@ -135,7 +135,7 @@ async def callback(
         ) from e
 
 
-@router.get("/logout/")
+@router.get("/logout")
 async def logout():
     """Reset httpOnly cookie to sign out user."""
     response = Response(status_code=HTTPStatus.OK)
@@ -178,15 +178,21 @@ async def get_or_create_user(
                     profile_img = EXCLUDED.profile_img
                 RETURNING id, username, profile_img, role
             )
+
             SELECT
                 u.id, u.username, u.profile_img, u.role,
+
+                -- Aggregate the organisation IDs managed by the user
                 array_agg(
                     DISTINCT om.organisation_id
-                ) FILTER (WHERE om.organisation_id IS NOT NULL) as orgs_managed,
+                ) FILTER (WHERE om.organisation_id IS NOT NULL) AS orgs_managed,
+
+                -- Aggregate project roles for the user, as project:role pairs
                 jsonb_object_agg(
                     ur.project_id,
                     COALESCE(ur.role, 'MAPPER')
-                ) FILTER (WHERE ur.project_id IS NOT NULL) as project_roles
+                ) FILTER (WHERE ur.project_id IS NOT NULL) AS project_roles
+
             FROM upserted_user u
             LEFT JOIN user_roles ur ON u.id = ur.user_id
             LEFT JOIN organisation_managers om ON u.id = om.user_id
@@ -229,7 +235,7 @@ async def get_or_create_user(
             ) from e
 
 
-@router.get("/me/", response_model=FMTMUser)
+@router.get("/me", response_model=FMTMUser)
 async def my_data(
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(login_required)],

@@ -20,7 +20,7 @@ async function add_event(
 		task_id: taskId,
 		comment: comment,
 	};
-	const resp = await fetch(`${API_URL}/tasks/${taskId}/event/?project_id=${projectId}`, {
+	const resp = await fetch(`${API_URL}/tasks/${taskId}/event?project_id=${projectId}`, {
 		method: 'POST',
 		credentials: 'include',
 		headers: {

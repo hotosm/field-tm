@@ -305,7 +305,7 @@ set_domains() {
 set_osm_credentials() {
     pretty_echo "OSM OAuth2 Credentials"
 
-    redirect_uri="http${FMTM_DOMAIN:+s}://${FMTM_DOMAIN:-127.0.0.1:7051}/osmauth/"
+    redirect_uri="http${FMTM_DOMAIN:+s}://${FMTM_DOMAIN:-127.0.0.1:7051}/osmauth"
 
     echo "App credentials are generated from your OSM user profile."
     echo

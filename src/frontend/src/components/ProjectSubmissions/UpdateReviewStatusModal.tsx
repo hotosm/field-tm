@@ -61,7 +61,7 @@ const UpdateReviewStatusModal = () => {
     if (noteComments.trim().length > 0) {
       dispatch(
         PostProjectComments(
-          `${import.meta.env.VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event/?project_id=${updateReviewStatusModal?.projectId}`,
+          `${import.meta.env.VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
           {
             task_id: updateReviewStatusModal?.taskUid,
             comment: `${updateReviewStatusModal?.instanceId}-SUBMISSION_INST-${noteComments}`,
