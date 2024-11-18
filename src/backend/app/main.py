@@ -121,6 +121,8 @@ def get_application() -> FastAPI:
         debug=settings.DEBUG,
         lifespan=lifespan,
         root_path=settings.API_PREFIX,
+        # NOTE REST APIs should not have trailing slashes
+        redirect_slashes=False,
     )
 
     # Set custom logger

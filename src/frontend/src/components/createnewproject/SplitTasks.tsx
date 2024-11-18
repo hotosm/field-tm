@@ -167,7 +167,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
 
     if (splitTasksSelection === task_split_type.DIVIDE_ON_SQUARE) {
       dispatch(
-        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square/`, {
+        GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square`, {
           geojson: drawnGeojsonFile,
           extract_geojson: formValues.dataExtractWays === 'osm_data_extract' ? null : dataExtractFile,
           dimension: formValues?.dimension,

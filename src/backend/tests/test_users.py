@@ -44,18 +44,18 @@ async def test_nothing():
 
 
 # async def test_create_users(client):
-#     response = await client.post("/users/", json={
+#     response = await client.post("/users", json={
 # "username": "test3", "password": "test1"})
 #     assert response.status_code == status.HTTP_200_OK
 
-#     response = await client.post("/users/", json={
+#     response = await client.post("/users", json={
 # "username": "niraj", "password": "niraj"})
 #     assert response.status_code == status.HTTP_200_OK
 
-#     response = await client.post("/users/", json={"username": "niraj"})
+#     response = await client.post("/users", json={"username": "niraj"})
 #     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-#     response = await client.post("/users/", json={
+#     response = await client.post("/users", json={
 # "username": "niraj", "password": "niraj"})
 #     assert response.status_code == status.HTTP_400_BAD_REQUEST
 #     assert response.json() == {"detail": "Username already registered"}

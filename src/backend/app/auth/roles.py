@@ -86,38 +86,59 @@ async def check_access(
     user_id = await get_uid(user)
 
     sql = """
+        WITH role_hierarchy AS (
+            SELECT 'MAPPER' AS role, 0 AS level
+            UNION ALL SELECT 'VALIDATOR', 1
+            UNION ALL SELECT 'FIELD_MANAGER', 2
+            UNION ALL SELECT 'ASSOCIATE_PROJECT_MANAGER', 3
+            UNION ALL SELECT 'PROJECT_MANAGER', 4
+        )
+
         SELECT *
         FROM users
         WHERE id = %(user_id)s
             AND (
                 CASE
-                    WHEN role = 'ADMIN' THEN true
-                    WHEN role = 'READ_ONLY' THEN false
+                    -- Simple check to see if ADMIN or blocked (READ_ONLY)
+                    WHEN role = 'ADMIN'::public.userrole THEN true
+                    WHEN role = 'READ_ONLY'::public.userrole THEN false
                     ELSE
+
+                        -- Check to see if user is org admin
                         EXISTS (
                             SELECT 1
                             FROM organisation_managers
                             WHERE organisation_managers.user_id = %(user_id)s
-                              AND
-                              organisation_managers.organisation_id = %(org_id)s
+                            AND organisation_managers.organisation_id = %(org_id)s
                         )
+
+                        -- Check to see if user has equal or greater than project role
                         OR EXISTS (
                             SELECT 1
                             FROM user_roles
+                            JOIN role_hierarchy AS user_role_h
+                                ON user_roles.role::public.projectrole
+                                    = user_role_h.role::public.projectrole
+                            JOIN role_hierarchy AS required_role_h
+                                ON %(role)s::public.projectrole
+                                    = required_role_h.role::public.projectrole
                             WHERE user_roles.user_id = %(user_id)s
-                              AND user_roles.project_id = %(project_id)s
-                              AND user_roles.role >= %(role)s
+                            AND user_roles.project_id = %(project_id)s
+                            AND user_role_h.level >= required_role_h.level
                         )
+
+                        -- Extract organisation id from project,
+                        -- then check to see if user is org admin
                         OR (
                             %(org_id)s IS NULL
                             AND EXISTS (
                                 SELECT 1
                                 FROM organisation_managers
-                                JOIN projects ON
-                                  projects.organisation_id
-                                    = organisation_managers.organisation_id
+                                JOIN projects
+                                    ON projects.organisation_id =
+                                        organisation_managers.organisation_id
                                 WHERE organisation_managers.user_id = %(user_id)s
-                                  AND projects.id = %(project_id)s
+                                AND projects.id = %(project_id)s
                             )
                         )
                 END

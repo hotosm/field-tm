@@ -47,7 +47,7 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("")
 async def read_submissions(
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ) -> list[dict]:
@@ -383,7 +383,7 @@ async def download_submission_geojson(
     return Response(submission_data.getvalue(), headers=headers)
 
 
-@router.get("/conflate-submission-geojson/")
+@router.get("/conflate-submission-geojson")
 async def conflate_geojson(
     db_task: Annotated[DbTask, Depends(get_task)],
     project_user: Annotated[ProjectUserDict, Depends(mapper)],

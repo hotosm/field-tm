@@ -117,7 +117,7 @@ const SubmissionDetails = () => {
     if (taskUid == 'undefined') return;
     dispatch(
       GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUid)}/history/?project_id=${projectId}&comments=true`,
+        `${import.meta.env.VITE_API_URL}/tasks/${parseInt(taskUid)}/history?project_id=${projectId}&comments=true`,
       ),
     );
   }, [taskUid]);

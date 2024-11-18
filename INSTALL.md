@@ -99,8 +99,8 @@ To properly configure your FMTM project, you will need to create keys for OSM.
 
 2. Register your FMTM instance to OAuth 2 applications.
 
-   Put your login redirect url as `http://127.0.0.1:7051/osmauth/` if running locally,
-   or for production replace with https://{YOUR_DOMAIN}/osmauth/
+   Put your login redirect url as `http://127.0.0.1:7051/osmauth` if running locally,
+   or for production replace with https://{YOUR_DOMAIN}/osmauth
 
    > Note: `127.0.0.1` is required for debugging instead of `localhost`
    > due to OSM restrictions.

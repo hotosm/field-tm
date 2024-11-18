@@ -28,7 +28,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
     if (downloadType === 'form') {
       dispatch(
         DownloadProjectForm(
-          `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}/`,
+          `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}`,
           downloadType,
           projectId,
         ),
@@ -44,7 +44,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
     } else if (downloadType === 'extract') {
       dispatch(
         DownloadDataExtract(
-          `${import.meta.env.VITE_API_URL}/projects/features/download/?project_id=${projectId}`,
+          `${import.meta.env.VITE_API_URL}/projects/features/download?project_id=${projectId}`,
           projectId,
         ),
       );

@@ -37,7 +37,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[task_schemas.TaskOut])
+@router.get("", response_model=list[task_schemas.TaskOut])
 async def read_tasks(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
@@ -84,7 +84,7 @@ async def add_new_task_event(
     return await DbTaskEvent.create(db, new_event)
 
 
-@router.get("/activity/", response_model=list[task_schemas.TaskEventCount])
+@router.get("/activity", response_model=list[task_schemas.TaskEventCount])
 async def task_activity(
     project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
@@ -105,7 +105,7 @@ async def task_activity(
     return await task_crud.get_project_task_activity(db, project_id, days)
 
 
-@router.get("/{task_id}/history/", response_model=list[task_schemas.TaskEventOut])
+@router.get("/{task_id}/history", response_model=list[task_schemas.TaskEventOut])
 async def get_task_event_history(
     task_id: int,
     db: Annotated[Connection, Depends(db_conn)],

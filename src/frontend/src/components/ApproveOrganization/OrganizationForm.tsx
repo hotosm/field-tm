@@ -38,7 +38,7 @@ const OrganizationForm = () => {
     if (organizationId) {
       dispatch(
         ApproveOrganizationService(
-          `${import.meta.env.VITE_API_URL}/organisation/approve/?org_id=${parseInt(organizationId)}`,
+          `${import.meta.env.VITE_API_URL}/organisation/approve?org_id=${parseInt(organizationId)}`,
         ),
       );
     }

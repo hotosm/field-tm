@@ -79,7 +79,7 @@ const FormUpdateTab = ({ projectId }) => {
             onClick={() =>
               dispatch(
                 DownloadProjectForm(
-                  `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}/`,
+                  `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}`,
                   'form',
                   projectId,
                 ),

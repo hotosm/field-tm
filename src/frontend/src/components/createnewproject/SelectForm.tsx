@@ -175,7 +175,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
                   </p>
                   <p className="fmtm-text-base fmtm-mt-2">
                     <a
-                      href={`https://xlsforms.fmtm.dev/?url=${
+                      href={`https://xlsforms.fmtm.dev?url=${
                         import.meta.env.VITE_API_URL
                       }/helper/download-template-xlsform?category=${formValues.formCategorySelection}`}
                       target="_"

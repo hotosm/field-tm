@@ -35,7 +35,7 @@ const Comments = () => {
   useEffect(() => {
     dispatch(
       GetProjectComments(
-        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history/?project_id=${projectId}&comments=true`,
+        `${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/history?project_id=${projectId}&comments=true`,
       ),
     );
   }, [selectedTask, projectId, currentStatus?.id]);
@@ -58,7 +58,7 @@ const Comments = () => {
       return;
     }
     dispatch(
-      PostProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/event/?project_id=${projectId}`, {
+      PostProjectComments(`${import.meta.env.VITE_API_URL}/tasks/${currentStatus?.id}/event?project_id=${projectId}`, {
         task_id: selectedTask.id,
         comment,
       }),

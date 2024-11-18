@@ -57,7 +57,7 @@ async def db_conn(request: Request) -> Connection:
     To use the connection in endpoints:
     -----------------------------------
 
-    @app.get("/something/")
+    @app.get("/something")
     async def do_stuff(db = Depends(db_conn)):
         async with db.cursor() as cursor:
             await cursor.execute("SELECT * FROM items")

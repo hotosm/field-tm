@@ -55,7 +55,7 @@ const CreateProjectService = (
       if (isOsmExtract) {
         // Generated extract from raw-data-api
         extractResponse = await API.get(
-          `${import.meta.env.VITE_API_URL}/projects/data-extract-url/?project_id=${projectId}&url=${
+          `${import.meta.env.VITE_API_URL}/projects/data-extract-url?project_id=${projectId}&url=${
             projectData.data_extract_url
           }`,
         );
@@ -64,7 +64,7 @@ const CreateProjectService = (
         const dataExtractFormData = new FormData();
         dataExtractFormData.append('custom_extract_file', dataExtractFile);
         extractResponse = await API.post(
-          `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract/?project_id=${projectId}`,
+          `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract?project_id=${projectId}`,
           dataExtractFormData,
         );
       }
