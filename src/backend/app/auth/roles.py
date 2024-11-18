@@ -46,8 +46,10 @@ async def get_uid(user_data: AuthUser | DbUser) -> int:
         return user_id
 
     except Exception as e:
-        log.error(e)
-        log.error(f"Failed to get user id from auth object: {user_data}")
+        log.exception(
+            f"Failed to get user id from auth object: {user_data}. Error: {e}",
+            stack_info=True,
+        )
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail="Auth failed. No user id present",

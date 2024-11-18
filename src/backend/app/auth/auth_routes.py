@@ -221,7 +221,7 @@ async def get_or_create_user(
 
     except Exception as e:
         await db.rollback()
-        log.error(f"Exception occurred: {e}")
+        log.exception(f"Exception occurred: {e}", stack_info=True)
         if 'duplicate key value violates unique constraint "users_username_key"' in str(
             e
         ):
