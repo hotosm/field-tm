@@ -72,7 +72,7 @@ temp_webmaps/Naivasha
 **/**/yarn.lock
 **/**/.pnpm-store
 
-# pdm
+# pdm (legacy)
 **/**/.pdm.toml
 **/**/pdm.toml
 **/**/.pdm-python

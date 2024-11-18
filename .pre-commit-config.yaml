@@ -19,6 +19,14 @@ repos:
       - id: ruff-format
         files: ^src/backend/(?:.*/)*.*$
 
+  # Deps: ensure Python uv lockfile is up to date
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.5.2
+    hooks:
+      - id: uv-lock
+        files: src/backend/pyproject.toml
+        args: [--project, src/backend]
+
   # Upgrade: upgrade Python syntax
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.19.0

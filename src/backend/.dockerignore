@@ -9,5 +9,5 @@
 !migrate-entrypoint.sh
 !backup-entrypoint.sh
 !pyproject.toml
-!pdm.lock
+!uv.lock
 !migrations

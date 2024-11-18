@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -15,7 +15,9 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 ARG PYTHON_IMG_TAG=3.12
+ARG UV_IMG_TAG=0.5.2
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-10-13T13-34-11Z}
+FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} as uv
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
@@ -30,45 +32,41 @@ LABEL org.hotosm.fmtm.app-name="backend" \
       org.hotosm.fmtm.python-img-tag="${PYTHON_IMG_TAG}" \
       org.hotosm.fmtm.maintainer="sysadmin@hotosm.org" \
       org.hotosm.fmtm.api-port="8000"
-RUN set -ex \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install \
-    -y --no-install-recommends "locales" "ca-certificates" \
+RUN apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
+        "locales" "ca-certificates" "curl" \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/* \
     && update-ca-certificates
-# Set locale
+# Set locale & env vars
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
-
-
-# Extract dependencies from PDM lock to standard requirements.txt
-FROM base AS extract-deps
-WORKDIR /opt/python
-COPY pyproject.toml pdm.lock /opt/python/
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir pdm==2.19.3
-RUN pdm export --prod > requirements.txt \
-    # Export with default deps, as we install one or the other
-    && pdm export -G monitoring \
-    --without-hashes > requirements-monitoring.txt \
-    && pdm export -G debug \
-    --no-default --without-hashes > requirements-debug.txt \
-    && pdm export -G test -G docs -G dev \
-    --no-default --without-hashes > requirements-ci.txt
+# - Silence uv complaining about not being able to use hard links,
+# - tell uv to byte-compile packages for faster application startups,
+# - prevent uv from accidentally downloading isolated Python builds,
+# - use a temp dir instead of cache during install,
+# - select system python version,
+# - declare `/opt/python` as the target for `uv sync` (i.e. instead of .venv).
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8 \
+    UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_NO_CACHE=1 \
+    UV_PYTHON="python$PYTHON_IMG_TAG" \
+    UV_PROJECT_ENVIRONMENT=/opt/python
+STOPSIGNAL SIGINT
 
 
 # Build stage will all dependencies required to build Python wheels
 FROM base AS build
-# NOTE this argument is specified during production build on Github workflow
+# NOTE the MONITORING argument is specified during production build on Github workflow
 # NOTE only the production API image contains the monitoring dependencies
 ARG MONITORING
-RUN set -ex \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install \
-    -y --no-install-recommends \
+RUN apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
         "build-essential" \
         "gcc" \
         "libpcre3-dev" \
@@ -78,17 +76,21 @@ RUN set -ex \
         "libgeos-dev" \
         "git" \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=extract-deps \
-    /opt/python/requirements.txt \
-    /opt/python/requirements-monitoring.txt \
-    /opt/python/
-# Install with or without monitoring, depending on flag
-RUN pip install --user --no-warn-script-location --no-cache-dir \
+COPY --from=uv /uv /usr/local/bin/uv
+COPY pyproject.toml uv.lock /_lock/
+# Ensure caching & install with or without monitoring, depending on flag
+RUN --mount=type=cache,target=/root/.cache <<EOT
+    uv sync \
+        --project /_lock \
+        --locked \
+        --no-dev \
+        --no-install-project \
     $(if [ -z "$MONITORING" ]; then \
-        echo "-r /opt/python/requirements.txt"; \
+        echo ""; \
     else \
-        echo "-r /opt/python/requirements-monitoring.txt"; \
+        echo "--group monitoring"; \
     fi)
+EOT
 
 
 # Run stage will minimal dependencies required to run Python libraries
@@ -97,16 +99,15 @@ ARG PYTHON_IMG_TAG
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONFAULTHANDLER=1 \
-    PATH="/home/appuser/.local/bin:$PATH" \
+    PATH="/opt/python/bin:$PATH" \
     PYTHONPATH="/opt" \
-    PYTHON_LIB="/home/appuser/.local/lib/python$PYTHON_IMG_TAG/site-packages" \
+    PYTHON_LIB="/opt/python/lib/python$PYTHON_IMG_TAG/site-packages" \
     SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
     REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
     CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
-RUN set -ex \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install \
-    -y --no-install-recommends \
+RUN apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
         "nano" \
         "curl" \
         "gettext-base" \
@@ -123,9 +124,7 @@ COPY --from=minio /usr/bin/mc /usr/local/bin/
 COPY *-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
-COPY --from=build \
-    /root/.local \
-    /home/appuser/.local
+COPY --from=build /opt/python /opt/python
 WORKDIR /opt
 # Add app code
 COPY app/ /opt/app/
@@ -154,15 +153,19 @@ RUN update-ca-certificates
 # Stage to use during local development
 FROM add-odk-certs AS debug
 USER appuser
-COPY --from=extract-deps --chown=appuser \
-    /opt/python/requirements-debug.txt \
-    /opt/python/requirements-ci.txt \
-    /opt/python/
-RUN pip install --user --upgrade --no-warn-script-location \
-    --no-cache-dir \
-    -r /opt/python/requirements-debug.txt \
-    -r /opt/python/requirements-ci.txt \
-    && rm -r /opt/python
+COPY --from=uv /uv /usr/local/bin/uv
+COPY pyproject.toml uv.lock /_lock/
+RUN --mount=type=cache,target=/root/.cache <<EOT
+    uv sync \
+        --project /_lock \
+        --locked \
+        --no-dev \
+        --no-install-project \
+        --group debug \
+        --group test \
+        --group docs \
+        --group dev
+EOT
 CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
     "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
@@ -170,28 +173,13 @@ CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
 
 
 # Used during CI workflows (as root), with docs/test dependencies pre-installed
-FROM add-odk-certs AS ci
-ARG PYTHON_IMG_TAG
-COPY --from=extract-deps \
-    /opt/python/requirements-ci.txt /opt/python/
-# Copy packages from user to root dirs (run ci as root)
-RUN cp -r /home/appuser/.local/bin/* /usr/local/bin/ \
-    && cp -r /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages/* \
-    /usr/local/lib/python${PYTHON_IMG_TAG}/site-packages/ \
-    && rm -rf /home/appuser/.local/bin \
-    && rm -rf /home/appuser/.local/lib/python${PYTHON_IMG_TAG}/site-packages \
-    && set -ex \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install \
-    -y --no-install-recommends \
+FROM debug AS ci
+USER root
+RUN apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
         "git" \
-    && rm -rf /var/lib/apt/lists/* \
-    && pip install --upgrade --no-warn-script-location \
-    --no-cache-dir -r \
-    /opt/python/requirements-ci.txt \
-    && rm -r /opt/python \
-    # Pre-compile packages to .pyc (init speed gains)
-    && python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
+    && rm -rf /var/lib/apt/lists/*
 # Override entrypoint, as not possible in Github action
 ENTRYPOINT []
 CMD ["sleep", "infinity"]
@@ -199,8 +187,10 @@ CMD ["sleep", "infinity"]
 
 # Final stage used during deployment
 FROM runtime AS prod
-# Pre-compile packages to .pyc (init speed gains)
-RUN python -c "import compileall; compileall.compile_path(maxlevels=10, quiet=1)"
 # Note: 1 worker (process) per container, behind load balancer
 CMD ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "1", "--log-level", "critical", "--no-access-log"]
+# Sanity check to see if build succeeded
+RUN python -V
+    python -Im site
+    python -c 'import app'
