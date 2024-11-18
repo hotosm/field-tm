@@ -69,9 +69,11 @@ async def check_access(
     - For other roles, access is granted if the user is an organisation manager
       for the specified organisation (org_id) or has the specified role
       in the specified project (project_id).
+    - If only project_id is provided, the user's organization manager status
+      for the organization linked to the project is also checked.
 
     Args:
-        user (AuthUser, int): AuthUser object, or user ID.
+        user (AuthUser): AuthUser object, or user ID.
         db (Connection): The database connection.
         org_id (Optional[int]): Org ID for organisation-specific access.
         project_id (Optional[int]): Project ID for project-specific access.
@@ -96,14 +98,27 @@ async def check_access(
                             SELECT 1
                             FROM organisation_managers
                             WHERE organisation_managers.user_id = %(user_id)s
-                            AND organisation_managers.organisation_id = %(org_id)s
+                              AND
+                              organisation_managers.organisation_id = %(org_id)s
                         )
                         OR EXISTS (
                             SELECT 1
                             FROM user_roles
                             WHERE user_roles.user_id = %(user_id)s
-                            AND user_roles.project_id = %(project_id)s
-                            AND user_roles.role >= %(role)s
+                              AND user_roles.project_id = %(project_id)s
+                              AND user_roles.role >= %(role)s
+                        )
+                        OR (
+                            %(org_id)s IS NULL
+                            AND EXISTS (
+                                SELECT 1
+                                FROM organisation_managers
+                                JOIN projects ON
+                                  projects.organisation_id
+                                    = organisation_managers.organisation_id
+                                WHERE organisation_managers.user_id = %(user_id)s
+                                  AND projects.id = %(project_id)s
+                            )
                         )
                 END
             );
@@ -121,10 +136,7 @@ async def check_access(
         )
         db_user = await cur.fetchone()
 
-    if db_user:
-        return db_user
-
-    return None
+    return db_user if db_user else None
 
 
 async def super_admin(
