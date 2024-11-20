@@ -9,6 +9,20 @@ In reverse chronological order, with most recent events first.
 
 > <div class="timeline-container">
 >     <div class="timeline-entry">
+>         <div class="timeline-date">2024-10</div>
+>         <h3>Project: Mwanza, Tanzania</h3>
+>         💼 Project alongside Slum Dwellers International, mapping
+>         informal settlements in the Mwanza region.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
+>         <div class="timeline-date">2024-9</div>
+>         <h3>Project: Freetown, Sierra Leone</h3>
+>         💼 Part of an E2E household enumeration survey together with the
+>         community of Jai-Mata, an informal settlement in Freetown.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
 >         <div class="timeline-date">2024-07</div>
 >         <h3>Community Webinar 2</h3>
 >         🎥 Public webinar displaying FMTM's current capabilities and building
