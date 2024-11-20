@@ -69,7 +69,7 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
             ),
         ) from e
     except Exception as e:
-        log.exception(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
@@ -88,7 +88,7 @@ def get_odk_form(odk_central: central_schemas.ODKCentralDecrypted):
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         form = OdkForm(url, user, pw)
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
@@ -114,7 +114,7 @@ def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] 
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
         form = OdkAppUser(url, user, pw)
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
@@ -156,7 +156,7 @@ def create_odk_project(
         log.info(f"Project {name} available on the ODK Central server.")
         return result
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=f"Error creating project on ODK Central: {e}",
@@ -206,7 +206,7 @@ def create_odk_xform(
     try:
         xform = get_odk_form(odk_credentials)
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             HTTPStatus.INTERNAL_SERVER_ERROR,
             detail={"message": "Connection failed to odk central"},
@@ -278,7 +278,7 @@ async def get_form_list(db: Connection) -> list:
     try:
         return await DbXLSForm.all(db)
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=str(e),
@@ -302,7 +302,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         # NOTE pyxform.xls2xform.convert returns a ConvertResult object
         return BytesIO(xform_convert(input_data).xform.encode("utf-8"))
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         msg = f"XLSForm is invalid: {str(e)}"
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
@@ -688,8 +688,8 @@ async def get_entities_data(
                 url_params=f"$select=__id{',' if fields else ''} {fields}",
             )
     except Exception as e:
+        log.exception(f"Error: {e}", stack_info=True)
         msg = f"Getting entity data failed for ODK project ({odk_id})"
-        log.error(msg)
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=msg,
@@ -928,7 +928,7 @@ async def get_appuser_token(
         return f"{odk_url}/v1/key/{appuser_token}/projects/{project_odk_id}"
 
     except Exception as e:
-        log.error(f"An error occurred: {str(e)}")
+        log.exception(f"An error occurred: {str(e)}", stack_info=True)
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the app user token.",

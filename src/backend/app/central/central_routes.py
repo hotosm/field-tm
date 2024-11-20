@@ -106,7 +106,7 @@ async def refresh_appuser_token(
         )
 
     except Exception as e:
-        log.error(e)
+        log.exception(f"Error: {e}", stack_info=True)
         msg = f"failed to refresh the appuser token for project {project_id}"
         log.error(msg)
         raise HTTPException(

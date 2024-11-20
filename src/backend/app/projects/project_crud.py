@@ -226,8 +226,10 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
                 log.info(f"XLSForm for '{category}' inserted/updated in the database")
 
             except Exception as e:
-                log.error(
-                    f"Failed to insert or update {category} in the database. Error: {e}"
+                log.exception(
+                    f"Failed to insert or update {category} in the database. "
+                    f"Error: {e}",
+                    stack_info=True,
                 )
 
         # Determine the forms that need to be deleted (those in the DB but
@@ -777,7 +779,7 @@ def generate_project_basemap(
 
     except Exception as e:
         log.debug(str(format_exc()))
-        log.exception(str(e))
+        log.exception(f"Error: {e}", stack_info=True)
         log.error(f"Tiles generation process failed for project id {project_id}")
 
         if new_basemap:

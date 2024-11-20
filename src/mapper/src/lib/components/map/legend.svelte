@@ -19,7 +19,17 @@
 </script>
 
 <div use:clickOutside onclick_outside={() => (isOpen = false)} class="relative">
-	<div class="group absolute bottom-0 right-0 text-nowrap cursor-pointer" onclick={() => (isOpen = !isOpen)}>
+	<div
+		class="group text-nowrap cursor-pointer"
+		onclick={() => (isOpen = !isOpen)}
+		role="button"
+		onkeydown={(e) => {
+			if (e.key === 'Enter') {
+				isOpen = !isOpen;
+			}
+		}}
+		tabindex="0"
+	>
 		<hot-icon
 			style="border: 1px solid #D7D7D7;"
 			name="legend-toggle"
@@ -29,7 +39,7 @@
 	<div
 		class={`absolute bottom-0 right-14 bg-white rounded-md p-4 duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'} overflow-hidden flex flex-col gap-2`}
 	>
-		<p class="font-barlow-semibold leading-0 text-xl">Legend</p>
+		<p class="font-barlow-semibold leading-0 text-lg mb-3">Legend</p>
 		{#each taskStatuses as taskStatus}
 			<div class="flex items-center gap-2">
 				{#if !taskStatus.color}
@@ -37,7 +47,10 @@
 						<img src={taskStatus.icon} class="w-4" />
 					</div>
 				{:else}
-					<div style="background-color: {taskStatus.color}; border: 1px solid #D0D0D0;" class={`w-5 h-5 opacity-40`}></div>
+					<div
+						style="background-color: {taskStatus.color}; border: 1px solid #D0D0D0;"
+						class={`w-5 h-5 opacity-40`}
+					></div>
 				{/if}
 				<p class="font-barlow-regular text-[#494949] text-nowrap leading-0">{taskStatus?.status}</p>
 			</div>

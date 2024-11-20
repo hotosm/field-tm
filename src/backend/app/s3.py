@@ -195,8 +195,11 @@ def copy_obj_bucket_to_bucket(
         )
 
     except Exception as e:
-        log.exception(e)
-        log.error(f"Failed to copy object {source_path} to new bucket: {dest_bucket}")
+        log.exception(
+            f"Failed to copy object {source_path} to new bucket {dest_bucket}. "
+            f"Error: {e}",
+            stack_info=True,
+        )
         return False
 
     return True
@@ -237,9 +240,10 @@ async def delete_all_objs_under_prefix(bucket_name: str, s3_path: str) -> bool:
             return False
 
     except Exception as e:
-        log.exception(e)
-        log.error(
-            f"Failed to delete bucket ({bucket_name}) files under path: {s3_path}"
+        log.exception(
+            f"Failed to delete bucket ({bucket_name}) files under path: {s3_path}. "
+            f"Error: {e}",
+            stack_info=True,
         )
         return False
 
