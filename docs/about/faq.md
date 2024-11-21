@@ -358,13 +358,13 @@ connect with other contributors and learn from their experiences.
 
 ## Advanced Use Cases
 
-## How can I work with an offline basemap?
+### How can I work with an offline basemap?
 
 - Download MBTiles from FMTM.
 - Load MBTiles into ODK Collect via
   [this guide](https://docs.getodk.org/collect-offline-maps)
 
-## Can I edit my XLSForm after I create a project?
+### Can I edit my XLSForm after I create a project?
 
 - XLSForms can be updated!
 - Go to the 'Manage Project' section.
@@ -373,7 +373,7 @@ connect with other contributors and learn from their experiences.
 - Edit the form, then upload and click the 'Update' button.
 - This will update the form in ODK also.
 
-## Can I record features that don't exist on the map yet?
+### Can I record features that don't exist on the map yet?
 
 Yes!
 
@@ -383,7 +383,7 @@ Yes!
 - One of the form questions will ask you to record a geopoint of the
   feature location.
 
-## Can I lock multiple tasks as once for mapping or validation?
+### Can I lock multiple tasks as once for mapping or validation?
 
 Yes!
 
