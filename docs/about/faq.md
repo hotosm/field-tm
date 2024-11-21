@@ -229,12 +229,12 @@ or projects.
 
 ---
 
-## For Contributors
+## For Repository Contributors
 
 ### How can I become a contributor to the FMTM?
 
 To become a contributor to the FMTM, you can create an account on
-the platform and join a mapping project.
+Github and contribute to issues, discussions, or pull requests.
 
 ---
 
@@ -355,3 +355,39 @@ project managers or experienced contributors for additional feedback.
 The FMTM provides training and resources to help you improve your
 mapping skills. You can also join mapping communities and forums to
 connect with other contributors and learn from their experiences.
+
+## Advanced Use Cases
+
+## How can I work with an offline basemap?
+
+- Download MBTiles from FMTM.
+- Load MBTiles into ODK Collect via
+  [this guide](https://docs.getodk.org/collect-offline-maps)
+
+## Can I edit my XLSForm after I create a project?
+
+- XLSForms can be updated!
+- Go to the 'Manage Project' section.
+- Edit --> Form Update.
+- You can download the existing form from here.
+- Edit the form, then upload and click the 'Update' button.
+- This will update the form in ODK also.
+
+## Can I record features that don't exist on the map yet?
+
+Yes!
+
+- Click on a task area.
+- Then click to 'Add new feature'.
+- This will open the Form to collect data.
+- One of the form questions will ask you to record a geopoint of the
+  feature location.
+
+## Can I lock multiple tasks as once for mapping or validation?
+
+Yes!
+
+- There should be no issue doing this.
+- However, note that if there is no activity on a locked task
+  after a period of time, the task may auto-unlock, allowing
+  other mappers to lock and contribute.
