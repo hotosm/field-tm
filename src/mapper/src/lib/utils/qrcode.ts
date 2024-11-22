@@ -27,7 +27,7 @@ export function generateQrCode(projectName: string, odkToken: string, username: 
 	return base64zlibencode(odkCollectJson);
 }
 
-export function downloadQrCode(projectName: string, qrCode: string) {
+export function downloadQrCode(projectName: string) {
 	const qrCodeElement = document.querySelector('hot-qr-code')?.shadowRoot;
 	if (!qrCodeElement) return;
 

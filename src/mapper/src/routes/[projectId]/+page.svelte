@@ -7,11 +7,11 @@
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
+	import ImportQrGif from '$assets/images/importQr.gif';
 
 	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
 	// import EventCard from '$lib/components/event-card.svelte';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
-	import TaskActionDialog from '$lib/components/task-action-dialog.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 
@@ -38,8 +38,9 @@
 
 	let mapComponent: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
-	let selectedTab: string = $state('map');
+	let selectedTab: string = $state('qrcode');
 	let isTaskActionModalOpen = $state(false);
+	let infoDialogRef: any = $state(null);
 
 	const taskStore = getTaskStore();
 	const taskEventStream = getTaskEventStream(data.projectId);
@@ -118,11 +119,6 @@
 	</hot-card>
 {/if}
 
-<!-- The dialog should overlay with actions for a task -->
-{#if taskStore.selectedTaskId}
-	<TaskActionDialog state={taskStore.selectedTaskState} projectId={data.projectId} taskId={taskStore.selectedTaskId} />
-{/if}
-
 <!-- The main page -->
 <div class="h-[calc(100svh-4.625rem)]">
 	<MapComponent
@@ -168,34 +164,93 @@
 				<div class="flex flex-col items-center p-4 space-y-4">
 					<!-- Text above the QR code -->
 					<div class="text-center w-full">
-						<div class="font-bold text-lg font-barlow-medium">Scan this QR Code in ODK Collect</div>
+						<div class="font-bold text-lg font-barlow-medium">
+							<span class="mr-1"
+								>Scan this QR code in ODK Collect from another users phone, or download and import it manually</span
+							>
+							<sl-tooltip content="More information on manually importing qr code" placement="bottom">
+								<hot-icon
+									onclick={() => {
+										if (infoDialogRef) infoDialogRef?.show();
+									}}
+									onkeydown={(e: KeyboardEvent) => {
+										if (e.key === 'Enter') {
+											if (infoDialogRef) infoDialogRef?.show();
+										}
+									}}
+									role="button"
+									tabindex="0"
+									name="info-circle-fill"
+									class="!text-[14px] text-[#b91c1c] cursor-pointer duration-200 scale-[1.5]"
+								></hot-icon>
+							</sl-tooltip>
+						</div>
 					</div>
 
 					<!-- QR Code Container -->
 					<div class="flex justify-center w-full max-w-sm">
-						<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250"></hot-qr-code>
+						<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250" class="p-4 bg-white m-4"
+						></hot-qr-code>
 					</div>
 
 					<!-- Download Button -->
-					<sl-button onclick={downloadQrCode} size="small" class="secondary w-full max-w-[200px]">
+					<sl-button
+						onclick={() => downloadQrCode(data?.project?.name)}
+						onkeydown={(e: KeyboardEvent) => {
+							e.key === 'Enter' && downloadQrCode(data?.project?.name);
+						}}
+						role="button"
+						tabindex="0"
+						size="small"
+						class="secondary w-full max-w-[200px]"
+					>
 						<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 						></hot-icon>
 						<span class="font-barlow-medium text-base uppercase">Download QR</span>
 					</sl-button>
 
-					<!-- Open ODK Button -->
-					<sl-button
-						size="small"
-						class="primary w-full max-w-[200px]"
-						href="odkcollect://form/{data.project.odk_form_id}{taskStore.selectedTaskId
-							? `?task_filter=${taskStore.selectedTaskId}`
-							: ''}"
-					>
-						<span class="font-barlow-medium text-base uppercase">Open ODK</span></sl-button
-					>
+					<!-- Open ODK Button (Hide if it's project walkthrough step) -->
+					{#if +projectSetupStepStore.projectSetupStep !== projectSetupStepEnum['odk_project_load']}
+						<sl-button
+							size="small"
+							class="primary w-full max-w-[200px]"
+							href="odkcollect://form/{data.project.odk_form_id}{taskStore.selectedTaskId
+								? `?task_filter=${taskStore.selectedTaskId}`
+								: ''}"
+						>
+							<span class="font-barlow-medium text-base uppercase">Open ODK</span></sl-button
+						>
+					{/if}
 				</div>
 			{/if}
 		</BottomSheet>
+		<hot-dialog
+			bind:this={infoDialogRef}
+			class="dialog-overview"
+			style="--width: fit; --body-spacing: 0.5rem"
+			no-header
+		>
+			<div class="flex flex-col gap-[0.5rem]">
+				<img
+					src={ImportQrGif}
+					alt="manual process of importing qr code gif"
+					style="border: 1px solid #ededed;"
+					class="h-[70vh]"
+				/>
+				<sl-button
+					onclick={() => infoDialogRef.close()}
+					onkeydown={(e: KeyboardEvent) => {
+						e.key === 'Enter' && infoDialogRef.close();
+					}}
+					role="button"
+					tabindex="0"
+					size="small"
+					class="primary w-fit ml-auto"
+				>
+					<span class="font-barlow-medium text-SM uppercase">CLOSE</span>
+				</sl-button>
+			</div>
+		</hot-dialog>
 	{/if}
 
 	<sl-tab-group
@@ -230,20 +285,10 @@
 	</sl-tab-group>
 </div>
 
-<!-- </div> -->
-
 <style>
 	:root {
 		--nav-height: 4rem;
 	}
-	/* sl-tab-group {
-		bottom: 0;
-		width: 100%;
-	} */
-
-	/* sl-tab-group::part(base) {
-		position: relative;
-	} */
 
 	sl-tab-group::part(body) {
 		display: var(--panel-display);
@@ -269,10 +314,6 @@
 		background-color: white;
 	}
 
-	/* The tab active indicator */
-	/* sl-tab-group::part(active-tab-indicator) {
-	} */
-
 	/* Each tab item (icon) container */
 	sl-tab {
 		padding-left: 3vw;
@@ -283,11 +324,6 @@
 	hot-icon {
 		font-size: 2rem;
 	}
-
-	/* Floating map buttons
-	hot-icon-button {
-		font-size: 2rem;
-	} */
 
 	#notification-banner {
 		--padding: 0.3rem;
