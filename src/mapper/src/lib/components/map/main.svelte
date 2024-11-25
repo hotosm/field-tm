@@ -33,7 +33,7 @@
 	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
 	// import { entityFeatcolStore, selectedEntityId } from '$store/entities';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
-	import { baseLayers } from '$constants/baseLayers.ts';
+	import { baseLayers, osmStyle } from '$constants/baseLayers.ts';
 
 	type bboxType = [number, number, number, number];
 
@@ -78,36 +78,6 @@
 			}
 		}
 	});
-
-	const osmStyle = {
-		id: 'OSM Raster',
-		version: 8,
-		name: 'OpenStreetMap',
-		sources: {
-			osm: {
-				type: 'raster',
-				tiles: [
-					'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-					'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-					'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
-				],
-				minzoom: 0,
-				maxzoom: 19,
-				attribution:
-					'© <a target="_blank" rel="noopener" href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-			},
-		},
-		layers: [
-			{
-				id: 'osm',
-				type: 'raster',
-				source: 'osm',
-				layout: {
-					visibility: 'visible',
-				},
-			},
-		],
-	};
 </script>
 
 <!-- Note here we still use Svelte 4 on:click until svelte-maplibre migrates -->

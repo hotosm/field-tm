@@ -144,14 +144,18 @@ map = new Map({
 		if (reAddSources?.length > 0) {
 			for (const reAddSource of reAddSources) {
 				for (const [id, source] of Object.entries(reAddSource)) {
-					map?.addSource(id, source);
+					if (!map?.getStyle().sources[id]) {
+						map?.addSource(id, source);
+					}
 				}
 			}
 		}
 		// reapply user defined layers
 		if (reAddLayers?.length > 0) {
 			for (const layer of reAddLayers) {
-				map?.addLayer(layer);
+				if (!map?.getStyle().layers.find((layerx) => layerx?.id === layer.id)) {
+					map?.addLayer(layer);
+				}
 			}
 		}
 	}
