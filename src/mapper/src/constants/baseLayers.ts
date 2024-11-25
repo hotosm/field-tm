@@ -1,3 +1,33 @@
+export const osmStyle = {
+	id: 'OSM Raster',
+	version: 8,
+	name: 'OpenStreetMap',
+	sources: {
+		osm: {
+			type: 'raster',
+			tiles: [
+				'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+				'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+				'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			],
+			minzoom: 0,
+			maxzoom: 19,
+			attribution:
+				'© <a target="_blank" rel="noopener" href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+		},
+	},
+	layers: [
+		{
+			id: 'osm',
+			type: 'raster',
+			source: 'osm',
+			layout: {
+				visibility: 'visible',
+			},
+		},
+	],
+};
+
 let stamenStyle = {
 	id: 'Stamen Raster',
 	version: 8,
