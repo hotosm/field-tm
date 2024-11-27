@@ -14,6 +14,7 @@ interface IButton {
   disabled?: boolean;
   loadingText?: string;
   btnId?: string;
+  btnTestId?: string;
 }
 
 const btnStyle = (btnType, className) => {
@@ -45,11 +46,12 @@ const Button = ({
   isLoading,
   loadingText,
   btnId,
+  btnTestId,
 }: IButton) => (
   <div>
     <button
       data-btnid={btnId}
-      data-testid="test-button"
+      data-testid={btnTestId}
       type={type === 'submit' ? 'submit' : 'button'}
       onClick={onClick}
       className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-outline-none ${btnStyle(

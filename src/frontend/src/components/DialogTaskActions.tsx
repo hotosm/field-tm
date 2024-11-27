@@ -184,6 +184,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
             return list_of_task_actions?.length != 0 ? (
               <Button
                 btnId={data.value}
+                btnTestId="StartMapping"
                 key={index}
                 onClick={(e) => {
                   if (

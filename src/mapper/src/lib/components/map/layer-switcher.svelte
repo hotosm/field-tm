@@ -37,7 +37,7 @@ map = new Map({
 	let allStyles: MapLibreStylePlusMetadata[] | [] = $state([]);
 	let selectedStyleUrl: string | undefined = $state(undefined);
 	let isClosed = $state(true);
-	let isOpen = $state(true);
+	let isOpen = $state(false);
 
 	$effect(() => {
 		if (extraStyles.length > 0) {

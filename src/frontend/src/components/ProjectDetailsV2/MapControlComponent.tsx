@@ -10,6 +10,7 @@ import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { Tooltip } from '@mui/material';
+import MapLegends from '@/components/MapLegends';
 
 type mapControlComponentType = {
   map: any;
@@ -45,6 +46,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
   const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
+  const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const [divRef, toggle, handleToggle] = useOutsideClick();
 
   const handleOnClick = (btnId) => {
@@ -88,13 +90,14 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
         </Tooltip>
       ))}
       <LayerSwitchMenu map={map} pmTileLayerData={pmTileLayerData} />
+      {/* download options */}
       <div
         className={`fmtm-relative ${!pathname.includes('project/') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}
         ref={divRef}
       >
         <div
           onClick={() => handleToggle()}
-          className="fmtm-bg-white fmtm-rounded-full fmtm-p-2 hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 "
+          className="fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center"
         >
           <AssetModules.FileDownloadIcon />
         </div>
@@ -108,6 +111,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
           <ProjectOptions projectName={projectName} />
         </div>
       </div>
+      <MapLegends defaultTheme={defaultTheme} />
     </div>
   );
 };

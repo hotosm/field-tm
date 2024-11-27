@@ -126,7 +126,7 @@ const LayerSwitchMenu = ({ map, pmTileLayerData = null }: { map: any; pmTileLaye
                 backgroundImage: activeLayer === 'None' ? 'none' : `url(${layerIcons[activeLayer] || satelliteImg})`,
                 backgroundColor: 'white',
               }}
-              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-10 fmtm-h-10 fmtm-border-[1px] fmtm-border-primaryRed hover:fmtm-border-[2px] fmtm-duration-75 fmtm-cursor-pointer fmtm-bg-contain fmtm-rounded-full ${
+              className={`fmtm-relative fmtm-group fmtm-order-4 fmtm-w-9 fmtm-h-9 fmtm-border-[1px] fmtm-border-primaryRed hover:fmtm-border-[2px] fmtm-duration-75 fmtm-cursor-pointer fmtm-bg-contain fmtm-rounded-full ${
                 activeLayer === 'None' ? '!fmtm-border-primaryRed' : ''
               }`}
             ></div>

@@ -25,8 +25,6 @@ import MapControlComponent from '@/components/ProjectDetailsV2/MapControlCompone
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
 import getTaskStatusStyle, { getFeatureStatusStyle } from '@/utilfunctions/getTaskStatusStyle';
-import MapLegends from '@/components/MapLegends';
-import Accordion from '@/components/common/Accordion';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import Button from '@/components/common/Button';
 import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
@@ -41,7 +39,6 @@ import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import QrcodeComponent from '@/components/QrcodeComponent';
-import { createDropdownMenuScope } from '@radix-ui/react-dropdown-menu';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
@@ -50,9 +47,7 @@ const ProjectDetailsV2 = () => {
   const navigate = useNavigate();
   const { windowSize } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
-  const [legendRef, legendToggle, handleLegendToggle] = useOutsideClick();
 
-  const [mainView, setView] = useState<any>();
   const [selectedTaskArea, setSelectedTaskArea] = useState<Record<string, any> | null>(null);
   const [selectedTaskFeature, setSelectedTaskFeature] = useState();
   const [dataExtractUrl, setDataExtractUrl] = useState<string | undefined>();
@@ -511,30 +506,25 @@ const ProjectDetailsV2 = () => {
                 className="fmtm-w-[235px]"
               />
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-3 fmtm-left-3 fmtm-z-50 fmtm-rounded-lg">
-                <Accordion
-                  ref={legendRef}
-                  body={<MapLegends defaultTheme={defaultTheme} />}
-                  header={
-                    <div className="fmtm-flex fmtm-items-center fmtm-gap-1 sm:fmtm-gap-2">
-                      <p className="fmtm-text-base fmtm-font-normal">LEGEND</p>
-                    </div>
-                  }
-                  onToggle={() => {
-                    handleLegendToggle();
+                <Button
+                  btnText="BASEMAPS"
+                  icon={<AssetModules.BoltIcon className="!fmtm-text-xl" />}
+                  onClick={() => {
+                    dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
                   }}
-                  className="fmtm-py-0 !fmtm-pb-0 fmtm-rounded-lg hover:fmtm-bg-gray-50"
-                  collapsed={!legendToggle}
+                  btnType="other"
+                  className="!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white"
                 />
               </div>
               <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-bottom-5 fmtm-right-3 fmtm-z-50 fmtm-h-fit">
                 <Button
-                  btnText="Basemaps"
-                  icon={<AssetModules.BoltIcon />}
+                  btnText="START MAPPING"
+                  icon={<AssetModules.LocationOnIcon className="!fmtm-text-xl" />}
                   onClick={() => {
-                    dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
+                    window.location.href = `${window.location.origin}/mapnow/${projectId}`;
                   }}
                   btnType="primary"
-                  className="!fmtm-text-base !fmtm-pr-2"
+                  className="!fmtm-text-sm !fmtm-pr-2"
                 />
               </div>
               <div className="fmtm-absolute fmtm-right-0 fmtm-top-0 fmtm-z-50 fmtm-hidden sm:fmtm-block">

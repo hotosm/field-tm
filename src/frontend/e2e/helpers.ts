@@ -1,12 +1,7 @@
 import { Page } from '@playwright/test';
 
-export async function tempLogin(page: Page) {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await page.getByText('Temporary Account').click();
-}
-
 export async function openTestProject(page: Page) {
+  await page.goto('/');
   // open project card with regex text 'Project Create Playwright xxx'
   await page
     .getByText(/^Project Create Playwright/)

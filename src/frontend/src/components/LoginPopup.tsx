@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import { Modal } from '@/components/common/Modal';
 import { useDispatch } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { osmLoginRedirect } from '@/utilfunctions/login';
-import { TemporaryLoginService } from '@/api/Login';
-import AssetModules from '@/shared/AssetModules';
 import OSMImg from '@/assets/images/osm-logo.png';
 
 type loginOptionsType = {
@@ -24,17 +22,10 @@ const loginOptions: loginOptionsType[] = [
     image: OSMImg,
     description: 'Edits made in FMTM will be credited to your OSM account.',
   },
-  {
-    id: 'temp_account',
-    name: 'Temporary Account',
-    icon: <AssetModules.PersonIcon color="" sx={{ fontSize: '40px' }} className="fmtm-w-10 fmtm-h-10" />,
-    description: "If you're not an OSM user or prefer not to create an OSM account.",
-  },
 ];
 
 const LoginPopup = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
 
@@ -44,18 +35,13 @@ const LoginPopup = () => {
     if (selectedOption === 'osm_account') {
       localStorage.setItem('requestedPath', from);
       osmLoginRedirect();
-    } else {
-      await dispatch(TemporaryLoginService(`${import.meta.env.VITE_API_URL}/auth/temp-login`, from));
-      dispatch(LoginActions.setLoginModalOpen(false));
-      navigate(from);
     }
   };
 
   const LoginDescription = () => {
     return (
       <div className="fmtm-flex fmtm-items-start fmtm-flex-col">
-        <div className="fmtm-text-2xl fmtm-font-bold fmtm-mb-1">Sign In</div>
-        <div className="fmtm-text-base fmtm-mb-5 fmtm-text-gray-700">Select an account type to sign in</div>
+        <div className="fmtm-text-2xl fmtm-font-bold fmtm-mb-4">Sign In</div>
         <div className="fmtm-w-full fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-justify-items-center">
           {loginOptions?.map((option) => (
             <div
