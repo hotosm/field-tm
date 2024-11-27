@@ -122,5 +122,5 @@ dist
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-
-playwright/.auth
+/e2e/.cache/
+e2e/.auth

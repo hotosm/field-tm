@@ -315,7 +315,6 @@ async def temp_login(
     setting it as a cookie.
 
     Args:
-        request (Request): The incoming request object.
         email: email of non-osm user.
 
     Returns:

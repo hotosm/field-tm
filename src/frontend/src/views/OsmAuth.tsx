@@ -43,8 +43,13 @@ function OsmAuth() {
       dispatch(LoginActions.setLoginModalOpen(false));
 
       if (requestedPath) {
-        navigate(`${requestedPath}`);
-        localStorage.removeItem('requestedPath');
+        if (requestedPath.includes('mapnow')) {
+          // redirect to mapper frontend (navigate doesn't work as it's on svelte)
+          window.location.href = `${window.location.origin}${requestedPath}`;
+        } else {
+          navigate(`${requestedPath}`);
+          localStorage.removeItem('requestedPath');
+        }
       }
     };
     loginRedirect();

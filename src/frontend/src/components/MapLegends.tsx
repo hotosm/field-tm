@@ -1,5 +1,12 @@
 import React from 'react';
 import AssetModules from '@/shared/AssetModules';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+} from '@/components/common/Dropdown';
+import { Tooltip } from '@mui/material';
 
 type mapDetialsType = {
   value: string;
@@ -66,13 +73,34 @@ const MapLegends = ({ defaultTheme }: { defaultTheme: any }) => {
   };
 
   return (
-    <div className="fmtm-py-3">
-      <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-        {MapDetails.map((data, index) => {
-          return <LegendListItem data={data} key={index} />;
-        })}
-      </div>
-    </div>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger className="fmtm-outline-none">
+        <Tooltip title="Legend Toggle" placement="left">
+          <div
+            className={`fmtm-bg-white fmtm-rounded-full hover:fmtm-bg-gray-100 fmtm-cursor-pointer fmtm-duration-300 fmtm-w-9 fmtm-h-9 fmtm-min-h-9 fmtm-min-w-9 fmtm-max-w-9 fmtm-max-h-9 fmtm-flex fmtm-justify-center fmtm-items-center `}
+          >
+            <AssetModules.LegendToggleIcon />
+          </div>
+        </Tooltip>
+      </DropdownMenuTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuContent
+          className="fmtm-px-2 fmtm-border-none fmtm-z-[60px] fmtm-bg-white"
+          align="end"
+          alignOffset={100}
+          sideOffset={-42}
+        >
+          <div className="fmtm-py-3">
+            <p className="fmtm-mb-3">Legend</p>
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+              {MapDetails.map((data, index) => {
+                return <LegendListItem data={data} key={index} />;
+              })}
+            </div>
+          </div>{' '}
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
+    </DropdownMenu>
   );
 };
 

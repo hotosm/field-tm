@@ -8,6 +8,7 @@ import Organisation from '@/views/Organisation';
 import CreateEditOrganization from '@/views/CreateEditOrganization';
 import ApproveOrganization from '@/views/ApproveOrganization';
 import OsmAuth from '@/views/OsmAuth';
+import PlaywrightTempLogin from '@/views/PlaywrightTempLogin';
 import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
 import UnderConstruction from '@/views/UnderConstruction';
@@ -183,6 +184,16 @@ const routes = createBrowserRouter([
           <Suspense fallback={<div>Loading...</div>}>
             <ErrorBoundary>
               <OsmAuth />
+            </ErrorBoundary>
+          </Suspense>
+        ),
+      },
+      {
+        path: '/playwright-temp-login/',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ErrorBoundary>
+              <PlaywrightTempLogin />
             </ErrorBoundary>
           </Suspense>
         ),
