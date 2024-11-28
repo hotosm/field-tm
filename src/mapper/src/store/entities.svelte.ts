@@ -1,10 +1,36 @@
-import { writable } from 'svelte/store';
 import { ShapeStream, Shape } from '@electric-sql/client';
-import type { ShapeData, Row } from '@electric-sql/client';
+import type { ShapeData } from '@electric-sql/client';
 
-const entitiesStatusStore = writable([]);
-let selectedEntity = writable<any>(null);
+const API_URL = import.meta.env.VITE_API_URL;
+
+type entitiesStatusListType = {
+	osmid: number | undefined;
+	entity_id: string;
+	project_id: number;
+	status: string;
+	task_id: number;
+};
+
+type entitiesListType = {
+	id: string;
+	task_id: number;
+	osm_id: number;
+	status: number;
+	updated_at: string | null;
+};
+
+type entitiesShapeType = {
+	entity_id: string;
+	status: string;
+	project_id: number;
+	task_id: number;
+};
+
+let selectedEntity: number | null = $state(null);
 let entitiesShape: Shape;
+let entitiesStatusList: entitiesStatusListType[] = $state([]);
+let syncEntityStatusLoading: boolean = $state(false);
+let updateEntityStatusLoading: boolean = $state(false);
 
 function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 	if (!projectId) {
@@ -17,20 +43,74 @@ function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 	});
 }
 
-async function subscribeToEntityStatusUpdates(taskEventStream: ShapeStream) {
-	entitiesShape = new Shape(taskEventStream);
+function getEntitiesStatusStore() {
+	async function subscribeToEntityStatusUpdates(entitiesStream: ShapeStream, entitiesList: entitiesListType[]) {
+		entitiesShape = new Shape(entitiesStream);
 
-	entitiesShape.subscribe((entities: ShapeData) => {
-		const rows: Row[] = entities.rows;
-		if (rows && Array.isArray(rows)) {
-			for (const newStatus of rows) {
-				if (newStatus) {
-					// fixme
-					entitiesStatusStore.set(newStatus);
-				}
+		entitiesShape.subscribe((entities: ShapeData) => {
+			const rows: entitiesShapeType[] = entities.rows;
+			if (rows && Array.isArray(rows)) {
+				entitiesStatusList = rows?.map((entity) => {
+					return {
+						...entity,
+						osmid: entitiesList?.find((entityx) => entityx.id === entity.entity_id)?.osm_id,
+					};
+				});
 			}
+		});
+	}
+
+	async function setSelectedEntity(entityOsmId: number | null) {
+		selectedEntity = entityOsmId;
+	}
+
+	async function syncEntityStatus(projectId: number) {
+		try {
+			syncEntityStatusLoading = true;
+			await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
+				credentials: 'include',
+			});
+			syncEntityStatusLoading = false;
+		} catch (error) {
+			syncEntityStatusLoading = false;
 		}
-	});
+	}
+
+	async function updateEntityStatus(projectId: number, payload: Record<string, any>) {
+		try {
+			updateEntityStatusLoading = true;
+			await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entity/status`, {
+				method: 'POST',
+				body: JSON.stringify(payload),
+				headers: {
+					'Content-type': 'application/json',
+				},
+				credentials: 'include',
+			});
+			updateEntityStatusLoading = false;
+		} catch (error) {
+			updateEntityStatusLoading = false;
+		}
+	}
+
+	return {
+		subscribeToEntityStatusUpdates: subscribeToEntityStatusUpdates,
+		setSelectedEntity: setSelectedEntity,
+		syncEntityStatus: syncEntityStatus,
+		updateEntityStatus: updateEntityStatus,
+		get selectedEntity() {
+			return selectedEntity;
+		},
+		get entitiesStatusList() {
+			return entitiesStatusList;
+		},
+		get syncEntityStatusLoading() {
+			return syncEntityStatusLoading;
+		},
+		get updateEntityStatusLoading() {
+			return updateEntityStatusLoading;
+		},
+	};
 }
 
-export { entitiesStatusStore, selectedEntity, getEntityStatusStream, subscribeToEntityStatusUpdates };
+export { getEntityStatusStream, getEntitiesStatusStore };

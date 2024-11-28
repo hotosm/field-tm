@@ -1,6 +1,6 @@
 import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData, Row } from '@electric-sql/client';
-import type { GeoJSON } from 'geosjon';
+import type { GeoJSON } from 'geojson';
 
 import type { ProjectTask, TaskEventType } from '$lib/types';
 
