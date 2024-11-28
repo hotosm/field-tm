@@ -1,3 +1,6 @@
+import type { Basemap } from '$lib/utils/basemaps';
+import { getBasemapList } from '$lib/utils/basemaps';
+
 interface AlertDetails {
 	variant: 'primary' | 'success' | 'neutral' | 'warning' | 'danger' | null;
 	message: string;
@@ -5,6 +8,8 @@ interface AlertDetails {
 
 let alert: AlertDetails | undefined = $state({ variant: null, message: '' });
 let projectSetupStep: number | null = $state(null);
+let projectBasemaps: Basemap[] = $state([]);
+let projectPmtilesUrl: string | null = $state(null);
 
 function getAlertStore() {
 	return {
@@ -22,8 +27,42 @@ function getProjectSetupStepStore() {
 		get projectSetupStep() {
 			return projectSetupStep;
 		},
-		setProjectSetupStep: (step: string) => (projectSetupStep = step),
+		setProjectSetupStep: (step: number) => (projectSetupStep = step),
 	};
 }
 
-export { getAlertStore, getProjectSetupStepStore };
+function getProjectBasemapStore() {
+	async function refreshBasemaps(projectId: number) {
+		const basemaps = await getBasemapList(projectId);
+		setProjectBasemaps(basemaps);
+	}
+
+	function setProjectBasemaps(basemapArray: Basemap[]) {
+		// First we sort by recent first, created_at string datetime key
+		const sortedBasemaps = basemapArray.sort((a, b) => {
+			return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+		});
+		projectBasemaps = sortedBasemaps;
+	}
+
+	return {
+		get projectBasemaps() {
+			return projectBasemaps;
+		},
+		setProjectBasemaps: setProjectBasemaps,
+		refreshBasemaps: refreshBasemaps,
+
+		get projectPmtilesUrl() {
+			return projectPmtilesUrl;
+		},
+		setProjectPmtilesUrl: (url: string) => {
+			projectPmtilesUrl = url;
+			getAlertStore().setAlert({
+				variant: 'success',
+				message: 'Success! Check the base layer selector.',
+			});
+		},
+	};
+}
+
+export { getAlertStore, getProjectSetupStepStore, getProjectBasemapStore };

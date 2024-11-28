@@ -84,7 +84,7 @@ map = new Map({
 	 * Process the style to add metadata and return it.
 	 */
 	function processStyle(style: maplibregl.StyleSpecification): MapLibreStylePlusMetadata {
-		const thumbnailUrl = getRasterThumbnailUrl(style);
+		const thumbnailUrl = style?.metadata?.thumbnail || getRasterThumbnailUrl(style);
 		return {
 			...style,
 			metadata: {

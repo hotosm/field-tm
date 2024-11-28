@@ -5,7 +5,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
 	// const { db } = await parent();
+	const { projectId } = params;
 
+	/*
+	Login + user details
+	*/
 	const userResponse = await fetch(`${API_URL}/auth/refresh`, { credentials: 'include' });
 	if (userResponse.status === 401) {
 		// TODO redirect to different error page to handle login
@@ -13,7 +17,9 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	}
 	const userObj = await userResponse.json();
 
-	const { projectId } = params;
+	/*
+	Project details
+	*/
 	const projectResponse = await fetch(`${API_URL}/projects/${projectId}`, { credentials: 'include' });
 	if (projectResponse.status === 401) {
 		// TODO redirect to different error page to handle login
@@ -22,6 +28,12 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	if (projectResponse.status === 404) {
 		throw error(404, { message: `Project with ID (${projectId}) not found` });
 	}
+
+	/*
+	Basemaps
+	*/
+	// Load existing OPFS PMTiles archive if present
+	// TODO
 
 	return {
 		project: await projectResponse.json(),

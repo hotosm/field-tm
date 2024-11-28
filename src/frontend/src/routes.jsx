@@ -179,7 +179,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/osmauth/',
+        path: '/osmauth',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <ErrorBoundary>
@@ -189,7 +189,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/playwright-temp-login/',
+        path: '/playwright-temp-login',
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <ErrorBoundary>

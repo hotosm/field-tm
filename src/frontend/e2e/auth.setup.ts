@@ -13,7 +13,7 @@ setup('authenticate', async ({ browserName, page }) => {
 
   // Note this sets a token so we can proceed, but the login will be
   // overwritten by svcfmtm localadmin user (as DEBUG=True)
-  await page.goto('/playwright-temp-login/');
+  await page.goto('/playwright-temp-login');
 
   // Now check we are signed in as localadmin
   await page.waitForSelector('text=localadmin');
