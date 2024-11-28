@@ -44,9 +44,15 @@ importers:
       flatgeobuf:
         specifier: ^3.35.0
         version: 3.35.0
+      maplibre-gl:
+        specifier: ^4.7.1
+        version: 4.7.1
       pako:
         specifier: ^2.1.0
         version: 2.1.0
+      pmtiles:
+        specifier: ^4.0.1
+        version: 4.0.1
       svelte-maplibre:
         specifier: ^0.9.14
         version: 0.9.14(svelte@5.1.6)
@@ -1973,6 +1979,9 @@ packages:
 
   pmtiles@3.2.1:
     resolution: {integrity: sha512-3R4fBwwoli5mw7a6t1IGwOtfmcSAODq6Okz0zkXhS1zi9sz1ssjjIfslwPvcWw5TNhdjNBUg9fgfPLeqZlH6ng==}
+
+  pmtiles@4.0.1:
+    resolution: {integrity: sha512-YS4uj/v179kA6tDd2E8d7ikOIEHy8ahtXN+u4joZYGkG2EwTkC2DUwgNmYLipyl60Vzf3FnIccIuDZB6bmdKmg==}
 
   postcss-load-config@3.1.4:
     resolution: {integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==}
@@ -4304,6 +4313,10 @@ snapshots:
   pmtiles@3.2.1:
     dependencies:
       '@types/leaflet': 1.9.14
+      fflate: 0.8.2
+
+  pmtiles@4.0.1:
+    dependencies:
       fflate: 0.8.2
 
   postcss-load-config@3.1.4(postcss@8.4.47):

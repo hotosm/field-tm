@@ -10,13 +10,14 @@
 	import ImportQrGif from '$assets/images/importQr.gif';
 
 	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
-	// import EventCard from '$lib/components/event-card.svelte';
+	import SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
+	import QRCodeComponent from '$lib/components/qrcode.svelte';
+	import BasemapComponent from '$lib/components/offline/basemaps.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 
 	import type { ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
-	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
 	import {
@@ -38,9 +39,9 @@
 
 	let mapComponent: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
-	let selectedTab: string = $state('qrcode');
+	let selectedTab: string = $state('map');
 	let isTaskActionModalOpen = $state(false);
-	let infoDialogRef: any = $state(null);
+	let infoDialogRef: SlDialog | null = $state(null);
 
 	const taskStore = getTaskStore();
 	const taskEventStream = getTaskEventStream(data.projectId);
@@ -57,8 +58,6 @@
 	// 		console.log($entitiesStatusStore)
 	// 	}
 	// });
-
-	let qrCodeData = $derived(generateQrCode(data.project.name, data.project.odk_token, 'REPLACE_ME_WITH_A_USERNAME'));
 
 	function zoomToTask(taskId: number) {
 		const taskObj = data.project.tasks.find((task: ProjectTask) => task.id === taskId);
@@ -131,7 +130,7 @@
 		projectOutlineCoords={data.project.outline.coordinates}
 		projectId={data.projectId}
 		entitiesUrl={data.project.data_extract_url}
-	/>
+	></MapComponent>
 	<!-- task action buttons popup -->
 	<DialogTaskActions
 		{isTaskActionModalOpen}
@@ -140,75 +139,22 @@
 		}}
 		{selectedTab}
 		projectData={data?.project}
-	/>
+	></DialogTaskActions>
 
 	{#if selectedTab !== 'map'}
 		<BottomSheet onClose={() => tabGroup.show('map')}>
 			{#if selectedTab === 'events'}
-				<!-- {#if taskStore.events.length > 0}
-					{#each taskStore.events as record}
-						<EventCard
-							{record}
-							highlight={record.task_id === taskStore.selectedTaskId}
-							on:zoomToTask={(e) => zoomToTask(e)}
-						/>
-					{/each}
-				{/if} -->
-
-				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)} />
+				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)} ></More>
 			{/if}
 			{#if selectedTab === 'offline'}
-				<span class="font-barlow-medium text-base">Coming soon!</span>
+				<BasemapComponent projectId={data.project.id}></BasemapComponent>
 			{/if}
 			{#if selectedTab === 'qrcode'}
-				<div class="flex flex-col items-center p-4 space-y-4">
-					<!-- Text above the QR code -->
-					<div class="text-center w-full">
-						<div class="font-bold text-lg font-barlow-medium">
-							<span class="mr-1"
-								>Scan this QR code in ODK Collect from another users phone, or download and import it manually</span
-							>
-							<sl-tooltip content="More information on manually importing qr code" placement="bottom">
-								<hot-icon
-									onclick={() => {
-										if (infoDialogRef) infoDialogRef?.show();
-									}}
-									onkeydown={(e: KeyboardEvent) => {
-										if (e.key === 'Enter') {
-											if (infoDialogRef) infoDialogRef?.show();
-										}
-									}}
-									role="button"
-									tabindex="0"
-									name="info-circle-fill"
-									class="!text-[14px] text-[#b91c1c] cursor-pointer duration-200 scale-[1.5]"
-								></hot-icon>
-							</sl-tooltip>
-						</div>
-					</div>
-
-					<!-- QR Code Container -->
-					<div class="flex justify-center w-full max-w-sm">
-						<hot-qr-code value={qrCodeData} label="Scan to open ODK Collect" size="250" class="p-4 bg-white m-4"
-						></hot-qr-code>
-					</div>
-
-					<!-- Download Button -->
-					<sl-button
-						onclick={() => downloadQrCode(data?.project?.name)}
-						onkeydown={(e: KeyboardEvent) => {
-							e.key === 'Enter' && downloadQrCode(data?.project?.name);
-						}}
-						role="button"
-						tabindex="0"
-						size="small"
-						class="secondary w-full max-w-[200px]"
-					>
-						<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
-						></hot-icon>
-						<span class="font-barlow-medium text-base uppercase">Download QR</span>
-					</sl-button>
-
+				<QRCodeComponent
+					infoDialogRef={infoDialogRef}
+					projectName={data.project.name}
+					projectOdkToken={data.project.odk_token}
+				>
 					<!-- Open ODK Button (Hide if it's project walkthrough step) -->
 					{#if +projectSetupStepStore.projectSetupStep !== projectSetupStepEnum['odk_project_load']}
 						<sl-button
@@ -221,7 +167,7 @@
 							<span class="font-barlow-medium text-base uppercase">Open ODK</span></sl-button
 						>
 					{/if}
-				</div>
+				</QRCodeComponent>
 			{/if}
 		</BottomSheet>
 		<hot-dialog
@@ -238,9 +184,9 @@
 					class="h-[70vh]"
 				/>
 				<sl-button
-					onclick={() => infoDialogRef.close()}
+					onclick={() => infoDialogRef?.close()}
 					onkeydown={(e: KeyboardEvent) => {
-						e.key === 'Enter' && infoDialogRef.close();
+						e.key === 'Enter' && infoDialogRef?.close();
 					}}
 					role="button"
 					tabindex="0"

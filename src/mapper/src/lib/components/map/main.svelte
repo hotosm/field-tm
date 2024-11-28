@@ -15,6 +15,8 @@
 		ControlGroup,
 		ControlButton,
 	} from 'svelte-maplibre';
+	import maplibre from 'maplibre-gl';
+	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
@@ -30,10 +32,10 @@
 	import Geolocation from '$lib/components/map/geolocation.svelte';
 	import FlatGeobuf from '$lib/components/map/flatgeobuf-layer.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
-	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
+	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 	// import { entityFeatcolStore, selectedEntityId } from '$store/entities';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
-	import { baseLayers, osmStyle } from '$constants/baseLayers.ts';
+	import { baseLayers, osmStyle, customStyle } from '$constants/baseLayers.ts';
 
 	type bboxType = [number, number, number, number];
 
@@ -49,12 +51,31 @@
 
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
+	const projectBasemapStore = getProjectBasemapStore();
 
 	let map: maplibregl.Map | undefined = $state();
 	let loaded: boolean = $state(false);
 	let taskAreaClicked: boolean = $state(false);
 	let toggleGeolocationStatus: boolean = $state(false);
 	let projectSetupStep = $state(null);
+	// If no custom layer URL, omit, else set URL from projectPmtilesUrl
+	let processedBaseLayers = $derived(
+		[
+			...baseLayers,
+			...(projectBasemapStore.projectPmtilesUrl
+				? [{
+					...customStyle,
+					sources: {
+						...customStyle.sources,
+						custom: {
+							...customStyle.sources.custom,
+							url: projectBasemapStore.projectPmtilesUrl,
+						},
+					},
+				}]
+				: []),
+		]
+	);
 
 	$effect(() => {
 		projectSetupStep = +projectSetupStepStore.projectSetupStep;
@@ -64,6 +85,11 @@
 	$effect(() => {
 		if (map) {
 			setMapRef(map);
+			// Register pmtiles protocol
+			if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
+				let protocol = new Protocol();
+				maplibre.addProtocol('pmtiles', protocol.tile);
+			}
 		}
 	});
 
@@ -103,6 +129,7 @@
 		{ id: 'locationDot', url: LocationDotImg },
 	]}
 >
+	<!-- Controls -->
 	<NavigationControl position="top-left" />
 	<ScaleControl />
 	<Control class="flex flex-col gap-y-2" position="top-left">
@@ -115,6 +142,10 @@
 			>
 		</ControlGroup></Control
 	>
+	<Control class="flex flex-col gap-y-2" position="bottom-right">
+		<LayerSwitcher {map} extraStyles={processedBaseLayers} sourcesIdToReAdd={['tasks', 'entities', 'geolocation']} />
+		<Legend />
+	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->
 	{#if toggleGeolocationStatus}
 		<Geolocation bind:map bind:toggleGeolocationStatus></Geolocation>
@@ -191,10 +222,18 @@
 			manageHoverState
 		/>
 	</FlatGeobuf>
-	<Control class="flex flex-col gap-y-2" position="bottom-right">
-		<LayerSwitcher {map} extraStyles={baseLayers} sourcesIdToReAdd={['tasks', 'entities', 'geolocation']} />
-		<Legend />
-	</Control>
+
+	<!-- Offline pmtiles, if present (alternative approach, not baselayer) -->
+	<!-- {#if projectBasemapStore.projectPmtilesUrl}
+	<RasterTileSource
+		url={projectBasemapStore.projectPmtilesUrl}
+		tileSize={512}
+	>
+		<RasterLayer id="pmtile-basemap" paint={{'raster-opacity': 0.8}}></RasterLayer>
+	</RasterTileSource>
+	{/if} -->
+
+	<!-- Help text for user on first load -->
 	{#if projectSetupStep === projectSetupStepEnum['task_selection']}
 		<div class="absolute top-5 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
 			<p class="uppercase font-barlow-medium text-base">please select a task / feature for mapping</p>

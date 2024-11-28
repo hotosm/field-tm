@@ -1,3 +1,5 @@
+import oamLogo from '$assets/images/oam-logo.svg';
+
 export const osmStyle = {
 	id: 'OSM Raster',
 	version: 8,
@@ -98,6 +100,33 @@ let satellite = {
 			id: 'satellite',
 			type: 'raster',
 			source: 'satellite',
+			layout: {
+				visibility: 'visible',
+			},
+		},
+	],
+};
+
+export const customStyle = {
+	id: 'Custom',
+	version: 8,
+	name: 'Custom',
+	metadata: {
+		thumbnail: oamLogo,
+	},
+	sources: {
+		custom: {
+			type: 'raster',
+			url: '',
+			tileSize: 512,
+			attribution: 'Protmaps',
+		},
+	},
+	layers: [
+		{
+			id: 'custom',
+			type: 'raster',
+			source: 'custom',
 			layout: {
 				visibility: 'visible',
 			},

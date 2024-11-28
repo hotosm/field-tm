@@ -52,7 +52,9 @@
 		"@turf/helpers": "^7.1.0",
 		"drizzle-orm": "^0.35.3",
 		"flatgeobuf": "^3.35.0",
+		"maplibre-gl": "^4.7.1",
 		"pako": "^2.1.0",
+		"pmtiles": "^4.0.1",
 		"svelte-maplibre": "^0.9.14",
 		"uuid": "^11.0.2"
 	},
