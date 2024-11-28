@@ -1,105 +1,125 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-    import { onDestroy } from 'svelte';
-    import { GeoJSON as MapLibreGeoJSON } from 'svelte-maplibre';
-    import { getId, updatedSourceContext, addSource, removeSource } from 'svelte-maplibre';
-    import type { HeaderMeta } from 'flatgeobuf';
-    import type { GeoJSON, Polygon, FeatureCollection } from 'geojson';
-    import { flatgeobufToGeoJson, filterGeomsCentroidsWithin } from '$lib/utils/flatgeobuf';
+	import { onDestroy } from 'svelte';
+	import { GeoJSON as MapLibreGeoJSON } from 'svelte-maplibre';
+	import { getId, updatedSourceContext, addSource, removeSource } from 'svelte-maplibre';
+	import type { HeaderMeta } from 'flatgeobuf';
+	import type { GeoJSON, Polygon, FeatureCollection } from 'geojson';
+	import { flatgeobufToGeoJson, filterGeomsCentroidsWithin } from '$lib/utils/flatgeobuf';
 
-    type bboxType = [number, number, number, number];
-    interface Props {
-        id?: string;
-        url: string;
-        extent?: bboxType | Polygon | null;
-        extractGeomCols: boolean,
-        metadataFunc?: (headerMetadata: HeaderMeta) => void;
-        promoteId?: string;
-        children?: Snippet;
-    }
+	type bboxType = [number, number, number, number];
+	interface Props {
+		id?: string;
+		url: string;
+		extent?: bboxType | Polygon | null;
+		extractGeomCols: boolean;
+		metadataFunc?: (headerMetadata: HeaderMeta) => void;
+		promoteId?: string;
+		children?: Snippet;
+		processGeojson?: (geojson: GeoJSON) => GeoJSON;
+		geojsonUpdateDependency?: any;
+	}
 
-    let {
-        id = getId('flatgeobuf'),
-        url,
-        extent,
-        extractGeomCols = false,
-        promoteId = undefined,
-        metadataFunc,
-        children,
-    }: Props = $props();
+	let {
+		id = getId('flatgeobuf'),
+		url,
+		extent,
+		extractGeomCols = false,
+		promoteId = undefined,
+		metadataFunc,
+		children,
+		processGeojson,
+		geojsonUpdateDependency = '',
+	}: Props = $props();
 
-    const { map, self: sourceId } = updatedSourceContext();
-    let sourceObj: maplibregl.GeoJSONSource | undefined = $state();
-    let first = $state(true);
-    let geojsonData: GeoJSON = $state({type: 'FeatureCollection', features: []});
+	const { map, self: sourceId } = updatedSourceContext();
+	let sourceObj: maplibregl.GeoJSONSource | undefined = $state();
+	let first = $state(true);
+	let geojsonData: GeoJSON = $state({ type: 'FeatureCollection', features: [] });
 
-    // Set currentSourceId as reactive property once determined from context
-    let currentSourceId: string | undefined = $state();
-    $effect(() => {
-        currentSourceId = $sourceId;
-    });
+	// Set currentSourceId as reactive property once determined from context
+	let currentSourceId: string | undefined = $state();
+	$effect(() => {
+		currentSourceId = $sourceId;
+	});
 
-    // Deserialise flatgeobuf to GeoJSON, reactive to bbox/extent changes
-    async function updateGeoJSONData() {
-        const featcol: FeatureCollection | null = await flatgeobufToGeoJson(url, extent, metadataFunc, extractGeomCols);
+	// Deserialise flatgeobuf to GeoJSON, reactive to bbox/extent changes
+	async function updateGeoJSONData() {
+		const featcol: FeatureCollection | null = await flatgeobufToGeoJson(url, extent, metadataFunc, extractGeomCols);
 
-        // If there is no data, set to an empty FeatureCollection to avoid
-        // re-adding layer if the bbox extent is updated
-        if (!featcol) {
-            geojsonData = {
-                type: 'FeatureCollection',
-                features: [],
-            };
-        } else if (extent && "type" in extent && extent.type === 'Polygon') {
-            geojsonData = filterGeomsCentroidsWithin(featcol, extent);
-        } else {
-            geojsonData = featcol;
-        }
+		// If there is no data, set to an empty FeatureCollection to avoid
+		// re-adding layer if the bbox extent is updated
+		if (!featcol) {
+			geojsonData = {
+				type: 'FeatureCollection',
+				features: [],
+			};
+		} else if (extent && 'type' in extent && extent.type === 'Polygon') {
+			const filteredGeojsonData = filterGeomsCentroidsWithin(featcol, extent);
+			if (processGeojson) {
+				geojsonData = processGeojson(filteredGeojsonData);
+			} else {
+				geojsonData = filteredGeojsonData;
+			}
+		} else {
+			if (processGeojson) {
+				geojsonData = processGeojson(featcol);
+			} else {
+				geojsonData = featcol;
+			}
+		}
 
-        currentSourceId = id;
-        addSourceToMap();
-    }
+		currentSourceId = id;
+		addSourceToMap();
+	}
 
-    $effect(() => {
-        updateGeoJSONData();
-    });
+	$effect(() => {
+		geojsonUpdateDependency;
+		updateGeoJSONData();
+	});
 
-    function addSourceToMap() {
-        if (!$map) return;
+	function addSourceToMap() {
+		if (!$map) return;
 
-        const initialData: maplibregl.SourceSpecification = {
-            type: 'geojson',
-            data: geojsonData,
-            promoteId,
-        };
+		const initialData: maplibregl.SourceSpecification = {
+			type: 'geojson',
+			data: geojsonData,
+			promoteId,
+		};
 
-        // Use the currentSourceId in addSource
-        addSource($map, currentSourceId!, initialData, (sourceId) => sourceId === currentSourceId, () => {
-            sourceObj = $map?.getSource(currentSourceId!) as maplibregl.GeoJSONSource;
-            first = true;
-        });
-    }
+		// Use the currentSourceId in addSource
+		addSource(
+			$map,
+			currentSourceId!,
+			initialData,
+			(sourceId) => sourceId === currentSourceId,
+			() => {
+				sourceObj = $map?.getSource(currentSourceId!) as maplibregl.GeoJSONSource;
+				first = true;
+			},
+		);
+	}
 
-    // Update data only if source already exists
-    $effect(() => {
-        if (sourceObj && geojsonData) {
-            if (first) {
-                first = false;
-            } else {
-                sourceObj.setData(geojsonData);
-            }
-        }
-    });
+	// Update data only if source already exists
+	$effect(() => {
+		if (sourceObj && geojsonData) {
+			if (first) {
+				first = false;
+			} else {
+				sourceObj.setData(geojsonData);
+			}
+		}
+	});
 
-    onDestroy(() => {
-        if (sourceObj && $map) {
-            removeSource($map, currentSourceId!, sourceObj);
-            currentSourceId = undefined;
-            sourceObj = undefined;
-        }
-    });
+	onDestroy(() => {
+		if (sourceObj && $map) {
+			removeSource($map, currentSourceId!, sourceObj);
+			currentSourceId = undefined;
+			sourceObj = undefined;
+		}
+	});
 </script>
 
-<MapLibreGeoJSON id={currentSourceId} data={geojsonData} promoteId={promoteId}>
-    {@render children?.()}
+<MapLibreGeoJSON id={currentSourceId} data={geojsonData} {promoteId}>
+	{@render children?.()}
 </MapLibreGeoJSON>

@@ -16,16 +16,12 @@
 	import QRCodeComponent from '$lib/components/qrcode.svelte';
 	import BasemapComponent from '$lib/components/offline/basemaps.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
-
+	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
+	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
 	import type { ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
-	import {
-		entitiesStatusStore,
-		selectedEntity,
-		getEntityStatusStream,
-		subscribeToEntityStatusUpdates,
-	} from '$store/entities.svelte.ts';
+	import { getEntitiesStatusStore, getEntityStatusStream } from '$store/entities.svelte.ts';
 	import More from '$lib/components/more/index.svelte';
 	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
@@ -40,24 +36,21 @@
 	let mapComponent: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
 	let selectedTab: string = $state('map');
+	let openedActionModal: 'entity-modal' | 'task-modal' | null = $state(null);
 	let isTaskActionModalOpen = $state(false);
 	let infoDialogRef: SlDialog | null = $state(null);
 
 	const taskStore = getTaskStore();
+	const entitiesStore = getEntitiesStatusStore();
 	const taskEventStream = getTaskEventStream(data.projectId);
+	const entityStatusStream = getEntityStatusStream(data.projectId);
+
 	// Update the geojson task states when a new event is added
 	$effect(() => {
 		if (taskStore.latestEvent) {
 			taskStore.appendTaskStatesToFeatcol(data.project.tasks);
 		}
 	});
-	// const entityStatusStream = getEntityStatusStream(data.projectId);
-	// $effect(() => {
-	// 	if ($entitiesStatusStore) {
-	// 		// TODO replace this with updating the entities geojson
-	// 		console.log($entitiesStatusStore)
-	// 	}
-	// });
 
 	function zoomToTask(taskId: number) {
 		const taskObj = data.project.tasks.find((task: ProjectTask) => task.id === taskId);
@@ -79,16 +72,17 @@
 	}
 
 	onMount(async () => {
+		// In store/entities.ts
+		await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, data.entityStatus);
+
 		// In store/tasks.svelte.ts
 		await taskStore.subscribeToEvents(taskEventStream);
 		await taskStore.appendTaskStatesToFeatcol(data.project.tasks);
-
-		// In store/entities.ts
-		// await subscribeToEntityStatusUpdates(entityStatusStream);
 	});
 
 	onDestroy(() => {
 		taskEventStream.unsubscribeAll();
+		entityStatusStream.unsubscribeAll();
 	});
 
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -124,8 +118,8 @@
 		setMapRef={(map) => {
 			mapComponent = map;
 		}}
-		toggleTaskActionModal={(value) => {
-			isTaskActionModalOpen = value;
+		toggleActionModal={(value) => {
+			openedActionModal = value;
 		}}
 		projectOutlineCoords={data.project.outline.coordinates}
 		projectId={data.projectId}
@@ -133,28 +127,31 @@
 	></MapComponent>
 	<!-- task action buttons popup -->
 	<DialogTaskActions
-		{isTaskActionModalOpen}
+		isTaskActionModalOpen={openedActionModal === 'task-modal'}
 		toggleTaskActionModal={(value) => {
-			isTaskActionModalOpen = value;
+			openedActionModal = value ? 'task-modal' : null;
 		}}
 		{selectedTab}
 		projectData={data?.project}
-	></DialogTaskActions>
-
+	/>
+	<DialogEntityActions
+		isTaskActionModalOpen={openedActionModal === 'entity-modal'}
+		toggleTaskActionModal={(value) => {
+			openedActionModal = value ? 'entity-modal' : null;
+		}}
+		{selectedTab}
+		projectData={data?.project}
+	/>
 	{#if selectedTab !== 'map'}
 		<BottomSheet onClose={() => tabGroup.show('map')}>
 			{#if selectedTab === 'events'}
-				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)} ></More>
+				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)}></More>
 			{/if}
 			{#if selectedTab === 'offline'}
 				<BasemapComponent projectId={data.project.id}></BasemapComponent>
 			{/if}
 			{#if selectedTab === 'qrcode'}
-				<QRCodeComponent
-					infoDialogRef={infoDialogRef}
-					projectName={data.project.name}
-					projectOdkToken={data.project.odk_token}
-				>
+				<QRCodeComponent {infoDialogRef} projectName={data.project.name} projectOdkToken={data.project.odk_token}>
 					<!-- Open ODK Button (Hide if it's project walkthrough step) -->
 					{#if +projectSetupStepStore.projectSetupStep !== projectSetupStepEnum['odk_project_load']}
 						<sl-button
