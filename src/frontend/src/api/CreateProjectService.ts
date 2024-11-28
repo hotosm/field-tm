@@ -190,34 +190,37 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
       let isAPISuccess = true;
       try {
         let response;
+
         const additional_entities: string[] =
           projectData?.additional_entities?.length > 0
             ? [projectData?.additional_entities?.[0]?.replaceAll(' ', '_')]
             : [];
+
         if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
           const generateApiFormData = new FormData();
           generateApiFormData.append('xlsform', formUpload);
+
           if (additional_entities?.length > 0) {
             generateApiFormData.append('additional_entities', additional_entities);
           }
+
           response = await axios.post(url, generateApiFormData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
         } else {
-          const generateApiFormData = new FormData();
-          generateApiFormData.append(
-            'additional_entities',
-            additional_entities?.length > 0 ? additional_entities : null,
-          );
-          response = await axios.post(url, generateApiFormData, {
+          const payload = {
+            additional_entities: additional_entities.length > 0 ? additional_entities : null,
+          };
+          response = await axios.post(url, payload, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
           });
         }
+
         isAPISuccess = isStatusSuccess(response.status);
         if (!isAPISuccess) {
           throw new Error(`Request failed with status ${response.status}`);
