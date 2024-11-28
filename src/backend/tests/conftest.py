@@ -19,6 +19,7 @@
 
 import json
 import os
+import uuid
 from io import BytesIO
 from pathlib import Path
 from typing import Any, AsyncGenerator
@@ -32,6 +33,7 @@ from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from loguru import logger as log
 from psycopg import AsyncConnection
+from pyodk.client import Client
 
 from app.auth.auth_routes import get_or_create_user
 from app.auth.auth_schemas import AuthUser, FMTMUser
@@ -52,6 +54,7 @@ from tests.test_data import test_data_path
 odk_central_url = os.getenv("ODK_CENTRAL_URL")
 odk_central_user = os.getenv("ODK_CENTRAL_USER")
 odk_central_password = encrypt_value(os.getenv("ODK_CENTRAL_PASSWD", ""))
+odk_config_file = str(Path(__file__).parent / ".pyodk_config.toml")
 
 
 def pytest_configure(config):
@@ -273,6 +276,94 @@ async def odk_project(db, client, project, tasks):
         pytest.fail(f"Test failed with exception: {str(e)}")
 
     yield project
+
+
+@pytest_asyncio.fixture(scope="function")
+async def submission(client, odk_project):
+    """Set up a submission for a project in ODK Central."""
+    odk_project_id = odk_project.odkid
+    odk_credentials = odk_project.odk_credentials
+    odk_creds = odk_credentials.model_dump()
+    base_url = odk_creds["odk_central_url"]
+    auth = (
+        odk_creds["odk_central_user"],
+        odk_creds["odk_central_password"],
+    )
+
+    def forms(base_url, auth, pid):
+        """Fetch a list of forms in a project."""
+        url = f"{base_url}/v1/projects/{pid}/forms"
+        return requests.get(url, auth=auth)
+
+    forms_response = forms(base_url, auth, odk_project_id)
+    assert forms_response.status_code == 200, "Failed to fetch forms from ODK Central"
+    forms = forms_response.json()
+    assert forms, "No forms found in ODK Central project"
+    odk_form_id = forms[0]["xmlFormId"]
+    odk_form_version = forms[0]["version"]
+
+    submission_id = str(uuid.uuid4())
+
+    submission_xml = f"""
+        <data id="{odk_form_id}" version="{odk_form_version}">
+        <meta>
+            <instanceID>{submission_id}</instanceID>
+        </meta>
+        <start>2024-11-15T12:28:23.641Z</start>
+        <end>2024-11-15T12:29:00.876Z</end>
+        <today>2024-11-15</today>
+        <phonenumber/>
+        <deviceid>collect:OOYOOcNu8uOA2G4b</deviceid>
+        <username>testuser</username>
+        <instructions/>
+        <warmup/>
+        <feature/>
+        <null/>
+        <new_feature>12.750577838121643 -24.776785714285722 0.0 0.0</new_feature>
+        <form_category>building</form_category>
+        <xid/>
+        <xlocation>12.750577838121643 -24.776785714285722 0.0 0.0</xlocation>
+        <task_id/>
+        <status>2</status>
+        <survey_questions>
+            <buildings>
+            <category>housing</category>
+            <name/>
+            <building_material/>
+            <building_levels/>
+            <housing/>
+            <provider/>
+            </buildings>
+            <details>
+            <power/>
+            <water/>
+            <age/>
+            <building_prefab/>
+            <building_floor/>
+            <building_roof/>
+            <condition/>
+            <access_roof/>
+            <levels_underground/>
+            </details>
+            <comment/>
+        </survey_questions>
+        </data>
+    """
+
+    with Client(config_path=odk_config_file) as client:
+        submission_data = client.submissions.create(
+            project_id=odk_project_id,
+            form_id=odk_form_id,
+            xml=submission_xml,
+            device_id=None,
+            encoding="utf-8",
+        )
+
+    yield {
+        "project": odk_project,
+        "odk_form_id": odk_form_id,
+        "submission_data": submission_data,
+    }
 
 
 @pytest_asyncio.fixture(scope="function")
