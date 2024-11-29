@@ -191,34 +191,41 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
       try {
         let response;
 
-        const additional_entities: string[] =
+        const additional_entities =
           projectData?.additional_entities?.length > 0
-            ? [projectData?.additional_entities?.[0]?.replaceAll(' ', '_')]
+            ? projectData.additional_entities.map((e: string) => e.replaceAll(' ', '_'))
             : [];
+        const generateApiFormData = new FormData();
+
+        if (additional_entities?.length > 0) {
+          generateApiFormData.append('additional_entities', additional_entities);
+        }
 
         if (projectData.form_ways === 'custom_form') {
           // TODO move form upload to a separate service / endpoint?
-          const generateApiFormData = new FormData();
           generateApiFormData.append('xlsform', formUpload);
-
-          if (additional_entities?.length > 0) {
-            generateApiFormData.append('additional_entities', additional_entities);
-          }
-
           response = await axios.post(url, generateApiFormData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
         } else {
-          const payload = {
-            additional_entities: additional_entities.length > 0 ? additional_entities : null,
-          };
-          response = await axios.post(url, payload, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+          if (additional_entities?.length > 0) {
+            response = await axios.post(url, generateApiFormData, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+          } else {
+            const payload = {
+              additional_entities: null,
+            };
+            response = await axios.post(url, payload, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+          }
         }
 
         isAPISuccess = isStatusSuccess(response.status);
