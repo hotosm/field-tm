@@ -55,6 +55,27 @@ async def get_tasks_near_me(
     return "Coming..."
 
 
+@router.get("/activity", response_model=list[task_schemas.TaskEventCount])
+async def task_activity(
+    project_id: int,
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    days: int = 10,
+):
+    """Get the number of mapped or validated tasks on each day.
+
+    Return format:
+    [
+        {
+            date: DD/MM/YYYY,
+            validated: int,
+            mapped: int,
+        }
+    ]
+    """
+    return await task_crud.get_project_task_activity(db, project_id, days)
+
+
 @router.get("/{task_id}", response_model=task_schemas.TaskOut)
 async def get_specific_task(
     task_id: int,
@@ -82,27 +103,6 @@ async def add_new_task_event(
     new_event.user_id = user_id
     new_event.task_id = task_id
     return await DbTaskEvent.create(db, new_event)
-
-
-@router.get("/activity", response_model=list[task_schemas.TaskEventCount])
-async def task_activity(
-    project_id: int,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    days: int = 10,
-):
-    """Get the number of mapped or validated tasks on each day.
-
-    Return format:
-    [
-        {
-            date: DD/MM/YYYY,
-            validated: int,
-            mapped: int,
-        }
-    ]
-    """
-    return await task_crud.get_project_task_activity(db, project_id, days)
 
 
 @router.get("/{task_id}/history", response_model=list[task_schemas.TaskEventOut])
