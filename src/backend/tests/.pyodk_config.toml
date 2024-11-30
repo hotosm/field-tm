@@ -1,4 +1,4 @@
 [central]
 base_url = "https://proxy"
-username = "test@hotosm.org"
+username = "admin@hotosm.org"
 password = "Password1234"
