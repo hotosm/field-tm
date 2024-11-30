@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -23,6 +23,7 @@ import uuid
 from io import BytesIO
 from pathlib import Path
 from typing import Any, AsyncGenerator
+from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
@@ -248,11 +249,8 @@ async def odk_project(db, client, project, tasks):
         data_extracts,
     )
 
-    internal_file_path = (
-        f"{settings.S3_ENDPOINT}"
-        f"{data_extract_s3_path.split(settings.FMTM_DEV_PORT)[1]}"
-    )
-    response = requests.head(internal_file_path, allow_redirects=True)
+    internal_s3_url = f"{settings.S3_ENDPOINT}{urlparse(data_extract_s3_path).path}"
+    response = requests.head(internal_s3_url, allow_redirects=True)
     assert response.status_code < 400
 
     xlsform_file = Path(f"{test_data_path}/buildings.xls")

@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -22,6 +22,7 @@ import os
 from io import BytesIO
 from pathlib import Path
 from unittest.mock import Mock, patch
+from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
@@ -359,12 +360,8 @@ async def test_generate_project_files(db, client, project):
         data_extracts,
     )
     assert data_extract_s3_path is not None
-    # Test url, but first sub localhost url with docker network for backend connection
-    internal_file_path = (
-        f"{settings.S3_ENDPOINT}"
-        f"{data_extract_s3_path.split(settings.FMTM_DEV_PORT)[1]}"
-    )
-    response = requests.head(internal_file_path, allow_redirects=True)
+    internal_s3_url = f"{settings.S3_ENDPOINT}{urlparse(data_extract_s3_path).path}"
+    response = requests.head(internal_s3_url, allow_redirects=True)
     assert response.status_code < 400
 
     # Get custom XLSForm path
