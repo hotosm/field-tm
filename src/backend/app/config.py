@@ -174,7 +174,7 @@ class Settings(BaseSettings):
 
         # Handle localhost/testing scenario
         domain = info.data.get("FMTM_DOMAIN", "fmtm.localhost")
-        dev_port = info.data.get("FMTM_DEV_PORT", "")
+        dev_port = info.data.get("FMTM_DEV_PORT")
         # NOTE fmtm.dev.test is used as the Playwright test domain
         if "localhost" in domain or "fmtm.dev.test" in domain:
             local_server_port = (
@@ -268,6 +268,7 @@ class Settings(BaseSettings):
         else:
             fmtm_domain = info.data.get("FMTM_DOMAIN")
             # Local dev
+            # NOTE for automated tests, this is overridden manually
             if info.data.get("DEBUG"):
                 dev_port = info.data.get("FMTM_DEV_PORT")
                 return f"http://s3.{fmtm_domain}:{dev_port}"
