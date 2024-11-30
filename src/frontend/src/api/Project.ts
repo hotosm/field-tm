@@ -2,8 +2,6 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
 import { task_state, task_event } from '@/types/enums';
-import { writeBinaryToOPFS } from '@/api/Files';
-import { projectInfoType } from '@/models/project/projectModel';
 
 export const ProjectById = (projectId: string) => {
   return async (dispatch) => {
@@ -169,51 +167,23 @@ export const GenerateProjectTiles = (url: string, projectId: string, data: objec
   };
 };
 
-export const DownloadTile = (url: string, payload: Partial<projectInfoType>, toOpfs: boolean = false) => {
+export const DownloadBasemapFile = (url: string) => {
   return async (dispatch) => {
-    dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: true }));
+    dispatch(ProjectActions.SetDownloadTileLoading({ loading: true }));
 
-    const getDownloadTile = async (url: string, payload: Partial<projectInfoType>, toOpfs: boolean) => {
+    const downloadBasemapFromAPI = async (url: string) => {
       try {
-        const response = await CoreModules.axios.get(url, {
-          responseType: 'arraybuffer',
-        });
+        // Open S3 url directly
+        window.open(url);
 
-        // Get filename from Content-Disposition header
-        const tileData = response.data;
-
-        if (toOpfs) {
-          // Copy to OPFS filesystem for offline use
-          const projectId = payload.id;
-          const filePath = `${projectId}/all.pmtiles`;
-          await writeBinaryToOPFS(filePath, tileData);
-          // Set the OPFS file path to project state
-          dispatch(ProjectActions.SetProjectOpfsBasemapPath(filePath));
-          return;
-        }
-
-        const filename = response.headers['content-disposition'].split('filename=')[1];
-        console.log(filename);
-        // Create Blob from ArrayBuffer
-        const blob = new Blob([tileData], { type: response.headers['content-type'] });
-        const downloadUrl = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = filename;
-        a.click();
-
-        // Clean up object URL
-        URL.revokeObjectURL(downloadUrl);
-
-        dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadTileLoading({ loading: false }));
       } catch (error) {
-        dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadTileLoading({ loading: false }));
       } finally {
-        dispatch(ProjectActions.SetDownloadTileLoading({ type: payload, loading: false }));
+        dispatch(ProjectActions.SetDownloadTileLoading({ loading: false }));
       }
     };
-    await getDownloadTile(url, payload, toOpfs);
+    await downloadBasemapFromAPI(url);
   };
 };
 

@@ -8,9 +8,8 @@ import LayerSwitcher from 'ol-layerswitcher';
 import React, { useEffect, useState } from 'react';
 import { XYZ } from 'ol/source';
 import { useLocation } from 'react-router-dom';
-import DataTile from 'ol/source/DataTile.js';
-import TileLayer from 'ol/layer/WebGLTile.js';
-import { FileSource, PMTiles } from 'pmtiles';
+import WebGLTile from 'ol/layer/WebGLTile.js';
+import { PMTilesRasterSource } from 'ol-pmtiles';
 import windowDimention from '@/hooks/WindowDimension';
 import { useAppSelector } from '@/types/reduxTypes';
 
@@ -134,41 +133,20 @@ const monochromeMidNight = (visible = false) =>
     }),
   });
 
-const pmTileLayer = (pmTileLayerData, visible) => {
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.addEventListener('load', () => resolve(img));
-      img.addEventListener('error', () => reject(new Error('load failed')));
-      img.src = src;
-    });
-  }
-
-  const pmTiles = new PMTiles(new FileSource(pmTileLayerData));
-
-  async function loader(z, x, y) {
-    const response = await pmTiles.getZxy(z, x, y);
-    const blob = new Blob([response.data]);
-    const src = URL.createObjectURL(blob);
-    const image = await loadImage(src);
-    URL.revokeObjectURL(src);
-    return image;
-  }
-  return new TileLayer({
-    title: `PMTile`,
-    type: 'raster pm tiles',
-    visible: true,
-    source: new DataTile({
-      loader,
-      wrapX: true,
+const pmTileLayer = (pmTileLayerUrl, visible = true) => {
+  return new WebGLTile({
+    title: 'Custom',
+    type: 'custom',
+    visible: visible,
+    source: new PMTilesRasterSource({
+      url: pmTileLayerUrl,
+      attributions: ['OpenAerialMap'],
       tileSize: [512, 512],
-      maxZoom: 22,
-      attributions: 'Tiles © OpenAerialMap',
     }),
   });
 };
 
-const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) => {
+const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerUrl = null }) => {
   const { windowSize } = windowDimention();
   const { pathname } = useLocation();
 
@@ -181,7 +159,7 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
         // mapboxMap(visible),
         // mapboxOutdoors(visible),
         none(visible),
-        // pmTileLayer(pmTileLayerData, visible),
+        // pmTileLayer(pmTileLayerUrl, visible),
       ],
     }),
   );
@@ -246,11 +224,11 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
   }, [map, visible]);
 
   useEffect(() => {
-    if (!pmTileLayerData) {
+    if (!pmTileLayerUrl) {
       return;
     }
 
-    const pmTileBaseLayer = pmTileLayer(pmTileLayerData, visible);
+    const pmTileBaseLayer = pmTileLayer(pmTileLayerUrl, visible);
 
     const currentLayers = basemapLayers.getLayers();
     currentLayers.push(pmTileBaseLayer);
@@ -259,7 +237,7 @@ const LayerSwitcherControl = ({ map, visible = 'osm', pmTileLayerData = null }) 
     return () => {
       basemapLayers.getLayers().remove(pmTileBaseLayer);
     };
-  }, [pmTileLayerData]);
+  }, [pmTileLayerUrl]);
 
   const location = useLocation();
   useEffect(() => {}, [map]);

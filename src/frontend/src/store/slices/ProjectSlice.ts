@@ -15,6 +15,7 @@ const initialState: ProjectStateTypes = {
   tilesList: [],
   tilesListLoading: false,
   downloadTilesLoading: false,
+  customBasemapUrl: null,
   downloadDataExtractLoading: false,
   taskModalStatus: false,
   toggleGenerateMbTilesModal: false,
@@ -39,7 +40,6 @@ const initialState: ProjectStateTypes = {
   projectPostCommentsLoading: false,
   projectGetCommentsLoading: false,
   clearEditorContent: false,
-  projectOpfsBasemapPath: null,
   projectTaskActivity: [],
   projectActivityLoading: false,
   downloadSubmissionLoading: false,
@@ -86,6 +86,9 @@ const ProjectSlice = createSlice({
     SetDownloadTileLoading(state, action) {
       state.downloadTilesLoading = action.payload;
     },
+    SetPmtileBasemapUrl(state, action) {
+      state.customBasemapUrl = action.payload;
+    },
     SetDownloadDataExtractLoading(state, action) {
       state.downloadDataExtractLoading = action.payload;
     },
@@ -130,9 +133,6 @@ const ProjectSlice = createSlice({
     },
     UpdateProjectCommentsList(state, action) {
       state.projectCommentsList = [...state.projectCommentsList, action.payload];
-    },
-    SetProjectOpfsBasemapPath(state, action) {
-      state.projectOpfsBasemapPath = action.payload;
     },
     SetProjectTaskActivity(state, action) {
       state.projectTaskActivity = action.payload;

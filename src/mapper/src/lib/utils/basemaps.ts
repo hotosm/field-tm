@@ -38,67 +38,15 @@ export async function getBasemapList(projectId: number): Promise<Basemap[]> {
 	}
 }
 
-type BasemapDownload = {
-	data: ArrayBuffer;
-	headers: Headers | null;
-};
+export async function loadOnlinePmtiles(url: string | null) {
+	if (!url) return;
 
-async function downloadBasemap(projectId: number, basemapId: UUID): Promise<BasemapDownload> {
-	try {
-		const downloadResponse = await fetch(`${API_URL}/projects/${projectId}/tiles/${basemapId}`, {
-			credentials: 'include',
-		});
-
-		if (!downloadResponse.ok) {
-			throw new Error('Failed to download mbtiles');
-		}
-
-		let basemapData = await downloadResponse.arrayBuffer();
-		if (!basemapData) {
-			throw new Error('Basemap contained no data');
-		}
-
-		return {
-			data: basemapData,
-			headers: downloadResponse.headers,
-		};
-	} catch (error) {
-		console.error('Error downloading basemaps:', error);
-		alertStore.setAlert({
-			variant: 'danger',
-			message: 'Error downloading basemap file.',
-		});
-		return { data: new ArrayBuffer(0), headers: null };
-	}
-}
-
-export async function downloadMbtiles(projectId: number, basemapId: UUID | null) {
-	if (!basemapId) return;
-
-	const { data, headers } = await downloadBasemap(projectId, basemapId);
-	const filename = headers?.get('content-disposition')?.split('filename=')[1] || 'basemap.mbtiles';
-	const contentType = headers?.get('content-type') || 'application/vnd.mapbox-vector-tile';
-
-	// Create Blob from ArrayBuffer
-	const blob = new Blob([data], { type: contentType });
-	const downloadUrl = URL.createObjectURL(blob);
-
-	const a = document.createElement('a');
-	a.href = downloadUrl;
-	a.download = filename;
-	a.click();
-
-	// Clean up object URL
-	URL.revokeObjectURL(downloadUrl);
-}
-
-export async function loadOnlinePmtiles(selectedBasemap: Basemap) {
-	const pmtilesUrl = `pmtiles://${selectedBasemap.url}`;
+	const pmtilesUrl = `pmtiles://${url}`;
 	basemapStore.setProjectPmtilesUrl(pmtilesUrl);
 }
 
 export async function loadOfflinePmtiles(projectId: number) {
-	const filePath = `${projectId}/all.pmtiles`;
+	const filePath = `${projectId}/basemap.pmtiles`;
 
 	// Read file from OPFS and display on map
 	const opfsPmtilesData = await readFileFromOPFS(filePath);
@@ -112,13 +60,38 @@ export async function loadOfflinePmtiles(projectId: number) {
 	basemapStore.setProjectPmtilesUrl(pmtilesUrl);
 }
 
-export async function writeOfflinePmtiles(projectId: number, basemapId: UUID | null) {
-	if (!basemapId) return;
+async function downloadBasemap(url: string | null): Promise<ArrayBuffer> {
+	let basemapData: ArrayBuffer = new ArrayBuffer(0);
 
-	const { data } = await downloadBasemap(projectId, basemapId);
+	if (!url) return basemapData;
+
+	try {
+		const downloadResponse = await fetch(url);
+
+		if (!downloadResponse.ok) {
+			throw new Error('Failed to download mbtiles');
+		}
+
+		basemapData = await downloadResponse.arrayBuffer();
+		if (!basemapData) {
+			throw new Error('Basemap contained no data');
+		}
+	} catch (error) {
+		console.error('Error downloading basemaps:', error);
+		alertStore.setAlert({
+			variant: 'danger',
+			message: 'Error downloading basemap file.',
+		});
+	} finally {
+		return basemapData;
+	}
+}
+
+export async function writeOfflinePmtiles(projectId: number, url: string | null) {
+	const data = await downloadBasemap(url);
 
 	// Copy to OPFS filesystem for offline use
-	const filePath = `${projectId}/all.pmtiles`;
+	const filePath = `${projectId}/basemap.pmtiles`;
 	await writeBinaryToOPFS(filePath, data);
 
 	await loadOfflinePmtiles(projectId);

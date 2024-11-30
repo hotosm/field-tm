@@ -31,9 +31,10 @@ const config = {
 	alias: {
 		$lib: 'src/lib',
 		$components: 'src/components',
-		$static: 'static',
 		$store: 'src/store',
 		$routes: 'src/routes',
+		$constants: 'src/constants',
+		$static: 'static',
 		$styles: 'styles',
 		$assets: 'assets',
 	},

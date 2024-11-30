@@ -87,6 +87,7 @@
     "ol": "^8.0.0",
     "ol-ext": "^4.0.11",
     "ol-layerswitcher": "^4.1.1",
+    "ol-pmtiles": "^1.0.2",
     "pako": "^2.1.0",
     "pmtiles": "^3.0.6",
     "qrcode-generator": "^1.4.4",

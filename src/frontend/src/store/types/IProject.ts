@@ -18,6 +18,7 @@ export type ProjectStateTypes = {
   tilesList: tilesListTypes[];
   tilesListLoading: boolean;
   downloadTilesLoading: boolean;
+  customBasemapUrl: string | null;
   downloadDataExtractLoading: boolean;
   taskModalStatus: boolean;
   toggleGenerateMbTilesModal: boolean;
@@ -33,7 +34,6 @@ export type ProjectStateTypes = {
   projectPostCommentsLoading: boolean;
   projectGetCommentsLoading: boolean;
   clearEditorContent: boolean;
-  projectOpfsBasemapPath: string | null;
   projectTaskActivity: projectTaskActivity[];
   projectActivityLoading: boolean;
   downloadSubmissionLoading: boolean;
@@ -53,6 +53,7 @@ type tilesListTypes = {
   status: string;
   source: string;
   format: string;
+  url: string;
 };
 
 type projectCommentsListTypes = {

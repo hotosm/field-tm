@@ -49,7 +49,7 @@ from app.db.postgis_utils import (
     split_geojson_by_task_areas,
 )
 from app.projects import project_deps, project_schemas
-from app.s3 import add_obj_to_bucket
+from app.s3 import add_file_to_bucket, add_obj_to_bucket
 
 TILESDIR = "/opt/tiles"
 
@@ -686,6 +686,7 @@ async def get_project_features_geojson(
 def generate_project_basemap(
     db: Connection,
     project_id: int,
+    org_id: int,
     background_task_id: uuid.UUID,
     source: str,
     output_format: str = "mbtiles",
@@ -693,9 +694,12 @@ def generate_project_basemap(
 ):
     """Get the tiles for a project.
 
+    FIXME waiting on hotosm/basemap-api project to replace this
+
     Args:
         db (Connection): The database connection.
         project_id (int): ID of project to create tiles for.
+        org_id (int): Organisation ID that the project falls within.
         background_task_id (uuid.UUID): UUID of background task to track.
         source (str): Tile source ("esri", "bing", "google", "custom" (tms)).
         output_format (str, optional): Default "mbtiles".
@@ -711,8 +715,6 @@ def generate_project_basemap(
     # NOTE mbtile max supported zoom level is 22 (in GDAL at least)
     zooms = "12-22" if tms else "12-19"
     tiles_dir = f"{TILESDIR}/{project_id}"
-    # FIXME for now this is still a location on disk and we do not upload to S3
-    # FIXME waiting on basemap-api project to replace this with URL
     outfile = f"{tiles_dir}/{project_id}_{source}tiles.{output_format}"
 
     # NOTE here we put the connection in autocommit mode to ensure we get
@@ -730,7 +732,6 @@ def generate_project_basemap(
                 background_task_id=background_task_id,
                 status=BackgroundTaskStatus.PENDING,
                 tile_source=source,
-                url=outfile,
             ),
         )
 
@@ -761,11 +762,37 @@ def generate_project_basemap(
         )
         log.info(f"Basemap created for project ID {project_id}: {outfile}")
 
+        # Generate S3 urls
+        # We parse as BasemapOut to calculated computed fields (format, mimetype)
+        basemap_out = project_schemas.BasemapOut(
+            **new_basemap.model_dump(exclude=["url"]),
+            url=outfile,
+        )
+        basemap_s3_path = (
+            f"{org_id}/{project_id}/basemaps/{basemap_out.id}.{basemap_out.format}"
+        )
+        log.debug(f"Uploading basemap to S3 path: {basemap_s3_path}")
+        add_file_to_bucket(
+            settings.S3_BUCKET_NAME,
+            basemap_s3_path,
+            outfile,
+            content_type=basemap_out.mimetype,
+        )
+        basemap_external_s3_url = (
+            f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{basemap_s3_path}"
+        )
+        log.info(f"Upload of basemap to S3 complete: {basemap_external_s3_url}")
+        # Delete file on disk
+        Path(outfile).unlink(missing_ok=True)
+
         update_basemap_sync = async_to_sync(DbBasemap.update)
         update_basemap_sync(
             db,
-            new_basemap.id,
-            project_schemas.BasemapUpdate(status=BackgroundTaskStatus.SUCCESS),
+            basemap_out.id,
+            project_schemas.BasemapUpdate(
+                url=basemap_external_s3_url,
+                status=BackgroundTaskStatus.SUCCESS,
+            ),
         )
 
         update_bg_task_sync = async_to_sync(DbBackgroundTask.update)

@@ -56,7 +56,7 @@ const LayerCard = ({ layer, changeBaseLayerHandler, active }: layerCardPropType)
   );
 };
 
-const LayerSwitchMenu = ({ map, pmTileLayerData = null }: { map: any; pmTileLayerData?: any }) => {
+const LayerSwitchMenu = ({ map, pmTileLayerUrl = null }: { map: any; pmTileLayerUrl?: any }) => {
   const { pathname } = useLocation();
   const [baseLayers, setBaseLayers] = useState<string[]>(['OSM', 'Satellite', 'None']);
   const [hasPMTile, setHasPMTile] = useState(false);
@@ -78,10 +78,10 @@ const LayerSwitchMenu = ({ map, pmTileLayerData = null }: { map: any; pmTileLaye
   }, [projectInfo, pathname, map]);
 
   useEffect(() => {
-    if (!pmTileLayerData || baseLayers.includes('PMTile')) return;
+    if (!pmTileLayerUrl || baseLayers.includes('Custom')) return;
     setHasPMTile(true);
-    setActiveTileLayer('PMTile');
-  }, [pmTileLayerData]);
+    setActiveTileLayer('Custom');
+  }, [pmTileLayerUrl]);
 
   const changeBaseLayer = (baseLayerTitle: string) => {
     const allLayers = map.getLayers();
@@ -90,7 +90,7 @@ const LayerSwitchMenu = ({ map, pmTileLayerData = null }: { map: any; pmTileLaye
     );
     const baseLayersCollection: Record<string, any>[] = filteredBaseLayers?.values_?.layers.array_;
     baseLayersCollection
-      ?.filter((bLayer) => bLayer?.values_?.title !== 'PMTile')
+      ?.filter((bLayer) => bLayer?.values_?.title !== 'Custom')
       ?.forEach((baseLayer) => {
         if (baseLayer?.values_?.title === baseLayerTitle) {
           baseLayer.setVisible(true);
@@ -158,10 +158,10 @@ const LayerSwitchMenu = ({ map, pmTileLayerData = null }: { map: any; pmTileLaye
                   <h6 className="fmtm-text-base fmtm-mb-1">Tiles</h6>
                   <div className="fmtm-flex fmtm-flex-wrap fmtm-justify-between fmtm-gap-y-2">
                     <LayerCard
-                      key="PMTile"
-                      layer="PMTile"
-                      changeBaseLayerHandler={() => toggleTileLayer('PMTile')}
-                      active={'PMTile' === activeTileLayer}
+                      key="Custom"
+                      layer="Custom"
+                      changeBaseLayerHandler={() => toggleTileLayer('Custom')}
+                      active={'Custom' === activeTileLayer}
                     />
                   </div>
                 </div>

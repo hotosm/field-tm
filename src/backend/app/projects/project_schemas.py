@@ -286,9 +286,9 @@ class BasemapIn(DbBasemap):
     id: Annotated[Optional[UUID], Field(exclude=True)] = None
     project_id: int
     tile_source: str
-    url: str
     background_task_id: UUID
     status: BackgroundTaskStatus
+    # 'url' not set to mandatory, as it can be updated after upload
 
 
 class BasemapUpdate(DbBasemap):

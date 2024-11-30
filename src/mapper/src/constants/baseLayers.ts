@@ -107,15 +107,15 @@ let satellite = {
 	],
 };
 
-export const customStyle = {
-	id: 'Custom',
+export const pmtilesStyle = {
+	id: 'PMTiles',
 	version: 8,
-	name: 'Custom',
+	name: 'PMTiles',
 	metadata: {
 		thumbnail: oamLogo,
 	},
 	sources: {
-		custom: {
+		pmtiles: {
 			type: 'raster',
 			url: '',
 			tileSize: 512,
@@ -124,9 +124,9 @@ export const customStyle = {
 	},
 	layers: [
 		{
-			id: 'custom',
+			id: 'pmtiles',
 			type: 'raster',
-			source: 'custom',
+			source: 'pmtiles',
 			layout: {
 				visibility: 'visible',
 			},
@@ -134,4 +134,4 @@ export const customStyle = {
 	],
 };
 
-export const baseLayers = [stamenStyle, esriStyle, satellite];
+export const baseLayers = [osmStyle, stamenStyle, esriStyle, satellite];

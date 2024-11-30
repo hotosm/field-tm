@@ -119,6 +119,9 @@ importers:
       ol-layerswitcher:
         specifier: ^4.1.1
         version: 4.1.1(ol@8.2.0)
+      ol-pmtiles:
+        specifier: ^1.0.2
+        version: 1.0.2(ol@8.2.0)
       pako:
         specifier: ^2.1.0
         version: 2.1.0
@@ -3566,6 +3569,11 @@ packages:
     peerDependencies:
       ol: '>=5.0.0'
 
+  ol-pmtiles@1.0.2:
+    resolution: {integrity: sha512-+2itEeTcOk6RWikH2/cWIvv2mFW0empLaCibon65e1kyOEzB+zHIqF3eKa15yyznV8r9K0wfx9S3aG6ceXL0hQ==}
+    peerDependencies:
+      ol: '>=9.0.0'
+
   ol@8.2.0:
     resolution: {integrity: sha512-/m1ddd7Jsp4Kbg+l7+ozR5aKHAZNQOBAoNZ5pM9Jvh4Etkf0WGkXr9qXd7PnhmwiC1Hnc2Toz9XjCzBBvexfXw==}
 
@@ -3675,6 +3683,9 @@ packages:
 
   pmtiles@3.0.6:
     resolution: {integrity: sha512-IdeMETd5lBIDVTLul1HFl0Q7l4KLJjzdxgcp+sN7pYvbipaV7o/0u0HiV06kaFCD0IGEN8KtUHyFZpY30WMflw==}
+
+  pmtiles@3.2.1:
+    resolution: {integrity: sha512-3R4fBwwoli5mw7a6t1IGwOtfmcSAODq6Okz0zkXhS1zi9sz1ssjjIfslwPvcWw5TNhdjNBUg9fgfPLeqZlH6ng==}
 
   possible-typed-array-names@1.0.0:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
@@ -8432,6 +8443,11 @@ snapshots:
     dependencies:
       ol: 8.2.0
 
+  ol-pmtiles@1.0.2(ol@8.2.0):
+    dependencies:
+      ol: 8.2.0
+      pmtiles: 3.2.1
+
   ol@8.2.0:
     dependencies:
       color-rgba: 3.0.0
@@ -8537,6 +8553,11 @@ snapshots:
       fsevents: 2.3.2
 
   pmtiles@3.0.6:
+    dependencies:
+      '@types/leaflet': 1.9.8
+      fflate: 0.8.2
+
+  pmtiles@3.2.1:
     dependencies:
       '@types/leaflet': 1.9.8
       fflate: 0.8.2

@@ -22,7 +22,6 @@ import os
 from io import BytesIO
 from pathlib import Path
 from typing import Annotated, Optional
-from uuid import UUID
 
 import requests
 from fastapi import (
@@ -37,7 +36,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fmtm_splitter.splitter import split_by_sql, split_by_square
 from geojson_pydantic import FeatureCollection
 from loguru import logger as log
@@ -314,42 +313,45 @@ async def tiles_list(
     return await DbBasemap.all(db, project_user.get("project").id)
 
 
-@router.get(
-    "/{project_id}/tiles/{tile_id}",
-    response_model=project_schemas.BasemapOut,
-)
-async def download_tiles(
-    tile_id: UUID,
-    db: Annotated[Connection, Depends(db_conn)],
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-):
-    """Download the basemap tile archive for a project."""
-    log.debug("Getting basemap path from DB")
-    try:
-        db_basemap = await DbBasemap.one(db, tile_id)
-    except KeyError as e:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
+# NOTE we no longer need this as tiles are uploaded to S3
+# However, it could be useful if requiring private buckets in
+# the future, with pre-signed URL generation
+# @router.get(
+#     "/{project_id}/tiles/{tile_id}",
+#     response_model=project_schemas.BasemapOut,
+# )
+# async def download_tiles(
+#     tile_id: UUID,
+#     db: Annotated[Connection, Depends(db_conn)],
+#     project_user: Annotated[ProjectUserDict, Depends(mapper)],
+# ):
+#     """Download the basemap tile archive for a project."""
+#     log.debug("Getting basemap path from DB")
+#     try:
+#         db_basemap = await DbBasemap.one(db, tile_id)
+#     except KeyError as e:
+#         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
-    log.info(f"User requested download for tiles: {db_basemap.url}")
+#     log.info(f"User requested download for tiles: {db_basemap.url}")
 
-    project = project_user.get("project")
-    filename = Path(db_basemap.url).name.replace(f"{project.id}_", f"{project.slug}_")
-    log.debug(f"Sending tile archive to user: {filename}")
+#     project = project_user.get("project")
+#     filename = Path(db_basemap.url).name.replace(f"{project.id}_", f"{project.slug}_")
+#     log.debug(f"Sending tile archive to user: {filename}")
 
-    if db_basemap.format == "mbtiles":
-        mimetype = "application/vnd.mapbox-vector-tile"
-    elif db_basemap.format == "pmtiles":
-        mimetype = "application/vnd.pmtiles"
-    else:
-        mimetype = "application/vnd.sqlite3"
+#     if db_basemap.format == "mbtiles":
+#         mimetype = "application/vnd.mapbox-vector-tile"
+#     elif db_basemap.format == "pmtiles":
+#         mimetype = "application/vnd.pmtiles"
+#     else:
+#         mimetype = "application/vnd.sqlite3"
 
-    return FileResponse(
-        db_basemap.url,
-        headers={
-            "Content-Disposition": f"attachment; filename={filename}",
-            "Content-Type": mimetype,
-        },
-    )
+#     return FileResponse(
+#         db_basemap.url,
+#         headers={
+#             "Content-Disposition": f"attachment; filename={filename}",
+#             "Content-Type": mimetype,
+#         },
+#     )
 
 
 @router.get("/categories")
@@ -956,6 +958,7 @@ async def generate_project_basemap(
 ):
     """Returns basemap tiles for a project."""
     project_id = project_user.get("project").id
+    org_id = project_user.get("project").organisation_id
 
     # Create task in db and return uuid
     log.debug(
@@ -974,6 +977,7 @@ async def generate_project_basemap(
         project_crud.generate_project_basemap,
         db,
         project_id,
+        org_id,
         background_task_id,
         basemap_in.tile_source,
         basemap_in.file_format,

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-    import type { UUID } from 'crypto';
     import type { SlSelectEvent } from '@shoelace-style/shoelace/dist/events';
     // FIXME this is a workaround to re-import, as using hot-select
     // and hot-option prevents selection of values!
@@ -11,7 +10,7 @@
 
     import type { Basemap } from '$lib/utils/basemaps';
     import { getProjectBasemapStore } from '$store/common.svelte.ts';
-	import { downloadMbtiles, loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/utils/basemaps';
+	import { loadOnlinePmtiles, writeOfflinePmtiles } from '$lib/utils/basemaps';
 
 	interface Props {
         projectId: number;
@@ -20,12 +19,10 @@
 
 	let { projectId, children }: Props = $props();
 	const basemapStore = getProjectBasemapStore();
-
-    let selectedBasemapId: UUID | null = $state(null);
+	let selectedBasemap: Basemap | null = $state(null);
 
     // Reactive variables
 	let basemapsAvailable: boolean = $derived(basemapStore.projectBasemaps && basemapStore.projectBasemaps.length > 0);
-	let selectedBasemap: Basemap | null = $derived(basemapStore.projectBasemaps?.find((basemap: Basemap) => basemap.id === selectedBasemapId) || null);
 
 	onMount(() => {
         basemapStore.refreshBasemaps(projectId);
@@ -48,8 +45,8 @@
             <sl-select
                 placeholder="Select a basemap"
                 onsl-change={(event: SlSelectEvent) => {
-                    const selection = event.originalTarget.value
-                    selectedBasemapId = selection;
+                    const selectedId = event.originalTarget.value
+                    selectedBasemap = basemapStore.projectBasemaps?.find((basemap: Basemap) => basemap.id === selectedId) || null
                 }}
             >
                 {#each basemapStore.projectBasemaps as basemap}
@@ -73,11 +70,11 @@
     </div>
 
     <!-- Load baselayer & download to OPFS buttons -->
-    {#if selectedBasemap?.format === 'pmtiles' }
+    {#if selectedBasemap && selectedBasemap?.format === 'pmtiles' }
         <sl-button
-            onclick={() => loadOnlinePmtiles(selectedBasemap)}
+            onclick={() => loadOnlinePmtiles(selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
-                e.key === 'Enter' && loadOnlinePmtiles(selectedBasemap);
+                e.key === 'Enter' && loadOnlinePmtiles(selectedBasemap.url);
             }}
             role="button"
             tabindex="0"
@@ -90,9 +87,9 @@
         </sl-button>
 
         <sl-button
-            onclick={() => writeOfflinePmtiles(projectId, selectedBasemapId)}
+            onclick={() => writeOfflinePmtiles(projectId, selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
-                e.key === 'Enter' && writeOfflinePmtiles(projectId, selectedBasemapId);
+                e.key === 'Enter' && writeOfflinePmtiles(projectId, selectedBasemap.url);
             }}
             role="button"
             tabindex="0"
@@ -105,11 +102,11 @@
         </sl-button>
 
     <!-- Download Mbtiles Button -->
-    {:else if selectedBasemap?.format === 'mbtiles' }
+    {:else if selectedBasemap && selectedBasemap?.format === 'mbtiles' }
         <sl-button
-            onclick={() => downloadMbtiles(projectId, selectedBasemapId)}
+            onclick={() => window.open(selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
-                e.key === 'Enter' && downloadMbtiles(projectId, selectedBasemapId);
+                e.key === 'Enter' && window.open(selectedBasemap.url);
             }}
             role="button"
             tabindex="0"
