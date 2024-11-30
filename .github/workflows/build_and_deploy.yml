@@ -17,7 +17,7 @@ on:
 
 jobs:
   backend-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.9
     with:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
@@ -29,12 +29,12 @@ jobs:
     secrets: inherit
 
   frontend-unit-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/test_pnpm.yml@2.0.9
     with:
       working_dir: src/frontend
 
   frontend-e2e-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.9
     with:
       playwright: true
       cache_image: false
@@ -47,7 +47,7 @@ jobs:
     secrets: inherit
 
   backend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
     needs: [backend-test]
     with:
       context: src/backend
@@ -55,7 +55,7 @@ jobs:
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
-    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
     needs: [frontend-unit-test, frontend-e2e-test]
     with:
       context: src
@@ -165,7 +165,7 @@ jobs:
     needs:
       - smoke-test-backend
       - smoke-test-frontend
-    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@2.0.10
+    uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@2.0.9
     with:
       environment: ${{ github.ref_name }}
       docker_compose_file: "docker-compose.${{ github.ref_name }}.yml"
