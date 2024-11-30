@@ -41,8 +41,8 @@ async def init_osm_auth():
     return Auth(
         osm_url=settings.OSM_URL,
         client_id=settings.OSM_CLIENT_ID,
-        client_secret=settings.OSM_CLIENT_SECRET,
-        secret_key=settings.OSM_SECRET_KEY,
+        client_secret=settings.OSM_CLIENT_SECRET.get_secret_value(),
+        secret_key=settings.OSM_SECRET_KEY.get_secret_value(),
         login_redirect_uri=settings.OSM_LOGIN_REDIRECT_URI,
         scope=settings.OSM_SCOPE,
     )
@@ -108,7 +108,7 @@ def create_jwt_tokens(input_data: dict) -> tuple[str, str]:
     access_token_data = input_data
     access_token = jwt.encode(
         access_token_data,
-        settings.ENCRYPTION_KEY,
+        settings.ENCRYPTION_KEY.get_secret_value(),
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
     refresh_token_data = input_data
@@ -117,7 +117,7 @@ def create_jwt_tokens(input_data: dict) -> tuple[str, str]:
     )  # set refresh token expiry to 7 days
     refresh_token = jwt.encode(
         refresh_token_data,
-        settings.ENCRYPTION_KEY,
+        settings.ENCRYPTION_KEY.get_secret_value(),
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
 
@@ -130,7 +130,7 @@ def refresh_access_token(payload: dict) -> str:
 
     return jwt.encode(
         payload,
-        settings.ENCRYPTION_KEY,
+        settings.ENCRYPTION_KEY.get_secret_value(),
         algorithm=settings.JWT_ENCRYPTION_ALGORITHM,
     )
 
@@ -150,7 +150,7 @@ def verify_token(token: str):
     try:
         return jwt.decode(
             token,
-            settings.ENCRYPTION_KEY,
+            settings.ENCRYPTION_KEY.get_secret_value(),
             algorithms=[settings.JWT_ENCRYPTION_ALGORITHM],
             audience=settings.FMTM_DOMAIN,
         )

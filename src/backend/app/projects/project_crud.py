@@ -151,7 +151,7 @@ async def generate_data_extract(
     pg = PostgresClient(
         "underpass",
         extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN
+        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
         if settings.RAW_DATA_API_AUTH_TOKEN
         else None,
     )

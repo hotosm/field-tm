@@ -800,7 +800,7 @@ def get_osm_geometries(form_category, geometry):
     pg = PostgresClient(
         "underpass",
         extract_config,
-        auth_token=settings.RAW_DATA_API_AUTH_TOKEN
+        auth_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
         if settings.RAW_DATA_API_AUTH_TOKEN
         else None,
     )

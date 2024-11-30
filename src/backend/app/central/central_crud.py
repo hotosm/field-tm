@@ -53,7 +53,11 @@ def get_odk_project(odk_central: Optional[central_schemas.ODKCentralDecrypted] =
         log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
+        pw = (
+            settings.ODK_CENTRAL_PASSWD.get_secret_value()
+            if settings.ODK_CENTRAL_PASSWD
+            else ""
+        )
 
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
@@ -108,7 +112,11 @@ def get_odk_app_user(odk_central: Optional[central_schemas.ODKCentralDecrypted] 
         log.debug("Attempting extraction from environment variables")
         url = settings.ODK_CENTRAL_URL
         user = settings.ODK_CENTRAL_USER
-        pw = settings.ODK_CENTRAL_PASSWD
+        pw = (
+            settings.ODK_CENTRAL_PASSWD.get_secret_value()
+            if settings.ODK_CENTRAL_PASSWD
+            else ""
+        )
 
     try:
         log.debug(f"Connecting to ODKCentral: url={url} user={user}")
