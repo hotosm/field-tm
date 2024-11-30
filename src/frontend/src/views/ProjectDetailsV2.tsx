@@ -34,7 +34,6 @@ import { useAppSelector } from '@/types/reduxTypes';
 import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
-import { readFileFromOPFS } from '@/api/Files';
 import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
@@ -53,8 +52,7 @@ const ProjectDetailsV2 = () => {
   const [dataExtractUrl, setDataExtractUrl] = useState<string | undefined>();
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
-  // Can pass a File object, or a string URL to be read by PMTiles
-  const [customBasemapData, setCustomBasemapData] = useState<File | string | null>();
+  const customBasemapUrl = useAppSelector((state) => state.project.customBasemapUrl);
   const [viewState, setViewState] = useState('project_info');
   const projectId: string = params.id;
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
@@ -68,7 +66,6 @@ const ProjectDetailsV2 = () => {
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const taskModalStatus = CoreModules.useAppSelector((state) => state.project.taskModalStatus);
-  const projectOpfsBasemapPath = useAppSelector((state) => state?.project?.projectOpfsBasemapPath);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const entityOsmMap = useAppSelector((state) => state?.project?.entityOsmMap);
 
@@ -255,32 +252,6 @@ const ProjectDetailsV2 = () => {
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
-  const getPmtilesBasemap = async () => {
-    if (!projectOpfsBasemapPath) {
-      return;
-    }
-    const opfsPmtilesData = await readFileFromOPFS(projectOpfsBasemapPath);
-    setCustomBasemapData(opfsPmtilesData);
-  };
-  useEffect(() => {
-    if (!projectOpfsBasemapPath) {
-      return;
-    }
-
-    // Extract project id from projectOpfsBasemapPath
-    const projectOpfsBasemapPathParts = projectOpfsBasemapPath.split('/');
-    const projectOpfsBasemapProjectId = projectOpfsBasemapPathParts[0];
-
-    // Check if project id from projectOpfsBasemapPath matches current projectId
-    if (projectOpfsBasemapProjectId !== projectId) {
-      // If they don't match, set CustomBasemapData to null
-      setCustomBasemapData(null);
-    } else {
-      // If they match, fetch the basemap data
-      getPmtilesBasemap();
-    }
-    return () => {};
-  }, [projectOpfsBasemapPath]);
   const [showDebugConsole, setShowDebugConsole] = useState(false);
 
   return (
@@ -450,10 +421,7 @@ const ProjectDetailsV2 = () => {
                   />
                 </div>
               )}
-              <LayerSwitcherControl
-                visible={customBasemapData ? 'custom' : 'osm'}
-                pmTileLayerData={customBasemapData}
-              />
+              <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
 
               {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (
                 <VectorLayer
@@ -533,7 +501,7 @@ const ProjectDetailsV2 = () => {
               <MapControlComponent
                 map={map}
                 projectName={state?.projectInfo?.name || ''}
-                pmTileLayerData={customBasemapData}
+                pmTileLayerUrl={customBasemapUrl}
               />
             </MapComponent>
             <div

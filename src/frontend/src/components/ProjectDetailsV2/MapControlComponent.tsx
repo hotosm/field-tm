@@ -15,7 +15,7 @@ import MapLegends from '@/components/MapLegends';
 type mapControlComponentType = {
   map: any;
   projectName: string;
-  pmTileLayerData: any;
+  pmTileLayerUrl: any;
 };
 
 const btnList = [
@@ -41,7 +41,7 @@ const btnList = [
   },
 ];
 
-const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlComponentType) => {
+const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlComponentType) => {
   const { pathname } = useLocation();
   const dispatch = CoreModules.useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
@@ -89,7 +89,7 @@ const MapControlComponent = ({ map, projectName, pmTileLayerData }: mapControlCo
           </div>
         </Tooltip>
       ))}
-      <LayerSwitchMenu map={map} pmTileLayerData={pmTileLayerData} />
+      <LayerSwitchMenu map={map} pmTileLayerUrl={pmTileLayerUrl} />
       {/* download options */}
       <div
         className={`fmtm-relative ${!pathname.includes('project/') ? 'fmtm-hidden' : 'sm:fmtm-hidden'}`}

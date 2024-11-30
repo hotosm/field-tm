@@ -67,20 +67,26 @@ def object_exists(bucket_name: str, s3_path: str) -> bool:
             ) from e
 
 
-def add_file_to_bucket(bucket_name: str, file_path: str, s3_path: str):
+def add_file_to_bucket(
+    bucket_name: str,
+    s3_path: str,
+    file_path: str,
+    content_type="application/octet-stream",
+):
     """Upload a file from the filesystem to an S3 bucket.
 
     Args:
         bucket_name (str): The name of the S3 bucket.
-        file_path (str): The path to the file on the local filesystem.
         s3_path (str): The path in the S3 bucket where the file will be stored.
+        file_path (str): The path to the file on the local filesystem.
+        content_type (str): The file mimetype, default application/octet-stream.
     """
     # Ensure s3_path starts with a forward slash
     if not s3_path.startswith("/"):
         s3_path = f"/{s3_path}"
 
     client = s3_client()
-    client.fput_object(bucket_name, file_path, s3_path)
+    client.fput_object(bucket_name, s3_path, file_path, content_type=content_type)
 
 
 def add_obj_to_bucket(
@@ -110,7 +116,12 @@ def add_obj_to_bucket(
     file_obj.seek(0)
 
     result = client.put_object(
-        bucket_name, s3_path, file_obj, file_obj.getbuffer().nbytes, **kwargs
+        bucket_name,
+        s3_path,
+        file_obj,
+        file_obj.getbuffer().nbytes,
+        content_type=content_type,
+        **kwargs,
     )
     log.debug(
         f"Created {result.object_name} object; etag: {result.etag}, "

@@ -3,7 +3,7 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import environment from '@/environment';
-import { DownloadTile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
+import { DownloadBasemapFile, GenerateProjectTiles, GetTilesList, ProjectById } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { projectInfoType } from '@/models/project/projectModel';
 import { useAppSelector } from '@/types/reduxTypes';
@@ -31,9 +31,6 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     padding: '16px 32px 24px 32px',
     maxWidth: '1000px',
   });
-  const downloadBasemap = (tileId, toOpfs = false) => {
-    dispatch(DownloadTile(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles/${tileId}`, projectInfo, toOpfs));
-  };
 
   const getTilesList = () => {
     dispatch(GetTilesList(`${import.meta.env.VITE_API_URL}/projects/${id}/tiles`));
@@ -306,16 +303,16 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
                     <CoreModules.TableCell align="center">
                       <div className="fmtm-flex fmtm-gap-4 fmtm-float-right">
                         {list.status === 'SUCCESS' && list.format === 'pmtiles' && (
-                          <AssetModules.BoltIcon
+                          <AssetModules.VisibilityOutlinedIcon
                             sx={{ cursor: 'pointer', fontSize: '22px' }}
-                            onClick={() => downloadBasemap(list.id, true)}
+                            onClick={() => dispatch(ProjectActions.SetPmtileBasemapUrl(list.url))}
                             className="fmtm-text-red-500 hover:fmtm-text-red-700"
                           />
                         )}
                         {list.status === 'SUCCESS' && (
                           <AssetModules.FileDownloadIcon
                             sx={{ cursor: 'pointer', fontSize: '22px' }}
-                            onClick={() => downloadBasemap(list.id)}
+                            onClick={() => dispatch(DownloadBasemapFile(list.url))}
                             className="fmtm-text-gray-500 hover:fmtm-text-blue-500"
                           />
                         )}

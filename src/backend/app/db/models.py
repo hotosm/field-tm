@@ -1523,6 +1523,23 @@ class DbBackgroundTask(BaseModel):
 
         return updated_task
 
+    @classmethod
+    async def delete(cls, db: Connection, background_task_id: UUID) -> bool:
+        """Delete a background task entry."""
+        sql = """
+            DELETE from background_tasks
+            WHERE id = %(background_task_id)s
+            RETURNING id;
+        """
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, {"background_task_id": background_task_id})
+            success = await cur.fetchone()
+
+        if success:
+            return True
+        return False
+
 
 class DbBasemap(BaseModel):
     """Table tiles_path.
@@ -1636,7 +1653,7 @@ class DbBasemap(BaseModel):
     async def update(
         cls,
         db: Connection,
-        basemap_id: int,
+        basemap_id: UUID,
         basemap_update: "BasemapUpdate",
     ) -> Self:
         """Update values for a basemap."""
@@ -1661,6 +1678,23 @@ class DbBasemap(BaseModel):
             )
 
         return updated_basemap
+
+    @classmethod
+    async def delete(cls, db: Connection, basemap_id: UUID) -> bool:
+        """Delete a basemap."""
+        sql = """
+            DELETE from basemaps
+            WHERE id = %(basemap_id)s
+            RETURNING id;
+        """
+
+        async with db.cursor() as cur:
+            await cur.execute(sql, {"basemap_id": basemap_id})
+            success = await cur.fetchone()
+
+        if success:
+            return True
+        return False
 
 
 class DbSubmissionPhoto(BaseModel):

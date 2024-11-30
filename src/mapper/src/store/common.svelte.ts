@@ -57,10 +57,6 @@ function getProjectBasemapStore() {
 		},
 		setProjectPmtilesUrl: (url: string) => {
 			projectPmtilesUrl = url;
-			getAlertStore().setAlert({
-				variant: 'success',
-				message: 'Success! Check the base layer selector.',
-			});
 		},
 	};
 }

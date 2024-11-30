@@ -2,6 +2,7 @@
 	import '$styles/page.css';
 	import '$styles/button.css';
 	import '@hotosm/ui/dist/hotosm-ui';
+	import { onMount, tick } from 'svelte';
 	import {
 		MapLibre,
 		GeoJSON,
@@ -34,8 +35,10 @@
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 	// import { entityFeatcolStore, selectedEntityId } from '$store/entities';
+	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
+	import { loadOfflinePmtiles } from '$lib/utils/basemaps.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
-	import { baseLayers, osmStyle, customStyle } from '$constants/baseLayers.ts';
+	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import type { GeoJSON as GeoJSONType } from 'geojson';
 
@@ -58,27 +61,49 @@
 
 	let map: maplibregl.Map | undefined = $state();
 	let loaded: boolean = $state(false);
+	let selectedBaselayer: string = $state('OSM');
 	let taskAreaClicked: boolean = $state(false);
 	let toggleGeolocationStatus: boolean = $state(false);
 	let projectSetupStep = $state(null);
-	// If no custom layer URL, omit, else set URL from projectPmtilesUrl
-	let processedBaseLayers = $derived([
-		...baseLayers,
-		...(projectBasemapStore.projectPmtilesUrl
-			? [
-					{
-						...customStyle,
-						sources: {
-							...customStyle.sources,
-							custom: {
-								...customStyle.sources.custom,
-								url: projectBasemapStore.projectPmtilesUrl,
-							},
+	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
+	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
+		projectBasemapStore.projectPmtilesUrl ? 
+			[
+				...baseLayers,
+				{
+					...pmtilesStyle,
+					sources: {
+						...pmtilesStyle.sources,
+						pmtiles: {
+							...pmtilesStyle.sources.pmtiles,
+							url: projectBasemapStore.projectPmtilesUrl,
 						},
 					},
-				]
-			: []),
-	]);
+				},
+			]
+			: baseLayers
+	);
+	// // This does not work! Infinite looping
+	// // Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
+	// $effect(() => {
+	// 	if (projectBasemapStore.projectPmtilesUrl) {
+	// 		const layers = allBaseLayers
+	// 		.filter((layer) => layer.name !== "PMTiles")
+	// 		.push(
+	// 			{
+	// 				...pmtilesStyle,
+	// 				sources: {
+	// 					...pmtilesStyle.sources,
+	// 					pmtiles: {
+	// 						...pmtilesStyle.sources.pmtiles,
+	// 						url: projectBasemapStore.projectPmtilesUrl,
+	// 					},
+	// 				},
+	// 			},
+	// 		)
+	// 		allBaseLayers = layers;
+	// 	}
+	// })
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
@@ -137,11 +162,6 @@
 	$effect(() => {
 		if (map) {
 			setMapRef(map);
-			// Register pmtiles protocol
-			if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
-				let protocol = new Protocol();
-				maplibre.addProtocol('pmtiles', protocol.tile);
-			}
 		}
 	});
 
@@ -173,6 +193,22 @@
 			}),
 		};
 	}
+
+	onMount(async () => {
+		// Register pmtiles protocol
+		if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
+			let protocol = new Protocol();
+			maplibre.addProtocol('pmtiles', protocol.tile);
+		}
+
+		// Attempt loading OPFS PMTiles layers on first load
+		// note that this sets projectBasemapStore.projectPmtilesUrl
+		const offlineBasemapFile = await readFileFromOPFS(`${projectId}/basemap.pmtiles`);
+		if (offlineBasemapFile) {
+			await loadOfflinePmtiles(projectId);
+			selectedBaselayer = 'PMTiles';
+		}
+	});
 </script>
 
 <!-- Note here we still use Svelte 4 on:click until svelte-maplibre migrates -->
@@ -213,7 +249,12 @@
 		</ControlGroup></Control
 	>
 	<Control class="flex flex-col gap-y-2" position="bottom-right">
-		<LayerSwitcher {map} extraStyles={processedBaseLayers} sourcesIdToReAdd={['tasks', 'entities', 'geolocation']} />
+		<LayerSwitcher
+			{map}
+			styles={allBaseLayers}
+			sourcesIdToReAdd={['tasks', 'entities', 'geolocation']}
+			selectedStyleName={selectedBaselayer}
+		></LayerSwitcher>
 		<Legend />
 	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->

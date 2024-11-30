@@ -22,12 +22,12 @@ export default defineConfig({
 		alias: {
 			$lib: path.resolve('./src/lib'),
 			$components: path.resolve('./src/components'),
-			$static: path.resolve('./static'),
 			$store: path.resolve('./src/store'),
 			$routes: path.resolve('./src/routes'),
+			$constants: path.resolve('./src/constants'),
+			$static: path.resolve('./static'),
 			$styles: path.resolve('./src/styles'),
 			$assets: path.resolve('./src/assets'),
-			$constants: path.resolve('./src/constants'),
 		},
 	},
 	test: {
