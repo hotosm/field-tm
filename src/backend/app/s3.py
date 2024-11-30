@@ -24,7 +24,7 @@ def s3_client():
     return Minio(
         minio_url,
         settings.S3_ACCESS_KEY,
-        settings.S3_SECRET_KEY,
+        settings.S3_SECRET_KEY.get_secret_value() if settings.S3_SECRET_KEY else "",
         secure=is_secure,
     )
     # For AWS Instance Profile usage, but doesn't seem to work...

@@ -27,6 +27,7 @@ from cryptography.fernet import Fernet
 from pydantic import (
     BeforeValidator,
     Field,
+    SecretStr,
     TypeAdapter,
     ValidationInfo,
     computed_field,
@@ -119,7 +120,7 @@ class OpenObserveSettings(OtelSettings):
     """Optional OpenTelemetry specific settings (monitoring)."""
 
     OTEL_ENDPOINT: HttpUrlStr = Field(exclude=True)
-    OTEL_AUTH_TOKEN: Optional[str] = Field(exclude=True)
+    OTEL_AUTH_TOKEN: Optional[SecretStr] = Field(exclude=True)
 
     @computed_field
     @property
@@ -135,7 +136,7 @@ class OpenObserveSettings(OtelSettings):
         if not self.OTEL_AUTH_TOKEN:
             return None
         # NOTE auth token must be URL encoded, i.e. space=%20
-        auth_header = f"Authorization=Basic%20{self.OTEL_AUTH_TOKEN}"
+        auth_header = f"Authorization=Basic%20{self.OTEL_AUTH_TOKEN.get_secret_value()}"
         os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = auth_header
         return auth_header
 
@@ -150,7 +151,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "FMTM"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
-    ENCRYPTION_KEY: str
+    ENCRYPTION_KEY: SecretStr
     # NOTE HS384 is used for simplicity of implementation and compatibility with
     # existing Fernet based database value encryption
     JWT_ENCRYPTION_ALGORITHM: str = "HS384"
@@ -203,7 +204,7 @@ class Settings(BaseSettings):
 
     FMTM_DB_HOST: Optional[str] = "fmtm-db"
     FMTM_DB_USER: Optional[str] = "fmtm"
-    FMTM_DB_PASSWORD: Optional[str] = "fmtm"
+    FMTM_DB_PASSWORD: Optional[SecretStr] = "fmtm"
     FMTM_DB_NAME: Optional[str] = "fmtm"
 
     FMTM_DB_URL: Optional[PostgresDsn] = None
@@ -217,7 +218,7 @@ class Settings(BaseSettings):
         pg_url = PostgresDsn.build(
             scheme="postgresql",
             username=info.data.get("FMTM_DB_USER"),
-            password=info.data.get("FMTM_DB_PASSWORD"),
+            password=info.data.get("FMTM_DB_PASSWORD").get_secret_value(),
             host=info.data.get("FMTM_DB_HOST"),
             path=info.data.get("FMTM_DB_NAME", ""),
         )
@@ -225,11 +226,11 @@ class Settings(BaseSettings):
 
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
-    ODK_CENTRAL_PASSWD: Optional[str] = ""
+    ODK_CENTRAL_PASSWD: Optional[SecretStr] = ""
 
     OSM_CLIENT_ID: str
-    OSM_CLIENT_SECRET: str
-    OSM_SECRET_KEY: str
+    OSM_CLIENT_SECRET: SecretStr
+    OSM_SECRET_KEY: SecretStr
     # NOTE www is required for now
     # https://github.com/openstreetmap/operations/issues/951#issuecomment-1748717154
     OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
@@ -238,7 +239,7 @@ class Settings(BaseSettings):
 
     S3_ENDPOINT: str = "http://s3:9000"
     S3_ACCESS_KEY: Optional[str] = ""
-    S3_SECRET_KEY: Optional[str] = ""
+    S3_SECRET_KEY: Optional[SecretStr] = ""
     S3_BUCKET_NAME: str = "fmtm-data"
     S3_DOWNLOAD_ROOT: Optional[str] = None
 
@@ -273,7 +274,7 @@ class Settings(BaseSettings):
             return f"https://s3.{fmtm_domain}"
 
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
-    RAW_DATA_API_AUTH_TOKEN: Optional[str] = None
+    RAW_DATA_API_AUTH_TOKEN: Optional[SecretStr] = None
 
     @field_validator("RAW_DATA_API_AUTH_TOKEN", mode="before")
     @classmethod
@@ -323,7 +324,7 @@ def get_cipher_suite():
     # we are stuck at 32 char to maintain support with Fernet (reuse the same key).
     #
     # However this would require a migration for all existing instances of FMTM.
-    return Fernet(settings.ENCRYPTION_KEY)
+    return Fernet(settings.ENCRYPTION_KEY.get_secret_value())
 
 
 def encrypt_value(password: Union[str, HttpUrlStr]) -> str:

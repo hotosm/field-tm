@@ -60,7 +60,9 @@ async def init_admin_org(db: Connection) -> None:
         url="https://hotosm.org",
         odk_central_url=settings.ODK_CENTRAL_URL,
         odk_central_user=settings.ODK_CENTRAL_USER,
-        odk_central_password=settings.ODK_CENTRAL_PASSWD,
+        odk_central_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
+        if settings.ODK_CENTRAL_PASSWD
+        else "",
         approved=True,
     )
     with open("/opt/app/images/hot-org-logo.png", "rb") as logo_file:
