@@ -6,11 +6,10 @@ import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import Fill from 'ol/style/Fill';
 import { Cluster, OSM as OSMSource } from 'ol/source';
-import { Text, Circle, Icon } from 'ol/style';
+import { Text, Circle } from 'ol/style';
 import VectorSource from 'ol/source/Vector';
 import SelectCluster from 'ol-ext/interaction/SelectCluster';
 import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
-import MarkerIcon from '@/assets/images/red_marker.png';
 
 function setAsyncStyle(style, feature, getIndividualStyle) {
   const styleCache = {};
@@ -186,23 +185,7 @@ const ClusterLayer = ({
       if (isExpandedFeature) {
         const feature = clusterMember.getProperties().features[0];
         const featureProperty = feature?.getProperties();
-        console.log(featureProperty, 'featureProperty');
-        console.log(feature, 'isExpandedFeature');
-        const style = new Style({
-          image: new Icon({
-            src: MarkerIcon,
-            scale: 0.06,
-          }),
-          text: new Text({
-            text: featureProperty?.project_id,
-            fill: new Fill({
-              color: 'black',
-            }),
-            offsetY: 25,
-            font: '15px Times New Roman',
-          }),
-        });
-        fillColor = '#96bfff';
+        const style = getIndividualStyle(featureProperty);
         return style;
       } else {
         return;

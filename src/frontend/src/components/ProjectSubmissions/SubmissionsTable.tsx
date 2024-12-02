@@ -15,7 +15,7 @@ import Button from '@/components/common/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
 import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
 import { Modal } from '@/components/common/Modal';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import filterParams from '@/utilfunctions/filterParams';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { useAppSelector } from '@/types/reduxTypes';
@@ -467,14 +467,9 @@ const SubmissionsTable = ({ toggleView }) => {
               const taskUid = taskList?.find((task) => task?.id == row?.task_id)?.id;
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
-                  <AssetModules.VisibilityOutlinedIcon
-                    className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
-                    onClick={() => {
-                      navigate(
-                        `/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`,
-                      );
-                    }}
-                  />{' '}
+                  <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`}>
+                    <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
+                  </Link>
                   <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
                   <AssetModules.CheckOutlinedIcon
                     className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"

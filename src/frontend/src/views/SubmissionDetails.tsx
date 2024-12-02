@@ -13,6 +13,7 @@ import Accordion from '@/components/common/Accordion';
 import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
 import ImageSlider from '@/components/common/ImageSlider';
+import { extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
 
 const renderValue = (value: any, key: string = '') => {
   if (key === 'start' || key === 'end') {
@@ -130,49 +131,6 @@ const SubmissionDetails = () => {
 
   const filteredData = restSubmissionDetails ? removeNullValues(restSubmissionDetails) : {};
 
-  const coordinatesArray: [number, number][] = restSubmissionDetails?.xlocation?.split(';').map(function (
-    coord: string,
-  ) {
-    let coordinate = coord
-      .trim()
-      .split(' ')
-      .slice(0, 2)
-      .map((value: string) => {
-        return parseFloat(value);
-      });
-    return [coordinate[1], coordinate[0]];
-  });
-
-  const geojsonFeature: Record<string, any> = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: coordinatesArray,
-        },
-        properties: {},
-      },
-    ],
-  };
-
-  const pointFeature = {
-    type: 'Feature',
-    geometry: {
-      ...restSubmissionDetails?.point,
-    },
-    properties: {},
-  };
-
-  const newFeaturePoint = {
-    type: 'Feature',
-    geometry: {
-      ...restSubmissionDetails?.new_feature,
-    },
-    properties: {},
-  };
-
   return (
     <>
       <UpdateReviewStatusModal />
@@ -256,19 +214,7 @@ const SubmissionDetails = () => {
           </div>
           <div className="fmtm-flex fmtm-flex-grow fmtm-justify-center fmtm-mt-10 md:fmtm-mt-0">
             <div className="fmtm-w-full fmtm-h-[20rem] md:fmtm-h-full fmtm-rounded-lg fmtm-overflow-hidden">
-              <SubmissionInstanceMap
-                featureGeojson={
-                  submissionDetailsLoading
-                    ? {}
-                    : restSubmissionDetails?.new_feature
-                      ? newFeaturePoint
-                      : coordinatesArray
-                        ? geojsonFeature
-                        : restSubmissionDetails?.point
-                          ? pointFeature
-                          : {}
-                }
-              />
+              <SubmissionInstanceMap featureGeojson={extractGeojsonFromObject(restSubmissionDetails)} />
             </div>
           </div>
         </div>
