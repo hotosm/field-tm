@@ -67,21 +67,21 @@
 	let projectSetupStep = $state(null);
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
-		projectBasemapStore.projectPmtilesUrl ? 
-			[
-				...baseLayers,
-				{
-					...pmtilesStyle,
-					sources: {
-						...pmtilesStyle.sources,
-						pmtiles: {
-							...pmtilesStyle.sources.pmtiles,
-							url: projectBasemapStore.projectPmtilesUrl,
+		projectBasemapStore.projectPmtilesUrl
+			? [
+					...baseLayers,
+					{
+						...pmtilesStyle,
+						sources: {
+							...pmtilesStyle.sources,
+							pmtiles: {
+								...pmtilesStyle.sources.pmtiles,
+								url: projectBasemapStore.projectPmtilesUrl,
+							},
 						},
 					},
-				},
-			]
-			: baseLayers
+				]
+			: baseLayers,
 	);
 	// // This does not work! Infinite looping
 	// // Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set

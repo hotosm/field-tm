@@ -30,11 +30,13 @@
 
 		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 		if (isMobile) {
-			entitiesStore.updateEntityStatus(projectData.id, {
-				entity_id: entityUuid,
-				status: 1,
-				label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
-			});
+			if (selectedEntity?.status === 'READY') {
+				entitiesStore.updateEntityStatus(projectData.id, {
+					entity_id: entityUuid,
+					status: 1,
+					label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
+				});
+			}
 			// Load entity in ODK Collect by intent
 			document.location.href = `odkcollect://form/${xformId}?feature=${entityUuid}`;
 		} else {

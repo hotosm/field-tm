@@ -17,8 +17,7 @@
 	import BasemapComponent from '$lib/components/offline/basemaps.svelte';
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
-	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
-	import type { ProjectTask, ZoomToTaskEventDetail } from '$lib/types';
+	import type { ProjectTask } from '$lib/types';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
 	import { getEntitiesStatusStore, getEntityStatusStream } from '$store/entities.svelte.ts';
@@ -31,7 +30,6 @@
 	}
 
 	let { data }: Props = $props();
-	// $effect: ({ electric, project } = data)
 
 	let mapComponent: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
@@ -113,7 +111,7 @@
 {/if}
 
 <!-- The main page -->
-<div class="h-[calc(100svh-4.625rem)]">
+<div class="h-[calc(100svh-3.699rem)] sm:h-[calc(100svh-4.625rem)]">
 	<MapComponent
 		setMapRef={(map) => {
 			mapComponent = map;
@@ -181,9 +179,9 @@
 					class="h-[70vh]"
 				/>
 				<sl-button
-					onclick={() => infoDialogRef?.close()}
+					onclick={() => infoDialogRef?.hide()}
 					onkeydown={(e: KeyboardEvent) => {
-						e.key === 'Enter' && infoDialogRef?.close();
+						e.key === 'Enter' && infoDialogRef?.hide();
 					}}
 					role="button"
 					tabindex="0"
