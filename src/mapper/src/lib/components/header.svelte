@@ -32,8 +32,8 @@
 
 <div class="p-3 flex items-center justify-between">
 	<div class="flex items-center gap-1">
-		<img src={HotLogo} alt="hot-logo" />
-		<img src={HotLogoText} alt="hot-logo" />
+		<img src={HotLogo} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
+		<img src={HotLogoText} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
 	</div>
 	<div class="flex items-center gap-4">
 		<!-- profile image and username display -->
@@ -55,7 +55,11 @@
 						class="w-[1.8rem] h-[1.8rem] min-w-[1.8rem] min-h-[1.8rem] max-w-[1.8rem] max-h-[1.8rem] rounded-full"
 					/>
 				{/if}
-				<p class="font-barlow-medium">{loginStore?.getAuthDetails?.username}</p>
+				<p
+					class="font-barlow-medium text-sm sm:text-base text-ellipsis whitespace-nowrap overflow-hidden max-w-[6rem] sm:max-w-fit"
+				>
+					{loginStore?.getAuthDetails?.username}
+				</p>
 			</div>
 		{:else}
 			<sl-button
@@ -103,20 +107,22 @@
 				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black">{menu.name}</a
 			>
 		{/each}
-		<sl-button
-			class="primary rounded"
-			variant="primary"
-			size="small"
-			onclick={handleSignOut}
-			onkeydown={(e: KeyboardEvent) => {
-				if (e.key === 'Enter') {
-					handleSignOut();
-				}
-			}}
-			role="button"
-			tabindex="0"
-		>
-			<span class="font-barlow-medium text-base">SIGN OUT</span>
-		</sl-button>
+		{#if loginStore?.getAuthDetails}
+			<sl-button
+				class="primary rounded"
+				variant="primary"
+				size="small"
+				onclick={handleSignOut}
+				onkeydown={(e: KeyboardEvent) => {
+					if (e.key === 'Enter') {
+						handleSignOut();
+					}
+				}}
+				role="button"
+				tabindex="0"
+			>
+				<span class="font-barlow-medium text-base">SIGN OUT</span>
+			</sl-button>
+		{/if}
 	</div>
 </hot-drawer>
