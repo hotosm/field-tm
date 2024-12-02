@@ -142,4 +142,44 @@ The example CSV can be downloaded
 
 ### 3. From Code (API)
 
--
+### Injected Fields in the FMTM XLS Form
+
+During project creation in the Field Mapping Tasking Manager (FMTM), specific
+fields and questions are automatically injected into the XLS form to assess
+digitization status and support the data conflation process. Below is an
+overview of the injected fields and their purposes:
+
+1. The rows are added to record essential metadata like date, username,
+   phone number, device ID and email address of the mapper.
+2. We also take the user's realtime location
+3. The question for feature selection is added on default to access
+   selecting of entity to be mapped during survey.
+4. If no feature is selected, the user would be prompted to take a GPS coordinate
+   of new feature.
+   Note: One of these two options must be filled up to proceed.
+5. We also dedicate few rows for calculating form category, osm ID,
+   Task Id and mapping status used on FMTM.
+6. We then ask mappers to answer if the feature exist in reality?
+   If yes, the custom form uploaded by user is proceeded.
+7. If no, the user is prompted to capture an image (if available) and the form
+   is terminated with a message:
+   "You cannot proceed with data acquisition if the building does not exist."
+
+The another set of questions injected are digitisation verification related questions.
+These questions are used for data conflation process i.e. merging the data to osm.
+These questions include:
+
+1. Is the digitized location for this feature correct?
+   If incorrect, users are asked: "What is wrong with the digitization?"
+   Options provided are:
+   Lumped – Multiple buildings digitized as a single polygon.
+   Split – A single building digitized as multiple polygons.
+   Other – Users can provide a custom explanation in a text field.
+   In case of other, user can input the their answer on text form.
+2. In all cases, users have the option to upload images to support
+   their responses. However, its an optional field.
+   The translated fields are also available in multiple languages,
+   including French and Spanish.
+   Below is the sample of injected fields.
+
+[mandatory_fields (3).xls](https://github.com/user-attachments/files/17975369/mandatory_fields.3.xls)
