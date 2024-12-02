@@ -5,9 +5,32 @@ import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
+import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
+import { Style, Circle } from 'ol/style';
+import { Stroke } from 'ol/style';
+import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
+import { Fill } from 'ol/style';
+import { geojsonType } from '@/store/types/ISubmissions';
 
 type submissionInstanceMapPropType = {
-  featureGeojson: Record<string, any>;
+  featureGeojson: { vectorLayerGeojson: geojsonType; clusterLayerGeojson: geojsonType };
+};
+
+const getIndividualStyle = (featureProperty) => {
+  const style = new Style({
+    image: new Circle({
+      radius: 10,
+      stroke: new Stroke({
+        color: hexToRgba('#D73F37'),
+        width: 2,
+      }),
+      fill: new Fill({
+        color: hexToRgba('#eb9f9f'),
+        width: 40,
+      }),
+    }),
+  });
+  return style;
 };
 
 const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType) => {
@@ -39,9 +62,9 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
           <LayerSwitchMenu map={map} />
         </div>
         <LayerSwitcherControl visible={'osm'} />
-        {featureGeojson?.type && (
+        {featureGeojson?.vectorLayerGeojson?.type && (
           <VectorLayer
-            geojson={featureGeojson}
+            geojson={featureGeojson?.vectorLayerGeojson}
             viewProperties={{
               size: map?.getSize(),
               padding: [50, 50, 50, 50],
@@ -52,6 +75,22 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
             zIndex={10}
             zoomToLayer
             style={{ ...defaultStyles, lineColor: '#D73F37', lineThickness: 2, circleRadius: 10, fillColor: '#D73F37' }}
+          />
+        )}
+        {featureGeojson?.clusterLayerGeojson?.type && (
+          <ClusterLayer
+            map={map}
+            source={featureGeojson?.clusterLayerGeojson}
+            zIndex={100}
+            visibleOnMap={true}
+            style={{
+              ...defaultStyles,
+              background_color: '#D73F37',
+              color: '#eb9f9f',
+              opacity: 90,
+            }}
+            mapOnClick={() => {}}
+            getIndividualStyle={getIndividualStyle}
           />
         )}
       </MapComponent>
