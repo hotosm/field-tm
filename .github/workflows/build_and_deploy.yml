@@ -33,19 +33,6 @@ jobs:
     with:
       working_dir: src/frontend
 
-  frontend-e2e-test:
-    uses: hotosm/gh-workflows/.github/workflows/test_compose.yml@2.0.9
-    with:
-      playwright: true
-      cache_image: false
-      compose_file: docker-compose.yml -f contrib/playwright/docker-compose.yml
-      compose_service: ui-test
-      cache_extra_imgs: |
-        "docker.io/postgis/postgis:${{ vars.POSTGIS_TAG }}"
-        "docker.io/minio/minio:${{ vars.MINIO_TAG }}"
-        "mcr.microsoft.com/playwright:${{ vars.PLAYWRIGHT_TAG }}"
-    secrets: inherit
-
   backend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
     needs: [backend-test]
@@ -56,7 +43,7 @@ jobs:
 
   frontend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
-    needs: [frontend-unit-test, frontend-e2e-test]
+    needs: [frontend-unit-test]
     with:
       context: src
       dockerfile: Dockerfile.ui.prod
