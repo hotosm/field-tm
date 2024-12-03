@@ -6,6 +6,7 @@ import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layer
 import { DrawnGeojsonTypes, GeoJSONFeatureTypes } from '@/store/types/ICreateProject';
 import MapControlComponent from '@/components/createnewproject/MapControlComponent';
 import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
+import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
 type NewDefineAreaMapProps = {
   drawToggle?: boolean;
@@ -65,6 +66,7 @@ const NewDefineAreaMap = ({
               duration: 500,
             }}
             onModify={onModify}
+            style={{ ...defaultStyles, lineColor: '#0fffff', lineThickness: 2, fillOpacity: 10, fillColor: '#000000' }}
           />
         )}
         {isDrawOrGeojsonFile && !splittedGeojson && (
@@ -80,6 +82,7 @@ const NewDefineAreaMap = ({
             onModify={onModify}
             zoomToLayer
             getAOIArea={getAOIArea}
+            style={{ ...defaultStyles, lineColor: '#0fffff', lineThickness: 2, fillOpacity: 10, fillColor: '#000000' }}
           />
         )}
 
@@ -93,6 +96,7 @@ const NewDefineAreaMap = ({
               duration: 500,
             }}
             zoomToLayer
+            style={{ ...defaultStyles, lineColor: '#D73F37', lineThickness: 1.5, fillColor: '#D73F37' }}
           />
         )}
         {buildingExtractedGeojson && (
@@ -105,6 +109,7 @@ const NewDefineAreaMap = ({
               duration: 500,
             }}
             zoomToLayer
+            style={{ ...defaultStyles, lineColor: '#1a2fa2', fillOpacity: 30, lineOpacity: 50 }}
           />
         )}
         {lineExtractedGeojson && (

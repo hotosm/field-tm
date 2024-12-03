@@ -11,6 +11,7 @@ import { Stroke } from 'ol/style';
 import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 import { Fill } from 'ol/style';
 import { geojsonType } from '@/store/types/ISubmissions';
+import MapControlComponent from '@/components/SubmissionMap/MapControlComponent';
 
 type submissionInstanceMapPropType = {
   featureGeojson: { vectorLayerGeojson: geojsonType; clusterLayerGeojson: geojsonType };
@@ -61,6 +62,7 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
         <div className="fmtm-absolute fmtm-right-2 fmtm-top-2 fmtm-z-20">
           <LayerSwitchMenu map={map} />
         </div>
+        <MapControlComponent map={map} />
         <LayerSwitcherControl visible={'osm'} />
         {featureGeojson?.vectorLayerGeojson?.type && (
           <VectorLayer
