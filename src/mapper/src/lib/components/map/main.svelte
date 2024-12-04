@@ -194,6 +194,14 @@
 		};
 	}
 
+	function zoomToProject() {
+		const taskBuffer = buffer(taskStore.featcol, 5, { units: 'meters' });
+		if (taskBuffer && map) {
+			const taskBbox: [number, number, number, number] = bbox(taskBuffer) as [number, number, number, number];
+			map?.fitBounds(taskBbox, { duration: 500 });
+		}
+	}
+
 	onMount(async () => {
 		// Register pmtiles protocol
 		if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
@@ -244,6 +252,14 @@
 				><hot-icon
 					name="geolocate"
 					class={`!text-[1.2rem] cursor-pointer  duration-200 ${toggleGeolocationStatus ? 'text-red-600' : 'text-[#52525B]'}`}
+				></hot-icon></ControlButton
+			>
+		</ControlGroup></Control
+	>
+	<Control class="flex flex-col gap-y-2" position="top-left">
+		<ControlGroup>
+			<ControlButton on:click={zoomToProject}
+				><hot-icon name="crop-free" class={`!text-[1.2rem] cursor-pointer duration-200 text-black`}
 				></hot-icon></ControlButton
 			>
 		</ControlGroup></Control
