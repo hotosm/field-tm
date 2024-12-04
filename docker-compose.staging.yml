@@ -72,6 +72,10 @@ services:
     extends:
       file: docker-compose.development.yml
       service: fmtm-db
+  electric:
+    extends:
+      file: docker-compose.development.yml
+      service: electric
   central-db:
     extends:
       file: docker-compose.development.yml
