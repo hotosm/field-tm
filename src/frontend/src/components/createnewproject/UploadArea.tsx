@@ -31,11 +31,11 @@ const uploadAreaOptions = [
   },
 ];
 
-const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload }) => {
+const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload, setAdditionalFeature }) => {
   useDocumentTitle('Create Project: Upload Area');
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const [uploadAreaFile, setUploadAreaFile] = useState(null);
   const [isGeojsonWGS84, setIsGeojsonWG84] = useState(true);
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
@@ -66,13 +66,15 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     navigate('/upload-survey');
     dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
+
   const {
     handleSubmit,
     handleCustomChange,
     values: formValues,
     errors,
   }: any = useForm(projectDetails, submission, UploadAreaValidation);
-  const toggleStep = (step, url) => {
+
+  const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
     navigate(url);
     dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
@@ -168,11 +170,14 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
 
   const resetFile = () => {
     setGeojsonFile(null);
+    setCustomDataExtractUpload(null);
     handleCustomChange('uploadedAreaFile', null);
     handleCustomChange('drawnGeojson', null);
+    setAdditionalFeature(null);
     dispatch(CreateProjectActions.SetDrawnGeojson(null));
     dispatch(CreateProjectActions.SetTotalAreaSelection(null));
-    dispatch(CreateProjectActions.ClearProjectStepState(formValues));
+    dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
+    dispatch(CreateProjectActions.ClearProjectStepState({ ...formValues, uploadedAreaFile: null, drawnGeojson: null }));
   };
 
   useEffect(() => {
@@ -279,38 +284,6 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   btnText="Upload a Geojson"
                   errorMsg={errors.uploadedAreaFile}
                 />
-                // <div className="fmtm-mt-5 fmtm-pb-3">
-                //   <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
-                //     <label
-                //       id="file-input"
-                //       className="fmtm-bg-primaryRed fmtm-text-white fmtm-px-4 fmtm-py-1 fmtm-rounded-md fmtm-cursor-pointer"
-                //     >
-                //       <p>Select a file</p>
-                //       <input
-                //         id="upload-area-geojson-file"
-                //         ref={geojsonFileRef}
-                //         type="file"
-                //         className="fmtm-hidden"
-                //         onChange={changeFileHandler}
-                //         accept=".geojson, .json"
-                //       />
-                //     </label>
-                //     <div className="fmtm-rounded-full fmtm-p-1 hover:fmtm-bg-slate-100 fmtm-duration-300 fmtm-cursor-pointer">
-                //       <AssetModules.ReplayIcon className="fmtm-text-gray-600" onClick={() => resetFile()} />
-                //     </div>
-                //   </div>
-                //   {geojsonFile && (
-                //     <div className="fmtm-mt-2">
-                //       <p>{geojsonFile?.name}</p>
-                //     </div>
-                //   )}
-                //   <p className="fmtm-text-gray-700 fmtm-mt-3">
-                //     *The supported file formats are zipped shapefile, geojson or kml files.
-                //   </p>
-                //   <p className="fmtm-text-gray-700 fmtm-pt-8">
-                //     Total Area: <span className="fmtm-font-bold">234 sq.km</span>
-                //   </p>
-                // </div>
               )}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">

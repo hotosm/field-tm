@@ -48,6 +48,7 @@ export const ProjectById = (projectId: string) => {
             custom_tms_url: projectResp?.custom_tms_url,
             organisation_id: projectResp?.organisation_id,
             organisation_logo: projectResp?.organisation_logo,
+            organisation_name: projectResp?.organisation_name,
             created_at: projectResp?.created_at,
           }),
         );
