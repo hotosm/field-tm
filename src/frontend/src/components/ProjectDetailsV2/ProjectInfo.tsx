@@ -106,6 +106,7 @@ const ProjectInfo: React.FC = () => {
                 alt="Organization Photo"
               />
             </div>
+            <p>{projectInfo?.organisation_name}</p>
           </div>
         )}
       </div>

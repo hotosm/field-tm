@@ -67,6 +67,7 @@ const CreateNewProject = () => {
             geojsonFile={geojsonFile}
             setGeojsonFile={setGeojsonFile}
             setCustomDataExtractUpload={setCustomDataExtractUpload}
+            setAdditionalFeature={setAdditionalFeature}
           />
         );
       case '/upload-survey':
