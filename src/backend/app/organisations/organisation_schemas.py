@@ -79,20 +79,16 @@ def parse_organisation_input(
     The parsed data is returned as an OrganisationIn instance, with the
     ODKCentralIn fields merged in.
     """
-    odk_central_data = ODKCentralIn(
-        odk_central_url=odk_central_url,
-        odk_central_user=odk_central_user,
-        odk_central_password=odk_central_password,
-    )
-    org_data = OrganisationUpdate(
+    return OrganisationUpdate(
         name=name,
         slug=slug,
         created_by=created_by,
         community_type=community_type,
         type=type,
-        **odk_central_data.dict(exclude_unset=True),
+        odk_central_url=odk_central_url,
+        odk_central_user=odk_central_user,
+        odk_central_password=odk_central_password,
     )
-    return org_data
 
 
 class OrganisationOut(BaseModel):
