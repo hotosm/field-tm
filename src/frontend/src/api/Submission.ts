@@ -3,6 +3,7 @@ import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
 export const SubmissionService: Function = (url: string) => {
   return async (dispatch) => {
+    dispatch(SubmissionActions.SetSubmissionDetails(null));
     dispatch(SubmissionActions.SetSubmissionDetailsLoading(true));
     const getSubmissionDetails = async (url: string) => {
       try {

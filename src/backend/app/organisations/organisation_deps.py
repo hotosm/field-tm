@@ -85,9 +85,9 @@ async def get_org_odk_creds(
         )
 
     return central_schemas.ODKCentralDecrypted(
-        odk_central_url=org.odk_central_url,
-        odk_central_user=org.odk_central_user,
-        odk_central_password=org.odk_central_password,
+        odk_central_url=url,
+        odk_central_user=user,
+        odk_central_password=password,
     )
 
 
