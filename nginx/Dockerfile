@@ -18,7 +18,7 @@
 ARG NGINX_TAG
 
 
-FROM docker.io/nginx:${NGINX_TAG}-bookworm as brotli-module
+FROM docker.io/nginx:${NGINX_TAG}-bookworm AS brotli-module
 RUN set -ex \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install \
@@ -49,7 +49,7 @@ RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') \
 
 
 
-FROM docker.io/nginx:${NGINX_TAG}-bookworm as base
+FROM docker.io/nginx:${NGINX_TAG}-bookworm AS base
 ARG NGINX_TAG
 ARG GIT_COMMIT
 LABEL org.hotosm.fmtm.app-name="proxy" \
@@ -84,7 +84,7 @@ HEALTHCHECK --start-period=5s --interval=5s --retries=8 \
 
 
 
-FROM base as debug
+FROM base AS debug
 COPY certs /etc/nginx/
 RUN cat /etc/nginx/central.crt /etc/nginx/ca.crt \
     >> /etc/nginx/central-fullchain.crt
@@ -97,7 +97,7 @@ COPY templates/dev/fmtm.conf.template \
 
 
 
-FROM base as certs-init-main
+FROM base AS certs-init-main
 # Replace existing /docker-entrypoint.sh
 COPY container-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
@@ -109,13 +109,13 @@ COPY templates/cert-init/fmtm.conf.template \
 
 
 
-FROM certs-init-main as certs-init-development
+FROM certs-init-main AS certs-init-development
 COPY templates/cert-init/odk.conf.template \
      /etc/nginx/templates/
 
 
 
-FROM base as main
+FROM base AS main
 # API, Frontend, S3
 COPY templates/fmtm.conf.template \
      templates/api.conf.template \
@@ -125,7 +125,7 @@ COPY templates/fmtm.conf.template \
 
 
 
-FROM main as development
+FROM main AS development
 # API, Frontend, S3 + ODK
 COPY templates/odk.conf.template \
      /etc/nginx/templates/
