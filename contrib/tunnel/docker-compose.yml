@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -20,26 +20,6 @@ networks:
     name: fmtm-${GIT_BRANCH:-local}
 
 services:
-  frontend-tunnel:
-    image: "docker.io/cloudflare/cloudflared:2024.10.1"
-    depends_on:
-      proxy:
-        condition: service_healthy
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    command: tunnel --url http://proxy:80
-
-  api-tunnel:
-    image: "docker.io/cloudflare/cloudflared:2024.10.1"
-    depends_on:
-      api:
-        condition: service_healthy
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    command: tunnel --url http://api:8000
-
   central-tunnel:
     image: "docker.io/cloudflare/cloudflared:2024.10.1"
     depends_on:
@@ -49,13 +29,3 @@ services:
       - fmtm-net
     restart: "unless-stopped"
     command: tunnel --url http://central:8383
-
-  s3-tunnel:
-    image: "docker.io/cloudflare/cloudflared:2024.10.1"
-    depends_on:
-      s3:
-        condition: service_healthy
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    command: tunnel --url http://s3:9000

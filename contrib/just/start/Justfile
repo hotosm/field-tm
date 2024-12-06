@@ -70,9 +70,9 @@ josm:
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
 
-# Start FMTM with tunnels
+# Externally accessible ODK Central for tests
 [no-cd]
-tunnel:
+odk-tunnel:
   #!/usr/bin/env sh
 
   docker compose \
@@ -85,36 +85,25 @@ tunnel:
   # Wait until services ready without HEALTHCHECK
   sleep 5
 
-  fmtm_url=$(just --unstable start _get-tunnel-url 'frontend')
-  api_url=$(just --unstable start _get-tunnel-url 'api')
   odk_url=$(just --unstable start _get-tunnel-url 'central')
-  s3_url=$(just --unstable start _get-tunnel-url 's3')
 
-  just --unstable dotenv update "EXTRA_CORS_ORIGINS" "${fmtm_url}"
-  just --unstable dotenv update "S3_ENDPOINT" "${s3_url}"
-
-  # Restart the containers with env vars set
-  # (API url for frontend, domain for Central form download urls)
+  # Restart Central with DOMAIN var set to new tunnel URL.
+  # Is is required to correctly download forms from Collect
   CENTRAL_DOMAIN_OVERRIDE="$(echo "${odk_url}" | sed 's|^https://||')" \
-  API_URL="$(echo "${api_url}" | sed 's|^https://||')" \
   docker compose \
     -f docker-compose.yml \
     -f contrib/tunnel/docker-compose.yml \
-    up -d api ui central
+    up -d central
 
-  just --unstable start _print-tunnel-urls "$fmtm_url" "$api_url" "$odk_url" "$s3_url"
+  just --unstable start _print-tunnel-url "$odk_url"
 
 # View the URLs for created tunnels
 [no-cd]
-view-tunnel-urls:
+view-tunnel-url:
   #!/usr/bin/env sh
 
-  fmtm_url=$(just --unstable start _get-tunnel-url 'frontend')
-  api_url=$(just --unstable start _get-tunnel-url 'api')
   odk_url=$(just --unstable start _get-tunnel-url 'central')
-  s3_url=$(just --unstable start _get-tunnel-url 's3')
-
-  just --unstable start _print-tunnel-urls "$fmtm_url" "$api_url" "$odk_url" "$s3_url"
+  just --unstable start _print-tunnel-url "$odk_url"
 
 [no-cd]
 _get-tunnel-url service_name:
@@ -130,24 +119,12 @@ _get-tunnel-url service_name:
   echo "$service_url"
 
 [no-cd]
-_print-tunnel-urls fmtm_url api_url odk_url s3_url:
+_print-tunnel-url odk_url:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-  @echo "\033[0;34m FMTM URL: \033[0m"
-  @echo " {{fmtm_url}}"
-  @echo
-  @echo "\033[0;34m API URL: \033[0m"
-  @echo " {{api_url}}"
   @echo
   @echo "\033[0;34m ODK Central URL: \033[0m"
   @echo " {{odk_url}}"
   @echo
-  @echo "\033[0;34m S3 URL: \033[0m"
-  @echo " {{s3_url}}"
-  @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
-
-
-
