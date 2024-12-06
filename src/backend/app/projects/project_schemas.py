@@ -239,6 +239,7 @@ class ProjectSummary(BaseModel):
     tasks_mapped: Optional[int] = None
     tasks_validated: Optional[int] = None
     tasks_bad: Optional[int] = None
+    organisation_logo: Optional[str] = None
 
 
 class PaginationInfo(BaseModel):

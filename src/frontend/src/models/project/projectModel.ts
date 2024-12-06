@@ -51,6 +51,7 @@ export type projectInfoType = {
   total_tasks: any;
   organisation_id: number;
   organisation_logo: string;
+  organisation_name: string;
   instructions: string;
   custom_tms_url: string;
   created_at: string;

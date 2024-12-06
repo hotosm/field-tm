@@ -464,7 +464,7 @@ const SubmissionsTable = ({ toggleView }) => {
             headerClassName="updatedHeader !fmtm-sticky fmtm-right-0 fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)] fmtm-text-center"
             rowClassName="updatedRow !fmtm-sticky fmtm-right-0 fmtm-bg-white fmtm-shadow-[-10px_0px_20px_0px_rgba(0,0,0,0.1)]"
             dataFormat={(row) => {
-              const taskUid = taskList?.find((task) => task?.id == row?.task_id)?.id;
+              const taskUid = taskList?.find((task) => task?.index == row?.task_id)?.id;
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
                   <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`}>
