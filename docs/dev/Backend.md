@@ -277,29 +277,20 @@ This adds JOSM to the docker compose stack for local development.
 
 You can now call the JOSM API from FMTM and changes will be reflected in the GUI.
 
-### Debugging local services on mobile
+### Debugging ODK forms when running on localhost
 
-- It's difficult to debug services running on localhost from your mobile phone.
-- An easy way to do this is by tunneling: Cloudflare provides a great free
-  solution for this (an alternative is Ngrok).
-- We may also wish to debug our local ODK Central instance forms on our mobile ODK
-  Collect.
-- To handle both of these instances set up tunnels for all services with:
+- ODK Collect requires an externally accessible instance of Central.
+- To achieve this for local development / debugging, a good solution is Cloudflare
+  tunnelling (alternative to Ngrok).
+- There is a helper script to do this automatically for you:
 
-```bash
-just start tunnel
-```
+  ```bash
+  just start odk-tunnel
+  ```
 
-To complete this setup, two additional steps must be complete:
+Once started, use the output ODK Central URL from the terminal during
+project creation. The QRCode should now work in ODK Collect.
 
-- **Requirement 1**: For login to work, use the temporary login.
-
-- **Requirement 2**: During project creation, set the ODK Central server URL
-  to the provided tunnel URL for the ODK Central API.
-
-  > The credentials for the local ODK Central instance are:
-  > Username: <admin@hotosm.org>
-  > Password: Password1234
-
-Now when you access the project via a QRCode on mobile, the connection to ODK
-Central should work.
+> The credentials for the local ODK Central instance are:
+> Username: <admin@hotosm.org>
+> Password: Password1234
