@@ -7,6 +7,7 @@
     // TODO should raise an issue in hotosm/ui about this / test further
 	import '@shoelace-style/shoelace/dist/components/select/select.js';
 	import '@shoelace-style/shoelace/dist/components/option/option.js';
+	import '@shoelace-style/shoelace/dist/components/button/button.js';
 
     import type { Basemap } from '$lib/utils/basemaps';
     import { getProjectBasemapStore } from '$store/common.svelte.ts';
@@ -38,7 +39,7 @@
     </div>
 
     <!-- Basemap selector -->
-    <div class="flex justify-center w-full max-w-sm">
+    <div class="flex justify-center w-full sm:max-w-sm">
         {#if basemapsAvailable}
             <!-- Note here we cannot two way bind:var to the web-component,
             so use event instead -->
@@ -79,7 +80,7 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full max-w-[200px]"
+            class="secondary w-full sm:max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
@@ -94,7 +95,7 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full max-w-[200px]"
+            class="secondary w-full sm:max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
@@ -111,7 +112,7 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full max-w-[200px]"
+            class="secondary w-full sm:max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
