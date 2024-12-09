@@ -248,7 +248,7 @@ async def view_user_oauth_token(
     The token is encrypted with a secret key and only usable via
     this FMTM instance and the osm-login-python module.
     """
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    cookie_name = settings.cookie_name
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={"access_token": request.cookies.get(cookie_name)},
@@ -289,7 +289,7 @@ async def send_test_osm_message(
     osm_auth: Annotated[Auth, Depends(init_osm_auth)],
 ):
     """Sends a test message to currently logged in OSM user."""
-    cookie_name = f"{settings.FMTM_DOMAIN.replace('.', '_')}_osm"
+    cookie_name = f"{settings.cookie_name}_osm"
     log.debug(f"Extracting OSM token from cookie {cookie_name}")
     serialised_osm_token = request.cookies.get(cookie_name)
     if not serialised_osm_token:

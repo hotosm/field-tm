@@ -161,6 +161,11 @@ class Settings(BaseSettings):
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
 
+    @property
+    def cookie_name(self) -> str:
+        """Get the cookie name for the domain."""
+        return self.FMTM_DOMAIN.replace(".", "_")
+
     @field_validator("EXTRA_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
