@@ -39,7 +39,7 @@
     </div>
 
     <!-- Basemap selector -->
-    <div class="flex justify-center w-full sm:max-w-sm">
+    <div class="flex justify-center w-full max-w-sm">
         {#if basemapsAvailable}
             <!-- Note here we cannot two way bind:var to the web-component,
             so use event instead -->
@@ -71,8 +71,8 @@
     </div>
 
     <!-- Load baselayer & download to OPFS buttons -->
-    {#if selectedBasemap && selectedBasemap?.format === 'pmtiles' }
-        <sl-button
+    {#if selectedBasemap && selectedBasemap.format === 'pmtiles' }
+        <hot-button
             onclick={() => loadOnlinePmtiles(selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
                 e.key === 'Enter' && loadOnlinePmtiles(selectedBasemap.url);
@@ -80,14 +80,14 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full sm:max-w-[200px]"
+            class="secondary w-full max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
             <span class="font-barlow-medium text-base uppercase">Show On Map</span>
-        </sl-button>
+        </hot-button>
 
-        <sl-button
+        <hot-button
             onclick={() => writeOfflinePmtiles(projectId, selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
                 e.key === 'Enter' && writeOfflinePmtiles(projectId, selectedBasemap.url);
@@ -95,16 +95,16 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full sm:max-w-[200px]"
+            class="secondary w-full max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
             <span class="font-barlow-medium text-base uppercase">Store Offline</span>
-        </sl-button>
+        </hot-button>
 
     <!-- Download Mbtiles Button -->
-    {:else if selectedBasemap && selectedBasemap?.format === 'mbtiles' }
-        <sl-button
+    {:else if selectedBasemap && selectedBasemap.format === 'mbtiles' }
+        <hot-button
             onclick={() => window.open(selectedBasemap.url)}
             onkeydown={(e: KeyboardEvent) => {
                 e.key === 'Enter' && window.open(selectedBasemap.url);
@@ -112,12 +112,12 @@
             role="button"
             tabindex="0"
             size="small"
-            class="secondary w-full sm:max-w-[200px]"
+            class="secondary w-full max-w-[200px]"
         >
             <hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
             ></hot-icon>
             <span class="font-barlow-medium text-base uppercase">Download MBTiles</span>
-        </sl-button>
+        </hot-button>
     {/if}
 
     {@render children?.()}
