@@ -1198,7 +1198,7 @@ class DbProject(BaseModel):
             LEFT JOIN
                 tasks t ON p.id = t.project_id
             LEFT JOIN
-                task_events ON p.id = project_id
+                task_events ON p.id = task_events.project_id
             {'WHERE ' + ' AND '.join(filters) if filters else ''}
             GROUP BY
                 p.id, project_org.id
