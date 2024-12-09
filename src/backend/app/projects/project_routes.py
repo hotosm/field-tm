@@ -614,7 +614,7 @@ async def preview_split_by_square(
         else:
             log.warning("Parsed geojson file contained no geometries")
 
-    if len(boundary_featcol["features"]) == 0:
+    if len(boundary_featcol["features"]) > 0:
         boundary_featcol = merge_polygons(boundary_featcol)
 
     return split_by_square(
@@ -639,6 +639,7 @@ async def get_data_extract(
     TODO alternatively, direct to raw-data-api to generate first, then upload
     """
     boundary_geojson = json.loads(await geojson_file.read())
+    clean_boundary_geojson = merge_polygons(boundary_geojson)
 
     # Get extract config file from existing data_models
     if form_category:
@@ -650,7 +651,7 @@ async def get_data_extract(
         extract_config = None
 
     fgb_url = await project_crud.generate_data_extract(
-        boundary_geojson,
+        clean_boundary_geojson,
         extract_config,
     )
 
