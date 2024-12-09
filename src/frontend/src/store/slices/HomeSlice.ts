@@ -12,7 +12,7 @@ export const initialState: HomeStateTypes = {
     variant: 'info',
     duration: 0,
   },
-  showMapStatus: true,
+  showMapStatus: false,
   projectCentroidLoading: false,
   homeProjectPagination: {
     has_next: false,
