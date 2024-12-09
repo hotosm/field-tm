@@ -49,6 +49,13 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
         fontSize: 22,
       },
     },
+    button: {
+      marginTop: '1rem',
+      marginLeft: '2%',
+      padding: '0.5rem 1rem',
+      fontSize: defaultTheme.typography.h5.fontSize,
+      fontWeight: 'bold',
+    },
   };
 
   return (
@@ -100,6 +107,23 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
                 <p className="fmtm-capitalize fmtm-line-clamp-1 fmtm-text-[#7A7676]" title={data?.location_str}>
                   {data?.location_str}
                 </p>
+              </div>
+
+              {/* Start Mapping Button */}
+              <div className="fmtm-mt-[2%] fmtm-mr-[3%]">
+                <CoreModules.Button
+                  variant="contained"
+                  color="error"
+                  style={cardInnerStyles.button}
+                  onClick={(e) => {
+                    // Prevent card click
+                    e.stopPropagation();
+                    // Redirect without opening new tab
+                    window.location.href = `/mapnow/${data.id}`;
+                  }}
+                >
+                  Start Mapping
+                </CoreModules.Button>
               </div>
             </CoreModules.Stack>
           </div>
