@@ -12,7 +12,7 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	/*
 	Login + user details
 	*/
-	const userResponse = await fetch(`${API_URL}/auth/refresh`, { credentials: 'include' });
+	const userResponse = await fetch(`${API_URL}/auth/refresh/mapper`, { credentials: 'include' });
 	if (userResponse.status === 401) {
 		// TODO redirect to different error page to handle login
 		loginStore.signOut();
