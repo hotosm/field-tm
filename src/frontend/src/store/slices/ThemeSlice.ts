@@ -140,6 +140,10 @@ const initialState: themeStateType = {
         fontFamily: 'BarlowLight',
         fontSize: 16,
       },
+      h5: {
+        fontFamily: 'BarlowLight',
+        fontSize: 14,
+      },
       p: {
         fontFamily: 'Archivo',
         fontSize: 16,
