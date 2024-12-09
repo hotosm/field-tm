@@ -47,7 +47,7 @@ dependencies = [
     "pyjwt==2.9.0",
     "osm-fieldwork==0.16.11",
     "osm-login-python==2.0.0",
-    "osm-rawdata==0.4.0",
+    "osm-rawdata==0.4.1",
     "fmtm-splitter==1.5.1",
     "pyodk",
 ]
