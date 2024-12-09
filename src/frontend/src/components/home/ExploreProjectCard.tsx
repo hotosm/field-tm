@@ -69,7 +69,7 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
       sx={{ boxShadow: 0 }}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
-      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-h-[22.5rem]"
+      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-min-h-[22.5rem]"
     >
       <CoreModules.CardContent className="fmtm-h-full" style={{ padding: '16px' }}>
         <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
@@ -108,27 +108,11 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
                   {data?.location_str}
                 </p>
               </div>
-
-              {/* Start Mapping Button */}
-              <div className="fmtm-mt-[2%] fmtm-mr-[3%]">
-                <CoreModules.Button
-                  variant="contained"
-                  color="error"
-                  style={cardInnerStyles.button}
-                  onClick={(e) => {
-                    // Prevent card click
-                    e.stopPropagation();
-                    // Redirect without opening new tab
-                    window.location.href = `/mapnow/${data.id}`;
-                  }}
-                >
-                  Start Mapping
-                </CoreModules.Button>
-              </div>
             </CoreModules.Stack>
           </div>
 
           <div>
+            {/* Number of Contributors */}
             <CoreModules.Stack direction={'row'}>
               <CoreModules.Typography
                 mt={'7%'}
@@ -148,12 +132,29 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
                 fontSize={defaultTheme.typography.htmlFontSize}
                 color="info"
               >
-                contributors
+                contributor{data.num_contributors === 1 ? '' : 's'}
               </CoreModules.Typography>
             </CoreModules.Stack>
 
             {/* Contribution Progress Bar */}
             <CustomizedProgressBar data={data} height={7} />
+          </div>
+
+          {/* Start Mapping Button */}
+          <div className="fmtm-mt-[2%] fmtm-mr-[3%]">
+            <CoreModules.Button
+              variant="contained"
+              color="primary"
+              style={cardInnerStyles.button}
+              onClick={(e) => {
+                // Prevent card click
+                e.stopPropagation();
+                // Redirect without opening new tab
+                window.location.href = `/mapnow/${data.id}`;
+              }}
+            >
+              Start Mapping
+            </CoreModules.Button>
           </div>
         </div>
       </CoreModules.CardContent>
