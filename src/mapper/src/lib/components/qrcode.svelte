@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
-	import { generateQrCode, downloadQrCode } from '$lib/utils/qrcode';
+	import { generateQrCode, downloadQrCode } from '$lib/odk/qrcode';
 
 	interface Props {
 		infoDialogRef: SlDialog | null;

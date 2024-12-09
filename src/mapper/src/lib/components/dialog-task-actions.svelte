@@ -2,36 +2,17 @@
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { ProjectData } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
-	import { getAlertStore } from '$store/common.svelte.ts';
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
 		selectedTab: string;
 		projectData: ProjectData;
+		clickMapNewFeature: () => void;
 	};
 
 	const taskStore = getTaskStore();
-	const alertStore = getAlertStore();
-	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData }: Props = $props();
-
-	function mapNewFeature() {
-		const xformId = projectData?.odk_form_id;
-		if (!xformId) {
-			return;
-		}
-
-		const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-		if (isMobile) {
-			document.location.href = `odkcollect://form/${xformId}`;
-		} else {
-			alertStore.setAlert({
-				variant: 'warning',
-				message: 'Requires a mobile phone with ODK Collect.',
-			});
-		}
-	}
+	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData, clickMapNewFeature }: Props = $props();
 </script>
 
 {#if taskStore.selectedTaskId && selectedTab === 'map' && isTaskActionModalOpen && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}
@@ -57,11 +38,11 @@
 				<p class="text-[#333] text-xl font-barlow-semibold">Task #{taskStore.selectedTaskId}</p>
 				<div
 					onclick={() => {
-						mapNewFeature();
+						clickMapNewFeature();
 					}}
 					onkeydown={(e: KeyboardEvent) => {
 						if (e.key === 'Enter') {
-							mapNewFeature();
+							clickMapNewFeature();
 						}
 					}}
 					role="button"
