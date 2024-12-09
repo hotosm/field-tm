@@ -1,11 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from '../$types';
+import { getLoginStore } from '$store/login.svelte.ts';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
 	// const { db } = await parent();
 	const { projectId } = params;
+	const loginStore = getLoginStore();
 
 	/*
 	Login + user details
@@ -13,6 +15,7 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	const userResponse = await fetch(`${API_URL}/auth/refresh`, { credentials: 'include' });
 	if (userResponse.status === 401) {
 		// TODO redirect to different error page to handle login
+		loginStore.signOut();
 		throw error(401, { message: `You must log in first` });
 	}
 	const userObj = await userResponse.json();
