@@ -20,6 +20,7 @@
 
 import os
 import time
+from typing import Optional
 
 import jwt
 from fastapi import Header, HTTPException, Request
@@ -61,6 +62,41 @@ async def login_required(
 
     # Attempt extract from cookie if access token not passed
     if not access_token:
+        access_token = extract_token_from_osm_cookie(request)
+
+    if not access_token:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="No access token provided",
+        )
+
+    try:
+        token_data = verify_token(access_token)
+    except ValueError as e:
+        log.exception(
+            f"Failed to deserialise access token. Error: {e}", stack_info=True
+        )
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Access token not valid",
+        ) from e
+
+    return AuthUser(**token_data)
+
+
+async def mapper_login_required(
+    request: Request, access_token: str = Header(None)
+) -> AuthUser:
+    """Dependency to inject into endpoints requiring login for mapper frontend."""
+    if settings.DEBUG:
+        return AuthUser(
+            sub="fmtm|1",
+            username="localadmin",
+            role=UserRole.ADMIN,
+        )
+
+    # Attempt extract from cookie if access token not passed
+    if not access_token:
         access_token = extract_token_from_cookie(request)
 
     if not access_token:
@@ -83,17 +119,36 @@ async def login_required(
     return AuthUser(**token_data)
 
 
-def extract_token_from_cookie(request: Request) -> str:
+def extract_token_from_osm_cookie(request: Request) -> str:
     """Extract access token from cookies."""
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
+    cookie_name = settings.cookie_name
     log.debug(f"Extracting token from cookie {cookie_name}")
     return request.cookies.get(cookie_name)
 
 
+def extract_token_from_cookie(request: Request) -> str:
+    """Extract access token from cookies."""
+    cookie_name = settings.cookie_name
+    temp_cookie_name = f"{cookie_name}_temp"
+    log.debug(f"Extracting token from cookie {cookie_name}")
+    return request.cookies.get(cookie_name) or request.cookies.get(temp_cookie_name)
+
+
+def extract_refresh_token_from_osm_cookie(request: Request) -> str:
+    """Extract refresh token from cookies."""
+    cookie_name = settings.cookie_name
+    return request.cookies.get(f"{cookie_name}_refresh")
+
+
 def extract_refresh_token_from_cookie(request: Request) -> str:
     """Extract refresh token from cookies."""
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
-    return request.cookies.get(f"{cookie_name}_refresh")
+    cookie_name = settings.cookie_name
+    refresh_cookie_name = f"{cookie_name}_refresh"
+    temp_refresh_cookie_name = f"{cookie_name}_temp_refresh"
+
+    return request.cookies.get(refresh_cookie_name), request.cookies.get(
+        temp_refresh_cookie_name
+    )
 
 
 def create_jwt_tokens(input_data: dict) -> tuple[str, str]:
@@ -166,12 +221,20 @@ def verify_token(token: str):
         ) from e
 
 
-def set_cookies(access_token: str, refresh_token: str) -> JSONResponse:
+def set_cookies(
+    access_token: str,
+    refresh_token: str,
+    cookie_name: Optional[str] = settings.cookie_name,
+    refresh_cookie_name: Optional[str] = f"{settings.cookie_name}_refresh",
+) -> JSONResponse:
     """Sets cookies for the access token and refresh token.
 
     Args:
         access_token (str): The access token to be stored in the cookie.
         refresh_token (str): The refresh token to be stored in the cookie.
+        cookie_name (str, optional): The name of the cookie to store the access token.
+        refresh_cookie_name (str, optional): The name of the cookie to store the refresh
+            token.
 
     Returns:
         JSONResponse: A response object with the cookies set.
@@ -186,7 +249,6 @@ def set_cookies(access_token: str, refresh_token: str) -> JSONResponse:
         status_code=HTTPStatus.OK,
         content={"token": access_token},
     )
-    cookie_name = settings.FMTM_DOMAIN.replace(".", "_")
     response.set_cookie(
         key=cookie_name,
         value=access_token,
@@ -199,7 +261,7 @@ def set_cookies(access_token: str, refresh_token: str) -> JSONResponse:
         samesite="lax",
     )
     response.set_cookie(
-        key=f"{cookie_name}_refresh",
+        key=refresh_cookie_name,
         value=refresh_token,
         max_age=86400 * 7,
         expires=86400 * 7,  # expiry set for 7 days
