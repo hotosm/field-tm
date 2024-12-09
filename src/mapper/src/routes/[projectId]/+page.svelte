@@ -18,6 +18,7 @@
 	import DialogTaskActions from '$lib/components/dialog-task-actions.svelte';
 	import DialogEntityActions from '$lib/components/dialog-entities-actions.svelte';
 	import type { ProjectTask } from '$lib/types';
+	import { openOdkCollectNewFeature } from '$lib/odk/collect';
 	import { convertDateToTimeAgo } from '$lib/utils/datetime';
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
 	import { getEntitiesStatusStore, getEntityStatusStream } from '$store/entities.svelte.ts';
@@ -31,12 +32,13 @@
 
 	let { data }: Props = $props();
 
-	let mapComponent: maplibregl.Map | undefined = $state(undefined);
+	let maplibreMap: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
 	let selectedTab: string = $state('map');
 	let openedActionModal: 'entity-modal' | 'task-modal' | null = $state(null);
-	let isTaskActionModalOpen = $state(false);
+	let isTaskActionModalOpen: boolean = $state(false);
 	let infoDialogRef: SlDialog | null = $state(null);
+	let isDrawEnabled: boolean = $state(false);
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -60,9 +62,9 @@
 
 		const taskPolygon = polygon(taskObj.outline.coordinates);
 		const taskBuffer = buffer(taskPolygon, 5, { units: 'meters' });
-		if (taskBuffer && mapComponent) {
+		if (taskBuffer && maplibreMap) {
 			const taskBbox: [number, number, number, number] = bbox(taskBuffer) as [number, number, number, number];
-			mapComponent.fitBounds(taskBbox, { duration: 500 });
+			maplibreMap.fitBounds(taskBbox, { duration: 500 });
 		}
 
 		// Open the map tab
@@ -114,7 +116,7 @@
 <div class="h-[calc(100svh-3.699rem)] sm:h-[calc(100svh-4.625rem)]">
 	<MapComponent
 		setMapRef={(map) => {
-			mapComponent = map;
+			maplibreMap = map;
 		}}
 		toggleActionModal={(value) => {
 			openedActionModal = value;
@@ -122,6 +124,11 @@
 		projectOutlineCoords={data.project.outline.coordinates}
 		projectId={data.projectId}
 		entitiesUrl={data.project.data_extract_url}
+		draw={isDrawEnabled}
+		handleDrawnGeom={(geom) => {
+			isDrawEnabled = false;
+			openOdkCollectNewFeature(data?.project?.odk_form_id, geom);
+		}}
 	></MapComponent>
 	<!-- task action buttons popup -->
 	<DialogTaskActions
@@ -131,6 +138,10 @@
 		}}
 		{selectedTab}
 		projectData={data?.project}
+		clickMapNewFeature={() => {
+			openedActionModal = null;
+			isDrawEnabled = true;
+		}}
 	/>
 	<DialogEntityActions
 		isTaskActionModalOpen={openedActionModal === 'entity-modal'}

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import '$styles/page.css';
 	import '$styles/button.css';
+	import '@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css'
 	import '@hotosm/ui/dist/hotosm-ui';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import {
 		MapLibre,
 		GeoJSON,
@@ -17,11 +18,12 @@
 		ControlButton,
 	} from 'svelte-maplibre';
 	import maplibre from 'maplibre-gl';
+	import MaplibreTerradrawControl from '@watergis/maplibre-gl-terradraw'
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { Position } from 'geojson';
+	import type { GeoJSON as GeoJSONType, Position, Geometry as GeoJSONGeometry } from 'geojson';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
@@ -40,7 +42,6 @@
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import type { GeoJSON as GeoJSONType } from 'geojson';
 
 	type bboxType = [number, number, number, number];
 
@@ -50,9 +51,11 @@
 		toggleActionModal: (value: 'task-modal' | 'entity-modal' | null) => void;
 		projectId: number;
 		setMapRef: (map: maplibregl.Map | undefined) => void;
+		draw?: boolean;
+		handleDrawnGeom?: ((geojson: GeoJSONGeometry) => void) | null;
 	}
 
-	let { projectOutlineCoords, entitiesUrl, toggleActionModal, projectId, setMapRef }: Props = $props();
+	let { projectOutlineCoords, entitiesUrl, toggleActionModal, projectId, setMapRef, draw = false, handleDrawnGeom }: Props = $props();
 
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -104,6 +107,29 @@
 	// 		allBaseLayers = layers;
 	// 	}
 	// })
+	let displayDrawHelpText: boolean = $state(false);
+	const drawControl = new MaplibreTerradrawControl({
+		modes: [
+			'point',
+			// 'polygon',
+			// 'linestring',
+			// 'delete',
+		],
+		// Note We do not open the toolbar options, allowing the user
+		// to simply click with a pre-defined mode active
+		// open: true,
+	});
+
+	$effect(() => {
+		projectSetupStep = +projectSetupStepStore.projectSetupStep;
+	});
+
+	// set the map ref to parent component
+	$effect(() => {
+		if (map) {
+			setMapRef(map);
+		}
+	});
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
@@ -154,14 +180,55 @@
 		}
 	});
 
-	$effect(() => {
-		projectSetupStep = +projectSetupStepStore.projectSetupStep;
-	});
-
-	// set the map ref to parent component
-	$effect(() => {
+	// Workaround due to bug in @watergis/mapbox-gl-terradraw
+	function removeTerraDrawLayers() {
 		if (map) {
-			setMapRef(map);
+				if (map.getLayer('td-point')) map.removeLayer('td-point');
+				if (map.getSource('td-point')) map.removeSource('td-point');
+
+				if (map.getLayer('td-linestring')) map.removeLayer('td-linestring');
+				if (map.getSource('td-linestring')) map.removeSource('td-linestring');
+
+				if (map.getLayer('td-polygon')) map.removeLayer('td-polygon');
+				if (map.getSource('td-polygon')) map.removeSource('td-polygon');
+
+				if (map.getLayer('td-polygon-outline')) map.removeLayer('td-polygon-outline');
+				if (map.getSource('td-polygon-outline')) map.removeSource('td-polygon-outline');
+			}
+	}
+	// Add draw layer & handle emitted geom
+	$effect(() => {
+		if (draw) {
+			map?.addControl(drawControl, 'top-left');
+			displayDrawHelpText = true;
+
+			const drawInstance = drawControl.getTerraDrawInstance();
+			if (drawInstance && handleDrawnGeom) {
+				drawInstance.start();
+				drawInstance.setMode('point');
+
+				drawInstance.on('finish', (id: string, _context: any) => {
+					// Save the drawn geometry location, then delete all geoms from store
+					const features: { id: string; geometry: GeoJSONGeometry }[] = drawInstance.getSnapshot();
+					const drawnFeature = features.find((geom) => geom.id === id);
+					let firstGeom: GeoJSONGeometry = null;
+					if (drawnFeature && drawnFeature.geometry) {
+						firstGeom = drawnFeature.geometry;
+					} else {
+						console.error(`Feature with id ${id} not found or has no geometry.`);
+					}
+					drawInstance.stop();
+
+					if (firstGeom) {
+						removeTerraDrawLayers();
+						handleDrawnGeom(firstGeom);
+					}
+				});
+			};
+		} else {
+			removeTerraDrawLayers();
+			map?.removeControl(drawControl);
+			displayDrawHelpText = false;
 		}
 	});
 
@@ -384,6 +451,13 @@
 	{#if projectSetupStep === projectSetupStepEnum['task_selection']}
 		<div class="absolute top-5 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
 			<p class="uppercase font-barlow-medium text-base">please select a task / feature for mapping</p>
+		</div>
+	{/if}
+
+	<!-- Help for drawing a new geometry -->
+	{#if displayDrawHelpText}
+		<div class="absolute top-5 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
+			<p class="uppercase font-barlow-medium text-base">Click on the map to create a new point</p>
 		</div>
 	{/if}
 </MapLibre>
