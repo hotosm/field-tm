@@ -982,6 +982,13 @@ class DbProject(BaseModel):
         Optional["ODKCentralDecrypted"],
         Field(validate_default=True),
     ] = None
+    total_tasks: Optional[int] = None
+    num_contributors: Optional[int] = None
+    # FIXME we could add the following to the project summary cards
+    # Also required uncommenting of the ProjectSummary fields
+    # tasks_mapped: Optional[int] = 0
+    # tasks_validated: Optional[int] = 0
+    # tasks_bad: Optional[int] = 0
 
     @field_validator("odk_credentials", mode="before")
     @classmethod
@@ -1182,13 +1189,16 @@ class DbProject(BaseModel):
                 ST_AsGeoJSON(p.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
                 project_org.logo as organisation_logo,
-                COUNT(t.id) AS task_count
+                COUNT(t.id) AS total_tasks,
+                COUNT(DISTINCT task_events.user_id) AS num_contributors
             FROM
                 projects p
             LEFT JOIN
                 organisations project_org ON p.organisation_id = project_org.id
             LEFT JOIN
                 tasks t ON p.id = t.project_id
+            LEFT JOIN
+                task_events ON p.id = project_id
             {'WHERE ' + ' AND '.join(filters) if filters else ''}
             GROUP BY
                 p.id, project_org.id
