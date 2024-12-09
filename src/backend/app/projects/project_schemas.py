@@ -136,8 +136,8 @@ class ProjectInBase(DbProject):
         # geojson_pydantic.GeometryCollection
         # FIXME update this to remove the Featcol parsing at some point
         featcol = geojson_to_featcol(value)
-        merged = merge_polygons(featcol)
-        return merged.get("features")[0].get("geometry")
+        merged_geojson = merge_polygons(featcol, True)
+        return merged_geojson.get("features")[0].get("geometry")
 
     @model_validator(mode="after")
     def append_fmtm_hashtag_and_slug(self) -> Self:

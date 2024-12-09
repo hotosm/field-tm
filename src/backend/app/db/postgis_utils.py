@@ -32,7 +32,7 @@ from osm_fieldwork.data_models import data_models_path
 from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row
-from shapely.geometry import mapping, shape
+from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
@@ -698,7 +698,7 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str, geom_type: str) ->
 def multigeom_to_singlegeom(
     featcol: geojson.FeatureCollection,
 ) -> geojson.FeatureCollection:
-    """Converts any Multi(xxx) geometry types to individual geometries.
+    """Converts any Multi(xxx) geometry types to list of individual geometries.
 
     Args:
         featcol : A GeoJSON FeatureCollection of geometries.
@@ -723,8 +723,6 @@ def multigeom_to_singlegeom(
             geom = shape(feature["geometry"])
         except ValueError:
             log.warning(f"Geometry is not valid, so was skipped: {feature['geometry']}")
-            continue
-
         if geom.geom_type.startswith("Multi"):
             # Handle all MultiXXX types
             final_features.extend(split_multigeom(geom, properties))
@@ -740,11 +738,54 @@ def multigeom_to_singlegeom(
     return geojson.FeatureCollection(final_features)
 
 
+def remove_holes(polygon: Polygon):
+    """Detect and remove holes within a polygon."""
+    if polygon.interiors:
+        return Polygon(polygon.exterior)  # Keep only the exterior ring
+    return polygon
+
+
+def create_single_polygon(multipolygon: MultiPolygon, dissolve_polygon: bool):
+    """If a MultiPolygon can create a common exterior ring, return a single AOI Polygon.
+
+    Otherwise, dissolve the polygons with convex hull.
+    """
+    unified = [Polygon(poly.exterior) for poly in multipolygon.geoms]
+    merged_polygon = unary_union(unified)
+
+    if merged_polygon.geom_type == "MultiPolygon":
+        polygons = [
+            Polygon(poly.exterior) for poly in merged_polygon.geoms if poly.is_valid
+        ]
+        union_poly = unary_union(polygons)
+
+        if union_poly.geom_type == "Polygon":
+            return union_poly
+
+        if union_poly.geom_type == "MultiPolygon" and dissolve_polygon:
+            # disjoint polygons
+            return union_poly.convex_hull
+
+    return merged_polygon
+
+
+def ensure_right_hand_rule(polygon: Polygon):
+    """Check if a polygon follows the right-hand rule, fix it if not."""
+    if polygon.exterior.is_ccw:  # If counter-clockwise, reverse it
+        return Polygon(
+            polygon.exterior.coords[::-1],
+            [interior.coords[::-1] for interior in polygon.interiors],
+        )
+    return polygon
+
+
 def merge_polygons(
     featcol: geojson.FeatureCollection,
-    dissolve_polygon: bool = True,
+    dissolve_polygon: bool = False,
 ) -> geojson.FeatureCollection:
     """Merge multiple Polygons or MultiPolygons into a single Polygon.
+
+    It is used to create a single polygon boundary.
 
     Args:
         featcol: a FeatureCollection containing geometries.
@@ -754,29 +795,35 @@ def merge_polygons(
         geojson.FeatureCollection: a FeatureCollection of a single Polygon.
     """
     geom_list = []
+    properties = {}
 
     try:
         features = featcol.get("features", [])
 
         for feature in features:
+            properties = feature["properties"]
             polygon = shape(feature["geometry"])
-            geom_list.append(polygon)
+            if isinstance(polygon, MultiPolygon):
+                # Remove holes in each polygon
+                polygons_without_holes = [remove_holes(poly) for poly in polygon.geoms]
+                valid_polygons = [
+                    ensure_right_hand_rule(poly) for poly in polygons_without_holes
+                ]
+            else:
+                polygon_without_holes = remove_holes(polygon)
+                valid_polygons = [ensure_right_hand_rule(polygon_without_holes)]
+            geom_list.extend(valid_polygons)
 
-        merged_polygon = unary_union(geom_list)
-        merged_geojson = mapping(merged_polygon)
+        merged_geom = create_single_polygon(MultiPolygon(geom_list), dissolve_polygon)
+        merged_geojson = mapping(merged_geom)
 
-        # MultiPolygons are stripped out earlier
-        if dissolve_polygon:
-            merged_polygon = merged_polygon.convex_hull
-            merged_geojson = mapping(merged_polygon)
-            log.warning(
-                "Resulted GeoJSON contains disjoint Polygons. "
-                "Adjacent polygons are preferred."
-            )
-        return geojson.FeatureCollection([geojson.Feature(geometry=merged_geojson)])
+        # Create FeatureCollection
+        return geojson.FeatureCollection(
+            [geojson.Feature(geometry=merged_geojson, properties=properties)]
+        )
     except Exception as e:
         raise HTTPException(
-            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=f"Couldn't merge the multipolygon to polygon: {str(e)}",
         ) from e
 
