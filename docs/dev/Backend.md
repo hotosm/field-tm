@@ -285,7 +285,7 @@ You can now call the JOSM API from FMTM and changes will be reflected in the GUI
 - There is a helper script to do this automatically for you:
 
   ```bash
-  just start odk-tunnel
+  just start tunnel
   ```
 
 Once started, use the output ODK Central URL from the terminal during
