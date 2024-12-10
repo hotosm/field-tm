@@ -23,7 +23,7 @@
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
 	import { getEntitiesStatusStore, getEntityStatusStream } from '$store/entities.svelte.ts';
 	import More from '$lib/components/more/index.svelte';
-	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
+	import { getProjectSetupStepStore, getCommonStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 
 	interface Props {
@@ -34,7 +34,6 @@
 
 	let maplibreMap: maplibregl.Map | undefined = $state(undefined);
 	let tabGroup: SlTabGroup;
-	let selectedTab: string = $state('map');
 	let openedActionModal: 'entity-modal' | 'task-modal' | null = $state(null);
 	let isTaskActionModalOpen: boolean = $state(false);
 	let infoDialogRef: SlDialog | null = $state(null);
@@ -42,6 +41,8 @@
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
+	const commonStore = getCommonStore();
+
 	const taskEventStream = getTaskEventStream(data.projectId);
 	const entityStatusStream = getEntityStatusStream(data.projectId);
 
@@ -136,7 +137,7 @@
 		toggleTaskActionModal={(value) => {
 			openedActionModal = value ? 'task-modal' : null;
 		}}
-		{selectedTab}
+		selectedTab={commonStore.selectedTab}
 		projectData={data?.project}
 		clickMapNewFeature={() => {
 			openedActionModal = null;
@@ -148,18 +149,18 @@
 		toggleTaskActionModal={(value) => {
 			openedActionModal = value ? 'entity-modal' : null;
 		}}
-		{selectedTab}
+		selectedTab={commonStore.selectedTab}
 		projectData={data?.project}
 	/>
-	{#if selectedTab !== 'map'}
+	{#if commonStore.selectedTab !== 'map'}
 		<BottomSheet onClose={() => tabGroup.show('map')}>
-			{#if selectedTab === 'events'}
+			{#if commonStore.selectedTab === 'events'}
 				<More projectData={data?.project} zoomToTask={(taskId) => zoomToTask(taskId)}></More>
 			{/if}
-			{#if selectedTab === 'offline'}
+			{#if commonStore.selectedTab === 'offline'}
 				<BasemapComponent projectId={data.project.id}></BasemapComponent>
 			{/if}
-			{#if selectedTab === 'qrcode'}
+			{#if commonStore.selectedTab === 'qrcode'}
 				<QRCodeComponent {infoDialogRef} projectName={data.project.name} projectOdkToken={data.project.odk_token}>
 					<!-- Open ODK Button (Hide if it's project walkthrough step) -->
 					{#if +projectSetupStepStore.projectSetupStep !== projectSetupStepEnum['odk_project_load']}
@@ -210,7 +211,7 @@
 		placement="bottom"
 		no-scroll-controls
 		onsl-tab-show={(e: CustomEvent<{ name: string }>) => {
-			selectedTab = e.detail.name;
+			commonStore.setSelectedTab(e.detail.name);
 			if (
 				e.detail.name !== 'qrcode' &&
 				+projectSetupStepStore.projectSetupStep === projectSetupStepEnum['odk_project_load']

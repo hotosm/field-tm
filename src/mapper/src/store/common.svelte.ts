@@ -10,6 +10,16 @@ let alert: AlertDetails | undefined = $state({ variant: null, message: '' });
 let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
+let selectedTab: string = $state('map');
+
+function getCommonStore() {
+	return {
+		get selectedTab() {
+			return selectedTab;
+		},
+		setSelectedTab: (tab: string) => (selectedTab = tab),
+	};
+}
 
 function getAlertStore() {
 	return {
@@ -61,4 +71,4 @@ function getProjectBasemapStore() {
 	};
 }
 
-export { getAlertStore, getProjectSetupStepStore, getProjectBasemapStore };
+export { getAlertStore, getProjectSetupStepStore, getProjectBasemapStore, getCommonStore };
