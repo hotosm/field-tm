@@ -273,10 +273,7 @@ async def submission_table(
         dict: Paginated submissions with `results` and `pagination` keys.
     """
     project = project_user.get("project")
-    skip = (page - 1) * results_per_page
     filters = {
-        "$top": results_per_page,
-        "$skip": skip,
         "$count": True,
         "$wkt": True,
     }
@@ -300,7 +297,7 @@ async def submission_table(
             filters["$filter"] = f"__system/reviewState eq '{review_state}'"
 
     data = await submission_crud.get_submission_by_project(project, filters)
-    count = data.get("@odata.count", 0)
+    total_count = data.get("@odata.count", 0)
     submissions = data.get("value", [])
     instance_ids = []
     for submission in submissions:
@@ -327,9 +324,15 @@ async def submission_table(
     if task_id:
         submissions = [sub for sub in submissions if sub.get("task_id") == str(task_id)]
 
-    pagination = await project_crud.get_pagination(page, count, results_per_page, count)
+    start_index = (page - 1) * results_per_page
+    end_index = start_index + results_per_page
+    paginated_submissions = submissions[start_index:end_index]
+
+    pagination = await project_crud.get_pagination(
+        page, len(submissions), results_per_page, total_count
+    )
     response = submission_schemas.PaginatedSubmissions(
-        results=submissions,
+        results=paginated_submissions,
         pagination=submission_schemas.PaginationInfo(**pagination.model_dump()),
     )
 
