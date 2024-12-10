@@ -1,22 +1,42 @@
 <script lang="ts">
-	import { GeoJSON, SymbolLayer } from 'svelte-maplibre';
+	import { GeoJSON, SymbolLayer, type LngLatLike } from 'svelte-maplibre';
 	import type { FeatureCollection } from 'geojson';
 
 	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
 	import { getAlertStore } from '$store/common.svelte.ts';
-
-	const alertStore = getAlertStore();
+	import { getCommonStore } from '$store/common.svelte.ts';
 
 	interface Props {
 		map: maplibregl.Map | undefined;
-		toggleGeolocationStatus?: boolean;
+		toggleGeolocationStatus: boolean;
+		toggleNavigationMode: boolean;
 	}
 
-	let { map = $bindable(), toggleGeolocationStatus = $bindable(false) }: Props = $props();
+	const alertStore = getAlertStore();
+	const commonStore = getCommonStore();
 
-	let coords: [number, number] | undefined = $state();
+	let { map, toggleGeolocationStatus, toggleNavigationMode }: Props = $props();
+
+	let coords: LngLatLike | undefined = $state();
 	let rotationDeg: number | undefined = $state();
 	let watchId: number | undefined = $state();
+
+	// if bottom sheet is open, add bottom padding for better visibility of location arrow
+	$effect(() => {
+		if (commonStore.selectedTab === 'map') {
+			map?.setPadding({ bottom: 0, top: 0, left: 0, right: 0 });
+		} else {
+			map?.setPadding({ bottom: 300, top: 0, left: 0, right: 0 });
+		}
+	});
+
+	// zoom to user's current location
+	$effect(() => {
+		if (toggleNavigationMode) {
+			map?.setCenter(coords as LngLatLike);
+			map?.setZoom(18);
+		}
+	});
 
 	$effect(() => {
 		if (map && toggleGeolocationStatus) {
@@ -34,6 +54,10 @@
 			watchId = navigator.geolocation.watchPosition(
 				function (pos) {
 					coords = [pos.coords.longitude, pos.coords.latitude];
+					if (toggleNavigationMode) {
+						// if user is in navigation mode, update the map center according to user's live location since swiping map isn't possible
+						map?.setCenter(coords);
+					}
 				},
 				function (error) {
 					alert(`ERROR: ${error.message}`);
@@ -91,6 +115,9 @@
 				});
 				sensor.addEventListener('reading', (event: Event) => {
 					rotationDeg = GetDeviceRotation(sensor.quaternion);
+
+					// rotate map according to device orientation
+					if (toggleNavigationMode) map.rotateTo(rotationDeg || 0, { duration: 0 });
 				});
 
 				Promise.all([
@@ -114,7 +141,9 @@
 		hoverCursor="pointer"
 		layout={{
 			// if orientation true (meaning the browser supports device orientation sensor show location dot with orientation sign)
-			'icon-image': ['case', ['==', ['get', 'orientation'], true], 'locationArc', 'locationDot'],
+			'icon-image': !toggleNavigationMode
+				? ['case', ['==', ['get', 'orientation'], true], 'locationArc', 'locationDot']
+				: ['case', ['==', ['get', 'orientation'], true], 'arrow', 'locationDot'],
 			'icon-allow-overlap': true,
 			'text-offset': [0, -2],
 			'text-size': 12,

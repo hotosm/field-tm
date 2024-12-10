@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '$styles/page.css';
 	import '$styles/button.css';
-	import '@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css'
+	import '@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css';
 	import '@hotosm/ui/dist/hotosm-ui';
 	import { onMount } from 'svelte';
 	import {
@@ -18,7 +18,7 @@
 		ControlButton,
 	} from 'svelte-maplibre';
 	import maplibre from 'maplibre-gl';
-	import MaplibreTerradrawControl from '@watergis/maplibre-gl-terradraw'
+	import MaplibreTerradrawControl from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
@@ -29,6 +29,7 @@
 	import LocationDotImg from '$assets/images/locationDot.png';
 	import BlackLockImg from '$assets/images/black-lock.png';
 	import RedLockImg from '$assets/images/red-lock.png';
+	import Arrow from '$assets/images/arrow.png';
 
 	import Legend from '$lib/components/map/legend.svelte';
 	import LayerSwitcher from '$lib/components/map/layer-switcher.svelte';
@@ -55,7 +56,15 @@
 		handleDrawnGeom?: ((geojson: GeoJSONGeometry) => void) | null;
 	}
 
-	let { projectOutlineCoords, entitiesUrl, toggleActionModal, projectId, setMapRef, draw = false, handleDrawnGeom }: Props = $props();
+	let {
+		projectOutlineCoords,
+		entitiesUrl,
+		toggleActionModal,
+		projectId,
+		setMapRef,
+		draw = false,
+		handleDrawnGeom,
+	}: Props = $props();
 
 	const taskStore = getTaskStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
@@ -67,6 +76,7 @@
 	let selectedBaselayer: string = $state('OSM');
 	let taskAreaClicked: boolean = $state(false);
 	let toggleGeolocationStatus: boolean = $state(false);
+	let toggleNavigationMode: boolean = $state(false);
 	let projectSetupStep = $state(null);
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
@@ -183,18 +193,18 @@
 	// Workaround due to bug in @watergis/mapbox-gl-terradraw
 	function removeTerraDrawLayers() {
 		if (map) {
-				if (map.getLayer('td-point')) map.removeLayer('td-point');
-				if (map.getSource('td-point')) map.removeSource('td-point');
+			if (map.getLayer('td-point')) map.removeLayer('td-point');
+			if (map.getSource('td-point')) map.removeSource('td-point');
 
-				if (map.getLayer('td-linestring')) map.removeLayer('td-linestring');
-				if (map.getSource('td-linestring')) map.removeSource('td-linestring');
+			if (map.getLayer('td-linestring')) map.removeLayer('td-linestring');
+			if (map.getSource('td-linestring')) map.removeSource('td-linestring');
 
-				if (map.getLayer('td-polygon')) map.removeLayer('td-polygon');
-				if (map.getSource('td-polygon')) map.removeSource('td-polygon');
+			if (map.getLayer('td-polygon')) map.removeLayer('td-polygon');
+			if (map.getSource('td-polygon')) map.removeSource('td-polygon');
 
-				if (map.getLayer('td-polygon-outline')) map.removeLayer('td-polygon-outline');
-				if (map.getSource('td-polygon-outline')) map.removeSource('td-polygon-outline');
-			}
+			if (map.getLayer('td-polygon-outline')) map.removeLayer('td-polygon-outline');
+			if (map.getSource('td-polygon-outline')) map.removeSource('td-polygon-outline');
+		}
 	}
 	// Add draw layer & handle emitted geom
 	$effect(() => {
@@ -224,7 +234,7 @@
 						handleDrawnGeom(firstGeom);
 					}
 				});
-			};
+			}
 		} else {
 			removeTerraDrawLayers();
 			map?.removeControl(drawControl);
@@ -269,6 +279,20 @@
 		}
 	}
 
+	// if navigation mode on, tilt map by 50 degrees
+	$effect(() => {
+		if (toggleNavigationMode && toggleGeolocationStatus) {
+			map?.setPitch(50);
+		} else {
+			map?.setPitch(0);
+		}
+	});
+
+	// if map loaded, turn on geolocation by default
+	$effect(() => {
+		if (loaded) toggleGeolocationStatus = true;
+	});
+
 	onMount(async () => {
 		// Register pmtiles protocol
 		if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
@@ -308,6 +332,7 @@
 		{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
 		{ id: 'locationArc', url: LocationArcImg },
 		{ id: 'locationDot', url: LocationDotImg },
+		{ id: 'arrow', url: Arrow },
 	]}
 >
 	<!-- Controls -->
@@ -315,7 +340,11 @@
 	<ScaleControl />
 	<Control class="flex flex-col gap-y-2" position="top-left">
 		<ControlGroup>
-			<ControlButton on:click={() => (toggleGeolocationStatus = !toggleGeolocationStatus)}
+			<ControlButton
+				on:click={() => {
+					toggleGeolocationStatus = !toggleGeolocationStatus;
+					toggleNavigationMode = false;
+				}}
 				><hot-icon
 					name="geolocate"
 					class={`!text-[1.2rem] cursor-pointer  duration-200 ${toggleGeolocationStatus ? 'text-red-600' : 'text-[#52525B]'}`}
@@ -331,6 +360,16 @@
 			>
 		</ControlGroup></Control
 	>
+	<Control class="flex flex-col gap-y-2" position="top-left">
+		<ControlGroup>
+			<ControlButton on:click={() => (toggleNavigationMode = !toggleNavigationMode)}
+				><hot-icon
+					name="send"
+					class={`!text-[1.2rem] cursor-pointer duration-200 ${toggleNavigationMode ? 'text-red-600' : 'text-[#52525B]'}`}
+				></hot-icon></ControlButton
+			>
+		</ControlGroup></Control
+	>
 	<Control class="flex flex-col gap-y-2" position="bottom-right">
 		<LayerSwitcher
 			{map}
@@ -342,7 +381,7 @@
 	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->
 	{#if toggleGeolocationStatus}
-		<Geolocation bind:map bind:toggleGeolocationStatus></Geolocation>
+		<Geolocation {map} {toggleGeolocationStatus} {toggleNavigationMode}></Geolocation>
 	{/if}
 	<!-- The task area geojson -->
 	<GeoJSON id="tasks" data={taskStore.featcol} promoteId="fid">
