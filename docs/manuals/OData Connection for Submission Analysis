@@ -1,0 +1,27 @@
+If you want to visualise the submissions and create custom charts
+and diagrams using FMTM submissions, then you can follow the steps 
+below and load the submissions on any data analysis platform using OData. 
+OData endpoints are a standardised way to ingest 
+this data into other tools: PowerBI, Tableau, Redash, Grafana
+
+Why PowerBI? You can use other tools too like Tableau, Redash, Grafana or even
+Excel. However, PowerBI is free to use, very powerful, and user friendly though its Proprietary Microsoft. 
+
+The steps shows how to use powerBI and create custom visualisations. 
+ODK already has good docs on this which you can refer to. 
+https://docs.getodk.org/tutorial-mapping-households/ 
+
+Step 1: Start a new project, add a new data source 'OData Feed'
+https://private-user-images.githubusercontent.com/78538841/366426499-376de20e-61e5-452e-ab76-669bf1940c72.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzM5MDgwMTUsIm5iZiI6MTczMzkwNzcxNSwicGF0aCI6Ii83ODUzODg0MS8zNjY0MjY0OTktMzc2ZGUyMGUtNjFlNS00NTJlLWFiNzYtNjY5YmYxOTQwYzcyLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQxMjExVDA5MDE1NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPThiMWYzOTBiMDQyNGEzNDI1ZjBjZDg1Mjg2ZmE0NGU4Yzg1MGQyZWIyN2Q5YjQ4MGJmZmRlYzYzMWI3OWMxZWQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.riSVz4Y2tiFXqjkaSWsmsOvLjhx8M_5YiA-LSQ7FBys
+Step 2: Use the OData URLs shown in the ODK docs:
+a. Submission data: /v1/projects/{projectId}/forms/{xmlFormId}.svc
+e.g. https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc
+a. Entity data: /v1/projects/{projectId}/datasets/{name}.svc
+e.g. https://odk.hotosm.org/v1/projects/86/datasets/features.svc
+
+Step 3: Enter your credentials using Basic Auth
+
+Step 4: Preview the data
+
+Step 5: Transform data as needed, load into charts, graphs, etc, to create the dashboard you need.
+
