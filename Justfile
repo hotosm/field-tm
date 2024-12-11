@@ -57,7 +57,7 @@ bump:
     && git config --global user.name svcfmtm \
     && git config --global user.email fmtm@hotosm.org \
     && cd src/backend \
-    && cz bump --check-consistency'
+    && cz bump --check-consistency --no-verify'
 
 # Run docs website locally
 docs:
