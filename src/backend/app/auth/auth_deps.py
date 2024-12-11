@@ -235,7 +235,27 @@ async def refresh_cookies(
     # frontend header. For the mapper frontend this is enough, but for the
     # management frontend we instead use the return from /auth/me
     response = JSONResponse(status_code=HTTPStatus.OK, content=access_token_data)
-    return set_cookies(response, new_access_token, new_refresh_token)
+    response_plus_cookies = set_cookies(response, new_access_token, new_refresh_token)
+
+    # Invalidate any temp cookies from mapper frontend
+    for cookie_name in [
+        f"{settings.cookie_name}_temp",
+        f"{settings.cookie_name}_temp_refresh",
+    ]:
+        log.debug(f"Resetting cookie in response named '{cookie_name}'")
+        response_plus_cookies.set_cookie(
+            key=cookie_name,
+            value="",
+            max_age=0,  # Set to expire immediately
+            expires=0,  # Set to expire immediately
+            path="/",
+            domain=settings.FMTM_DOMAIN,
+            secure=False if settings.DEBUG else True,
+            httponly=True,
+            samesite="lax",
+        )
+
+    return response_plus_cookies
 
 
 ### Endpoint Dependencies ###
@@ -248,11 +268,12 @@ async def login_required(
     if settings.DEBUG:
         return AuthUser(sub="fmtm|1", username="localadmin", role=UserRole.ADMIN)
 
-    # Extract access token only from the OSM cookie
+    # Extract access token only from the FMTM cookie
     extracted_token = access_token or get_cookie_value(
         request,
-        settings.cookie_name,  # OSM cookie
+        settings.cookie_name,  # FMTM cookie
     )
+    print("manage")
     return await _authenticate_user(extracted_token)
 
 
@@ -263,15 +284,16 @@ async def mapper_login_required(
     if settings.DEBUG:
         return AuthUser(sub="fmtm|1", username="localadmin", role=UserRole.ADMIN)
 
-    # Extract access token from OSM cookie, fallback to temp auth cookie
+    # Extract access token from FMTM cookie, fallback to temp auth cookie
     extracted_token = access_token or get_cookie_value(
         request,
-        settings.cookie_name,  # OSM cookie
+        settings.cookie_name,  # FMTM cookie
         f"{settings.cookie_name}_temp",  # Temp cookie
     )
 
     # Verify login and continue
     if extracted_token:
+        print("mapper")
         return await _authenticate_user(extracted_token)
 
     # Else user has no token, so we provide login data automatically

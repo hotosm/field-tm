@@ -1,8 +1,8 @@
 // The /auth/me endpoint does an UPSERT in the database, ensuring the user
 // exists in the FMTM DB
-export const getUserDetailsFromApi = async () => {
+export const getUserDetailsFromApi = async (fetchClient = fetch) => {
 	try {
-		const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+		const response = await fetchClient(`${import.meta.env.VITE_API_URL}/auth/me`, {
 			credentials: 'include',
 		});
 
@@ -26,9 +26,9 @@ export const osmLoginRedirect = async () => {
 	} catch (error) {}
 };
 
-export const refreshCookies = async () => {
+export const refreshCookies = async (fetchClient = fetch) => {
 	try {
-		const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh/mapper`, {
+		const response = await fetchClient(`${import.meta.env.VITE_API_URL}/auth/refresh/mapper`, {
 			credentials: 'include',
 		});
 

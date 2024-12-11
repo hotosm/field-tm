@@ -10,13 +10,14 @@ type authDetailsType = {
 	// orgs_managed: number[];
 };
 
+import { refreshCookies } from '$lib/utils/login';
+
 let authDetails: authDetailsType | null = $state(null);
 let isLoginModalOpen: boolean = $state(false);
 
 function getLoginStore() {
 	return {
 		get getAuthDetails() {
-			console.log(authDetails);
 			return authDetails;
 		},
 		get isLoginModalOpen() {
@@ -28,8 +29,10 @@ function getLoginStore() {
 		toggleLoginModal: (status: boolean) => {
 			isLoginModalOpen = status;
 		},
-		signOut: () => {
+		signOut: async () => {
 			authDetails = null;
+			// Re-add temp auth cookies
+			await refreshCookies();
 		},
 	};
 }

@@ -13,17 +13,16 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	/*
 	Login + user details
 	*/
-	let apiUser = await refreshCookies();
-	const fmtmUserExists = localStorage.getItem('fmtm-user-exists');
-	if (!fmtmUserExists) {
+	let apiUser = await refreshCookies(fetch);
+	if (apiUser?.username !== 'svcfmtm') {
 		// Call /auth/me to populate the user details in the header
-		apiUser = await getUserDetailsFromApi();
-	}
-	if (!apiUser) {
-		loginStore.signOut();
-		throw error(401, { message: `You must log in first` });
-	} else {
-		loginStore.setAuthDetails(apiUser);
+		apiUser = await getUserDetailsFromApi(fetch);
+		if (!apiUser) {
+			loginStore.signOut();
+			throw error(401, { message: `You must log in first` });
+		} else {
+			loginStore.setAuthDetails(apiUser);
+		}
 	}
 
 	/*

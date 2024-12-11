@@ -28,9 +28,6 @@ const RefreshUserCookies = () => {
             const apiUser = await getUserDetailsFromApi();
             if (apiUser) {
               dispatch(LoginActions.setAuthDetails(apiUser));
-              // To prevent calls to /auth/me in future (on mapper frontend)
-              // We still require this here to retrieve role info for the user
-              localStorage.setItem('fmtm-user-exists', 'true');
             } else {
               console.error('Failed to fetch user details after cookie refresh.');
             }
