@@ -1,19 +1,35 @@
 // The /auth/me endpoint does an UPSERT in the database, ensuring the user
 // exists in the FMTM DB
 export const getUserDetailsFromApi = async () => {
-  const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+      credentials: 'include',
+    });
 
-  if (resp.status !== 200) {
+    if (!response.ok) {
+      throw new Error(`Status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error('Error retrieving user details:', err);
+  }
+};
+
+export const refreshCookies = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh/management`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    return true;
+  } catch (err) {
     return false;
   }
-
-  const apiUser = await resp.json();
-
-  if (!apiUser) return false;
-
-  return apiUser;
 };
 
 export const osmLoginRedirect = async () => {
@@ -26,7 +42,7 @@ export const osmLoginRedirect = async () => {
   }
 };
 
-export const revokeCookie = async () => {
+export const revokeCookies = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, { credentials: 'include' });
     if (!response.ok) {

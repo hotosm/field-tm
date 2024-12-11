@@ -34,7 +34,6 @@ import { useAppSelector } from '@/types/reduxTypes';
 import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
-import DebugConsole from '@/utilities/DebugConsole';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import QrcodeComponent from '@/components/QrcodeComponent';
@@ -252,13 +251,8 @@ const ProjectDetailsV2 = () => {
     dispatch(GetEntityInfo(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   }, []);
 
-  const [showDebugConsole, setShowDebugConsole] = useState(false);
-
   return (
     <div className="fmtm-bg-[#f5f5f5] !fmtm-h-[100dvh] sm:!fmtm-h-full">
-      {/* only used to display debug console */}
-
-      <DebugConsole showDebugConsole={showDebugConsole} setShowDebugConsole={setShowDebugConsole} />
       {/* Customized Modal For Generate Tiles */}
       <div>
         <GenerateBasemap projectInfo={state.projectInfo} />
@@ -409,18 +403,6 @@ const ProjectDetailsV2 = () => {
                 windowSize.width <= 640 ? '!fmtm-h-[100dvh]' : '!fmtm-h-full'
               }`}
             >
-              {import.meta.env.MODE === 'development' && (
-                <div className="fmtm-block sm:fmtm-hidden fmtm-absolute fmtm-top-6 fmtm-left-16 fmtm-z-50">
-                  <CustomCheckbox
-                    label="Toggle-Console"
-                    checked={showDebugConsole}
-                    onCheckedChange={(status) => {
-                      setShowDebugConsole(status);
-                    }}
-                    className="fmtm-text-black !fmtm-w-full"
-                  />
-                </div>
-              )}
               <LayerSwitcherControl visible={customBasemapUrl ? 'custom' : 'osm'} pmTileLayerUrl={customBasemapUrl} />
 
               {taskBoundariesLayer && taskBoundariesLayer?.features?.length > 0 && (

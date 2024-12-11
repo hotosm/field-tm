@@ -31,7 +31,7 @@
 	const handleSignIn = async (selectedOption: string) => {
 		if (selectedOption === 'osm_account') {
 			// store current url in local storage so that the user can be redirected to current page after login
-			localStorage.setItem('requestedPath', window.location.pathname);
+			sessionStorage.setItem('requestedPath', window.location.pathname);
 			osmLoginRedirect();
 		}
 	};

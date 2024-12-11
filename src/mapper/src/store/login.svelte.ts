@@ -1,10 +1,13 @@
 type authDetailsType = {
 	id: number;
 	username: string;
-	profile_img: string;
+	picture: string;
 	role: string;
-	project_roles: string | null;
-	orgs_managed: number[];
+	// Here we omit project_roles and orgs_managed as they are not needed
+	// for mapping. The token refresh endpoints do not call the db for this
+	// data, in order to be more performant / separate concerns.
+	// project_roles: string | null;
+	// orgs_managed: number[];
 };
 
 let authDetails: authDetailsType | null = $state(null);
@@ -13,6 +16,7 @@ let isLoginModalOpen: boolean = $state(false);
 function getLoginStore() {
 	return {
 		get getAuthDetails() {
+			console.log(authDetails);
 			return authDetails;
 		},
 		get isLoginModalOpen() {
@@ -20,26 +24,11 @@ function getLoginStore() {
 		},
 		setAuthDetails: (authData: authDetailsType) => {
 			authDetails = authData;
-			// the react frontend uses redux-persist to store the authDetails in
-			// the local storage, so we maintain the same schema to store data here also
-			localStorage.setItem(
-				'persist:login',
-				JSON.stringify({
-					authDetails: JSON.stringify(authData),
-					_persist: JSON.stringify({ version: -1, rehydrated: true }),
-				}),
-			);
-		},
-		retrieveAuthDetailsFromLocalStorage: () => {
-			const persistedAuth = localStorage.getItem('persist:login');
-			if (!persistedAuth) return;
-			authDetails = JSON.parse(JSON.parse(persistedAuth).authDetails);
 		},
 		toggleLoginModal: (status: boolean) => {
 			isLoginModalOpen = status;
 		},
 		signOut: () => {
-			localStorage.removeItem('persist:login');
 			authDetails = null;
 		},
 	};

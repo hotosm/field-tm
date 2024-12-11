@@ -6,7 +6,7 @@ import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { revokeCookie } from '@/utilfunctions/login';
+import { revokeCookies } from '@/utilfunctions/login';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/hotLog.png';
@@ -48,7 +48,7 @@ export default function PrimaryAppBar() {
   const handleOnSignOut = async () => {
     setOpen(false);
     try {
-      await revokeCookie();
+      await revokeCookies();
       dispatch(LoginActions.signOut());
       dispatch(ProjectActions.clearProjects([]));
     } catch {
@@ -111,12 +111,12 @@ export default function PrimaryAppBar() {
               alignItems="center"
               className="fmtm-text-ellipsis fmtm-max-w-[9.5rem]"
             >
-              {authDetails['profile_img'] !== 'null' && authDetails['profile_img'] ? (
+              {authDetails['picture'] !== 'null' && authDetails['picture'] ? (
                 <CoreModules.Stack
                   className="fmtm-w-7 fmtm-h-7 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-overflow-hidden fmtm-rounded-full fmtm-border-[1px]"
                   sx={{ display: { xs: 'none', md: 'block' }, mt: '3%' }}
                 >
-                  <img src={authDetails['profile_img']} alt="Profile Picture" />
+                  <img src={authDetails['picture']} alt="Profile Picture" />
                 </CoreModules.Stack>
               ) : (
                 <AssetModules.PersonIcon color="success" sx={{ mt: '3%' }} />

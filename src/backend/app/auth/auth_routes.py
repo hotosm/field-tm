@@ -19,7 +19,7 @@
 """Auth routes, to login, logout, and get user details."""
 
 from time import time
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -29,12 +29,10 @@ from psycopg.rows import class_row
 
 from app.auth.auth_deps import (
     create_jwt_tokens,
-    get_cookie_value,
     login_required,
     mapper_login_required,
-    refresh_jwt_token,
+    refresh_cookies,
     set_cookies,
-    verify_jwt_token,
 )
 from app.auth.auth_schemas import AuthUser, FMTMUser
 from app.auth.providers.osm import handle_osm_callback, init_osm_auth
@@ -80,6 +78,7 @@ async def callback(
     Also returns a cookie containing the access token for persistence in frontend apps.
     """
     try:
+        # This includes the main cookie, refresh cookie, osm token cookie
         response_plus_cookies = await handle_osm_callback(request, osm_auth)
         return response_plus_cookies
     except Exception as e:
@@ -164,7 +163,7 @@ async def get_or_create_user(
                 {
                     "user_id": user_data.id,
                     "username": user_data.username,
-                    "profile_img": user_data.picture or "",
+                    "profile_img": user_data.profile_img or "",
                     "role": UserRole(user_data.role).name,
                 },
             )
@@ -211,64 +210,7 @@ async def my_data(
     return await get_or_create_user(db, current_user)
 
 
-async def refresh_fmtm_cookies(request: Request, current_user: AuthUser):
-    """Reusable function to renew the expiry on the FMTM and expiry tokens.
-
-    Used by both management and mapper refresh endpoints.
-    """
-    if settings.DEBUG:
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={**current_user.model_dump()},
-        )
-
-    try:
-        access_token = get_cookie_value(
-            request,
-            settings.cookie_name,  # OSM cookie
-        )
-        if not access_token:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED,
-                detail="No access token provided",
-            )
-
-        refresh_token = get_cookie_value(
-            request,
-            f"{settings.cookie_name}_refresh",  # OSM refresh cookie
-        )
-        if not refresh_token:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED,
-                detail="No refresh token provided",
-            )
-
-        # Decode JWT and get data from both cookies
-        access_token_data = verify_jwt_token(access_token, ignore_expiry=True)
-        refresh_token_data = verify_jwt_token(refresh_token)
-
-        # Refresh token + refresh token
-        new_access_token = refresh_jwt_token(access_token_data)
-        new_refresh_token = refresh_jwt_token(refresh_token_data)
-
-        response = set_cookies(new_access_token, new_refresh_token)
-        # Append the user data to the JSONResponse
-        # We use this in the frontend to determine if the token user matches the
-        # currently logged in user. If no, we clear the frontend auth state.
-        return JSONResponse(
-            status=response.status,
-            headers=response.headers,
-            content=access_token_data,
-        )
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail=f"Failed to refresh the access token: {e}",
-        ) from e
-
-
-@router.get("/refresh/management", response_model=AuthUser)
+@router.get("/refresh/management", response_model=FMTMUser)
 async def refresh_management_cookies(
     request: Request,
     current_user: Annotated[AuthUser, Depends(login_required)],
@@ -278,16 +220,20 @@ async def refresh_management_cookies(
     This endpoint is specific to the management desktop frontend.
     Any temp auth cookies will be ignored and removed.
     OSM login is required.
+
+    NOTE this endpoint has no db calls and returns in ~2ms.
     """
-    response = await refresh_fmtm_cookies(request, current_user)
+    response = await refresh_cookies(
+        request,
+        current_user,
+        settings.cookie_name,
+        f"{settings.cookie_name}_refresh",
+    )
 
     # Invalidate any temp cookies from mapper frontend
-    fmtm_cookie_name = settings.cookie_name
-    temp_cookie_name = f"{fmtm_cookie_name}_temp"
-    temp_refresh_cookie_name = f"{fmtm_cookie_name}_temp_refresh"
     for cookie_name in [
-        temp_cookie_name,
-        temp_refresh_cookie_name,
+        f"{settings.cookie_name}_temp",
+        f"{settings.cookie_name}_temp_refresh",
     ]:
         log.debug(f"Resetting cookie in response named '{cookie_name}'")
         response.set_cookie(
@@ -305,7 +251,7 @@ async def refresh_management_cookies(
     return response
 
 
-@router.get("/refresh/mapper", response_model=AuthUser)
+@router.get("/refresh/mapper", response_model=Optional[FMTMUser])
 async def refresh_mapper_token(
     request: Request,
     current_user: Annotated[AuthUser, Depends(mapper_login_required)],
@@ -315,34 +261,41 @@ async def refresh_mapper_token(
     This endpoint is specific to the mapper mobile frontend.
     By default the user will be logged in with a temporary auth cookie.
     OSM auth is optional, if the user wishes to be attributed for contributions.
+
+    NOTE this endpoint has no db calls and returns in ~2ms.
     """
     try:
-        response = await refresh_fmtm_cookies(request, current_user)
+        # If standard login cookie is passed, use that
+        response = await refresh_cookies(
+            request,
+            current_user,
+            settings.cookie_name,
+            f"{settings.cookie_name}_refresh",
+        )
         return response
     except HTTPException:
         # NOTE we allow for token verification to fail for the main cookie
         # and fallback to to generate a temp auth cookie
         pass
 
-    username = "svcfmtm"
-    jwt_data = {
-        "sub": "fmtm|20386219",
+    # Refresh the temp cookies (we must re-create the 'sub' field)
+    temp_jwt_details = {
+        **current_user.model_dump(exclude=["id"]),
+        "sub": f"fmtm|{current_user.id}",
         "aud": settings.FMTM_DOMAIN,
         "iat": int(time()),
         "exp": int(time()) + 86400,  # set token expiry to 1 day
-        "username": username,
-        "picture": None,
-        "role": UserRole.MAPPER,
     }
-    access_token, refresh_token = create_jwt_tokens(jwt_data)
-    response = set_cookies(
-        access_token,
+
+    fmtm_token, refresh_token = create_jwt_tokens(temp_jwt_details)
+    # NOTE be sure to not append content=current_user.model_dump() to this JSONResponse
+    # as we want the login state on the frontend to remain empty (allowing the user to
+    # log in via OSM instead / override)
+    response = JSONResponse(status_code=HTTPStatus.OK, content={})
+    return set_cookies(
+        response,
+        fmtm_token,
         refresh_token,
         f"{settings.cookie_name}_temp",
         f"{settings.cookie_name}_temp_refresh",
-    )
-    return JSONResponse(
-        status=response.status,
-        headers=response.headers,
-        content=jwt_data,
     )

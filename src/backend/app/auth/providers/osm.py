@@ -21,13 +21,13 @@
 import os
 from time import time
 
-from fastapi import Request
+from fastapi import Request, Response
 from loguru import logger as log
 from osm_login_python.core import Auth
 
 from app.auth.auth_deps import create_jwt_tokens, set_cookies
 from app.config import settings
-from app.db.enums import UserRole
+from app.db.enums import HTTPStatus, UserRole
 
 if settings.DEBUG:
     # Required as callback url is http during dev
@@ -82,9 +82,14 @@ async def handle_osm_callback(request: Request, osm_auth: Auth):
 
     # Create our JWT tokens from user data
     fmtm_token, refresh_token = create_jwt_tokens(user_data)
-    response_plus_cookies = set_cookies(fmtm_token, refresh_token)
+    response = Response(status_code=HTTPStatus.OK)
+    response_plus_cookies = set_cookies(response, fmtm_token, refresh_token)
 
-    # Get OSM token from response (serialised in cookie, deserialise to use)
+    # NOTE Here we create a separate cookie to store the OSM token, for later
+    # workflows such as conflation (OSM changesets) or OSM messaging.
+    # First, we get the OSM token from response.
+    # The token is serialised in the cookie & must be deserialised using
+    # osm_login_python.auth.deserialize_data.
     serialised_osm_token = tokens.get("oauth_token")
     cookie_name = settings.cookie_name
     osm_cookie_name = f"{cookie_name}_osm"

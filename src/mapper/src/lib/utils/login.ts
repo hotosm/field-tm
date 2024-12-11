@@ -1,3 +1,21 @@
+// The /auth/me endpoint does an UPSERT in the database, ensuring the user
+// exists in the FMTM DB
+export const getUserDetailsFromApi = async () => {
+	try {
+		const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+			credentials: 'include',
+		});
+
+		if (!response.ok) {
+			throw new Error(`Status: ${response.status}`);
+		}
+
+		return response.json();
+	} catch (err) {
+		console.error('Error retrieving user details:', err);
+	}
+};
+
 // Note the callback is handled in the management frontend under /osmauth,
 // then the user is redirected back to the mapper frontend URL requested
 export const osmLoginRedirect = async () => {
@@ -6,6 +24,22 @@ export const osmLoginRedirect = async () => {
 		const data = await resp.json();
 		window.location = data.login_url;
 	} catch (error) {}
+};
+
+export const refreshCookies = async () => {
+	try {
+		const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh/mapper`, {
+			credentials: 'include',
+		});
+
+		if (!response.ok) {
+			throw new Error(`Status: ${response.status}`);
+		}
+
+		return response.json();
+	} catch (err) {
+		console.error('Error refreshing user cookie:', err);
+	}
 };
 
 export const revokeCookies = async () => {

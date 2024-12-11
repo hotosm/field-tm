@@ -38,14 +38,21 @@ class ProjectUserDict(TypedDict):
     project: DbProject
 
 
-class AuthUser(BaseModel):
-    """The user model returned from OSM OAuth2."""
+class BaseUser(BaseModel):
+    """Base user model to inherit."""
 
     model_config = ConfigDict(use_enum_values=True)
 
     username: str
+    # TODO any usage of profile_img should be refactored out
+    # in place of 'picture'
+    profile_img: Optional[str] = None
     picture: Optional[str] = None
     role: Optional[UserRole] = UserRole.MAPPER
+
+
+class AuthUser(BaseUser):
+    """The user model returned from OSM OAuth2."""
 
     _sub: str = PrivateAttr()  # it won't return this field
 
@@ -61,6 +68,14 @@ class AuthUser(BaseModel):
         sub = self._sub
         return int(sub.split("|")[1])
 
+    def model_post_init(self, ctx):
+        """Temp workaround to convert oauth picture --> profile_img.
+
+        TODO profile_img is used in the db for now, but will be refactored.
+        """
+        if self.picture:
+            self.profile_img = self.picture
+
 
 # NOTE we no longer use this, but is present as an example
 # class AuthUserWithToken(AuthUser):
@@ -68,16 +83,18 @@ class AuthUser(BaseModel):
 #     token: str
 
 
-class FMTMUser(BaseModel):
-    """User details returned to the frontend.
-
-    TODO this should inherit from AuthUser and extend.
-    TODO profile_img should be refactored to `picture`.
-    """
+class FMTMUser(BaseUser):
+    """User details returned to the frontend."""
 
     id: int
-    username: str
-    profile_img: str
-    role: UserRole
     project_roles: Optional[dict[int, ProjectRole]] = None
     orgs_managed: Optional[list[int]] = None
+
+    def model_post_init(self, ctx):
+        """Add to picture field, and remove the value for profile_img.
+
+        We need this workaround as OSM returns profile_img in the response.
+        """
+        if self.profile_img:
+            self.picture = self.profile_img
+            self.profile_img = None
