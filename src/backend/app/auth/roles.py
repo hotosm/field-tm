@@ -30,8 +30,8 @@ from psycopg import Connection
 from psycopg.rows import class_row
 from pydantic import Field
 
+from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
-from app.auth.osm import login_required
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, ProjectRole, ProjectVisibility
 from app.db.models import DbProject, DbUser
@@ -347,7 +347,8 @@ async def validator(
 async def mapper(
     project: Annotated[DbProject, Depends(get_project)],
     db: Annotated[Connection, Depends(db_conn)],
-    current_user: Annotated[AuthUser, Depends(login_required)],
+    # Here temp auth token/cookie is allowed
+    current_user: Annotated[AuthUser, Depends(mapper_login_required)],
 ) -> ProjectUserDict:
     """A mapper for a specific project.
 
@@ -363,6 +364,9 @@ async def mapper(
             "project": project,
         }
 
+    # As the default user for temp auth (svcfmtm) does not have valid permissions
+    # on any project, this will block access for temp login users on projects
+    # that are not public
     return await wrap_check_access(
         project,
         db,

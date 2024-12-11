@@ -20,10 +20,18 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	}
 	const userObj = await userResponse.json();
 
+	// Clear stored auth state if mismatch (but skip for localadmin id=1)
+	if (userObj.id !== 1 && userObj.username !== loginStore.getAuthDetails?.username) {
+		loginStore.signOut();
+		throw error(401, { message: `Please log in again` });
+	} else {
+		loginStore.setAuthDetails(userObj);
+	}
+
 	/*
 	Project details
 	*/
-	const projectResponse = await fetch(`${API_URL}/projects/${projectId}`, { credentials: 'include' });
+	const projectResponse = await fetch(`${API_URL}/projects/${projectId}/minimal`, { credentials: 'include' });
 	if (projectResponse.status === 401) {
 		// TODO redirect to different error page to handle login
 		throw error(401, { message: `You must log in first` });
@@ -34,12 +42,6 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	const entityStatusResponse = await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
 		credentials: 'include',
 	});
-
-	/*
-	Basemaps
-	*/
-	// Load existing OPFS PMTiles archive if present
-	// TODO
 
 	return {
 		project: await projectResponse.json(),

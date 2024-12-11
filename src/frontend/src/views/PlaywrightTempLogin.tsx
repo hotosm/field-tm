@@ -11,7 +11,7 @@ import { LoginActions } from '@/store/slices/LoginSlice';
 async function PlaywrightTempAuth() {
   const dispatch = CoreModules.useAppDispatch();
   // Sets a cookie in the browser that is used for auth
-  await axios.get(`${import.meta.env.VITE_API_URL}/auth/temp-login`);
+  await axios.get(`${import.meta.env.VITE_API_URL}/auth/refresh/management`);
 
   const apiUser = await getUserDetailsFromApi();
   if (!apiUser) {

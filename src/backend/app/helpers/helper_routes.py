@@ -38,8 +38,9 @@ from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
 from osm_login_python.core import Auth
 
+from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser
-from app.auth.osm import init_osm_auth, login_required
+from app.auth.providers.osm import init_osm_auth
 from app.central import central_deps
 from app.central.central_crud import (
     convert_geojson_to_odk_csv,
