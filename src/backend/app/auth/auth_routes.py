@@ -255,8 +255,11 @@ async def refresh_fmtm_cookies(request: Request, current_user: AuthUser):
         # Append the user data to the JSONResponse
         # We use this in the frontend to determine if the token user matches the
         # currently logged in user. If no, we clear the frontend auth state.
-        response.content = access_token_data
-        return response
+        return JSONResponse(
+            status=response.status,
+            headers=response.headers,
+            content=access_token_data,
+        )
 
     except Exception as e:
         raise HTTPException(
@@ -338,5 +341,8 @@ async def refresh_mapper_token(
         f"{settings.cookie_name}_temp",
         f"{settings.cookie_name}_temp_refresh",
     )
-    response.content = jwt_data
-    return response
+    return JSONResponse(
+        status=response.status,
+        headers=response.headers,
+        content=jwt_data,
+    )
