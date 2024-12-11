@@ -23,7 +23,6 @@ from typing import Optional
 
 import jwt
 from fastapi import Header, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
 from loguru import logger as log
 
 from app.auth.auth_schemas import AuthUser
@@ -72,7 +71,7 @@ def set_cookies(
     refresh_token: str,
     cookie_name: str = settings.cookie_name,
     refresh_cookie_name: str = f"{settings.cookie_name}_refresh",
-) -> JSONResponse:
+) -> Response:
     """Set cookies for the access and refresh tokens.
 
     Args:
@@ -83,12 +82,12 @@ def set_cookies(
             refresh token.
 
     Returns:
-        JSONResponse: A response with attached cookies (set-cookie headers).
+        Response: A response with attached cookies (set-cookie headers).
     """
     # NOTE if needed we can return the token in the JSON response, but we don't for now
     # response = JSONResponse(status_code=HTTPStatus.OK,
     # content={"token": access_token})
-    response = JSONResponse(status_code=HTTPStatus.OK, content={})
+    response = Response(status_code=HTTPStatus.OK)
 
     secure = not settings.DEBUG
     domain = settings.FMTM_DOMAIN
