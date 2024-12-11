@@ -1,8 +1,7 @@
 <script lang="ts">
 	import OSMLogo from '$assets/images/osm-logo.png';
-	import { osmLoginRedirect, TemporaryLoginService } from '$lib/utils/login';
+	import { osmLoginRedirect } from '$lib/utils/login';
 	import { getLoginStore } from '$store/login.svelte.ts';
-	import { getAlertStore } from '$store/common.svelte.ts';
 
 	type Props = {
 		open: boolean;
@@ -24,41 +23,16 @@
 			image: OSMLogo,
 			description: 'Edits made in FMTM will be credited to your OSM account.',
 		},
-		{
-			id: 'temp_account',
-			name: 'Temporary Account',
-			icon: 'person-fill',
-			description: "If you're not an OSM user or prefer not to create an OSM account.",
-		},
 	];
 
 	let dialogRef;
 	const loginStore = getLoginStore();
-	const alertStore = getAlertStore();
 
 	const handleSignIn = async (selectedOption: string) => {
 		if (selectedOption === 'osm_account') {
 			// store current url in local storage so that the user can be redirected to current page after login
 			localStorage.setItem('requestedPath', window.location.pathname);
 			osmLoginRedirect();
-		} else {
-			const userDetailResp = await TemporaryLoginService(`${import.meta.env.VITE_API_URL}/auth/temp-login`);
-
-			if (!userDetailResp) {
-				alertStore.setAlert({ variant: 'danger', message: 'Temporary Login Failed' });
-				return;
-			}
-			loginStore.setAuthDetails({ authDetails: userDetailResp });
-
-			// the react frontend uses redux-persist to store the authDetails in the local storage, so we maintain the same schema to store data here also
-			localStorage.setItem(
-				'persist:login',
-				JSON.stringify({
-					authDetails: JSON.stringify(userDetailResp),
-					_persist: JSON.stringify({ version: -1, rehydrated: true }),
-				}),
-			);
-			location.reload();
 		}
 	};
 </script>

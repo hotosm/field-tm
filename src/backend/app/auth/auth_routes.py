@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 #
 # This file is part of FMTM.
 #
@@ -27,19 +27,17 @@ from loguru import logger as log
 from psycopg import Connection
 from psycopg.rows import class_row
 
-from app.auth.auth_schemas import AuthUser, AuthUserWithToken, FMTMUser
-from app.auth.osm import (
+from app.auth.auth_deps import (
     create_jwt_tokens,
-    extract_refresh_token_from_cookie,
-    extract_refresh_token_from_osm_cookie,
-    extract_token_from_cookie,
-    init_osm_auth,
+    get_cookie_value,
     login_required,
     mapper_login_required,
-    refresh_access_token,
+    refresh_jwt_token,
     set_cookies,
-    verify_token,
+    verify_jwt_token,
 )
+from app.auth.auth_schemas import AuthUser, FMTMUser
+from app.auth.providers.osm import handle_osm_callback, init_osm_auth
 from app.config import settings
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus, UserRole
@@ -80,62 +78,12 @@ async def callback(
 
     Provides an access token that can be used for authenticating other endpoints.
     Also returns a cookie containing the access token for persistence in frontend apps.
-
-    Args:
-        request: The GET request.
-        request: The response, including a cookie.
-        osm_auth: The Auth object from osm-login-python.
-
-    Returns:
-        JSONResponse: A response including cookies that will be set in-browser.
     """
     try:
-        log.debug(f"Callback url requested: {request.url}")
-
-        # Enforce https callback url for openstreetmap.org
-        callback_url = str(request.url).replace("http://", "https://")
-
-        # Get user data from response
-        tokens = osm_auth.callback(callback_url)
-        serialised_user_data = tokens.get("user_data")
-        log.debug(f"Access token returned of length {len(serialised_user_data)}")
-        osm_user = osm_auth.deserialize_data(serialised_user_data)
-        user_data = {
-            "sub": f"fmtm|{osm_user['id']}",
-            "aud": settings.FMTM_DOMAIN,
-            "iat": int(time()),
-            "exp": int(time()) + 86400,  # expiry set to 1 day
-            "username": osm_user["username"],
-            "email": osm_user.get("email"),
-            "picture": osm_user.get("img_url"),
-            "role": UserRole.MAPPER,
-        }
-        # Create our JWT tokens from user data
-        fmtm_token, refresh_token = create_jwt_tokens(user_data)
-        response_plus_cookies = set_cookies(fmtm_token, refresh_token)
-
-        # Get OSM token from response (serialised in cookie, deserialise to use)
-        serialised_osm_token = tokens.get("oauth_token")
-        cookie_name = settings.cookie_name
-        osm_cookie_name = f"{cookie_name}_osm"
-        log.debug(f"Creating cookie '{osm_cookie_name}' with OSM token")
-        response_plus_cookies.set_cookie(
-            key=osm_cookie_name,
-            value=serialised_osm_token,
-            max_age=864000,
-            expires=864000,  # expiry set for 10 days
-            path="/",
-            domain=settings.FMTM_DOMAIN,
-            secure=False if settings.DEBUG else True,
-            httponly=True,
-            samesite="lax",
-        )
-
+        response_plus_cookies = await handle_osm_callback(request, osm_auth)
         return response_plus_cookies
     except Exception as e:
-        raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED, detail=f"Invalid OSM token: {e}"
-        ) from e
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=str(e)) from e
 
 
 @router.get("/logout")
@@ -263,52 +211,51 @@ async def my_data(
     return await get_or_create_user(db, current_user)
 
 
-@router.get("/refresh/management", response_model=AuthUserWithToken)
-async def refresh_mgmt_token(
-    request: Request,
-    current_user: Annotated[AuthUser, Depends(login_required)],
-):
-    """Uses the refresh token to generate a new access token."""
+async def refresh_fmtm_cookies(request: Request, current_user: AuthUser):
+    """Reusable function to renew the expiry on the FMTM and expiry tokens.
+
+    Used by both management and mapper refresh endpoints.
+    """
     if settings.DEBUG:
         return JSONResponse(
             status_code=HTTPStatus.OK,
-            content={
-                "token": "debugtoken",
-                **current_user.model_dump(),
-            },
+            content={**current_user.model_dump()},
         )
-    try:
-        cookie_name = settings.cookie_name
-        access_token = extract_token_from_cookie(request)
 
-        refresh_token = extract_refresh_token_from_osm_cookie(request)
+    try:
+        access_token = get_cookie_value(
+            request,
+            settings.cookie_name,  # OSM cookie
+        )
+        if not access_token:
+            raise HTTPException(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                detail="No access token provided",
+            )
+
+        refresh_token = get_cookie_value(
+            request,
+            f"{settings.cookie_name}_refresh",  # OSM refresh cookie
+        )
         if not refresh_token:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
                 detail="No refresh token provided",
             )
 
-        token_data = verify_token(refresh_token)
-        access_token = refresh_access_token(token_data)
+        # Decode JWT and get data from both cookies
+        access_token_data = verify_jwt_token(access_token, ignore_expiry=True)
+        refresh_token_data = verify_jwt_token(refresh_token)
 
-        response = JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={
-                "token": access_token,
-                **current_user.model_dump(),
-            },
-        )
-        response.set_cookie(
-            key=cookie_name,
-            value=access_token,
-            max_age=86400,
-            expires=86400,
-            path="/",
-            domain=settings.FMTM_DOMAIN,
-            secure=False if settings.DEBUG else True,
-            httponly=True,
-            samesite="lax",
-        )
+        # Refresh token + refresh token
+        new_access_token = refresh_jwt_token(access_token_data)
+        new_refresh_token = refresh_jwt_token(refresh_token_data)
+
+        response = set_cookies(new_access_token, new_refresh_token)
+        # Append the user data to the JSONResponse
+        # We use this in the frontend to determine if the token user matches the
+        # currently logged in user. If no, we clear the frontend auth state.
+        response.content = access_token_data
         return response
 
     except Exception as e:
@@ -318,98 +265,62 @@ async def refresh_mgmt_token(
         ) from e
 
 
-@router.get("/refresh/mapper", response_model=AuthUserWithToken)
+@router.get("/refresh/management", response_model=AuthUser)
+async def refresh_management_cookies(
+    request: Request,
+    current_user: Annotated[AuthUser, Depends(login_required)],
+):
+    """Uses the refresh token to generate a new access token.
+
+    This endpoint is specific to the management desktop frontend.
+    Any temp auth cookies will be ignored and removed.
+    OSM login is required.
+    """
+    response = await refresh_fmtm_cookies(request, current_user)
+
+    # Invalidate any temp cookies from mapper frontend
+    fmtm_cookie_name = settings.cookie_name
+    temp_cookie_name = f"{fmtm_cookie_name}_temp"
+    temp_refresh_cookie_name = f"{fmtm_cookie_name}_temp_refresh"
+    for cookie_name in [
+        temp_cookie_name,
+        temp_refresh_cookie_name,
+    ]:
+        log.debug(f"Resetting cookie in response named '{cookie_name}'")
+        response.set_cookie(
+            key=cookie_name,
+            value="",
+            max_age=0,  # Set to expire immediately
+            expires=0,  # Set to expire immediately
+            path="/",
+            domain=settings.FMTM_DOMAIN,
+            secure=False if settings.DEBUG else True,
+            httponly=True,
+            samesite="lax",
+        )
+
+    return response
+
+
+@router.get("/refresh/mapper", response_model=AuthUser)
 async def refresh_mapper_token(
     request: Request,
     current_user: Annotated[AuthUser, Depends(mapper_login_required)],
 ):
-    """Uses the refresh token to generate a new access token."""
-    if settings.DEBUG:
-        return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={
-                "token": "debugtoken",
-                **current_user.model_dump(),
-            },
-        )
-    try:
-        refresh_token, temp_refresh_token = extract_refresh_token_from_cookie(request)
-        if not refresh_token and not temp_refresh_token:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED,
-                detail="No refresh token provided",
-            )
+    """Uses the refresh token to generate a new access token.
 
-        # Will check for both refresh and temp_refresh cookies
-        # If both are present, the refresh cookie will be used
-        token_data = None
-        cookie_name = settings.cookie_name
-        try:
-            if refresh_token:
-                token_data = verify_token(refresh_token)
-        except Exception:
-            log.warning("Failed to verify refresh token, checking temp token...")
-
-        if not token_data:
-            token_data = verify_token(temp_refresh_token)
-            cookie_name = f"{settings.cookie_name}_temp"
-
-        access_token = refresh_access_token(token_data)
-
-        response = JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={
-                "token": access_token,
-                **current_user.model_dump(),
-            },
-        )
-        response.set_cookie(
-            key=cookie_name,
-            value=access_token,
-            max_age=86400,
-            expires=86400,
-            path="/",
-            domain=settings.FMTM_DOMAIN,
-            secure=False if settings.DEBUG else True,
-            httponly=True,
-            samesite="lax",
-        )
-        if temp_refresh_token and refresh_token:
-            response.set_cookie(
-                key=f"{settings.cookie_name}_temp_refresh",
-                value="",
-                max_age=0,  # Set to expire immediately
-                expires=0,  # Set to expire immediately
-                path="/",
-                domain=settings.FMTM_DOMAIN,
-                secure=False if settings.DEBUG else True,
-                httponly=True,
-                samesite="lax",
-            )
-        return response
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail=f"Failed to refresh the access token: {e}",
-        ) from e
-
-
-@router.get("/temp-login")
-async def temp_login(
-    # email: Optional[str] = None,
-):
-    """Handles the authentication check endpoint.
-
-    By creating a temporary access token and
-    setting it as a cookie.
-
-    Args:
-        email: email of non-osm user.
-
-    Returns:
-        Response: The response object containing the access token as a cookie.
+    This endpoint is specific to the mapper mobile frontend.
+    By default the user will be logged in with a temporary auth cookie.
+    OSM auth is optional, if the user wishes to be attributed for contributions.
     """
+    try:
+        response = await refresh_fmtm_cookies(request, current_user)
+        return response
+    except HTTPException:
+        # NOTE we allow for token verification to fail for the main cookie
+        # and fallback to to generate a temp auth cookie
+        pass
+
     username = "svcfmtm"
     jwt_data = {
         "sub": "fmtm|20386219",
@@ -421,9 +332,11 @@ async def temp_login(
         "role": UserRole.MAPPER,
     }
     access_token, refresh_token = create_jwt_tokens(jwt_data)
-    return set_cookies(
+    response = set_cookies(
         access_token,
         refresh_token,
         f"{settings.cookie_name}_temp",
         f"{settings.cookie_name}_temp_refresh",
     )
+    response.content = jwt_data
+    return response

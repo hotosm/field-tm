@@ -45,8 +45,8 @@ from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
 from psycopg import Connection
 
+from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
-from app.auth.osm import login_required
 from app.auth.roles import mapper, org_admin, project_manager
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
@@ -1131,6 +1131,29 @@ async def read_project(
 ):
     """Get a specific project by ID."""
     return project_user.get("project")
+
+
+@router.get("/{project_id}/minimal", response_model=project_schemas.ProjectOut)
+async def read_project_minimal(
+    project_id: int,
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[AuthUser, Depends(mapper_login_required)],
+):
+    """Get a specific project by ID, with minimal metadata.
+
+    This endpoint is used for a quick return on the mapper frontend,
+    without all additional calculated fields.
+
+    It can also be accessed via temporary authentication, regardless of
+    project visibility, hence has very minimal metadata included
+    (no sensitive fields).
+
+    NOTE this does mean the odk_token can be retrieved from this endpoint
+    and is a small leak that could be addressed in future if needed.
+    (any user could theoretically submit a contribution via the ODK
+    token, even if this is a private project).
+    """
+    return await DbProject.one(db, project_id, minimal=True)
 
 
 @router.get("/{project_id}/download")

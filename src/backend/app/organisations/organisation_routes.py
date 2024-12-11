@@ -30,8 +30,8 @@ from fastapi import (
 from loguru import logger as log
 from psycopg import Connection
 
+from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict
-from app.auth.osm import login_required
 from app.auth.roles import org_admin, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus

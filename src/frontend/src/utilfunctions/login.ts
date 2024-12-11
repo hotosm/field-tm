@@ -1,3 +1,5 @@
+// The /auth/me endpoint does an UPSERT in the database, ensuring the user
+// exists in the FMTM DB
 export const getUserDetailsFromApi = async () => {
   const resp = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
     credentials: 'include',

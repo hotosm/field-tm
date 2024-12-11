@@ -5,7 +5,7 @@
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
-	import { revokeCookie } from '$lib/utils/login';
+	import { revokeCookies } from '$lib/utils/login';
 	import { getAlertStore } from '$store/common.svelte';
 
 	let drawerRef: any = $state();
@@ -13,17 +13,16 @@
 	const alertStore = getAlertStore();
 
 	onMount(() => {
-		// retrieve persisted auth details from local storage and set  auth details to store
-		const persistedAuth = localStorage.getItem('persist:login');
-		if (!persistedAuth) return;
-		loginStore.setAuthDetails(JSON.parse(JSON.parse(persistedAuth).authDetails));
+		// retrieve persisted auth details from local storage and set auth details to store
+		loginStore.retrieveAuthDetailsFromLocalStorage();
 	});
 
 	const handleSignOut = async () => {
 		try {
-			await revokeCookie();
+			await revokeCookies();
 			loginStore.signOut();
-			window.location.href = window.location.origin;
+			drawerRef.hide();
+			// window.location.href = window.location.origin;
 		} catch (error) {
 			alertStore.setAlert({ variant: 'danger', message: 'Sign Out Failed' });
 		}
