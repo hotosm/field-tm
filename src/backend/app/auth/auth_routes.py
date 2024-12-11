@@ -223,32 +223,12 @@ async def refresh_management_cookies(
 
     NOTE this endpoint has no db calls and returns in ~2ms.
     """
-    response = await refresh_cookies(
+    return await refresh_cookies(
         request,
         current_user,
         settings.cookie_name,
         f"{settings.cookie_name}_refresh",
     )
-
-    # Invalidate any temp cookies from mapper frontend
-    for cookie_name in [
-        f"{settings.cookie_name}_temp",
-        f"{settings.cookie_name}_temp_refresh",
-    ]:
-        log.debug(f"Resetting cookie in response named '{cookie_name}'")
-        response.set_cookie(
-            key=cookie_name,
-            value="",
-            max_age=0,  # Set to expire immediately
-            expires=0,  # Set to expire immediately
-            path="/",
-            domain=settings.FMTM_DOMAIN,
-            secure=False if settings.DEBUG else True,
-            httponly=True,
-            samesite="lax",
-        )
-
-    return response
 
 
 @router.get("/refresh/mapper", response_model=Optional[FMTMUser])
@@ -291,7 +271,7 @@ async def refresh_mapper_token(
     # NOTE be sure to not append content=current_user.model_dump() to this JSONResponse
     # as we want the login state on the frontend to remain empty (allowing the user to
     # log in via OSM instead / override)
-    response = JSONResponse(status_code=HTTPStatus.OK, content={})
+    response = JSONResponse(status_code=HTTPStatus.OK, content=temp_jwt_details)
     return set_cookies(
         response,
         fmtm_token,

@@ -30,7 +30,7 @@
 	</div>
 	<div class="flex items-center gap-4">
 		<!-- profile image and username display -->
-		{#if loginStore?.getAuthDetails.username}
+		{#if loginStore?.getAuthDetails?.username}
 			<div class="flex items-center gap-2">
 				{#if !loginStore?.getAuthDetails?.picture}
 					<hot-icon
@@ -100,7 +100,7 @@
 				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black">{menu.name}</a
 			>
 		{/each}
-		{#if loginStore?.getAuthDetails.username}
+		{#if loginStore?.getAuthDetails?.username}
 			<sl-button
 				class="primary rounded"
 				variant="primary"
