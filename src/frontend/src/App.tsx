@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { Provider, useDispatch } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import CoreModules from '@/shared/CoreModules';
 import { LoginActions } from '@/store/slices/LoginSlice';
+import { refreshCookies, getUserDetailsFromApi } from '@/utilfunctions/login';
 
 // import '@hotosm/ui/components/Tracking';
 import '@hotosm/ui/dist/style.css';
@@ -14,40 +14,35 @@ import AppRoutes from '@/routes';
 import { store, persistor } from '@/store/Store';
 import OfflineReadyPrompt from '@/components/OfflineReadyPrompt';
 
-const CheckLoginState = () => {
+const RefreshUserCookies = () => {
   const dispatch = useDispatch();
-  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
-
-  const checkIfUserLoginValid = () => {
-    fetch(`${import.meta.env.VITE_API_URL}/auth/refresh/management`, { credentials: 'include' })
-      .then((resp) => {
-        if (resp.status !== 200) {
-          dispatch(LoginActions.signOut());
-          return;
-        }
-        return resp.json();
-      })
-      .then((apiUser) => {
-        if (!apiUser) return;
-
-        if (apiUser.username !== authDetails?.username) {
-          // Mismatch between store user and logged in user via api
-          dispatch(LoginActions.signOut());
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   useEffect(() => {
-    // Check current login state (omit callback url)
-    if (!window.location.pathname.includes('osmauth')) {
-      // No need for token refresh check if user details are not set
-      if (!authDetails) return;
-      checkIfUserLoginValid();
-    }
-  }, [authDetails]);
+    const refreshUserDetails = async () => {
+      try {
+        if (!window.location.pathname.includes('osmauth')) {
+          // Do not do this on the /osmauth page after OSM callback / redirect
+          const refreshSuccess = await refreshCookies();
+          if (refreshSuccess) {
+            // Call /auth/me to populate the user details in the header
+            const apiUser = await getUserDetailsFromApi();
+            if (apiUser) {
+              dispatch(LoginActions.setAuthDetails(apiUser));
+              // To prevent calls to /auth/me in future (on mapper frontend)
+              // We still require this here to retrieve role info for the user
+              localStorage.setItem('fmtm-user-exists', 'true');
+            } else {
+              console.error('Failed to fetch user details after cookie refresh.');
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Unexpected error in RefreshUserCookies:', err);
+      }
+    };
+
+    refreshUserDetails();
+  }, [dispatch]);
 
   return null; // Renders nothing
 };
@@ -57,7 +52,7 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <RouterProvider router={AppRoutes} />
-        <CheckLoginState />
+        <RefreshUserCookies />
         <OfflineReadyPrompt />
         <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.hotosm.org'}></hot-tracking>
       </PersistGate>

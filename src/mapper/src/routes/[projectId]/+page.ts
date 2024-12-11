@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from '../$types';
 import { getLoginStore } from '$store/login.svelte.ts';
+import { refreshCookies, getUserDetailsFromApi } from '$lib/utils/login';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,20 +13,17 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	/*
 	Login + user details
 	*/
-	const userResponse = await fetch(`${API_URL}/auth/refresh/mapper`, { credentials: 'include' });
-	if (userResponse.status === 401) {
-		// TODO redirect to different error page to handle login
+	let apiUser = await refreshCookies();
+	const fmtmUserExists = localStorage.getItem('fmtm-user-exists');
+	if (!fmtmUserExists) {
+		// Call /auth/me to populate the user details in the header
+		apiUser = await getUserDetailsFromApi();
+	}
+	if (!apiUser) {
 		loginStore.signOut();
 		throw error(401, { message: `You must log in first` });
-	}
-	const userObj = await userResponse.json();
-
-	// Clear stored auth state if mismatch (but skip for localadmin id=1)
-	if (userObj.id !== 1 && userObj.username !== loginStore.getAuthDetails?.username) {
-		loginStore.signOut();
-		throw error(401, { message: `Please log in again` });
 	} else {
-		loginStore.setAuthDetails(userObj);
+		loginStore.setAuthDetails(apiUser);
 	}
 
 	/*
@@ -46,7 +44,7 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	return {
 		project: await projectResponse.json(),
 		projectId: parseInt(projectId),
-		userId: userObj.id,
+		userId: apiUser.id,
 		entityStatus: await entityStatusResponse.json(),
 		// db: db,
 	};

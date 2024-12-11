@@ -15,7 +15,6 @@ const LoginSlice = CoreModules.createSlice({
       state.authDetails = action.payload;
     },
     signOut(state) {
-      storage.removeItem('persist:login');
       state.authDetails = null;
     },
     setLoginModalOpen(state, action) {

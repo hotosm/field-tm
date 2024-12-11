@@ -33,7 +33,7 @@ const LoginPopup = () => {
 
   const handleSignIn = async (selectedOption: string) => {
     if (selectedOption === 'osm_account') {
-      localStorage.setItem('requestedPath', from);
+      sessionStorage.setItem('requestedPath', from);
       osmLoginRedirect();
     }
   };

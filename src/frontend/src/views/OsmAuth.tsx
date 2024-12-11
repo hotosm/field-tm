@@ -9,7 +9,8 @@ function OsmAuth() {
   const location = useLocation();
   const dispatch = CoreModules.useAppDispatch();
   const [isReadyToRedirect, setIsReadyToRedirect] = useState(false);
-  const requestedPath = localStorage.getItem('requestedPath');
+  const [error, setError] = useState<string | null>(null);
+  const requestedPath = sessionStorage.getItem('requestedPath');
 
   useEffect(() => {
     // Redirect workaround required for localhost, until PR is merged:
@@ -27,33 +28,51 @@ function OsmAuth() {
     const loginRedirect = async () => {
       // authCode is passed from OpenStreetMap redirect, so get cookie, then redirect
       if (authCode) {
-        const callbackUrl = `${import.meta.env.VITE_API_URL}/auth/callback?code=${authCode}&state=${state}`;
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/auth/callback?code=${authCode}&state=${state}`,
+            { credentials: 'include' },
+          );
 
-        const completeLogin = async () => {
-          // NOTE this encapsulates async methods to call sequentially
-          // Sets a cookie in the browser that is used for auth
-          await fetch(callbackUrl, { credentials: 'include' });
-          const apiUser = await getUserDetailsFromApi();
-          dispatch(LoginActions.setAuthDetails(apiUser));
-        };
-        await completeLogin();
-      }
+          if (!response.ok) {
+            throw new Error(`Callback request failed with status ${response.status}`);
+          }
 
-      setIsReadyToRedirect(true);
-      dispatch(LoginActions.setLoginModalOpen(false));
+          setIsReadyToRedirect(true);
+          dispatch(LoginActions.setLoginModalOpen(false));
 
-      if (requestedPath) {
-        if (requestedPath.includes('mapnow')) {
-          // redirect to mapper frontend (navigate doesn't work as it's on svelte)
-          window.location.href = `${window.location.origin}${requestedPath}`;
-        } else {
-          navigate(`${requestedPath}`);
-          localStorage.removeItem('requestedPath');
+          if (requestedPath) {
+            sessionStorage.removeItem('requestedPath');
+            if (requestedPath.includes('mapnow')) {
+              // redirect to mapper frontend (navigate doesn't work as it's on svelte)
+              window.location.href = `${window.location.origin}${requestedPath}`;
+            } else {
+              // Call /auth/me to populate the user details in the header
+              const apiUser = await getUserDetailsFromApi();
+              if (apiUser) {
+                dispatch(LoginActions.setAuthDetails(apiUser));
+                // To prevent calls to /auth/me in future
+                localStorage.setItem('fmtm-user-exists', 'true');
+              } else {
+                console.error('Failed to fetch user details after cookie refresh.');
+              }
+              // Then navigate to the originally requested url
+              navigate(`${requestedPath}`);
+            }
+          }
+        } catch (err) {
+          console.error('Error during callback:', err);
+          setError('Failed to authenticate. Please try again.');
         }
       }
     };
+
     loginRedirect();
-  }, [dispatch, location.search, navigate]);
+  }, [dispatch, location.search, navigate, requestedPath]);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return <>{!isReadyToRedirect ? null : <div>redirecting</div>}</>;
 }

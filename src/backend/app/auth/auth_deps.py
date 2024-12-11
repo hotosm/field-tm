@@ -18,11 +18,12 @@
 
 """Auth dependencies, for restricted routes and cookie handling."""
 
-import time
+from time import time
 from typing import Optional
 
 import jwt
 from fastapi import Header, HTTPException, Request, Response
+from fastapi.responses import JSONResponse
 from loguru import logger as log
 
 from app.auth.auth_schemas import AuthUser
@@ -67,14 +68,16 @@ def set_cookie(
 
 
 def set_cookies(
+    response: Response,
     access_token: str,
     refresh_token: str,
     cookie_name: str = settings.cookie_name,
     refresh_cookie_name: str = f"{settings.cookie_name}_refresh",
-) -> Response:
+) -> JSONResponse:
     """Set cookies for the access and refresh tokens.
 
     Args:
+        response (str): The response to attach the cookies to.
         access_token (str): The access token to be stored in the cookie.
         refresh_token (str): The refresh token to be stored in the cookie.
         cookie_name (str, optional): The name of the cookie to store the access token.
@@ -82,13 +85,8 @@ def set_cookies(
             refresh token.
 
     Returns:
-        Response: A response with attached cookies (set-cookie headers).
+        JSONResponse: A response with attached cookies (set-cookie headers).
     """
-    # NOTE if needed we can return the token in the JSON response, but we don't for now
-    # response = JSONResponse(status_code=HTTPStatus.OK,
-    # content={"token": access_token})
-    response = Response(status_code=HTTPStatus.OK)
-
     secure = not settings.DEBUG
     domain = settings.FMTM_DOMAIN
 
@@ -123,7 +121,7 @@ def create_jwt_tokens(input_data: dict) -> tuple[str, str]:
     """
     access_token_data = input_data.copy()
     # Set refresh token expiry to 7 days
-    refresh_token_data = {**input_data, "exp": int(time.time()) + 86400 * 7}
+    refresh_token_data = {**input_data, "exp": int(time()) + 86400 * 7}
 
     encryption_key = settings.ENCRYPTION_KEY.get_secret_value()
     algorithm = settings.JWT_ENCRYPTION_ALGORITHM
@@ -140,7 +138,7 @@ def refresh_jwt_token(
     expiry_seconds: int = 86400,
 ) -> str:
     """Generate a new JTW token with expiry."""
-    payload["exp"] = int(time.time()) + expiry_seconds
+    payload["exp"] = int(time()) + expiry_seconds
     return jwt.encode(
         payload,
         settings.ENCRYPTION_KEY.get_secret_value(),
@@ -188,6 +186,58 @@ def verify_jwt_token(token: str, ignore_expiry: bool = False) -> dict:
         ) from e
 
 
+async def refresh_cookies(
+    request: Request,
+    current_user: AuthUser,
+    cookie_name: str,
+    refresh_cookie_name: str,
+):
+    """Reusable function to renew the expiry on cookies.
+
+    Used by both management and mapper refresh endpoints.
+    """
+    if settings.DEBUG:
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={**current_user.model_dump()},
+        )
+
+    access_token = get_cookie_value(request, cookie_name)
+    if not access_token:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="No access token provided",
+        )
+
+    refresh_token = get_cookie_value(request, refresh_cookie_name)
+    if not refresh_token:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="No refresh token provided",
+        )
+
+    # Decode JWT and get data from both cookies,
+    # checking refresh expiry is valid first
+    refresh_token_data = verify_jwt_token(refresh_token)
+    access_token_data = verify_jwt_token(access_token, ignore_expiry=True)
+
+    try:
+        # Refresh token + refresh token
+        new_access_token = refresh_jwt_token(access_token_data)
+        new_refresh_token = refresh_jwt_token(refresh_token_data)
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail=f"Failed to refresh tokens: {e}",
+        ) from e
+
+    # NOTE Append the user data to the JSONResponse so we can display in the
+    # frontend header. For the mapper frontend this is enough, but for the
+    # management frontend we instead use the return from /auth/me
+    response = JSONResponse(status_code=HTTPStatus.OK, content=access_token_data)
+    return set_cookies(response, new_access_token, new_refresh_token)
+
+
 ### Endpoint Dependencies ###
 
 
@@ -219,7 +269,19 @@ async def mapper_login_required(
         settings.cookie_name,  # OSM cookie
         f"{settings.cookie_name}_temp",  # Temp cookie
     )
-    return await _authenticate_user(extracted_token)
+
+    # Verify login and continue
+    if extracted_token:
+        return await _authenticate_user(extracted_token)
+
+    # Else user has no token, so we provide login data automatically
+    username = "svcfmtm"
+    temp_user = {
+        "sub": "fmtm|20386219",
+        "username": username,
+        "role": UserRole.MAPPER,
+    }
+    return AuthUser(**temp_user)
 
 
 async def _authenticate_user(access_token: Optional[str]) -> AuthUser:

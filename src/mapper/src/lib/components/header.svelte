@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import HotLogo from '$assets/images/hot-logo.svg';
 	import HotLogoText from '$assets/images/hot-logo-text.svg';
 	import Login from '$lib/components/login.svelte';
@@ -11,11 +10,6 @@
 	let drawerRef: any = $state();
 	const loginStore = getLoginStore();
 	const alertStore = getAlertStore();
-
-	onMount(() => {
-		// retrieve persisted auth details from local storage and set auth details to store
-		loginStore.retrieveAuthDetailsFromLocalStorage();
-	});
 
 	const handleSignOut = async () => {
 		try {
@@ -36,9 +30,9 @@
 	</div>
 	<div class="flex items-center gap-4">
 		<!-- profile image and username display -->
-		{#if loginStore?.getAuthDetails}
+		{#if loginStore?.getAuthDetails.username}
 			<div class="flex items-center gap-2">
-				{#if !loginStore?.getAuthDetails?.profile_img}
+				{#if !loginStore?.getAuthDetails?.picture}
 					<hot-icon
 						name="person-fill"
 						class="!text-[1.5rem] text-[#52525B] leading-0 cursor-pointer text-red-600 duration-200"
@@ -49,7 +43,7 @@
 					></hot-icon>
 				{:else}
 					<img
-						src={loginStore?.getAuthDetails?.profile_img}
+						src={loginStore?.getAuthDetails?.picture}
 						alt="profile"
 						class="w-[1.8rem] h-[1.8rem] min-w-[1.8rem] min-h-[1.8rem] max-w-[1.8rem] max-h-[1.8rem] rounded-full"
 					/>
@@ -106,7 +100,7 @@
 				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black">{menu.name}</a
 			>
 		{/each}
-		{#if loginStore?.getAuthDetails}
+		{#if loginStore?.getAuthDetails.username}
 			<sl-button
 				class="primary rounded"
 				variant="primary"
