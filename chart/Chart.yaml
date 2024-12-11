@@ -3,7 +3,7 @@ type: application
 name: fmtm
 description: Field Mapping Tasking Manager - coordinated field mapping.
 version: "0.1.0"
-appVersion: "2024.4.1"
+appVersion: "2024.5.0"
 maintainers:
 - email: sam.woodcock@hotosm.org
   name: Sam Woodcock

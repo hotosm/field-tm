@@ -1,5 +1,105 @@
 # Changelog
 
+## 2024.5.0 (2024-12-11)
+
+### Feat
+
+- update auth cookie logic for both backend and frontend (#1974)
+- **mapper**: add navigation mode to map (pitch angle / rotate) (#1973)
+- **debug**: add cloudflare tunnel config to simple configurable frontend button
+- **frontend**: add 'Start Mapping' call to action button on homepage cards (#1968)
+- **mapper**: add new point geom in maplibre terradraw, inject to ODK collect (#1966)
+- **projects**: add organisation_logo field to ProjectSummary model (#1956)
+- **mapper**: add zoom to extent button to map (#1947)
+- **frontend**: all uploaded submission features/geometries on submission instance page (#1931)
+- **mapper**: frontend pmtile basemap management pt2 (#1925)
+- **mapper**: set entity (feature) color based on it's mapping status (#1921)
+- **mapper**: basemap control component + opfs pmtile support (pt1) (#1922)
+- **mapper**: frontend login + remove temp auth from React frontend (#1903)
+- **splitTasks**: additional entities feature count add to split tasks section (#1906)
+- **mapper**: basemap layer switcher integration for maplibre (#1835)
+- **submission**: add project_contributors dependency for permission … (#1873)
+- **splitTasks**: add total number of features on split tasks section (#1880)
+- **mapper**: map new feature in odk btn (#1879)
+- **frontend**: visualise submission photos via slider (#1857)
+- **backend**: API to delete user account #1661 (#1848)
+- **mapper**: start improved mapper flow (#1854)
+- **mapper**: flatgeobuf maplibre component for loading features (#1851)
+- update API to use events and task states + fixes to backend refactor (#1838)
+- **backend**: remove SQLAlchemy and replace with async psycopg db driver (#1834)
+- **frontend**: mapper UI frontend refactor (#1830)
+- **frontend**: mapper frontend continuation (#1823)
+- mapper frontend using ElectricSQL ShapeStream (live updates) (#1760)
+
+### Fix
+
+- **auth**: final fixes to temp/osm auth across frontends
+- finalise auth setup between frontends (#1981)
+- **backend**: correctly return JSONResponse content on refresh endpoints
+- apply pagination after fetch submissions from odk (#1971)
+- **mapper**: remove extra semicolon from new_feature odk field injection
+- **mapper**: correctly inject username into qrcode from logged in details
+- **frontend**: update token refresh calls to match updates in PR #1948
+- **backend**: ambiguous project_id reference in project summaries .all()
+- **frontend**: update min height of project home page card, move start mapping button
+- **backend**: including num_contribotors and total_tasks to the project response
+- **frontend**: default do not show map on home page
+- **mapper**: attempt fixing missing basemap download buttons on mobile
+- **backend**: login enforced for management, additional temp login option for mappers (#1948)
+- **+page**: remove user details from localStorage in case of session expiration (#1965)
+- **backend**: polygon geometries; remove holes, fix right hand rule (#1961)
+- Submission Instance Page, Create Project (#1958)
+- odk credentials are passed without encrypting at first to avoid double encryption (#1957)
+- **mapper**: better distinguish create project layer colours (#1936)
+- **frontend**: remove trailing slash from activity endpoint (#1932)
+- **backend**: use pydantic SecretStr for all sensitive env vars
+- edit multi additional entities names replacing space with '_' (#1926)
+- **backend**: resolve route ambiguity for /tasks/activity endpoint (#1924)
+- **frontend**: update the body of generate-project-data;parse null as a json instead of form data (#1919)
+- **mapper**: geolocation layerswitch bug (#1914)
+- **mapper**: frontend enhancements, add more instructions (#1905)
+- **mapper**: mobile broser map control placement fix (#1899)
+- **project**: allow users to view project cards without login (#1902)
+- **frontend**: project creation wording form --> survey (#1858)
+- **frontend**: minor fixes including bottom sheet drag up (#1895)
+- trailing slashes from endpoints, fix check_access for backend roles (#1893)
+- **backend**: update check_access logic to allow checking for org_manager to a project (#1892)
+- **backend**: create and delete organisation (#1867)
+- **backend**: fix permissions for backend project routes (#1885)
+- **backend**: building of extra cors origins, type mismatch
+- **backend**: update project xlsform SQL after backend refactor (#1872)
+- **mapper**: disable mobile browsers to pull-to-refresh functionality (#1878)
+- **mapper**: loading of electric shapestreams, api call ordering
+- **backend**: cors origin list building when DEBUG not set on localhost
+- **mapper**: task comment events for mapper frontend (#1871)
+- **backend**: remove auth bypass in for HOTOSM org #1785 (#1845)
+- **formUpdateTab**: xFormId undefined issue fix on form update (#1863)
+- **createProjectService**: replace all spaces with underscore (#1862)
+- **frontend**: pass additional entity file name to backend (#1860)
+- **additional-entity**: allow custom properties to create entities list (#1861)
+- **backend**: s3 upload and db insertion for submission photos (#1856)
+- **frontend**: after backend refactoring to events (#1844)
+- mapper frontend task display and event POSTs (#1842)
+- add temp ?sslmode=disable to electric url due to electric#1792
+- **backend**: allow empty task id in entity statuses for new geopoint (#1822)
+- dockerfile warning such as Casing and whitespace separator
+- updated osm-fieldwork -> 0.16.8 (#1814)
+- **files**: cleanup function remove
+- **QrcodeComponent**: reduce qrcode skeleton size
+- **dialogTaskActions**: add task id filter on odk redirect
+- **qrcode**: increase qrcode size
+- **createProject**: xlsform key update, fix customForm upload issue
+- **editor**: solve editor empty issue on manageProject on initial render
+- **submissionsTable**: on filter reset, set task_id to null
+
+### Refactor
+
+- **mapper**: improve logic for rendering basemap action buttons
+- **logging**: enhance error logging with stack information across multiple modules (#1887)
+- **mapper**: upgrade mapper frontend to Svelte 5 Runes (#1846)
+- remove unnecessary db injection where not needed
+- update link to custom ODK build (renamed to -FMTM)
+
 ## 2024.4.1 (2024-10-24)
 
 ### Fix
