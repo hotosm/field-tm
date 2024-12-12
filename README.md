@@ -118,15 +118,20 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 |✅| 🖥️ view mapper submissions in the FMTM dashboard |
 |✅| 📢 Beta Release |
 |✅| 🖥️ & 📱 basic user tutorials and usage guides |
-|⚙️| 📱 open ODK Collect with feature already selected |
-|⚙️| 📱 live updates during mapping (if online) |
-| | 🖥️ export (+merge) the final data to OpenStreetMap |
-| | 🖥️ organization creation |
+|✅| 📱 open ODK Collect with feature already selected |
+|✅| 📱 live updates during mapping (if online) |
+|✅| 📱 features turn green once mapped |
+|⚙️| 📱 better support for mapping **new** points, lines, polygons |
+|⚙️| 📱 navigation and capability for routing to map features |
+| | 📱 integrate ODK Web Forms (to avoid switching apps) |
+| | 📱 fully offline field mapping |
+| | 🖥️ organization creation and management |
 | | 🖥️ simplify project creation with basic / advanced workflows |
 | | 🖥️ refinements to task splitting algorithm |
 | | 🖥️ improvements to the validation criteria and workflow |
+| | 🖥️ export (+merge) the final data to OpenStreetMap |
+| | 🖥️ better data visualisation and export options |
 | | 🖥️ Field Admin role |
-| | 📱 fully offline FMTM (± small field-based device) |
 <!-- prettier-ignore-end -->
 
 > [!Note]
