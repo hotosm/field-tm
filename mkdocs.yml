@@ -80,6 +80,7 @@ nav:
       - Project Manager Guide: manuals/project-managers.md
       - XLSForm Design: manuals/xlsform-design.md
       - ODKCollect Offline Maps: https://docs.getodk.org/collect-offline-maps
+      - Field Mapping Examples: manuals/field-mapping-examples.md
   - Developer Guide:
       - Dev Practices: https://docs.hotosm.org/dev-practices
       - Setup: dev/Setup.md
