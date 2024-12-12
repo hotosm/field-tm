@@ -5,16 +5,12 @@ type drawerItemsType = {
 
 export const drawerItems: drawerItemsType[] = [
 	{
-		name: 'Explore Projects',
-		path: `${window.location.origin}`,
-	},
-	{
-		name: 'Learn',
-		path: 'https://hotosm.github.io/fmtm',
-	},
-	{
 		name: 'About',
-		path: 'https://docs.fmtm.dev/About/',
+		path: 'https://docs.fmtm.dev/about/about/',
+	},
+	{
+		name: 'Guide For Mappers',
+		path: 'https://docs.fmtm.dev/manuals/mapping/',
 	},
 	{
 		name: 'Support',

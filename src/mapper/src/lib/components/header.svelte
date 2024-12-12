@@ -25,7 +25,7 @@
 
 <div class="p-3 flex items-center justify-between">
 	<div class="flex items-center gap-1">
-		<img src={HotLogo} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
+		<a href={window.location.origin}><img src={HotLogo} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" /></a>
 		<img src={HotLogoText} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
 	</div>
 	<div class="flex items-center gap-4">
