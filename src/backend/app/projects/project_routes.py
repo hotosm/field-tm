@@ -638,7 +638,7 @@ async def get_data_extract(
     TODO allow config file (YAML/JSON) upload for data extract generation
     TODO alternatively, direct to raw-data-api to generate first, then upload
     """
-    boundary_geojson = json.loads(await geojson_file.read())
+    boundary_geojson = parse_geojson_file_to_featcol(await geojson_file.read())
     clean_boundary_geojson = merge_polygons(boundary_geojson)
 
     # Get extract config file from existing data_models
