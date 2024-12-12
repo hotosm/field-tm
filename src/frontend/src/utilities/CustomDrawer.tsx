@@ -51,7 +51,7 @@ const MenuItems = [
   },
   {
     name: 'About',
-    ref: 'https://docs.fmtm.dev/About/',
+    ref: 'https://docs.fmtm.dev/about/about/',
     isExternalLink: true,
     isActive: true,
   },
