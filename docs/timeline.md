@@ -9,14 +9,34 @@ In reverse chronological order, with most recent events first.
 
 > <div class="timeline-container">
 >     <div class="timeline-entry">
+>         <div class="timeline-date">2025-01</div>
+>         <h3>Project: KYC, Ghana</h3>
+>         💼 Another SDI project, mapping informal settlements in Ghana.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
+>         <div class="timeline-date">2025-01</div>
+>         <h3>Project: Tokha, Nepal</h3>
+>         💼 A project to map all buildings, and associated roads,
+>         in the Tokha municipality in Nepal.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
+>         <div class="timeline-date">2024-12</div>
+>         <h3>Mapper Frontend Release</h3>
+>         📱 Release of the 'mapper frontend', a streamlined and
+>         intuitive mapping experience optimised for mobile devices.
+>         <div class="timeline-dot"></div>
+>     </div>
+>     <div class="timeline-entry">
 >         <div class="timeline-date">2024-10</div>
 >         <h3>Project: Mwanza, Tanzania</h3>
->         💼 Project alongside Slum Dwellers International, mapping
+>         💼 Project alongside Slum Dwellers International (SDI), mapping
 >         informal settlements in the Mwanza region.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
->         <div class="timeline-date">2024-9</div>
+>         <div class="timeline-date">2024-09</div>
 >         <h3>Project: Freetown, Sierra Leone</h3>
 >         💼 Part of an E2E household enumeration survey together with the
 >         community of Jai-Mata, an informal settlement in Freetown.
