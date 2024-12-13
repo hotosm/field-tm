@@ -275,7 +275,7 @@ into your language.
 ### What technologies are used in FMTM?
 
 FMTM is built using several technologies, including FastAPI,
-Postgres, React, and web components. The codebase is written in
+Postgres, React, Svelte, and web components. The codebase is written in
 Python & TypeScript mostly.
 
 ---
@@ -285,6 +285,50 @@ Python & TypeScript mostly.
 To set up FMTM locally, the simplest approach is likely using Docker.
 If you are an advanced user, it is possible to run each service individually too.
 Please follow the instructions in the setup guide on this site.
+
+---
+
+### Help! Cloning the repo doesn't work for me
+
+If you are receiving errors cloning the repo, it may be an unstable internet
+connection causing issues.
+
+First, please check your internet connection, or use another connection if
+possible.
+
+One option to reduce the amount of content that needs to be downloaded
+is to do a shallow clone:
+
+    ```bash
+    # Shallow clone only the `development` branch
+    git clone --depth 1 --no-single-branch https://github.com/hotosm/fmtm.git
+    ```
+
+To pull additional branches as you need them (for example, to work on them):
+
+    ```bash
+    git fetch origin branch-name
+    git checkout branch-name
+    ```
+
+As an **absolute last resort**, you could try the following:
+
+    ```bash
+    # Set HTTP version to 1.1 for stability (multiple connections vs multiplexing)
+    git config --global http.version HTTP/1.1
+
+    # Increase timeout to 3 minutes
+    git config --global http.lowSpeedTime 180
+
+    # Allow retries in case of failure
+    git config --global http.retry 3
+
+    # Disable integrity checks for easier resume
+    git config --global fetch.fsckObjects false
+    git config --global fetch.writeCommitGraph false
+
+    # Your clone command here...
+    ```
 
 ---
 
