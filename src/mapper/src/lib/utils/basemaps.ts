@@ -38,7 +38,7 @@ export async function getBasemapList(projectId: number): Promise<Basemap[]> {
 	}
 }
 
-export async function loadOnlinePmtiles(url: string | null) {
+export async function loadOnlinePmtiles(url: string | undefined) {
 	if (!url) return;
 
 	const pmtilesUrl = `pmtiles://${url}`;
@@ -60,7 +60,7 @@ export async function loadOfflinePmtiles(projectId: number) {
 	basemapStore.setProjectPmtilesUrl(pmtilesUrl);
 }
 
-async function downloadBasemap(url: string | null): Promise<ArrayBuffer> {
+async function downloadBasemap(url: string | undefined): Promise<ArrayBuffer> {
 	let basemapData: ArrayBuffer = new ArrayBuffer(0);
 
 	if (!url) return basemapData;
@@ -87,7 +87,7 @@ async function downloadBasemap(url: string | null): Promise<ArrayBuffer> {
 	}
 }
 
-export async function writeOfflinePmtiles(projectId: number, url: string | null) {
+export async function writeOfflinePmtiles(projectId: number, url: string | undefined) {
 	const data = await downloadBasemap(url);
 
 	// Copy to OPFS filesystem for offline use
