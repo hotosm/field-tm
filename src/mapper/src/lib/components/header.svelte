@@ -6,10 +6,16 @@
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
 	import { revokeCookies } from '$lib/utils/login';
 	import { getAlertStore } from '$store/common.svelte';
+	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
+	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 
 	let drawerRef: any = $state();
+	let drawerOpenButtonRef: any = $state();
 	const loginStore = getLoginStore();
 	const alertStore = getAlertStore();
+	const projectSetupStepStore = getProjectSetupStepStore();
+
+	let isFirstLoad = $derived(+projectSetupStepStore.projectSetupStep === projectSetupStepEnum['odk_project_load']);
 
 	const handleSignOut = async () => {
 		try {
@@ -74,19 +80,40 @@
 			</sl-button>
 		{/if}
 
-		<!-- drawer component toggle trigger -->
-		<hot-icon
-			name="list"
-			class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
-			onclick={() => {
-				drawerRef.show();
+		<!-- drawer component toggle trigger (snippet to reuse below) -->
+		{#snippet drawerOpenButton()}
+			<hot-icon
+				name="list"
+				class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
+				style={isFirstLoad ? 'background-color: var(--sl-color-yellow-300);' : ''}
+				onclick={() => {
+					drawerRef.show();
+				}}
+				onkeydown={() => {
+					drawerRef.show();
+				}}
+				role="button"
+				tabindex="0"
+			></hot-icon>
+	  	{/snippet}
+		<!-- add tooltip on first load -->
+		{#if isFirstLoad}
+		<hot-tooltip
+			bind:this={drawerOpenButtonRef}
+			content="First download the custom ODK Collect app here"
+			open={true}
+			placement="bottom"
+			onsl-after-hide={() => {
+				// Always keep tooltip open
+				drawerOpenButtonRef.show();
 			}}
-			onkeydown={() => {
-				drawerRef.show();
-			}}
-			role="button"
-			tabindex="0"
-		></hot-icon>
+		>
+			{@render drawerOpenButton()}
+		</hot-tooltip>
+		<!-- else render with no tooltip -->
+		{:else}
+			{@render drawerOpenButton()}
+		{/if}
 	</div>
 </div>
 <Login />
