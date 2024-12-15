@@ -31,6 +31,9 @@ const RefreshUserCookies = () => {
             } else {
               console.error('Failed to fetch user details after cookie refresh.');
             }
+          } else {
+            // Reset frontend login state on 401
+            dispatch(LoginActions.setAuthDetails(null));
           }
         }
       } catch (err) {
