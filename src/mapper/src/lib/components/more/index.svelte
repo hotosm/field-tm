@@ -2,11 +2,17 @@
 	import Editor from '$lib/components/editor/editor.svelte';
 	import Comment from '$lib/components/more/comment.svelte';
 	import Activities from '$lib/components/more/activities.svelte';
+	import ProjectInfo from '$lib/components/more/project-info.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import type { ProjectData, TaskEventType } from '$lib/types';
 
-	type stackType = '' | 'Comment' | 'Instructions' | 'Activities';
+	type stackType = '' | 'Comment' | 'Instructions' | 'Activities' | 'Project Information';
+
 	const stackGroup: { icon: string; title: stackType }[] = [
+		{
+			icon: 'info-circle',
+			title: 'Project Information',
+		},
 		{
 			icon: 'chat',
 			title: 'Comment',
@@ -24,7 +30,7 @@
 	type Props = {
 		projectData: ProjectData;
 		zoomToTask: (taskId: number) => void;
-	}
+	};
 
 	let { projectData, zoomToTask }: Props = $props();
 	const taskStore = getTaskStore();
@@ -88,15 +94,22 @@
 			<p class="text-[1.125rem] font-barlow-semibold">{activeStack}</p>
 		</div>
 	{/if}
+
 	<!-- body -->
 	{#if activeStack === 'Comment'}
 		<Comment {comments} projectId={projectData?.id} />
 	{/if}
-
 	{#if activeStack === 'Instructions'}
-		<Editor editable={false} content={projectData?.per_task_instructions} />
+		{#if projectData?.per_task_instructions}
+			<Editor editable={false} content={projectData?.per_task_instructions} />
+		{:else}
+			<div class="flex justify-center mt-10">
+				<p class="text-[#484848] text-base">No Instructions</p>
+			</div>
+		{/if}
 	{/if}
 	{#if activeStack === 'Activities'}
-		<Activities {taskEvents} zoomToTask={zoomToTask} />
+		<Activities {taskEvents} {zoomToTask} />
 	{/if}
+	{#if activeStack === 'Project Information'}<ProjectInfo {projectData} />{/if}
 </div>
