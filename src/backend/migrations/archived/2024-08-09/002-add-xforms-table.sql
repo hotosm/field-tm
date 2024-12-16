@@ -70,14 +70,19 @@ SET
         FROM public.tasks
         WHERE
             NOT EXISTS (
-                SELECT 1 FROM public.projects WHERE odk_token IS NOT NULL
+                SELECT 1 FROM public.projects
+                WHERE odk_token IS NOT NULL
             )
         LIMIT 1
     )
 WHERE id = (
     SELECT id
     FROM public.projects
-    WHERE NOT EXISTS (SELECT 1 FROM public.projects WHERE odk_token IS NOT NULL)
+    WHERE
+        NOT EXISTS (
+            SELECT 1 FROM public.projects
+            WHERE odk_token IS NOT NULL
+        )
     LIMIT 1
 );
 
