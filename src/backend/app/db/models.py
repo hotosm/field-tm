@@ -1015,6 +1015,7 @@ class DbProject(BaseModel):
             sql = """
                 SELECT
                     p.*,
+                    project_org.name AS organisation_name,
                     ST_AsGeoJSON(p.outline)::jsonb AS outline,
                     ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid,
                     COALESCE(
@@ -1032,13 +1033,15 @@ class DbProject(BaseModel):
                     projects p
                 LEFT JOIN
                     tasks t ON t.project_id = %(project_id)s
+                LEFT JOIN
+                    organisations project_org ON p.organisation_id = project_org.id
                 WHERE
                     p.id = %(project_id)s AND (
                         t.project_id = %(project_id)s
                             -- Also required to return a project with if tasks
                             OR t.project_id IS NULL
                     )
-                GROUP BY p.id;
+                GROUP BY p.id, project_org.name;
             """
 
         # Full query with all additional calculated fields
