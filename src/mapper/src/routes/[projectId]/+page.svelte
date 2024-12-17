@@ -59,7 +59,7 @@
 		if (!taskObj) return;
 
 		// Set as selected task for buttons
-		taskStore.setSelectedTaskId(taskObj.id);
+		taskStore.setSelectedTaskId(taskObj.id, taskObj?.task_index);
 
 		const taskPolygon = polygon(taskObj.outline.coordinates);
 		const taskBuffer = buffer(taskPolygon, 5, { units: 'meters' });

@@ -35,7 +35,7 @@
 				></hot-icon>
 			</div>
 			<div class="flex justify-between items-center">
-				<p class="text-[#333] text-xl font-barlow-semibold">Task #{taskStore.selectedTaskId}</p>
+				<p class="text-[#333] text-xl font-barlow-semibold">Task #{taskStore.selectedTaskIndex}</p>
 				<div
 					onclick={() => {
 						clickMapNewFeature();
@@ -58,7 +58,7 @@
 			</div>
 
 			{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
-				<p class="my-4 sm:my-6">Do you want to start mapping task #{taskStore.selectedTaskId}?</p>
+				<p class="my-4 sm:my-6">Do you want to start mapping task #{taskStore.selectedTaskIndex}?</p>
 				<div class="flex justify-center gap-x-2">
 					<sl-button
 						size="small"
@@ -95,7 +95,7 @@
 					</sl-button>
 				</div>
 			{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
-				<p class="my-4 sm:my-6">Task #{taskStore.selectedTaskId} has been locked. Is the task completely mapped?</p>
+				<p class="my-4 sm:my-6">Task #{taskStore.selectedTaskIndex} has been locked. Is the task completely mapped?</p>
 				<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
 					<sl-button
 						onclick={() => resetTask(projectData?.id, taskStore.selectedTaskId)}

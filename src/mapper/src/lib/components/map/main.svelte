@@ -164,7 +164,7 @@
 		if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
 			taskAreaClicked = true;
 			const clickedTaskId = clickedTaskFeature[0]?.properties?.fid;
-			taskStore.setSelectedTaskId(clickedTaskId);
+			taskStore.setSelectedTaskId(clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
 			if (+projectSetupStepStore.projectSetupStep === projectSetupStepEnum['task_selection']) {
 				localStorage.setItem(`project-${projectId}-setup`, projectSetupStepEnum['complete_setup']);
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['complete_setup']);
@@ -322,7 +322,7 @@
 	on:click={(_e) => {
 		// deselect everything on click, to allow for re-selection
 		// if the user clicks on a feature layer directly (on:click)
-		taskStore.setSelectedTaskId(null);
+		taskStore.setSelectedTaskId(null, null);
 		taskAreaClicked = false;
 		toggleActionModal(null);
 		entitiesStore.setSelectedEntity(null);

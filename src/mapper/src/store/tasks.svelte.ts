@@ -8,7 +8,11 @@ let taskEventShape: Shape;
 let featcol = $state({ type: 'FeatureCollection', features: [] });
 let latestEvent = $state(null);
 let events: TaskEventType[] = $state([]);
+
+// for UI show task index for simplicity & for api's use task id
 let selectedTaskId: number | null = $state(null);
+let selectedTaskIndex: number | null = $state(null);
+
 let selectedTask: any = $state(null);
 let selectedTaskState: string = $state('');
 let selectedTaskGeom: GeoJSON | null = $state(null);
@@ -45,7 +49,6 @@ function getTaskStore() {
 
 	async function appendTaskStatesToFeatcol(projectTasks: ProjectTask[]) {
 		const latestTaskStates = await getLatestStatePerTask();
-
 		const features = projectTasks.map((task) => ({
 			type: 'Feature',
 			geometry: task.outline,
@@ -53,6 +56,7 @@ function getTaskStore() {
 				fid: task.id,
 				state: latestTaskStates.get(task.id)?.state || 'UNLOCKED_TO_MAP',
 				actioned_by_uid: latestTaskStates.get(task.id)?.actioned_by_uid,
+				task_index: task?.project_task_index,
 			},
 		}));
 
@@ -78,12 +82,13 @@ function getTaskStore() {
 		return currentTaskStates;
 	}
 
-	async function setSelectedTaskId(newId: number) {
-		selectedTaskId = newId;
+	async function setSelectedTaskId(taskId: number | null, taskIndex: number | null) {
+		selectedTaskId = taskId;
+		selectedTaskIndex = taskIndex;
 		const allTasksCurrentStates = await getLatestStatePerTask();
-		selectedTask = allTasksCurrentStates.get(newId);
+		selectedTask = allTasksCurrentStates.get(taskId);
 		selectedTaskState = selectedTask?.state || 'UNLOCKED_TO_MAP';
-		selectedTaskGeom = featcol.features.find((x) => x.properties.fid === newId)?.geometry || null;
+		selectedTaskGeom = featcol.features.find((x) => x.properties.fid === taskId)?.geometry || null;
 	}
 
 	return {
@@ -106,6 +111,9 @@ function getTaskStore() {
 		setSelectedTaskId: setSelectedTaskId,
 		get selectedTaskId() {
 			return selectedTaskId;
+		},
+		get selectedTaskIndex() {
+			return selectedTaskIndex;
 		},
 		get selectedTask() {
 			return selectedTask;
