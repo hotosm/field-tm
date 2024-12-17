@@ -20,7 +20,7 @@
 
 <div class="h-[calc(100%-2.25rem)] sm:h-[calc(100%-2.6rem)]">
 	<div
-		class={`overflow-y-scroll overflow-x-hidden flex flex-col gap-2 ${taskStore.selectedTaskId ? 'h-[calc(100%-11.875rem)]' : 'h-[100%]'}`}
+		class={`overflow-y-scroll overflow-x-hidden flex flex-col gap-2 ${taskStore.selectedTaskIndex ? 'h-[calc(100%-11.875rem)]' : 'h-[100%]'}`}
 	>
 		{#if false}
 			{#each Array.from({ length: 5 }) as _, index}
@@ -29,7 +29,7 @@
 		{:else if comments?.length === 0}
 			<div class="flex justify-center mt-10">
 				<p class="text-[#484848] text-base">
-					{taskStore?.selectedTaskId ? `No comments yet on task ${taskStore?.selectedTaskId}` : 'No comments yet'}
+					{taskStore?.selectedTaskIndex ? `No comments yet on task ${taskStore?.selectedTaskIndex}` : 'No comments yet'}
 				</p>
 			</div>
 		{:else}

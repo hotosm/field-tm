@@ -21,7 +21,9 @@
 	{:else if taskEvents?.length === 0}
 		<div class="flex justify-center mt-10">
 			<p class="text-[#484848] text-base">
-				{taskStore?.selectedTaskId ? `No activities yet on task ${taskStore?.selectedTaskId}` : 'No activities yet'}
+				{taskStore?.selectedTaskIndex
+					? `No activities yet on task ${taskStore?.selectedTaskIndex}`
+					: 'No activities yet'}
 			</p>
 		</div>
 	{:else}
