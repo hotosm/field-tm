@@ -562,7 +562,7 @@ requires-dist = [
     { name = "asgiref", specifier = "==3.8.1" },
     { name = "cryptography", specifier = "==43.0.3" },
     { name = "fastapi", specifier = "==0.115.3" },
-    { name = "fmtm-splitter", specifier = "==1.5.1" },
+    { name = "fmtm-splitter", specifier = "==2.0.0" },
     { name = "geojson", specifier = "==3.1.0" },
     { name = "geojson-pydantic", specifier = "==1.1.2" },
     { name = "httptools", specifier = "==0.6.4" },
@@ -618,7 +618,7 @@ test = [
 
 [[package]]
 name = "fmtm-splitter"
-version = "1.5.1"
+version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "geojson" },
@@ -627,9 +627,9 @@ dependencies = [
     { name = "psycopg2" },
     { name = "shapely" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/fe/a710e03b4cb12210682f016a4d28d833246e9cbfc9e7a9256e0b3bc834b5/fmtm-splitter-1.5.1.tar.gz", hash = "sha256:d1b9463479e8c656c7309d36215b2b0ccf36116ef21bb513c16fcb99c4991f22", size = 32808 }
+sdist = { url = "https://files.pythonhosted.org/packages/57/5d/a57b23e5f75ec80d994c8bb7f6d227e850843576bf3f8766f4cf1675996f/fmtm-splitter-2.0.0.tar.gz", hash = "sha256:344f4c549cafc9a062e0ba184708f767573ae0c3d2ea4b4c48e0e4c6a243fe1a", size = 33542 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/a3/f84cf17a2b3752efd71feb4ce735558d31a899fc2e7fad9a7d3427995679/fmtm_splitter-1.5.1-py3-none-any.whl", hash = "sha256:e5023cd935550d873f4ebca3ac66ac2eec4bb9e932e36df1341c733ef57be771", size = 33945 },
+    { url = "https://files.pythonhosted.org/packages/cf/dd/6a2a8d78aaffcb8be43dde2ba50201276e039201aa427a20220ab2d8b41e/fmtm_splitter-2.0.0-py3-none-any.whl", hash = "sha256:8718033d48554fe3f2b4f1d79fe00cb367ca2a7a33583d1db147480a955c6fe3", size = 34746 },
 ]
 
 [[package]]

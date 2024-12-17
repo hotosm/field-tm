@@ -48,7 +48,7 @@ dependencies = [
     "osm-fieldwork==0.16.12",
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.1",
-    "fmtm-splitter==1.5.1",
+    "fmtm-splitter==2.0.0",
     "pyodk",
 ]
 readme = "../../README.md"
