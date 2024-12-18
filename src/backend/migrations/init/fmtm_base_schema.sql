@@ -39,6 +39,8 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
 CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
+-- Required for fmtm-splitter PostGIS StraightSkeleton usage
+CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
 
 
 -- Enums
