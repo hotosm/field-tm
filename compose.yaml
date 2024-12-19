@@ -225,7 +225,7 @@ services:
     restart: "on-failure:2"
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2024-10-13T13-34-11Z}"
+    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2024-12-18T13-15-44Z}"
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
