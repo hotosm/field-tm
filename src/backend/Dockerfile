@@ -16,7 +16,7 @@
 #
 ARG PYTHON_IMG_TAG=3.12
 ARG UV_IMG_TAG=0.5.2
-ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-10-13T13-34-11Z}
+ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2024-12-18T13-15-44Z}
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
@@ -159,7 +159,6 @@ RUN --mount=type=cache,target=/root/.cache <<EOT
     uv sync \
         --project /_lock \
         --locked \
-        --no-dev \
         --no-install-project \
         --group debug \
         --group test \
