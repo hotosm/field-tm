@@ -157,5 +157,5 @@ jobs:
     uses: hotosm/gh-workflows/.github/workflows/remote_deploy_compose.yml@2.0.9
     with:
       environment: ${{ github.ref_name }}
-      docker_compose_file: "docker-compose.${{ github.ref_name }}.yml"
+      docker_compose_file: "compose.${{ github.ref_name }}.yaml"
     secrets: inherit
