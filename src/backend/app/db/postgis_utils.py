@@ -391,6 +391,7 @@ def add_required_geojson_properties(
             properties["changeset"] = 1
         if not properties.get("timestamp"):
             properties["timestamp"] = timestamp().strftime("%Y-%m-%dT%H:%M:%S")
+        properties["submission_ids"] = None
 
     return geojson
 
