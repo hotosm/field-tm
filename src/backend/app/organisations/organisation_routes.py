@@ -21,9 +21,11 @@ from typing import Annotated, Optional
 
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     File,
     HTTPException,
+    Request,
     Response,
     UploadFile,
 )
@@ -32,6 +34,7 @@ from psycopg import Connection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict
+from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import org_admin, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
@@ -128,13 +131,18 @@ async def delete_unapproved_org(
 
 @router.post("/approve", response_model=OrganisationOut)
 async def approve_organisation(
+    request: Request,
     org_id: int,
+    background_tasks: BackgroundTasks,
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(super_admin)],
+    osm_auth=Depends(init_osm_auth),
 ):
     """Approve the organisation request made by the user.
 
-    The logged in user must be super admin to perform this action .
+    The logged in user must be super admin to perform this action.
+
+    A background task notifies the organisation creator.
     """
     log.info(f"Approving organisation ({org_id}).")
     approved_org = await DbOrganisation.update(
@@ -146,6 +154,15 @@ async def approve_organisation(
     if approved_org.created_by:
         await DbOrganisationManagers.create(
             db, approved_org.id, approved_org.created_by
+        )
+
+        log.info(f"Approved organisation ({org_id}).")
+        background_tasks.add_task(
+            organisation_crud.send_approval_message,
+            request=request,
+            creator_id=approved_org.created_by,
+            organisation_name=approved_org.name,
+            osm_auth=osm_auth,
         )
 
     return approved_org

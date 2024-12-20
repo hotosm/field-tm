@@ -313,6 +313,7 @@ async def send_test_osm_message(
 
         > Notes section
     """)
+    # NOTE post body should contain either recipient or recipient_id
     post_body = {
         "recipient_id": 16289154,
         # "recipient_id": current_user.id,

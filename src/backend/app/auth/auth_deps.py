@@ -273,7 +273,6 @@ async def login_required(
         request,
         settings.cookie_name,  # FMTM cookie
     )
-    print("manage")
     return await _authenticate_user(extracted_token)
 
 
