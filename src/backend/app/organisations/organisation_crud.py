@@ -17,11 +17,19 @@
 #
 """Logic for organisation management."""
 
-from fastapi import UploadFile
+from textwrap import dedent
+
+from fastapi import (
+    Request,
+    UploadFile,
+)
+from loguru import logger as log
+from osm_login_python.core import Auth
 from psycopg import Connection
 from psycopg.rows import class_row
 
 from app.auth.auth_schemas import AuthUser
+from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.config import settings
 from app.db.enums import MappingLevel, UserRole
 from app.db.models import DbOrganisation, DbOrganisationManagers, DbUser
@@ -118,3 +126,30 @@ async def get_my_organisations(
     async with db.cursor(row_factory=class_row(OrganisationOut)) as cur:
         await cur.execute(sql, {"user_id": current_user.id})
         return await cur.fetchall()
+
+
+async def send_approval_message(
+    request: Request,
+    creator_id: int,
+    organisation_name: str,
+    osm_auth: Auth,
+):
+    """Send message to the organisation creator after approval."""
+    log.info(f"Sending approval message to organisation creator ({creator_id}).")
+    osm_token = get_osm_token(request, osm_auth)
+    message_content = dedent(f"""
+        ## Congratulations!
+
+        Your organisation **{organisation_name}** has been approved.
+
+        You can now manage your organisation freely.
+
+        Thank you for being a part of our platform!
+    """)
+    send_osm_message(
+        osm_token=osm_token,
+        osm_id=creator_id,
+        title="Your organisation has been approved!",
+        body=message_content,
+    )
+    log.info(f"Approval message sent to organisation creator ({creator_id}).")
