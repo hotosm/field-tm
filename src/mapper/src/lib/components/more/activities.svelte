@@ -11,6 +11,7 @@
 	let { taskEvents, zoomToTask }: Props = $props();
 
 	const taskStore = getTaskStore();
+	const taskIdIndexMap: Record<number, number> = taskStore.taskIdIndexMap;
 </script>
 
 <div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-2 pb-2">
@@ -38,7 +39,7 @@
 					<div class="flex flex-col gap-1 flex-1">
 						<p class="font-semibold capitalize">{event?.username}</p>
 						<div class="flex items-center justify-between">
-							<p class="text-[#484848] text-sm">#{event?.task_id}</p>
+							<p class="text-[#484848] text-sm">#{taskIdIndexMap[event?.task_id]}</p>
 							<div class="flex items-center gap-2">
 								<hot-icon name="clock-history" class="!text-[1rem] text-red-600 cursor-pointer duration-200"></hot-icon>
 								<p class="text-[#484848] text-sm">

@@ -16,6 +16,7 @@ let selectedTaskIndex: number | null = $state(null);
 let selectedTask: any = $state(null);
 let selectedTaskState: string = $state('');
 let selectedTaskGeom: GeoJSON | null = $state(null);
+let taskIdIndexMap: Record<number, number> = $state({});
 
 function getTaskEventStream(projectId: number): ShapeStream | undefined {
 	if (!projectId) {
@@ -92,15 +93,20 @@ function getTaskStore() {
 		selectedTaskGeom = featcol.features.find((x) => x?.properties?.fid === taskId)?.geometry || null;
 	}
 
+	function setTaskIdIndexMap(idIndexMappedRecord: Record<number, number>) {
+		taskIdIndexMap = idIndexMappedRecord;
+	}
+
 	return {
 		// The task areas / status colours displayed on the map
 		appendTaskStatesToFeatcol: appendTaskStatesToFeatcol,
+		subscribeToEvents: subscribeToTaskEvents,
+		setSelectedTaskId: setSelectedTaskId,
+		setTaskIdIndexMap: setTaskIdIndexMap,
 		get featcol() {
 			return featcol;
 		},
-
 		// The latest event to display in notifications bar
-		subscribeToEvents: subscribeToTaskEvents,
 		get latestEvent() {
 			return latestEvent;
 		},
@@ -109,7 +115,6 @@ function getTaskStore() {
 		},
 
 		// The selected task to display mapping dialog
-		setSelectedTaskId: setSelectedTaskId,
 		get selectedTaskId() {
 			return selectedTaskId;
 		},
@@ -124,6 +129,9 @@ function getTaskStore() {
 		},
 		get selectedTaskGeom() {
 			return selectedTaskGeom;
+		},
+		get taskIdIndexMap() {
+			return taskIdIndexMap;
 		},
 	};
 }
