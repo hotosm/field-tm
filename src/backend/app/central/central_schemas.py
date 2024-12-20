@@ -256,6 +256,7 @@ class EntityMappingStatus(EntityOsmID, EntityTaskID):
 
     updatedAt: Optional[str] = Field(exclude=True)  # noqa: N815
     status: Optional[EntityState] = None
+    submission_ids: Optional[str] = None
 
     @computed_field
     @property

@@ -538,6 +538,7 @@ async def generate_project_files(
     entity_properties = list(
         feature_collection.get("features")[0].get("properties").keys()
     )
+    entity_properties.append("submission_ids")
 
     # Split extract by task area
     log.debug("Splitting data extract per task area")
