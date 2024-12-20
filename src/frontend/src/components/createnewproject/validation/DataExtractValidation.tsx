@@ -28,7 +28,7 @@ function DataExtractValidation(values: ProjectValues) {
   }
 
   if (values.hasAdditionalFeature && !values.additionalFeature) {
-    errors.additionalFeature = 'Additional Feature is Required.';
+    errors.additionalFeature = 'Supporting Dataset is Required.';
   }
 
   return errors;

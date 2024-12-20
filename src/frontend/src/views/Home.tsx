@@ -69,33 +69,36 @@ const Home = () => {
   }, [paginationPage, debouncedSearch]);
 
   return (
-    <div style={{ flex: 1, background: '#F5F5F5' }} className="fmtm-flex fmtm-flex-col fmtm-justify-between">
+    <div
+      style={{ flex: 1, background: '#F5F5F5' }}
+      className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full"
+    >
       <div className="fmtm-h-full">
         <HomePageFilters onSearch={handleSearch} filteredProjectCount={filteredProjectCards?.length} />
         {stateHome.homeProjectLoading == false ? (
-          <div style={{ height: 'calc(100% - 174px)' }} className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5">
-            <div className={`fmtm-w-full ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}>
+          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-9.313rem)]">
+            <div
+              className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}
+            >
               {filteredProjectCards.length > 0 ? (
-                <div>
-                  <div>
-                    <div
-                      className={`fmtm-grid fmtm-gap-5 ${
-                        !showMapStatus
-                          ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
-                          : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-h-[75vh] lg:fmtm-overflow-y-scroll lg:scrollbar'
-                      }`}
-                    >
-                      {filteredProjectCards.map((value: projectType, index: number) => (
-                        <ExploreProjectCard data={value} key={index} />
-                      ))}
-                    </div>
+                <>
+                  <div
+                    className={`fmtm-grid fmtm-gap-5 ${
+                      !showMapStatus
+                        ? 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-4 xl:fmtm-grid-cols-5 2xl:fmtm-grid-cols-6'
+                        : 'fmtm-grid-cols-1 sm:fmtm-grid-cols-2 md:fmtm-grid-cols-3 lg:fmtm-grid-cols-2 2xl:fmtm-grid-cols-3 lg:fmtm-overflow-y-scroll lg:scrollbar'
+                    }`}
+                  >
+                    {filteredProjectCards.map((value: projectType, index: number) => (
+                      <ExploreProjectCard data={value} key={index} />
+                    ))}
                   </div>
-                  <div className="fmtm-flex fmtm-justify-center fmtm-mt-5">
+                  <div className="fmtm-flex fmtm-justify-center fmtm-mt-5 fmtm-mb-2 lg:fmtm-mb-0">
                     <CoreModules.Pagination
                       page={homeProjectPagination?.page}
                       count={homeProjectPagination?.pages}
                       shape="rounded"
-                      size={type === 'xs' ? 'small' : 'large'}
+                      size={type === 'xs' ? 'medium' : 'large'}
                       sx={{
                         '.Mui-selected': {
                           background: 'rgb(216,73,55) !important',
@@ -107,7 +110,7 @@ const Home = () => {
                       }}
                     />
                   </div>
-                </div>
+                </>
               ) : (
                 <CoreModules.Typography
                   variant="h2"
@@ -139,34 +142,7 @@ const Home = () => {
             <ProjectCardSkeleton defaultTheme={defaultTheme} cardsPerRow={cardsPerRow} />
           </CoreModules.Stack>
         )}
-        {/*pagingation*/}
-        {/* <CoreModules.Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '1%' }}>
-        <CoreModules.Pagination color="standard" count={10} variant="outlined" />
-      </CoreModules.Stack> */}
       </div>
-
-      {/* <div className="fmtm-flex fmtm-justify-end fmtm-mr-4 fmtm-py-1 fmtm-gap-3">
-        <div>1-5 of 10 </div>
-        <AssetModules.ArrowLeftIcon
-          sx={{
-            fontSize: 25,
-            color: '#555555',
-            cursor: 'pointer',
-          }}
-        />
-        <AssetModules.ArrowRightIcon
-          sx={{
-            fontSize: 25,
-            color: '#555555',
-            cursor: 'pointer',
-          }}
-        />
-        <div>Jump to</div>
-        <input
-          type="number"
-          className="fmtm-w-10 fmtm-rounded-md fmtm-border-[1px] fmtm-border-[#E7E2E2] fmtm-outline-none"
-        />
-      </div> */}
     </div>
   );
 };
