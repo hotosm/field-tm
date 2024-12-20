@@ -1,4 +1,4 @@
-export function GetDeviceRotation(quaternion) {
+export function GetDeviceRotation(quaternion: any) {
 	// https://w3c.github.io/orientation-sensor/#model explains the order of
 	// the 4 elements in the sensor.quaternion array.
 	let [qx, qy, qz, qw] = quaternion;

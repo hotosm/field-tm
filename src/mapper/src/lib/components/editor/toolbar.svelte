@@ -11,6 +11,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('bold')}
 			onclick={() => editor?.chain()?.focus()?.toggleBold().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleBold().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Italic" placement="bottom">
@@ -19,6 +24,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('italic')}
 			onclick={() => editor?.chain()?.focus()?.toggleItalic().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleItalic().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Strike" placement="bottom">
@@ -27,6 +37,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('strike')}
 			onclick={() => editor?.chain()?.focus()?.toggleStrike().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleStrike().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 1" placement="bottom">
@@ -35,6 +50,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 1 })}
 			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 1 }).run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleHeading({ level: 1 }).run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 2" placement="bottom">
@@ -43,6 +63,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 2 })}
 			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 2 }).run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleHeading({ level: 2 }).run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Heading 3" placement="bottom">
@@ -51,6 +76,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('heading', { level: 3 })}
 			onclick={() => editor?.chain()?.focus()?.toggleHeading({ level: 3 }).run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleHeading({ level: 3 }).run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Unordered List" placement="bottom">
@@ -59,6 +89,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('bulletList')}
 			onclick={() => editor?.chain()?.focus()?.toggleBulletList().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleBulletList().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Ordered List" placement="bottom">
@@ -67,6 +102,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('orderedList')}
 			onclick={() => editor?.chain()?.focus()?.toggleOrderedList().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleOrderedList().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Code" placement="bottom">
@@ -75,6 +115,11 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('codeBlock')}
 			onclick={() => editor?.chain()?.focus()?.toggleCodeBlock().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleCodeBlock().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Quote" placement="bottom">
@@ -83,17 +128,48 @@
 			class={`${iconClassName}`}
 			class:active={editor.isActive('blockquote')}
 			onclick={() => editor?.chain()?.focus()?.toggleBlockquote().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.toggleBlockquote().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Horizontal Ruler" placement="bottom">
-		<hot-icon name="hr" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.setHorizontalRule().run()}
+		<hot-icon
+			name="hr"
+			class={`${iconClassName}`}
+			onclick={() => editor?.chain()?.focus()?.setHorizontalRule().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.setHorizontalRule().run();
+			}}
+			role="button"
+			tabindex="0"
 		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Undo" placement="bottom">
-		<hot-icon name="undo" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.undo().run()}></hot-icon>
+		<hot-icon
+			name="undo"
+			class={`${iconClassName}`}
+			onclick={() => editor?.chain()?.focus()?.undo().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.undo().run();
+			}}
+			role="button"
+			tabindex="0"
+		></hot-icon>
 	</sl-tooltip>
 	<sl-tooltip content="Redo" placement="bottom">
-		<hot-icon name="redo" class={`${iconClassName}`} onclick={() => editor?.chain()?.focus()?.redo().run()}></hot-icon>
+		<hot-icon
+			name="redo"
+			class={`${iconClassName}`}
+			onclick={() => editor?.chain()?.focus()?.redo().run()}
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') editor?.chain()?.focus()?.redo().run();
+			}}
+			role="button"
+			tabindex="0"
+		></hot-icon>
 	</sl-tooltip>
 </div>
 

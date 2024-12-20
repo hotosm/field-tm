@@ -23,7 +23,7 @@
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { GeoJSON as GeoJSONType, Position, Geometry as GeoJSONGeometry } from 'geojson';
+	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
@@ -77,7 +77,7 @@
 	let taskAreaClicked: boolean = $state(false);
 	let toggleGeolocationStatus: boolean = $state(false);
 	let toggleNavigationMode: boolean = $state(false);
-	let projectSetupStep = $state(null);
+	let projectSetupStep: number | null = $state(null);
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
 		projectBasemapStore.projectPmtilesUrl
@@ -131,7 +131,7 @@
 	});
 
 	$effect(() => {
-		projectSetupStep = +projectSetupStepStore.projectSetupStep;
+		projectSetupStep = +(projectSetupStepStore.projectSetupStep || 0);
 	});
 
 	// set the map ref to parent component
@@ -165,7 +165,7 @@
 			taskAreaClicked = true;
 			const clickedTaskId = clickedTaskFeature[0]?.properties?.fid;
 			taskStore.setSelectedTaskId(clickedTaskId, clickedTaskFeature[0]?.properties?.task_index);
-			if (+projectSetupStepStore.projectSetupStep === projectSetupStepEnum['task_selection']) {
+			if (+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['task_selection']) {
 				localStorage.setItem(`project-${projectId}-setup`, projectSetupStepEnum['complete_setup']);
 				projectSetupStepStore.setProjectSetupStep(projectSetupStepEnum['complete_setup']);
 			}
@@ -221,7 +221,7 @@
 					// Save the drawn geometry location, then delete all geoms from store
 					const features: { id: string; geometry: GeoJSONGeometry }[] = drawInstance.getSnapshot();
 					const drawnFeature = features.find((geom) => geom.id === id);
-					let firstGeom: GeoJSONGeometry = null;
+					let firstGeom: GeoJSONGeometry | null = null;
 					if (drawnFeature && drawnFeature.geometry) {
 						firstGeom = drawnFeature.geometry;
 					} else {
@@ -254,11 +254,11 @@
 		}
 	});
 
-	function addStatusToGeojsonProperty(geojsonData: GeoJSONType) {
+	function addStatusToGeojsonProperty(geojsonData: FeatureCollection) {
 		return {
 			...geojsonData,
 			features: geojsonData.features.map((feature) => {
-				const entity = entitiesStore.entitiesStatusList.find((entity) => entity.osmid === feature.properties.osm_id);
+				const entity = entitiesStore.entitiesStatusList.find((entity) => entity.osmid === feature?.properties?.osm_id);
 				return {
 					...feature,
 					properties: {

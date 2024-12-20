@@ -3,11 +3,6 @@
 	import { osmLoginRedirect } from '$lib/utils/login';
 	import { getLoginStore } from '$store/login.svelte.ts';
 
-	type Props = {
-		open: boolean;
-		toggleOpen: (value: boolean) => void;
-	};
-
 	type loginOptionsType = {
 		id: string;
 		name: string;
