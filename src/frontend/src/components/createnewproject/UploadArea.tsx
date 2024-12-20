@@ -32,7 +32,7 @@ const uploadAreaOptions = [
 ];
 
 const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload, setAdditionalFeature }) => {
-  useDocumentTitle('Create Project: Upload Area');
+  useDocumentTitle('Create Project: Project Area');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -210,7 +210,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
       <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Upload Area</h6>
+        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Project Area</h6>
         <div className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
           <span>You can choose to upload the AOI. Note: The file upload only supports .geojson format. </span>
           <div>
@@ -257,8 +257,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                 <div>
                   <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-5">Draw a polygon on the map to plot the area</p>
                   <Button
-                    btnText="Click to Reset"
-                    btnType="primary"
+                    btnText="Reset"
+                    btnType="secondary"
                     type="button"
                     onClick={() => resetFile()}
                     className=""
@@ -275,15 +275,20 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                 </div>
               )}
               {uploadAreaSelection === 'upload_file' && (
-                <FileInputComponent
-                  customFile={geojsonFile}
-                  onChange={changeFileHandler}
-                  onResetFile={resetFile}
-                  accept=".geojson, .json"
-                  fileDescription="*The supported file format is geojson file."
-                  btnText="Upload a Geojson"
-                  errorMsg={errors.uploadedAreaFile}
-                />
+                <>
+                  <FileInputComponent
+                    customFile={geojsonFile}
+                    onChange={changeFileHandler}
+                    onResetFile={resetFile}
+                    accept=".geojson, .json"
+                    fileDescription="*The supported file format is geojson file."
+                    btnText="Upload a Geojson"
+                    errorMsg={errors.uploadedAreaFile}
+                  />
+                  <p className="fmtm-text-gray-700">
+                    Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
+                  </p>
+                </>
               )}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">

@@ -19,13 +19,13 @@ function UploadAreaValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
   if (!values.uploadAreaSelection) {
-    errors.uploadAreaSelection = 'Select Upload Area Options.';
+    errors.uploadAreaSelection = 'Select Upload Project Area Options';
   }
   if (values.uploadAreaSelection === 'draw' && !values.drawnGeojson) {
-    errors.drawnGeojson = 'Drawing Area is Required.';
+    errors.drawnGeojson = 'Drawing Area is Required';
   }
   if (values.uploadAreaSelection === 'upload_file' && !values.uploadedAreaFile) {
-    errors.uploadedAreaFile = 'Uploaded Area File is Required.';
+    errors.uploadedAreaFile = 'Uploaded Area File is Required';
   }
 
   return errors;

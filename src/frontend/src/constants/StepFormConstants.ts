@@ -13,10 +13,10 @@ export const createProjectSteps: ICreateProjectSteps[] = [
     name: 'Project Details',
   },
   {
-    url: '/upload-area',
+    url: '/project-area',
     step: 2,
     label: '02',
-    name: 'Upload Area',
+    name: 'Project Area',
   },
   {
     url: '/upload-survey',
@@ -25,10 +25,10 @@ export const createProjectSteps: ICreateProjectSteps[] = [
     name: 'Upload Survey',
   },
   {
-    url: '/map-features',
+    url: '/map-data',
     step: 4,
     label: '04',
-    name: 'Map Features',
+    name: 'Map Data',
   },
   {
     url: '/split-tasks',

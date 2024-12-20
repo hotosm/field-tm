@@ -47,8 +47,8 @@ const FormUpdateTab = ({ projectId }) => {
     <div className="fmtm-flex fmtm-flex-col fmtm-gap-10">
       <div className="">
         <CustomSelect
-          title="Select Survey Type"
-          placeholder="Select Survey Type"
+          title="What are you Surveying"
+          placeholder="Survey Type"
           data={sortedFormCategoryList}
           dataKey="id"
           valueKey="title"

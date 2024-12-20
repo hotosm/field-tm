@@ -8,10 +8,11 @@ test('create new project', async ({ browserName, page }) => {
   // (playwright.config.ts is configured to run all browsers by default)
   test.skip(browserName !== 'chromium', 'Test only for chromium!');
 
-  // 1. Project Details Step
   await page.goto('/');
   await page.getByRole('button', { name: '+ Create New Project' }).click();
   await page.getByRole('button', { name: 'NEXT' }).click();
+
+  // 1. Project Details Step
   await expect(page.getByText('Project Name is Required.')).toBeVisible();
   await expect(page.getByText('Short Description is Required.', { exact: true })).toBeVisible();
   await expect(page.getByText('Description is Required.', { exact: true })).toBeVisible();
@@ -67,10 +68,10 @@ test('create new project', async ({ browserName, page }) => {
   await page.getByRole('button', { name: 'NEXT' }).click();
 
   // 4. Map Features Step
-  const dataExtractRadio = await page.getByText('Use OSM map features');
+  const dataExtractRadio = await page.getByText('Fetch data from OSM');
   await dataExtractRadio.click();
   await expect(dataExtractRadio).toBeChecked();
-  await page.getByRole('button', { name: 'Generate Map Features' }).click();
+  await page.getByRole('button', { name: 'Generate Map Data' }).click();
   await page.getByRole('button', { name: 'NEXT' }).click();
 
   // 5. Split Tasks Step

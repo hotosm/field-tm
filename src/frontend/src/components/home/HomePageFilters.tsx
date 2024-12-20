@@ -1,5 +1,4 @@
 import React from 'react';
-import windowDimention from '@/hooks/WindowDimension';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import Switch from '@/components/common/Switch';
@@ -18,19 +17,8 @@ const HomePageFilters = ({ onSearch, filteredProjectCount }: homePageFiltersProp
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
 
-  const { windowSize } = windowDimention();
-
   return (
     <CoreModules.Stack>
-      {/* Explore project typography in mobile size */}
-      <CoreModules.Stack
-        sx={{ display: { xs: windowSize.width <= 599 ? 'flex' : 'none', md: 'none' }, justifyContent: 'center' }}
-      >
-        <CoreModules.Typography variant="subtitle2" noWrap mt={'2%'} ml={'3%'}>
-          EXPLORE PROJECTS
-        </CoreModules.Typography>
-      </CoreModules.Stack>
-
       {/* Create New Project Button  */}
       <div>
         <div className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row sm:fmtm-items-center fmtm-gap-4">
@@ -61,6 +49,8 @@ const HomePageFilters = ({ onSearch, filteredProjectCount }: homePageFiltersProp
           <div className="fmtm-flex fmtm-items-center fmtm-gap-2">
             <p>Show Map</p>
             <Switch
+              ref={null}
+              className=""
               checked={showMapStatus}
               onCheckedChange={() => dispatch(HomeActions.SetShowMapStatus(!showMapStatus))}
             />

@@ -65,7 +65,7 @@ const ProjectListMap = () => {
   };
 
   return (
-    <div className="lg:fmtm-order-last lg:fmtm-w-[50%] fmtm-h-[33rem] lg:fmtm-h-full fmtm-bg-gray-300 fmtm-mx-4 fmtm-mb-2">
+    <div className="lg:fmtm-order-last lg:fmtm-w-[50%] fmtm-h-[33rem] lg:fmtm-h-full fmtm-bg-gray-300 fmtm-mx-0 lg:fmtm-mx-4 fmtm-mb-2 fmtm-rounded-lg fmtm-overflow-hidden">
       <div className="map-container" style={{ height: '100%' }}>
         <MapComponent
           ref={mapRef}
