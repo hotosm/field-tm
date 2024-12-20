@@ -1,23 +1,12 @@
 import type { UUID } from 'crypto';
+import type { Polygon } from 'geojson';
 
 export type ProjectTask = {
 	id: number;
 	project_id: number;
 	project_task_index: number;
 	feature_count: number;
-	outline: {
-		type: string;
-		geometry: {
-			type: string;
-			coordinates: [];
-		};
-		properties: {
-			fid: number;
-			uid: number;
-			name: string;
-		};
-		id: number;
-	};
+	outline: Polygon;
 };
 
 export interface ProjectData {

@@ -35,9 +35,3 @@
 		{alertStore.alert?.message}
 	</sl-alert>
 </div>
-
-<style>
-	.alert-duration sl-alert {
-		margin-top: var(--sl-spacing-medium);
-	}
-</style>

@@ -44,7 +44,11 @@ function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 }
 
 function getEntitiesStatusStore() {
-	async function subscribeToEntityStatusUpdates(entitiesStream: ShapeStream, entitiesList: entitiesListType[]) {
+	async function subscribeToEntityStatusUpdates(
+		entitiesStream: ShapeStream | undefined,
+		entitiesList: entitiesListType[],
+	) {
+		if (!entitiesStream) return;
 		entitiesShape = new Shape(entitiesStream);
 
 		entitiesShape.subscribe((entities: ShapeData) => {

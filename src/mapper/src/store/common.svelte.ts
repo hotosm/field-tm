@@ -2,11 +2,11 @@ import type { Basemap } from '$lib/utils/basemaps';
 import { getBasemapList } from '$lib/utils/basemaps';
 
 interface AlertDetails {
-	variant: 'primary' | 'success' | 'neutral' | 'warning' | 'danger' | null;
+	variant: 'success' | 'default' | 'warning' | 'danger';
 	message: string;
 }
 
-let alert: AlertDetails | undefined = $state({ variant: null, message: '' });
+let alert: AlertDetails = $state({ variant: 'default', message: '' });
 let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
@@ -28,7 +28,7 @@ function getAlertStore() {
 		},
 		setAlert: (alertDetails: AlertDetails) =>
 			(alert = { variant: alertDetails.variant, message: alertDetails.message }),
-		clearAlert: (alertDetails: AlertDetails) => (alert = { variant: null, message: '' }),
+		clearAlert: (alertDetails: AlertDetails) => (alert = { variant: 'default', message: '' }),
 	};
 }
 

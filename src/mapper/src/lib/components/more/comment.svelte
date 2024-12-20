@@ -94,7 +94,7 @@
 					size="small"
 					class="primary col-span-2 sm:col-span-1"
 					onclick={() => {
-						commentTask(projectId, taskStore.selectedTaskId, currentComment);
+						if (taskStore.selectedTaskId) commentTask(projectId, taskStore.selectedTaskId, currentComment);
 						editorRef?.commands.clearContent(true);
 					}}
 					onkeydown={() => {}}

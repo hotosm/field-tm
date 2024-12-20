@@ -80,10 +80,12 @@
 						variant="default"
 						size="small"
 						class="primary"
-						onclick={() => mapTask(projectData?.id, taskStore.selectedTaskId)}
+						onclick={() => {
+							if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
+						}}
 						onkeydown={(e: KeyboardEvent) => {
 							if (e.key === 'Enter') {
-								mapTask(projectData?.id, taskStore.selectedTaskId);
+								if (taskStore.selectedTaskId) mapTask(projectData?.id, taskStore.selectedTaskId);
 							}
 						}}
 						role="button"
@@ -98,14 +100,16 @@
 				<p class="my-4 sm:my-6">Task #{taskStore.selectedTaskIndex} has been locked. Is the task completely mapped?</p>
 				<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
 					<sl-button
-						onclick={() => resetTask(projectData?.id, taskStore.selectedTaskId)}
+						onclick={() => {
+							if (taskStore.selectedTaskId) resetTask(projectData?.id, taskStore.selectedTaskId);
+						}}
 						variant="default"
 						outline
 						size="small"
 						class="secondary"
 						onkeydown={(e: KeyboardEvent) => {
 							if (e.key === 'Enter') {
-								resetTask(projectData?.id, taskStore.selectedTaskId);
+								if (taskStore.selectedTaskId) resetTask(projectData?.id, taskStore.selectedTaskId);
 							}
 						}}
 						role="button"
@@ -119,13 +123,15 @@
 						<span class="font-barlow-medium text-sm">CANCEL MAPPING</span>
 					</sl-button>
 					<sl-button
-						onclick={() => finishTask(projectData?.id, taskStore.selectedTaskId)}
+						onclick={() => {
+							if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
+						}}
 						variant="default"
 						size="small"
 						class="green"
 						onkeydown={(e: KeyboardEvent) => {
 							if (e.key === 'Enter') {
-								finishTask(projectData?.id, taskStore.selectedTaskId);
+								if (taskStore.selectedTaskId) finishTask(projectData?.id, taskStore.selectedTaskId);
 							}
 						}}
 						role="button"

@@ -7,8 +7,8 @@
 
 	let startY: number;
 	let startHeight: number;
-	let currSheetHeight: number = $state();
-	let show: boolean = $state();
+	let currSheetHeight: number = $state(0);
+	let show: boolean = $state(false);
 	let isDragging: boolean = $state(false);
 
 	interface Props {
@@ -37,17 +37,27 @@
 		document.body.style.overflowY = 'auto';
 	};
 
-	const dragStart = (e) => {
+	const dragStart = (e: MouseEvent | TouchEvent) => {
 		e.preventDefault();
-		const pagesY = e.pageY || e.changedTouches[0].screenY;
+		let pagesY: number = 0;
+		if (e instanceof MouseEvent) {
+			pagesY = e.pageY;
+		} else if (e instanceof TouchEvent) {
+			pagesY = e.changedTouches[0].screenY;
+		}
 		startY = pagesY;
 		startHeight = parseInt(sheetContentRef.style.height);
 		isDragging = true;
 	};
 
-	const dragging = (e) => {
+	const dragging = (e: MouseEvent | TouchEvent) => {
 		if (!isDragging) return;
-		const delta = startY - (e.pageY || e.changedTouches[0].screenY);
+		let delta: number = 0;
+		if (e instanceof MouseEvent) {
+			delta = startY - e.pageY;
+		} else if (e instanceof TouchEvent) {
+			delta = startY - e.changedTouches[0].screenY;
+		}
 		const newHeight = startHeight + (delta / window.innerHeight) * 100;
 		bottomSheetRef.style.height = `100vh`;
 		updateSheetHeight(newHeight);
@@ -106,8 +116,6 @@
 			>
 				<span class="h-[6px] w-[3.25rem] block bg-[#d2d2d4] rounded-full pointer-events-none"></span>
 			</div>
-			<!-- </div> -->
-
 			<!-- body -->
 			<div class="overflow-y-scroll scrollbar h-[calc(100%-5rem)] sm:h-[calc(100%-6.7rem)] px-4 relative">
 				{@render children?.()}
