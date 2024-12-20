@@ -53,6 +53,16 @@
 		}
 	});
 
+	$effect(() => {
+		let taskIdIndexMap: Record<number, number> = {};
+		if (data?.project?.tasks && data?.project?.tasks?.length > 0) {
+			data?.project?.tasks?.forEach((task: ProjectTask) => {
+				taskIdIndexMap[task.id] = task.project_task_index;
+			});
+		}
+		taskStore.setTaskIdIndexMap(taskIdIndexMap);
+	});
+
 	function zoomToTask(taskId: number) {
 		const taskObj = data.project.tasks.find((task: ProjectTask) => task.id === taskId);
 
