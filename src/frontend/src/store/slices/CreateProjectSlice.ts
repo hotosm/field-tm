@@ -52,6 +52,7 @@ export const initialState: CreateProjectStateTypes = {
   toggleSplittedGeojsonEdit: false,
   customFileValidity: false,
   additionalFeatureGeojson: null,
+  descriptionToFocus: null,
 };
 
 const CreateProject = createSlice({
@@ -215,6 +216,9 @@ const CreateProject = createSlice({
     },
     SetAdditionalFeatureGeojson(state, action) {
       state.additionalFeatureGeojson = action.payload;
+    },
+    SetDescriptionToFocus(state, action) {
+      state.descriptionToFocus = action.payload;
     },
   },
 });

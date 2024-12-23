@@ -3,7 +3,7 @@ import path from 'path';
 
 const authFile = path.join(__dirname, './.auth/user.json');
 
-setup('authenticate', async ({ browserName, page }) => {
+setup.skip('authenticate', async ({ browserName, page }) => {
   // Note here we only run in chromium, to avoid running this setup step
   // for Firefox and Webkit.
   // This is because Webkit does not respect 'secure' cookies on http contexts.

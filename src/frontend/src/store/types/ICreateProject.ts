@@ -36,6 +36,7 @@ export type CreateProjectStateTypes = {
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;
   additionalFeatureGeojson: GeoJSONFeatureTypes | null;
+  descriptionToFocus: string | null;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
