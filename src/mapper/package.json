@@ -45,6 +45,7 @@
 		"@electric-sql/client": "^0.8.0",
 		"@electric-sql/pglite": "^0.2.14",
 		"@hotosm/ui": "0.2.0-b5",
+		"@maplibre/maplibre-gl-directions": "^0.7.1",
 		"@tiptap/core": "^2.10.3",
 		"@tiptap/pm": "^2.10.3",
 		"@tiptap/starter-kit": "^2.10.3",

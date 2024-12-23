@@ -17,6 +17,9 @@ importers:
       '@hotosm/ui':
         specifier: 0.2.0-b5
         version: 0.2.0-b5(@types/react@18.3.3)
+      '@maplibre/maplibre-gl-directions':
+        specifier: ^0.7.1
+        version: 0.7.1(@types/geojson@7946.0.14)(maplibre-gl@4.7.1)
       '@shoelace-style/shoelace':
         specifier: ^2.15.1
         version: 2.18.0(@types/react@18.3.3)
@@ -1079,6 +1082,11 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
 
+  '@maplibre/maplibre-gl-directions@0.7.1':
+    resolution: {integrity: sha512-n2dQkMM1+LO77bnVXXp+rZwD1OVa0UNbP3mgGyDxE6NLFEPU/p+w3G/pxnDfwuapzyHYeevdpYpxrVbwABU4BQ==}
+    peerDependencies:
+      maplibre-gl: ^4.0.0
+
   '@maplibre/maplibre-gl-style-spec@20.4.0':
     resolution: {integrity: sha512-AzBy3095fTFPjDjmWpR2w6HVRAZJ6hQZUCwk5Plz6EyfnfuQW1odeW5i2Ai47Y6TBA2hQnC+azscjBSALpaWgw==}
     hasBin: true
@@ -1097,6 +1105,11 @@ packages:
 
   '@petamoriken/float16@3.9.0':
     resolution: {integrity: sha512-rYUZ+VFjPHD0NT2JYKj64NxXxrV642IiyaUxxorTEj0S3hT7B5Ixezyc9Fn+XvSk0ETEBp5VWjGIErzh0ug0Xw==}
+
+  '@placemarkio/polyline@1.2.0':
+    resolution: {integrity: sha512-PjXntwUKQFTM/MgXIZHBOtuU2rAkmPgfrIxweOJEf1vyytQJNLDMI4YIRO3LUkt++F4TyAQHjPoRsteYa+gtVQ==}
+    peerDependencies:
+      '@types/geojson': '*'
 
   '@playwright/test@1.49.0':
     resolution: {integrity: sha512-DMulbwQURa8rNIQrf94+jPJQ4FmOVdpE5ZppRNvWVjvhC+6sOeo28r8MgIpQRYouXRtt/FCCXU7zn20jnHR4Qw==}
@@ -2828,6 +2841,11 @@ packages:
   nanoid@3.3.8:
     resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.0.9:
+    resolution: {integrity: sha512-Aooyr6MXU6HpvvWXKoVoXwKMs/KyVakWwg7xQfv5/S/RIgJMy0Ifa45H9qqYy7pTCszrHzP21Uk4PZq2HpEM8Q==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -4723,6 +4741,14 @@ snapshots:
 
   '@mapbox/whoots-js@3.1.0': {}
 
+  '@maplibre/maplibre-gl-directions@0.7.1(@types/geojson@7946.0.14)(maplibre-gl@4.7.1)':
+    dependencies:
+      '@placemarkio/polyline': 1.2.0(@types/geojson@7946.0.14)
+      maplibre-gl: 4.7.1
+      nanoid: 5.0.9
+    transitivePeerDependencies:
+      - '@types/geojson'
+
   '@maplibre/maplibre-gl-style-spec@20.4.0':
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
@@ -4747,6 +4773,10 @@ snapshots:
 
   '@petamoriken/float16@3.9.0':
     optional: true
+
+  '@placemarkio/polyline@1.2.0(@types/geojson@7946.0.14)':
+    dependencies:
+      '@types/geojson': 7946.0.14
 
   '@playwright/test@1.49.0':
     dependencies:
@@ -6654,6 +6684,8 @@ snapshots:
   murmurhash-js@1.0.0: {}
 
   nanoid@3.3.8: {}
+
+  nanoid@5.0.9: {}
 
   natural-compare@1.4.0: {}
 
