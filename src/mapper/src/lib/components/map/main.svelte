@@ -75,9 +75,8 @@
 	let loaded: boolean = $state(false);
 	let selectedBaselayer: string = $state('OSM');
 	let taskAreaClicked: boolean = $state(false);
-	let toggleGeolocationStatus: boolean = $state(false);
-	let toggleNavigationMode: boolean = $state(false);
 	let projectSetupStep: number | null = $state(null);
+
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
 		projectBasemapStore.projectPmtilesUrl
@@ -151,13 +150,17 @@
 		const clickedTaskFeature = map?.queryRenderedFeatures(e.point, {
 			layers: ['task-fill-layer'],
 		});
-
 		// if clicked point contains entity then set it's osm id else set null to store
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0) {
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.osm_id;
 			entitiesStore.setSelectedEntity(clickedEntityId);
+			entitiesStore.setSelectedEntityCoordinate({
+				entityId: clickedEntityId,
+				coordinate: [e.lngLat.lng, e.lngLat.lat],
+			});
 		} else {
 			entitiesStore.setSelectedEntity(null);
+			entitiesStore.setSelectedEntityCoordinate(null);
 		}
 
 		// if clicked point contains task layer
@@ -279,20 +282,6 @@
 		}
 	}
 
-	// if navigation mode on, tilt map by 50 degrees
-	$effect(() => {
-		if (toggleNavigationMode && toggleGeolocationStatus) {
-			map?.setPitch(50);
-		} else {
-			map?.setPitch(0);
-		}
-	});
-
-	// if map loaded, turn on geolocation by default
-	$effect(() => {
-		if (loaded) toggleGeolocationStatus = true;
-	});
-
 	onMount(async () => {
 		// Register pmtiles protocol
 		if (!maplibre.config.REGISTERED_PROTOCOLS.hasOwnProperty('pmtiles')) {
@@ -336,36 +325,12 @@
 	]}
 >
 	<!-- Controls -->
-	<NavigationControl position="top-left" />
+	<NavigationControl position="top-left" showZoom={false} />
 	<ScaleControl />
-	<Control class="flex flex-col gap-y-2" position="top-left">
-		<ControlGroup>
-			<ControlButton
-				on:click={() => {
-					toggleGeolocationStatus = !toggleGeolocationStatus;
-					toggleNavigationMode = false;
-				}}
-				><hot-icon
-					name="geolocate"
-					class={`!text-[1.2rem] cursor-pointer  duration-200 ${toggleGeolocationStatus ? 'text-red-600' : 'text-[#52525B]'}`}
-				></hot-icon></ControlButton
-			>
-		</ControlGroup></Control
-	>
 	<Control class="flex flex-col gap-y-2" position="top-left">
 		<ControlGroup>
 			<ControlButton on:click={zoomToProject}
 				><hot-icon name="crop-free" class={`!text-[1.2rem] cursor-pointer duration-200 text-black`}
-				></hot-icon></ControlButton
-			>
-		</ControlGroup></Control
-	>
-	<Control class="flex flex-col gap-y-2" position="top-left">
-		<ControlGroup>
-			<ControlButton on:click={() => (toggleNavigationMode = !toggleNavigationMode)}
-				><hot-icon
-					name="send"
-					class={`!text-[1.2rem] cursor-pointer duration-200 ${toggleNavigationMode ? 'text-red-600' : 'text-[#52525B]'}`}
 				></hot-icon></ControlButton
 			>
 		</ControlGroup></Control
@@ -380,9 +345,7 @@
 		<Legend />
 	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->
-	{#if toggleGeolocationStatus}
-		<Geolocation {map} {toggleGeolocationStatus} {toggleNavigationMode}></Geolocation>
-	{/if}
+	<Geolocation {map}></Geolocation>
 	<!-- The task area geojson -->
 	<GeoJSON id="tasks" data={taskStore.featcol} promoteId="fid">
 		<FillLayer
@@ -448,17 +411,28 @@
 		<FillLayer
 			id="entity-fill-layer"
 			paint={{
-				'fill-opacity': 0.3,
+				'fill-opacity': 0.6,
 				'fill-color': [
 					'match',
 					['get', 'status'],
 					'READY',
-					'#d62822',
+					'#9c9a9a',
 					'OPENED_IN_ODK',
-					'#fad30a',
+					'#fae15f',
+					'SURVEY_SUBMITTED',
+					'#71bf86',
+					'#c5fbf5', // default color if no match is found
+				],
+				'fill-outline-color': [
+					'match',
+					['get', 'status'],
+					'READY',
+					'#000000',
+					'OPENED_IN_ODK',
+					'#ffd603',
 					'SURVEY_SUBMITTED',
 					'#32a852',
-					'#c5fbf5', // default color if no match is found
+					'#c5fbf5',
 				],
 			}}
 			beforeLayerType="symbol"
