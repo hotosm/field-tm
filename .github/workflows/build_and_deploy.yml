@@ -26,6 +26,7 @@ jobs:
       compose_command: pytest
       tag_override: ci-${{ github.ref_name }}
       coverage: true
+      compose_file: "compose.${{ github.ref_name }}.yaml"
     secrets: inherit
 
   frontend-unit-test:
