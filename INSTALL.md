@@ -155,10 +155,10 @@ local test - used during development, or to start a test version
 The corresponding docker-compose files are:
 
 ```text
-main - compose.main.yaml
-staging - compose.staging.yaml
-development - compose.development.yaml
-local test - compose.yaml
+main - docker-compose.main.yml
+staging - docker-compose.staging.yml
+development - docker-compose.development.yml
+local test - docker-compose.yml
 ```
 
 Set your selection to a terminal variable to make the next step easier:
@@ -173,7 +173,7 @@ export GIT_BRANCH=development
 #### Pull the Images
 
 ```bash
-docker compose -f "compose.${GIT_BRANCH}.yaml" pull
+docker compose -f "docker-compose.${GIT_BRANCH}.yml" pull
 ```
 
 > This will pull the latest containers for the branch you selected.
@@ -185,13 +185,13 @@ Before we can run, you need to build your version of the frontend.
 This is because the frontend contains variable specific to your deployment.
 
 ```bash
-docker compose -f "compose.${GIT_BRANCH}.yaml" build ui
+docker compose -f "docker-compose.${GIT_BRANCH}.yml" build ui
 ```
 
 #### Start the Containers
 
 ```bash
-docker compose -f "compose.${GIT_BRANCH}.yaml" up -d
+docker compose -f "docker-compose.${GIT_BRANCH}.yml" up -d
 ```
 
 You should see the containers start up in order.

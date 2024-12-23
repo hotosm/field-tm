@@ -185,11 +185,11 @@ attaching to the FMTM containers:
 export GIT_BRANCH=development
 
 # Shut down the running database & delete the data
-docker compose -f compose.$GIT_BRANCH.yaml down -v
+docker compose -f docker-compose.$GIT_BRANCH.yml down -v
 
 # First, ensure you have a suitable .env with database vars
 # Start the databases only
-docker compose -f compose.$GIT_BRANCH.yaml up -d fmtm-db central-db
+docker compose -f docker-compose.$GIT_BRANCH.yml up -d fmtm-db central-db
 
 # (Optional) restore odk central from the backup
 backup_filename=fmtm-central-db-${GIT_BRANCH}-XXXX-XX-XX-sql.gz
@@ -208,7 +208,7 @@ fmtm-${GIT_BRANCH}-fmtm-db-1 \
 pg_restore --verbose -U fmtm -d fmtm
 
 # Run the entire docker compose stack
-docker compose -f compose.$GIT_BRANCH.yaml up -d
+docker compose -f docker-compose.$GIT_BRANCH.yml up -d
 ```
 
 ## Help! FMTM Prod Is Broken 😨

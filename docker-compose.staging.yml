@@ -46,43 +46,43 @@ networks:
 services:
   proxy:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: proxy
   api:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: api
   ui:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: ui
   central:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: central
   central-ui:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: central-ui
   s3:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: s3
   fmtm-db:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: fmtm-db
   electric:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: electric
   central-db:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: central-db
   migrations:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: migrations
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
@@ -107,6 +107,6 @@ services:
       retries: 3
   certbot:
     extends:
-      file: compose.development.yaml
+      file: docker-compose.development.yml
       service: certbot
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-staging"
