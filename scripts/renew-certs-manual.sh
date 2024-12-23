@@ -35,7 +35,7 @@ if [[ -z $(docker ps -q -f "ancestor=ghcr.io/hotosm/fmtm/proxy:${BRANCH_NAME}") 
     echo "No containers using the 'ghcr.io/hotosm/fmtm/proxy:${BRANCH_NAME}' image are running."
     echo "You must first start the containers using:"
     echo
-    echo "docker-compose -f compose.${BRANCH_NAME}.yaml up -d"
+    echo "docker-compose -f docker-compose.${BRANCH_NAME}.yml up -d"
     echo
     exit 1
 fi

@@ -116,13 +116,13 @@ just migrate
 
 ### Interactive Debugging
 
-- The `compose.yaml` builds FMTM using the `debug` target in the Dockerfile.
+- The `docker-compose.yml` builds FMTM using the `debug` target in the Dockerfile.
 - The debug image contains `debugpy` to assist debugging in the container.
 
 To use it:
 
 1. Re-build the docker image `docker compose build api`
-2. Uncomment the debug port in compose.yaml:
+2. Uncomment the debug port in docker-compose.yml:
 
    ```yml
    services:
@@ -201,7 +201,7 @@ Creating a new release during development may not always be feasible.
 - A development version of osm-fieldwork can be mounted into
   the FMTM container via bind mount.
 - Clone the osm-fieldwork repo to the same root directory as FMTM.
-- Uncomment the line in compose.yaml
+- Uncomment the line in docker-compose.yml
 
 ```yaml
 - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.12/site-packages/osm_fieldwork

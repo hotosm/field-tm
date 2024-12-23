@@ -25,15 +25,15 @@ default:
 [no-cd]
 josm:
   docker compose \
-    -f compose.yaml \
-    -f contrib/josm/compose.yaml \
+    -f docker-compose.yml \
+    -f contrib/josm/docker-compose.yml \
     down
   
 # Stop FMTM & tunnels
 [no-cd]
 tunnel:
   docker compose \
-    -f compose.yaml \
-    -f contrib/tunnel/compose.yaml \
+    -f docker-compose.yml \
+    -f contrib/tunnel/docker-compose.yml \
     down
 
