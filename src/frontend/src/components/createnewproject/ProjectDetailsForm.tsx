@@ -15,6 +15,7 @@ import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationDropdownType } from '@/models/createproject/createProjectModel';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import DescriptionSection from '@/components/createnewproject/Description';
 
 const ProjectDetailsForm = ({ flag }) => {
   useDocumentTitle('Create Project: Project Details');
@@ -105,47 +106,7 @@ const ProjectDetailsForm = ({ flag }) => {
 
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
-      <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Project Details</h6>
-        <div className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>
-            Fill in your project basic information such as name, description, hashtag, etc. This captures essential
-            information about your project.
-          </span>
-          <span>To complete the first step, you will need the login credentials of ODK Central Server.</span>{' '}
-          <div>
-            <a
-              href="https://docs.getodk.org/central-install-digital-ocean/"
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
-              target="_"
-            >
-              Here{' '}
-            </a>
-            <span>
-              are the instructions for setting up a Central ODK Server on Digital Ocean, if you haven’t already.
-            </span>
-          </div>
-          <div>
-            You can use the 'Custom TMS URL' option to integrate high-resolution aerial imagery like OpenAerialMap{' '}
-            <a
-              href="https://openaerialmap.org/"
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
-              target="_"
-            >
-              (OAM)
-            </a>
-            . Simply obtain the TMS URL and paste it into the custom TMS field. More details:{' '}
-            <a
-              href="https://docs.openaerialmap.org/"
-              className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-w-fit"
-              target="_"
-            >
-              OpenAerialMap Documentation
-            </a>
-            .
-          </div>
-        </div>
-      </div>
+      <DescriptionSection section="Project Details" />
       <form
         className="xl:fmtm-w-[83%] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-h-full fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar"
         onSubmit={handleSubmit}
@@ -201,52 +162,60 @@ const ProjectDetailsForm = ({ flag }) => {
               <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.organisation_id}</p>
             )}
           </div>
-          {hasODKCredentials && (
-            <CustomCheckbox
-              key="defaultODKCredentials"
-              label="Use default ODK credentials"
-              checked={values.defaultODKCredentials}
-              onCheckedChange={() => {
-                handleCustomChange('defaultODKCredentials', !values.defaultODKCredentials);
-              }}
-              className="fmtm-text-black"
-              labelClickable={true}
-            />
-          )}
-          {((!values.defaultODKCredentials && hasODKCredentials) || !hasODKCredentials) && (
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-6">
-              <InputTextField
-                id="odk_central_url"
-                name="odk_central_url"
-                label="ODK Central URL"
-                value={values?.odk_central_url}
-                onChange={handleChange}
-                fieldType="text"
-                errorMsg={errors.odk_central_url}
-                required
+          <div
+            className="fmtm-flex fmtm-flex-col fmtm-gap-6"
+            onMouseOver={() => {
+              dispatch(CreateProjectActions.SetDescriptionToFocus('projectdetails-odk'));
+            }}
+            onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
+          >
+            {hasODKCredentials && (
+              <CustomCheckbox
+                key="defaultODKCredentials"
+                label="Use default ODK credentials"
+                checked={values.defaultODKCredentials}
+                onCheckedChange={() => {
+                  handleCustomChange('defaultODKCredentials', !values.defaultODKCredentials);
+                }}
+                className="fmtm-text-black"
+                labelClickable={true}
               />
-              <InputTextField
-                id="odk_central_user"
-                name="odk_central_user"
-                label="ODK Central Email"
-                value={values?.odk_central_user}
-                onChange={handleChange}
-                fieldType="text"
-                errorMsg={errors.odk_central_user}
-                required
-              />
-              <InputTextField
-                id="odk_central_password"
-                name="odk_central_password"
-                label="ODK Central Password"
-                value={values?.odk_central_password}
-                onChange={handleChange}
-                fieldType="password"
-                errorMsg={errors.odk_central_password}
-                required
-              />
-            </div>
-          )}
+            )}
+            {((!values.defaultODKCredentials && hasODKCredentials) || !hasODKCredentials) && (
+              <>
+                <InputTextField
+                  id="odk_central_url"
+                  name="odk_central_url"
+                  label="ODK Central URL"
+                  value={values?.odk_central_url}
+                  onChange={handleChange}
+                  fieldType="text"
+                  errorMsg={errors.odk_central_url}
+                  required
+                />
+                <InputTextField
+                  id="odk_central_user"
+                  name="odk_central_user"
+                  label="ODK Central Email"
+                  value={values?.odk_central_user}
+                  onChange={handleChange}
+                  fieldType="text"
+                  errorMsg={errors.odk_central_user}
+                  required
+                />
+                <InputTextField
+                  id="odk_central_password"
+                  name="odk_central_password"
+                  label="ODK Central Password"
+                  value={values?.odk_central_password}
+                  onChange={handleChange}
+                  fieldType="password"
+                  errorMsg={errors.odk_central_password}
+                  required
+                />
+              </>
+            )}
+          </div>
           <div>
             <InputTextField
               id="hashtags"
@@ -264,15 +233,22 @@ const ProjectDetailsForm = ({ flag }) => {
             </p>
           </div>
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
-            <CustomCheckbox
-              key="hasCustomTMS"
-              label="I would like to include my own imagery layer for reference"
-              checked={values.hasCustomTMS}
-              onCheckedChange={() => {
-                handleCustomChange('hasCustomTMS', !values.hasCustomTMS);
+            <div
+              onMouseOver={() => {
+                dispatch(CreateProjectActions.SetDescriptionToFocus('projectdetails-tms'));
               }}
-              className="fmtm-text-black"
-            />
+              onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
+            >
+              <CustomCheckbox
+                key="hasCustomTMS"
+                label="I would like to include my own imagery layer for reference"
+                checked={values.hasCustomTMS}
+                onCheckedChange={() => {
+                  handleCustomChange('hasCustomTMS', !values.hasCustomTMS);
+                }}
+                className="fmtm-text-black"
+              />
+            </div>
             {values.hasCustomTMS && (
               <InputTextField
                 id="custom_tms_url"

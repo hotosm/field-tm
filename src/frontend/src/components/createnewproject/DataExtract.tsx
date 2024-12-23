@@ -17,6 +17,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { task_split_type } from '@/types/enums';
 import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 import { CustomCheckbox } from '@/components/common/Checkbox';
+import DescriptionSection from '@/components/createnewproject/Description';
 
 const dataExtractOptions = [
   { name: 'data_extract', value: 'osm_data_extract', label: 'Fetch data from OSM' },
@@ -217,23 +218,7 @@ const DataExtract = ({
 
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
-      <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-        <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Map Data</h6>
-        <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-          <span>You may either choose to use OSM data, or upload your own data for the mapping project.</span>
-          <span> The relevant map data that exist on OSM are imported based on the select map area.</span>{' '}
-          <span>
-            You can use these map data to use the &apos;select from map&apos; functionality from ODK that allows you to
-            select the feature to collect data for.
-          </span>{' '}
-          <span>
-            Additional datasets might be important if your survey consists of more than one feature to select. For
-            example, selecting a building as the primary feature, with an associated road, or nearby hospital. In this
-            case, the roads or hospital features would be uploaded separately. Note that these features will not be
-            factored in when dividing the primary features into task areas.
-          </span>
-        </p>
-      </div>
+      <DescriptionSection section="Map Data" />
       <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
         <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
           <form
@@ -251,6 +236,13 @@ const DataExtract = ({
                   setExtractWays(value);
                 }}
                 errorMsg={errors.dataExtractWays}
+                hoveredOption={(hoveredOption) =>
+                  dispatch(
+                    CreateProjectActions.SetDescriptionToFocus(
+                      hoveredOption && hoveredOption === 'osm_data_extract' ? 'mapfeatures-osm' : null,
+                    ),
+                  )
+                }
               />
               {extractWays === 'osm_data_extract' && (
                 <Button
@@ -287,19 +279,26 @@ const DataExtract = ({
               )}
               {extractWays && (
                 <div className="fmtm-mt-4">
-                  <CustomCheckbox
-                    key="uploadAdditionalFeature"
-                    label="Upload Supporting Datasets"
-                    checked={formValues?.hasAdditionalFeature}
-                    onCheckedChange={(status) => {
-                      handleCustomChange('hasAdditionalFeature', status);
-                      handleCustomChange('additionalFeature', null);
-                      dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
-                      setAdditionalFeature(null);
+                  <div
+                    onMouseOver={() => {
+                      dispatch(CreateProjectActions.SetDescriptionToFocus('mapfeatures-additional'));
                     }}
-                    className="fmtm-text-black"
-                    labelClickable
-                  />
+                    onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
+                  >
+                    <CustomCheckbox
+                      key="uploadAdditionalFeature"
+                      label="Upload Supporting Datasets"
+                      checked={formValues?.hasAdditionalFeature}
+                      onCheckedChange={(status) => {
+                        handleCustomChange('hasAdditionalFeature', status);
+                        handleCustomChange('additionalFeature', null);
+                        dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
+                        setAdditionalFeature(null);
+                      }}
+                      className="fmtm-text-black"
+                      labelClickable
+                    />
+                  </div>
                   {formValues?.hasAdditionalFeature && (
                     <>
                       <FileInputComponent

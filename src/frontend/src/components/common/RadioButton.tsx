@@ -17,6 +17,7 @@ interface RadioButtonProps {
   errorMsg?: string;
   className?: string;
   required?: boolean;
+  hoveredOption?: (option: string | null) => void;
 }
 
 const RadioButton: React.FC<RadioButtonProps> = ({
@@ -28,6 +29,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
   errorMsg,
   className,
   required,
+  hoveredOption,
 }) => (
   <div>
     {topic && (
@@ -41,6 +43,8 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       {options.map((option) => {
         return (
           <div
+            onMouseOver={() => hoveredOption && hoveredOption(option.value)}
+            onMouseLeave={() => hoveredOption && hoveredOption(null)}
             key={option.value}
             className={`fmtm-gap-2 fmtm-flex fmtm-items-center ${
               option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''

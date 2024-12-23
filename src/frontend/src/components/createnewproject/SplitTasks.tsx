@@ -18,6 +18,7 @@ import {
 import { task_split_type } from '@/types/enums';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
+import DescriptionSection from '@/components/createnewproject/Description';
 
 const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, customFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
@@ -232,24 +233,13 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
     <>
       <form onSubmit={handleSubmit} className="fmtm-h-full">
         <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
-          <div className="fmtm-bg-white lg:fmtm-w-[20%] xl:fmtm-w-[17%] fmtm-px-5 fmtm-py-6 lg:fmtm-h-full lg:fmtm-overflow-y-scroll lg:scrollbar">
-            <h6 className="fmtm-text-xl fmtm-font-[600] fmtm-pb-2 lg:fmtm-pb-6">Split Tasks</h6>
-            <p className="fmtm-text-gray-500 lg:fmtm-flex lg:fmtm-flex-col lg:fmtm-gap-3">
-              <span>You may choose how to divide an area into tasks for field mapping</span>
-              <span>Divide area on squares split the AOI into squares based on user’s input in dimensions</span>
-              <span>Choose area as task creates the number of tasks based on number of polygons in AOI</span>
-              <span>
-                Task splitting algorithm splits an entire AOI into smallers tasks based on linear networks (road, river)
-                followed by taking into account the input of number of average buildings per task
-              </span>
-            </p>
-          </div>
+          <DescriptionSection section="Split Tasks" />
           <div className="lg:fmtm-w-[80%] xl:fmtm-w-[83%] fmtm-bg-white fmtm-px-5 lg:fmtm-px-11 fmtm-py-6 lg:fmtm-overflow-y-scroll lg:scrollbar">
             <div className="fmtm-w-full fmtm-flex fmtm-gap-6 md:fmtm-gap-14 fmtm-flex-col md:fmtm-flex-row fmtm-h-full">
               <div className="fmtm-flex fmtm-flex-col fmtm-gap-6 lg:fmtm-w-[40%] fmtm-justify-between">
                 <div>
                   <RadioButton
-                    value={splitTasksSelection || null}
+                    value={splitTasksSelection || ''}
                     topic="Select an option to split the task"
                     options={taskSplitOptions}
                     direction="column"
@@ -264,6 +254,13 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                       }
                     }}
                     errorMsg={errors.task_split_type}
+                    hoveredOption={(hoveredOption) =>
+                      dispatch(
+                        CreateProjectActions.SetDescriptionToFocus(
+                          hoveredOption ? `splittasks-${hoveredOption}` : null,
+                        ),
+                      )
+                    }
                   />
                   <div className="fmtm-mt-5">
                     <p className="fmtm-text-gray-500">
