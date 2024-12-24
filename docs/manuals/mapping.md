@@ -62,6 +62,9 @@ mapping experience.
 
 ## Part (B): Mapping Features
 
+Before starting to map features, ensure that geolocation is enabled.
+This will allow you to access your live location, making navigation easier.
+
 ### Select An Existing Feature
 
 In most cases we are submitting a survey about a feature that already exists.
