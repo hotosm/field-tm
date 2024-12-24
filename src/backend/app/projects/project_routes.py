@@ -619,8 +619,9 @@ async def preview_split_by_square(
 
     return split_by_square(
         boundary_featcol,
-        osm_extract=parsed_extract,
+        settings.FMTM_DB_URL.unicode_string(),
         meters=dimension_meters,
+        osm_extract=parsed_extract,
     )
 
 

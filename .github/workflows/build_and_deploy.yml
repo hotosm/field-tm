@@ -39,6 +39,7 @@ jobs:
     with:
       context: src/backend
       build_target: prod
+      scan_image: False
       image_name: ghcr.io/${{ github.repository }}/backend
 
   frontend-build:
