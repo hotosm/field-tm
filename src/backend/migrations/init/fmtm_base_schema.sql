@@ -26,13 +26,13 @@ ALTER SCHEMA public OWNER TO fmtm;
 
 -- PostGIS
 
-CREATE SCHEMA tiger;
+CREATE SCHEMA IF NOT EXISTS tiger;
 ALTER SCHEMA tiger OWNER TO fmtm;
 
-CREATE SCHEMA tiger_data;
+CREATE SCHEMA IF NOT EXISTS tiger_data;
 ALTER SCHEMA tiger_data OWNER TO fmtm;
 
-CREATE SCHEMA topology;
+CREATE SCHEMA IF NOT EXISTS topology;
 ALTER SCHEMA topology OWNER TO fmtm;
 
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
@@ -287,6 +287,7 @@ CREATE TABLE public.task_events (
     task_id integer NOT NULL,
     project_id integer,
     user_id integer,
+    username character varying,
     state public.mappingstate,
     comment text,
     created_at timestamp with time zone NOT NULL DEFAULT now()
@@ -343,7 +344,7 @@ ALTER TABLE public.users OWNER TO fmtm;
 
 CREATE TABLE public.odk_entities (
     entity_id UUID NOT NULL,
-    status entitystate NOT NULL,
+    status public.entitystate NOT NULL,
     project_id integer NOT NULL,
     task_id integer
 );
@@ -495,10 +496,6 @@ CREATE INDEX idx_task_event_user_id
 ON public.task_events USING btree (
     task_id, user_id
 );
-CREATE INDEX idx_task_history_date
-ON public.task_history USING btree (
-    task_id, created_at
-);
 CREATE INDEX idx_entities_project_id
 ON public.odk_entities USING btree (
     entity_id, project_id
@@ -565,7 +562,7 @@ ADD CONSTRAINT fk_project_id FOREIGN KEY (
 
 -- Triggers
 
-CREATE OR REPLACE FUNCTION set_task_state()
+CREATE OR REPLACE FUNCTION public.set_task_state()
 RETURNS TRIGGER AS $$
 BEGIN
     CASE NEW.event
@@ -597,7 +594,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER task_event_state_trigger
 BEFORE INSERT ON public.task_events
 FOR EACH ROW
-EXECUTE FUNCTION set_task_state();
+EXECUTE FUNCTION public.set_task_state();
 
 -- Finalise
 
