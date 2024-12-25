@@ -271,7 +271,7 @@ name = "click"
 version = "8.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de", size = 336121 }
 wheels = [
@@ -568,7 +568,7 @@ requires-dist = [
     { name = "httptools", specifier = "==0.6.4" },
     { name = "loguru", specifier = "==0.7.2" },
     { name = "minio", specifier = "==7.2.9" },
-    { name = "osm-fieldwork", specifier = "==0.16.12" },
+    { name = "osm-fieldwork", specifier = "==0.17.0" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "osm-rawdata", specifier = "==0.4.1" },
     { name = "psycopg", extras = ["pool"], specifier = ">=3.2.3" },
@@ -1025,7 +1025,7 @@ version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "ghp-import" },
     { name = "jinja2" },
     { name = "markdown" },
@@ -1435,7 +1435,7 @@ wheels = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.16.12"
+version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1459,9 +1459,9 @@ dependencies = [
     { name = "shapely" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/ee/9d8428bd8155b9fa44e54056f17cf45a1c35659cba62fd25dedb898eb479/osm-fieldwork-0.16.12.tar.gz", hash = "sha256:1b4115cc51a9c5f5d66f93734413e444bcfb349e6dff2b908f812635fb00d1d6", size = 1485409 }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/c6/348ab8c8fbba7ab7fbf60ed72bbeba97119379320847ea936e4eaf26b86a/osm-fieldwork-0.17.0.tar.gz", hash = "sha256:3c904e6f882f411e1b0ae3ef8645ac09ced2e2bb8f1a5cc84e6ae095c49e5f79", size = 1484922 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b9/c0/1eed86313a2d624d7722cbea6991587287beefde5bd3d9f104212f5cd96f/osm_fieldwork-0.16.12-py3-none-any.whl", hash = "sha256:4543083e408055acb9c2488563090a904dc942737d5f7aa177d31319838f5ed4", size = 1513698 },
+    { url = "https://files.pythonhosted.org/packages/d3/ec/890267f20c2e4c13ecd07ac46e3292551ee0bf56a4779319f7eda0bc1510/osm_fieldwork-0.17.0-py3-none-any.whl", hash = "sha256:5182f97870ed345f0fef4aeab87101df83bd19c62e6a6bed961bd6a10cffb52d", size = 1510703 },
 ]
 
 [[package]]
