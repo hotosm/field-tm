@@ -70,7 +70,6 @@ from app.db.postgis_utils import (
     flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
-    split_geojson_by_task_areas,
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -813,20 +812,15 @@ async def add_additional_entity_list(
     of the GeoJSON uploaded.
     """
     project = project_user_dict.get("project")
-    project_id = project.id
     project_odk_id = project.odkid
     project_odk_creds = project.odk_credentials
     # NOTE the Entity name is extracted from the filename (without extension)
     entity_name = Path(geojson.filename).stem
 
-    # Parse geojson + divide by task
-    # (not technically required, but also appends properties in correct format)
+    # Parse geojson
     featcol = parse_geojson_file_to_featcol(await geojson.read())
     properties = list(featcol.get("features")[0].get("properties").keys())
-    feature_split_by_task = await split_geojson_by_task_areas(db, featcol, project_id)
-    entities_list = await central_crud.task_geojson_dict_to_entity_values(
-        feature_split_by_task
-    )
+    entities_list = await central_crud.task_geojson_dict_to_entity_values(featcol, True)
     dataset_name = entity_name.replace(" ", "_")
 
     await central_crud.create_entity_list(
