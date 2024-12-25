@@ -249,17 +249,14 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
               {uploadAreaSelection === 'draw' && (
                 <div>
                   <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-5">Draw a polygon on the map to plot the area</p>
-                  <Button
-                    btnText="Reset"
-                    btnType="secondary"
-                    type="button"
-                    onClick={() => resetFile()}
-                    className=""
-                    disabled={drawnGeojson ? false : true}
-                  />
-                  <p className="fmtm-text-gray-700 fmtm-mt-5">
-                    Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
-                  </p>
+                  {drawnGeojson && (
+                    <>
+                      <Button btnText="Reset" btnType="secondary" type="button" onClick={() => resetFile()} />
+                      <p className="fmtm-text-gray-700 fmtm-mt-5">
+                        Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
+                      </p>
+                    </>
+                  )}
                   {errors.drawnGeojson && (
                     <div>
                       <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.drawnGeojson}</p>
@@ -278,7 +275,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                     onResetFile={resetFile}
                     accept=".geojson, .json"
                     fileDescription="*The supported file format is geojson file."
-                    btnText="Upload a Geojson"
+                    btnText="Upload"
                     errorMsg={errors.uploadedAreaFile}
                   />
                   <p className="fmtm-text-gray-700">

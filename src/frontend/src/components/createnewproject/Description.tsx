@@ -107,14 +107,13 @@ const UploadArea = ({ hoveredSection }: hoveredSectionType) => {
         ref={drawRef}
         className={`${hoveredSection === 'uploadarea-draw' && 'fmtm-text-gray-800'} fmtm-duration-150`}
       >
-        <p>You may also draw a freehand polygon on map interface.</p>{' '}
-        <p>Click on the reset button to redraw the AOI.</p>
+        <p>You can draw a freehand polygon on map interface.</p> <p>Click on the reset button to redraw the AOI.</p>
       </div>
       <div
         ref={uploadRef}
         className={`${hoveredSection === 'uploadarea-upload_file' && 'fmtm-text-gray-800'} fmtm-duration-150`}
       >
-        <p>You can choose to upload the AOI. Note: The file upload only supports .geojson format. </p>
+        <p>You may also choose to upload the AOI. Note: The file upload only supports .geojson format. </p>
       </div>
       <span>The total area of the AOI is also calculated and displayed on the screen.</span>
       <p
