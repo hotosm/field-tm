@@ -71,7 +71,7 @@ test.skip('create new project', async ({ browserName, page }) => {
   const dataExtractRadio = await page.getByText('Fetch data from OSM');
   await dataExtractRadio.click();
   await expect(dataExtractRadio).toBeChecked();
-  await page.getByRole('button', { name: 'Generate Map Data' }).click();
+  await page.getByRole('button', { name: 'Fetch OSM Data' }).click();
   await page.getByRole('button', { name: 'NEXT' }).click();
 
   // 5. Split Tasks Step

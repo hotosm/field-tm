@@ -54,7 +54,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
     {
       name: 'define_tasks',
       value: task_split_type.CHOOSE_AREA_AS_TASK,
-      label: 'Choose area as task',
+      label: 'Use uploaded AOI as task areas',
       disabled: false,
     },
     {
@@ -240,7 +240,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                 <div>
                   <RadioButton
                     value={splitTasksSelection || ''}
-                    topic="Select an option to split the task"
+                    topic="Select an option to split your project area"
                     options={taskSplitOptions}
                     direction="column"
                     onChangeData={(value) => {
@@ -267,12 +267,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                       Total number of features:{' '}
                       <span className="fmtm-font-bold">{dataExtractGeojson?.features?.length || 0}</span>
                     </p>
-                    {additionalFeatureGeojson && (
-                      <p className="fmtm-text-gray-500 fmtm-mt-1">
-                        Total number of additional features:{' '}
-                        <span className="fmtm-font-bold">{additionalFeatureGeojson?.features?.length || 0}</span>
-                      </p>
-                    )}
                   </div>
                   {splitTasksSelection === task_split_type.DIVIDE_ON_SQUARE && (
                     <>
