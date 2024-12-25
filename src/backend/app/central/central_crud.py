@@ -22,6 +22,7 @@ import json
 from asyncio import gather
 from io import BytesIO, StringIO
 from typing import Optional, Union
+from uuid import uuid4
 
 import geojson
 from fastapi import HTTPException
@@ -499,13 +500,12 @@ async def convert_odk_submission_json_to_geojson(
 
 async def feature_geojson_to_entity_dict(
     feature: geojson.Feature,
+    additional_features: bool = False,
 ) -> central_schemas.EntityDict:
     """Convert a single GeoJSON to an Entity dict for upload."""
     if not isinstance(feature, (dict, geojson.Feature)):
         log.error(f"Feature not in correct format: {feature}")
         raise ValueError(f"Feature not in correct format: {type(feature)}")
-
-    feature_id = feature.get("id")
 
     geometry = feature.get("geometry", {})
     if not geometry:
@@ -514,35 +514,52 @@ async def feature_geojson_to_entity_dict(
         raise ValueError(msg)
 
     javarosa_geom = await geojson_to_javarosa_geom(geometry)
-    properties = {}
-    for key, value in feature.get("properties", {}).items():
-        if not central_schemas.is_valid_property_name(key):
-            log.warning(f"Invalid property name: {key},Excluding from properties.")
-            continue
-        # NOTE all properties MUST be string values for Entities, convert
-        properties.update({str(central_schemas.sanitize_key(key)): str(value)})
+    raw_properties = feature.get("properties", {})
+    properties = {
+        central_schemas.sanitize_key(key): str(
+            value
+        )  # NOTE all properties MUST be string values for Entities
+        for key, value in raw_properties.items()
+        if central_schemas.is_valid_property_name(key)
+    }
+    if additional_features:
+        entity_label = f"Additional Feature {uuid4()}"
+    else:
+        properties["status"] = "0"
+        task_id = properties.get("task_id", None)
+        feature_id = feature.get("id", None)
+        entity_label = f"Task {task_id} Feature {feature_id}"
 
-    properties["status"] = "0"
-
-    task_id = properties.get("task_id")
-    entity_label = f"Task {task_id} Feature {feature_id}"
-
-    return {"label": entity_label, "data": {"geometry": javarosa_geom, **properties}}
+    return {
+        "label": entity_label,
+        "data": {"geometry": javarosa_geom, **properties},
+    }
 
 
 async def task_geojson_dict_to_entity_values(
-    task_geojson_dict: dict[int, geojson.Feature],
+    task_geojson_dict: Union[dict[int, geojson.Feature], geojson.FeatureCollection],
+    additional_features: bool = False,
 ) -> list[central_schemas.EntityDict]:
     """Convert a dict of task GeoJSONs into data for ODK Entity upload."""
     log.debug("Converting dict of task GeoJSONs to Entity upload format")
 
     asyncio_tasks = []
-    for _, geojson_dict in task_geojson_dict.items():
-        # Extract the features list and pass each Feature through
-        features = geojson_dict.get("features", [])
+
+    if additional_features:
+        features = task_geojson_dict.get("features", [])
         asyncio_tasks.extend(
-            [feature_geojson_to_entity_dict(feature) for feature in features if feature]
+            feature_geojson_to_entity_dict(feature, additional_features)
+            for feature in features
+            if feature
         )
+    else:
+        for geojson_dict in task_geojson_dict.values():
+            features = geojson_dict.get("features", [])
+            asyncio_tasks.extend(
+                feature_geojson_to_entity_dict(feature)
+                for feature in features
+                if feature
+            )
 
     return await gather(*asyncio_tasks)
 
