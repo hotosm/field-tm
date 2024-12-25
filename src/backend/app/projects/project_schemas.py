@@ -230,7 +230,7 @@ class ProjectSummary(BaseModel):
     outline: Optional[Polygon]
     hashtags: Optional[list[str]]
     location_str: Optional[str] = None
-    description: Optional[str] = None
+    short_description: Optional[str] = None
 
     # Calculated
     organisation_logo: Optional[str] = None
