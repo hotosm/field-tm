@@ -45,8 +45,11 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
               {data.name}
             </p>
 
-            <p className="fmtm-capitalize fmtm-line-clamp-2 fmtm-mt-[5%] fmtm-text-[#7A7676]" title={data.description}>
-              {data.description}
+            <p
+              className="fmtm-capitalize fmtm-line-clamp-2 fmtm-mt-[5%] fmtm-text-[#7A7676]"
+              title={data.short_description}
+            >
+              {data.short_description}
             </p>
             <div className="fmtm-flex fmtm-items-start fmtm-mt-[1.63rem] fmtm-gap-2">
               <AssetModules.LocationOn color="error" style={{ fontSize: '22px' }} />

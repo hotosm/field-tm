@@ -1,5 +1,6 @@
 import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
+import type { LngLatLike } from 'svelte-maplibre';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,6 +32,7 @@ type entityIdCoordinateMapType = {
 	coordinate: [number, number];
 };
 
+let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntity: number | null = $state(null);
 let entitiesShape: Shape;
 let entitiesStatusList: entitiesStatusListType[] = $state([]);
@@ -117,6 +119,10 @@ function getEntitiesStatusStore() {
 		toggleGeolocation = status;
 	}
 
+	function setUserLocationCoordinate(coordinate: LngLatLike | undefined) {
+		userLocationCoord = coordinate;
+	}
+
 	return {
 		subscribeToEntityStatusUpdates: subscribeToEntityStatusUpdates,
 		setSelectedEntity: setSelectedEntity,
@@ -125,6 +131,7 @@ function getEntitiesStatusStore() {
 		setSelectedEntityCoordinate: setSelectedEntityCoordinate,
 		setEntityToNavigate: setEntityToNavigate,
 		setToggleGeolocation: setToggleGeolocation,
+		setUserLocationCoordinate: setUserLocationCoordinate,
 		get selectedEntity() {
 			return selectedEntity;
 		},
@@ -145,6 +152,9 @@ function getEntitiesStatusStore() {
 		},
 		get toggleGeolocation() {
 			return toggleGeolocation;
+		},
+		get userLocationCoord() {
+			return userLocationCoord;
 		},
 	};
 }
