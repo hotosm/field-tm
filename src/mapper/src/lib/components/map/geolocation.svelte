@@ -20,7 +20,6 @@
 
 	let { map }: Props = $props();
 
-	let coords: LngLatLike | undefined = $state();
 	let rotationDeg: number | undefined = $state();
 	let watchId: number | undefined = $state();
 	let directions: MapLibreGlDirections = $state();
@@ -70,8 +69,8 @@
 	}
 
 	$effect(() => {
-		if (coords && entityToNavigate) {
-			setWaypoints(coords as [number, number], entityToNavigate?.coordinate);
+		if (entitiesStore.userLocationCoord && entityToNavigate) {
+			setWaypoints(entitiesStore.userLocationCoord as [number, number], entityToNavigate?.coordinate);
 		}
 	});
 
@@ -96,7 +95,7 @@
 	// zoom to user's current location
 	$effect(() => {
 		if (entityToNavigate) {
-			map?.setCenter(coords as LngLatLike);
+			map?.setCenter(entitiesStore.userLocationCoord as LngLatLike);
 			map?.setZoom(18);
 		}
 	});
@@ -116,10 +115,11 @@
 			// track users location
 			watchId = navigator.geolocation.watchPosition(
 				function (pos) {
-					coords = [pos.coords.longitude, pos.coords.latitude];
+					let latLong = [pos.coords.longitude, pos.coords.latitude];
+					entitiesStore.setUserLocationCoordinate(latLong);
 					if (entityToNavigate) {
 						// if user is in navigation mode, update the map center according to user's live location since swiping map isn't possible
-						map?.setCenter(coords);
+						map?.setCenter(latLong);
 					}
 				},
 				function (error) {
@@ -152,7 +152,7 @@
 				type: 'Feature',
 				geometry: {
 					type: 'Point',
-					coordinates: coords as number[],
+					coordinates: entitiesStore.userLocationCoord as number[],
 				},
 				// firefox & safari doesn't support device orientation sensor, so if the browser any of the two set orientation to false
 				properties: { orientation: !(isFirefox || isSafari) },

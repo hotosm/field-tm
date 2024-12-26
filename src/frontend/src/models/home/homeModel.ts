@@ -24,7 +24,7 @@ export type homeProjectPaginationTypes = {
 export type projectType = {
   name: string;
   centroid: [number, number];
-  description: string;
+  short_description: string;
   hashtags: string | null;
   id: number;
   location_str: string;

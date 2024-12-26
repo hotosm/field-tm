@@ -38,6 +38,9 @@ importers:
       '@turf/buffer':
         specifier: ^7.1.0
         version: 7.1.0
+      '@turf/centroid':
+        specifier: ^7.1.0
+        version: 7.1.0
       '@turf/helpers':
         specifier: ^7.1.0
         version: 7.1.0
@@ -1437,6 +1440,9 @@ packages:
 
   '@turf/center@7.1.0':
     resolution: {integrity: sha512-p9AvBMwNZmRg65kU27cGKHAUQnEcdz8Y7f/i5DvaMfm4e8zmawr+hzPKXaUpUfiTyLs8Xt2W9vlOmNGyH+6X3w==}
+
+  '@turf/centroid@7.1.0':
+    resolution: {integrity: sha512-1Y1b2l+ZB1CZ+ITjUCsGqC4/tSjwm/R4OUfDztVqyyCq/VvezkLmTNqvXTGXgfP0GXkpv68iCfxF5M7QdM5pJQ==}
 
   '@turf/clone@7.1.0':
     resolution: {integrity: sha512-5R9qeWvL7FDdBIbEemd0eCzOStr09oburDvJ1hRiPCFX6rPgzcZBQ0gDmZzoF4AFcNLb5IwknbLZjVLaUGWtFA==}
@@ -5118,6 +5124,13 @@ snapshots:
     dependencies:
       '@turf/bbox': 7.1.0
       '@turf/helpers': 7.1.0
+      '@types/geojson': 7946.0.14
+      tslib: 2.8.1
+
+  '@turf/centroid@7.1.0':
+    dependencies:
+      '@turf/helpers': 7.1.0
+      '@turf/meta': 7.1.0
       '@types/geojson': 7946.0.14
       tslib: 2.8.1
 

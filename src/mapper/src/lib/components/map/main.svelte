@@ -43,6 +43,7 @@
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
+	import { centroid } from '@turf/centroid';
 
 	type bboxType = [number, number, number, number];
 
@@ -152,11 +153,12 @@
 		});
 		// if clicked point contains entity then set it's osm id else set null to store
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0) {
+			const entityCentroid = centroid(clickedEntityFeature[0].geometry);
 			const clickedEntityId = clickedEntityFeature[0]?.properties?.osm_id;
 			entitiesStore.setSelectedEntity(clickedEntityId);
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
-				coordinate: [e.lngLat.lng, e.lngLat.lat],
+				coordinate: entityCentroid?.geometry?.coordinates,
 			});
 		} else {
 			entitiesStore.setSelectedEntity(null);

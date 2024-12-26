@@ -434,7 +434,7 @@ const SubmissionsTable = ({ toggleView }) => {
             rowClassName="codeRow"
             dataFormat={(row) => (
               <div className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate">
-                <span>{row?.__system?.reviewState ? camelToFlat(row?.__system?.reviewState) : 'Recieved'}</span>
+                <span>{row?.__system?.reviewState ? camelToFlat(row?.__system?.reviewState) : 'Received'}</span>
               </div>
             )}
           />
