@@ -431,7 +431,7 @@ async def test_project_summaries(client, project):
 
     assert first_project["id"] == project.id
     assert first_project["name"] == project.name
-    assert first_project["description"] == project.description
+    assert first_project["short_description"] == project.short_description
     assert first_project["hashtags"] == project.hashtags
     assert first_project["organisation_id"] == project.organisation_id
 

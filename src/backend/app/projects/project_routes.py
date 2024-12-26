@@ -32,6 +32,7 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
+    Request,
     Response,
     UploadFile,
 )
@@ -47,6 +48,7 @@ from psycopg import Connection
 
 from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
+from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import mapper, org_admin, project_manager
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
@@ -62,6 +64,7 @@ from app.db.models import (
     DbOdkEntities,
     DbProject,
     DbTask,
+    DbUser,
     DbUserRole,
 )
 from app.db.postgis_utils import (
@@ -74,6 +77,7 @@ from app.db.postgis_utils import (
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
 from app.s3 import delete_all_objs_under_prefix
+from app.users.user_deps import get_user
 
 router = APIRouter(
     prefix="/projects",
@@ -727,18 +731,30 @@ async def upload_custom_extract(
 
 @router.post("/add-manager")
 async def add_new_project_manager(
+    request: Request,
     db: Annotated[Connection, Depends(db_conn)],
-    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    background_tasks: BackgroundTasks,
+    new_manager: Annotated[DbUser, Depends(get_user)],
+    org_user_dict: Annotated[OrgUserDict, Depends(org_admin)],
+    osm_auth=Depends(init_osm_auth),
 ):
     """Add a new project manager.
 
-    The logged in user must be either the admin of the organisation or a super admin.
+    The logged in user must be the admin of the organisation.
     """
     await DbUserRole.create(
         db,
-        project_user_dict["project"].id,
-        project_user_dict["user"].id,
+        org_user_dict["project"].id,
+        new_manager.id,
         ProjectRole.PROJECT_MANAGER,
+    )
+
+    background_tasks.add_task(
+        project_crud.send_project_manager_message,
+        request=request,
+        project=org_user_dict["project"],
+        new_manager=new_manager,
+        osm_auth=osm_auth,
     )
     return Response(status_code=HTTPStatus.OK)
 
