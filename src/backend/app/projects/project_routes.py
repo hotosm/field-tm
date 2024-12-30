@@ -48,7 +48,7 @@ from psycopg import Connection
 
 from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
-from app.auth.providers.osm import init_osm_auth
+from app.auth.providers.osm import check_osm_user, init_osm_auth
 from app.auth.roles import mapper, org_admin, project_manager
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
@@ -754,6 +754,32 @@ async def add_new_project_manager(
         request=request,
         project=org_user_dict["project"],
         new_manager=new_manager,
+        osm_auth=osm_auth,
+    )
+    return Response(status_code=HTTPStatus.OK)
+
+
+@router.post("/invite-new-user")
+async def invite_new_user(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    project: Annotated[DbProject, Depends(project_deps.get_project)],
+    invitee_username: str,
+    osm_auth=Depends(init_osm_auth),
+):
+    """Invite a new user to a project."""
+    user_exists = await check_osm_user(invitee_username)
+
+    if not user_exists:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="User does not exist on Open Street Map",
+        )
+    background_tasks.add_task(
+        project_crud.send_invitation_message,
+        request=request,
+        project=project,
+        invitee_username=invitee_username,
         osm_auth=osm_auth,
     )
     return Response(status_code=HTTPStatus.OK)

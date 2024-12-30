@@ -157,3 +157,20 @@ def send_osm_message(
     else:
         msg = "Sending message via OSM failed"
         log.error(f"{msg}: {response.text}")
+
+
+async def check_osm_user(osm_username: str):
+    """Check if the user is an OSM user based on their username."""
+    osm_url = f"https://www.openstreetmap.org/user/{osm_username}/"
+
+    user_exists = False
+    try:
+        response = requests.get(osm_url)
+        if response.status_code == 200:
+            user_exists = True
+    except Exception as e:
+        log.exception(
+            f"Failed to check if user exists on OSM. Error: {e}",
+            stack_info=True,
+        )
+    return user_exists
