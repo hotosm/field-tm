@@ -53,7 +53,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
     <div
       className={`fmtm-duration-1000 fmtm-z-[10002] fmtm-h-fit ${
         taskModalStatus
-          ? 'fmtm-bottom-[4.4rem] sm:fmtm-bottom-0 lg:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-[25rem]'
+          ? 'fmtm-bottom-[4.4rem] md:fmtm-bottom-0 lg:fmtm-top-[50%] md:-fmtm-translate-y-[35%] fmtm-right-0 fmtm-w-[100vw] md:fmtm-w-[50vw] md:fmtm-max-w-[25rem]'
           : 'fmtm-top-[calc(100vh)] md:fmtm-top-[calc(40vh)] md:fmtm-left-[calc(100vw)] fmtm-w-[100vw]'
       } fmtm-fixed
         fmtm-rounded-t-3xl fmtm-border-opacity-50`}

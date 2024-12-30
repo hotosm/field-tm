@@ -24,7 +24,7 @@ export type ProjectStateTypes = {
   toggleGenerateMbTilesModal: boolean;
   mobileFooterSelection: string;
   projectDetailsLoading: boolean;
-  projectDashboardDetail: projectDashboardDetailTypes;
+  projectDashboardDetail: projectDashboardDetailTypes | null;
   entityOsmMap: EntityOsmMap[];
   entityOsmMapLoading: boolean;
   updateEntityStateLoading: boolean;
@@ -41,10 +41,11 @@ export type ProjectStateTypes = {
 
 export type EntityOsmMap = {
   id: string;
-  osm_id: string;
+  osm_id: number;
   status: number;
   task_id: number;
   updated_at: string;
+  submission_ids: string;
 };
 
 type tilesListTypes = {

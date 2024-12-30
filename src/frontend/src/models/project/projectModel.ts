@@ -60,10 +60,9 @@ export type projectInfoType = {
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
 
 export type projectDashboardDetailTypes = {
-  name: string;
   slug: string;
   organisation_name: string;
-  total_tasks: number | null;
+  total_tasks: number;
   created_at: string;
   organisation_logo: string;
   total_submissions: number | null;

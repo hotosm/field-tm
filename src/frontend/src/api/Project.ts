@@ -209,7 +209,7 @@ export const GetSubmissionDashboard = (url: string) => {
   };
 };
 
-export const GetEntityInfo = (url: string) => {
+export const GetEntityStatusList = (url: string) => {
   return async (dispatch) => {
     const getEntityOsmMap = async (url: string) => {
       try {
