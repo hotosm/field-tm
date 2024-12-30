@@ -100,7 +100,7 @@ const MobileFooter = () => {
     );
   };
   return (
-    <div className="fmtm-absolute fmtm-bottom-0 sm:fmtm-hidden fmtm-w-full fmtm-border-t-[1px] fmtm-z-[10008]">
+    <div className="fmtm-absolute fmtm-bottom-0 md:fmtm-hidden fmtm-w-full fmtm-border-t-[1px] fmtm-z-[10008]">
       <div
         className={`fmtm-w-full fmtm-grid ${
           taskModalStatus ? 'fmtm-grid-cols-5' : 'fmtm-grid-cols-4'

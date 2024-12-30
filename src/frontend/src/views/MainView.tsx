@@ -55,7 +55,7 @@ const MainView = () => {
       <CoreModules.Paper>
         <CoreModules.Container disableGutters={true} maxWidth={false}>
           <CoreModules.Stack sx={{ height: '100vh' }}>
-            {popupInParams === 'true' || (pathname.includes('/project/') && windowSize.width <= 640) ? (
+            {popupInParams === 'true' || (pathname.includes('/project/') && windowSize.width <= 768) ? (
               <div></div>
             ) : (
               <div>
@@ -68,12 +68,12 @@ const MainView = () => {
             ) : (
               <CoreModules.Stack
                 className={`${
-                  pathname.includes('/project/') && windowSize.width < 640 ? '' : 'fmtm-p-6'
+                  pathname.includes('/project/') && windowSize.width < 768 ? '' : 'fmtm-p-6'
                 } fmtm-bg-[#f5f5f5]`}
                 sx={{
                   height: popupInParams
                     ? '100vh'
-                    : pathname.includes('project/') && windowSize.width <= 640
+                    : pathname.includes('project/') && windowSize.width <= 768
                       ? '100vh'
                       : windowSize.width <= 599
                         ? '90vh'

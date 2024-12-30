@@ -78,7 +78,7 @@ const BottomSheet = ({ body, onClose }: bottomSheetType) => {
   }, [currSheetHeight]);
 
   return (
-    <div className="fmtm-absolute fmtm-bottom-[200px] fmtm-bg-white sm:fmtm-hidden fmtm-z-[10005]">
+    <div className="fmtm-absolute fmtm-bottom-[200px] fmtm-bg-white md:fmtm-hidden fmtm-z-[10005]">
       <div
         className={`bottom-sheet fmtm-fixed fmtm-w-full fmtm-left-0 fmtm-bottom-0 fmtm-flex fmtm-items-center fmtm-flex-col fmtm-justify-end fmtm-duration-100 fmtm-ease-linear ${
           !show ? 'fmtm-opacity-0 fmtm-pointer-events-none' : 'fmtm-opacity-100 fmtm-pointer-events-auto'
