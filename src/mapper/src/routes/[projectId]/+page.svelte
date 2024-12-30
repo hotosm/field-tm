@@ -118,10 +118,13 @@
 
 <!-- There is a new event to display in the top right corner -->
 {#if taskStore.latestEvent}
-	<hot-card id="notification-banner" class="absolute z-10 top-18 right-0 font-sans hidden sm:flex">
-		<b>{convertDateToTimeAgo(taskStore.latestEvent.created_at)}</b> | {taskStore.latestEvent.event}
+	<div
+		id="notification-banner"
+		class="absolute z-10 top-15 sm:top-18.8 right-0 font-sans flex bg-white text-black bg-opacity-70 text-sm sm:text-base px-1 rounded-bl-md"
+	>
+		<b class="">{convertDateToTimeAgo(taskStore.latestEvent.created_at)}</b>&nbsp;| {taskStore.latestEvent.event}
 		on task {taskStore.latestEvent.task_id} by {taskStore.latestEvent.username || 'anon'}
-	</hot-card>
+	</div>
 {/if}
 
 <!-- The main page -->

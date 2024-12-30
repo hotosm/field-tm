@@ -464,14 +464,14 @@
 
 	<!-- Help text for user on first load -->
 	{#if projectSetupStep === projectSetupStepEnum['task_selection']}
-		<div class="absolute top-5 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
+		<div class="absolute top-7 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
 			<p class="uppercase font-barlow-medium text-base">please select a task / feature for mapping</p>
 		</div>
 	{/if}
 
 	<!-- Help for drawing a new geometry -->
 	{#if displayDrawHelpText}
-		<div class="absolute top-5 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
+		<div class="absolute top-7 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
 			<p class="uppercase font-barlow-medium text-base">Click on the map to create a new point</p>
 		</div>
 	{/if}
