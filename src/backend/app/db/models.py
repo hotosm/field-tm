@@ -1163,15 +1163,15 @@ class DbProject(BaseModel):
     async def all(
         cls,
         db: Connection,
-        skip: int = 0,
-        limit: int = 100,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
         user_id: Optional[int] = None,
         hashtags: Optional[list[str]] = None,
         search: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all projects with optional filters for user, hashtags, and search."""
         filters = []
-        params = {"offset": skip, "limit": limit}
+        params = {"offset": skip, "limit": limit} if skip and limit else {}
 
         # Filter by user_id (project author)
         if user_id:
@@ -1185,7 +1185,7 @@ class DbProject(BaseModel):
 
         # Filter by search term (project name using ILIKE for case-insensitive match)
         if search:
-            filters.append("slug ILIKE %(search)s")
+            filters.append("p.slug ILIKE %(search)s")
             params["search"] = f"%{search}%"
 
         # Base query with optional filtering
@@ -1210,9 +1210,15 @@ class DbProject(BaseModel):
                 p.id, project_org.id
             ORDER BY
                 p.created_at DESC
+        """
+        sql += (
+            """
             OFFSET %(offset)s
             LIMIT %(limit)s;
         """
+            if skip and limit
+            else ";"
+        )
 
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(sql, params)
