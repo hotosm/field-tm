@@ -144,10 +144,11 @@ async def read_project_summaries(
     results_per_page: int = Query(13, le=100),
     user_id: Optional[int] = None,
     hashtags: Optional[str] = None,
+    search: Optional[str] = None,
 ):
     """Get a paginated summary of projects."""
     return await project_crud.get_paginated_projects(
-        db, page, results_per_page, user_id, hashtags
+        db, page, results_per_page, user_id, hashtags, search
     )
 
 

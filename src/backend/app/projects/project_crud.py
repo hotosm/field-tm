@@ -853,8 +853,8 @@ def generate_project_basemap(
 
 async def get_pagination(page: int, count: int, results_per_page: int, total: int):
     """Pagination result for splash page."""
-    total_pages = (count + results_per_page - 1) // results_per_page
-    has_next = (page * results_per_page) < count  # noqa: N806
+    total_pages = (total + results_per_page - 1) // results_per_page
+    has_next = (page * results_per_page) < total  # noqa: N806
     has_prev = page > 1  # noqa: N806
 
     pagination = project_schemas.PaginationInfo(
@@ -883,26 +883,19 @@ async def get_paginated_projects(
     if hashtags:
         hashtags = hashtags.split(",")
 
-    # Calculate pagination offsets
-    skip = (page - 1) * results_per_page
-    limit = results_per_page
-
     # Get subset of projects
     projects = await DbProject.all(
-        db, skip=skip, limit=limit, user_id=user_id, hashtags=hashtags, search=search
+        db, user_id=user_id, hashtags=hashtags, search=search
     )
-
-    # Count total number of projects for pagination
-    async with db.cursor() as cur:
-        await cur.execute("SELECT COUNT(*) FROM projects")
-        total_project_count = await cur.fetchone()
-        total_project_count = total_project_count[0]
+    start_index = (page - 1) * results_per_page
+    end_index = start_index + results_per_page
+    paginated_projects = projects[start_index:end_index]
 
     pagination = await get_pagination(
-        page, len(projects), results_per_page, total_project_count
+        page, len(paginated_projects), results_per_page, len(projects)
     )
 
-    return {"results": projects, "pagination": pagination}
+    return {"results": paginated_projects, "pagination": pagination}
 
 
 async def get_project_users_plus_contributions(db: Connection, project_id: int):
