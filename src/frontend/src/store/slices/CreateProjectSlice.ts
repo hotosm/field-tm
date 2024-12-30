@@ -95,6 +95,7 @@ const CreateProject = createSlice({
       state.generateProjectSuccess = false;
       state.generateProjectError = false;
       state.drawToggle = false;
+      state.additionalFeatureGeojson = null;
     },
     GetFormCategoryLoading(state, action) {
       state.formCategoryLoading = action.payload;
