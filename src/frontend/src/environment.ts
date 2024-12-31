@@ -12,7 +12,7 @@ export default {
   tasksStatus: [
     {
       label: 'UNLOCKED_TO_MAP',
-      action: [{ key: 'Start Mapping', value: 'MAP', btnBG: 'red' }],
+      action: [{ key: 'Assign To Mapper', value: 'MAP', btnBG: 'red' }],
       btnBG: 'red',
     },
     {
