@@ -6,7 +6,6 @@ import { projectType } from '@/models/home/homeModel';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { useAppSelector } from '@/types/reduxTypes';
-import Button from '@/components/common/Button';
 
 //Explore Project Card Model to be rendered in home view
 export default function ExploreProjectCard({ data }: { data: projectType }) {
@@ -20,9 +19,14 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
       onClick={() => {
         const project: projectType = data;
         dispatch(HomeActions.SetSelectedProject(project));
-        navigate(`/project/${data.id}`);
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          window.location.href = `/mapnow/${data.id}`;
+        } else {
+          navigate(`/project/${data.id}`);
+        }
       }}
-      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-p-4 fmtm-max-h-fit"
+      className="hover:fmtm-bg-red-50 hover:fmtm-shadow-xl fmtm-duration-500 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-solid fmtm-border-[#706E6E] fmtm-bg-white fmtm-p-4 fmtm-max-h-fit fmtm-cursor-pointer"
     >
       <div className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full">
         <div>
@@ -87,19 +91,6 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
           {/* Contribution Progress Bar */}
           <CustomizedProgressBar data={data} height={7} />
         </div>
-        {/* Start Mapping Button */}
-        <Button
-          btnText="Start Mapping"
-          btnType="secondary"
-          type="submit"
-          className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center fmtm-uppercase fmtm-mt-4"
-          onClick={(e) => {
-            // Prevent card click
-            e.stopPropagation();
-            // Redirect without opening new tab
-            window.location.href = `/mapnow/${data.id}`;
-          }}
-        />{' '}
       </div>
     </div>
   );

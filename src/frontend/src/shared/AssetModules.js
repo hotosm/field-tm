@@ -90,6 +90,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   RotateLeft as RotateLeftIcon,
   RotateRight as RotateRightIcon,
+  Sync as SyncIcon,
 } from '@mui/icons-material';
 import LockPng from '@/assets/images/lock.png';
 import RedLockPng from '@/assets/images/red-lock.png';
@@ -190,4 +191,5 @@ export default {
   ChevronLeftIcon,
   RotateLeftIcon,
   RotateRightIcon,
+  SyncIcon,
 };
