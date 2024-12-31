@@ -881,6 +881,7 @@ async def add_additional_entity_list(
 async def generate_files(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    background_tasks: BackgroundTasks,
     xlsform_upload: Annotated[
         Optional[BytesIO], Depends(central_deps.read_optional_xlsform)
     ],
@@ -905,6 +906,7 @@ async def generate_files(
             created (i.e. the project form references multiple geometries).
         db (Connection): The database connection.
         project_user_dict (ProjectUserDict): Project admin role.
+        background_tasks (BackgroundTasks): FastAPI background tasks.
 
     Returns:
         json (JSONResponse): A success message containing the project ID.
@@ -980,6 +982,13 @@ async def generate_files(
             },
         )
 
+    if project.custom_tms_url:
+        basemap_in = project_schemas.BasemapGenerate(
+            tile_source="custom", file_format="pmtiles", tms_url=project.custom_tms_url
+        )
+        org_id = project.organisation_id
+        await generate_basemap(project_id, org_id, basemap_in, db, background_tasks)
+
     return JSONResponse(
         status_code=HTTPStatus.OK,
         content={"message": "success"},
@@ -999,7 +1008,19 @@ async def generate_project_basemap(
     project_id = project_user.get("project").id
     org_id = project_user.get("project").organisation_id
 
+    await generate_basemap(project_id, org_id, basemap_in, db, background_tasks)
     # Create task in db and return uuid
+    return {"Message": "Tile generation started"}
+
+
+async def generate_basemap(
+    project_id: int,
+    org_id: int,
+    basemap_in: project_schemas.BasemapGenerate,
+    db: Connection,
+    background_tasks: BackgroundTasks,
+):
+    """Generate basemap tiles for a project."""
     log.debug(
         "Creating generate_project_basemap background task "
         f"for project ID: {project_id}"
@@ -1022,8 +1043,6 @@ async def generate_project_basemap(
         basemap_in.file_format,
         basemap_in.tms_url,
     )
-
-    return {"Message": "Tile generation started"}
 
 
 @router.patch("/{project_id}", response_model=project_schemas.ProjectOut)
