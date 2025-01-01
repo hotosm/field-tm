@@ -45,15 +45,15 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
 
   useEffect(() => {
     if (projectInfo?.custom_tms_url) {
-      setSelectedTileSource('tms');
+      setSelectedTileSource('custom');
       setTmsUrl(projectInfo?.custom_tms_url);
     }
   }, [projectInfo]);
 
   const handleTileSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedTileSource(e.target.value);
-    // If 'tms' is selected, clear the TMS URL
-    if (e.target.value !== 'tms') {
+    // If 'custom' is selected, clear the TMS URL
+    if (e.target.value !== 'custom') {
       setTmsUrl('');
     }
   };
@@ -70,7 +70,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
     if (!selectedOutputFormat) {
       currentError.push('selectedOutputFormat');
     }
-    if (!tmsUrl && selectedTileSource === 'tms') {
+    if (!tmsUrl && selectedTileSource === 'custom') {
       currentError.push('tmsUrl');
     }
     setError(currentError);
@@ -150,7 +150,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
               <p className="fmtm-text-sm fmtm-text-red-500">Tile Source is Required.</p>
             )}
           </CoreModules.Grid>
-          {selectedTileSource === 'tms' && (
+          {selectedTileSource === 'custom' && (
             <CoreModules.Grid item xs={12} sm={6} md={4}>
               <CoreModules.FormControl fullWidth>
                 <CoreModules.TextField
@@ -219,8 +219,8 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
           <CoreModules.Grid
             item
             xs={12}
-            sm={selectedTileSource === 'tms' ? 6 : 12}
-            md={selectedTileSource === 'tms' ? 12 : 4}
+            sm={selectedTileSource === 'custom' ? 6 : 12}
+            md={selectedTileSource === 'custom' ? 12 : 4}
           >
             <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-center sm:fmtm-justify-end fmtm-mr-4 fmtm-gap-4 fmtm-h-full">
               {/* Generate Button */}
