@@ -69,6 +69,8 @@
 		}
 	}
 
+	// set waypoints for navigation on every 10 seconds if navigation mode is on i.e. entityToNavigate is not null
+	// don't track user geolocation
 	$effect(() => {
 		if (!untrack(() => entitiesStore.userLocationCoord) && !entityToNavigate) return;
 		entityToNavigate?.coordinate &&
