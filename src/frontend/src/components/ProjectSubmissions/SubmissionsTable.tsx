@@ -1,29 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import AssetModules from '@/shared/AssetModules.js';
-import { CustomSelect } from '@/components/common/Select.js';
-import windowDimention from '@/hooks/WindowDimension';
-import Table, { TableHeader } from '@/components/common/CustomTable';
-import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
-import CoreModules from '@/shared/CoreModules.js';
-import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader.js';
-import { Loader2 } from 'lucide-react';
-import { SubmissionActions } from '@/store/slices/SubmissionSlice';
-import { reviewStateData } from '@/constants/projectSubmissionsConstants';
-import CustomDatePicker from '@/components/common/CustomDatePicker';
-import { format } from 'date-fns';
-import Button from '@/components/common/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
-import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
-import { Modal } from '@/components/common/Modal';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import filterParams from '@/utilfunctions/filterParams';
+import { format } from 'date-fns';
+import { Tooltip } from '@mui/material';
+import { Loader2 } from 'lucide-react';
+
+import AssetModules from '@/shared/AssetModules.js';
+import CoreModules from '@/shared/CoreModules.js';
+import windowDimention from '@/hooks/WindowDimension';
+
+import Button from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal';
+import { CustomSelect } from '@/components/common/Select.js';
+import CustomDatePicker from '@/components/common/CustomDatePicker';
+import Table, { TableHeader } from '@/components/common/CustomTable';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/common/Dropdown';
+import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/ProjectSubmissionsSkeletonLoader.js';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
+import { reviewStateData } from '@/constants/projectSubmissionsConstants';
+
 import { useAppSelector } from '@/types/reduxTypes';
+import { task_state, task_event, entity_state } from '@/types/enums';
+import { filterType } from '@/store/types/ISubmissions';
+import { SubmissionActions } from '@/store/slices/SubmissionSlice';
+
+import { CreateTaskEvent } from '@/api/TaskEvent';
+import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
+import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
+
+import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { CreateTaskEvent } from '@/api/TaskEvent';
-import { filterType } from '@/store/types/ISubmissions';
-import { task_state, task_event } from '@/types/enums';
 
 const SubmissionsTable = ({ toggleView }) => {
   useDocumentTitle('Submission Table');
@@ -79,27 +85,24 @@ const SubmissionsTable = ({ toggleView }) => {
     setNumberOfFilters(count);
   }, [filter]);
 
-  useEffect(() => {
-    let count = 0;
-    const filters = Object.keys(filter);
-    filters?.map((fltr) => {
-      if (filter[fltr]) {
-        count = count + 1;
+  const updatedSubmissionFormFields = submissionFormFields
+    //filter necessary fields only
+    ?.filter(
+      (formField) =>
+        formField?.path.startsWith('/survey_questions') ||
+        ['/start', '/end', '/username', '/task_id', '/status'].includes(formField?.path),
+    )
+    // convert path to dot notation & update name
+    ?.map((formField) => {
+      if (formField.type !== 'structure') {
+        return {
+          ...formField,
+          path: formField?.path.slice(1).replace(/\//g, '.'),
+          name: formField?.name.charAt(0).toUpperCase() + formField?.name.slice(1).replace(/_/g, ' '),
+        };
       }
+      return null;
     });
-    setNumberOfFilters(count);
-  }, [filter]);
-
-  const updatedSubmissionFormFields = submissionFormFields?.map((formField) => {
-    if (formField.type !== 'structure') {
-      return {
-        ...formField,
-        path: formField?.path.slice(1).replace(/\//g, '.'),
-        name: formField?.name.charAt(0).toUpperCase() + formField?.name.slice(1).replace(/_/g, ' '),
-      };
-    }
-    return null;
-  });
 
   useEffect(() => {
     dispatch(
@@ -169,6 +172,8 @@ const SubmissionsTable = ({ toggleView }) => {
       if (path === 'start' || path === 'end') {
         // start & end date is static
         value = `${value[item]?.split('T')[0]} ${value[item]?.split('T')[1]}`;
+      } else if (path === 'status') {
+        value = entity_state[value[item]].replaceAll('_', ' ');
       } else if (
         value &&
         value[item] &&
@@ -185,7 +190,7 @@ const SubmissionsTable = ({ toggleView }) => {
         value = value?.[item];
       }
     });
-    return value ? (typeof value === 'object' ? '-' : value) : '';
+    return value ? (typeof value === 'object' ? '-' : value) : '-';
   }
 
   const uploadToJOSM = () => {
@@ -247,7 +252,7 @@ const SubmissionsTable = ({ toggleView }) => {
           </div>
         }
         open={!!josmEditorError}
-        onOpenChange={(value) => {
+        onOpenChange={() => {
           dispatch(CoreModules.TaskActions.SetJosmEditorError(null));
         }}
       />
@@ -446,14 +451,16 @@ const SubmissionsTable = ({ toggleView }) => {
                   dataField={field?.name}
                   headerClassName="codeHeader"
                   rowClassName="codeRow"
-                  dataFormat={(row) => (
-                    <div
-                      className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate"
-                      title={getValueByPath(row, field?.path)}
-                    >
-                      <span className="fmtm-text-[15px]">{getValueByPath(row, field?.path)}</span>
-                    </div>
-                  )}
+                  dataFormat={(row) => {
+                    const value = getValueByPath(row, field?.path);
+                    return (
+                      <Tooltip arrow placement="bottom-start" title={value}>
+                        <div className="fmtm-w-[7rem] fmtm-overflow-hidden fmtm-truncate">
+                          <span className="fmtm-text-[15px]">{value}</span>
+                        </div>
+                      </Tooltip>
+                    );
+                  }}
                 />
               );
             }
@@ -468,24 +475,28 @@ const SubmissionsTable = ({ toggleView }) => {
               return (
                 <div className="fmtm-w-[5rem] fmtm-overflow-hidden fmtm-truncate fmtm-text-center">
                   <Link to={`/project-submissions/${projectId}/tasks/${taskUid}/submission/${row?.meta?.instanceID}`}>
-                    <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
+                    <Tooltip arrow placement="bottom" title="Validate Submission">
+                      <AssetModules.VisibilityOutlinedIcon className="fmtm-text-[#545454] hover:fmtm-text-primaryRed" />
+                    </Tooltip>
                   </Link>
                   <span className="fmtm-text-primaryRed fmtm-border-[1px] fmtm-border-primaryRed fmtm-mx-1"></span>{' '}
-                  <AssetModules.CheckOutlinedIcon
-                    className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
-                    onClick={() => {
-                      dispatch(
-                        SubmissionActions.SetUpdateReviewStatusModal({
-                          toggleModalStatus: true,
-                          instanceId: row?.meta?.instanceID,
-                          taskId: row?.task_id,
-                          projectId: projectId,
-                          reviewState: row?.__system?.reviewState,
-                          taskUid: taskUid,
-                        }),
-                      );
-                    }}
-                  />
+                  <Tooltip arrow placement="bottom" title="Update Review Status">
+                    <AssetModules.CheckOutlinedIcon
+                      className="fmtm-text-[#545454] hover:fmtm-text-primaryRed"
+                      onClick={() => {
+                        dispatch(
+                          SubmissionActions.SetUpdateReviewStatusModal({
+                            toggleModalStatus: true,
+                            instanceId: row?.meta?.instanceID,
+                            taskId: row?.task_id,
+                            projectId: projectId,
+                            reviewState: row?.__system?.reviewState,
+                            taskUid: taskUid,
+                          }),
+                        );
+                      }}
+                    />
+                  </Tooltip>
                 </div>
               );
             }}
