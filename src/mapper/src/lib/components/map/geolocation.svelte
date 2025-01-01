@@ -9,6 +9,7 @@
 	import { getCommonStore } from '$store/common.svelte.ts';
 	import { layers } from '$assets/maplibre-directions.ts';
 	import locationUrl from '$assets/images/location.png';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		map: maplibregl.Map | undefined;
@@ -69,9 +70,17 @@
 	}
 
 	$effect(() => {
-		if (entitiesStore.userLocationCoord && entityToNavigate) {
-			setWaypoints(entitiesStore.userLocationCoord as [number, number], entityToNavigate?.coordinate);
-		}
+		if (!untrack(() => entitiesStore.userLocationCoord) && !entityToNavigate) return;
+		entityToNavigate?.coordinate &&
+			setWaypoints(untrack(() => entitiesStore.userLocationCoord) as [number, number], entityToNavigate?.coordinate);
+		const interval = setInterval(() => {
+			entityToNavigate?.coordinate &&
+				setWaypoints(untrack(() => entitiesStore.userLocationCoord) as [number, number], entityToNavigate?.coordinate);
+		}, 10000);
+
+		return () => {
+			clearInterval(interval);
+		};
 	});
 
 	// if navigation mode on, tilt map by 50 degrees
