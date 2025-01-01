@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { ProjectData } from '$lib/types';
+	import { TaskStatusEnum, type ProjectData } from '$lib/types';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { getAlertStore } from '$store/common.svelte.ts';
+	import { getTaskStore } from '$store/tasks.svelte.ts';
+	import { mapTask } from '$lib/db/events';
 
 	type Props = {
 		isTaskActionModalOpen: boolean;
@@ -14,6 +16,7 @@
 
 	const entitiesStore = getEntitiesStatusStore();
 	const alertStore = getAlertStore();
+	const taskStore = getTaskStore();
 
 	const selectedEntityOsmId = $derived(entitiesStore.selectedEntity);
 	const selectedEntity = $derived(
@@ -38,6 +41,10 @@
 					status: 1,
 					label: `Task ${selectedEntity?.task_id} Feature ${selectedEntity?.osmid}`,
 				});
+
+				if (taskStore.selectedTaskId && taskStore.selectedTaskState === TaskStatusEnum['UNLOCKED_TO_MAP']) {
+					mapTask(projectData?.id, taskStore.selectedTaskId);
+				}
 			}
 			// Load entity in ODK Collect by intent
 			document.location.href = `odkcollect://form/${xformId}?feature=${entityUuid}`;
