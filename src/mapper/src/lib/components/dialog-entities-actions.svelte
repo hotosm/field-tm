@@ -48,7 +48,8 @@
 
 	const navigateToEntity = () => {
 		if (!entitiesStore.toggleGeolocation) {
-			entitiesStore.setToggleGeolocation(true);
+			alertStore.setAlert({ message: 'Please enable geolocation to navigate to the entity.', variant: 'warning' });
+			return;
 		}
 		entitiesStore.setEntityToNavigate(selectedEntityCoordinate);
 	};
