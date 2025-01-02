@@ -1750,8 +1750,8 @@ class DbGeometryLog(BaseModel):
 
     geom: dict
     status: GeomStatus
-    project_id: Optional[int]
-    task_id: Optional[int]
+    project_id: Optional[int] = None
+    task_id: Optional[int] = None
 
     @classmethod
     async def create(
@@ -1792,13 +1792,22 @@ class DbGeometryLog(BaseModel):
     async def delete(
         cls,
         db: Connection,
+        project_id: int,
         id: int,
     ) -> bool:
         """Delete a geometry."""
         async with db.cursor() as cur:
             await cur.execute(
                 """
-                DELETE FROM geometrylog WHERE id = %(id)s;
+                DELETE FROM geometrylog WHERE project_id=%(project_id)s AND id = %(id)s;
             """,
-                {"id": id},
+                {"project_id": project_id, "id": id},
             )
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=HTTPStatus.NOT_FOUND,
+                    detail=f"""
+                    Geometry log with project_id {project_id}
+                    and geom_id {id} not found.
+                    """,
+                )

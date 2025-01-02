@@ -49,7 +49,7 @@ from psycopg import Connection
 from app.auth.auth_deps import login_required, mapper_login_required
 from app.auth.auth_schemas import AuthUser, OrgUserDict, ProjectUserDict
 from app.auth.providers.osm import check_osm_user, init_osm_auth
-from app.auth.roles import mapper, org_admin, project_manager
+from app.auth.roles import check_access, mapper, org_admin, project_manager
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.database import db_conn
@@ -1260,16 +1260,37 @@ async def download_task_boundaries(
 @router.post("/{project_id}/geometries")
 async def create_geom_log(
     geom_log: project_schemas.GeometryLogIn,
+    current_user: Annotated[ProjectUserDict, Depends(mapper)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
     """Creates a new entry in the geometries log table.
+
+    It allows mappers to create new geom.
+    But needs a validator to invalidate (BAD status) the geom.
 
     Returns:
     geometries (DbGeometryLog): The created geometries log entry.
 
     Raises:
-    HTTPException: If the geometries log creation fails.
+    HTTPException: If user do not have permission.
+    Or if the geometries log creation fails.
     """
+    db_user = current_user.get("user")
+    db_project = current_user.get("project")
+
+    if geom_log.status == "BAD":
+        access = await check_access(
+            db_user,
+            db,
+            project_id=db_project.id,
+            role=ProjectRole.PROJECT_MANAGER,  # later change this to validator
+        )
+        if not access:
+            raise HTTPException(
+                status_code=HTTPStatus.FORBIDDEN,
+                detail="You don't have permission to do this operation.",
+            )
+
     geometries = await DbGeometryLog.create(db, geom_log)
     if not geometries:
         raise HTTPException(
@@ -1278,3 +1299,24 @@ async def create_geom_log(
         )
 
     return geometries
+
+
+@router.delete("/{project_id}/geometries")
+async def delete_geom_log(
+    geom_id: int,
+    project_user: Annotated[
+        ProjectUserDict, Depends(project_manager)
+    ],  # later change this to validator
+    db: Annotated[Connection, Depends(db_conn)],
+):
+    """Delete geometry from geometry log table.
+
+    Returns: HTTP 204 response.
+
+    Raises:
+    HTTPException: If the geometries log deletion fails.
+    """
+    project_id = project_user.get("project").id
+    await DbGeometryLog.delete(db, project_id, geom_id)
+    log.info(f"Deletion of geom {geom_id} from project {project_id} is successful")
+    return Response(status_code=HTTPStatus.NO_CONTENT)
