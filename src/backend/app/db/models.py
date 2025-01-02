@@ -43,6 +43,7 @@ from app.db.enums import (
     BackgroundTaskStatus,
     CommunityType,
     EntityState,
+    GeomStatus,
     HTTPStatus,
     MappingLevel,
     MappingState,
@@ -70,6 +71,7 @@ if TYPE_CHECKING:
         BackgroundTaskUpdate,
         BasemapIn,
         BasemapUpdate,
+        GeometryLogIn,
         ProjectIn,
         ProjectUpdate,
     )
@@ -1741,3 +1743,62 @@ def slugify(name: Optional[str]) -> Optional[str]:
     # Remove consecutive hyphens
     slug = sub(r"[-\s]+", "-", slug)
     return slug
+
+
+class DbGeometryLog(BaseModel):
+    """Table geometry log."""
+
+    geom: dict
+    status: GeomStatus
+    project_id: Optional[int]
+    task_id: Optional[int]
+
+    @classmethod
+    async def create(
+        cls,
+        db: Connection,
+        geometry_log_in: "GeometryLogIn",
+    ) -> Self:
+        """Creates a new geometry log with its status."""
+        model_dump = dump_and_check_model(geometry_log_in)
+        columns = []
+        value_placeholders = []
+
+        for key in model_dump.keys():
+            columns.append(key)
+            if key == "geom":
+                value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
+                # Must be string json for db input
+                model_dump[key] = json.dumps(model_dump[key])
+            else:
+                value_placeholders.append(f"%({key})s")
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                f"""
+                INSERT INTO geometrylog
+                    ({", ".join(columns)})
+                VALUES
+                    ({", ".join(value_placeholders)})
+                RETURNING
+                    *,
+                    ST_AsGeoJSON(geom)::jsonb AS geom;
+            """,
+                model_dump,
+            )
+            new_geomlog = await cur.fetchone()
+        return new_geomlog
+
+    @classmethod
+    async def delete(
+        cls,
+        db: Connection,
+        id: int,
+    ) -> bool:
+        """Delete a geometry."""
+        async with db.cursor() as cur:
+            await cur.execute(
+                """
+                DELETE FROM geometrylog WHERE id = %(id)s;
+            """,
+                {"id": id},
+            )
