@@ -48,8 +48,8 @@ class GeometryLogIn(BaseModel):
 
     status: GeomStatus
     geom: dict
-    project_id: Optional[int]
-    task_id: Optional[int]
+    project_id: Optional[int] = None
+    task_id: Optional[int] = None
 
     @field_validator("geom", mode="before")
     @classmethod

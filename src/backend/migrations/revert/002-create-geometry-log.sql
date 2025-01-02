@@ -5,6 +5,7 @@
 BEGIN;
 
 DROP TABLE IF EXISTS geometrylog;
+DROP TYPE IF EXISTS geomstatus;
 
 -- Commit the transaction
 
