@@ -251,3 +251,10 @@ class XLSFormType(StrEnum, Enum):
     # religious = "religious"
     # landusage = "landusage"
     # waterways = "waterways"
+
+
+class GeomStatus(StrEnum, Enum):
+    """Geometry status."""
+
+    NEW = "NEW"
+    BAD = "BAD"

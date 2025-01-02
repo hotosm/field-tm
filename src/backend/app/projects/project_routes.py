@@ -61,6 +61,7 @@ from app.db.enums import (
 from app.db.models import (
     DbBackgroundTask,
     DbBasemap,
+    DbGeometryLog,
     DbOdkEntities,
     DbProject,
     DbTask,
@@ -1254,3 +1255,26 @@ async def download_task_boundaries(
     }
 
     return Response(content=out, headers=headers)
+
+
+@router.post("/{project_id}/geometries")
+async def create_geom_log(
+    geom_log: project_schemas.GeometryLogIn,
+    db: Annotated[Connection, Depends(db_conn)],
+):
+    """Creates a new entry in the geometries log table.
+
+    Returns:
+    geometries (DbGeometryLog): The created geometries log entry.
+
+    Raises:
+    HTTPException: If the geometries log creation fails.
+    """
+    geometries = await DbGeometryLog.create(db, geom_log)
+    if not geometries:
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail="geometries log creation failed.",
+        )
+
+    return geometries

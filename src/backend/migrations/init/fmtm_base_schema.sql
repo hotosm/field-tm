@@ -386,6 +386,15 @@ ALTER TABLE public.submission_photos_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.submission_photos_id_seq
 OWNED BY public.submission_photos.id;
 
+CREATE TABLE geometrylog (
+    id SERIAL PRIMARY KEY,
+    geom GEOMETRY NOT NULL,
+    status geomstatus,
+    project_id int,
+    task_id int
+);
+ALTER TABLE geometrylog OWNER TO fmtm;
+
 -- nextval for primary keys (autoincrement)
 
 ALTER TABLE ONLY public.organisations ALTER COLUMN id SET DEFAULT nextval(
@@ -458,6 +467,9 @@ ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
 ALTER TABLE ONLY public.submission_photos
 ADD CONSTRAINT submission_photos_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.idx_geometrylog
+ADD CONSTRAINT geometrylog_pkey PRIMARY KEY (id);
+
 -- Indexing
 
 CREATE INDEX idx_projects_outline ON public.projects USING gist (outline);
@@ -504,6 +516,8 @@ CREATE INDEX idx_entities_task_id
 ON public.odk_entities USING btree (
     entity_id, task_id
 );
+CREATE INDEX idx_geometrylog
+ON geometrylog USING gist (geom);
 
 -- Foreign keys
 
