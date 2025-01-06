@@ -328,7 +328,7 @@ class DbOrganisation(BaseModel):
     url: Optional[str] = None
     type: Optional[OrganisationType] = None
     approved: Optional[bool] = None
-    created_by: Optional[int] = None
+    created_by: Optional[int] = None  # this is not foreign key linked intentionally
     odk_central_url: Optional[str] = None
     odk_central_user: Optional[str] = None
     odk_central_password: Optional[str] = None
