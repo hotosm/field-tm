@@ -45,7 +45,7 @@ const OrganizationForm = () => {
   };
 
   const rejectOrganization = () => {
-    dispatch(RejectOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`));
+    dispatch(RejectOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/unapproved/${organizationId}`));
   };
 
   // redirect to manage-organization page after approve/reject success
@@ -105,7 +105,7 @@ const OrganizationForm = () => {
           id="url"
           name="url"
           label="Community or Organization are you applied for? "
-          value={organisationFormData?.organization_type}
+          value={organisationFormData?.community_type}
           onChange={() => {}}
           fieldType="text"
           disabled

@@ -65,6 +65,8 @@ def parse_organisation_input(
     slug: Optional[str] = Form(None),
     created_by: Optional[int] = Form(None),
     community_type: CommunityType = Form(None),
+    description: Optional[str] = Form(None),
+    url: Optional[str] = Form(None),
     type: OrganisationType = Form(None, alias="type"),
     odk_central_url: Optional[str] = Form(None),
     odk_central_user: Optional[str] = Form(None),
@@ -83,6 +85,8 @@ def parse_organisation_input(
         name=name,
         slug=slug,
         created_by=created_by,
+        description=description,
+        url=url,
         community_type=community_type,
         type=type,
         odk_central_url=odk_central_url,
@@ -98,6 +102,7 @@ class OrganisationOut(BaseModel):
     name: str
     approved: bool
     type: OrganisationType
+    community_type: CommunityType
     logo: Optional[str]
     description: Optional[str]
     slug: Optional[str]

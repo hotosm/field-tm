@@ -22,11 +22,11 @@ import { organizationTypeOptionsType } from '@/models/organisation/organisationM
 import { useAppSelector } from '@/types/reduxTypes';
 
 const organizationTypeOptions: organizationTypeOptionsType[] = [
-  { name: 'osm_community', value: 'osm_community', label: 'OSM Community' },
-  { name: 'company', value: 'company', label: 'Company' },
-  { name: 'non_profit', value: 'non_profit', label: 'Non-profit' },
-  { name: 'university', value: 'university', label: 'University' },
-  { name: 'other', value: 'other', label: 'Other' },
+  { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
+  { name: 'company', value: 'COMPANY', label: 'Company' },
+  { name: 'non_profit', value: 'NON_PROFIT', label: 'Non-profit' },
+  { name: 'university', value: 'UNIVERSITY', label: 'University' },
+  { name: 'other', value: 'OTHER', label: 'Other' },
 ];
 
 const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
@@ -211,12 +211,12 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
               topic="What type of community or organization are you applying for? "
               options={organizationTypeOptions}
               direction="column"
-              value={values.organization_type}
+              value={values.community_type}
               onChangeData={(value) => {
-                handleCustomChange('organization_type', value);
+                handleCustomChange('community_type', value);
               }}
               className="fmtm-text-base fmtm-text-[#7A7676] fmtm-mt-1"
-              errorMsg={errors.organization_type}
+              errorMsg={errors.community_type}
               required
             />
           )}
