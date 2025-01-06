@@ -86,7 +86,8 @@ In reverse chronological order, with most recent events first.
 >         <div class="timeline-date">2024-02</div>
 >         <h3>Demo: Monrovia, Liberia</h3>
 >         🚀 The first conceptualisation of HOT's full E2E workflow, after field
->         mapping feedback.
+>         mapping feedback
+>         <a href="https://docs.google.com/document/d/1jzxDO922iVfFgf-Noz-AtA64T56G6kq8E6OO9V2swUE/edit?tab=t.0#heading=h.oj17xl5txjet"> (info)</a>.
 >         <div class="timeline-dot"></div>
 >     </div>
 >     <div class="timeline-entry">
