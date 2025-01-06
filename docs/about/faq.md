@@ -167,7 +167,7 @@ collection ecosystem. Instead, it is a higher level tool, aimed at
   sophisticated than directly using XLSForms. It's nevertheless very useful for
   beginners.
 
-## For Users
+## Info For Users
 
 ### Do I need to create an account to use the FMTM Web App?
 
@@ -229,7 +229,58 @@ or projects.
 
 ---
 
-## For Repository Contributors
+### What are the benefits of contributing to the FMTM?
+
+Contributing to the FMTM allows you to help with important
+humanitarian and development work, while also developing your mapping
+skills and knowledge.
+
+---
+
+### Do I need to have prior mapping experience to contribute to the FMTM?
+
+No, prior mapping experience is not required to contribute to the
+FMTM. The platform provides training and resources to help new
+contributors get started.
+
+---
+
+### Can I work on multiple mapping projects at the same time?
+
+Yes, you can work on multiple mapping projects at the same
+time. However, it is important to ensure that you can commit the
+necessary time and effort to each project.
+
+---
+
+### How do I get feedback on my mapping work?
+
+The FMTM provides a validation process where other contributors
+review and provide feedback on mapping work. You can also contact
+project managers or experienced contributors for additional feedback.
+
+---
+
+## Info For Project Managers
+
+### Can I use my own ODK Central instance?
+
+Yes, you can. We understand in many cases users may already have
+an instance of ODK Central (for example, at at organisational level),
+so you may use your own server and credentials.
+
+Please ensure the user credentials have 'Administrator' level permission,
+else FMTM project creation will not work.
+
+The credentials should be provided when requesting the creation of an
+'Organisation' in FMTM.
+
+Alternatively, you may request credentials for the HOT Global
+[ODK Central Instance](https://odk.hotosm.org).
+
+---
+
+## Info For Repository Contributors
 
 ### How can I become a contributor to the FMTM?
 
@@ -352,53 +403,6 @@ FMTM community on Slack to connect with other contributors and get
 help with your contributions.
 
 ---
-
-### What are the benefits of contributing to the FMTM?
-
-Contributing to the FMTM allows you to help with important
-humanitarian and development work, while also developing your mapping
-skills and knowledge.
-
----
-
-### Do I need to have prior mapping experience to contribute to the FMTM?
-
-No, prior mapping experience is not required to contribute to the
-FMTM. The platform provides training and resources to help new
-contributors get started.
-
----
-
-### How do I know which mapping project to join?
-
-The FMTM provides information about each project, including the
-location, the organization sponsoring the project, and the mapping
-goals. Review the project information and choose a project that
-interests you.
-
----
-
-### Can I work on multiple mapping projects at the same time?
-
-Yes, you can work on multiple mapping projects at the same
-time. However, it is important to ensure that you can commit the
-necessary time and effort to each project.
-
----
-
-### How do I get feedback on my mapping work?
-
-The FMTM provides a validation process where other contributors
-review and provide feedback on mapping work. You can also contact
-project managers or experienced contributors for additional feedback.
-
----
-
-### How can I improve my mapping skills?
-
-The FMTM provides training and resources to help you improve your
-mapping skills. You can also join mapping communities and forums to
-connect with other contributors and learn from their experiences.
 
 ## Advanced Use Cases
 
