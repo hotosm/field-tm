@@ -18,10 +18,10 @@
 # NOTE this dockerfile simply extends the official image
 # to init an admin user at startup
 
-ARG ODK_CENTRAL_TAG
+ARG ODK_CENTRAL_TAG=v2024.2.1
 
 
-FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG}
+FROM ghcr.io/getodk/central-service:$ODK_CENTRAL_TAG
 COPY init-user-and-start.sh /
 RUN chmod +x /init-user-and-start.sh
 ENTRYPOINT ["/init-user-and-start.sh"]
