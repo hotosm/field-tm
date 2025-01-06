@@ -11,7 +11,6 @@ started with the Field Mapping Tasking Manager.
   - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
   - [Steps to start access your project and Start mapping or a mapping campaign](#steps-to-start-access-your-project-and-start-mapping-or-a-mapping-campaign)
   - [Help and Support](#help-and-support)
-  - [Thank you](#thank-you)
 
 ## Introduction
 
@@ -265,39 +264,6 @@ the following resources:
 
 - Check the [FAQs][21] .
 - Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][22]
-
-## Thank you
-
-We are excited to have you join our community of passionate mappers and
-volunteers. FMTM is a powerful platform developed by the Humanitarian
-OpenStreetMap Team (HOT) to facilitate mapping projects for disaster response,
-humanitarian efforts, and community development.
-
-With FMTM, you have the opportunity to make a real impact by mapping areas that
-are in need of support. Your contributions help create detailed and up-to-date
-maps that aid organizations and communities in their efforts to respond to
-crises, plan infrastructure, and improve the lives of people around the world.
-
-Whether you are a seasoned mapper or new to the world of mapping, FMTM provides
-a user-friendly interface and a range of tools to make your mapping experience
-smooth and rewarding. You can create tasks, collaborate with other volunteers,
-and contribute to ongoing projects that align with your interests and expertise.
-
-By mapping with FMTM, you are joining a global community of dedicated
-individuals who share a common goal of using open data to make a positive
-difference. Together, we can create a more resilient and inclusive world.
-
-Explore the projects, join tasks, and contribute your skills to help us build
-accurate and comprehensive maps. Don't hesitate to ask questions, seek
-guidance, and engage with fellow mappers through our forums and communication
-channels.
-
-Thank you for being part of FMTM. Your mapping efforts are invaluable, and we
-appreciate your commitment to making a difference.
-
-Happy mapping!
-
-The FMTM Team
 
 [9]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
 [10]: https://docs.getodk.org/central-install-digital-ocean/ "Account on ODK Central Server"

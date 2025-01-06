@@ -17,7 +17,7 @@ your own cloud server.
 ### Run the install script
 
 ```bash
-curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
+curl -L https://get.fmtm.dev -o install.sh
 bash install.sh
 
 # Then follow the prompts
@@ -28,19 +28,19 @@ bash install.sh
 Variables are set in `.env`.
 Some can be updated manually, as required.
 
-#### EXTRA_CORS_ORIGINS
+##### EXTRA_CORS_ORIGINS
 
 > If extra cors origins are required for testing, the variable
 > `EXTRA_CORS_ORIGINS` is a set of comma separated strings, e.g.:
 > <http://fmtm.localhost:7050,http://some.other.domain>
 
-#### API_PREFIX
+##### API_PREFIX
 
 > It is also possible to use the API_PREFIX variable if the api
 > is served under, e.g. /api on the domain.
 > However, this isn't the recommended approach, and testing is minimal.
 
-#### S3_ACCESS_KEY & S3_SECRET_KEY
+##### S3_ACCESS_KEY & S3_SECRET_KEY
 
 > In most circumstances these variables should be provided
 > to authenticate with your S3 provider.
@@ -52,7 +52,7 @@ Some can be updated manually, as required.
 > authenticated. S3_ACCESS_KEY and S3_SECRET_KEY should
 > be set to blank strings in this case `=""`.
 
-#### ODK\_ Variables
+##### ODK\_ Variables
 
 These can point to an externally hosted instance of ODK Central.
 

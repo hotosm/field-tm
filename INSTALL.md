@@ -34,7 +34,7 @@ On a Linux-based machine with `bash` installed, run the script:
 > However, if you run as root, a user svcfmtm will be created for you.
 
 ```bash
-curl -L https://hotosm.github.io/fmtm-installer/install.sh -o install.sh
+curl -L https://get.fmtm.dev -o install.sh
 bash install.sh
 
 # Then follow the prompts
@@ -123,7 +123,7 @@ a sample is located at `.env.example`.
 This can be created interactively by running:
 
 ```bash
-bash scripts/gen-env.sh
+bash scripts/1-environment/gen-env.sh
 ```
 
 > Note: If extra cors origins are required for testing, the variable
