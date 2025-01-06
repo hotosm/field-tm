@@ -111,7 +111,7 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 | Status | Feature |
 |:--:| :-- |
 |✅| 🖥️ project area splitting avoiding roads, rivers, railways |
-|✅| 🖥️ XLSForm generation in ODK Central |
+|✅| 🖥️ XLSForm survey generation in ODK Central |
 |✅| 📱 mapping of project via survey in ODK Collect mobile app |
 |✅| 📱 locking & unlocking of tasks to coordinate mapping |
 |✅| 📱 download base imagery & geolocation for in the field |
