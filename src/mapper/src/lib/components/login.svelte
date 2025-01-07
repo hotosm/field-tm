@@ -34,7 +34,7 @@
 
 <hot-dialog
 	bind:this={dialogRef}
-	class="dialog-overview z-50 font-barlow-regular"
+	class="dialog-overview z-50 font-barlow font-regular"
 	open={loginStore.isLoginModalOpen}
 	onsl-hide={() => {
 		loginStore.toggleLoginModal(false);
@@ -68,7 +68,7 @@
 						}
 					}}
 					tabindex="0"
-					class="option-card bg-[#F5F5F5] text-gray-700 p-3 rounded-md duration-300 hover:border-primaryRed hover:text-red-600 cursor-pointer text-sm flex items-start gap-3 group"
+					class="option-card bg-[#F5F5F5] text-gray-700 p-3 border-1 border-solid border-white hover:border-[#d73f3f] rounded-md duration-300 hover:text-red-600 cursor-pointer text-sm flex items-start gap-3 group"
 				>
 					<div class="w-10 max-w-10 min-w-10">
 						{#if option?.image}
@@ -86,13 +86,3 @@
 		</div>
 	</div>
 </hot-dialog>
-
-<style>
-	.option-card {
-		border: 1px solid white;
-	}
-
-	.option-card:hover {
-		border: solid 1px #d73f3f;
-	}
-</style>

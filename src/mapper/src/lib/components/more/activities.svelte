@@ -1,5 +1,4 @@
 <script lang="ts">
-	import ActivitiesSkeleton from '$lib/components/more/skeleton/activities.svelte';
 	import type { TaskEventType } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 
@@ -15,11 +14,7 @@
 </script>
 
 <div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-2 pb-2">
-	{#if false}
-		{#each Array.from({ length: 5 }) as _, index}
-			<ActivitiesSkeleton />
-		{/each}
-	{:else if taskEvents?.length === 0}
+	{#if taskEvents?.length === 0}
 		<div class="flex justify-center mt-10">
 			<p class="text-[#484848] text-base">
 				{taskStore?.selectedTaskIndex
@@ -28,7 +23,7 @@
 			</p>
 		</div>
 	{:else}
-		{#each taskEvents as event}
+		{#each taskEvents as event (event?.event_id)}
 			<div class="flex flex-col gap-2 py-3 bg-[#F6F5F5] rounded-md mr-1">
 				<div class="flex gap-4 px-3">
 					<hot-icon

@@ -113,6 +113,9 @@
 				ontouchend={dragStop}
 				onmouseup={dragStop}
 				onmouseout={dragStop}
+				role="button"
+				tabindex="0"
+				onblur={() => {}}
 			>
 				<span class="h-[6px] w-[3.25rem] block bg-[#d2d2d4] rounded-full pointer-events-none"></span>
 			</div>

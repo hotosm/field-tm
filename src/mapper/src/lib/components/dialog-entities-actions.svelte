@@ -63,10 +63,8 @@
 </script>
 
 {#if isTaskActionModalOpen && selectedTab === 'map' && selectedEntity}
-	<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
-		<div
-			class="bg-white w-full font-barlow-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl"
-		>
+	<div class="font-barlow flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
+		<div class="bg-white w-full font-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl">
 			<div class="flex justify-end">
 				<hot-icon
 					name="close"
@@ -83,7 +81,7 @@
 			</div>
 			<div class="flex flex-col gap-4">
 				<div class="flex items-center justify-between">
-					<p class="text-[#333] text-xl font-barlow-semibold">Feature {selectedEntity?.osmid}</p>
+					<p class="text-[#333] text-xl font-semibold">Feature {selectedEntity?.osmid}</p>
 					<sl-button
 						onclick={async () => {
 							await entitiesStore.syncEntityStatus(projectData?.id);
@@ -102,7 +100,7 @@
 							name="arrow-repeat"
 							class={`!text-[1rem] cursor-pointer duration-200 ${entitiesStore.syncEntityStatusLoading && 'animate-spin'}`}
 						></hot-icon>
-						<span class="font-barlow-medium text-SM uppercase">SYNC STATUS</span>
+						<span class="font-barlow font-medium text-sm uppercase">SYNC STATUS</span>
 					</sl-button>
 				</div>
 				<div class="flex flex-col gap-1">
@@ -132,7 +130,7 @@
 							tabindex="0"
 						>
 							<hot-icon slot="prefix" name="direction" class="!text-[1rem] cursor-pointer duration-200"></hot-icon>
-							<span class="font-barlow-medium text-sm">NAVIGATE HERE</span>
+							<span class="font-barlow font-medium text-sm">NAVIGATE HERE</span>
 						</sl-button>
 						<sl-button
 							loading={entitiesStore.updateEntityStatusLoading}
@@ -152,7 +150,7 @@
 						>
 							<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
 							></hot-icon>
-							<span class="font-barlow-medium text-sm">MAP FEATURE IN ODK</span>
+							<span class="font-barlow font-medium text-sm">MAP FEATURE IN ODK</span>
 						</sl-button>
 					</div>
 				{/if}

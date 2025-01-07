@@ -57,7 +57,7 @@
 	});
 </script>
 
-<div class={`font-barlow-medium ${activeStack === 'Comment' ? 'h-full' : 'h-fit'}`}>
+<div class={`font-barlow font-medium ${activeStack === 'Comment' ? 'h-full' : 'h-fit'}`}>
 	{#if activeStack === ''}
 		{#each stackGroup as stack}
 			<div
@@ -91,7 +91,7 @@
 				tabindex="0"
 				role="button"
 			></hot-icon>
-			<p class="text-[1.125rem] font-barlow-semibold">{activeStack}</p>
+			<p class="text-[1.125rem] font-semibold">{activeStack}</p>
 		</div>
 	{/if}
 
