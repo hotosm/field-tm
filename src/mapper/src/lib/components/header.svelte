@@ -32,7 +32,7 @@
 	};
 </script>
 
-<div class="p-3 flex items-center justify-between">
+<div class="p-3 flex items-center justify-between font-barlow">
 	<div class="flex items-center gap-1">
 		<a href={window.location.origin}><img src={HotLogo} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" /></a>
 		<img src={HotLogoText} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
@@ -58,7 +58,7 @@
 					/>
 				{/if}
 				<p
-					class="font-barlow-medium text-sm sm:text-base text-ellipsis whitespace-nowrap overflow-hidden max-w-[6rem] sm:max-w-fit"
+					class="font-medium text-sm sm:text-base text-ellipsis whitespace-nowrap overflow-hidden max-w-[6rem] sm:max-w-fit"
 				>
 					{loginStore?.getAuthDetails?.username}
 				</p>
@@ -79,7 +79,7 @@
 				role="button"
 				tabindex="0"
 			>
-				<span class="font-barlow-medium text-base">SIGN IN</span>
+				<span class="font-barlow font-medium text-base">SIGN IN</span>
 			</sl-button>
 		{/if}
 
@@ -127,7 +127,7 @@
 				target="_blank"
 				rel="noopener noreferrer"
 				href={menu.path}
-				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black">{menu.name}</a
+				class="hover:text-red-600 cursor-pointer duration-200 decoration-none text-black font-barlow">{menu.name}</a
 			>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
@@ -144,7 +144,7 @@
 				role="button"
 				tabindex="0"
 			>
-				<span class="font-barlow-medium text-base">SIGN OUT</span>
+				<span class="font-barlow font-medium text-base">SIGN OUT</span>
 			</sl-button>
 		{/if}
 	</div>

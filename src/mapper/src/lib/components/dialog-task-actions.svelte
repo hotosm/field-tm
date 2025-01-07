@@ -16,10 +16,8 @@
 </script>
 
 {#if taskStore.selectedTaskId && selectedTab === 'map' && isTaskActionModalOpen && (taskStore.selectedTaskState === 'UNLOCKED_TO_MAP' || taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING')}
-	<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
-		<div
-			class="bg-white w-full font-barlow-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl"
-		>
+	<div class="flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50 font-barlow">
+		<div class="bg-white w-full font-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl">
 			<div class="flex justify-end">
 				<hot-icon
 					name="close"
@@ -35,7 +33,7 @@
 				></hot-icon>
 			</div>
 			<div class="flex justify-between items-center">
-				<p class="text-[#333] text-xl font-barlow-semibold">Task #{taskStore.selectedTaskIndex}</p>
+				<p class="text-[#333] text-xl font-semibold">Task #{taskStore.selectedTaskIndex}</p>
 				<div
 					onclick={() => {
 						clickMapNewFeature();
@@ -74,7 +72,7 @@
 						role="button"
 						tabindex="0"
 					>
-						<span class="font-barlow-medium text-sm">CANCEL</span>
+						<span class="font-barlow font-medium text-sm">CANCEL</span>
 					</sl-button>
 					<sl-button
 						variant="default"
@@ -93,7 +91,7 @@
 					>
 						<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
 						></hot-icon>
-						<span class="font-barlow-medium text-sm">START MAPPING</span>
+						<span class="font-barlow font-medium text-sm">START MAPPING</span>
 					</sl-button>
 				</div>
 			{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
@@ -120,7 +118,7 @@
 							name="close"
 							class="!text-[1rem] text-[#d73f37] cursor-pointer duration-200 hover:text-[#b91c1c]"
 						></hot-icon>
-						<span class="font-barlow-medium text-sm">CANCEL MAPPING</span>
+						<span class="font-barlow font-medium text-sm">CANCEL MAPPING</span>
 					</sl-button>
 					<sl-button
 						onclick={() => {
@@ -138,10 +136,10 @@
 						tabindex="0"
 					>
 						<hot-icon slot="prefix" name="check" class="!text-[1rem] text-white cursor-pointer duration-200"></hot-icon>
-						<span class="font-barlow-medium text-sm">COMPLETE MAPPING</span>
+						<span class="font-barlow font-medium text-sm">COMPLETE MAPPING</span>
 					</sl-button>
 					<sl-button variant="default" size="small" class="primary col-span-2 sm:col-span-1">
-						<span class="font-barlow-medium text-sm">GO TO ODK</span>
+						<span class="font-barlow font-medium text-sm">GO TO ODK</span>
 					</sl-button>
 				</div>
 			{/if}

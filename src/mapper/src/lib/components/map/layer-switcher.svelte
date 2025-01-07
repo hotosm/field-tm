@@ -135,9 +135,7 @@ map = new Map({
 		}
 
 		// Deduplicate styles by `name`
-		allStyles = processedStyles.filter(
-			(style, index, self) => self.findIndex((s) => s.name === style.name) === index,
-		);
+		allStyles = processedStyles.filter((style, index, self) => self.findIndex((s) => s.name === style.name) === index);
 	}
 
 	function selectStyle(style: MapLibreStylePlusMetadata) {
@@ -179,7 +177,7 @@ map = new Map({
 	});
 </script>
 
-<div class="relative" use:clickOutside onclick_outside={() => (isOpen = false)}>
+<div class="relative font-barlow" use:clickOutside onclick_outside={() => (isOpen = false)}>
 	<div
 		onclick={() => (isOpen = !isOpen)}
 		role="button"
@@ -200,7 +198,7 @@ map = new Map({
 	<div
 		class={`absolute bottom-0 right-14 bg-white rounded-md p-4 duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 	>
-		<p class="font-barlow-semibold text-lg mb-2">Base Maps</p>
+		<p class="font-semibold text-lg mb-2">Base Maps</p>
 		<div class="grid grid-cols-2 w-[212px] gap-3">
 			{#each allStyles as style, _}
 				<div

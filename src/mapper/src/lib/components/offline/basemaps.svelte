@@ -30,10 +30,10 @@
 	});
 </script>
 
-<div class="flex flex-col items-center p-4 space-y-4">
+<div class="flex flex-col items-center p-4 space-y-4 font-barlow">
 	<!-- Text above the basemap selector -->
 	<div class="text-center w-full">
-		<div class="font-bold text-lg font-barlow-medium">
+		<div class="font-bold text-lg font-medium">
 			<span class="mr-1">Manage Basemaps</span>
 		</div>
 	</div>
@@ -61,8 +61,8 @@
 			</sl-select>
 		{:else}
 			<div class="text-center w-full">
-				<div class="text-sm font-barlow-medium">There are no basemaps available for this project.</div>
-				<div class="text-sm font-barlow-medium pt-2">Please ask the project manager to create basemaps.</div>
+				<div class="text-sm font-medium">There are no basemaps available for this project.</div>
+				<div class="text-sm font-medium pt-2">Please ask the project manager to create basemaps.</div>
 			</div>
 		{/if}
 	</div>
@@ -81,7 +81,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-barlow-medium text-base uppercase">Show On Map</span>
+			<span class="font-barlow font-medium text-base uppercase">Show On Map</span>
 		</hot-button>
 
 		<hot-button
@@ -96,7 +96,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-barlow-medium text-base uppercase">Store Offline</span>
+			<span class="font-barlow font-medium text-base uppercase">Store Offline</span>
 		</hot-button>
 
 		<!-- Download Mbtiles Button -->
@@ -113,7 +113,7 @@
 		>
 			<hot-icon slot="prefix" name="download" class="!text-[1rem] text-[#b91c1c] cursor-pointer duration-200"
 			></hot-icon>
-			<span class="font-barlow-medium text-base uppercase">Download MBTiles</span>
+			<span class="font-medium text-base uppercase">Download MBTiles</span>
 		</hot-button>
 	{/if}
 

@@ -331,7 +331,7 @@
 	<ScaleControl />
 	<Control class="flex flex-col gap-y-2" position="top-left">
 		<ControlGroup>
-			<ControlButton on:click={zoomToProject}
+			<ControlButton title="Zoom to project" on:click={zoomToProject}
 				><hot-icon name="crop-free" class={`!text-[1.2rem] cursor-pointer duration-200 text-black`}
 				></hot-icon></ControlButton
 			>
@@ -465,14 +465,14 @@
 	<!-- Help text for user on first load -->
 	{#if projectSetupStep === projectSetupStepEnum['task_selection']}
 		<div class="absolute top-7 bg-[#F097334D] min-w-[14rem] z-10 left-[50%] translate-x-[-50%] p-1">
-			<p class="uppercase font-barlow-medium text-base">click on a task to select a feature for mapping</p>
+			<p class="uppercase font-barlow font-medium text-base">click on a task to select a feature for mapping</p>
 		</div>
 	{/if}
 
 	<!-- Help for drawing a new geometry -->
 	{#if displayDrawHelpText}
 		<div class="absolute top-7 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
-			<p class="uppercase font-barlow-medium text-base">Click on the map to create a new point</p>
+			<p class="uppercase font-barlow font-medium text-base">Click on the map to create a new point</p>
 		</div>
 	{/if}
 </MapLibre>

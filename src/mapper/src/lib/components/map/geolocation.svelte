@@ -240,6 +240,7 @@
 				>
 			</div>
 			<ControlButton
+				title="Geolocation"
 				on:click={() => {
 					entitiesStore.setToggleGeolocation(!entitiesStore.toggleGeolocation);
 					if (!entitiesStore.toggleGeolocation) {
@@ -278,9 +279,9 @@
 {/if}
 
 {#if entitiesStore.toggleGeolocation && entityToNavigate}
-	<div class="w-full flex justify-center absolute z-10 bottom-2 pointer-events-none">
+	<div class="font-barlow w-full flex justify-center absolute z-10 bottom-2 pointer-events-none">
 		<div class="bg-white rounded-md py-2 px-4 flex items-center gap-6 pointer-events-auto shadow-md z-10">
-			<p class="text-black text-base font-barlow-medium">Distance: {entityDistance}m</p>
+			<p class="text-black text-base font-medium">Distance: {entityDistance}m</p>
 			<sl-button
 				onclick={exitNavigationMode}
 				onkeydown={(e: KeyboardEvent) => {
