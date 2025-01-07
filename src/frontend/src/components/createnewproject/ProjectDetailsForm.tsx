@@ -53,9 +53,6 @@ const ProjectDetailsForm = ({ flag }) => {
     // Calls onFocus when the window first loads
     return () => {
       window.removeEventListener('focus', onFocus);
-      // dispatch(
-      //   CreateProjectActions.SetCreateProjectValidations({ key: 'projectDetails', value: checkValidationOnly() }),
-      // );
     };
   }, []);
 

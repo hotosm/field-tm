@@ -1,6 +1,6 @@
 // import CoreModules from '@/shared/CoreModules.js';
-import { createSlice } from '@reduxjs/toolkit';
-import { IOrganisationState } from '../types/IOrganisation';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IOrganisationState } from '@/store/types/IOrganisation';
 
 export const initialState: IOrganisationState = {
   organisationFormData: {},
@@ -23,47 +23,48 @@ export const initialState: IOrganisationState = {
     organizationRejecting: false,
   },
 };
+
 const OrganisationSlice = createSlice({
   name: 'organisation',
   initialState: initialState,
   reducers: {
-    GetOrganisationsData(state, action) {
+    GetOrganisationsData(state, action: PayloadAction<IOrganisationState['organisationData']>) {
       state.organisationData = action.payload;
     },
-    GetOrganisationDataLoading(state, action) {
+    GetOrganisationDataLoading(state, action: PayloadAction<boolean>) {
       state.organisationDataLoading = action.payload;
     },
-    GetMyOrganisationsData(state, action) {
+    GetMyOrganisationsData(state, action: PayloadAction<IOrganisationState['myOrganisationData']>) {
       state.myOrganisationData = action.payload;
     },
-    GetMyOrganisationDataLoading(state, action) {
+    GetMyOrganisationDataLoading(state, action: PayloadAction<boolean>) {
       state.myOrganisationDataLoading = action.payload;
     },
-    postOrganisationData(state, action) {
+    postOrganisationData(state, action: PayloadAction<IOrganisationState['postOrganisationData']>) {
       state.postOrganisationData = action.payload;
     },
-    PostOrganisationDataLoading(state, action) {
+    PostOrganisationDataLoading(state, action: PayloadAction<boolean>) {
       state.postOrganisationDataLoading = action.payload;
     },
-    SetOrganisationFormData(state, action) {
+    SetOrganisationFormData(state, action: PayloadAction<IOrganisationState['organisationFormData']>) {
       state.organisationFormData = action.payload;
     },
-    SetConsentDetailsFormData(state, action) {
+    SetConsentDetailsFormData(state, action: PayloadAction<IOrganisationState['consentDetailsFormData']>) {
       state.consentDetailsFormData = action.payload;
     },
-    SetConsentApproval(state, action) {
+    SetConsentApproval(state, action: PayloadAction<boolean>) {
       state.consentApproval = action.payload;
     },
-    SetIndividualOrganization(state, action) {
+    SetIndividualOrganization(state, action: PayloadAction<IOrganisationState['organisationFormData']>) {
       state.organisationFormData = action.payload;
     },
-    SetOrganizationApproving(state, action) {
+    SetOrganizationApproving(state, action: PayloadAction<boolean>) {
       state.organizationApprovalStatus.organizationApproving = action.payload;
     },
-    SetOrganizationRejecting(state, action) {
+    SetOrganizationRejecting(state, action: PayloadAction<boolean>) {
       state.organizationApprovalStatus.organizationRejecting = action.payload;
     },
-    SetOrganizationApprovalStatus(state, action) {
+    SetOrganizationApprovalStatus(state, action: PayloadAction<boolean>) {
       state.organizationApprovalStatus.isSuccess = action.payload;
     },
   },

@@ -14,10 +14,10 @@ type NewDefineAreaMapProps = {
   uploadedOrDrawnGeojsonFile: DrawnGeojsonTypes | null;
   buildingExtractedGeojson?: GeoJSONFeatureTypes | null;
   lineExtractedGeojson?: GeoJSONFeatureTypes;
-  onDraw?: ((geojson: any, area: number) => void) | null;
-  onModify?: ((geojson: any, area?: number) => void) | null;
+  onDraw?: ((geojson: any, area: string) => void) | null;
+  onModify?: ((geojson: any, area: string) => void) | null;
   hasEditUndo?: boolean;
-  getAOIArea?: ((area?: number) => void) | null;
+  getAOIArea?: ((area?: string) => void) | null;
   additionalFeatureGeojson?: GeoJSONFeatureTypes | null;
 };
 

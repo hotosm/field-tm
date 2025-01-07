@@ -1,7 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { TaskStateTypes } from '@/store/types/ITask';
-import { taskSubmissionInfoType } from '@/models/task/taskModel';
-import { EntityOsmMap } from '@/store/types/IProject';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TaskFeatureSelectionProperties, TaskStateTypes } from '@/store/types/ITask';
+import { EntityOsmMap, taskSubmissionInfoType } from '@/models/task/taskModel';
 
 const initialState: TaskStateTypes = {
   taskLoading: false,
@@ -15,9 +14,7 @@ const initialState: TaskStateTypes = {
     changeset: 0,
   },
   projectBoundaryLoading: false,
-  projectBoundary: [],
   convertToOsmLoading: false,
-  convertToOsm: [],
   downloadSubmissionLoading: { type: '', loading: false },
   convertXMLToJOSMLoading: false,
   josmEditorError: null,
@@ -27,19 +24,11 @@ const TaskSlice = createSlice({
   name: 'task',
   initialState: initialState,
   reducers: {
-    GetProjectBoundaryLoading(state, action) {
-      state.projectBoundaryLoading = action.payload;
-    },
-
-    FetchConvertToOsmLoading(state, action) {
-      state.convertToOsmLoading = action.payload;
-    },
-
-    SetTaskSubmissionStatesLoading(state, action) {
+    SetTaskSubmissionStatesLoading(state, action: PayloadAction<boolean>) {
       state.taskLoading = action.payload;
     },
 
-    SetTaskSubmissionStates(state, action) {
+    SetTaskSubmissionStates(state, action: PayloadAction<EntityOsmMap[]>) {
       const groupedPayload: Record<string, EntityOsmMap[]> = action.payload?.reduce((acc, item) => {
         if (!acc[item.task_id]) {
           acc[item.task_id] = [];
@@ -76,27 +65,20 @@ const TaskSlice = createSlice({
       state.taskInfo = taskInfo;
     },
 
-    SetSelectedTask(state, action) {
+    SetSelectedTask(state, action: PayloadAction<number | null>) {
       state.selectedTask = action.payload;
     },
 
-    SetSelectedFeatureProps(state, action) {
+    SetSelectedFeatureProps(state, action: PayloadAction<TaskFeatureSelectionProperties>) {
       state.selectedFeatureProps = action.payload;
     },
-
-    GetDownloadProjectBoundary(state, action) {
-      state.projectBoundary = action.payload;
-    },
-    FetchConvertToOsm(state, action) {
-      state.convertToOsm = action.payload;
-    },
-    GetDownloadProjectSubmissionLoading(state, action) {
+    GetDownloadProjectSubmissionLoading(state, action: PayloadAction<{ type: 'json' | 'csv'; loading: boolean }>) {
       state.downloadSubmissionLoading = action.payload;
     },
-    SetConvertXMLToJOSMLoading(state, action) {
+    SetConvertXMLToJOSMLoading(state, action: PayloadAction<boolean>) {
       state.convertXMLToJOSMLoading = action.payload;
     },
-    SetJosmEditorError(state, action) {
+    SetJosmEditorError(state, action: PayloadAction<string | null>) {
       state.josmEditorError = action.payload;
     },
   },

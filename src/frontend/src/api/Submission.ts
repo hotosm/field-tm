@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
 export const SubmissionService: Function = (url: string) => {
@@ -7,9 +7,8 @@ export const SubmissionService: Function = (url: string) => {
     dispatch(SubmissionActions.SetSubmissionDetailsLoading(true));
     const getSubmissionDetails = async (url: string) => {
       try {
-        const getSubmissionDetailsResponse = await axios.get(url);
-        const response: any = getSubmissionDetailsResponse.data;
-        dispatch(SubmissionActions.SetSubmissionDetails(response));
+        const response: AxiosResponse<Record<string, any>> = await axios.get(url);
+        dispatch(SubmissionActions.SetSubmissionDetails(response.data));
         dispatch(SubmissionActions.SetSubmissionDetailsLoading(false));
       } catch (error) {
         dispatch(SubmissionActions.SetSubmissionDetailsLoading(false));
@@ -26,7 +25,7 @@ export const GetSubmissionPhotosService: Function = (url: string) => {
     dispatch(SubmissionActions.SetSubmissionPhotosLoading(true));
     const getSubmissionPhotos = async (url: string) => {
       try {
-        const response = await axios.get(url);
+        const response: AxiosResponse<{ image_urls: string[] }> = await axios.get(url);
         dispatch(SubmissionActions.SetSubmissionPhotos(response?.data?.image_urls));
         dispatch(SubmissionActions.SetSubmissionPhotosLoading(false));
       } catch (error) {

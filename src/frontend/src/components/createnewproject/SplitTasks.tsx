@@ -245,7 +245,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                     direction="column"
                     onChangeData={(value) => {
                       handleCustomChange('task_split_type', value);
-                      dispatch(CreateProjectActions.SetSplitTasksSelection(value));
+                      dispatch(CreateProjectActions.SetSplitTasksSelection(value as task_split_type));
                       if (task_split_type.CHOOSE_AREA_AS_TASK === value) {
                         dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: false }));
                         dispatch(

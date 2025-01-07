@@ -46,7 +46,7 @@ export const OrganisationDataService: Function = (url: string) => {
     const getOrganisationData = async (url: string) => {
       try {
         const getOrganisationDataResponse = await API.get(url);
-        const response: GetOrganisationDataModel = getOrganisationDataResponse.data;
+        const response: GetOrganisationDataModel[] = getOrganisationDataResponse.data;
         dispatch(OrganisationAction.GetOrganisationsData(response));
         dispatch(OrganisationAction.GetOrganisationDataLoading(false));
       } catch (error) {
@@ -95,7 +95,8 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
           },
         });
 
-        const resp: HomeProjectCardModel = postOrganisationData.data;
+        const resp: GetOrganisationDataModel = postOrganisationData.data;
+
         dispatch(OrganisationAction.PostOrganisationDataLoading(false));
         dispatch(OrganisationAction.postOrganisationData(resp));
         dispatch(

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CommonStateTypes } from '@/store/types/ICommon';
 
 const initialState: CommonStateTypes = {
@@ -22,19 +22,19 @@ const CommonSlice = createSlice({
   name: 'common',
   initialState: initialState,
   reducers: {
-    SetSnackBar(state, action) {
+    SetSnackBar(state, action: PayloadAction<CommonStateTypes['snackbar']>) {
       state.snackbar = action.payload;
     },
-    SetLoading(state, action) {
+    SetLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    PostOrganisationLoading(state, action) {
-      state.organisation = action.payload;
+    PostOrganisationLoading(state, action: PayloadAction<boolean>) {
+      state.postOrganisationLoading = action.payload;
     },
-    SetCurrentStepFormStep(state, action) {
+    SetCurrentStepFormStep(state, action: PayloadAction<{ flag: string; step: number }>) {
       state.currentStepFormStep[action.payload.flag] = { step: action.payload.step };
     },
-    SetProjectNotFound(state, action) {
+    SetProjectNotFound(state, action: PayloadAction<boolean>) {
       state.projectNotFound = action.payload;
     },
   },

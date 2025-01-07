@@ -7,24 +7,23 @@ export type CreateProjectStateTypes = {
   projectDetailsResponse: EditProjectResponseTypes | null;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  formCategoryList: FormCategoryListTypes[] | [];
+  formCategoryList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
   generateProjectLoading: boolean;
   generateProjectSuccess: boolean;
   generateProjectError: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
-  createProjectStep: number;
   dividedTaskLoading: boolean;
-  dividedTaskGeojson: null | GeoJSONFeatureTypes;
+  dividedTaskGeojson: null | splittedGeojsonType;
   formUpdateLoading: boolean;
   taskSplittingGeojsonLoading: boolean;
-  taskSplittingGeojson: TaskSplittingGeojsonTypes | null;
+  taskSplittingGeojson: splittedGeojsonType | null;
   updateBoundaryLoading: boolean;
   drawnGeojson: DrawnGeojsonTypes | null;
   drawToggle: boolean;
   validateCustomFormLoading: boolean;
-  uploadAreaSelection: string;
+  uploadAreaSelection: 'upload_file' | 'draw' | null;
   totalAreaSelection: string | null;
   splitTasksSelection: task_split_type | null;
   dataExtractGeojson: GeoJSONFeatureTypes | null;
@@ -117,18 +116,15 @@ export type FormCategoryListTypes = {
 };
 
 export type OrganisationListTypes = {
-  logo: string;
   id: number;
-  url: string;
-  slug: string;
   name: string;
+  approved: boolean;
+  type: string;
+  logo: string | null;
   description: string;
-  type: 1;
+  slug: string;
+  url: string;
   odk_central_url: string | null;
-};
-
-export type TaskSplittingGeojsonTypes = {
-  // Define properties related to the task splitting GeoJSON here
 };
 
 export type DrawnGeojsonTypes = {
@@ -148,4 +144,13 @@ export type taskSplitOptionsType = {
 export type dataExtractGeojsonType = {
   type: string;
   features: Record<string, any>[];
+};
+
+export type splittedGeojsonType = {
+  type: 'FeatureCollection';
+  features: {
+    type: 'Feature';
+    geometry: { type: 'Polygon'; coordinates: number[][] };
+    properties: Record<string, any>;
+  }[];
 };
