@@ -12,8 +12,10 @@ export type submissionFormFieldsTypes = {
 };
 
 export type submissionTableDataTypes = {
-  results: any[];
+  results: Record<string, any>[];
   pagination: {
+    has_next: boolean;
+    has_prev: boolean;
     total: number | null;
     page: number | null;
     prev_num: number | null;
@@ -31,4 +33,13 @@ export type reviewListType = {
 };
 
 export type formSubmissionType = { date: string; count: number; label: string };
-export type validatedMappedType = { date: string; Validated: number; Mapped: number; label: string };
+export type validatedMappedType = { date: string; validated: number; mapped: number };
+
+export type updateReviewStateType = {
+  instanceId: string;
+  submitterId: number;
+  deviceId: string;
+  createdAt: string;
+  updatedAt: string;
+  reviewState: string;
+};

@@ -6,9 +6,7 @@ export type TaskStateTypes = {
   selectedTask: number | null;
   selectedFeatureProps: TaskFeatureSelectionProperties;
   projectBoundaryLoading: boolean;
-  projectBoundary: [];
   convertToOsmLoading: boolean;
-  convertToOsm: [];
   downloadSubmissionLoading: downloadSubmissionLoadingTypes;
   convertXMLToJOSMLoading: boolean;
   josmEditorError: null | string;

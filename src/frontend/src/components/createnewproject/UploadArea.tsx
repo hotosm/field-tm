@@ -17,7 +17,16 @@ import { valid } from 'geojson-validation';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import DescriptionSection from '@/components/createnewproject/Description';
 
-const uploadAreaOptions = [
+type uploadAreaType = 'upload_file' | 'draw';
+
+type uploadAreaOptionsType = {
+  name: 'upload_area';
+  value: uploadAreaType;
+  label: string;
+  icon: JSX.Element;
+};
+
+const uploadAreaOptions: uploadAreaOptionsType[] = [
   {
     name: 'upload_area',
     value: 'draw',
@@ -231,14 +240,14 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                 direction="row"
                 onChangeData={(value) => {
                   handleCustomChange('uploadAreaSelection', value);
-                  dispatch(CreateProjectActions.SetUploadAreaSelection(value));
+                  dispatch(CreateProjectActions.SetUploadAreaSelection(value as uploadAreaType));
                   if (value === 'draw') {
                     dispatch(CreateProjectActions.SetDrawToggle(!drawToggle));
                   } else {
                     dispatch(CreateProjectActions.SetDrawToggle(false));
                   }
                 }}
-                value={uploadAreaSelection}
+                value={uploadAreaSelection || ''}
                 errorMsg={errors.uploadAreaSelection}
                 hoveredOption={(hoveredOption) => {
                   dispatch(
@@ -324,7 +333,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   : null
               }
               getAOIArea={(area) => {
-                if (drawnGeojson) {
+                if (drawnGeojson && area) {
                   dispatch(CreateProjectActions.SetTotalAreaSelection(area));
                 }
               }}

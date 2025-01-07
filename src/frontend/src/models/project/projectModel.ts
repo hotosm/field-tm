@@ -23,38 +23,59 @@ export type taskHistoryTypes = {
 export type projectInfoType = {
   id: number;
   name: string;
-  outline: {
-    type: string;
-    geometry: {
-      type: string;
-      coordinates: [];
-    };
-    properties: {
-      id: number;
-      bbox: [number, number, number, number];
-    };
-    id: number;
-    bbox: null | number[];
-  };
-  priority: number;
-  location_str: string;
-  description: string;
+  outline: outlineType;
+  odkid: number;
+  author_id: number;
+  organisation_id: number;
   short_description: string;
+  description: string;
+  per_task_instructions: string;
+  slug: string;
+  task_split_type: string;
+  location_str: string;
+  custom_tms_url: string;
+  status: string;
+  visibility: string;
+  total_tasks: number;
   xform_category: string;
   odk_form_id: string;
-  data_extract_url: string;
+  mapper_level: string;
+  priority: string;
+  featured: boolean;
+  odk_central_url: string;
+  odk_central_user: string;
   odk_token: string;
-  num_contributors: any;
-  tasks_bad: any;
-  tasks_mapped: any;
-  tasks_validated: any;
-  total_tasks: any;
-  organisation_id: number;
-  organisation_logo: string;
-  organisation_name: string;
-  instructions: string;
-  custom_tms_url: string;
+  data_extract_type: string;
+  data_extract_url: string;
+  task_split_dimension: null | number;
+  task_num_buildings: number;
+  hashtags: string[];
+  due_date: null | string;
+  updated_at: string;
   created_at: string;
+  tasks: taskType[];
+  organisation_name: string;
+  organisation_logo: string | null;
+  centroid: { type: 'Point'; coordinates: [number, number] };
+  bbox: [number, number, number, number];
+  last_active: string;
+  num_contributors: number | null;
+};
+
+export type taskType = {
+  id: number;
+  outline: outlineType;
+  project_id: number;
+  project_task_index: number;
+  feature_count: number;
+  task_state: string;
+  actioned_by_uid: number | null;
+  actioned_by_username: string | null;
+};
+
+export type outlineType = {
+  type: string;
+  coordinates: number[][][];
 };
 
 export type downloadProjectFormLoadingType = { type: 'form' | 'geojson' | 'csv' | 'json'; loading: boolean };
@@ -78,21 +99,10 @@ export type projectTaskBoundriesType = {
 export type taskBoundriesTypes = {
   id: number;
   index: number;
-  project_task_index: number;
-  actioned_by_uid: null | string;
-  actioned_by_username: null | string;
-  outline: {
-    type: string;
-    geometry: {
-      coordinates: [string, string];
-      type: string;
-    };
-    properties: Record<string, any>;
-    id: string;
-    bbox: null | number[];
-  };
-  task_history: taskHistoryTypes[];
+  outline: outlineType;
   task_state: string;
+  actioned_by_uid: number | null;
+  actioned_by_username: string | null;
 };
 
 export type taskBoundriesGeojson = {
@@ -116,4 +126,25 @@ export type taskBoundriesGeojson = {
     id: string;
     bbox: null | number[];
   };
+};
+
+export type tileType = {
+  id: string;
+  url: string | null;
+  tile_source: string;
+  background_task_id: string;
+  status: 'SUCCESS' | 'FAILED' | 'PENDING';
+  created_at: string;
+  bbox: any;
+  format: string | null;
+  mimetype: string | null;
+};
+
+export type EntityOsmMap = {
+  id: string;
+  osm_id: number;
+  status: number;
+  task_id: number;
+  updated_at: string;
+  submission_ids: string | null;
 };

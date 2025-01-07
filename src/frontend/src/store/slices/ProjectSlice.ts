@@ -1,20 +1,16 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { ProjectStateTypes } from '@/store/types/IProject';
 
 const initialState: ProjectStateTypes = {
-  projectLoading: true,
   projectTaskBoundries: [],
   newProjectTrigger: false,
   projectInfo: {},
-  projectSubmissionLoading: false,
-  projectSubmission: [],
   projectDataExtractLoading: false,
   downloadProjectFormLoading: { type: 'form', loading: false },
   generateProjectTilesLoading: false,
   tilesList: [],
   tilesListLoading: false,
-  downloadTilesLoading: false,
   customBasemapUrl: null,
   downloadDataExtractLoading: false,
   taskModalStatus: false,
@@ -40,11 +36,8 @@ const ProjectSlice = createSlice({
   name: 'project',
   initialState: initialState,
   reducers: {
-    SetProjectTaskBoundries(state, action) {
+    SetProjectTaskBoundries(state, action: PayloadAction<ProjectStateTypes['projectTaskBoundries']>) {
       state.projectTaskBoundries = action.payload;
-    },
-    SetProjectLoading(state, action) {
-      state.projectLoading = action.payload;
     },
     SetProjectInfo(state, action) {
       state.projectInfo = action.payload;
@@ -52,74 +45,65 @@ const ProjectSlice = createSlice({
     SetNewProjectTrigger(state) {
       state.newProjectTrigger = !state.newProjectTrigger;
     },
-    clearProjects(state, action) {
+    clearProjects(state, action: PayloadAction<[]>) {
       storage.removeItem('persist:project');
       state.projectTaskBoundries = action.payload;
     },
-    GetProjectSubmissionLoading(state, action) {
-      state.projectSubmissionLoading = action.payload;
-    },
-    SetProjectSubmission(state, action) {
-      state.projectSubmission = action.payload;
-    },
-    SetDownloadProjectFormLoading(state, action) {
+    SetDownloadProjectFormLoading(state, action: PayloadAction<ProjectStateTypes['downloadProjectFormLoading']>) {
       state.downloadProjectFormLoading = action.payload;
     },
-    SetGenerateProjectTilesLoading(state, action) {
+    SetGenerateProjectTilesLoading(state, action: PayloadAction<boolean>) {
       state.generateProjectTilesLoading = action.payload;
     },
-    SetTilesList(state, action) {
+    SetTilesList(state, action: PayloadAction<ProjectStateTypes['tilesList']>) {
       state.tilesList = action.payload;
     },
-    SetTilesListLoading(state, action) {
+    SetTilesListLoading(state, action: PayloadAction<boolean>) {
       state.tilesListLoading = action.payload;
     },
-    SetDownloadTileLoading(state, action) {
-      state.downloadTilesLoading = action.payload;
-    },
-    SetPmtileBasemapUrl(state, action) {
+    SetPmtileBasemapUrl(state, action: PayloadAction<string | null>) {
       state.customBasemapUrl = action.payload;
     },
-    SetDownloadDataExtractLoading(state, action) {
+    SetDownloadDataExtractLoading(state, action: PayloadAction<boolean>) {
       state.downloadDataExtractLoading = action.payload;
     },
-    ToggleTaskModalStatus(state, action) {
+    ToggleTaskModalStatus(state, action: PayloadAction<boolean>) {
       state.taskModalStatus = action.payload;
     },
-    ToggleGenerateMbTilesModalStatus(state, action) {
+    ToggleGenerateMbTilesModalStatus(state, action: PayloadAction<boolean>) {
       state.toggleGenerateMbTilesModal = action.payload;
     },
-    SetMobileFooterSelection(state, action) {
+    SetMobileFooterSelection(state, action: PayloadAction<string>) {
       state.mobileFooterSelection = action.payload;
     },
-    SetProjectDetialsLoading(state, action) {
+    SetProjectDetialsLoading(state, action: PayloadAction<boolean>) {
       state.projectDetailsLoading = action.payload;
     },
-    SetProjectDashboardDetail(state, action) {
+    SetProjectDashboardDetail(state, action: PayloadAction<ProjectStateTypes['projectDashboardDetail']>) {
       state.projectDashboardDetail = action.payload;
     },
-    SetEntityToOsmIdMapping(state, action) {
+    SetEntityToOsmIdMapping(state, action: PayloadAction<ProjectStateTypes['entityOsmMap']>) {
       state.entityOsmMap = action.payload;
     },
-    SetEntityToOsmIdMappingLoading(state, action) {
+    SetEntityToOsmIdMappingLoading(state, action: PayloadAction<boolean>) {
       state.entityOsmMapLoading = action.payload;
     },
-    SetProjectDashboardLoading(state, action) {
+    SetProjectDashboardLoading(state, action: PayloadAction<boolean>) {
       state.projectDashboardLoading = action.payload;
     },
-    ToggleGeolocationStatus(state, action) {
+    ToggleGeolocationStatus(state, action: PayloadAction<boolean>) {
       state.geolocationStatus = action.payload;
     },
     SetProjectCommentsList(state, action) {
       state.projectCommentsList = action.payload;
     },
-    SetPostProjectCommentsLoading(state, action) {
+    SetPostProjectCommentsLoading(state, action: PayloadAction<boolean>) {
       state.projectPostCommentsLoading = action.payload;
     },
-    SetProjectGetCommentsLoading(state, action) {
+    SetProjectGetCommentsLoading(state, action: PayloadAction<boolean>) {
       state.projectGetCommentsLoading = action.payload;
     },
-    ClearEditorContent(state, action) {
+    ClearEditorContent(state, action: PayloadAction<boolean>) {
       state.clearEditorContent = action.payload;
     },
     UpdateProjectCommentsList(state, action) {
@@ -128,13 +112,13 @@ const ProjectSlice = createSlice({
     SetProjectTaskActivity(state, action) {
       state.projectTaskActivity = action.payload;
     },
-    SetProjectTaskActivityLoading(state, action) {
+    SetProjectTaskActivityLoading(state, action: PayloadAction<boolean>) {
       state.projectActivityLoading = action.payload;
     },
     UpdateProjectTaskActivity(state, action) {
       state.projectTaskActivity = [action.payload, ...state.projectTaskActivity];
     },
-    UpdateEntityStateLoading(state, action) {
+    UpdateEntityStateLoading(state, action: PayloadAction<boolean>) {
       state.updateEntityStateLoading = action.payload;
     },
     UpdateEntityState(state, action) {
@@ -166,7 +150,7 @@ const ProjectSlice = createSlice({
       });
       state.projectTaskBoundries = updatedProjectTaskBoundries;
     },
-    SetDownloadSubmissionGeojsonLoading(state, action) {
+    SetDownloadSubmissionGeojsonLoading(state, action: PayloadAction<boolean>) {
       state.downloadSubmissionLoading = action.payload;
     },
   },

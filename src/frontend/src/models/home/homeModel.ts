@@ -32,10 +32,7 @@ export type projectType = {
   organisation_id: number;
   organisation_logo: string | null;
   priority: number;
-  tasks_bad: number;
-  tasks_mapped: number;
-  tasks_validated: number;
-  total_tasks: number;
+  outline: { type: string; coordinates: number[][] };
 };
 
 export type snackbarTypes = {

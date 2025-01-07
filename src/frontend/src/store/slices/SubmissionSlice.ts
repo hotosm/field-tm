@@ -1,5 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SubmissionStateTypes } from '@/store/types/ISubmissions';
+import { updateReviewStateType, validatedMappedType } from '@/models/submission/submissionModel';
 
 const initialState: SubmissionStateTypes = {
   submissionDetailsLoading: true,
@@ -10,6 +11,8 @@ const initialState: SubmissionStateTypes = {
   submissionTableData: {
     results: [],
     pagination: {
+      has_next: false,
+      has_prev: false,
       total: null,
       page: null,
       prev_num: null,
@@ -40,40 +43,40 @@ const SubmissionSlice = createSlice({
   name: 'submission',
   initialState: initialState,
   reducers: {
-    SetSubmissionDetailsLoading(state, action) {
+    SetSubmissionDetailsLoading(state, action: PayloadAction<boolean>) {
       state.submissionDetailsLoading = action.payload;
     },
-    SetSubmissionDetails(state, action) {
+    SetSubmissionDetails(state, action: PayloadAction<Record<string, any> | null>) {
       state.submissionDetails = action.payload;
     },
-    SetSubmissionContributors(state, action) {
+    SetSubmissionContributors(state, action: PayloadAction<SubmissionStateTypes['submissionContributors']>) {
       state.submissionContributors = action.payload;
     },
-    SetSubmissionContributorsLoading(state, action) {
+    SetSubmissionContributorsLoading(state, action: PayloadAction<boolean>) {
       state.submissionContributorsLoading = action.payload;
     },
-    SetSubmissionFormFields(state, action) {
+    SetSubmissionFormFields(state, action: PayloadAction<SubmissionStateTypes['submissionFormFields']>) {
       state.submissionFormFields = action.payload;
     },
-    SetSubmissionTable(state, action) {
+    SetSubmissionTable(state, action: PayloadAction<SubmissionStateTypes['submissionTableData']>) {
       state.submissionTableData = action.payload;
     },
-    SetSubmissionFormFieldsLoading(state, action) {
+    SetSubmissionFormFieldsLoading(state, action: PayloadAction<boolean>) {
       state.submissionFormFieldsLoading = action.payload;
     },
-    SetSubmissionTableLoading(state, action) {
+    SetSubmissionTableLoading(state, action: PayloadAction<boolean>) {
       state.submissionTableDataLoading = action.payload;
     },
-    SetSubmissionTableRefreshing(state, action) {
+    SetSubmissionTableRefreshing(state, action: PayloadAction<boolean>) {
       state.submissionTableRefreshing = action.payload;
     },
-    SetUpdateReviewStatusModal(state, action) {
+    SetUpdateReviewStatusModal(state, action: PayloadAction<SubmissionStateTypes['updateReviewStatusModal']>) {
       state.updateReviewStatusModal = action.payload;
     },
-    UpdateReviewStateLoading(state, action) {
+    UpdateReviewStateLoading(state, action: PayloadAction<boolean>) {
       state.updateReviewStateLoading = action.payload;
     },
-    UpdateSubmissionTableDataReview(state, action) {
+    UpdateSubmissionTableDataReview(state, action: PayloadAction<updateReviewStateType>) {
       const updatedSubmission = action.payload;
 
       // submission-instance table update
@@ -98,20 +101,20 @@ const SubmissionSlice = createSlice({
         };
       }
     },
-    SetMappedVsValidatedTask(state, action) {
+    SetMappedVsValidatedTask(state, action: PayloadAction<validatedMappedType[]>) {
       const MappedVsValidatedTask = action.payload;
       state.mappedVsValidatedTask = MappedVsValidatedTask?.map((task) => ({
         ...task,
         label: task?.date?.split('/').slice(0, 2).join('/'),
       }));
     },
-    SetMappedVsValidatedTaskLoading(state, action) {
+    SetMappedVsValidatedTaskLoading(state, action: PayloadAction<boolean>) {
       state.mappedVsValidatedTaskLoading = action.payload;
     },
-    SetSubmissionPhotos(state, action) {
+    SetSubmissionPhotos(state, action: PayloadAction<string[]>) {
       state.submissionPhotos = action.payload;
     },
-    SetSubmissionPhotosLoading(state, action) {
+    SetSubmissionPhotosLoading(state, action: PayloadAction<boolean>) {
       state.submissionPhotosLoading = action.payload;
     },
   },

@@ -34,3 +34,12 @@ export type legendColorArrayType = {
   max: number;
   color: string;
 };
+
+export type EntityOsmMap = {
+  id: string;
+  osm_id: number;
+  status: number;
+  task_id: number;
+  updated_at: string;
+  submission_ids: string | null;
+};

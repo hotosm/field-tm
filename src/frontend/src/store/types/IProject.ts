@@ -1,23 +1,21 @@
 import {
   downloadProjectFormLoadingType,
+  EntityOsmMap,
   projectDashboardDetailTypes,
   projectInfoType,
   projectTaskBoundriesType,
+  tileType,
 } from '@/models/project/projectModel';
 
 export type ProjectStateTypes = {
-  projectLoading: boolean;
   projectTaskBoundries: projectTaskBoundriesType[];
   newProjectTrigger: boolean;
   projectInfo: Partial<projectInfoType>;
-  projectSubmissionLoading: boolean;
-  projectSubmission: [];
   projectDataExtractLoading: boolean;
   downloadProjectFormLoading: downloadProjectFormLoadingType;
   generateProjectTilesLoading: boolean;
-  tilesList: tilesListTypes[];
+  tilesList: tileType[];
   tilesListLoading: boolean;
-  downloadTilesLoading: boolean;
   customBasemapUrl: string | null;
   downloadDataExtractLoading: boolean;
   taskModalStatus: boolean;
@@ -37,24 +35,6 @@ export type ProjectStateTypes = {
   projectTaskActivity: projectTaskActivity[];
   projectActivityLoading: boolean;
   downloadSubmissionLoading: boolean;
-};
-
-export type EntityOsmMap = {
-  id: string;
-  osm_id: number;
-  status: number;
-  task_id: number;
-  updated_at: string;
-  submission_ids: string;
-};
-
-type tilesListTypes = {
-  id: number;
-  project_id: number;
-  status: string;
-  source: string;
-  format: string;
-  url: string;
 };
 
 type projectCommentsListTypes = {

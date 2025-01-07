@@ -25,13 +25,21 @@ export interface GetOrganisationDataModel {
   description: string;
   type: number;
   id: number;
-  logo: string;
+  logo: string | null;
   url: string;
   approved: boolean;
+  odk_central_url: string | null;
 }
 
 export type organizationTypeOptionsType = {
   name: string;
   value: string;
   label: string;
+};
+
+export type consentDetailsFormDataType = {
+  give_consent: '' | 'yes' | 'no';
+  review_documentation: string[];
+  log_into: string[];
+  participated_in: string[];
 };

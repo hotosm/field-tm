@@ -1,5 +1,5 @@
 import CoreModules from '@/shared/CoreModules';
-import { CommonActions } from '@/store/slices/CommonSlice';
+import { TaskActions } from '@/store/slices/TaskSlice';
 
 export const getDownloadProjectSubmission: Function = (url: string, projectName: string) => {
   return async (dispatch) => {
@@ -7,7 +7,7 @@ export const getDownloadProjectSubmission: Function = (url: string, projectName:
     const isExportJson = params.get('export_json');
     const isJsonOrCsv = isExportJson === 'true' ? 'json' : 'csv';
     dispatch(
-      CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+      TaskActions.GetDownloadProjectSubmissionLoading({
         type: isJsonOrCsv,
         loading: true,
       }),
@@ -22,22 +22,10 @@ export const getDownloadProjectSubmission: Function = (url: string, projectName:
         a.href = window.URL.createObjectURL(response.data);
         a.download = isExportJson === 'true' ? `${projectName}.json` : `${projectName}.zip`;
         a.click();
-        dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-            type: isJsonOrCsv,
-            loading: false,
-          }),
-        );
       } catch (error) {
-        dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-            type: isJsonOrCsv,
-            loading: false,
-          }),
-        );
       } finally {
         dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
+          TaskActions.GetDownloadProjectSubmissionLoading({
             type: isJsonOrCsv,
             loading: false,
           }),
@@ -45,122 +33,12 @@ export const getDownloadProjectSubmission: Function = (url: string, projectName:
       }
     };
     await getProjectSubmission(url);
-  };
-};
-
-export const getDownloadProjectSubmissionJson: Function = (url: string) => {
-  return async (dispatch) => {
-    dispatch(
-      CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-        type: 'json',
-        loading: true,
-      }),
-    );
-
-    const getProjectSubmission = async (url: string) => {
-      try {
-        const response = await CoreModules.axios.post(url);
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: response.data.Message,
-            variant: 'success',
-            duration: 3000,
-          }),
-        );
-
-        const checkStatus = async () => {
-          let statusResponse;
-          do {
-            const submissionResponse = await CoreModules.axios.post(
-              `${url}&background_task_id=${response.data.task_id}`,
-            );
-            statusResponse = submissionResponse.data;
-            if (statusResponse.status === 'PENDING') {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-            }
-          } while (statusResponse.status === 'PENDING');
-          return statusResponse;
-        };
-        const finalStatus = await checkStatus();
-        if (finalStatus.status === 'FAILED') {
-          dispatch(
-            CommonActions.SetSnackBar({
-              open: true,
-              message: finalStatus.message,
-              variant: 'error',
-              duration: 3000,
-            }),
-          );
-          return;
-        }
-        var a = document.createElement('a');
-        a.href = finalStatus;
-        a.download = 'Submissions';
-        a.click();
-        dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-            type: 'json',
-            loading: false,
-          }),
-        );
-      } catch (error) {
-        dispatch(
-          CommonActions.SetSnackBar({
-            open: true,
-            message: 'Something went wrong.',
-            variant: 'error',
-            duration: 3000,
-          }),
-        );
-        dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-            type: 'json',
-            loading: false,
-          }),
-        );
-      } finally {
-        dispatch(
-          CoreModules.TaskActions.GetDownloadProjectSubmissionLoading({
-            type: 'json',
-            loading: false,
-          }),
-        );
-      }
-    };
-    await getProjectSubmission(url);
-  };
-};
-
-export const fetchConvertToOsmDetails: Function = (url: string) => {
-  return async (dispatch) => {
-    dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(true));
-
-    try {
-      const response = await CoreModules.axios.get(url, {
-        responseType: 'blob',
-      });
-
-      const downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(new Blob([response.data]));
-      downloadLink.setAttribute('download', 'task.zip');
-      document.body.appendChild(downloadLink);
-
-      downloadLink.click();
-
-      document.body.removeChild(downloadLink);
-      window.URL.revokeObjectURL(downloadLink.href);
-
-      dispatch(CoreModules.TaskActions.FetchConvertToOsm(response.data));
-    } catch (error) {
-      dispatch(CoreModules.TaskActions.FetchConvertToOsmLoading(false));
-    }
   };
 };
 
 export const ConvertXMLToJOSM: Function = (url: string, projectBbox: number[]) => {
   return async (dispatch) => {
-    dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(true));
+    dispatch(TaskActions.SetConvertXMLToJOSMLoading(true));
     const getConvertXMLToJOSM = async (url) => {
       try {
         // checkJOSMOpen - To check if JOSM Editor is Open Or Not.
@@ -188,11 +66,9 @@ export const ConvertXMLToJOSM: Function = (url: string, projectBbox: number[]) =
 
         await fetch(`http://127.0.0.1:8111/zoom?${queryString}`);
       } catch (error: any) {
-        dispatch(CoreModules.TaskActions.SetJosmEditorError('JOSM Error'));
-        // alert(error.response.data);
-        dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(false));
+        dispatch(TaskActions.SetJosmEditorError('JOSM Error'));
       } finally {
-        dispatch(CoreModules.TaskActions.SetConvertXMLToJOSMLoading(false));
+        dispatch(TaskActions.SetConvertXMLToJOSMLoading(false));
       }
     };
     await getConvertXMLToJOSM(url);

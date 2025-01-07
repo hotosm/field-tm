@@ -1,11 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { HomeStateTypes } from '@/store/types/IHome';
 
 export const initialState: HomeStateTypes = {
   homeProjectSummary: [],
   homeProjectLoading: true,
   selectedProject: {},
-  dialogStatus: false,
   snackbar: {
     open: false,
     message: '',
@@ -13,7 +12,6 @@ export const initialState: HomeStateTypes = {
     duration: 0,
   },
   showMapStatus: false,
-  projectCentroidLoading: false,
   homeProjectPagination: {
     has_next: false,
     has_prev: false,
@@ -30,31 +28,22 @@ const HomeSlice = createSlice({
   name: 'home',
   initialState: initialState,
   reducers: {
-    SetHomeProjectSummary(state, action) {
+    SetHomeProjectSummary(state, action: PayloadAction<HomeStateTypes['homeProjectSummary']>) {
       state.homeProjectSummary = action.payload;
     },
-    HomeProjectLoading(state, action) {
+    HomeProjectLoading(state, action: PayloadAction<boolean>) {
       state.homeProjectLoading = action.payload;
     },
-    SetSelectedProject(state, action) {
+    SetSelectedProject(state, action: PayloadAction<HomeStateTypes['selectedProject']>) {
       state.selectedProject = action.payload;
     },
-    SetDialogStatus(state, action) {
-      state.dialogStatus = action.payload;
-    },
-    SetSnackBar(state, action) {
+    SetSnackBar(state, action: PayloadAction<HomeStateTypes['snackbar']>) {
       state.snackbar = action.payload;
     },
-    SetShowMapStatus(state, action) {
+    SetShowMapStatus(state, action: PayloadAction<boolean>) {
       state.showMapStatus = action.payload;
     },
-    SetProjectCentroidLoading(state, action) {
-      state.projectCentroidLoading = action.payload;
-    },
-    SetProjectCentroid(state, action) {
-      state.homeProjectSummary = action.payload;
-    },
-    SetHomeProjectPagination(state, action) {
+    SetHomeProjectPagination(state, action: PayloadAction<HomeStateTypes['homeProjectPagination']>) {
       state.homeProjectPagination = action.payload;
     },
   },
