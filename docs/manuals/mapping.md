@@ -13,9 +13,9 @@ not supported on iOS devices.
 Verify that your mobile device meets the minimum specifications required
 for field mapping:
 
-- **Minimum RAM**: 4GB
-- **Storage**: Ensure sufficient storage space is available (1GB should be enough).
-- **Operating System**: ODK recommends using Android 10 or higher for
+- Minimum RAM: 4GB
+- Storage: Ensure sufficient storage space is available (1GB should be enough).
+- Operating System: ODK recommends using Android 10 or higher for
   the best security and performance.
 
 #### Checking Device Specifications
