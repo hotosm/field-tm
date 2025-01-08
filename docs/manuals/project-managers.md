@@ -1,16 +1,7 @@
-# User Manual for FMTM
+# Project Manager Manual for FMTM
 
 This manual is a step by step guide for the project managers on how to get
 started with the Field Mapping Tasking Manager.
-
-- [User Manual for FMTM](#user-manual-for-fmtm)
-  - [Introduction](#introduction)
-  - [An Overview Of FMTM In Relations With HOT, OSM and ODK](#an-overview-of-fmtm-in-relations-with-hot-osm-and-odk)
-  - [Prerequisites](#prerequisites)
-  - [Video Tutorial](#video-tutorial)
-  - [Steps to create a project in FMTM](#steps-to-create-a-project-in-fmtm)
-  - [Steps to start access your project and Start mapping or a mapping campaign](#steps-to-start-access-your-project-and-start-mapping-or-a-mapping-campaign)
-  - [Help and Support](#help-and-support)
 
 ## Introduction
 
@@ -77,13 +68,9 @@ and improve the effectiveness of humanitarian efforts.
 
 ## Prerequisites
 
-- Stable Internet connection
-- Knowledge on field mapping . If you are new to mapping we suggest you to read
-  [this][9] .
-- Account on ODK Central Server.
-  [Here][10]
-  are the instructions for setting up an ODK Central server on Digital Ocean
-  (it's very similar on AWS etc)
+- Stable Internet connection.
+- Basic bnowledge of field mapping. If you are new to mapping we suggest you
+  read [this][1].
 
 ## Video Tutorial
 
@@ -97,9 +84,28 @@ and improve the effectiveness of humanitarian efforts.
 
 <https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8>
 
-## Steps to create a project in FMTM
+## Steps to Join An Organisation
 
-1. Go to [fmtm][11] .
+You may request to join an existing organisation.
+
+Alternatively, request the creation of a new organisation for your team:
+
+1. Go to the Manage organization tab. You can see the number of organizations.
+   On the top, there is a New button, clicking on which you can request
+   for a new organization.
+
+2. You have to provide your consent and fill up the form by providing
+   necessary details like Organization name, URL, Description of
+   organization, type of organization etc.
+   ![image](https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d)
+
+3. Now submit the form. The request will reach the Admin who will create your
+   organization and inform you through the email.
+   ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
+
+## Steps To Create A Project In FMTM
+
+1. Go to [fmtm][2] .
 2. In the header, you'll find two tabs: Explore Projects and Manage Organization.
 
    ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
@@ -110,7 +116,7 @@ and improve the effectiveness of humanitarian efforts.
    of your choice.
 5. If you are not logged into the system, the "Create new project" button will
    be disabled.
-6. If you are new then on the top right cornor click on Sign up and create an
+6. If you are new then on the top right corner click on Sign up and create an
    account . Else , Sign in to your existing account .
 7. Once signed in, the "Create new project" button will be enabled. Click on it.
 8. The process of creating a new project involves four steps: Project Details,
@@ -161,73 +167,133 @@ and improve the effectiveness of humanitarian efforts.
 17. After the project creation is successful and QR codes are generated, you are
     redirected to the project details page of the project.
 
-## Steps to start access your project and Start mapping or a mapping campaign
+### Guidelines / Common Questions
 
-1. Go to the Explore projects tab . Click on the project card and proceed to the
-   next step.
-2. Select one of the available tasks and start the field mapping exercise.
+#### Defining the Project Boundary
 
-   ![image](https://github.com/user-attachments/assets/513a189d-04d9-4a30-9793-7cdfbb333069)
+- Confirm the exact area for the survey before creating
+  the project, as the project boundary cannot be
+  edited once the project is created.
 
-3. If a task is already locked by another user, choose a different task that is
-   available for mapping.If a task is already locked by another user, choose a
-   different task that is available for mapping.
+#### Preparing Map Features
 
-   - The drop down icon beside **LEGEND** displays a color code. This
-     color code lets you know the status of each task on the map.
+- Ensure you have the map features ready for the area
+  you plan to survey before starting project creation.
+- The files should be in GeoJSON format, use the WGS coordinate
+  system with EPSG 4326, and must not include
+  a Z-coordinate. The map feature file should follow the
+  osm tags structure.
+- Below is a sample of the required file structure:
 
-     - **READY** means that task is available to be mapped
-     - **LOCKED FOR MAPPING** means that task is already being mapped by another
-       volunteer and therefore unavailable for mapping
-     - **MAPPED** or **READY FOR VALIDATION** means that task has been completely
-       mapped and ready to be validated.
-     - **LOCKED FOR VALIDATION** means that task has been mapped and being
-       validated.
-     - **VALIDATED** means that task has successfully been validated and completely
-       mapped with no errors
-     - **INVALIDATED** or **MORE MAPPING NEEDED** means that task did not pass the
-       validation process and needs more mapping
-     - **BAD** means that task is not clear and cannot be mapped
+```json
+{
+   "type": "Feature",
+   "properties": { "full_id": "r9517874",
+      "osm_id": "9517874",
+      "osm_type": "relation"
+      "tags": {"building": "yes"},
+      "type": "multipolygon",
+      "name": "",
+      "building:levels": "" },
+   "geometry": { "type": "MultiPolygon", "coordinates": [ [ [
+      [ -3.9618848, 5.3041323 ],
+      [ -3.9615121, 5.3041457 ],
+      [ -3.9615028, 5.3038906 ],
+      [ -3.9618755, 5.3038772 ],
+      [ -3.9618848, 5.3041323 ]
+   ],
+   [
+      [ -3.9620167, 5.3042236 ],
+      [ -3.9620143, 5.3041258 ],
+      [ -3.9619839, 5.3041266 ],
+      [ -3.9619757, 5.3037882 ],
+      [ -3.9614038, 5.3038019 ],
+      [ -3.9614144, 5.3042381 ],
+      [ -3.9620167, 5.3042236 ]
+   ] ] ] }
+},
+```
 
-   > Note: 'task' refers to each section of the map enclosed in the dotted
-   > lines and each task has a corresponding number tag.
+- You may download features from OpenStreetMap (OSM)
+  by clicking on Fetch data from osm with FMTM project  
+  creation; however, note that FMTM is not responsible  
+  for the data quality of features extracted from OSM.
+- Currently, available types of survey features are Buildings
+  and Healthcare only. We plan to add more types of features moving ahead.
+- Project managers can also upload supporting map features.
+  Note that these secondary features can’t be surveyed but  
+  selected for respective primary features.
 
-   ![image](https://github.com/user-attachments/assets/280fd927-b71e-4336-a89a-1672e8de687b)
+#### XLS Form Preparation
 
-   - To begin mapping, click on a task closest to you that has the color
-     code associated with **READY** and change it's status from **READY**
-     to **LOCKED FOR MAPPING**. Remember to take note of the number tag.
-   - Scroll to the bottom of the page. The **ACTIVITIES** tab shows the
-     tasks either **LOCKED FOR MAPPING**, **BAD** or **LOCKED FOR
-     VALIDATION**. You can search for tasks with the status mentioned
-     using the number tag associated with each task.
+- Be prepared with the XLS form for the project.
+- If updates are required to the form, you can edit the  
+  XLS form even after the project is created.
+- Note that a few fields in the beginning and end of  
+  the form will be injected to ask for some feature verification.
+- So project managers are requested to fill up the  
+  form through odk or download the form after the project  
+  is created to know about the field injected. You can also  
+  get the fields injected from our documentation  
+  [Here](https://docs.fmtm.dev/manuals/xlsform-design/#injected-fields-in-the-fmtm-xls-form)
 
-4. Use the QR code to start mapping the selected task using the ODK Collect app
-   on your mobile phone.
-5. Install and open the ODK Collect app on your phone.
-6. Set up the project details by scanning the QR code provided.
-7. Once the project is set up in the app, start a new form based on the selected
-   form from the project setup.
-8. Fill in the questionnaires and collect data for the field mapping exercise.
-9. Save and send the completed form to the server.
-10. After completing the assigned task, go back to the project platform on FMTM
-    and mark it as fully mapped.
+Also read carefully the overview in the left section of
+each step to understand the details of the functionalities.
 
-## Steps to Create an organisation
+#### Uploading Custom Imagery
 
-1. Go to the Manage organization tab. You can see the number of organizations.
-   On the top, there is a New button, clicking on which you can request
-   for a new organization.
-2. You have to provide your consent and fill up the form by providing
-   necessary details like Organization name, URL, Description of
-   organization, type of organization etc.
-   ![image](https://github.com/user-attachments/assets/e808a57a-2cce-48e3-9e68-a7af3dfeb36d)
+If you have custom imagery that you want to use as basemap
+during field mapping activity, then you have to add the  
+TMS link of that imagery during the first step of project creation.
 
-3. Now submit the form. The request will reach the Admin who will create your
-   organization and inform you through the email.
-   ![image](https://github.com/user-attachments/assets/6efffe4c-f887-4ef0-95e5-b432ee227a91)
+- Click on _I would like to include my own imagery layer  
+  for reference_ in the first step to add TMS URL. You can  
+  get the URL by uploading it in openaerialmap.
 
-## Steps to view your submissions and infographics
+#### ODK Central Credentials
+
+To store your submissions in ODK Central, you need to  
+have valid ODK Central credentials. You can obtain these  
+by hosting your own ODK Central server. If you don’t have  
+access to a personal ODK Central server, you can use HOT’s  
+server by selecting HOT as your organization.
+
+#### During Mapper Training
+
+1. Make sure mapper has downloaded custom odk collect from  
+   FMTM website. You can also share the apk file if mappers
+   find it difficult to download by themselves.
+2. Share the link of the project for the mapper to reach  
+   to the project easily. The URL be:
+   [https://fmtm.hotosm.org/mapnow/project_id](https://fmtm.hotosm.org/mapnow/project_id)
+3. **Updating Metadata**  
+   If you need mappers to include their email  
+   and phone number along with their username, guide them  
+   to update their ODK Collect settings:
+   - Navigate to **Settings** for the project.
+   - Click on **User and Device Identity** to update the  
+     metadata fields.
+4. **Test Submissions**  
+   Encourage mappers to submit a few test entries to  
+   familiarize themselves with the workflow and address  
+   any issues during training.
+
+#### After Training
+
+1. Collect regular ongoing feedback from mappers to ensure they face no difficulties
+   during fieldwork.
+2. Prepare clear and detailed instructions for mappers
+   and validators, specific to the project requirements.
+3. Prepare the checklist for validation. The things to
+   check may depend on the type of project.
+4. Connect the odk central to powerBI or any other data visualisation tool via Odata
+   link to customise the charts and graphs as per your need.  
+   ![odk_image](image.png)
+
+To get more info about project management in odk collect  
+follow the guide [Here](https://docs.getodk.org/collect-using/).
+
+## Steps To View Your Submissions and Infographics
 
 1. Go to the respective project. On the bottom left side,
    you will see the view infographics button.
@@ -247,7 +313,41 @@ and improve the effectiveness of humanitarian efforts.
    control enabled.
    ![image](https://github.com/user-attachments/assets/b17df10f-df86-4ca1-abc4-97a34be1d6c3)
 
-## Steps to Edit project details
+### Connecting The Data To External Applications
+
+If you want to visualise the submissions and create custom charts
+and diagrams using FMTM submissions, then you can follow the steps
+below and load the submissions on any data analysis platform using **OData**.
+
+OData endpoints are a standardised way to ingest
+this data into other tools: PowerBI, Tableau, Redash, Grafana.
+
+Why PowerBI? You can use other tools too like Tableau, Redash, Grafana or even
+Excel. However, PowerBI is free to use, very powerful, and user friendly to use,
+despite being a proprietary Microsoft tool.
+
+The steps shows how to use PowerBI and create custom visualisations.
+ODK already has good docs on this which you can refer to.
+<https://docs.getodk.org/tutorial-mapping-households/>
+
+Step 1: Start a new project, add a new data source 'OData Feed'
+
+[Image here]
+
+Step 2: Use the OData URLs shown in the ODK docs:
+a. Submission data: /v1/projects/{projectId}/forms/{xmlFormId}.svc
+e.g. <https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc>
+b. Entity data: /v1/projects/{projectId}/datasets/{name}.svc
+e.g. <https://odk.hotosm.org/v1/projects/86/datasets/features.svc>
+
+Step 3: Enter your credentials using Basic Auth
+
+Step 4: Preview the data
+
+Step 5: Transform data as needed, load into charts, graphs, etc, to create the
+dashboard you need.
+
+## Steps to Edit Project Details
 
 1. Users can also edit a few fields after project creation like basic
    details like name, description, instructions as well as XLS form.
@@ -262,11 +362,10 @@ and improve the effectiveness of humanitarian efforts.
 If you encounter any issues or need assistance while using FMTM, you can access
 the following resources:
 
-- Check the [FAQs][21] .
-- Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][22]
+- Check the [FAQs][3] .
+- Ask your doubts in the [Slack channel: #field-mapping-tasking-manager][4]
 
-[9]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
-[10]: https://docs.getodk.org/central-install-digital-ocean/ "Account on ODK Central Server"
-[11]: https://fmtm.hotosm.org/ "fmtm"
-[21]: https://docs.fmtm.dev/faq "FAQs"
-[22]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
+[1]: https://tasks.hotosm.org/learn/map "If you are new to mapping"
+[2]: https://fmtm.hotosm.org/ "fmtm"
+[3]: https://docs.fmtm.dev/faq "FAQs"
+[4]: https://hotosm.slack.com/archives/C04PCBFDEGN "Slack channel: #field-mapping-tasking-manager"
