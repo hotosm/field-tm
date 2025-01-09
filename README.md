@@ -63,7 +63,7 @@ the FMTM aims to solve the problem of **coordinating** field mapping campaigns.
 This project relies heavily on the [ODK](getodk.org) ecosystem underneath:
 
 - [XLSForms](https://xlsform.org) are used for the underlying data collection
-  survey. The fields in this survey can be mapped to OpenStreeMap tags.
+  survey. The fields in this survey can be mapped to OpenStreetMap tags.
 - [ODK Central](https://github.com/getodk/central) is used to store the XLSForm
   and receive data submissions from users.
 - [ODK Collect](https://github.com/getodk/collect) is a mobile app that the user
