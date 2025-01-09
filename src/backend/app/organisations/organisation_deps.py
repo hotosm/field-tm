@@ -18,10 +18,12 @@
 
 """Organisation dependencies for use in Depends."""
 
+import os
 from typing import Annotated
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
+from loguru import logger as log
 from psycopg import Connection
 
 from app.central import central_schemas
@@ -79,15 +81,26 @@ async def get_org_odk_creds(
     password = org.odk_central_password
 
     if not all([url, user, password]):
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail="Organisation does not have ODK Central credentials configured",
+        log.info(
+            """Organisation does not have ODK Central credentials configured
+            using default hotosm credentials""",
         )
+        default_creds = await get_default_odk_creds()
+        return central_schemas.ODKCentralDecrypted(**default_creds.dict())
 
     return central_schemas.ODKCentralDecrypted(
         odk_central_url=url,
         odk_central_user=user,
         odk_central_password=password,
+    )
+
+
+async def get_default_odk_creds():
+    """Get default odk credentials."""
+    return central_schemas.ODKCentralIn(
+        odk_central_url=os.getenv("ODK_CENTRAL_URL"),
+        odk_central_user=os.getenv("ODK_CENTRAL_USER"),
+        odk_central_password=os.getenv("ODK_CENTRAL_PASSWD"),
     )
 
 

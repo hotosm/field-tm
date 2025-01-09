@@ -51,6 +51,7 @@ from app.db.postgis_utils import (
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
+from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
 
@@ -556,6 +557,10 @@ async def generate_project_files(
     project_xlsform = project.xlsform_content
     project_odk_form_id = project.odk_form_id
     project_odk_creds = project.odk_credentials
+
+    if not project_odk_creds:
+        # get default credentials
+        project_odk_creds = await get_default_odk_creds()
 
     odk_token = await generate_odk_central_project_content(
         project_odk_id,
