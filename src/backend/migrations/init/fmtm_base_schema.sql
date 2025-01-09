@@ -392,8 +392,8 @@ ALTER SEQUENCE public.submission_photos_id_seq
 OWNED BY public.submission_photos.id;
 
 CREATE TABLE geometrylog (
-    id SERIAL PRIMARY KEY,
-    geom GEOMETRY NOT NULL,
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    geom JSONB NOT NULL,
     status geomstatus,
     project_id int,
     task_id int

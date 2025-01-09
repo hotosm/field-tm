@@ -1303,7 +1303,7 @@ async def create_geom_log(
 
 @router.delete("/{project_id}/geometries")
 async def delete_geom_log(
-    geom_id: int,
+    geom_id: str,
     project_user: Annotated[
         ProjectUserDict, Depends(project_manager)
     ],  # later change this to validator
