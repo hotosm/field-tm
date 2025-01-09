@@ -75,6 +75,9 @@ const ProjectDetailsForm = ({ flag }) => {
 
     if (selectedOrg && selectedOrg.hasODKCredentials) {
       handleCustomChange('defaultODKCredentials', selectedOrg.hasODKCredentials);
+    } else {
+      // Allow the user to choose default credentials for orgs without ODK credentials
+      handleCustomChange('defaultODKCredentials', false);
     }
   };
 
@@ -166,7 +169,7 @@ const ProjectDetailsForm = ({ flag }) => {
             }}
             onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
           >
-            {hasODKCredentials && (
+            {
               <CustomCheckbox
                 key="defaultODKCredentials"
                 label="Use default ODK credentials"
@@ -175,10 +178,10 @@ const ProjectDetailsForm = ({ flag }) => {
                   handleCustomChange('defaultODKCredentials', !values.defaultODKCredentials);
                 }}
                 className="fmtm-text-black"
-                labelClickable={true}
+                labelClickable={hasODKCredentials} // Dynamically set labelClickable based on hasODKCredentials
               />
-            )}
-            {((!values.defaultODKCredentials && hasODKCredentials) || !hasODKCredentials) && (
+            }
+            {!values.defaultODKCredentials && !hasODKCredentials && (
               <>
                 <InputTextField
                   id="odk_central_url"
