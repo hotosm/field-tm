@@ -1789,7 +1789,7 @@ class DbGeometryLog(BaseModel):
         for key in model_dump.keys():
             columns.append(key)
             if key == "geom":
-                value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
+                value_placeholders.append(f"%({key})s::jsonb")
                 # Must be string json for db input
                 model_dump[key] = json.dumps(model_dump[key])
             else:
@@ -1802,8 +1802,7 @@ class DbGeometryLog(BaseModel):
                 VALUES
                     ({", ".join(value_placeholders)})
                 RETURNING
-                    *,
-                    ST_AsGeoJSON(geom)::jsonb AS geom;
+                    *
             """,
                 model_dump,
             )
@@ -1815,7 +1814,7 @@ class DbGeometryLog(BaseModel):
         cls,
         db: Connection,
         project_id: int,
-        id: int,
+        id: str,
     ) -> bool:
         """Delete a geometry."""
         async with db.cursor() as cur:
