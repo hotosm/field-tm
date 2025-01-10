@@ -34,14 +34,16 @@ from loguru import logger as log
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
 from psycopg.rows import class_row
-from pydantic import AwareDatetime, BaseModel, Field, ValidationInfo
+from pydantic import AwareDatetime, BaseModel, Field, PositiveInt, ValidationInfo
 from pydantic.functional_validators import field_validator
 
 from app.central.central_schemas import ODKCentralDecrypted
 from app.config import settings
+from app.db import database
 from app.db.enums import (
     BackgroundTaskStatus,
     CommunityType,
+    DbGeomType,
     EntityState,
     GeomStatus,
     HTTPStatus,
@@ -329,6 +331,7 @@ class DbOrganisation(BaseModel):
     type: Optional[OrganisationType] = None
     approved: Optional[bool] = None
     created_by: Optional[int] = None  # this is not foreign key linked intentionally
+    associated_email: Optional[str] = None
     odk_central_url: Optional[str] = None
     odk_central_user: Optional[str] = None
     odk_central_password: Optional[str] = None
@@ -966,6 +969,9 @@ class DbProject(BaseModel):
     data_extract_url: Optional[str] = None
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
+    new_geom_type: Optional[DbGeomType] = None
+    geo_restrict_distance_meters: Optional[PositiveInt] = None
+    geo_restrict_force_error: Optional[bool] = None
     hashtags: Optional[list[str]] = None
     due_date: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
@@ -1387,58 +1393,69 @@ class DbOdkEntities(BaseModel):
         db: Connection,
         project_id: int,
         entities: list[Self],
+        batch_size: int = 10000,
     ) -> bool:
-        """Update or insert Entity data, with statuses.
+        """Update or insert Entity data in batches, with statuses.
 
         Args:
             db (Connection): The database connection.
             project_id (int): The project ID.
             entities (list[Self]): List of DbOdkEntities objects.
+            batch_size (int): Number of entities to process in each batch.
 
         Returns:
             bool: Success or failure.
         """
         log.info(
             f"Updating FMTM database Entities for project {project_id} "
-            f"with ({len(entities)}) features"
+            f"with ({len(entities)}) features in batches of {batch_size}"
         )
 
-        sql = """
-            INSERT INTO public.odk_entities
-                (entity_id, status, project_id, task_id)
-            VALUES
-        """
+        result = []
 
-        # Prepare data for bulk insert
-        values = []
-        data = {}
-        for index, entity in enumerate(entities):
-            entity_index = f"entity_{index}"
-            values.append(
-                f"(%({entity_index}_entity_id)s, "
-                f"%({entity_index}_status)s, "
-                f"%({entity_index}_project_id)s, "
-                f"%({entity_index}_task_id)s)"
+        for batch_start in range(0, len(entities), batch_size):
+            batch = entities[batch_start : batch_start + batch_size]
+            sql = """
+                INSERT INTO public.odk_entities
+                    (entity_id, status, project_id, task_id)
+                VALUES
+            """
+
+            # Prepare data for batch insert
+            values = []
+            data = {}
+            for index, entity in enumerate(batch):
+                entity_index = f"entity_{batch_start + index}"
+                values.append(
+                    f"(%({entity_index}_entity_id)s, "
+                    f"%({entity_index}_status)s, "
+                    f"%({entity_index}_project_id)s, "
+                    f"%({entity_index}_task_id)s)"
+                )
+                data[f"{entity_index}_entity_id"] = entity["id"]
+                data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
+                data[f"{entity_index}_project_id"] = project_id
+                task_id = entity["task_id"]
+                data[f"{entity_index}_task_id"] = int(task_id) if task_id else None
+
+            sql += (
+                ", ".join(values)
+                + """
+                ON CONFLICT (entity_id) DO UPDATE SET
+                    status = EXCLUDED.status,
+                    task_id = EXCLUDED.task_id
+                RETURNING True;
+            """
             )
-            data[f"{entity_index}_entity_id"] = entity["id"]
-            data[f"{entity_index}_status"] = EntityState(int(entity["status"])).name
-            data[f"{entity_index}_project_id"] = project_id
-            task_id = entity["task_id"]
-            data[f"{entity_index}_task_id"] = int(task_id) if task_id else None
 
-        sql += (
-            ", ".join(values)
-            + """
-            ON CONFLICT (entity_id) DO UPDATE SET
-                status = EXCLUDED.status,
-                task_id = EXCLUDED.task_id
-            RETURNING True;
-        """
-        )
-
-        async with db.cursor() as cur:
-            await cur.execute(sql, data)
-            result = await cur.fetchall()
+            async with db.cursor() as cur:
+                await cur.execute(sql, data)
+                batch_result = await cur.fetchall()
+                if not batch_result:
+                    log.warning(
+                        f"Batch failed at batch {batch_start} for project {project_id}"
+                    )
+                result.extend(batch_result)
 
         return bool(result)
 
@@ -1534,9 +1551,14 @@ class DbBackgroundTask(BaseModel):
             RETURNING *;
         """
 
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, {"task_id": task_id, **model_dump})
-            updated_task = await cur.fetchone()
+        # This is a workaround as the db connection can often timeout,
+        # before the background job is finished processing
+        pool = database.get_db_connection_pool()
+        async with pool as pool_instance:
+            async with pool_instance.connection() as conn:
+                async with conn.cursor(row_factory=class_row(cls)) as cur:
+                    await cur.execute(sql, {"task_id": task_id, **model_dump})
+                    updated_task = await cur.fetchone()
 
         if updated_task is None:
             msg = f"Failed to update background task with ID: {task_id}"
@@ -1690,9 +1712,14 @@ class DbBasemap(BaseModel):
             RETURNING *;
         """
 
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, {"basemap_id": basemap_id, **model_dump})
-            updated_basemap = await cur.fetchone()
+        # This is a workaround as the db connection can often timeout,
+        # before the basemap is finished processing
+        pool = database.get_db_connection_pool()
+        async with pool as pool_instance:
+            async with pool_instance.connection() as conn:
+                async with conn.cursor(row_factory=class_row(cls)) as cur:
+                    await cur.execute(sql, {"basemap_id": basemap_id, **model_dump})
+                    updated_basemap = await cur.fetchone()
 
         if updated_basemap is None:
             msg = f"Failed to update basemap with ID: {basemap_id}"
@@ -1780,8 +1807,7 @@ class DbGeometryLog(BaseModel):
                 VALUES
                     ({", ".join(value_placeholders)})
                 RETURNING
-                    *,
-                    ST_AsGeoJSON(geom)::jsonb AS geom;
+                    *
             """,
                 model_dump,
             )
@@ -1793,7 +1819,7 @@ class DbGeometryLog(BaseModel):
         cls,
         db: Connection,
         project_id: int,
-        id: int,
+        id: str,
     ) -> bool:
         """Delete a geometry."""
         async with db.cursor() as cur:

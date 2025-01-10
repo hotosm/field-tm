@@ -107,4 +107,5 @@ class OrganisationOut(BaseModel):
     description: Optional[str]
     slug: Optional[str]
     url: Optional[str]
+    associated_email: Optional[str]
     odk_central_url: Optional[str]
