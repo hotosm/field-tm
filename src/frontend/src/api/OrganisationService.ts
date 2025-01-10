@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { HomeProjectCardModel } from '@/models/home/homeModel';
 import { GetOrganisationDataModel, OrganisationModal } from '@/models/organisation/organisationModel';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import { API } from '.';
 import { LoginActions } from '@/store/slices/LoginSlice';
+import { AppDispatch } from '@/store/Store';
 
 function appendObjectToFormData(formData: FormData, object: Record<string, any>) {
   for (const [key, value] of Object.entries(object)) {
@@ -15,8 +15,8 @@ function appendObjectToFormData(formData: FormData, object: Record<string, any>)
   }
 }
 
-export const OrganisationService: Function = (url: string, payload: OrganisationModal) => {
-  return async (dispatch) => {
+export const OrganisationService = (url: string, payload: OrganisationModal) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(CommonActions.PostOrganisationLoading(true));
 
     const postOrganisation = async (url: string, payload: OrganisationModal) => {
@@ -40,8 +40,8 @@ export const OrganisationService: Function = (url: string, payload: Organisation
   };
 };
 
-export const OrganisationDataService: Function = (url: string) => {
-  return async (dispatch) => {
+export const OrganisationDataService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(OrganisationAction.GetOrganisationDataLoading(true));
     const getOrganisationData = async (url: string) => {
       try {
@@ -60,8 +60,8 @@ export const OrganisationDataService: Function = (url: string) => {
   };
 };
 
-export const MyOrganisationDataService: Function = (url: string) => {
-  return async (dispatch) => {
+export const MyOrganisationDataService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(OrganisationAction.GetMyOrganisationDataLoading(true));
     const getMyOrganisationData = async (url: string) => {
       try {
@@ -77,8 +77,8 @@ export const MyOrganisationDataService: Function = (url: string) => {
   };
 };
 
-export const PostOrganisationDataService: Function = (url: string, payload: any) => {
-  return async (dispatch) => {
+export const PostOrganisationDataService = (url: string, payload: any) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
@@ -124,8 +124,8 @@ export const PostOrganisationDataService: Function = (url: string, payload: any)
   };
 };
 
-export const GetIndividualOrganizationService: Function = (url: string) => {
-  return async (dispatch) => {
+export const GetIndividualOrganizationService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));
     const getOrganisationData = async (url: string) => {
       try {
@@ -138,8 +138,8 @@ export const GetIndividualOrganizationService: Function = (url: string) => {
   };
 };
 
-export const PatchOrganizationDataService: Function = (url: string, payload: any) => {
-  return async (dispatch) => {
+export const PatchOrganizationDataService = (url: string, payload: any) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(OrganisationAction.SetOrganisationFormData({}));
     dispatch(OrganisationAction.PostOrganisationDataLoading(true));
 
@@ -156,7 +156,7 @@ export const PatchOrganizationDataService: Function = (url: string, payload: any
           },
         });
 
-        const resp: HomeProjectCardModel = patchOrganisationData.data;
+        const resp: GetOrganisationDataModel = patchOrganisationData.data;
         dispatch(OrganisationAction.PostOrganisationDataLoading(false));
         dispatch(OrganisationAction.postOrganisationData(resp));
         dispatch(
@@ -184,8 +184,8 @@ export const PatchOrganizationDataService: Function = (url: string, payload: any
   };
 };
 
-export const ApproveOrganizationService: Function = (url: string) => {
-  return async (dispatch) => {
+export const ApproveOrganizationService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     const approveOrganization = async (url: string) => {
       try {
         dispatch(OrganisationAction.SetOrganizationApproving(true));
@@ -217,8 +217,8 @@ export const ApproveOrganizationService: Function = (url: string) => {
   };
 };
 
-export const RejectOrganizationService: Function = (url: string) => {
-  return async (dispatch) => {
+export const RejectOrganizationService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     const rejectOrganization = async (url: string) => {
       try {
         dispatch(OrganisationAction.SetOrganizationRejecting(true));

@@ -6,16 +6,15 @@ import Button from '@/components/common/Button';
 import useForm from '@/hooks/useForm';
 import ConsentDetailsValidation from '@/components/CreateEditOrganization/validation/ConsentDetailsValidation';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ConsentDetailsForm = () => {
   useDocumentTitle('Consent Details Form');
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const consentDetailsFormData = useAppSelector((state) => state.organisation.consentDetailsFormData);
 

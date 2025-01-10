@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
 // @ts-ignore
 import VectorLayer from 'ol/layer/Vector';
-import CoreModules from '@/shared/CoreModules.js';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useLocation } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
 import useOutsideClick from '@/hooks/useOutsideClick';
@@ -43,7 +42,7 @@ const btnList = [
 
 const MapControlComponent = ({ map, projectName, pmTileLayerUrl }: mapControlComponentType) => {
   const { pathname } = useLocation();
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const [toggleCurrentLoc, setToggleCurrentLoc] = useState(false);
   const geolocationStatus = useAppSelector((state) => state.project.geolocationStatus);
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);

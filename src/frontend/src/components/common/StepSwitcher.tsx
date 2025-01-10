@@ -1,9 +1,9 @@
 import React from 'react';
 import AssetModules from '@/shared/AssetModules.js';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import CoreModules from '@/shared/CoreModules.js';
 import { useNavigate } from 'react-router-dom';
 import { ICreateProjectSteps } from '@/constants/StepFormConstants';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 type stepSwitcherPropType = {
   data: ICreateProjectSteps[];
@@ -19,9 +19,9 @@ interface IIndividualStep {
 }
 
 const StepSwitcher = ({ data, flag, switchSteps }: stepSwitcherPropType) => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentStep = CoreModules.useAppSelector((state) => state.common.currentStepFormStep[flag]);
+  const currentStep = useAppSelector((state) => state.common.currentStepFormStep[flag]);
 
   const toggleStep = (step: IIndividualStep) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step.step }));

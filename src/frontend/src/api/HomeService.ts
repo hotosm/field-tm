@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { AppDispatch } from '@/store/Store';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import { homeProjectPaginationTypes, projectType } from '@/models/home/homeModel';
 
-export const HomeSummaryService: Function = (url: string) => {
-  return async (dispatch) => {
+export const HomeSummaryService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(HomeActions.HomeProjectLoading(true));
 
     const fetchHomeSummaries = async (url: string) => {

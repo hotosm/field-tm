@@ -6,7 +6,7 @@ import AssetModules from '@/shared/AssetModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
 import QrcodeComponent from '@/components/QrcodeComponent';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 type TaskSelectionPopupPropType = {
   taskId: number | null;
@@ -16,7 +16,7 @@ type TaskSelectionPopupPropType = {
 
 const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropType) => {
   const params = CoreModules.useParams();
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const currentProjectId: string = params.id;
   const [task_state, set_task_state] = useState('UNLOCKED_TO_MAP');

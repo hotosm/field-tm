@@ -3,7 +3,7 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { DownloadDataExtract, DownloadProjectForm, DownloadSubmissionGeojson } from '@/api/Project';
 import Button from '@/components/common/Button';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { GetProjectQrCode } from '@/api/Files';
 
 type projectOptionPropTypes = {
@@ -11,7 +11,7 @@ type projectOptionPropTypes = {
 };
 
 const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
 
   const downloadProjectFormLoading = useAppSelector((state) => state.project.downloadProjectFormLoading);

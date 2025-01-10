@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import Button from '@/components/common/Button';
 import { PostProjectComments, GetProjectComments } from '@/api/Project';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import { ProjectCommentsSekeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 
 const Comments = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const params = useParams();
   const projectId: any = params.id;
 

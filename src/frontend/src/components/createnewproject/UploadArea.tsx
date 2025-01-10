@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
-import { useDispatch } from 'react-redux';
 import RadioButton from '@/components/common/RadioButton';
 import AssetModules from '@/shared/AssetModules.js';
 import DrawSvg from '@/components/createnewproject/DrawSvg';
 import { useNavigate } from 'react-router-dom';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadAreaValidation from '@/components/createnewproject/validation/UploadAreaValidation';
 import FileInputComponent from '@/components/common/FileInputComponent';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
@@ -44,7 +43,7 @@ const uploadAreaOptions: uploadAreaOptionsType[] = [
 const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpload, setAdditionalFeature }) => {
   useDocumentTitle('Create Project: Project Area');
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isGeojsonWGS84, setIsGeojsonWG84] = useState(true);
 

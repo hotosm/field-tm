@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import CoreModules from '@/shared/CoreModules.js';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { getUserDetailsFromApi } from '@/utilfunctions/login';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 function OsmAuth() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const [isReadyToRedirect, setIsReadyToRedirect] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestedPath = sessionStorage.getItem('requestedPath');

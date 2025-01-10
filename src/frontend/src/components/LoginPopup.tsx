@@ -1,11 +1,11 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import { Modal } from '@/components/common/Modal';
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { osmLoginRedirect } from '@/utilfunctions/login';
 import OSMImg from '@/assets/images/osm-logo.png';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 type loginOptionsType = {
   id: string;
@@ -25,7 +25,7 @@ const loginOptions: loginOptionsType[] = [
 ];
 
 const LoginPopup = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const from = location.state?.from || '/';
 

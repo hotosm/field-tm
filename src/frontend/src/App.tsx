@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { refreshCookies, getUserDetailsFromApi } from '@/utilfunctions/login';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 // import '@hotosm/ui/components/Tracking';
 import '@hotosm/ui/dist/style.css';
@@ -15,7 +16,7 @@ import { store, persistor } from '@/store/Store';
 import OfflineReadyPrompt from '@/components/OfflineReadyPrompt';
 
 const RefreshUserCookies = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const refreshUserDetails = async () => {

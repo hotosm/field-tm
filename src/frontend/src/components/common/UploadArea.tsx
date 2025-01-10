@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import AssetModules from '@/shared/AssetModules';
-import { v4 as uuidv4 } from 'uuid';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 type FileType = {
   id: string;
@@ -23,7 +23,7 @@ type uploadAreaPropType = {
 
 const UploadArea = ({ title, label, acceptedInput, data, onUploadFile, multiple, filterKey }: uploadAreaPropType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [selectedFiles, setSelectedFiles] = useState<FileType[]>([]);
 
   function isEmpty(obj) {

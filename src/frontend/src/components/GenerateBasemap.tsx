@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import environment from '@/environment';
-import { DownloadBasemapFile, GenerateProjectTiles, GetTilesList, ProjectById } from '@/api/Project';
+import { DownloadBasemapFile, GenerateProjectTiles, GetTilesList } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { projectInfoType } from '@/models/project/projectModel';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType> }) => {
-  const dispatch = CoreModules.useAppDispatch();
-  const params = CoreModules.useParams();
-  const id: string = params.id;
+  const dispatch = useAppDispatch();
+  const params = useParams();
+  const id: string | undefined = params.id;
 
   const [selectedTileSource, setSelectedTileSource] = useState('');
   const [selectedOutputFormat, setSelectedOutputFormat] = useState('');
@@ -78,6 +79,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
   };
 
   const generateProjectTiles = () => {
+    if (!id) return;
     const currentErrors = generateProjectTilesValidation();
     if (currentErrors.length === 0) {
       dispatch(

@@ -7,12 +7,12 @@ import { GetOrganisationDataModel } from '@/models/organisation/organisationMode
 import OrganisationGridCard from '@/components/organisation/OrganisationGridCard';
 import OrganisationCardSkeleton from '@/components/organisation/OrganizationCardSkeleton';
 import windowDimention from '@/hooks/WindowDimension';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const Organisation = () => {
   useDocumentTitle('Organizations');
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const { type } = windowDimention();
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');

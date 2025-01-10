@@ -11,12 +11,13 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/hotLog.png';
 import LoginPopup from '@/components/LoginPopup';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 export default function PrimaryAppBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState<boolean>(false);
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const defaultTheme: any = CoreModules.useAppSelector((state) => state.theme.hotTheme);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const handleOpenDrawer = () => {

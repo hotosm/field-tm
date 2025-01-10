@@ -3,7 +3,7 @@ import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import Switch from '@/components/common/Switch';
 import { HomeActions } from '@/store/slices/HomeSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 type homePageFiltersPropType = {
   onSearch: (data: string) => void;
@@ -12,7 +12,7 @@ type homePageFiltersPropType = {
 
 //Home Filter
 const HomePageFilters = ({ onSearch, filteredProjectCount }: homePageFiltersPropType) => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
   const homeProjectPagination = useAppSelector((state) => state.home.homeProjectPagination);
