@@ -954,7 +954,6 @@ class DbProject(BaseModel):
     custom_tms_url: Optional[str] = None
     status: Optional[ProjectStatus] = None
     visibility: Optional[ProjectVisibility] = None
-    total_tasks: Optional[int] = None
     xform_category: Optional[str] = None
     odk_form_id: Optional[str] = None
     xlsform_content: Optional[bytes] = None
@@ -1127,7 +1126,8 @@ class DbProject(BaseModel):
                             )
                         -- Required filter if the task array is empty
                         ) FILTER (WHERE tasks.id IS NOT NULL), '[]'::json
-                    ) AS tasks
+                    ) AS tasks,
+                    COUNT(tasks.id) AS total_tasks
                 FROM
                     projects p
                 -- For org name, logo, and ODK credentials
