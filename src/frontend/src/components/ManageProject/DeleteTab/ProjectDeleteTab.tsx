@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Button from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal';
-import CoreModules from '@/shared/CoreModules';
 import { DeleteProjectService } from '@/api/CreateProjectService';
+import { useAppDispatch } from '@/types/reduxTypes';
 
 const FormUpdateTab = ({ projectId, projectName }) => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const [showModal, setShowModal] = useState(false);
   const [confirmProjectName, setConfirmProjectName] = useState('');
   const [confirmEnabled, setConfirmEnabled] = useState(false);

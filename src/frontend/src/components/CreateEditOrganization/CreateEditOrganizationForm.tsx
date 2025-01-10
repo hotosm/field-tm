@@ -5,11 +5,9 @@ import TextArea from '@/components/common/TextArea';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import useForm from '@/hooks/useForm';
-import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
-import { useDispatch } from 'react-redux';
 import {
   GetIndividualOrganizationService,
   PatchOrganizationDataService,
@@ -19,7 +17,7 @@ import { diffObject } from '@/utilfunctions/compareUtils';
 import InstructionsSidebar from '@/components/CreateEditOrganization/InstructionsSidebar';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const organizationTypeOptions: organizationTypeOptionsType[] = [
   { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
@@ -31,7 +29,7 @@ const organizationTypeOptions: organizationTypeOptionsType[] = [
 
 const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const inputFileRef = useRef<any>(null);
   const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);

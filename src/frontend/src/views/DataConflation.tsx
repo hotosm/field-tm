@@ -2,13 +2,12 @@ import React, { useEffect } from 'react';
 import ConflationMap from '@/components/DataConflation/ConflationMap';
 import TaskInfo from '@/components/DataConflation/TaskInfo';
 import SubmissionConflation from '@/components/DataConflation/SubmissionConflation';
-import { useDispatch } from 'react-redux';
 import { SubmissionConflationGeojsonService } from '@/api/DataConflation';
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const DataConflation = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { projectId, taskId } = useParams();
   const selectedFeatureOSMId = useAppSelector((state) => state.dataconflation.selectedFeatureOSMId);
 

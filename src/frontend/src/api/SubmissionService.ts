@@ -10,9 +10,10 @@ import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { filterType } from '@/store/types/ISubmissions';
+import { AppDispatch } from '@/store/Store';
 
-export const ProjectContributorsService: Function = (url: string) => {
-  return async (dispatch) => {
+export const ProjectContributorsService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     const fetchProjectContributor = async (url: string) => {
       try {
         dispatch(SubmissionActions.SetSubmissionContributorsLoading(true));
@@ -28,8 +29,8 @@ export const ProjectContributorsService: Function = (url: string) => {
   };
 };
 
-export const SubmissionFormFieldsService: Function = (url: string) => {
-  return async (dispatch) => {
+export const SubmissionFormFieldsService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     const fetchFormFields = async (url: string) => {
       try {
         dispatch(SubmissionActions.SetSubmissionFormFieldsLoading(true));
@@ -47,8 +48,8 @@ export const SubmissionFormFieldsService: Function = (url: string) => {
   };
 };
 
-export const SubmissionTableService: Function = (url: string, payload: filterType) => {
-  return async (dispatch) => {
+export const SubmissionTableService = (url: string, payload: filterType) => {
+  return async (dispatch: AppDispatch) => {
     const fetchSubmissionTable = async (url: string, payload: filterType) => {
       try {
         dispatch(SubmissionActions.SetSubmissionTableLoading(true));
@@ -66,8 +67,8 @@ export const SubmissionTableService: Function = (url: string, payload: filterTyp
   };
 };
 
-export const UpdateReviewStateService: Function = (url: string, payload: object) => {
-  return async (dispatch) => {
+export const UpdateReviewStateService = (url: string, payload: object) => {
+  return async (dispatch: AppDispatch) => {
     const UpdateReviewState = async (url: string) => {
       try {
         dispatch(SubmissionActions.UpdateReviewStateLoading(true));
@@ -90,8 +91,8 @@ export const UpdateReviewStateService: Function = (url: string, payload: object)
   };
 };
 
-export const MappedVsValidatedTaskService: Function = (url: string) => {
-  return async (dispatch) => {
+export const MappedVsValidatedTaskService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     const MappedVsValidatedTask = async (url: string) => {
       try {
         dispatch(SubmissionActions.SetMappedVsValidatedTaskLoading(true));

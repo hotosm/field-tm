@@ -3,14 +3,13 @@ import { MapContainer as MapComponent, useOLMap } from '@/components/MapComponen
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index';
 import MapLegend from '@/components/DataConflation/ConflationMap/MapLegend';
 import Button from '@/components/common/Button';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
-import { useDispatch } from 'react-redux';
 import { DataConflationActions } from '@/store/slices/DataConflationSlice';
 import LayerSwitchMenu from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
 const ConflationMap = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const submissionConflationGeojson = useAppSelector((state) => state.dataconflation.submissionConflationGeojson);
   const submissionConflationGeojsonLoading = useAppSelector(

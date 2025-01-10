@@ -11,9 +11,10 @@ import {
   tileType,
 } from '@/models/project/projectModel';
 import { TaskActions } from '@/store/slices/TaskSlice';
+import { AppDispatch } from '@/store/Store';
 
 export const ProjectById = (projectId: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const fetchProjectById = async (projectId: string) => {
       try {
         dispatch(ProjectActions.SetProjectDetialsLoading(true));
@@ -82,7 +83,7 @@ export const ProjectById = (projectId: string) => {
 };
 
 export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(ProjectActions.SetDownloadProjectFormLoading({ type: downloadType, loading: true }));
 
     const fetchProjectForm = async (url: string, downloadType: 'form' | 'geojson', projectId: string) => {
@@ -113,7 +114,7 @@ export const DownloadProjectForm = (url: string, downloadType: 'form' | 'geojson
 };
 
 export const DownloadDataExtract = (url: string, projectId: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(ProjectActions.SetDownloadDataExtractLoading(true));
 
     const getDownloadExtract = async (url: string, projectId: string) => {
@@ -138,7 +139,7 @@ export const DownloadDataExtract = (url: string, projectId: string) => {
 };
 
 export const GetTilesList = (url: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(ProjectActions.SetTilesListLoading(true));
 
     const fetchTilesList = async (url: string) => {
@@ -155,7 +156,7 @@ export const GetTilesList = (url: string) => {
 };
 
 export const GenerateProjectTiles = (url: string, projectId: string, data: object) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(ProjectActions.SetGenerateProjectTilesLoading(true));
 
     const generateProjectTiles = async (url: string, projectId: string) => {
@@ -173,20 +174,31 @@ export const GenerateProjectTiles = (url: string, projectId: string, data: objec
   };
 };
 
-export const DownloadBasemapFile = (url: string) => {
-  return async () => {
+export const DownloadBasemapFile = (url: string | null) => {
+  return async (dispatch: AppDispatch) => {
     const downloadBasemapFromAPI = async (url: string) => {
       try {
         // Open S3 url directly
         window.open(url);
       } catch (error) {}
     };
-    await downloadBasemapFromAPI(url);
+    if (!url) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          open: true,
+          message: 'No url associated to download basemap.',
+          variant: 'error',
+          duration: 2000,
+        }),
+      );
+    } else {
+      await downloadBasemapFromAPI(url);
+    }
   };
 };
 
 export const GetSubmissionDashboard = (url: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const GetSubmissionDashboard = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectDashboardLoading(true));
@@ -207,7 +219,7 @@ export const GetSubmissionDashboard = (url: string) => {
 };
 
 export const GetEntityStatusList = (url: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const getEntityOsmMap = async (url: string) => {
       try {
         dispatch(ProjectActions.SetEntityToOsmIdMappingLoading(true));
@@ -228,7 +240,7 @@ export const GetEntityStatusList = (url: string) => {
 };
 
 export const GetProjectComments = (url: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const getProjectComments = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectGetCommentsLoading(true));
@@ -247,9 +259,9 @@ export const GetProjectComments = (url: string) => {
 
 export const PostProjectComments = (
   url: string,
-  payload: { event: task_event.COMMENT; task_id: number; comment: string },
+  payload: { event?: task_event.COMMENT; task_id: number; comment: string },
 ) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const postProjectComments = async (url: string) => {
       try {
         dispatch(ProjectActions.SetPostProjectCommentsLoading(true));
@@ -270,7 +282,7 @@ export const PostProjectComments = (
 };
 
 export const GetProjectTaskActivity = (url: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const getProjectActivity = async (url: string) => {
       try {
         dispatch(ProjectActions.SetProjectTaskActivityLoading(true));
@@ -288,7 +300,7 @@ export const GetProjectTaskActivity = (url: string) => {
 };
 
 export const UpdateEntityState = (url: string, payload: { entity_id: string; status: number; label: string }) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const updateEntityState = async (url: string, payload: { entity_id: string; status: number; label: string }) => {
       try {
         dispatch(ProjectActions.UpdateEntityStateLoading(true));
@@ -312,7 +324,7 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
 };
 
 export const DownloadSubmissionGeojson = (url: string, projectName: string) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(true));
 
     const downloadSubmissionGeojson = async (url: string) => {

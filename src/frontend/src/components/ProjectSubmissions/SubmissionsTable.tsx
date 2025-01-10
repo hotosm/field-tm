@@ -18,7 +18,7 @@ import { SubmissionsTableSkeletonLoader } from '@/components/ProjectSubmissions/
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
 import { reviewStateData } from '@/constants/projectSubmissionsConstants';
 
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_state, task_event, entity_state } from '@/types/enums';
 import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
@@ -44,7 +44,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const [filter, setFilter] = useState<filterType>(initialFilterState);
 
   const { windowSize } = windowDimention();
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
 
@@ -202,19 +202,19 @@ const SubmissionsTable = ({ toggleView }) => {
     );
   };
 
-  const handleDownload = (downloadType) => {
+  const handleDownload = (downloadType: 'csv' | 'json') => {
     if (downloadType === 'csv') {
       dispatch(
         getDownloadProjectSubmission(
           `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=false`,
-          projectInfo.name,
+          projectInfo.name!,
         ),
       );
     } else if (downloadType === 'json') {
       dispatch(
         getDownloadProjectSubmission(
           `${import.meta.env.VITE_API_URL}/submission/download?project_id=${projectId}&export_json=true`,
-          projectInfo.name,
+          projectInfo.name!,
         ),
       );
     }

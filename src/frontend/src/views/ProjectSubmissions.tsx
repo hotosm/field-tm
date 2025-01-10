@@ -3,16 +3,15 @@ import AssetModules from '@/shared/AssetModules';
 import ProjectInfo from '@/components/ProjectSubmissions/ProjectInfo.js';
 import SubmissionsInfographics from '@/components/ProjectSubmissions/SubmissionsInfographics.js';
 import SubmissionsTable from '@/components/ProjectSubmissions/SubmissionsTable.js';
-import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { ProjectById, GetEntityStatusList } from '@/api/Project';
-import { useSearchParams } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { ProjectContributorsService, MappedVsValidatedTaskService } from '@/api/SubmissionService';
 
 const ProjectSubmissions = () => {
-  const dispatch = CoreModules.useAppDispatch();
-  const params = CoreModules.useParams();
+  const dispatch = useAppDispatch();
+  const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const projectId = params.projectId;
@@ -24,8 +23,9 @@ const ProjectSubmissions = () => {
 
   //Fetch project for the first time
   useEffect(() => {
+    if (!projectId) return;
     dispatch(ProjectActions.SetNewProjectTrigger());
-    if (state.projectTaskBoundries.findIndex((project) => project.id == projectId) == -1) {
+    if (state.projectTaskBoundries.findIndex((project) => project.id == +projectId) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));
       dispatch(ProjectById(projectId));
     } else {
@@ -35,7 +35,7 @@ const ProjectSubmissions = () => {
     if (Object.keys(state.projectInfo).length == 0) {
       dispatch(ProjectActions.SetProjectInfo(projectInfo));
     } else {
-      if (state.projectInfo.id != projectId) {
+      if (state.projectInfo.id != +projectId) {
         dispatch(ProjectActions.SetProjectInfo(projectInfo));
       }
     }

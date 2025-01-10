@@ -1,8 +1,9 @@
+import { AppDispatch } from '@/store/Store';
 import CoreModules from '@/shared/CoreModules';
 import { TaskActions } from '@/store/slices/TaskSlice';
 
-export const getDownloadProjectSubmission: Function = (url: string, projectName: string) => {
-  return async (dispatch) => {
+export const getDownloadProjectSubmission = (url: string, projectName: string) => {
+  return async (dispatch: AppDispatch) => {
     const params = new URLSearchParams(url.split('?')[1]);
     const isExportJson = params.get('export_json');
     const isJsonOrCsv = isExportJson === 'true' ? 'json' : 'csv';
@@ -36,8 +37,8 @@ export const getDownloadProjectSubmission: Function = (url: string, projectName:
   };
 };
 
-export const ConvertXMLToJOSM: Function = (url: string, projectBbox: number[]) => {
-  return async (dispatch) => {
+export const ConvertXMLToJOSM = (url: string, projectBbox: number[]) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(TaskActions.SetConvertXMLToJOSMLoading(true));
     const getConvertXMLToJOSM = async (url) => {
       try {

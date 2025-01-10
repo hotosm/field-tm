@@ -3,13 +3,12 @@ import CoreModules from '@/shared/CoreModules';
 import CreateEditOrganizationHeader from '@/components/CreateEditOrganization/CreateEditOrganizationHeader';
 import ConsentDetailsForm from '@/components/CreateEditOrganization/ConsentDetailsForm';
 import CreateEditOrganizationForm from '@/components/CreateEditOrganization/CreateEditOrganizationForm';
-import { useDispatch } from 'react-redux';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const CreateEditOrganization = () => {
   const params = CoreModules.useParams();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const organizationId: string = params.id;
   const consentApproval = useAppSelector((state) => state.organisation.consentApproval);
 

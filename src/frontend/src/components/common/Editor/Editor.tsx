@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useEditor, EditorContent, FloatingMenu, BubbleMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import { Toolbar } from '@/components/common/Editor/Toolbar';
 import StarterKit from '@tiptap/starter-kit';
 import ListItem from '@tiptap/extension-list-item';
@@ -13,8 +13,7 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import './editorStyles.scss';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 type RichTextEditorProps = {
   editorHtmlContent: string;
@@ -48,7 +47,7 @@ const RichTextEditor = ({
   isEditorEmpty,
   className,
 }: RichTextEditorProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const editor = useEditor({
     extensions,
     content: editorHtmlContent,

@@ -5,12 +5,13 @@ import { HomeActions } from '@/store/slices/HomeSlice';
 import { projectType } from '@/models/home/homeModel';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useNavigate } from 'react-router-dom';
 
 //Explore Project Card Model to be rendered in home view
 export default function ExploreProjectCard({ data }: { data: projectType }) {
-  const navigate = CoreModules.useNavigate();
-  const dispatch = CoreModules.useAppDispatch();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
 

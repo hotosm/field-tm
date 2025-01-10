@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Button from '@/components/common/Button';
 import { CustomSelect } from '@/components/common/Select';
 import { useNavigate } from 'react-router-dom';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import FileInputComponent from '@/components/common/FileInputComponent';
 import SelectFormValidation from '@/components/createnewproject/validation/SelectFormValidation';
 import { FormCategoryService, ValidateCustomForm } from '@/api/CreateProjectService';
@@ -18,7 +17,7 @@ import DescriptionSection from '@/components/createnewproject/Description';
 
 const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) => {
   useDocumentTitle('Create Project: Upload Survey');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);

@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { geojson as fgbGeojson } from 'flatgeobuf';
 import Button from '@/components/common/Button';
-import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import RadioButton from '@/components/common/RadioButton';
 import { useNavigate } from 'react-router-dom';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { FormCategoryService } from '@/api/CreateProjectService';
 import FileInputComponent from '@/components/common/FileInputComponent';
 import DataExtractValidation from '@/components/createnewproject/validation/DataExtractValidation';
@@ -32,7 +31,7 @@ const DataExtract = ({
   setAdditionalFeature,
 }) => {
   useDocumentTitle('Create Project: Map Data');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [extractWays, setExtractWays] = useState('');
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);

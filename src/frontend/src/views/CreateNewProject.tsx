@@ -8,14 +8,13 @@ import DataExtract from '@/components/createnewproject/DataExtract';
 import SplitTasks from '@/components/createnewproject/SplitTasks';
 import SelectForm from '@/components/createnewproject/SelectForm';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import Prompt from '@/hooks/Prompt';
 
 const CreateNewProject = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const isUnsavedChanges = useAppSelector((state) => state.createproject.isUnsavedChanges);

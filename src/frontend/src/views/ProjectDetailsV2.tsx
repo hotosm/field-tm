@@ -17,7 +17,7 @@ import MobileFooter from '@/components/ProjectDetailsV2/MobileFooter';
 import MobileActivitiesContents from '@/components/ProjectDetailsV2/MobileActivitiesContents';
 import BottomSheet from '@/components/common/BottomSheet';
 import MobileProjectInfoContent from '@/components/ProjectDetailsV2/MobileProjectInfoContent';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
 import { MapContainer as MapComponent, useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index';
@@ -30,7 +30,7 @@ import Button from '@/components/common/Button';
 import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
@@ -38,8 +38,8 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
-  const dispatch = CoreModules.useAppDispatch();
-  const params = CoreModules.useParams();
+  const dispatch = useAppDispatch();
+  const params = useParams();
   const navigate = useNavigate();
   const { windowSize } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
@@ -51,7 +51,7 @@ const ProjectDetailsV2 = () => {
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
   const customBasemapUrl = useAppSelector((state) => state.project.customBasemapUrl);
   const [viewState, setViewState] = useState('project_info');
-  const projectId: string = params.id;
+  const projectId: string | undefined = params.id;
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const state = useAppSelector((state) => state.project);
   const projectInfo = useAppSelector((state) => state.home.selectedProject);
@@ -92,6 +92,8 @@ const ProjectDetailsV2 = () => {
 
   //Fetch project for the first time
   useEffect(() => {
+    if (!projectId) return;
+
     dispatch(ProjectActions.SetNewProjectTrigger());
     if (state.projectTaskBoundries.findIndex((project) => project.id.toString() === projectId) == -1) {
       dispatch(ProjectActions.SetProjectTaskBoundries([]));

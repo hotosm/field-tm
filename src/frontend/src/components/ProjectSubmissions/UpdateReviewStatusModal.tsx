@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from '@/components/common/Modal';
-import { useDispatch } from 'react-redux';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
 import { UpdateReviewStateService } from '@/api/SubmissionService';
 import TextArea from '../common/TextArea';
 import Button from '../common/Button';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { PostProjectComments } from '@/api/Project';
+import { task_event } from '@/types/enums';
 
 // Note these id values must be camelCase to match what ODK Central requires
 const reviewList: reviewListType[] = [
@@ -32,7 +32,7 @@ const reviewList: reviewListType[] = [
 ];
 
 const UpdateReviewStatusModal = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [noteComments, setNoteComments] = useState('');
   const [reviewStatus, setReviewStatus] = useState('');
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
@@ -43,7 +43,12 @@ const UpdateReviewStatusModal = () => {
   }, [updateReviewStatusModal.reviewState]);
 
   const handleStatusUpdate = async () => {
-    if (!updateReviewStatusModal.instanceId || !updateReviewStatusModal.projectId || !updateReviewStatusModal.taskId) {
+    if (
+      !updateReviewStatusModal.instanceId ||
+      !updateReviewStatusModal.projectId ||
+      !updateReviewStatusModal.taskId ||
+      !updateReviewStatusModal?.taskUid
+    ) {
       return;
     }
 
@@ -63,9 +68,9 @@ const UpdateReviewStatusModal = () => {
         PostProjectComments(
           `${import.meta.env.VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
           {
-            task_id: updateReviewStatusModal?.taskUid,
+            task_id: +updateReviewStatusModal?.taskUid,
             comment: `${updateReviewStatusModal?.instanceId}-SUBMISSION_INST-${noteComments}`,
-            event: 'COMMENT',
+            event: task_event.COMMENT,
           },
         ),
       );

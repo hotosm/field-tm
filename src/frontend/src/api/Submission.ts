@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
+import { AppDispatch } from '@/store/Store';
 
-export const SubmissionService: Function = (url: string) => {
-  return async (dispatch) => {
+export const SubmissionService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(SubmissionActions.SetSubmissionDetails(null));
     dispatch(SubmissionActions.SetSubmissionDetailsLoading(true));
     const getSubmissionDetails = async (url: string) => {
@@ -20,8 +21,8 @@ export const SubmissionService: Function = (url: string) => {
   };
 };
 
-export const GetSubmissionPhotosService: Function = (url: string) => {
-  return async (dispatch) => {
+export const GetSubmissionPhotosService = (url: string) => {
+  return async (dispatch: AppDispatch) => {
     dispatch(SubmissionActions.SetSubmissionPhotosLoading(true));
     const getSubmissionPhotos = async (url: string) => {
       try {

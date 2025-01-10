@@ -2,9 +2,8 @@ import TextArea from '@/components/common/TextArea';
 import InputTextField from '@/components/common/InputTextField';
 import React, { useEffect, useState } from 'react';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useForm from '@/hooks/useForm';
 import CreateProjectValidation from '@/components/createnewproject/validation/CreateProjectValidation';
 import Button from '@/components/common/Button';
@@ -19,7 +18,7 @@ import DescriptionSection from '@/components/createnewproject/Description';
 
 const ProjectDetailsForm = ({ flag }) => {
   useDocumentTitle('Create Project: Project Details');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);

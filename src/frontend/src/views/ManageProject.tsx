@@ -1,12 +1,12 @@
-import EditTab from '../components/ManageProject/EditTab';
-import UserTab from '../components/ManageProject/UserTab';
-import DeleteTab from '../components/ManageProject/DeleteTab';
 import React, { useEffect, useState } from 'react';
-import AssetModules from '../shared/AssetModules.js';
+import { useNavigate } from 'react-router-dom';
+import EditTab from '@/components/ManageProject/EditTab';
+import UserTab from '@/components/ManageProject/UserTab';
+import DeleteTab from '@/components/ManageProject/DeleteTab';
+import AssetModules from '@/shared/AssetModules.js';
 import CoreModules from '@/shared/CoreModules';
 import { GetIndividualProjectDetails } from '@/api/CreateProjectService';
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const tabList = [
   // { id: 'users', name: 'USERS', icon: <AssetModules.PersonIcon style={{ fontSize: '20px' }} /> },
@@ -14,7 +14,7 @@ const tabList = [
   { id: 'delete', name: 'DELETE', icon: <AssetModules.DeleteIcon style={{ fontSize: '20px' }} /> },
 ];
 const ManageProject = () => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
   const projectId = params.id;

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@/components/common/Button';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { NavLink } from 'react-router-dom';
@@ -8,7 +7,7 @@ import { revokeCookies } from '@/utilfunctions/login';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 type customDrawerType = {
   open: boolean;
@@ -70,7 +69,7 @@ const MenuItems = [
 ];
 
 export default function CustomDrawer({ open, size, type, onClose, setOpen }: customDrawerType) {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);

@@ -7,11 +7,11 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import Loader from '@/utilities/AppLoader';
 import MappingHeader from '@/utilities/MappingHeader';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectNotFound from './ProjectNotFound';
 
 const MainView = () => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { windowSize } = windowDimention();

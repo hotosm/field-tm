@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import VectorLayer from 'ol/layer/Vector';
+import React from 'react';
 import AssetModules from '@/shared/AssetModules';
-import CoreModules from '@/shared/CoreModules.js';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 
 const MapControlComponent = ({ map, hasEditUndo }) => {
-  const dispatch = CoreModules.useAppDispatch();
-  const toggleSplittedGeojsonEdit = CoreModules.useAppSelector(
-    (state) => state.createproject.toggleSplittedGeojsonEdit,
-  );
+  const dispatch = useAppDispatch();
+  const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
   const btnList = [
     {
       id: 'Add',

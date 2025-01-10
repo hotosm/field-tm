@@ -8,12 +8,12 @@ import HomePageFilters from '@/components/home/HomePageFilters';
 import CoreModules from '@/shared/CoreModules';
 import ProjectListMap from '@/components/home/ProjectListMap';
 import { projectType } from '@/models/home/homeModel';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const Home = () => {
   useDocumentTitle('Explore Projects');
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const { type } = windowDimention();
 
   const [searchQuery, setSearchQuery] = useState('');

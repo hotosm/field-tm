@@ -1,3 +1,4 @@
+import { AppDispatch } from '@/store/Store';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
@@ -33,7 +34,7 @@ export const CreateTaskEvent = (
   style?: any,
   feature?: Record<string, any>,
 ) => {
-  return async (dispatch) => {
+  return async (dispatch: AppDispatch) => {
     const updateTask = async (
       url: string,
       body: any,

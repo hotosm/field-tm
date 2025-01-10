@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useAppSelector } from '@/types/reduxTypes';
-import CoreModules from '@/shared/CoreModules';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
 import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
@@ -15,7 +14,7 @@ type FeatureSelectionPopupPropType = {
 };
 
 const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPopupPropType) => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = useParams();
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
   const entityOsmMap = useAppSelector((state) => state.project.entityOsmMap);

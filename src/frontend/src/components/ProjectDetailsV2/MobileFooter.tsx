@@ -1,8 +1,7 @@
 import React from 'react';
 import AssetModules from '@/shared/AssetModules.js';
-import CoreModules from '@/shared/CoreModules';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { Link, useParams } from 'react-router-dom';
 
 type footerItemType = {
@@ -12,7 +11,7 @@ type footerItemType = {
 };
 
 const MobileFooter = () => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = useParams();
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);

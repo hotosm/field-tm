@@ -21,7 +21,7 @@ import {
 } from '@/models/task/taskModel';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { projectInfoType, projectTaskBoundriesType } from '@/models/project/projectModel';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
 
@@ -74,7 +74,7 @@ const getChoroplethColor = (value, colorCodesOutput) => {
 };
 
 const TaskSubmissionsMap = () => {
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const [taskBoundaries, setTaskBoundaries] = useState<taskBoundariesType | null>(null);
   const [dataExtractUrl, setDataExtractUrl] = useState<string | null>(null);

@@ -6,7 +6,7 @@ import { GetSubmissionDashboard } from '@/api/Project';
 import Button from '@/components/common/Button';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import UpdateReviewStatusModal from '@/components/ProjectSubmissions/UpdateReviewStatusModal';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useNavigate } from 'react-router-dom';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Accordion from '@/components/common/Accordion';
@@ -85,7 +85,7 @@ function removeNullValues(obj: Record<string, any>) {
 
 const SubmissionDetails = () => {
   useDocumentTitle('Submission Instance');
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
   const navigate = useNavigate();
 

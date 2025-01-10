@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadArea from '../../common/UploadArea';
 import Button from '../../common/Button';
 import { CustomSelect } from '@/components/common/Select';
@@ -18,7 +18,7 @@ type FileType = {
 
 const FormUpdateTab = ({ projectId }) => {
   useDocumentTitle('Manage Project: Form Update');
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);
   const [error, setError] = useState({ formError: '', categoryError: '' });

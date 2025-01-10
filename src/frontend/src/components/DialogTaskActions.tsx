@@ -9,7 +9,7 @@ import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { GetProjectTaskActivity } from '@/api/Project';
 import { Modal } from '@/components/common/Modal';
-import { useAppSelector } from '@/types/reduxTypes';
+import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
 
 type dialogPropType = {
@@ -25,7 +25,7 @@ type taskListStateType = {
 
 export default function Dialog({ taskId, feature }: dialogPropType) {
   const navigate = useNavigate();
-  const dispatch = CoreModules.useAppDispatch();
+  const dispatch = useAppDispatch();
   const params = CoreModules.useParams();
   const geojsonStyles = MapStyles();
 
