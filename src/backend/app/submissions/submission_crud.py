@@ -294,7 +294,7 @@ async def upload_attachment_to_s3(
         batch_insert_data = []
         for instance_id in instance_ids:
             submission_detail = await get_submission_detail(instance_id, project)
-            attachments = submission_detail["verification"]["image"]
+            attachments = submission_detail["image"]
 
             if not isinstance(attachments, list):
                 attachments = [attachments]
@@ -358,7 +358,7 @@ async def upload_attachment_to_s3(
                 """,
                 batch_insert_data,
             )
-            db.commit()
+            await db.commit()
         return True
 
     except Exception as e:

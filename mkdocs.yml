@@ -74,14 +74,15 @@ nav:
       - FAQ: about/faq.md
       - The Team: about/team.md
   - User Manuals:
+      - Mapper Guide: manuals/mapping.md
+      - Project Manager Guide: manuals/project-managers.md
       - Video Guides: manuals/videos.md
       - User Types Explanation: manuals/user-breakdown.md
       - Workflow Diagrams: manuals/workflow-diagrams.md
-      - Mapper Guide: manuals/mapping.md
-      - Project Manager Guide: manuals/project-managers.md
       - XLSForm Design: manuals/xlsform-design.md
-      - ODKCollect Offline Maps: https://docs.getodk.org/collect-offline-maps
       - Field Mapping Examples: manuals/field-mapping-examples.md
+      - Visualising Data Externally: https://docs.getodk.org/tutorial-mapping-households
+      - ODKCollect Offline Maps: https://docs.getodk.org/collect-offline-maps
   - Developer Guide:
       - Dev Practices: https://docs.hotosm.org/dev-practices
       - Setup: dev/Setup.md
