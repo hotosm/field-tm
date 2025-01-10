@@ -1748,7 +1748,7 @@ def slugify(name: Optional[str]) -> Optional[str]:
 class DbGeometryLog(BaseModel):
     """Table geometry log."""
 
-    geom: dict
+    geojson: dict
     status: GeomStatus
     project_id: Optional[int] = None
     task_id: Optional[int] = None
@@ -1766,8 +1766,8 @@ class DbGeometryLog(BaseModel):
 
         for key in model_dump.keys():
             columns.append(key)
-            if key == "geom":
-                value_placeholders.append(f"ST_GeomFromGeoJSON(%({key})s)")
+            if key == "geojson":
+                value_placeholders.append(f"%({key})s::jsonb")
                 # Must be string json for db input
                 model_dump[key] = json.dumps(model_dump[key])
             else:
