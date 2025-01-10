@@ -568,7 +568,7 @@ requires-dist = [
     { name = "httptools", specifier = "==0.6.4" },
     { name = "loguru", specifier = "==0.7.2" },
     { name = "minio", specifier = "==7.2.9" },
-    { name = "osm-fieldwork", specifier = "==0.17.0" },
+    { name = "osm-fieldwork", specifier = "==0.18.0" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "osm-rawdata", specifier = "==0.4.1" },
     { name = "psycopg", extras = ["pool"], specifier = ">=3.2.3" },
@@ -1435,7 +1435,7 @@ wheels = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.17.0"
+version = "0.18.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1459,9 +1459,9 @@ dependencies = [
     { name = "shapely" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/c6/348ab8c8fbba7ab7fbf60ed72bbeba97119379320847ea936e4eaf26b86a/osm-fieldwork-0.17.0.tar.gz", hash = "sha256:3c904e6f882f411e1b0ae3ef8645ac09ced2e2bb8f1a5cc84e6ae095c49e5f79", size = 1484922 }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/60/a43713da67c39b47460d1d9c598324e71a59c241bd54b69fce6de4168307/osm-fieldwork-0.18.0.tar.gz", hash = "sha256:887fb94b5796bc14a2f8b6ebe0391bb7795bb685f6d9ddee6c9458072d133252", size = 1485366 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d3/ec/890267f20c2e4c13ecd07ac46e3292551ee0bf56a4779319f7eda0bc1510/osm_fieldwork-0.17.0-py3-none-any.whl", hash = "sha256:5182f97870ed345f0fef4aeab87101df83bd19c62e6a6bed961bd6a10cffb52d", size = 1510703 },
+    { url = "https://files.pythonhosted.org/packages/d1/58/8ed93d23d6f74ec92aa4326faef186f983a368aa9f028ad47d4ee6f4972b/osm_fieldwork-0.18.0-py3-none-any.whl", hash = "sha256:bde9c8c4cca9658d100e5993e986cae84b5060f71134182595a4e1896f8a7437", size = 1511469 },
 ]
 
 [[package]]
@@ -1693,6 +1693,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/62/51/2007ea29e605957a1
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/16/4623fad6076448df21c1a870c93a9774ad8a7b4dd1660223b59082dd8fec/psycopg2-2.9.10-cp312-cp312-win32.whl", hash = "sha256:65a63d7ab0e067e2cdb3cf266de39663203d38d6a8ed97f5ca0cb315c73fe067", size = 1025113 },
     { url = "https://files.pythonhosted.org/packages/66/de/baed128ae0fc07460d9399d82e631ea31a1f171c0c4ae18f9808ac6759e3/psycopg2-2.9.10-cp312-cp312-win_amd64.whl", hash = "sha256:4a579d6243da40a7b3182e0430493dbd55950c493d8c68f4eec0b302f6bbf20e", size = 1163951 },
+    { url = "https://files.pythonhosted.org/packages/ae/49/a6cfc94a9c483b1fa401fbcb23aca7892f60c7269c5ffa2ac408364f80dc/psycopg2-2.9.10-cp313-cp313-win_amd64.whl", hash = "sha256:91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2", size = 2569060 },
 ]
 
 [[package]]
