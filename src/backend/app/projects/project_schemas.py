@@ -47,11 +47,11 @@ class GeometryLogIn(BaseModel):
     """Geometry log insert."""
 
     status: GeomStatus
-    geom: dict
+    geojson: dict
     project_id: Optional[int] = None
     task_id: Optional[int] = None
 
-    @field_validator("geom", mode="before")
+    @field_validator("geojson", mode="before")
     @classmethod
     def parse_input_geometry(
         cls,
