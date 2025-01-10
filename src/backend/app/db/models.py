@@ -34,7 +34,7 @@ from loguru import logger as log
 from psycopg import Connection
 from psycopg.errors import UniqueViolation
 from psycopg.rows import class_row
-from pydantic import AwareDatetime, BaseModel, Field, ValidationInfo
+from pydantic import AwareDatetime, BaseModel, Field, PositiveInt, ValidationInfo
 from pydantic.functional_validators import field_validator
 
 from app.central.central_schemas import ODKCentralDecrypted
@@ -43,6 +43,7 @@ from app.db import database
 from app.db.enums import (
     BackgroundTaskStatus,
     CommunityType,
+    DbGeomType,
     EntityState,
     GeomStatus,
     HTTPStatus,
@@ -330,6 +331,7 @@ class DbOrganisation(BaseModel):
     type: Optional[OrganisationType] = None
     approved: Optional[bool] = None
     created_by: Optional[int] = None  # this is not foreign key linked intentionally
+    associated_email: Optional[str] = None
     odk_central_url: Optional[str] = None
     odk_central_user: Optional[str] = None
     odk_central_password: Optional[str] = None
@@ -967,6 +969,9 @@ class DbProject(BaseModel):
     data_extract_url: Optional[str] = None
     task_split_dimension: Optional[int] = None
     task_num_buildings: Optional[int] = None
+    new_geom_type: Optional[DbGeomType] = None
+    geo_restrict_distance_meters: Optional[PositiveInt] = None
+    geo_restrict_force_error: Optional[bool] = None
     hashtags: Optional[list[str]] = None
     due_date: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None

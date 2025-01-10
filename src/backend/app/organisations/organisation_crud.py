@@ -66,6 +66,7 @@ async def init_admin_org(db: Connection) -> None:
         name="HOTOSM",
         description="Humanitarian OpenStreetMap Team.",
         url="https://hotosm.org",
+        associated_email="sysadmin@hotosm.org",
         odk_central_url=settings.ODK_CENTRAL_URL,
         odk_central_user=settings.ODK_CENTRAL_USER,
         odk_central_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
