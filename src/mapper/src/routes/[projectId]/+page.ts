@@ -36,15 +36,11 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	if (projectResponse.status === 404) {
 		throw error(404, { message: `Project with ID (${projectId}) not found` });
 	}
-	const entityStatusResponse = await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
-		credentials: 'include',
-	});
 
 	return {
 		project: await projectResponse.json(),
 		projectId: parseInt(projectId),
 		userId: apiUser.id,
-		entityStatus: await entityStatusResponse.json(),
 		// db: db,
 	};
 };
