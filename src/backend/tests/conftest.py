@@ -42,10 +42,17 @@ from app.central import central_crud, central_schemas
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import encrypt_value, settings
 from app.db.database import db_conn
-from app.db.enums import TaskEvent, UserRole
-from app.db.models import DbProject, DbTask, DbTaskEvent
+from app.db.enums import CommunityType, OrganisationType, TaskEvent, UserRole
+from app.db.models import (
+    DbOrganisation,
+    DbProject,
+    DbTask,
+    DbTaskEvent,
+    slugify,
+)
 from app.main import get_application
 from app.organisations.organisation_deps import get_organisation
+from app.organisations.organisation_schemas import OrganisationIn
 from app.projects import project_crud
 from app.projects.project_schemas import ProjectIn
 from app.tasks.task_schemas import TaskEventIn
@@ -107,6 +114,54 @@ async def admin_user(db):
 async def organisation(db):
     """A test organisation."""
     return await get_organisation(db, "HOTOSM")
+
+
+@pytest_asyncio.fixture(scope="function")
+async def organisation_data(admin_user):
+    """A test organisation using the test user."""
+    organisation_name = "svcfmtm hot org"
+    slug = slugify(organisation_name)
+
+    organisation_data = {
+        "name": organisation_name,
+        "slug": slug,
+        "description": "A test organisation for tests.",
+        "url": "https://fmtm.hotosm.org/",
+        "type": OrganisationType.FREE.value,
+        "community_type": CommunityType.OSM_COMMUNITY.value,
+    }
+    odk_credentials = {
+        "odk_central_url": odk_central_url,
+        "odk_central_user": odk_central_user,
+        "odk_central_password": odk_central_password,
+    }
+    odk_creds_decrypted = central_schemas.ODKCentralDecrypted(**odk_credentials)
+    organisation_data.update(**odk_creds_decrypted.model_dump())
+
+    return organisation_data
+
+
+@pytest_asyncio.fixture(scope="function")
+async def organisation_logo():
+    """Fixture to provide a test logo."""
+    from io import BytesIO
+
+    logo = BytesIO(b"Fake image content for logo testing.")
+    logo.name = "test_logo.png"
+    return logo
+
+
+@pytest_asyncio.fixture(scope="function")
+async def new_organisation(db, admin_user, organisation_data):
+    """A test organisation."""
+    new_organisation_data = OrganisationIn(**organisation_data)
+    new_organisation = await DbOrganisation.create(
+        db,
+        new_organisation_data,
+        admin_user.id,
+        None,
+    )
+    return new_organisation
 
 
 @pytest_asyncio.fixture(scope="function")
