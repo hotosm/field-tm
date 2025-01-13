@@ -561,6 +561,12 @@ async def validate_form(
     If the `debug` param is used, the form is returned for inspection.
     NOTE that this debug form has additional fields appended and should
         not be used for FMTM project creation.
+
+    NOTE this provides a basic sanity check, some fields are omitted
+    so the form is not usable in production:
+        - form_category
+        - additional_entities
+        - new_geom_type
     """
     if debug:
         xform_id, updated_form = await central_crud.append_fields_to_user_xlsform(
@@ -915,6 +921,7 @@ async def generate_files(
     project = project_user_dict.get("project")
     project_id = project.id
     form_category = project.xform_category
+    new_geom_type = project.new_geom_type
 
     log.debug(f"Generating additional files for project: {project.id}")
 
@@ -926,6 +933,7 @@ async def generate_files(
             xlsform=xlsform_upload,
             form_category=form_category,
             additional_entities=additional_entities,
+            new_geom_type=new_geom_type,
         )
         xlsform = xlsform_upload
 
@@ -941,6 +949,7 @@ async def generate_files(
         xlsform=xlsform,
         form_category=form_category,
         additional_entities=additional_entities,
+        new_geom_type=new_geom_type,
     )
     # Write XLS form content to db
     xlsform_bytes = project_xlsform.getvalue()

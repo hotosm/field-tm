@@ -7,3 +7,9 @@ export enum projectSetupStep {
 	'task_selection' = 2,
 	'complete_setup' = 3,
 }
+
+export enum NewGeomTypes {
+	POINT = 'POINT',
+	POLYGON = 'POLYGON',
+	LINESTRING = 'LINESTRING',
+}
