@@ -170,6 +170,7 @@
 		projectId={data.projectId}
 		entitiesUrl={data.project.data_extract_url}
 		draw={isDrawEnabled}
+		drawGeomType={data.project.new_geom_type}
 		handleDrawnGeom={(geom) => {
 			isDrawEnabled = false;
 			openOdkCollectNewFeature(data?.project?.odk_form_id, geom);

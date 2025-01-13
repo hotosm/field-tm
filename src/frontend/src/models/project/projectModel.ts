@@ -1,3 +1,5 @@
+import { NewGeomTypes } from '@/types/enums';
+
 export type osmTag = {
   string: string;
 };
@@ -60,6 +62,7 @@ export type projectInfoType = {
   bbox: [number, number, number, number];
   last_active: string;
   num_contributors: number | null;
+  new_geom_type: NewGeomTypes;
 };
 
 export type taskType = {

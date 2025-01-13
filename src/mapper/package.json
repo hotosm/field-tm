@@ -1,6 +1,6 @@
 {
 	"name": "fmtm-mapper",
-	"version": "0.0.1",
+	"version": "2024.5.0",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -53,7 +53,7 @@
 		"@turf/buffer": "^7.1.0",
 		"@turf/centroid": "^7.1.0",
 		"@turf/helpers": "^7.1.0",
-		"@watergis/maplibre-gl-terradraw": "^0.5.1",
+		"@watergis/maplibre-gl-terradraw": "^0.8.1",
 		"drizzle-orm": "^0.35.3",
 		"flatgeobuf": "^3.36.0",
 		"maplibre-gl": "^4.7.1",

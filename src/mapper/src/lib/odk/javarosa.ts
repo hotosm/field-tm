@@ -39,5 +39,5 @@ export function geojsonGeomToJavarosa(geometry: GeoJSONGeometry) {
 		.join(';');
 
 	// Must append a final ; to finish the geom
-	return javarosaGeometry;
+	return `${javarosaGeometry};`;
 }

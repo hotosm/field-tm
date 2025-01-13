@@ -45,8 +45,8 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       '@watergis/maplibre-gl-terradraw':
-        specifier: ^0.5.1
-        version: 0.5.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
+        specifier: ^0.8.1
+        version: 0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)
       drizzle-orm:
         specifier: ^0.35.3
         version: 0.35.3(@electric-sql/pglite@0.2.14)(@libsql/client-wasm@0.14.0)(@prisma/client@4.8.1)(@types/react@18.3.3)
@@ -1725,12 +1725,16 @@ packages:
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
-  '@watergis/maplibre-gl-terradraw@0.5.1':
-    resolution: {integrity: sha512-SIvCbrQYnYTJhTNqra3xKW6hUFzPRwvPiUlYoupjRqElmoEMjP7/t0+mDS+sDVofqArtzmcJ3OiaezgymnkDhw==}
+  '@watergis/maplibre-gl-terradraw@0.8.1':
+    resolution: {integrity: sha512-tK7j4B3WDppEHoeWwVkkWNM16ZL+e+SgthVH5NctXg90D1sMXF68sZcXzak7Nh1CjycdXMVkTQeA5I4umaQs+w==}
     engines: {pnpm: ^9.0.0}
     peerDependencies:
-      maplibre-gl: ^2.0.0 || ^3.0.0 || ^4.0.0
-      terra-draw: ^1.0.0-beta.1
+      maplibre-gl: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      terra-draw: ^1.0.0-beta.11
+      terradraw: '*'
+    peerDependenciesMeta:
+      terradraw:
+        optional: true
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -5555,7 +5559,7 @@ snapshots:
 
   '@vue/shared@3.5.13': {}
 
-  '@watergis/maplibre-gl-terradraw@0.5.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)':
+  '@watergis/maplibre-gl-terradraw@0.8.1(maplibre-gl@4.7.1)(terra-draw@1.0.0-beta.8)':
     dependencies:
       maplibre-gl: 4.7.1
       terra-draw: 1.0.0-beta.8
