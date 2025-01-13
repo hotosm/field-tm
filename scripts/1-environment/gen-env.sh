@@ -324,7 +324,7 @@ set_osm_credentials() {
 
     export OSM_CLIENT_ID=${OSM_CLIENT_ID}
     export OSM_CLIENT_SECRET=${OSM_CLIENT_SECRET}
-    secret_key=$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 50)
+    secret_key=$(base64 </dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 50)
     export OSM_SECRET_KEY=${secret_key}
 }
 
