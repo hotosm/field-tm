@@ -575,7 +575,7 @@ async def validate_form(
         return StreamingResponse(
             updated_form,
             media_type=(
-                "application/vnd.openxmlformats-" "officedocument.spreadsheetml.sheet"
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ),
             headers={"Content-Disposition": f"attachment; filename={xform_id}.xlsx"},
         )

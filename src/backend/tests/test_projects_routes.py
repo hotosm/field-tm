@@ -415,7 +415,7 @@ async def test_update_project(client, admin_user, project):
     assert sorted(response_data["hashtags"]) == sorted(
         [
             "#FMTM",
-            f"#{settings.FMTM_DOMAIN}-{response_data["id"]}",
+            f"#{settings.FMTM_DOMAIN}-{response_data['id']}",
             "#anothertag",
         ]
     )

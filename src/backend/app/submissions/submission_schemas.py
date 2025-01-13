@@ -94,6 +94,6 @@ class SubmissionDashboard(BaseModel):
         elif days_difference == 1:
             return "yesterday"
         elif days_difference < 7:
-            return f'{days_difference} day{"s" if days_difference > 1 else ""} ago'
+            return f"{days_difference} day{'s' if days_difference > 1 else ''} ago"
         else:
             return last_active.strftime("%d %b %Y")
