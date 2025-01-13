@@ -109,20 +109,20 @@ from app.s3 import add_obj_to_bucket
 #     return final_zip_file_path
 
 
-async def gather_all_submission_csvs(project: DbProject):
+async def gather_all_submission_csvs(project: DbProject, filters: dict):
     """Gather all of the submission CSVs for a project.
 
     Generate a single zip with all submissions.
     """
     log.info(f"Downloading all CSV submissions for project {project.id}")
     xform = get_odk_form(project.odk_credentials)
-    file = xform.getSubmissionMedia(project.odkid, project.odk_form_id)
+    file = xform.getSubmissionMedia(project.odkid, project.odk_form_id, filters)
     return file.content
 
 
-async def download_submission_in_json(project: DbProject):
+async def download_submission_in_json(project: DbProject, filters: dict):
     """Download submission data from ODK Central."""
-    if data := await get_submission_by_project(project, {}):
+    if data := await get_submission_by_project(project, filters):
         json_data = data
     else:
         json_data = None

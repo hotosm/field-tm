@@ -18,11 +18,12 @@
 		ControlButton,
 	} from 'svelte-maplibre';
 	import maplibre from 'maplibre-gl';
-	import MaplibreTerradrawControl from '@watergis/maplibre-gl-terradraw';
+	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
 	import { Protocol } from 'pmtiles';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
+	import { centroid } from '@turf/centroid';
 	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
@@ -40,10 +41,10 @@
 	// import { entityFeatcolStore, selectedEntityId } from '$store/entities';
 	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
 	import { loadOfflinePmtiles } from '$lib/utils/basemaps.ts';
-	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
+	import { projectSetupStep as projectSetupStepEnum, NewGeomTypes } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-	import { centroid } from '@turf/centroid';
+
 
 	type bboxType = [number, number, number, number];
 
@@ -54,6 +55,7 @@
 		projectId: number;
 		setMapRef: (map: maplibregl.Map | undefined) => void;
 		draw?: boolean;
+	    drawGeomType: NewGeomTypes | undefined;
 		handleDrawnGeom?: ((geojson: GeoJSONGeometry) => void) | null;
 	}
 
@@ -64,6 +66,7 @@
 		projectId,
 		setMapRef,
 		draw = false,
+		drawGeomType,
 		handleDrawnGeom,
 	}: Props = $props();
 
@@ -118,12 +121,12 @@
 	// 	}
 	// })
 	let displayDrawHelpText: boolean = $state(false);
+	type DrawModeOptions = 'point' | 'linestring' | 'delete-selection' | 'polygon';
+	const currentDrawMode: DrawModeOptions = drawGeomType ? drawGeomType.toLowerCase() as DrawModeOptions : 'point';
 	const drawControl = new MaplibreTerradrawControl({
 		modes: [
-			'point',
-			// 'polygon',
-			// 'linestring',
-			// 'delete',
+			currentDrawMode,
+			// 'delete-selection'
 		],
 		// Note We do not open the toolbar options, allowing the user
 		// to simply click with a pre-defined mode active
@@ -220,7 +223,7 @@
 			const drawInstance = drawControl.getTerraDrawInstance();
 			if (drawInstance && handleDrawnGeom) {
 				drawInstance.start();
-				drawInstance.setMode('point');
+				drawInstance.setMode(currentDrawMode);
 
 				drawInstance.on('finish', (id: string, _context: any) => {
 					// Save the drawn geometry location, then delete all geoms from store
@@ -423,7 +426,7 @@
 					'#fae15f',
 					'SURVEY_SUBMITTED',
 					'#71bf86',
-					'#c5fbf5', // default color if no match is found
+					'#9c9a9a', // default color if no match is found
 				],
 				'fill-outline-color': [
 					'match',
@@ -434,7 +437,7 @@
 					'#ffd603',
 					'SURVEY_SUBMITTED',
 					'#32a852',
-					'#c5fbf5',
+					'#000000',
 				],
 			}}
 			beforeLayerType="symbol"

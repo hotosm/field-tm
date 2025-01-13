@@ -1,5 +1,6 @@
 import type { UUID } from 'crypto';
 import type { Polygon } from 'geojson';
+import type { NewGeomTypes } from '$constants/enums.ts';
 
 export type ProjectTask = {
 	id: number;
@@ -40,6 +41,7 @@ export interface ProjectData {
 	status: number;
 	hashtags: string[];
 	tasks: ProjectTask[];
+	new_geom_type: NewGeomTypes;
 }
 
 export interface ZoomToTaskEventDetail {

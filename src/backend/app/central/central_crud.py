@@ -34,7 +34,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from app.central import central_deps, central_schemas
 from app.config import settings
-from app.db.enums import EntityState, HTTPStatus
+from app.db.enums import DbGeomType, EntityState, HTTPStatus
 from app.db.models import DbXLSForm
 from app.db.postgis_utils import (
     geojson_to_javarosa_geom,
@@ -323,6 +323,7 @@ async def append_fields_to_user_xlsform(
     form_category: str = "buildings",
     additional_entities: list[str] = None,
     existing_id: str = None,
+    new_geom_type: DbGeomType = DbGeomType.POINT,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory FMTM fields to XLSForm")
@@ -331,6 +332,7 @@ async def append_fields_to_user_xlsform(
         form_category=form_category,
         additional_entities=additional_entities,
         existing_id=existing_id,
+        new_geom_type=new_geom_type,
     )
 
 
@@ -339,6 +341,7 @@ async def validate_and_update_user_xlsform(
     form_category: str = "buildings",
     additional_entities: list[str] = None,
     existing_id: str = None,
+    new_geom_type: DbGeomType = DbGeomType.POINT,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
@@ -346,6 +349,7 @@ async def validate_and_update_user_xlsform(
         form_category=form_category,
         additional_entities=additional_entities,
         existing_id=existing_id,
+        new_geom_type=new_geom_type,
     )
 
     # Validate and return the form
