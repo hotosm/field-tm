@@ -423,7 +423,7 @@
 					'#fae15f',
 					'SURVEY_SUBMITTED',
 					'#71bf86',
-					'#c5fbf5', // default color if no match is found
+					'#9c9a9a', // default color if no match is found
 				],
 				'fill-outline-color': [
 					'match',
@@ -434,7 +434,7 @@
 					'#ffd603',
 					'SURVEY_SUBMITTED',
 					'#32a852',
-					'#c5fbf5',
+					'#000000',
 				],
 			}}
 			beforeLayerType="symbol"

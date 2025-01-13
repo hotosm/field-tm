@@ -25,6 +25,9 @@
 	import More from '$lib/components/more/index.svelte';
 	import { getProjectSetupStepStore, getCommonStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
+	import type { ShapeStream } from '@electric-sql/client';
+
+	const API_URL = import.meta.env.VITE_API_URL;
 
 	interface Props {
 		data: PageData;
@@ -44,7 +47,6 @@
 	const commonStore = getCommonStore();
 
 	const taskEventStream = getTaskEventStream(data.projectId);
-	const entityStatusStream = getEntityStatusStream(data.projectId);
 
 	// Update the geojson task states when a new event is added
 	$effect(() => {
@@ -98,9 +100,6 @@
 	}
 
 	onMount(async () => {
-		// In store/entities.ts
-		await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, data.entityStatus);
-
 		// In store/tasks.svelte.ts
 		await taskStore.subscribeToEvents(taskEventStream);
 		await taskStore.appendTaskStatesToFeatcol(data.project.tasks);
@@ -108,9 +107,25 @@
 
 	onDestroy(() => {
 		taskEventStream?.unsubscribeAll();
-		entityStatusStream?.unsubscribeAll();
 	});
 
+	$effect(() => {
+		let entityStatusStream: ShapeStream | undefined;
+
+		async function getEntityStatus() {
+			const entityStatusResponse = await fetch(`${API_URL}/projects/${data.projectId}/entities/statuses`, {
+				credentials: 'include',
+			});
+			const response = await entityStatusResponse.json();
+			entityStatusStream = getEntityStatusStream(data.projectId);
+			await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, response);
+		}
+
+		getEntityStatus();
+		return () => {
+			entityStatusStream?.unsubscribeAll();
+		};
+	});
 	const projectSetupStepStore = getProjectSetupStepStore();
 
 	$effect(() => {
