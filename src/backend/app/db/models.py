@@ -295,7 +295,7 @@ class DbUser(BaseModel):
                 ({columns})
             VALUES
                 ({value_placeholders})
-            {conflict_statement if ignore_conflict else ''}
+            {conflict_statement if ignore_conflict else ""}
             RETURNING *;
         """
 
@@ -416,7 +416,7 @@ class DbOrganisation(BaseModel):
                 ({columns})
             VALUES
                 ({value_placeholders})
-            {'ON CONFLICT ("name") DO NOTHING' if ignore_conflict else ''}
+            {'ON CONFLICT ("name") DO NOTHING' if ignore_conflict else ""}
             RETURNING *;
         """
 
@@ -495,7 +495,7 @@ class DbOrganisation(BaseModel):
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
         sql = f"""
             UPDATE organisations
-            SET {', '.join(placeholders)}
+            SET {", ".join(placeholders)}
             WHERE id = %(org_id)s
             RETURNING *;
         """
@@ -939,9 +939,7 @@ class DbTask(BaseModel):
         for index, feature in enumerate(features):
             feature_index = f"geom_{index}"
             values.append(
-                "(%(project_id)s,"
-                f"{index + 1},"
-                f"ST_GeomFromGeoJSON(%({feature_index})s))"
+                f"(%(project_id)s,{index + 1},ST_GeomFromGeoJSON(%({feature_index})s))"
             )
             # Must be string json for db input
             data[feature_index] = json.dumps(feature["geometry"])
@@ -1234,7 +1232,7 @@ class DbProject(BaseModel):
                 tasks t ON p.id = t.project_id
             LEFT JOIN
                 task_events ON p.id = task_events.project_id
-            {'WHERE ' + ' AND '.join(filters) if filters else ''}
+            {"WHERE " + " AND ".join(filters) if filters else ""}
             GROUP BY
                 p.id, project_org.id
             ORDER BY
@@ -1335,7 +1333,7 @@ class DbProject(BaseModel):
 
         sql = f"""
             UPDATE projects
-            SET {', '.join(placeholders)}
+            SET {", ".join(placeholders)}
             WHERE id = %(project_id)s
             RETURNING
                 *,
@@ -1567,7 +1565,7 @@ class DbBackgroundTask(BaseModel):
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
         sql = f"""
             UPDATE background_tasks
-            SET {', '.join(placeholders)}
+            SET {", ".join(placeholders)}
             WHERE id = %(task_id)s
             RETURNING *;
         """
@@ -1728,7 +1726,7 @@ class DbBasemap(BaseModel):
         placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
         sql = f"""
             UPDATE basemaps
-            SET {', '.join(placeholders)}
+            SET {", ".join(placeholders)}
             WHERE id = %(basemap_id)s
             RETURNING *;
         """

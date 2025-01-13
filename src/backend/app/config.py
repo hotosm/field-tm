@@ -97,7 +97,7 @@ class OtelSettings(BaseSettings):
         # NOTE we add ODK Central session auth endpoint here
         if self.ODK_CENTRAL_URL:
             os.environ["OTEL_PYTHON_REQUESTS_EXCLUDED_URLS"] = (
-                f"{endpoints}" f"{self.ODK_CENTRAL_URL}/v1/sessions"
+                f"{endpoints}{self.ODK_CENTRAL_URL}/v1/sessions"
             )
         return endpoints
 
@@ -315,7 +315,7 @@ def get_settings():
     if _settings.DEBUG:
         # Enable detailed Python async debugger
         os.environ["PYTHONASYNCIODEBUG"] = "1"
-        print("Loaded settings: " f"{_settings.model_dump()}")
+        print(f"Loaded settings: {_settings.model_dump()}")
     return _settings
 
 
