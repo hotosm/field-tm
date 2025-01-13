@@ -132,6 +132,7 @@ version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
     "../frontend/package.json:version",
+    "../mapper/package.json:version",
     "../../chart/Chart.yaml:appVersion",
 ]
 changelog_file = "../../CHANGELOG.md"

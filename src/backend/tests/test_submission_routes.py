@@ -48,8 +48,11 @@ async def test_download_submission_json(client, submission):
     """Test downloading submissions as JSON."""
     odk_project = submission["project"]
 
+    date = submission["submission_data"].createdAt.strftime("%Y-%m-%d")
+
     response = await client.get(
-        f"/submission/download?project_id={odk_project.id}&export_json=true"
+        f"/submission/download?project_id={odk_project.id}"
+        f"&submitted_date_range={date},{date}&export_json=true"
     )
 
     assert response.status_code == 200, (
@@ -76,8 +79,11 @@ async def test_download_submission_file(client, submission):
     """Test downloading submissions as a ZIP file."""
     odk_project = submission["project"]
 
+    date = submission["submission_data"].createdAt.strftime("%Y-%m-%d")
+
     response = await client.get(
-        f"/submission/download?project_id={odk_project.id}&export_json=false"
+        f"/submission/download?project_id={odk_project.id}"
+        f"&submitted_date_range={date},{date}&export_json=false"
     )
 
     assert response.status_code == 200, (

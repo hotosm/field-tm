@@ -36,3 +36,9 @@ export enum user_roles {
   MAPPER = 'MAPPER',
   ADMIN = 'ADMIN',
 }
+
+export type NewGeomTypes = {
+  POINT: 'POINT';
+  POLYGON: 'POLYGON';
+  LINESTRING: 'LINESTRING';
+};

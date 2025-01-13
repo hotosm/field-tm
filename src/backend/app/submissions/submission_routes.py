@@ -65,6 +65,11 @@ async def read_submissions(
 async def download_submission(
     project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
     export_json: bool = True,
+    submitted_date_range: Optional[str] = Query(
+        None,
+        title="Submitted Date Range",
+        description="Date range in format (e.g., 'YYYY-MM-DD,YYYY-MM-DD')",
+    ),
 ):
     """Download the submissions for a given project.
 
@@ -74,12 +79,23 @@ async def download_submission(
         Union[list[dict], File]: JSON of submissions, or submission file.
     """
     project = project_user.get("project")
+    filters = None
+    if submitted_date_range:
+        start_date, end_date = submitted_date_range.split(",")
+        filters = {
+            "$filter": (
+                f"__system/submissionDate ge {start_date}T00:00:00+00:00 "
+                f"and __system/submissionDate le {end_date}T23:59:59.999+00:00"
+            )
+        }
     if not export_json:
-        file_content = await submission_crud.gather_all_submission_csvs(project)
+        file_content = await submission_crud.gather_all_submission_csvs(
+            project, filters
+        )
         headers = {"Content-Disposition": f"attachment; filename={project.slug}.zip"}
         return Response(file_content, headers=headers)
 
-    return await submission_crud.download_submission_in_json(project)
+    return await submission_crud.download_submission_in_json(project, filters)
 
 
 # # FIXME 07/06/2024 since osm-fieldwork update
@@ -263,8 +279,10 @@ async def submission_table(
     task_id: Optional[int] = None,
     submitted_by: Optional[str] = None,
     review_state: Optional[str] = None,
-    submitted_date: Optional[str] = Query(
-        None, title="Submitted Date", description="Date in format (e.g., 'YYYY-MM-DD')"
+    submitted_date_range: Optional[str] = Query(
+        None,
+        title="Submitted Date Range",
+        description="Date range in format (e.g., 'YYYY-MM-DD,YYYY-MM-DD')",
     ),
 ):
     """This api returns the submission table of a project.
@@ -278,31 +296,29 @@ async def submission_table(
         "$wkt": True,
     }
 
-    if submitted_date:
+    if submitted_date_range:
+        start_date, end_date = submitted_date_range.split(",")
         filters["$filter"] = (
             "__system/submissionDate ge {}T00:00:00+00:00 "
             "and __system/submissionDate le {}T23:59:59.999+00:00"
-        ).format(submitted_date, submitted_date)
-
-    if submitted_by:
-        if "$filter" in filters:
-            filters["$filter"] += f"and (username eq '{submitted_by}')"
-        else:
-            filters["$filter"] = f"username eq '{submitted_by}'"
+        ).format(start_date, end_date)
 
     if review_state:
-        if "$filter" in filters:
-            filters["$filter"] += f" and (__system/reviewState eq '{review_state}')"
-        else:
-            filters["$filter"] = f"__system/reviewState eq '{review_state}'"
+        review_filter = f"__system/reviewState eq '{review_state}'"
+        filters["$filter"] = (
+            f"{filters['$filter']} and {review_filter}"
+            if "$filter" in filters
+            else review_filter
+        )
 
     data = await submission_crud.get_submission_by_project(project, filters)
     total_count = data.get("@odata.count", 0)
     submissions = data.get("value", [])
-    instance_ids = []
-    for submission in submissions:
-        if submission["__system"]["attachmentsPresent"] != 0:
-            instance_ids.append(submission["__id"])
+    instance_ids = [
+        sub["__id"]
+        for sub in submissions
+        if sub["__system"].get("attachmentsPresent", 0) != 0
+    ]
 
     if instance_ids:
         background_task_id = await DbBackgroundTask.create(
@@ -323,6 +339,11 @@ async def submission_table(
 
     if task_id:
         submissions = [sub for sub in submissions if sub.get("task_id") == str(task_id)]
+
+    if submitted_by:
+        submissions = [
+            sub for sub in submissions if sub.get("username") == submitted_by
+        ]
 
     start_index = (page - 1) * results_per_page
     end_index = start_index + results_per_page
