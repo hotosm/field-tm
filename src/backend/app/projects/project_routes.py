@@ -1068,7 +1068,6 @@ async def update_project(
 
 @router.post("/{project_id}/upload-task-boundaries")
 async def upload_project_task_boundaries(
-    project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
     task_geojson: UploadFile = File(...),
@@ -1084,6 +1083,7 @@ async def upload_project_task_boundaries(
     Returns:
         JSONResponse: JSON containing success message.
     """
+    project_id = project_user_dict.get("project").id
     tasks_featcol = parse_geojson_file_to_featcol(await task_geojson.read())
     await check_crs(tasks_featcol)
     # We only want to allow polygon geometries
@@ -1241,7 +1241,6 @@ async def download_project_boundary(
 
 @router.get("/{project_id}/download_tasks")
 async def download_task_boundaries(
-    project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ):
@@ -1266,7 +1265,7 @@ async def download_task_boundaries(
     return Response(content=out, headers=headers)
 
 
-@router.post("/{project_id}/geometries")
+@router.post("/{project_id}/geometry/records")
 async def create_geom_log(
     geom_log: project_schemas.GeometryLogIn,
     current_user: Annotated[ProjectUserDict, Depends(mapper)],
@@ -1310,7 +1309,32 @@ async def create_geom_log(
     return geometries
 
 
-@router.delete("/{project_id}/geometries")
+@router.get(
+    "{project_id}/geometry/records", response_model=list[project_schemas.GeometryLogIn]
+)
+async def read_geom_logs(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+):
+    """Retrieve all geometry logs for a specific project.
+
+    This endpoint fetches geometry records.
+    - Bad submitted feature and
+    - new feature drawn in a project
+
+    Args:
+        db: The database connection.
+        project_user: The currently authenticated project user details.
+
+    Returns:
+        list[project_schemas.GeometryLogIn]: A list of geometry log entries.
+    """
+    project_id = project_user.get("project").id
+    geometries = await DbGeometryLog.all(db, project_id)
+    return geometries
+
+
+@router.delete("/{project_id}/geometry/records/{geom_id}")
 async def delete_geom_log(
     geom_id: str,
     project_user: Annotated[

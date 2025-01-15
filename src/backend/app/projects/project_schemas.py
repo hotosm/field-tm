@@ -64,7 +64,7 @@ class GeometryLogIn(BaseModel):
         if value is None:
             return None
         featcol = geojson_to_featcol(value)
-        return featcol.get("features")[0].get("geometry")
+        return featcol.get("features")[0]
 
 
 class ProjectInBase(DbProject):
