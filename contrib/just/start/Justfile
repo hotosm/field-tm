@@ -32,7 +32,7 @@ backend:
   cd {{justfile_directory()}}
   docker compose up -d api
 
-# Start backend API only
+# Start backend API without docker
 [no-cd]
 backend-no-docker:
   #!/usr/bin/env sh
@@ -43,10 +43,33 @@ backend-no-docker:
   OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
 
-# Start frontend UI only
+# Start frontend UI (also starts backend)
 [no-cd]
 frontend:
   docker compose up -d ui
+
+# Start frontend UI without docker, connected to staging
+[no-cd]
+frontend-dev:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}/src/frontend
+
+  pnpm install
+  VITE_API_URL=https://api.stage.fmtm.hotosm.org \
+  pnpm run dev
+
+# Start mapper frontend UI without docker, connected to staging
+[no-cd]
+mapper-frontend-dev:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}/src/mapper
+
+  pnpm install
+  VITE_API_URL=https://api.stage.fmtm.hotosm.org \
+  VITE_SYNC_URL=https://sync.stage.fmtm.hotosm.org \
+  pnpm run dev
 
 # Start FMTM without ODK Central
 [no-cd]
