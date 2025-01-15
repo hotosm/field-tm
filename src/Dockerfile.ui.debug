@@ -9,6 +9,6 @@ WORKDIR /app
 COPY --from=code ./package.json ./pnpm-lock.yaml ./
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack use pnpm@9.3.0
+RUN corepack enable && corepack use pnpm@9.15.4
 RUN pnpm install
 ENTRYPOINT ["pnpm", "run", "dev"]

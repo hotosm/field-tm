@@ -5,7 +5,7 @@ ENV VITE_API_URL=${VITE_API_URL} \
     VITE_SYNC_URL=${VITE_SYNC_URL} \
     PNPM_HOME="/pnpm" \
     PATH="$PATH:/pnpm"
-RUN corepack enable && corepack use pnpm@9.3.0
+RUN corepack enable && corepack use pnpm@9.15.4
 WORKDIR /app
 
 
