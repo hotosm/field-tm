@@ -247,12 +247,16 @@ button {
 .react-datepicker-popper {
   z-index: 9000;
 }
-.react-datepicker__day--selected {
-  background-color: #d73f3e;
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range {
+  background-color: #d73f3e !important;
+}
+.react-datepicker__day--in-selecting-range {
+  background-color: #df6565 !important;
 }
 .react-datepicker__day--selected:hover {
-  background-color: #bc2c2c;
+  background-color: #bc2c2c !important;
 }
 .react-datepicker__day--keyboard-selected {
-  background-color: #fcc2c2;
+  background-color: #fcc2c2 !important;
 }

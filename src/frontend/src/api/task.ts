@@ -2,11 +2,14 @@ import { AppDispatch } from '@/store/Store';
 import CoreModules from '@/shared/CoreModules';
 import { TaskActions } from '@/store/slices/TaskSlice';
 
-export const getDownloadProjectSubmission = (url: string, projectName: string) => {
+export const getDownloadProjectSubmission = (
+  url: string,
+  projectName: string,
+  params: { project_id: string; export_json: boolean; submitted_date_range: string | null },
+) => {
   return async (dispatch: AppDispatch) => {
-    const params = new URLSearchParams(url.split('?')[1]);
-    const isExportJson = params.get('export_json');
-    const isJsonOrCsv = isExportJson === 'true' ? 'json' : 'csv';
+    const isExportJson = params.export_json;
+    const isJsonOrCsv = isExportJson ? 'json' : 'csv';
     dispatch(
       TaskActions.GetDownloadProjectSubmissionLoading({
         type: isJsonOrCsv,
@@ -16,12 +19,10 @@ export const getDownloadProjectSubmission = (url: string, projectName: string) =
 
     const getProjectSubmission = async (url: string) => {
       try {
-        const response = await CoreModules.axios.get(url, {
-          responseType: 'blob',
-        });
+        const response = await CoreModules.axios.get(url, { params, responseType: 'blob' });
         var a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
-        a.download = isExportJson === 'true' ? `${projectName}.json` : `${projectName}.zip`;
+        a.download = isExportJson ? `${projectName}.json` : `${projectName}.zip`;
         a.click();
       } catch (error) {
       } finally {

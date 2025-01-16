@@ -97,7 +97,7 @@ interface ICustomSelect {
   placeholder: string;
   data: any;
   dataKey: string;
-  value?: string | undefined;
+  value?: string;
   valueKey: string;
   label: string;
   onValueChange?: (value: string | null | number) => void;
