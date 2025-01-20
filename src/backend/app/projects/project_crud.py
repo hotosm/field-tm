@@ -41,7 +41,7 @@ from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_schemas
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus, XLSFormType
-from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbTask, DbUser
+from app.db.models import DbBackgroundTask, DbBasemap, DbProject, DbUser
 from app.db.postgis_utils import (
     check_crs,
     featcol_keep_single_geom_type,
@@ -623,18 +623,28 @@ async def get_task_geometry(db: Connection, project_id: int):
     Returns:
         str: A geojson of the task boundaries
     """
-    db_tasks = await DbTask.all(db, project_id)
-    features = []
-    for task in db_tasks:
-        properties = {
-            "task_id": task.id,
-        }
-        feature = {
+    query = """
+        SELECT project_task_index,
+        ST_AsGeoJSON(tasks.outline)::jsonb AS outline
+        FROM tasks
+        WHERE project_id = %(project_id)s
+    """
+    async with db.cursor(row_factory=class_row(dict)) as cur:
+        await cur.execute(query, {"project_id": project_id})
+        db_tasks = await cur.fetchall()
+
+    if not db_tasks:
+        raise ValueError(f"No tasks found for project ID {project_id}.")
+
+    features = [
+        {
             "type": "Feature",
-            "geometry": task.outline,
-            "properties": properties,
+            "geometry": task["outline"],
+            "properties": {"task_id": task["project_task_index"]},
         }
-        features.append(feature)
+        for task in db_tasks
+        if task["outline"]  # Exclude tasks with no geometry
+    ]
 
     feature_collection = {"type": "FeatureCollection", "features": features}
     return json.dumps(feature_collection)
