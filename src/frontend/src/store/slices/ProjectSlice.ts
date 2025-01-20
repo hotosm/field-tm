@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { ProjectStateTypes } from '@/store/types/IProject';
+import { geometryLogResponseType } from '@/models/project/projectModel';
 
 const initialState: ProjectStateTypes = {
   projectTaskBoundries: [],
@@ -30,6 +31,10 @@ const initialState: ProjectStateTypes = {
   projectTaskActivity: [],
   projectActivityLoading: false,
   downloadSubmissionLoading: false,
+  badGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
+  newGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
+  badGeomLogList: [],
+  getGeomLogLoading: false,
 };
 
 const ProjectSlice = createSlice({
@@ -152,6 +157,18 @@ const ProjectSlice = createSlice({
     },
     SetDownloadSubmissionGeojsonLoading(state, action: PayloadAction<boolean>) {
       state.downloadSubmissionLoading = action.payload;
+    },
+    SetGeometryLog(state, action: PayloadAction<geometryLogResponseType[]>) {
+      const geomLog = action.payload;
+      const badGeomLog = geomLog.filter((geom) => geom.status === 'BAD');
+      const badGeomLogGeojson = badGeomLog.map((geom) => geom.geojson);
+      const newGeomLogGeojson = geomLog.filter((geom) => geom.status === 'NEW').map((geom) => geom.geojson);
+      state.badGeomFeatureCollection = { type: 'FeatureCollection', features: badGeomLogGeojson };
+      state.newGeomFeatureCollection = { type: 'FeatureCollection', features: newGeomLogGeojson };
+      state.badGeomLogList = badGeomLog;
+    },
+    SetGeometryLogLoading(state, action: PayloadAction<boolean>) {
+      state.getGeomLogLoading = action.payload;
     },
   },
 });

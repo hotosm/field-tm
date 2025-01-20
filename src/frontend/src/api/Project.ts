@@ -1,10 +1,11 @@
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import CoreModules from '@/shared/CoreModules';
 import { task_state, task_event } from '@/types/enums';
 import {
   EntityOsmMap,
+  geometryLogResponseType,
   projectDashboardDetailTypes,
   projectInfoType,
   projectTaskBoundriesType,
@@ -351,5 +352,23 @@ export const DownloadSubmissionGeojson = (url: string, projectName: string) => {
       }
     };
     await downloadSubmissionGeojson(url);
+  };
+};
+
+export const GetGeometryLog = (url: string) => {
+  return async (dispatch: AppDispatch) => {
+    const getProjectActivity = async (url: string) => {
+      try {
+        dispatch(ProjectActions.SetGeometryLogLoading(true));
+        const response: AxiosResponse<geometryLogResponseType[]> = await axios.get(url);
+        dispatch(ProjectActions.SetGeometryLog(response.data));
+      } catch (error) {
+        // error means no geometry log present for the project
+        dispatch(ProjectActions.SetGeometryLog([]));
+      } finally {
+        dispatch(ProjectActions.SetGeometryLogLoading(false));
+      }
+    };
+    await getProjectActivity(url);
   };
 };

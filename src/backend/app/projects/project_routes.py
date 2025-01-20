@@ -1310,7 +1310,7 @@ async def create_geom_log(
 
 
 @router.get(
-    "{project_id}/geometry/records", response_model=list[project_schemas.GeometryLogIn]
+    "/{project_id}/geometry/records", response_model=list[project_schemas.GeometryLogIn]
 )
 async def read_geom_logs(
     db: Annotated[Connection, Depends(db_conn)],

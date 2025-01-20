@@ -13,7 +13,8 @@ import Accordion from '@/components/common/Accordion';
 import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
 import ImageSlider from '@/components/common/ImageSlider';
-import { extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
+import { convertCoordinateStringToFeature, extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
+import { submission_status } from '@/types/enums';
 
 const renderValue = (value: any, key: string = '') => {
   if (key === 'start' || key === 'end') {
@@ -172,6 +173,9 @@ const SubmissionDetails = () => {
                   <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">
                     Submission Id: {paramsInstanceId}
                   </h2>
+                  <h2 className="fmtm-text-base fmtm-font-bold fmtm-text-[#545454] fmtm-break-words">
+                    Submission Status: {submission_status[restSubmissionDetails?.__system?.reviewState]}
+                  </h2>
                 </div>
               )}
               <Button
@@ -188,6 +192,9 @@ const SubmissionDetails = () => {
                       taskId: taskId,
                       reviewState: restSubmissionDetails?.__system?.reviewState,
                       taskUid: taskUid,
+                      entity_id: restSubmissionDetails?.feature,
+                      label: restSubmissionDetails?.meta?.entity?.label,
+                      feature: convertCoordinateStringToFeature(restSubmissionDetails?.xlocation),
                     }),
                   );
                 }}

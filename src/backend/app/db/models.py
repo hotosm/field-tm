@@ -1794,6 +1794,7 @@ def slugify(name: Optional[str]) -> Optional[str]:
 class DbGeometryLog(BaseModel):
     """Table geometry log."""
 
+    id: Optional[UUID] = None
     geojson: dict
     status: GeomStatus
     project_id: Optional[int] = None

@@ -3,7 +3,7 @@ import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
-import { ProjectById, GetEntityStatusList } from '@/api/Project';
+import { ProjectById, GetEntityStatusList, GetGeometryLog } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
 import { HomeActions } from '@/store/slices/HomeSlice';
@@ -35,6 +35,7 @@ import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { Style, Stroke } from 'ol/style';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
@@ -66,6 +67,8 @@ const ProjectDetailsV2 = () => {
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const entityOsmMap = useAppSelector((state) => state?.project?.entityOsmMap);
   const entityOsmMapLoading = useAppSelector((state) => state?.project?.entityOsmMapLoading);
+  const badGeomFeatureCollection = useAppSelector((state) => state?.project?.badGeomFeatureCollection);
+  const getGeomLogLoading = useAppSelector((state) => state?.project?.getGeomLogLoading);
 
   useEffect(() => {
     if (state.projectInfo.name) {
@@ -252,9 +255,51 @@ const ProjectDetailsV2 = () => {
     dispatch(GetEntityStatusList(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
   };
 
+  const getGeometryLog = () => {
+    dispatch(GetGeometryLog(`${import.meta.env.VITE_API_URL}/projects/${projectId}/geometry/records`));
+  };
+
   useEffect(() => {
     getEntityStatusList();
+    getGeometryLog();
   }, []);
+
+  // pulse rejected entity feature stroke effect
+  useEffect(() => {
+    if (!map) return;
+    let layer;
+    let width = 1;
+    let expanding = true;
+
+    const interval = setInterval(() => {
+      const allLayers = map?.getAllLayers();
+      // layer representing bad entities
+      layer = allLayers?.find((layer) => layer.getProperties().name === 'bad-entities');
+      if (!layer) return;
+
+      if (expanding) {
+        width += 0.3;
+        if (width >= 6) expanding = false;
+      } else {
+        width -= 0.3;
+        if (width <= 1) expanding = true;
+      }
+
+      // apply style to the layer
+      layer?.setStyle(
+        new Style({
+          stroke: new Stroke({ color: 'rgb(215,63,62,1)', width: width }),
+        }),
+      );
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [map, badGeomFeatureCollection]);
+
+  const syncStatus = () => {
+    getEntityStatusList();
+    getGeometryLog();
+  };
 
   return (
     <div className="fmtm-bg-[#f5f5f5] !fmtm-h-[100dvh] sm:!fmtm-h-full">
@@ -433,7 +478,19 @@ const ProjectDetailsV2 = () => {
                   }}
                 />
               )}
-              {dataExtractUrl && isValidUrl(dataExtractUrl) && dataExtractExtent && (
+              <VectorLayer
+                geojson={badGeomFeatureCollection}
+                viewProperties={{
+                  size: map?.getSize(),
+                  padding: [50, 50, 50, 50],
+                  constrainResolution: true,
+                  duration: 2000,
+                }}
+                layerProperties={{ name: 'bad-entities' }}
+                zIndex={5}
+                style=""
+              />
+              {dataExtractUrl && isValidUrl(dataExtractUrl) && dataExtractExtent && selectedTask && (
                 <VectorLayer
                   fgbUrl={dataExtractUrl}
                   fgbExtent={dataExtractExtent}
@@ -479,7 +536,7 @@ const ProjectDetailsV2 = () => {
                   }
                   onClick={() => {
                     if (entityOsmMapLoading) return;
-                    getEntityStatusList();
+                    syncStatus();
                   }}
                   btnType="other"
                   className={`!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white ${entityOsmMapLoading && 'fmtm-cursor-not-allowed'}`}

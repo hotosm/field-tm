@@ -46,6 +46,7 @@ from app.db.postgis_utils import (
 class GeometryLogIn(BaseModel):
     """Geometry log insert."""
 
+    id: Optional[UUID] = None
     status: GeomStatus
     geojson: dict
     project_id: Optional[int] = None

@@ -57,6 +57,7 @@ const VectorLayer = ({
   layerProperties,
   rotation,
   getAOIArea,
+  processGeojson,
 }) => {
   const [vectorLayer, setVectorLayer] = useState(null);
   useEffect(() => {
@@ -185,8 +186,7 @@ const VectorLayer = ({
 
   async function loadFgbRemote(filterExtent = true, extractGeomCol = true) {
     this.clear();
-    const filteredFeatures = [];
-
+    let filteredFeatures = [];
     for await (let feature of FGBGeoJson.deserialize(fgbUrl, fgbBoundingBox(fgbExtent.getExtent()))) {
       if (extractGeomCol && feature.geometry.type === 'GeometryCollection') {
         // Extract first geom from geomcollection
@@ -208,6 +208,11 @@ const VectorLayer = ({
       } else {
         filteredFeatures.push(extractGeom);
       }
+    }
+    // Process Geojson if needed i.e. filter, modify, etc
+    // ex: in our use case we are filtering only rejected entities
+    if (processGeojson) {
+      filteredFeatures = processGeojson(filteredFeatures);
     }
     this.addFeatures(filteredFeatures);
   }

@@ -1,5 +1,6 @@
 import { ShapeStream, Shape } from '@electric-sql/client';
 import type { ShapeData } from '@electric-sql/client';
+import type { Feature, FeatureCollection } from 'geojson';
 import type { LngLatLike } from 'svelte-maplibre';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -32,10 +33,21 @@ type entityIdCoordinateMapType = {
 	coordinate: [number, number];
 };
 
+type newBadGeomType<T> = {
+	geojson: Feature;
+	id: number;
+	project_id: number;
+	status: T;
+	task_id: number;
+};
+
 let userLocationCoord: LngLatLike | undefined = $state();
 let selectedEntity: number | null = $state(null);
 let entitiesShape: Shape;
+let geomShape: Shape;
 let entitiesStatusList: entitiesStatusListType[] = $state([]);
+let badGeomList: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
+let newGeomList: FeatureCollection = $state({ type: 'FeatureCollection', features: [] });
 let syncEntityStatusLoading: boolean = $state(false);
 let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
@@ -49,6 +61,17 @@ function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 	return new ShapeStream({
 		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
 		table: 'odk_entities',
+		where: `project_id=${projectId}`,
+	});
+}
+
+function getNewBadGeomStream(projectId: number): ShapeStream | undefined {
+	if (!projectId) {
+		return;
+	}
+	return new ShapeStream({
+		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
+		table: 'geometrylog',
 		where: `project_id=${projectId}`,
 	});
 }
@@ -70,6 +93,28 @@ function getEntitiesStatusStore() {
 						osmid: entitiesList?.find((entityx) => entityx.id === entity.entity_id)?.osm_id,
 					};
 				});
+			}
+		});
+	}
+
+	async function subscribeToNewBadGeom(geomStream: ShapeStream | undefined) {
+		if (!geomStream) return;
+		geomShape = new Shape(geomStream);
+
+		geomShape.subscribe((geom: ShapeData) => {
+			const rows: newBadGeomType<'NEW' | 'BAD'>[] = geom.rows;
+			const badRows = rows.filter((row) => row.status === 'BAD').map((row) => row?.geojson) as Feature[];
+			const newRows = rows.filter((row) => row.status === 'NEW').map((row) => row?.geojson) as Feature[];
+
+			if (rows && Array.isArray(rows)) {
+				badGeomList = {
+					type: 'FeatureCollection',
+					features: badRows,
+				};
+				newGeomList = {
+					type: 'FeatureCollection',
+					features: newRows,
+				};
 			}
 		});
 	}
@@ -132,11 +177,18 @@ function getEntitiesStatusStore() {
 		setEntityToNavigate: setEntityToNavigate,
 		setToggleGeolocation: setToggleGeolocation,
 		setUserLocationCoordinate: setUserLocationCoordinate,
+		subscribeToNewBadGeom: subscribeToNewBadGeom,
 		get selectedEntity() {
 			return selectedEntity;
 		},
 		get entitiesStatusList() {
 			return entitiesStatusList;
+		},
+		get badGeomList() {
+			return badGeomList;
+		},
+		get newGeomList() {
+			return newGeomList;
 		},
 		get syncEntityStatusLoading() {
 			return syncEntityStatusLoading;
@@ -159,4 +211,4 @@ function getEntitiesStatusStore() {
 	};
 }
 
-export { getEntityStatusStream, getEntitiesStatusStore };
+export { getEntityStatusStream, getEntitiesStatusStore, getNewBadGeomStream };

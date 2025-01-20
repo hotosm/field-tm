@@ -31,6 +31,8 @@ const initialState: SubmissionStateTypes = {
     projectId: null,
     reviewState: '',
     taskUid: null,
+    entity_id: null,
+    label: null,
   },
   updateReviewStateLoading: false,
   mappedVsValidatedTask: [],
