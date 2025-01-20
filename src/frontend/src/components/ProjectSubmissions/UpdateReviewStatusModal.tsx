@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from '@/components/common/Modal';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
-import { UpdateReviewStateService } from '@/api/SubmissionService';
+import { DeleteGeometry, PostGeometry, UpdateReviewStateService } from '@/api/SubmissionService';
 import TextArea from '../common/TextArea';
 import Button from '../common/Button';
+import { GetGeometryLog, PostProjectComments, UpdateEntityState } from '@/api/Project';
+import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import { PostProjectComments } from '@/api/Project';
 import { task_event } from '@/types/enums';
+import { featureType } from '@/store/types/ISubmissions';
 
 // Note these id values must be camelCase to match what ODK Central requires
 const reviewList: reviewListType[] = [
@@ -23,12 +25,6 @@ const reviewList: reviewListType[] = [
     className: 'fmtm-bg-[#E9DFCF] fmtm-text-[#D99F00] fmtm-border-[#D99F00]',
     hoverClass: 'hover:fmtm-text-[#D99F00] hover:fmtm-border-[#D99F00]',
   },
-  {
-    id: 'rejected',
-    title: 'Rejected',
-    className: 'fmtm-bg-[#E8D5D5] fmtm-text-[#D73F37] fmtm-border-[#D73F37]',
-    hoverClass: 'hover:fmtm-text-[#D73F37] hover:fmtm-border-[#D73F37]',
-  },
 ];
 
 const UpdateReviewStatusModal = () => {
@@ -37,17 +33,26 @@ const UpdateReviewStatusModal = () => {
   const [reviewStatus, setReviewStatus] = useState('');
   const updateReviewStatusModal = useAppSelector((state) => state.submission.updateReviewStatusModal);
   const updateReviewStateLoading = useAppSelector((state) => state.submission.updateReviewStateLoading);
+  const badGeomLogList = useAppSelector((state) => state?.project?.badGeomLogList);
 
   useEffect(() => {
     setReviewStatus(updateReviewStatusModal.reviewState);
   }, [updateReviewStatusModal.reviewState]);
+
+  useEffect(() => {
+    if (!updateReviewStatusModal.projectId) return;
+    dispatch(
+      GetGeometryLog(`${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`),
+    );
+  }, [updateReviewStatusModal.projectId]);
 
   const handleStatusUpdate = async () => {
     if (
       !updateReviewStatusModal.instanceId ||
       !updateReviewStatusModal.projectId ||
       !updateReviewStatusModal.taskId ||
-      !updateReviewStatusModal?.taskUid
+      !updateReviewStatusModal.entity_id ||
+      !updateReviewStatusModal.taskUid
     ) {
       return;
     }
@@ -62,7 +67,55 @@ const UpdateReviewStatusModal = () => {
           },
         ),
       );
+
+      // post bad geometry if submission is marked as hasIssues
+      if (reviewStatus === 'hasIssues') {
+        const badFeature = {
+          ...(updateReviewStatusModal.feature as featureType),
+          properties: {
+            entity_id: updateReviewStatusModal.entity_id,
+            task_id: updateReviewStatusModal.taskUid,
+            instance_id: updateReviewStatusModal.instanceId,
+          },
+        };
+
+        dispatch(
+          PostGeometry(
+            `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`,
+            {
+              status: 'BAD',
+              geojson: badFeature,
+              project_id: updateReviewStatusModal.projectId,
+              task_id: +updateReviewStatusModal.taskUid,
+            },
+          ),
+        );
+      }
+
+      // delete bad geometry if the entity previously has rejected submission and current submission is marked as approved
+      if (reviewStatus === 'approved') {
+        const badGeomId = badGeomLogList.find(
+          (geom) => geom.geojson.properties.entity_id === updateReviewStatusModal.entity_id,
+        )?.id;
+        dispatch(
+          DeleteGeometry(
+            `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records/${badGeomId}`,
+          ),
+        );
+      }
+
+      dispatch(
+        UpdateEntityState(
+          `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/entity/status`,
+          {
+            entity_id: updateReviewStatusModal.entity_id,
+            status: reviewStatus === 'approved' ? entity_state['SURVEY_SUBMITTED'] : entity_state['MARKED_BAD'],
+            label: updateReviewStatusModal.label,
+          },
+        ),
+      );
     }
+
     if (noteComments.trim().length > 0) {
       dispatch(
         PostProjectComments(
@@ -84,6 +137,9 @@ const UpdateReviewStatusModal = () => {
         taskId: null,
         reviewState: '',
         taskUid: null,
+        entity_id: null,
+        label: null,
+        feature: null,
       }),
     );
     dispatch(SubmissionActions.UpdateReviewStateLoading(false));
@@ -96,11 +152,11 @@ const UpdateReviewStatusModal = () => {
           <h2 className="!fmtm-text-lg fmtm-font-archivo fmtm-tracking-wide">Update Review Status</h2>
         </div>
       }
-      className="!fmtm-w-fit !fmtm-outline-none fmtm-rounded-xl"
+      className="!fmtm-w-[23rem] !fmtm-outline-none fmtm-rounded-xl"
       description={
         <div className="fmtm-mt-9">
           <div className="fmtm-mb-4">
-            <div className="fmtm-flex fmtm-justify-between fmtm-gap-2">
+            <div className="fmtm-flex fmtm-gap-2">
               {reviewList.map((reviewBtn) => (
                 <button
                   key={reviewBtn.id}
@@ -136,6 +192,9 @@ const UpdateReviewStatusModal = () => {
                     taskId: null,
                     reviewState: '',
                     taskUid: null,
+                    entity_id: null,
+                    label: null,
+                    feature: null,
                   }),
                 );
               }}
@@ -162,6 +221,9 @@ const UpdateReviewStatusModal = () => {
             taskId: null,
             reviewState: '',
             taskUid: null,
+            entity_id: null,
+            label: null,
+            feature: null,
           }),
         );
       }}

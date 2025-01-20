@@ -111,40 +111,27 @@ export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, an
 
   let status = entity_state[entity?.status];
 
-  const borderStrokeColor = '#FF0000';
+  const borderStrokeColor = 'rgb(0,0,0,0.5)';
 
-  const lockedPolygonStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb,
-    borderStrokeColor,
-  );
-  const lockedValidationStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
-    borderStrokeColor,
-  );
-  const iconStyle = createIconStyle(AssetModules.LockPng);
-  const redIconStyle = createIconStyle(AssetModules.RedLockPng);
+  const strokeStyle = new Stroke({
+    color: borderStrokeColor,
+    width: 1,
+    opacity: 0.2,
+  });
 
   const geojsonStyles = {
     READY: new Style({
-      stroke: new Stroke({
-        color: borderStrokeColor,
-        width: 1,
-      }),
+      stroke: strokeStyle,
       fill: new Fill({
         color: mapTheme.palette.mapFeatureColors.ready_rgb,
       }),
     }),
-    OPENED_IN_ODK: [lockedPolygonStyle, iconStyle],
-    // UNLOCKED_TO_VALIDATE: new Style({
-    //   stroke: new Stroke({
-    //     color: borderStrokeColor,
-    //     width: 1,
-    //   }),
-    //   fill: new Fill({
-    //     color: mapTheme.palette.mapFeatureColors.mapped_rgb,
-    //   }),
-    // }),
-    // LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
+    OPENED_IN_ODK: new Style({
+      stroke: strokeStyle,
+      fill: new Fill({
+        color: mapTheme.palette.mapFeatureColors.locked_for_validation,
+      }),
+    }),
     SURVEY_SUBMITTED: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,
@@ -154,15 +141,6 @@ export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, an
         color: mapTheme.palette.mapFeatureColors.validated_rgb,
       }),
     }),
-    // INVALIDATED: new Style({
-    //   stroke: new Stroke({
-    //     color: borderStrokeColor,
-    //     width: 1,
-    //   }),
-    //   fill: new Fill({
-    //     color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
-    //   }),
-    // }),
     MARKED_BAD: new Style({
       stroke: new Stroke({
         color: borderStrokeColor,

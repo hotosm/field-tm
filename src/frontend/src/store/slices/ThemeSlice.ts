@@ -61,14 +61,14 @@ const initialState: themeStateType = {
         locked_for_validation_rgb: 'rgb(252,236,164,0.3)',
         //green
         validated: 'rgba(64, 172, 140, 0.3)',
-        validated_rgb: 'rgba(64, 172, 140, 0.3)',
+        validated_rgb: 'rgba(64, 172, 140, 0.8)',
         //yellow
         // invalidated: '#ffff00',
         invalidated: 'rgb(215,63,62,0.3)',
         invalidated_rgb: 'rgb(215,63,62,0.3)',
         //brown
         bad: 'rgba(216, 218, 228, 0.3)',
-        bad_rgb: 'rgba(216, 218, 228, 0.3)',
+        bad_rgb: 'rgba(250, 17, 0, 0.3)',
         split: 'rgb(112, 67, 67,0.3)',
         split_rgb: 'rgb(112, 67, 67,0.3)',
       },

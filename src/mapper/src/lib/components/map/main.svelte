@@ -23,8 +23,8 @@
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
+	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection, Feature } from 'geojson';
 	import { centroid } from '@turf/centroid';
-	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
@@ -38,13 +38,11 @@
 	import FlatGeobuf from '$lib/components/map/flatgeobuf-layer.svelte';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
 	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
-	// import { entityFeatcolStore, selectedEntityId } from '$store/entities';
 	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
 	import { loadOfflinePmtiles } from '$lib/utils/basemaps.ts';
 	import { projectSetupStep as projectSetupStepEnum, NewGeomTypes } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
-
 
 	type bboxType = [number, number, number, number];
 
@@ -55,7 +53,7 @@
 		projectId: number;
 		setMapRef: (map: maplibregl.Map | undefined) => void;
 		draw?: boolean;
-	    drawGeomType: NewGeomTypes | undefined;
+		drawGeomType: NewGeomTypes | undefined;
 		handleDrawnGeom?: ((geojson: GeoJSONGeometry) => void) | null;
 	}
 
@@ -80,6 +78,8 @@
 	let selectedBaselayer: string = $state('OSM');
 	let taskAreaClicked: boolean = $state(false);
 	let projectSetupStep: number | null = $state(null);
+	let lineWidth = $state(1); // Initial line width of the rejected entities
+	let expanding = true; // Whether the line is expanding
 
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
@@ -122,7 +122,7 @@
 	// })
 	let displayDrawHelpText: boolean = $state(false);
 	type DrawModeOptions = 'point' | 'linestring' | 'delete-selection' | 'polygon';
-	const currentDrawMode: DrawModeOptions = drawGeomType ? drawGeomType.toLowerCase() as DrawModeOptions : 'point';
+	const currentDrawMode: DrawModeOptions = drawGeomType ? (drawGeomType.toLowerCase() as DrawModeOptions) : 'point';
 	const drawControl = new MaplibreTerradrawControl({
 		modes: [
 			currentDrawMode,
@@ -262,7 +262,7 @@
 		}
 	});
 
-	function addStatusToGeojsonProperty(geojsonData: FeatureCollection) {
+	function addStatusToGeojsonProperty(geojsonData: FeatureCollection): FeatureCollection {
 		return {
 			...geojsonData,
 			features: geojsonData.features.map((feature) => {
@@ -301,6 +301,20 @@
 			await loadOfflinePmtiles(projectId);
 			selectedBaselayer = 'PMTiles';
 		}
+
+		const interval = setInterval(() => {
+			if (expanding) {
+				lineWidth += 0.3;
+				if (lineWidth >= 4) expanding = false; // Maximum width
+			} else {
+				lineWidth -= 0.3;
+				if (lineWidth <= 1) expanding = true; // Minimum width
+			}
+		}, 50); // Update every 50ms for smooth animation
+
+		return () => {
+			clearInterval(interval);
+		};
 	});
 </script>
 
@@ -416,7 +430,7 @@
 		<FillLayer
 			id="entity-fill-layer"
 			paint={{
-				'fill-opacity': 0.6,
+				'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
 				'fill-color': [
 					'match',
 					['get', 'status'],
@@ -426,7 +440,9 @@
 					'#fae15f',
 					'SURVEY_SUBMITTED',
 					'#71bf86',
-					'#9c9a9a', // default color if no match is found
+					'MARKED_BAD',
+					'#fa1100',
+					'#c5fbf5', // default color if no match is found
 				],
 				'fill-outline-color': [
 					'match',
@@ -437,7 +453,9 @@
 					'#ffd603',
 					'SURVEY_SUBMITTED',
 					'#32a852',
-					'#000000',
+					'MARKED_BAD',
+					'#fa1100',
+					'#c5fbf5',
 				],
 			}}
 			beforeLayerType="symbol"
@@ -447,13 +465,36 @@
 			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 			paint={{
 				'line-color': '#fa1100',
-				'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity], 1, 0],
-				'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity], 1, 0.35],
+				'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
+				'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
 			}}
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
 	</FlatGeobuf>
+	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
+		<FillLayer
+			id="bad-geom-fill-layer"
+			hoverCursor="pointer"
+			paint={{
+				'fill-color': '#fa1100',
+				'fill-opacity': 0.3,
+			}}
+			beforeLayerType="symbol"
+			manageHoverState
+		/>
+		<LineLayer
+			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+			paint={{
+				'line-color': '#fa1100',
+				'line-width': lineWidth,
+			}}
+			beforeLayerType="symbol"
+			manageHoverState
+		/>
+	</GeoJSON>
+
+	<!-- pulse effect layer representing rejected entities -->
 
 	<!-- Offline pmtiles, if present (alternative approach, not baselayer) -->
 	<!-- {#if projectBasemapStore.projectPmtilesUrl}

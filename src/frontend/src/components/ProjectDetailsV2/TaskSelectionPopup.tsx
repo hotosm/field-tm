@@ -81,7 +81,10 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
           <AssetModules.CloseIcon
             style={{ width: '20px' }}
             className="hover:fmtm-text-primaryRed"
-            onClick={() => dispatch(ProjectActions.ToggleTaskModalStatus(false))}
+            onClick={() => {
+              dispatch(ProjectActions.ToggleTaskModalStatus(false));
+              dispatch(CoreModules.TaskActions.SetSelectedTask(null));
+            }}
           />
         </div>
       </div>

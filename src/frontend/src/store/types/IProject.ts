@@ -1,6 +1,7 @@
 import {
   downloadProjectFormLoadingType,
   EntityOsmMap,
+  geometryLogResponseType,
   projectDashboardDetailTypes,
   projectInfoType,
   projectTaskBoundriesType,
@@ -35,6 +36,10 @@ export type ProjectStateTypes = {
   projectTaskActivity: projectTaskActivity[];
   projectActivityLoading: boolean;
   downloadSubmissionLoading: boolean;
+  badGeomFeatureCollection: FeatureCollectionType;
+  newGeomFeatureCollection: FeatureCollectionType;
+  badGeomLogList: geometryLogResponseType[];
+  getGeomLogLoading: boolean;
 };
 
 type projectCommentsListTypes = {
@@ -55,4 +60,15 @@ export type projectTaskActivity = {
   profile_img: null | string;
   username: string;
   created_at: string;
+};
+
+export type FeatureCollectionType = {
+  type: 'FeatureCollection';
+  features: featureType[];
+};
+
+export type featureType = {
+  type: 'Feature';
+  geometry: { type: string; coordinates: number[][][] };
+  properties: Record<string, any>;
 };

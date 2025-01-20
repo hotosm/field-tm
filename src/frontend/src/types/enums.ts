@@ -42,3 +42,11 @@ export type NewGeomTypes = {
   POLYGON: 'POLYGON';
   LINESTRING: 'LINESTRING';
 };
+
+export enum submission_status {
+  null = 'Received',
+  hasIssues = 'Has issues',
+  edited = 'Edited',
+  approved = 'Approved',
+  rejected = 'Rejected',
+}

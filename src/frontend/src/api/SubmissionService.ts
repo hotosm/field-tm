@@ -1,10 +1,11 @@
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
   submissionContributorsTypes,
   submissionFormFieldsTypes,
   submissionTableDataTypes,
   updateReviewStateType,
   validatedMappedType,
+  geometryLogType,
 } from '@/models/submission/submissionModel';
 import CoreModules from '@/shared/CoreModules';
 import { CommonActions } from '@/store/slices/CommonSlice';
@@ -105,5 +106,48 @@ export const MappedVsValidatedTaskService = (url: string) => {
     };
 
     await MappedVsValidatedTask(url);
+  };
+};
+
+// post bad and new geometries
+export const PostGeometry = (url: string, payload: geometryLogType) => {
+  return async (dispatch: AppDispatch) => {
+    const postGeometry = async () => {
+      try {
+        await CoreModules.axios.post(url, payload);
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to post geometry.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+    };
+
+    await postGeometry();
+  };
+};
+
+export const DeleteGeometry = (url: string) => {
+  return async (dispatch: AppDispatch) => {
+    const deleteGeometry = async () => {
+      try {
+        await axios.delete(url);
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed to delete geometry.',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+    };
+
+    await deleteGeometry();
   };
 };

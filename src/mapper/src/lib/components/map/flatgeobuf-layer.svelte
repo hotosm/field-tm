@@ -16,7 +16,7 @@
 		metadataFunc?: (headerMetadata: HeaderMeta) => void;
 		promoteId?: string;
 		children?: Snippet;
-		processGeojson?: (geojson: GeoJSON) => GeoJSON;
+		processGeojson?: (geojson: FeatureCollection) => FeatureCollection;
 		geojsonUpdateDependency?: any;
 	}
 
