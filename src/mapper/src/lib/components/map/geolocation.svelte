@@ -244,6 +244,7 @@
 				on:click={() => {
 					entitiesStore.setToggleGeolocation(!entitiesStore.toggleGeolocation);
 					if (!entitiesStore.toggleGeolocation) {
+						entitiesStore.setUserLocationCoordinate(undefined);
 						exitNavigationMode();
 					}
 				}}

@@ -52,6 +52,7 @@
 		"@turf/bbox": "^7.1.0",
 		"@turf/buffer": "^7.1.0",
 		"@turf/centroid": "^7.1.0",
+		"@turf/distance": "^7.2.0",
 		"@turf/helpers": "^7.1.0",
 		"@watergis/maplibre-gl-terradraw": "^0.8.1",
 		"drizzle-orm": "^0.35.3",
