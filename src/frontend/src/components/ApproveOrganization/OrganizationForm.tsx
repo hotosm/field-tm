@@ -52,7 +52,7 @@ const OrganizationForm = () => {
     if (organizationApprovalSuccess) {
       dispatch(OrganisationAction.SetOrganisationFormData({}));
       dispatch(OrganisationAction.SetOrganizationApprovalStatus(false));
-      navigate('/organisation');
+      navigate('/organization');
     }
   }, [organizationApprovalSuccess]);
 
@@ -78,6 +78,15 @@ const OrganizationForm = () => {
           name="url"
           label="Website URL"
           value={organisationFormData?.url}
+          onChange={() => {}}
+          fieldType="text"
+          disabled
+        />
+        <InputTextField
+          id="associated_email"
+          name="associated_email"
+          label="Email"
+          value={organisationFormData?.associated_email}
           onChange={() => {}}
           fieldType="text"
           disabled

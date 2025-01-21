@@ -36,7 +36,7 @@ const OrganisationGridCard = ({ filteredData, allDataLength }: organizationGridC
             sx={cardStyle}
             onClick={() => {
               if (!data?.approved && authDetails && authDetails?.['role'] === user_roles.ADMIN) {
-                navigate(`/approve-organization/${data?.id}`);
+                navigate(`/organization/approve/${data?.id}`);
               }
             }}
           >

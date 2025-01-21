@@ -14,6 +14,7 @@ interface OrganisationValues {
   osm_profile: string;
   community_type: string;
   fillODKCredentials: boolean;
+  associated_email: string;
 }
 interface ValidationErrors {
   logo?: string;
@@ -27,7 +28,10 @@ interface ValidationErrors {
   osm_profile?: string;
   community_type?: string;
   fillODKCredentials?: boolean;
+  associated_email?: string;
 }
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function OrganizationDetailsValidation(values: OrganisationValues) {
   const errors: ValidationErrors = {};
@@ -53,6 +57,12 @@ function OrganizationDetailsValidation(values: OrganisationValues) {
 
   if (values?.odk_central_url && !isValidUrl(values.odk_central_url)) {
     errors.odk_central_url = 'Invalid URL.';
+  }
+
+  if (isInputEmpty(values?.associated_email)) {
+    errors.associated_email = 'Email is Required.';
+  } else if (!emailPattern.test(values?.associated_email)) {
+    errors.associated_email = 'Invalid Email.';
   }
 
   if (values?.fillODKCredentials && isInputEmpty(values.odk_central_url)) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import UploadArea from '../../common/UploadArea';
-import Button from '../../common/Button';
+import UploadArea from '@/components/common/UploadArea';
+import Button from '@/components/common/Button';
 import { CustomSelect } from '@/components/common/Select';
 import CoreModules from '@/shared/CoreModules';
 import { FormCategoryService } from '@/api/CreateProjectService';
@@ -9,19 +9,20 @@ import { DownloadProjectForm } from '@/api/Project';
 import { PostFormUpdate } from '@/api/CreateProjectService';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 type FileType = {
   id: string;
-  name: string;
-  url?: File;
-  isDeleted: boolean;
+  file: File;
+  previewURL: string;
 };
 
 const FormUpdateTab = ({ projectId }) => {
   useDocumentTitle('Manage Project: Form Update');
   const dispatch = useAppDispatch();
 
-  const [uploadForm, setUploadForm] = useState<FileType[] | null>(null);
-  const [error, setError] = useState({ formError: '', categoryError: '' });
+  const [uploadForm, setUploadForm] = useState<FileType[] | null>([]);
+  const [formError, setFormError] = useState(false);
 
   const xFormId = CoreModules.useAppSelector((state) => state.createproject.editProjectDetails.odk_form_id);
   const formCategoryList = useAppSelector((state) => state.createproject.formCategoryList);
@@ -30,15 +31,19 @@ const FormUpdateTab = ({ projectId }) => {
   const formUpdateLoading = useAppSelector((state) => state.createproject.formUpdateLoading);
 
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${API_URL}/central/list-forms`));
   }, []);
 
   const onSave = () => {
+    if (uploadForm?.length === 0) {
+      setFormError(true);
+      return;
+    }
     dispatch(
-      PostFormUpdate(`${import.meta.env.VITE_API_URL}/projects/update-form?project_id=${projectId}`, {
+      PostFormUpdate(`${API_URL}/projects/update-form?project_id=${projectId}`, {
         xformId: xFormId,
         category: selectedCategory,
-        upload: uploadForm && uploadForm?.[0]?.url,
+        upload: uploadForm && uploadForm?.[0]?.file,
       }),
     );
   };
@@ -57,7 +62,6 @@ const FormUpdateTab = ({ projectId }) => {
           className="fmtm-max-w-[13.5rem]"
           disabled
         />
-        {error.categoryError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.categoryError}</p>}
         <p className="fmtm-text-base fmtm-mt-2">
           The survey type will be used to set the OpenStreetMap{' '}
           <a
@@ -77,13 +81,7 @@ const FormUpdateTab = ({ projectId }) => {
           <a
             className="fmtm-text-blue-600 hover:fmtm-text-blue-700 fmtm-cursor-pointer fmtm-underline"
             onClick={() =>
-              dispatch(
-                DownloadProjectForm(
-                  `${import.meta.env.VITE_API_URL}/projects/download-form/${projectId}`,
-                  'form',
-                  projectId,
-                ),
-              )
+              dispatch(DownloadProjectForm(`${API_URL}/projects/download-form/${projectId}`, 'form', projectId))
             }
           >
             download
@@ -96,15 +94,14 @@ const FormUpdateTab = ({ projectId }) => {
         <UploadArea
           title="Upload Form"
           label="Please upload .xls, .xlsx, .xml file"
-          multiple={false}
           data={uploadForm || []}
-          filterKey="url"
-          onUploadFile={(updatedFiles: FileType[]) => {
-            setUploadForm(updatedFiles);
+          onUploadFile={(updatedFiles) => {
+            setUploadForm(updatedFiles as FileType[]);
+            formError && setFormError(false);
           }}
           acceptedInput=".xls, .xlsx, .xml"
         />
-        {error.formError && <p className="fmtm-text-primaryRed fmtm-text-base">{error.formError}</p>}
+        {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
       </div>
       <div className="fmtm-flex fmtm-justify-center">
         <Button

@@ -31,7 +31,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organisation',
+        path: '/organization',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -41,7 +41,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/create-organization',
+        path: '/organization/create',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -51,7 +51,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/edit-organization/:id',
+        path: '/organization/edit/:id',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -61,7 +61,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/approve-organization/:id',
+        path: '/organization/approve/:id',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
