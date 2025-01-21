@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import Button from '@/components/common/Button';
 import InputTextField from '@/components/common/InputTextField';
 import TextArea from '@/components/common/TextArea';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { OrganisationAction } from '@/store/slices/organisationSlice';
 import useForm from '@/hooks/useForm';
-import AssetModules from '@/shared/AssetModules';
 import OrganizationDetailsValidation from '@/components/CreateEditOrganization/validation/OrganizationDetailsValidation';
 import RadioButton from '@/components/common/RadioButton';
 import {
@@ -18,6 +17,10 @@ import InstructionsSidebar from '@/components/CreateEditOrganization/Instruction
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import { organizationTypeOptionsType } from '@/models/organisation/organisationModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import UploadArea from '@/components/common/UploadArea';
+import { CommonActions } from '@/store/slices/CommonSlice';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const organizationTypeOptions: organizationTypeOptionsType[] = [
   { name: 'osm_community', value: 'OSM_COMMUNITY', label: 'OSM Community' },
@@ -31,42 +34,47 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const inputFileRef = useRef<any>(null);
   const organisationFormData = useAppSelector((state) => state.organisation.organisationFormData);
   const postOrganisationDataLoading = useAppSelector((state) => state.organisation.postOrganisationDataLoading);
   const postOrganisationData = useAppSelector((state) => state.organisation.postOrganisationData);
-  const [previewSource, setPreviewSource] = useState<any>('');
 
   const submission = () => {
     if (!organizationId) {
       const { fillODKCredentials, ...filteredValues } = values;
-      dispatch(PostOrganisationDataService(`${import.meta.env.VITE_API_URL}/organisation`, filteredValues));
+      dispatch(
+        PostOrganisationDataService(`${API_URL}/organisation`, {
+          ...filteredValues,
+          logo: filteredValues.logo ? filteredValues.logo?.[0].file : null,
+        }),
+      );
     } else {
       const { fillODKCredentials, ...filteredValues } = values;
-      const changedValues = diffObject(organisationFormData, filteredValues);
+      let changedValues = diffObject(organisationFormData, filteredValues);
+      if (changedValues.logo) {
+        changedValues = {
+          ...changedValues,
+          logo: changedValues.logo?.length > 0 ? changedValues.logo?.[0].file : null,
+        };
+      }
       if (Object.keys(changedValues).length > 0) {
+        dispatch(PatchOrganizationDataService(`${API_URL}/organisation/${organizationId}`, changedValues));
+      } else {
         dispatch(
-          PatchOrganizationDataService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`, changedValues),
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Organization details up to date',
+            variant: 'info',
+            duration: 2000,
+          }),
         );
       }
     }
   };
-
   const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
     organisationFormData,
     submission,
     OrganizationDetailsValidation,
   );
-
-  const previewFile = (file: File) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file); //reads file as data url (base64 encoding)
-    reader.onload = () => {
-      if (reader) {
-        setPreviewSource(reader?.result);
-      }
-    };
-  };
 
   // redirect to manage-org page after post success
   useEffect(() => {
@@ -85,14 +93,14 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
       if (searchParams.get('popup') === 'true') {
         window.close();
       } else {
-        navigate('/organisation');
+        navigate('/organization');
       }
     }
   }, [postOrganisationData]);
 
   useEffect(() => {
     if (organizationId) {
-      dispatch(GetIndividualOrganizationService(`${import.meta.env.VITE_API_URL}/organisation/${organizationId}`));
+      dispatch(GetIndividualOrganizationService(`${API_URL}/organisation/${organizationId}`));
     }
   }, [organizationId]);
 
@@ -151,6 +159,16 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
               errorMsg={errors.url}
             />
           )}
+          <InputTextField
+            id="associated_email"
+            name="associated_email"
+            label="Email"
+            value={values?.associated_email}
+            onChange={handleChange}
+            fieldType="text"
+            required
+            errorMsg={errors.associated_email}
+          />
           <TextArea
             id="description"
             name="description"
@@ -218,43 +236,15 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
               required
             />
           )}
-          <div className="flex items-center">
-            <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold">Upload Logo</p>
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-5">
-              <input
-                ref={inputFileRef}
-                type="file"
-                className="fmtm-max-w-[250px]"
-                onChange={(e) => {
-                  handleCustomChange('logo', e.target?.files?.[0]);
-                  if (e.target?.files?.[0]) {
-                    previewFile(e.target?.files?.[0]);
-                  }
-                }}
-                accept="image/png, image/gif, image/jpeg"
-              />
-              {(previewSource || values.logo) && (
-                <div className="fmtm-relative fmtm-w-fit">
-                  <div className="fmtm-absolute -fmtm-top-3 -fmtm-right-3" title="Remove Logo">
-                    <AssetModules.DeleteIcon
-                      style={{ fontSize: '28px' }}
-                      className="fmtm-text-primaryRed hover:fmtm-text-red-700 fmtm-cursor-pointer"
-                      onClick={() => {
-                        inputFileRef.current.value = '';
-                        handleCustomChange('logo', '');
-                        setPreviewSource('');
-                      }}
-                    />
-                  </div>
-                  <img
-                    src={previewSource ? previewSource : values.logo ? values.logo : ''}
-                    alt=""
-                    className="fmtm-h-[100px] fmtm-rounded-sm fmtm-border-[1px]"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <UploadArea
+            title="Upload Logo"
+            label="Please upload .png, .gif, .jpeg"
+            data={values?.logo}
+            onUploadFile={(updatedFiles) => {
+              handleCustomChange('logo', updatedFiles);
+            }}
+            acceptedInput="image/*"
+          />
         </div>
 
         <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">

@@ -112,7 +112,7 @@ const Organisation = () => {
               onClick={() => loadMyOrganisations()}
             />
             {authDetails && (
-              <CoreModules.Link to={'/create-organization'}>
+              <CoreModules.Link to={'/organization/create'}>
                 <CoreModules.Button
                   variant="outlined"
                   color="error"

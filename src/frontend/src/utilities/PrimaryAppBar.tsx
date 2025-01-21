@@ -93,7 +93,7 @@ export default function PrimaryAppBar() {
               Explore Projects
             </Link>
             <Link
-              to="/organisation"
+              to="/organization"
               className={`fmtm-uppercase fmtm-text-base fmtm-text-[#717171] hover:fmtm-text-[#3f3d3d] fmtm-duration-200 ${
                 activeTab === 1 ? 'fmtm-border-[#706E6E]' : 'fmtm-border-white'
               } fmtm-pb-1 fmtm-border-b-2`}
