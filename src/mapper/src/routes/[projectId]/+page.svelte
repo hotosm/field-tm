@@ -102,8 +102,6 @@
 	}
 
 	onMount(async () => {
-		// In store/entities.ts
-		await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, data.entityStatus);
 		await entitiesStore.subscribeToNewBadGeom(newBadGeomStream);
 
 		// In store/tasks.svelte.ts
