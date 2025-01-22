@@ -372,3 +372,46 @@ export const GetGeometryLog = (url: string) => {
     await getProjectActivity(url);
   };
 };
+
+export const SyncTaskState = (
+  url: string,
+  params: { project_id: string },
+  taskBoundaryFeatures: any,
+  geojsonStyles: any,
+) => {
+  return async (dispatch: AppDispatch) => {
+    const syncTaskState = async () => {
+      try {
+        dispatch(ProjectActions.SyncTaskStateLoading(true));
+        const response: AxiosResponse = await axios.get(url, { params });
+
+        response.data.map((task) => {
+          const feature = taskBoundaryFeatures?.find((feature) => feature.getId() === task.id);
+          const previousProperties = feature.getProperties();
+          feature.setProperties({
+            ...previousProperties,
+            task_state: task.task_state,
+            actioned_by_uid: task.actioned_by_uid,
+            actioned_by_username: task.actioned_by_username,
+          });
+
+          feature.setStyle(geojsonStyles[task.task_state]);
+
+          dispatch(
+            ProjectActions.UpdateProjectTaskBoundries({
+              projectId: params.project_id,
+              taskId: task.id,
+              actioned_by_uid: task.actioned_by_uid,
+              actioned_by_username: task.actioned_by_username,
+              task_state: task.task_state,
+            }),
+          );
+        });
+      } catch (error) {
+      } finally {
+        dispatch(ProjectActions.SyncTaskStateLoading(false));
+      }
+    };
+    await syncTaskState();
+  };
+};

@@ -136,26 +136,6 @@
 			<div class="flex flex-col gap-4">
 				<div class="flex items-center justify-between">
 					<p class="text-[#333] text-xl font-semibold">Feature {selectedEntity?.osmid}</p>
-					<sl-button
-						onclick={async () => {
-							await entitiesStore.syncEntityStatus(projectData?.id);
-						}}
-						onkeydown={(e: KeyboardEvent) => {
-							e.key === 'Enter' && {};
-						}}
-						role="button"
-						tabindex="0"
-						size="small"
-						class="link w-fit ml-auto"
-						disabled={entitiesStore.syncEntityStatusLoading}
-					>
-						<hot-icon
-							slot="prefix"
-							name="arrow-repeat"
-							class={`!text-[1rem] cursor-pointer duration-200 ${entitiesStore.syncEntityStatusLoading && 'animate-spin'}`}
-						></hot-icon>
-						<span class="font-barlow font-medium text-sm uppercase">SYNC STATUS</span>
-					</sl-button>
 				</div>
 				<div class="flex flex-col gap-1">
 					<p><span class="font-medium">Task Id:</span> {selectedEntity?.task_id}</p>

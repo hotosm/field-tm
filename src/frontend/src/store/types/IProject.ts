@@ -40,6 +40,7 @@ export type ProjectStateTypes = {
   newGeomFeatureCollection: FeatureCollectionType;
   badGeomLogList: geometryLogResponseType[];
   getGeomLogLoading: boolean;
+  syncTaskStateLoading: boolean;
 };
 
 type projectCommentsListTypes = {

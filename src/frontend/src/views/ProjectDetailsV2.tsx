@@ -3,7 +3,7 @@ import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import WindowDimension from '@/hooks/WindowDimension';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
-import { ProjectById, GetEntityStatusList, GetGeometryLog } from '@/api/Project';
+import { ProjectById, GetEntityStatusList, GetGeometryLog, SyncTaskState } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
 import { HomeActions } from '@/store/slices/HomeSlice';
@@ -36,6 +36,7 @@ import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { Style, Stroke } from 'ol/style';
+import MapStyles from '@/hooks/MapStyles';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
@@ -44,6 +45,8 @@ const ProjectDetailsV2 = () => {
   const navigate = useNavigate();
   const { windowSize } = WindowDimension();
   const [divRef, toggle, handleToggle] = useOutsideClick();
+
+  const geojsonStyles = MapStyles();
 
   const [selectedTaskArea, setSelectedTaskArea] = useState<Record<string, any> | null>(null);
   const [selectedTaskFeature, setSelectedTaskFeature] = useState();
@@ -69,6 +72,7 @@ const ProjectDetailsV2 = () => {
   const entityOsmMapLoading = useAppSelector((state) => state?.project?.entityOsmMapLoading);
   const badGeomFeatureCollection = useAppSelector((state) => state?.project?.badGeomFeatureCollection);
   const getGeomLogLoading = useAppSelector((state) => state?.project?.getGeomLogLoading);
+  const syncTaskStateLoading = useAppSelector((state) => state?.project?.syncTaskStateLoading);
 
   useEffect(() => {
     if (state.projectInfo.name) {
@@ -259,6 +263,24 @@ const ProjectDetailsV2 = () => {
     dispatch(GetGeometryLog(`${import.meta.env.VITE_API_URL}/projects/${projectId}/geometry/records`));
   };
 
+  const syncTaskState = () => {
+    const taskBoundaryLayer = map
+      .getLayers()
+      .getArray()
+      .find((layer: any) => layer.get('name') == 'project-area');
+    const taskBoundaryFeatures = taskBoundaryLayer.getSource().getFeatures();
+
+    projectId &&
+      dispatch(
+        SyncTaskState(
+          `${import.meta.env.VITE_API_URL}/tasks`,
+          { project_id: projectId },
+          taskBoundaryFeatures,
+          geojsonStyles,
+        ),
+      );
+  };
+
   useEffect(() => {
     getEntityStatusList();
     getGeometryLog();
@@ -299,6 +321,7 @@ const ProjectDetailsV2 = () => {
   const syncStatus = () => {
     getEntityStatusList();
     getGeometryLog();
+    syncTaskState();
   };
 
   return (
@@ -462,7 +485,6 @@ const ProjectDetailsV2 = () => {
                     size: map?.getSize(),
                     padding: [50, 50, 50, 50],
                     constrainResolution: true,
-                    duration: 2000,
                   }}
                   layerProperties={{ name: 'project-area' }}
                   mapOnClick={projectClickOnTaskArea}
@@ -532,14 +554,16 @@ const ProjectDetailsV2 = () => {
                 <Button
                   btnText="SYNC STATUS"
                   icon={
-                    <AssetModules.SyncIcon className={`!fmtm-text-xl ${entityOsmMapLoading && 'fmtm-animate-spin'}`} />
+                    <AssetModules.SyncIcon
+                      className={`!fmtm-text-xl ${(entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading) && 'fmtm-animate-spin'}`}
+                    />
                   }
                   onClick={() => {
                     if (entityOsmMapLoading) return;
                     syncStatus();
                   }}
                   btnType="other"
-                  className={`!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white ${entityOsmMapLoading && 'fmtm-cursor-not-allowed'}`}
+                  className={`!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white ${(entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading) && 'fmtm-cursor-not-allowed'}`}
                 />
               </div>
               <MapControlComponent

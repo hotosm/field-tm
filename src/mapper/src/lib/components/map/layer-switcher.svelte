@@ -190,13 +190,13 @@ map = new Map({
 	>
 		<img
 			style="border: 1px solid #d73f3f;"
-			class="w-[2.824rem] h-[2.824rem] rounded-full"
+			class="w-[2.25rem] h-[2.25rem] rounded-full"
 			src={selectedStyleUrl}
 			alt="Basemap Icon"
 		/>
 	</div>
 	<div
-		class={`absolute bottom-0 right-14 bg-white rounded-md p-4 duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+		class={`absolute bottom-0 right-11 bg-white rounded-md p-4 duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 	>
 		<p class="font-semibold text-lg mb-2">Base Maps</p>
 		<div class="grid grid-cols-2 w-[212px] gap-3">
