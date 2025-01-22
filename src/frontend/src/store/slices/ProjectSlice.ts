@@ -35,6 +35,7 @@ const initialState: ProjectStateTypes = {
   newGeomFeatureCollection: { type: 'FeatureCollection', features: [] },
   badGeomLogList: [],
   getGeomLogLoading: false,
+  syncTaskStateLoading: false,
 };
 
 const ProjectSlice = createSlice({
@@ -169,6 +170,9 @@ const ProjectSlice = createSlice({
     },
     SetGeometryLogLoading(state, action: PayloadAction<boolean>) {
       state.getGeomLogLoading = action.payload;
+    },
+    SyncTaskStateLoading(state, action: PayloadAction<boolean>) {
+      state.syncTaskStateLoading = action.payload;
     },
   },
 });

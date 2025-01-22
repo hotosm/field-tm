@@ -355,6 +355,23 @@
 		</ControlGroup></Control
 	>
 	<Control class="flex flex-col gap-y-2" position="bottom-right">
+		<div
+			class="rounded-full w-[2.25rem] h-[2.25rem] overflow-hidden flex items-center justify-center border-1 border-solid border-red-600 bg-[#FFEDED]"
+		>
+			<sl-icon-button
+				name="arrow-repeat"
+				label="Settings"
+				disabled={entitiesStore.syncEntityStatusLoading}
+				class={`text-[1.25rem] rotate-90 text-red-600 ${entitiesStore.syncEntityStatusLoading && 'animate-spin'}`}
+				onclick={async () => await entitiesStore.syncEntityStatus(projectId)}
+				onkeydown={async (e: KeyboardEvent) => {
+					e.key === 'Enter' && (await entitiesStore.syncEntityStatus(projectId));
+				}}
+				role="button"
+				tabindex="0"
+			></sl-icon-button>
+		</div>
+
 		<LayerSwitcher
 			{map}
 			styles={allBaseLayers}
