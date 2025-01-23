@@ -25,7 +25,7 @@ URLs defined in the docker-compose file and your env file.
    and ensure that it is running on your local machine.
 2. From the command line: navigate to the top level directory
    of the FMTM project.
-3. From the command line run: `docker-compose pull`.
+3. From the command line run: `docker compose pull`.
    This will pull the latest container builds from **main** branch.
 4. Make sure you have a `.env` file with all required variables, see
    [here](../INSTALL.md#2-create-an-env-file).
