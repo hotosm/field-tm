@@ -1359,6 +1359,12 @@ class DbProject(BaseModel):
         async with db.cursor() as cur:
             await cur.execute(
                 """
+                DELETE FROM submission_photos WHERE project_id = %(project_id)s;
+            """,
+                {"project_id": project_id},
+            )
+            await cur.execute(
+                """
                 DELETE FROM background_tasks WHERE project_id = %(project_id)s;
             """,
                 {"project_id": project_id},
