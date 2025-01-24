@@ -43,6 +43,7 @@
 	import { projectSetupStep as projectSetupStepEnum, NewGeomTypes } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
+	import { clickOutside } from '$lib/utils/clickOutside.ts';
 
 	type bboxType = [number, number, number, number];
 
@@ -80,6 +81,8 @@
 	let projectSetupStep: number | null = $state(null);
 	let lineWidth = $state(1); // Initial line width of the rejected entities
 	let expanding = true; // Whether the line is expanding
+	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
+	let selectedStyleUrl: string | undefined = $state(undefined);
 
 	// Trigger adding the PMTiles layer to baselayers, if PmtilesUrl is set
 	let allBaseLayers: maplibregl.StyleSpecification[] = $derived(
@@ -371,14 +374,44 @@
 				tabindex="0"
 			></sl-icon-button>
 		</div>
-
-		<LayerSwitcher
-			{map}
-			styles={allBaseLayers}
-			sourcesIdToReAdd={['tasks', 'entities', 'geolocation']}
-			selectedStyleName={selectedBaselayer}
-		></LayerSwitcher>
-		<Legend />
+		<div
+			aria-label="layer switcher"
+			onclick={() => {
+				selectedControl = 'layer-switcher';
+			}}
+			role="button"
+			onkeydown={(e) => {
+				if (e.key === 'Enter') {
+					selectedControl = 'layer-switcher';
+				}
+			}}
+			tabindex="0"
+		>
+			<img
+				style="border: 1px solid #d73f3f;"
+				class="w-[2.25rem] h-[2.25rem] rounded-full"
+				src={selectedStyleUrl}
+				alt="Basemap Icon"
+			/>
+		</div>
+		<div
+			aria-label="toggle legend"
+			class="group text-nowrap cursor-pointer"
+			onclick={() => (selectedControl = 'legend')}
+			role="button"
+			onkeydown={(e) => {
+				if (e.key === 'Enter') {
+					selectedControl = 'legend';
+				}
+			}}
+			tabindex="0"
+		>
+			<hot-icon
+				style="border: 1px solid #D7D7D7;"
+				name="legend-toggle"
+				class="!text-[1.7rem] text-[#333333] bg-white p-1 rounded-full group-hover:text-red-600 duration-200"
+			></hot-icon>
+		</div>
 	</Control>
 	<!-- Add the Geolocation GeoJSON layer to the map -->
 	<Geolocation {map}></Geolocation>
@@ -537,3 +570,36 @@
 		</div>
 	{/if}
 </MapLibre>
+
+<div
+	use:clickOutside
+	onclick_outside={() => (selectedControl = null)}
+	class={`font-barlow flex justify-center !w-[100vw] absolute left-0 z-20 duration-400 ${selectedControl ? 'bottom-[4rem]' : '-bottom-[100%] pointer-events-none'}`}
+>
+	<div class="bg-white w-full font-regular md:max-w-[580px] px-4 py-3 sm:py-4 rounded-t-3xl">
+		<div class="flex justify-end">
+			<hot-icon
+				name="close"
+				class="!text-[1.5rem] text-[#52525B] cursor-pointer hover:text-red-600 duration-200"
+				onclick={() => (selectedControl = null)}
+				onkeydown={(e: KeyboardEvent) => {
+					if (e.key === 'Enter') {
+						selectedControl = null;
+					}
+				}}
+				role="button"
+				tabindex="0"
+			></hot-icon>
+		</div>
+		<LayerSwitcher
+			{map}
+			styles={allBaseLayers}
+			sourcesIdToReAdd={['tasks', 'entities', 'geolocation']}
+			selectedStyleName={selectedBaselayer}
+			{selectedStyleUrl}
+			setSelectedStyleUrl={(style) => (selectedStyleUrl = style)}
+			isOpen={selectedControl === 'layer-switcher'}
+		></LayerSwitcher>
+		<Legend isOpen={selectedControl === 'legend'} />
+	</div>
+</div>

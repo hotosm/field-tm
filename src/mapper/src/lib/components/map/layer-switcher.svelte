@@ -24,7 +24,6 @@ map = new Map({
 
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { clickOutside } from '$lib/utils/clickOutside';
 
 	type MapLibreStylePlusMetadata = maplibregl.StyleSpecification & {
 		metadata: {
@@ -37,15 +36,17 @@ map = new Map({
 		selectedStyleName?: string | undefined;
 		map: maplibregl.Map | undefined;
 		sourcesIdToReAdd: string[];
+		selectedStyleUrl: string | undefined;
+		setSelectedStyleUrl: (url: string | undefined) => void;
+		isOpen: boolean;
 	};
 
-	const { styles, selectedStyleName, map, sourcesIdToReAdd }: Props = $props();
+	const { styles, selectedStyleName, map, sourcesIdToReAdd, selectedStyleUrl, setSelectedStyleUrl, isOpen }: Props =
+		$props();
 
 	let allStyles: MapLibreStylePlusMetadata[] | [] = $state([]);
-	let selectedStyleUrl: string | undefined = $state(undefined);
 	// This variable is used for updating the prop selectedStyleName dynamically
 	let reactiveStyleSelection: MapLibreStylePlusMetadata | undefined = $state(undefined);
-	let isOpen = $state(false);
 
 	// Get style info when styles are updated
 	$effect(() => {
@@ -60,7 +61,7 @@ map = new Map({
 	$effect(() => {
 		// Set initial selected style
 		reactiveStyleSelection = allStyles.find((style) => style.name === selectedStyleName) || allStyles[0];
-		selectedStyleUrl = reactiveStyleSelection?.metadata?.thumbnail;
+		setSelectedStyleUrl(reactiveStyleSelection?.metadata?.thumbnail);
 	});
 
 	// Update the map when a new style is selected
@@ -143,7 +144,7 @@ map = new Map({
 
 		if (style.name === currentMapStyle.name) return;
 
-		selectedStyleUrl = style.metadata.thumbnail;
+		setSelectedStyleUrl(style.metadata.thumbnail);
 
 		// Apply the selected style to the map
 		// being sure to save sources and layers to add back on top
@@ -173,48 +174,27 @@ map = new Map({
 	}
 	onDestroy(() => {
 		allStyles = [];
-		selectedStyleUrl = undefined;
+		setSelectedStyleUrl(undefined);
 	});
 </script>
 
-<div class="relative font-barlow" use:clickOutside onclick_outside={() => (isOpen = false)}>
-	<div
-		onclick={() => (isOpen = !isOpen)}
-		role="button"
-		onkeydown={(e) => {
-			if (e.key === 'Enter') {
-				isOpen = !isOpen;
-			}
-		}}
-		tabindex="0"
-	>
-		<img
-			style="border: 1px solid #d73f3f;"
-			class="w-[2.25rem] h-[2.25rem] rounded-full"
-			src={selectedStyleUrl}
-			alt="Basemap Icon"
-		/>
-	</div>
-	<div
-		class={`absolute bottom-0 right-11 bg-white rounded-md p-4 duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-	>
-		<p class="font-semibold text-lg mb-2">Base Maps</p>
-		<div class="grid grid-cols-2 w-[212px] gap-3">
-			{#each allStyles as style, _}
-				<div
-					class={`layer-card ${selectedStyleUrl === style.metadata.thumbnail ? 'active' : ''} h-[3.75rem] relative overflow-hidden rounded-md cursor-pointer hover:border-red-600`}
-					onclick={() => selectStyle(style)}
-					role="button"
-					onkeydown={(e) => {
-						if (e.key === 'Enter') selectStyle(style);
-					}}
-					tabindex="0"
-				>
-					<img src={style.metadata.thumbnail} alt="Style Thumbnail" class="w-full h-full object-cover" />
-					<span class="absolute top-0 left-0 bg-white bg-opacity-80 px-1 rounded-br">{style.name}</span>
-				</div>
-			{/each}
-		</div>
+<div class={`${isOpen ? 'block' : 'hidden'}`}>
+	<p class="font-semibold text-lg mb-2">Base Maps</p>
+	<div class="grid grid-cols-3 w-full gap-3">
+		{#each allStyles as style, _}
+			<div
+				class={`layer-card ${selectedStyleUrl === style.metadata.thumbnail ? 'active' : ''} h-[3.75rem] relative overflow-hidden rounded-md cursor-pointer hover:border-red-600`}
+				onclick={() => selectStyle(style)}
+				role="button"
+				onkeydown={(e) => {
+					if (e.key === 'Enter') selectStyle(style);
+				}}
+				tabindex="0"
+			>
+				<img src={style.metadata.thumbnail} alt="Style Thumbnail" class="w-full h-full object-cover" />
+				<span class="absolute top-0 left-0 bg-white bg-opacity-80 px-1 rounded-br text-sm">{style.name}</span>
+			</div>
+		{/each}
 	</div>
 </div>
 

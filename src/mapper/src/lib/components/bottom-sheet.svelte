@@ -91,7 +91,7 @@
 	<!-- sheet container -->
 	<div
 		bind:this={bottomSheetRef}
-		class={`z-10 bottom-sheet fixed w-[100vw] left-0 bottom-0 flex items-center flex-col justify-end duration-100 ease-linear z-20 ${
+		class={`z-30 bottom-sheet fixed w-[100vw] left-0 bottom-0 flex items-center flex-col justify-end duration-100 ease-linear z-20 ${
 			!show ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-none'
 		}`}
 	>
