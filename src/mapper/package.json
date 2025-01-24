@@ -1,6 +1,6 @@
 {
 	"name": "fmtm-mapper",
-	"version": "2024.5.0",
+	"version": "2025.1.0",
 	"type": "module",
 	"private": true,
 	"scripts": {
