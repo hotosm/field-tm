@@ -356,6 +356,7 @@ CREATE TABLE public.users (
     tasks_validated integer NOT NULL DEFAULT 0,
     tasks_invalidated integer NOT NULL DEFAULT 0,
     projects_mapped integer [],
+    api_key character varying,
     registered_at timestamp with time zone DEFAULT now()
 );
 ALTER TABLE public.users OWNER TO fmtm;
