@@ -276,7 +276,6 @@ async def get_odk_entity_mapping_status(
 async def set_odk_entities_mapping_status(
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
     entity_details: central_schemas.EntityMappingStatusIn,
-    db: Annotated[Connection, Depends(db_conn)],
 ):
     """Set the ODK entities mapping status, i.e. in progress or complete.
 

@@ -39,6 +39,7 @@ from app.config import MonitoringTypes, settings
 from app.db.database import db_conn, get_db_connection_pool
 from app.db.enums import HTTPStatus
 from app.helpers import helper_routes
+from app.integrations import integration_routes
 from app.monitoring import (
     add_endpoint_profiler,
     instrument_app_otel,
@@ -144,6 +145,7 @@ def get_application() -> FastAPI:
     _app.include_router(auth_routes.router)
     _app.include_router(submission_routes.router)
     _app.include_router(organisation_routes.router)
+    _app.include_router(integration_routes.router)
     _app.include_router(helper_routes.router)
 
     return _app

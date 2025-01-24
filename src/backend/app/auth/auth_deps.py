@@ -19,7 +19,7 @@
 """Auth dependencies, for restricted routes and cookie handling."""
 
 from time import time
-from typing import Optional
+from typing import Annotated, Optional
 
 import jwt
 from fastapi import Header, HTTPException, Request, Response
@@ -262,7 +262,7 @@ async def refresh_cookies(
 
 
 async def login_required(
-    request: Request, access_token: str = Header(None)
+    request: Request, access_token: Annotated[Optional[str], Header()] = None
 ) -> AuthUser:
     """Dependency for endpoints requiring login."""
     if settings.DEBUG:
@@ -277,7 +277,7 @@ async def login_required(
 
 
 async def mapper_login_required(
-    request: Request, access_token: str = Header(None)
+    request: Request, access_token: Annotated[Optional[str], Header()] = None
 ) -> AuthUser:
     """Dependency for mapper frontend login."""
     if settings.DEBUG:

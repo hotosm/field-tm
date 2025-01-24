@@ -159,6 +159,7 @@ class DbUser(BaseModel):
     tasks_validated: Optional[int] = None
     tasks_invalidated: Optional[int] = None
     projects_mapped: Optional[list[int]] = None
+    api_key: Optional[str] = None
     registered_at: Optional[AwareDatetime] = None
 
     # Relationships
