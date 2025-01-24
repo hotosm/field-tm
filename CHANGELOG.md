@@ -1,5 +1,62 @@
 # Changelog
 
+## 2025.1.0 (2025-01-24)
+
+### Feat
+
+- **backend**: add `integrations` router with API key functionality (external apps) (#2110)
+- entity pulse effect on rejected submissions (#2018)
+- **mapper**: distance constraint add on frontend (#2084)
+- **frontend**: submission table date range filter (#2091)
+- **backend**: get api for project's geometry log (#2090)
+- capability to draw new polygon and linestring geoms (#2082)
+- **backend**: add filters for submission date in submission table and downloads (#2077)
+- **backend**: osm-fieldwork --> 0.18.0 (submission filter param + config new feat geom type)
+- **geolocation**: comments add
+- add submission ids in entities statuses endpoint (#2038)
+- consider every additional entities without clipping them with AOI (#2017)
+- update the version of osm-fieldwork (#2029)
+- **backend**: send org approval message to creator (#2008)
+- add submission ids as a dataset property for the entities (#2007)
+- update the version of fmtm-splitter 2.0.0 (#1996)
+- **mapper**: project details section add to bottom sheet (#1994)
+- **mapper**: prompt user to download custom ODK Collect on first load (#1989)
+
+### Fix
+
+- **backend**: delete submission photos while deleting project to avoid foreignkey constraint (#2112)
+- **backend**: review state for received on submission table (#2101)
+- **+page**: remove irrelevant subscribeToEntityStatusUpdates call in onMount
+- use task index instead of id in task boundary geojson properties (#2095)
+- **mapper**: get entities after page load to speed up first paint (#2051)
+- **backend**: get total_tasks count on single project response
+- **backend**: various fixes based on sentry error reports (#2053)
+- default odk creds when organisation do not have their own during project creation (#2070)
+- change geom to geojson in db model
+- **generateBasemap**: update tile source option value (#2050)
+- **geolocation**: fetch routing api on every 10 seconds
+- **dialog-entities-actions**: show alert instead of turning on location on navigation
+- **createProjecSlice**: clear additionalFeatureGeojson state after successful project creation (#2041)
+- compose file name for backend test stage
+- **mapper**: replace task id with index on activities panel (#2002)
+- **mapper**: task id with task index on mapper frontend  (#1997)
+- **backend**: include organisation name in minimal project query results (#1993)
+- **frontend**: small fix to reset frontend login if cookie refresh fails
+- **mapper**: offline mode button visibility & basemap component TS type error (#1990)
+- parse geojson to featcol in generate data extract (#1983)
+
+### Refactor
+
+- **mapper**: feature legend & layer-switcher (#2107)
+- **mapper**: relocate entity sync button (#2100)
+- **frontend**: organization management pages (#2097)
+- **frontend**: JS to TS conversion: update useDispatch to useAppDispatch  (#2076)
+- **frontend**: update TS types on actions (#2054)
+- replace incorrect osm libya logo with official osm logo
+- **frontend**: terminologies and wording update for users (#1978)
+- **mapper**: ts errors on frontend (#2006)
+- **mapper**: add mapping guide to sidebar + update links
+
 ## 2024.5.0 (2024-12-11)
 
 ### Feat
