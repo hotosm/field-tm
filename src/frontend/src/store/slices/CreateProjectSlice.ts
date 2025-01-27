@@ -20,6 +20,7 @@ export const initialState: CreateProjectStateTypes = {
     formWays: 'existing_form',
     hasCustomTMS: false,
     custom_tms_url: '',
+    project_admins: [],
   },
   projectDetailsResponse: null,
   projectDetailsLoading: false,

@@ -112,6 +112,7 @@ export type ProjectDetailsTypes = {
   customFormUpload: any;
   hasAdditionalFeature: boolean;
   new_geom_type: NewGeomTypes;
+  project_admins: number[];
 };
 
 export type FormCategoryListTypes = {

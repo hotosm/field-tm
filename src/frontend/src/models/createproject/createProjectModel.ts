@@ -64,12 +64,6 @@ export interface OrganisationListModel {
   odk_central_url: string | null;
 }
 
-export type organizationDropdownType = {
-  label: string;
-  value: number;
-  hasODKCredentials: boolean;
-};
-
 export type splittedGeojsonType = {
   type: 'FeatureCollection';
   features: {

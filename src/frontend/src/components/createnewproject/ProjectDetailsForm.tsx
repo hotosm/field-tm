@@ -8,13 +8,15 @@ import useForm from '@/hooks/useForm';
 import CreateProjectValidation from '@/components/createnewproject/validation/CreateProjectValidation';
 import Button from '@/components/common/Button';
 import { CommonActions } from '@/store/slices/CommonSlice';
-import { CustomSelect } from '@/components/common/Select';
 import { OrganisationService } from '@/api/CreateProjectService';
 import { CustomCheckbox } from '@/components/common/Checkbox';
-import { organizationDropdownType } from '@/models/createproject/createProjectModel';
 import RichTextEditor from '@/components/common/Editor/Editor';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import DescriptionSection from '@/components/createnewproject/Description';
+import Select2 from '@/components/common/Select2';
+import { GetUserListService } from '@/api/User';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ProjectDetailsForm = ({ flag }) => {
   useDocumentTitle('Create Project: Project Details');
@@ -23,7 +25,16 @@ const ProjectDetailsForm = ({ flag }) => {
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const organisationListData = useAppSelector((state) => state.createproject.organisationList);
-  const organisationList: organizationDropdownType[] = organisationListData.map((item) => ({
+  const organisationListLoading = useAppSelector((state) => state.createproject.organisationListLoading);
+  const userList = useAppSelector((state) => state.user.userList)?.map((user) => ({
+    id: user.id,
+    label: user.username,
+    value: user.id,
+  }));
+  const userListLoading = useAppSelector((state) => state.user.userListLoading);
+
+  const organisationList = organisationListData.map((item) => ({
+    id: item.id,
     label: item.name,
     value: item.id,
     hasODKCredentials: item?.odk_central_url ? true : false,
@@ -36,14 +47,14 @@ const ProjectDetailsForm = ({ flag }) => {
     navigate('/project-area');
   };
 
-  const { handleSubmit, handleChange, handleCustomChange, values, errors, checkValidationOnly }: any = useForm(
+  const { handleSubmit, handleChange, handleCustomChange, values, errors }: any = useForm(
     projectDetails,
     submission,
     CreateProjectValidation,
   );
 
   const onFocus = () => {
-    dispatch(OrganisationService(`${import.meta.env.VITE_API_URL}/organisation`));
+    dispatch(OrganisationService(`${VITE_API_URL}/organisation`));
   };
 
   useEffect(() => {
@@ -53,6 +64,10 @@ const ProjectDetailsForm = ({ flag }) => {
     return () => {
       window.removeEventListener('focus', onFocus);
     };
+  }, []);
+
+  useEffect(() => {
+    dispatch(GetUserListService(`${VITE_API_URL}/users`));
   }, []);
 
   const handleInputChanges = (e) => {
@@ -141,25 +156,38 @@ const ProjectDetailsForm = ({ flag }) => {
             required
             errorMsg={errors.description}
           />
-          <div className="">
-            <div className="fmtm-flex fmtm-items-center">
-              <CustomSelect
-                title="Organization Name"
-                placeholder="Organization Name"
-                data={organisationList}
-                dataKey="value"
-                value={values.organisation_id?.toString()}
-                valueKey="value"
-                label="label"
-                onValueChange={(value) => {
-                  setSelectedOrganisation(value);
-                }}
-                required
-              />
-            </div>
+          <div>
+            <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent`}>
+              Organization Name <span className="fmtm-text-red-500 fmtm-text-[1rem]">*</span>
+            </p>
+            <Select2
+              options={organisationList || []}
+              value={values.organisation_id}
+              onChange={(value: any) => {
+                setSelectedOrganisation(value);
+              }}
+              placeholder="Organization Name"
+              className="naxatw-w-1/5 naxatw-min-w-[9rem]"
+              isLoading={organisationListLoading}
+            />
             {errors.organisation_id && (
               <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.organisation_id}</p>
             )}
+          </div>
+          <div>
+            <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent">Assign Project Admin</p>
+            <Select2
+              options={userList || []}
+              value={values.project_admins}
+              onChange={(value: any) => {
+                handleCustomChange('project_admins', value);
+              }}
+              placeholder="Assign Project Admin"
+              className="naxatw-w-1/5 naxatw-min-w-[9rem]"
+              multiple
+              checkBox
+              isLoading={userListLoading}
+            />
           </div>
           <div
             className="fmtm-flex fmtm-flex-col fmtm-gap-6"
