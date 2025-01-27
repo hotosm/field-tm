@@ -5,7 +5,7 @@ import { geojsonGeomToJavarosa } from '$lib/odk/javarosa';
 
 const alertStore = getAlertStore();
 
-export function openOdkCollectNewFeature(xFormId: string, geom: GeoJSONGeometry) {
+export function openOdkCollectNewFeature(xFormId: string, geom: GeoJSONGeometry, task_id: number | null) {
 	if (!xFormId || !geom) {
 		return;
 	}
@@ -16,7 +16,7 @@ export function openOdkCollectNewFeature(xFormId: string, geom: GeoJSONGeometry)
 
 	if (isMobile) {
 		// TODO we need to update the form to support task_id=${}&
-		document.location.href = `odkcollect://form/${xFormId}?new_feature=${javarosaGeom}`;
+		document.location.href = `odkcollect://form/${xFormId}?new_feature=${javarosaGeom}&task_id=${task_id}`;
 	} else {
 		alertStore.setAlert({
 			variant: 'warning',
