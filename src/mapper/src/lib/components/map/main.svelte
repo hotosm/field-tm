@@ -55,7 +55,7 @@
 		setMapRef: (map: maplibregl.Map | undefined) => void;
 		draw?: boolean;
 		drawGeomType: NewGeomTypes | undefined;
-		handleDrawnGeom?: ((geojson: GeoJSONGeometry) => void) | null;
+		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void) | null;
 	}
 
 	let {
@@ -127,10 +127,7 @@
 	type DrawModeOptions = 'point' | 'linestring' | 'delete-selection' | 'polygon';
 	const currentDrawMode: DrawModeOptions = drawGeomType ? (drawGeomType.toLowerCase() as DrawModeOptions) : 'point';
 	const drawControl = new MaplibreTerradrawControl({
-		modes: [
-			currentDrawMode,
-			// 'delete-selection'
-		],
+		modes: [currentDrawMode, 'select', 'delete'],
 		// Note We do not open the toolbar options, allowing the user
 		// to simply click with a pre-defined mode active
 		// open: true,
@@ -225,7 +222,6 @@
 
 			const drawInstance = drawControl.getTerraDrawInstance();
 			if (drawInstance && handleDrawnGeom) {
-				drawInstance.start();
 				drawInstance.setMode(currentDrawMode);
 
 				drawInstance.on('finish', (id: string, _context: any) => {
@@ -238,11 +234,10 @@
 					} else {
 						console.error(`Feature with id ${id} not found or has no geometry.`);
 					}
-					drawInstance.stop();
 
 					if (firstGeom) {
-						removeTerraDrawLayers();
-						handleDrawnGeom(firstGeom);
+						handleDrawnGeom(drawInstance, firstGeom);
+						displayDrawHelpText = false;
 					}
 				});
 			}

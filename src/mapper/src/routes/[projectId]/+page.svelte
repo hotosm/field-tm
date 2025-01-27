@@ -148,6 +148,19 @@
 			});
 		}
 	});
+
+	let newFeatureDrawInstance: any = $state(null);
+	let newFeatureGeom: any = $state(null);
+
+	function mapNewFeatureInODK() {
+		openOdkCollectNewFeature(data?.project?.odk_form_id, newFeatureGeom, taskStore.selectedTaskId);
+	}
+	function cancelMapNewFeatureInODK() {
+		newFeatureDrawInstance.clear();
+		isDrawEnabled = false;
+		newFeatureDrawInstance = null;
+		newFeatureGeom = null;
+	}
 </script>
 
 <!-- There is a new event to display in the top right corner -->
@@ -162,7 +175,7 @@
 {/if}
 
 <!-- The main page -->
-<div class="h-[calc(100svh-3.699rem)] sm:h-[calc(100svh-4.625rem)]">
+<div class="h-[calc(100svh-3.699rem)] sm:h-[calc(100svh-4.625rem)] font-barlow">
 	<MapComponent
 		setMapRef={(map) => {
 			maplibreMap = map;
@@ -175,11 +188,51 @@
 		entitiesUrl={data.project.data_extract_url}
 		draw={isDrawEnabled}
 		drawGeomType={data.project.new_geom_type}
-		handleDrawnGeom={(geom) => {
-			isDrawEnabled = false;
-			openOdkCollectNewFeature(data?.project?.odk_form_id, geom);
+		handleDrawnGeom={(drawInstance, geom) => {
+			newFeatureDrawInstance = drawInstance;
+			newFeatureGeom = geom;
+			// after drawing a feature, allow user to modify the drawn feature
+			newFeatureDrawInstance.setMode('select');
 		}}
 	></MapComponent>
+
+	{#if newFeatureGeom}
+		<div class="absolute left-0 right-0 z-20 top-[4.5rem] sm:top-[5.2rem] flex justify-center pointer-events-none">
+			<div class="pointer-events-auto bg-white px-4 py-2 rounded-md shadow-lg w-fit max-w-[65%]">
+				<p class="mb-2">Are you sure you want to confirm & make submission?</p>
+				<div class="flex gap-2 justify-end">
+					<sl-button
+						onclick={() => {
+							cancelMapNewFeatureInODK();
+						}}
+						onkeydown={(e: KeyboardEvent) => {
+							if (e.key === 'Enter') {
+								cancelMapNewFeatureInODK();
+							}
+						}}
+						role="button"
+						tabindex="0"
+						size="small"
+						class="secondary w-fit"
+					>
+						<span class="font-barlow font-medium text-xs uppercase">CANCEL</span>
+					</sl-button>
+					<sl-button
+						onclick={() => mapNewFeatureInODK()}
+						onkeydown={(e: KeyboardEvent) => {
+							e.key === 'Enter' && mapNewFeatureInODK();
+						}}
+						role="button"
+						tabindex="0"
+						size="small"
+						class="primary w-fit"
+					>
+						<span class="font-barlow font-medium text-xs uppercase">PROCEED</span>
+					</sl-button>
+				</div>
+			</div>
+		</div>
+	{/if}
 	<!-- task action buttons popup -->
 	<DialogTaskActions
 		isTaskActionModalOpen={openedActionModal === 'task-modal'}
