@@ -10,6 +10,9 @@ import {
 import { CommonActions } from '@/store/slices/CommonSlice';
 import { isStatusSuccess } from '@/utilfunctions/commonUtils';
 import { AppDispatch } from '@/store/Store';
+import isEmpty from '@/utilfunctions/isEmpty';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const CreateProjectService = (
   url: string,
@@ -19,6 +22,7 @@ const CreateProjectService = (
   dataExtractFile: any,
   isOsmExtract: boolean,
   additionalFeature: any,
+  projectAdmins: number[],
 ) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
@@ -42,10 +46,7 @@ const CreateProjectService = (
 
       // Submit task boundaries
       hasAPISuccess = await dispatch(
-        UploadTaskAreasService(
-          `${import.meta.env.VITE_API_URL}/projects/${projectId}/upload-task-boundaries`,
-          taskAreaGeojson,
-        ),
+        UploadTaskAreasService(`${VITE_API_URL}/projects/${projectId}/upload-task-boundaries`, taskAreaGeojson),
       );
 
       if (!hasAPISuccess) {
@@ -57,16 +58,14 @@ const CreateProjectService = (
       if (isOsmExtract) {
         // Generated extract from raw-data-api
         extractResponse = await API.get(
-          `${import.meta.env.VITE_API_URL}/projects/data-extract-url?project_id=${projectId}&url=${
-            projectData.data_extract_url
-          }`,
+          `${VITE_API_URL}/projects/data-extract-url?project_id=${projectId}&url=${projectData.data_extract_url}`,
         );
       } else if (dataExtractFile) {
-        // Custom data extract from user
+        // post custom data extract
         const dataExtractFormData = new FormData();
         dataExtractFormData.append('custom_extract_file', dataExtractFile);
         extractResponse = await API.post(
-          `${import.meta.env.VITE_API_URL}/projects/upload-custom-extract?project_id=${projectId}`,
+          `${VITE_API_URL}/projects/upload-custom-extract?project_id=${projectId}`,
           dataExtractFormData,
         );
       }
@@ -79,10 +78,7 @@ const CreateProjectService = (
       // post additional feature if available
       if (additionalFeature) {
         const postAdditionalFeature = await dispatch(
-          PostAdditionalFeatureService(
-            `${import.meta.env.VITE_API_URL}/projects/${projectId}/additional-entity`,
-            additionalFeature,
-          ),
+          PostAdditionalFeatureService(`${VITE_API_URL}/projects/${projectId}/additional-entity`, additionalFeature),
         );
 
         hasAPISuccess = postAdditionalFeature;
@@ -91,10 +87,10 @@ const CreateProjectService = (
         }
       }
 
-      // Generate project files
+      // generate project files
       const generateProjectFile = await dispatch(
         GenerateProjectFilesService(
-          `${import.meta.env.VITE_API_URL}/projects/${projectId}/generate-project-data`,
+          `${VITE_API_URL}/projects/${projectId}/generate-project-data`,
           additionalFeature
             ? { ...projectData, additional_entities: [additionalFeature?.name?.split('.')?.[0]] }
             : projectData,
@@ -106,11 +102,21 @@ const CreateProjectService = (
       if (!hasAPISuccess) {
         throw new Error(`Request failed`);
       }
+
+      // assign project admins
+      if (!isEmpty(projectAdmins)) {
+        const promises = projectAdmins?.map(async (id: any) => {
+          await dispatch(
+            AssignProjectManager(`${VITE_API_URL}/projects/add-manager`, { id, project_id: projectId as number }),
+          );
+        });
+        await Promise.all(promises);
+      }
       dispatch(CreateProjectActions.GenerateProjectError(false));
       // dispatch(CreateProjectActions.CreateProjectLoading(false));
     } catch (error: any) {
       if (projectId) {
-        await dispatch(DeleteProjectService(`${import.meta.env.VITE_API_URL}/projects/${projectId}`, false));
+        await dispatch(DeleteProjectService(`${VITE_API_URL}/projects/${projectId}`, false));
       }
 
       await dispatch(CreateProjectActions.GenerateProjectError(true));
@@ -236,14 +242,14 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
           throw new Error(`Request failed with status ${response.status}`);
         }
 
-        await dispatch(CreateProjectActions.GenerateProjectLoading(false));
+        dispatch(CreateProjectActions.GenerateProjectLoading(false));
         dispatch(CommonActions.SetLoading(false));
         // Trigger the watcher and redirect after success
-        await dispatch(CreateProjectActions.GenerateProjectSuccess(true));
+        dispatch(CreateProjectActions.GenerateProjectSuccess(true));
       } catch (error: any) {
         isAPISuccess = false;
         dispatch(CommonActions.SetLoading(false));
-        await dispatch(CreateProjectActions.GenerateProjectError(true));
+        dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
             open: true,
@@ -304,6 +310,7 @@ const OrganisationService = (url: string) => {
         const resp: OrganisationListModel[] = getOrganisationListResponse.data;
         dispatch(CreateProjectActions.GetOrganisationList(resp));
       } catch (error) {
+      } finally {
         dispatch(CreateProjectActions.GetOrganisationListLoading(false));
       }
     };
@@ -603,6 +610,27 @@ const DeleteProjectService = (url: string, hasRedirect: boolean = true) => {
     };
 
     await deleteProject(url);
+  };
+};
+
+const AssignProjectManager = (url: string, params: { id: number; project_id: number }) => {
+  return async (dispatch: AppDispatch) => {
+    const assignProjectManager = async () => {
+      try {
+        await axios.post(url, {}, { params });
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: error.response.data.detail || 'Could not assign project manager',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      }
+    };
+
+    return await assignProjectManager();
   };
 };
 

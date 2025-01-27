@@ -137,6 +137,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         customDataExtractUpload,
         projectDetails.dataExtractWays === 'osm_data_extract',
         additionalFeature,
+        projectDetails.project_admins as number[],
       ),
     );
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData({ ...projectDetails, ...formValues }));
