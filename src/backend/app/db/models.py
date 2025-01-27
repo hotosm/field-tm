@@ -161,6 +161,7 @@ class DbUser(BaseModel):
     projects_mapped: Optional[list[int]] = None
     api_key: Optional[str] = None
     registered_at: Optional[AwareDatetime] = None
+    last_login_at: Optional[AwareDatetime] = None
 
     # Relationships
     project_roles: Optional[dict[int, ProjectRole]] = None  # project:role pairs
@@ -208,12 +209,12 @@ class DbUser(BaseModel):
                 sql,
                 {"user_identifier": user_identifier},
             )
-            db_project = await cur.fetchone()
+            db_user = await cur.fetchone()
 
-        if db_project is None:
+        if db_user is None:
             raise KeyError(f"User ({user_identifier}) not found.")
 
-        return db_project
+        return db_user
 
     @classmethod
     async def all(

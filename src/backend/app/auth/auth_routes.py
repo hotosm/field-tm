@@ -133,7 +133,8 @@ async def get_or_create_user(
                 )
                 ON CONFLICT (id)
                 DO UPDATE SET
-                    profile_img = EXCLUDED.profile_img
+                    profile_img = EXCLUDED.profile_img,
+                    last_login_at = NOW()
                 RETURNING id, username, profile_img, role
             )
 

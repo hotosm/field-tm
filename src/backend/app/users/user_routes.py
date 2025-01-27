@@ -19,16 +19,18 @@
 
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Request, Response
 from loguru import logger as log
 from psycopg import Connection
 
+from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import mapper, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.enums import UserRole as UserRoleEnum
 from app.db.models import DbUser
 from app.users import user_schemas
+from app.users.user_crud import process_inactive_users
 from app.users.user_deps import get_user
 
 router = APIRouter(
@@ -82,4 +84,16 @@ async def delete_user_by_identifier(
     )
     await DbUser.delete(db, user.id)
     log.info(f"User {user.id} deleted successfully.")
+    return Response(status_code=HTTPStatus.NO_CONTENT)
+
+
+@router.post("/process-inactive-users")
+async def delete_inactive_users(
+    request: Request,
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[DbUser, Depends(super_admin)],
+    osm_auth=Depends(init_osm_auth),
+):
+    """Identify inactive users, send warnings, and delete accounts."""
+    await process_inactive_users(db, request, osm_auth)
     return Response(status_code=HTTPStatus.NO_CONTENT)

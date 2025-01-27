@@ -247,7 +247,7 @@ CREATE TABLE public.projects (
     id integer NOT NULL,
     organisation_id integer,
     odkid integer,
-    author_id integer NOT NULL,
+    author_id integer,
     name character varying,
     short_description character varying,
     description character varying,
@@ -357,7 +357,8 @@ CREATE TABLE public.users (
     tasks_invalidated integer NOT NULL DEFAULT 0,
     projects_mapped integer [],
     api_key character varying,
-    registered_at timestamp with time zone DEFAULT now()
+    registered_at timestamp with time zone DEFAULT now(),
+    last_login_at timestamp with time zone DEFAULT now()
 );
 ALTER TABLE public.users OWNER TO fmtm;
 
