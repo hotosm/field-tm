@@ -19,9 +19,9 @@
 
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field
 
-from app.db.enums import UserRole
+from app.db.enums import ProjectRole, UserRole
 from app.db.models import DbUser, DbUserRole
 
 
@@ -32,6 +32,22 @@ class UserIn(DbUser):
     # NOTE this is a unique case where the primary key is not auto-generated
     # NOTE we use the OSM ID in most cases, which is unique from OSM
     pass
+
+
+class UserUpdate(DbUser):
+    """User details for update in DB."""
+
+    # Exclude (do not allow update)
+    id: Annotated[Optional[int], Field(exclude=True)] = None
+    username: Annotated[Optional[str], Field(exclude=True)] = None
+    registered_at: Annotated[Optional[AwareDatetime], Field(exclude=True)] = None
+    tasks_mapped: Annotated[Optional[int], Field(exclude=True)] = None
+    tasks_validated: Annotated[Optional[int], Field(exclude=True)] = None
+    tasks_invalidated: Annotated[Optional[int], Field(exclude=True)] = None
+    project_roles: Annotated[Optional[dict[int, ProjectRole]], Field(exclude=True)] = (
+        None
+    )
+    orgs_managed: Annotated[Optional[list[int]], Field(exclude=True)] = None
 
 
 class UserOut(DbUser):
