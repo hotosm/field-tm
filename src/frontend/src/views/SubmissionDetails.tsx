@@ -30,7 +30,7 @@ const renderValue = (value: any, key: string = '') => {
     return (
       <>
         {renderValue(
-          `${value?.type} (${value?.coordinates?.[0]},${value?.coordinates?.[1]},${value?.coordinates?.[2]}`,
+          `${value?.type} (${value?.coordinates?.[0]},${value?.coordinates?.[1]},${value?.coordinates?.[2]})`,
           key,
         )}
         <div className="fmtm-border-b fmtm-my-3" />
@@ -101,7 +101,7 @@ const SubmissionDetails = () => {
   const submissionPhotosLoading = useAppSelector((state) => state.submission.submissionPhotosLoading);
   const submissionPhotos = useAppSelector((state) => state.submission.submissionPhotos);
 
-  const { start, end, today, deviceid, ...restSubmissionDetails } = submissionDetails || {};
+  const { start, end, today, deviceid, new_feature, ...restSubmissionDetails } = submissionDetails || {};
   const dateDeviceDetails = { start, end, today, deviceid };
 
   useEffect(() => {
