@@ -78,7 +78,7 @@ if TYPE_CHECKING:
         ProjectUpdate,
     )
     from app.tasks.task_schemas import TaskEventIn
-    from app.users.user_schemas import UserIn
+    from app.users.user_schemas import UserIn, UserUpdate
 
 
 def dump_and_check_model(db_model: BaseModel):
@@ -313,6 +313,36 @@ class DbUser(BaseModel):
             )
 
         return new_user
+
+    @classmethod
+    async def update(
+        cls, db: Connection, user_id: int, user_update: "UserUpdate"
+    ) -> Self:
+        """Update the role of a specific user."""
+        model_dump = dump_and_check_model(user_update)
+        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
+        sql = f"""
+            UPDATE users
+            SET {", ".join(placeholders)}
+            WHERE id = %(user_id)s
+            RETURNING *;
+        """
+
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+                {"user_id": user_id, **model_dump},
+            )
+            updated_user = await cur.fetchone()
+
+        if updated_user is None:
+            msg = f"Failed to update user with ID: {user_id}"
+            log.error(msg)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=msg
+            )
+
+        return updated_user
 
 
 class DbOrganisation(BaseModel):
