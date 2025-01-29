@@ -145,7 +145,7 @@
 						{selectedEntity?.status?.replaceAll('_', ' ')}
 					</p>
 				</div>
-				{#if selectedEntity?.status !== 'SURVEY_SUBMITTED'}
+				{#if selectedEntity?.status !== 'SURVEY_SUBMITTED' && selectedEntity?.status !== 'VALIDATED'}
 					<div class="flex gap-2">
 						<sl-button
 							disabled={entityToNavigate?.entityId === selectedEntity?.osmid}

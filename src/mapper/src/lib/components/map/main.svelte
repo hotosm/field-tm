@@ -485,6 +485,8 @@
 					'#fae15f',
 					'SURVEY_SUBMITTED',
 					'#71bf86',
+					'VALIDATED',
+					'#71bf86',
 					'MARKED_BAD',
 					'#fa1100',
 					'#c5fbf5', // default color if no match is found

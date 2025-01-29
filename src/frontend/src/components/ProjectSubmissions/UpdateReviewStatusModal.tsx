@@ -3,13 +3,27 @@ import { Modal } from '@/components/common/Modal';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 import { reviewListType } from '@/models/submission/submissionModel';
 import { DeleteGeometry, PostGeometry, UpdateReviewStateService } from '@/api/SubmissionService';
-import TextArea from '../common/TextArea';
-import Button from '../common/Button';
+import TextArea from '@/components/common/TextArea';
+import Button from '@/components/common/Button';
 import { GetGeometryLog, PostProjectComments, UpdateEntityState } from '@/api/Project';
 import { entity_state } from '@/types/enums';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { task_event } from '@/types/enums';
 import { featureType } from '@/store/types/ISubmissions';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+const initialReviewState = {
+  toggleModalStatus: false,
+  projectId: null,
+  instanceId: null,
+  taskId: null,
+  reviewState: '',
+  taskUid: null,
+  entity_id: null,
+  label: null,
+  feature: null,
+};
 
 // Note these id values must be camelCase to match what ODK Central requires
 const reviewList: reviewListType[] = [
@@ -41,9 +55,7 @@ const UpdateReviewStatusModal = () => {
 
   useEffect(() => {
     if (!updateReviewStatusModal.projectId) return;
-    dispatch(
-      GetGeometryLog(`${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`),
-    );
+    dispatch(GetGeometryLog(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`));
   }, [updateReviewStatusModal.projectId]);
 
   const handleStatusUpdate = async () => {
@@ -60,7 +72,7 @@ const UpdateReviewStatusModal = () => {
     if (updateReviewStatusModal.reviewState !== reviewStatus) {
       await dispatch(
         UpdateReviewStateService(
-          `${import.meta.env.VITE_API_URL}/submission/update-review-state?project_id=${updateReviewStatusModal.projectId}`,
+          `${VITE_API_URL}/submission/update-review-state?project_id=${updateReviewStatusModal.projectId}`,
           {
             instance_id: updateReviewStatusModal.instanceId,
             review_state: reviewStatus,
@@ -80,15 +92,12 @@ const UpdateReviewStatusModal = () => {
         };
 
         dispatch(
-          PostGeometry(
-            `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`,
-            {
-              status: 'BAD',
-              geojson: badFeature,
-              project_id: updateReviewStatusModal.projectId,
-              task_id: +updateReviewStatusModal.taskUid,
-            },
-          ),
+          PostGeometry(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records`, {
+            status: 'BAD',
+            geojson: badFeature,
+            project_id: updateReviewStatusModal.projectId,
+            task_id: +updateReviewStatusModal.taskUid,
+          }),
         );
       }
 
@@ -97,29 +106,28 @@ const UpdateReviewStatusModal = () => {
         const badGeomId = badGeomLogList.find(
           (geom) => geom.geojson.properties.entity_id === updateReviewStatusModal.entity_id,
         )?.id;
-        dispatch(
-          DeleteGeometry(
-            `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records/${badGeomId}`,
-          ),
-        );
+        if (badGeomId) {
+          dispatch(
+            DeleteGeometry(
+              `${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/geometry/records/${badGeomId}`,
+            ),
+          );
+        }
       }
 
       dispatch(
-        UpdateEntityState(
-          `${import.meta.env.VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/entity/status`,
-          {
-            entity_id: updateReviewStatusModal.entity_id,
-            status: reviewStatus === 'approved' ? entity_state['SURVEY_SUBMITTED'] : entity_state['MARKED_BAD'],
-            label: updateReviewStatusModal.label,
-          },
-        ),
+        UpdateEntityState(`${VITE_API_URL}/projects/${updateReviewStatusModal.projectId}/entity/status`, {
+          entity_id: updateReviewStatusModal.entity_id,
+          status: reviewStatus === 'approved' ? entity_state['VALIDATED'] : entity_state['MARKED_BAD'],
+          label: updateReviewStatusModal.label as string,
+        }),
       );
     }
 
     if (noteComments.trim().length > 0) {
       dispatch(
         PostProjectComments(
-          `${import.meta.env.VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
+          `${VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
           {
             task_id: +updateReviewStatusModal?.taskUid,
             comment: `${updateReviewStatusModal?.instanceId}-SUBMISSION_INST-${noteComments}`,
@@ -129,19 +137,7 @@ const UpdateReviewStatusModal = () => {
       );
       setNoteComments('');
     }
-    dispatch(
-      SubmissionActions.SetUpdateReviewStatusModal({
-        toggleModalStatus: false,
-        projectId: null,
-        instanceId: null,
-        taskId: null,
-        reviewState: '',
-        taskUid: null,
-        entity_id: null,
-        label: null,
-        feature: null,
-      }),
-    );
+    dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
     dispatch(SubmissionActions.UpdateReviewStateLoading(false));
   };
 
@@ -155,22 +151,20 @@ const UpdateReviewStatusModal = () => {
       className="!fmtm-w-[23rem] !fmtm-outline-none fmtm-rounded-xl"
       description={
         <div className="fmtm-mt-9">
-          <div className="fmtm-mb-4">
-            <div className="fmtm-flex fmtm-gap-2">
-              {reviewList.map((reviewBtn) => (
-                <button
-                  key={reviewBtn.id}
-                  className={`${
-                    reviewBtn.id === reviewStatus
-                      ? reviewBtn.className
-                      : `fmtm-border-[#D7D7D7] fmtm-bg-[#F5F5F5] fmtm-text-[#484848] ${reviewBtn.hoverClass} fmtm-duration-150`
-                  } fmtm-pt-2 fmtm-pb-1 fmtm-px-7 fmtm-outline-none fmtm-w-fit fmtm-border-[1px] fmtm-rounded-[40px] fmtm-font-archivo fmtm-text-sm`}
-                  onClick={() => setReviewStatus(reviewBtn.id)}
-                >
-                  {reviewBtn.title}
-                </button>
-              ))}
-            </div>
+          <div className="fmtm-flex fmtm-gap-2 fmtm-mb-4">
+            {reviewList.map((reviewBtn) => (
+              <button
+                key={reviewBtn.id}
+                className={`${
+                  reviewBtn.id === reviewStatus
+                    ? reviewBtn.className
+                    : `fmtm-border-[#D7D7D7] fmtm-bg-[#F5F5F5] fmtm-text-[#484848] ${reviewBtn.hoverClass} fmtm-duration-150`
+                } fmtm-pt-2 fmtm-pb-1 fmtm-px-7 fmtm-outline-none fmtm-w-fit fmtm-border-[1px] fmtm-rounded-[40px] fmtm-font-archivo fmtm-text-sm`}
+                onClick={() => setReviewStatus(reviewBtn.id)}
+              >
+                {reviewBtn.title}
+              </button>
+            ))}
           </div>
           <TextArea
             rows={4}
@@ -184,19 +178,7 @@ const UpdateReviewStatusModal = () => {
               btnType="other"
               className="fmtm-w-full fmtm-justify-center !fmtm-rounded fmtm-font-bold fmtm-text-sm !fmtm-py-2"
               onClick={() => {
-                dispatch(
-                  SubmissionActions.SetUpdateReviewStatusModal({
-                    toggleModalStatus: false,
-                    projectId: null,
-                    instanceId: null,
-                    taskId: null,
-                    reviewState: '',
-                    taskUid: null,
-                    entity_id: null,
-                    label: null,
-                    feature: null,
-                  }),
-                );
+                dispatch(SubmissionActions.SetUpdateReviewStatusModal(initialReviewState));
               }}
             />
             <Button
@@ -215,15 +197,8 @@ const UpdateReviewStatusModal = () => {
       onOpenChange={(value) => {
         dispatch(
           SubmissionActions.SetUpdateReviewStatusModal({
+            ...initialReviewState,
             toggleModalStatus: value,
-            projectId: null,
-            instanceId: null,
-            taskId: null,
-            reviewState: '',
-            taskUid: null,
-            entity_id: null,
-            label: null,
-            feature: null,
           }),
         );
       }}
