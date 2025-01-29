@@ -48,7 +48,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
     borderStrokeColor,
   );
   const lockedValidationStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
+    mapTheme.palette.mapFeatureColors.locked_for_validation,
     borderStrokeColor,
   );
   const iconStyle = createIconStyle(AssetModules.LockPng);
@@ -61,7 +61,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.ready_rgb,
+        color: mapTheme.palette.mapFeatureColors.ready,
       }),
     }),
     LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
@@ -71,7 +71,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.mapped_rgb,
+        color: mapTheme.palette.mapFeatureColors.mapped,
       }),
     }),
     LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
@@ -81,27 +81,9 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
         width: 3,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.validated_rgb,
+        color: mapTheme.palette.mapFeatureColors.validated,
       }),
     }),
-    // MARKED_INVALID: new Style({
-    //   stroke: new Stroke({
-    //     color: borderStrokeColor,
-    //     width: 3,
-    //   }),
-    //   fill: new Fill({
-    //     color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
-    //   }),
-    // }),
-    // MARKED_BAD: new Style({
-    //   stroke: new Stroke({
-    //     color: borderStrokeColor,
-    //     width: 3,
-    //   }),
-    //   fill: new Fill({
-    //     color: mapTheme.palette.mapFeatureColors.bad_rgb,
-    //   }),
-    // }),
   };
   return geojsonStyles[status];
 };
@@ -123,13 +105,13 @@ export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, an
     READY: new Style({
       stroke: strokeStyle,
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.ready_rgb,
+        color: mapTheme.palette.entityStatusColors.ready,
       }),
     }),
     OPENED_IN_ODK: new Style({
       stroke: strokeStyle,
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.locked_for_validation,
+        color: mapTheme.palette.entityStatusColors.opened_in_odk,
       }),
     }),
     SURVEY_SUBMITTED: new Style({
@@ -138,7 +120,7 @@ export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, an
         width: 1,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.validated_rgb,
+        color: mapTheme.palette.entityStatusColors.survey_submitted,
       }),
     }),
     MARKED_BAD: new Style({
@@ -147,7 +129,16 @@ export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, an
         width: 1,
       }),
       fill: new Fill({
-        color: mapTheme.palette.mapFeatureColors.bad_rgb,
+        color: mapTheme.palette.entityStatusColors.marked_bad,
+      }),
+    }),
+    VALIDATED: new Style({
+      stroke: new Stroke({
+        color: borderStrokeColor,
+        width: 1,
+      }),
+      fill: new Fill({
+        color: mapTheme.palette.entityStatusColors.validated,
       }),
     }),
   };

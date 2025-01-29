@@ -7,6 +7,7 @@ import AssetModules from '@/shared/AssetModules';
 import Button from '@/components/common/Button';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { TaskFeatureSelectionProperties } from '@/store/types/ITask';
+import { entity_state } from '@/types/enums';
 
 type FeatureSelectionPopupPropType = {
   taskId: number;
@@ -65,43 +66,42 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
             </p>
           </div>
         </div>
-        {!submissionIds ||
-          (submissionIds?.length !== 0 && (
-            <div className="fmtm-px-2 sm:fmtm-px-5 fmtm-py-3 fmtm-border-t fmtm-flex fmtm-flex-col fmtm-gap-3">
-              {submissionIds?.length > 1 ? (
-                <>
-                  {submissionIds?.map((submissionId, index) => (
-                    <div
-                      key={submissionId}
-                      className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row md:fmtm-flex-col sm:fmtm-justify-between sm:fmtm-items-end md:fmtm-items-stretch fmtm-gap-1"
-                    >
-                      <div>
-                        <p className="fmtm-border-b fmtm-w-fit fmtm-border-primaryRed fmtm-leading-5 fmtm-mb-1">
-                          Submission #{index + 1}
-                        </p>
-                        <p className="">ID: {submissionId?.replace('uuid:', '')}</p>
-                      </div>
-                      <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionId}`}>
-                        <Button
-                          btnText="validate this feature"
-                          btnType="other"
-                          className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase !fmtm-w-fit md:!fmtm-w-full"
-                        />
-                      </Link>
+        {(!submissionIds || submissionIds?.length !== 0) && entity && entity_state[entity.status] !== 'VALIDATED' && (
+          <div className="fmtm-px-2 sm:fmtm-px-5 fmtm-py-3 fmtm-border-t fmtm-flex fmtm-flex-col fmtm-gap-3">
+            {submissionIds?.length > 1 ? (
+              <>
+                {submissionIds?.map((submissionId, index) => (
+                  <div
+                    key={submissionId}
+                    className="fmtm-flex fmtm-flex-col sm:fmtm-flex-row md:fmtm-flex-col sm:fmtm-justify-between sm:fmtm-items-end md:fmtm-items-stretch fmtm-gap-1"
+                  >
+                    <div>
+                      <p className="fmtm-border-b fmtm-w-fit fmtm-border-primaryRed fmtm-leading-5 fmtm-mb-1">
+                        Submission #{index + 1}
+                      </p>
+                      <p className="">ID: {submissionId?.replace('uuid:', '')}</p>
                     </div>
-                  ))}
-                </>
-              ) : (
-                <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionIds}`}>
-                  <Button
-                    btnText="validate this feature"
-                    btnType="other"
-                    className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase fmtm-w-fit md:!fmtm-w-full fmtm-mx-auto"
-                  />
-                </Link>
-              )}
-            </div>
-          ))}
+                    <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionId}`}>
+                      <Button
+                        btnText="validate this feature"
+                        btnType="other"
+                        className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase !fmtm-w-fit md:!fmtm-w-full"
+                      />
+                    </Link>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionIds}`}>
+                <Button
+                  btnText="validate this feature"
+                  btnType="other"
+                  className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase fmtm-w-fit md:!fmtm-w-full fmtm-mx-auto"
+                />
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

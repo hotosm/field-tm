@@ -161,6 +161,8 @@ class EntityState(IntEnum, Enum):
     READY = 0
     OPENED_IN_ODK = 1
     SURVEY_SUBMITTED = 2
+    NEW_GEOM = 3
+    VALIDATED = 5
     MARKED_BAD = 6
 
 

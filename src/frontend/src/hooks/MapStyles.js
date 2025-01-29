@@ -43,11 +43,11 @@ export default function MapStyles() {
   useEffect(() => {
     // Example usage:
     const lockedPolygonStyle = createPolygonStyle(
-      mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb,
+      mapTheme.palette.mapFeatureColors.locked_for_mapping,
       secondaryStrokeColor,
     );
     const lockedValidationStyle = createPolygonStyle(
-      mapTheme.palette.mapFeatureColors.locked_for_validation_rgb,
+      mapTheme.palette.mapFeatureColors.locked_for_validation,
       secondaryStrokeColor,
     );
     const iconStyle = createIconStyle(AssetModules.LockPng);
@@ -60,7 +60,7 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.ready_rgb,
+          color: mapTheme.palette.mapFeatureColors.ready,
         }),
       }),
       LOCKED_FOR_MAPPING: [lockedPolygonStyle, iconStyle],
@@ -70,7 +70,7 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.mapped_rgb,
+          color: mapTheme.palette.mapFeatureColors.mapped,
         }),
       }),
       LOCKED_FOR_VALIDATION: [lockedValidationStyle, redIconStyle],
@@ -80,27 +80,9 @@ export default function MapStyles() {
           width: 3,
         }),
         fill: new Fill({
-          color: mapTheme.palette.mapFeatureColors.validated_rgb,
+          color: mapTheme.palette.mapFeatureColors.validated,
         }),
       }),
-      // INVALIDATED: new Style({
-      //   stroke: new Stroke({
-      //     color: strokeColor,
-      //     width: 3,
-      //   }),
-      //   fill: new Fill({
-      //     color: mapTheme.palette.mapFeatureColors.invalidated_rgb,
-      //   }),
-      // }),
-      // BAD: new Style({
-      //   stroke: new Stroke({
-      //     color: strokeColor,
-      //     width: 3,
-      //   }),
-      //   fill: new Fill({
-      //     color: mapTheme.palette.mapFeatureColors.bad_rgb,
-      //   }),
-      // }),
     };
     setStyle(geojsonStyles);
   }, []);

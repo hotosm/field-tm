@@ -50,27 +50,21 @@ const initialState: themeStateType = {
         skeleton_rgb: 'rgb(112, 67, 67,0.1)',
       },
       mapFeatureColors: {
-        //blue
         ready: 'rgba(255,255,255, 0.3)',
-        ready_rgb: 'rgba(255,255,255, 0.3)',
         locked_for_mapping: 'rgba(0, 128, 153, 0.3)',
-        locked_for_mapping_rgb: 'rgba(0, 128, 153, 0.3)',
         mapped: 'rgba(173, 230, 239, 0.8)',
         mapped_rgb: 'rgba(173, 230, 239, 0.8)',
         locked_for_validation: 'rgb(252,236,164,0.3)',
-        locked_for_validation_rgb: 'rgb(252,236,164,0.3)',
-        //green
         validated: 'rgba(64, 172, 140, 0.3)',
-        validated_rgb: 'rgba(64, 172, 140, 0.8)',
-        //yellow
-        // invalidated: '#ffff00',
         invalidated: 'rgb(215,63,62,0.3)',
-        invalidated_rgb: 'rgb(215,63,62,0.3)',
-        //brown
         bad: 'rgba(216, 218, 228, 0.3)',
-        bad_rgb: 'rgba(250, 17, 0, 0.3)',
-        split: 'rgb(112, 67, 67,0.3)',
-        split_rgb: 'rgb(112, 67, 67,0.3)',
+      },
+      entityStatusColors: {
+        ready: 'rgba(255,255,255, 0.3)',
+        opened_in_odk: 'rgb(252,236,164,0.3)',
+        survey_submitted: 'rgba(64, 172, 140, 0.8)',
+        marked_bad: 'rgba(250, 17, 0, 0.3)',
+        validated: 'rgba(0, 123, 255, 0.3)',
       },
     },
     statusTextTheme: {

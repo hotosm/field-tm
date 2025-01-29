@@ -149,6 +149,8 @@ CREATE TYPE public.entitystate AS ENUM (
     'READY',
     'OPENED_IN_ODK',
     'SURVEY_SUBMITTED',
+    'NEW_GEOM',
+    'VALIDATED',
     'MARKED_BAD'
 );
 ALTER TYPE public.entitystate OWNER TO fmtm;
