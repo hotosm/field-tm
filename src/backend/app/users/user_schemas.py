@@ -23,6 +23,7 @@ from pydantic import AwareDatetime, BaseModel, Field
 
 from app.db.enums import ProjectRole, UserRole
 from app.db.models import DbUser, DbUserRole
+from app.projects.project_schemas import PaginationInfo
 
 
 class UserIn(DbUser):
@@ -71,3 +72,10 @@ class UserRolesOut(DbUserRole):
 
     # project_id is redundant if the user specified it in the endpoint
     project_id: Annotated[Optional[int], Field(exclude=True)] = None
+
+
+class PaginatedUsers(BaseModel):
+    """Project summaries + Pagination info."""
+
+    results: list[UserOut]
+    pagination: PaginationInfo
