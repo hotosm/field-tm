@@ -19,6 +19,7 @@
 
 from datetime import datetime, timedelta, timezone
 from textwrap import dedent
+from typing import Optional
 
 from fastapi import Request
 from loguru import logger as log
@@ -28,6 +29,7 @@ from psycopg.rows import class_row
 
 from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.db.models import DbUser
+from app.projects.project_crud import get_pagination
 
 WARNING_INTERVALS = [21, 14, 7]  # Days before deletion
 INACTIVITY_THRESHOLD = 2 * 365  # 2 years approx
@@ -115,3 +117,23 @@ async def send_warning_email_or_osm(
         body=message_content,
     )
     log.info(f"Sent warning to {username}: {days_remaining} days remaining.")
+
+
+async def get_paginated_users(
+    db: Connection,
+    page: int,
+    results_per_page: int,
+    search: Optional[str] = None,
+) -> dict:
+    """Helper function to fetch paginated users with optional filters."""
+    # Get subset of users
+    users = await DbUser.all(db, search=search)
+    start_index = (page - 1) * results_per_page
+    end_index = start_index + results_per_page
+    paginated_users = users[start_index:end_index]
+
+    pagination = await get_pagination(
+        page, len(paginated_users), results_per_page, len(users)
+    )
+
+    return {"results": paginated_users, "pagination": pagination}

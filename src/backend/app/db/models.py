@@ -218,18 +218,37 @@ class DbUser(BaseModel):
 
     @classmethod
     async def all(
-        cls, db: Connection, skip: int = 0, limit: int = 100
+        cls,
+        db: Connection,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
+        search: Optional[str] = None,
     ) -> Optional[list[Self]]:
         """Fetch all users."""
+        filters = []
+        params = {"offset": skip, "limit": limit} if skip and limit else {}
+
+        if search:
+            filters.append("username ILIKE %(search)s")
+            params["search"] = f"%{search}%"
+
+        sql = f"""
+            SELECT * FROM users
+            {"WHERE " + " AND ".join(filters) if filters else ""}
+            ORDER BY registered_at DESC
+        """
+        sql += (
+            """
+            OFFSET %(offset)s
+            LIMIT %(limit)s;
+        """
+            if skip and limit
+            else ";"
+        )
         async with db.cursor(row_factory=class_row(cls)) as cur:
             await cur.execute(
-                """
-                SELECT * FROM users
-                ORDER BY registered_at DESC
-                OFFSET %(offset)s
-                LIMIT %(limit)s;
-                """,
-                {"offset": skip, "limit": limit},
+                sql,
+                params,
             )
             return await cur.fetchall()
 
