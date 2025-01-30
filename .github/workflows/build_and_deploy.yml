@@ -39,8 +39,8 @@ jobs:
     with:
       context: src/backend
       build_target: prod
-      scan_image: False
       image_name: ghcr.io/${{ github.repository }}/backend
+      compose_file: "compose.yaml"
 
   frontend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
@@ -49,7 +49,6 @@ jobs:
       context: src
       dockerfile: Dockerfile.ui.prod
       build_target: prod
-      scan_image: False
       image_name: ghcr.io/${{ github.repository }}/frontend
 
   smoke-test-backend:
