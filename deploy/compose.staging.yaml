@@ -46,47 +46,47 @@ networks:
 services:
   proxy:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: proxy
   api:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: api
   ui:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: ui
   central:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: central
   central-webhook:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: central-webhook
   central-ui:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: central-ui
   s3:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: s3
   fmtm-db:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: fmtm-db
   electric:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: electric
   central-db:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: central-db
   migrations:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: migrations
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
@@ -111,6 +111,6 @@ services:
       retries: 3
   certbot:
     extends:
-      file: deploy/compose.development.yaml
+      file: compose.development.yaml
       service: certbot
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-staging"
