@@ -64,18 +64,19 @@ async def add_submission_id():
             project["odk_creds"] = get_odk_creds(project)
             print(f"\n------- Project {project['id']} -------\n")
 
-            async with central_deps.get_odk_dataset(
-                project["odk_creds"]
-            ) as odk_central:
-                try:
+            try:
+                async with central_deps.get_odk_dataset(
+                    project["odk_creds"]
+                ) as odk_central:
                     await odk_central.createDatasetProperty(
                         project["odkid"],
                         "submission_ids",
                     )
-                except Exception as e:
-                    print(f"Failed updating project ({project['id']}): {e}")
-                    print("If 409 conflict, it's likely the property already exists")
-                    continue
+            except Exception as e:
+                print(f"Failed updating project ({project['id']}): {e}")
+                print("If 409 conflict, it's likely the property already exists")
+                print("If 400 conflict, the project odk credentials may be incorrect")
+                continue
 
             # Sleep 0.5 second between
             sleep(0.5)
