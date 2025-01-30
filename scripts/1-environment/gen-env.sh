@@ -172,6 +172,10 @@ set_odk_user_creds() {
             echo
         fi
     done
+
+    # Set an API key for the webhook
+    api_key=$(head -c 32 /dev/urandom | base64 | tr -d '=+/')
+    export CENTRAL_WEBHOOK_API_KEY="${api_key}"
 }
 
 check_external_database() {

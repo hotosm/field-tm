@@ -159,6 +159,21 @@ services:
       - fmtm-net
     restart: "unless-stopped"
 
+  central-webhook:
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.0-rc}"
+    depends_on:
+      central-db:
+        condition: service_healthy
+    environment:
+      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER}:${CENTRAL_DB_USER}@central-db:5432/${CENTRAL_DB_NAME}?sslmode=disable
+      CENTRAL_WEBHOOK_UPDATE_ENTITY_URL: http://api:8000/integrations/webhooks/entity-status
+      # CENTRAL_WEBHOOK_REVIEW_SUBMISSION_URL: http://api:8000/integrations/webhooks/entity-status
+      CENTRAL_WEBHOOK_API_KEY: ${CENTRAL_WEBHOOK_API_KEY}
+      CENTRAL_WEBHOOK_LOG_LEVEL: ${CENTRAL_WEBHOOK_LOG_LEVEL:-INFO}
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v3.0.0"
     depends_on:

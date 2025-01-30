@@ -60,6 +60,10 @@ services:
     extends:
       file: deploy/compose.development.yaml
       service: central
+  central-webhook:
+    extends:
+      file: deploy/compose.development.yaml
+      service: central-webhook
   central-ui:
     extends:
       file: deploy/compose.development.yaml

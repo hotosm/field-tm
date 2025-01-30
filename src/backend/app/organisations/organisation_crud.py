@@ -58,8 +58,8 @@ async def init_admin_org(db: Connection) -> None:
         name="FMTM Service Account",
         email_address=settings.ODK_CENTRAL_USER,
         is_email_verified=True,
-        # We set a dummy API key for svc user in development
-        api_key="qnyE7ev7OWsfMAaX2fm-PuWYnkAUJw2xlyp72FKCH3Q" if settings.DEBUG else "",
+        # This API key is used for the Central Webhook service
+        api_key=settings.CENTRAL_WEBHOOK_API_KEY,
     )
     await DbUser.create(db, svc_user, ignore_conflict=True)
 
