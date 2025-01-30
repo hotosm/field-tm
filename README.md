@@ -204,6 +204,9 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Seckrel"><img src="https://avatars.githubusercontent.com/u/43112525?v=4?s=100" width="100px;" alt="Aayam Ojha"/><br /><sub><b>Aayam Ojha</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Seckrel" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/casdal"><img src="https://avatars.githubusercontent.com/u/141283367?v=4?s=100" width="100px;" alt="casdal"/><br /><sub><b>casdal</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=casdal" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://danieljdufour.com"><img src="https://avatars.githubusercontent.com/u/4313463?v=4?s=100" width="100px;" alt="Daniel J. Dufour"/><br /><sub><b>Daniel J. Dufour</b></sub></a><br /><a href="#ideas-DanielJDufour" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/hotosm/fmtm/commits?author=DanielJDufour" title="Code">💻</a></td>
+    </tr>
   </tbody>
   <tfoot>
     <tr>
