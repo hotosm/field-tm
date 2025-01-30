@@ -202,6 +202,7 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sijandh35"><img src="https://avatars.githubusercontent.com/u/29759582?v=4?s=100" width="100px;" alt="Sijan Dhungana"/><br /><sub><b>Sijan Dhungana</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=sijandh35" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/khushishikhu"><img src="https://avatars.githubusercontent.com/u/65439761?v=4?s=100" width="100px;" alt="Khushi Gautam"/><br /><sub><b>Khushi Gautam</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=khushishikhu" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Seckrel"><img src="https://avatars.githubusercontent.com/u/43112525?v=4?s=100" width="100px;" alt="Aayam Ojha"/><br /><sub><b>Aayam Ojha</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=Seckrel" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/casdal"><img src="https://avatars.githubusercontent.com/u/141283367?v=4?s=100" width="100px;" alt="casdal"/><br /><sub><b>casdal</b></sub></a><br /><a href="https://github.com/hotosm/fmtm/commits?author=casdal" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
