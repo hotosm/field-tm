@@ -232,6 +232,7 @@ class Settings(BaseSettings):
     ODK_CENTRAL_URL: Optional[HttpUrlStr] = ""
     ODK_CENTRAL_USER: Optional[str] = ""
     ODK_CENTRAL_PASSWD: Optional[SecretStr] = ""
+    CENTRAL_WEBHOOK_API_KEY: Optional[SecretStr] = ""
 
     OSM_CLIENT_ID: str
     OSM_CLIENT_SECRET: SecretStr
