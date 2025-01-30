@@ -59,7 +59,9 @@ async def init_admin_org(db: Connection) -> None:
         email_address=settings.ODK_CENTRAL_USER,
         is_email_verified=True,
         # This API key is used for the Central Webhook service
-        api_key=settings.CENTRAL_WEBHOOK_API_KEY,
+        api_key=settings.CENTRAL_WEBHOOK_API_KEY.get_secret_value()
+        if settings.CENTRAL_WEBHOOK_API_KEY
+        else None,
     )
     await DbUser.create(db, svc_user, ignore_conflict=True)
 
