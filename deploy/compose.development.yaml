@@ -165,7 +165,7 @@ services:
       central-db:
         condition: service_healthy
     environment:
-      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER}:${CENTRAL_DB_USER}@central-db:5432/${CENTRAL_DB_NAME}?sslmode=disable
+      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER}:${CENTRAL_DB_PASSWORD}@central-db:5432/${CENTRAL_DB_NAME}?sslmode=disable
       CENTRAL_WEBHOOK_UPDATE_ENTITY_URL: http://api:8000/integrations/webhooks/entity-status
       # CENTRAL_WEBHOOK_REVIEW_SUBMISSION_URL: http://api:8000/integrations/webhooks/entity-status
       CENTRAL_WEBHOOK_API_KEY: ${CENTRAL_WEBHOOK_API_KEY}
