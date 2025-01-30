@@ -31,19 +31,22 @@ from fastapi import (
 )
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
+from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.roles import super_admin
-from app.central.central_crud import update_entity_mapping_status
-from app.central.central_schemas import EntityMappingStatus, EntityMappingStatusIn
+from app.central.central_schemas import (
+    OdkCentralWebhookRequest,
+)
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
-from app.db.models import DbProject, DbUser
+from app.db.enums import HTTPStatus, OdkWebhookEvents
+from app.db.models import DbUser
 from app.integrations.integration_crud import (
     generate_api_token,
+    update_entity_status_in_fmtm,
+    # update_entity_status_in_odk,
 )
 from app.integrations.integration_deps import valid_api_token
-from app.projects.project_deps import get_project
 
 router = APIRouter(
     prefix="/integrations",
@@ -52,12 +55,12 @@ router = APIRouter(
 )
 
 
-@router.get("/api-token")
-async def get_api_token(
+@router.get("/api-key")
+async def get_api_key(
     current_user: Annotated[DbUser, Depends(super_admin)],
     db: Annotated[Connection, Depends(db_conn)],
 ):
-    """Generate and return a new API token.
+    """Generate and return a new API key.
 
     This can only be accessed once, and is regenerated on
     each call to this endpoint.
@@ -67,7 +70,7 @@ async def get_api_token(
     NOTE currently requires super admin permission.
     """
     try:
-        api_key = await generate_api_token(db, current_user.id)
+        api_token = await generate_api_token(db, current_user.id)
     except ValueError as e:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -75,24 +78,46 @@ async def get_api_token(
         ) from e
     return JSONResponse(
         status_code=HTTPStatus.OK,
-        content={"api_key": api_key},
+        content={"api_token": api_token},
     )
 
 
 @router.post(
     "/webhooks/entity-status",
-    response_model=EntityMappingStatus,
+    # response_model=EntityMappingStatus,
 )
-async def update_entity_status(
+async def update_entity_status_from_webhook(
+    db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[DbUser, Depends(valid_api_token)],
-    project: Annotated[DbProject, Depends(get_project)],
-    entity_details: EntityMappingStatusIn,
+    odk_event: OdkCentralWebhookRequest,
 ):
-    """Update the status for an Entity."""
-    return await update_entity_mapping_status(
-        project.odk_credentials,
-        project.odkid,
-        entity_details.entity_id,
-        entity_details.label,
-        entity_details.status,
-    )
+    """ODK Central webhook triggers.
+
+    These are required to trigger the replication to users via electric-sql.
+
+    TODO perhaps these should be separated out, as the review action
+    does not require a db connection.
+    """
+    log.debug(f"Webhook called with event ({odk_event.type.value})")
+
+    if odk_event.type == OdkWebhookEvents.UPDATE_ENTITY:
+        # insert state into db
+        await update_entity_status_in_fmtm(db, odk_event)
+
+    elif odk_event.type == OdkWebhookEvents.REVIEW_SUBMISSION:
+        # update entity status in odk
+        # await update_entity_status_in_odk(db, odk_event)
+        log.warning(
+            "The handling of submission reviews via webhook is not implemented yet."
+        )
+
+    elif odk_event.type == OdkWebhookEvents.NEW_SUBMISSION:
+        # unsupported for now
+        log.debug("The handling of new submissions via webhook is not implemented yet.")
+
+    else:
+        msg = (
+            f"Webhook was called for an unsupported event type ({odk_event.type.value})"
+        )
+        log.warning(msg)
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=msg)

@@ -268,3 +268,11 @@ class GeomStatus(StrEnum, Enum):
 
     NEW = "NEW"
     BAD = "BAD"
+
+
+class OdkWebhookEvents(StrEnum, Enum):
+    """Types of events received from ODK Central webhook."""
+
+    UPDATE_ENTITY = "entity.update.version"
+    NEW_SUBMISSION = "submission.create"
+    REVIEW_SUBMISSION = "submission.update"

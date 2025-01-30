@@ -64,6 +64,7 @@ from app.s3 import add_obj_to_bucket, delete_all_objs_under_prefix
 
 # Avoid cyclical dependencies when only type checking
 if TYPE_CHECKING:
+    from app.central.central_schemas import OdkEntitiesUpdate
     from app.organisations.organisation_schemas import (
         OrganisationIn,
         OrganisationUpdate,
@@ -308,7 +309,8 @@ class DbUser(BaseModel):
             SET
                 role = EXCLUDED.role,
                 mapping_level = EXCLUDED.mapping_level,
-                name = EXCLUDED.name
+                name = EXCLUDED.name,
+                api_key = EXCLUDED.api_key
         """
 
         sql = f"""
@@ -1534,6 +1536,34 @@ class DbOdkEntities(BaseModel):
                 result.extend(batch_result)
 
         return bool(result)
+
+    @classmethod
+    async def update(
+        cls, db: Connection, entity_uuid: str, entity_update: "OdkEntitiesUpdate"
+    ) -> bool:
+        """Update the entity value in the FMTM db."""
+        model_dump = dump_and_check_model(entity_update)
+        placeholders = [f"{key} = %({key})s" for key in model_dump.keys()]
+        sql = f"""
+            UPDATE odk_entities
+            SET {", ".join(placeholders)}
+            WHERE entity_id = %(entity_uuid)s
+            RETURNING entity_id;
+        """
+
+        async with db.cursor() as cur:
+            await cur.execute(
+                sql,
+                {"entity_uuid": entity_uuid, **model_dump},
+            )
+            success = await cur.fetchone()
+
+        if not success:
+            msg = f"Failed to update entity with UUID: {entity_uuid}"
+            log.error(msg)
+            return False
+
+        return True
 
 
 class DbBackgroundTask(BaseModel):
