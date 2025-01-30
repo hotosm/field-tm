@@ -224,6 +224,22 @@ services:
     network_mode: none
     restart: "on-failure:2"
 
+  central-webhook:
+    profiles: ["", "central"]
+    image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_VERSION:-0.1.0-rc}"
+    depends_on:
+      central-db:
+        condition: service_healthy
+    environment:
+      CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER:-odk}:${CENTRAL_DB_USER:-odk}@central-db:5432/${CENTRAL_DB_NAME:-odk}?sslmode=disable
+      CENTRAL_WEBHOOK_UPDATE_ENTITY_URL: http://api:8000/integrations/webhooks/entity-status
+      # CENTRAL_WEBHOOK_REVIEW_SUBMISSION_URL: https://your.domain.com/some/webhook
+      CENTRAL_WEBHOOK_API_KEY: qnyE7ev7OWsfMAaX2fm-PuWYnkAUJw2xlyp72FKCH3Q
+      # CENTRAL_WEBHOOK_LOG_LEVEL: DEBUG
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
   s3:
     image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
     environment:

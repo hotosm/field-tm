@@ -385,6 +385,12 @@ async def update_review_state(
             post_data.instance_id,
             {"reviewState": post_data.review_state},
         )
+        # FIXME we have this due to bad exception handling code in osm-fieldwork
+        if response == {}:
+            raise Exception(
+                "ODK Central could not find or process the submission "
+                f"({post_data.instance_id})"
+            )
         return response
     except Exception as e:
         raise HTTPException(

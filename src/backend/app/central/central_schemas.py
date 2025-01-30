@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field, ValidationInfo, computed_field
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr, decrypt_value, encrypt_value
-from app.db.enums import EntityState
+from app.db.enums import EntityState, OdkWebhookEvents
 
 
 class ODKCentral(BaseModel):
@@ -299,3 +299,20 @@ class EntityMappingStatusIn(BaseModel):
     def integer_status_to_string(cls, value: EntityState) -> str:
         """Convert integer status to string for ODK Entity data."""
         return str(value.value)
+
+
+class OdkCentralWebhookRequest(BaseModel):
+    """The POST data from the central webhook service."""
+
+    type: OdkWebhookEvents
+    # NOTE we cannot use UUID validation, as Central often passes uuid as 'uuid:xxx-xxx'
+    id: str
+    # NOTE do not use EntityPropertyDict or similar to allow more flexible parsing
+    # submission.create provides an XML string as the 'data'
+    data: dict
+
+
+class OdkEntitiesUpdate(BaseModel):
+    """A small base model to update the OdkEntity status field only."""
+
+    status: str  # this must be the str representation of the db enum

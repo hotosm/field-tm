@@ -18,7 +18,7 @@
 
 """Integration dependencies, for API token validation."""
 
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import (
     Depends,
@@ -35,7 +35,7 @@ from app.db.models import DbUser
 
 async def valid_api_token(
     db: Annotated[Connection, Depends(db_conn)],
-    x_api_key: Annotated[str, Header()],
+    x_api_key: Annotated[Optional[str], Header()] = None,
 ) -> DbUser:
     """Check the API token is present for an active database user.
 
@@ -45,6 +45,14 @@ async def valid_api_token(
     TODO include checking roles.
     TODO If roles other than 'mapper' are required, this should be integrated.
     """
+    if not x_api_key:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN,
+            detail=(
+                "An API key must be provided in request headers as: X-API-KEY: xxx"
+            ),
+        )
+
     async with db.cursor(row_factory=class_row(DbUser)) as cur:
         await cur.execute(
             """
