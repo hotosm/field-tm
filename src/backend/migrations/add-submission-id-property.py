@@ -1,6 +1,7 @@
 """Add dataset property submission ID for old projects."""
 
 import asyncio
+from time import sleep
 
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
@@ -41,7 +42,7 @@ async def fetch_projects(db: AsyncConnection) -> list[dict]:
                p_org.odk_central_password as org_odk_central_password
         FROM projects p
         LEFT JOIN organisations p_org ON p.organisation_id = p_org.id
-        WHERE p.created_at < '2024-01-24 00:00:00.000 +0545';
+        WHERE p.created_at < '2025-01-24 00:00:00.000+00:00'::timestamptz;
     """
     async with db.cursor(row_factory=class_row(dict)) as cur:
         await cur.execute(sql)
@@ -56,7 +57,7 @@ async def add_submission_id():
         projects = await fetch_projects(db)
 
         if not projects:
-            print("No projects found.")
+            print(f"No projects found: {projects}")
             return
 
         for project in projects:
@@ -66,12 +67,20 @@ async def add_submission_id():
             async with central_deps.get_odk_dataset(
                 project["odk_creds"]
             ) as odk_central:
-                await odk_central.createDatasetProperty(
-                    project["odkid"],
-                    "submission_ids",
-                )
+                try:
+                    await odk_central.createDatasetProperty(
+                        project["odkid"],
+                        "submission_ids",
+                    )
+                except Exception as e:
+                    print(f"Failed updating project ({project['id']}): {e}")
+                    print("If 409 conflict, it's likely the property already exists")
+                    continue
 
-    print("✅ Submission ID property added successfully.")
+            # Sleep 0.5 second between
+            sleep(0.5)
+
+            print("✅ Submission ID property added successfully.")
 
 
 if __name__ == "__main__":
