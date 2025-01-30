@@ -267,6 +267,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/43112525?v=4",
       "profile": "https://github.com/Seckrel",
       "contributions": ["code"]
+    },
+    {
+      "login": "casdal",
+      "name": "casdal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/141283367?v=4",
+      "profile": "https://github.com/casdal",
+      "contributions": ["code"]
     }
   ],
   "contributorsPerLine": 7,
