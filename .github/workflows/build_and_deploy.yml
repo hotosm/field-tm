@@ -22,6 +22,7 @@ jobs:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
       pre_command: docker compose up -d proxy && docker compose exec api /app-entrypoint.sh
+      compose_file: "compose.yaml"
       compose_service: api
       compose_command: pytest
       tag_override: ci-${{ github.ref_name }}
@@ -40,7 +41,6 @@ jobs:
       context: src/backend
       build_target: prod
       image_name: ghcr.io/${{ github.repository }}/backend
-      compose_file: "compose.yaml"
 
   frontend-build:
     uses: hotosm/gh-workflows/.github/workflows/image_build.yml@2.0.9
