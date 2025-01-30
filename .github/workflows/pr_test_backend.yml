@@ -19,6 +19,7 @@ jobs:
       image_name: ghcr.io/${{ github.repository }}/backend
       build_context: src/backend
       pre_command: docker compose up -d proxy && docker compose exec api /app-entrypoint.sh
+      compose_file: "compose.yaml"
       compose_service: api
       compose_command: pytest
       cache_extra_imgs: |
