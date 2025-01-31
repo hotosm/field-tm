@@ -19,7 +19,7 @@ export const initialState: HomeStateTypes = {
     page: null,
     pages: null,
     prev_num: null,
-    per_page: null,
+    per_page: 13,
     total: null,
   },
 };

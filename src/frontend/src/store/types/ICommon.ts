@@ -16,3 +16,14 @@ type snackbarTypes = {
   variant: 'info' | 'success' | 'error' | 'warning';
   duration: number;
 };
+
+export type paginationType = {
+  has_next: boolean;
+  has_prev: boolean;
+  next_num: number | null;
+  page: number | null;
+  pages: number | null;
+  prev_num: number | null;
+  per_page: number;
+  total: number | null;
+};
