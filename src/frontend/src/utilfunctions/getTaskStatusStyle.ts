@@ -44,7 +44,7 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
   const borderStrokeColor = isTaskStatusLocked && taskLockedByUser ? secondaryStrokeColor : strokeColor;
 
   const lockedPolygonStyle = createPolygonStyle(
-    mapTheme.palette.mapFeatureColors.locked_for_mapping_rgb,
+    mapTheme.palette.mapFeatureColors.locked_for_mapping,
     borderStrokeColor,
   );
   const lockedValidationStyle = createPolygonStyle(
