@@ -17,7 +17,7 @@ const initialState: SubmissionStateTypes = {
       page: null,
       prev_num: null,
       next_num: null,
-      per_page: null,
+      per_page: 13,
       pages: null,
     },
   },

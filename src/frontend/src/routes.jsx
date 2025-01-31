@@ -16,6 +16,7 @@ import ErrorBoundary from '@/views/ErrorBoundary';
 import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
 import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
+import ManageUsers from '@/views/ManageUsers';
 import DataConflation from '@/views/DataConflation';
 
 const routes = createBrowserRouter([
@@ -213,6 +214,18 @@ const routes = createBrowserRouter([
             <Suspense fallback={<div>Loading...</div>}>
               <ErrorBoundary>
                 <ManageProject />
+              </ErrorBoundary>
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/manage-users',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ErrorBoundary>
+                <ManageUsers />
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>

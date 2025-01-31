@@ -1,3 +1,5 @@
+import { paginationType } from '@/store/types/ICommon';
+
 export type submissionContributorsTypes = {
   user: string;
   contributions: number;
@@ -13,16 +15,7 @@ export type submissionFormFieldsTypes = {
 
 export type submissionTableDataTypes = {
   results: Record<string, any>[];
-  pagination: {
-    has_next: boolean;
-    has_prev: boolean;
-    total: number | null;
-    page: number | null;
-    prev_num: number | null;
-    next_num: number | null;
-    per_page: number | null;
-    pages: number | null;
-  };
+  pagination: paginationType;
 };
 
 export type reviewListType = {

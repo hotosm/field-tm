@@ -1,4 +1,5 @@
-import { homeProjectPaginationTypes, projectType, snackbarTypes } from '@/models/home/homeModel';
+import { projectType, snackbarTypes } from '@/models/home/homeModel';
+import { paginationType } from '@/store/types/ICommon';
 
 export type HomeStateTypes = {
   homeProjectSummary: projectType[];
@@ -6,5 +7,5 @@ export type HomeStateTypes = {
   homeProjectLoading: boolean;
   snackbar: snackbarTypes;
   showMapStatus: boolean;
-  homeProjectPagination: homeProjectPaginationTypes;
+  homeProjectPagination: paginationType;
 };

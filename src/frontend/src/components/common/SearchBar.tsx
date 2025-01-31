@@ -45,7 +45,7 @@ export default function Searchbar({
         {placeholder}
       </label>
       <div className="fmtm-relative fmtm-w-full">
-        <div className="fmtm-pointer-events-none fmtm-absolute fmtm-inset-y-0 fmtm-left-0 fmtm-flex fmtm-items-center fmtm-pl-3">
+        <div className="fmtm-pointer-events-none fmtm-absolute fmtm-inset-y-0 fmtm-left-0 fmtm-flex fmtm-items-center fmtm-pl-2">
           <img src={SearchIcon} alt="Search Icon" className="fmtm-h-5 fmtm-w-5" />
         </div>
         {value && (

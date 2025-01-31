@@ -1,9 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserStateTypes } from '@/store/types/IUser';
+import { userType } from '@/models/user/userModel';
 
 export const initialState: UserStateTypes = {
-  userList: [],
+  userList: {
+    results: [],
+    pagination: {
+      has_next: false,
+      has_prev: false,
+      next_num: null,
+      page: 1,
+      pages: null,
+      prev_num: null,
+      per_page: 13,
+      total: null,
+    },
+  },
   userListLoading: false,
+  updateUserRoleLoading: false,
 };
 
 const UserSlice = createSlice({
@@ -15,6 +29,14 @@ const UserSlice = createSlice({
     },
     SetUserListLoading: (state, action: PayloadAction<boolean>) => {
       state.userListLoading = action.payload;
+    },
+    UpdateUserList: (state, action: PayloadAction<userType>) => {
+      state.userList.results = state.userList.results.map((user) =>
+        user.id === action.payload.id ? action.payload : user,
+      );
+    },
+    SetUpdateUserRoleLoading: (state, action: PayloadAction<boolean>) => {
+      state.updateUserRoleLoading = action.payload;
     },
   },
 });

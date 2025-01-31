@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { AppDispatch } from '@/store/Store';
 import { HomeActions } from '@/store/slices/HomeSlice';
-import { homeProjectPaginationTypes, projectType } from '@/models/home/homeModel';
+import { projectType } from '@/models/home/homeModel';
+import { paginationType } from '@/store/types/ICommon';
 
 export const HomeSummaryService = (url: string) => {
   return async (dispatch: AppDispatch) => {
@@ -11,7 +12,7 @@ export const HomeSummaryService = (url: string) => {
       try {
         const fetchHomeData = await axios.get(url);
         const projectSummaries: projectType[] = fetchHomeData.data.results;
-        const paginationResp: homeProjectPaginationTypes = fetchHomeData.data.pagination;
+        const paginationResp: paginationType = fetchHomeData.data.pagination;
         dispatch(HomeActions.SetHomeProjectPagination(paginationResp));
         dispatch(HomeActions.SetHomeProjectSummary(projectSummaries));
         dispatch(HomeActions.HomeProjectLoading(false));
