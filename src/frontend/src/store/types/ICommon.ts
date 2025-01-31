@@ -1,3 +1,5 @@
+import { selectOptionsType } from '@/components/common/Select2';
+
 export type CommonStateTypes = {
   snackbar: snackbarTypes;
   loading: boolean;
@@ -8,6 +10,7 @@ export type CommonStateTypes = {
     };
   };
   projectNotFound: boolean;
+  previousSelectedOptions: Record<string, selectOptionsType[]>;
 };
 
 type snackbarTypes = {

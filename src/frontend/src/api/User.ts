@@ -57,3 +57,26 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
     await updateUserRole(url);
   };
 };
+
+export const GetUserListForSelect = (
+  url: string,
+  params: { page: number; results_per_page: number; search: string },
+) => {
+  return async (dispatch: AppDispatch) => {
+    dispatch(UserActions.SetUserListForSelectLoading(true));
+
+    const getUserList = async (url: string) => {
+      try {
+        const response: AxiosResponse<{ results: userType[]; pagination: paginationType }> = await axios.get(url, {
+          params,
+        });
+        dispatch(UserActions.SetUserListForSelect(response.data.results));
+      } catch (error) {
+      } finally {
+        dispatch(UserActions.SetUserListForSelectLoading(false));
+      }
+    };
+
+    await getUserList(url);
+  };
+};
