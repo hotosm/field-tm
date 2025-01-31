@@ -14,7 +14,8 @@ import RichTextEditor from '@/components/common/Editor/Editor';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import DescriptionSection from '@/components/createnewproject/Description';
 import Select2 from '@/components/common/Select2';
-import { GetUserListService } from '@/api/User';
+import { GetUserListForSelect } from '@/api/User';
+import { UserActions } from '@/store/slices/UserSlice';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,7 +27,7 @@ const ProjectDetailsForm = ({ flag }) => {
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const organisationListData = useAppSelector((state) => state.createproject.organisationList);
   const organisationListLoading = useAppSelector((state) => state.createproject.organisationListLoading);
-  const userList = useAppSelector((state) => state.user.userList)?.map((user) => ({
+  const userList = useAppSelector((state) => state.user.userListForSelect)?.map((user) => ({
     id: user.id,
     label: user.username,
     value: user.id,
@@ -64,10 +65,6 @@ const ProjectDetailsForm = ({ flag }) => {
     return () => {
       window.removeEventListener('focus', onFocus);
     };
-  }, []);
-
-  useEffect(() => {
-    dispatch(GetUserListService(`${VITE_API_URL}/users`));
   }, []);
 
   const handleInputChanges = (e) => {
@@ -178,22 +175,6 @@ const ProjectDetailsForm = ({ flag }) => {
               <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">{errors.organisation_id}</p>
             )}
           </div>
-          {/* Select project admin */}
-          <div>
-            <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent">Assign Project Admin</p>
-            <Select2
-              options={userList || []}
-              value={values.project_admins}
-              onChange={(value: any) => {
-                handleCustomChange('project_admins', value);
-              }}
-              placeholder="Assign Project Admin"
-              className="naxatw-w-1/5 naxatw-min-w-[9rem]"
-              multiple
-              checkBox
-              isLoading={userListLoading}
-            />
-          </div>
           {/* Custom ODK creds toggle */}
           <div
             className="fmtm-flex fmtm-flex-col fmtm-gap-6"
@@ -217,6 +198,32 @@ const ProjectDetailsForm = ({ flag }) => {
             {shouldShowCustomODKFields() && (
               <ODKCredentialsFields values={values} errors={errors} handleChange={handleChange} />
             )}
+          </div>
+          {/* Select project admin */}
+          <div>
+            <p className="fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent">Assign Project Admin</p>
+            <Select2
+              name="project_admins"
+              options={userList || []}
+              value={values.project_admins}
+              onChange={(value: any) => {
+                handleCustomChange('project_admins', value);
+              }}
+              placeholder="Search for FMTM users"
+              className="naxatw-w-1/5 naxatw-min-w-[9rem]"
+              multiple
+              checkBox
+              isLoading={userListLoading}
+              handleApiSearch={(value) => {
+                if (value) {
+                  dispatch(
+                    GetUserListForSelect(`${VITE_API_URL}/users`, { search: value, page: 1, results_per_page: 30 }),
+                  );
+                } else {
+                  dispatch(UserActions.SetUserListForSelect([]));
+                }
+              }}
+            />
           </div>
           {/* Hashtags */}
           <div>

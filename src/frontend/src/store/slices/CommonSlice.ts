@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CommonStateTypes } from '@/store/types/ICommon';
+import { selectOptionsType } from '@/components/common/Select2';
 
 const initialState: CommonStateTypes = {
   snackbar: {
@@ -16,6 +17,7 @@ const initialState: CommonStateTypes = {
     },
   },
   projectNotFound: false,
+  previousSelectedOptions: {},
 };
 
 const CommonSlice = createSlice({
@@ -36,6 +38,10 @@ const CommonSlice = createSlice({
     },
     SetProjectNotFound(state, action: PayloadAction<boolean>) {
       state.projectNotFound = action.payload;
+    },
+    // set previous selected options of select component
+    SetPreviousSelectedOptions(state, action: PayloadAction<{ key: string; options: selectOptionsType[] }>) {
+      state.previousSelectedOptions[action.payload.key] = action.payload.options;
     },
   },
 });
