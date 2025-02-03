@@ -113,8 +113,7 @@ const ProjectDetailsForm = ({ flag }) => {
   }, [organisationList]);
 
   const shouldShowCustomODKFields = () => {
-    const currentOrg = getSelectedOrganization();
-    return !values.useDefaultODKCredentials || !currentOrg?.hasODKCredentials;
+    return !values.useDefaultODKCredentials;
   };
 
   return (
