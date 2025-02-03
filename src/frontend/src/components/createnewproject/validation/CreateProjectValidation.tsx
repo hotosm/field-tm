@@ -38,16 +38,16 @@ function CreateProjectValidation(values: ProjectValues) {
   if (!values?.organisation_id) {
     errors.organisation_id = 'Organization is Required.';
   }
-  if (!values?.defaultODKCredentials && isInputEmpty(values?.odk_central_url)) {
+  if (!values?.useDefaultODKCredentials && isInputEmpty(values?.odk_central_url)) {
     errors.odk_central_url = 'ODK URL is Required.';
   }
-  if (!values?.defaultODKCredentials && values?.odk_central_url && !isValidUrl(values.odk_central_url)) {
+  if (!values?.useDefaultODKCredentials && values?.odk_central_url && !isValidUrl(values.odk_central_url)) {
     errors.odk_central_url = 'Invalid URL.';
   }
-  if (!values?.defaultODKCredentials && isInputEmpty(values?.odk_central_user)) {
+  if (!values?.useDefaultODKCredentials && isInputEmpty(values?.odk_central_user)) {
     errors.odk_central_user = 'ODK Central User is Required.';
   }
-  if (!values?.defaultODKCredentials && isInputEmpty(values?.odk_central_password)) {
+  if (!values?.useDefaultODKCredentials && isInputEmpty(values?.odk_central_password)) {
     errors.odk_central_password = 'ODK Central Password is Required.';
   }
   if (isInputEmpty(values?.name)) {
