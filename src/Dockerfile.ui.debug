@@ -9,6 +9,9 @@ WORKDIR /app
 COPY --from=code ./package.json ./pnpm-lock.yaml ./
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack install
+# FIXME this npm install is a workaround due to https://github.com/nodejs/corepack/issues/627
+RUN npm install -g corepack@0.31.0
+# FIXME delete this line after fixed upstream
+RUN corepack prepare pnpm@9.15.5 --activate && corepack enable && corepack install
 RUN pnpm install
 ENTRYPOINT ["pnpm", "run", "dev"]
