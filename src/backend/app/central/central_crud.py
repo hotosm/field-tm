@@ -593,6 +593,34 @@ async def create_entity_list(
             )
 
 
+async def create_entity(
+    odk_creds: central_schemas.ODKCentralDecrypted,
+    odk_id: int,
+    properties: list[str],
+    entity: central_schemas.EntityDict,
+    dataset_name: str = "features",
+) -> None:
+    """Create a new Entity in ODK."""
+    log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
+    try:
+        properties = central_schemas.entity_fields_to_list(properties)
+
+        label = entity.get("label")
+        data = entity.get("data")
+
+        if not label or not data:
+            log.error("Missing required entity fields: 'label' or 'data'")
+            raise ValueError("Entity must contain 'label' and 'data' fields")
+
+        async with central_deps.get_odk_dataset(odk_creds) as odk_central:
+            await odk_central.createEntity(odk_id, dataset_name, label, data)
+        log.info(f"Entity '{label}' successfully created in ODK")
+
+    except Exception as e:
+        log.exception(f"Failed to create entity in ODK: {str(e)}")
+        raise
+
+
 async def get_entities_geojson(
     odk_creds: central_schemas.ODKCentralDecrypted,
     odk_id: int,
