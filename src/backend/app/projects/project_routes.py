@@ -21,7 +21,7 @@ import json
 import os
 from io import BytesIO
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated, Any, Dict, Optional
 
 import requests
 from fastapi import (
@@ -69,11 +69,13 @@ from app.db.models import (
     DbUserRole,
 )
 from app.db.postgis_utils import (
+    add_required_geojson_properties,
     check_crs,
     featcol_keep_single_geom_type,
     flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
+    split_geojson_by_task_areas,
 )
 from app.organisations import organisation_deps
 from app.projects import project_crud, project_deps, project_schemas
@@ -881,6 +883,58 @@ async def add_additional_entity_list(
     )
 
     return Response(status_code=HTTPStatus.OK)
+
+
+@router.post("/{project_id}/create-entity")
+async def add_new_entity(
+    db: Annotated[Connection, Depends(db_conn)],
+    project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
+    geojson: Dict[str, Any],
+):
+    """Create an Entity for the project in ODK."""
+    try:
+        project = project_user_dict.get("project")
+        project_odk_id = project.odkid
+        project_odk_creds = project.odk_credentials
+
+        features = geojson.get("features")
+        if not features or not isinstance(features, list):
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail="Invalid GeoJSON format"
+            )
+
+        # Add required properties and extract entity data
+        featcol = add_required_geojson_properties(geojson)
+        properties = list(featcol["features"][0]["properties"].keys())
+        task_geojson = await split_geojson_by_task_areas(db, featcol, project.id)
+        entities_list = await central_crud.task_geojson_dict_to_entity_values(
+            task_geojson
+        )
+
+        if not entities_list:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail="No valid entities found"
+            )
+
+        # Create entity in ODK
+        await central_crud.create_entity(
+            project_odk_creds,
+            project_odk_id,
+            properties=properties,
+            entity=entities_list[0],
+            dataset_name="features",
+        )
+
+        return Response(status_code=HTTPStatus.OK)
+    except HTTPException as http_err:
+        log.error(f"HTTP error: {http_err.detail}")
+        raise
+    except Exception as e:
+        log.exception("Unexpected error during entity creation")
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail="Entity creation failed",
+        ) from e
 
 
 @router.post("/{project_id}/generate-project-data")
