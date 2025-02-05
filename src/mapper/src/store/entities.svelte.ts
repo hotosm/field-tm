@@ -60,8 +60,10 @@ function getEntityStatusStream(projectId: number): ShapeStream | undefined {
 	}
 	return new ShapeStream({
 		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-		table: 'odk_entities',
-		where: `project_id=${projectId}`,
+		params: {
+			table: 'odk_entities',
+			where: `project_id=${projectId}`,
+		},
 	});
 }
 
@@ -71,8 +73,10 @@ function getNewBadGeomStream(projectId: number): ShapeStream | undefined {
 	}
 	return new ShapeStream({
 		url: `${import.meta.env.VITE_SYNC_URL}/v1/shape`,
-		table: 'geometrylog',
-		where: `project_id=${projectId}`,
+		params: {
+			table: 'geometrylog',
+			where: `project_id=${projectId}`,
+		},
 	});
 }
 
