@@ -72,10 +72,6 @@ const ProjectDetailsForm = ({ flag }) => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(true));
   };
 
-  const getSelectedOrganization = () => {
-    return organisationList.find((org) => org.value === values.organisation_id);
-  };
-
   const handleOrganizationChange = (orgId: number) => {
     // Ensure orgId is not null or undefined before integer convert
     const orgIdInt = orgId && +orgId;
@@ -111,10 +107,6 @@ const ProjectDetailsForm = ({ flag }) => {
       }
     });
   }, [organisationList]);
-
-  const shouldShowCustomODKFields = () => {
-    return !values.useDefaultODKCredentials;
-  };
 
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
@@ -182,7 +174,7 @@ const ProjectDetailsForm = ({ flag }) => {
             }}
             onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
           >
-            {
+            {hasODKCredentials && (
               <CustomCheckbox
                 key="useDefaultODKCredentials"
                 label="Use default ODK credentials"
@@ -193,8 +185,8 @@ const ProjectDetailsForm = ({ flag }) => {
                 className="fmtm-text-black"
                 labelClickable={hasODKCredentials} // Dynamically set labelClickable based on hasODKCredentials
               />
-            }
-            {shouldShowCustomODKFields() && (
+            )}
+            {((!values.useDefaultODKCredentials && hasODKCredentials) || !hasODKCredentials) && (
               <ODKCredentialsFields values={values} errors={errors} handleChange={handleChange} />
             )}
           </div>
