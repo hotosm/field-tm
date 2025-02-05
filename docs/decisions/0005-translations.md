@@ -8,7 +8,7 @@ global.
 Ideally these translations are contributed by the **community** and not
 just the HOT team.
 
-We will likely ask the community to contribute translations via Weblate,
+We will likely ask the community to contribute translations via **Weblate**,
 or another similar tool.
 
 We will not consider closed-source / paid tools for this, such as:
@@ -19,16 +19,16 @@ We will not consider closed-source / paid tools for this, such as:
 
 ## Considered Options
 
-- Any library that is framework specific, such as react-i18next,
-  react-intl, or svelte-i18n. These won't be used to avoid lock-in and
+- Any library that is framework specific, such as **react-i18next**,
+  **react-intl**, or **svelte-i18n**. These won't be used to avoid lock-in and
   to aid transfer of translations across projects.
-- i18next is one of the most prominent, but other tools have
+- **i18next** is one of the most prominent, but other tools have
   since superseded this in terms of usability and performance.
-- lingui looks like an excellent choice, with many nice features
+- **lingui** looks like an excellent choice, with many nice features
   such as being platform agnostic, good community, and semantic key
   translations (meaning the actual english text to be translated
   is present in the code, instead of a key like home.banner.hello).
-- ParaglideJS is the newest here, with most of the same advantages of
+- **ParaglideJS** is the newest here, with most of the same advantages of
   lingui, including a few extra such as code splitting / tree shaking.
 
 ## Decision Outcome
