@@ -412,7 +412,7 @@ OWNED BY public.submission_photos.id;
 CREATE TABLE public.geometrylog (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     geojson JSONB NOT NULL,
-    status geomstatus,
+    status public.geomstatus,
     project_id int,
     task_id int
 );
@@ -490,7 +490,7 @@ ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
 ALTER TABLE ONLY public.submission_photos
 ADD CONSTRAINT submission_photos_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY public.idx_geometrylog
+ALTER TABLE ONLY public.geometrylog
 ADD CONSTRAINT geometrylog_pkey PRIMARY KEY (id);
 
 -- Indexing
@@ -540,7 +540,7 @@ ON public.odk_entities USING btree (
     entity_id, task_id
 );
 CREATE INDEX idx_geometrylog_geojson
-ON public.geometrylog USING gin (geom);
+ON public.geometrylog USING gin (geojson);
 
 
 -- Foreign keys
