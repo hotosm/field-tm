@@ -12,7 +12,7 @@ interface ProjectValues {
   odk_central_url: string;
   odk_central_user: string;
   odk_central_password: string;
-  defaultODKCredentials: boolean;
+  useDefaultODKCredentials: boolean;
   hasCustomTMS: boolean;
   custom_tms_url: string;
 }
