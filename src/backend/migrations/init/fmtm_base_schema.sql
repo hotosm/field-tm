@@ -409,14 +409,14 @@ ALTER TABLE public.submission_photos_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.submission_photos_id_seq
 OWNED BY public.submission_photos.id;
 
-CREATE TABLE geometrylog (
+CREATE TABLE public.geometrylog (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     geojson JSONB NOT NULL,
     status geomstatus,
     project_id int,
     task_id int
 );
-ALTER TABLE geometrylog OWNER TO fmtm;
+ALTER TABLE public.geometrylog OWNER TO fmtm;
 
 -- nextval for primary keys (autoincrement)
 
@@ -540,7 +540,7 @@ ON public.odk_entities USING btree (
     entity_id, task_id
 );
 CREATE INDEX idx_geometrylog_geojson
-ON geometrylog USING gin (geom);
+ON public.geometrylog USING gin (geom);
 
 
 -- Foreign keys
