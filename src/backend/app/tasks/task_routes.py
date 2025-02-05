@@ -115,3 +115,12 @@ async def get_task_event_history(
 ):
     """Get the detailed history for a task."""
     return await DbTaskEvent.all(db, task_id=task_id, days=days, comments=comments)
+
+
+@router.post("/unlock-tasks")
+async def unlock_tasks(db: Annotated[Connection, Depends(db_conn)]):
+    """Endpoint to trigger unlock_old_locked_tasks manually."""
+    log.info("Start processing inactive tasks")
+    await task_crud.trigger_unlock_tasks(db)
+    log.info("Finished processing inactive tasks")
+    return {"message": "Old locked tasks unlocked successfully."}

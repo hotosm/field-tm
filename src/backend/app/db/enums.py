@@ -134,6 +134,7 @@ class TaskEvent(StrEnum, Enum):
     MERGE = "MERGE"
     ASSIGN = "ASSIGN"
     COMMENT = "COMMENT"
+    RESET = "RESET"
 
 
 class MappingState(StrEnum, Enum):

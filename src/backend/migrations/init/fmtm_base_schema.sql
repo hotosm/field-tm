@@ -131,7 +131,8 @@ CREATE TYPE public.taskevent AS ENUM (
     'SPLIT',
     'MERGE',
     'ASSIGN',
-    'COMMENT'
+    'COMMENT',
+    'RESET'
 );
 ALTER TYPE public.taskevent OWNER TO fmtm;
 
@@ -621,6 +622,8 @@ BEGIN
             NEW.state := 'LOCKED_FOR_MAPPING';
         WHEN 'COMMENT' THEN
             NEW.state := OLD.state;
+        WHEN 'RESET' THEN
+            NEW.state := 'UNLOCKED_TO_MAP';
         ELSE
             RAISE EXCEPTION 'Unknown task event type: %', NEW.event;
     END CASE;
