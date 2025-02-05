@@ -599,7 +599,7 @@ async def create_entity(
     properties: list[str],
     entity: central_schemas.EntityDict,
     dataset_name: str = "features",
-) -> None:
+) -> dict:
     """Create a new Entity in ODK."""
     log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
     try:
@@ -613,8 +613,9 @@ async def create_entity(
             raise ValueError("Entity must contain 'label' and 'data' fields")
 
         async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-            await odk_central.createEntity(odk_id, dataset_name, label, data)
+            response = await odk_central.createEntity(odk_id, dataset_name, label, data)
         log.info(f"Entity '{label}' successfully created in ODK")
+        return response
 
     except Exception as e:
         log.exception(f"Failed to create entity in ODK: {str(e)}")

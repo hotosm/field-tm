@@ -917,7 +917,7 @@ async def add_new_entity(
             )
 
         # Create entity in ODK
-        await central_crud.create_entity(
+        return await central_crud.create_entity(
             project_odk_creds,
             project_odk_id,
             properties=properties,
@@ -925,7 +925,6 @@ async def add_new_entity(
             dataset_name="features",
         )
 
-        return Response(status_code=HTTPStatus.OK)
     except HTTPException as http_err:
         log.error(f"HTTP error: {http_err.detail}")
         raise
