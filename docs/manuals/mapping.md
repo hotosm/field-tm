@@ -1,6 +1,6 @@
-# Mapper Frontend Documentation
+# Mapper Page Documentation
 
-The **Mapper Frontend** was developed to provide a simpler, more intuitive
+The **Mapper Page** was developed to provide a simpler, more intuitive
 mapping experience.
 
 ## Prerequisites
@@ -38,7 +38,7 @@ for field mapping:
 ### Step 1: Install The Custom ODK Collect Mobile App
 
 - The first time you load the project, you should be prompted to download
-  the custom `.apk` from the sidebar.
+  the custom ODK `.apk` from the sidebar.
 - Once downloaded, you should install the custom ODK Collect application.
 
   ![highlighted-sidebar](https://github.com/user-attachments/assets/53de2d80-2709-45b0-bb82-32f0190c7859)
@@ -52,18 +52,18 @@ for field mapping:
       You may have to enable installing from unknown sources in your device
       settings too.
 
-### Step 2: Access the Mapper Frontend
+### Step 2: Access the Mapper Page
 
-- **Option 1:** Click the **Start Mapping** button on the project cards of
-  explore project page.
-- **Option 2:** Click the **Start Mapping** button on the project details page.
+- **Option 1:** Click on the project cards from your mobile device
 - **Option 3:** Go to `https://fmtm.hotosm.org/mapnow/<project_id>` to open
-  the Mapper Frontend for a specific project.
+  the Mapper Page for a specific project.
 
 !!! note
 
       This functionality is designed for mappers in the field, so it is
-      recommended to use a mobile device to access it.
+      recommended to use a mobile device to access it. If you use a computer
+      browser, you will be redirected to the project details page instead of
+      mapper's page.
 
 !!! warning
 
@@ -74,7 +74,7 @@ for field mapping:
 
 ### Step 3: Configure ODK Collect (once only)
 
-- **Option 1:** Scan the QR code displayed on the Mapper Frontend using
+- **Option 1:** Scan the QR code displayed on the Mapper page using
   the custom ODK Collect mobile application.
 
 - **Option 2:** Download the QR code and import it into ODK Collect to
@@ -89,7 +89,7 @@ for field mapping:
 !!! tip
 
       For a demonstration of the process above, click the **i** info icon
-      on the QR Code tab of the mapper frontend.
+      on the QR Code tab of the mapper page.
 
 ### Step 4: Load Imagery (optional)
 
@@ -129,6 +129,8 @@ In most cases we are submitting a survey about a feature that already exists.
 - Now click on a feature you wish to map: a popup will appear.
 - Now click 'Map Feature In ODK': ODK Collect will open, with the
   feature pre-selected in the survey (no need to open the ODK map!).
+- If the feature you are trying to map is further than 50m away, you will
+  be prompted with warning message to ensure you made the correct selection.
 - Complete the survey and submit.
 
 ![IMG_20250109_160742](https://github.com/user-attachments/assets/bf350d1c-c80e-42ee-970b-ca71a3713a9f)
@@ -155,7 +157,8 @@ Sometimes the feature does not exist on the map yet!
 - Click on a task area: a popup will display.
 - At the top right, there is a button **Map New Feature**.
 - Click on the map to create a new geometry.
-- ODK Collect will be opened automatically to fill out the survey
+- Once the geometry is drawn on FMTM, save and confirm to be redirected to ODK.
+- ODK Collect will then be opened to fill out the survey
   data for the newly created feature.
   ![IMG_20250109_160816](https://github.com/user-attachments/assets/98b70f5a-4db8-46cb-84ae-58bec07c82c1)
 
