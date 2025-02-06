@@ -18,6 +18,7 @@
 """Logic for FMTM project routes."""
 
 import json
+import shutil
 import uuid
 from io import BytesIO
 from pathlib import Path
@@ -801,8 +802,6 @@ def generate_project_basemap(
             f"{settings.S3_DOWNLOAD_ROOT}/{settings.S3_BUCKET_NAME}/{basemap_s3_path}"
         )
         log.info(f"Upload of basemap to S3 complete: {basemap_external_s3_url}")
-        # Delete file on disk
-        Path(outfile).unlink(missing_ok=True)
 
         update_basemap_sync = async_to_sync(DbBasemap.update)
         update_basemap_sync(
@@ -845,6 +844,10 @@ def generate_project_basemap(
                 message=str(e),
             ),
         )
+    finally:
+        log.info(f"Cleaned up tiles directory: {tiles_dir}")
+        Path(outfile).unlink(missing_ok=True)
+        shutil.rmtree(tiles_dir)
 
 
 # async def convert_geojson_to_osm(geojson_file: str):
