@@ -37,6 +37,7 @@ const config = {
 		$static: 'static',
 		$styles: 'styles',
 		$assets: 'assets',
+		$translations: 'src/translations',
 	},
 };
 

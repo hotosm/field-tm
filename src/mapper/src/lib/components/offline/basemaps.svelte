@@ -4,7 +4,7 @@
 	import type { SlSelectEvent } from '@shoelace-style/shoelace/dist/events';
 	// FIXME this is a workaround to re-import, as using hot-select
 	// and hot-option prevents selection of values!
-	// TODO should raise an issue in hotosm/ui about this / test further
+	// perhaps related to https://github.com/hotosm/ui/issues/73
 	import '@shoelace-style/shoelace/dist/components/select/select.js';
 	import '@shoelace-style/shoelace/dist/components/option/option.js';
 	import '@shoelace-style/shoelace/dist/components/button/button.js';
