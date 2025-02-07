@@ -84,7 +84,7 @@ async def featcol_to_flatgeobuf(
             -- Wrap geometries in GeometryCollection
             CREATE TEMP TABLE IF NOT EXISTS temp_features(
                 geom geometry(GeometryCollection, 4326),
-                osm_id integer,
+                osm_id bigint,
                 tags text,
                 version integer,
                 changeset integer,
@@ -101,7 +101,7 @@ async def featcol_to_flatgeobuf(
                 ST_ForceCollection(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom,
                 regexp_replace(
                     (feat->'properties'->>'osm_id')::text, '[^0-9]', '', 'g'
-                )::integer as osm_id,
+                )::BIGINT as osm_id,
                 (feat->'properties'->>'tags')::text as tags,
                 (feat->'properties'->>'version')::integer as version,
                 (feat->'properties'->>'changeset')::integer as changeset,
