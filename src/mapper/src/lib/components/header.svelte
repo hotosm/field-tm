@@ -1,4 +1,15 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { setLanguageTag, onSetLanguageTag, availableLanguageTags } from "$translations/runtime.js";
+	import type { SlDrawer, SlTooltip } from '@shoelace-style/shoelace';
+	// FIXME this is a workaround to re-import, as using sl-dropdown
+	// and sl-menu prevents selection of values!
+	// perhaps related to https://github.com/hotosm/ui/issues/73
+	import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
+	import '@shoelace-style/shoelace/dist/components/menu/menu.js';
+	import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
+
+	import * as m from "$translations/messages.js";
 	import HotLogo from '$assets/images/hot-logo.svg';
 	import HotLogoText from '$assets/images/hot-logo-text.svg';
 	import Login from '$lib/components/login.svelte';
@@ -6,19 +17,24 @@
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
 	import { revokeCookies } from '$lib/utils/login';
 	import { getAlertStore } from '$store/common.svelte';
-	import { getProjectSetupStepStore } from '$store/common.svelte.ts';
+	import { getCommonStore, getProjectSetupStepStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
-	import type { SlDrawer, SlTooltip } from '@shoelace-style/shoelace';
 
 	let drawerRef: SlDrawer | undefined = $state();
 	let drawerOpenButtonRef: SlTooltip | undefined = $state();
 	const loginStore = getLoginStore();
 	const alertStore = getAlertStore();
+	const commonStore = getCommonStore();
 	const projectSetupStepStore = getProjectSetupStepStore();
 
 	let isFirstLoad = $derived(
 		+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load'],
 	);
+
+	// Trigger from paraglide-js, when the locale changes
+	onSetLanguageTag((newLocale: string) => {
+		commonStore.setLocale(newLocale);
+	});
 
 	const handleSignOut = async () => {
 		try {
@@ -30,6 +46,18 @@
 			alertStore.setAlert({ variant: 'danger', message: 'Sign Out Failed' });
 		}
 	};
+
+	onMount(() => {
+		setLanguageTag(commonStore.locale);
+
+		// Handle locale change
+		const container = document.querySelector('.locale-selection');
+		const dropdown = container.querySelector('sl-dropdown');
+		dropdown.addEventListener('sl-select', event => {
+			const selectedItem = event.detail.item;
+			setLanguageTag(selectedItem.value);
+		});
+	});
 </script>
 
 <div class="p-3 flex items-center justify-between font-barlow">
@@ -64,7 +92,7 @@
 				</p>
 			</div>
 		{:else}
-			<sl-button
+			<hot-button
 				class="hover:bg-gray-50 rounded"
 				variant="text"
 				size="small"
@@ -80,7 +108,7 @@
 				tabindex="0"
 			>
 				<span class="font-barlow font-medium text-base">SIGN IN</span>
-			</sl-button>
+			</hot-button>
 		{/if}
 
 		<!-- drawer component toggle trigger (snippet to reuse below) -->
@@ -88,7 +116,7 @@
 			<hot-icon
 				name="list"
 				class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
-				style={isFirstLoad ? 'background-color: var(--sl-color-yellow-300);' : ''}
+				style={isFirstLoad ? 'background-color: var(--hot-color-yellow-300);' : ''}
 				onclick={() => {
 					drawerRef?.show();
 				}}
@@ -106,7 +134,7 @@
 				content="First download the custom ODK Collect app here"
 				open={true}
 				placement="bottom"
-				onsl-after-hide={() => {
+				onhot-after-hide={() => {
 					// Always keep tooltip open
 					drawerOpenButtonRef?.show();
 				}}
@@ -120,8 +148,21 @@
 	</div>
 </div>
 <Login />
+
 <hot-drawer bind:this={drawerRef} class="drawer-overview">
 	<div class="flex flex-col gap-8 px-4">
+		<div class="locale-selection">
+			<sl-dropdown>
+				<hot-button slot="trigger" caret>
+					<hot-icon name="translate"></hot-icon> {commonStore.locale}
+				</hot-button>
+				<sl-menu>
+					{#each availableLanguageTags as locale}
+						<sl-menu-item value={locale}>{locale}</sl-menu-item>
+					{/each}
+				</sl-menu>
+			</sl-dropdown>
+		</div>
 		{#each menuItems as menu}
 			<a
 				target="_blank"
@@ -131,7 +172,7 @@
 			>
 		{/each}
 		{#if loginStore?.getAuthDetails?.username}
-			<sl-button
+			<hot-button
 				class="primary rounded"
 				variant="primary"
 				size="small"
@@ -144,8 +185,8 @@
 				role="button"
 				tabindex="0"
 			>
-				<span class="font-barlow font-medium text-base">SIGN OUT</span>
-			</sl-button>
+			{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m.sign_out()}</span>{/key}
+			</hot-button>
 		{/if}
 	</div>
 </hot-drawer>

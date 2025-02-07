@@ -1,5 +1,8 @@
+import { getLocalStorage, setLocalStorage } from '$lib/fs/local-storage.svelte';
 import type { Basemap } from '$lib/utils/basemaps';
 import { getBasemapList } from '$lib/utils/basemaps';
+
+import { languageTag } from '$translations/runtime.js';
 
 interface AlertDetails {
 	variant: 'success' | 'default' | 'warning' | 'danger';
@@ -11,6 +14,7 @@ let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
 let selectedTab: string = $state('map');
+let locale: string = $state(getLocalStorage('locale') ?? languageTag());
 
 function getCommonStore() {
 	return {
@@ -18,6 +22,13 @@ function getCommonStore() {
 			return selectedTab;
 		},
 		setSelectedTab: (tab: string) => (selectedTab = tab),
+		get locale() {
+			return locale;
+		},
+		setLocale: (newLocale: string) => {
+			setLocalStorage('locale', newLocale);
+			locale = newLocale;
+		},
 	};
 }
 

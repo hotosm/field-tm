@@ -1,0 +1,7 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"start_mapping_task": "Do you want to start mapping task #{taskId}?",
+	"scan_qr_code": "Scan this QR code in ODK Collect from another users phone, or download and import it manually",
+	"sign_out": "SIGN OUT",
+	"download": "DOWNLOAD"
+}

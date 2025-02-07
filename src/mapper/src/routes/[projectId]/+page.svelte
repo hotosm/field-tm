@@ -4,13 +4,14 @@
 	import '@hotosm/ui/dist/hotosm-ui';
 	import type { PageData } from '../$types';
 	import { onMount, onDestroy } from 'svelte';
+	import type { ShapeStream } from '@electric-sql/client';
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import ImportQrGif from '$assets/images/importQr.gif';
+	import type SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
+	import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
 
-	import SlTabGroup from '@shoelace-style/shoelace/dist/components/tab-group/tab-group.component.js';
-	import SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component.js';
+	import ImportQrGif from '$assets/images/importQr.gif';
 	import BottomSheet from '$lib/components/bottom-sheet.svelte';
 	import MapComponent from '$lib/components/map/main.svelte';
 	import QRCodeComponent from '$lib/components/qrcode.svelte';
@@ -25,7 +26,6 @@
 	import More from '$lib/components/more/index.svelte';
 	import { getProjectSetupStepStore, getCommonStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
-	import type { ShapeStream } from '@electric-sql/client';
 
 	const API_URL = import.meta.env.VITE_API_URL;
 

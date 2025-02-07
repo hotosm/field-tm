@@ -22,7 +22,7 @@
 
 	// map with variant because red color for error/danger is not red color i.e. primary is associated with red color (due to HOT theme)
 	const variantMap = {
-		default: 'default',
+	default: 'default',
 		success: 'success',
 		warning: 'warning',
 		danger: 'primary',
