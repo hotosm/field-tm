@@ -18,7 +18,7 @@
 """Logic for FMTM project routes."""
 
 import json
-import shutil
+import subprocess
 import uuid
 from io import BytesIO
 from pathlib import Path
@@ -32,7 +32,6 @@ import requests
 from asgiref.sync import async_to_sync
 from fastapi import HTTPException, Request
 from loguru import logger as log
-from osm_fieldwork.basemapper import create_basemap_file
 from osm_login_python.core import Auth
 from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection
@@ -55,8 +54,6 @@ from app.db.postgis_utils import (
 from app.organisations.organisation_deps import get_default_odk_creds
 from app.projects import project_deps, project_schemas
 from app.s3 import add_file_to_bucket, add_obj_to_bucket
-
-TILESDIR = "/opt/tiles"
 
 
 async def get_projects_featcol(
@@ -727,15 +724,49 @@ def generate_project_basemap(
         tms (str, optional): Default None. Custom TMS provider URL.
     """
     new_basemap = None
+    mbtiles_file = ""
+    final_tile_file = ""
 
     # TODO update this for user input or automatic
     # maxzoom can be determined from OAM: https://tiles.openaerialmap.org/663
     # c76196049ef00013b8494/0/663c76196049ef00013b8495
-    # TODO xy should also be user configurable
+    # TODO should inverted_y be user configurable?
+
     # NOTE mbtile max supported zoom level is 22 (in GDAL at least)
-    zooms = "12-22" if tms else "12-19"
-    tiles_dir = f"{TILESDIR}/{project_id}"
-    outfile = f"{tiles_dir}/{project_id}_{source}tiles.{output_format}"
+    if tms:
+        zooms = "12-22"
+    # While typically satellite imagery TMS only goes to zoom 19
+    else:
+        zooms = "12-19"
+
+    mbtiles_file = Path(f"/tmp/{project_id}_{source}tiles.mbtiles")
+
+    # Set URL based on source (previously in osm-fieldwork)
+    if source == "esri":
+        # ESRI uses inverted zyx convention
+        # the ordering is extracted automatically from the URL, else use
+        # -inverted-y param
+        tms_url = "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
+        tile_format = "png"
+    elif source == "bing":
+        # FIXME this probably doesn't work
+        tms_url = "http://ecn.t0.tiles.virtualearth.net/tiles/h{z}/{x}/{y}.jpg?g=129&mkt=en&stl=H"
+        tile_format = "jpg"
+    elif source == "google":
+        tms_url = "https://mt0.google.com/vt?lyrs=s&x={x}&y={y}&z={z}"
+        tile_format = "jpg"
+    elif source == "custom" and tms:
+        tms_url = tms
+        if not (tile_format := Path(tms_url).suffix.lstrip(".")):
+            # Default to png if suffix not included in URL
+            tile_format = "png"
+    else:
+        raise ValueError("Must select a source from: esri,bing,google,custom")
+
+    # Invert zxy --> zyx for OAM provider
+    # inverted_y = True if tms and "openaerialmap" in tms else False
+    # NOTE the xy ordering is determined from the URL placeholders, by tilepack!
+    inverted_y = False
 
     # NOTE here we put the connection in autocommit mode to ensure we get
     # background task db entries if there is an exception.
@@ -757,36 +788,65 @@ def generate_project_basemap(
 
         min_lon, min_lat, max_lon, max_lat = new_basemap.bbox
 
-        # Overwrite source with OAM provider
-        if tms and "openaerialmap" in tms:
-            # NOTE the 'xy' param is set automatically by source=oam
-            source = "oam"
-
+        tilepack_cmd = [
+            # "prlimit", f"--as={500 * 1000}", "--",
+            "tilepack",
+            "-dsn",
+            f"{str(mbtiles_file)}",
+            "-url-template",
+            f"{tms_url}",
+            # tilepack requires format: south,west,north,east
+            "-bounds",
+            f"{min_lat},{min_lon},{max_lat},{max_lon}",
+            "-zooms",
+            f"{zooms}",
+            "-output-mode",
+            "mbtiles",  # options: mbtiles or disk
+            "-mbtiles-format",
+            f"{tile_format}",
+            "-ensure-gzip=false",  # gzip is only used for pbf vector tiles
+            "-tileset-name",
+            f"fmtm_{project_id}_{source}tiles",
+        ]
+        # Add '-inverted-y' only if needed
+        if inverted_y:
+            tilepack_cmd.append("-inverted-y")
         log.debug(
-            "Creating basemap with params: "
-            f"boundary={min_lon},{min_lat},{max_lon},{max_lat} | "
-            f"outfile={outfile} | "
-            f"zooms={zooms} | "
-            f"outdir={tiles_dir} | "
-            f"source={source} | "
-            f"tms={tms}"
+            "Creating basemap mbtiles using tilepack with command: "
+            f"{' '.join(tilepack_cmd)}"
         )
+        subprocess.run(tilepack_cmd, check=True)
+        log.info(
+            f"MBTile basemap created for project ID {project_id}: {str(mbtiles_file)}"
+        )
+        # write to another var so we upload either mbtiles OR pmtiles override below
+        final_tile_file = str(mbtiles_file)
 
-        create_basemap_file(
-            boundary=f"{min_lon},{min_lat},{max_lon},{max_lat}",
-            outfile=outfile,
-            zooms=zooms,
-            outdir=tiles_dir,
-            source=source,
-            tms=tms,
-        )
-        log.info(f"Basemap created for project ID {project_id}: {outfile}")
+        if output_format == "pmtiles":
+            pmtiles_file = mbtiles_file.with_suffix(".pmtiles")
+            pmtile_command = [
+                # "prlimit", f"--as={500 * 1000}", "--",
+                "pmtiles",
+                "convert",
+                f"{str(mbtiles_file)}",
+                f"{str(pmtiles_file)}",
+            ]
+            log.debug(
+                "Converting mbtiles --> pmtiles file with command: "
+                f"{' '.join(pmtile_command)}"
+            )
+            subprocess.run(pmtile_command, check=True)
+            log.info(
+                f"PMTile basemap created for project ID {project_id}: "
+                f"{str(pmtiles_file)}"
+            )
+            final_tile_file = str(pmtiles_file)
 
         # Generate S3 urls
         # We parse as BasemapOut to calculated computed fields (format, mimetype)
         basemap_out = project_schemas.BasemapOut(
             **new_basemap.model_dump(exclude=["url"]),
-            url=outfile,
+            url=final_tile_file,
         )
         basemap_s3_path = (
             f"{org_id}/{project_id}/basemaps/{basemap_out.id}.{basemap_out.format}"
@@ -795,7 +855,7 @@ def generate_project_basemap(
         add_file_to_bucket(
             settings.S3_BUCKET_NAME,
             basemap_s3_path,
-            outfile,
+            final_tile_file,
             content_type=basemap_out.mimetype,
         )
         basemap_external_s3_url = (
@@ -845,9 +905,9 @@ def generate_project_basemap(
             ),
         )
     finally:
-        log.info(f"Cleaned up tiles directory: {tiles_dir}")
-        Path(outfile).unlink(missing_ok=True)
-        shutil.rmtree(tiles_dir)
+        Path(mbtiles_file).unlink(missing_ok=True)
+        Path(final_tile_file).unlink(missing_ok=True)
+        log.debug("Cleaning up tile archives on disk")
 
 
 # async def convert_geojson_to_osm(geojson_file: str):

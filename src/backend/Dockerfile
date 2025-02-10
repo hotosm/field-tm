@@ -19,6 +19,7 @@ ARG UV_IMG_TAG=0.5.2
 ARG MINIO_TAG=${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}
 FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 FROM docker.io/minio/minio:${MINIO_TAG} AS minio
+FROM ghcr.io/hotosm/fmtm/basemap-generator:0.3.0 AS basemap-bins
 
 
 # Includes all labels and timezone info to extend from
@@ -121,6 +122,9 @@ RUN apt-get update --quiet \
     && rm -rf /var/lib/apt/lists/*
 # Copy minio mc client
 COPY --from=minio /usr/bin/mc /usr/local/bin/
+# Copy basemap generation binaries
+COPY --from=basemap-bins /usr/bin/tilepack /usr/local/bin/
+COPY --from=basemap-bins /usr/bin/pmtiles /usr/local/bin/
 COPY *-entrypoint.sh /
 ENTRYPOINT ["/app-entrypoint.sh"]
 # Copy Python deps from build to runtime
@@ -131,12 +135,11 @@ COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
-    && mkdir -p /opt/logs /opt/tiles \
+    && mkdir -p /opt/logs \
     && chown -R appuser:appuser /opt /home/appuser \
     && chmod +x /app-entrypoint.sh /migrate-entrypoint.sh /backup-entrypoint.sh
-# Add volumes for persistence
+# Add log volume for persistence
 VOLUME /opt/logs
-VOLUME /opt/tiles
 # Change to non-root user
 USER appuser
 
