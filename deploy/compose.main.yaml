@@ -73,7 +73,6 @@ services:
     image: "ghcr.io/hotosm/fmtm/backend:main"
     volumes:
       - fmtm_logs:/opt/logs
-      - fmtm_tiles:/opt/tiles
     depends_on:
       fmtm-db:
         condition: service_healthy
