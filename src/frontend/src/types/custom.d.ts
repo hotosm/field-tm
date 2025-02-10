@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from '@types/react';
 
 declare module '*.png';
 declare module '*.svg';
