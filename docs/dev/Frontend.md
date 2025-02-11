@@ -33,13 +33,13 @@ For details on how to run the API first, please see:
 To run the frontend locally, connected to the staging server as a backend:
 
 ```bash
-just --unstable start frontend-dev
+just start frontend-dev
 ```
 
 The mapper frontend can be started with a similar command:
 
 ```bash
-just --unstable start mapper-frontend-dev
+just start mapper-frontend-dev
 ```
 
 ## Frontend Tips
