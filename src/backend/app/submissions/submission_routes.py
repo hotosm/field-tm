@@ -402,10 +402,25 @@ async def update_review_state(
 @router.get("/download-submission-geojson")
 async def download_submission_geojson(
     project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
+    submitted_date_range: Optional[str] = Query(
+        None,
+        title="Submitted Date Range",
+        description="Date range in format (e.g., 'YYYY-MM-DD,YYYY-MM-DD')",
+    ),
 ):
     """Download submission geojson for a specific project."""
     project = project_user.get("project")
-    data = await submission_crud.get_submission_by_project(project, {})
+    filters = {}
+
+    if submitted_date_range:
+        start_date, end_date = submitted_date_range.split(",")
+        filters = {
+            "$filter": (
+                f"__system/submissionDate ge {start_date}T00:00:00+00:00 "
+                f"and __system/submissionDate le {end_date}T23:59:59.999+00:00"
+            )
+        }
+    data = await submission_crud.get_submission_by_project(project, filters)
     submission_json = data.get("value", [])
 
     submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
