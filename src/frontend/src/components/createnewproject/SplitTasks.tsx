@@ -124,10 +124,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
     // Create a file object from the Blob
     const taskAreaGeojsonFile = new File([taskAreaBlob], 'data.json', { type: 'application/json' });
 
-    // FIXME for now hardcoded as Polygon projects (add project creation UI for user selection)
-    // projectData = { ...projectData, new_geom_type: projectDetails.new_geom_type };
-    projectData = { ...projectData, new_geom_type: 'POLYGON' };
-
     dispatch(
       CreateProjectService(
         `${import.meta.env.VITE_API_URL}/projects?org_id=${projectDetails.organisation_id}`,

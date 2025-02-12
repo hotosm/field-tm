@@ -41,7 +41,6 @@ export interface ProjectData {
 	status: number;
 	hashtags: string[];
 	tasks: ProjectTask[];
-	new_geom_type: NewGeomTypes;
 	geo_restrict_distance_meters: number;
 	geo_restrict_force_error: boolean;
 }

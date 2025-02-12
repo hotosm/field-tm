@@ -6,24 +6,27 @@ import { ClusterLayer } from '@/components/MapComponent/OpenLayersComponent/Laye
 import CoreModules from '@/shared/CoreModules';
 import { geojsonObjectModel, geojsonObjectModelType } from '@/constants/geojsonObjectModal';
 import { defaultStyles } from '@/components/MapComponent/OpenLayersComponent/helpers/styleUtils';
-import MarkerIcon from '@/assets/images/red_marker.png';
+import MarkerIcon from '@/assets/images/map-pin-primary.png';
 import { useNavigate } from 'react-router-dom';
 import { Style, Text, Icon, Fill } from 'ol/style';
 import { projectType } from '@/models/home/homeModel';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 
-const getIndividualStyle = (featureProperty) => {
+const getIndividualClusterPointStyle = (featureProperty) => {
   const style = new Style({
     image: new Icon({
+      anchor: [0.5, 1],
+      scale: 1.1,
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
       src: MarkerIcon,
-      scale: 0.08,
     }),
     text: new Text({
       text: featureProperty?.project_id,
       fill: new Fill({
         color: 'black',
       }),
-      offsetY: 35,
+      offsetY: 42,
       font: '20px Times New Roman',
     }),
   });
@@ -93,7 +96,7 @@ const ProjectListMap = () => {
                 opacity: 90,
               }}
               mapOnClick={projectClickOnMap}
-              getIndividualStyle={getIndividualStyle}
+              getIndividualStyle={getIndividualClusterPointStyle}
             />
           )}
         </MapComponent>

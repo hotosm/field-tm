@@ -1,9 +1,9 @@
 import { Fill, Icon, Stroke, Style } from 'ol/style';
+import { asArray, asString } from 'ol/color';
 import { getCenter } from 'ol/extent';
 import { Point } from 'ol/geom';
 import AssetModules from '@/shared/AssetModules';
-import { entity_state } from '@/types/enums';
-import { EntityOsmMap } from '@/store/types/IProject';
+import { GeoGeomTypesEnum } from '@/types/enums';
 
 function createPolygonStyle(fillColor: string, strokeColor: string) {
   return new Style({
@@ -18,20 +18,40 @@ function createPolygonStyle(fillColor: string, strokeColor: string) {
   });
 }
 
-function createIconStyle(iconSrc: string) {
+function createFeaturePolygonStyle(color: string, strokeOpacity: number = 1) {
+  return new Style({
+    stroke: new Stroke({
+      color: 'rgb(0,0,0,0.5)',
+      width: 1,
+      opacity: strokeOpacity,
+    }),
+    fill: new Fill({
+      color: color,
+    }),
+  });
+}
+
+function createIconStyle(iconSrc: string, scale: number = 0.8, color: any = 'red') {
   return new Style({
     image: new Icon({
       anchor: [0.5, 1],
-      scale: 0.8,
+      scale: scale,
       anchorXUnits: 'fraction',
       anchorYUnits: 'pixels',
       src: iconSrc,
+      color: color,
+      opacity: 1,
     }),
     geometry: function (feature) {
       const polygonCentroid = getCenter(feature.getGeometry().getExtent());
       return new Point(polygonCentroid);
     },
   });
+}
+
+function updateRbgAlpha(colorString: string, alphaVal: number) {
+  const val = asArray(colorString);
+  return `rgb(${val.slice(0, 3).join(',')},${alphaVal})`;
 }
 
 const strokeColor = 'rgb(0,0,0,0.3)';
@@ -88,61 +108,50 @@ const getTaskStatusStyle = (feature: Record<string, any>, mapTheme: Record<strin
   return geojsonStyles[status];
 };
 
-export const getFeatureStatusStyle = (osmId: string, mapTheme: Record<string, any>, entityOsmMap: EntityOsmMap[]) => {
-  const entity = entityOsmMap?.find((entity) => entity?.osm_id === osmId) as EntityOsmMap;
+export const getFeatureStatusStyle = (geomType: string, mapTheme: Record<string, any>, mappingStatus: string) => {
+  let geojsonStyles;
 
-  let status = entity_state[entity?.status];
+  if (geomType === GeoGeomTypesEnum.POINT) {
+    geojsonStyles = {
+      READY: createIconStyle(
+        AssetModules.MapPinGrey,
+        1.1,
+        updateRbgAlpha(mapTheme.palette.entityStatusColors.ready, 1),
+      ),
+      OPENED_IN_ODK: createIconStyle(
+        AssetModules.MapPinGrey,
+        1.1,
+        updateRbgAlpha(mapTheme.palette.entityStatusColors.opened_in_odk, 1),
+      ),
+      SURVEY_SUBMITTED: createIconStyle(
+        AssetModules.MapPinGrey,
+        1.1,
+        updateRbgAlpha(mapTheme.palette.entityStatusColors.survey_submitted, 1),
+      ),
+      MARKED_BAD: createIconStyle(
+        AssetModules.MapPinGrey,
+        1.1,
+        updateRbgAlpha(mapTheme.palette.entityStatusColors.marked_bad, 1),
+      ),
+      VALIDATED: createIconStyle(
+        AssetModules.MapPinGrey,
+        1.1,
+        updateRbgAlpha(mapTheme.palette.entityStatusColors.validated, 1),
+      ),
+    };
+  } else if (geomType === GeoGeomTypesEnum.POLYGON) {
+    geojsonStyles = {
+      READY: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.ready, 0.2),
+      OPENED_IN_ODK: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.opened_in_odk, 0.2),
+      SURVEY_SUBMITTED: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.survey_submitted),
+      MARKED_BAD: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.marked_bad),
+      VALIDATED: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.validated),
+    };
+  } else if (geomType === GeoGeomTypesEnum.LINESTRING) {
+    console.log('linestring style not set');
+  }
 
-  const borderStrokeColor = 'rgb(0,0,0,0.5)';
-
-  const strokeStyle = new Stroke({
-    color: borderStrokeColor,
-    width: 1,
-    opacity: 0.2,
-  });
-
-  const geojsonStyles = {
-    READY: new Style({
-      stroke: strokeStyle,
-      fill: new Fill({
-        color: mapTheme.palette.entityStatusColors.ready,
-      }),
-    }),
-    OPENED_IN_ODK: new Style({
-      stroke: strokeStyle,
-      fill: new Fill({
-        color: mapTheme.palette.entityStatusColors.opened_in_odk,
-      }),
-    }),
-    SURVEY_SUBMITTED: new Style({
-      stroke: new Stroke({
-        color: borderStrokeColor,
-        width: 1,
-      }),
-      fill: new Fill({
-        color: mapTheme.palette.entityStatusColors.survey_submitted,
-      }),
-    }),
-    MARKED_BAD: new Style({
-      stroke: new Stroke({
-        color: borderStrokeColor,
-        width: 1,
-      }),
-      fill: new Fill({
-        color: mapTheme.palette.entityStatusColors.marked_bad,
-      }),
-    }),
-    VALIDATED: new Style({
-      stroke: new Stroke({
-        color: borderStrokeColor,
-        width: 1,
-      }),
-      fill: new Fill({
-        color: mapTheme.palette.entityStatusColors.validated,
-      }),
-    }),
-  };
-  return geojsonStyles[status];
+  return geojsonStyles[mappingStatus];
 };
 
 export default getTaskStatusStyle;

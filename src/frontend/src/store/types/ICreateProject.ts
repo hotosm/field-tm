@@ -38,7 +38,6 @@ export type CreateProjectStateTypes = {
   descriptionToFocus: string | null;
   task_num_buildings: number | null;
   task_split_dimension: number | null;
-  new_geom_type: NewGeomTypes;
 };
 export type ValidateCustomFormResponse = {
   detail: { message: string; possible_reason: string };
@@ -111,7 +110,6 @@ export type ProjectDetailsTypes = {
   hasCustomTMS: boolean;
   customFormUpload: any;
   hasAdditionalFeature: boolean;
-  new_geom_type: NewGeomTypes;
   project_admins: number[];
 };
 
