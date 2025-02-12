@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
+import { Style, Stroke } from 'ol/style';
 import WindowDimension from '@/hooks/WindowDimension';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
 import { ProjectById, GetEntityStatusList, GetGeometryLog, SyncTaskState } from '@/api/Project';
@@ -35,8 +36,9 @@ import Comments from '@/components/ProjectDetailsV2/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
 import Instructions from '@/components/ProjectDetailsV2/Instructions';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
-import { Style, Stroke } from 'ol/style';
 import MapStyles from '@/hooks/MapStyles';
+import { EntityOsmMap } from '@/store/types/IProject';
+import { entity_state } from '@/types/enums';
 
 const ProjectDetailsV2 = () => {
   useDocumentTitle('Project Details');
@@ -517,7 +519,12 @@ const ProjectDetailsV2 = () => {
                   fgbUrl={dataExtractUrl}
                   fgbExtent={dataExtractExtent}
                   getTaskStatusStyle={(feature) => {
-                    return getFeatureStatusStyle(feature?.getProperties()?.osm_id, mapTheme, entityOsmMap);
+                    const geomType = feature.getGeometry().getType();
+                    const entity = entityOsmMap?.find(
+                      (entity) => entity?.osm_id === feature?.getProperties()?.osm_id,
+                    ) as EntityOsmMap;
+                    const status = entity_state[entity?.status];
+                    return getFeatureStatusStyle(geomType, mapTheme, status);
                   }}
                   viewProperties={{
                     size: map?.getSize(),

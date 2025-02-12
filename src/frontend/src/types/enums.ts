@@ -45,6 +45,12 @@ export type NewGeomTypes = {
   LINESTRING: 'LINESTRING';
 };
 
+export enum GeoGeomTypesEnum {
+  POINT = 'Point',
+  POLYGON = 'Polygon',
+  LINESTRING = 'LineString',
+}
+
 export enum submission_status {
   null = 'Received',
   hasIssues = 'Has issues',

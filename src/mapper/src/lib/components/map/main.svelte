@@ -23,11 +23,16 @@
 	import { polygon } from '@turf/helpers';
 	import { buffer } from '@turf/buffer';
 	import { bbox } from '@turf/bbox';
-	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection, Feature } from 'geojson';
+	import type { Position, Geometry as GeoJSONGeometry, FeatureCollection } from 'geojson';
 	import { centroid } from '@turf/centroid';
 
 	import LocationArcImg from '$assets/images/locationArc.png';
 	import LocationDotImg from '$assets/images/locationDot.png';
+	import MapPinGrey from '$assets/images/map-pin-grey.png';
+	import MapPinRed from '$assets/images/map-pin-red.png';
+	import MapPinYellow from '$assets/images/map-pin-yellow.png';
+	import MapPinGreen from '$assets/images/map-pin-green.png';
+	import MapPinBlue from '$assets/images/map-pin-blue.png';
 	import BlackLockImg from '$assets/images/black-lock.png';
 	import RedLockImg from '$assets/images/red-lock.png';
 	import Arrow from '$assets/images/arrow.png';
@@ -146,9 +151,23 @@
 
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
+		let entityLayerName: string;
+		switch (drawGeomType) {
+			case NewGeomTypes.POINT:
+				entityLayerName = 'entity-point-layer';
+				break;
+			case NewGeomTypes.POLYGON:
+				entityLayerName = 'entity-polygon-layer';
+				break;
+			case NewGeomTypes.LINESTRING:
+				entityLayerName = 'entity-line-layer';
+				break;
+			default:
+				throw new Error(`Unsupported geometry type: ${drawGeomType}`);
+			}
 		// returns list of features of entity layer present on that clicked point
 		const clickedEntityFeature = map?.queryRenderedFeatures(e.point, {
-			layers: ['entity-fill-layer'],
+			layers: [entityLayerName],
 		});
 		// returns list of features of task layer present on that clicked point
 		const clickedTaskFeature = map?.queryRenderedFeatures(e.point, {
@@ -334,6 +353,11 @@
 		entitiesStore.setSelectedEntity(null);
 	}}
 	images={[
+		{ id: 'MAP_PIN_GREY', url: MapPinGrey },
+		{ id: 'MAP_PIN_RED', url: MapPinRed },
+		{ id: 'MAP_PIN_BLUE', url: MapPinBlue },
+		{ id: 'MAP_PIN_YELLOW', url: MapPinYellow },
+		{ id: 'MAP_PIN_GREEN', url: MapPinGreen },
 		{ id: 'LOCKED_FOR_MAPPING', url: BlackLockImg },
 		{ id: 'LOCKED_FOR_VALIDATION', url: RedLockImg },
 		{ id: 'locationArc', url: LocationArcImg },
@@ -472,8 +496,9 @@
 		processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData)}
 		geojsonUpdateDependency={entitiesStore.entitiesStatusList}
 	>
+	{#if drawGeomType === NewGeomTypes.POLYGON}
 		<FillLayer
-			id="entity-fill-layer"
+			id="entity-polygon-layer"
 			paint={{
 				'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
 				'fill-color': [
@@ -518,6 +543,32 @@
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
+		{:else if drawGeomType === NewGeomTypes.POINT}
+		<SymbolLayer
+			id="entity-point-layer"
+			applyToClusters={false}
+			hoverCursor="pointer"
+			manageHoverState
+			layout={{
+				'icon-image': [
+					'match',
+					['get', 'status'],
+					'READY',
+					'MAP_PIN_GREY',
+					'OPENED_IN_ODK',
+					'MAP_PIN_YELLOW',
+					'SURVEY_SUBMITTED',
+					'MAP_PIN_GREEN',
+					'VALIDATED',
+					'MAP_PIN_BLUE',
+					'MARKED_BAD',
+					'MAP_PIN_RED',
+					'#c5fbf5', // default color if no match is found
+				],
+				'icon-allow-overlap': true,
+			}}
+		/>
+		{/if}
 	</FlatGeobuf>
 	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
 		<FillLayer

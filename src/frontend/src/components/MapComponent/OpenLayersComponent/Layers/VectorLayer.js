@@ -437,32 +437,4 @@ const VectorLayer = ({
   return null;
 };
 
-// TODO replace with typescript
-// VectorLayer.propTypes = {
-//   // Ensure either geojson or fgbUrl is provided
-//   geojson: (props, propName, componentName) => {
-//     if (!props.geojson && !props.fgbUrl) {
-//       return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
-//     }
-//     if (props.geojson && props.fgbUrl) {
-//       return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
-//     }
-//   },
-//   fgbUrl: (props, propName, componentName) => {
-//     if (!props.geojson && !props.fgbUrl) {
-//       return new Error(`One of 'geojson' or 'fgbUrl' is required in '${componentName}'`);
-//     }
-//     if (props.geojson && props.fgbUrl) {
-//       return new Error(`Only one of 'geojson' or 'fgbUrl' should be provided in '${componentName}'`);
-//     }
-//   },
-//   fgbExtent: PropTypes.object,
-//   style: PropTypes.object,
-//   zIndex: PropTypes.number,
-//   zoomToLayer: PropTypes.bool,
-//   viewProperties: PropTypes.object,
-//   mapOnClick: PropTypes.func,
-//   onModify: PropTypes.func,
-// };
-
 export default VectorLayer;

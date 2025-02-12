@@ -264,8 +264,8 @@ async def get_or_set_data_extract_url(
         str: URL to fgb file in S3.
     """
     project_id = db_project.id
-    # If url, get extract
-    # If not url, get new extract / set in db
+    # If url passed, get extract
+    # If no url passed, get new extract / set in db
     if not url:
         existing_url = db_project.data_extract_url
 
