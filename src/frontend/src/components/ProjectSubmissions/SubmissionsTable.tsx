@@ -25,7 +25,11 @@ import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
 import { CreateTaskEvent } from '@/api/TaskEvent';
 import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
-import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
+import {
+  downloadSubmissionGeojson,
+  SubmissionFormFieldsService,
+  SubmissionTableService,
+} from '@/api/SubmissionService';
 
 import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
@@ -59,6 +63,7 @@ const SubmissionsTable = ({ toggleView }) => {
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
+  const downloadSubmissionGeojsonLoading = useAppSelector((state) => state.submission.DownloadSubmissionGeojsonLoading);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const updateTaskStatusLoading = useAppSelector((state) => state.common.loading);
 
@@ -81,6 +86,20 @@ const SubmissionsTable = ({ toggleView }) => {
       ? new Date(initialFilterState.submitted_date_range.split(',')[1])
       : null,
   });
+
+  const submissionDownloadTypes: { type: 'csv' | 'json' | 'geojson'; label: string; loading: boolean }[] = [
+    {
+      type: 'csv',
+      label: 'Download as Csv',
+      loading: downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading,
+    },
+    {
+      type: 'json',
+      label: 'Download as Json',
+      loading: downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading,
+    },
+    { type: 'geojson', label: 'Download as GeoJson', loading: downloadSubmissionGeojsonLoading },
+  ];
 
   useEffect(() => {
     if (!dateRange.start || !dateRange.end) return;
@@ -209,14 +228,24 @@ const SubmissionsTable = ({ toggleView }) => {
     );
   };
 
-  const handleDownload = (downloadType: 'csv' | 'json') => {
-    dispatch(
-      getDownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectInfo.name!, {
-        project_id: projectId,
-        submitted_date_range: filter?.submitted_date_range,
-        export_json: downloadType === 'json',
-      }),
-    );
+  const handleDownload = (downloadType: 'csv' | 'json' | 'geojson') => {
+    if (downloadType === 'geojson') {
+      dispatch(
+        downloadSubmissionGeojson(
+          `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson`,
+          projectInfo.name!,
+          { project_id: projectId, submitted_date_range: filter?.submitted_date_range },
+        ),
+      );
+    } else {
+      dispatch(
+        getDownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectInfo.name!, {
+          project_id: projectId,
+          submitted_date_range: filter?.submitted_date_range,
+          export_json: downloadType === 'json',
+        }),
+      );
+    }
   };
 
   const handleTaskMap = async () => {
@@ -364,28 +393,20 @@ const SubmissionsTable = ({ toggleView }) => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="fmtm-z-[5000] fmtm-bg-white">
-                <DropdownMenuItem
-                  disabled={downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading}
-                  onSelect={() => handleDownload('csv')}
-                >
-                  <div className="fmtm-flex fmtm-gap-2 fmtm-items-center">
-                    <p className="fmtm-text-base">Download as Csv</p>
-                    {downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading && (
-                      <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
-                    )}
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => handleDownload('json')}
-                  disabled={downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading}
-                >
-                  <div className="fmtm-flex fmtm-gap-2 fmtm-items-center">
-                    <p className="fmtm-text-base">Download as Json</p>
-                    {downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading && (
-                      <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
-                    )}
-                  </div>{' '}
-                </DropdownMenuItem>
+                {submissionDownloadTypes?.map((submissionDownload) => (
+                  <DropdownMenuItem
+                    key={submissionDownload.type}
+                    disabled={submissionDownload.loading}
+                    onSelect={() => handleDownload(submissionDownload.type)}
+                  >
+                    <div className="fmtm-flex fmtm-gap-2 fmtm-items-center">
+                      <p className="fmtm-text-base">{submissionDownload.label}</p>
+                      {submissionDownload.loading && (
+                        <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-primaryRed" />
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
             <button

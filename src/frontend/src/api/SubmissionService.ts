@@ -151,3 +151,35 @@ export const DeleteGeometry = (url: string) => {
     await deleteGeometry();
   };
 };
+
+export const downloadSubmissionGeojson = (
+  url: string,
+  projectName: string,
+  params: { project_id: string; submitted_date_range: string | null },
+) => {
+  return async (dispatch: AppDispatch) => {
+    dispatch(SubmissionActions.DownloadSubmissionGeojsonLoading(true));
+
+    const getProjectSubmission = async (url: string) => {
+      try {
+        const response = await CoreModules.axios.get(url, { params, responseType: 'blob' });
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = `${projectName}.geojson`;
+        a.click();
+      } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: JSON.parse(await error.response.data.text())?.detail || 'Something went wrong',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
+      } finally {
+        dispatch(SubmissionActions.DownloadSubmissionGeojsonLoading(false));
+      }
+    };
+    await getProjectSubmission(url);
+  };
+};
