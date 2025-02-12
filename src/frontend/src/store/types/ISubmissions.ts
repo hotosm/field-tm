@@ -20,6 +20,7 @@ export type SubmissionStateTypes = {
   mappedVsValidatedTaskLoading: boolean;
   submissionPhotos: string[];
   submissionPhotosLoading: boolean;
+  DownloadSubmissionGeojsonLoading: boolean;
 };
 
 type updateReviewStatusModal = {

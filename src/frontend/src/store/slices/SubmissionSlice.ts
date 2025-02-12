@@ -40,6 +40,7 @@ const initialState: SubmissionStateTypes = {
   mappedVsValidatedTaskLoading: false,
   submissionPhotos: [],
   submissionPhotosLoading: false,
+  DownloadSubmissionGeojsonLoading: false,
 };
 
 const SubmissionSlice = createSlice({
@@ -119,6 +120,9 @@ const SubmissionSlice = createSlice({
     },
     SetSubmissionPhotosLoading(state, action: PayloadAction<boolean>) {
       state.submissionPhotosLoading = action.payload;
+    },
+    DownloadSubmissionGeojsonLoading(state, action: PayloadAction<boolean>) {
+      state.DownloadSubmissionGeojsonLoading = action.payload;
     },
   },
 });
