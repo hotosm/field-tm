@@ -447,6 +447,14 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
         );
       } catch (error) {
         dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
+        dispatch(
+          CommonActions.SetSnackBar({
+            open: true,
+            message: 'Failed. Do you have permission to edit?',
+            variant: 'error',
+            duration: 2000,
+          }),
+        );
       } finally {
         dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
       }
