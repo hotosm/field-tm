@@ -188,17 +188,6 @@ async def delete_odk_project(
         return "Could not delete project from central odk"
 
 
-def delete_odk_app_user(
-    project_id: int,
-    name: str,
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-):
-    """Delete an app-user from a remote ODK Server."""
-    odk_app_user = get_odk_app_user(odk_central)
-    result = odk_app_user.delete(project_id, name)
-    return result
-
-
 def create_odk_xform(
     odk_id: int,
     xform_data: BytesIO,
@@ -223,50 +212,6 @@ def create_odk_xform(
         ) from e
 
     xform.createForm(odk_id, xform_data, publish=True)
-
-
-def delete_odk_xform(
-    project_id: int,
-    xform_id: str,
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-):
-    """Delete an XForm from a remote ODK Central server."""
-    xform = get_odk_form(odk_central)
-    result = xform.deleteForm(project_id, xform_id)
-    # FIXME: make sure it's a valid project id
-    return result
-
-
-def list_odk_xforms(
-    project_id: int,
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-    metadata: bool = False,
-):
-    """List all XForms in an ODK Central project."""
-    project = get_odk_project(odk_central)
-    xforms = project.listForms(project_id, metadata)
-    # FIXME: make sure it's a valid project id
-    return xforms
-
-
-def get_form_full_details(
-    odk_project_id: int,
-    form_id: str,
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-):
-    """Get additional metadata for ODK Form."""
-    form = get_odk_form(odk_central)
-    form_details = form.getFullDetails(odk_project_id, form_id)
-    return form_details
-
-
-def get_odk_project_full_details(
-    odk_project_id: int, odk_central: central_schemas.ODKCentralDecrypted
-):
-    """Get additional metadata for ODK project."""
-    project = get_odk_project(odk_central)
-    project_details = project.getFullDetails(odk_project_id)
-    return project_details
 
 
 def list_submissions(
@@ -317,6 +262,14 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg
         ) from e
+
+
+def get_project_form_xml(
+    odk_creds: central_schemas.ODKCentralDecrypted, odkid: str, odk_form_id: str
+) -> str:
+    """Get the XForm from ODK Central as raw XML."""
+    xform = get_odk_form(odk_creds)
+    return xform.getXml(odkid, odk_form_id)
 
 
 async def append_fields_to_user_xlsform(
@@ -867,28 +820,6 @@ async def update_entity_mapping_status(
             },
         )
     return entity_to_flat_dict(entity, odk_id, entity_uuid, dataset_name)
-
-
-def upload_media(
-    project_id: int,
-    xform_id: str,
-    filespec: str,
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-):
-    """Upload a data file to Central."""
-    xform = get_odk_form(odk_central)
-    xform.uploadMedia(project_id, xform_id, filespec)
-
-
-def download_media(
-    project_id: int,
-    xform_id: str,
-    filename: str = "test",
-    odk_central: Optional[central_schemas.ODKCentralDecrypted] = None,
-):
-    """Upload a data file to Central."""
-    xform = get_odk_form(odk_central)
-    xform.getMedia(project_id, xform_id, filename)
 
 
 # FIXME replace osm_fieldwork.CSVDump with osm_fieldwork.ODKParsers
