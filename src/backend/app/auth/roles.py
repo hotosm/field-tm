@@ -279,7 +279,7 @@ async def wrap_check_access(
     if not db_user:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN,
-            detail="User do not have permission to access the project.",
+            detail="User does not have permission to access the project.",
         )
 
     return {
