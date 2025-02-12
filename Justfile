@@ -23,6 +23,7 @@ mod stop 'contrib/just/stop/Justfile'
 mod build 'contrib/just/build/Justfile'
 mod test 'contrib/just/test/Justfile'
 mod dotenv 'contrib/just/dotenv/Justfile'
+mod stats 'contrib/just/stats/Justfile'
 
 # Run the help script
 default:
