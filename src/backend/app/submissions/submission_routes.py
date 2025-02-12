@@ -23,11 +23,12 @@ from io import BytesIO
 from typing import Annotated, Optional
 
 import geojson
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
 from loguru import logger as log
 from psycopg import Connection
 from psycopg.rows import class_row
+from pyodk._endpoints.submissions import Submission as CentralSubmissionOut
 
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import mapper, project_contributors, project_manager
@@ -37,7 +38,7 @@ from app.db.database import db_conn
 from app.db.enums import HTTPStatus
 from app.db.models import DbBackgroundTask, DbSubmissionPhoto, DbTask
 from app.projects import project_crud, project_schemas
-from app.submissions import submission_crud, submission_schemas
+from app.submissions import submission_crud, submission_deps, submission_schemas
 from app.tasks.task_deps import get_task
 
 router = APIRouter(
@@ -59,6 +60,39 @@ async def read_submissions(
     project = project_user.get("project")
     data = await submission_crud.get_submission_by_project(project, {})
     return data.get("value", [])
+
+
+@router.post("", response_model=CentralSubmissionOut)
+async def create_submission(
+    project_user: Annotated[ProjectUserDict, Depends(mapper)],
+    submission_xml: Annotated[str, Body(embed=True)],
+    device_id: Annotated[Optional[str], Body(embed=True)] = None,
+    submission_attachments: Annotated[
+        Optional[dict[str, BytesIO]], Depends(submission_deps.read_submission_uploads)
+    ] = None,
+):
+    """Create a new submission via ODK Central REST endpoint.
+
+    Typically it would be best to use the OpenRosa submission endpoint,
+    as used by ODK Collect.
+
+    However, for now ODK Web Forms do not have direct ODK Central access
+    configured. Meaning we must handle getting forms and submitting new
+    data to ODK Central within FMTM.
+
+    This endpoint helps to facilitate, by allowing submission, alongside
+    any form attachments, via the ODK Central REST API (via pyodk),
+    """
+    project = project_user.get("project")
+
+    return await submission_crud.create_new_submission(
+        project.odk_credentials,
+        project.odkid,
+        project.odk_form_id,
+        submission_xml,
+        device_id,
+        submission_attachments,
+    )
 
 
 @router.get("/download")
@@ -237,24 +271,7 @@ async def get_submission_count(
 #     return Response(content=osmoutfile_data, media_type="application/xml")
 
 
-@router.get("/submission_page")
-async def get_submission_page(
-    project_user: Annotated[ProjectUserDict, Depends(mapper)],
-    days: int,
-    planned_task: Optional[int] = None,
-):
-    """Summary submissison details for submission page.
-
-    Returns:
-        dict: A dictionary containing the submission counts for each date.
-    """
-    project = project_user.get("project")
-    data = await submission_crud.get_submissions_by_date(project, days, planned_task)
-
-    return data
-
-
-@router.get("/submission_form_fields")
+@router.get("/submission-form-fields")
 async def get_submission_form_fields(
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
 ):
@@ -543,7 +560,7 @@ async def submission_photo(
 @router.get(
     "/{project_id}/dashboard", response_model=submission_schemas.SubmissionDashboard
 )
-async def project_dashboard(
+async def project_submission_dashboard(
     project_user: Annotated[ProjectUserDict, Depends(mapper)],
     db: Annotated[Connection, Depends(db_conn)],
 ):

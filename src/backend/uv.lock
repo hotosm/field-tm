@@ -568,14 +568,14 @@ requires-dist = [
     { name = "httptools", specifier = "==0.6.4" },
     { name = "loguru", specifier = "==0.7.2" },
     { name = "minio", specifier = "==7.2.9" },
-    { name = "osm-fieldwork", specifier = "==0.18.2" },
+    { name = "osm-fieldwork", specifier = "==0.19.0" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "osm-rawdata", specifier = "==0.4.2" },
     { name = "psycopg", extras = ["pool"], specifier = ">=3.2.3" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=build%2Fpython-3.10" },
+    { name = "pyodk", git = "https://github.com/hotosm/pyodk?rev=master-modified" },
     { name = "pyproj", specifier = "==3.7.0" },
     { name = "python-multipart", specifier = "==0.0.12" },
     { name = "pyxform", specifier = "==2.1.1" },
@@ -1435,7 +1435,7 @@ wheels = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.18.2"
+version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1459,9 +1459,9 @@ dependencies = [
     { name = "shapely" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6e/46/8833f246ee8df7e8c6d4cda682a6d85ef4e8c2716b6787031cc6192d84e6/osm-fieldwork-0.18.2.tar.gz", hash = "sha256:7e2bae57f3a2eb88dd3f91a67f89fbc7fa29ae512bd5c212ba060dc3f0ee825e", size = 1485777 }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/34/30e88b54d440fc2be9adc44920390edfb0ef7a4c4a07018cedc7618a28bb/osm-fieldwork-0.19.0.tar.gz", hash = "sha256:f7bb2fd2e4b1a87470314cd26ae94c6bca41abb44b3e2bae78f52429e0b34926", size = 1485906 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/2d/f9c1bfa56f0ba4a22434c2cdab2ab70e2309368f2921d6218a7ed2a54073/osm_fieldwork-0.18.2-py3-none-any.whl", hash = "sha256:469d210f78b1d391ec5c8ddcbd751365c68beb03424334d5159192464f0744c7", size = 1511940 },
+    { url = "https://files.pythonhosted.org/packages/89/2f/b2e98810f0020f49bad89734811a2ae553338bcb25a58f676a8c9899c0f8/osm_fieldwork-0.19.0-py3-none-any.whl", hash = "sha256:c875779ec448aecabaa5ec43c637ab40dd3206026644d59eb16b1f4f9b6058f9", size = 1512013 },
 ]
 
 [[package]]
@@ -1730,6 +1730,8 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/39/1b/d0b013bf7d1af7cf0a6a4fce13f5fe5813ab225313755367b36e714a63f8/pycryptodome-3.21.0-cp36-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:18caa8cfbc676eaaf28613637a89980ad2fd96e00c564135bf90bc3f0b34dd93", size = 2254397 },
     { url = "https://files.pythonhosted.org/packages/14/71/4cbd3870d3e926c34706f705d6793159ac49d9a213e3ababcdade5864663/pycryptodome-3.21.0-cp36-abi3-win32.whl", hash = "sha256:280b67d20e33bb63171d55b1067f61fbd932e0b1ad976b3a184303a3dad22764", size = 1775641 },
     { url = "https://files.pythonhosted.org/packages/43/1d/81d59d228381576b92ecede5cd7239762c14001a828bdba30d64896e9778/pycryptodome-3.21.0-cp36-abi3-win_amd64.whl", hash = "sha256:b7aa25fc0baa5b1d95b7633af4f5f1838467f1815442b22487426f94e0d66c53", size = 1812863 },
+    { url = "https://files.pythonhosted.org/packages/25/b3/09ff7072e6d96c9939c24cf51d3c389d7c345bf675420355c22402f71b68/pycryptodome-3.21.0-pp27-pypy_73-manylinux2010_x86_64.whl", hash = "sha256:2cb635b67011bc147c257e61ce864879ffe6d03342dc74b6045059dfbdedafca", size = 1691593 },
+    { url = "https://files.pythonhosted.org/packages/a8/91/38e43628148f68ba9b68dedbc323cf409e537fd11264031961fd7c744034/pycryptodome-3.21.0-pp27-pypy_73-win32.whl", hash = "sha256:4c26a2f0dc15f81ea3afa3b0c87b87e501f235d332b7f27e2225ecb80c0b1cdd", size = 1765997 },
 ]
 
 [[package]]
@@ -1856,7 +1858,7 @@ wheels = [
 [[package]]
 name = "pyodk"
 version = "1.1.0"
-source = { git = "https://github.com/hotosm/pyodk?rev=build%2Fpython-3.10#d9a557484887c3f099bc808b01d2f90937f2e997" }
+source = { git = "https://github.com/hotosm/pyodk?rev=master-modified#888c16efe357bd33e539b4ddc6a9671dbf2d0684" }
 dependencies = [
     { name = "pydantic" },
     { name = "requests" },

@@ -20,24 +20,26 @@
 import io
 import json
 import uuid
-from collections import Counter
-from datetime import datetime, timedelta
 from io import BytesIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Optional
 
 from fastapi import HTTPException, Response
 from loguru import logger as log
 from psycopg import Connection
 from psycopg.rows import class_row
+from pyodk._utils.config import CentralConfig
+from pyodk.client import Client
 
 # from osm_fieldwork.json2osm import json2osm
+from app.central import central_schemas
 from app.central.central_crud import (
     get_odk_form,
 )
 from app.config import settings
 from app.db.enums import BackgroundTaskStatus, HTTPStatus
 from app.db.models import DbBackgroundTask, DbProject, DbSubmissionPhoto
-from app.db.postgis_utils import timestamp
 from app.projects import project_crud, project_deps, project_schemas
 from app.s3 import add_obj_to_bucket
 
@@ -142,60 +144,6 @@ async def get_submission_count_of_a_project(project: DbProject):
     return len(data["value"])
 
 
-async def get_submissions_by_date(
-    project: DbProject,
-    days: int,
-    planned_task: Optional[int] = None,
-):
-    """Get submissions by date.
-
-    Fetches the submissions for a given project within a specified number of days.
-
-    Args:
-        project (DbProject): The database project object.
-        days (int): The number of days to consider for fetching submissions.
-        planned_task (int): Associated task id.
-
-    Returns:
-        dict: A dictionary containing the submission counts for each date.
-
-    Examples:
-        # Fetch submissions for project with ID 1 within the last 7 days
-        submissions = await get_submissions_by_date(1, 7)
-    """
-    data = await get_submission_by_project(project, {})
-
-    end_dates = [
-        datetime.fromisoformat(entry["end"].split("+")[0])
-        for entry in data["value"]
-        if entry.get("end")
-    ]
-
-    dates = [
-        date.strftime("%m/%d")
-        for date in end_dates
-        if timestamp() - date <= timedelta(days=days)
-    ]
-
-    submission_counts = Counter(sorted(dates))
-
-    response = [
-        {"date": key, "count": value} for key, value in submission_counts.items()
-    ]
-    if planned_task:
-        count_dict = {}
-        cummulative_count = 0
-        for date, count in submission_counts.items():
-            cummulative_count += count
-            count_dict[date] = cummulative_count
-        response = [
-            {"date": key, "count": count_dict[key], "planned": planned_task}
-            for key, value in submission_counts.items()
-        ]
-
-    return response
-
-
 async def get_submission_by_project(
     project: DbProject,
     filters: dict,
@@ -248,6 +196,42 @@ async def get_submission_detail(
 
     submission = json.loads(project_submissions)
     return submission.get("value", [])[0]
+
+
+async def create_new_submission(
+    odk_credentials: central_schemas.ODKCentralDecrypted,
+    odk_project_id: int,
+    odk_form_id: uuid.UUID,
+    submission_xml: str,
+    device_id: Optional[str] = None,
+    submission_attachments: Optional[dict[str, BytesIO]] = None,
+):
+    """Create a new submission in ODK Central, using pyodk REST endpoint."""
+    submission_attachments = submission_attachments or {}  # Ensure always a dict
+    attachment_filepaths = []
+
+    # Write all uploaded data to temp files for upload (required by PyODK)
+    # We must use TemporaryDir and preserve the uploaded file names
+    with TemporaryDirectory() as temp_dir:
+        for file_name, file_data in submission_attachments.items():
+            temp_path = Path(temp_dir) / file_name
+            with open(temp_path, "wb") as temp_file:
+                temp_file.write(file_data.getvalue())
+            attachment_filepaths.append(temp_path)
+
+        pyodk_config = CentralConfig(
+            base_url=odk_credentials.odk_central_url,
+            username=odk_credentials.odk_central_user,
+            password=odk_credentials.odk_central_password,
+        )
+        with Client(pyodk_config) as client:
+            return client.submissions.create(
+                project_id=odk_project_id,
+                form_id=odk_form_id,
+                xml=submission_xml,
+                device_id=device_id,
+                attachments=attachment_filepaths,
+            )
 
 
 async def upload_attachment_to_s3(
