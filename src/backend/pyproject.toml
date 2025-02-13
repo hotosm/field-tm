@@ -58,6 +58,7 @@ license = {text = "GPL-3.0-only"}
 dev = [
     "pre-commit>=4.0.1",
     "commitizen>=3.30.0",
+    "itrm>=1.4.15",
 ]
 test = [
     "pytest==8.3.3",
