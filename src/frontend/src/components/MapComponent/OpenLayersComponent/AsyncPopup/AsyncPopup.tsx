@@ -114,12 +114,16 @@ const AsyncPopup = ({
       }
       const { coordinate } = evt;
       const features = map.getFeaturesAtPixel(evt.pixel);
-
       if (features.length < 1) {
         closePopupFn();
         return;
       }
-      const featureProperties = features[0].getProperties();
+
+      // in the case of cluster-layer, the features are nested within features
+      const featureProperties = features[0]?.getProperties()?.features
+        ? features[0]?.getProperties()?.features[0]?.getProperties()
+        : features[0]?.getProperties();
+
       const { [primaryKey]: primaryKeyValue } = featureProperties;
       if (
         layerIds.includes(primaryKeyValue) ||

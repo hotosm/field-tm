@@ -1,7 +1,7 @@
 import { featureType, geojsonType } from '@/store/types/ISubmissions';
 
 // convert JavaRosa string to a GeoJson
-export const convertCoordinateStringToFeature = (coordinateString: string) => {
+export const convertCoordinateStringToFeature = (key: string, coordinateString: string) => {
   let feature: featureType = {
     type: 'Feature',
     geometry: {},
@@ -20,12 +20,12 @@ export const convertCoordinateStringToFeature = (coordinateString: string) => {
         });
       return [coordinate[1], coordinate[0]];
     });
-    feature = { ...feature, geometry: { type: 'Polygon', coordinates: [coordinates] } };
+    feature = { ...feature, geometry: { type: 'Polygon', coordinates: [coordinates] }, properties: { label: key } };
   } else {
     // if feature is Point in JavaRosa format it contains string of array
     const splittedCoord = coordinateString?.split(' ');
     let coordinates = [+splittedCoord[1], +splittedCoord[0]];
-    feature = { ...feature, geometry: { type: 'Point', coordinates: coordinates } };
+    feature = { ...feature, geometry: { type: 'Point', coordinates: coordinates }, properties: { label: key } };
   }
   return feature;
 };
@@ -54,12 +54,18 @@ export function extractGeojsonFromObject(data: Record<string, any>) {
           if (feature?.type === 'Point') {
             clusterLayerGeojson = {
               ...clusterLayerGeojson,
-              features: [...clusterLayerGeojson.features, { type: 'Feature', geometry: feature, properties: {} }],
+              features: [
+                ...clusterLayerGeojson.features,
+                { type: 'Feature', geometry: feature, properties: { label: key } },
+              ],
             };
           } else {
             vectorLayerGeojson = {
               ...vectorLayerGeojson,
-              features: [...vectorLayerGeojson.features, { type: 'Feature', geometry: value, properties: {} }],
+              features: [
+                ...vectorLayerGeojson.features,
+                { type: 'Feature', geometry: value, properties: { label: key } },
+              ],
             };
           }
         }
@@ -78,7 +84,7 @@ export function extractGeojsonFromObject(data: Record<string, any>) {
             ?.split(' ')
             ?.every((item) => !isNaN(+item))
         ) {
-          const convertedFeature = convertCoordinateStringToFeature(value);
+          const convertedFeature = convertCoordinateStringToFeature(key, value);
           vectorLayerGeojson = {
             ...vectorLayerGeojson,
             features: [...vectorLayerGeojson.features, convertedFeature],
@@ -92,7 +98,7 @@ export function extractGeojsonFromObject(data: Record<string, any>) {
           value?.split(' ')?.every((item) => !isNaN(+item)) &&
           value?.split(' ')?.length === 4
         ) {
-          const convertedFeature = convertCoordinateStringToFeature(value);
+          const convertedFeature = convertCoordinateStringToFeature(key, value);
           clusterLayerGeojson = {
             ...clusterLayerGeojson,
             features: [...clusterLayerGeojson.features, convertedFeature],

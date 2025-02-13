@@ -194,7 +194,7 @@ const SubmissionDetails = () => {
                       taskUid: taskUid,
                       entity_id: restSubmissionDetails?.feature,
                       label: restSubmissionDetails?.meta?.entity?.label,
-                      feature: convertCoordinateStringToFeature(restSubmissionDetails?.xlocation),
+                      feature: convertCoordinateStringToFeature('xlocation', restSubmissionDetails?.xlocation),
                     }),
                   );
                 }}

@@ -513,7 +513,7 @@ const SubmissionsTable = ({ toggleView }) => {
                             reviewState: row?.__system?.reviewState,
                             entity_id: row?.feature,
                             label: row?.meta?.entity?.label,
-                            feature: convertCoordinateStringToFeature(row?.xlocation),
+                            feature: convertCoordinateStringToFeature('xlocation', row?.xlocation),
                             taskUid: taskUid?.toString() || null,
                           }),
                         );
