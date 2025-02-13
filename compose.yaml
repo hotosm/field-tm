@@ -79,6 +79,7 @@ services:
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app
       - ./src/backend/tests:/opt/tests:ro
+      - ./src/backend/stats:/opt/stats:ro
       # - ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.12/site-packages/osm_fieldwork:ro
       # - ../osm-rawdata/osm_rawdata:/home/appuser/.local/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/home/appuser/.local/lib/python3.12/site-packages/fmtm_splitter:ro

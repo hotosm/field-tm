@@ -98,6 +98,7 @@ exclude = [
     ".ruff_cache",
     "__pypackages__",
     "app/__version__.py",
+    "stats",
 ]
 [tool.ruff.lint]
 select = ["I", "E", "W", "D", "B", "F", "N", "Q"]

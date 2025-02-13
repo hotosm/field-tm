@@ -16,10 +16,14 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+# Timeseries data about projects
+[no-cd]
+timeseries:
+  docker compose run --rm \
+    api python /opt/stats/timeseries.py
+
 # Get total feature mapped per project
 [no-cd]
 total-mapped:
   docker compose run --rm \
-    -v $PWD/scripts/misc/total_mapped.py:/opt/total_mapped.py \
-    -e API_URL=http://api:8000 \
-    api python /opt/total_mapped.py
+    api python /opt/stats/total_mapped.py

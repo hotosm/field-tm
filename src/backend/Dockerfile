@@ -133,6 +133,7 @@ WORKDIR /opt
 # Add app code
 COPY app/ /opt/app/
 COPY migrations/ /opt/migrations/
+COPY stats/ /opt/stats/
 # Add non-root user, permissions
 RUN useradd -u 1001 -m -c "fmtm account" -d /home/appuser -s /bin/false appuser \
     && mkdir -p /opt/logs \
