@@ -16,14 +16,34 @@
 #     along with FMTM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
+[no-cd]
+_run_stats_script script_name:
+  #!/usr/bin/env sh
+  cd {{justfile_directory()}}
+
+  # Note in Justfile syntax, using {{{{}} works as escape char for double curly braces
+  network=$(docker network ls --format '{{{{.Name}}' | grep '^fmtm-' | head -n 1)
+  if [ -z "$network" ]; then echo "No fmtm docker network found!" >&2; exit 1; fi
+  echo "Using network: $network"
+
+  # This works by running a debug API attached to the same network as prod containers
+  # it accesses the prod db and Central instance
+  # NOTE there must be a .env file present with the correct env vars
+  docker run --rm -d --name fmtm-stats \
+    --network "$network" \
+    -e DEBUG=True --env-file=./.env \
+    ghcr.io/hotosm/fmtm/backend:debug
+
+  docker exec fmtm-stats python /opt/stats/{{script_name}}
+
+  docker rm --force fmtm-stats
+
 # Timeseries data about projects
 [no-cd]
 timeseries:
-  docker compose run --rm \
-    api python /opt/stats/timeseries.py
+  just stats _run_stats_script timeseries.py
 
 # Get total feature mapped per project
 [no-cd]
 total-mapped:
-  docker compose run --rm \
-    api python /opt/stats/total_mapped.py
+  just stats _run_stats_script total_mapped.py

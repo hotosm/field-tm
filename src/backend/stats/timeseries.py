@@ -14,9 +14,9 @@ from pydantic import AwareDatetime, BaseModel
 
 # Access from the same machine: http://localhost:7052
 # Access from the docker container: http://localhost:8000
-# But we access from another container on same container network
-API_BASE_URL = os.getenv("API_URL", "http://api:8000")
-START_YEAR = os.getenv("START_YEAR", 2024)
+# Access from another container on same docker network: http://api:8000
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000")
+START_YEAR: int = int(os.getenv("START_YEAR", 2024))
 
 
 class ProjectDetails(BaseModel):
@@ -100,7 +100,7 @@ async def process_projects(projects: list[ProjectDetails]):
     print(f"Active projects in last year: {active_past_year}\n")
     print(f"Active projects in last month: {active_past_month}\n")
     print(f"Active projects in last week: {active_past_week}\n")
-    print(f"Average number of new projects per month: {project_monthly_average:.2f}\n")
+    print(f"Average number of new projects per month this year so far: {project_monthly_average:.2f}\n")
 
     # Bar chart: Total projects per month in the current year
     print("Total project per month this year:")
@@ -119,7 +119,7 @@ async def process_projects(projects: list[ProjectDetails]):
     )
     # Interpolation: Smooth y-values (projects over time)
     y_smooth = np.interp(x_smooth, project_dates, project_count_over_time)
-    print("Total project per month since START_YEAR:")
+    print(f"Total project per month since {START_YEAR}:")
     itrm.plot(x_smooth, y_smooth, "Projects Over Time")
     print()
 
