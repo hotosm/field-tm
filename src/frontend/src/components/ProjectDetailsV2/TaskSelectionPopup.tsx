@@ -97,7 +97,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
           <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
           <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_state}</p>
           {selectedTask?.actioned_by_username && (
-            <p className="fmtm-text-base fmtm-text-[#757575]">Locked By: {selectedTask?.actioned_by_username}</p>
+            <p className="fmtm-text-base fmtm-text-[#757575]">Actioned By: {selectedTask?.actioned_by_username}</p>
           )}
         </div>
         {/* only display qr code component render inside taskPopup on mobile screen */}
