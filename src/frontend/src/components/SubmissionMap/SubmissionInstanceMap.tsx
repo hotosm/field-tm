@@ -12,6 +12,7 @@ import { hexToRgba } from '@/components/MapComponent/OpenLayersComponent/helpers
 import { Fill } from 'ol/style';
 import { geojsonType } from '@/store/types/ISubmissions';
 import MapControlComponent from '@/components/SubmissionMap/MapControlComponent';
+import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 
 type submissionInstanceMapPropType = {
   featureGeojson: { vectorLayerGeojson: geojsonType; clusterLayerGeojson: geojsonType };
@@ -38,7 +39,7 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
   const { mapRef, map }: { mapRef: any; map: any } = useOLMap({
     center: [0, 0],
     zoom: 4,
-    maxZoom: 25,
+    maxZoom: 20,
   });
 
   map?.on('loadstart', function () {
@@ -47,6 +48,10 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
   map?.on('loadend', function () {
     map.getTargetElement().classList.remove('spinner');
   });
+
+  const taskSubmissionsPopupUI = (properties: Record<string, any>) => {
+    return <div className="fmtm-h-fit">{properties?.label}</div>;
+  };
 
   return (
     <div className="map-container" style={{ height: '100%' }}>
@@ -85,6 +90,7 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
             source={featureGeojson?.clusterLayerGeojson}
             zIndex={100}
             visibleOnMap={true}
+            zoomToLayer={false}
             style={{
               ...defaultStyles,
               background_color: '#D73F37',
@@ -95,6 +101,7 @@ const SubmissionInstanceMap = ({ featureGeojson }: submissionInstanceMapPropType
             getIndividualStyle={getIndividualStyle}
           />
         )}
+        <AsyncPopup map={map} popupUI={taskSubmissionsPopupUI} primaryKey="label" />
       </MapComponent>
     </div>
   );
