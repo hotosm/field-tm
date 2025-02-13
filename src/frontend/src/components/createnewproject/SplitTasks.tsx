@@ -19,6 +19,27 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import { taskSplitOptionsType } from '@/store/types/ICreateProject';
 import DescriptionSection from '@/components/createnewproject/Description';
 
+const taskSplitOptions: taskSplitOptionsType[] = [
+  {
+    name: 'define_tasks',
+    value: task_split_type.DIVIDE_ON_SQUARE,
+    label: 'Divide into square tasks',
+    disabled: false,
+  },
+  {
+    name: 'define_tasks',
+    value: task_split_type.CHOOSE_AREA_AS_TASK,
+    label: 'Use uploaded AOI as task areas',
+    disabled: false,
+  },
+  {
+    name: 'define_tasks',
+    value: task_split_type.TASK_SPLITTING_ALGORITHM,
+    label: 'Task Splitting Algorithm',
+    disabled: false,
+  },
+];
+
 const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, customFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useAppDispatch();
@@ -42,27 +63,6 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
   const toggleSplittedGeojsonEdit = useAppSelector((state) => state.createproject.toggleSplittedGeojsonEdit);
   const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
-
-  const taskSplitOptions: taskSplitOptionsType[] = [
-    {
-      name: 'define_tasks',
-      value: task_split_type.DIVIDE_ON_SQUARE,
-      label: 'Divide into square tasks',
-      disabled: false,
-    },
-    {
-      name: 'define_tasks',
-      value: task_split_type.CHOOSE_AREA_AS_TASK,
-      label: 'Use uploaded AOI as task areas',
-      disabled: false,
-    },
-    {
-      name: 'define_tasks',
-      value: task_split_type.TASK_SPLITTING_ALGORITHM,
-      label: 'Task Splitting Algorithm',
-      disabled: false,
-    },
-  ];
 
   const toggleStep = (step: number, url: string) => {
     dispatch(CommonActions.SetCurrentStepFormStep({ flag: flag, step: step }));
@@ -214,17 +214,13 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
     handleQRGeneration();
   }, [generateProjectSuccess, generateProjectError]);
 
-  const renderTraceback = (errorText: string) => {
-    if (!errorText) {
-      return null;
-    }
-
-    return errorText.split('\n').map((line, index) => (
-      <div key={index} style={{ display: 'flex' }}>
-        <span style={{ color: 'gray', marginRight: '1em' }}>{index + 1}.</span>
-        <span>{line}</span>
-      </div>
-    ));
+  const downloadSplittedGeojson = () => {
+    const blob = new Blob([JSON.stringify(dividedTaskGeojson)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'task_splitted_geojson.geojson';
+    a.click();
   };
 
   const parsedTaskGeojsonCount = dividedTaskGeojson?.features?.length || drawnGeojson?.features?.length || 1;
@@ -333,9 +329,19 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                     splitTasksSelection === task_split_type.TASK_SPLITTING_ALGORITHM ||
                     splitTasksSelection === task_split_type.CHOOSE_AREA_AS_TASK) && (
                     <div>
-                      <p className="fmtm-text-gray-500 fmtm-mt-5">
+                      <p className="fmtm-text-gray-500 fmtm-mt-5 fmtm-mb-2">
                         Total number of task: <span className="fmtm-font-bold">{totalSteps}</span>
                       </p>
+                      {dividedTaskGeojson && (
+                        <button
+                          type="button"
+                          onClick={downloadSplittedGeojson}
+                          className="fmtm-text-gray-500 fmtm-text-base fmtm-flex fmtm-items-center hover:fmtm-text-primaryRed fmtm-duration-200"
+                        >
+                          <AssetModules.FileDownloadOutlinedIcon className="fmtm-mr-1 !fmtm-text-xl" />
+                          <span>Download split geojson</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
