@@ -9,8 +9,8 @@ from pydantic import BaseModel
 
 # Access from the same machine: http://localhost:7052
 # Access from the docker container: http://localhost:8000
-# But we access from another container on same container network
-API_BASE_URL = os.getenv("API_URL", "http://api:8000")
+# Access from another container on same docker network: http://api:8000
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000")
 SURVEY_SUBMITTED = 2
 
 
