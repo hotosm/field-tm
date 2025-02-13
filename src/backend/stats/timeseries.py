@@ -16,6 +16,9 @@ from pydantic import AwareDatetime, BaseModel
 # Access from the docker container: http://localhost:8000
 # Access from another container on same docker network: http://api:8000
 API_BASE_URL = os.getenv("API_URL", "http://localhost:8000")
+API_TOKEN = os.getenv("API_TOKEN", None)
+headers = {"access-token": API_TOKEN} if API_TOKEN else None
+
 START_YEAR: int = int(os.getenv("START_YEAR", 2024))
 
 
@@ -27,7 +30,7 @@ class ProjectDetails(BaseModel):
 
 async def fetch_projects(client: httpx.AsyncClient) -> List[ProjectDetails]:
     url = f"{API_BASE_URL}/projects"
-    response = await client.get(url)
+    response = await client.get(url, headers=headers)
     response.raise_for_status()
     return [ProjectDetails(**proj) for proj in response.json()]
 
