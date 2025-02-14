@@ -343,4 +343,4 @@ services:
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
     healthcheck:
-      test: [] # Set the health check test to an empty value to disable it
+      test: ["NONE"] # Set the health check test to NONE to disable it
