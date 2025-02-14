@@ -228,7 +228,7 @@ services:
     profiles: ["", "central"]
     image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.0-rc}"
     depends_on:
-      central-db:
+      central:
         condition: service_healthy
     environment:
       CENTRAL_WEBHOOK_DB_URI: postgresql://${CENTRAL_DB_USER:-odk}:${CENTRAL_DB_USER:-odk}@central-db:5432/${CENTRAL_DB_NAME:-odk}?sslmode=disable
