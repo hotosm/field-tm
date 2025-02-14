@@ -15,7 +15,6 @@ export function openOdkCollectNewFeature(xFormId: string, geom: GeoJSONGeometry,
 	const javarosaGeom = geojsonGeomToJavarosa(geom);
 
 	if (isMobile) {
-		// TODO we need to update the form to support task_id=${}&
 		document.location.href = `odkcollect://form/${xFormId}?new_feature=${javarosaGeom}&task_id=${task_id}`;
 	} else {
 		alertStore.setAlert({
