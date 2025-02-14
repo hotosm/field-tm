@@ -5,7 +5,6 @@ import CoreModules from '@/shared/CoreModules';
 import CustomizedSnackbars from '@/utilities/CustomizedSnackbar';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Loader from '@/utilities/AppLoader';
-import MappingHeader from '@/utilities/MappingHeader';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import ProjectNotFound from './ProjectNotFound';
@@ -58,17 +57,14 @@ const MainView = () => {
             {popupInParams === 'true' || (pathname.includes('/project/') && windowSize.width <= 768) ? (
               <div></div>
             ) : (
-              <div>
-                <MappingHeader />
-                <PrimaryAppBar />
-              </div>
+              <PrimaryAppBar />
             )}
             {projectNotFound ? (
               <ProjectNotFound />
             ) : (
               <CoreModules.Stack
                 className={`${
-                  pathname.includes('/project/') && windowSize.width < 768 ? '' : 'fmtm-p-6'
+                  pathname.includes('/project/') && windowSize.width < 768 ? '' : 'fmtm-py-2 fmtm-px-5'
                 } fmtm-bg-[#f5f5f5]`}
                 sx={{
                   height: popupInParams

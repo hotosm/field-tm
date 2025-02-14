@@ -4,6 +4,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        red: {
+          light: '#FFEDED',
+          medium: '#D73F37',
+          dark: '#B11E20',
+        },
+        blue: {
+          light: '#929DB3',
+          gray: '#68707F',
+          dark: '#2C3038',
+        },
+        orange: '#F2A61D',
         primaryRed: '#D73F37',
         primary: {
           50: '#fbecec',
@@ -31,7 +42,7 @@ module.exports = {
         },
         grey: {
           50: '#FAFAFA',
-          100: '#F5F5F5',
+          100: '#F2F2F2',
           200: '#E6E6E6',
           300: '#D7D7D7',
           400: '#BDBDBD',
@@ -43,6 +54,7 @@ module.exports = {
         },
       },
       fontFamily: {
+        barlow: ['Barlow'],
         archivo: ['ArchivoRegular'],
       },
     },

@@ -32,7 +32,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organization',
+        path: '/manage/organization',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -42,7 +42,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organization/create',
+        path: '/manage/organization/new',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -52,7 +52,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organization/edit/:id',
+        path: '/manage/organization/edit/:id',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -62,7 +62,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/organization/approve/:id',
+        path: '/manage/organization/approve/:id',
         element: (
           <ProtectedRoute>
             <ErrorBoundary>
@@ -208,7 +208,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/manage-project/:id',
+        path: '/manage/project/:id',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
@@ -220,7 +220,7 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/manage-users',
+        path: '/manage/user',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>

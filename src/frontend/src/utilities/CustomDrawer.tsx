@@ -8,6 +8,7 @@ import { CommonActions } from '@/store/slices/CommonSlice';
 import { LoginActions } from '@/store/slices/LoginSlice';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { user_roles } from '@/types/enums';
 
 type customDrawerType = {
   open: boolean;
@@ -17,62 +18,62 @@ type customDrawerType = {
   setOpen: (open: boolean) => void;
 };
 
-const MenuItems = [
-  {
-    name: 'Explore Projects',
-    ref: '/',
-    isExternalLink: false,
-    isActive: true,
-  },
-  {
-    name: 'Manage Organizations',
-    ref: '/organization',
-    isExternalLink: false,
-    isActive: true,
-  },
-  {
-    name: 'Manage Category',
-    ref: '/',
-    isExternalLink: false,
-    isActive: true,
-  },
-  {
-    name: 'My Contributions',
-    ref: 'TBD',
-    isExternalLink: false,
-    isActive: false,
-  },
-  {
-    name: 'Learn',
-    ref: 'https://hotosm.github.io/fmtm',
-    isExternalLink: true,
-    isActive: true,
-  },
-  {
-    name: 'About',
-    ref: 'https://docs.fmtm.dev/about/about/',
-    isExternalLink: true,
-    isActive: true,
-  },
-  {
-    name: 'Support',
-    ref: 'https://github.com/hotosm/fmtm/issues/',
-    isExternalLink: true,
-    isActive: true,
-  },
-  {
-    name: 'Download Custom ODK Collect',
-    ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-FMTM.apk',
-    isExternalLink: true,
-    isActive: true,
-  },
-];
-
 export default function CustomDrawer({ open, size, type, onClose, setOpen }: customDrawerType) {
   const dispatch = useAppDispatch();
 
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
+
+  const MenuItems = [
+    {
+      name: 'Explore Projects',
+      ref: '/',
+      isExternalLink: false,
+      isActive: true,
+    },
+    {
+      name: 'Manage Users',
+      ref: '/manage/user',
+      isExternalLink: false,
+      isActive: authDetails?.role === user_roles.ADMIN,
+    },
+    {
+      name: 'Manage Organizations',
+      ref: '/manage/organization',
+      isExternalLink: false,
+      isActive: true,
+    },
+    {
+      name: 'My Contributions',
+      ref: 'TBD',
+      isExternalLink: false,
+      isActive: false,
+    },
+    {
+      name: 'Learn',
+      ref: 'https://hotosm.github.io/fmtm',
+      isExternalLink: true,
+      isActive: true,
+    },
+    {
+      name: 'About',
+      ref: 'https://docs.fmtm.dev/about/about/',
+      isExternalLink: true,
+      isActive: true,
+    },
+    {
+      name: 'Support',
+      ref: 'https://github.com/hotosm/fmtm/issues/',
+      isExternalLink: true,
+      isActive: true,
+    },
+    {
+      name: 'Download Custom ODK Collect',
+      ref: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-FMTM.apk',
+      isExternalLink: true,
+      isActive: true,
+    },
+  ];
 
   const onMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
     const targetElement = event.target as HTMLElement;
@@ -159,15 +160,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
                 ) : (
                   <AssetModules.PersonIcon color="success" sx={{ display: { xs: 'block', md: 'none' }, mt: '1%' }} />
                 )}
-                <CoreModules.Typography
-                  variant="subtitle2"
-                  color={'info'}
-                  noWrap
-                  sx={{ display: { xs: 'block', md: 'none' } }}
-                  className="fmtm-w-fit"
-                >
-                  {authDetails['username']}
-                </CoreModules.Typography>
+                <h4>{authDetails.username}</h4>
               </CoreModules.Stack>
             )}
             <CoreModules.Divider color={'info'} sx={{ display: { xs: 'block', md: 'none' } }} />
@@ -203,10 +196,13 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
                     key={index}
                     to={menuDetails.ref}
                     className={`fmtm-no-underline fmtm-text-inherit fmtm-opacity-80 ${
-                      menuDetails.name === 'Explore Projects' || menuDetails.name === 'Manage Organizations'
+                      menuDetails.name === 'Explore Projects' ||
+                      menuDetails.name === 'Manage Organizations' ||
+                      menuDetails.name === 'Manage Users'
                         ? 'lg:fmtm-hidden'
                         : ''
                     }`}
+                    onClick={onClose}
                   >
                     <CoreModules.ListItem
                       id={index.toString()}

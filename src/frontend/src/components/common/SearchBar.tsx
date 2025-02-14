@@ -51,10 +51,10 @@ export default function Searchbar({
         {value && (
           <div
             className={`fmtm-absolute fmtm-right-2 ${isSmall ? 'fmtm-top-1.5' : 'fmtm-top-[0.563rem]'} fmtm-flex 
-        fmtm-cursor-pointer fmtm-items-center fmtm-justify-center fmtm-rounded-full fmtm-bg-gray-200 fmtm-p-1 fmtm-duration-200  hover:fmtm-bg-gray-300`}
+        fmtm-cursor-pointer fmtm-items-center fmtm-justify-center fmtm-rounded-full fmtm-bg-grey-100 fmtm-p-1 fmtm-duration-200  hover:fmtm-bg-grey-200`}
             onClick={handleClearSearch}
           >
-            <AssetModules.CloseIcon className="!fmtm-text-[14px] fmtm-text-grey-800" />
+            <AssetModules.CloseIcon className="!fmtm-text-[14px] fmtm-text-grey-500" />
           </div>
         )}
 
@@ -63,7 +63,7 @@ export default function Searchbar({
           type="text"
           className={`fmtm-block fmtm-w-full fmtm-rounded-lg fmtm-border  fmtm-border-grey-300
             fmtm-pl-[35px] fmtm-pr-[28px] fmtm-text-base fmtm-font-normal 
-            fmtm-text-gray-500 placeholder:fmtm-font-normal placeholder:fmtm-text-gray-500 focus:fmtm-border-[#484848] focus:fmtm-outline-none  ${
+            fmtm-text-gray-500 placeholder:fmtm-font-normal placeholder:fmtm-text-gray-500 fmtm-outline-none ${
               isSmall ? 'fmtm-h-[36px] fmtm-py-2' : 'fmtm-h-[40px] fmtm-py-3'
             }
             ${className}`}

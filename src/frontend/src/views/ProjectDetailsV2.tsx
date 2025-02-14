@@ -357,7 +357,7 @@ const ProjectDetailsV2 = () => {
               btnType="other"
               className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md"
               icon={<AssetModules.SettingsIcon />}
-              onClick={() => navigate(`/manage-project/${params?.id}`)}
+              onClick={() => navigate(`/manage/project/${params?.id}`)}
             />
           </div>
           <div

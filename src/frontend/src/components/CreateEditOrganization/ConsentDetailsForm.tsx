@@ -87,7 +87,7 @@ const ConsentDetailsForm = () => {
             btnText="Cancel"
             btnType="other"
             className="fmtm-font-bold"
-            onClick={() => navigate('/organization')}
+            onClick={() => navigate('/manage/organization')}
           />
           <Button btnText="NEXT" btnType="primary" className="fmtm-font-bold" onClick={handleSubmit} />
         </div>
