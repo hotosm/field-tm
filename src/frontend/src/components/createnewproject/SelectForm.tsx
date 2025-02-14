@@ -30,10 +30,7 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
     if (!customFileValidity && formValues.formWays === 'custom_form') {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Your file is invalid',
-          variant: 'error',
-          duration: 2000,
         }),
       );
       return;

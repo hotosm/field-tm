@@ -39,10 +39,7 @@ export default function PrimaryAppBar() {
     } catch {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Failed to sign out.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
     }

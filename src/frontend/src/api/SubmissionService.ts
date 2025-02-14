@@ -78,10 +78,7 @@ export const UpdateReviewStateService = (url: string, payload: object) => {
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to update review state.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(SubmissionActions.UpdateReviewStateLoading(false));
@@ -118,10 +115,7 @@ export const PostGeometry = (url: string, payload: geometryLogType) => {
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to post geometry.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -139,10 +133,7 @@ export const DeleteGeometry = (url: string) => {
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to delete geometry.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -170,10 +161,7 @@ export const downloadSubmissionGeojson = (
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: JSON.parse(await error.response.data.text())?.detail || 'Something went wrong',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       } finally {

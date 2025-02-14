@@ -97,10 +97,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
               }
               dispatch(
                 CommonActions.SetSnackBar({
-                  open: true,
                   message: 'Invalid File Type.',
-                  variant: 'error',
-                  duration: 2000,
                 }),
               );
               return null;

@@ -323,10 +323,7 @@ const GenerateBasemap = ({ projectInfo }: { projectInfo: Partial<projectInfoType
                           onClick={() => {
                             dispatch(
                               CommonActions.SetSnackBar({
-                                open: true,
                                 message: 'Not implemented',
-                                variant: 'error',
-                                duration: 2000,
                               }),
                             );
                           }}

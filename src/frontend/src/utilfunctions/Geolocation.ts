@@ -141,10 +141,7 @@ export const Geolocation = (map, geolocationStatus, dispatch) => {
     if (isFirefox || isSafari) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: "Unable to handle device orientation. Your browser doesn't support device orientation sensors.",
-          variant: 'error',
-          duration: 4000,
         }),
       );
     } else {

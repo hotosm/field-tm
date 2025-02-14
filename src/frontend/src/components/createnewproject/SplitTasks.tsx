@@ -195,10 +195,8 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         const projectId = projectDetailsResponse?.id;
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Project Generation Completed. Redirecting...',
             variant: 'success',
-            duration: 2000,
           }),
         );
 

@@ -26,10 +26,8 @@ const ProjectDescriptionTab = ({ projectId }) => {
     } else {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'No changes to Save',
           variant: 'info',
-          duration: 2000,
         }),
       );
     }

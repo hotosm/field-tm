@@ -119,20 +119,14 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
       } else {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Something is wrong with the user.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
     } else {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Oops!, Please try again.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
     }
@@ -246,10 +240,8 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
               } else {
                 dispatch(
                   CommonActions.SetSnackBar({
-                    open: true,
                     message: 'Requires a mobile phone with ODK Collect.',
                     variant: 'warning',
-                    duration: 3000,
                   }),
                 );
               }

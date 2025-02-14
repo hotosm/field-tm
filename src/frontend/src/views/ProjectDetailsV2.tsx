@@ -6,8 +6,6 @@ import WindowDimension from '@/hooks/WindowDimension';
 import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
 import { ProjectById, GetEntityStatusList, GetGeometryLog, SyncTaskState } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
-import CustomizedSnackbar from '@/utilities/CustomizedSnackbar';
-import { HomeActions } from '@/store/slices/HomeSlice';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import GenerateBasemap from '@/components/GenerateBasemap';
@@ -83,21 +81,6 @@ const ProjectDetailsV2 = () => {
       document.title = 'HOT Field Mapping Tasking Manager';
     }
   }, [state.projectInfo.name]);
-
-  //snackbar handle close function
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    dispatch(
-      HomeActions.SetSnackBar({
-        open: false,
-        message: stateSnackBar.message,
-        variant: stateSnackBar.variant,
-        duration: 0,
-      }),
-    );
-  };
 
   //Fetch project for the first time
   useEffect(() => {
@@ -329,17 +312,7 @@ const ProjectDetailsV2 = () => {
   return (
     <div className="fmtm-bg-[#f5f5f5] !fmtm-h-[100dvh] sm:!fmtm-h-full">
       {/* Customized Modal For Generate Tiles */}
-      <div>
-        <GenerateBasemap projectInfo={state.projectInfo} />
-        {/* Home snackbar */}
-        <CustomizedSnackbar
-          duration={stateSnackBar.duration}
-          open={stateSnackBar.open}
-          variant={stateSnackBar.variant}
-          message={stateSnackBar.message}
-          handleClose={handleClose}
-        />
-      </div>
+      <GenerateBasemap projectInfo={state.projectInfo} />
 
       <div className="fmtm-flex fmtm-h-full fmtm-gap-6">
         <div className="fmtm-w-[22rem] fmtm-h-full fmtm-hidden md:fmtm-block">
