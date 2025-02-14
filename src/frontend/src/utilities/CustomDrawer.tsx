@@ -3,11 +3,7 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import { NavLink } from 'react-router-dom';
-import { revokeCookies } from '@/utilfunctions/login';
-import { CommonActions } from '@/store/slices/CommonSlice';
-import { LoginActions } from '@/store/slices/LoginSlice';
-import { ProjectActions } from '@/store/slices/ProjectSlice';
-import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { useAppSelector } from '@/types/reduxTypes';
 import { user_roles } from '@/types/enums';
 
 type customDrawerType = {
@@ -19,8 +15,6 @@ type customDrawerType = {
 };
 
 export default function CustomDrawer({ open, size, type, onClose, setOpen }: customDrawerType) {
-  const dispatch = useAppDispatch();
-
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
@@ -105,21 +99,6 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
       borderRadius: 7,
       fontFamily: defaultTheme.typography.subtitle2.fontFamily,
     },
-  };
-
-  const handleOnSignOut = async () => {
-    setOpen(false);
-    try {
-      await revokeCookies();
-      dispatch(LoginActions.signOut());
-      dispatch(ProjectActions.clearProjects([]));
-    } catch {
-      dispatch(
-        CommonActions.SetSnackBar({
-          message: 'Failed to sign out.',
-        }),
-      );
-    }
   };
 
   return (
@@ -212,26 +191,6 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
                   </NavLink>
                 ),
               )}
-              <div className="fmtm-ml-4 fmtm-mt-2 lg:fmtm-hidden">
-                {authDetails ? (
-                  <div
-                    className="fmtm-text-[#d73e3e] hover:fmtm-text-[#d73e3e] fmtm-cursor-pointer fmtm-opacity-80"
-                    onClick={handleOnSignOut}
-                  >
-                    Sign Out
-                  </div>
-                ) : (
-                  <div
-                    className="fmtm-text-[#44546a] hover:fmtm-text-[#d73e3e] fmtm-cursor-pointer fmtm-opacity-80"
-                    onClick={() => {
-                      onClose();
-                      dispatch(LoginActions.setLoginModalOpen(true));
-                    }}
-                  >
-                    Sign In
-                  </div>
-                )}
-              </div>
             </CoreModules.List>
           </CoreModules.Stack>
         </SwipeableDrawer>
