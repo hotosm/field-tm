@@ -100,20 +100,15 @@ export const PostOrganisationDataService = (url: string, payload: any) => {
 
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Organization Request Submitted.',
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error: any) {
         dispatch(OrganisationAction.PostOrganisationDataLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error.response.data.detail || 'Failed to create organization.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -134,10 +129,7 @@ export const GetIndividualOrganizationService = (url: string) => {
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error.response.data.detail || 'Failed to fetch organization.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -167,20 +159,15 @@ export const PatchOrganizationDataService = (url: string, payload: any) => {
         dispatch(OrganisationAction.SetOrganisationFormData({}));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Organization Updated Successfully.',
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error: any) {
         dispatch(OrganisationAction.PostOrganisationDataLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error.response.data.detail || 'Failed to update organization.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -198,10 +185,8 @@ export const ApproveOrganizationService = (url: string) => {
         await axios.post(url);
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Organization approved successfully.',
             variant: 'success',
-            duration: 2000,
           }),
         );
         dispatch(OrganisationAction.SetOrganizationApproving(false));
@@ -211,10 +196,7 @@ export const ApproveOrganizationService = (url: string) => {
         dispatch(OrganisationAction.SetOrganizationApproving(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to approve organization.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -231,10 +213,8 @@ export const RejectOrganizationService = (url: string) => {
         await axios.delete(url);
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Organization rejected successfully.',
             variant: 'success',
-            duration: 2000,
           }),
         );
         dispatch(OrganisationAction.SetOrganizationRejecting(false));
@@ -244,10 +224,7 @@ export const RejectOrganizationService = (url: string) => {
         dispatch(OrganisationAction.SetOrganizationRejecting(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to reject organization.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }

@@ -5,12 +5,6 @@ export const initialState: HomeStateTypes = {
   homeProjectSummary: [],
   homeProjectLoading: true,
   selectedProject: {},
-  snackbar: {
-    open: false,
-    message: '',
-    variant: 'info',
-    duration: 0,
-  },
   showMapStatus: false,
   homeProjectPagination: {
     has_next: false,
@@ -36,9 +30,6 @@ const HomeSlice = createSlice({
     },
     SetSelectedProject(state, action: PayloadAction<HomeStateTypes['selectedProject']>) {
       state.selectedProject = action.payload;
-    },
-    SetSnackBar(state, action: PayloadAction<HomeStateTypes['snackbar']>) {
-      state.snackbar = action.payload;
     },
     SetShowMapStatus(state, action: PayloadAction<boolean>) {
       state.showMapStatus = action.payload;

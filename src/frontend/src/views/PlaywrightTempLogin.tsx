@@ -17,10 +17,7 @@ async function PlaywrightTempAuth() {
     if (!apiUser) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Temp login failed. Try OSM.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
       return;

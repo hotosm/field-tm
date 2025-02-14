@@ -34,19 +34,14 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
         dispatch(UserActions.UpdateUserList(response.data));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: `Updated ${response.data.username}'s role to ${response.data.role} successfully`,
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to update user role',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       } finally {

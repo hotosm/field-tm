@@ -122,10 +122,7 @@ const CreateProjectService = (
       await dispatch(CreateProjectActions.GenerateProjectError(true));
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: JSON.stringify(error?.response?.data?.detail) || 'Something went wrong. Please try again.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
       dispatch(CreateProjectActions.CreateProjectLoading(false));
@@ -176,10 +173,7 @@ const UploadTaskAreasService = (url: string, filePayload: any) => {
         await dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: JSON.stringify(error?.response?.data?.detail) || 'Something Went Wrong.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -252,10 +246,7 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
         dispatch(CreateProjectActions.GenerateProjectError(true));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: JSON.stringify(error?.response?.data?.detail),
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(CreateProjectActions.GenerateProjectLoading(false));
@@ -287,10 +278,7 @@ const PostAdditionalFeatureService = (url: string, file: File) => {
         isAPISuccess = false;
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: JSON.stringify(error?.response?.data?.detail),
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -411,10 +399,7 @@ const TaskSplittingPreviewService = (
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Task generation failed. Please try again',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(CreateProjectActions.GetTaskSplittingPreviewLoading(false));
@@ -439,20 +424,15 @@ const PatchProjectDetails = (url: string, projectData: Record<string, any>) => {
         dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Project Successfully Edited',
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error) {
         dispatch(CreateProjectActions.SetPatchProjectDetailsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed. Do you have permission to edit?',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       } finally {
@@ -482,19 +462,14 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
         dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: resp.message,
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error?.response?.data?.detail || 'Failed to update Form',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(CreateProjectActions.SetPostFormUpdateLoading(false));
@@ -525,10 +500,8 @@ const EditProjectBoundaryService = (url: string, geojsonUpload: any, dimension: 
         dispatch(CreateProjectActions.SetEditProjectBoundaryServiceLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Project Boundary Successfully Updated',
             variant: 'success',
-            duration: 2000,
           }),
         );
       } catch (error) {
@@ -556,20 +529,15 @@ const ValidateCustomForm = (url: string, formUpload: any) => {
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: JSON.stringify(resp.message),
             variant: 'success',
-            duration: 2000,
           }),
         );
         dispatch(CreateProjectActions.SetCustomFileValidity(true));
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error?.response?.data?.detail || 'Something Went Wrong',
-            variant: 'error',
-            duration: 5000,
           }),
         );
         dispatch(CreateProjectActions.ValidateCustomFormLoading(false));
@@ -590,10 +558,8 @@ const DeleteProjectService = (url: string, hasRedirect: boolean = true) => {
         await API.delete(url);
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: `Project deleted. ${hasRedirect && 'Redirecting...'}`,
             variant: 'success',
-            duration: 2000,
           }),
         );
         // Redirect to homepage
@@ -606,10 +572,8 @@ const DeleteProjectService = (url: string, hasRedirect: boolean = true) => {
         if (error.response.status === 404) {
           dispatch(
             CommonActions.SetSnackBar({
-              open: true,
               message: 'Project already deleted',
               variant: 'success',
-              duration: 2000,
             }),
           );
         } else {
@@ -629,10 +593,7 @@ const AssignProjectManager = (url: string, params: { id: number; project_id: num
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error.response.data.detail || 'Could not assign project manager',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }

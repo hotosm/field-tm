@@ -75,21 +75,16 @@ export const CreateTaskEvent = (
 
         dispatch(CommonActions.SetLoading(false));
         dispatch(
-          HomeActions.SetSnackBar({
-            open: true,
+          CommonActions.SetSnackBar({
             message: `Task #${taskId} has been updated to ${response.data.state}`,
             variant: 'success',
-            duration: 3000,
           }),
         );
       } catch (error) {
         dispatch(CommonActions.SetLoading(false));
         dispatch(
-          HomeActions.SetSnackBar({
-            open: true,
+          CommonActions.SetSnackBar({
             message: `Failed to update Task #${taskId}`,
-            variant: 'error',
-            duration: 4000,
           }),
         );
       }

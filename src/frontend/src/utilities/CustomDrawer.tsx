@@ -116,10 +116,7 @@ export default function CustomDrawer({ open, size, type, onClose, setOpen }: cus
     } catch {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Failed to sign out.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
     }

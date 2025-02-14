@@ -48,10 +48,7 @@ const Comments = () => {
     if (isEditorEmpty) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Empty comment field.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
       return;

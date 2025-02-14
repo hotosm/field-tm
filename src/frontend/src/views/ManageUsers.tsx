@@ -25,7 +25,7 @@ const ManageUsers = () => {
 
   const updateRole = (id: number, currentRole: roleType, newRole: roleType) => {
     if (currentRole === newRole) {
-      dispatch(CommonActions.SetSnackBar({ duration: 2000, open: true, message: 'Role up-to-date', variant: 'info' }));
+      dispatch(CommonActions.SetSnackBar({ message: 'Role up-to-date', variant: 'info' }));
       return;
     }
     dispatch(UpdateUserRole(`${VITE_API_URL}/users/${id}`, { role: newRole }));

@@ -7,7 +7,7 @@ const initialState: CommonStateTypes = {
     open: false,
     message: '',
     variant: 'info',
-    duration: 0,
+    duration: 2000,
   },
   loading: false,
   postOrganisationLoading: false,
@@ -24,8 +24,16 @@ const CommonSlice = createSlice({
   name: 'common',
   initialState: initialState,
   reducers: {
-    SetSnackBar(state, action: PayloadAction<CommonStateTypes['snackbar']>) {
-      state.snackbar = action.payload;
+    SetSnackBar(
+      state,
+      action: PayloadAction<{
+        open?: boolean;
+        message: string;
+        variant?: 'info' | 'success' | 'error' | 'warning';
+        duration?: number;
+      }>,
+    ) {
+      state.snackbar = { open: true, variant: 'error', duration: 2000, ...action.payload };
     },
     SetLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;

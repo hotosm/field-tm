@@ -61,10 +61,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
       if (totalArea > 200 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Cannot create project of project area exceeding 200 Sq.KM.',
-            variant: 'error',
-            duration: 3000,
           }),
         );
         return;
@@ -126,10 +123,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
       addGeojsonToState(null);
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'File not a valid geojson',
-          variant: 'error',
-          duration: 4000,
         }),
       );
     }
@@ -141,10 +135,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     if (drawnGeojson && !valid(drawnGeojson)) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'File not a valid geojson',
-          variant: 'error',
-          duration: 4000,
         }),
       );
       return;
@@ -169,10 +160,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
   const showSpatialError = () => {
     dispatch(
       CommonActions.SetSnackBar({
-        open: true,
         message: 'Invalid spatial reference system. Please only import WGS84 (EPSG: 4326).',
-        variant: 'error',
-        duration: 6000,
       }),
     );
   };
@@ -196,20 +184,15 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
       if (totalArea > 100 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'The project area exceeded over 100 Sq.KM.',
             variant: 'warning',
-            duration: 3000,
           }),
         );
       }
       if (totalArea > 200 && areaUnit === 'km²') {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'The project area exceeded 200 Sq.KM. and must be less than 200 Sq.KM.',
-            variant: 'error',
-            duration: 3000,
           }),
         );
       }

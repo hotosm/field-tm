@@ -61,10 +61,8 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
       } else {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Organization details up to date',
             variant: 'info',
-            duration: 2000,
           }),
         );
       }

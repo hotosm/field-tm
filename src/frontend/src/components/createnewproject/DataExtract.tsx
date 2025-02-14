@@ -111,10 +111,7 @@ const DataExtract = ({
       } else {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Map has no features. Please try adjusting the map area.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
@@ -122,10 +119,7 @@ const DataExtract = ({
     } catch (error) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'Error generating map data.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
       dispatch(CreateProjectActions.SetFgbFetchingStatus(false));
@@ -205,7 +199,7 @@ const DataExtract = ({
       await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
       return;
     }
-    dispatch(CommonActions.SetSnackBar({ open: true, message: 'Invalid GeoJSON', variant: 'error', duration: 4000 }));
+    dispatch(CommonActions.SetSnackBar({ message: 'Invalid GeoJSON' }));
     handleCustomChange('customDataExtractUpload', null);
     dispatch(CreateProjectActions.setDataExtractGeojson(null));
     return;

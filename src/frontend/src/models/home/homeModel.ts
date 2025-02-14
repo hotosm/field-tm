@@ -23,10 +23,3 @@ export type projectType = {
   priority: number;
   outline: { type: string; coordinates: number[][] };
 };
-
-export type snackbarTypes = {
-  open: boolean;
-  message: string;
-  variant: 'info' | 'success' | 'error' | 'warning';
-  duration: number;
-};

@@ -69,10 +69,7 @@ export const ProjectById = (projectId: string) => {
         dispatch(ProjectActions.SetProjectDetialsLoading(false));
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: 'Failed to fetch project.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
       }
@@ -186,10 +183,7 @@ export const DownloadBasemapFile = (url: string | null) => {
     if (!url) {
       dispatch(
         CommonActions.SetSnackBar({
-          open: true,
           message: 'No url associated to download basemap.',
-          variant: 'error',
-          duration: 2000,
         }),
       );
     } else {
@@ -311,10 +305,7 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
       } catch (error) {
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: error?.response?.data?.detail || 'Failed to update entity state.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(ProjectActions.UpdateEntityStateLoading(false));
@@ -340,10 +331,7 @@ export const DownloadSubmissionGeojson = (url: string, projectName: string) => {
         const errortxt = JSON.parse(await error.response.data.text()).detail;
         dispatch(
           CommonActions.SetSnackBar({
-            open: true,
             message: errortxt || 'Failed to download submission geojson.',
-            variant: 'error',
-            duration: 2000,
           }),
         );
         dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
