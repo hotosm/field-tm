@@ -56,7 +56,7 @@ DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 const DropdownMenuItem = ({ ...props }) => (
   <DropdownMenuPrimitive.Item
     className={cn(
-      'fmtm-relative fmtm-flex fmtm-cursor-pointer fmtm-select-none fmtm-items-center fmtm-rounded-sm fmtm-px-2 fmtm-py-1.5 fmtm-text-sm fmtm-outline-none fmtm-transition-colors focus:fmtm-bg-red-100 focus:fmtm-text-black data-[disabled]:fmtm-pointer-events-none data-[disabled]:fmtm-opacity-50',
+      'fmtm-relative fmtm-flex fmtm-cursor-pointer fmtm-select-none fmtm-items-center fmtm-rounded-sm fmtm-px-2 fmtm-py-1.5 fmtm-text-sm fmtm-outline-none fmtm-transition-colors focus:fmtm-bg-red-light focus:fmtm-text-black data-[disabled]:fmtm-pointer-events-none data-[disabled]:fmtm-opacity-50',
     )}
     {...props}
   />

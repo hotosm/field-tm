@@ -87,7 +87,7 @@ const initialState: themeStateType = {
       //default font family changed to BarlowMedium
       fontSize: 16,
       // fontFamily: 'ArchivoMedium',
-      fontFamily: 'BarlowMedium',
+      fontFamily: 'Barlow',
       //custom
       htmlFontSize: 18,
 

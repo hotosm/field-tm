@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 interface usePaginationIProps {
   totalCount: number;
   pageSize: number;
-  siblingCount: number;
+  siblingCount?: number;
   currentPage: number;
 }
 

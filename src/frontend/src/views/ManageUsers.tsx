@@ -129,17 +129,19 @@ const ManageUsers = () => {
   return (
     <div className="fmtm-h-full fmtm-flex fmtm-flex-col">
       <div className="fmtm-flex fmtm-items-center fmtm-justify-between">
-        <h4 className="fmtm-text-[1.25rem] fmtm-font-bold fmtm-text-[#2C3038]">Manage Users</h4>
+        <h4 className="fmtm-font-semibold fmtm-text-[#2C3038]">Manage Users</h4>
         <Searchbar
           value={searchTextData}
           onChange={handleChangeData}
           wrapperStyle="!fmtm-w-[13rem]"
-          className="!fmtm-py-0"
+          className="!fmtm-py-0 !fmtm-rounded"
           placeholder="Search by username"
           isSmall
         />
       </div>
-      <p className="fmtm-text-grey-500  fmtm-mb-4">Total number of users: {userList?.pagination?.total}</p>
+      <p className="fmtm-body-md-semibold fmtm-text-grey-500 fmtm-mb-4">
+        Total number of users: {userList?.pagination?.total}
+      </p>
       <DataTable
         data={userList || []}
         columns={userDatacolumns}

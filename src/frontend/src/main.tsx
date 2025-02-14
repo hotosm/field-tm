@@ -1,4 +1,5 @@
 import '@/index.css';
+import '@/styles/tailwind.css';
 import 'ol/ol.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 

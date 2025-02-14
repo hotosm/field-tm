@@ -10,6 +10,7 @@ import ProjectListMap from '@/components/home/ProjectListMap';
 import { projectType } from '@/models/home/homeModel';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import Pagination from '@/components/common/Pagination';
 
 const Home = () => {
   useDocumentTitle('Explore Projects');
@@ -71,12 +72,12 @@ const Home = () => {
   return (
     <div
       style={{ flex: 1, background: '#F5F5F5' }}
-      className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full"
+      className="fmtm-flex fmtm-flex-col fmtm-justify-between fmtm-h-full fmtm-mt-1 lg:fmtm-overflow-hidden"
     >
       <div className="fmtm-h-full">
-        <HomePageFilters onSearch={handleSearch} filteredProjectCount={filteredProjectCards?.length} />
+        <HomePageFilters searchText={searchQuery} onSearch={handleSearch} />
         {stateHome.homeProjectLoading == false ? (
-          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-9.313rem)]">
+          <div className="fmtm-flex fmtm-flex-col lg:fmtm-flex-row fmtm-gap-5 fmtm-mt-7 md:fmtm-overflow-hidden lg:fmtm-h-[calc(100%-120px)] fmtm-pb-16 lg:fmtm-pb-0">
             <div
               className={`fmtm-w-full fmtm-flex fmtm-flex-col fmtm-justify-between md:fmtm-overflow-y-scroll md:scrollbar ${showMapStatus ? 'lg:fmtm-w-[50%]' : ''} `}
             >
@@ -93,35 +94,22 @@ const Home = () => {
                       <ExploreProjectCard data={value} key={index} />
                     ))}
                   </div>
-                  <div className="fmtm-flex fmtm-justify-center fmtm-mt-5 fmtm-mb-2 lg:fmtm-mb-0">
-                    <CoreModules.Pagination
-                      page={homeProjectPagination?.page}
-                      count={homeProjectPagination?.pages}
-                      shape="rounded"
-                      size={type === 'xs' ? 'medium' : 'large'}
-                      sx={{
-                        '.Mui-selected': {
-                          background: 'rgb(216,73,55) !important',
-                          color: 'white',
-                        },
-                      }}
-                      onChange={(e, page) => {
-                        setPaginationPage(page);
-                      }}
-                    />
-                  </div>
                 </>
               ) : (
-                <CoreModules.Typography
-                  variant="h2"
-                  color="error"
-                  sx={{ p: 2, textAlign: 'center' }}
-                  className="fmtm-h-full fmtm-flex fmtm-justify-center fmtm-items-center"
-                >
-                  No projects found.
-                </CoreModules.Typography>
+                <p className="fmtm-text-red-medium fmtm-flex fmtm-justify-center fmtm-items-center fmtm-h-full">
+                  No Projects Found
+                </p>
               )}
             </div>
+            <Pagination
+              showing={filteredProjectCards?.length}
+              totalCount={homeProjectPagination?.total || 0}
+              currentPage={homeProjectPagination?.page || 0}
+              isLoading={false}
+              pageSize={homeProjectPagination.per_page}
+              handlePageChange={(page) => setPaginationPage(page)}
+              className="fmtm-fixed fmtm-left-0 fmtm-w-full"
+            />
             {showMapStatus && <ProjectListMap />}
           </div>
         ) : (

@@ -5,7 +5,7 @@ import { cn } from '@/utilfunctions/shadcn';
 const Switch = ({ className, ref, ...props }) => (
   <SwitchPrimitives.Root
     className={cn(
-      `peer focus-visible:fmtm-ring-offset-background data-[state=checked]:fmtm-bg-primary-900 fmtm-inline-flex fmtm-h-[24px] fmtm-w-[44px] fmtm-shrink-0 fmtm-cursor-pointer
+      `peer focus-visible:fmtm-ring-offset-background data-[state=checked]:fmtm-bg-primary-900 fmtm-inline-flex fmtm-h-[18px] fmtm-w-[30px] fmtm-shrink-0 fmtm-cursor-pointer
         fmtm-items-center fmtm-rounded-full fmtm-border-2 fmtm-border-transparent
         fmtm-transition-colors  focus-visible:fmtm-outline-none focus-visible:fmtm-ring-2
         focus-visible:fmtm-ring-offset-2 disabled:fmtm-cursor-not-allowed disabled:fmtm-opacity-50
@@ -17,9 +17,9 @@ const Switch = ({ className, ref, ...props }) => (
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        `fmtm-pointer-events-none fmtm-block fmtm-h-5 fmtm-w-5 fmtm-rounded-full fmtm-bg-white
+        `fmtm-pointer-events-none fmtm-block fmtm-h-[14px] fmtm-w-[14px] fmtm-rounded-full fmtm-bg-white
           fmtm-shadow-lg fmtm-ring-0 fmtm-transition-transform
-          data-[state=checked]:fmtm-translate-x-5 data-[state=unchecked]:fmtm-translate-x-0`,
+          data-[state=checked]:fmtm-translate-x-3 data-[state=unchecked]:fmtm-translate-x-0`,
       )}
     />
   </SwitchPrimitives.Root>

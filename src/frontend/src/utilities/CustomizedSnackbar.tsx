@@ -33,7 +33,7 @@ export default function CustomizedSnackbars({
         TransitionComponent={SlideTransition}
       >
         <Alert onClose={handleClose} severity={variant} sx={{ width: '100%' }}>
-          <CoreModules.Typography variant="h2">{message}</CoreModules.Typography>
+          <span className="fmtm-body-lg fmtm-leading-none">{message}</span>
         </Alert>
       </CoreModules.Snackbar>
     </CoreModules.Stack>

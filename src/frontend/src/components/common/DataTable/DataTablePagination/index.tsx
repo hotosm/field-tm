@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/react-table';
 import clsx from 'clsx';
 import AssetModules from '@/shared/AssetModules';
 import { ColumnData } from '..';
-import usePagination, { DOTS } from './usePagination';
+import usePagination, { DOTS } from '@/hooks/usePagination';
 
 interface IPaginationProps {
   totalCount: number;
@@ -40,14 +40,14 @@ export default function DataTablePagination({
         className,
       )}
     >
-      <p>
+      <p className="fmtm-body-sm fmtm-text-grey-800">
         Showing {table.getRowCount()} of {totalCount} results
       </p>
 
       <div className="fmtm-flex fmtm-gap-6">
         {/* Go to page */}
         <div className="fmtm-flex fmtm-flex-1 fmtm-items-center fmtm-justify-end fmtm-gap-2 fmtm-md:pr-6">
-          <p className=" fmtm-whitespace-nowrap fmtm-text-grey-800">Go to Page</p>
+          <p className=" fmtm-whitespace-nowrap fmtm-body-sm fmtm-text-grey-800">Go to Page</p>
           <input
             type="number"
             min={1}
@@ -60,7 +60,7 @@ export default function DataTablePagination({
               setCurrentPageState(Number(e.target.value) > lastPage ? lastPage : e.target.value);
               table.setPageIndex(page);
             }}
-            className="fmtm-outline-none fmtm-border fmtm-border-[#D0D5DD] fmtm-rounded-lg fmtm-w-8 fmtm-h-8 fmtm-p-1"
+            className="fmtm-body-md fmtm-outline-none fmtm-border fmtm-border-[#D0D5DD] fmtm-rounded-lg fmtm-w-8 fmtm-h-8 fmtm-p-1 fmtm-text-grey-500"
           />
         </div>
 
@@ -74,9 +74,9 @@ export default function DataTablePagination({
                 setCurrentPageState((prev) => Number(prev) - 1);
                 table.previousPage();
               }}
-              className={`${!table.getCanPreviousPage() && 'fmtm-cursor-not-allowed'} hover:fmtm-bg-red-50 fmtm-rounded-full fmtm-duration-100 hover:fmtm-text-red-600`}
+              className={`fmtm-w-5 fmtm-h-5 fmtm-min-w-5 fmtm-min-h-5 fmtm-rounded-full fmtm-flex fmtm-items-center fmtm-justify-center ${!table.getCanPreviousPage() ? 'fmtm-cursor-not-allowed fmtm-text-grey-400' : 'hover:fmtm-bg-red-50 fmtm-duration-100 hover:fmtm-text-red-600'}`}
             >
-              <AssetModules.ChevronLeftIcon />
+              <AssetModules.ChevronLeftIcon className="!fmtm-text-sm" />
             </button>
 
             {/* Page Numbers */}
@@ -90,7 +90,7 @@ export default function DataTablePagination({
               }
               return (
                 <div
-                  className={`fmtm-grid fmtm-h-8 fmtm-cursor-pointer fmtm-place-items-center fmtm-px-3 600 fmtm-transition-colors hover:fmtm-text-primary-900 fmtm-border-b ${
+                  className={`fmtm-grid fmtm-h-8 fmtm-cursor-pointer fmtm-place-items-center fmtm-px-3 600 fmtm-transition-colors fmtm-border-b ${
                     currentPage === pageNumber ? 'fmtm-border-[#989898]' : 'fmtm-border-white'
                   }`}
                   key={pageNumber}
@@ -99,7 +99,9 @@ export default function DataTablePagination({
                     table.setPageIndex(+pageNumber - 1);
                   }}
                 >
-                  <p className={`${currentPage === pageNumber ? 'fmtm-font-bold fmtm-text-[#212121]' : ''}`}>
+                  <p
+                    className={`fmtm-body-sm ${currentPage === pageNumber ? 'fmtm-font-bold fmtm-text-[#212121]' : 'fmtm-text-grey-800 hover:fmtm-text-primary-900 fmtm-duration-200'}`}
+                  >
                     {pageNumber}
                   </p>
                 </div>
@@ -112,9 +114,9 @@ export default function DataTablePagination({
                 setCurrentPageState((prev) => Number(prev) + 1);
                 table.nextPage();
               }}
-              className={`${!table.getCanNextPage() && 'fmtm-cursor-not-allowed'} hover:fmtm-bg-red-50 fmtm-rounded-full fmtm-duration-100 hover:fmtm-text-red-600`}
+              className={`fmtm-w-5 fmtm-h-5 fmtm-min-w-5 fmtm-min-h-5 fmtm-rounded-full fmtm-flex fmtm-items-center fmtm-justify-center ${!table.getCanNextPage() ? 'fmtm-cursor-not-allowed fmtm-text-grey-400' : 'hover:fmtm-bg-red-50 fmtm-duration-100 hover:fmtm-text-red-600'}`}
             >
-              <AssetModules.ChevronRightIcon />
+              <AssetModules.ChevronRightIcon className="!fmtm-text-sm" />
             </button>
           </div>
         )}

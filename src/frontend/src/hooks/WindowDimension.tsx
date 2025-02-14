@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // Extra small.col -    < 576px	Mobile Display
 // Small.col - sm - ≥576px	Mobile Display
 // Medium.col - md - ≥768px	Tablet Display
 // Large.col - lg -  ≥992px	Desktop Display
 // Extra large.col - xl - ≥1200px Desktop Display
-function calculateWidthType(width) {
+function calculateWidthType(width: number) {
   if (width >= 1700) {
     return 'xl';
   } else if (width >= 1332) {
@@ -15,7 +15,7 @@ function calculateWidthType(width) {
     return 'sm';
   } else if (width >= 632) {
     return 's';
-  } else if (width < 632) {
+  } else {
     return 'xs';
   }
 }

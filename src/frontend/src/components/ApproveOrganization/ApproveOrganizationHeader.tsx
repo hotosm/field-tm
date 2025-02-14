@@ -8,11 +8,11 @@ const ApproveOrganizationHeader = () => {
     <div className="fmtm-px-5 fmtm-border-b-white fmtm-border-[1px] fmtm-bg-[#F5F5F5]">
       <div className="fmtm-flex fmtm-justify-between fmtm-items-center">
         <div className="fmtm-pt-3 fmtm-pb-1">
-          <h1 className="sm:fmtm-text-xl md:fmtm-text-2xl">APPROVE ORGANIZATION</h1>
+          <h4>APPROVE ORGANIZATION</h4>
         </div>
         <div
           className="hover:fmtm-bg-gray-200 fmtm-rounded-full fmtm-p-2 fmtm-duration-300 fmtm-cursor-pointer"
-          onClick={() => navigate('/organization')}
+          onClick={() => navigate('/manage/organization')}
         >
           <AssetModules.CloseIcon />
         </div>
