@@ -119,7 +119,7 @@ export default function PrimaryAppBar() {
                       className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-cursor-pointer"
                     />
                   ) : (
-                    <div className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-bg-grey-600 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-cursor-default">
+                    <div className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-bg-grey-600 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-cursor-pointer">
                       <h5 className="fmtm-text-white">{authDetails.username[0]?.toUpperCase()}</h5>
                     </div>
                   )}
@@ -137,7 +137,7 @@ export default function PrimaryAppBar() {
                           className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-cursor-pointer"
                         />
                       ) : (
-                        <div className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-bg-grey-600 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-cursor-default">
+                        <div className="fmtm-w-[2.25rem] fmtm-h-[2.25rem] fmtm-rounded-full fmtm-bg-grey-600 fmtm-flex fmtm-items-center fmtm-justify-center fmtm-cursor-pointer">
                           <h5 className="fmtm-text-white">{authDetails.username[0]?.toUpperCase()}</h5>
                         </div>
                       )}
