@@ -24,12 +24,8 @@ import { filterType } from '@/store/types/ISubmissions';
 import { SubmissionActions } from '@/store/slices/SubmissionSlice';
 
 import { CreateTaskEvent } from '@/api/TaskEvent';
-import { ConvertXMLToJOSM, getDownloadProjectSubmission } from '@/api/task';
-import {
-  downloadSubmissionGeojson,
-  SubmissionFormFieldsService,
-  SubmissionTableService,
-} from '@/api/SubmissionService';
+import { ConvertXMLToJOSM, DownloadProjectSubmission } from '@/api/task';
+import { SubmissionFormFieldsService, SubmissionTableService } from '@/api/SubmissionService';
 
 import filterParams from '@/utilfunctions/filterParams';
 import { camelToFlat } from '@/utilfunctions/commonUtils';
@@ -63,7 +59,6 @@ const SubmissionsTable = ({ toggleView }) => {
   const projectInfo = useAppSelector((state) => state.project.projectInfo);
   const josmEditorError = useAppSelector((state) => state.task.josmEditorError);
   const downloadSubmissionLoading = useAppSelector((state) => state.task.downloadSubmissionLoading);
-  const downloadSubmissionGeojsonLoading = useAppSelector((state) => state.submission.DownloadSubmissionGeojsonLoading);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const updateTaskStatusLoading = useAppSelector((state) => state.common.loading);
 
@@ -91,14 +86,18 @@ const SubmissionsTable = ({ toggleView }) => {
     {
       type: 'csv',
       label: 'Download as Csv',
-      loading: downloadSubmissionLoading.type === 'csv' && downloadSubmissionLoading.loading,
+      loading: downloadSubmissionLoading.fileType === 'csv' && downloadSubmissionLoading.loading,
     },
     {
       type: 'json',
       label: 'Download as Json',
-      loading: downloadSubmissionLoading.type === 'json' && downloadSubmissionLoading.loading,
+      loading: downloadSubmissionLoading.fileType === 'json' && downloadSubmissionLoading.loading,
     },
-    { type: 'geojson', label: 'Download as GeoJson', loading: downloadSubmissionGeojsonLoading },
+    {
+      type: 'geojson',
+      label: 'Download as GeoJson',
+      loading: downloadSubmissionLoading.fileType === 'geojson' && downloadSubmissionLoading.loading,
+    },
   ];
 
   useEffect(() => {
@@ -229,23 +228,13 @@ const SubmissionsTable = ({ toggleView }) => {
   };
 
   const handleDownload = (downloadType: 'csv' | 'json' | 'geojson') => {
-    if (downloadType === 'geojson') {
-      dispatch(
-        downloadSubmissionGeojson(
-          `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson`,
-          projectInfo.name!,
-          { project_id: projectId, submitted_date_range: filter?.submitted_date_range },
-        ),
-      );
-    } else {
-      dispatch(
-        getDownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectInfo.name!, {
-          project_id: projectId,
-          submitted_date_range: filter?.submitted_date_range,
-          export_json: downloadType === 'json',
-        }),
-      );
-    }
+    dispatch(
+      DownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectInfo.name!, {
+        project_id: projectId,
+        submitted_date_range: filter?.submitted_date_range,
+        file_type: downloadType,
+      }),
+    );
   };
 
   const handleTaskMap = async () => {

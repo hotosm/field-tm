@@ -271,6 +271,14 @@ class GeomStatus(StrEnum, Enum):
     BAD = "BAD"
 
 
+class SubmissionDownloadType(StrEnum, Enum):
+    """File type to download for ODK submission data."""
+
+    GEOJSON = "geojson"
+    JSON = "json"
+    CSV = "csv"
+
+
 class OdkWebhookEvents(StrEnum, Enum):
     """Types of events received from ODK Central webhook."""
 

@@ -156,9 +156,6 @@ const ProjectSlice = createSlice({
       });
       state.projectTaskBoundries = updatedProjectTaskBoundries;
     },
-    SetDownloadSubmissionGeojsonLoading(state, action: PayloadAction<boolean>) {
-      state.downloadSubmissionLoading = action.payload;
-    },
     SetGeometryLog(state, action: PayloadAction<geometryLogResponseType[]>) {
       const geomLog = action.payload;
       const badGeomLog = geomLog.filter((geom) => geom.status === 'BAD');
