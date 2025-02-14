@@ -569,7 +569,7 @@ requires-dist = [
     { name = "httptools", specifier = "==0.6.4" },
     { name = "loguru", specifier = "==0.7.2" },
     { name = "minio", specifier = "==7.2.9" },
-    { name = "osm-fieldwork", specifier = "==0.19.0" },
+    { name = "osm-fieldwork", specifier = "==0.20.1" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "osm-rawdata", specifier = "==0.4.2" },
     { name = "psycopg", extras = ["pool"], specifier = ">=3.2.3" },
@@ -1449,7 +1449,7 @@ wheels = [
 
 [[package]]
 name = "osm-fieldwork"
-version = "0.19.0"
+version = "0.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1473,9 +1473,9 @@ dependencies = [
     { name = "shapely" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0a/34/30e88b54d440fc2be9adc44920390edfb0ef7a4c4a07018cedc7618a28bb/osm-fieldwork-0.19.0.tar.gz", hash = "sha256:f7bb2fd2e4b1a87470314cd26ae94c6bca41abb44b3e2bae78f52429e0b34926", size = 1485906 }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/b3/cbbc7c2f09140bc4b2d510a58bf770bb7ab0e47f37241f79a316b8f95ca6/osm-fieldwork-0.20.1.tar.gz", hash = "sha256:96a57878c57177e8c407ca2bf42fd411aead0d8079f35a5cf6abefa5e5042fdf", size = 1487859 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/89/2f/b2e98810f0020f49bad89734811a2ae553338bcb25a58f676a8c9899c0f8/osm_fieldwork-0.19.0-py3-none-any.whl", hash = "sha256:c875779ec448aecabaa5ec43c637ab40dd3206026644d59eb16b1f4f9b6058f9", size = 1512013 },
+    { url = "https://files.pythonhosted.org/packages/bc/58/e927a1c375fe99422b6e6b9b2004fd18b601341f556b12935e486bb9c29e/osm_fieldwork-0.20.1-py3-none-any.whl", hash = "sha256:997a66f9201993ba63bd57447a4fbbe6c631787dd58be5b23565ddc81b63a321", size = 1513511 },
 ]
 
 [[package]]
