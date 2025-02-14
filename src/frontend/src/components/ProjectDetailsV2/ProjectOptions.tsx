@@ -51,7 +51,7 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
       );
     } else if (downloadType === 'submission') {
       dispatch(
-        DownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, params.name!, {
+        DownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectName, {
           project_id: projectId,
           file_type: 'geojson',
           submitted_date_range: null,
