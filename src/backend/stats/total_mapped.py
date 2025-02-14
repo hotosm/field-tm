@@ -1,8 +1,12 @@
-"""For each project get: ID, location, total features, total features mapped."""
+"""For each project get: ID, location, total features, total features mapped.
+
+Also include a project count per country at the end.
+"""
 
 import asyncio
 import os
 from typing import List, Optional
+from collections import defaultdict
 
 import httpx
 from pydantic import BaseModel
@@ -69,12 +73,28 @@ async def main():
             print("No projects found.")
             return
 
-        results = await asyncio.gather(
+        all_project_details = await asyncio.gather(
             *(process_project(client, proj) for proj in projects)
         )
 
-    for result in results:
-        print(result)
+    project_count_per_country = defaultdict(int)
+
+    print("\nFMTM Stats")
+    print("----------\n")
+    for project_details in all_project_details:
+        print(project_details)
+
+        # Group projects by country
+        if not project_details.get("location_str"):
+            # Skip if no location string
+            continue
+        _, country = project_details["location_str"].rsplit(",", 1)  # Extract country
+        project_count_per_country[country.strip()] += 1
+
+    print("--------------------------\n")
+    print(f"Project count per country:\n")
+    for country, count in project_count_per_country.items():
+        print(f"{country}: {count}")
 
 
 if __name__ == "__main__":

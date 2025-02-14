@@ -87,11 +87,27 @@ josm:
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
-  @echo " Access the JOSM Remote API: http://localhost:8111"
+  @echo " Access the S3 Browser at: http://localhost:8111"
   @echo " Access the JOSM GUI in browser: http://localhost:8112"
   @echo
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
+
+# Start S3 browser
+[no-cd]
+s3-browser:
+  docker compose \
+    -f contrib/s3_browser/compose.yaml \
+    up -d
+  
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+  @echo " Access the S3 Browser at: http://localhost:8334"
+  @echo
+  @echo "\033[0;33m ############################################### \033[0m"
+  @echo
+
 
 # Externally accessible ODK Central for tests
 [no-cd]
