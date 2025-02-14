@@ -229,14 +229,6 @@ class ReviewStateEnum(StrEnum, Enum):
     REJECTED = "rejected"
 
 
-class GeometryType(StrEnum, Enum):
-    """GeoJSON geometry types."""
-
-    Polygon = "Polygon"
-    LineString = "LineString"
-    Point = "Point"
-
-
 class DbGeomType(StrEnum, Enum):
     """Enum in the database, all geom types are in caps."""
 
