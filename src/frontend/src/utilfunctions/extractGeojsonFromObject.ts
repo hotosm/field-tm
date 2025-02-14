@@ -20,7 +20,12 @@ export const convertCoordinateStringToFeature = (key: string, coordinateString: 
         });
       return [coordinate[1], coordinate[0]];
     });
-    feature = { ...feature, geometry: { type: 'Polygon', coordinates: [coordinates] }, properties: { label: key } };
+    // if initial and last coordinates are same, it's a Polygon else LineString
+    if (coordinates?.[0]?.toString() === coordinates?.[coordinates?.length - 1]?.toString()) {
+      feature = { ...feature, geometry: { type: 'Polygon', coordinates: [coordinates] }, properties: { label: key } };
+    } else {
+      feature = { ...feature, geometry: { type: 'LineString', coordinates: coordinates }, properties: { label: key } };
+    }
   } else {
     // if feature is Point in JavaRosa format it contains string of array
     const splittedCoord = coordinateString?.split(' ');
