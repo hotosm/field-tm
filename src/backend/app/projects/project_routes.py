@@ -946,12 +946,13 @@ async def get_project_form_xml_route(
     odkid = project.odkid
     odk_form_id = project.odk_form_id
     # Run separate thread in event loop to avoid blocking with sync code
-    return await run_in_threadpool(
+    form_xml = await run_in_threadpool(
         central_crud.get_project_form_xml,
         odk_creds,
         odkid,
         odk_form_id,
     )
+    return Response(content=form_xml, media_type="application/xml")
 
 
 @router.post("/{project_id}/generate-project-data")
