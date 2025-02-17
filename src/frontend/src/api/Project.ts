@@ -315,34 +315,6 @@ export const UpdateEntityState = (url: string, payload: { entity_id: string; sta
   };
 };
 
-export const DownloadSubmissionGeojson = (url: string, projectName: string) => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(true));
-
-    const downloadSubmissionGeojson = async (url: string) => {
-      try {
-        const response = await CoreModules.axios.get(url, { responseType: 'blob' });
-        const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = `${projectName}.geojson`;
-        a.click();
-        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
-      } catch (error) {
-        const errortxt = JSON.parse(await error.response.data.text()).detail;
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: errortxt || 'Failed to download submission geojson.',
-          }),
-        );
-        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
-      } finally {
-        dispatch(ProjectActions.SetDownloadSubmissionGeojsonLoading(false));
-      }
-    };
-    await downloadSubmissionGeojson(url);
-  };
-};
-
 export const GetGeometryLog = (url: string) => {
   return async (dispatch: AppDispatch) => {
     const getProjectActivity = async (url: string) => {

@@ -229,14 +229,6 @@ class ReviewStateEnum(StrEnum, Enum):
     REJECTED = "rejected"
 
 
-class GeometryType(StrEnum, Enum):
-    """GeoJSON geometry types."""
-
-    Polygon = "Polygon"
-    LineString = "LineString"
-    Point = "Point"
-
-
 class DbGeomType(StrEnum, Enum):
     """Enum in the database, all geom types are in caps."""
 
@@ -269,6 +261,14 @@ class GeomStatus(StrEnum, Enum):
 
     NEW = "NEW"
     BAD = "BAD"
+
+
+class SubmissionDownloadType(StrEnum, Enum):
+    """File type to download for ODK submission data."""
+
+    GEOJSON = "geojson"
+    JSON = "json"
+    CSV = "csv"
 
 
 class OdkWebhookEvents(StrEnum, Enum):

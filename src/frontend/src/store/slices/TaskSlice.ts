@@ -15,7 +15,7 @@ const initialState: TaskStateTypes = {
   },
   projectBoundaryLoading: false,
   convertToOsmLoading: false,
-  downloadSubmissionLoading: { type: '', loading: false },
+  downloadSubmissionLoading: { fileType: '', loading: false },
   convertXMLToJOSMLoading: false,
   josmEditorError: null,
 };
@@ -72,7 +72,10 @@ const TaskSlice = createSlice({
     SetSelectedFeatureProps(state, action: PayloadAction<TaskFeatureSelectionProperties>) {
       state.selectedFeatureProps = action.payload;
     },
-    GetDownloadProjectSubmissionLoading(state, action: PayloadAction<{ type: 'json' | 'csv'; loading: boolean }>) {
+    DownloadProjectSubmissionLoading(
+      state,
+      action: PayloadAction<{ fileType: 'json' | 'csv' | 'geojson'; loading: boolean }>,
+    ) {
       state.downloadSubmissionLoading = action.payload;
     },
     SetConvertXMLToJOSMLoading(state, action: PayloadAction<boolean>) {

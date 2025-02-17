@@ -26,10 +26,20 @@
         background-color: #f0f0f0;
       }
 
+      /* Style to wrap two buttons */
+      #button-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 80%;
+        width: 80%;
+        align-items: center;
+        gap: 1rem;
+      }
+
       /* Style for the button */
       button {
         width: 80%; /* Make the button take up 80% of the width */
-        height: 80%; /* Make the button take up 80% of the height */
+        height: 40%; /* Make the button take up 40% of the height */
         font-size: 2rem; /* Increase font size for better visibility */
         background-color: #d63f3f;
         color: white;
@@ -46,10 +56,23 @@
     </style>
   </head>
   <body>
-    <button
-      onclick="window.location.href='odkcollect://form/1d0bf9fb-316d-4014-9526-7a4f95a8fa04?new_feature=27.712159507 85.302242429 0.0 0.0'"
-    >
-      Click Me
-    </button>
+    <script>
+      const xformId = "360e759c-5784-47d0-bf19-20619e44dafb";
+      const taskId = "203";
+      const entityUuid = "06add724-ece8-4c37-a97b-a7c4b745a710";
+      const newFeature = "27.710959067 85.300115063 0.0 0.0;";
+    </script>
+    <div id="button-wrapper">
+      <button
+        onclick="window.location.href=`odkcollect://form/${xformId}?feature=${entityUuid}&task_id=${taskId}`"
+      >
+        Existing Feature
+      </button>
+      <button
+        onclick="window.location.href=`odkcollect://form/${xformId}?new_lat=27.710959067&new_lon=85.300115063`"
+      >
+        New Feature
+      </button>
+    </div>
   </body>
 </html>
