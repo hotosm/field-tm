@@ -81,6 +81,7 @@ async def test_create_project_with_dup(client, organisation, project_data):
     assert isinstance(new_project["id"], int)
     assert isinstance(new_project["slug"], str)
     assert new_project["slug"] == slugify(project_name)
+    assert new_project["location_str"] == "Kathmandu,Nepal"
 
     # Duplicate response to test error condition: project name already exists
     response_duplicate = await client.post(
@@ -454,6 +455,7 @@ async def test_project_by_id(client, project):
     assert data["xform_category"] == project.xform_category
     assert data["hashtags"] == project.hashtags
     assert data["organisation_id"] == project.organisation_id
+    assert data["location_str"] == project.location_str
     assert data["tasks"] == []
 
 

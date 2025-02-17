@@ -50,6 +50,7 @@ dependencies = [
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",
     "pyodk",
+    "pg-nearest-city>=0.2.0",
 ]
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}

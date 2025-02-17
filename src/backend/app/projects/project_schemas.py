@@ -32,15 +32,10 @@ from pydantic.functional_serializers import field_serializer
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
-from app.config import decrypt_value, encrypt_value, settings
+from app.config import decrypt_value, encrypt_value
 from app.db.enums import BackgroundTaskStatus, DbGeomType, GeomStatus, ProjectPriority
 from app.db.models import DbBackgroundTask, DbBasemap, DbProject, slugify
-from app.db.postgis_utils import (
-    geojson_to_featcol,
-    get_address_from_lat_lon,
-    merge_polygons,
-    polygon_to_centroid,
-)
+from app.db.postgis_utils import geojson_to_featcol, merge_polygons
 
 
 class GeometryLogIn(BaseModel):
@@ -184,25 +179,6 @@ class ProjectIn(ProjectInBase, ODKCentralIn):
     outline: Polygon
     # Omit new_geom_type as we calculate this automatically
     new_geom_type: Annotated[Optional[DbGeomType], Field(exclude=True)] = None
-
-    @model_validator(mode="after")
-    def generate_location_str(self) -> Self:
-        """Generate location string after centroid is generated.
-
-        NOTE we use a model_validator as it's guaranteed to only run once.
-        NOTE if we use computed then nominatim is called multiple times,
-        NOTE as computed fields cannot wait for a http call async.
-        """
-        if settings.DEBUG:
-            # NOTE we add this to avoid spamming Nominatim during tests
-            # Required until https://github.com/hotosm/fmtm/issues/1827
-            return self
-
-        centroid = polygon_to_centroid(self.outline.model_dump())
-        latitude, longitude = centroid.y, centroid.x
-        address = get_address_from_lat_lon(latitude, longitude)
-        self.location_str = address if address is not None else ""
-        return self
 
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):

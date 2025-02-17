@@ -44,6 +44,7 @@ from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
 from osm_fieldwork.xlsforms import xlsforms_path
+from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
 from app.auth.auth_deps import login_required, mapper_login_required
@@ -58,6 +59,7 @@ from app.db.enums import (
     ProjectRole,
     XLSFormType,
 )
+from app.db.languages_and_countries import countries
 from app.db.models import (
     DbBackgroundTask,
     DbBasemap,
@@ -75,6 +77,7 @@ from app.db.postgis_utils import (
     flatgeobuf_to_featcol,
     merge_polygons,
     parse_geojson_file_to_featcol,
+    polygon_to_centroid,
     split_geojson_by_task_areas,
 )
 from app.organisations import organisation_deps
@@ -1218,6 +1221,15 @@ async def create_project(
     odkproject = await run_in_threadpool(
         lambda: central_crud.create_odk_project(project_info.name, odk_creds_decrypted)
     )
+
+    # Get the location_str via reverse geocode
+    async with AsyncNearestCity(db) as geocoder:
+        centroid = await polygon_to_centroid(project_info.outline.model_dump())
+        latitude, longitude = centroid.y, centroid.x
+        location = await geocoder.query(latitude, longitude)
+        # Convert to two letter country code --> full name
+        country_full_name = countries.get(location.country, location.country)
+        project_info.location_str = f"{location.city},{country_full_name}"
 
     # Create the project in the FMTM DB
     project_info.odkid = odkproject["id"]
