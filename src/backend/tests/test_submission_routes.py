@@ -55,8 +55,8 @@ async def test_download_submission_json(client, submission):
     ).strftime("%Y-%m-%d")
 
     response = await client.get(
-        f"/submission/download?project_id={odk_project.id}"
-        f"&submitted_date_range={date},{date}&export_json=true"
+        f"/submission/download?project_id={odk_project.id}&file_type=json"
+        f"&submitted_date_range={date},{date}"
     )
 
     assert response.status_code == 200, (
@@ -80,7 +80,7 @@ async def test_download_submission_json(client, submission):
 
 
 async def test_download_submission_file(client, submission):
-    """Test downloading submissions as a ZIP file."""
+    """Test downloading submissions as zipped CSV file + attachment media."""
     odk_project = submission["project"]
 
     date = datetime.strptime(
@@ -88,8 +88,8 @@ async def test_download_submission_file(client, submission):
     ).strftime("%Y-%m-%d")
 
     response = await client.get(
-        f"/submission/download?project_id={odk_project.id}"
-        f"&submitted_date_range={date},{date}&export_json=false"
+        f"/submission/download?project_id={odk_project.id}&file_type=csv"
+        f"&submitted_date_range={date},{date}"
     )
 
     assert response.status_code == 200, (
@@ -130,7 +130,7 @@ async def test_download_submission_geojson(client, submission):
     odk_project = submission["project"]
 
     response = await client.get(
-        f"/submission/download-submission-geojson?project_id={odk_project.id}"
+        f"/submission/download?project_id={odk_project.id}&file_type=geojson"
     )
 
     assert response.status_code == 200, (

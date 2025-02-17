@@ -48,7 +48,7 @@ from app.central.central_crud import (
 )
 from app.central.central_schemas import ODKCentral
 from app.config import settings
-from app.db.enums import GeometryType, HTTPStatus, XLSFormType
+from app.db.enums import HTTPStatus, XLSFormType
 from app.db.postgis_utils import (
     add_required_geojson_properties,
     featcol_keep_single_geom_type,
@@ -184,11 +184,10 @@ async def create_entities_from_csv(
 @router.post("/javarosa-geom-to-geojson")
 async def convert_javarosa_geom_to_geojson(
     javarosa_string: str,
-    geometry_type: GeometryType,
     current_user: Annotated[AuthUser, Depends(login_required)],
 ):
     """Convert a JavaRosa geometry string to GeoJSON."""
-    return await javarosa_to_geojson_geom(javarosa_string, geometry_type)
+    return await javarosa_to_geojson_geom(javarosa_string)
 
 
 @router.post("/convert-odk-submission-json-to-geojson")

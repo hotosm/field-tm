@@ -13,7 +13,7 @@ export type TaskStateTypes = {
 };
 
 type downloadSubmissionLoadingTypes = {
-  type: '' | 'json' | 'csv';
+  fileType: '' | 'json' | 'csv' | 'geojson';
   loading: boolean;
 };
 

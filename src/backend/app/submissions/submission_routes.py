@@ -35,7 +35,7 @@ from app.auth.roles import mapper, project_contributors, project_manager
 from app.central import central_crud
 from app.db import postgis_utils
 from app.db.database import db_conn
-from app.db.enums import HTTPStatus
+from app.db.enums import HTTPStatus, SubmissionDownloadType
 from app.db.models import DbBackgroundTask, DbSubmissionPhoto, DbTask
 from app.projects import project_crud, project_schemas
 from app.submissions import submission_crud, submission_deps, submission_schemas
@@ -98,7 +98,7 @@ async def create_submission(
 @router.get("/download")
 async def download_submission(
     project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
-    export_json: bool = True,
+    file_type: SubmissionDownloadType,
     submitted_date_range: Optional[str] = Query(
         None,
         title="Submitted Date Range",
@@ -107,13 +107,11 @@ async def download_submission(
 ):
     """Download the submissions for a given project.
 
-    Returned as either a JSONResponse, or a file to download.
-
-    Returns:
-        Union[list[dict], File]: JSON of submissions, or submission file.
+    Returns a JSON, CSV, or GeoJSON file.
     """
     project = project_user.get("project")
-    filters = None
+    filters = {}
+
     if submitted_date_range:
         start_date, end_date = submitted_date_range.split(",")
         filters = {
@@ -122,14 +120,28 @@ async def download_submission(
                 f"and __system/submissionDate le {end_date}T23:59:59.999+00:00"
             )
         }
-    if not export_json:
+
+    if file_type == SubmissionDownloadType.JSON:
+        return await submission_crud.download_submission_in_json(project, filters)
+
+    elif file_type == SubmissionDownloadType.CSV:
         file_content = await submission_crud.gather_all_submission_csvs(
             project, filters
         )
         headers = {"Content-Disposition": f"attachment; filename={project.slug}.zip"}
         return Response(file_content, headers=headers)
 
-    return await submission_crud.download_submission_in_json(project, filters)
+    # Else is GeoJSON download
+    data = await submission_crud.get_submission_by_project(project, filters)
+    submission_json = data.get("value", [])
+
+    submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
+        submission_json
+    )
+    submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
+
+    headers = {"Content-Disposition": f"attachment; filename={project.slug}.geojson"}
+    return Response(submission_data.getvalue(), headers=headers)
 
 
 # # FIXME 07/06/2024 since osm-fieldwork update
@@ -414,41 +426,6 @@ async def update_review_state(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=str(e),
         ) from e
-
-
-@router.get("/download-submission-geojson")
-async def download_submission_geojson(
-    project_user: Annotated[ProjectUserDict, Depends(project_contributors)],
-    submitted_date_range: Optional[str] = Query(
-        None,
-        title="Submitted Date Range",
-        description="Date range in format (e.g., 'YYYY-MM-DD,YYYY-MM-DD')",
-    ),
-):
-    """Download submission geojson for a specific project."""
-    project = project_user.get("project")
-    filters = {}
-
-    if submitted_date_range:
-        start_date, end_date = submitted_date_range.split(",")
-        filters = {
-            "$filter": (
-                f"__system/submissionDate ge {start_date}T00:00:00+00:00 "
-                f"and __system/submissionDate le {end_date}T23:59:59.999+00:00"
-            )
-        }
-    data = await submission_crud.get_submission_by_project(project, filters)
-    submission_json = data.get("value", [])
-
-    submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
-        submission_json
-    )
-    submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
-    filename = project.slug
-
-    headers = {"Content-Disposition": f"attachment; filename={filename}.geojson"}
-
-    return Response(submission_data.getvalue(), headers=headers)
 
 
 @router.get("/conflate-submission-geojson")

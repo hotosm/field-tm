@@ -200,9 +200,9 @@
 	></MapComponent>
 
 	{#if newFeatureGeom}
-		<div class="absolute left-0 right-0 z-20 top-[4.5rem] sm:top-[5.2rem] flex justify-center pointer-events-none">
+		<div class="absolute inset-0 z-20 flex items-center justify-center translate-y-[-5rem] pointer-events-none">
 			<div class="pointer-events-auto bg-white px-4 py-2 rounded-md shadow-lg w-fit max-w-[65%]">
-				<p class="mb-2">Are you sure you want to confirm & make submission?</p>
+				<p class="mb-2">Is the geometry in the correct place?</p>
 				<div class="flex gap-2 justify-end">
 					<sl-button
 						onclick={() => {
@@ -272,9 +272,7 @@
 						<sl-button
 							size="small"
 							class="primary w-full max-w-[200px]"
-							href="odkcollect://form/{data.project.odk_form_id}{taskStore.selectedTaskId
-								? `?task_filter=${taskStore.selectedTaskId}`
-								: ''}"
+							href="odkcollect://form/{data.project.odk_form_id}"
 						>
 							<span class="font-barlow font-medium text-base uppercase">Open ODK</span></sl-button
 						>

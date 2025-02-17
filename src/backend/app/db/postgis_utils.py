@@ -659,12 +659,14 @@ async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
     return ";".join(javarosa_geometry)
 
 
-async def javarosa_to_geojson_geom(javarosa_geom_string: str, geom_type: str) -> dict:
+async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     """Convert a JavaRosa format string to GeoJSON geometry.
+
+    The geometry type is automatically inferred from the geometry
+    coordinate structure.
 
     Args:
         javarosa_geom_string (str): The JavaRosa geometry.
-        geom_type (str): The geometry type.
 
     Returns:
         dict: A geojson geometry.
@@ -672,28 +674,25 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str, geom_type: str) ->
     if javarosa_geom_string is None:
         return {}
 
-    if geom_type == "Point":
-        lat, lon, _, _ = map(float, javarosa_geom_string.split())
-        geojson_geometry = {"type": "Point", "coordinates": [lon, lat]}
-    elif geom_type == "LineString":
-        coordinates = [
-            [float(coord) for coord in reversed(point.split()[:2])]
-            for point in javarosa_geom_string.split(";")
-        ]
-        geojson_geometry = {"type": "LineString", "coordinates": coordinates}
-    elif geom_type == "Polygon":
-        coordinates = [
-            [
-                [float(coord) for coord in reversed(point.split()[:2])]
-                for point in coordinate.split(";")
-            ]
-            for coordinate in javarosa_geom_string.split(",")
-        ]
-        geojson_geometry = {"type": "Polygon", "coordinates": coordinates}
-    else:
-        raise ValueError("Unsupported GeoJSON geometry type")
+    # Split by semicolon to get coordinate sets
+    coordinate_sets = javarosa_geom_string.strip().split(";")
+    # Convert coordinates to [lon, lat] pairs
+    coordinates = [
+        [float(coord) for coord in reversed(point.split()[:2])]
+        for point in coordinate_sets
+    ]
 
-    return geojson_geometry
+    # Determine geometry type
+    if len(coordinates) == 1:
+        geom_type = "Point"
+        coordinates = coordinates[0]  # Flatten for Point
+    elif coordinates[0] == coordinates[-1]:  # Check if closed loop
+        geom_type = "Polygon"
+        coordinates = [coordinates]  # Wrap in extra list for Polygon
+    else:
+        geom_type = "LineString"
+
+    return {"type": geom_type, "coordinates": coordinates}
 
 
 def multigeom_to_singlegeom(

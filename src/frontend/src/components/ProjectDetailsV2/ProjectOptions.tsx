@@ -1,7 +1,8 @@
 import React from 'react';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
-import { DownloadDataExtract, DownloadProjectForm, DownloadSubmissionGeojson } from '@/api/Project';
+import { DownloadDataExtract, DownloadProjectForm } from '@/api/Project';
+import { DownloadProjectSubmission } from '@/api/task';
 import Button from '@/components/common/Button';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { GetProjectQrCode } from '@/api/Files';
@@ -50,10 +51,11 @@ const ProjectOptions = ({ projectName }: projectOptionPropTypes) => {
       );
     } else if (downloadType === 'submission') {
       dispatch(
-        DownloadSubmissionGeojson(
-          `${import.meta.env.VITE_API_URL}/submission/download-submission-geojson?project_id=${projectId}`,
-          projectName,
-        ),
+        DownloadProjectSubmission(`${import.meta.env.VITE_API_URL}/submission/download`, projectName, {
+          project_id: projectId,
+          file_type: 'geojson',
+          submitted_date_range: null,
+        }),
       );
     } else if (downloadType === 'qr') {
       const downloadLink = document.createElement('a');
