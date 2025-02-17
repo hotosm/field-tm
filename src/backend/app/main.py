@@ -30,6 +30,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from loguru import logger as log
 from osm_fieldwork.xlsforms import xlsforms_path
+from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
 from app.__version__ import __version__
@@ -101,6 +102,9 @@ async def lifespan(
         await init_admin_org(conn)
         log.debug("Reading XLSForms from DB.")
         await read_and_insert_xlsforms(conn, xlsforms_path)
+        log.debug("Initialising reverse geocoding database")
+        async with AsyncNearestCity(conn):
+            pass
 
     yield {"db_pool": db_pool}
 

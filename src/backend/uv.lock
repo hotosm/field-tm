@@ -510,6 +510,7 @@ dependencies = [
     { name = "osm-fieldwork" },
     { name = "osm-login-python" },
     { name = "osm-rawdata" },
+    { name = "pg-nearest-city" },
     { name = "psycopg", extra = ["pool"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -573,6 +574,7 @@ requires-dist = [
     { name = "osm-fieldwork", specifier = "==0.20.2" },
     { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "osm-rawdata", specifier = "==0.4.2" },
+    { name = "pg-nearest-city", specifier = ">=0.2.0" },
     { name = "psycopg", extras = ["pool"], specifier = ">=3.2.3" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
@@ -1568,6 +1570,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712", size = 51043 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191 },
+]
+
+[[package]]
+name = "pg-nearest-city"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "psycopg" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7b/49/70102b50c39e765009a7d3774968e15956f812fd8c83b12203e9d05ac26a/pg_nearest_city-0.2.0.tar.gz", hash = "sha256:c4d8894caca49f676e0e9a9562b65b192b477a1771e38fba9ed1ba6f851cec7f", size = 13309104 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/d1/98273136ea3341efaf6d8f852df4dc943fdb48806784bf7cd9cd473a840b/pg_nearest_city-0.2.0-py3-none-any.whl", hash = "sha256:6baec18eb3c3943ce3cc7c69e43cd99503e235b1cd78075348dd0751f2f69d95", size = 13147470 },
 ]
 
 [[package]]

@@ -26,13 +26,12 @@ from typing import Optional, Union
 
 import geojson
 import geojson_pydantic
-import requests
 from fastapi import HTTPException
 from osm_fieldwork.data_models import data_models_path
 from osm_rawdata.postgres import PostgresClient
 from psycopg import Connection, ProgrammingError
 from psycopg.rows import class_row
-from shapely.geometry import MultiPolygon, Polygon, mapping, shape
+from shapely.geometry import MultiPolygon, Point, Polygon, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
@@ -51,9 +50,9 @@ def timestamp():
     return datetime.now(timezone.utc)
 
 
-def polygon_to_centroid(
+async def polygon_to_centroid(
     polygon: geojson.Polygon,
-) -> shape:
+) -> Point:
     """Convert GeoJSON to shapely geometry."""
     return shape(polygon).centroid
 
@@ -556,58 +555,6 @@ async def check_crs(input_geojson: Union[dict, geojson.FeatureCollection]):
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
         raise HTTPException(HTTPStatus.BAD_REQUEST, detail=error_message)
-
-
-def get_address_from_lat_lon(latitude, longitude):
-    """Get address using Nominatim, using lat,lon."""
-    base_url = "https://nominatim.openstreetmap.org/reverse"
-
-    params = {
-        "format": "json",
-        "lat": latitude,
-        "lon": longitude,
-        "zoom": 18,
-    }
-    headers = {
-        # Set the language to English
-        "Accept-Language": "en",
-        # Referer or User-Agent required as per usage policy:
-        # https://operations.osmfoundation.org/policies/nominatim
-        "Referer": settings.FMTM_DOMAIN,
-    }
-
-    log.debug(
-        f"Getting Nominatim address from project lat ({latitude}) lon ({longitude})"
-    )
-    response = requests.get(base_url, params=params, headers=headers)
-    if (status_code := response.status_code) != 200:
-        log.error(f"Getting address string failed: {status_code}")
-        return None
-
-    data = response.json()
-    log.debug(f"Nominatim response: {data}")
-
-    address = data.get("address", None)
-    if not address:
-        log.error(f"Getting address string failed: {status_code}")
-        return None
-
-    country = address.get("country", "")
-    city = address.get("city", "")
-    state = address.get("state", "")
-
-    address_str = f"{city},{country}" if city else f"{state},{country}"
-
-    if not address_str or address_str == ",":
-        log.error("Getting address string failed")
-        return None
-
-    return address_str
-
-
-async def get_address_from_lat_lon_async(latitude, longitude):
-    """Async wrapper for get_address_from_lat_lon."""
-    return get_address_from_lat_lon(latitude, longitude)
 
 
 async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
