@@ -5,7 +5,7 @@
   "enabledManagers": ["pep621", "npm"],
   "rangeStrategy": "update-lockfile",
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": false
   },
   "ignoreDeps": [
     "postgres",
