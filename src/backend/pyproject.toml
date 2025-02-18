@@ -49,7 +49,7 @@ dependencies = [
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",
-    "pg-nearest-city>=0.2.0",
+    "pg-nearest-city>=0.2.1",
     "pyodk",
 ]
 readme = "../../README.md"
