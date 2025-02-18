@@ -1,3 +1,7 @@
+networks:
+  fmtm-local:
+    external: true
+
 services:
   app:
     container_name: filestash
@@ -10,6 +14,8 @@ services:
     # - OFFICE_REWRITE_URL=http://127.0.0.1:9980
     ports:
       - "8334:8334"
+    networks:
+      - fmtm-local
     restart: unless-stopped
 
   # NOTE this is for document viewing - we don't need this
@@ -29,3 +35,16 @@ services:
   #   user: root
   #   ports:
   #   - "9980:9980"
+
+  # This service makes the Minio API in the FMTM dev stack accessible on port 9000
+  # localhost, despite not being bound in the dev compose.yaml file
+  port-bind:
+    profiles: [bind]
+    container_name: minio-port-bind
+    image: docker.io/alpine/socat
+    ports:
+      - "9000:9000"
+    networks:
+      - fmtm-local
+    command: |
+      TCP-LISTEN:"9000",fork TCP-CONNECT:"s3:9000"
