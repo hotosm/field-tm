@@ -171,9 +171,7 @@ backup_db() {
 
     BUCKET_NAME=${S3_BACKUP_BUCKET_NAME}
     echo "Uploading to S3 bucket ${BUCKET_NAME}"
-    # Sed required to strip additional "quotes"
     mc alias set s3 "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
-
     mc mb "s3/${BUCKET_NAME}" --ignore-existing
     mc anonymous set download "s3/${BUCKET_NAME}"
     mc cp "${db_backup_file}" "s3/${BUCKET_NAME}/pre-migrate/"

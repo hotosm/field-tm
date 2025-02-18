@@ -45,12 +45,12 @@ dependencies = [
     "sozipfile==0.3.2",
     "cryptography==43.0.3",
     "pyjwt==2.9.0",
-    "osm-fieldwork==0.20.2",
+    "osm-fieldwork==0.20.3",
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",
-    "pyodk",
     "pg-nearest-city>=0.2.0",
+    "pyodk",
 ]
 readme = "../../README.md"
 license = {text = "GPL-3.0-only"}

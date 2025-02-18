@@ -204,7 +204,7 @@ Creating a new release during development may not always be feasible.
 - Uncomment the line in compose.yaml
 
 ```yaml
-- ../osm-fieldwork/osm_fieldwork:/home/appuser/.local/lib/python3.12/site-packages/osm_fieldwork
+- ../osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork
 ```
 
 - Run the docker container with your local version of osm-fieldwork.

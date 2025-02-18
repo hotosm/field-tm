@@ -25,7 +25,7 @@ from typing import Optional
 
 from fastapi import File, UploadFile
 from fastapi.exceptions import HTTPException
-from osm_fieldwork.OdkCentralAsync import OdkDataset
+from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm
 
 from app.central.central_schemas import ODKCentralDecrypted
 from app.db.enums import HTTPStatus
@@ -36,6 +36,22 @@ async def get_odk_dataset(odk_creds: ODKCentralDecrypted):
     """Wrap getting an OdkDataset object with ConnectionError handling."""
     try:
         async with OdkDataset(
+            url=odk_creds.odk_central_url,
+            user=odk_creds.odk_central_user,
+            passwd=odk_creds.odk_central_password,
+        ) as odk_central:
+            yield odk_central
+    except ConnectionError as conn_error:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, detail=str(conn_error)
+        ) from conn_error
+
+
+@asynccontextmanager
+async def get_async_odk_form(odk_creds: ODKCentralDecrypted):
+    """Wrap getting an OdkDataset object with ConnectionError handling."""
+    try:
+        async with OdkForm(
             url=odk_creds.odk_central_url,
             user=odk_creds.odk_central_user,
             passwd=odk_creds.odk_central_password,
