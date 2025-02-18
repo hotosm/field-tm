@@ -1412,12 +1412,6 @@ class DbProject(BaseModel):
         async with db.cursor() as cur:
             await cur.execute(
                 """
-                DELETE FROM submission_photos WHERE project_id = %(project_id)s;
-            """,
-                {"project_id": project_id},
-            )
-            await cur.execute(
-                """
                 DELETE FROM background_tasks WHERE project_id = %(project_id)s;
             """,
                 {"project_id": project_id},
@@ -1852,19 +1846,6 @@ class DbBasemap(BaseModel):
         if success:
             return True
         return False
-
-
-class DbSubmissionPhoto(BaseModel):
-    """Table submission_photo.
-
-    TODO SQL this will be replace by ODK Central direct S3 upload.
-    """
-
-    id: Optional[int] = None
-    project_id: Optional[int] = None
-    task_id: Optional[int] = None  # Note this is not a DbTask, but an ODK task_id
-    submission_id: Optional[str] = None
-    s3_path: Optional[str] = None
 
 
 def slugify(name: Optional[str]) -> Optional[str]:

@@ -30,12 +30,14 @@ from psycopg import Connection
 from pyodk._utils.config import CentralConfig
 from pyodk.client import Client
 
-# from osm_fieldwork.json2osm import json2osm
 from app.central import central_schemas
 from app.central.central_crud import (
     get_odk_form,
 )
 from app.central.central_deps import get_async_odk_form
+
+# from osm_fieldwork.json2osm import json2osm
+from app.config import settings
 from app.db.enums import HTTPStatus
 from app.db.models import DbProject
 from app.projects import project_crud
@@ -248,6 +250,13 @@ async def get_submission_photos(
         submission_photos = await async_odk_form.getSubmissionAttachmentUrls(
             project.odkid, project.odk_form_id, submission_id
         )
+
+    # Iterate through and replace S3_ENDPOINT with S3_DOWNLOAD_ROOT,
+    # in case the S3 endpoint is containerised / local network
+    submission_photos = {
+        filename: url.replace(settings.S3_ENDPOINT, settings.S3_DOWNLOAD_ROOT)
+        for filename, url in submission_photos.items()
+    }
 
     return submission_photos
 

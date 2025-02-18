@@ -3,7 +3,8 @@ import AssetModules from '@/shared/AssetModules';
 import { Dialog, DialogContent } from '@/components/common/Modal';
 
 type ImageSliderProps = {
-  images: string[];
+  // key:value pairs of {filename:URL}
+  images: Record<string, string>;
 };
 
 const ImageSlider = ({ images }: ImageSliderProps) => {
@@ -19,6 +20,7 @@ const ImageSlider = ({ images }: ImageSliderProps) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       setIsOverflowing(container.scrollWidth > container.clientWidth);
+      handleScroll();
     }
   }, [images]);
 
@@ -34,6 +36,7 @@ const ImageSlider = ({ images }: ImageSliderProps) => {
 
   return (
     <>
+      {/* Fullscreen Image Viewer */}
       <Dialog
         open={selectedImageURL ? true : false}
         onOpenChange={(status) => {
@@ -66,11 +69,14 @@ const ImageSlider = ({ images }: ImageSliderProps) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Image Slider */}
       <div
         className="fmtm-flex fmtm-gap-x-3 fmtm-w-full fmtm-overflow-x-scroll scrollbar fmtm-relative"
         ref={scrollContainerRef}
         onScroll={handleScroll}
       >
+        {/* Left Scroll Button */}
         {showLeftButton && (
           <button
             className={`fmtm-sticky fmtm-left-2 fmtm-my-auto fmtm-z-50 fmtm-w-fit fmtm-p-1 fmtm-rounded-full fmtm-bg-black fmtm-bg-opacity-50 fmtm-h-fit hover:fmtm-scale-110 fmtm-cursor-pointer fmtm-duration-300`}
@@ -81,9 +87,11 @@ const ImageSlider = ({ images }: ImageSliderProps) => {
             <AssetModules.ChevronLeftIcon className="fmtm-text-white" />
           </button>
         )}
-        {images?.map((imageUrl, index) => (
+
+        {/* Image List */}
+        {Object.entries(images).map(([filename, imageUrl]) => (
           <div
-            key={index}
+            key={filename}
             onClick={() => setSelectedImageURL(imageUrl)}
             className="fmtm-h-[10.313rem] fmtm-w-[9.688rem] fmtm-min-w-[9.688rem] fmtm-rounded-lg fmtm-overflow-hidden fmtm-cursor-pointer"
           >
@@ -91,6 +99,7 @@ const ImageSlider = ({ images }: ImageSliderProps) => {
           </div>
         ))}
 
+        {/* Right Scroll Button */}
         {((isOverflowing && showRightButton) || (isOverflowing && scrollContainerRef?.current?.scrollLeft === 0)) && (
           <button
             className={`fmtm-sticky fmtm-right-2 fmtm-my-auto fmtm-z-50 fmtm-w-fit fmtm-p-1 fmtm-rounded-full fmtm-bg-black fmtm-bg-opacity-50 fmtm-h-fit hover:fmtm-scale-110 fmtm-cursor-pointer fmtm-duration-300`}
