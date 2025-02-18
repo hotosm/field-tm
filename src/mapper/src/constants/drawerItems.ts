@@ -18,6 +18,6 @@ export const drawerItems: drawerItemsType[] = [
 	},
 	{
 		name: 'Download Custom ODK Collect',
-		path: 'https://github.com/hotosm/odkcollect/releases/download/v2024.2.4-entity-select/ODK-Collect-v2024.2.4-FMTM.apk',
+		path: 'https://github.com/hotosm/odkcollect/releases/download/v2024.3.5-entity-select/ODK-Collect-v2024.3.5-HOTOSM-FMTM.apk',
 	},
 ];

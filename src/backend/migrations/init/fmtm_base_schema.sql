@@ -389,26 +389,6 @@ CACHE 1;
 ALTER TABLE public.xlsforms_id_seq OWNER TO fmtm;
 ALTER SEQUENCE public.xlsforms_id_seq OWNED BY public.xlsforms.id;
 
-CREATE TABLE public.submission_photos (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
-    -- Note this is not public.tasks, but an ODK task_id
-    task_id integer NOT NULL,
-    submission_id character varying NOT NULL,
-    s3_path character varying NOT NULL
-);
-ALTER TABLE public.submission_photos OWNER TO fmtm;
-CREATE SEQUENCE public.submission_photos_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE public.submission_photos_id_seq OWNER TO fmtm;
-ALTER SEQUENCE public.submission_photos_id_seq
-OWNED BY public.submission_photos.id;
-
 CREATE TABLE public.geometrylog (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     geojson JSONB NOT NULL,
@@ -431,9 +411,6 @@ ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval(
 );
 ALTER TABLE ONLY public.xlsforms ALTER COLUMN id SET DEFAULT nextval(
     'public.xlsforms_id_seq'::regclass
-);
-ALTER TABLE ONLY public.submission_photos ALTER COLUMN id SET DEFAULT nextval(
-    'public.submission_photos_id_seq'::regclass
 );
 
 
@@ -486,9 +463,6 @@ ADD CONSTRAINT xlsforms_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.xlsforms
 ADD CONSTRAINT xlsforms_title_key UNIQUE (title);
-
-ALTER TABLE ONLY public.submission_photos
-ADD CONSTRAINT submission_photos_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.geometrylog
 ADD CONSTRAINT geometrylog_pkey PRIMARY KEY (id);
@@ -592,11 +566,6 @@ ALTER TABLE ONLY public.user_roles
 ADD CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (
     user_id
 ) REFERENCES public.users (id);
-
-ALTER TABLE ONLY public.submission_photos
-ADD CONSTRAINT fk_project_id FOREIGN KEY (
-    project_id
-) REFERENCES public.projects (id);
 
 -- Triggers
 
