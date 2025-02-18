@@ -126,7 +126,11 @@ const SubmissionDetails = () => {
 
   useEffect(() => {
     if (paramsInstanceId) {
-      dispatch(GetSubmissionPhotosService(`${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}/photos`));
+      dispatch(
+        GetSubmissionPhotosService(
+          `${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}/photos?project_id=${projectId}`,
+        ),
+      );
     }
   }, [paramsInstanceId]);
 
@@ -200,6 +204,7 @@ const SubmissionDetails = () => {
                 }}
               />
             </div>
+
             {/* start, end, today, deviceid values */}
             {submissionDetailsLoading ? (
               <div className="fmtm-grid fmtm-grid-cols-2 fmtm-mt-6 fmtm-gap-0">
@@ -247,6 +252,7 @@ const SubmissionDetails = () => {
             <SubmissionComments />
           </div>
         </div>
+
         {/* submission photos */}
         {submissionPhotosLoading ? (
           <div className="fmtm-flex fmtm-gap-x-3 fmtm-overflow-x-scroll scrollbar fmtm-bg-white fmtm-p-6 fmtm-rounded-xl">
@@ -258,10 +264,10 @@ const SubmissionDetails = () => {
               />
             ))}
           </div>
-        ) : submissionPhotos?.length > 0 ? (
+        ) : submissionPhotos && Object.keys(submissionPhotos).length > 0 ? (
           <div className="fmtm-bg-white fmtm-rounded-xl fmtm-p-6">
             <p className="fmtm-text-base fmtm-font-bold fmtm-text-[#555] fmtm-mb-2">Images</p>
-            <ImageSlider images={submissionPhotos || []} />
+            <ImageSlider images={submissionPhotos || {}} />
           </div>
         ) : null}
       </div>
