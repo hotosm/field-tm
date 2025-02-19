@@ -26,6 +26,8 @@ FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG}
 # Copy minio mc client to create S3 buckets
 COPY --from=minio /usr/bin/mc /usr/local/bin/
+# Modify the S3 submission photo upload to every 15 minutes
+RUN sed -i 's/^0 5 \* \* \*/\*\/15 * * * */' /etc/cron.d/odk
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
 ENTRYPOINT ["/container-entrypoint.sh"]
