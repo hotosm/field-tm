@@ -3,7 +3,7 @@ import InputTextField from '../../../components/common/InputTextField';
 import AssetModules from '../../../shared/AssetModules.js';
 import Chips from '../../common/Chips';
 import { CustomSelect } from '../../common/Select';
-import Button from '../..//common/Button';
+import Button from '@/components/common/Button';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 
 const roleList = [
@@ -61,7 +61,7 @@ const AssignTab = () => {
         className="fmtm-bg-white"
       />
       <div className="fmtm-flex fmtm-justify-center">
-        <Button btnText="ASSIGN" btnType="primary" className="fmtm-rounded-md" />
+        <Button variant="primary-red">ASSIGN</Button>
       </div>
     </div>
   );

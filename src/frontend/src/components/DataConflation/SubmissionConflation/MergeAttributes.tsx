@@ -122,15 +122,9 @@ const MergeAttributes = ({
               </Table>
             </div>
             <div className="fmtm-flex fmtm-gap-[0.625rem] fmtm-justify-center fmtm-mt-5">
-              <Button
-                btnText="Save"
-                btnType="primary"
-                onClick={() => {
-                  setSelectedConflateMethod('');
-                }}
-                type="button"
-                className="!fmtm-rounded fmtm-text-sm !fmtm-py-2 fmtm-font-bold"
-              />
+              <Button variant="primary-red" onClick={() => setSelectedConflateMethod('')}>
+                Save
+              </Button>
             </div>
           </div>
         }

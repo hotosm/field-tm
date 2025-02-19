@@ -1,7 +1,7 @@
 import React from 'react';
 import TextArea from '../../common/TextArea';
 import InputTextField from '../../common/InputTextField';
-import Button from '../../common/Button';
+import Button from '@/components/common/Button';
 import EditProjectValidation from '@/components/ManageProject/EditTab/validation/EditProjectDetailsValidation';
 import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import { PatchProjectDetails } from '@/api/CreateProjectService';
@@ -90,14 +90,9 @@ const ProjectDescriptionTab = ({ projectId }) => {
         errorMsg={errors.hashtags}
       />
       <div className="fmtm-flex fmtm-justify-center fmtm-mt-4">
-        <Button
-          isLoading={editProjectDetailsLoading}
-          loadingText="Saving"
-          btnText="SAVE"
-          btnType="primary"
-          type="submit"
-          className="fmtm-rounded-md"
-        />
+        <Button variant="primary-red" isLoading={editProjectDetailsLoading} type="submit">
+          SAVE
+        </Button>
       </div>
     </form>
   );

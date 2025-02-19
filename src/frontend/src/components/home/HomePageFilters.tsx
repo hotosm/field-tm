@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { HomeActions } from '@/store/slices/HomeSlice';
 import Switch from '@/components/common/Switch';
 import Searchbar from '@/components/common/SearchBar';
-import Button from '@/components/common/Button2';
+import Button from '@/components/common/Button';
 
 type homePageFiltersPropType = {
   searchText: string;

@@ -242,7 +242,9 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   <p className="fmtm-text-gray-700 fmtm-pt-5 fmtm-pb-5">Draw a polygon on the map to plot the area</p>
                   {drawnGeojson && (
                     <>
-                      <Button btnText="Reset" btnType="secondary" type="button" onClick={() => resetFile()} />
+                      <Button variant="secondary-grey" onClick={() => resetFile()}>
+                        Reset
+                      </Button>
                       <p className="fmtm-text-gray-700 fmtm-mt-5">
                         Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
                       </p>
@@ -277,16 +279,17 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
               <Button
-                btnText="PREVIOUS"
-                btnType="secondary"
-                type="button"
+                variant="secondary-grey"
                 onClick={() => {
                   dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
                   toggleStep(1, '/create-project');
                 }}
-                className="fmtm-font-bold"
-              />
-              <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
+              >
+                PREVIOUS
+              </Button>
+              <Button variant="primary-red" type="submit">
+                NEXT
+              </Button>
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-full">

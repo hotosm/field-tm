@@ -273,7 +273,9 @@ const ProjectDetailsForm = ({ flag }) => {
             />
           </div>
           <div className="fmtm-w-fit fmtm-mx-auto fmtm-mt-10">
-            <Button btnText="NEXT" btnType="primary" type="submit" className="fmtm-font-bold" />
+            <Button variant="primary-red" type="submit">
+              NEXT
+            </Button>
           </div>
         </div>
       </form>

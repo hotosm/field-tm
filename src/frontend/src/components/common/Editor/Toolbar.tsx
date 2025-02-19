@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Editor } from '@tiptap/react';
 import AssetModules from '@/shared/AssetModules';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../Dropdown';
@@ -168,12 +168,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
               value={linkText}
               fieldType="text"
             />
-            <Button
-              btnText="Add"
-              btnType="other"
-              className="fmtm-text-sm !fmtm-px-2 !fmtm-py-1 fmtm-rounded-[6px] !fmtm-bg-primaryRed !fmtm-text-white"
-              onClick={setLink}
-            />
+            <Button variant="primary-red" onClick={setLink}>
+              Add
+            </Button>
           </DropdownMenuContent>
         </DropdownMenu>
         <Tooltip title="Quote">
@@ -203,12 +200,9 @@ export const Toolbar = ({ editor }: ToolbarProps) => {
               value={imageURL}
               fieldType="text"
             />
-            <Button
-              btnText="Insert"
-              btnType="other"
-              className="fmtm-text-sm !fmtm-px-2 !fmtm-py-1 fmtm-rounded-[6px] !fmtm-bg-primaryRed !fmtm-text-white"
-              onClick={addImage}
-            />
+            <Button variant="primary-red" onClick={addImage}>
+              Insert
+            </Button>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

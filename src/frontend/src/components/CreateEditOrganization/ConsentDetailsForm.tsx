@@ -83,13 +83,12 @@ const ConsentDetailsForm = () => {
         </div>
 
         <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">
-          <Button
-            btnText="Cancel"
-            btnType="other"
-            className="fmtm-font-bold"
-            onClick={() => navigate('/manage/organization')}
-          />
-          <Button btnText="NEXT" btnType="primary" className="fmtm-font-bold" onClick={handleSubmit} />
+          <Button variant="secondary-red" onClick={() => navigate('/manage/organization')}>
+            Cancel
+          </Button>
+          <Button variant="primary-red" onClick={handleSubmit}>
+            Next
+          </Button>
         </div>
       </div>
     </div>

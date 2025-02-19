@@ -61,7 +61,6 @@ const ProjectDetailsV2 = () => {
   const projectInfo = useAppSelector((state) => state.home.selectedProject);
   const selectedTask = useAppSelector((state) => state.task.selectedTask);
   const selectedFeatureProps = useAppSelector((state) => state.task.selectedFeatureProps);
-  const stateSnackBar = useAppSelector((state) => state.home.snackbar);
   const mobileFooterSelection = useAppSelector((state) => state.project.mobileFooterSelection);
   const mapTheme = useAppSelector((state) => state.theme.hotTheme);
   const projectDetailsLoading = useAppSelector((state) => state?.project?.projectDetailsLoading);
@@ -325,13 +324,9 @@ const ProjectDetailsV2 = () => {
             ) : (
               <p className="fmtm-text-lg fmtm-font-archivo fmtm-text-[#9B9999]">{`#${state.projectInfo.id}`}</p>
             )}
-            <Button
-              btnText="MANAGE PROJECT"
-              btnType="other"
-              className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md"
-              icon={<AssetModules.SettingsIcon />}
-              onClick={() => navigate(`/manage/project/${params?.id}`)}
-            />
+            <Button variant="secondary-red" onClick={() => navigate(`/manage/project/${params?.id}`)}>
+              MANAGE PROJECT <AssetModules.SettingsIcon />
+            </Button>
           </div>
           <div
             className="fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-flex-auto"
@@ -416,21 +411,18 @@ const ProjectDetailsV2 = () => {
           {viewState !== 'comments' && (
             <div className="fmtm-flex fmtm-gap-4">
               <Button
-                btnText="VIEW INFOGRAPHICS"
-                btnType="other"
-                className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md fmtm-my-2"
+                variant="secondary-red"
+                className="!fmtm-w-1/2"
                 onClick={() => navigate(`/project-submissions/${projectId}`)}
-              />
-              <div className="fmtm-relative" ref={divRef}>
-                <div onClick={() => handleToggle()}>
-                  <Button
-                    btnText="DOWNLOAD"
-                    btnType="other"
-                    className="hover:fmtm-text-red-700 fmtm-border-red-700 !fmtm-rounded-md fmtm-my-2"
-                  />
-                </div>
+              >
+                VIEW INFOGRAPHICS
+              </Button>
+              <div className="fmtm-relative fmtm-w-1/2" ref={divRef}>
+                <Button variant="secondary-red" className="fmtm-w-full" onClick={handleToggle}>
+                  DOWNLOAD
+                </Button>
                 <div
-                  className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-[#F5F5F5] fmtm-p-2 fmtm-rounded-md ${
+                  className={`fmtm-flex fmtm-gap-4 fmtm-absolute fmtm-duration-200 fmtm-z-[1000] fmtm-bg-[#F5F5F5] fmtm-px-2 fmtm-py-[2px] fmtm-rounded ${
                     toggle
                       ? 'fmtm-left-0 fmtm-bottom-0 lg:fmtm-top-0'
                       : '-fmtm-left-[65rem] fmtm-bottom-0 lg:fmtm-top-0'
@@ -521,30 +513,20 @@ const ProjectDetailsV2 = () => {
               />
               <div className="fmtm-absolute fmtm-bottom-20 md:fmtm-bottom-3 fmtm-left-3 fmtm-z-50">
                 <Button
-                  btnText="BASEMAPS"
-                  icon={<AssetModules.BoltIcon className="!fmtm-text-xl" />}
-                  onClick={() => {
-                    dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true));
-                  }}
-                  btnType="other"
-                  className="!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white"
-                />
+                  variant="secondary-red"
+                  onClick={() => dispatch(ProjectActions.ToggleGenerateMbTilesModalStatus(true))}
+                >
+                  BASEMAPS
+                  <AssetModules.BoltIcon className="!fmtm-text-xl" />
+                </Button>
               </div>
               <div className="fmtm-absolute fmtm-bottom-20 md:fmtm-bottom-3 fmtm-right-3 fmtm-z-50">
-                <Button
-                  btnText="SYNC STATUS"
-                  icon={
-                    <AssetModules.SyncIcon
-                      className={`!fmtm-text-xl ${(entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading) && 'fmtm-animate-spin'}`}
-                    />
-                  }
-                  onClick={() => {
-                    if (entityOsmMapLoading) return;
-                    syncStatus();
-                  }}
-                  btnType="other"
-                  className={`!fmtm-text-sm !fmtm-pr-2 fmtm-bg-white ${(entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading) && 'fmtm-cursor-not-allowed'}`}
-                />
+                <Button variant="secondary-red" onClick={syncStatus} disabled={entityOsmMapLoading}>
+                  SYNC STATUS
+                  <AssetModules.SyncIcon
+                    className={`!fmtm-text-xl ${(entityOsmMapLoading || getGeomLogLoading || syncTaskStateLoading) && 'fmtm-animate-spin'}`}
+                  />
+                </Button>
               </div>
               <MapControlComponent
                 map={map}

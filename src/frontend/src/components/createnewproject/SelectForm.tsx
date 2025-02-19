@@ -198,22 +198,17 @@ const SelectForm = ({ flag, geojsonFile, customFormFile, setCustomFormFile }) =>
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
               <Button
-                btnText="PREVIOUS"
-                btnType="secondary"
-                type="button"
+                variant="secondary-grey"
                 onClick={() => {
                   dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
                   toggleStep(2, '/project-area');
                 }}
-                className="fmtm-font-bold"
-              />
-              <Button
-                btnText="NEXT"
-                btnType="primary"
-                type="submit"
-                className="fmtm-font-bold"
-                disabled={validateCustomFormLoading}
-              />
+              >
+                PREVIOUS
+              </Button>
+              <Button variant="primary-red" type="submit" disabled={validateCustomFormLoading}>
+                NEXT
+              </Button>
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">

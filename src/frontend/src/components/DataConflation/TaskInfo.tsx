@@ -86,22 +86,12 @@ const TaskInfo = () => {
         </div>
 
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-3 fmtm-justify-end">
-          <Button
-            btnText="Submit Task"
-            type="button"
-            btnType="primary"
-            onClick={() => {}}
-            className="fmtm-text-sm !fmtm-rounded fmtm-w-full fmtm-justify-center"
-            disabled={submissionConflationGeojsonLoading}
-          />
-          <Button
-            btnText="Request Additional Mapping"
-            type="button"
-            btnType="other"
-            onClick={() => {}}
-            className="fmtm-text-sm !fmtm-rounded fmtm-w-full fmtm-justify-center"
-            disabled={submissionConflationGeojsonLoading}
-          />
+          <Button variant="primary-red" disabled={submissionConflationGeojsonLoading}>
+            Submit Task
+          </Button>
+          <Button variant="secondary-red" disabled={submissionConflationGeojsonLoading}>
+            Request Additional Mapping
+          </Button>
         </div>
       </div>
     </div>

@@ -282,18 +282,17 @@ const SubmissionsTable = ({ toggleView }) => {
         >
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger>
-              <button
-                className={`fmtm-py-1 fmtm-px-2 fmtm-text-red-600 fmtm-rounded fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-text-base fmtm-gap-2 fmtm-bg-white`}
-              >
-                <AssetModules.TuneIcon style={{ fontSize: '20px' }} /> <p>FILTER</p>{' '}
-                <div className="fmtm-text-sm fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-justify-center fmtm-items-center">
+              <Button variant="secondary-red">
+                <AssetModules.TuneIcon style={{ fontSize: '20px' }} />
+                FILTER{' '}
+                <div className="fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-full fmtm-w-4 fmtm-h-4 fmtm-flex fmtm-justify-center fmtm-items-center">
                   <p>{Object.values(filter).filter((filterObjValue) => filterObjValue).length}</p>
                 </div>
-              </button>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="fmtm-z-[50]" align="start">
               <div
-                className={`fmtm-w-fit -fmtm-bottom-20 fmtm-bg-white fmtm-px-4 fmtm-rounded-lg fmtm-shadow-2xl fmtm-pb-4 fmtm-pt-2 fmtm-grid fmtm-grid-cols-2 sm:fmtm-grid-cols-3 md:fmtm-grid-cols-4 lg:fmtm-grid-cols-5 fmtm-gap-4 fmtm-items-end`}
+                className={`fmtm-w-fit fmtm-max-w-[90vw] -fmtm-bottom-20 fmtm-bg-white fmtm-px-4 fmtm-rounded-lg fmtm-shadow-2xl fmtm-pb-4 fmtm-pt-2 fmtm-gap-4 fmtm-items-end fmtm-flex fmtm-flex-wrap`}
               >
                 <div className={`${windowSize.width < 500 ? 'fmtm-w-full' : 'fmtm-w-[11rem]'}`}>
                   <CustomSelect
@@ -351,35 +350,26 @@ const SubmissionsTable = ({ toggleView }) => {
                   </div>
                 </div>
                 <Button
-                  btnText="Reset Filter"
-                  btnType="other"
-                  className={`${
-                    submissionTableDataLoading || submissionFormFieldsLoading ? '' : 'fmtm-bg-white'
-                  } !fmtm-text-base !fmtm-font-bold !fmtm-rounded`}
+                  variant="secondary-red"
                   onClick={clearFilters}
                   disabled={submissionTableDataLoading || submissionFormFieldsLoading}
-                />
+                >
+                  Reset Filter
+                </Button>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="fmtm-flex fmtm-gap-2">
-            <button
-              className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 fmtm-bg-primaryRed hover:fmtm-bg-red-700`}
-              onClick={uploadToJOSM}
-            >
-              <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
-              <p className="fmtm-text-white fmtm-text-base fmtm-truncate">UPLOAD TO JOSM</p>
-            </button>
+            <Button variant="primary-red" onClick={uploadToJOSM}>
+              <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
+              UPLOAD TO JOSM
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <button
-                  className={`fmtm-px-2 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150
-                    fmtm-bg-primaryRed hover:fmtm-bg-red-700
-                  `}
-                >
-                  <AssetModules.FileDownloadIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
-                  <p className="fmtm-text-white fmtm-text-base">DOWNLOAD</p>
-                </button>
+                <Button variant="primary-red">
+                  <AssetModules.FileDownloadIcon className="!fmtm-text-xl" />
+                  DOWNLOAD
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="fmtm-z-[5000] fmtm-bg-white">
                 {submissionDownloadTypes?.map((submissionDownload) => (
@@ -398,36 +388,24 @@ const SubmissionsTable = ({ toggleView }) => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <button
-              className={`fmtm-px-4 fmtm-py-1 fmtm-flex fmtm-items-center fmtm-w-fit fmtm-rounded fmtm-gap-2 fmtm-duration-150 ${
-                submissionTableDataLoading || submissionFormFieldsLoading
-                  ? 'fmtm-bg-gray-400 fmtm-cursor-not-allowed'
-                  : 'fmtm-bg-primaryRed hover:fmtm-bg-red-700'
-              }`}
+            <Button
+              variant="primary-red"
               onClick={refreshTable}
+              isLoading={(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing}
               disabled={submissionTableDataLoading || submissionFormFieldsLoading}
             >
-              {(submissionTableDataLoading || submissionFormFieldsLoading) && submissionTableRefreshing ? (
-                <Loader2 className="fmtm-h-4 fmtm-w-4 fmtm-animate-spin fmtm-text-white" />
-              ) : (
-                <AssetModules.ReplayIcon className="fmtm-text-white" style={{ fontSize: '18px' }} />
-              )}
-              <p className="fmtm-text-white fmtm-text-base">REFRESH</p>
-            </button>
+              <AssetModules.ReplayIcon className="!fmtm-text-xl" />
+              REFRESH
+            </Button>
           </div>
         </div>
-        <div className="fmtm-w-full fmtm-flex fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
+        <div className="fmtm-w-full fmtm-flex fmtm-items-center fmtm-justify-end xl:fmtm-w-fit fmtm-gap-3">
           {filter?.task_id &&
             projectData?.[projectIndex]?.taskBoundries?.find((task) => task?.id === +filter?.task_id)?.task_state ===
               task_state.LOCKED_FOR_VALIDATION && (
-              <Button
-                isLoading={updateTaskStatusLoading}
-                loadingText="MARK AS VALIDATED"
-                btnText="MARK AS VALIDATED"
-                btnType="primary"
-                className="!fmtm-rounded !fmtm-text-base"
-                onClick={handleTaskMap}
-              />
+              <Button variant="primary-red" onClick={handleTaskMap} isLoading={updateTaskStatusLoading}>
+                MARK AS VALIDATED
+              </Button>
             )}
           {toggleView}
         </div>

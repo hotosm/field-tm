@@ -104,14 +104,9 @@ const FormUpdateTab = ({ projectId }) => {
         {formError && <p className="fmtm-text-primaryRed fmtm-text-sm fmtm-pt-1">Please upload a form</p>}
       </div>
       <div className="fmtm-flex fmtm-justify-center">
-        <Button
-          isLoading={formUpdateLoading}
-          loadingText="UPDATE"
-          onClick={onSave}
-          btnText="UPDATE"
-          btnType="primary"
-          className="fmtm-rounded-md"
-        />
+        <Button variant="primary-red" onClick={onSave} isLoading={formUpdateLoading}>
+          UPDATE
+        </Button>
       </div>
     </div>
   );

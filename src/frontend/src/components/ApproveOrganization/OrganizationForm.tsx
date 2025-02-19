@@ -135,23 +135,21 @@ const OrganizationForm = () => {
       </div>
       <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">
         <Button
-          btnText="Reject"
-          btnType="other"
-          className="fmtm-font-bold"
+          variant="secondary-red"
           onClick={rejectOrganization}
           isLoading={organizationRejecting}
-          loadingText="Rejecting..."
           disabled={organizationApproving}
-        />
+        >
+          Reject
+        </Button>
         <Button
-          btnText="Verify"
-          btnType="primary"
-          className="fmtm-font-bold"
+          variant="primary-red"
           onClick={approveOrganization}
           isLoading={organizationApproving}
-          loadingText="Verifying..."
           disabled={organizationRejecting}
-        />
+        >
+          Verify
+        </Button>
       </div>
     </div>
   );

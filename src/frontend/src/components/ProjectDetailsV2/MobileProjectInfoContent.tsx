@@ -16,14 +16,14 @@ const MobileProjectInfoContent = ({ projectInfo }: { projectInfo: Partial<projec
       <div className="fmtm-flex fmtm-gap-3 fmtm-justify-between">
         <p className="fmtm-text-2xl fmtm-text-primaryRed">#{projectInfo?.id}</p>
         <Button
-          btnText="Manage Project"
-          icon={<AssetModules.SettingsIcon />}
+          variant="secondary-red"
           onClick={() => {
             navigate(`/manage/project/${projectInfo?.id}`);
           }}
-          btnType="other"
-          className="!fmtm-text-base !fmtm-pr-2"
-        />
+        >
+          Manage Project
+          <AssetModules.SettingsIcon className="!fmtm-text-xl" />
+        </Button>
       </div>
       <div className="fmtm-flex fmtm-gap-3">
         <p className="fmtm-text-xl">Name: </p>

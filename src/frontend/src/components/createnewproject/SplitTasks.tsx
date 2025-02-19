@@ -305,13 +305,9 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                     <div className="fmtm-mt-6 fmtm-pb-3">
                       <div className="fmtm-flex fmtm-items-center fmtm-gap-4">
                         <Button
-                          btnText="Click to generate task"
-                          btnType="primary"
-                          type="button"
+                          variant="primary-red"
                           isLoading={dividedTaskLoading || taskSplittingGeojsonLoading}
                           onClick={generateTaskBasedOnSelection}
-                          className=""
-                          icon={<AssetModules.SettingsIcon className="fmtm-text-white" />}
                           disabled={
                             (splitTasksSelection === task_split_type.TASK_SPLITTING_ALGORITHM &&
                               !formValues?.average_buildings_per_task) ||
@@ -319,7 +315,10 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                               ? true
                               : false
                           }
-                        />
+                        >
+                          Click to generate task
+                          <AssetModules.SettingsIcon />
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -331,37 +330,32 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
                         Total number of task: <span className="fmtm-font-bold">{totalSteps}</span>
                       </p>
                       {dividedTaskGeojson && (
-                        <button
-                          type="button"
-                          onClick={downloadSplittedGeojson}
-                          className="fmtm-text-gray-500 fmtm-text-base fmtm-flex fmtm-items-center hover:fmtm-text-primaryRed fmtm-duration-200"
-                        >
-                          <AssetModules.FileDownloadOutlinedIcon className="fmtm-mr-1 !fmtm-text-xl" />
-                          <span>Download split geojson</span>
-                        </button>
+                        <Button variant="link-grey" onClick={downloadSplittedGeojson}>
+                          <AssetModules.FileDownloadOutlinedIcon />
+                          Download split geojson
+                        </Button>
                       )}
                     </div>
                   )}
                 </div>
                 <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
                   <Button
-                    btnText="PREVIOUS"
-                    btnType="secondary"
-                    type="button"
+                    variant="secondary-grey"
                     onClick={() => {
                       dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
                       toggleStep(3, '/map-data');
                     }}
-                    className="fmtm-font-bold"
-                  />
+                  >
+                    PREVIOUS
+                  </Button>
                   <Button
-                    isLoading={projectDetailsLoading}
-                    btnText="SUBMIT"
-                    btnType="primary"
+                    variant="primary-red"
                     type="submit"
-                    className="fmtm-font-bold"
+                    isLoading={projectDetailsLoading}
                     disabled={taskGenerationStatus ? false : true}
-                  />
+                  >
+                    SUBMIT
+                  </Button>
                 </div>
               </div>
               <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">
