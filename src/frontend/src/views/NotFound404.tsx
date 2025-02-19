@@ -19,12 +19,9 @@ const ProjectNotFound = () => {
             Page Not Found
           </p>
         </div>
-        <Button
-          btnText="Return Home"
-          onClick={() => navigate('/')}
-          btnType="other"
-          className="fmtm-mx-auto fmtm-rounded-none fmtm-py-2"
-        />
+        <Button variant="secondary-red" onClick={() => navigate('/')}>
+          Return Home
+        </Button>
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ type dialogPropType = {
 type taskListStateType = {
   value: string;
   key: string;
-  btnBG: string;
+  btnType: 'primary-red' | 'primary-grey' | 'link-red' | 'secondary-red';
 };
 
 export default function Dialog({ taskId, feature }: dialogPropType) {
@@ -150,25 +150,24 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
             </div>
             <div className="fmtm-flex fmtm-gap-4 fmtm-items-center fmtm-justify-end">
               <Button
-                btnText="CONTINUE MAPPING"
-                btnType="primary"
-                type="submit"
-                className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+                variant="primary-red"
                 onClick={() => {
                   setToggleMappedConfirmationModal(false);
                 }}
-              />
+              >
+                CONTINUE MAPPING
+              </Button>
               <Button
                 btnId="FINISH"
+                variant="primary-grey"
                 onClick={(e) => {
                   handleOnClick(e);
                   setToggleMappedConfirmationModal(false);
                 }}
                 disabled={loading}
-                btnText="MARK AS FULLY MAPPED"
-                btnType="other"
-                className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center !fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none`}
-              />
+              >
+                MARK AS FULLY MAPPED
+              </Button>
             </div>
           </div>
         }
@@ -177,15 +176,16 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
       {list_of_task_actions?.length > 0 && (
         <div
           className={`empty:fmtm-hidden fmtm-grid fmtm-border-t-[1px] fmtm-p-2 sm:fmtm-p-5 ${
-            list_of_task_actions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2'
+            list_of_task_actions?.length === 1 ? 'fmtm-grid-cols-1' : 'fmtm-grid-cols-2 fmtm-gap-2'
           }`}
         >
           {list_of_task_actions?.map((data, index) => {
             return checkIfTaskAssignedOrNot(data.value) ? (
               <Button
+                key={index}
+                variant={data.btnType}
                 btnId={data.value}
                 btnTestId="StartMapping"
-                key={index}
                 onClick={(e) => {
                   if (
                     data.key === 'Mark as fully mapped' &&
@@ -197,17 +197,10 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                     handleOnClick(e);
                   }
                 }}
-                disabled={loading}
-                btnText={data.key.toUpperCase()}
-                btnType={data.btnBG === 'red' ? 'primary' : 'other'}
-                className={`fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center ${
-                  data.btnBG === 'gray'
-                    ? '!fmtm-bg-[#4C4C4C] hover:!fmtm-bg-[#5f5f5f] fmtm-text-white hover:!fmtm-text-white !fmtm-border-none'
-                    : data.btnBG === 'transparent'
-                      ? '!fmtm-bg-transparent !fmtm-text-primaryRed !fmtm-border-none !fmtm-w-fit fmtm-mx-auto hover:!fmtm-text-red-700'
-                      : ''
-                }`}
-              />
+                className="!fmtm-w-full"
+              >
+                {data.key.toUpperCase()}
+              </Button>
             ) : null;
           })}
         </div>
@@ -215,21 +208,18 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
       {task_state !== taskStateEnum.UNLOCKED_TO_MAP && task_state !== taskStateEnum.LOCKED_FOR_MAPPING && (
         <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
           <Button
-            btnText="GO TO TASK SUBMISSION"
-            btnType="primary"
-            type="submit"
-            className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+            variant="primary-red"
             onClick={() => navigate(`/project-submissions/${params.id}?tab=table&task_id=${taskId}`)}
-          />
+            className="!fmtm-w-full"
+          >
+            GO TO TASK SUBMISSION
+          </Button>
         </div>
       )}
       {task_state === taskStateEnum.LOCKED_FOR_MAPPING && (
         <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
           <Button
-            btnText="GO TO ODK"
-            btnType="primary"
-            type="submit"
-            className="fmtm-font-bold !fmtm-rounded fmtm-text-sm !fmtm-py-2 !fmtm-w-full fmtm-flex fmtm-justify-center"
+            variant="primary-red"
             onClick={() => {
               const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
                 navigator.userAgent,
@@ -246,7 +236,10 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
                 );
               }
             }}
-          />
+            className="!fmtm-w-full"
+          >
+            GO TO ODK
+          </Button>
         </div>
       )}
     </div>

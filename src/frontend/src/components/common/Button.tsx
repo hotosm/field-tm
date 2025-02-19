@@ -1,84 +1,67 @@
-import { Loader2 } from 'lucide-react';
 import React from 'react';
+import { Loader2 } from 'lucide-react';
+
+type variantType = 'primary-red' | 'secondary-red' | 'link-red' | 'primary-grey' | 'secondary-grey' | 'link-grey';
 
 interface IButton {
-  btnText: string;
-  btnType: 'primary' | 'secondary' | 'other' | 'disabled';
+  variant: variantType;
+  children?: React.ReactNode;
   type?: 'submit' | 'button';
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
-  count?: number;
-  dataTip?: string;
-  icon?: React.ReactNode;
   isLoading?: boolean;
   disabled?: boolean;
-  loadingText?: string;
   btnId?: string;
   btnTestId?: string;
 }
 
-const btnStyle = (btnType, className) => {
-  switch (btnType) {
-    case 'primary':
-      return `${className} hover:fmtm-bg-red-700 fmtm-flex fmtm-px-4 fmtm-py-1 fmtm-bg-primaryRed fmtm-text-white fmtm-rounded-[8px] fmtm-w-fit`;
-    case 'secondary':
-      return `hover:fmtm-bg-gray-100 fmtm-flex fmtm-bg-white  fmtm-px-4 fmtm-py-1 fmtm-border border-[#E0E0E0] fmtm-rounded-[8px] fmtm-w-fit ${className}`;
+const variantStyle = {
+  primary: 'fmtm-py-2 fmtm-px-4 fmtm-gap-2 fmtm-rounded',
+  secondary: 'fmtm-py-2 fmtm-px-4 fmtm-gap-2 fmtm-rounded fmtm-border',
+  link: 'fmtm-py-2 fmtm-px-1 fmtm-gap-2 ',
+};
 
-    case 'other':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-red-600 fmtm-rounded-lg fmtm-border-[1px] fmtm-border-red-600 hover:fmtm-text-red-700 hover:fmtm-border-red-700 fmtm-w-fit ${className}`;
-    case 'disabled':
-      return `fmtm-py-1 fmtm-px-4 fmtm-text-white fmtm-rounded-lg fmtm-bg-gray-400 fmtm-cursor-not-allowed fmtm-w-fit ${className}`;
-
-    default:
-      return 'fmtm-primary';
+const btnStyle = (variant: variantType) => {
+  switch (variant) {
+    case 'primary-red':
+      return `${variantStyle.primary} fmtm-bg-red-medium fmtm-text-white hover:fmtm-bg-red-dark disabled:fmtm-bg-red-400`;
+    case 'secondary-red':
+      return `${variantStyle.secondary} fmtm-bg-white fmtm-text-red-medium fmtm-border-red-medium hover:fmtm-text-red-dark hover:fmtm-border-red-dark hover:fmtm-bg-red-light disabled:fmtm-text-red-400 disabled:fmtm-border-red-400 disabled:fmtm-bg-white`;
+    case 'link-red':
+      return `${variantStyle.link} fmtm-text-red-medium hover:fmtm-text-red-dark disabled:fmtm-text-red-400`;
+    case 'primary-grey':
+      return `${variantStyle.primary} fmtm-bg-grey-800 fmtm-text-white hover:fmtm-bg-grey-900 disabled:fmtm-bg-grey-600`;
+    case 'secondary-grey':
+      return `${variantStyle.secondary} fmtm-bg-white fmtm-text-grey-800 fmtm-border-grey-800 hover:fmtm-text-grey-900 hover:fmtm-border-grey-900 hover:fmtm-bg-grey-50 disabled:fmtm-text-grey-600 disabled:fmtm-border-grey-600 disabled:fmtm-bg-white`;
+    case 'link-grey':
+      return `${variantStyle.link} fmtm-text-grey-800 hover:fmtm-text-grey-900 disabled:fmtm-text-grey-600`;
   }
 };
+
 const Button = ({
-  btnText,
-  btnType,
-  type,
+  variant,
+  type = 'button',
   onClick,
   disabled,
   className,
-  count,
-  dataTip,
-  icon,
   isLoading,
-  loadingText,
   btnId,
   btnTestId,
+  children,
 }: IButton) => (
-  <div>
-    <button
-      data-btnid={btnId}
-      data-testid={btnTestId}
-      type={type === 'submit' ? 'submit' : 'button'}
-      onClick={onClick}
-      className={`fmtm-text-lg fmtm-group fmtm-flex fmtm-items-center fmtm-gap-2 fmtm-outline-none ${btnStyle(
-        isLoading || disabled ? 'disabled' : btnType,
-        className,
-      )}`}
-      disabled={disabled || isLoading}
-      title={dataTip}
-    >
-      {isLoading ? (
-        <>
-          {loadingText ? loadingText : type === 'submit' ? 'Submitting...' : 'Loading...'}
-          <Loader2 className="fmtm-mr-2 fmtm-h-6 fmtm-w-6 fmtm-animate-spin" />
-        </>
-      ) : (
-        <>
-          <p className="fmtm-whitespace-nowrap">{btnText}</p>
-          {count && (
-            <p className="fmtm-flex fmtm-justify-center fmtm-items-center fmtm-text-overline fmtm-ml-2 fmtm-rounded-[40px] fmtm-bg-active_text fmtm-text-white fmtm-w-6 fmtm-h-6">
-              {count}
-            </p>
-          )}
-          {icon && <div>{icon}</div>}
-        </>
-      )}
-    </button>
-  </div>
+  <button
+    data-btnid={btnId}
+    data-testid={btnTestId}
+    type={type}
+    onClick={onClick}
+    className={`fmtm-button fmtm-group fmtm-flex fmtm-justify-center fmtm-items-center fmtm-gap-2 fmtm-outline-none fmtm-w-fit fmtm-duration-200 fmtm-whitespace-nowrap ${btnStyle(variant)} ${className} ${(disabled || isLoading) && 'fmtm-cursor-not-allowed'}`}
+    disabled={disabled || isLoading}
+  >
+    <>
+      {children}
+      {isLoading && <Loader2 className="fmtm-animate-spin fmtm-w-4" strokeWidth={3.25} />}
+    </>
+  </button>
 );
 
 export default Button;

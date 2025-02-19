@@ -18,7 +18,7 @@ import {
   DropdownMenuPortal,
   DropdownMenuItem,
 } from '@/components/common/Dropdown';
-import Button from '@/components/common/Button2';
+import Button from '@/components/common/Button';
 import { user_roles } from '@/types/enums';
 
 export default function PrimaryAppBar() {

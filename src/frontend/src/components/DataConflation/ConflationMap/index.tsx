@@ -55,13 +55,9 @@ const ConflationMap = () => {
           <MapLegend />
         </div>
         <div className="fmtm-absolute fmtm-bottom-20 sm:fmtm-top-3 fmtm-right-3 fmtm-z-50 fmtm-rounded-lg fmtm-h-fit">
-          <Button
-            btnText="Upload to OSM"
-            type="button"
-            btnType="primary"
-            onClick={() => {}}
-            disabled={submissionConflationGeojsonLoading}
-          />
+          <Button variant="primary-red" onClick={() => {}} isLoading={submissionConflationGeojsonLoading}>
+            Upload to OSM
+          </Button>
         </div>
       </MapComponent>
     </>

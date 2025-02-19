@@ -12,35 +12,34 @@ export default {
   tasksStatus: [
     {
       label: 'UNLOCKED_TO_MAP',
-      action: [{ key: 'Assign To Mapper', value: 'MAP', btnBG: 'red' }],
-      btnBG: 'red',
+      action: [{ key: 'Assign To Mapper', value: 'MAP', btnType: 'primary-red' }],
     },
     {
       label: 'LOCKED_FOR_MAPPING',
       action: [
-        { key: 'Mark as fully mapped', value: 'FINISH', btnBG: 'gray' },
-        { key: 'Stop Mapping', value: 'BAD', btnBG: 'transparent' },
+        { key: 'Mark as fully mapped', value: 'FINISH', btnType: 'primary-grey' },
+        { key: 'Stop Mapping', value: 'BAD', btnType: 'link-red' },
       ],
     },
     {
       label: 'UNLOCKED_TO_VALIDATE',
       action: [
-        { key: 'Start Validation', value: 'VALIDATE', btnBG: 'gray' },
-        { key: 'Reset', value: 'BAD' },
+        { key: 'Start Validation', value: 'VALIDATE', btnType: 'primary-grey' },
+        { key: 'Reset', value: 'BAD', btnType: 'secondary-red' },
       ],
     },
     {
       label: 'LOCKED_FOR_VALIDATION',
       action: [
-        { key: 'Mark As Validated', value: 'GOOD', btnBG: 'gray' },
-        { key: 'Mapping Needed', value: 'BAD', btnBG: 'transparent' },
+        { key: 'Mark As Validated', value: 'GOOD', btnType: 'primary-grey' },
+        { key: 'Mapping Needed', value: 'BAD', btnType: 'link-red' },
       ],
     },
     {
       label: 'UNLOCKED_DONE',
       action: [
-        { key: 'Reset', value: 'BAD', btnBG: 'gray' },
-        // { key: 'Merge data with OSM', value: 'CONFLATE', btnBG: 'gray' },
+        { key: 'Reset', value: 'BAD', btnType: 'primary-grey' },
+        // { key: 'Merge data with OSM', value: 'CONFLATE', btnType: 'grey-red' },
       ],
     },
     // TODO add SPLIT, MERGE, ASSIGN

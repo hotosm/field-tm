@@ -82,22 +82,18 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
                       <p className="">ID: {submissionId?.replace('uuid:', '')}</p>
                     </div>
                     <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionId}`}>
-                      <Button
-                        btnText="validate this feature"
-                        btnType="other"
-                        className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase !fmtm-w-fit md:!fmtm-w-full"
-                      />
+                      <Button variant="secondary-red" className="!fmtm-w-full">
+                        VALIDATE THIS FEATURE
+                      </Button>
                     </Link>
                   </div>
                 ))}
               </>
             ) : (
               <Link to={`/project-submissions/${projectId}/tasks/${taskId}/submission/${submissionIds}`}>
-                <Button
-                  btnText="validate this feature"
-                  btnType="other"
-                  className="fmtm-font-bold !fmtm-rounded fmtm-text-sm fmtm-flex fmtm-justify-center fmtm-uppercase fmtm-w-fit md:!fmtm-w-full fmtm-mx-auto"
-                />
+                <Button variant="secondary-red" className="!fmtm-w-full">
+                  VALIDATE THIS FEATURE
+                </Button>
               </Link>
             )}
           </div>

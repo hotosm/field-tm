@@ -1,6 +1,7 @@
 import { AppDispatch } from '@/store/Store';
 import CoreModules from '@/shared/CoreModules';
 import { TaskActions } from '@/store/slices/TaskSlice';
+import { CommonActions } from '@/store/slices/CommonSlice';
 
 export const DownloadProjectSubmission = (
   url: string,
@@ -24,6 +25,11 @@ export const DownloadProjectSubmission = (
         a.download = `${projectName}.${params.file_type === 'csv' ? 'zip' : params.file_type}`;
         a.click();
       } catch (error) {
+        dispatch(
+          CommonActions.SetSnackBar({
+            message: JSON.parse(await error?.response?.data?.text())?.detail || 'Failed to download submissions',
+          }),
+        );
       } finally {
         dispatch(
           TaskActions.DownloadProjectSubmissionLoading({

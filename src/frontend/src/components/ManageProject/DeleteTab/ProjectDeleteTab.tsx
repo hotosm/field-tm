@@ -36,18 +36,24 @@ const FormUpdateTab = ({ projectId, projectName }) => {
   return (
     <div className="fmtm-flex fmtm-flex-col fmtm-items-center fmtm-gap-10">
       <div className="fmtm-flex fmtm-justify-left">
-        <Button onClick={onDelete} btnText="DELETE PROJECT" btnType="primary" className="fmtm-rounded-md" />
+        <Button variant="primary-red" onClick={onDelete}>
+          DELETE PROJECT
+        </Button>
       </div>
       <Modal
         className="fmtm-w-[700px]"
         description={
           <div className="text-center">
-            <h2>Are you sure?</h2>
+            <h5>Are you sure?</h5>
             <p>Please confirm the project name to proceed:</p>
             <input type="text" value={confirmProjectName} onChange={handleConfirmChange} />
             <div className="fmtm-flex fmtm-justify-center fmtm-gap-4">
-              <Button onClick={onSave} btnText="Confirm" btnType="primary" disabled={!confirmEnabled} />
-              <Button onClick={closeModal} btnText="Cancel" btnType="secondary" />
+              <Button variant="primary-red" onClick={onSave} disabled={!confirmEnabled}>
+                Confirm
+              </Button>
+              <Button variant="secondary-red" onClick={closeModal}>
+                Cancel
+              </Button>
             </div>
           </div>
         }

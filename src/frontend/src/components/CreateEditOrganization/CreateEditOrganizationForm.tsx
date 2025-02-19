@@ -247,21 +247,14 @@ const CreateEditOrganizationForm = ({ organizationId }: { organizationId: string
 
         <div className="fmtm-flex fmtm-items-center fmtm-justify-center fmtm-gap-6 fmtm-mt-8 lg:fmtm-mt-16">
           {!organizationId && (
-            <Button
-              btnText="Back"
-              btnType="other"
-              className="fmtm-font-bold"
-              onClick={() => dispatch(OrganisationAction.SetConsentApproval(false))}
-            />
+            <Button variant="secondary-red" onClick={() => dispatch(OrganisationAction.SetConsentApproval(false))}>
+              Back
+            </Button>
           )}
-          <Button
-            isLoading={postOrganisationDataLoading}
-            loadingText={!organizationId ? 'Submitting' : 'Updating'}
-            btnText={!organizationId ? 'Submit' : 'Update'}
-            btnType="primary"
-            className="fmtm-font-bold"
-            onClick={handleSubmit}
-          />
+
+          <Button variant="primary-red" onClick={handleSubmit} isLoading={postOrganisationDataLoading}>
+            {!organizationId ? 'Submit' : 'Update'}
+          </Button>
         </div>
       </div>
     </div>

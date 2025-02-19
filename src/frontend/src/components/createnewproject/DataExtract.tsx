@@ -238,18 +238,19 @@ const DataExtract = ({
                 }
               />
               {extractWays === 'osm_data_extract' && (
-                <Button
-                  btnText="Fetch OSM Data"
-                  btnType="primary"
-                  onClick={() => {
-                    resetFile(setCustomDataExtractUpload);
-                    generateDataExtract();
-                  }}
-                  className="fmtm-mt-4 !fmtm-mb-8 fmtm-text-base"
-                  isLoading={isFgbFetching}
-                  loadingText="Generating Map Data..."
-                  disabled={dataExtractGeojson && customDataExtractUpload ? true : false}
-                />
+                <div className="fmtm-mt-4 fmtm-mb-8">
+                  <Button
+                    variant="primary-red"
+                    onClick={() => {
+                      resetFile(setCustomDataExtractUpload);
+                      generateDataExtract();
+                    }}
+                    isLoading={isFgbFetching}
+                    disabled={dataExtractGeojson && customDataExtractUpload ? true : false}
+                  >
+                    Fetch OSM Data
+                  </Button>
+                </div>
               )}
               {extractWays === 'custom_data_extract' && (
                 <>
@@ -327,25 +328,20 @@ const DataExtract = ({
               )}
             </div>
             <div className="fmtm-flex fmtm-gap-5 fmtm-mx-auto fmtm-mt-10 fmtm-my-5">
+              <Button variant="secondary-grey" onClick={() => toggleStep(3, '/upload-survey')}>
+                PREVIOUS
+              </Button>
               <Button
-                btnText="PREVIOUS"
-                btnType="secondary"
-                type="button"
-                onClick={() => toggleStep(3, '/upload-survey')}
-                className="fmtm-font-bold"
-              />
-              <Button
-                btnText="NEXT"
-                btnType="primary"
+                variant="primary-red"
                 type="submit"
-                className="fmtm-font-bold"
-                dataTip={`${!dataExtractGeojson ? 'Please Fetch OSM Data First.' : ''}`}
                 disabled={
                   !dataExtractGeojson || (extractWays === 'osm_data_extract' && !dataExtractGeojson) || isFgbFetching
                     ? true
                     : false
                 }
-              />
+              >
+                NEXT
+              </Button>
             </div>
           </form>
           <div className="fmtm-w-full lg:fmtm-w-[60%] fmtm-flex fmtm-flex-col fmtm-gap-6 fmtm-bg-gray-300 fmtm-h-[60vh] lg:fmtm-h-full">

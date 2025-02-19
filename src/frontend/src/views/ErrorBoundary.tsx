@@ -47,23 +47,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 We encountered an error. We are trying to fix the problem, it might take a few second.
               </p>
               <div className="fmtm-flex fmtm-items-center fmtm-gap-5 fmtm-justify-center">
+                <Button variant="secondary-red" onClick={() => window.location.reload()}>
+                  Reload
+                </Button>
                 <Button
-                  type="button"
-                  btnText="Reload"
-                  btnType="secondary"
-                  className="fmtm-rounded-none fmtm-border-primaryRed fmtm-text-primaryRed fmtm-text-sm sm:fmtm-text-base"
-                  onClick={() => window.location.reload()}
-                />
-                <Button
-                  type="button"
-                  btnText="View Details"
-                  btnType="secondary"
-                  icon={
-                    <div className={`${this.state.showDetails ? 'fmtm-rotate-180' : ''}`}>
-                      <AssetModules.KeyboardArrowUpIcon />
-                    </div>
-                  }
-                  className="fmtm-border-none fmtm-text-primaryRed fmtm-px-0 hover:fmtm-text-red-700 hover:fmtm-bg-white fmtm-rounded-none fmtm-text-sm sm:fmtm-text-base"
+                  variant="secondary-red"
                   onClick={() =>
                     this.setState({
                       error,
@@ -71,7 +59,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                       showDetails: !this.state.showDetails,
                     })
                   }
-                />
+                  className="fmtm-border-none"
+                >
+                  View Details
+                  <AssetModules.KeyboardArrowUpIcon className={`${this.state.showDetails ? 'fmtm-rotate-180' : ''}`} />
+                </Button>
               </div>
             </div>
           </div>

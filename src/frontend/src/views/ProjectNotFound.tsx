@@ -19,12 +19,9 @@ const ProjectNotFound = () => {
             There is no project to show
           </p>
         </div>
-        <Button
-          btnText="Create Project"
-          onClick={() => navigate('/create-project')}
-          btnType="other"
-          className="fmtm-mx-auto fmtm-rounded-none fmtm-py-2"
-        />
+        <Button variant="secondary-red" onClick={() => navigate('/create-project')}>
+          Create Project
+        </Button>
       </div>
     </div>
   );

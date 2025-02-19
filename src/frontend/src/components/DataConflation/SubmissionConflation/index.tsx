@@ -70,7 +70,8 @@ const SubmissionConflation = () => {
                 <></>
               )}
             </div>
-            <Button
+            {/* TODO: update & fix button on feature development */}
+            {/* <Button
               btnText="Accept Submission Feature"
               btnType="other"
               type="button"
@@ -85,7 +86,7 @@ const SubmissionConflation = () => {
                 )
               }
               onClick={() => setSelectedConflateMethod('submission_feature')}
-            />
+            /> */}
           </div>
 
           <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-max-h-[40vh] md:fmtm-max-h-[40%]">
@@ -103,7 +104,8 @@ const SubmissionConflation = () => {
                 <></>
               )}
             </div>
-            <Button
+            {/* TODO: update & fix button on feature development */}
+            {/* <Button
               btnText="Accept OSM Features"
               btnType="other"
               type="button"
@@ -114,11 +116,12 @@ const SubmissionConflation = () => {
               } fmtm-py-2 fmtm-px-4 fmtm-text-sm fmtm-mx-auto fmtm-border-none !fmtm-rounded`}
               icon={selectedConflateMethod !== 'osm_feature' && <AssetModules.DoneIcon style={{ fontSize: '16px' }} />}
               onClick={() => setSelectedConflateMethod('osm_feature')}
-            />
+            /> */}
           </div>
 
           <div className="md:fmtm-absolute md:fmtm-bottom-0 fmtm-w-full">
-            <Button
+            {/* TODO: update & fix button on feature development */}
+            {/* <Button
               btnText="Merge Attributes"
               btnType="other"
               type="button"
@@ -128,7 +131,7 @@ const SubmissionConflation = () => {
                   : ''
               } fmtm-py-2 fmtm-px-4 fmtm-text-sm fmtm-w-full fmtm-justify-center !fmtm-rounded`}
               onClick={() => setSelectedConflateMethod('merge_attributes')}
-            />
+            /> */}
           </div>
         </div>
       </div>
