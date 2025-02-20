@@ -79,6 +79,7 @@ services:
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
       - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
+      - ./src/backend/scheduler:/opt/scheduler:ro
       - ./src/backend/stats:/opt/stats:ro
       # - ../osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork:ro
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
@@ -362,9 +363,6 @@ services:
       - .env
     environment:
       DEBUG: false
-    volumes:
-      - ./src/backend/app:/opt/app:ro
-      - ./src/backend/scheduler:/opt/scheduler:ro
     networks:
       - fmtm-net
     entrypoint: ["/bin/sh", "-c"]

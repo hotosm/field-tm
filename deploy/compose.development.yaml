@@ -293,10 +293,6 @@ services:
       file: ../compose.yaml
       service: scheduler
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-    volumes:
-      # We do this to override the volumes defined in compose.yaml
-      # otherwise there will be a mount error
-      - /tmp:/tmp
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
