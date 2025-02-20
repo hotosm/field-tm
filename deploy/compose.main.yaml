@@ -70,141 +70,47 @@ services:
     restart: "unless-stopped"
 
   api:
-    image: "ghcr.io/hotosm/fmtm/backend:main"
-    volumes:
-      - fmtm_logs:/opt/logs
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
-      s3:
-        condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/__lbheartbeat__"]
-      start_period: 60s
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    deploy:
-      replicas: ${API_REPLICAS:-4}
-      resources:
-        limits:
-          cpus: "0.9"
-          memory: 1500M
-        reservations:
-          cpus: "0.1"
-          memory: 100M
+    extends:
+      file: compose.staging.yaml
+      service: api
 
   ui:
-    # This service simply builds the frontend to a volume
-    # accessible to the proxy, then shuts down
-    image: "ghcr.io/hotosm/fmtm/frontend:main"
-    build:
-      context: src
-      dockerfile: Dockerfile.ui.prod
-      args:
-        APP_VERSION: main
-        VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-        VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
-    volumes:
-      - fmtm_frontend:/frontend
-    network_mode: none
-    restart: "on-failure:2"
+    extends:
+      file: compose.staging.yaml
+      service: ui
 
   s3:
-    image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
-    environment:
-      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
-      MINIO_VOLUMES: "/mnt/data"
-      MINIO_BROWSER: "off"
-    volumes:
-      - fmtm_data:/mnt/data
-    networks:
-      - fmtm-net
-    command: minio server
-    restart: "unless-stopped"
-    healthcheck:
-      test: timeout 5s bash -c ':> /dev/tcp/127.0.0.1/9000' || exit 1
-      interval: 5s
-      retries: 3
-      start_period: 5s
-      timeout: 5s
+    extends:
+      file: compose.staging.yaml
+      service: s3
 
   fmtm-db:
-    image: "postgis/postgis:${POSTGIS_TAG:-14-3.5-alpine}"
-    command: -c 'max_connections=300' -c 'wal_level=logical'
-    volumes:
-      - fmtm_db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${FMTM_DB_USER}
-      - POSTGRES_PASSWORD=${FMTM_DB_PASSWORD}
-      - POSTGRES_DB=${FMTM_DB_NAME}
-    ports:
-      - "5433:5432"
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
-    healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
-      start_period: 5s
-      interval: 10s
-      timeout: 5s
-      retries: 3
+    extends:
+      file: compose.staging.yaml
+      service: fmtm-db
 
   electric:
-    image: "electricsql/electric:${ELECTRIC_TAG:-1.0.0-beta.10}"
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-      migrations:
-        condition: service_completed_successfully
-    environment:
-      DATABASE_URL: postgresql://${FMTM_DB_USER}:${FMTM_DB_PASSWORD}@${FMTM_DB_HOST:-fmtm-db}/${FMTM_DB_NAME:-fmtm}?sslmode=disable
-      # OTEL_EXPORT: otlp
-      # OTLP_ENDPOINT: https://...
-      # ELECTRIC_WRITE_TO_PG_MODE: direct_writes
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
+    extends:
+      file: compose.staging.yaml
+      service: electric
 
   migrations:
-    image: "ghcr.io/hotosm/fmtm/backend:main"
-    depends_on:
-      fmtm-db:
-        condition: service_healthy
-      s3:
-        condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    entrypoint: ["/migrate-entrypoint.sh"]
-    restart: "on-failure:2"
+    extends:
+      file: compose.staging.yaml
+      service: migrations
 
-  backups:
-    image: "ghcr.io/hotosm/fmtm/backend:main"
+  scheduler:
+    extends:
+      file: compose.staging.yaml
+      service: scheduler
+
+  backup:
+    extends:
+      file: compose.staging.yaml
+      service: backup
     depends_on:
       fmtm-db:
         condition: service_healthy
-    env_file:
-      - .env
-    networks:
-      - fmtm-net
-    entrypoint: ["/backup-entrypoint.sh"]
-    restart: "on-failure:2"
-    healthcheck:
-      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
-      start_period: 5s
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-main"

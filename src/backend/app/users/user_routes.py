@@ -19,11 +19,10 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Depends, Query, Response
 from loguru import logger as log
 from psycopg import Connection
 
-from app.auth.providers.osm import init_osm_auth
 from app.auth.roles import mapper, project_manager, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
@@ -103,11 +102,11 @@ async def delete_user_by_identifier(
 
 @router.post("/process-inactive-users")
 async def delete_inactive_users(
-    request: Request,
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[DbUser, Depends(super_admin)],
-    osm_auth=Depends(init_osm_auth),
 ):
     """Identify inactive users, send warnings, and delete accounts."""
-    await process_inactive_users(db, request, osm_auth)
+    log.info("Start processing inactive users")
+    await process_inactive_users(db)
+    log.info("Finished processing inactive users")
     return Response(status_code=HTTPStatus.NO_CONTENT)

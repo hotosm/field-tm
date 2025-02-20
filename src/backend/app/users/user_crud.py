@@ -17,28 +17,26 @@
 #
 """Logic for user routes."""
 
+import os
 from datetime import datetime, timedelta, timezone
 from textwrap import dedent
 from typing import Optional
 
-from fastapi import Request
 from loguru import logger as log
-from osm_login_python.core import Auth
 from psycopg import Connection
 from psycopg.rows import class_row
 
-from app.auth.providers.osm import get_osm_token, send_osm_message
+from app.auth.providers.osm import send_osm_message
 from app.db.models import DbUser
 from app.projects.project_crud import get_pagination
 
+SVC_OSM_TOKEN = os.getenv("SVC_OSM_TOKEN", None)
 WARNING_INTERVALS = [21, 14, 7]  # Days before deletion
 INACTIVITY_THRESHOLD = 2 * 365  # 2 years approx
 
 
 async def process_inactive_users(
     db: Connection,
-    request: Request,
-    osm_auth: Auth,
 ):
     """Identify inactive users, send warnings, and delete accounts."""
     now = datetime.now(timezone.utc)
@@ -47,8 +45,6 @@ async def process_inactive_users(
         for days in WARNING_INTERVALS
     ]
     deletion_threshold = now - timedelta(days=INACTIVITY_THRESHOLD)
-
-    osm_token = get_osm_token(request, osm_auth)
 
     async with db.cursor() as cur:
         # Users eligible for warnings
@@ -71,7 +67,16 @@ async def process_inactive_users(
                 users_to_warn = await cur.fetchall()
 
             for user in users_to_warn:
-                await send_warning_email_or_osm(user.id, user.username, days, osm_token)
+                if SVC_OSM_TOKEN:
+                    await send_warning_email_or_osm(
+                        user.id, user.username, days, SVC_OSM_TOKEN
+                    )
+                else:
+                    log.warning(
+                        f"The SVC_OSM_TOKEN is not set on this server. "
+                        f"Cannot send emails to inactive users: "
+                        f"{', '.join(user.username for user in users_to_warn)}"
+                    )
 
         # Users eligible for deletion
         async with db.cursor(row_factory=class_row(DbUser)) as cur:
