@@ -12,60 +12,8 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import Accordion from '@/components/common/Accordion';
 import { GetProjectComments } from '@/api/Project';
 import SubmissionComments from '@/components/SubmissionInstance/SubmissionComments';
-import ImageSlider from '@/components/common/ImageSlider';
 import { convertCoordinateStringToFeature, extractGeojsonFromObject } from '@/utilfunctions/extractGeojsonFromObject';
 import { submission_status } from '@/types/enums';
-
-const renderValue = (value: any, key: string = '') => {
-  if (key === 'start' || key === 'end') {
-    return (
-      <>
-        <div className="fmtm-capitalize fmtm-text-base fmtm-font-bold fmtm-text-[#555]">{key}</div>
-        <p className="fmtm-text-sm fmtm-text-[#555]">
-          {value?.split('T')[0]}, {value?.split('T')[1]}
-        </p>
-      </>
-    );
-  } else if (typeof value === 'object' && Object.values(value).includes('Point')) {
-    return (
-      <>
-        {renderValue(
-          `${value?.type} (${value?.coordinates?.[0]},${value?.coordinates?.[1]},${value?.coordinates?.[2]})`,
-          key,
-        )}
-        <div className="fmtm-border-b fmtm-my-3" />
-        {renderValue(value?.properties?.accuracy, 'accuracy')}
-      </>
-    );
-  } else if (typeof value === 'object') {
-    return (
-      <ul className="fmtm-flex fmtm-flex-col fmtm-gap-1">
-        <Accordion
-          className="fmtm-rounded-xl fmtm-px-6"
-          onToggle={() => {}}
-          hasSeperator={false}
-          header={<p className="fmtm-text-xl fmtm-text-[#555]">{key}</p>}
-          body={
-            <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
-              {Object.entries(value).map(([key, nestedValue]) => {
-                return <div key={key}>{renderValue(nestedValue, key)}</div>;
-              })}
-            </div>
-          }
-        />
-      </ul>
-    );
-  } else {
-    return (
-      <>
-        <div className="fmtm-capitalize fmtm-text-base fmtm-font-bold fmtm-leading-normal fmtm-text-[#555] fmtm-break-words">
-          {key}
-        </div>
-        <span className="fmtm-text-sm fmtm-text-[#555] fmtm-break-words">{value}</span>
-      </>
-    );
-  }
-};
 
 function removeNullValues(obj: Record<string, any>) {
   const newObj = {};
@@ -104,6 +52,65 @@ const SubmissionDetails = () => {
   const { start, end, today, deviceid, new_feature, ...restSubmissionDetails } = submissionDetails || {};
   const dateDeviceDetails = { start, end, today, deviceid };
 
+  const renderValue = (value: any, key: string = '') => {
+    if (key === 'start' || key === 'end') {
+      return (
+        <>
+          <div className="fmtm-capitalize fmtm-text-base fmtm-font-bold fmtm-text-[#555]">{key}</div>
+          <p className="fmtm-text-sm fmtm-text-[#555]">
+            {value?.split('T')[0]}, {value?.split('T')[1]}
+          </p>
+        </>
+      );
+    } else if (typeof value === 'object' && Object.values(value).includes('Point')) {
+      return (
+        <>
+          {renderValue(
+            `${value?.type} (${value?.coordinates?.[0]},${value?.coordinates?.[1]},${value?.coordinates?.[2]}`,
+            key,
+          )}
+          <div className="fmtm-border-b fmtm-my-3" />
+          {renderValue(value?.properties?.accuracy, 'accuracy')}
+        </>
+      );
+    } else if (typeof value === 'object') {
+      return (
+        <ul className="fmtm-flex fmtm-flex-col fmtm-gap-1">
+          <Accordion
+            className="fmtm-rounded-xl fmtm-px-6"
+            onToggle={() => {}}
+            hasSeperator={false}
+            header={<p className="fmtm-text-xl fmtm-text-[#555]">{key}</p>}
+            body={
+              <div className="fmtm-flex fmtm-flex-col fmtm-gap-2">
+                {Object.entries(value).map(([key, nestedValue]) => {
+                  return <div key={key}>{renderValue(nestedValue, key)}</div>;
+                })}
+              </div>
+            }
+          />
+        </ul>
+      );
+    } else {
+      return (
+        <>
+          <div className="fmtm-capitalize fmtm-text-base fmtm-font-bold fmtm-leading-normal fmtm-text-[#555] fmtm-break-words">
+            {key}
+          </div>
+          {typeof value === 'string' && value?.includes('.jpg') ? (
+            submissionPhotosLoading ? (
+              <CoreModules.Skeleton style={{ width: '16rem', height: '8rem' }} className="!fmtm-rounded-lg" />
+            ) : (
+              <img src={submissionPhotos[value]} alt={key} className="fmtm-max-w-[16rem]" />
+            )
+          ) : (
+            <span className="fmtm-text-sm fmtm-text-[#555] fmtm-break-words">{value}</span>
+          )}
+        </>
+      );
+    }
+  };
+
   useEffect(() => {
     dispatch(GetSubmissionDashboard(`${import.meta.env.VITE_API_URL}/submission/${projectId}/dashboard`));
   }, []);
@@ -127,9 +134,9 @@ const SubmissionDetails = () => {
   useEffect(() => {
     if (paramsInstanceId) {
       dispatch(
-        GetSubmissionPhotosService(
-          `${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}/photos?project_id=${projectId}`,
-        ),
+        GetSubmissionPhotosService(`${import.meta.env.VITE_API_URL}/submission/${paramsInstanceId}/photos`, {
+          project_id: projectId,
+        }),
       );
     }
   }, [paramsInstanceId]);
@@ -254,24 +261,6 @@ const SubmissionDetails = () => {
             <SubmissionComments />
           </div>
         </div>
-
-        {/* submission photos */}
-        {submissionPhotosLoading ? (
-          <div className="fmtm-flex fmtm-gap-x-3 fmtm-overflow-x-scroll scrollbar fmtm-bg-white fmtm-p-6 fmtm-rounded-xl">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <CoreModules.Skeleton
-                key={i}
-                style={{ width: '9.688rem', height: '10.313rem' }}
-                className="!fmtm-rounded-lg"
-              />
-            ))}
-          </div>
-        ) : submissionPhotos && Object.keys(submissionPhotos).length > 0 ? (
-          <div className="fmtm-bg-white fmtm-rounded-xl fmtm-p-6">
-            <p className="fmtm-text-base fmtm-font-bold fmtm-text-[#555] fmtm-mb-2">Images</p>
-            <ImageSlider images={submissionPhotos || {}} />
-          </div>
-        ) : null}
       </div>
     </>
   );
