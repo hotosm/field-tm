@@ -11,6 +11,7 @@ export type CreateProjectStateTypes = {
   formCategoryLoading: boolean;
   generateProjectLoading: boolean;
   generateProjectSuccess: boolean;
+  generateProjectWarning: string | null;
   generateProjectError: boolean;
   organisationList: OrganisationListTypes[];
   organisationListLoading: boolean;
@@ -25,12 +26,12 @@ export type CreateProjectStateTypes = {
   validateCustomFormLoading: boolean;
   uploadAreaSelection: 'upload_file' | 'draw' | null;
   totalAreaSelection: string | null;
-  splitTasksSelection: task_split_type | null;
+  taskSplittingMethod: task_split_type | null;
   dataExtractGeojson: GeoJSONFeatureTypes | null;
   createProjectValidations: {};
   isUnsavedChanges: boolean;
   canSwitchCreateProjectSteps: boolean;
-  isTasksGenerated: Record<string, any>;
+  isTasksSplit: Record<string, any>;
   isFgbFetching: boolean;
   toggleSplittedGeojsonEdit: boolean;
   customFileValidity: boolean;

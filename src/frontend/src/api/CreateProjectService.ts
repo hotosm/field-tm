@@ -19,10 +19,11 @@ const CreateProjectService = (
   projectData: any,
   taskAreaGeojson: any,
   formUpload: any,
-  dataExtractFile: any,
+  dataExtractFile: File | null,
   isOsmExtract: boolean,
   additionalFeature: any,
   projectAdmins: number[],
+  combinedFeaturesCount: number,
 ) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.CreateProjectLoading(true));
@@ -95,6 +96,7 @@ const CreateProjectService = (
             ? { ...projectData, additional_entities: [additionalFeature?.name?.split('.')?.[0]] }
             : projectData,
           formUpload,
+          combinedFeaturesCount,
         ),
       );
 
@@ -184,77 +186,56 @@ const UploadTaskAreasService = (url: string, filePayload: any) => {
   };
 };
 
-const GenerateProjectFilesService = (url: string, projectData: any, formUpload: any) => {
+const GenerateProjectFilesService = (url: string, projectData: any, formUpload: any, combinedFeaturesCount: number) => {
   return async (dispatch: AppDispatch) => {
     dispatch(CreateProjectActions.GenerateProjectLoading(true));
     dispatch(CommonActions.SetLoading(true));
 
-    const postUploadArea = async (url, projectData: any, formUpload) => {
-      let isAPISuccess = true;
-      try {
-        let response;
+    try {
+      const formData = new FormData();
 
-        const additional_entities =
-          projectData?.additional_entities?.length > 0
-            ? projectData.additional_entities.map((e: string) => e.replaceAll(' ', '_'))
-            : [];
-        const generateApiFormData = new FormData();
-
-        if (additional_entities?.length > 0) {
-          generateApiFormData.append('additional_entities', additional_entities);
-        }
-
-        if (projectData.form_ways === 'custom_form') {
-          // TODO move form upload to a separate service / endpoint?
-          generateApiFormData.append('xlsform', formUpload);
-          response = await axios.post(url, generateApiFormData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-        } else {
-          if (additional_entities?.length > 0) {
-            response = await axios.post(url, generateApiFormData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
-          } else {
-            const payload = {
-              additional_entities: null,
-            };
-            response = await axios.post(url, payload, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-          }
-        }
-
-        isAPISuccess = isStatusSuccess(response.status);
-        if (!isAPISuccess) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        dispatch(CreateProjectActions.GenerateProjectLoading(false));
-        dispatch(CommonActions.SetLoading(false));
-        // Trigger the watcher and redirect after success
-        dispatch(CreateProjectActions.GenerateProjectSuccess(true));
-      } catch (error: any) {
-        isAPISuccess = false;
-        dispatch(CommonActions.SetLoading(false));
-        dispatch(CreateProjectActions.GenerateProjectError(true));
-        dispatch(
-          CommonActions.SetSnackBar({
-            message: JSON.stringify(error?.response?.data?.detail),
-          }),
-        );
-        dispatch(CreateProjectActions.GenerateProjectLoading(false));
+      // Append additional_entities if they exist
+      const additionalEntities = projectData?.additional_entities?.map((e: string) => e.replaceAll(' ', '_')) ?? [];
+      if (additionalEntities.length > 0) {
+        formData.append('additional_entities', additionalEntities);
       }
-      return isAPISuccess;
-    };
 
-    return await postUploadArea(url, projectData, formUpload);
+      // Append xlsform only if it's a custom form
+      if (projectData.form_ways === 'custom_form' && formUpload) {
+        formData.append('xlsform', formUpload);
+      }
+
+      // Add combined features count
+      formData.append('combined_features_count', combinedFeaturesCount.toString());
+
+      const response = await axios.post(url, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (!isStatusSuccess(response.status)) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      // If warning provided, then inform user
+      const message = response.data?.message;
+      if (message) {
+        dispatch(CreateProjectActions.GenerateProjectWarning(message));
+      }
+
+      dispatch(CreateProjectActions.GenerateProjectSuccess(true));
+      return true; // ✅ Return success
+    } catch (error: any) {
+      dispatch(CreateProjectActions.GenerateProjectError(true));
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: JSON.stringify(error?.response?.data?.detail),
+        }),
+      );
+      return false; // ❌ Return failure
+    } finally {
+      dispatch(CreateProjectActions.GenerateProjectLoading(false));
+      dispatch(CommonActions.SetLoading(false));
+    }
   };
 };
 
@@ -318,8 +299,8 @@ const GetDividedTaskFromGeojson = (url: string, projectData: Record<string, any>
         dividedTaskFormData.append('dimension_meters', projectData.dimension);
         const getGetDividedTaskFromGeojsonResponse = await axios.post(url, dividedTaskFormData);
         const resp: splittedGeojsonType = getGetDividedTaskFromGeojsonResponse.data;
-        dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: true }));
-        dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'task_splitting_algorithm', value: false }));
+        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: true }));
+        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: false }));
         dispatch(CreateProjectActions.SetDividedTaskGeojson(resp));
         dispatch(CreateProjectActions.SetDividedTaskFromGeojsonLoading(false));
       } catch (error) {
@@ -393,8 +374,8 @@ const TaskSplittingPreviewService = (
           // TODO display error to user, perhaps there is not osm data here?
           return;
         }
-        dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'divide_on_square', value: false }));
-        dispatch(CreateProjectActions.SetIsTasksGenerated({ key: 'task_splitting_algorithm', value: true }));
+        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'divide_on_square', value: false }));
+        dispatch(CreateProjectActions.SetIsTasksSplit({ key: 'task_splitting_algorithm', value: true }));
         dispatch(CreateProjectActions.GetTaskSplittingPreview(resp));
       } catch (error) {
         dispatch(
