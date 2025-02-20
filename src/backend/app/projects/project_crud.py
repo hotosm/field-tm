@@ -587,6 +587,10 @@ async def generate_project_files(
         )
         for task in project.tasks
     ]
+    log.debug(
+        "Setting task feature counts in db for "
+        f"({len(project.tasks if project.tasks else 0)}) tasks",
+    )
     sql = """
         WITH task_update(id, feature_count) AS (
             VALUES {}
@@ -608,6 +612,7 @@ async def generate_project_files(
     async with db.cursor() as cur:
         await cur.execute(formatted_sql)
 
+    log.info("Finished generation of project additional files")
     return True
 
 

@@ -20,8 +20,6 @@ const useForm = (initialState, callback, validate) => {
   };
   const checkValidationOnly = (formValues) => {
     const x = validate(formValues);
-    console.log(x, 'x');
-    console.log(formValues, 'values');
     if (Object.keys(x)?.length === 0) {
       return false;
     } else {

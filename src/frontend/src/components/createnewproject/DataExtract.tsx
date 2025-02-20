@@ -33,12 +33,43 @@ const DataExtract = ({
   useDocumentTitle('Create Project: Map Data');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [disableNextButton, setDisableNextButton] = useState(true);
   const [extractWays, setExtractWays] = useState('');
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const projectAoiGeojson = useAppSelector((state) => state.createproject.drawnGeojson);
   const dataExtractGeojson = useAppSelector((state) => state.createproject.dataExtractGeojson);
   const isFgbFetching = useAppSelector((state) => state.createproject.isFgbFetching);
   const additionalFeatureGeojson = useAppSelector((state) => state.createproject.additionalFeatureGeojson);
+
+  useEffect(() => {
+    const featureCount = dataExtractGeojson?.features?.length ?? 0;
+
+    if (featureCount > 10000) {
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: `${featureCount} is a lot of features to map at once. Are you sure?`,
+          variant: 'warning',
+          duration: 10000,
+        }),
+      );
+    }
+
+    if (featureCount > 30000) {
+      setDisableNextButton(true);
+      dispatch(
+        CommonActions.SetSnackBar({
+          message: `${featureCount} is a lot of features! Please consider breaking this into smaller projects.`,
+          variant: 'error',
+          duration: 10000,
+        }),
+      );
+    } else {
+      // Enable/disable NEXT button based on conditions (if feature limit not exceeded)
+      const shouldDisableButton =
+        !dataExtractGeojson || (extractWays === 'osm_data_extract' && !dataExtractGeojson) || isFgbFetching;
+      setDisableNextButton(shouldDisableButton);
+    }
+  }, [dataExtractGeojson, additionalFeatureGeojson, extractWays, isFgbFetching]);
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
@@ -271,6 +302,12 @@ const DataExtract = ({
                   />
                 </>
               )}
+              <div className="fmtm-mt-5">
+                <p className="fmtm-text-gray-500">
+                  Total number of features:{' '}
+                  <span className="fmtm-font-bold">{dataExtractGeojson?.features?.length || 0}</span>
+                </p>
+              </div>
               {extractWays && (
                 <div className="fmtm-mt-4">
                   <div
@@ -331,15 +368,7 @@ const DataExtract = ({
               <Button variant="secondary-grey" onClick={() => toggleStep(3, '/upload-survey')}>
                 PREVIOUS
               </Button>
-              <Button
-                variant="primary-red"
-                type="submit"
-                disabled={
-                  !dataExtractGeojson || (extractWays === 'osm_data_extract' && !dataExtractGeojson) || isFgbFetching
-                    ? true
-                    : false
-                }
-              >
+              <Button variant="primary-red" type="submit" disabled={disableNextButton}>
                 NEXT
               </Button>
             </div>
