@@ -77,7 +77,7 @@ services:
     volumes:
       - fmtm_logs:/opt/logs
       - ./src/backend/pyproject.toml:/opt/pyproject.toml:ro
-      - ./src/backend/app:/opt/app
+      - ./src/backend/app:/opt/app:ro
       - ./src/backend/tests:/opt/tests:ro
       - ./src/backend/stats:/opt/stats:ro
       # - ../osm-fieldwork/osm_fieldwork:/opt/python/lib/python3.12/site-packages/osm_fieldwork:ro
@@ -352,3 +352,38 @@ services:
     restart: "on-failure:2"
     healthcheck:
       test: ["NONE"] # Set the health check test to NONE to disable it
+
+  scheduler:
+    image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
+    depends_on:
+      fmtm-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DEBUG: false
+    volumes:
+      - ./src/backend/app:/opt/app:ro
+      - ./src/backend/scheduler:/opt/scheduler:ro
+    networks:
+      - fmtm-net
+    entrypoint: ["/bin/sh", "-c"]
+    # The approach below allows us to easily switch to Kubernetes CronJob if needed
+    command: |
+      "
+        # Task unlocking every 3hrs
+        echo '* */3 * * * /opt/scheduler/unlock_tasks.py' > ./crontab
+
+        # Check inactive users every Sunday 00:00
+        echo '0 0 * * 0 /opt/scheduler/inactive_users.py' >> ./crontab
+
+        exec /usr/local/bin/supercronic ./crontab
+      "
+    restart: "unless-stopped"
+    # Check the 'supercronic' service is still running
+    healthcheck:
+      test: ["CMD", "pgrep", "supercronic"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 10s

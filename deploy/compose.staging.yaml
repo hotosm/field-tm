@@ -88,6 +88,10 @@ services:
     extends:
       file: compose.development.yaml
       service: migrations
+  scheduler:
+    extends:
+      file: compose.development.yaml
+      service: scheduler
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     depends_on:

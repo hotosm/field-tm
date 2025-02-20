@@ -24,10 +24,10 @@ from loguru import logger as log
 from psycopg import Connection
 
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import mapper
+from app.auth.roles import mapper, super_admin
 from app.db.database import db_conn
 from app.db.enums import HTTPStatus
-from app.db.models import DbTask, DbTaskEvent
+from app.db.models import DbTask, DbTaskEvent, DbUser
 from app.tasks import task_crud, task_schemas
 
 router = APIRouter(
@@ -118,7 +118,10 @@ async def get_task_event_history(
 
 
 @router.post("/unlock-tasks")
-async def unlock_tasks(db: Annotated[Connection, Depends(db_conn)]):
+async def unlock_tasks(
+    db: Annotated[Connection, Depends(db_conn)],
+    current_user: Annotated[DbUser, Depends(super_admin)],
+):
     """Endpoint to trigger unlock_old_locked_tasks manually."""
     log.info("Start processing inactive tasks")
     await task_crud.trigger_unlock_tasks(db)

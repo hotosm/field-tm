@@ -204,7 +204,6 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
       MINIO_VOLUMES: "/mnt/data"
       MINIO_BROWSER: "off"
-      # MINIO_CONSOLE_ADDRESS: ":9090"
     volumes:
       - fmtm_data:/mnt/data
     networks:
@@ -288,6 +287,13 @@ services:
       - fmtm-net
     entrypoint: ["/migrate-entrypoint.sh"]
     restart: "on-failure:2"
+
+  scheduler:
+    extends:
+      file: ../compose.yaml
+      service: scheduler
+    image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
+    volumes: []
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
