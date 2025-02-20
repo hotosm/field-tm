@@ -43,11 +43,6 @@ const MapLegends = ({ defaultTheme }: { defaultTheme: any }) => {
       status: 'none',
     },
     {
-      value: 'More mapping needed',
-      color: defaultTheme.palette.mapFeatureColors.invalidated,
-      status: 'none',
-    },
-    {
       value: 'Locked',
       color: defaultTheme.palette.mapFeatureColors.invalidated,
       status: 'none',
