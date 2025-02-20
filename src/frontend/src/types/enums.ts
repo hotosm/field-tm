@@ -24,6 +24,14 @@ export enum task_state {
   UNLOCKED_DONE = 'UNLOCKED_DONE',
 }
 
+export enum task_state_labels {
+  UNLOCKED_TO_MAP = 'Ready',
+  LOCKED_FOR_MAPPING = 'Locked For Mapping',
+  UNLOCKED_TO_VALIDATE = 'Ready For Validation',
+  LOCKED_FOR_VALIDATION = 'Locked For Validation',
+  UNLOCKED_DONE = 'Validated',
+}
+
 export enum entity_state {
   READY = 0,
   OPENED_IN_ODK = 1,
