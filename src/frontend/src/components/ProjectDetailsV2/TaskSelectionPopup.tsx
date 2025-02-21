@@ -7,6 +7,7 @@ import { ProjectActions } from '@/store/slices/ProjectSlice';
 import environment from '@/environment';
 import QrcodeComponent from '@/components/QrcodeComponent';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
+import { task_state_labels } from '@/types/enums';
 
 type TaskSelectionPopupPropType = {
   taskId: number | null;
@@ -95,7 +96,7 @@ const TaskSelectionPopup = ({ taskId, body, feature }: TaskSelectionPopupPropTyp
       >
         <div className="fmtm-flex fmtm-flex-col fmtm-gap-2 fmtm-p-3 sm:fmtm-p-5">
           <h4 className="fmtm-text-lg fmtm-font-bold">Task: {selectedTask.index}</h4>
-          <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_state}</p>
+          <p className="fmtm-text-base fmtm-text-[#757575]">Status: {task_state_labels[task_state]}</p>
           {selectedTask?.actioned_by_username && (
             <p className="fmtm-text-base fmtm-text-[#757575]">Actioned By: {selectedTask?.actioned_by_username}</p>
           )}
