@@ -48,11 +48,21 @@
 				(event: TaskEventType) => event.event !== 'COMMENT' && event.task_id === taskStore?.selectedTaskId,
 			);
 			comments = taskStore?.events?.filter(
-				(event: TaskEventType) => event.event === 'COMMENT' && event.task_id === taskStore?.selectedTaskId,
+				(event: TaskEventType) =>
+					event.event === 'COMMENT' &&
+					event.task_id === taskStore?.selectedTaskId &&
+					!event.comment?.includes('-SUBMISSION_INST-') &&
+					!event.comment?.startsWith('#submissionId:uuid:'),
 			);
 		} else {
 			taskEvents = taskStore?.events?.filter((event: TaskEventType) => event.event !== 'COMMENT');
-			comments = taskStore?.events?.filter((event: TaskEventType) => event.event === 'COMMENT');
+			comments = taskStore?.events?.filter(
+				(event: TaskEventType) =>
+					event.event === 'COMMENT' &&
+					event.task_id === taskStore?.selectedTaskId &&
+					!event.comment?.includes('-SUBMISSION_INST-') &&
+					!event.comment?.startsWith('#submissionId:uuid:'),
+			);
 		}
 	});
 </script>

@@ -23,6 +23,7 @@ const initialReviewState = {
   entity_id: null,
   label: null,
   feature: null,
+  featureId: null,
 };
 
 // Note these id values must be camelCase to match what ODK Central requires
@@ -64,7 +65,8 @@ const UpdateReviewStatusModal = () => {
       !updateReviewStatusModal.projectId ||
       !updateReviewStatusModal.taskId ||
       !updateReviewStatusModal.entity_id ||
-      !updateReviewStatusModal.taskUid
+      !updateReviewStatusModal.taskUid ||
+      !updateReviewStatusModal.featureId
     ) {
       return;
     }
@@ -130,7 +132,7 @@ const UpdateReviewStatusModal = () => {
           `${VITE_API_URL}/tasks/${updateReviewStatusModal?.taskUid}/event?project_id=${updateReviewStatusModal?.projectId}`,
           {
             task_id: +updateReviewStatusModal?.taskUid,
-            comment: `${updateReviewStatusModal?.instanceId}-SUBMISSION_INST-${noteComments}`,
+            comment: `#submissionId:${updateReviewStatusModal?.instanceId} #featureId:${updateReviewStatusModal?.featureId} ${noteComments}`,
             event: task_event.COMMENT,
           },
         ),

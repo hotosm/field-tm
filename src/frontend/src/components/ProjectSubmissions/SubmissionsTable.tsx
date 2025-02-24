@@ -482,6 +482,7 @@ const SubmissionsTable = ({ toggleView }) => {
                             label: row?.meta?.entity?.label,
                             feature: convertCoordinateStringToFeature('xlocation', row?.xlocation),
                             taskUid: taskUid?.toString() || null,
+                            featureId: row?.xid,
                           }),
                         );
                       }}

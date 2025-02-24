@@ -27,8 +27,9 @@ const Comments = () => {
       return task?.id == selectedTask;
     })?.[0],
   };
+  // filter out submission/feature level comments
   const filteredProjectCommentsList = projectCommentsList?.filter(
-    (entry) => !entry?.comment?.includes('-SUBMISSION_INST-'),
+    (entry) => !entry?.comment?.includes('-SUBMISSION_INST-') && !entry?.comment?.startsWith('#submissionId:uuid:'),
   );
 
   useEffect(() => {
