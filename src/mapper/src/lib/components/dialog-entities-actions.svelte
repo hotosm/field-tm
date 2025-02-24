@@ -184,7 +184,7 @@
 							{selectedEntity?.status?.replaceAll('_', ' ')?.toLowerCase()}
 						</p>
 					</div>
-					{#if entityComments?.length > 1}
+					{#if entityComments?.length > 0}
 						<div class="flex">
 							<p class="min-w-[6.25rem] text-[#2B2B2B]">Comments</p>
 							:
