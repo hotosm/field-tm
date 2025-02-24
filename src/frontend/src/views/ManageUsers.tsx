@@ -8,6 +8,8 @@ import { user_roles } from '@/types/enums';
 import { CommonActions } from '@/store/slices/CommonSlice';
 import Searchbar from '@/components/common/SearchBar';
 import useDebouncedInput from '@/hooks/useDebouncedInput';
+import { useIsAdmin } from '@/hooks/usePermissions';
+import NoAccessComponent from './NoAccessComponent';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,6 +21,9 @@ const roleLabel = {
 };
 
 const ManageUsers = () => {
+  const isAdmin = useIsAdmin();
+  if (!isAdmin) return <NoAccessComponent />;
+
   const dispatch = useAppDispatch();
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
   const userList = useAppSelector((state) => state.user.userList);

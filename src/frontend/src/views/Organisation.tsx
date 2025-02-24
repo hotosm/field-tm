@@ -9,11 +9,14 @@ import OrganisationCardSkeleton from '@/components/organisation/OrganizationCard
 import windowDimention from '@/hooks/WindowDimension';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useHasManagedAnyOrganization, useIsAdmin } from '@/hooks/usePermissions';
 
 const Organisation = () => {
   useDocumentTitle('Organizations');
   const dispatch = useAppDispatch();
   const { type } = windowDimention();
+  const isAdmin = useIsAdmin();
+  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
 
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
@@ -111,7 +114,7 @@ const Organisation = () => {
               className="fmtm-duration-150"
               onClick={() => loadMyOrganisations()}
             />
-            {authDetails && (
+            {(!hasManagedAnyOrganization || isAdmin) && (
               <CoreModules.Link to={'/manage/organization/new'}>
                 <CoreModules.Button
                   variant="outlined"

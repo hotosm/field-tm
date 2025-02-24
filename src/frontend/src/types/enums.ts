@@ -47,6 +47,14 @@ export enum user_roles {
   ADMIN = 'ADMIN',
 }
 
+export enum project_roles {
+  MAPPER = 'MAPPER',
+  VALIDATOR = 'VALIDATOR',
+  FIELD_MANAGER = 'FIELD_MANAGER',
+  PROJECT_MANAGER = 'PROJECT_MANAGER',
+  ASSOCIATE_PROJECT_MANAGER = 'ASSOCIATE_PROJECT_MANAGER',
+}
+
 export type NewGeomTypes = {
   POINT: 'POINT';
   POLYGON: 'POLYGON';

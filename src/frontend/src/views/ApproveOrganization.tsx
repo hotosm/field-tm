@@ -2,8 +2,13 @@ import React from 'react';
 import ApproveOrganizationHeader from '@/components/ApproveOrganization/ApproveOrganizationHeader';
 import OrganizationForm from '@/components/ApproveOrganization/OrganizationForm';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
+import { useIsAdmin } from '@/hooks/usePermissions';
+import NoAccessComponent from '@/views/NoAccessComponent';
 
 const ApproveOrganization = () => {
+  const isAdmin = useIsAdmin();
+  if (!isAdmin) return <NoAccessComponent />;
+
   useDocumentTitle('Approve Organization');
   return (
     <div className="fmtm-bg-[#F5F5F5]">

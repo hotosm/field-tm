@@ -16,6 +16,9 @@ import DescriptionSection from '@/components/createnewproject/Description';
 import Select2 from '@/components/common/Select2';
 import { GetUserListForSelect } from '@/api/User';
 import { UserActions } from '@/store/slices/UserSlice';
+import CoreModules from '@/shared/CoreModules';
+import { useIsAdmin } from '@/hooks/usePermissions';
+import { isEmpty } from '@/utilfunctions/commonUtils';
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +26,7 @@ const ProjectDetailsForm = ({ flag }) => {
   useDocumentTitle('Create Project: Project Details');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const isAdmin = useIsAdmin();
 
   const projectDetails = useAppSelector((state) => state.createproject.projectDetails);
   const organisationListData = useAppSelector((state) => state.createproject.organisationList);
@@ -33,6 +37,7 @@ const ProjectDetailsForm = ({ flag }) => {
     value: user.id,
   }));
   const userListLoading = useAppSelector((state) => state.user.userListLoading);
+  const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
 
   const organisationList = organisationListData.map((item) => ({
     id: item.id,
@@ -55,7 +60,9 @@ const ProjectDetailsForm = ({ flag }) => {
   );
 
   const onFocus = () => {
-    dispatch(OrganisationService(`${VITE_API_URL}/organisation`));
+    dispatch(
+      OrganisationService(isAdmin ? `${VITE_API_URL}/organisation` : `${VITE_API_URL}/organisation/my-organisations`),
+    );
   };
 
   useEffect(() => {
@@ -79,7 +86,6 @@ const ProjectDetailsForm = ({ flag }) => {
     if (!orgIdInt) {
       return;
     }
-
     const selectedOrg = organisationList.find((org) => org.value === orgIdInt);
     handleCustomChange('organisation_id', orgIdInt);
     handleCustomChange('useDefaultODKCredentials', selectedOrg?.hasODKCredentials || false);
@@ -101,12 +107,20 @@ const ProjectDetailsForm = ({ flag }) => {
   }, [values.useDefaultODKCredentials]);
 
   useEffect(() => {
+    if (isEmpty(organisationList)) return;
     organisationList?.map((organization) => {
       if (values?.organisation_id == organization?.value) {
         setHasODKCredentials(organization.hasODKCredentials);
       }
     });
   }, [organisationList]);
+
+  useEffect(() => {
+    if (!authDetails || isEmpty(organisationList)) return;
+    if (!isAdmin && authDetails && authDetails?.orgs_managed?.length === 1) {
+      handleOrganizationChange(authDetails?.orgs_managed[0]);
+    }
+  }, [authDetails, organisationListData]);
 
   return (
     <div className="fmtm-flex fmtm-gap-7 fmtm-flex-col lg:fmtm-flex-row fmtm-h-full">
@@ -152,8 +166,10 @@ const ProjectDetailsForm = ({ flag }) => {
             <p className={`fmtm-text-[1rem] fmtm-mb-2 fmtm-font-semibold !fmtm-bg-transparent`}>
               Organization Name <span className="fmtm-text-red-500 fmtm-text-[1rem]">*</span>
             </p>
+            {/* if user is organization-admin of only one org, then disable the dropdown & preselect the org */}
             <Select2
               options={organisationList || []}
+              disabled={!isAdmin && authDetails && authDetails?.orgs_managed?.length === 1}
               value={values.organisation_id}
               onChange={(value: any) => {
                 handleOrganizationChange(value);
