@@ -9,7 +9,7 @@ type entitiesStatusListType = {
 	osmid: number | undefined;
 	entity_id: string;
 	project_id: number;
-	status: string;
+	status: 'READY' | 'OPENED_IN_ODK' | 'SURVEY_SUBMITTED' | 'MARKED_BAD' | 'VALIDATED';
 	task_id: number;
 };
 

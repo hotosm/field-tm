@@ -9,10 +9,17 @@ const SubmissionComments = () => {
   const submissionInstanceId = params.instanceId;
 
   const taskCommentsList = useAppSelector((state) => state?.project?.projectCommentsList);
-  const filteredTaskCommentsList = taskCommentsList
+  const taskGetCommentsLoading = useAppSelector((state) => state?.project?.projectGetCommentsLoading);
+
+  // handle for old project comments
+  const oldfilteredTaskCommentsList = taskCommentsList
     ?.filter((entry) => entry?.comment.includes('-SUBMISSION_INST-'))
     .filter((entry) => entry.comment.split('-SUBMISSION_INST-')[0] === submissionInstanceId);
-  const taskGetCommentsLoading = useAppSelector((state) => state?.project?.projectGetCommentsLoading);
+  const newfilteredTaskCommentsList = taskCommentsList?.filter(
+    (comment) => comment?.comment?.split(' ')?.[0] === `#submissionId:${submissionInstanceId}`,
+  );
+
+  const filteredTaskCommentsList = [...oldfilteredTaskCommentsList, ...newfilteredTaskCommentsList];
 
   return (
     <div className="fmtm-bg-white fmtm-rounded-xl fmtm-p-6">
@@ -34,7 +41,10 @@ const SubmissionComments = () => {
         </div>
       ) : filteredTaskCommentsList?.length > 0 ? (
         filteredTaskCommentsList?.map((entry) => (
-          <div className="fmtm-py-[0.875rem] fmtm-border-b fmtm-border-[#D4D4D4] fmtm-flex fmtm-flex-col fmtm-gap-2">
+          <div
+            key={entry?.event_id}
+            className="fmtm-py-[0.875rem] fmtm-border-b fmtm-border-[#D4D4D4] fmtm-flex fmtm-flex-col fmtm-gap-2"
+          >
             <div className="fmtm-flex fmtm-justify-between fmtm-items-center">
               <p className="fmtm-text-base fmtm-font-bold fmtm-text-[#555]">{entry?.username}</p>
               <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
@@ -42,7 +52,10 @@ const SubmissionComments = () => {
                 <p className="fmtm-text-xs fmtm-text-[#555]">{entry?.created_at?.split('T')[0]}</p>
               </div>
             </div>
-            <p className="fmtm-text-[#555] fmtm-text-sm">{entry?.comment?.split('-SUBMISSION_INST-')[1]}</p>
+            <p className="fmtm-text-[#555] fmtm-text-sm">
+              {entry?.comment?.split('-SUBMISSION_INST-')?.[1] ||
+                entry?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}
+            </p>
           </div>
         ))
       ) : (

@@ -44,12 +44,14 @@ export type ProjectStateTypes = {
 };
 
 type projectCommentsListTypes = {
-  id: number;
+  event_id: number;
   task_id: number;
+  event: string;
+  username: string;
   comment: string;
   created_at: string;
-  username: string;
   profile_img: string;
+  state: any;
 };
 
 export type projectTaskActivity = {

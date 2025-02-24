@@ -8,6 +8,7 @@
 	import { mapTask } from '$lib/db/events';
 	import type { SlDialog } from '@shoelace-style/shoelace';
 
+	type statusType = 'READY' | 'OPENED_IN_ODK' | 'SURVEY_SUBMITTED' | 'MARKED_BAD' | 'VALIDATED';
 	type Props = {
 		isTaskActionModalOpen: boolean;
 		toggleTaskActionModal: (value: boolean) => void;
@@ -15,10 +16,26 @@
 		projectData: ProjectData;
 	};
 
+	function getStatusStyle(status: statusType) {
+		switch (status) {
+			case 'READY':
+				return 'bg-gray-100 text-gray-700';
+			case 'OPENED_IN_ODK':
+				return 'bg-yellow-100 text-yellow-700';
+			case 'SURVEY_SUBMITTED':
+				return 'bg-green-100 text-green-700';
+			case 'MARKED_BAD':
+				return 'bg-red-100 text-red-700';
+			case 'VALIDATED':
+				return 'bg-blue-100 text-blue-700';
+		}
+	}
+
 	let { isTaskActionModalOpen, toggleTaskActionModal, selectedTab, projectData }: Props = $props();
 
 	let dialogRef: SlDialog | null = $state(null);
 	let toggleDistanceWarningDialog = $state(false);
+	let showCommentsPopup: boolean = $state(false);
 
 	const entitiesStore = getEntitiesStatusStore();
 	const alertStore = getAlertStore();
@@ -30,6 +47,16 @@
 	);
 	const selectedEntityCoordinate = $derived(entitiesStore.selectedEntityCoordinate);
 	const entityToNavigate = $derived(entitiesStore.entityToNavigate);
+	const entityComments = $derived(
+		taskStore.events
+			?.filter(
+				(event) =>
+					event.event === 'COMMENT' &&
+					event.comment?.startsWith('#submissionId:uuid:') &&
+					`#featureId:${entitiesStore.selectedEntity}` === event.comment?.split(' ')?.[1],
+			)
+			?.reverse(),
+	);
 
 	const mapFeature = () => {
 		const xformId = projectData?.odk_form_id;
@@ -118,7 +145,9 @@
 
 {#if isTaskActionModalOpen && selectedTab === 'map' && selectedEntity}
 	<div class="font-barlow flex justify-center !w-[100vw] absolute bottom-[4rem] left-0 pointer-events-none z-50">
-		<div class="bg-white w-full font-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl">
+		<div
+			class="bg-white w-full font-regular md:max-w-[580px] pointer-events-auto px-4 py-3 sm:py-4 rounded-t-3xl max-h-[60vh] overflow-y-scroll"
+		>
 			<div class="flex justify-end">
 				<hot-icon
 					name="close"
@@ -134,16 +163,67 @@
 				></hot-icon>
 			</div>
 			<div class="flex flex-col gap-4">
-				<div class="flex items-center justify-between">
-					<p class="text-[#333] text-xl font-semibold">Feature {selectedEntity?.osmid}</p>
-				</div>
-				<div class="flex flex-col gap-1">
-					<p><span class="font-medium">Task Id:</span> {selectedEntity?.task_id}</p>
-					<p><span class="font-medium">Entity Uuid:</span> {selectedEntity?.entity_id}</p>
-					<p>
-						<span class="font-medium">Status:</span>
-						{selectedEntity?.status?.replaceAll('_', ' ')}
-					</p>
+				<p class="text-[#333] text-lg font-semibold">Feature {selectedEntity?.osmid}</p>
+				<div class="flex flex-col gap-2">
+					<div class="flex">
+						<p class="min-w-[6.25rem] text-[#2B2B2B]">Task Id</p>
+						:
+						<p class="text-[#161616] font-medium ml-2">{selectedEntity?.task_id}</p>
+					</div>
+					<div class="flex">
+						<p class="min-w-[6.25rem] text-[#2B2B2B]">Entity Uuid</p>
+						:
+						<p class="break-all text-[#161616] font-medium ml-2">{selectedEntity?.entity_id}</p>
+					</div>
+					<div class="flex items-center">
+						<p class="min-w-[6.25rem] text-[#2B2B2B]">Status</p>
+						:
+						<p
+							class={`text-[#161616] font-medium capitalize border-[1px] border-solid ml-2 py-1 px-3 rounded-full ${getStatusStyle(selectedEntity?.status)}`}
+						>
+							{selectedEntity?.status?.replaceAll('_', ' ')?.toLowerCase()}
+						</p>
+					</div>
+					{#if entityComments?.length > 1}
+						<div class="flex">
+							<p class="min-w-[6.25rem] text-[#2B2B2B]">Comments</p>
+							:
+							<div class="flex flex-col ml-2 gap-2 flex-1">
+								{#each entityComments?.slice(0, 2) as comment}
+									<div class="bg-[#F6F5F5] rounded px-2 py-1">
+										<div class="flex items-center justify-between mb-1">
+											<p>{comment?.username}</p>
+											<div class="flex items-center gap-2">
+												<hot-icon name="clock-history" class="!text-[0.8rem] text-red-600 cursor-pointer"></hot-icon>
+												<p class="text-sm">{comment?.created_at?.split(' ')[0]}</p>
+											</div>
+										</div>
+										<p class="font-medium">
+											{comment?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}
+										</p>
+									</div>
+								{/each}
+								{#if entityComments?.length > 2}
+									<div class="flex items-center gap-2">
+										<div class="h-[1px] bg-gray-200 flex flex-1"></div>
+										<div
+											class="text-sm text-gray-600 hover:text-gray-800 cursor-pointer font-light"
+											onclick={() => (showCommentsPopup = true)}
+											onkeydown={(e: KeyboardEvent) => {
+												if (e.key === 'Enter') {
+													showCommentsPopup = true;
+												}
+											}}
+											tabindex="0"
+											role="button"
+										>
+											See all comments
+										</div>
+									</div>
+								{/if}
+							</div>
+						</div>
+					{/if}
 				</div>
 				{#if selectedEntity?.status !== 'SURVEY_SUBMITTED' && selectedEntity?.status !== 'VALIDATED'}
 					<div class="flex gap-2">
@@ -254,3 +334,29 @@
 		</div>
 	</hot-dialog>
 {/if}
+
+<hot-dialog
+	label="Feature Comments"
+	class="dialog-overview z-50 font-barlow font-regular"
+	open={showCommentsPopup}
+	onsl-hide={() => {
+		showCommentsPopup = false;
+	}}
+>
+	<div class="flex flex-col gap-3">
+		{#each entityComments as comment}
+			<div class="bg-[#F6F5F5] rounded px-2 py-1">
+				<div class="flex items-center justify-between mb-2">
+					<p>{comment?.username}</p>
+					<div class="flex items-center gap-2">
+						<hot-icon name="clock-history" class="!text-[0.8rem] text-red-600 cursor-pointer"></hot-icon>
+						<p class="text-sm">{comment?.created_at?.split(' ')[0]}</p>
+					</div>
+				</div>
+				<p class="font-medium">
+					{comment?.comment?.replace(/#submissionId:uuid:[\w-]+|#featureId:[\w-]+/g, '')?.trim()}
+				</p>
+			</div>
+		{/each}
+	</div>
+</hot-dialog>
