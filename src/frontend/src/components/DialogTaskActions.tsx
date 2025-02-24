@@ -11,6 +11,7 @@ import { GetProjectTaskActivity } from '@/api/Project';
 import { Modal } from '@/components/common/Modal';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { taskSubmissionInfoType } from '@/models/task/taskModel';
+import { useIsOrganizationAdmin, useIsProjectManager } from '@/hooks/usePermissions';
 
 type dialogPropType = {
   taskId: number;
@@ -40,6 +41,9 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
   const projectData = useAppSelector((state) => state.project.projectTaskBoundries);
   const authDetails = CoreModules.useAppSelector((state) => state.login.authDetails);
   const projectTaskActivityList = useAppSelector((state) => state?.project?.projectTaskActivity);
+
+  const isOrganizationAdmin = useIsOrganizationAdmin(projectInfo?.organisation_id as number);
+  const isProjectManager = useIsProjectManager(projectInfo?.id as number);
 
   const currentProjectId: string = params.id;
   const projectIndex = projectData.findIndex((project) => project.id == parseInt(currentProjectId));
@@ -180,7 +184,7 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
           }`}
         >
           {list_of_task_actions?.map((data, index) => {
-            return checkIfTaskAssignedOrNot(data.value) ? (
+            return checkIfTaskAssignedOrNot(data.value) || isOrganizationAdmin || isProjectManager ? (
               <Button
                 key={index}
                 variant={data.btnType}

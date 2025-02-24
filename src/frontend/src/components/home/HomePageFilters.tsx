@@ -6,6 +6,7 @@ import { HomeActions } from '@/store/slices/HomeSlice';
 import Switch from '@/components/common/Switch';
 import Searchbar from '@/components/common/SearchBar';
 import Button from '@/components/common/Button';
+import { useHasManagedAnyOrganization } from '@/hooks/usePermissions';
 
 type homePageFiltersPropType = {
   searchText: string;
@@ -13,6 +14,7 @@ type homePageFiltersPropType = {
 };
 
 const HomePageFilters = ({ searchText, onSearch }: homePageFiltersPropType) => {
+  const hasManagedAnyOrganization = useHasManagedAnyOrganization();
   const dispatch = useAppDispatch();
 
   const showMapStatus = useAppSelector((state) => state.home.showMapStatus);
@@ -36,12 +38,14 @@ const HomePageFilters = ({ searchText, onSearch }: homePageFiltersPropType) => {
             onCheckedChange={() => dispatch(HomeActions.SetShowMapStatus(!showMapStatus))}
           />
         </div>
-        <Link to={'/create-project'}>
-          <Button variant="primary-red">
-            <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />
-            <p>New Project</p>
-          </Button>
-        </Link>
+        {hasManagedAnyOrganization && (
+          <Link to={'/create-project'}>
+            <Button variant="primary-red">
+              <AssetModules.AddIcon className="!fmtm-text-[1.125rem]" />
+              <p>New Project</p>
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
