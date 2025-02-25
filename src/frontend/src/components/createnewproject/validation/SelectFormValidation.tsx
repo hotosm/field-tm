@@ -1,22 +1,15 @@
 interface ProjectValues {
-  formCategorySelection: string;
-  formWays: string;
-  customFormUpload: File | null;
+  xlsFormFileUpload: File | null;
 }
 interface ValidationErrors {
-  formCategorySelection?: string;
-  formWays?: string;
-  customFormUpload?: any;
+  xlsFormFileUpload?: any;
 }
 
 function SelectFormValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
-  if (!values?.formCategorySelection) {
-    errors.formCategorySelection = 'Survey Type is Required.';
-  }
-  if (values?.formWays === 'custom_form' && !values?.customFormUpload) {
-    errors.customFormUpload = 'Form needs to be Uploaded.';
+  if (!values?.xlsFormFileUpload) {
+    errors.xlsFormFileUpload = 'Form needs to be Uploaded.';
   }
 
   return errors;

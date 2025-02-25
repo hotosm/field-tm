@@ -1,6 +1,10 @@
+import { MapGeomTypes } from '@/types/enums';
+
 interface ProjectValues {
-  form_ways: string;
-  dataExtractWays: string;
+  primaryGeomType: MapGeomTypes;
+  useMixedGeomTypes: boolean;
+  newGeomType: MapGeomTypes;
+  dataExtractType: string;
   data_extractFile: object;
   data_extract_options: string;
   customDataExtractUpload: string;
@@ -8,8 +12,9 @@ interface ProjectValues {
   additionalFeature: File;
 }
 interface ValidationErrors {
-  form_ways?: string;
-  dataExtractWays?: string;
+  primaryGeomType?: string;
+  newGeomType?: string;
+  dataExtractType?: string;
   data_extractFile?: string;
   data_extract_options?: string;
   customDataExtractUpload?: string;
@@ -19,11 +24,19 @@ interface ValidationErrors {
 function DataExtractValidation(values: ProjectValues) {
   const errors: ValidationErrors = {};
 
-  if (!values?.dataExtractWays) {
-    errors.dataExtractWays = 'Map Features Selection is Required.';
+  if (!values?.primaryGeomType) {
+    errors.primaryGeomType = 'A primary geometry type must be selected.';
   }
 
-  if (values.dataExtractWays && values.dataExtractWays === 'custom_data_extract' && !values.customDataExtractUpload) {
+  if (values?.useMixedGeomTypes && !values?.newGeomType) {
+    errors.newGeomType = 'Please select a type for new geometries.';
+  }
+
+  if (!values?.dataExtractType) {
+    errors.dataExtractType = 'Map Features Selection is Required.';
+  }
+
+  if (values.dataExtractType && values.dataExtractType === 'custom_data_extract' && !values.customDataExtractUpload) {
     errors.customDataExtractUpload = 'A GeoJSON file is required.';
   }
 

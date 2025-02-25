@@ -148,7 +148,7 @@ export const getFeatureStatusStyle = (geomType: string, mapTheme: Record<string,
       VALIDATED: createFeaturePolygonStyle(mapTheme.palette.entityStatusColors.validated),
     };
   } else if (geomType === GeoGeomTypesEnum.LINESTRING) {
-    console.log('linestring style not set');
+    console.warn('linestring style not set');
   }
 
   return geojsonStyles[mappingStatus];

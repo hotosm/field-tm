@@ -22,7 +22,7 @@ const FileInputComponent = ({
 }: fileInputComponentType) => {
   const customFileRef = useRef<any>(null);
   return (
-    <div className="fmtm-mt-3 fmtm-pb-3">
+    <div>
       <div className="fmtm-flex fmtm-items-center fmtm-gap-1">
         <label
           id="file-input"

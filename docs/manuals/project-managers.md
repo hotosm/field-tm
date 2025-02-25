@@ -138,9 +138,8 @@ Alternatively, request the creation of a new organisation for your team:
 
     ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
-13. The step 3 is to choose the form category of the project. Meaning if you want
-    to survey each household or healthcare or educational institutes.
-    You can upload the custom XLS form by clicking on the checkbox.
+13. Upload your XLSForm. Here you download pre-defined forms from FMTM.
+    Some are specifically designed to work with OpenStreetMap.
     Click on "Next" to proceed.
 
     ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)

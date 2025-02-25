@@ -10,7 +10,7 @@ export interface ProjectDetailsModel {
   instructions: string;
   per_task_instructions: string;
   status: number;
-  xform_category: string;
+  osm_category: string;
   location_str: string;
   outline: {
     type: string;

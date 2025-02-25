@@ -45,7 +45,7 @@
 	import { getProjectSetupStepStore, getProjectBasemapStore } from '$store/common.svelte.ts';
 	import { readFileFromOPFS } from '$lib/fs/opfs.ts';
 	import { loadOfflinePmtiles } from '$lib/utils/basemaps.ts';
-	import { projectSetupStep as projectSetupStepEnum, NewGeomTypes } from '$constants/enums.ts';
+	import { projectSetupStep as projectSetupStepEnum, MapGeomTypes } from '$constants/enums.ts';
 	import { baseLayers, osmStyle, pmtilesStyle } from '$constants/baseLayers.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
 	import { clickOutside } from '$lib/utils/clickOutside.ts';
@@ -58,8 +58,9 @@
 		toggleActionModal: (value: 'task-modal' | 'entity-modal' | null) => void;
 		projectId: number;
 		setMapRef: (map: maplibregl.Map | undefined) => void;
+		primaryGeomType: MapGeomTypes;
 		draw?: boolean;
-		drawGeomType: NewGeomTypes | undefined;
+		drawGeomType: MapGeomTypes | undefined;
 		handleDrawnGeom?: ((drawInstance: any, geojson: GeoJSONGeometry) => void) | null;
 	}
 
@@ -69,6 +70,7 @@
 		toggleActionModal,
 		projectId,
 		setMapRef,
+		primaryGeomType,
 		draw = false,
 		drawGeomType,
 		handleDrawnGeom,
@@ -153,13 +155,13 @@
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
 		let entityLayerName: string;
 		switch (drawGeomType) {
-			case NewGeomTypes.POINT:
+			case MapGeomTypes.POINT:
 				entityLayerName = 'entity-point-layer';
 				break;
-			case NewGeomTypes.POLYGON:
+			case MapGeomTypes.POLYGON:
 				entityLayerName = 'entity-polygon-layer';
 				break;
-			case NewGeomTypes.LINESTRING:
+			case MapGeomTypes.LINESTRING:
 				entityLayerName = 'entity-line-layer';
 				break;
 			default:
@@ -496,7 +498,7 @@
 		processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData)}
 		geojsonUpdateDependency={entitiesStore.entitiesStatusList}
 	>
-	{#if drawGeomType === NewGeomTypes.POLYGON}
+	{#if primaryGeomType === MapGeomTypes.POLYGON}
 		<FillLayer
 			id="entity-polygon-layer"
 			paint={{
@@ -543,7 +545,7 @@
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
-		{:else if drawGeomType === NewGeomTypes.POINT}
+		{:else if primaryGeomType === MapGeomTypes.POINT}
 		<SymbolLayer
 			id="entity-point-layer"
 			applyToClusters={false}

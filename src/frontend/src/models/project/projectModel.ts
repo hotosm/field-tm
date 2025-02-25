@@ -1,4 +1,4 @@
-import { NewGeomTypes } from '@/types/enums';
+import { MapGeomTypes } from '@/types/enums';
 
 export type osmTag = {
   string: string;
@@ -39,7 +39,7 @@ export type projectInfoType = {
   status: string;
   visibility: string;
   total_tasks: number;
-  xform_category: string;
+  osm_category: string;
   odk_form_id: string;
   mapper_level: string;
   priority: string;
@@ -47,7 +47,6 @@ export type projectInfoType = {
   odk_central_url: string;
   odk_central_user: string;
   odk_token: string;
-  data_extract_type: string;
   data_extract_url: string;
   task_split_dimension: null | number;
   task_num_buildings: number;

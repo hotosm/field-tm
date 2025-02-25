@@ -259,6 +259,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
               )}
               {uploadAreaSelection === 'upload_file' && (
                 <div
+                  className="fmtm-my-2"
                   onMouseOver={() => dispatch(CreateProjectActions.SetDescriptionToFocus('uploadarea-uploadgeojson'))}
                   onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
                 >

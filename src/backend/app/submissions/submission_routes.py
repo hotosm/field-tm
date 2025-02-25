@@ -434,10 +434,10 @@ async def conflate_geojson(
         submission_geojson = await central_crud.convert_odk_submission_json_to_geojson(
             task_submission
         )
-        form_category = project.xform_category
+        osm_category = project.osm_category
         input_features = submission_geojson["features"]
 
-        osm_features = postgis_utils.get_osm_geometries(form_category, task_geojson)
+        osm_features = postgis_utils.get_osm_geometries(osm_category, task_geojson)
         conflated_features = postgis_utils.conflate_features(
             input_features, osm_features.get("features", []), remove_conflated
         )

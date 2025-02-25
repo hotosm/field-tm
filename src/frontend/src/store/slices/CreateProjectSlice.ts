@@ -17,7 +17,6 @@ export const initialState: CreateProjectStateTypes = {
     description: '',
     organisation_id: null,
     per_task_instructions: '',
-    formWays: 'existing_form',
     hasCustomTMS: false,
     custom_tms_url: '',
     project_admins: [],
@@ -25,7 +24,7 @@ export const initialState: CreateProjectStateTypes = {
   projectDetailsResponse: null,
   projectDetailsLoading: false,
   editProjectDetailsLoading: false,
-  formCategoryList: [],
+  formExampleList: [],
   formCategoryLoading: false,
   generateProjectLoading: false,
   generateProjectSuccess: false,
@@ -80,7 +79,6 @@ const CreateProject = createSlice({
         odk_central_password: '',
         description: '',
         organisation_id: null,
-        form_ways: 'existing_form',
       };
       state.totalAreaSelection = null;
       state.taskSplittingMethod = null;
@@ -100,8 +98,8 @@ const CreateProject = createSlice({
     GetFormCategoryLoading(state, action: PayloadAction<boolean>) {
       state.formCategoryLoading = action.payload;
     },
-    GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formCategoryList']>) {
-      state.formCategoryList = action.payload;
+    GetFormCategoryList(state, action: PayloadAction<CreateProjectStateTypes['formExampleList']>) {
+      state.formExampleList = action.payload;
     },
     SetIndividualProjectDetailsData(state, action) {
       state.projectDetails = action.payload;

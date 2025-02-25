@@ -157,10 +157,10 @@ overview of the injected fields and their purposes:
 4. If no feature is selected, the user would be prompted to take a GPS coordinate
    of new feature.
    Note: One of these two options must be filled up to proceed.
-5. We also dedicate few rows for calculating form category, osm ID,
-   Task Id and mapping status used on FMTM.
+5. We also dedicate few rows for calculating OSM ID,
+   Task ID and mapping status used on FMTM.
 6. We then ask mappers to answer if the feature exist in reality?
-   If yes, the custom form uploaded by user is proceeded.
+   If yes, user proceeds with form submission.
 7. If no, the user is prompted to capture an image (if available) and the form
    is terminated with a message:
    "You cannot proceed with data acquisition if the building does not exist."

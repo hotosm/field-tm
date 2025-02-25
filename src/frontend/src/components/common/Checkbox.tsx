@@ -56,12 +56,12 @@ export const CustomCheckbox = ({
         ref={null}
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className="fmtm-mt-[2px]"
+        className="fmtm-mt-1"
         disabled={disabled}
       />
       <p
         style={labelStyle}
-        className={`fmtm-text-[#7A7676] fmtm-font-archivo fmtm-text-base fmtm-break-words ${className}`}
+        className={`fmtm-text-gray-800 fmtm-text-base fmtm-break-words ${className}`}
         onClick={labelClickable && !disabled ? handleLabelClick : undefined}
       >
         {label}

@@ -33,7 +33,7 @@ from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentralDecrypted, ODKCentralIn
 from app.config import decrypt_value, encrypt_value
-from app.db.enums import BackgroundTaskStatus, DbGeomType, GeomStatus, ProjectPriority
+from app.db.enums import BackgroundTaskStatus, GeomStatus, ProjectPriority
 from app.db.models import DbBackgroundTask, DbBasemap, DbProject, slugify
 from app.db.postgis_utils import geojson_to_featcol, merge_polygons
 
@@ -173,12 +173,8 @@ class ProjectInBase(DbProject):
 class ProjectIn(ProjectInBase, ODKCentralIn):
     """Upload new project."""
 
-    # Mandatory
-    xform_category: str
     # Ensure geojson_pydantic.Polygon
     outline: Polygon
-    # Omit new_geom_type as we calculate this automatically
-    new_geom_type: Annotated[Optional[DbGeomType], Field(exclude=True)] = None
 
 
 class ProjectUpdate(ProjectInBase, ODKCentralIn):

@@ -52,7 +52,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
           >
             <input
               type="radio"
-              id={option.value}
+              id={option.label?.toString()}
               name={option.name}
               value={option.value}
               className={`fmtm-accent-primaryRed fmtm-cursor-pointer ${
@@ -65,7 +65,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
               disabled={option?.disabled === true}
             />
             <label
-              htmlFor={option.value}
+              htmlFor={option.label?.toString()}
               className={`fmtm-text-base fmtm-bg-white fmtm-text-gray-500 fmtm-mb-[2px] fmtm-cursor-pointer fmtm-flex fmtm-items-center fmtm-gap-2  ${className}`}
             >
               <p className={`${option?.disabled === true ? 'fmtm-cursor-not-allowed' : ''}`}>{option.label}</p>
