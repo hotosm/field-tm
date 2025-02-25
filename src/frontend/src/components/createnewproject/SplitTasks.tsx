@@ -40,7 +40,7 @@ const taskSplitOptions: taskSplitOptionsType[] = [
   },
 ];
 
-const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, customFormFile }) => {
+const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalFeature, xlsFormFile }) => {
   useDocumentTitle('Create Project: Split Tasks');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -105,8 +105,8 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIsUnsavedChanges(false));
-
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(formValues));
+
     // Project POST data
     let projectData = {
       name: projectDetails.name,
@@ -118,21 +118,25 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
       odk_central_url: projectDetails.odk_central_url,
       odk_central_user: projectDetails.odk_central_user,
       odk_central_password: projectDetails.odk_central_password,
-      // dont send xform_category if upload custom form is selected
-      xform_category: projectDetails.formCategorySelection,
+      primary_geom_type: projectDetails.primaryGeomType,
+      new_geom_type: projectDetails.newGeomType ? projectDetails.newGeomType : projectDetails.primaryGeomType,
       task_split_type: taskSplittingMethod,
-      form_ways: projectDetails.formWays,
       // "uploaded_form": projectDetails.uploaded_form,
       hashtags: projectDetails.hashtags,
       data_extract_url: projectDetails.data_extract_url,
       custom_tms_url: projectDetails.custom_tms_url,
     };
+    // Append osm_category if set
+    if (projectDetails.osmFormSelectionName) {
+      projectData = { ...projectData, osm_category: projectDetails.osmFormSelectionName };
+    }
     // Append extra param depending on task split type
     if (taskSplittingMethod === task_split_type.TASK_SPLITTING_ALGORITHM) {
       projectData = { ...projectData, task_num_buildings: projectDetails.average_buildings_per_task };
     } else {
       projectData = { ...projectData, task_split_dimension: projectDetails.dimension };
     }
+
     // Create file object from generated task areas
     const taskAreaBlob = new Blob([JSON.stringify(dividedTaskGeojson || drawnGeojson)], {
       type: 'application/json',
@@ -145,9 +149,9 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
         `${import.meta.env.VITE_API_URL}/projects?org_id=${projectDetails.organisation_id}`,
         projectData,
         taskAreaGeojsonFile,
-        customFormFile,
+        xlsFormFile,
         customDataExtractUpload,
-        projectDetails.dataExtractWays === 'osm_data_extract',
+        projectDetails.dataExtractType === 'osm_data_extract',
         additionalFeature,
         projectDetails.project_admins as number[],
         combinedFeaturesCount,
@@ -187,7 +191,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
       dispatch(
         GetDividedTaskFromGeojson(`${import.meta.env.VITE_API_URL}/projects/preview-split-by-square`, {
           geojson: drawnGeojsonFile,
-          extract_geojson: formValues.dataExtractWays === 'osm_data_extract' ? null : dataExtractFile,
+          extract_geojson: formValues.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
           dimension: formValues?.dimension,
         }),
       );
@@ -198,7 +202,7 @@ const SplitTasks = ({ flag, setGeojsonFile, customDataExtractUpload, additionalF
           drawnGeojsonFile,
           formValues?.average_buildings_per_task,
           // Only send dataExtractFile if custom extract
-          formValues.dataExtractWays === 'osm_data_extract' ? null : dataExtractFile,
+          formValues.dataExtractType === 'osm_data_extract' ? null : dataExtractFile,
         ),
       );
     }

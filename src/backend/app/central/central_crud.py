@@ -274,16 +274,16 @@ def get_project_form_xml(
 
 async def append_fields_to_user_xlsform(
     xlsform: BytesIO,
-    form_category: str = "buildings",
-    additional_entities: list[str] = None,
-    existing_id: str = None,
-    new_geom_type: DbGeomType = DbGeomType.POLYGON,
+    form_name: str = "buildings",
+    additional_entities: Optional[list[str]] = None,
+    existing_id: Optional[str] = None,
+    new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory FMTM fields to XLSForm")
     return await append_mandatory_fields(
         xlsform,
-        form_category=form_category,
+        form_name=form_name,
         additional_entities=additional_entities,
         existing_id=existing_id,
         new_geom_type=new_geom_type,
@@ -292,15 +292,15 @@ async def append_fields_to_user_xlsform(
 
 async def validate_and_update_user_xlsform(
     xlsform: BytesIO,
-    form_category: str = "buildings",
-    additional_entities: list[str] = None,
-    existing_id: str = None,
-    new_geom_type: DbGeomType = DbGeomType.POLYGON,
+    form_name: str = "buildings",
+    additional_entities: Optional[list[str]] = None,
+    existing_id: Optional[str] = None,
+    new_geom_type: Optional[DbGeomType] = DbGeomType.POLYGON,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
         xlsform,
-        form_category=form_category,
+        form_name=form_name,
         additional_entities=additional_entities,
         existing_id=existing_id,
         new_geom_type=new_geom_type,
@@ -315,7 +315,7 @@ async def update_project_xform(
     xform_id: str,
     odk_id: int,
     xlsform: BytesIO,
-    category: str,
+    # osm_category: str,
     odk_credentials: central_schemas.ODKCentralDecrypted,
 ) -> None:
     """Update and publish the XForm for a project.
@@ -324,7 +324,6 @@ async def update_project_xform(
         xform_id (str): The UUID of the existing XForm in ODK Central.
         odk_id (int): ODK Central form ID.
         xlsform (UploadFile): XForm data.
-        category (str): Category of the XForm.
         odk_credentials (central_schemas.ODKCentralDecrypted): ODK Central creds.
 
     Returns: None
@@ -337,6 +336,7 @@ async def update_project_xform(
     xform_obj.createForm(
         odk_id,
         xform_bytesio,
+        # NOTE this variable is incorrectly named and should be form_id
         form_name=xform_id,
     )
     # The draft form must be published after upload

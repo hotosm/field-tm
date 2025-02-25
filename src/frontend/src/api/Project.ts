@@ -49,7 +49,7 @@ export const ProjectById = (projectId: string) => {
             short_description: projectResp.short_description,
             num_contributors: projectResp.num_contributors,
             total_tasks: projectResp.total_tasks,
-            xform_category: projectResp.xform_category,
+            osm_category: projectResp.osm_category,
             odk_form_id: projectResp?.odk_form_id,
             data_extract_url: projectResp.data_extract_url,
             instructions: projectResp?.per_task_instructions,

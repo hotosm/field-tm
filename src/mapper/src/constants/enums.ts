@@ -8,7 +8,7 @@ export enum projectSetupStep {
 	'complete_setup' = 3,
 }
 
-export enum NewGeomTypes {
+export enum MapGeomTypes {
 	POINT = 'POINT',
 	POLYGON = 'POLYGON',
 	LINESTRING = 'LINESTRING',

@@ -27,7 +27,7 @@ const CreateNewProject = () => {
   const projectDetails: any = useAppSelector((state) => state.createproject.projectDetails);
   const [geojsonFile, setGeojsonFile] = useState(null);
   const [customDataExtractUpload, setCustomDataExtractUpload] = useState(null);
-  const [customFormFile, setCustomFormFile] = useState(null);
+  const [xlsFormFile, setXlsFormFile] = useState(null);
   const [additionalFeature, setAdditionalFeature] = useState(null);
 
   useEffect(() => {
@@ -79,8 +79,8 @@ const CreateNewProject = () => {
           <SelectForm
             flag="create_project"
             geojsonFile={geojsonFile}
-            customFormFile={customFormFile}
-            setCustomFormFile={setCustomFormFile}
+            xlsFormFile={xlsFormFile}
+            setXlsFormFile={setXlsFormFile}
           />
         );
       case '/map-data':
@@ -100,7 +100,7 @@ const CreateNewProject = () => {
             setGeojsonFile={setGeojsonFile}
             customDataExtractUpload={customDataExtractUpload}
             additionalFeature={additionalFeature}
-            customFormFile={customFormFile}
+            xlsFormFile={xlsFormFile}
           />
         );
       default:

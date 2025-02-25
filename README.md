@@ -123,11 +123,11 @@ Alternatively see the [docs](https://docs.fmtm.dev) for various deployment guide
 |✅| 📱 features turn green once mapped |
 |✅| 📱 better support for mapping **new** points, lines, polygons |
 |✅| 📱 navigation and capability for routing to map features |
+|✅| 🖥️ organization creation and management |
 |⚙️| 📱 integrate ODK Web Forms (to avoid switching apps) |
 |⚙️| 🖥️ multiple approaches to task splitting algorithm |
 |⚙️| 🖥️ user role management per project |
 | | 📱 fully offline field mapping |
-| | 🖥️ organization creation and management |
 | | 🖥️ simplify project creation with basic / advanced workflows |
 | | 🖥️ improvements to the validation criteria and workflow |
 | | 🖥️ export (+merge) the final data to OpenStreetMap |

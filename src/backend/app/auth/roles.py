@@ -289,11 +289,14 @@ async def wrap_check_access(
 
 
 async def project_manager(
-    project: Annotated[DbProject, Depends(get_project)],
+    project_id: int,
     db: Annotated[Connection, Depends(db_conn)],
     current_user: Annotated[AuthUser, Depends(login_required)],
 ) -> ProjectUserDict:
     """A project manager for a specific project."""
+    # NOTE here we get the project manually to avoid warnings before the project
+    # if fully created yet (about odk_token not existing)
+    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
     return await wrap_check_access(
         project,
         db,

@@ -200,10 +200,8 @@ const GenerateProjectFilesService = (url: string, projectData: any, formUpload: 
         formData.append('additional_entities', additionalEntities);
       }
 
-      // Append xlsform only if it's a custom form
-      if (projectData.form_ways === 'custom_form' && formUpload) {
-        formData.append('xlsform', formUpload);
-      }
+      // Append xlsform
+      formData.append('xlsform', formUpload);
 
       // Add combined features count
       formData.append('combined_features_count', combinedFeaturesCount.toString());
@@ -433,7 +431,8 @@ const PostFormUpdate = (url: string, projectData: Record<string, any>) => {
       try {
         const formFormData = new FormData();
         formFormData.append('xform_id', projectData.xformId);
-        formFormData.append('category', projectData.category);
+        // FIXME add back in capability to update osm_category
+        // formFormData.append('category', projectData.osm_category);
         formFormData.append('xlsform', projectData.upload);
 
         const postFormUpdateResponse = await axios.post(url, formFormData);

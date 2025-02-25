@@ -1,4 +1,4 @@
-import { task_split_type, NewGeomTypes } from '@/types/enums';
+import { task_split_type, MapGeomTypes } from '@/types/enums';
 
 export type CreateProjectStateTypes = {
   editProjectDetails: ProjectDetailsTypes;
@@ -7,7 +7,7 @@ export type CreateProjectStateTypes = {
   projectDetailsResponse: EditProjectResponseTypes | null;
   projectDetailsLoading: boolean;
   editProjectDetailsLoading: boolean;
-  formCategoryList: FormCategoryListTypes[];
+  formExampleList: FormCategoryListTypes[];
   formCategoryLoading: boolean;
   generateProjectLoading: boolean;
   generateProjectSuccess: boolean;
@@ -79,7 +79,7 @@ type EditProjectResponseTypes = {
   status: number;
   outline: GeoJSONFeatureTypes;
   tasks: ProjectTaskTypes[];
-  xform_category: string;
+  osm_category: string;
   hashtags: string;
 };
 
@@ -98,19 +98,21 @@ export type ProjectDetailsTypes = {
   short_description?: string;
   description?: string;
   task_split_type?: number;
-  xform_category?: string;
+  osm_category?: string;
   data_extract_options?: string;
-  form_ways?: string;
   organisation_id?: number | null;
-  formWays?: string;
-  formCategorySelection?: string;
+  formExampleSelection?: string;
+  osmFormSelectionName?: string;
   average_buildings_per_task?: number;
-  dataExtractWays?: string;
+  dataExtractType?: string;
   per_task_instructions?: string;
   custom_tms_url: string;
   hasCustomTMS: boolean;
-  customFormUpload: any;
+  xlsFormFileUpload: any;
   hasAdditionalFeature: boolean;
+  primaryGeomType: MapGeomTypes;
+  useMixedGeomTypes: boolean;
+  newGeomType: MapGeomTypes;
   project_admins: number[];
 };
 

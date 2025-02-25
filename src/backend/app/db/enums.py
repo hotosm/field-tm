@@ -247,9 +247,9 @@ class XLSFormType(StrEnum, Enum):
     The the value is the user facing form name (e.g. healthcare).
     """
 
-    buildings = "buildings"
+    buildings = "OSM Buildings"
     # highways = "highways"
-    health = "healthcare"
+    health = "OSM Healthcare"
     # toilets = "toilets"
     # religious = "religious"
     # landusage = "landusage"

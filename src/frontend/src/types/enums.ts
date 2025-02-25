@@ -55,7 +55,7 @@ export enum project_roles {
   ASSOCIATE_PROJECT_MANAGER = 'ASSOCIATE_PROJECT_MANAGER',
 }
 
-export type NewGeomTypes = {
+export type MapGeomTypes = {
   POINT: 'POINT';
   POLYGON: 'POLYGON';
   LINESTRING: 'LINESTRING';
@@ -73,4 +73,9 @@ export enum submission_status {
   edited = 'Edited',
   approved = 'Approved',
   rejected = 'Rejected',
+}
+
+export enum osm_forms {
+  buildings = 'OSM Buildings',
+  health = 'OSM Healthcare',
 }

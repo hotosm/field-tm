@@ -45,7 +45,7 @@ dependencies = [
     "sozipfile==0.3.2",
     "cryptography==43.0.3",
     "pyjwt==2.9.0",
-    "osm-fieldwork==0.20.4",
+    "osm-fieldwork==0.21.0",
     "osm-login-python==2.0.0",
     "osm-rawdata==0.4.2",
     "fmtm-splitter==2.0.0",

@@ -47,7 +47,6 @@ from app.db.postgis_utils import (
     featcol_keep_single_geom_type,
     featcol_to_flatgeobuf,
     flatgeobuf_to_featcol,
-    get_featcol_dominant_geom_type,
     parse_geojson_file_to_featcol,
     split_geojson_by_task_areas,
 )
@@ -147,7 +146,7 @@ async def generate_data_extract(
     if not extract_config:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail="To generate a new data extract a form_category must be specified.",
+            detail="To generate a new data extract a extract_config must be specified.",
         )
 
     pg = PostgresClient(
@@ -203,7 +202,7 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
         # Insert or update new XLSForms from disk
         for xls_type in XLSFormType:
             file_name = xls_type.name
-            category = xls_type.value
+            form_type = xls_type.value
             file_path = Path(directory) / f"{file_name}.xls"
 
             if not file_path.exists():
@@ -224,12 +223,12 @@ async def read_and_insert_xlsforms(db: Connection, directory: str) -> None:
                     ON CONFLICT (title) DO UPDATE
                     SET xls = EXCLUDED.xls
                 """
-                await cur.execute(insert_query, {"title": category, "xls": data})
-                log.info(f"XLSForm for '{category}' inserted/updated in the database")
+                await cur.execute(insert_query, {"title": form_type, "xls": data})
+                log.info(f"XLSForm for '{form_type}' inserted/updated in the database")
 
             except Exception as e:
                 log.exception(
-                    f"Failed to insert or update {category} in the database. "
+                    f"Failed to insert or update {form_type} in the database. "
                     f"Error: {e}",
                     stack_info=True,
                 )
@@ -278,17 +277,11 @@ async def get_or_set_data_extract_url(
             raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
         return existing_url
 
-    # FIXME determine this using get_featcol_dominant_geom_type ?
-    # FIXME would have to download extract first though
-    # Perhaps we do this via generate-data-extract URL
-    extract_type = "polygon"
-
     await DbProject.update(
         db,
         project_id,
         project_schemas.ProjectUpdate(
             data_extract_url=url,
-            data_extract_type=extract_type,
         ),
     )
 
@@ -299,7 +292,6 @@ async def upload_custom_extract_to_s3(
     db: Connection,
     project_id: int,
     fgb_content: bytes,
-    data_extract_type: str,
 ) -> str:
     """Uploads custom data extracts to S3.
 
@@ -307,7 +299,6 @@ async def upload_custom_extract_to_s3(
         db (Connection): The database connection.
         project_id (int): The ID of the project.
         fgb_content (bytes): Content of read flatgeobuf file.
-        data_extract_type (str): centroid/polygon/line for database.
 
     Returns:
         str: URL to fgb file in S3.
@@ -336,7 +327,6 @@ async def upload_custom_extract_to_s3(
         project_id,
         project_schemas.ProjectUpdate(
             data_extract_url=s3_fgb_full_url,
-            data_extract_type=data_extract_type,
         ),
     )
 
@@ -374,34 +364,11 @@ async def upload_custom_fgb_extract(
         log.error(msg)
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
-    data_extract_type = await get_data_extract_type(featcol)
-
     return await upload_custom_extract_to_s3(
         db,
         project_id,
         fgb_content,
-        data_extract_type,
     )
-
-
-async def get_data_extract_type(featcol: geojson.FeatureCollection) -> str:
-    """Determine predominant geometry type for extract."""
-    geom_type = get_featcol_dominant_geom_type(featcol)
-    if geom_type not in ["Polygon", "LineString", "Point"]:
-        msg = (
-            "Extract does not contain valid geometry types, from 'Polygon' "
-            ", 'LineString' and 'Point'."
-        )
-        log.error(msg)
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
-    geom_name_map = {
-        "Polygon": "polygon",
-        "Point": "centroid",
-        "LineString": "line",
-    }
-    data_extract_type = geom_name_map.get(geom_type, "polygon")
-
-    return data_extract_type
 
 
 async def upload_custom_geojson_extract(
@@ -433,8 +400,6 @@ async def upload_custom_geojson_extract(
 
     await check_crs(featcol_single_geom_type)
 
-    data_extract_type = await get_data_extract_type(featcol_single_geom_type)
-
     log.debug(
         "Generating fgb object from geojson with "
         f"{len(featcol_single_geom_type.get('features', []))} features"
@@ -447,7 +412,9 @@ async def upload_custom_geojson_extract(
         raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
 
     return await upload_custom_extract_to_s3(
-        db, project_id, fgb_data, data_extract_type
+        db,
+        project_id,
+        fgb_data,
     )
 
 
@@ -529,7 +496,7 @@ async def generate_project_files(
     Returns:
         bool: True if success.
     """
-    project = await project_deps.get_project_by_id(db, project_id)
+    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
     log.info(f"Starting generate_project_files for project {project_id}")
 
     # Extract data extract from flatgeobuf

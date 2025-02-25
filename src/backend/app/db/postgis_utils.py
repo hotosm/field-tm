@@ -774,17 +774,17 @@ def merge_polygons(
         ) from e
 
 
-def get_osm_geometries(form_category, geometry):
+def get_osm_geometries(osm_category, geometry):
     """Request a snapshot based on the provided geometry.
 
     Args:
-        form_category(str): feature category type (eg: buildings).
+        osm_category(str): feature category type (eg: buildings).
         geometry (str): The geometry data in JSON format.
 
     Returns:
         dict: The JSON response containing the snapshot data.
     """
-    config_filename = XLSFormType(form_category).name
+    config_filename = XLSFormType(osm_category).name
     data_model = f"{data_models_path}/{config_filename}.yaml"
 
     with open(data_model, "rb") as data_model_yaml:

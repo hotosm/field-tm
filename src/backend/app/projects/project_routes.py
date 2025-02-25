@@ -43,7 +43,6 @@ from geojson_pydantic import FeatureCollection
 from loguru import logger as log
 from osm_fieldwork.data_models import data_models_path
 from osm_fieldwork.make_data_extract import getChoices
-from osm_fieldwork.xlsforms import xlsforms_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import Connection
 
@@ -568,7 +567,6 @@ async def validate_form(
 
     NOTE this provides a basic sanity check, some fields are omitted
     so the form is not usable in production:
-        - form_category
         - additional_entities
         - new_geom_type
     """
@@ -647,7 +645,8 @@ async def get_data_extract(
     # FIXME once sub project creation implemented, this should be manager only
     current_user: Annotated[AuthUser, Depends(login_required)],
     geojson_file: UploadFile = File(...),
-    form_category: Optional[XLSFormType] = Form(None),
+    # FIXME this is currently hardcoded but needs to be user configurable via UI
+    osm_category: Annotated[Optional[XLSFormType], Form()] = XLSFormType.buildings,
 ):
     """Get a new data extract for a given project AOI.
 
@@ -658,8 +657,8 @@ async def get_data_extract(
     clean_boundary_geojson = merge_polygons(boundary_geojson)
 
     # Get extract config file from existing data_models
-    if form_category:
-        config_filename = XLSFormType(form_category).name
+    if osm_category:
+        config_filename = XLSFormType(osm_category).name
         data_model = f"{data_models_path}/{config_filename}.yaml"
         with open(data_model, "rb") as data_model_yaml:
             extract_config = BytesIO(data_model_yaml.read())
@@ -803,30 +802,17 @@ async def update_project_form(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
     xform_id: str = Form(...),
-    category: XLSFormType = Form(...),
+    # FIXME add back in capability to update osm_category
+    # osm_category: XLSFormType = Form(...),
 ):
-    """Update the XForm data in ODK Central.
-
-    Also updates the category and custom XLSForm data in the database.
-    """
+    """Update the XForm data in ODK Central & FMTM DB."""
     project = project_user_dict["project"]
-
-    # TODO we currently do nothing with the provided category
-    # TODO allowing for category updates is disabled due to complexity
-    # TODO as it would mean also updating data extracts,
-    # TODO so perhaps we just remove this?
-    # form_filename = XLSFormType(project.xform_category).name
-    # xlsform_path = Path(f"{xlsforms_path}/{form_filename}.xls")
-    # file_ext = xlsform_path.suffix.lower()
-    # with open(xlsform_path, "rb") as f:
-    #     new_xform_data = BytesIO(f.read())
 
     # Update ODK Central form data
     await central_crud.update_project_xform(
         xform_id,
         project.odkid,
         xlsform,
-        category,
         project.odk_credentials,
     )
 
@@ -963,9 +949,7 @@ async def generate_files(
     db: Annotated[Connection, Depends(db_conn)],
     project_user_dict: Annotated[ProjectUserDict, Depends(project_manager)],
     background_tasks: BackgroundTasks,
-    xlsform_upload: Annotated[
-        Optional[BytesIO], Depends(central_deps.read_optional_xlsform)
-    ] = None,
+    xlsform_upload: Annotated[BytesIO, Depends(central_deps.read_xlsform)],
     additional_entities: Annotated[Optional[list[str]], None] = None,
     combined_features_count: Annotated[int, Form()] = 0,
 ):
@@ -973,7 +957,7 @@ async def generate_files(
 
     Boundary, ODK Central forms, QR codes, etc.
 
-    Accepts a project ID, category, custom form flag, and an uploaded file as inputs.
+    Accepts a project ID and an uploaded file as inputs.
     The generated files are associated with the project ID and stored in the database.
     This api generates odk appuser tokens, forms. This api also creates an app user for
     each task and provides the required roles.
@@ -982,8 +966,7 @@ async def generate_files(
     it to the form.
 
     Args:
-        xlsform_upload (UploadFile, optional): A custom XLSForm to use in the project.
-            A file should be provided if user wants to upload a custom xls form.
+        xlsform_upload (UploadFile): The XLSForm for the project data collection.
         additional_entities (list[str]): If additional Entity lists need to be
             created (i.e. the project form references multiple geometries).
         combined_features_count (int): Total count of features to be mapped, plus
@@ -997,34 +980,24 @@ async def generate_files(
     """
     project = project_user_dict.get("project")
     project_id = project.id
-    form_category = project.xform_category
     new_geom_type = project.new_geom_type
 
     log.debug(f"Generating additional files for project: {project.id}")
 
-    if xlsform_upload:
-        log.debug("User provided custom XLSForm")
+    form_name = f"FMTM_Project_{project.id}"
 
-        # Validate uploaded form
-        await central_crud.validate_and_update_user_xlsform(
-            xlsform=xlsform_upload,
-            form_category=form_category,
-            additional_entities=additional_entities,
-            new_geom_type=new_geom_type,
-        )
-        xlsform = xlsform_upload
-
-    else:
-        log.debug(f"Using default XLSForm for category: '{form_category}'")
-
-        form_filename = XLSFormType(form_category).name
-        xlsform_path = f"{xlsforms_path}/{form_filename}.xls"
-        with open(xlsform_path, "rb") as f:
-            xlsform = BytesIO(f.read())
+    # Validate uploaded form
+    await central_crud.validate_and_update_user_xlsform(
+        xlsform=xlsform_upload,
+        form_name=form_name,
+        additional_entities=additional_entities,
+        new_geom_type=new_geom_type,
+    )
+    xlsform = xlsform_upload
 
     xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
         xlsform=xlsform,
-        form_category=form_category,
+        form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
     )

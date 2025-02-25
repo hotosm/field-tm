@@ -26,8 +26,8 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import pytest
-import requests
 from fastapi import HTTPException
+from httpx import AsyncClient
 from loguru import logger as log
 
 from app.central.central_crud import create_odk_project
@@ -362,8 +362,11 @@ async def test_generate_project_files(db, client, project):
     )
     assert data_extract_s3_path is not None
     internal_s3_url = f"{settings.S3_ENDPOINT}{urlparse(data_extract_s3_path).path}"
-    response = requests.head(internal_s3_url, allow_redirects=True)
-    assert response.status_code < 400
+    async with AsyncClient() as client_httpx:
+        response = await client_httpx.head(internal_s3_url, follow_redirects=True)
+        assert response.status_code < 400, (
+            f"HEAD request failed with status {response.status_code}"
+        )
 
     # Get custom XLSForm path
     xlsform_file = Path(f"{test_data_path}/buildings.xls")
@@ -371,7 +374,7 @@ async def test_generate_project_files(db, client, project):
         xlsform_obj = BytesIO(xlsform_data.read())
 
     xform_file = {
-        "xls_form_upload": (
+        "xlsform": (
             "buildings.xls",
             xlsform_obj,
         )
@@ -395,7 +398,7 @@ async def test_update_project(client, admin_user, project):
         "name": f"Updated Test Project {uuid4()}",
         "short_description": "updated short description",
         "description": "updated description",
-        "xform_category": "healthcare",
+        "osm_category": "healthcare",
         "hashtags": "#FMTM anothertag",
     }
 
@@ -412,7 +415,7 @@ async def test_update_project(client, admin_user, project):
     )
     assert response_data["description"] == updated_project_data["description"]
 
-    assert response_data["xform_category"] == updated_project_data["xform_category"]
+    assert response_data["osm_category"] == updated_project_data["osm_category"]
     assert sorted(response_data["hashtags"]) == sorted(
         [
             "#FMTM",
@@ -452,7 +455,7 @@ async def test_project_by_id(client, project):
     assert data["description"] == project.description
     assert data["per_task_instructions"] == project.per_task_instructions
     assert data["status"] == project.status
-    assert data["xform_category"] == project.xform_category
+    assert data["osm_category"] == project.osm_category
     assert data["hashtags"] == project.hashtags
     assert data["organisation_id"] == project.organisation_id
     assert data["location_str"] == project.location_str

@@ -41,7 +41,7 @@ async def get_project(
 async def get_project_by_id(db: Connection, project_id: int):
     """Get a single project by it's ID."""
     try:
-        return await DbProject.one(db, project_id)
+        return await DbProject.one(db, project_id, warn_on_missing_token=False)
     except KeyError as e:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=str(e)) from e
 
