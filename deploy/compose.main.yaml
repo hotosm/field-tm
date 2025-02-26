@@ -104,10 +104,10 @@ services:
       file: compose.staging.yaml
       service: scheduler
 
-  backup:
+  backups:
     extends:
       file: compose.staging.yaml
-      service: backup
+      service: backups
     depends_on:
       fmtm-db:
         condition: service_healthy
