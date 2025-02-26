@@ -105,12 +105,24 @@ services:
       service: scheduler
 
   backups:
-    extends:
-      file: compose.staging.yaml
-      service: backups
+    image: "ghcr.io/hotosm/fmtm/backend:main"
     depends_on:
       fmtm-db:
         condition: service_healthy
+      s3:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - fmtm-net
+    entrypoint: ["/backup-entrypoint.sh"]
+    restart: "on-failure:2"
+    healthcheck:
+      test: pg_isready -U ${FMTM_DB_USER} -d ${FMTM_DB_NAME}
+      start_period: 5s
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   certbot:
     image: "ghcr.io/hotosm/fmtm/proxy:certs-init-main"
