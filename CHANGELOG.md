@@ -1,5 +1,83 @@
 # Changelog
 
+## 2025.1.1 (2025-02-26)
+
+### Feat
+
+- separate out primary mapping geometry from new feature geometry (during proj create) (#2225)
+- **frontend**: start user roles integration (#2207)
+- **frontend**: task comments for individual features( #2218)
+- **backend**: add task scheduler to backend services (cron jobs) (#2147)
+- finalise S3 submission photos on backend + frontend (#2211)
+- **backend**: replace custom ODK submission media upload with official external storage (S3) (#1894)
+- **backend**: replace nominatim usage with pg-nearest-city reverse-geocode (#2199)
+- **backend**: extract additional geoms into submission geojson featcol
+- **frontend**: design modifications, project details, home page, header, buttons (#2148)
+- **frontend**: show geometry label popups on submission details page (#2187)
+- **frontend**: download split geojson during proj create (#2186)
+- **frontend**: download filtered submissions, with option for geojson too (#2183)
+- **backend**: endpoints to download form XML and create new form submissions (#2178)
+- create script for generating project stats via API
+- **frontend**: render points on both frontends, with colour determined by status (#2174)
+- **submission**: add date range filter for geojson download (#2176)
+- **mapper**: add i18n (internationalisation) frontend translations via paraglide js (#2155)
+- **tasks**: add task to unlock tasks locked for over 3 days and reset entities after an hour (#1984)
+- **backend**: return entity uuid on create (#2151)
+- **backend**: add endpoint to create an entity in existing project for new geometry (#2145)
+- **frontend**: update user roles list during project creation (#2135)
+- **frontend**: add table component and manage users page (#2133)
+- **backend**: add central-webhook service for triggering entity status updates in FMTM database (#2130)
+- **backend**: migration to add dataset property to old projects (#2126)
+- **users**: add pagination and search functionality (#2124)
+- **backend**: add endpoint to change global user roles (#2117)
+- **frontend**: assign PM during project creation & refactor radix components (#2115)
+- **backend**: warn users and delete user accounts after period of inactivity  (#2088)
+
+### Fix
+
+- **dialog-entities-actions**: update submission length check condition
+- **backend**: set new_geom_type default to Polygon as temp fix for #2164
+- **taskSelectionPopup**: update task popup task state label
+- **submissionDetails**: display submission images on the submission field itself (#2216)
+- add project create feature warning (10,000) and limit (30,000) (#2215)
+- **frontend**: inconsistent task history names and styling (#2217)
+- **backend**: update role to project admin to fetch user list (#2203)
+- **frontend**: correctly include project name in geojson submission download file
+- **frontend**: use fmtm-cursor-pointer for default user icon
+- **frontend**: move new geom confirm dialog to center screen
+- **extractGeojsonFromObject**: differentiate and visualize Polygon & LineString seperately (#2196)
+- **frontend**: task lock logic, allow unlock by admins (#2188)
+- **+page**: confirmation dialog close before redirection to ODK (#2185)
+- **frontend**: add error message if project editing fails (permissions)
+- **frontend**: add hot-tracking to react type declarations
+- **backend**: TMS issues by using go-tilepacks and go-pmtiles (#2162)
+- **backend**: support big int osm id fgb creation (#2160)
+- **backend**: clear tiles from disk after generation (#2158)
+- updated usage of shapestream requiring 'params' field
+- **projectDetails**: update set odk credential logic (#2149)
+- **frontend**: custom odk creds validation, relate to PR #2142
+- **frontend**: allow users to select default odk credentials (#2142)
+- **getTaskStatusStyle**: fix locked_for_mapping task state color
+- **backend**: getting secret value from CENTRAL_WEBHOOK_API_KEY config var
+- **frontend**: logic allowing for custom odk server creds during proj create (#2129)
+- **frontend**: validated entity state visualization on map (#2122)
+- **mapper**: flaky new feature polygon draw (#2118)
+
+### Refactor
+
+- **frontend**: replace old button with new button components (#2212)
+- **frontend**: update link to custom ODK Collect --> v2024.3.5 (entity refresh on load)
+- automatically determine geom type from javarosa geom structure
+- remove sign out button from sidebar drawer
+- replace two submission download endpoints with one
+- tweak odk tunnel testing config button
+- **frontend**: remove task_filter field from frontend intent url
+- **frontend**: simplify SetSnackBar action with defaults (#2192)
+- use @types/react for custom module declarations
+- ensure translations match
+- move unused root level 'images' to prototyping docs section
+- **submissionDetails**: fix bracket, don't show new_feature geometry object (#2121)
+
 ## 2025.1.0 (2025-01-24)
 
 ### Feat
