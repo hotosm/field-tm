@@ -191,7 +191,9 @@ EOT
 CMD ["python", "-Xfrozen_modules=off", "-m", "debugpy", \
     "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:api", \
     "--host", "0.0.0.0", "--port", "8000", "--workers", "1", \
-    "--reload", "--log-level", "critical", "--no-access-log"]
+    "--reload", "--reload-dir", "app", "--reload-dir", "tests", \
+    "--reload-dir", "scheduler", "--reload-dir", "stats", "--log-level", \
+    "critical", "--no-access-log"]
 
 
 # Used during CI workflows (as root), with docs/test dependencies pre-installed
