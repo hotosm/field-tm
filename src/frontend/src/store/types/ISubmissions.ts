@@ -32,7 +32,6 @@ type updateReviewStatusModal = {
   entity_id: string | null;
   label: string | null;
   feature: featureType | null;
-  featureId: string | null;
 };
 
 export type filterType = {

@@ -18,9 +18,10 @@ type downloadSubmissionLoadingTypes = {
 };
 
 export type TaskFeatureSelectionProperties = {
-  osm_id: number;
-  tags: string;
-  timestamp: string;
-  version: number;
-  changeset: number;
+  osm_id?: number;
+  tags?: string;
+  timestamp?: string;
+  version?: number;
+  changeset?: number;
+  entity_id?: string;
 };
