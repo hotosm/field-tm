@@ -154,22 +154,29 @@
 	// using this function since outside click of entity layer couldn't be tracked via FillLayer
 	function handleMapClick(e: maplibregl.MapMouseEvent) {
 		let entityLayerName: string;
+		let newEntityLayerName: string;
 		switch (drawGeomType) {
 			case MapGeomTypes.POINT:
 				entityLayerName = 'entity-point-layer';
+				newEntityLayerName = 'new-entity-point-layer';
 				break;
 			case MapGeomTypes.POLYGON:
 				entityLayerName = 'entity-polygon-layer';
+				newEntityLayerName = 'new-entity-polygon-layer';
 				break;
 			case MapGeomTypes.LINESTRING:
 				entityLayerName = 'entity-line-layer';
+				newEntityLayerName = 'new-entity-line-layer';
 				break;
 			default:
 				throw new Error(`Unsupported geometry type: ${drawGeomType}`);
-			}
+		}
 		// returns list of features of entity layer present on that clicked point
 		const clickedEntityFeature = map?.queryRenderedFeatures(e.point, {
 			layers: [entityLayerName],
+		});
+		const clickedNewEntityFeature = map?.queryRenderedFeatures(e.point, {
+			layers: [newEntityLayerName],
 		});
 		// returns list of features of task layer present on that clicked point
 		const clickedTaskFeature = map?.queryRenderedFeatures(e.point, {
@@ -178,7 +185,15 @@
 		// if clicked point contains entity then set it's osm id else set null to store
 		if (clickedEntityFeature && clickedEntityFeature?.length > 0) {
 			const entityCentroid = centroid(clickedEntityFeature[0].geometry);
-			const clickedEntityId = clickedEntityFeature[0]?.properties?.osm_id;
+			const clickedEntityId = clickedEntityFeature[0]?.properties?.entity_id;
+			entitiesStore.setSelectedEntity(clickedEntityId);
+			entitiesStore.setSelectedEntityCoordinate({
+				entityId: clickedEntityId,
+				coordinate: entityCentroid?.geometry?.coordinates,
+			});
+		} else if (clickedNewEntityFeature && clickedNewEntityFeature?.length > 0) {
+			const entityCentroid = centroid(clickedNewEntityFeature[0].geometry);
+			const clickedEntityId = clickedNewEntityFeature[0]?.properties?.entity_id;
 			entitiesStore.setSelectedEntity(clickedEntityId);
 			entitiesStore.setSelectedEntityCoordinate({
 				entityId: clickedEntityId,
@@ -200,7 +215,10 @@
 			}
 		}
 
-		if (clickedEntityFeature && clickedEntityFeature?.length > 0) {
+		if (
+			(clickedEntityFeature && clickedEntityFeature?.length > 0) ||
+			(clickedNewEntityFeature && clickedNewEntityFeature?.length > 0)
+		) {
 			toggleActionModal('entity-modal');
 		} else if (clickedTaskFeature && clickedTaskFeature?.length > 0) {
 			toggleActionModal('task-modal');
@@ -281,21 +299,42 @@
 		}
 	});
 
-	function addStatusToGeojsonProperty(geojsonData: FeatureCollection): FeatureCollection {
-		return {
-			...geojsonData,
-			features: geojsonData.features.map((feature) => {
-				const entity = entitiesStore.entitiesStatusList.find((entity) => entity.osmid === feature?.properties?.osm_id);
-				return {
-					...feature,
-					properties: {
-						...feature.properties,
-						status: entity?.status,
-						entity_id: entity?.entity_id,
-					},
-				};
-			}),
-		};
+	function addStatusToGeojsonProperty(geojsonData: FeatureCollection, entityType: '' | 'new'): FeatureCollection {
+		if (entityType === 'new') {
+			return {
+				...geojsonData,
+				features: geojsonData.features.map((feature) => {
+					const entity = entitiesStore.entitiesStatusList.find(
+						(entity) => entity.entity_id === feature?.properties?.entity_id,
+					);
+					return {
+						...feature,
+						properties: {
+							...feature.properties,
+							status: entity?.status,
+							entity_id: entity?.entity_id,
+						},
+					};
+				}),
+			};
+		} else {
+			return {
+				...geojsonData,
+				features: geojsonData.features.map((feature) => {
+					const entity = entitiesStore.entitiesStatusList.find(
+						(entity) => entity.osmid === feature?.properties?.osm_id,
+					);
+					return {
+						...feature,
+						properties: {
+							...feature.properties,
+							status: entity?.status,
+							entity_id: entity?.entity_id,
+						},
+					};
+				}),
+			};
+		}
 	}
 
 	function zoomToProject() {
@@ -495,81 +534,81 @@
 		extent={taskStore.selectedTaskGeom}
 		extractGeomCols={true}
 		promoteId="id"
-		processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData)}
+		processGeojson={(geojsonData) => addStatusToGeojsonProperty(geojsonData, '')}
 		geojsonUpdateDependency={entitiesStore.entitiesStatusList}
 	>
-	{#if primaryGeomType === MapGeomTypes.POLYGON}
-		<FillLayer
-			id="entity-polygon-layer"
-			paint={{
-				'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
-				'fill-color': [
-					'match',
-					['get', 'status'],
-					'READY',
-					'#9c9a9a',
-					'OPENED_IN_ODK',
-					'#fae15f',
-					'SURVEY_SUBMITTED',
-					'#71bf86',
-					'VALIDATED',
-					'#71bf86',
-					'MARKED_BAD',
-					'#fa1100',
-					'#c5fbf5', // default color if no match is found
-				],
-				'fill-outline-color': [
-					'match',
-					['get', 'status'],
-					'READY',
-					'#000000',
-					'OPENED_IN_ODK',
-					'#ffd603',
-					'SURVEY_SUBMITTED',
-					'#32a852',
-					'MARKED_BAD',
-					'#fa1100',
-					'#c5fbf5',
-				],
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
-		<LineLayer
-			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-			paint={{
-				'line-color': '#fa1100',
-				'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
-				'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
+		{#if primaryGeomType === MapGeomTypes.POLYGON}
+			<FillLayer
+				id="entity-polygon-layer"
+				paint={{
+					'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
+					'fill-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'#9c9a9a',
+						'OPENED_IN_ODK',
+						'#fae15f',
+						'SURVEY_SUBMITTED',
+						'#71bf86',
+						'VALIDATED',
+						'#71bf86',
+						'MARKED_BAD',
+						'#fa1100',
+						'#c5fbf5', // default color if no match is found
+					],
+					'fill-outline-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'#000000',
+						'OPENED_IN_ODK',
+						'#ffd603',
+						'SURVEY_SUBMITTED',
+						'#32a852',
+						'MARKED_BAD',
+						'#fa1100',
+						'#c5fbf5',
+					],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': '#fa1100',
+					'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
+					'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
 		{:else if primaryGeomType === MapGeomTypes.POINT}
-		<SymbolLayer
-			id="entity-point-layer"
-			applyToClusters={false}
-			hoverCursor="pointer"
-			manageHoverState
-			layout={{
-				'icon-image': [
-					'match',
-					['get', 'status'],
-					'READY',
-					'MAP_PIN_GREY',
-					'OPENED_IN_ODK',
-					'MAP_PIN_YELLOW',
-					'SURVEY_SUBMITTED',
-					'MAP_PIN_GREEN',
-					'VALIDATED',
-					'MAP_PIN_BLUE',
-					'MARKED_BAD',
-					'MAP_PIN_RED',
-					'#c5fbf5', // default color if no match is found
-				],
-				'icon-allow-overlap': true,
-			}}
-		/>
+			<SymbolLayer
+				id="entity-point-layer"
+				applyToClusters={false}
+				hoverCursor="pointer"
+				manageHoverState
+				layout={{
+					'icon-image': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'MAP_PIN_GREY',
+						'OPENED_IN_ODK',
+						'MAP_PIN_YELLOW',
+						'SURVEY_SUBMITTED',
+						'MAP_PIN_GREEN',
+						'VALIDATED',
+						'MAP_PIN_BLUE',
+						'MARKED_BAD',
+						'MAP_PIN_RED',
+						'#c5fbf5', // default color if no match is found
+					],
+					'icon-allow-overlap': true,
+				}}
+			/>
 		{/if}
 	</FlatGeobuf>
 	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
@@ -592,6 +631,82 @@
 			beforeLayerType="symbol"
 			manageHoverState
 		/>
+	</GeoJSON>
+	<GeoJSON id="new-geoms" data={addStatusToGeojsonProperty(entitiesStore.newGeomList, 'new')}>
+		{#if drawGeomType === MapGeomTypes.POLYGON}
+			<FillLayer
+				id="new-entity-polygon-layer"
+				paint={{
+					'fill-opacity': ['match', ['get', 'status'], 'MARKED_BAD', 0, 0.6],
+					'fill-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'#9c9a9a',
+						'OPENED_IN_ODK',
+						'#fae15f',
+						'SURVEY_SUBMITTED',
+						'#71bf86',
+						'VALIDATED',
+						'#71bf86',
+						'MARKED_BAD',
+						'#fa1100',
+						'#c5fbf5',
+					],
+					'fill-outline-color': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'#000000',
+						'OPENED_IN_ODK',
+						'#ffd603',
+						'SURVEY_SUBMITTED',
+						'#32a852',
+						'MARKED_BAD',
+						'#fa1100',
+						'#c5fbf5',
+					],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': '#fa1100',
+					'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
+					'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+		{:else if drawGeomType === MapGeomTypes.POINT}
+			<!-- id="new-geom-symbol-layer" -->
+			<SymbolLayer
+				id="new-entity-point-layer"
+				applyToClusters={false}
+				hoverCursor="pointer"
+				manageHoverState
+				layout={{
+					'icon-image': [
+						'match',
+						['get', 'status'],
+						'READY',
+						'MAP_PIN_GREY',
+						'OPENED_IN_ODK',
+						'MAP_PIN_YELLOW',
+						'SURVEY_SUBMITTED',
+						'MAP_PIN_GREEN',
+						'VALIDATED',
+						'MAP_PIN_BLUE',
+						'MARKED_BAD',
+						'MAP_PIN_RED',
+						'#c5fbf5', // default color if no match is found
+					],
+					'icon-allow-overlap': true,
+				}}
+			/>
+		{/if}
 	</GeoJSON>
 
 	<!-- pulse effect layer representing rejected entities -->

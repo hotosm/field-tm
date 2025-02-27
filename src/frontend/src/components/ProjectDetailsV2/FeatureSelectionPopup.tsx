@@ -20,7 +20,9 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
   const taskModalStatus = useAppSelector((state) => state.project.taskModalStatus);
   const entityOsmMap = useAppSelector((state) => state.project.entityOsmMap);
   const projectId = params.id || '';
-  const entity = entityOsmMap.find((x) => x.osm_id === featureProperties?.osm_id);
+  const entity = entityOsmMap.find(
+    (x) => x.osm_id === featureProperties?.osm_id || x.id === featureProperties?.entity_id,
+  );
   const submissionIds = entity?.submission_ids ? entity?.submission_ids?.split(',') : [];
 
   return (
@@ -37,7 +39,11 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
         } fmtm-rounded-t-2xl md:fmtm-rounded-tr-none md:fmtm-rounded-l-2xl`}
       >
         <div className="fmtm-flex fmtm-justify-between fmtm-items-center fmtm-gap-2 fmtm-px-3 sm:fmtm-px-5 fmtm-py-2">
-          <h4 className="fmtm-text-lg fmtm-font-bold">Feature: {featureProperties?.osm_id}</h4>
+          <h4 className="fmtm-text-lg fmtm-font-bold">
+            {featureProperties?.osm_id
+              ? `Feature: ${featureProperties.osm_id}`
+              : `Entity: ${featureProperties?.entity_id}`}
+          </h4>
           <div title="Close">
             <AssetModules.CloseIcon
               style={{ width: '20px' }}
@@ -46,26 +52,28 @@ const FeatureSelectionPopup = ({ featureProperties, taskId }: FeatureSelectionPo
             />
           </div>
         </div>
-        <div className="fmtm-h-fit fmtm-px-2 sm:fmtm-px-5 fmtm-py-2 fmtm-border-t">
-          <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
-            <p>
-              <span>Tags: </span>
-              <span className="fmtm-overflow-hidden fmtm-line-clamp-2">{featureProperties?.tags}</span>
-            </p>
-            <p>
-              <span>Timestamp: </span>
-              <span>{featureProperties?.timestamp}</span>
-            </p>
-            <p>
-              <span>Changeset: </span>
-              <span>{featureProperties?.changeset}</span>
-            </p>
-            <p>
-              <span>Version: </span>
-              <span>{featureProperties?.version}</span>
-            </p>
+        {featureProperties?.changeset && (
+          <div className="fmtm-h-fit fmtm-px-2 sm:fmtm-px-5 fmtm-py-2 fmtm-border-t">
+            <div className="fmtm-flex fmtm-flex-col fmtm-gap-1 fmtm-mt-1">
+              <p>
+                <span>Tags: </span>
+                <span className="fmtm-overflow-hidden fmtm-line-clamp-2">{featureProperties?.tags}</span>
+              </p>
+              <p>
+                <span>Timestamp: </span>
+                <span>{featureProperties?.timestamp}</span>
+              </p>
+              <p>
+                <span>Changeset: </span>
+                <span>{featureProperties?.changeset}</span>
+              </p>
+              <p>
+                <span>Version: </span>
+                <span>{featureProperties?.version}</span>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         {(!submissionIds || submissionIds?.length !== 0) && entity && entity_state[entity.status] !== 'VALIDATED' && (
           <div className="fmtm-px-2 sm:fmtm-px-5 fmtm-py-3 fmtm-border-t fmtm-flex fmtm-flex-col fmtm-gap-3">
             {submissionIds?.length > 1 ? (

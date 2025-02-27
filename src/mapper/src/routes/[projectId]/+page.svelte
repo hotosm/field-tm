@@ -24,7 +24,7 @@
 	import { getTaskStore, getTaskEventStream } from '$store/tasks.svelte.ts';
 	import { getEntitiesStatusStore, getEntityStatusStream, getNewBadGeomStream } from '$store/entities.svelte.ts';
 	import More from '$lib/components/more/index.svelte';
-	import { getProjectSetupStepStore, getCommonStore } from '$store/common.svelte.ts';
+	import { getProjectSetupStepStore, getCommonStore, getAlertStore } from '$store/common.svelte.ts';
 	import { projectSetupStep as projectSetupStepEnum } from '$constants/enums.ts';
 
 	const API_URL = import.meta.env.VITE_API_URL;
@@ -45,6 +45,7 @@
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
 	const commonStore = getCommonStore();
+	const alertStore = getAlertStore();
 
 	const taskEventStream = getTaskEventStream(data.projectId);
 	const entityStatusStream = getEntityStatusStream(data.projectId);
@@ -159,10 +160,29 @@
 		newFeatureGeom = null;
 	}
 
-	function mapNewFeatureInODK() {
-		const newGeom = newFeatureGeom;
-		cancelMapNewFeatureInODK();
-		openOdkCollectNewFeature(data?.project?.odk_form_id, newGeom, taskStore.selectedTaskId);
+	async function mapNewFeatureInODK() {
+		{
+			/*
+			1: create entity in ODK of newly created feature
+			2: create geom record to show the feature on map
+			3: pass entity uuid to ODK intent URL as a param 
+			*/
+		}
+		try {
+			const entity = await entitiesStore.createEntity(data.projectId, {
+				type: 'FeatureCollection',
+				features: [{ type: 'Feature', geometry: newFeatureGeom, properties: {} }],
+			});
+			await entitiesStore.createGeomRecord(data.projectId, {
+				status: 'NEW',
+				geojson: { type: 'Feature', geometry: newFeatureGeom, properties: { entity_id: entity.uuid } },
+				project_id: data.projectId,
+			});
+			cancelMapNewFeatureInODK();
+			openOdkCollectNewFeature(data?.project?.odk_form_id, entity.uuid);
+		} catch (error) {
+			alertStore.setAlert({ message: 'Unable to create entity', variant: 'danger' });
+		}
 	}
 </script>
 
