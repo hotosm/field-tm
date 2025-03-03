@@ -1005,7 +1005,18 @@ class DbTask(BaseModel):
             await cur.execute(sql, data)
             result = await cur.fetchall()
 
-        return bool(result)
+            if success := bool(result):
+                update_project_sql = """
+                    UPDATE projects
+                    SET total_tasks = (
+                        SELECT COALESCE(MAX(project_task_index), 0)
+                        FROM public.tasks WHERE project_id = %(project_id)s
+                    )
+                    WHERE id = %(project_id)s;
+                """
+                await cur.execute(update_project_sql, {"project_id": project_id})
+
+        return success
 
 
 class DbProject(BaseModel):
