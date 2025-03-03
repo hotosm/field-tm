@@ -1,4 +1,4 @@
-# Copyright (c) 2022, 2023 Humanitarian OpenStreetMap Team
+# Copyright (c) Humanitarian OpenStreetMap Team
 # This file is part of FMTM.
 #
 #     FMTM is free software: you can redistribute it and/or modify
@@ -18,8 +18,12 @@
 name: fmtm-dev
 
 volumes:
+  nginx-configs:
+    name: fmtm-nginx-configs-${GIT_BRANCH}
   fmtm_frontend:
     name: fmtm-frontend-${GIT_BRANCH}
+  fmtm_mapper_frontend:
+    name: fmtm-mapper-frontend-${GIT_BRANCH}
   fmtm_db_data:
     name: fmtm-db-data-${GIT_BRANCH}
   fmtm_data:
@@ -42,42 +46,90 @@ volumes:
 networks:
   fmtm-net:
     name: fmtm-${GIT_BRANCH}
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.20.30.0/24
 
 services:
   proxy:
-    image: "ghcr.io/hotosm/fmtm/proxy:${GIT_BRANCH}"
+    # Extend proxy-configs so environment var config is duplicated
+    extends:
+      service: proxy-config
+    image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
     depends_on:
+      proxy-config:
+        condition: service_started
       api:
         condition: service_started
+      ui:
+        condition: service_completed_successfully
       central:
         condition: service_started
       central-ui:
         condition: service_completed_successfully
       s3:
-        condition: service_healthy
-      certbot:
-        condition: service_completed_successfully
-      ui:
-        condition: service_completed_successfully
+        condition: service_started
       electric:
         condition: service_started
     volumes:
-      - fmtm_frontend:/usr/share/nginx/html/fmtm
-      - central_frontend:/usr/share/nginx/html/central/
+      - nginx-configs:/etc/nginx
+      - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
+      - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
+      - central_frontend:/var/www/html/odk.dev.fmtm.hotosm.org:ro
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
-    environment:
-      FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_ODK_DOMAIN: ${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
-      FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
-      FMTM_SYNC_DOMAIN: ${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
     ports:
       - 80:80
       - 443:443
     networks:
       - fmtm-net
     restart: "unless-stopped"
+
+  # This is needed by bunkerweb to generate the nginx configs
+  proxy-config:
+    image: "ghcr.io/bunkerity/bunkerweb-scheduler:${BUNKERWEB_TAG:-1.6.0}"
+    environment:
+      # General
+      BUNKERWEB_INSTANCES: proxy:5000
+      LOG_LEVEL: notice
+      API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+      MULTISITE: yes
+      USE_REVERSE_PROXY: yes
+      REVERSE_PROXY_INTERCEPT_ERRORS: no
+      ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+      USE_REAL_IP: yes
+      SERVE_FILES: yes
+      USE_BACKUP: no
+      USE_METRICS: no
+      # USE_ANTIBOT: yes
+      USE_BAD_BEHAVIOR: no
+      USE_LIMIT_REQ: no
+      USE_MODSECURITY: no
+      USE_BROTLI: yes
+      # For OpenTelemetry
+      KEEP_UPSTREAM_HEADERS: "*"
+      CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
+      AUTO_LETS_ENCRYPT: yes
+      EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
+      USE_LETS_ENCRYPT_STAGING: yes
+      # Reverse proxy configs
+      SERVER_NAME: dev.fmtm.hotosm.org mapper.dev.fmtm.hotosm.org api.dev.fmtm.hotosm.org s3.dev.fmtm.hotosm.org sync.dev.fmtm.hotosm.org odk.dev.fmtm.hotosm.org
+      api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
+      api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+      s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
+      s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
+      sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
+      sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+      odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
+      odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
+      # buffer requests, but not responses, so streaming out works
+      odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
+      odk.fmtm.localhost_MAX_CLIENT_SIZE: 500m
+    networks:
+      - fmtm-net
+    restart: "no"
+    entrypoint: timeout 120 ./entrypoint.sh
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
@@ -123,7 +175,8 @@ services:
         VITE_API_URL: https://${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
         VITE_SYNC_URL: https://${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
     volumes:
-      - fmtm_frontend:/frontend
+      - fmtm_frontend:/frontend/manager
+      - fmtm_mapper_frontend:/frontend/mapper
     network_mode: none
     restart: "on-failure:2"
 
@@ -134,6 +187,8 @@ services:
         condition: service_healthy
       s3:
         condition: service_healthy
+      pyxform:
+        condition: service_started
     environment:
       - DOMAIN=${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
       - SSL_TYPE=upstream
@@ -293,22 +348,3 @@ services:
       file: ../compose.yaml
       service: scheduler
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
-
-  certbot:
-    image: "ghcr.io/hotosm/fmtm/proxy:certs-init-development"
-    volumes:
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
-    environment:
-      FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_ODK_DOMAIN: ${FMTM_ODK_DOMAIN:-odk.${FMTM_DOMAIN}}
-      FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
-      FMTM_SYNC_DOMAIN: ${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
-      CERT_EMAIL: ${CERT_EMAIL}
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - fmtm-net
-    restart: "on-failure:2"

@@ -17,8 +17,12 @@ export default function ExploreProjectCard({ data }: { data: projectType }) {
     dispatch(HomeActions.SetSelectedProject(project));
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      window.location.href = `/mapnow/${data.id}`;
+      // Redirect to mapper frontend on mobile
+      // (we hardcode mapper.xxx for now - open an issue if more flexibility is needed)
+      const { protocol, hostname, port } = window.location;
+      window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/${data.id}`;
     } else {
+      // Else view project via manager frontend (desktop)
       navigate(`/project/${data.id}`);
     }
   };

@@ -264,7 +264,7 @@ server by selecting HOT as your organization.
    find it difficult to download by themselves.
 2. Share the link of the project for the mapper to reach  
    to the project easily. The URL be:
-   [https://fmtm.hotosm.org/mapnow/project_id](https://fmtm.hotosm.org/mapnow/project_id)
+   [https://mapper.fmtm.hotosm.org/project_id](https://mapper.fmtm.hotosm.org/project_id)
 3. **Updating Metadata**  
    If you need mappers to include their email  
    and phone number along with their username, guide them  
