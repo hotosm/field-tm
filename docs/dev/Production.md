@@ -69,6 +69,8 @@ ${FMTM_DOMAIN} --> Frontend
 api.${FMTM_DOMAIN} --> Backend
 odk.${FMTM_DOMAIN} --> ODK Central
 s3.${FMTM_DOMAIN} --> S3 / Minio
+sync.${FMTM_DOMAIN} --> The DB Sync Service
+mapper.${FMTM_DOMAIN} --> The Mapper UI
 ```
 
 These defaults can be overridden with respective environment variables:

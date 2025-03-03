@@ -22,8 +22,8 @@ docker compose build ui-mapper
 docker compose up -d
 ```
 
-- The UI runs behind the same Nginx proxy, under the path:
+- The UI runs behind the same Nginx proxy, under the domain:
 
 ```html
-https://DOMAIN/mapnow/{projectId}
+https://mapper.fmtm.localhost:7050/{projectId}
 ```

@@ -43,9 +43,10 @@ function OsmAuth() {
 
           if (requestedPath) {
             sessionStorage.removeItem('requestedPath');
-            if (requestedPath.includes('mapnow')) {
+            const { protocol, hostname, port } = window.location;
+            if (hostname.startsWith('mapper.')) {
               // redirect to mapper frontend (navigate doesn't work as it's on svelte)
-              window.location.href = `${window.location.origin}${requestedPath}`;
+              window.location.href = `${protocol}//mapper.${hostname}${port ? `:${port}` : ''}/${requestedPath}`;
             } else {
               // Call /auth/me to populate the user details in the header
               const apiUser = await getUserDetailsFromApi();

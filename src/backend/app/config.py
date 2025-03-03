@@ -188,9 +188,11 @@ class Settings(BaseSettings):
                 else ""
             )
             default_origins.append(f"http://{domain}{local_server_port}")
+            default_origins.append(f"http://mapper.{domain}{local_server_port}")
         else:
-            # Add the main FMTM domain
+            # Add the main FMTM domains (UI + Mapper UI)
             default_origins.append(f"https://{domain}")
+            default_origins.append(f"https://mapper.{domain}")
 
         # Process `extra_origins` if provided
         if isinstance(extra_origins, str):

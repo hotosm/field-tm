@@ -40,3 +40,24 @@ alias:
   else
       echo "'dc' alias already exists in ~/.bashrc."
   fi
+
+# Generate certs for local ODK Central https
+[no-cd]
+gen-odk-cert:
+    #!/usr/bin/env sh
+    openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -days 36500 \
+    -nodes -keyout odkcentral.key -out odkcentral.crt -subj "/CN=odkcentral" \
+    -addext "subjectAltName=DNS:odkcentral,DNS:*.odk.fmtm.localhost,IP:10.20.30.50"
+
+    CERT_BASE64=$(cat odkcentral.crt | base64 -w0)
+    KEY_BASE64=$(cat odkcentral.key | base64 -w0)
+
+    echo
+    echo "Cert base64:"
+    echo
+    echo ${CERT_BASE64}
+    echo
+    echo "Key base64:"
+    echo
+    echo ${KEY_BASE64}
+    echo

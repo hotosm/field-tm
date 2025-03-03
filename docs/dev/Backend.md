@@ -45,7 +45,7 @@ URLs defined in the docker-compose file and your env file.
 - FMTM uses ODK Central to store ODK data.
 - To facilitate faster development, the Docker setup includes a Central server.
 - The credentials are provided via the `.env` file, and the default URL to
-  access Central from within containers is: `https://proxy`.
+  access Central from within containers is: `https://odkcentral:8443`.
 
 > Alternatively, you may provide credentials to an external Central server
 > in the `.env`.

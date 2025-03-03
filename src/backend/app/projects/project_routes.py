@@ -1293,7 +1293,7 @@ async def read_project_minimal(
     (any user could theoretically submit a contribution via the ODK
     token, even if this is a private project).
     """
-    return await DbProject.one(db, project_id, minimal=True)
+    return await project_deps.get_project_by_id(db, project_id, minimal=True)
 
 
 @router.get("/{project_id}/download")

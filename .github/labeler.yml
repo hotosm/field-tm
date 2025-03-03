@@ -14,7 +14,6 @@ devops:
   - changed-files:
       - any-glob-to-any-file:
           - .github/**
-          - nginx/**
           - scripts/**
           - docker-*.yml
           - ./**/Dockerfile

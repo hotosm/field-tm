@@ -55,7 +55,7 @@ for field mapping:
 ### Step 2: Access the Mapper Page
 
 - **Option 1:** Click on the project cards from your mobile device
-- **Option 3:** Go to `https://fmtm.hotosm.org/mapnow/<project_id>` to open
+- **Option 3:** Go to `https://mapper.fmtm.hotosm.org/<project_id>` to open
   the Mapper Page for a specific project.
 
 !!! note
