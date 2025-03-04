@@ -48,6 +48,30 @@ services:
     extends:
       file: compose.development.yaml
       service: proxy
+  proxy-setup:
+    extends:
+      file: compose.development.yaml
+      service: proxy-setup
+    volumes:
+      - nginx-configs:/etc/nginx
+      - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
+      - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
+      - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
+    environment:
+      SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
+      api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+      api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      s3.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+      s3.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+      sync.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+      sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
+      # buffer requests, but not responses, so streaming out works
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
+      odk.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
   api:
     extends:
       file: compose.development.yaml
@@ -113,8 +137,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-  certbot:
-    extends:
-      file: compose.development.yaml
-      service: certbot
-    image: "ghcr.io/hotosm/fmtm/proxy:certs-init-staging"

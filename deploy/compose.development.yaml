@@ -56,6 +56,7 @@ x-proxy-env: &proxy-env # General
   BUNKERWEB_INSTANCES: proxy:5000
   LOG_LEVEL: notice
   USE_BUNKERNET: no
+  DISABLE_DEFAULT_SERVER: yes
   API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
   MULTISITE: yes
   USE_REVERSE_PROXY: yes
@@ -69,14 +70,15 @@ x-proxy-env: &proxy-env # General
   USE_BAD_BEHAVIOR: no
   USE_LIMIT_REQ: no
   USE_MODSECURITY: no
+  USE_GZIP: yes
+  # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
   # For OpenTelemetry
   KEEP_UPSTREAM_HEADERS: "*"
   CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
   AUTO_LETS_ENCRYPT: yes
   EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
-  # Use staging certs as this isn't prod security
-  USE_LETS_ENCRYPT_STAGING: yes
+  # USE_LETS_ENCRYPT_STAGING: yes
   # Reverse proxy configs
   SERVER_NAME: dev.fmtm.hotosm.org mapper.dev.fmtm.hotosm.org api.dev.fmtm.hotosm.org s3.dev.fmtm.hotosm.org sync.dev.fmtm.hotosm.org odk.dev.fmtm.hotosm.org
   api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
