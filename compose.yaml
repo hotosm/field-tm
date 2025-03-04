@@ -18,7 +18,6 @@
 name: fmtm
 
 volumes:
-  nginx-configs:
   fmtm_data:
   fmtm_db_data:
   fmtm_logs:
@@ -102,7 +101,6 @@ services:
         condition: service_completed_successfully
         required: false
     volumes:
-      - nginx-configs:/etc/nginx
       - central_frontend:/var/www/html/odk.fmtm.localhost:ro
     ports:
       - ${FMTM_DEV_PORT:-7050}:8080

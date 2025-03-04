@@ -18,8 +18,6 @@
 name: fmtm-main
 
 volumes:
-  nginx-configs:
-    name: fmtm-nginx-configs-main
   fmtm_frontend:
     name: fmtm-frontend-main
   fmtm_mapper_frontend:
@@ -94,7 +92,6 @@ services:
       ui:
         condition: service_completed_successfully
     volumes:
-      - nginx-configs:/etc/nginx
       # - certs:/etc/letsencrypt
       - certs:/data
       - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
