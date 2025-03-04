@@ -56,10 +56,6 @@ services:
     extends:
       file: compose.development.yaml
       service: proxy
-  proxy-setup:
-    extends:
-      file: compose.development.yaml
-      service: proxy-setup
     volumes:
       - nginx-configs:/etc/nginx
       - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
@@ -67,6 +63,10 @@ services:
       - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
+  proxy-setup:
+    extends:
+      file: compose.development.yaml
+      service: proxy-setup
     environment:
       SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
       api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000

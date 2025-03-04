@@ -47,36 +47,70 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
+# Used for both bunkerweb proxy + scheduler (config) service
+x-proxy-env: &proxy-env # General
+  BUNKERWEB_INSTANCES: proxy:5000
+  LOG_LEVEL: notice
+  USE_BUNKERNET: no
+  DISABLE_DEFAULT_SERVER: yes
+  API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+  MULTISITE: yes
+  USE_REVERSE_PROXY: yes
+  REVERSE_PROXY_INTERCEPT_ERRORS: no
+  ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+  USE_REAL_IP: yes
+  SERVE_FILES: yes
+  USE_BACKUP: no
+  USE_METRICS: no
+  # USE_ANTIBOT: yes
+  USE_BAD_BEHAVIOR: no
+  USE_LIMIT_REQ: no
+  USE_MODSECURITY: no
+  USE_GZIP: yes
+  # On client, brotli is preferred over gzip if both are enabled
+  USE_BROTLI: yes
+  # For OpenTelemetry
+  KEEP_UPSTREAM_HEADERS: "*"
+  CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
+  AUTO_LETS_ENCRYPT: yes
+  EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
+  # USE_LETS_ENCRYPT_STAGING: yes
+  # Reverse proxy configs
+  SERVER_NAME: dev.fmtm.hotosm.org mapper.fmtm.hotosm.org api.fmtm.hotosm.org s3.fmtm.hotosm.org sync.fmtm.hotosm.org odk.fmtm.hotosm.org
+  api.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+  api.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  s3.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+  s3.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+  sync.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+  sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+
 services:
   proxy:
-    extends:
-      file: compose.staging.yaml
-      service: proxy
+    image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
+    depends_on:
+      # Frontends must be built and available first
+      ui:
+        condition: service_completed_successfully
+    volumes:
+      - nginx-configs:/etc/nginx
+      - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
+      - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
+    environment: *proxy-env
+    ports:
+      - 80:8080
+      - 443:8443
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
 
   proxy-setup:
     extends:
-      file: compose.staging.yaml
+      file: compose.development.yaml
       service: proxy-setup
-    volumes:
-      - nginx-configs:/etc/nginx
-      - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
-      - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
-      - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
-    environment:
-      SERVER_NAME: dev.fmtm.hotosm.org mapper.fmtm.hotosm.org api.fmtm.hotosm.org s3.fmtm.hotosm.org sync.fmtm.hotosm.org odk.fmtm.hotosm.org
-      api.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
-      api.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-      s3.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
-      s3.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
-      sync.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
-      sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-      odk.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
-      odk.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      odk.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
-      odk.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+    # Override the environment variables
+    environment: *proxy-env
 
   api:
     extends:
