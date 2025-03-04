@@ -65,9 +65,10 @@ x-proxy-env: &proxy-env # General
   USE_BACKUP: no
   USE_METRICS: no
   # USE_ANTIBOT: yes
-  USE_BAD_BEHAVIOR: no
-  USE_LIMIT_REQ: no
-  USE_MODSECURITY: no
+  USE_LIMIT_CONN: yes
+  USE_BAD_BEHAVIOR: yes
+  USE_LIMIT_REQ: yes
+  USE_MODSECURITY: yes
   USE_GZIP: yes
   # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
