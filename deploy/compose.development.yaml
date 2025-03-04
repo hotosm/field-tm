@@ -79,6 +79,9 @@ x-proxy-env: &proxy-env # General
   # USE_LETS_ENCRYPT_STAGING: yes
   # Reverse proxy configs
   SERVER_NAME: dev.fmtm.hotosm.org mapper.dev.fmtm.hotosm.org api.dev.fmtm.hotosm.org s3.dev.fmtm.hotosm.org sync.dev.fmtm.hotosm.org odk.dev.fmtm.hotosm.org
+  # We need this to allow for client-side routing in the SPA (from index.html)
+  dev.fmtm.hotosm.org_ERRORS: 404=/index.html
+  mapper.dev.fmtm.hotosm.org_ERRORS: 404=/index.html
   api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
   api.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   s3.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
