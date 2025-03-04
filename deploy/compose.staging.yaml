@@ -36,8 +36,6 @@ volumes:
     name: fmtm-tiles-${GIT_BRANCH}
   certs:
     name: fmtm-certs-${GIT_BRANCH}
-  certbot_data:
-    name: fmtm-certbot-data-${GIT_BRANCH}
   central_db_data:
     name: fmtm-central-db-data-${GIT_BRANCH}
   central_frontend:
@@ -53,6 +51,33 @@ networks:
 
 # Used for both bunkerweb proxy + scheduler (config) service
 x-proxy-env: &proxy-env # General
+  BUNKERWEB_INSTANCES: proxy:5000
+  LOG_LEVEL: notice
+  USE_BUNKERNET: no
+  DISABLE_DEFAULT_SERVER: yes
+  API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+  MULTISITE: yes
+  USE_REVERSE_PROXY: yes
+  REVERSE_PROXY_INTERCEPT_ERRORS: no
+  ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+  USE_REAL_IP: yes
+  SERVE_FILES: yes
+  USE_BACKUP: no
+  USE_METRICS: no
+  # USE_ANTIBOT: yes
+  USE_BAD_BEHAVIOR: no
+  USE_LIMIT_REQ: no
+  USE_MODSECURITY: no
+  USE_GZIP: yes
+  # On client, brotli is preferred over gzip if both are enabled
+  USE_BROTLI: yes
+  # For OpenTelemetry
+  KEEP_UPSTREAM_HEADERS: "*"
+  CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
+  AUTO_LETS_ENCRYPT: yes
+  EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
+  # USE_LETS_ENCRYPT_STAGING: yes
+  # Reverse proxy configs
   SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
   api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
   api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
@@ -77,8 +102,8 @@ services:
         condition: service_completed_successfully
     volumes:
       - nginx-configs:/etc/nginx
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
+      # - certs:/etc/letsencrypt
+      - certs:/var/cache/bunkerweb/letsencrypt
       - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
       - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro

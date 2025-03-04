@@ -36,8 +36,6 @@ volumes:
     name: fmtm-tiles-${GIT_BRANCH}
   certs:
     name: fmtm-certs-${GIT_BRANCH}
-  certbot_data:
-    name: fmtm-certbot-data-${GIT_BRANCH}
   central_db_data:
     name: fmtm-central-db-data-${GIT_BRANCH}
   central_frontend:
@@ -104,8 +102,8 @@ services:
         condition: service_completed_successfully
     volumes:
       - nginx-configs:/etc/nginx
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
+      # - certs:/etc/letsencrypt
+      - certs:/var/cache/bunkerweb/letsencrypt
       - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
       - central_frontend:/var/www/html/odk.dev.fmtm.hotosm.org:ro
@@ -125,8 +123,7 @@ services:
         condition: service_started
     volumes:
       - nginx-configs:/etc/nginx
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
+      - certs:/var/cache/bunkerweb/letsencrypt
     environment: *proxy-env
     networks:
       - fmtm-net

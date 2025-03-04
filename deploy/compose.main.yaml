@@ -36,8 +36,6 @@ volumes:
     name: fmtm-tiles-main
   certs:
     name: fmtm-certs-main
-  certbot_data:
-    name: fmtm-certbot-data-main
 
 networks:
   fmtm-net:
@@ -93,8 +91,8 @@ services:
         condition: service_completed_successfully
     volumes:
       - nginx-configs:/etc/nginx
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
+      # - certs:/etc/letsencrypt
+      - certs:/var/cache/bunkerweb/letsencrypt
       - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
     environment: *proxy-env
