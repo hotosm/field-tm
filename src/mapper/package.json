@@ -29,6 +29,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.16.0",
 		"@typescript-eslint/parser": "^8.16.0",
 		"@unocss/extractor-svelte": "^0.65.0-beta.2",
+		"@vite-pwa/sveltekit": "^0.6.7",
 		"eslint": "^9.16.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.46.1",
@@ -40,7 +41,6 @@
 		"typescript": "^5.7.2",
 		"unocss": "^0.65.0-beta.2",
 		"vite": "^6.0.1",
-		"vite-plugin-pwa": "^0.21.1",
 		"vitest": "^2.1.6"
 	},
 	"dependencies": {

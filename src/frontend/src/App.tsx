@@ -13,7 +13,6 @@ import '@hotosm/ui/dist/components';
 import environment from '@/environment';
 import AppRoutes from '@/routes';
 import { store, persistor } from '@/store/Store';
-import OfflineReadyPrompt from '@/components/OfflineReadyPrompt';
 
 const RefreshUserCookies = () => {
   const dispatch = useAppDispatch();
@@ -54,7 +53,6 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <RouterProvider router={AppRoutes} />
         <RefreshUserCookies />
-        <OfflineReadyPrompt />
         <hot-tracking site-id={environment.matomoTrackingId} domain={'fmtm.hotosm.org'}></hot-tracking>
       </PersistGate>
     </Provider>

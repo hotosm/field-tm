@@ -10,7 +10,7 @@
 		"sourceMap": true,
 		"strict": true,
 		"moduleResolution": "bundler",
-		"types": ["vite-plugin-pwa/client"],
+		"types": ["vite-plugin-pwa/client", "vite-plugin-pwa/info"],
 		"paths": {
 			"$lib/*": ["./src/lib/*"],
 			"$components/*": ["./src/components/*"],

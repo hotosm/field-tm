@@ -32,9 +32,12 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
 	if (projectResponse.status === 401) {
 		// TODO redirect to different error page to handle login
 		throw error(401, { message: `You must log in first` });
-	}
-	if (projectResponse.status === 404) {
+	} else if (projectResponse.status === 404) {
 		throw error(404, { message: `Project with ID (${projectId}) not found` });
+	} else if (projectResponse.status === 400) {
+		throw error(400, { message: `Invalid project ID (${projectId}). It must be numeric` });
+	} else if (projectResponse.status >= 300) {
+		throw error(400, { message: `Unknown error for project (${projectId})` });
 	}
 
 	return {
