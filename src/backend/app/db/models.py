@@ -141,6 +141,29 @@ class DbUserRole(BaseModel):
 
         return new_role
 
+    @classmethod
+    async def all(
+        cls,
+        db: Connection,
+        project_id: Optional[int] = None,
+    ) -> Optional[list[Self]]:
+        """Fetch all project user roles."""
+        filters = []
+        params = {}
+        if project_id:
+            filters.append(f"project_id = {project_id}")
+            params["project_id"] = project_id
+
+        sql = f"""
+            SELECT * FROM user_roles
+            {"WHERE " + " AND ".join(filters) if filters else ""}
+        """
+        async with db.cursor(row_factory=class_row(cls)) as cur:
+            await cur.execute(
+                sql,
+            )
+            return await cur.fetchall()
+
 
 class DbUser(BaseModel):
     """Table users."""

@@ -55,7 +55,7 @@ export const UpdateUserRole = (url: string, payload: { role: 'READ_ONLY' | 'ADMI
 
 export const GetUserListForSelect = (
   url: string,
-  params: { page: number; results_per_page: number; search: string },
+  params: { page: number; org_id: number; results_per_page: number; search: string },
 ) => {
   return async (dispatch: AppDispatch) => {
     dispatch(UserActions.SetUserListForSelectLoading(true));
