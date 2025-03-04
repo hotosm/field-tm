@@ -93,10 +93,10 @@ services:
         condition: service_completed_successfully
     volumes:
       - nginx-configs:/etc/nginx
-      - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
-      - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
+      - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
+      - fmtm_mapper_frontend:/var/www/html/mapper.dev.fmtm.hotosm.org:ro
     environment: *proxy-env
     ports:
       - 80:8080

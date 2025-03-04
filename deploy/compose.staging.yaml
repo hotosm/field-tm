@@ -51,35 +51,51 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
+# Used for both bunkerweb proxy + scheduler (config) service
+x-proxy-env: &proxy-env # General
+  SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
+  api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+  api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  s3.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+  s3.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+  sync.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+  sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
+  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
+  # buffer requests, but not responses, so streaming out works
+  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
+  odk.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+
 services:
   proxy:
-    extends:
-      file: compose.development.yaml
-      service: proxy
+    image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
+    depends_on:
+      # Frontends must be built and available first
+      ui:
+        condition: service_completed_successfully
+      central-ui:
+        condition: service_completed_successfully
     volumes:
       - nginx-configs:/etc/nginx
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
       - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
       - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
+    environment: *proxy-env
+    ports:
+      - 80:8080
+      - 443:8443
+    networks:
+      - fmtm-net
+    restart: "unless-stopped"
+
   proxy-setup:
     extends:
       file: compose.development.yaml
       service: proxy-setup
-    environment:
-      SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
-      api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
-      api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-      s3.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
-      s3.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
-      sync.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
-      sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
-      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
-      odk.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+    environment: *proxy-env
+
   api:
     extends:
       file: compose.development.yaml
@@ -128,6 +144,7 @@ services:
     extends:
       file: compose.development.yaml
       service: scheduler
+
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     depends_on:
