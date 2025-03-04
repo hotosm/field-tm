@@ -55,6 +55,7 @@ networks:
 x-proxy-env: &proxy-env # General
   BUNKERWEB_INSTANCES: proxy:5000
   LOG_LEVEL: notice
+  USE_BUNKERNET: no
   API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
   MULTISITE: yes
   USE_REVERSE_PROXY: yes
@@ -120,6 +121,10 @@ services:
     depends_on:
       proxy:
         condition: service_started
+    volumes:
+      - nginx-configs:/etc/nginx
+      - certs:/etc/letsencrypt
+      - certbot_data:/var/www/certbot
     environment: *proxy-env
     networks:
       - fmtm-net
