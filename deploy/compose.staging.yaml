@@ -106,7 +106,7 @@ services:
     volumes:
       - nginx-configs:/etc/nginx
       # - certs:/etc/letsencrypt
-      - certs:/var/cache/bunkerweb/letsencrypt
+      - /data/cache/letsencrypt
       - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
       - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
