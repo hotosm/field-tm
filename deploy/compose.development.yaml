@@ -51,27 +51,54 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
+# Used for both bunkerweb proxy + scheduler (config) service
+x-proxy-env: &proxy-env # General
+  BUNKERWEB_INSTANCES: proxy:5000
+  LOG_LEVEL: notice
+  API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+  MULTISITE: yes
+  USE_REVERSE_PROXY: yes
+  REVERSE_PROXY_INTERCEPT_ERRORS: no
+  ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+  USE_REAL_IP: yes
+  SERVE_FILES: yes
+  USE_BACKUP: no
+  USE_METRICS: no
+  # USE_ANTIBOT: yes
+  USE_BAD_BEHAVIOR: no
+  USE_LIMIT_REQ: no
+  USE_MODSECURITY: no
+  USE_BROTLI: yes
+  # For OpenTelemetry
+  KEEP_UPSTREAM_HEADERS: "*"
+  CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
+  AUTO_LETS_ENCRYPT: yes
+  EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
+  # Use staging certs as this isn't prod security
+  USE_LETS_ENCRYPT_STAGING: yes
+  # Reverse proxy configs
+  SERVER_NAME: dev.fmtm.hotosm.org mapper.dev.fmtm.hotosm.org api.dev.fmtm.hotosm.org s3.dev.fmtm.hotosm.org sync.dev.fmtm.hotosm.org odk.dev.fmtm.hotosm.org
+  api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+  api.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  s3.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+  s3.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+  sync.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+  sync.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  odk.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
+  odk.dev.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
+  # buffer requests, but not responses, so streaming out works
+  odk.dev.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
+  odk.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+
 services:
   proxy:
-    # Extend proxy-configs so environment var config is duplicated
-    extends:
-      service: proxy-config
     image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
     depends_on:
-      proxy-config:
-        condition: service_started
-      api:
-        condition: service_started
+      # Frontends must be built and available first
       ui:
         condition: service_completed_successfully
-      central:
-        condition: service_started
       central-ui:
         condition: service_completed_successfully
-      s3:
-        condition: service_started
-      electric:
-        condition: service_started
     volumes:
       - nginx-configs:/etc/nginx
       - fmtm_frontend:/var/www/html/dev.fmtm.hotosm.org:ro
@@ -79,6 +106,7 @@ services:
       - central_frontend:/var/www/html/odk.dev.fmtm.hotosm.org:ro
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
+    environment: *proxy-env
     ports:
       - 80:80
       - 443:443
@@ -87,55 +115,25 @@ services:
     restart: "unless-stopped"
 
   # This is needed by bunkerweb to generate the nginx configs
-  proxy-config:
+  proxy-setup:
     image: "ghcr.io/bunkerity/bunkerweb-scheduler:${BUNKERWEB_TAG:-1.6.0}"
-    environment:
-      # General
-      BUNKERWEB_INSTANCES: proxy:5000
-      LOG_LEVEL: notice
-      API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
-      MULTISITE: yes
-      USE_REVERSE_PROXY: yes
-      REVERSE_PROXY_INTERCEPT_ERRORS: no
-      ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
-      USE_REAL_IP: yes
-      SERVE_FILES: yes
-      USE_BACKUP: no
-      USE_METRICS: no
-      # USE_ANTIBOT: yes
-      USE_BAD_BEHAVIOR: no
-      USE_LIMIT_REQ: no
-      USE_MODSECURITY: no
-      USE_BROTLI: yes
-      # For OpenTelemetry
-      KEEP_UPSTREAM_HEADERS: "*"
-      CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
-      AUTO_LETS_ENCRYPT: yes
-      EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
-      USE_LETS_ENCRYPT_STAGING: yes
-      # Reverse proxy configs
-      SERVER_NAME: dev.fmtm.hotosm.org mapper.dev.fmtm.hotosm.org api.dev.fmtm.hotosm.org s3.dev.fmtm.hotosm.org sync.dev.fmtm.hotosm.org odk.dev.fmtm.hotosm.org
-      api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
-      api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
-      s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
-      sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
-      sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
-      odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
-      odk.fmtm.localhost_MAX_CLIENT_SIZE: 500m
+    depends_on:
+      proxy:
+        condition: service_started
+    environment: *proxy-env
     networks:
       - fmtm-net
     restart: "no"
-    entrypoint: timeout 120 ./entrypoint.sh
+    # If success or timeout exits with 0 code, else use actual exit code
+    entrypoint: sh -c 'timeout 120 ./entrypoint.sh || [ $? -eq 124 ] && exit 0'
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     volumes:
       - fmtm_logs:/opt/logs
     depends_on:
+      proxy:
+        condition: service_healthy
       fmtm-db:
         condition: service_healthy
       migrations:
@@ -183,6 +181,8 @@ services:
   central:
     image: "ghcr.io/hotosm/fmtm/odkcentral:${ODK_CENTRAL_TAG:-v2024.2.1}"
     depends_on:
+      proxy:
+        condition: service_healthy
       central-db:
         condition: service_healthy
       s3:
@@ -236,9 +236,6 @@ services:
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v3.0.0"
-    depends_on:
-      central-db:
-        condition: service_healthy
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -254,6 +251,9 @@ services:
 
   s3:
     image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
+    depends_on:
+      proxy:
+        condition: service_healthy
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
@@ -296,6 +296,8 @@ services:
   electric:
     image: "electricsql/electric:${ELECTRIC_TAG:-1.0.0-beta.10}"
     depends_on:
+      proxy:
+        condition: service_healthy
       fmtm-db:
         condition: service_healthy
       migrations:

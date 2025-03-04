@@ -35,92 +35,86 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
+# Used for both bunkerweb proxy + scheduler (config) service
+x-proxy-env: &proxy-env # General
+  BUNKERWEB_INSTANCES: proxy:5000
+  LOG_LEVEL: notice
+  API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+  MULTISITE: yes
+  USE_REVERSE_PROXY: yes
+  REVERSE_PROXY_INTERCEPT_ERRORS: no
+  ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+  USE_REAL_IP: yes
+  SERVE_FILES: yes
+  USE_BACKUP: no
+  USE_METRICS: no
+  # USE_ANTIBOT: yes
+  USE_BAD_BEHAVIOR: no
+  USE_LIMIT_REQ: no
+  USE_MODSECURITY: no
+  USE_BROTLI: yes
+  # Reverse proxy configs
+  SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost odkcentral
+  fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
+  fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7055
+  mapper.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
+  api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
+  s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
+  sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
+  sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
+  odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
+  # buffer requests, but not responses, so streaming out works
+  odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
+  odk.fmtm.localhost_MAX_CLIENT_SIZE: 500m
+  # Service for local development only to facilitate https odkcentral
+  odkcentral_REVERSE_PROXY_HOST: http://central:8383
+  odkcentral_REVERSE_PROXY_URL: ~ ^/v\d
+  odkcentral_REVERSE_PROXY_BUFFERING: no
+  # Custom cert only for local development
+  odkcentral_USE_CUSTOM_SSL: yes
+  odkcentral_AUTO_REDIRECT_HTTP_TO_HTTPS: no
+  odkcentral_CUSTOM_SSL_CERT_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUI5RENDQVhtZ0F3SUJBZ0lVWXFyb0dWRVdsK204eU9OY2pUU2pCWThkckN3d0NnWUlLb1pJemowRUF3SXcKRlRFVE1CRUdBMVVFQXd3S2IyUnJZMlZ1ZEhKaGJEQWdGdzB5TkRBM01qTXhNakF6TVRWYUdBOHlNVEkwTURZeQpPVEV5TURNeE5Wb3dGVEVUTUJFR0ExVUVBd3dLYjJSclkyVnVkSEpoYkRCMk1CQUdCeXFHU000OUFnRUdCU3VCCkJBQWlBMklBQktSZmpOQVFzWUI0ekNXckdETHdKNEVIRDRTNW5rL1Z3aG00TmYwN203c0RTai9RTzlYK0JnNjIKeWlMbWVzT1ZMRExHRklpZXZ2aHIrZkxNY0YwUDQwN0FWKytER1o5bXZ6VmNwMVdZMlE5NllpTVVuelM3MWx0RQo4K3BXbFBmanRLT0JoekNCaERBZEJnTlZIUTRFRmdRVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dId1lEClZSMGpCQmd3Rm9BVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXgKQmdOVkhSRUVLakFvZ2dwdlpHdGpaVzUwY21Gc2doUXFMbTlrYXk1bWJYUnRMbXh2WTJGc2FHOXpkSWNFQ2hRZQpNakFLQmdncWhrak9QUVFEQWdOcEFEQm1BakVBb2xuOGRubmlQN0dKSEJPQW4rTHVCV0ZhaUY1NHFZRmpTYyt1Clpia1cwY1pyNWw2VnZ6WVlBdGdWbUtOdTB5WWRBakVBMWlvT2JRTERYdDV3S1JPWjV5VUtmbys2T21IbTV1NWkKQU5LUHd2MExqc2ZIYk5hbzJMWnduK0VxTjNtdUpPNXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  odkcentral_CUSTOM_SSL_KEY_DATA: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JRzJBZ0VBTUJBR0J5cUdTTTQ5QWdFR0JTdUJCQUFpQklHZU1JR2JBZ0VCQkRCc21pQjBmUU5hR1VobEdpWnMKNks1YVo1K1hUOVM1cFdlWkhZc05SVXRlK2FRZ1hIK0pTSmpwRnFqRnNLN21abldoWkFOaUFBU2tYNHpRRUxHQQplTXdscXhneThDZUJCdytFdVo1UDFjSVp1RFg5TzV1N0Ewby8wRHZWL2dZT3Rzb2k1bnJEbFN3eXhoU0lucjc0CmEvbnl6SEJkRCtOT3dGZnZneG1mWnI4MVhLZFZtTmtQZW1JakZKODB1OVpiUlBQcVZwVDM0N1E9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+
 services:
   proxy:
-    # Extend proxy-configs so environment var config is duplicated
-    extends:
-      service: proxy-config
     image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
     depends_on:
-      proxy-config:
-        condition: service_started
-      api:
-        condition: service_started
+      # Frontends must be built and available first
       ui:
         condition: service_started
       ui-mapper:
         condition: service_started
-      central:
-        condition: service_started
-        required: false
       central-ui:
         condition: service_completed_successfully
         required: false
-      s3:
-        condition: service_healthy
-      electric:
-        condition: service_started
     volumes:
       - nginx-configs:/etc/nginx
       - central_frontend:/var/www/html/odk.fmtm.localhost:ro
     ports:
       - ${FMTM_DEV_PORT:-7050}:8080
+    environment: *proxy-env
     networks:
       fmtm-net:
         ipv4_address: 10.20.30.50
     restart: "unless-stopped"
 
-  # This is needed by bunkerweb, but we don't use it
-  proxy-config:
+  # This is needed by bunkerweb to generate the nginx configs
+  proxy-setup:
     image: "ghcr.io/bunkerity/bunkerweb-scheduler:${BUNKERWEB_TAG:-1.6.0}"
-    environment:
-      # General
-      BUNKERWEB_INSTANCES: proxy:5000
-      LOG_LEVEL: notice
-      API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
-      MULTISITE: yes
-      USE_REVERSE_PROXY: yes
-      REVERSE_PROXY_INTERCEPT_ERRORS: no
-      ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
-      USE_REAL_IP: yes
-      SERVE_FILES: yes
-      USE_BACKUP: no
-      USE_METRICS: no
-      # USE_ANTIBOT: yes
-      USE_BAD_BEHAVIOR: no
-      USE_LIMIT_REQ: no
-      USE_MODSECURITY: no
-      USE_BROTLI: yes
-      # Reverse proxy configs
-      SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost odkcentral
-      fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
-      fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7055
-      mapper.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
-      api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
-      s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
-      sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
-      sync.fmtm.localhost_MAX_CLIENT_SIZE: 1G
-      odk.fmtm.localhost_REVERSE_PROXY_HOST: http://central:8383
-      odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
-      # buffer requests, but not responses, so streaming out works
-      odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
-      odk.fmtm.localhost_MAX_CLIENT_SIZE: 500m
-      # Service for local development only to facilitate https odkcentral
-      odkcentral_REVERSE_PROXY_HOST: http://central:8383
-      odkcentral_REVERSE_PROXY_URL: ~ ^/v\d
-      odkcentral_REVERSE_PROXY_BUFFERING: no
-      # Custom cert only for local development
-      odkcentral_USE_CUSTOM_SSL: yes
-      odkcentral_AUTO_REDIRECT_HTTP_TO_HTTPS: no
-      odkcentral_CUSTOM_SSL_CERT_DATA: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUI5RENDQVhtZ0F3SUJBZ0lVWXFyb0dWRVdsK204eU9OY2pUU2pCWThkckN3d0NnWUlLb1pJemowRUF3SXcKRlRFVE1CRUdBMVVFQXd3S2IyUnJZMlZ1ZEhKaGJEQWdGdzB5TkRBM01qTXhNakF6TVRWYUdBOHlNVEkwTURZeQpPVEV5TURNeE5Wb3dGVEVUTUJFR0ExVUVBd3dLYjJSclkyVnVkSEpoYkRCMk1CQUdCeXFHU000OUFnRUdCU3VCCkJBQWlBMklBQktSZmpOQVFzWUI0ekNXckdETHdKNEVIRDRTNW5rL1Z3aG00TmYwN203c0RTai9RTzlYK0JnNjIKeWlMbWVzT1ZMRExHRklpZXZ2aHIrZkxNY0YwUDQwN0FWKytER1o5bXZ6VmNwMVdZMlE5NllpTVVuelM3MWx0RQo4K3BXbFBmanRLT0JoekNCaERBZEJnTlZIUTRFRmdRVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dId1lEClZSMGpCQmd3Rm9BVWNVekZsNUpWN1dUM045VUhxbmhSRHlWT3ZjY3dEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXgKQmdOVkhSRUVLakFvZ2dwdlpHdGpaVzUwY21Gc2doUXFMbTlrYXk1bWJYUnRMbXh2WTJGc2FHOXpkSWNFQ2hRZQpNakFLQmdncWhrak9QUVFEQWdOcEFEQm1BakVBb2xuOGRubmlQN0dKSEJPQW4rTHVCV0ZhaUY1NHFZRmpTYyt1Clpia1cwY1pyNWw2VnZ6WVlBdGdWbUtOdTB5WWRBakVBMWlvT2JRTERYdDV3S1JPWjV5VUtmbys2T21IbTV1NWkKQU5LUHd2MExqc2ZIYk5hbzJMWnduK0VxTjNtdUpPNXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-      odkcentral_CUSTOM_SSL_KEY_DATA: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JRzJBZ0VBTUJBR0J5cUdTTTQ5QWdFR0JTdUJCQUFpQklHZU1JR2JBZ0VCQkRCc21pQjBmUU5hR1VobEdpWnMKNks1YVo1K1hUOVM1cFdlWkhZc05SVXRlK2FRZ1hIK0pTSmpwRnFqRnNLN21abldoWkFOaUFBU2tYNHpRRUxHQQplTXdscXhneThDZUJCdytFdVo1UDFjSVp1RFg5TzV1N0Ewby8wRHZWL2dZT3Rzb2k1bnJEbFN3eXhoU0lucjc0CmEvbnl6SEJkRCtOT3dGZnZneG1mWnI4MVhLZFZtTmtQZW1JakZKODB1OVpiUlBQcVZwVDM0N1E9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+    depends_on:
+      proxy:
+        condition: service_started
+    environment: *proxy-env
     networks:
       - fmtm-net
     restart: "no"
-    entrypoint: timeout 120 ./entrypoint.sh
+    # If success or timeout exits with 0 code, else use actual exit code
+    entrypoint: sh -c 'timeout 120 ./entrypoint.sh || [ $? -eq 124 ] && exit 0'
 
   api:
     image: "ghcr.io/hotosm/fmtm/backend:${TAG_OVERRIDE:-debug}"
@@ -144,6 +138,8 @@ services:
       # - ../osm-rawdata/osm_rawdata:/opt/python/lib/python3.12/site-packages/osm_rawdata:ro
       # - ../fmtm-splitter/fmtm_splitter:/opt/python/lib/python3.12/site-packages/fmtm_splitter:ro
     depends_on:
+      proxy:
+        condition: service_healthy
       fmtm-db:
         condition: service_healthy
       central:
@@ -186,9 +182,6 @@ services:
       additional_contexts:
         - code=src/frontend
       dockerfile: Dockerfile.ui.debug
-    depends_on:
-      api:
-        condition: service_started
     volumes:
       - ./src/frontend:/app
       - /app/node_modules/
@@ -207,9 +200,6 @@ services:
       additional_contexts:
         - code=src/mapper
       dockerfile: Dockerfile.ui.debug
-    depends_on:
-      api:
-        condition: service_started
     volumes:
       - ./src/mapper:/app
       - /app/node_modules/
@@ -230,6 +220,8 @@ services:
       args:
         ODK_CENTRAL_TAG: ${ODK_CENTRAL_TAG:-v2024.2.1}
     depends_on:
+      proxy:
+        condition: service_healthy
       central-db:
         condition: service_healthy
       s3:
@@ -274,9 +266,6 @@ services:
     # Temp workaround until multiarch support
     build:
       context: https://github.com/getodk/pyxform-http.git#v2.0.3
-    depends_on:
-      central-db:
-        condition: service_healthy
     networks:
       - fmtm-net
     restart: "unless-stopped"
@@ -313,6 +302,9 @@ services:
 
   s3:
     image: "docker.io/minio/minio:${MINIO_TAG:-RELEASE.2025-01-20T14-49-07Z}"
+    depends_on:
+      proxy:
+        condition: service_healthy
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-fmtm}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
@@ -362,6 +354,8 @@ services:
   electric:
     image: "electricsql/electric:${ELECTRIC_TAG:-1.0.0-beta.10}"
     depends_on:
+      proxy:
+        condition: service_healthy
       fmtm-db:
         condition: service_healthy
       migrations:
