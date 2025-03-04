@@ -96,6 +96,10 @@ services:
     extends:
       file: compose.development.yaml
       service: central-webhook
+  pyxform:
+    extends:
+      file: compose.development.yaml
+      service: pyxform
   central-ui:
     extends:
       file: compose.development.yaml
