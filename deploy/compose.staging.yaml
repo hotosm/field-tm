@@ -18,8 +18,12 @@
 name: fmtm-stage
 
 volumes:
+  nginx-configs:
+    name: fmtm-nginx-configs-${GIT_BRANCH}
   fmtm_frontend:
     name: fmtm-frontend-${GIT_BRANCH}
+  fmtm_mapper_frontend:
+    name: fmtm-mapper-frontend-${GIT_BRANCH}
   fmtm_db_data:
     name: fmtm-db-data-${GIT_BRANCH}
   fmtm_data:
@@ -42,6 +46,10 @@ volumes:
 networks:
   fmtm-net:
     name: fmtm-${GIT_BRANCH}
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.20.30.0/24
 
 services:
   proxy:
