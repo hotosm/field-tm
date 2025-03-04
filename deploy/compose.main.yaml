@@ -18,8 +18,12 @@
 name: fmtm-main
 
 volumes:
+  nginx-configs:
+    name: fmtm-nginx-configs-main
   fmtm_frontend:
     name: fmtm-frontend-main
+  fmtm_mapper_frontend:
+    name: fmtm-mapper-frontend-main
   fmtm_db_data:
     name: fmtm-db-data-main
   fmtm_data:
@@ -38,36 +42,41 @@ volumes:
 networks:
   fmtm-net:
     name: fmtm-main
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.20.30.0/24
 
 services:
   proxy:
-    image: "ghcr.io/hotosm/fmtm/proxy:main"
-    depends_on:
-      api:
-        condition: service_started
-      certbot:
-        condition: service_completed_successfully
-      s3:
-        condition: service_healthy
-      ui:
-        condition: service_completed_successfully
-      electric:
-        condition: service_started
+    extends:
+      file: compose.staging.yaml
+      service: proxy
+
+  proxy-setup:
+    extends:
+      file: compose.staging.yaml
+      service: proxy-setup
     volumes:
-      - fmtm_frontend:/usr/share/nginx/html/fmtm
+      - nginx-configs:/etc/nginx
+      - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
+      - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
+      - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
       - certs:/etc/letsencrypt
       - certbot_data:/var/www/certbot
     environment:
-      FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
-      FMTM_SYNC_DOMAIN: ${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - fmtm-net
-    restart: "unless-stopped"
+      SERVER_NAME: dev.fmtm.hotosm.org mapper.fmtm.hotosm.org api.fmtm.hotosm.org s3.fmtm.hotosm.org sync.fmtm.hotosm.org odk.fmtm.hotosm.org
+      api.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+      api.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      s3.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+      s3.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+      sync.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+      sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      odk.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
+      odk.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
+      # buffer requests, but not responses, so streaming out works
+      odk.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
+      odk.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
 
   api:
     extends:
@@ -123,21 +132,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  certbot:
-    image: "ghcr.io/hotosm/fmtm/proxy:certs-init-main"
-    volumes:
-      - certs:/etc/letsencrypt
-      - certbot_data:/var/www/certbot
-    environment:
-      FMTM_DOMAIN: ${FMTM_DOMAIN}
-      FMTM_API_DOMAIN: ${FMTM_API_DOMAIN:-api.${FMTM_DOMAIN}}
-      FMTM_S3_DOMAIN: ${FMTM_S3_DOMAIN:-s3.${FMTM_DOMAIN}}
-      FMTM_SYNC_DOMAIN: ${FMTM_SYNC_DOMAIN:-sync.${FMTM_DOMAIN}}
-      CERT_EMAIL: ${CERT_EMAIL}
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - fmtm-net
-    restart: "on-failure:2"

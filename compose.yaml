@@ -40,6 +40,7 @@ x-proxy-env: &proxy-env # General
   BUNKERWEB_INSTANCES: proxy:5000
   LOG_LEVEL: notice
   USE_BUNKERNET: no
+  DISABLE_DEFAULT_SERVER: "yes"
   API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
   MULTISITE: yes
   USE_REVERSE_PROXY: yes
@@ -53,6 +54,8 @@ x-proxy-env: &proxy-env # General
   USE_BAD_BEHAVIOR: no
   USE_LIMIT_REQ: no
   USE_MODSECURITY: no
+  USE_GZIP: yes
+  # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
   # Reverse proxy configs
   SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost odkcentral
