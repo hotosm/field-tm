@@ -61,8 +61,12 @@ x-proxy-env: &proxy-env # General
   SERVER_NAME: fmtm.localhost mapper.fmtm.localhost api.fmtm.localhost s3.fmtm.localhost sync.fmtm.localhost odk.fmtm.localhost odkcentral
   fmtm.localhost_REVERSE_PROXY_HOST: http://ui:7051
   fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  # Required for vite websockets / live-reload
+  fmtm.localhost_REVERSE_PROXY_WS: yes
   mapper.fmtm.localhost_REVERSE_PROXY_HOST: http://ui-mapper:7055
   mapper.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  # Required for vite websockets / live-reload
+  mapper.fmtm.localhost_REVERSE_PROXY_WS: yes
   api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
   api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
   s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
