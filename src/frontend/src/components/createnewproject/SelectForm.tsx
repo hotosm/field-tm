@@ -58,8 +58,6 @@ const SelectForm = ({ flag, _geojsonFile, xlsFormFile, setXlsFormFile }) => {
     const { files } = event.target;
     // Set the selected file as the xlsFormFile state
     setXlsFormFile(files[0]);
-    console.log(files[0]);
-    console.log(xlsFormFile);
     handleCustomChange('xlsFormFileUpload', files[0]);
   };
   const resetFile = (): void => {

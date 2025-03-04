@@ -29,8 +29,7 @@
     "noImplicitReturns": true,
     "strictPropertyInitialization": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "types": ["vite-plugin-pwa/react"]
+    "noUnusedParameters": true
   },
   "include": ["src", "src/**/*.ts", "tests"],
   "exclude": ["node_modules", "dist"]

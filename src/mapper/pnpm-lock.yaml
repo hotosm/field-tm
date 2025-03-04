@@ -108,6 +108,9 @@ importers:
       '@unocss/extractor-svelte':
         specifier: ^0.65.0-beta.2
         version: 0.65.0-beta.2
+      '@vite-pwa/sveltekit':
+        specifier: ^0.6.7
+        version: 0.6.7(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(vite-plugin-pwa@0.21.1(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))(workbox-build@7.3.0)(workbox-window@7.3.0))
       eslint:
         specifier: ^9.16.0
         version: 9.16.0(jiti@1.21.7)
@@ -141,9 +144,6 @@ importers:
       vite:
         specifier: ^6.0.1
         version: 6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)
-      vite-plugin-pwa:
-        specifier: ^0.21.1
-        version: 0.21.1(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))(workbox-build@7.3.0)(workbox-window@7.3.0)
       vitest:
         specifier: ^2.1.6
         version: 2.1.6(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)
@@ -1896,6 +1896,17 @@ packages:
     resolution: {integrity: sha512-LGPGwdwhY4z9oIip65/E5T2L72vHSseNKwRSuWeeGfeLSn3PleTmtah80hdLgQtZLLJNqgnj7oi4IAvi+bJt+w==}
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0
+
+  '@vite-pwa/sveltekit@0.6.7':
+    resolution: {integrity: sha512-geeRgOiFr4RdW4JHIshOTsa8OqX4P+aJtudnKjuxzpmHy44bo4o18OWM1iXc4qXBJCxCw+3yTttyJsdmHXG/sA==}
+    engines: {node: '>=16.14 || >=18.13'}
+    peerDependencies:
+      '@sveltejs/kit': ^1.3.1 || ^2.0.1
+      '@vite-pwa/assets-generator': ^0.2.6
+      vite-plugin-pwa: '>=0.21.1 <1'
+    peerDependenciesMeta:
+      '@vite-pwa/assets-generator':
+        optional: true
 
   '@vitest/expect@2.1.6':
     resolution: {integrity: sha512-9M1UR9CAmrhJOMoSwVnPh2rELPKhYo0m/CSgqw9PyStpxtkwhmdM6XYlXGKeYyERY1N6EIuzkQ7e3Lm1WKCoUg==}
@@ -6364,6 +6375,13 @@ snapshots:
       - rollup
       - supports-color
       - vue
+
+  '@vite-pwa/sveltekit@0.6.7(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(vite-plugin-pwa@0.21.1(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))(workbox-build@7.3.0)(workbox-window@7.3.0))':
+    dependencies:
+      '@sveltejs/kit': 2.9.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)))(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))
+      kolorist: 1.8.0
+      tinyglobby: 0.2.10
+      vite-plugin-pwa: 0.21.1(vite@6.0.1(@types/node@22.10.1)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2))(workbox-build@7.3.0)(workbox-window@7.3.0)
 
   '@vitest/expect@2.1.6':
     dependencies:
