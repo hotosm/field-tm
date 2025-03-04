@@ -67,8 +67,7 @@ x-proxy-env: &proxy-env # General
   # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
   # For OpenTelemetry
-  KEEP_UPSTREAM_HEADERS: "*"
-  CUSTOM_HEADER: "Access-Control-Allow-Headers: traceparent,tracestate"
+  CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate"
   AUTO_LETS_ENCRYPT: yes
   EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
   # USE_LETS_ENCRYPT_STAGING: yes
