@@ -46,6 +46,7 @@ const ProjectDetailsForm = ({ flag }) => {
     hasODKCredentials: item?.odk_central_url ? true : false,
   }));
   const [hasODKCredentials, setHasODKCredentials] = useState(false);
+  const [userSearchText, setUserSearchText] = useState('');
 
   const submission = () => {
     dispatch(CreateProjectActions.SetIndividualProjectDetailsData(values));
@@ -105,6 +106,23 @@ const ProjectDetailsForm = ({ flag }) => {
       handleCustomChange('odk_central_password', '');
     }
   }, [values.useDefaultODKCredentials]);
+
+  useEffect(() => {
+    if (!userSearchText) return;
+    if (!values.organisation_id && userSearchText) {
+      dispatch(CommonActions.SetSnackBar({ message: 'Please select an organization', variant: 'warning' }));
+      return;
+    }
+
+    dispatch(
+      GetUserListForSelect(`${VITE_API_URL}/users`, {
+        search: userSearchText,
+        page: 1,
+        results_per_page: 30,
+        org_id: values.organisation_id,
+      }),
+    );
+  }, [userSearchText]);
 
   useEffect(() => {
     if (isEmpty(organisationList)) return;
@@ -223,9 +241,7 @@ const ProjectDetailsForm = ({ flag }) => {
               isLoading={userListLoading}
               handleApiSearch={(value) => {
                 if (value) {
-                  dispatch(
-                    GetUserListForSelect(`${VITE_API_URL}/users`, { search: value, page: 1, results_per_page: 30 }),
-                  );
+                  setUserSearchText(value);
                 } else {
                   dispatch(UserActions.SetUserListForSelect([]));
                 }

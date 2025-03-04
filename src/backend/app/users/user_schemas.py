@@ -70,8 +70,9 @@ class UserRole(BaseModel):
 class UserRolesOut(DbUserRole):
     """User role for a specific project."""
 
-    # project_id is redundant if the user specified it in the endpoint
-    project_id: Annotated[Optional[int], Field(exclude=True)] = None
+    user_id: int
+    role: ProjectRole
+    project_id: Optional[int] = None
 
 
 class PaginatedUsers(BaseModel):
@@ -79,3 +80,10 @@ class PaginatedUsers(BaseModel):
 
     results: list[UserOut]
     pagination: PaginationInfo
+
+
+class Usernames(BaseModel):
+    """User info with username and their id."""
+
+    id: int
+    username: str
