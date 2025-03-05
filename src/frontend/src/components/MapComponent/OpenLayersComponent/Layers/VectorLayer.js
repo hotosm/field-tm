@@ -86,8 +86,8 @@ const VectorLayer = ({
         dataProjection: 'EPSG:4326',
         featureProjection: 'EPSG:3857',
       });
-      const geometry = vectorLayer.getSource().getFeatures()?.[0].getGeometry();
-      const area = formatArea(geometry);
+      const features = vectorLayer.getSource().getFeatures();
+      const area = formatArea(features);
 
       onModify(geoJSONString, area);
     });
@@ -101,13 +101,13 @@ const VectorLayer = ({
     };
   }, [map, vectorLayer, onModify]);
 
-  const formatArea = function (polygon) {
-    const area = getArea(polygon);
+  const formatArea = function (features) {
+    const totalArea = features?.reduce((acc, curr) => acc + getArea(curr.getGeometry()), 0);
     let output;
-    if (area > 10000) {
-      output = Math.round((area / 1000000) * 100) / 100 + ' km\xB2';
+    if (totalArea > 10000) {
+      output = Math.round((totalArea / 1000000) * 100) / 100 + ' km\xB2';
     } else {
-      output = Math.round(area * 100) / 100 + ' m\xB2';
+      output = Math.round(totalArea * 100) / 100 + ' m\xB2';
     }
     return output;
   };
@@ -136,7 +136,7 @@ const VectorLayer = ({
       });
 
       const geometry = feature.getGeometry();
-      const area = formatArea(geometry);
+      const area = formatArea([feature]);
 
       onDraw(newGeojson, area);
     });
@@ -422,8 +422,8 @@ const VectorLayer = ({
 
   useEffect(() => {
     if (!vectorLayer || !getAOIArea) return;
-    const geometry = vectorLayer.getSource().getFeatures()?.[0].getGeometry();
-    const area = formatArea(geometry);
+    const features = vectorLayer.getSource().getFeatures();
+    const area = formatArea(features);
     getAOIArea(area);
   }, [vectorLayer, getAOIArea]);
 
