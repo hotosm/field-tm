@@ -92,7 +92,7 @@ x-proxy-env: &proxy-env # General
   sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   # CORS must be enabled for Electric to work
   sync.fmtm.hotosm.org_USE_CORS: yes
-  sync.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://fmtm.hotosm.org
+  sync.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.fmtm.hotosm.org
 
 services:
   proxy:

@@ -96,7 +96,7 @@ x-proxy-env: &proxy-env # General
   sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   # CORS must be enabled for Electric to work
   sync.stage.fmtm.hotosm.org_USE_CORS: yes
-  sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://stage.fmtm.hotosm.org
+  sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.stage.fmtm.hotosm.org
   odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
   odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
   # buffer requests, but not responses, so streaming out works
