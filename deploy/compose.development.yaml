@@ -91,6 +91,8 @@ x-proxy-env: &proxy-env # General
   # buffer requests, but not responses, so streaming out works
   odk.dev.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
   odk.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+  # Avoid running ModSec rules on calls to ODK Central from API
+  odk.dev.fmtm.hotosm.org_WHITELIST_IP: 10.20.30.0/24
 
 services:
   proxy:
