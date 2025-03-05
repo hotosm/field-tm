@@ -71,7 +71,7 @@ x-proxy-env: &proxy-env # General
   USE_GZIP: yes
   # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
-  # For OpenTelemetry
+  # For OpenTelemetry (Allow-Headers are what the browser can include in the REQUEST headers)
   CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate"
   AUTO_LETS_ENCRYPT: yes
   EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
@@ -91,10 +91,11 @@ x-proxy-env: &proxy-env # General
   sync.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
   sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   # CORS must be enabled for Electric to work
-  sync.dev.fmtm.hotosm.org_USE_CORS: yes
-  sync.dev.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.fmtm.hotosm.org
-  sync.dev.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
-  sync.dev.fmtm.hotosm.org_CORS_ALLOW_HEADERS: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate,electric-offset,electric-handle,electric-schema
+  sync.fmtm.hotosm.org_USE_CORS: yes
+  sync.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.fmtm.hotosm.org
+  sync.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
+  # Expose-Headers are RESPONSE headers the browser is allowed to access
+  sync.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: Content-Length,Content-Range,electric-offset,electric-handle,electric-schema
 
 services:
   proxy:
