@@ -52,8 +52,11 @@ x-proxy-env: &proxy-env # General
   API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
   # Avoid running ModSec rules on internal service calls
   WHITELIST_IP: 10.20.30.0/24
+  WHITELIST_URI: https://fmtm.hotosm.org
   MULTISITE: yes
   USE_REVERSE_PROXY: yes
+  # Required for electric headers electric-offset, electric-handle, electric-schema
+  KEEP_UPSTREAM_HEADERS: yes
   REVERSE_PROXY_INTERCEPT_ERRORS: no
   ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
   USE_REAL_IP: yes
@@ -68,8 +71,8 @@ x-proxy-env: &proxy-env # General
   USE_GZIP: yes
   # On client, brotli is preferred over gzip if both are enabled
   USE_BROTLI: yes
-  # For OpenTelemetry
-  CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate"
+  # For OpenTelemetry + Electric
+  CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate,electric-offset,electric-handle,electric-schema"
   AUTO_LETS_ENCRYPT: yes
   EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
   # USE_LETS_ENCRYPT_STAGING: yes
@@ -84,7 +87,7 @@ x-proxy-env: &proxy-env # General
   s3.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
   # CORS must be enabled for Minio to work
   s3.fmtm.hotosm.org_USE_CORS: yes
-  # s3.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: "*" # default
+  s3.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://fmtm.hotosm.org
   sync.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
   sync.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   # CORS must be enabled for Electric to work

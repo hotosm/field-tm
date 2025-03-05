@@ -43,8 +43,11 @@ x-proxy-env: &proxy-env # General
   API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
   # Avoid running ModSec rules on internal service calls
   WHITELIST_IP: 10.20.30.0/24
+  WHITELIST_URI: http://fmtm.localhost:7050
   MULTISITE: yes
   USE_REVERSE_PROXY: yes
+  # Required for electric headers electric-offset, electric-handle, electric-schema
+  KEEP_UPSTREAM_HEADERS: yes
   REVERSE_PROXY_INTERCEPT_ERRORS: no
   ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
   USE_REAL_IP: yes
