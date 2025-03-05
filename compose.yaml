@@ -274,10 +274,7 @@ services:
     restart: "unless-stopped"
 
   pyxform:
-    image: "ghcr.io/getodk/pyxform-http:v2.0.3"
-    # Temp workaround until multiarch support
-    build:
-      context: https://github.com/getodk/pyxform-http.git#v2.0.3
+    image: "ghcr.io/getodk/pyxform-http:v3.0.0"
     networks:
       - fmtm-net
     restart: "unless-stopped"
