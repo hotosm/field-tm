@@ -80,12 +80,19 @@ x-proxy-env: &proxy-env # General
   # We need this to allow for client-side routing in the SPA (from index.html)
   dev.fmtm.hotosm.org_ERRORS: 404=/index.html
   mapper.dev.fmtm.hotosm.org_ERRORS: 404=/index.html
+  # CORS for the backend is configured by FastAPI
   api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
   api.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
   s3.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
   s3.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+  # CORS must be enabled for Minio to work
+  s3.dev.fmtm.hotosm.org_USE_CORS: yes
+  # s3.dev.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: "*" # default
   sync.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
   sync.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  # CORS must be enabled for Electric to work
+  sync.dev.fmtm.hotosm.org_USE_CORS: yes
+  sync.dev.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://dev.fmtm.hotosm.org
   odk.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
   odk.dev.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
   # buffer requests, but not responses, so streaming out works
