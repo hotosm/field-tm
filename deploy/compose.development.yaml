@@ -69,7 +69,8 @@ x-proxy-env: &proxy-env # General
   USE_METRICS: no
   # USE_ANTIBOT: yes
   USE_LIMIT_CONN: yes
-  USE_BAD_BEHAVIOR: yes
+  # BAD_BEHAVIOUR disabled as it's difficult to work with...
+  USE_BAD_BEHAVIOR: no
   USE_LIMIT_REQ: yes
   USE_MODSECURITY: yes
   USE_GZIP: yes
