@@ -220,32 +220,6 @@ export default function Dialog({ taskId, feature }: dialogPropType) {
           </Button>
         </div>
       )}
-      {task_state === taskStateEnum.LOCKED_FOR_MAPPING && (
-        <div className="fmtm-p-2 sm:fmtm-p-5 fmtm-border-t">
-          <Button
-            variant="primary-red"
-            onClick={() => {
-              const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                navigator.userAgent,
-              );
-
-              if (isMobile) {
-                document.location.href = `odkcollect://form/${projectInfo.odk_form_id}`;
-              } else {
-                dispatch(
-                  CommonActions.SetSnackBar({
-                    message: 'Requires a mobile phone with ODK Collect.',
-                    variant: 'warning',
-                  }),
-                );
-              }
-            }}
-            className="!fmtm-w-full"
-          >
-            GO TO ODK
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
