@@ -138,9 +138,6 @@
 						<hot-icon slot="prefix" name="check" class="!text-[1rem] text-white cursor-pointer duration-200"></hot-icon>
 						<span class="font-barlow font-medium text-sm">COMPLETE MAPPING</span>
 					</sl-button>
-					<sl-button variant="default" size="small" class="primary col-span-2 sm:col-span-1">
-						<span class="font-barlow font-medium text-sm">GO TO ODK</span>
-					</sl-button>
 				</div>
 			{/if}
 		</div>
