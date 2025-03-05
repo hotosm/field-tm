@@ -95,7 +95,7 @@ x-proxy-env: &proxy-env # General
   sync.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.fmtm.hotosm.org
   sync.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
   # Expose-Headers are RESPONSE headers the browser is allowed to access
-  sync.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: Content-Length,Content-Range,electric-offset,electric-handle,electric-schema
+  sync.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
 
 services:
   proxy:

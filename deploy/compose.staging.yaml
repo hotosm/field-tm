@@ -99,7 +99,7 @@ x-proxy-env: &proxy-env # General
   sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.stage.fmtm.hotosm.org
   sync.stage.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
   # Expose-Headers are RESPONSE headers the browser is allowed to access
-  sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: Content-Length,Content-Range,electric-offset,electric-handle,electric-schema
+  sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
   odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
   odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
   # buffer requests, but not responses, so streaming out works
