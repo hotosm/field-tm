@@ -16,6 +16,7 @@
 		Control,
 		ControlGroup,
 		ControlButton,
+		CircleLayer,
 	} from 'svelte-maplibre';
 	import maplibre from 'maplibre-gl';
 	import { MaplibreTerradrawControl } from '@watergis/maplibre-gl-terradraw';
@@ -86,7 +87,8 @@
 	let selectedBaselayer: string = $state('OSM');
 	let taskAreaClicked: boolean = $state(false);
 	let projectSetupStep: number | null = $state(null);
-	let lineWidth = $state(1); // Initial line width of the rejected entities
+	let lineWidth = $state(1); // Initial line width of the rejected entities (polygon)
+	let circleRadius = $state(15); // Initial line width of the rejected entities (point)
 	let expanding = true; // Whether the line is expanding
 	let selectedControl: 'layer-switcher' | 'legend' | null = $state(null);
 	let selectedStyleUrl: string | undefined = $state(undefined);
@@ -361,12 +363,22 @@
 		}
 
 		const interval = setInterval(() => {
-			if (expanding) {
-				lineWidth += 0.3;
-				if (lineWidth >= 4) expanding = false; // Maximum width
-			} else {
-				lineWidth -= 0.3;
-				if (lineWidth <= 1) expanding = true; // Minimum width
+			if (drawGeomType === MapGeomTypes.POLYGON) {
+				if (expanding) {
+					lineWidth += 0.3;
+					if (lineWidth >= 4) expanding = false; // Maximum width
+				} else {
+					lineWidth -= 0.3;
+					if (lineWidth <= 1) expanding = true; // Minimum width
+				}
+			} else if (drawGeomType === MapGeomTypes.POINT) {
+				if (expanding) {
+					circleRadius += 0.5;
+					if (circleRadius >= 25) expanding = false; // Maximum radius
+				} else {
+					circleRadius -= 0.5;
+					if (circleRadius <= 15) expanding = true; // Minimum radius
+				}
 			}
 		}, 50); // Update every 50ms for smooth animation
 
@@ -578,8 +590,8 @@
 				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 				paint={{
 					'line-color': '#fa1100',
-					'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
-					'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
@@ -607,30 +619,44 @@
 						'#c5fbf5', // default color if no match is found
 					],
 					'icon-allow-overlap': true,
+					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],
 				}}
 			/>
 		{/if}
 	</FlatGeobuf>
 	<GeoJSON id="bad-geoms" data={entitiesStore.badGeomList}>
-		<FillLayer
-			id="bad-geom-fill-layer"
-			hoverCursor="pointer"
-			paint={{
-				'fill-color': '#fa1100',
-				'fill-opacity': 0.3,
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
-		<LineLayer
-			layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-			paint={{
-				'line-color': '#fa1100',
-				'line-width': lineWidth,
-			}}
-			beforeLayerType="symbol"
-			manageHoverState
-		/>
+		{#if drawGeomType === MapGeomTypes.POLYGON}
+			<FillLayer
+				id="bad-geom-fill-layer"
+				hoverCursor="pointer"
+				paint={{
+					'fill-color': '#fa1100',
+					'fill-opacity': 0.3,
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+			<LineLayer
+				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+				paint={{
+					'line-color': '#fa1100',
+					'line-width': lineWidth,
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+		{:else if drawGeomType === MapGeomTypes.POINT}
+			<CircleLayer
+				id="bad-geom-circle-layer"
+				hoverCursor="pointer"
+				paint={{
+					'circle-color': '#fa1100',
+					'circle-opacity': 0.4,
+					'circle-radius': circleRadius,
+					'circle-stroke-opacity': hoverStateFilter(0, 1),
+				}}
+			/>
+		{/if}
 	</GeoJSON>
 	<GeoJSON id="new-geoms" data={addStatusToGeojsonProperty(entitiesStore.newGeomList, 'new')}>
 		{#if drawGeomType === MapGeomTypes.POLYGON}
@@ -674,8 +700,8 @@
 				layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 				paint={{
 					'line-color': '#fa1100',
-					'line-width': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0],
-					'line-opacity': ['case', ['==', ['get', 'osm_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
+					'line-width': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0],
+					'line-opacity': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1, 0.35],
 				}}
 				beforeLayerType="symbol"
 				manageHoverState
@@ -704,6 +730,7 @@
 						'#c5fbf5', // default color if no match is found
 					],
 					'icon-allow-overlap': true,
+					'icon-size': ['case', ['==', ['get', 'entity_id'], entitiesStore.selectedEntity || ''], 1.6, 1],
 				}}
 			/>
 		{/if}

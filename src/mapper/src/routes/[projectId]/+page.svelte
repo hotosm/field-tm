@@ -41,6 +41,7 @@
 	let infoDialogRef: SlDialog | null = $state(null);
 	let isDrawEnabled: boolean = $state(false);
 	let latestEventTime: string = $state('');
+	let isGeometryCreationLoading: boolean = $state(false);
 
 	const taskStore = getTaskStore();
 	const entitiesStore = getEntitiesStatusStore();
@@ -115,15 +116,17 @@
 	});
 
 	$effect(() => {
+		entitiesStore.syncEntityStatus(data.projectId);
+	});
+
+	$effect(() => {
+		entitiesStore.entitiesList;
 		let entityStatusStream: ShapeStream | undefined;
 
+		if (entitiesStore.entitiesList?.length === 0) return;
 		async function getEntityStatus() {
-			const entityStatusResponse = await fetch(`${API_URL}/projects/${data.projectId}/entities/statuses`, {
-				credentials: 'include',
-			});
-			const response = await entityStatusResponse.json();
 			entityStatusStream = getEntityStatusStream(data.projectId);
-			await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, response);
+			await entitiesStore.subscribeToEntityStatusUpdates(entityStatusStream, entitiesStore.entitiesList);
 		}
 
 		getEntityStatus();
@@ -169,6 +172,7 @@
 			*/
 		}
 		try {
+			isGeometryCreationLoading = true;
 			const entity = await entitiesStore.createEntity(data.projectId, {
 				type: 'FeatureCollection',
 				features: [{ type: 'Feature', geometry: newFeatureGeom, properties: {} }],
@@ -178,10 +182,13 @@
 				geojson: { type: 'Feature', geometry: newFeatureGeom, properties: { entity_id: entity.uuid } },
 				project_id: data.projectId,
 			});
+			entitiesStore.syncEntityStatus(data.projectId);
 			cancelMapNewFeatureInODK();
 			openOdkCollectNewFeature(data?.project?.odk_form_id, entity.uuid);
 		} catch (error) {
 			alertStore.setAlert({ message: 'Unable to create entity', variant: 'danger' });
+		} finally {
+			isGeometryCreationLoading = false;
 		}
 	}
 </script>
@@ -250,6 +257,7 @@
 						tabindex="0"
 						size="small"
 						class="primary w-fit"
+						loading={isGeometryCreationLoading}
 					>
 						<span class="font-barlow font-medium text-xs uppercase">PROCEED</span>
 					</sl-button>
