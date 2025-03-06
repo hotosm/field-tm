@@ -54,8 +54,7 @@ let updateEntityStatusLoading: boolean = $state(false);
 let selectedEntityCoordinate: entityIdCoordinateMapType | null = $state(null);
 let entityToNavigate: entityIdCoordinateMapType | null = $state(null);
 let toggleGeolocation: boolean = $state(false);
-let createEntityLoading: boolean = $state(false);
-let createGeomRecordLoading: boolean = $state(false);
+let entitiesList: entitiesListType[] = $state([]);
 let alertStore = getAlertStore();
 
 function getEntityStatusStream(projectId: number): ShapeStream | undefined {
@@ -138,9 +137,11 @@ function getEntitiesStatusStore() {
 	async function syncEntityStatus(projectId: number) {
 		try {
 			syncEntityStatusLoading = true;
-			await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
+			const entityStatusResponse = await fetch(`${API_URL}/projects/${projectId}/entities/statuses`, {
 				credentials: 'include',
 			});
+			const response = await entityStatusResponse.json();
+			entitiesList = response;
 			syncEntityStatusLoading = false;
 		} catch (error) {
 			syncEntityStatusLoading = false;
@@ -166,7 +167,6 @@ function getEntitiesStatusStore() {
 
 	async function createEntity(projectId: number, payload: Record<string, any>) {
 		try {
-			createEntityLoading = true;
 			const resp = await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/create-entity`, {
 				method: 'POST',
 				body: JSON.stringify(payload),
@@ -185,14 +185,11 @@ function getEntitiesStatusStore() {
 				variant: 'danger',
 				message: error.message || 'Failed to create entity',
 			});
-		} finally {
-			createEntityLoading = false;
 		}
 	}
 
 	async function createGeomRecord(projectId: number, payload: Record<string, any>) {
 		try {
-			createGeomRecordLoading = true;
 			const resp = await fetch(`${import.meta.env.VITE_API_URL}/projects/${projectId}/geometry/records`, {
 				method: 'POST',
 				body: JSON.stringify(payload),
@@ -210,8 +207,6 @@ function getEntitiesStatusStore() {
 				variant: 'danger',
 				message: error.message || 'Failed to create geometry record',
 			});
-		} finally {
-			createGeomRecordLoading = false;
 		}
 	}
 
@@ -268,6 +263,9 @@ function getEntitiesStatusStore() {
 		},
 		get userLocationCoord() {
 			return userLocationCoord;
+		},
+		get entitiesList() {
+			return entitiesList;
 		},
 	};
 }
