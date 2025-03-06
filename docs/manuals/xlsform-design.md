@@ -5,6 +5,7 @@ Adapted and updated from
 in osm-fieldwork.
 
 The full specification for XLSForms can be found [here](https://xlsform.org/en/).
+A cheatsheet reference for XLSForm can be found [here](https://datafordev.com/wp-content/uploads/2021/02/datafordev-xlsform-cheat-sheet-v1.pdf).
 
 ## XLSForm & ODK Terms
 
