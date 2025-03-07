@@ -9,7 +9,6 @@ import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { FormCategoryService } from '@/api/CreateProjectService';
-import FileInputComponent from '@/components/common/FileInputComponent';
 import DataExtractValidation from '@/components/createnewproject/validation/DataExtractValidation';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
@@ -17,6 +16,10 @@ import { task_split_type } from '@/types/enums';
 import { dataExtractGeojsonType } from '@/store/types/ICreateProject';
 import { CustomCheckbox } from '@/components/common/Checkbox';
 import DescriptionSection from '@/components/createnewproject/Description';
+import UploadArea from '@/components/common/UploadArea';
+import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
+
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const primaryGeomOptions = [
   { name: 'primary_geom_type', value: 'POLYGON', label: 'Polygons (e.g. buildings)' },
@@ -130,10 +133,7 @@ const DataExtract = ({
     dispatch(CreateProjectActions.SetFgbFetchingStatus(true));
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/projects/generate-data-extract`,
-        dataExtractRequestFormData,
-      );
+      const response = await axios.post(`${VITE_API_URL}/projects/generate-data-extract`, dataExtractRequestFormData);
 
       const fgbUrl = response.data.url;
       // Append url to project data & remove custom files
@@ -193,45 +193,22 @@ const DataExtract = ({
     navigate(url);
   };
 
-  const convertFileToFeatureCol = async (file) => {
-    if (!file) return;
-    // Parse file as JSON
-    const fileReader = new FileReader();
-    const fileLoaded: any = await new Promise((resolve) => {
-      fileReader.onload = (e) => resolve(e.target?.result);
-      fileReader.readAsText(file, 'UTF-8');
-    });
-    const parsedJSON = JSON.parse(fileLoaded);
-
-    // Convert to FeatureCollection
-    let geojsonConversion;
-    if (parsedJSON.type === 'FeatureCollection') {
-      geojsonConversion = parsedJSON;
-    } else if (parsedJSON.type === 'Feature') {
-      geojsonConversion = {
-        type: 'FeatureCollection',
-        features: [parsedJSON],
-      };
-    } else {
-      geojsonConversion = {
-        type: 'FeatureCollection',
-        features: [{ type: 'Feature', properties: null, geometry: parsedJSON }],
-      };
+  const changeMapDataFileHandler = async (file, setDataExtractToState) => {
+    if (!file) {
+      resetFile(setCustomDataExtractUpload);
+      handleCustomChange('customDataExtractUpload', null);
+      dispatch(CreateProjectActions.setDataExtractGeojson(null));
+      return;
     }
-    return geojsonConversion;
-  };
-
-  const changeFileHandler = async (event, setDataExtractToState) => {
-    const { files } = event.target;
-    const uploadedFile = files[0];
+    const uploadedFile = file?.file;
     const fileType = uploadedFile.name.split('.').pop();
 
     // Handle geojson and fgb types, return featurecollection geojson
     let extractFeatCol;
     if (['json', 'geojson'].includes(fileType)) {
       // Set to state immediately for splitting
-      setDataExtractToState(uploadedFile);
-      extractFeatCol = await convertFileToFeatureCol(uploadedFile);
+      setDataExtractToState(file);
+      extractFeatCol = await convertFileToGeojson(uploadedFile);
     } else if (['fgb'].includes(fileType)) {
       const arrayBuffer = new Uint8Array(await uploadedFile.arrayBuffer());
       extractFeatCol = fgbGeojson.deserialize(arrayBuffer);
@@ -240,7 +217,7 @@ const DataExtract = ({
       setDataExtractToState(geojsonFile);
     }
     if (extractFeatCol && extractFeatCol?.features?.length > 0) {
-      handleCustomChange('customDataExtractUpload', event.target.files[0]);
+      handleCustomChange('customDataExtractUpload', uploadedFile);
       handleCustomChange('task_split_type', task_split_type.CHOOSE_AREA_AS_TASK.toString());
       // View on map
       await dispatch(CreateProjectActions.setDataExtractGeojson(extractFeatCol));
@@ -252,8 +229,22 @@ const DataExtract = ({
     return;
   };
 
+  const changeAdditionalMapDataFileHandler = async (file) => {
+    if (!file) {
+      resetFile(setAdditionalFeature);
+      dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
+      handleCustomChange('additionalFeature', null);
+      return;
+    }
+    const uploadedFile = file?.file;
+    setAdditionalFeature(file);
+    handleCustomChange('additionalFeature', uploadedFile);
+    const additionalFeatureGeojson = await convertFileToGeojson(uploadedFile);
+    dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(additionalFeatureGeojson));
+  };
+
   useEffect(() => {
-    dispatch(FormCategoryService(`${import.meta.env.VITE_API_URL}/central/list-forms`));
+    dispatch(FormCategoryService(`${VITE_API_URL}/central/list-forms`));
   }, []);
 
   return (
@@ -336,20 +327,14 @@ const DataExtract = ({
               )}
               {extractType === 'custom_data_extract' && (
                 <>
-                  <FileInputComponent
-                    onChange={(e) => {
-                      changeFileHandler(e, setCustomDataExtractUpload);
+                  <UploadArea
+                    title="Upload Map Data"
+                    label="The supported file formats are .geojson, .json, .fgb"
+                    data={customDataExtractUpload ? [customDataExtractUpload] : []}
+                    onUploadFile={(updatedFiles) => {
+                      changeMapDataFileHandler(updatedFiles?.[0], setCustomDataExtractUpload);
                     }}
-                    onResetFile={() => {
-                      resetFile(setCustomDataExtractUpload);
-                      handleCustomChange('customDataExtractUpload', null);
-                      dispatch(CreateProjectActions.setDataExtractGeojson(null));
-                    }}
-                    customFile={customDataExtractUpload}
-                    btnText="Upload Map Data"
-                    accept=".geojson,.json,.fgb"
-                    fileDescription="*The supported file formats are .geojson, .json, .fgb"
-                    errorMsg={errors.customDataExtractUpload}
+                    acceptedInput=".geojson,.json,.fgb"
                   />
                 </>
               )}
@@ -381,27 +366,20 @@ const DataExtract = ({
                   </div>
                   {formValues?.hasAdditionalFeature && (
                     <>
-                      <FileInputComponent
-                        onChange={async (e) => {
-                          if (e?.target?.files) {
-                            const uploadedFile = e?.target?.files[0];
-                            setAdditionalFeature(uploadedFile);
-                            handleCustomChange('additionalFeature', uploadedFile);
-                            const additionalFeatureGeojson = await convertFileToFeatureCol(uploadedFile);
-                            dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(additionalFeatureGeojson));
-                          }
+                      <UploadArea
+                        title="Upload Supporting Datasets"
+                        label="The supported file formats are .geojson"
+                        data={additionalFeature ? [additionalFeature] : []}
+                        onUploadFile={(updatedFiles) => {
+                          changeAdditionalMapDataFileHandler(updatedFiles?.[0]);
                         }}
-                        onResetFile={() => {
-                          resetFile(setAdditionalFeature);
-                          dispatch(CreateProjectActions.SetAdditionalFeatureGeojson(null));
-                          handleCustomChange('additionalFeature', null);
-                        }}
-                        customFile={additionalFeature}
-                        btnText="Upload Supporting Datasets"
-                        accept=".geojson"
-                        fileDescription="*The supported file formats are .geojson"
-                        errorMsg={errors.additionalFeature}
+                        acceptedInput=".geojson"
                       />
+                      {errors.additionalFeature && (
+                        <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">
+                          {errors.additionalFeature}
+                        </p>
+                      )}
                     </>
                   )}
                   {additionalFeatureGeojson && (

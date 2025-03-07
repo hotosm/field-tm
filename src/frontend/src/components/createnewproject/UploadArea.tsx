@@ -9,12 +9,13 @@ import { CreateProjectActions } from '@/store/slices/CreateProjectSlice';
 import useForm from '@/hooks/useForm';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import UploadAreaValidation from '@/components/createnewproject/validation/UploadAreaValidation';
-import FileInputComponent from '@/components/common/FileInputComponent';
 import NewDefineAreaMap from '@/views/NewDefineAreaMap';
 import { checkWGS84Projection } from '@/utilfunctions/checkWGS84Projection.js';
 import { valid } from 'geojson-validation';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import DescriptionSection from '@/components/createnewproject/Description';
+import UploadAreaComponent from '@/components/common/UploadArea';
+import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
 
 type uploadAreaType = 'upload_file' | 'draw';
 
@@ -86,37 +87,22 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     dispatch(CreateProjectActions.SetToggleSplittedGeojsonEdit(false));
   };
 
-  const convertFileToGeojson = async (file) => {
-    if (!file) return;
-    const fileReader = new FileReader();
-    const fileLoaded: any = await new Promise((resolve) => {
-      fileReader.onload = (e) => resolve(e.target?.result);
-      fileReader.readAsText(file, 'UTF-8');
-    });
-    const parsedJSON = JSON.parse(fileLoaded);
-    let geojsonConversion;
-    if (parsedJSON.type === 'FeatureCollection') {
-      geojsonConversion = parsedJSON;
-    } else {
-      geojsonConversion = {
-        type: 'FeatureCollection',
-        features: [{ type: 'Feature', properties: null, geometry: parsedJSON }],
-      };
-    }
-    addGeojsonToState(geojsonConversion);
-    return geojsonConversion;
-  };
-
   const addGeojsonToState = (geojson) => {
     dispatch(CreateProjectActions.SetDrawnGeojson(geojson));
   };
 
-  const changeFileHandler = async (event) => {
-    const { files } = event.target;
-    if (valid(await convertFileToGeojson(files[0]))) {
-      handleCustomChange('uploadedAreaFile', files[0].name);
-      setGeojsonFile(files[0]);
-      convertFileToGeojson(files[0]);
+  const changeFileHandler = async (file) => {
+    if (!file) {
+      resetFile();
+      return;
+    }
+
+    const fileObject = file?.file;
+    const convertedGeojson = await convertFileToGeojson(fileObject);
+    if (valid(convertedGeojson)) {
+      handleCustomChange('uploadedAreaFile', fileObject?.name);
+      setGeojsonFile(file);
+      addGeojsonToState(convertedGeojson);
     } else {
       handleCustomChange('uploadedAreaFile', '');
       setGeojsonFile(null);
@@ -259,16 +245,21 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                   onMouseOver={() => dispatch(CreateProjectActions.SetDescriptionToFocus('uploadarea-uploadgeojson'))}
                   onMouseLeave={() => dispatch(CreateProjectActions.SetDescriptionToFocus(null))}
                 >
-                  <FileInputComponent
-                    customFile={geojsonFile}
-                    onChange={changeFileHandler}
-                    onResetFile={resetFile}
-                    accept=".geojson, .json"
-                    fileDescription="*The supported file format is geojson file."
-                    btnText="Upload"
-                    errorMsg={errors.uploadedAreaFile}
+                  <UploadAreaComponent
+                    title="Upload Form"
+                    label="Please upload .geojson, .json file"
+                    data={geojsonFile ? [geojsonFile] : []}
+                    onUploadFile={(updatedFiles) => {
+                      changeFileHandler(updatedFiles?.[0]);
+                    }}
+                    acceptedInput=".geojson, .json"
                   />
-                  <p className="fmtm-text-gray-700">
+                  {errors.uploadedAreaFile && (
+                    <p className="fmtm-form-error fmtm-text-red-600 fmtm-text-sm fmtm-py-1">
+                      {errors.uploadedAreaFile}
+                    </p>
+                  )}
+                  <p className="fmtm-text-gray-700 fmtm-mt-4">
                     Total Area: <span className="fmtm-font-bold">{totalAreaSelection}</span>
                   </p>
                 </div>
