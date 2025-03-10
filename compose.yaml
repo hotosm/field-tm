@@ -74,6 +74,8 @@ x-proxy-env: &proxy-env # General
   mapper.fmtm.localhost_REVERSE_PROXY_WS: yes
   api.fmtm.localhost_REVERSE_PROXY_HOST: http://api:8000
   api.fmtm.localhost_MAX_CLIENT_SIZE: 1G
+  # Increase timeout slightly for long project creation requests
+  api.fmtm.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
   s3.fmtm.localhost_REVERSE_PROXY_HOST: http://s3:9000
   s3.fmtm.localhost_MAX_CLIENT_SIZE: 10G
   sync.fmtm.localhost_REVERSE_PROXY_HOST: http://electric:3000
@@ -82,7 +84,7 @@ x-proxy-env: &proxy-env # General
   odk.fmtm.localhost_REVERSE_PROXY_URL: ~ ^/v\d
   # buffer requests, but not responses, so streaming out works
   odk.fmtm.localhost_REVERSE_PROXY_BUFFERING: no
-  odk.fmtm.localhost_MAX_CLIENT_SIZE: 500m
+  odk.fmtm.localhost_MAX_CLIENT_SIZE: 1G
   # Service for local development only to facilitate https odkcentral
   odkcentral_REVERSE_PROXY_HOST: http://central:8383
   odkcentral_REVERSE_PROXY_URL: ~ ^/v\d

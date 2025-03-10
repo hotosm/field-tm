@@ -89,6 +89,8 @@ x-proxy-env: &proxy-env # General
   # CORS for the backend is configured by FastAPI
   api.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
   api.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  # Increase timeout slightly for long project creation requests
+  api.dev.fmtm.hotosm.org_REVERSE_PROXY_READ_TIMEOUT: 90s
   s3.dev.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
   s3.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
   # CORS must be enabled for Minio to work
@@ -106,7 +108,7 @@ x-proxy-env: &proxy-env # General
   odk.dev.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
   # buffer requests, but not responses, so streaming out works
   odk.dev.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
-  odk.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 500m
+  odk.dev.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
 
 services:
   proxy:
