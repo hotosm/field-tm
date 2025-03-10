@@ -1,5 +1,5 @@
 import React from 'react';
-import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
+import ActivitiesPanel from '@/components/ProjectDetails/ActivitiesPanel';
 import CoreModules from '@/shared/CoreModules';
 import { useAppSelector } from '@/types/reduxTypes';
 

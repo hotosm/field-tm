@@ -3,8 +3,8 @@ import AssetModules from '@/shared/AssetModules.js';
 import ProjectIcon from '@/assets/images/project_icon.png';
 import CoreModules from '@/shared/CoreModules';
 import { useAppSelector } from '@/types/reduxTypes';
-import { EntityOsmMap } from '@/store/types/IProject';
 import { entity_state } from '@/types/enums';
+import { EntityOsmMap } from '@/models/project/projectModel';
 
 const ProjectInfo: React.FC = () => {
   const paraRef = useRef<HTMLParagraphElement>(null);

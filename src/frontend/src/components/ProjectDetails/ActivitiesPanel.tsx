@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AssetModules from '@/shared/AssetModules';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
-import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
+import { ActivitiesCardSkeletonLoader, ShowingCountSkeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import { useAppSelector } from '@/types/reduxTypes';
 import { projectTaskActivity } from '@/store/types/IProject';
 import { projectTaskBoundriesType } from '@/models/project/projectModel';

@@ -13,7 +13,7 @@ import SubmissionDetails from '@/views/SubmissionDetails';
 import CreateNewProject from '@/views/CreateNewProject';
 import UnderConstruction from '@/views/UnderConstruction';
 import ErrorBoundary from '@/views/ErrorBoundary';
-import ProjectDetailsV2 from '@/views/ProjectDetailsV2';
+import ProjectDetails from '@/views/ProjectDetails';
 import ProjectSubmissions from '@/views/ProjectSubmissions';
 import ManageProject from '@/views/ManageProject';
 import ManageUsers from '@/views/ManageUsers';
@@ -101,7 +101,7 @@ const routes = createBrowserRouter([
           <ProtectedRoute>
             <Suspense fallback={<div>Loading...</div>}>
               <ErrorBoundary>
-                <ProjectDetailsV2 />
+                <ProjectDetails />
               </ErrorBoundary>
             </Suspense>
           </ProtectedRoute>

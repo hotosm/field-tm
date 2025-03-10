@@ -3,42 +3,53 @@ import '../../node_modules/ol/ol.css';
 import '../styles/home.scss';
 import { Style, Stroke } from 'ol/style';
 import WindowDimension from '@/hooks/WindowDimension';
-import ActivitiesPanel from '@/components/ProjectDetailsV2/ActivitiesPanel';
+import ActivitiesPanel from '@/components/ProjectDetails/ActivitiesPanel';
 import { ProjectById, GetEntityStatusList, GetGeometryLog, SyncTaskState } from '@/api/Project';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import CoreModules from '@/shared/CoreModules';
 import AssetModules from '@/shared/AssetModules';
 import GenerateBasemap from '@/components/GenerateBasemap';
-import TaskSelectionPopup from '@/components/ProjectDetailsV2/TaskSelectionPopup';
-import FeatureSelectionPopup from '@/components/ProjectDetailsV2/FeatureSelectionPopup';
+import TaskSelectionPopup from '@/components/ProjectDetails/TaskSelectionPopup';
+import FeatureSelectionPopup from '@/components/ProjectDetails/FeatureSelectionPopup';
 import DialogTaskActions from '@/components/DialogTaskActions';
-import MobileFooter from '@/components/ProjectDetailsV2/MobileFooter';
-import MobileActivitiesContents from '@/components/ProjectDetailsV2/MobileActivitiesContents';
+import MobileFooter from '@/components/ProjectDetails/MobileFooter';
+import MobileActivitiesContents from '@/components/ProjectDetails/MobileActivitiesContents';
 import BottomSheet from '@/components/common/BottomSheet';
-import MobileProjectInfoContent from '@/components/ProjectDetailsV2/MobileProjectInfoContent';
+import MobileProjectInfoContent from '@/components/ProjectDetails/MobileProjectInfoContent';
 import { useNavigate, useParams } from 'react-router-dom';
-import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
+import ProjectOptions from '@/components/ProjectDetails/ProjectOptions';
 import { MapContainer as MapComponent, useOLMap } from '@/components/MapComponent/OpenLayersComponent';
 import LayerSwitcherControl from '@/components/MapComponent/OpenLayersComponent/LayerSwitcher/index';
-import MapControlComponent from '@/components/ProjectDetailsV2/MapControlComponent';
+import MapControlComponent from '@/components/ProjectDetails/MapControlComponent';
 import { VectorLayer } from '@/components/MapComponent/OpenLayersComponent/Layers';
 import { geojsonObjectModel } from '@/constants/geojsonObjectModal';
 import getTaskStatusStyle, { getFeatureStatusStyle } from '@/utilfunctions/getTaskStatusStyle';
 import AsyncPopup from '@/components/MapComponent/OpenLayersComponent/AsyncPopup/AsyncPopup';
 import Button from '@/components/common/Button';
-import ProjectInfo from '@/components/ProjectDetailsV2/ProjectInfo';
+import ProjectInfo from '@/components/ProjectDetails/ProjectInfo';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { isValidUrl } from '@/utilfunctions/urlChecker';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
-import Comments from '@/components/ProjectDetailsV2/Comments';
+import Comments from '@/components/ProjectDetails/Comments';
 import { Geolocation } from '@/utilfunctions/Geolocation';
-import Instructions from '@/components/ProjectDetailsV2/Instructions';
+import Instructions from '@/components/ProjectDetails/Instructions';
 import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import MapStyles from '@/hooks/MapStyles';
-import { EntityOsmMap } from '@/store/types/IProject';
 import { entity_state } from '@/types/enums';
+import { EntityOsmMap } from '@/models/project/projectModel';
 
-const ProjectDetailsV2 = () => {
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+type tabType = 'project_info' | 'task_activity' | 'comments' | 'instructions';
+
+const tabList: { id: tabType; name: string }[] = [
+  { id: 'project_info', name: 'Project Info' },
+  { id: 'task_activity', name: 'Task Activity' },
+  { id: 'comments', name: 'Comments' },
+  { id: 'instructions', name: 'Instructions' },
+];
+
+const ProjectDetails = () => {
   useDocumentTitle('Project Details');
   const dispatch = useAppDispatch();
   const params = useParams();
@@ -54,7 +65,7 @@ const ProjectDetailsV2 = () => {
   const [dataExtractExtent, setDataExtractExtent] = useState(null);
   const [taskBoundariesLayer, setTaskBoundariesLayer] = useState<null | Record<string, any>>(null);
   const customBasemapUrl = useAppSelector((state) => state.project.customBasemapUrl);
-  const [viewState, setViewState] = useState('project_info');
+  const [selectedTab, setSelectedTab] = useState<tabType>('project_info');
   const projectId: string | undefined = params.id;
   const defaultTheme = useAppSelector((state) => state.theme.hotTheme);
   const state = useAppSelector((state) => state.project);
@@ -193,31 +204,9 @@ const ProjectDetailsV2 = () => {
    */
   const projectClickOnTaskFeature = (properties, feature) => {
     // Close task area popup, open task feature popup
-    // setSelectedTaskArea(undefined);
     setSelectedTaskFeature(feature);
-
     dispatch(CoreModules.TaskActions.SetSelectedFeatureProps(properties));
-
-    // let extent = properties.geometry.getExtent();
-    // setDataExtractExtent(properties.geometry);
-
-    // mapRef.current?.scrollIntoView({
-    //   block: 'center',
-    //   behavior: 'smooth',
-    // });
-
     dispatch(ProjectActions.ToggleTaskModalStatus(true));
-
-    // // Fit the map view to the clicked feature's extent based on the window size
-    // if (windowSize.width < 768 && map.getView().getZoom() < 17) {
-    //   map.getView().fit(extent, {
-    //     padding: [10, 20, 300, 20],
-    //   });
-    // } else if (windowSize.width > 768 && map.getView().getZoom() < 17) {
-    //   map.getView().fit(extent, {
-    //     padding: [20, 350, 50, 10],
-    //   });
-    // }
   };
 
   useEffect(() => {
@@ -234,18 +223,18 @@ const ProjectDetailsV2 = () => {
 
   useEffect(() => {
     if (taskModalStatus) {
-      setViewState('task_activity');
+      setSelectedTab('task_activity');
     } else {
-      setViewState('project_info');
+      setSelectedTab('project_info');
     }
   }, [taskModalStatus]);
 
   const getEntityStatusList = () => {
-    dispatch(GetEntityStatusList(`${import.meta.env.VITE_API_URL}/projects/${projectId}/entities/statuses`));
+    dispatch(GetEntityStatusList(`${VITE_API_URL}/projects/${projectId}/entities/statuses`));
   };
 
   const getGeometryLog = () => {
-    dispatch(GetGeometryLog(`${import.meta.env.VITE_API_URL}/projects/${projectId}/geometry/records`));
+    dispatch(GetGeometryLog(`${VITE_API_URL}/projects/${projectId}/geometry/records`));
   };
 
   const syncTaskState = () => {
@@ -256,14 +245,7 @@ const ProjectDetailsV2 = () => {
     const taskBoundaryFeatures = taskBoundaryLayer.getSource().getFeatures();
 
     projectId &&
-      dispatch(
-        SyncTaskState(
-          `${import.meta.env.VITE_API_URL}/tasks`,
-          { project_id: projectId },
-          taskBoundaryFeatures,
-          geojsonStyles,
-        ),
-      );
+      dispatch(SyncTaskState(`${VITE_API_URL}/tasks`, { project_id: projectId }, taskBoundaryFeatures, geojsonStyles));
   };
 
   useEffect(() => {
@@ -309,6 +291,48 @@ const ProjectDetailsV2 = () => {
     syncTaskState();
   };
 
+  const getTabContent = (tabState: tabType) => {
+    switch (tabState) {
+      case 'project_info':
+        return <ProjectInfo />;
+      case 'task_activity':
+        return (
+          <ActivitiesPanel params={params} state={state.projectTaskBoundries} defaultTheme={defaultTheme} map={map} />
+        );
+      case 'comments':
+        return <Comments />;
+      case 'instructions':
+        return <Instructions instructions={state?.projectInfo?.instructions} />;
+      default:
+        return <></>;
+    }
+  };
+
+  const getMobileBottomSheetContent = (
+    mobileTabState: '' | 'projectInfo' | 'activities' | 'comment' | 'instructions',
+  ) => {
+    switch (mobileTabState) {
+      case 'projectInfo':
+        return <MobileProjectInfoContent projectInfo={state.projectInfo} />;
+      case 'activities':
+        return <MobileActivitiesContents map={map} />;
+      case 'instructions':
+        return (
+          <div className="fmtm-mb-[10vh]">
+            <Instructions instructions={state?.projectInfo?.instructions} />
+          </div>
+        );
+      case 'comment':
+        return (
+          <div className="fmtm-mb-[10vh]">
+            <Comments />
+          </div>
+        );
+      default:
+        return <></>;
+    }
+  };
+
   return (
     <div className="fmtm-bg-[#f5f5f5] !fmtm-h-[100dvh] sm:!fmtm-h-full">
       {/* Customized Modal For Generate Tiles */}
@@ -331,7 +355,7 @@ const ProjectDetailsV2 = () => {
           </div>
           <div
             className="fmtm-flex fmtm-flex-col fmtm-gap-4 fmtm-flex-auto"
-            style={{ height: `${viewState === 'comments' ? 'calc(100% - 63px)' : 'calc(100% - 103px)'}` }}
+            style={{ height: `${selectedTab === 'comments' ? 'calc(100% - 63px)' : 'calc(100% - 103px)'}` }}
           >
             {projectDetailsLoading ? (
               <CoreModules.Skeleton className="!fmtm-w-[250px] fmtm-h-[25px]" />
@@ -347,69 +371,23 @@ const ProjectDetailsV2 = () => {
             )}
             <div className="fmtm-w-full fmtm-h-1 fmtm-bg-white"></div>
             <div className="fmtm-flex fmtm-w-full">
-              {!taskModalStatus && (
+              {tabList.map((tab) => (
                 <button
-                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                    viewState === 'project_info'
+                  key={tab.id}
+                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base fmtm-py-1 ${
+                    selectedTab === tab.id
                       ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
                       : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                  } fmtm-py-1`}
-                  onClick={() => setViewState('project_info')}
+                  } ${(taskModalStatus && tab.id === 'project_info') || (!taskModalStatus && (tab.id === 'task_activity' || tab.id === 'comments')) ? 'fmtm-hidden' : ''}`}
+                  onClick={() => setSelectedTab(tab.id)}
                 >
-                  Project Info
+                  {tab.name}
                 </button>
-              )}
-              {taskModalStatus && (
-                <button
-                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                    viewState === 'task_activity'
-                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                  } fmtm-py-1`}
-                  onClick={() => setViewState('task_activity')}
-                >
-                  Task Activity
-                </button>
-              )}
-              {taskModalStatus && (
-                <button
-                  className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                    viewState === 'comments'
-                      ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                      : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                  } fmtm-py-1`}
-                  onClick={() => setViewState('comments')}
-                >
-                  Comments
-                </button>
-              )}
-              <button
-                className={`fmtm-rounded-none fmtm-border-none fmtm-text-base ${
-                  viewState === 'instructions'
-                    ? 'fmtm-bg-primaryRed fmtm-text-white hover:fmtm-bg-red-700'
-                    : 'fmtm-bg-white fmtm-text-[#706E6E] hover:fmtm-bg-grey-50'
-                } fmtm-py-1`}
-                onClick={() => setViewState('instructions')}
-              >
-                Instructions
-              </button>
+              ))}
             </div>
-            {viewState === 'project_info' ? (
-              <ProjectInfo />
-            ) : viewState === 'comments' ? (
-              <Comments />
-            ) : viewState === 'task_activity' ? (
-              <ActivitiesPanel
-                params={params}
-                state={state.projectTaskBoundries}
-                defaultTheme={defaultTheme}
-                map={map}
-              />
-            ) : (
-              <Instructions instructions={state?.projectInfo?.instructions} />
-            )}
+            {getTabContent(selectedTab)}
           </div>
-          {viewState !== 'comments' && (
+          {selectedTab !== 'comments' && (
             <div className="fmtm-flex fmtm-gap-4">
               <Button
                 variant="secondary-red"
@@ -480,11 +458,6 @@ const ProjectDetailsV2 = () => {
                 zIndex={5}
                 style=""
               />
-              {/* New geometry layer */}
-              {/* TODO: 
-                  1. style add to layer, 
-                  2. on feature click show validate button with feature info's 
-              */}
               <VectorLayer
                 geojson={newGeomFeatureCollection}
                 viewProperties={{
@@ -567,35 +540,9 @@ const ProjectDetailsV2 = () => {
             >
               <AssetModules.ArrowBackIcon className="fmtm-text-grey-800" />
             </div>
-            {mobileFooterSelection === 'projectInfo' && (
+            {['projectInfo', 'activities', 'instructions', 'comment'].includes(mobileFooterSelection) && (
               <BottomSheet
-                body={<MobileProjectInfoContent projectInfo={state.projectInfo} />}
-                onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
-              />
-            )}
-            {mobileFooterSelection === 'activities' && (
-              <BottomSheet
-                body={<MobileActivitiesContents map={map} />}
-                onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
-              />
-            )}
-            {mobileFooterSelection === 'instructions' && (
-              <BottomSheet
-                body={
-                  <div className="fmtm-mb-[10vh]">
-                    <Instructions instructions={state?.projectInfo?.instructions} />
-                  </div>
-                }
-                onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
-              />
-            )}
-            {mobileFooterSelection === 'comment' && (
-              <BottomSheet
-                body={
-                  <div className="fmtm-mb-[10vh]">
-                    <Comments />
-                  </div>
-                }
+                body={getMobileBottomSheetContent(mobileFooterSelection)}
                 onClose={() => dispatch(ProjectActions.SetMobileFooterSelection(''))}
               />
             )}
@@ -621,4 +568,4 @@ const ProjectDetailsV2 = () => {
   );
 };
 
-export default ProjectDetailsV2;
+export default ProjectDetails;
