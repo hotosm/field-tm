@@ -16,6 +16,7 @@ import useDocumentTitle from '@/utilfunctions/useDocumentTitle';
 import DescriptionSection from '@/components/createnewproject/Description';
 import UploadAreaComponent from '@/components/common/UploadArea';
 import { convertFileToGeojson } from '@/utilfunctions/convertFileToGeojson';
+import { fileType } from '@/store/types/ICommon';
 
 type uploadAreaType = 'upload_file' | 'draw';
 
@@ -91,7 +92,7 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
     dispatch(CreateProjectActions.SetDrawnGeojson(geojson));
   };
 
-  const changeFileHandler = async (file) => {
+  const changeFileHandler = async (file: fileType, fileInputRef: React.RefObject<HTMLInputElement | null>) => {
     if (!file) {
       resetFile();
       return;
@@ -99,7 +100,9 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
 
     const fileObject = file?.file;
     const convertedGeojson = await convertFileToGeojson(fileObject);
-    if (valid(convertedGeojson)) {
+    const isGeojsonValid = valid(convertedGeojson, true);
+
+    if (isGeojsonValid?.length === 0) {
       handleCustomChange('uploadedAreaFile', fileObject?.name);
       setGeojsonFile(file);
       addGeojsonToState(convertedGeojson);
@@ -107,9 +110,11 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
       handleCustomChange('uploadedAreaFile', '');
       setGeojsonFile(null);
       addGeojsonToState(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       dispatch(
         CommonActions.SetSnackBar({
-          message: 'File not a valid geojson',
+          message: `The uploaded GeoJSON is invalid and contains the following errors: ${isGeojsonValid?.map((error) => `\n${error}`)}`,
+          duration: 10000,
         }),
       );
     }
@@ -249,8 +254,8 @@ const UploadArea = ({ flag, geojsonFile, setGeojsonFile, setCustomDataExtractUpl
                     title="Upload Form"
                     label="Please upload .geojson, .json file"
                     data={geojsonFile ? [geojsonFile] : []}
-                    onUploadFile={(updatedFiles) => {
-                      changeFileHandler(updatedFiles?.[0]);
+                    onUploadFile={(updatedFiles, fileInputRef) => {
+                      changeFileHandler(updatedFiles?.[0] as fileType, fileInputRef);
                     }}
                     acceptedInput=".geojson, .json"
                   />

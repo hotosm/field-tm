@@ -30,3 +30,9 @@ export type paginationType = {
   per_page: number;
   total: number | null;
 };
+
+export type fileType = {
+  id: string;
+  file: File;
+  previewURL: string;
+};
