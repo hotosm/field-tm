@@ -18,7 +18,7 @@ type uploadAreaPropType = {
   title: string;
   label: string;
   data: FileType[] | string;
-  onUploadFile: (updatedFiles: FileType[]) => void;
+  onUploadFile: (updatedFiles: FileType[], ref: React.RefObject<HTMLInputElement | null>) => void;
   acceptedInput: string;
 };
 
@@ -45,14 +45,15 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
     fileInputRef?.current?.click();
   };
 
-  const changeHandler = (event) => {
+  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
-    const fileList = Object.values(files).map((item: any) => {
-      const file = item;
+    if (!files) return;
+    const fileList = Object.values(files).map((fileItem) => {
+      const file = fileItem;
       const id = uuidv4();
       return { id, file: file, previewURL: URL.createObjectURL(file) };
     });
-    onUploadFile(fileList);
+    onUploadFile(fileList, fileInputRef);
   };
 
   const handleDeleteFile = (id: string) => {
@@ -60,7 +61,7 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    return onUploadFile(updatedList);
+    return onUploadFile(updatedList, fileInputRef);
   };
 
   return (
@@ -103,9 +104,9 @@ const UploadArea = ({ title, label, acceptedInput, data, onUploadFile }: uploadA
               return null;
             });
             if (fileList.length > 0) {
-              onUploadFile([fileList.at(fileList.length - 1) as FileType]);
+              onUploadFile([fileList.at(fileList.length - 1) as FileType], fileInputRef);
             } else {
-              onUploadFile(data as FileType[]);
+              onUploadFile(data as FileType[], fileInputRef);
             }
           }
         }}
