@@ -83,6 +83,8 @@ x-proxy-env: &proxy-env # General
   mapper.fmtm.hotosm.org_ERRORS: 404=/index.html
   api.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
   api.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+  # Increase timeout slightly for long project creation requests
+  api.fmtm.hotosm.org_REVERSE_PROXY_READ_TIMEOUT: 90s
   s3.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
   s3.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
   # CORS must be enabled for Minio to work
