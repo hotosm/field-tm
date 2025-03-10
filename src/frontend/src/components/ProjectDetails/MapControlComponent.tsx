@@ -5,7 +5,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import { useLocation } from 'react-router-dom';
-import ProjectOptions from '@/components/ProjectDetailsV2/ProjectOptions';
+import ProjectOptions from '@/components/ProjectDetails/ProjectOptions';
 import useOutsideClick from '@/hooks/useOutsideClick';
 import LayerSwitchMenu from '../MapComponent/OpenLayersComponent/LayerSwitcher/LayerSwitchMenu';
 import { Tooltip } from '@mui/material';

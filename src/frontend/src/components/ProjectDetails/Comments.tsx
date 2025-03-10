@@ -5,7 +5,7 @@ import { PostProjectComments, GetProjectComments } from '@/api/Project';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/types/reduxTypes';
 import AssetModules from '@/shared/AssetModules';
-import { ProjectCommentsSekeletonLoader } from '@/components/ProjectDetailsV2/SkeletonLoader';
+import { ProjectCommentsSekeletonLoader } from '@/components/ProjectDetails/SkeletonLoader';
 import { ProjectActions } from '@/store/slices/ProjectSlice';
 import { CommonActions } from '@/store/slices/CommonSlice';
 
