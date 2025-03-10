@@ -1037,7 +1037,11 @@ class DbTask(BaseModel):
                     )
                     WHERE id = %(project_id)s;
                 """
+                log.debug(f"Updating total_tasks count for project ({project_id})")
                 await cur.execute(update_project_sql, {"project_id": project_id})
+
+            else:
+                log.error(f"Failed to insert task areas into db. Result: {result}")
 
         return success
 
