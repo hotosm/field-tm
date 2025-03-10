@@ -214,18 +214,19 @@ const DataExtract = ({
     // Handle geojson and fgb types, return featurecollection geojson
     let extractFeatCol;
     if (fileType && ['json', 'geojson'].includes(fileType)) {
-      // Set to state immediately for splitting
+      // already geojson format, so we simply append
       setCustomDataExtractUpload(file);
       extractFeatCol = await convertFileToGeojson(uploadedFile);
     } else if (fileType && ['fgb'].includes(fileType)) {
+      // deserialise the fgb --> geojson for upload
       const arrayBuffer = new Uint8Array(await uploadedFile.arrayBuffer());
       extractFeatCol = fgbGeojson.deserialize(arrayBuffer);
       // Set converted geojson to state for splitting
-      const geojsonFile = {
+      const geojsonFromFgbFile = {
         ...file,
-        file: new File([extractFeatCol], 'custom_extract.geojson', { type: 'application/json' }),
+        file: new File([JSON.stringify(extractFeatCol)], 'custom_extract.geojson', { type: 'application/json' }),
       };
-      setCustomDataExtractUpload(geojsonFile);
+      setCustomDataExtractUpload(geojsonFromFgbFile);
     }
 
     const isGeojsonValid = valid(extractFeatCol, true);
