@@ -333,44 +333,6 @@ async def upload_custom_extract_to_s3(
     return s3_fgb_full_url
 
 
-async def upload_custom_fgb_extract(
-    db: Connection,
-    project_id: int,
-    fgb_content: bytes,
-) -> str:
-    """Upload a flatgeobuf data extract.
-
-    FIXME how can we validate this has the required fields for geojson conversion?
-    Requires:
-        "id"
-        "osm_id"
-        "tags"
-        "version"
-        "changeset"
-        "timestamp"
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): The ID of the project.
-        fgb_content (bytes): Content of read flatgeobuf file.
-
-    Returns:
-        str: URL to fgb file in S3.
-    """
-    featcol = await flatgeobuf_to_featcol(db, fgb_content)
-
-    if not featcol:
-        msg = f"Failed extracting geojson from flatgeobuf for project ({project_id})"
-        log.error(msg)
-        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=msg)
-
-    return await upload_custom_extract_to_s3(
-        db,
-        project_id,
-        fgb_content,
-    )
-
-
 async def upload_custom_geojson_extract(
     db: Connection,
     project_id: int,

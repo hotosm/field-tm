@@ -729,14 +729,9 @@ async def upload_custom_extract(
     # read entire file
     extract_data = await custom_extract_file.read()
 
-    if file_ext == ".fgb":
-        fgb_url = await project_crud.upload_custom_fgb_extract(
-            db, project_id, extract_data
-        )
-    else:
-        fgb_url = await project_crud.upload_custom_geojson_extract(
-            db, project_id, extract_data
-        )
+    fgb_url = await project_crud.upload_custom_geojson_extract(
+        db, project_id, extract_data
+    )
     return JSONResponse(status_code=HTTPStatus.OK, content={"url": fgb_url})
 
 
