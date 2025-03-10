@@ -89,6 +89,7 @@ x-proxy-env: &proxy-env # General
   odkcentral_REVERSE_PROXY_HOST: http://central:8383
   odkcentral_REVERSE_PROXY_URL: ~ ^/v\d
   odkcentral_REVERSE_PROXY_BUFFERING: no
+  odkcentral_MAX_CLIENT_SIZE: 1G
   # Custom cert only for local development
   odkcentral_USE_CUSTOM_SSL: yes
   odkcentral_AUTO_REDIRECT_HTTP_TO_HTTPS: no
