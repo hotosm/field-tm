@@ -69,6 +69,8 @@ const CreateProjectService = (
           `${VITE_API_URL}/projects/upload-custom-extract?project_id=${projectId}`,
           dataExtractFormData,
         );
+      } else {
+        throw new Error('Neither isOsmExtract or dataExtractFile was set');
       }
       hasAPISuccess = isStatusSuccess(extractResponse.status);
 
