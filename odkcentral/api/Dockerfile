@@ -38,5 +38,3 @@ RUN sed -i 's/^0 5 \* \* \*/\*\/15 * * * */' /etc/cron.d/odk
 COPY container-entrypoint.sh /
 RUN chmod +x /container-entrypoint.sh
 ENTRYPOINT ["/container-entrypoint.sh"]
-HEALTHCHECK --start-period=10s --interval=5s --retries=10 \
-    CMD nc -z localhost 8383 || exit 1
