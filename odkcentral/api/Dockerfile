@@ -24,6 +24,13 @@ FROM docker.io/minio/minio:${MINIO_TAG} AS minio
 
 
 FROM ghcr.io/getodk/central-service:${ODK_CENTRAL_TAG}
+RUN apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
+        "ca-certificates" \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
 # Copy minio mc client to create S3 buckets
 COPY --from=minio /usr/bin/mc /usr/local/bin/
 # Modify the S3 submission photo upload to every 15 minutes
