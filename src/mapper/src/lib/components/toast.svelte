@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SlAlert from '@shoelace-style/shoelace/dist/components/alert/alert.js';
+	import type SlAlert from '@shoelace-style/shoelace/dist/components/alert/alert.js';
 	import { getAlertStore } from '$store/common.svelte.ts';
 
 	const alertStore = getAlertStore();

@@ -1,0 +1,45 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"task_states": {
+		"UNLOCKED_TO_MAP": "",
+		"LOCKED_FOR_MAPPING": "",
+		"UNLOCKED_TO_VALIDATE": "",
+		"LOCKED_FOR_VALIDATION": "",
+		"UNLOCKED_DONE": ""
+	},
+	"entity_states": {
+		"READY": "",
+		"OPENED_IN_ODK": "",
+		"SURVEY_SUBMITTED": "",
+		"MARKED_BAD": ""
+	},
+	"header": {
+		"about": "",
+		"guide_for_mappers": "",
+		"support": "",
+		"download_custom_odk_collect": "",
+		"sign_in": "INICIAR SESSÃO",
+		"sign_out": "SAIR"
+	},
+	"map": {
+		"enable_geolocation": "",
+		"enable_geolocation_got_it": "",
+		"exit_navigation": "",
+		"click_on_a_task": "",
+		"click_on_the_map": ""
+	},
+	"popup": {
+		"task": "Tarefa",
+		"task_id": "ID da tarefa",
+		"feature": "Recurso",
+		"start_mapping_task": "Deseja começar a mapear a tarefa #{taskId}?",
+		"map_new_feature": "",
+		"start_mapping": "",
+		"cancel_mapping": "",
+		"cancel": "",
+		"navigate_here": "",
+		"map_in_odk": ""
+	},
+	"scan_qr_code": "Digitize este código QR no ODK Collect a partir do telefone de outro usuário ou faça o download e importe-o manualmente",
+	"download": "BAIXAR"
+}

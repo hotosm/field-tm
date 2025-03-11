@@ -3,6 +3,7 @@
 	import type { FeatureCollection } from 'geojson';
 	import MapLibreGlDirections, { LoadingIndicatorControl } from '@maplibre/maplibre-gl-directions';
 
+	import { m } from "$translations/messages.js";
 	import { GetDeviceRotation } from '$lib/utils/getDeviceRotation';
 	import { getAlertStore } from '$store/common.svelte.ts';
 	import { getEntitiesStatusStore } from '$store/entities.svelte.ts';
@@ -233,10 +234,10 @@
 			tabindex="0"
 		>
 			<div slot="content" class="flex items-center gap-1">
-				<span>For the best experience, turn on location</span>
+				<span>{m['map.enable_geolocation']()}</span>
 				<button
 					class="text-white rounded"
-					style="border: white 1px solid; width: fit-content; padding-left: 10px; padding-right: 10px">Got it!</button
+					style="border: white 1px solid; width: fit-content; padding-left: 10px; padding-right: 10px">{m['map.enable_geolocation_got_it']()}</button
 				>
 			</div>
 			<ControlButton
@@ -294,7 +295,7 @@
 				class="secondary"
 				disabled={entitiesStore.syncEntityStatusLoading}
 			>
-				<span class="text-sm">Exit Navigation</span>
+				<span class="text-sm">{m['map.exit_navigation']()}</span>
 			</sl-button>
 		</div>
 	</div>

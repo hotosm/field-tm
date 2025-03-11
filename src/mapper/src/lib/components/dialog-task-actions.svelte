@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from "$translations/messages.js";
 	import { mapTask, finishTask, resetTask } from '$lib/db/events';
 	import type { ProjectData } from '$lib/types';
 	import { getTaskStore } from '$store/tasks.svelte.ts';
@@ -33,7 +34,7 @@
 				></hot-icon>
 			</div>
 			<div class="flex justify-between items-center">
-				<p class="text-[#333] text-xl font-semibold">Task #{taskStore.selectedTaskIndex}</p>
+				<p class="text-[#333] text-xl font-semibold">{m['popup.task']()} #{taskStore.selectedTaskIndex}</p>
 				<div
 					onclick={() => {
 						clickMapNewFeature();
@@ -51,12 +52,12 @@
 						name="new-window"
 						class="!text-[1.25rem] duration-200 text-[#333333] font-light group-hover:text-black"
 					></hot-icon>
-					<p class="uppercase text-[0.813rem] text-red-600 group-hover:text-red-700">map new feature</p>
+					<p class="uppercase text-[0.813rem] text-red-600 group-hover:text-red-700">{m['popup.map_new_feature']()}</p>
 				</div>
 			</div>
 
 			{#if taskStore.selectedTaskState === 'UNLOCKED_TO_MAP'}
-				<p class="my-4 sm:my-6">Do you want to start mapping task #{taskStore.selectedTaskIndex}?</p>
+				<p class="my-4 sm:my-6">{m['popup.start_mapping_task']({taskId: taskStore.selectedTaskIndex})}</p>
 				<div class="flex justify-center gap-x-2">
 					<sl-button
 						size="small"
@@ -72,7 +73,7 @@
 						role="button"
 						tabindex="0"
 					>
-						<span class="font-barlow font-medium text-sm">CANCEL</span>
+						<span class="font-barlow font-medium text-sm">{m['popup.cancel']()}</span>
 					</sl-button>
 					<sl-button
 						variant="default"
@@ -91,7 +92,7 @@
 					>
 						<hot-icon slot="prefix" name="location" class="!text-[1rem] text-white cursor-pointer duration-200"
 						></hot-icon>
-						<span class="font-barlow font-medium text-sm">START MAPPING</span>
+						<span class="font-barlow font-medium text-sm">{m['popup.start_mapping']()}</span>
 					</sl-button>
 				</div>
 			{:else if taskStore.selectedTaskState === 'LOCKED_FOR_MAPPING'}
@@ -118,7 +119,7 @@
 							name="close"
 							class="!text-[1rem] text-[#d73f37] cursor-pointer duration-200 hover:text-[#b91c1c]"
 						></hot-icon>
-						<span class="font-barlow font-medium text-sm">CANCEL MAPPING</span>
+						<span class="font-barlow font-medium text-sm">{m['popup.cancel_mapping']()}</span>
 					</sl-button>
 					<sl-button
 						onclick={() => {

@@ -2,7 +2,6 @@
 	import '$styles/page.css';
 	import '$styles/button.css';
 	import '@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css';
-	import '@hotosm/ui/dist/hotosm-ui';
 	import { onMount } from 'svelte';
 	import {
 		MapLibre,
@@ -38,6 +37,7 @@
 	import RedLockImg from '$assets/images/red-lock.png';
 	import Arrow from '$assets/images/arrow.png';
 
+	import { m } from "$translations/messages.js";
 	import Legend from '$lib/components/map/legend.svelte';
 	import LayerSwitcher from '$lib/components/map/layer-switcher.svelte';
 	import Geolocation from '$lib/components/map/geolocation.svelte';
@@ -751,14 +751,14 @@
 	<!-- Help text for user on first load -->
 	{#if projectSetupStep === projectSetupStepEnum['task_selection']}
 		<div class="absolute top-7 bg-[#F097334D] min-w-[14rem] z-10 left-[50%] translate-x-[-50%] p-1">
-			<p class="uppercase font-barlow font-medium text-base">click on a task to select a feature for mapping</p>
+			<p class="uppercase font-barlow font-medium text-base">{m['map.click_on_a_task']()}</p>
 		</div>
 	{/if}
 
 	<!-- Help for drawing a new geometry -->
 	{#if displayDrawHelpText}
 		<div class="absolute top-7 w-fit bg-[#F097334D] z-10 left-[50%] translate-x-[-50%] p-1">
-			<p class="uppercase font-barlow font-medium text-base">Click on the map to create a new point</p>
+			<p class="uppercase font-barlow font-medium text-base">{m['map.click_on_the_map']()}</p>
 		</div>
 	{/if}
 </MapLibre>

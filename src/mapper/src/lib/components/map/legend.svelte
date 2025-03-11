@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '$styles/page.css';
+	import { m } from "$translations/messages.js";
 
 	type taskStatusesType = { status: string; color: string };
 	type Props = {
@@ -8,10 +9,10 @@
 	const { isOpen }: Props = $props();
 
 	const taskStatuses: taskStatusesType[] = [
-		{ status: 'Ready', color: '#9c9a9a' },
-		{ status: 'Opened in ODK', color: '#fae15f' },
-		{ status: 'Survey Submitted', color: '#71bf86' },
-		{ status: 'Marked Bad', color: '#fa1100' },
+		{ status: m['entity_states.READY'](), color: '#9c9a9a' },
+		{ status: m['entity_states.OPENED_IN_ODK'](), color: '#fae15f' },
+		{ status: m['entity_states.SURVEY_SUBMITTED'](), color: '#71bf86' },
+		{ status: m['entity_states.MARKED_BAD'](), color: '#fa1100' },
 	];
 </script>
 
