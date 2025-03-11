@@ -2,7 +2,7 @@ import { getLocalStorage, setLocalStorage } from '$lib/fs/local-storage.svelte';
 import type { Basemap } from '$lib/utils/basemaps';
 import { getBasemapList } from '$lib/utils/basemaps';
 
-import { languageTag } from '$translations/runtime.js';
+import { getLocale as getParaglideLocale, locales } from '$translations/runtime.js';
 
 interface ConfigJson {
 	logoUrl: string;
@@ -20,22 +20,50 @@ let projectSetupStep: number | null = $state(null);
 let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
 let selectedTab: string = $state('map');
-let locale: string = $state(getLocalStorage('locale') ?? languageTag());
 let config: ConfigJson | null = $state(null);
 
 function getCommonStore() {
+	function getLocaleFromStorage() {
+		// Priority 1: localStorage (defined previously)
+		const storedLocale = getLocalStorage('locale');
+		if (storedLocale) {
+			setNewLocale(storedLocale);
+			return storedLocale;
+		}
+
+		// Priority 2: browser locale
+		// We don't differentiate US and UK English, but all others we want the variants (e.g. pt-BR)
+		const browserLocale = navigator.language.startsWith('en')
+			? navigator.language.trim().split(/-|_/)[0]
+			: navigator.language.trim();
+		if (browserLocale) {
+			setNewLocale(browserLocale);
+			return browserLocale;
+		}
+
+		// Priority 3: from paraglide
+		const fallbackLocale = getParaglideLocale();
+		setNewLocale(fallbackLocale);
+		return fallbackLocale;
+	}
+
+	function setNewLocale(newLocale: string) {
+		if (!locales.includes(newLocale)) {
+			console.warn(`Selected locale is not available: ${newLocale}. Setting to default 'en'.`);
+			newLocale = 'en';
+		}
+		setLocalStorage('locale', newLocale);
+	}
+
 	return {
 		get selectedTab() {
 			return selectedTab;
 		},
 		setSelectedTab: (tab: string) => (selectedTab = tab),
 		get locale() {
-			return locale;
+			return getLocaleFromStorage();
 		},
-		setLocale: (newLocale: string) => {
-			setLocalStorage('locale', newLocale);
-			locale = newLocale;
-		},
+		setLocale: setNewLocale,
 		get config() {
 			return config;
 		},

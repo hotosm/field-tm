@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { setLanguageTag, onSetLanguageTag, availableLanguageTags } from "$translations/runtime.js";
+	import { onMount, onDestroy } from 'svelte';
 	import type { SlDrawer, SlTooltip } from '@shoelace-style/shoelace';
 	// FIXME this is a workaround to re-import, as using sl-dropdown
 	// and sl-menu prevents selection of values!
@@ -8,8 +7,10 @@
 	import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
 	import '@shoelace-style/shoelace/dist/components/menu/menu.js';
 	import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
+	import type { SlSelectEvent } from '@shoelace-style/shoelace/dist/events';
 
-	import * as m from "$translations/messages.js";
+	import { setLocale as setParaglideLocale, locales } from "$translations/runtime.js";
+	import { m } from "$translations/messages.js";
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
@@ -29,11 +30,6 @@
 		+(projectSetupStepStore.projectSetupStep || 0) === projectSetupStepEnum['odk_project_load'],
 	);
 
-	// Trigger from paraglide-js, when the locale changes
-	onSetLanguageTag((newLocale: string) => {
-		commonStore.setLocale(newLocale);
-	});
-
 	const handleSignOut = async () => {
 		try {
 			await revokeCookies();
@@ -45,16 +41,23 @@
 		}
 	};
 
-	onMount(() => {
-		setLanguageTag(commonStore.locale);
+	const handleLocaleSelect = (event: SlSelectEvent) => {
+		const selectedItem = event.detail.item;
+		commonStore.setLocale(selectedItem.value);
+		setParaglideLocale(selectedItem.value) // paraglide function for UI changes (causes reload)
+	};
 
+	onMount(() => {
 		// Handle locale change
 		const container = document.querySelector('.locale-selection');
-		const dropdown = container.querySelector('sl-dropdown');
-		dropdown.addEventListener('sl-select', event => {
-			const selectedItem = event.detail.item;
-			setLanguageTag(selectedItem.value);
-		});
+		const dropdown = container?.querySelector('sl-dropdown');
+		dropdown?.addEventListener('sl-select', handleLocaleSelect);
+	});
+
+	onDestroy(() => {
+		const container = document.querySelector('.locale-selection');
+		const dropdown = container?.querySelector('sl-dropdown');
+		dropdown?.removeEventListener('sl-select', handleLocaleSelect);
 	});
 </script>
 
@@ -116,7 +119,7 @@
 				role="button"
 				tabindex="0"
 			>
-				<span class="font-barlow font-medium text-base">SIGN IN</span>
+				<span class="font-barlow font-medium text-base">{m['header.sign_in']()}</span>
 			</hot-button>
 		{/if}
 
@@ -166,7 +169,7 @@
 					<hot-icon name="translate"></hot-icon> {commonStore.locale}
 				</hot-button>
 				<sl-menu>
-					{#each availableLanguageTags as locale}
+					{#each locales as locale}
 						<sl-menu-item value={locale}>{locale}</sl-menu-item>
 					{/each}
 				</sl-menu>
@@ -194,7 +197,7 @@
 				role="button"
 				tabindex="0"
 			>
-			{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m.sign_out()}</span>{/key}
+			{#key commonStore.locale}<span class="font-barlow font-medium text-base">{m['header.sign_out']()}</span>{/key}
 			</hot-button>
 		{/if}
 	</div>

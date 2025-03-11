@@ -1,3 +1,5 @@
+import { m } from '$translations/messages.js';
+
 export enum task_split_type {
   DIVIDE_ON_SQUARE = 'DIVIDE_ON_SQUARE',
   CHOOSE_AREA_AS_TASK = 'CHOOSE_AREA_AS_TASK',
@@ -25,11 +27,11 @@ export enum task_state {
 }
 
 export enum task_state_labels {
-  UNLOCKED_TO_MAP = 'Ready',
-  LOCKED_FOR_MAPPING = 'Locked For Mapping',
-  UNLOCKED_TO_VALIDATE = 'Ready For Validation',
-  LOCKED_FOR_VALIDATION = 'Locked For Validation',
-  UNLOCKED_DONE = 'Validated',
+  UNLOCKED_TO_MAP = m['task_states.UNLOCKED_TO_MAP'](),
+  LOCKED_FOR_MAPPING = m['task_states.LOCKED_FOR_MAPPING'](),
+  UNLOCKED_TO_VALIDATE = m['task_states.UNLOCKED_TO_VALIDATE'](),
+  LOCKED_FOR_VALIDATION = m['task_states.LOCKED_FOR_VALIDATION'](),
+  UNLOCKED_DONE = m['task_states.UNLOCKED_DONE'](),
 }
 
 export enum entity_state {

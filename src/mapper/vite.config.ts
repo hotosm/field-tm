@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { paraglide } from '@inlang/paraglide-vite';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import UnoCSS from 'unocss/vite';
 import extractorSvelte from '@unocss/extractor-svelte';
 
@@ -49,7 +49,7 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA(pwaOptions),
-		paraglide({
+		paraglideVitePlugin({
 			project: './project.inlang',
 			outdir: './src/translations',
 		}),

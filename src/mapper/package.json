@@ -17,8 +17,7 @@
 		"test:unit": "vitest"
 	},
 	"devDependencies": {
-		"@inlang/paraglide-js": "^1.11.8",
-		"@inlang/paraglide-vite": "^1.3.5",
+		"@inlang/paraglide-js": "^2.0.0-beta.26",
 		"@playwright/test": "^1.49.0",
 		"@sveltejs/adapter-static": "^3.0.6",
 		"@sveltejs/kit": "^2.9.0",
