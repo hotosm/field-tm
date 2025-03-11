@@ -1,6 +1,7 @@
 import type { UUID } from 'crypto';
 import type { Polygon } from 'geojson';
 import type { MapGeomTypes } from '$constants/enums.ts';
+import { m } from '$translations/messages.js';
 
 export type ProjectTask = {
 	id: number;
@@ -61,11 +62,11 @@ export type TaskStatus = {
 	// ARCHIVED: string;
 };
 export const TaskStatusEnum: TaskStatus = Object.freeze({
-	UNLOCKED_TO_MAP: 'UNLOCKED_TO_MAP',
-	LOCKED_FOR_MAPPING: 'LOCKED_FOR_MAPPING',
-	UNLOCKED_TO_VALIDATE: 'UNLOCKED_TO_VALIDATE',
-	LOCKED_FOR_VALIDATION: 'LOCKED_FOR_VALIDATION',
-	UNLOCKED_DONE: 'UNLOCKED_DONE',
+	UNLOCKED_TO_MAP: m['task_states.UNLOCKED_TO_MAP'](),
+	LOCKED_FOR_MAPPING: m['task_states.LOCKED_FOR_MAPPING'](),
+	UNLOCKED_TO_VALIDATE: m['task_states.UNLOCKED_TO_VALIDATE'](),
+	LOCKED_FOR_VALIDATION: m['task_states.LOCKED_FOR_VALIDATION'](),
+	UNLOCKED_DONE: m['task_states.UNLOCKED_DONE'](),
 });
 
 export type TaskEvent = {
