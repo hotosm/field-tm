@@ -322,7 +322,6 @@ services:
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-somelongpassword}
       MINIO_VOLUMES: "/mnt/data"
       MINIO_BROWSER: ${MINIO_BROWSER:-off}
-      MINIO_CONSOLE_ADDRESS: ":9090"
     volumes:
       - fmtm_data:/mnt/data
     # ports:
