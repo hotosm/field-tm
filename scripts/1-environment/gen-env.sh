@@ -282,11 +282,8 @@ set_domains() {
     echo
     echo "$fmtm_domain --> $current_ip"
     echo "api.$fmtm_domain --> $current_ip"
-
-    if [ "$BRANCH_NAME" != "main" ]; then
-        echo "s3.$fmtm_domain --> $current_ip"
-        echo "odk.$fmtm_domain --> $current_ip"
-    fi
+    echo "s3.$fmtm_domain --> $current_ip"
+    echo "odk.$fmtm_domain --> $current_ip"
 
     echo
     read -erp "Once these DNS entries are set and valid, press ENTER to continue."

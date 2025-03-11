@@ -251,12 +251,13 @@ async def get_submission_photos(
             project.odkid, project.odk_form_id, submission_id
         )
 
-    # Iterate through and replace S3_ENDPOINT with S3_DOWNLOAD_ROOT,
-    # in case the S3 endpoint is containerised / local network
-    submission_photos = {
-        filename: url.replace(settings.S3_ENDPOINT, settings.S3_DOWNLOAD_ROOT)
-        for filename, url in submission_photos.items()
-    }
+    # For local dev only, we need to iterate through and replace S3_ENDPOINT
+    # with S3_DOWNLOAD_ROOT, due to internal docker name used for S3 URL
+    if settings.DEBUG:
+        submission_photos = {
+            filename: url.replace(settings.S3_ENDPOINT, settings.S3_DOWNLOAD_ROOT)
+            for filename, url in submission_photos.items()
+        }
 
     return submission_photos
 
