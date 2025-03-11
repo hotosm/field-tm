@@ -239,6 +239,12 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    healthcheck:
+      test: nc -z localhost 8383 || exit 1
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 15
 
   central-webhook:
     image: "ghcr.io/hotosm/central-webhook:${ODK_WEBHOOK_TAG:-0.1.0-rc}"
