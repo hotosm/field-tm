@@ -697,7 +697,8 @@ async def upload_custom_extract(
 ):
     """Upload a custom data extract geojson for a project.
 
-    Extract can be in geojson for flatgeobuf format.
+    The frontend has the option to upload flatgeobuf, but this must first
+    be deserialised to GeoJSON before upload here.
 
     Note the following properties are mandatory:
     - "id"
@@ -706,6 +707,8 @@ async def upload_custom_extract(
     - "version"
     - "changeset"
     - "timestamp"
+
+    If a property is missing, a defaults will be assigned.
 
     Extracts are best generated with https://export.hotosm.org for full compatibility.
 

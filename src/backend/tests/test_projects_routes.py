@@ -269,26 +269,6 @@ async def test_create_odk_project():
 
 async def test_upload_data_extracts(client, project):
     """Test uploading data extracts in GeoJSON and flatgeobuf formats."""
-    # Flatgeobuf
-    fgb_file = {
-        "custom_extract_file": (
-            "file.fgb",
-            open(f"{test_data_path}/data_extract_kathmandu.fgb", "rb"),
-        )
-    }
-    response = await client.post(
-        f"/projects/upload-custom-extract?project_id={project.id}",
-        files=fgb_file,
-    )
-
-    assert response.status_code == 200
-
-    response = await client.get(
-        f"/projects/data-extract-url?project_id={project.id}",
-    )
-    assert "url" in response.json()
-
-    # Geojson
     geojson_file = {
         "custom_extract_file": (
             "file.geojson",
@@ -306,13 +286,6 @@ async def test_upload_data_extracts(client, project):
         f"/projects/data-extract-url?project_id={project.id}",
     )
     assert "url" in response.json()
-
-    # TODO add extra handling for custom extras not in specific format
-    # TODO replace properties
-    # TODO fix loading extracts without standard structure
-    # data_extracts_file = f"{test_data_path}/building_footprint.zip"
-    # with zipfile.ZipFile(data_extracts_file, "r") as zip_archive:
-    #     data_extracts = zip_archive.read("building_foot_jnk.geojson")
 
 
 async def test_generate_project_files(db, client, project):
