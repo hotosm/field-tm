@@ -10,8 +10,6 @@
 	import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
 
 	import * as m from "$translations/messages.js";
-	import HotLogo from '$assets/images/hot-logo.svg';
-	import HotLogoText from '$assets/images/hot-logo-text.svg';
 	import Login from '$lib/components/login.svelte';
 	import { getLoginStore } from '$store/login.svelte.ts';
 	import { drawerItems as menuItems } from '$constants/drawerItems.ts';
@@ -62,8 +60,19 @@
 
 <div class="p-3 flex items-center justify-between font-barlow">
 	<div class="flex items-center gap-1">
-		<a href={window.location.origin}><img src={HotLogo} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" /></a>
-		<img src={HotLogoText} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" />
+		<a href={window.location.origin}><img src={commonStore.config?.logoUrl} alt="hot-logo" class="h-[2.2rem] sm:h-[3rem]" /></a>
+		<!-- The approach below is finicky - can loading the logo via CSS work nicely? -->
+		<!-- <a href={window.location.origin} 
+			class="inline-block flex h-[2.2rem] sm:h-[3rem] w-[2.2rem] sm:w-[3rem] bg-no-repeat bg-cover"
+			style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/45/Humanitarian_OpenStreetMap_Team_logo.svg');"
+			aria-label="Home"
+		></a> -->
+		<span
+			class="text-sm sm:text-base font-bold text-red-600 h-[2.2rem] sm:h-[3rem] max-w-[6rem] sm:max-w-[8rem] p-0 m-0 flex items-center justify-center leading-[1.1] sm:leading-[1.2] text-left"
+			style="color: var(--sl-color-primary-700); font-family: var(--sl-font-sans);"
+		>
+			{commonStore.config?.logoText}
+		</span>
 	</div>
 	<div class="flex items-center gap-4">
 		<!-- profile image and username display -->
@@ -116,7 +125,7 @@
 			<hot-icon
 				name="list"
 				class="!text-[1.8rem] text-[#52525B] leading-0 cursor-pointer hover:text-red-600 duration-200"
-				style={isFirstLoad ? 'background-color: var(--hot-color-yellow-300);' : ''}
+				style={isFirstLoad ? 'background-color: var(--sl-color-warning-300);' : ''}
 				onclick={() => {
 					drawerRef?.show();
 				}}
