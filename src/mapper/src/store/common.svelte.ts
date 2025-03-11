@@ -4,6 +4,12 @@ import { getBasemapList } from '$lib/utils/basemaps';
 
 import { languageTag } from '$translations/runtime.js';
 
+interface ConfigJson {
+	logoUrl: string;
+	logoText: string;
+	cssFile: string;
+}
+
 interface AlertDetails {
 	variant: 'success' | 'default' | 'warning' | 'danger';
 	message: string;
@@ -15,6 +21,7 @@ let projectBasemaps: Basemap[] = $state([]);
 let projectPmtilesUrl: string | null = $state(null);
 let selectedTab: string = $state('map');
 let locale: string = $state(getLocalStorage('locale') ?? languageTag());
+let config: ConfigJson | null = $state(null);
 
 function getCommonStore() {
 	return {
@@ -29,6 +36,10 @@ function getCommonStore() {
 			setLocalStorage('locale', newLocale);
 			locale = newLocale;
 		},
+		get config() {
+			return config;
+		},
+		setConfig: (fetchedConfig: ConfigJson) => (config = fetchedConfig),
 	};
 }
 
