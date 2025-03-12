@@ -98,7 +98,7 @@ jobs:
           API_REPLICAS: 1
         run: |
           # Migrate db first, so api works
-          docker compose up migrations --exit-code-from migrations
+          docker compose run --rm migrations 
 
           # Run without migrations (avoid exit code 0)
           # Also run within if block to capture logs if failure
