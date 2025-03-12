@@ -19,6 +19,23 @@ wait_for_db() {
     exit 1  # Exit with an error code
 }
 
+wait_for_s3() {
+    max_retries=6
+    retry_interval=10
+
+    for ((i = 0; i < max_retries; i++)); do
+        if curl --silent --head --fail -o /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}"; then
+            echo "S3 is available."
+            return 0  # S3 is available, exit successfully
+        fi
+        echo "S3 is not yet available. Retrying in ${retry_interval} seconds..."
+        sleep ${retry_interval}
+    done
+
+    echo "Timed out waiting for S3 to become available."
+    exit 1  # Exit with an error code
+}
+
 create_s3_buckets() {
     echo "Running init_s3_buckets.py script main function"
     python /opt/app/s3.py
@@ -26,6 +43,7 @@ create_s3_buckets() {
 
 # Start wait in background with tmp log files
 wait_for_db &
+wait_for_s3 &
 # Wait until checks complete
 wait
 

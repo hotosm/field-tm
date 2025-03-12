@@ -76,6 +76,23 @@ wait_for_db() {
     exit 1  # Exit with an error code
 }
 
+wait_for_s3() {
+    max_retries=6
+    retry_interval=10
+
+    for ((i = 0; i < max_retries; i++)); do
+        if curl --silent --head --fail -o /dev/null "${S3_ENDPOINT}/${S3_BUCKET_NAME}"; then
+            echo "S3 is available."
+            return 0  # S3 is available, exit successfully
+        fi
+        echo "S3 is not yet available. Retrying in ${retry_interval} seconds..."
+        sleep ${retry_interval}
+    done
+
+    echo "Timed out waiting for S3 to become available."
+    exit 1  # Exit with an error code
+}
+
 backup_db() {
     local db_host="$1"
     local db_user="$2"
@@ -121,6 +138,7 @@ while true; do
     pretty_echo "### Backup FMTM $(date +%Y-%m-%d_%H:%M:%S) ###"
     check_fmtm_db_vars_present
     wait_for_db "${FMTM_DB_HOST:-fmtm-db}"
+    wait_for_s3
     backup_db "${FMTM_DB_HOST:-fmtm-db}" "${FMTM_DB_USER:-fmtm}" \
         "${FMTM_DB_NAME:-fmtm}" "${FMTM_DB_PASSWORD}"
     pretty_echo "### Backup FMTM Complete ###"
