@@ -47,70 +47,9 @@ networks:
       config:
         - subnet: 10.20.30.0/24
 
-# Used for both bunkerweb proxy + scheduler (config) service
-x-proxy-env: &proxy-env # General
-  BUNKERWEB_INSTANCES: proxy:5000
-  LOG_LEVEL: notice
-  USE_BUNKERNET: no
-  DISABLE_DEFAULT_SERVER: yes
-  API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
-  # Avoid running ModSec rules on internal service calls
-  WHITELIST_IP: 10.20.30.0/24
-  WHITELIST_URI: https://stage.fmtm.hotosm.org
-  MULTISITE: yes
-  USE_REVERSE_PROXY: yes
-  # Required for electric headers electric-offset, electric-handle, electric-schema
-  KEEP_UPSTREAM_HEADERS: yes
-  REVERSE_PROXY_INTERCEPT_ERRORS: no
-  ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
-  USE_REAL_IP: yes
-  SERVE_FILES: yes
-  USE_BACKUP: no
-  USE_METRICS: no
-  # USE_ANTIBOT: yes
-  USE_LIMIT_CONN: yes
-  USE_BAD_BEHAVIOR: no
-  USE_LIMIT_REQ: yes
-  USE_MODSECURITY: yes
-  USE_GZIP: yes
-  # On client, brotli is preferred over gzip if both are enabled
-  USE_BROTLI: yes
-  # For OpenTelemetry (Allow-Headers are what the browser can include in the REQUEST headers)
-  CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate"
-  AUTO_LETS_ENCRYPT: yes
-  EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
-  # USE_LETS_ENCRYPT_STAGING: yes
-  # Reverse proxy configs
-  SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
-  # We need this to allow for client-side routing in the SPA (from index.html)
-  stage.fmtm.hotosm.org_ERRORS: 404=/index.html
-  mapper.stage.fmtm.hotosm.org_ERRORS: 404=/index.html
-  api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
-  api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-  # Increase timeout slightly for long project creation requests
-  api.stage.fmtm.hotosm.org_REVERSE_PROXY_READ_TIMEOUT: 90s
-  s3.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
-  s3.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
-  # CORS must be enabled for Minio to work
-  s3.stage.fmtm.hotosm.org_USE_CORS: yes
-  s3.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://stage.fmtm.hotosm.org
-  sync.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
-  sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-  # CORS must be enabled for Electric to work
-  sync.stage.fmtm.hotosm.org_USE_CORS: yes
-  sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.stage.fmtm.hotosm.org
-  sync.stage.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
-  # Expose-Headers are RESPONSE headers the browser is allowed to access
-  sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
-  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
-  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
-  # buffer requests, but not responses, so streaming out works
-  odk.stage.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
-  odk.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
-
 services:
   proxy:
-    image: "ghcr.io/bunkerity/bunkerweb:${BUNKERWEB_TAG:-1.6.0}"
+    image: "bunkerity/bunkerweb-all-in-one:${BUNKERWEB_TAG:-dev}"
     depends_on:
       # Frontends must be built and available first
       ui:
@@ -123,19 +62,72 @@ services:
       - fmtm_frontend:/var/www/html/stage.fmtm.hotosm.org:ro
       - fmtm_mapper_frontend:/var/www/html/mapper.stage.fmtm.hotosm.org:ro
       - central_frontend:/var/www/html/odk.stage.fmtm.hotosm.org:ro
-    environment: *proxy-env
+    environment:
+      # General
+      BUNKERWEB_INSTANCES: proxy:5000
+      LOG_LEVEL: notice
+      USE_BUNKERNET: no
+      DISABLE_DEFAULT_SERVER: yes
+      API_WHITELIST_IP: 127.0.0.0/8 10.20.30.0/24
+      # Avoid running ModSec rules on internal service calls
+      WHITELIST_IP: 10.20.30.0/24
+      WHITELIST_URI: https://stage.fmtm.hotosm.org
+      MULTISITE: yes
+      USE_REVERSE_PROXY: yes
+      # Required for electric headers electric-offset, electric-handle, electric-schema
+      KEEP_UPSTREAM_HEADERS: yes
+      REVERSE_PROXY_INTERCEPT_ERRORS: no
+      ALLOWED_METHODS: OPTIONS|HEAD|GET|POST|PATCH|PUT|DELETE
+      USE_REAL_IP: yes
+      SERVE_FILES: yes
+      USE_BACKUP: no
+      USE_METRICS: no
+      # USE_ANTIBOT: yes
+      USE_LIMIT_CONN: yes
+      USE_BAD_BEHAVIOR: no
+      USE_LIMIT_REQ: yes
+      USE_MODSECURITY: yes
+      USE_GZIP: yes
+      # On client, brotli is preferred over gzip if both are enabled
+      USE_BROTLI: yes
+      # For OpenTelemetry (Allow-Headers are what the browser can include in the REQUEST headers)
+      CUSTOM_HEADER: "Access-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,traceparent,tracestate"
+      AUTO_LETS_ENCRYPT: yes
+      EMAIL_LETS_ENCRYPT: ${CERT_EMAIL}
+      # USE_LETS_ENCRYPT_STAGING: yes
+      # Reverse proxy configs
+      SERVER_NAME: stage.fmtm.hotosm.org mapper.stage.fmtm.hotosm.org api.stage.fmtm.hotosm.org s3.stage.fmtm.hotosm.org sync.stage.fmtm.hotosm.org odk.stage.fmtm.hotosm.org
+      # We need this to allow for client-side routing in the SPA (from index.html)
+      stage.fmtm.hotosm.org_ERRORS: 404=/index.html
+      mapper.stage.fmtm.hotosm.org_ERRORS: 404=/index.html
+      api.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://api:8000
+      api.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      # Increase timeout slightly for long project creation requests
+      api.stage.fmtm.hotosm.org_REVERSE_PROXY_READ_TIMEOUT: 90s
+      s3.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://s3:9000
+      s3.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 10G
+      # CORS must be enabled for Minio to work
+      s3.stage.fmtm.hotosm.org_USE_CORS: yes
+      s3.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://stage.fmtm.hotosm.org
+      sync.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://electric:3000
+      sync.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
+      # CORS must be enabled for Electric to work
+      sync.stage.fmtm.hotosm.org_USE_CORS: yes
+      sync.stage.fmtm.hotosm.org_CORS_ALLOW_ORIGIN: https://mapper.stage.fmtm.hotosm.org
+      sync.stage.fmtm.hotosm.org_CORS_ALLOW_METHODS: GET, HEAD, DELETE, OPTIONS
+      # Expose-Headers are RESPONSE headers the browser is allowed to access
+      sync.stage.fmtm.hotosm.org_CORS_EXPOSE_HEADERS: electric-offset,electric-handle,electric-schema
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_HOST: http://central:8383
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_URL: ~ ^/v\d
+      # buffer requests, but not responses, so streaming out works
+      odk.stage.fmtm.hotosm.org_REVERSE_PROXY_BUFFERING: no
+      odk.stage.fmtm.hotosm.org_MAX_CLIENT_SIZE: 1G
     ports:
       - 80:8080
       - 443:8443
     networks:
       - fmtm-net
     restart: "unless-stopped"
-
-  proxy-setup:
-    extends:
-      file: compose.development.yaml
-      service: proxy-setup
-    environment: *proxy-env
 
   api:
     extends:
@@ -189,6 +181,8 @@ services:
   backups:
     image: "ghcr.io/hotosm/fmtm/backend:${GIT_BRANCH}"
     depends_on:
+      proxy:
+        condition: service_healthy
       fmtm-db:
         condition: service_healthy
       central-db:
