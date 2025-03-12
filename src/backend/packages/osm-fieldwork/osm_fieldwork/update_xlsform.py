@@ -329,7 +329,7 @@ async def append_mandatory_fields(
 
     # Extract existing form id if present, else set to random uuid
     if "form_id" in custom_sheets["settings"]:
-        xform_id = custom_sheets["settings"]["form_id"]
+        xform_id = custom_sheets["settings"]["form_id"].iloc[0]
         log.debug(f"Extracted existing form_id field: {xform_id}")
     else:
         xform_id = str(uuid4())
