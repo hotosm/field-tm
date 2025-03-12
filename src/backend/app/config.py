@@ -245,9 +245,9 @@ class Settings(BaseSettings):
     OSM_SCOPE: list[str] = ["read_prefs", "send_messages"]
     OSM_LOGIN_REDIRECT_URI: str = "http://127.0.0.1:7051/osmauth"
 
-    S3_ENDPOINT: str = "http://s3:9000"
-    S3_ACCESS_KEY: Optional[str] = ""
-    S3_SECRET_KEY: Optional[SecretStr] = ""
+    S3_ENDPOINT: str
+    S3_ACCESS_KEY: str
+    S3_SECRET_KEY: SecretStr
     S3_BUCKET_NAME: str = "fmtm-data"
     S3_DOWNLOAD_ROOT: Optional[str] = None
 
