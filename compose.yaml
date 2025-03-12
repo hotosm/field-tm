@@ -262,6 +262,12 @@ services:
     networks:
       - fmtm-net
     restart: "unless-stopped"
+    healthcheck:
+      test: nc -z localhost 8383 || exit 1
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   pyxform:
     image: "ghcr.io/getodk/pyxform-http:v3.0.0"
