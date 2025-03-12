@@ -1,15 +1,19 @@
 # FIXME is an automated publishing flow a bit over-complex for the monorepo setup?
 # FIXME Is it even useful if we just publish manually periodically when stable?
 
-# name: 🚩 Publish osm-fieldwork
+name: 🚩 Publish osm-fieldwork
 
-# on:
-#   release:
-#     types: [published]
-#   # Allow manual trigger (workflow_dispatch)
-#   workflow_dispatch:
+on:
+  #   release:
+  #     types: [published]
+  # Allow manual trigger (workflow_dispatch)
+  workflow_dispatch:
 
-# jobs:
+jobs:
+  do_nothing:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hello
 #   publish_to_pypi:
 #     uses: hotosm/gh-workflows/.github/workflows/pypi_publish.yml@2.0.5
 #     secrets:
